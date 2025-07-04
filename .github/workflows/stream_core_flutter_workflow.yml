@@ -43,9 +43,6 @@ jobs:
           flutter pub global activate remove_from_coverage
 
       - name: Bootstrap Workspace
-        run: melos postclean
-
-      - name: Bootstrap Workspace
         run: melos bootstrap --verbose
 
       - name: Prepare environment
