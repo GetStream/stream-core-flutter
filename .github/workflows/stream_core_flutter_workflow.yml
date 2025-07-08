@@ -2,7 +2,6 @@ name: stream_core_flutter_workflow
 
 env:
   FLUTTER_CHANNEL: stable
-  FLUTTER_VERSION: 3.29.0
   ENV_PROPERTIES: ${{ secrets.ENV_PROPERTIES }}
 
 on:
@@ -34,8 +33,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
           channel: ${{ env.FLUTTER_CHANNEL }}
-          flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: Install Tools
         run: |
@@ -45,15 +44,9 @@ jobs:
       - name: Bootstrap Workspace
         run: melos bootstrap --verbose
 
-      - name: Prepare environment
-        run: |
-          echo "${{ env.ENV_PROPERTIES }}" > .env &&
-          melos run generate:all
-
-        # TODO: Treat info and warning as error once all packages solve their issues.
       - name: Dart Analyze
         run: |
-          melos run analyze:warning
+          melos run analyze
 
       - name: Check formatting
         run: |
