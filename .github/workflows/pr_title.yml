@@ -20,10 +20,7 @@ jobs:
         with: 
           scopes: |
             llc
-            ui
-            doc
             repo
-            samples
           requireScope: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
