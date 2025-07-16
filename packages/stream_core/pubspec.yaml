@@ -5,15 +5,12 @@ repository: https://github.com/GetStream/stream-core-flutter
 publish_to: none # Delete when ready to publish
 
 environment:
-  sdk: ^3.7.2
-  flutter: ">=1.17.0"
+  sdk: ^3.6.2
 
 dependencies:
-  flutter:
-    sdk: flutter
+  equatable: ^2.0.7
+  rxdart: ^0.28.0
+  web_socket_channel: ^3.0.1
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-flutter:
+  test: ^1.26.2

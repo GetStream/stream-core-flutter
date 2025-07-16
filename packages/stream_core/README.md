@@ -23,3 +23,6 @@ This package is **not designed for direct use by customers**. It acts as the fou
 ## ⚠️ Versioning Notice
 
 This library does follow semantic versioning. Breaking changes may be introduced at any time without warning. We reserve the right to refactor or remove functionality without deprecation periods. However, as all our products need to depend on the same version of the core packages we want to limit breaking changes as much as possible.
+
+## Detailed docs
+* [Websocket](./docs/web_socket.md)
