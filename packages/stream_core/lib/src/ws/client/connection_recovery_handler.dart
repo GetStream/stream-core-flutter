@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:meta/meta.dart';
+
 import '../../utils/network_monitor.dart';
 import 'web_socket_client.dart';
 import 'web_socket_connection_state.dart';
@@ -11,44 +13,26 @@ abstract class AutomaticReconnectionPolicy {
 
 class ConnectionRecoveryHandler {
   ConnectionRecoveryHandler({
-    RetryStrategy? retryStrategy,
+    required this.retryStrategy,
     required this.client,
-    this.networkMonitor,
-  }) {
-    this.retryStrategy = retryStrategy ?? DefaultRetryStrategy();
-
-    policies = <AutomaticReconnectionPolicy>[
-      WebSocketAutomaticReconnectionPolicy(client: client),
-      if (networkMonitor case final networkMonitor?)
-        InternetAvailableReconnectionPolicy(
-          networkMonitor: networkMonitor,
-        ),
-    ];
-
-    _subscribe();
-  }
-
-  Future<void> dispose() async {
-    await Future.wait(
-        subscriptions.map((subscription) => subscription.cancel()));
-    subscriptions.clear();
-    _cancelReconnectionTimer();
-  }
+    required this.policies,
+  });
 
   final WebSocketClient client;
-  final NetworkMonitor? networkMonitor;
-  late final List<AutomaticReconnectionPolicy> policies;
-  List<StreamSubscription> subscriptions = [];
-  late final RetryStrategy retryStrategy;
+  final List<AutomaticReconnectionPolicy> policies;
+  List<StreamSubscription<dynamic>> subscriptions = [];
+  final RetryStrategy retryStrategy;
   Timer? _reconnectionTimer;
 
-  void _reconnectIfNeeded() {
+  @protected
+  void reconnectIfNeeded() {
     if (!_canReconnectAutomatically()) return;
 
     client.connect();
   }
 
-  void _disconnectIfNeeded() {
+  @protected
+  void disconnectIfNeeded() {
     final canBeDisconnected = switch (client.connectionState) {
       Connecting() || Connected() || Authenticating() => true,
       _ => false,
@@ -60,15 +44,17 @@ class ConnectionRecoveryHandler {
     }
   }
 
-  void _scheduleReconnectionTimerIfNeeded() {
+  @protected
+  void scheduleReconnectionTimerIfNeeded() {
     if (!_canReconnectAutomatically()) return;
 
     final delay = retryStrategy.getDelayAfterFailure();
     print('Scheduling reconnection in ${delay.inSeconds} seconds');
-    _reconnectionTimer = Timer(delay, _reconnectIfNeeded);
+    _reconnectionTimer = Timer(delay, reconnectIfNeeded);
   }
 
-  void _cancelReconnectionTimer() {
+  @protected
+  void cancelReconnectionTimer() {
     if (_reconnectionTimer == null) return;
 
     print('Cancelling reconnection timer');
@@ -76,35 +62,11 @@ class ConnectionRecoveryHandler {
     _reconnectionTimer = null;
   }
 
-  void _subscribe() {
-    subscriptions.add(
-        client.connectionStateStream.listen(_websocketConnectionStateChanged));
-    if (networkMonitor case final networkMonitor?) {
-      subscriptions
-          .add(networkMonitor.onStatusChange.listen(_networkStatusChanged));
-    }
-  }
-
-  void _networkStatusChanged(NetworkStatus status) {
-    if (status == NetworkStatus.connected) {
-      _disconnectIfNeeded();
-    } else {
-      _reconnectIfNeeded();
-    }
-  }
-
-  void _websocketConnectionStateChanged(WebSocketConnectionState state) {
-    switch (state) {
-      case Connecting():
-        _cancelReconnectionTimer();
-      case Connected():
-        retryStrategy.resetConsecutiveFailures();
-      case Disconnected():
-        _scheduleReconnectionTimerIfNeeded();
-      case Initialized() || Authenticating() || Disconnecting():
-        // Don't do anything
-        break;
-    }
+  Future<void> dispose() async {
+    await Future.wait(
+        subscriptions.map((subscription) => subscription.cancel()));
+    subscriptions.clear();
+    cancelReconnectionTimer();
   }
 
   bool _canReconnectAutomatically() =>

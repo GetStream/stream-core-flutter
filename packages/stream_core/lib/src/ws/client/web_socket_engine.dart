@@ -112,7 +112,7 @@ class URLSessionWebSocketEngine implements WebSocketEngine {
   @override
   void send({required SendableEvent message}) {
     print('[send] hasWS: ${_ws != null}');
-    _ws?.sink.add(message);
+    _ws?.sink.add(message.toSerializedData());
   }
 
   @override
