@@ -24,5 +24,5 @@ Map<String, dynamic> _$WsAuthMessageRequestToJson(
     <String, dynamic>{
       'products': instance.products,
       'token': instance.token,
-      'user_details': instance.userDetails,
+      'user_details': instance.userDetails?.toJson(),
     };

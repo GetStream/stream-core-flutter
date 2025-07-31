@@ -17,8 +17,6 @@ class WsAuthMessageRequest implements SendableEvent {
 
   final List<String>? products;
   final String token;
-
-  @JsonKey(name: 'user_details')
   final ConnectUserDetailsRequest? userDetails;
 
   Map<String, dynamic> toJson() => _$WsAuthMessageRequestToJson(this);

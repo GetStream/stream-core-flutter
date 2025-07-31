@@ -14,6 +14,7 @@ ConnectUserDetailsRequest _$ConnectUserDetailsRequestFromJson(
       invisible: json['invisible'] as bool?,
       language: json['language'] as String?,
       name: json['name'] as String?,
+      customData: json['custom_data'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$ConnectUserDetailsRequestToJson(
@@ -24,4 +25,5 @@ Map<String, dynamic> _$ConnectUserDetailsRequestToJson(
       'invisible': instance.invisible,
       'language': instance.language,
       'name': instance.name,
+      'custom_data': instance.customData,
     };
