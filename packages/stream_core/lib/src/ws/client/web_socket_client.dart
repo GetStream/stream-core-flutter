@@ -81,6 +81,12 @@ class WebSocketClient implements WebSocketEngineListener, WebSocketPingClient {
 
     engine.disconnect(code.code, source.toString());
   }
+
+  void dispose() {
+    pingController.dispose();
+    _connectionStateStreamController.close();
+    _events.close();
+  }
   //#endregion
 
   //#region WebSocketEngineListener

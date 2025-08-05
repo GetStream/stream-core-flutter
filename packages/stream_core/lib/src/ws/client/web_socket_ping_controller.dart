@@ -59,6 +59,11 @@ class WebSocketPingController {
   void _cancelPongTimeoutTimer() {
     _pongTimeoutTimer?.cancel();
   }
+
+  void dispose() {
+    _pongTimeoutTimer?.cancel();
+    _pingTimer?.cancel();
+  }
 }
 
 abstract interface class WebSocketPingClient {
