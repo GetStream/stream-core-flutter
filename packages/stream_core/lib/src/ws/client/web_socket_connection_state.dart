@@ -2,8 +2,6 @@ import 'package:equatable/equatable.dart';
 
 import '../../errors/client_exception.dart';
 import '../events/ws_event.dart';
-import 'web_socket_client.dart';
-import 'web_socket_engine.dart';
 import 'web_socket_ping_controller.dart';
 
 /// A web socket connection state.
@@ -162,4 +160,3 @@ final class NoPongReceived extends DisconnectionSource {
   /// [WebSocketPingController] didn't get a pong response.
   const NoPongReceived();
 }
-

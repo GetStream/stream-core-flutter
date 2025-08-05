@@ -37,3 +37,18 @@ final class HealthCheckInfo extends Equatable {
   @override
   List<Object?> get props => [connectionId, participantCount];
 }
+
+final class WsErrorEvent extends WsEvent {
+  const WsErrorEvent({
+    required this.error,
+    required this.message,
+  });
+
+  final Object message;
+
+  @override
+  final Object error;
+
+  @override
+  List<Object?> get props => [error, message];
+}

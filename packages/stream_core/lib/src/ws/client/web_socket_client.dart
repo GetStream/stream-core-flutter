@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import '../../errors/client_exception.dart';
 import '../../utils/shared_emitter.dart';
 import '../events/sendable_event.dart';
@@ -37,6 +35,7 @@ class WebSocketClient implements WebSocketEngineListener, WebSocketPingClient {
   SharedEmitter<WsEvent> get events => _events;
   final _events = MutableSharedEmitterImpl<WsEvent>();
 
+  String? get connectionId => _connectionId;
   String? _connectionId;
 
   WebSocketClient({
@@ -53,6 +52,11 @@ class WebSocketClient implements WebSocketEngineListener, WebSocketPingClient {
     );
 
     pingController = environment.createPingController(client: this);
+  }
+
+  @override
+  void send(SendableEvent message) {
+    engine.send(message: message);
   }
 
   //#region Connection
@@ -76,6 +80,12 @@ class WebSocketClient implements WebSocketEngineListener, WebSocketPingClient {
     );
 
     engine.disconnect(code.code, source.toString());
+  }
+
+  void dispose() {
+    pingController.dispose();
+    _connectionStateStreamController.close();
+    _events.close();
   }
   //#endregion
 
