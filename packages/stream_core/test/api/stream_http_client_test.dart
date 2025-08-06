@@ -84,14 +84,17 @@ void main() {
 
   test('UserAgentInterceptor should be added', () {
     const apiKey = 'api-key';
-    final client = CoreHttpClient(apiKey,
-        systemEnvironmentManager: systemEnvironmentManager,);
+    final client = CoreHttpClient(
+      apiKey,
+      systemEnvironmentManager: systemEnvironmentManager,
+    );
 
     expect(
-        client.httpClient.interceptors
-            .whereType<AdditionalHeadersInterceptor>()
-            .length,
-        1,);
+      client.httpClient.interceptors
+          .whereType<AdditionalHeadersInterceptor>()
+          .length,
+      1,
+    );
   });
 
   test('AuthInterceptor should be added if tokenManager is provided', () {
@@ -103,7 +106,9 @@ void main() {
     );
 
     expect(
-        client.httpClient.interceptors.whereType<AuthInterceptor>().length, 1,);
+      client.httpClient.interceptors.whereType<AuthInterceptor>().length,
+      1,
+    );
   });
 
   test(
@@ -203,10 +208,12 @@ void main() {
     );
 
     const path = 'test-get-api-path';
-    when(() => dio.get(
-          path,
-          options: any(named: 'options'),
-        ),).thenAnswer((_) async => successResponse(path));
+    when(
+      () => dio.get(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).thenAnswer((_) async => successResponse(path));
 
     final res = await client.get(path);
 
@@ -214,17 +221,22 @@ void main() {
     expect(res.statusCode, 200);
     expect(res.requestOptions.path, path);
 
-    verify(() => dio.get(
-          path,
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.get(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
   test('`.get` should throw an instance of `ClientException`', () async {
     final dio = MockDio();
-    final client = CoreHttpClient('api-key',
-        systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+    final client = CoreHttpClient(
+      'api-key',
+      systemEnvironmentManager: systemEnvironmentManager,
+      dio: dio,
+    );
 
     const path = 'test-get-api-path';
     final error = throwableError(
@@ -245,10 +257,12 @@ void main() {
       expect(e, isA<ClientException>());
     }
 
-    verify(() => dio.get(
-          path,
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.get(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
@@ -261,10 +275,12 @@ void main() {
     );
 
     const path = 'test-post-api-path';
-    when(() => dio.post(
-          path,
-          options: any(named: 'options'),
-        ),).thenAnswer((_) async => successResponse(path));
+    when(
+      () => dio.post(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).thenAnswer((_) async => successResponse(path));
 
     final res = await client.post(path);
 
@@ -272,10 +288,12 @@ void main() {
     expect(res.statusCode, 200);
     expect(res.requestOptions.path, path);
 
-    verify(() => dio.post(
-          path,
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.post(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
@@ -283,18 +301,23 @@ void main() {
     '`.post` should throw an instance of `ClientException`',
     () async {
       final dio = MockDio();
-      final client = CoreHttpClient('api-key',
-          systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+      final client = CoreHttpClient(
+        'api-key',
+        systemEnvironmentManager: systemEnvironmentManager,
+        dio: dio,
+      );
 
       const path = 'test-post-api-path';
       final error = throwableError(
         path,
         error: ClientException(error: _createStreamApiError()),
       );
-      when(() => dio.post(
-            path,
-            options: any(named: 'options'),
-          ),).thenThrow(error);
+      when(
+        () => dio.post(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(error);
 
       try {
         await client.post(path);
@@ -303,24 +326,31 @@ void main() {
         expect(e, isA<ClientException>());
       }
 
-      verify(() => dio.post(
-            path,
-            options: any(named: 'options'),
-          ),).called(1);
+      verify(
+        () => dio.post(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).called(1);
       verifyNoMoreInteractions(dio);
     },
   );
 
   test('`.delete` should return response successfully', () async {
     final dio = MockDio();
-    final client = CoreHttpClient('api-key',
-        systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+    final client = CoreHttpClient(
+      'api-key',
+      systemEnvironmentManager: systemEnvironmentManager,
+      dio: dio,
+    );
 
     const path = 'test-delete-api-path';
-    when(() => dio.delete(
-          path,
-          options: any(named: 'options'),
-        ),).thenAnswer((_) async => successResponse(path));
+    when(
+      () => dio.delete(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).thenAnswer((_) async => successResponse(path));
 
     final res = await client.delete(path);
 
@@ -328,10 +358,12 @@ void main() {
     expect(res.statusCode, 200);
     expect(res.requestOptions.path, path);
 
-    verify(() => dio.delete(
-          path,
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.delete(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
@@ -339,18 +371,23 @@ void main() {
     '`.delete` should throw an instance of `ClientException`',
     () async {
       final dio = MockDio();
-      final client = CoreHttpClient('api-key',
-          systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+      final client = CoreHttpClient(
+        'api-key',
+        systemEnvironmentManager: systemEnvironmentManager,
+        dio: dio,
+      );
 
       const path = 'test-delete-api-path';
       final error = throwableError(
         path,
         error: ClientException(error: _createStreamApiError()),
       );
-      when(() => dio.delete(
-            path,
-            options: any(named: 'options'),
-          ),).thenThrow(error);
+      when(
+        () => dio.delete(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(error);
 
       try {
         await client.delete(path);
@@ -359,24 +396,31 @@ void main() {
         expect(e, isA<ClientException>());
       }
 
-      verify(() => dio.delete(
-            path,
-            options: any(named: 'options'),
-          ),).called(1);
+      verify(
+        () => dio.delete(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).called(1);
       verifyNoMoreInteractions(dio);
     },
   );
 
   test('`.patch` should return response successfully', () async {
     final dio = MockDio();
-    final client = CoreHttpClient('api-key',
-        systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+    final client = CoreHttpClient(
+      'api-key',
+      systemEnvironmentManager: systemEnvironmentManager,
+      dio: dio,
+    );
 
     const path = 'test-patch-api-path';
-    when(() => dio.patch(
-          path,
-          options: any(named: 'options'),
-        ),).thenAnswer((_) async => successResponse(path));
+    when(
+      () => dio.patch(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).thenAnswer((_) async => successResponse(path));
 
     final res = await client.patch(path);
 
@@ -384,10 +428,12 @@ void main() {
     expect(res.statusCode, 200);
     expect(res.requestOptions.path, path);
 
-    verify(() => dio.patch(
-          path,
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.patch(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
@@ -395,18 +441,23 @@ void main() {
     '`.patch` should throw an instance of `ClientException`',
     () async {
       final dio = MockDio();
-      final client = CoreHttpClient('api-key',
-          systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+      final client = CoreHttpClient(
+        'api-key',
+        systemEnvironmentManager: systemEnvironmentManager,
+        dio: dio,
+      );
 
       const path = 'test-patch-api-path';
       final error = throwableError(
         path,
         error: ClientException(error: _createStreamApiError()),
       );
-      when(() => dio.patch(
-            path,
-            options: any(named: 'options'),
-          ),).thenThrow(error);
+      when(
+        () => dio.patch(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(error);
 
       try {
         await client.patch(path);
@@ -415,24 +466,31 @@ void main() {
         expect(e, isA<ClientException>());
       }
 
-      verify(() => dio.patch(
-            path,
-            options: any(named: 'options'),
-          ),).called(1);
+      verify(
+        () => dio.patch(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).called(1);
       verifyNoMoreInteractions(dio);
     },
   );
 
   test('`.put` should return response successfully', () async {
     final dio = MockDio();
-    final client = CoreHttpClient('api-key',
-        systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+    final client = CoreHttpClient(
+      'api-key',
+      systemEnvironmentManager: systemEnvironmentManager,
+      dio: dio,
+    );
 
     const path = 'test-put-api-path';
-    when(() => dio.put(
-          path,
-          options: any(named: 'options'),
-        ),).thenAnswer((_) async => successResponse(path));
+    when(
+      () => dio.put(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).thenAnswer((_) async => successResponse(path));
 
     final res = await client.put(path);
 
@@ -440,10 +498,12 @@ void main() {
     expect(res.statusCode, 200);
     expect(res.requestOptions.path, path);
 
-    verify(() => dio.put(
-          path,
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.put(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
@@ -451,18 +511,23 @@ void main() {
     '`.put` should throw an instance of `ClientException`',
     () async {
       final dio = MockDio();
-      final client = CoreHttpClient('api-key',
-          systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+      final client = CoreHttpClient(
+        'api-key',
+        systemEnvironmentManager: systemEnvironmentManager,
+        dio: dio,
+      );
 
       const path = 'test-put-api-path';
       final error = throwableError(
         path,
         error: ClientException(error: _createStreamApiError()),
       );
-      when(() => dio.put(
-            path,
-            options: any(named: 'options'),
-          ),).thenThrow(error);
+      when(
+        () => dio.put(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(error);
 
       try {
         await client.put(path);
@@ -471,27 +536,34 @@ void main() {
         expect(e, isA<ClientException>());
       }
 
-      verify(() => dio.put(
-            path,
-            options: any(named: 'options'),
-          ),).called(1);
+      verify(
+        () => dio.put(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).called(1);
       verifyNoMoreInteractions(dio);
     },
   );
 
   test('`.postFile` should return response successfully', () async {
     final dio = MockDio();
-    final client = CoreHttpClient('api-key',
-        systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+    final client = CoreHttpClient(
+      'api-key',
+      systemEnvironmentManager: systemEnvironmentManager,
+      dio: dio,
+    );
 
     const path = 'test-delete-api-path';
     final file = MultipartFile.fromBytes([]);
 
-    when(() => dio.post(
-          path,
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        ),).thenAnswer((_) async => successResponse(path));
+    when(
+      () => dio.post(
+        path,
+        data: any(named: 'data'),
+        options: any(named: 'options'),
+      ),
+    ).thenAnswer((_) async => successResponse(path));
 
     final res = await client.postFile(path, file);
 
@@ -499,11 +571,13 @@ void main() {
     expect(res.statusCode, 200);
     expect(res.requestOptions.path, path);
 
-    verify(() => dio.post(
-          path,
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.post(
+        path,
+        data: any(named: 'data'),
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
@@ -511,8 +585,11 @@ void main() {
     '`.postFile` should throw an instance of `ClientException`',
     () async {
       final dio = MockDio();
-      final client = CoreHttpClient('api-key',
-          systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+      final client = CoreHttpClient(
+        'api-key',
+        systemEnvironmentManager: systemEnvironmentManager,
+        dio: dio,
+      );
 
       const path = 'test-post-file-api-path';
       final file = MultipartFile.fromBytes([]);
@@ -521,11 +598,13 @@ void main() {
         path,
         error: ClientException(error: _createStreamApiError()),
       );
-      when(() => dio.post(
-            path,
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          ),).thenThrow(error);
+      when(
+        () => dio.post(
+          path,
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(error);
 
       try {
         await client.postFile(path, file);
@@ -534,25 +613,32 @@ void main() {
         expect(e, isA<ClientException>());
       }
 
-      verify(() => dio.post(
-            path,
-            data: any(named: 'data'),
-            options: any(named: 'options'),
-          ),).called(1);
+      verify(
+        () => dio.post(
+          path,
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).called(1);
       verifyNoMoreInteractions(dio);
     },
   );
 
   test('`.request` should return response successfully', () async {
     final dio = MockDio();
-    final client = CoreHttpClient('api-key',
-        systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+    final client = CoreHttpClient(
+      'api-key',
+      systemEnvironmentManager: systemEnvironmentManager,
+      dio: dio,
+    );
 
     const path = 'test-request-api-path';
-    when(() => dio.request(
-          path,
-          options: any(named: 'options'),
-        ),).thenAnswer((_) async => successResponse(path));
+    when(
+      () => dio.request(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).thenAnswer((_) async => successResponse(path));
 
     final res = await client.request(path);
 
@@ -560,10 +646,12 @@ void main() {
     expect(res.statusCode, 200);
     expect(res.requestOptions.path, path);
 
-    verify(() => dio.request(
-          path,
-          options: any(named: 'options'),
-        ),).called(1);
+    verify(
+      () => dio.request(
+        path,
+        options: any(named: 'options'),
+      ),
+    ).called(1);
     verifyNoMoreInteractions(dio);
   });
 
@@ -571,8 +659,11 @@ void main() {
     '`.request` should throw an instance of `ClientException`',
     () async {
       final dio = MockDio();
-      final client = CoreHttpClient('api-key',
-          systemEnvironmentManager: systemEnvironmentManager, dio: dio,);
+      final client = CoreHttpClient(
+        'api-key',
+        systemEnvironmentManager: systemEnvironmentManager,
+        dio: dio,
+      );
 
       const path = 'test-put-api-path';
       final error = throwableError(
@@ -594,10 +685,12 @@ void main() {
         expect(e, isA<ClientException>());
       }
 
-      verify(() => dio.request(
-            path,
-            options: any(named: 'options'),
-          ),).called(1);
+      verify(
+        () => dio.request(
+          path,
+          options: any(named: 'options'),
+        ),
+      ).called(1);
       verifyNoMoreInteractions(dio);
     },
   );

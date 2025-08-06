@@ -7,7 +7,6 @@ import 'web_socket_engine.dart';
 import 'web_socket_ping_controller.dart';
 
 class WebSocketClient implements WebSocketEngineListener, WebSocketPingClient {
-
   WebSocketClient({
     required String url,
     required this.eventDecoder,

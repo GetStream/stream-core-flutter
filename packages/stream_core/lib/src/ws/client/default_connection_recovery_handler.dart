@@ -63,6 +63,7 @@ mixin WebSocketAwareConnectionRecoveryHandler on ConnectionRecoveryHandler {
 
   void subscribeToWebSocketConnectionChanges() {
     subscriptions.add(
-        client.connectionStateStream.listen(_websocketConnectionStateChanged),);
+      client.connectionStateStream.listen(_websocketConnectionStateChanged),
+    );
   }
 }
