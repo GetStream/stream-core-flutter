@@ -1,25 +1,36 @@
-import 'package:equatable/equatable.dart';
+import 'stream_api_error.dart';
 
-import 'http_api_error.dart';
-
-class ClientException extends Equatable {
-  final String? message;
-
-  late final Object? underlyingError;
-  late final HttpApiError? apiError;
-
+class ClientException implements Exception {
   ClientException({
     this.message,
     Object? error,
+    this.stackTrace,
   }) {
     underlyingError = error;
-    if (error is HttpApiError) {
+    if (error is StreamApiError) {
       apiError = error;
+    } else {
+      apiError = null;
     }
   }
 
-  @override
-  List<Object?> get props => [message, underlyingError, apiError];
+  final String? message;
+
+  late final Object? underlyingError;
+  late final StreamApiError? apiError;
+  final StackTrace? stackTrace;
+}
+
+class HttpClientException extends ClientException {
+  HttpClientException({
+    super.message,
+    super.error,
+    super.stackTrace,
+    required this.statusCode,
+    required this.isRequestCancelledError,
+  });
+  final int? statusCode;
+  final bool isRequestCancelledError;
 }
 
 class WebSocketException extends ClientException {
@@ -31,14 +42,7 @@ class WebSocketException extends ClientException {
   final WebSocketEngineException? serverException;
 }
 
-
 class WebSocketEngineException extends ClientException {
-  static const stopErrorCode = 1000;
-
-  final String reason;
-  final int code;
-  final Object? engineError;
-
   WebSocketEngineException({
     required this.reason,
     required this.code,
@@ -51,4 +55,10 @@ class WebSocketEngineException extends ClientException {
           code: 0,
           engineError: null,
         );
+
+  static const stopErrorCode = 1000;
+
+  final String reason;
+  final int code;
+  final Object? engineError;
 }

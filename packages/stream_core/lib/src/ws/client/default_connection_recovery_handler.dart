@@ -31,7 +31,7 @@ class DefaultConnectionRecoveryHandler extends ConnectionRecoveryHandler
 
 mixin NetworkAwareConnectionRecoveryHandler on ConnectionRecoveryHandler {
   void _networkStatusChanged(NetworkStatus status) {
-    if (status == NetworkStatus.connected) {
+    if (status == NetworkStatus.disconnected) {
       disconnectIfNeeded();
     } else {
       reconnectIfNeeded();
@@ -63,6 +63,7 @@ mixin WebSocketAwareConnectionRecoveryHandler on ConnectionRecoveryHandler {
 
   void subscribeToWebSocketConnectionChanges() {
     subscriptions.add(
-        client.connectionStateStream.listen(_websocketConnectionStateChanged));
+      client.connectionStateStream.listen(_websocketConnectionStateChanged),
+    );
   }
 }

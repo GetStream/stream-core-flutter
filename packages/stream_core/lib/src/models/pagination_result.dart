@@ -16,10 +16,10 @@ class PaginationData extends Equatable {
     this.previous,
   });
 
-  /// Item id of where to start searching from for next [results]
+  /// Item id of where to start searching from for next results
   final String? next;
 
-  /// Item id of where to start searching from for previous [results]
+  /// Item id of where to start searching from for previous results
   final String? previous;
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+// ignore: one_member_abstracts
 abstract interface class SendableEvent {
   /// Serialize the object to `String` or `Uint8List`.
   Object toSerializedData();

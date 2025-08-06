@@ -3,13 +3,14 @@ import 'package:equatable/equatable.dart';
 enum _ResultType { success, failure }
 
 ///  A class which encapsulates a successful outcome with a value of type [T]
-///  or a failure with [VideoError].
+///  or a [Failure] with error.
 abstract class Result<T> extends Equatable {
   const Result._(this._type);
 
   const factory Result.success(T value) = Success._;
 
-  const factory Result.failure(Object error, [StackTrace stackTrace]) = Failure._;
+  const factory Result.failure(Object error, [StackTrace stackTrace]) =
+      Failure._;
 
   final _ResultType _type;
 

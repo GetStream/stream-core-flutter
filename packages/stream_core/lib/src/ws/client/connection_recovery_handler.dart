@@ -7,6 +7,7 @@ import '../../utils/network_monitor.dart';
 import 'web_socket_client.dart';
 import 'web_socket_connection_state.dart';
 
+// ignore: one_member_abstracts
 abstract class AutomaticReconnectionPolicy {
   bool canBeReconnected();
 }
@@ -20,7 +21,7 @@ class ConnectionRecoveryHandler {
 
   final WebSocketClient client;
   final List<AutomaticReconnectionPolicy> policies;
-  List<StreamSubscription<dynamic>> subscriptions = [];
+  final List<StreamSubscription<dynamic>> subscriptions = [];
   final RetryStrategy retryStrategy;
   Timer? _reconnectionTimer;
 
@@ -64,7 +65,8 @@ class ConnectionRecoveryHandler {
 
   Future<void> dispose() async {
     await Future.wait(
-        subscriptions.map((subscription) => subscription.cancel()));
+      subscriptions.map((subscription) => subscription.cancel()),
+    );
     subscriptions.clear();
     cancelReconnectionTimer();
   }
@@ -75,9 +77,9 @@ class ConnectionRecoveryHandler {
 
 class WebSocketAutomaticReconnectionPolicy
     implements AutomaticReconnectionPolicy {
-  WebSocketClient client;
-
   WebSocketAutomaticReconnectionPolicy({required this.client});
+
+  final WebSocketClient client;
 
   @override
   bool canBeReconnected() {
@@ -87,9 +89,8 @@ class WebSocketAutomaticReconnectionPolicy
 
 class InternetAvailableReconnectionPolicy
     implements AutomaticReconnectionPolicy {
-  NetworkMonitor networkMonitor;
-
   InternetAvailableReconnectionPolicy({required this.networkMonitor});
+  final NetworkMonitor networkMonitor;
 
   @override
   bool canBeReconnected() {
@@ -123,9 +124,8 @@ abstract class RetryStrategy {
 }
 
 class DefaultRetryStrategy extends RetryStrategy {
-  static const maximumReconnectionDelayInSeconds = 25;
-
   DefaultRetryStrategy();
+  static const maximumReconnectionDelayInSeconds = 25;
 
   @override
   Duration get nextRetryDelay {
@@ -134,7 +134,9 @@ class DefaultRetryStrategy extends RetryStrategy {
     if (consecutiveFailuresCount == 0) return Duration.zero;
 
     final maxDelay = math.min(
-        0.5 + consecutiveFailuresCount * 2, maximumReconnectionDelayInSeconds);
+      0.5 + consecutiveFailuresCount * 2,
+      maximumReconnectionDelayInSeconds,
+    );
     final minDelay = math.min(
       math.max(0.25, (consecutiveFailuresCount - 1) * 2),
       maximumReconnectionDelayInSeconds,

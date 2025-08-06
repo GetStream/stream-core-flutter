@@ -46,7 +46,7 @@ jobs:
 
       - name: Dart Analyze
         run: |
-          melos run analyze
+          melos run analyze 
 
       - name: Check formatting
         run: |

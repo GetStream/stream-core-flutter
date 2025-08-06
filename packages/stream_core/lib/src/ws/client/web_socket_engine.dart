@@ -35,6 +35,7 @@ class URLSessionWebSocketEngine implements WebSocketEngine {
   });
 
   /// The URI to connect to.
+  @override
   final String url;
 
   /// The protocols to use.
