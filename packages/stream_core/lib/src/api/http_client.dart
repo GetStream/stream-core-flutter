@@ -117,7 +117,7 @@ class CoreHttpClient {
   }
 
   /// Handy method to make http GET request with error parsing.
-  Future<Response<dynamic>> get(
+  Future<Response<T>> get<T>(
     String path, {
     Map<String, Object?>? queryParameters,
     Map<String, Object?>? headers,
@@ -125,7 +125,7 @@ class CoreHttpClient {
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await httpClient.get<dynamic>(
+      final response = await httpClient.get<T>(
         path,
         queryParameters: queryParameters,
         options: Options(headers: headers),
@@ -133,13 +133,13 @@ class CoreHttpClient {
         cancelToken: cancelToken,
       );
       return response;
-    } on DioException catch (error) {
-      throw _parseError(error);
+    } on DioException catch (error, stackTrace) {
+      throw Error.throwWithStackTrace(_parseError(error), stackTrace);
     }
   }
 
   /// Handy method to make http POST request with error parsing.
-  Future<Response<dynamic>> post(
+  Future<Response<T>> post<T>(
     String path, {
     Object? data,
     Map<String, Object?>? queryParameters,
@@ -149,7 +149,7 @@ class CoreHttpClient {
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await httpClient.post<dynamic>(
+      final response = await httpClient.post<T>(
         path,
         queryParameters: queryParameters,
         data: data,
@@ -159,33 +159,33 @@ class CoreHttpClient {
         cancelToken: cancelToken,
       );
       return response;
-    } on DioException catch (error) {
-      throw _parseError(error);
+    } on DioException catch (error, stackTrace) {
+      throw Error.throwWithStackTrace(_parseError(error), stackTrace);
     }
   }
 
   /// Handy method to make http DELETE request with error parsing.
-  Future<Response<dynamic>> delete(
+  Future<Response<T>> delete<T>(
     String path, {
     Map<String, Object?>? queryParameters,
     Map<String, Object?>? headers,
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await httpClient.delete<dynamic>(
+      final response = await httpClient.delete<T>(
         path,
         queryParameters: queryParameters,
         options: Options(headers: headers),
         cancelToken: cancelToken,
       );
       return response;
-    } on DioException catch (error) {
-      throw _parseError(error);
+    } on DioException catch (error, stackTrace) {
+      throw Error.throwWithStackTrace(_parseError(error), stackTrace);
     }
   }
 
   /// Handy method to make http PATCH request with error parsing.
-  Future<Response<dynamic>> patch(
+  Future<Response<T>> patch<T>(
     String path, {
     Object? data,
     Map<String, Object?>? queryParameters,
@@ -195,7 +195,7 @@ class CoreHttpClient {
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await httpClient.patch<dynamic>(
+      final response = await httpClient.patch<T>(
         path,
         queryParameters: queryParameters,
         data: data,
@@ -205,13 +205,13 @@ class CoreHttpClient {
         cancelToken: cancelToken,
       );
       return response;
-    } on DioException catch (error) {
-      throw _parseError(error);
+    } on DioException catch (error, stackTrace) {
+      throw Error.throwWithStackTrace(_parseError(error), stackTrace);
     }
   }
 
   /// Handy method to make http PUT request with error parsing.
-  Future<Response<dynamic>> put(
+  Future<Response<T>> put<T>(
     String path, {
     Object? data,
     Map<String, Object?>? queryParameters,
@@ -221,7 +221,7 @@ class CoreHttpClient {
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await httpClient.put<dynamic>(
+      final response = await httpClient.put<T>(
         path,
         queryParameters: queryParameters,
         data: data,
@@ -231,13 +231,13 @@ class CoreHttpClient {
         cancelToken: cancelToken,
       );
       return response;
-    } on DioException catch (error) {
-      throw _parseError(error);
+    } on DioException catch (error, stackTrace) {
+      throw Error.throwWithStackTrace(_parseError(error), stackTrace);
     }
   }
 
   /// Handy method to post files with error parsing.
-  Future<Response<dynamic>> postFile(
+  Future<Response<T>> postFile<T>(
     String path,
     MultipartFile file, {
     Map<String, Object?>? queryParameters,
@@ -247,7 +247,7 @@ class CoreHttpClient {
     CancelToken? cancelToken,
   }) async {
     final formData = FormData.fromMap({'file': file});
-    final response = await post(
+    final response = await post<T>(
       path,
       data: formData,
       queryParameters: queryParameters,
@@ -260,7 +260,7 @@ class CoreHttpClient {
   }
 
   /// Handy method to make generic http request with error parsing.
-  Future<Response<dynamic>> request(
+  Future<Response<T>> request<T>(
     String path, {
     Object? data,
     Map<String, Object?>? queryParameters,
@@ -270,7 +270,7 @@ class CoreHttpClient {
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await httpClient.request<dynamic>(
+      final response = await httpClient.request<T>(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -280,21 +280,21 @@ class CoreHttpClient {
         cancelToken: cancelToken,
       );
       return response;
-    } on DioException catch (error) {
-      throw _parseError(error);
+    } on DioException catch (error, stackTrace) {
+      throw Error.throwWithStackTrace(_parseError(error), stackTrace);
     }
   }
 
   /// Handy method to make http requests from [RequestOptions]
   /// with error parsing.
-  Future<Response<dynamic>> fetch(
+  Future<Response<T>> fetch<T>(
     RequestOptions requestOptions,
   ) async {
     try {
-      final response = await httpClient.fetch<dynamic>(requestOptions);
+      final response = await httpClient.fetch<T>(requestOptions);
       return response;
-    } on DioException catch (error) {
-      throw _parseError(error);
+    } on DioException catch (error, stackTrace) {
+      throw Error.throwWithStackTrace(_parseError(error), stackTrace);
     }
   }
 }
