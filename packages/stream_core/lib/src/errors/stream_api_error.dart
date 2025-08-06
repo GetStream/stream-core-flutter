@@ -58,34 +58,6 @@ class StreamApiError {
         'unrecoverable: $unrecoverable, '
         ')';
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is StreamApiError &&
-        other.code == code &&
-        other.details == details &&
-        other.duration == duration &&
-        other.exceptionFields == exceptionFields &&
-        other.message == message &&
-        other.moreInfo == moreInfo &&
-        other.statusCode == statusCode &&
-        other.unrecoverable == unrecoverable;
-  }
-
-  @override
-  int get hashCode {
-    return Object.hashAll([
-      code,
-      details,
-      duration,
-      exceptionFields,
-      message,
-      moreInfo,
-      statusCode,
-      unrecoverable,
-    ]);
-  }
 }
 
 final _tokenInvalidErrorCodes = _range(40, 42);

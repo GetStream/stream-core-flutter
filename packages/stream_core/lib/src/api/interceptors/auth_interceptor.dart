@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
 import '../../errors.dart';
-import '../../errors/stream_error_code.dart';
 import '../http_client.dart';
 import '../stream_core_dio_error.dart';
 import '../token_manager.dart';
@@ -51,20 +50,20 @@ class AuthInterceptor extends QueuedInterceptor {
 
   @override
   Future<void> onError(
-    DioException exception,
+    DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    final data = exception.response?.data;
+    final data = err.response?.data;
     if (data == null || data is! Map<String, dynamic>) {
-      return handler.next(exception);
+      return handler.next(err);
     }
 
     final error = StreamApiError.fromJson(data);
     if (error.isTokenExpiredError) {
-      if (_tokenManager.isStatic) return handler.next(exception);
+      if (_tokenManager.isStatic) return handler.next(err);
       await _tokenManager.loadToken(refresh: true);
       try {
-        final options = exception.requestOptions;
+        final options = err.requestOptions;
         // ignore: inference_failure_on_function_invocation
         final response = await _client.fetch(options);
         return handler.resolve(response);
@@ -72,6 +71,6 @@ class AuthInterceptor extends QueuedInterceptor {
         return handler.next(exception);
       }
     }
-    return handler.next(exception);
+    return handler.next(err);
   }
 }

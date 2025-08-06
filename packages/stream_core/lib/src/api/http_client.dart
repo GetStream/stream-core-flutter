@@ -1,20 +1,18 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
 import '../../stream_core.dart';
-import 'connection_id_provider.dart';
+import '../logger/stream_logger.dart';
 import 'interceptors/additional_headers_interceptor.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/connection_id_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
-import 'stream_core_dio_error.dart';
-import 'system_environment_manager.dart';
-import 'token_manager.dart';
 
 part 'http_client_options.dart';
+
+const _tag = 'SC:CoreHttpClient';
 
 /// This is where we configure the base url, headers,
 ///  query parameters and convenient methods for http verbs with error parsing.
@@ -27,7 +25,7 @@ class CoreHttpClient {
     TokenManager? tokenManager,
     ConnectionIdProvider? connectionIdProvider,
     required SystemEnvironmentManager systemEnvironmentManager,
-    Logger? logger,
+    StreamLogger? logger,
     Iterable<Interceptor>? interceptors,
     HttpClientAdapter? httpClientAdapter,
   })  : _options = options ?? const HttpClientOptions(),
@@ -54,17 +52,29 @@ class CoreHttpClient {
             [
               // Add a default logging interceptor if no interceptors are
               // provided.
-              if (logger != null && logger.level != Level.OFF)
+              if (logger != null)
                 LoggingInterceptor(
                   requestHeader: true,
                   logPrint: (step, message) {
                     switch (step) {
                       case InterceptStep.request:
-                        return logger.info(message);
+                        return logger.log(
+                          Priority.info,
+                          _tag,
+                          message.toString,
+                        );
                       case InterceptStep.response:
-                        return logger.info(message);
+                        return logger.log(
+                          Priority.info,
+                          _tag,
+                          message.toString,
+                        );
                       case InterceptStep.error:
-                        return logger.severe(message);
+                        return logger.log(
+                          Priority.error,
+                          _tag,
+                          message.toString,
+                        );
                     }
                   },
                 ),
@@ -89,9 +99,9 @@ class CoreHttpClient {
   @visibleForTesting
   final Dio httpClient;
 
-  /// Shuts down the [StreamHttpClient].
+  /// Shuts down the [CoreHttpClient].
   ///
-  /// If [force] is `false` the [StreamHttpClient] will be kept alive
+  /// If [force] is `false` the [CoreHttpClient] will be kept alive
   /// until all active connections are done. If [force] is `true` any active
   /// connections will be closed to immediately release all resources. These
   /// closed connections will receive an error event to indicate that the client

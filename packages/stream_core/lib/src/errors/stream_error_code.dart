@@ -142,18 +142,6 @@ const _errorCodeWithDescription = {
       MapEntry(1000, 'Unauthorised, token not defined'),
 };
 
-const _authenticationErrors = [
-  StreamErrorCode.undefinedToken,
-  StreamErrorCode.authenticationError,
-  StreamErrorCode.tokenExpired,
-  StreamErrorCode.tokenBeforeIssuedAt,
-  StreamErrorCode.tokenNotValid,
-  StreamErrorCode.tokenSignatureInvalid,
-  StreamErrorCode.accessKeyError,
-  StreamErrorCode.noAccessToChannels,
-];
-
-///
 StreamErrorCode? streamErrorCodeFromCode(int code) =>
     _errorCodeWithDescription.keys
         .firstWhereOrNull((key) => _errorCodeWithDescription[key]!.key == code);

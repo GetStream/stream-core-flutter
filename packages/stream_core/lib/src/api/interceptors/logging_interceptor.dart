@@ -43,7 +43,7 @@ class LoggingInterceptor extends Interceptor {
   /// Print request header [Options.headers]
   final bool requestHeader;
 
-  /// Print request data [Options.data]
+  /// Print request data [RequestOptions.data]
   final bool requestBody;
 
   /// Print [Response.data]
@@ -119,36 +119,39 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException exception, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     if (error) {
-      if (exception.type == DioExceptionType.badResponse) {
-        final uri = exception.response?.requestOptions.uri;
+      if (err.type == DioExceptionType.badResponse) {
+        final uri = err.response?.requestOptions.uri;
         _printBoxed(
           _logPrintError,
           header:
-              'DioException ║ Status: ${exception.response?.statusCode} ${exception.response?.statusMessage}',
+              'DioException ║ Status: ${err.response?.statusCode} ${err.response?.statusMessage}',
           text: uri.toString(),
         );
-        if (exception.response != null && exception.response?.data != null) {
-          _logPrintError('╔ ${exception.type.toString()}');
-          _printResponse(_logPrintError, exception.response!);
+        if (err.response != null && err.response?.data != null) {
+          _logPrintError('╔ ${err.type}');
+          _printResponse(_logPrintError, err.response!);
         }
         _printLine(_logPrintError, '╚');
         _logPrintError('');
       } else {
         _printBoxed(
           _logPrintError,
-          header: 'DioException ║ ${exception.type}',
-          text: exception.message,
+          header: 'DioException ║ ${err.type}',
+          text: err.message,
         );
-        _printRequestHeader(_logPrintError, exception.requestOptions);
+        _printRequestHeader(_logPrintError, err.requestOptions);
       }
     }
-    super.onError(exception, handler);
+    super.onError(err, handler);
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
     _printResponseHeader(_logPrintResponse, response);
     if (responseHeader) {
       final responseHeaders = <String, String>{};
@@ -178,7 +181,10 @@ class LoggingInterceptor extends Interceptor {
     _printLine(logPrint, '╚');
   }
 
-  void _printResponse(void Function(Object) logPrint, Response response) {
+  void _printResponse(
+    void Function(Object) logPrint,
+    Response<dynamic> response,
+  ) {
     if (response.data != null) {
       if (response.data is Map) {
         _printPrettyMap(logPrint, response.data as Map);
@@ -192,7 +198,10 @@ class LoggingInterceptor extends Interceptor {
     }
   }
 
-  void _printResponseHeader(void Function(Object) logPrint, Response response) {
+  void _printResponseHeader(
+    void Function(Object) logPrint,
+    Response<dynamic> response,
+  ) {
     final uri = response.requestOptions.uri;
     final method = response.requestOptions.method;
     _printBoxed(
@@ -234,11 +243,13 @@ class LoggingInterceptor extends Interceptor {
   void _printBlock(void Function(Object) logPrint, String msg) {
     final lines = (msg.length / maxWidth).ceil();
     for (var i = 0; i < lines; ++i) {
-      logPrint((i >= 0 ? '║ ' : '') +
-          msg.substring(
-            i * maxWidth,
-            math.min<int>(i * maxWidth + maxWidth, msg.length),
-          ));
+      logPrint(
+        (i >= 0 ? '║ ' : '') +
+            msg.substring(
+              i * maxWidth,
+              math.min<int>(i * maxWidth + maxWidth, msg.length),
+            ),
+      );
     }
   }
 
@@ -246,15 +257,15 @@ class LoggingInterceptor extends Interceptor {
 
   void _printPrettyMap(
     void Function(Object) logPrint,
-    Map data, {
+    Map<dynamic, dynamic> data, {
     int tabs = initialTab,
     bool isListItem = false,
     bool isLast = false,
   }) {
-    var _tabs = tabs;
-    final isRoot = _tabs == initialTab;
-    final initialIndent = _indent(_tabs);
-    _tabs++;
+    var indentedTabs = tabs;
+    final isRoot = indentedTabs == initialTab;
+    final initialIndent = _indent(indentedTabs);
+    indentedTabs++;
 
     if (isRoot || isListItem) logPrint('║$initialIndent{');
 
@@ -262,37 +273,37 @@ class LoggingInterceptor extends Interceptor {
       final isLast = index == data.length - 1;
       dynamic value = data[key];
       if (value is String) {
-        value = '"${value.toString().replaceAll(RegExp(r'(\r|\n)+'), " ")}"';
+        value = '"${value.replaceAll(RegExp(r'(\r|\n)+'), " ")}"';
       }
       if (value is Map) {
         if (compact) {
-          logPrint('║${_indent(_tabs)} $key: $value${!isLast ? ',' : ''}');
+          logPrint('║${_indent(indentedTabs)} $key: $value${!isLast ? ',' : ''}');
         } else {
-          logPrint('║${_indent(_tabs)} $key: {');
-          _printPrettyMap(logPrint, value, tabs: _tabs);
+          logPrint('║${_indent(indentedTabs)} $key: {');
+          _printPrettyMap(logPrint, value, tabs: indentedTabs);
         }
       } else if (value is List) {
         if (compact) {
-          logPrint('║${_indent(_tabs)} $key: ${value.toString()}');
+          logPrint('║${_indent(indentedTabs)} $key: $value');
         } else {
-          logPrint('║${_indent(_tabs)} $key: [');
-          _printList(logPrint, value, tabs: _tabs);
-          logPrint('║${_indent(_tabs)} ]${isLast ? '' : ','}');
+          logPrint('║${_indent(indentedTabs)} $key: [');
+          _printList(logPrint, value, tabs: indentedTabs);
+          logPrint('║${_indent(indentedTabs)} ]${isLast ? '' : ','}');
         }
       } else {
         final msg = value.toString().replaceAll('\n', '');
-        final indent = _indent(_tabs);
+        final indent = _indent(indentedTabs);
         final linWidth = maxWidth - indent.length;
         if (msg.length + indent.length > linWidth) {
           final lines = (msg.length / linWidth).ceil();
           for (var i = 0; i < lines; ++i) {
-            logPrint('║${_indent(_tabs)} ${msg.substring(
+            logPrint('║${_indent(indentedTabs)} ${msg.substring(
               i * linWidth,
               math.min<int>(i * linWidth + linWidth, msg.length),
             )}');
           }
         } else {
-          logPrint('║${_indent(_tabs)} $key: $msg${!isLast ? ',' : ''}');
+          logPrint('║${_indent(indentedTabs)} $key: $msg${!isLast ? ',' : ''}');
         }
       }
     });
@@ -302,7 +313,7 @@ class LoggingInterceptor extends Interceptor {
 
   void _printList(
     void Function(Object) logPrint,
-    List list, {
+    List<dynamic> list, {
     int tabs = initialTab,
   }) {
     list.asMap().forEach((i, dynamic e) {
@@ -327,13 +338,14 @@ class LoggingInterceptor extends Interceptor {
 
   void _printMapAsTable(
     void Function(Object) logPrint,
-    Map? map, {
+    Map<dynamic, dynamic>? map, {
     String? header,
   }) {
     if (map == null || map.isEmpty) return;
     logPrint('╔ $header ');
-    map.forEach((dynamic key, dynamic value) =>
-        _printKV(logPrint, key.toString(), value));
+    map.forEach(
+      (dynamic key, dynamic value) => _printKV(logPrint, key.toString(), value),
+    );
     _printLine(logPrint, '╚');
   }
 

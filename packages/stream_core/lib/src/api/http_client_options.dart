@@ -25,9 +25,6 @@ class HttpClientOptions {
   /// Common query parameters.
   ///
   /// List values use the default [ListFormat.multiCompatible].
-  ///
-  /// The value can be overridden per parameter by adding a [MultiParam]
-  /// object wrapping the actual List value and the desired format.
   final Map<String, Object?> queryParameters;
 
   /// Http request headers.

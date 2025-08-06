@@ -1,14 +1,6 @@
-import 'package:equatable/equatable.dart';
-
 import 'stream_api_error.dart';
 
-class ClientException extends Equatable implements Exception {
-  final String? message;
-
-  late final Object? underlyingError;
-  late final StreamApiError? apiError;
-  final StackTrace? stackTrace;
-
+class ClientException implements Exception {
   ClientException({
     this.message,
     Object? error,
@@ -17,11 +9,16 @@ class ClientException extends Equatable implements Exception {
     underlyingError = error;
     if (error is StreamApiError) {
       apiError = error;
+    } else {
+      apiError = null;
     }
   }
 
-  @override
-  List<Object?> get props => [message, underlyingError, apiError];
+  final String? message;
+
+  late final Object? underlyingError;
+  late final StreamApiError? apiError;
+  final StackTrace? stackTrace;
 }
 
 class HttpClientException extends ClientException {
@@ -46,12 +43,6 @@ class WebSocketException extends ClientException {
 }
 
 class WebSocketEngineException extends ClientException {
-  static const stopErrorCode = 1000;
-
-  final String reason;
-  final int code;
-  final Object? engineError;
-
   WebSocketEngineException({
     required this.reason,
     required this.code,
@@ -64,4 +55,10 @@ class WebSocketEngineException extends ClientException {
           code: 0,
           engineError: null,
         );
+
+  static const stopErrorCode = 1000;
+
+  final String reason;
+  final int code;
+  final Object? engineError;
 }

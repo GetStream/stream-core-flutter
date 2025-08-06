@@ -12,13 +12,13 @@ sealed class WebSocketConnectionState extends Equatable {
   factory WebSocketConnectionState.connecting() => const Connecting();
   factory WebSocketConnectionState.authenticating() => const Authenticating();
   factory WebSocketConnectionState.connected(
-          {HealthCheckInfo? healthCheckInfo}) =>
+          {HealthCheckInfo? healthCheckInfo,}) =>
       Connected(healthCheckInfo: healthCheckInfo);
   factory WebSocketConnectionState.disconnecting(
-          {required DisconnectionSource source}) =>
+          {required DisconnectionSource source,}) =>
       Disconnecting(source: source);
   factory WebSocketConnectionState.disconnected(
-          {required DisconnectionSource source}) =>
+          {required DisconnectionSource source,}) =>
       Disconnected(source: source);
 
   /// Checks if the connection state is connected.
@@ -36,7 +36,7 @@ sealed class WebSocketConnectionState extends Equatable {
     final source = (this as Disconnected).source;
 
     return switch (source) {
-      ServerInitiated serverInitiated =>
+      final ServerInitiated serverInitiated =>
         serverInitiated.error != null, //TODO: Implement
       UserInitiated() => false,
       SystemInitiated() => true,

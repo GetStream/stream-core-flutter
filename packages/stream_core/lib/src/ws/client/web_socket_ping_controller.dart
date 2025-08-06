@@ -12,12 +12,6 @@ import 'web_socket_connection_state.dart';
 ///
 /// The controller will automatically resume the ping timer when the connection is resumed.
 class WebSocketPingController {
-  final WebSocketPingClient _client;
-
-  final Duration _pingTimeInterval;
-  final Duration _pongTimeout;
-  Timer? _pongTimeoutTimer;
-  Timer? _pingTimer;
 
   WebSocketPingController({
     required WebSocketPingClient client,
@@ -26,6 +20,12 @@ class WebSocketPingController {
   })  : _client = client,
         _pingTimeInterval = pingTimeInterval,
         _pongTimeout = pongTimeout;
+  final WebSocketPingClient _client;
+
+  final Duration _pingTimeInterval;
+  final Duration _pongTimeout;
+  Timer? _pongTimeoutTimer;
+  Timer? _pingTimer;
 
   void connectionStateChanged(WebSocketConnectionState connectionState) {
     _pongTimeoutTimer?.cancel();

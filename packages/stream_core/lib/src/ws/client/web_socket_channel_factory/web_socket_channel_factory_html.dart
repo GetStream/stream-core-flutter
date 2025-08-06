@@ -9,7 +9,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class WebSocketChannelFactory {
   const WebSocketChannelFactory();
   Future<WebSocketChannel> connect(Uri uri,
-      {Iterable<String>? protocols}) async {
+      {Iterable<String>? protocols,}) async {
     final completer = Completer<HtmlWebSocketChannel>();
     final webSocket = web.WebSocket(uri.toString())
       ..binaryType = BinaryType.list.value;

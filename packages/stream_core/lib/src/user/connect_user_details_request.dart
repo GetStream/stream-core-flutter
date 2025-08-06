@@ -4,13 +4,6 @@ part 'connect_user_details_request.g.dart';
 
 @JsonSerializable()
 class ConnectUserDetailsRequest {
-  final String id;
-  final String? image;
-  final bool? invisible;
-  final String? language;
-  final String? name;
-  final Map<String, dynamic>? customData;
-
   const ConnectUserDetailsRequest({
     required this.id,
     this.image,
@@ -19,6 +12,13 @@ class ConnectUserDetailsRequest {
     this.name,
     this.customData,
   });
+
+  final String id;
+  final String? image;
+  final bool? invisible;
+  final String? language;
+  final String? name;
+  final Map<String, dynamic>? customData;
 
   Map<String, dynamic> toJson() => _$ConnectUserDetailsRequestToJson(this);
   static ConnectUserDetailsRequest fromJson(Map<String, dynamic> json) =>

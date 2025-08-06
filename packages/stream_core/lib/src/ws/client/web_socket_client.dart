@@ -7,6 +7,22 @@ import 'web_socket_engine.dart';
 import 'web_socket_ping_controller.dart';
 
 class WebSocketClient implements WebSocketEngineListener, WebSocketPingClient {
+
+  WebSocketClient({
+    required String url,
+    required this.eventDecoder,
+    this.pingReguestBuilder,
+    this.onConnectionEstablished,
+    this.onConnected,
+    WebSocketEnvironment environment = const WebSocketEnvironment(),
+  }) {
+    engine = environment.createEngine(
+      url: url,
+      listener: this,
+    );
+
+    pingController = environment.createPingController(client: this);
+  }
   late final WebSocketEngine engine;
   late final WebSocketPingController pingController;
   final PingReguestBuilder? pingReguestBuilder;
@@ -38,23 +54,6 @@ class WebSocketClient implements WebSocketEngineListener, WebSocketPingClient {
   String? get connectionId => _connectionId;
   String? _connectionId;
 
-  WebSocketClient({
-    required String url,
-    required this.eventDecoder,
-    this.pingReguestBuilder,
-    this.onConnectionEstablished,
-    this.onConnected,
-    WebSocketEnvironment environment = const WebSocketEnvironment(),
-  }) {
-    engine = environment.createEngine(
-      url: url,
-      listener: this,
-    );
-
-    pingController = environment.createPingController(client: this);
-  }
-
-  @override
   void send(SendableEvent message) {
     engine.send(message: message);
   }

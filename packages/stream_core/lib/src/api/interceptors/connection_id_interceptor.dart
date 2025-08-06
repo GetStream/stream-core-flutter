@@ -11,7 +11,7 @@ class ConnectionIdInterceptor extends Interceptor {
   final ConnectionIdProvider connectionIdProvider;
 
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
