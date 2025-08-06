@@ -12,37 +12,11 @@ import 'package:test/test.dart';
 
 import '../mocks.dart';
 
-final systemEnvironmentManager = SystemEnvironmentManager(
-  environment: const SystemEnvironment(
-    sdkName: 'core',
-    sdkIdentifier: 'dart',
-    sdkVersion: '0.1',
-  ),
-);
-
 const testUser = User(
   id: 'user-id',
   name: 'test-user',
   imageUrl: 'https://example.com/image.png',
 );
-
-StreamApiError _createStreamApiError({
-  int code = 0,
-  List<int> details = const [],
-  String message = '',
-  String duration = '',
-  String moreInfo = '',
-  int statusCode = 0,
-}) {
-  return StreamApiError(
-    code: code,
-    details: details,
-    duration: duration,
-    message: message,
-    moreInfo: moreInfo,
-    statusCode: statusCode,
-  );
-}
 
 void main() {
   Response<dynamic> successResponse(String path) => Response(
@@ -241,7 +215,7 @@ void main() {
     const path = 'test-get-api-path';
     final error = throwableError(
       path,
-      error: ClientException(error: _createStreamApiError()),
+      error: ClientException(error: createStreamApiError()),
     );
     when(
       () => dio.get(
@@ -310,7 +284,7 @@ void main() {
       const path = 'test-post-api-path';
       final error = throwableError(
         path,
-        error: ClientException(error: _createStreamApiError()),
+        error: ClientException(error: createStreamApiError()),
       );
       when(
         () => dio.post(
@@ -380,7 +354,7 @@ void main() {
       const path = 'test-delete-api-path';
       final error = throwableError(
         path,
-        error: ClientException(error: _createStreamApiError()),
+        error: ClientException(error: createStreamApiError()),
       );
       when(
         () => dio.delete(
@@ -450,7 +424,7 @@ void main() {
       const path = 'test-patch-api-path';
       final error = throwableError(
         path,
-        error: ClientException(error: _createStreamApiError()),
+        error: ClientException(error: createStreamApiError()),
       );
       when(
         () => dio.patch(
@@ -520,7 +494,7 @@ void main() {
       const path = 'test-put-api-path';
       final error = throwableError(
         path,
-        error: ClientException(error: _createStreamApiError()),
+        error: ClientException(error: createStreamApiError()),
       );
       when(
         () => dio.put(
@@ -596,7 +570,7 @@ void main() {
 
       final error = throwableError(
         path,
-        error: ClientException(error: _createStreamApiError()),
+        error: ClientException(error: createStreamApiError()),
       );
       when(
         () => dio.post(
@@ -669,7 +643,7 @@ void main() {
       final error = throwableError(
         path,
         streamDioError: true,
-        error: ClientException(error: _createStreamApiError()),
+        error: ClientException(error: createStreamApiError()),
       );
       when(
         () => dio.request(

@@ -145,3 +145,9 @@ const _errorCodeWithDescription = {
 StreamErrorCode? streamErrorCodeFromCode(int code) =>
     _errorCodeWithDescription.keys
         .firstWhereOrNull((key) => _errorCodeWithDescription[key]!.key == code);
+
+int codeFromStreamErrorCode(StreamErrorCode errorCode) =>
+    _errorCodeWithDescription[errorCode]!.key;
+
+String messageFromStreamErrorCode(StreamErrorCode errorCode) =>
+    _errorCodeWithDescription[errorCode]!.value;
