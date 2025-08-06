@@ -21,6 +21,8 @@ class MockHttpClient extends Mock implements CoreHttpClient {}
 
 class MockTokenManager extends Mock implements TokenManager {}
 
+class MockWebSocketClient extends Mock implements WebSocketClient {}
+
 final systemEnvironmentManager = SystemEnvironmentManager(
   environment: const SystemEnvironment(
     sdkName: 'core',

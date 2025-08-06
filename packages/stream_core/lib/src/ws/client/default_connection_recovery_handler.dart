@@ -31,7 +31,7 @@ class DefaultConnectionRecoveryHandler extends ConnectionRecoveryHandler
 
 mixin NetworkAwareConnectionRecoveryHandler on ConnectionRecoveryHandler {
   void _networkStatusChanged(NetworkStatus status) {
-    if (status == NetworkStatus.connected) {
+    if (status == NetworkStatus.disconnected) {
       disconnectIfNeeded();
     } else {
       reconnectIfNeeded();
