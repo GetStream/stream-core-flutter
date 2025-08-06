@@ -26,6 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   semantic_changelog_update:
+    if: ${{ false }} # TODO: Enable after the first release
     needs: conventional_pr_title # Trigger after the [conventional_pr_title] completes
     runs-on: ubuntu-latest
     steps:
