@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../logger/logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
 
@@ -34,16 +33,13 @@ WebSocketChannel _createWebSocket(WebSocketOptions options) {
 class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   /// Creates a new instance of [StreamWebSocketEngine].
   StreamWebSocketEngine({
-    String tag = 'StreamWebSocketEngine',
     WebSocketProvider? wsProvider,
     WebSocketEngineListener<Inc>? listener,
     required WebSocketMessageCodec<Inc, Out> messageCodec,
-  })  : _logger = TaggedLogger(tag),
-        _wsProvider = wsProvider ?? _createWebSocket,
+  })  : _wsProvider = wsProvider ?? _createWebSocket,
         _messageCodec = messageCodec,
         _listener = listener;
 
-  final TaggedLogger _logger;
   final WebSocketProvider _wsProvider;
   final WebSocketMessageCodec<Inc, Out> _messageCodec;
 

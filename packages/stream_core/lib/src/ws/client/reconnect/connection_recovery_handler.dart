@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:rxdart/utils.dart';
 
-import '../../../logger/impl/tagged_logger.dart';
 import '../../../utils.dart';
 import '../stream_web_socket_client.dart';
 import '../web_socket_connection_state.dart';
@@ -75,7 +74,6 @@ class ConnectionRecoveryHandler extends Disposable {
   final StreamWebSocketClient _client;
   final RetryStrategy _reconnectStrategy;
   final List<AutomaticReconnectionPolicy> _policies;
-  late final _logger = taggedLogger(tag: 'ConnectionRecoveryHandler');
 
   late final _subscriptions = CompositeSubscription();
 

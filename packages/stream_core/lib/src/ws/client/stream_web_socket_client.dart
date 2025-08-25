@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import '../../logger/logger.dart';
 import '../../utils.dart';
 import '../events/event_emitter.dart';
 import '../events/ws_event.dart';
@@ -46,14 +45,13 @@ class StreamWebSocketClient
     implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
-    String tag = 'StreamWebSocketClient',
     required this.options,
     this.onConnectionEstablished,
     WebSocketProvider? wsProvider,
     this.pingRequestBuilder = _defaultPingRequestBuilder,
     required WebSocketMessageCodec<WsEvent, WsRequest> messageCodec,
     Iterable<EventResolver<WsEvent>>? eventResolvers,
-  }) : _logger = TaggedLogger(tag) {
+  }) {
     _events = MutableEventEmitter(resolvers: eventResolvers);
     _engine = StreamWebSocketEngine(
       listener: this,
@@ -61,8 +59,6 @@ class StreamWebSocketClient
       messageCodec: messageCodec,
     );
   }
-
-  final TaggedLogger _logger;
 
   /// The WebSocket connection options including URL and configuration.
   final WebSocketOptions options;
