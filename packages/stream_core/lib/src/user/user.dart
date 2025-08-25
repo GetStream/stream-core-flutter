@@ -12,10 +12,10 @@ class User extends Equatable {
   const User({
     required this.id,
     String? name,
-    this.imageUrl,
+    this.image,
     this.role = 'user',
     this.type = UserType.regular,
-    Map<String, Object>? custom,
+    Map<String, Object?>? custom,
   })  : originalName = name,
         custom = custom ?? const {};
 
@@ -33,7 +33,7 @@ class User extends Equatable {
   final String id;
 
   /// The user's image URL.
-  final String? imageUrl;
+  final String? image;
 
   /// The user's role.
   final String role;
@@ -42,7 +42,7 @@ class User extends Equatable {
   final UserType type;
 
   /// The user's custom data.
-  final Map<String, Object> custom;
+  final Map<String, Object?> custom;
 
   /// User's name that was provided when the object was created. It will be used when communicating
   /// with the API and in cases where it doesn't make sense to override `null` values with the
@@ -56,7 +56,7 @@ class User extends Equatable {
   @override
   List<Object?> get props => [
         id,
-        imageUrl,
+        image,
         role,
         type,
         originalName,
