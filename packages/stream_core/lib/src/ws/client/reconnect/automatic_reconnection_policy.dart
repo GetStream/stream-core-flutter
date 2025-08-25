@@ -12,7 +12,8 @@ abstract interface class AutomaticReconnectionPolicy {
 
 /// A reconnection policy that checks if automatic reconnection is enabled
 /// based on the current state of the WebSocket connection.
-class WebSocketAutomaticReconnectionPolicy implements AutomaticReconnectionPolicy {
+class WebSocketAutomaticReconnectionPolicy
+    implements AutomaticReconnectionPolicy {
   /// Creates a [WebSocketAutomaticReconnectionPolicy].
   WebSocketAutomaticReconnectionPolicy({required this.connectionState});
 
@@ -29,7 +30,8 @@ class WebSocketAutomaticReconnectionPolicy implements AutomaticReconnectionPolic
 /// A reconnection policy that checks for internet connectivity before allowing
 /// reconnection. This prevents unnecessary reconnection attempts when there's no
 /// network available.
-class InternetAvailabilityReconnectionPolicy implements AutomaticReconnectionPolicy {
+class InternetAvailabilityReconnectionPolicy
+    implements AutomaticReconnectionPolicy {
   /// Creates an [InternetAvailabilityReconnectionPolicy].
   InternetAvailabilityReconnectionPolicy({required this.networkState});
 

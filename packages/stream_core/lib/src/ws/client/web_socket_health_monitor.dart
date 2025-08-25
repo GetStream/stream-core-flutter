@@ -27,12 +27,12 @@ abstract interface class WebSocketHealthListener {
 ///
 /// Manages the health checking mechanism for WebSocket connections by automatically
 /// sending ping requests and monitoring for pong responses to detect unhealthy connections.
-/// 
+///
 /// The monitor integrates with [WebSocketHealthListener] to provide automatic connection
 /// health detection and recovery triggers.
 ///
 /// ## Health Check Process
-/// 
+///
 /// 1. **Automatic Start**: Monitoring begins when connection state becomes connected
 /// 2. **Ping Scheduling**: Sends periodic ping requests at the configured interval
 /// 3. **Pong Monitoring**: Starts timeout timer after each ping request
@@ -48,10 +48,10 @@ class WebSocketHealthMonitor {
 
   /// The interval between ping requests for health checking.
   final Duration pingInterval;
-  
+
   /// The maximum time to wait for a pong response before considering the connection unhealthy.
   final Duration timeoutThreshold;
-  
+
   final WebSocketHealthListener _listener;
 
   Timer? _pingTimer;

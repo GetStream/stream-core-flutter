@@ -16,7 +16,8 @@ typedef ConnectionStateEmitter = StateEmitter<WebSocketConnectionState>;
 ///
 /// Extends [ConnectionStateEmitter] with the ability to update the current state.
 /// Used internally by WebSocket client implementations to manage state transitions.
-typedef MutableConnectionStateEmitter = MutableStateEmitter<WebSocketConnectionState>;
+typedef MutableConnectionStateEmitter
+    = MutableStateEmitter<WebSocketConnectionState>;
 
 /// Represents the current state of a WebSocket connection.
 ///
