@@ -1,17 +1,16 @@
 import 'package:dio/dio.dart';
 
 import '../../errors.dart';
-import '../http_client.dart';
+import '../../user.dart';
 import '../stream_core_dio_error.dart';
-import '../token_manager.dart';
 
 /// Authentication interceptor that refreshes the token if
 /// an auth error is received
 class AuthInterceptor extends QueuedInterceptor {
   /// Initialize a new auth interceptor
-  AuthInterceptor(this._client, this._tokenManager);
+  AuthInterceptor(this._dio, this._tokenManager);
 
-  final CoreHttpClient _client;
+  final Dio _dio;
 
   /// The token manager used in the client
   final TokenManager _tokenManager;
@@ -22,16 +21,12 @@ class AuthInterceptor extends QueuedInterceptor {
     RequestInterceptorHandler handler,
   ) async {
     try {
-      final token = await _tokenManager.loadToken();
+      final token = await _tokenManager.getToken();
 
-      final params = {'user_id': _tokenManager.userId};
-      final headers = {
-        'Authorization': token,
-        'stream-auth-type': _tokenManager.authType,
-      };
-      options
-        ..queryParameters.addAll(params)
-        ..headers.addAll(headers);
+      options.queryParameters['user_id'] = _tokenManager.userId;
+      options.headers['Authorization'] = token.rawValue;
+      options.headers['stream-auth-type'] = token.authType.headerValue;
+
       return handler.next(options);
     } catch (e, stackTrace) {
       final error = ClientException(
@@ -39,11 +34,13 @@ class AuthInterceptor extends QueuedInterceptor {
         stackTrace: stackTrace,
         error: e,
       );
+
       final dioError = StreamDioException(
         exception: error,
         requestOptions: options,
         stackTrace: StackTrace.current,
       );
+
       return handler.reject(dioError, true);
     }
   }
@@ -60,17 +57,21 @@ class AuthInterceptor extends QueuedInterceptor {
 
     final error = StreamApiError.fromJson(data);
     if (error.isTokenExpiredError) {
-      if (_tokenManager.isStatic) return handler.next(err);
-      await _tokenManager.loadToken(refresh: true);
+      // Don't try to refresh the token if we're using a static provider
+      if (_tokenManager.usesStaticProvider) return handler.next(err);
+      // Otherwise, mark the current token as expired.
+      _tokenManager.expireToken();
+
       try {
         final options = err.requestOptions;
         // ignore: inference_failure_on_function_invocation
-        final response = await _client.fetch(options);
+        final response = await _dio.fetch(options);
         return handler.resolve(response);
       } on DioException catch (exception) {
         return handler.next(exception);
       }
     }
+
     return handler.next(err);
   }
 }

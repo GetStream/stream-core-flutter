@@ -7,22 +7,7 @@ abstract class WsEvent extends Equatable {
   HealthCheckInfo? get healthCheckInfo => null;
 
   @override
-  bool? get stringify => true;
-
-  @override
   List<Object?> get props => [];
-}
-
-class HealthCheckPongEvent extends WsEvent {
-  const HealthCheckPongEvent({
-    required this.healthCheckInfo,
-  });
-
-  @override
-  final HealthCheckInfo healthCheckInfo;
-
-  @override
-  List<Object?> get props => [healthCheckInfo];
 }
 
 final class HealthCheckInfo extends Equatable {
@@ -36,19 +21,4 @@ final class HealthCheckInfo extends Equatable {
 
   @override
   List<Object?> get props => [connectionId, participantCount];
-}
-
-final class WsErrorEvent extends WsEvent {
-  const WsErrorEvent({
-    required this.error,
-    required this.message,
-  });
-
-  final Object message;
-
-  @override
-  final Object error;
-
-  @override
-  List<Object?> get props => [error, message];
 }

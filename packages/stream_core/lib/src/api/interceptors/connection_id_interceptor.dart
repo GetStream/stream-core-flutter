@@ -1,26 +1,26 @@
 import 'package:dio/dio.dart';
 
-import '../connection_id_provider.dart';
+typedef ConnectionIdGetter = String? Function();
 
 /// Interceptor that injects the connection id in the request params
 class ConnectionIdInterceptor extends Interceptor {
-  ///
-  ConnectionIdInterceptor(this.connectionIdProvider);
+  /// Initialize a new [ConnectionIdInterceptor].
+  const ConnectionIdInterceptor(this._connectionId);
 
-  ///
-  final ConnectionIdProvider connectionIdProvider;
+  /// The getter for the connection id.
+  final ConnectionIdGetter _connectionId;
 
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final connectionId = connectionIdProvider();
-    if (connectionId != null) {
-      options.queryParameters.addAll({
-        'connection_id': connectionId,
-      });
+    final connectionId = _connectionId.call();
+    if (connectionId != null && connectionId.isNotEmpty) {
+      // Add the connection id to the query parameters
+      options.queryParameters['connection_id'] = connectionId;
     }
-    handler.next(options);
+
+    return handler.next(options);
   }
 }

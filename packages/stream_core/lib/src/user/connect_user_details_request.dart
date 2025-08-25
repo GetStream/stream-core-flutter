@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'connect_user_details_request.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(createFactory: false)
 class ConnectUserDetailsRequest {
   const ConnectUserDetailsRequest({
     required this.id,
@@ -10,7 +10,7 @@ class ConnectUserDetailsRequest {
     this.invisible,
     this.language,
     this.name,
-    this.customData,
+    this.custom,
   });
 
   final String id;
@@ -18,9 +18,7 @@ class ConnectUserDetailsRequest {
   final bool? invisible;
   final String? language;
   final String? name;
-  final Map<String, dynamic>? customData;
+  final Map<String, Object?>? custom;
 
   Map<String, dynamic> toJson() => _$ConnectUserDetailsRequestToJson(this);
-  static ConnectUserDetailsRequest fromJson(Map<String, dynamic> json) =>
-      _$ConnectUserDetailsRequestFromJson(json);
 }
