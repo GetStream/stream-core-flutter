@@ -711,10 +711,9 @@ void main() {
         );
 
         final result = comments.updateNested(
-          updatedComment,
-          key: (comment) => comment.id,
+          (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
               parent.copyWith(replies: newReplies),
         );
@@ -757,10 +756,9 @@ void main() {
         );
 
         final result = comments.updateNested(
-          updatedComment,
-          key: (comment) => comment.id,
+          (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
               parent.copyWith(replies: newReplies),
         );
@@ -798,10 +796,9 @@ void main() {
         );
 
         final result = comments.updateNested(
-          updatedComment,
-          key: (comment) => comment.id,
+          (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
               parent.copyWith(replies: newReplies),
           compare: (a, b) =>
@@ -854,10 +851,9 @@ void main() {
         );
 
         final result = comments.updateNested(
-          updatedComment,
-          key: (comment) => comment.id,
+          (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
               parent.copyWith(replies: newReplies),
         );
@@ -874,8 +870,7 @@ void main() {
         final comments = <_TestComment>[];
 
         final result = comments.updateNested(
-          const _TestComment(id: '1', text: 'New comment', replies: []),
-          key: (comment) => comment.id,
+          (comment) => comment.id == '1',
           children: (comment) => comment.replies,
           update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
@@ -891,8 +886,7 @@ void main() {
         ];
 
         final result = comments.updateNested(
-          const _TestComment(id: 'nonexistent', text: 'Not found', replies: []),
-          key: (comment) => comment.id,
+          (comment) => comment.id == 'nonexistent',
           children: (comment) => comment.replies,
           update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
@@ -944,10 +938,9 @@ void main() {
         );
 
         final result = forumThread.updateNested(
-          upvotedComment,
-          key: (comment) => comment.id,
+          (comment) => comment.id == upvotedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
+          update: (comment) => upvotedComment.copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
               parent.copyWith(replies: newReplies),
           compare: (a, b) => b.upvotes.compareTo(a.upvotes), // Sort by upvotes
@@ -1067,10 +1060,9 @@ void main() {
 
         final stopwatch = Stopwatch()..start();
         final result = deepComments.updateNested(
-          const _TestComment(id: 'thread1_0', text: 'Updated leaf'),
-          key: (comment) => comment.id,
+          (comment) => comment.id == 'thread1_0',
           children: (comment) => comment.replies,
-          update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
+          update: (comment) => const _TestComment(id: 'thread1_0', text: 'Updated leaf').copyWith(modifiedAt: DateTime.now()),
           updateChildren: (parent, newReplies) =>
               parent.copyWith(replies: newReplies),
         );
@@ -1195,10 +1187,9 @@ void main() {
         var currentState = comments;
         for (var i = 0; i < 10; i++) {
           currentState = currentState.updateNested(
-            _TestComment(id: '2', text: 'Reply 1', upvotes: 5 + i),
-            key: (comment) => comment.id,
+            (comment) => comment.id == '2',
             children: (comment) => comment.replies,
-            update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
+            update: (comment) => _TestComment(id: '2', text: 'Reply 1', upvotes: 5 + i).copyWith(modifiedAt: DateTime.now()),
             updateChildren: (parent, newReplies) =>
                 parent.copyWith(replies: newReplies),
           );

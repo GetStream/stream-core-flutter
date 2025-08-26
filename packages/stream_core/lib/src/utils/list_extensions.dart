@@ -178,11 +178,9 @@ extension SortedListExtensions<T extends Object> on List<T> {
     // and re-sort the list if necessary.
 
     final updatedList = [...this];
-
     updatedList.removeAt(index);
-    updatedList.sortedInsert(element, compare: compare);
 
-    return updatedList;
+    return updatedList.sortedInsert(element, compare: compare);
   }
 
   /// Merges this list with another list, handling duplicates based on a key.
@@ -333,14 +331,14 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
   /// Recursively updates elements in a nested tree structure.
   ///
-  /// Searches for an element with a matching key at any level of nesting.
-  /// When found, the element is updated and parent elements are rebuilt
-  /// through the provided callback functions. Uses copy-on-write to avoid
-  /// unnecessary object creation. Time complexity: O(n * d) where n is
+  /// Searches for elements matching the test condition at any level of
+  /// nesting. When an element is found, it is updated and parent elements are
+  /// rebuilt through the provided callback functions. Uses copy-on-write to
+  /// avoid unnecessary object creation. Time complexity: O(n * d) where n is
   /// total number of nodes and d is average depth.
   ///
   /// ```dart
-  /// final post = [
+  /// final comments = [
   ///   Comment(
   ///     id: '1',
   ///     text: 'What do you think about the new Flutter release?',
@@ -373,49 +371,36 @@ extension SortedListExtensions<T extends Object> on List<T> {
   ///   ),
   /// ];
   ///
-  /// // User upvotes a deeply nested comment
-  /// final upvotedComment = Comment(
-  ///   id: '3',
-  ///   text: 'Agreed, much faster now',
-  ///   author: 'senior_dev',
-  ///   upvotes: 9, // Incremented
-  ///   replies: [],
-  /// );
-  /// final updated = post.updateNested(
-  ///   upvotedComment,
-  ///   key: (comment) => comment.id,
+  /// // Update comment by ID
+  /// final updated = comments.updateNested(
+  ///   (comment) => comment.id == '3',
   ///   children: (comment) => comment.replies,
-  ///   update: (comment) => comment, // Use the updated comment as-is
+  ///   update: (comment) => comment.copyWith(upvotes: comment.upvotes + 1),
   ///   updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
   /// );
-  /// // Result: Deeply nested comment upvote count updated
   ///
-  /// // Edit comment text
-  /// final editedComment = Comment(id: '4', text: 'Actually, bugs are fixed now', author: 'skeptic_user', upvotes: 3);
-  /// final withEdit = post.updateNested(
-  ///   editedComment,
-  ///   key: (comment) => comment.id,
+  /// // Update comments by author with complex condition
+  /// final moderated = comments.updateNested(
+  ///   (comment) => comment.author == 'skeptic_user' && comment.upvotes < 5,
   ///   children: (comment) => comment.replies,
-  ///   update: (comment) => comment.copyWith(editedAt: DateTime.now()), // Mark as edited
+  ///   update: (comment) => comment.copyWith(text: '[Comment moderated]'),
   ///   updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
-  ///   compare: (a, b) => b.upvotes.compareTo(a.upvotes), // Sort replies by upvotes
+  ///   compare: (a, b) => b.upvotes.compareTo(a.upvotes), // Sort by upvotes
   /// );
-  /// // Result: Comment text updated, marked as edited, replies sorted by upvotes
   /// ```
-  List<T> updateNested<K>(
-    T element, {
-    required K Function(T item) key,
+  List<T> updateNested(
+    bool Function(T element) test, {
     required List<T> Function(T) children,
-    required T Function(T) update,
+    required T Function(T element) update,
     required T Function(T, List<T>) updateChildren,
     Comparator<T>? compare,
   }) {
     if (isEmpty) return this;
 
-    final index = indexWhere((e) => key(e) == key(element));
+    final index = indexWhere(test);
     // If the element is found at the root level, update and sort the list
     if (index != -1) {
-      final updatedElement = update(element);
+      final updatedElement = update(this[index]);
       final updated = [...this].apply((it) => it[index] = updatedElement);
       return compare?.let(updated.sorted) ?? updated;
     }
@@ -427,8 +412,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
       if (kids.isEmpty) continue;
 
       final newKids = kids.updateNested(
-        element,
-        key: key,
+        test,
         children: children,
         update: update,
         updateChildren: updateChildren,
