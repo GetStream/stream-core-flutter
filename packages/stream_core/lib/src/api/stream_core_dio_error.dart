@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
-
 import '../../stream_core.dart';
 
 /// Error class specific to StreamChat and Dio

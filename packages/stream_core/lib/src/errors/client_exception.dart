@@ -33,32 +33,32 @@ class HttpClientException extends ClientException {
   final bool isRequestCancelledError;
 }
 
-class WebSocketException extends ClientException {
-  WebSocketException(this.serverException, {super.error})
-      : super(
-          message:
-              (serverException ?? WebSocketEngineException.unknown()).reason,
-        );
-  final WebSocketEngineException? serverException;
-}
-
-class WebSocketEngineException extends ClientException {
-  WebSocketEngineException({
-    required this.reason,
-    required this.code,
-    this.engineError,
-  }) : super(message: reason);
-
-  WebSocketEngineException.unknown()
-      : this(
-          reason: 'Unknown',
-          code: 0,
-          engineError: null,
-        );
-
-  static const stopErrorCode = 1000;
-
-  final String reason;
-  final int code;
-  final Object? engineError;
-}
+// class WebSocketException extends ClientException {
+//   WebSocketException(this.serverException, {super.error})
+//       : super(
+//           message:
+//               (serverException ?? WebSocketEngineException.unknown()).reason,
+//         );
+//   final WebSocketEngineException? serverException;
+// }
+//
+// class WebSocketEngineException extends ClientException {
+//   WebSocketEngineException({
+//     required this.reason,
+//     required this.code,
+//     this.engineError,
+//   }) : super(message: reason);
+//
+//   WebSocketEngineException.unknown()
+//       : this(
+//           reason: 'Unknown',
+//           code: 0,
+//           engineError: null,
+//         );
+//
+//   static const stopErrorCode = 1000;
+//
+//   final String reason;
+//   final int code;
+//   final Object? engineError;
+// }
