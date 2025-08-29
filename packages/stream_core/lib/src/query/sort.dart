@@ -74,6 +74,8 @@ class Sort<T extends Object> {
   int compare(T? a, T? b) {
     return field.comparator.call(a, b, direction, nullOrdering);
   }
+
+  Map<String, dynamic> toJson() => _$SortToJson(this);
 }
 
 class SortField<T extends Object> {
