@@ -11,7 +11,7 @@ sealed class Result<T> extends Equatable {
 
   const factory Result.failure(
     Object error, [
-    StackTrace stackTrace,
+    StackTrace? stackTrace,
   ]) = Failure._;
 
   /// Returns `true` if this instance represents a successful outcome.
