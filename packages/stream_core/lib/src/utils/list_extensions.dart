@@ -222,7 +222,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// // Result: [Score(userId: '1', points: 150), Score(userId: '3', points: 120), Score(userId: '2', points: 80)]
   /// ```
   List<T> merge<K>(
-    List<T> other, {
+    Iterable<T> other, {
     required K Function(T item) key,
     T Function(T original, T updated)? update,
     Comparator<T>? compare,

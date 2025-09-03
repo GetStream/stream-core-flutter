@@ -129,13 +129,22 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
   /// [Result] objects as each upload completes. Progress updates are provided
   /// through the optional [onProgress] callback.
   ///
+  /// When [eagerError] is true, the stream throws an exception and closes
+  /// immediately on the first upload failure. When false (default), failed
+  /// uploads are emitted as [Result.failure] and processing continues.
+  ///
   /// Returns a [Stream] of [Result] objects in completion order, not input order.
   Stream<Result<UploadedAttachment>> uploadBatch(
-    List<StreamAttachment> attachments, {
+    Iterable<StreamAttachment> attachments, {
     OnBatchUploadProgress? onProgress,
     int maxConcurrent = 5,
-  }) {
-    return Stream.fromIterable(attachments).flatMap(
+    bool eagerError = false,
+  }) async* {
+    // Early return for empty list
+    if (attachments.isEmpty) return;
+
+    // Create a stream that uploads attachments with controlled concurrency
+    final uploadStream = Stream.fromIterable(attachments).flatMap(
       maxConcurrent: maxConcurrent,
       (attachment) => Stream.fromFuture(
         upload(
@@ -146,5 +155,16 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
         ),
       ),
     );
+
+    // Yield results as they complete
+    await for (final result in uploadStream) {
+      // If eagerError is enabled, throw on first failure
+      if (result.exceptionOrNull() case final error? when eagerError) {
+        final stackTrace = result.stackTraceOrNull();
+        Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
+      }
+
+      yield result;
+    }
   }
 }
