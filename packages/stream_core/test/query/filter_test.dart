@@ -359,7 +359,7 @@ void main() {
 
           expect(filter.field, field);
           expect(filter.value, value);
-                      expect(filter.operator, FilterOperator.contains_);
+          expect(filter.operator, FilterOperator.contains_);
         });
 
         test('should serialize to JSON correctly', () {
