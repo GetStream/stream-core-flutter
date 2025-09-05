@@ -35,8 +35,11 @@ enum NullOrdering {
   nullsLast;
 }
 
-/// Signature for a function that retrieves a sort field value of type [V] from
+/// Signature for a function that retrieves a sortable field value of type [V] from
 /// an instance of type [T].
+///
+/// This function is used to extract the specific field value that should be used
+/// for sorting operations from a model instance.
 typedef SortFieldValueGetter<T, V> = V? Function(T);
 
 /// A comparator function that compares two instances of type [T] based on
@@ -48,13 +51,31 @@ typedef SortFieldComparator<T> = int Function(
   NullOrdering nullOrdering,
 );
 
+/// A sort specification that defines how to order a collection of objects.
+///
+/// Combines a [SortField] with a [SortDirection] and [NullOrdering] to create
+/// a complete sorting specification. Can be used for both API queries and
+/// local sorting operations.
+///
+/// Example usage:
+/// ```dart
+/// final createdAtField = SortField('created_at', (activity) => activity.createdAt);
+/// final ascendingSort = Sort.asc(createdAtField);
+/// final descendingSort = Sort.desc(createdAtField, nullOrdering: NullOrdering.nullsFirst);
+/// ```
 @JsonSerializable(createFactory: false)
 class Sort<T extends Object> {
+  /// Creates an ascending sort with the specified field and null ordering.
+  ///
+  /// By default, null values are ordered last in ascending sorts.
   const Sort.asc(
     this.field, {
     this.nullOrdering = NullOrdering.nullsLast,
   }) : direction = SortDirection.asc;
 
+  /// Creates a descending sort with the specified field and null ordering.
+  ///
+  /// By default, null values are ordered first in descending sorts.
   const Sort.desc(
     this.field, {
     this.nullOrdering = NullOrdering.nullsFirst,
@@ -62,23 +83,53 @@ class Sort<T extends Object> {
 
   static String _fieldToJson(SortField field) => field.remote;
 
+  /// The field to sort by.
   @JsonKey(toJson: _fieldToJson)
   final SortField<T> field;
 
+  /// The direction of the sort operation (ascending or descending).
   @JsonKey(name: 'direction')
   final SortDirection direction;
 
+  /// How null values should be ordered in the sort operation.
   @JsonKey(includeToJson: false, includeFromJson: false)
   final NullOrdering nullOrdering;
 
+  /// Compares two objects using this sort specification.
+  ///
+  /// Returns:
+  /// - 0 if the objects are equal
+  /// - A positive value if [a] should come after [b]
+  /// - A negative value if [a] should come before [b]
   int compare(T? a, T? b) {
     return field.comparator.call(a, b, direction, nullOrdering);
   }
 
+  /// Converts this sort specification to a JSON representation.
   Map<String, dynamic> toJson() => _$SortToJson(this);
 }
 
+/// A sortable field definition that maps remote field names to local value extractors.
+///
+/// This class defines how to sort model instances by specifying both the remote
+/// field name (used in API queries) and a function to extract the corresponding
+/// value from local model instances for comparison.
+///
+/// The [SortField] combines the remote field identifier with a comparator function
+/// that can extract and compare values from model instances, enabling both remote
+/// API sorting and local client-side sorting with the same field definition.
+///
+/// Example usage:
+/// ```dart
+/// final createdAtField = SortField('created_at', (activity) => activity.createdAt);
+/// final nameSort = Sort.asc(createdAtField);
+/// ```
 class SortField<T extends Object> {
+  /// Creates a new [SortField] with the specified remote field name and value extractor.
+  ///
+  /// The [remote] parameter specifies the field name as it appears in API queries.
+  /// The [localValue] parameter is a function that extracts the corresponding value
+  /// from local model instances for comparison operations.
   factory SortField(
     String remote,
     SortFieldValueGetter<T, Object> localValue,
@@ -95,9 +146,10 @@ class SortField<T extends Object> {
     required this.comparator,
   });
 
+  /// The remote field name used in API queries.
   final String remote;
 
-  @JsonKey(includeToJson: false, includeFromJson: false)
+  /// The comparator function used for local sorting operations.
   final AnySortComparator<T> comparator;
 }
 
