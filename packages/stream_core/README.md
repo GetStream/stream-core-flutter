@@ -18,7 +18,7 @@ It provides shared low-level utilities, such as:
 
 This package is **not designed for direct use by customers**. It acts as the foundation layer for other Stream SDKs and contains internal logic that is subject to change.
 
-> If you're building an app with Stream, use [stream-chat-flutter](https://github.com/GetStream/stream-chat-flutter) or [stream-video-flutter](https://github.com/GetStream/stream-video-flutter) instead.
+> If you're building an app with Stream, use [stream-chat-flutter](https://github.com/GetStream/stream-chat-flutter), [stream-video-flutter](https://github.com/GetStream/stream-video-flutter) or [stream-feeds-flutter](https://github.com/GetStream/stream-feeds-flutter) instead.
 
 ## ⚠️ Versioning Notice
 

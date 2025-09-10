@@ -1,12 +1,5 @@
 # Stream Core WebSocket
 
-## TODO
-- [ ] cover with unit tests
-- [ ] test implementation
-- [x] reconnect logic
-- [x] improve docs
-- [ ] replace print statements with proper logs
-
 Stream Core WebSocket provides a robust WebSocket client with automatic reconnection, health monitoring, and type-safe event handling for real-time applications.
 
 The WebSocket implementation includes comprehensive connection lifecycle management, intelligent reconnection policies, and structured event processing for building reliable real-time features.
