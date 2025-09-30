@@ -38,11 +38,13 @@ class ConnectionRecoveryHandler extends Disposable {
   ConnectionRecoveryHandler({
     required StreamWebSocketClient client,
     NetworkStateProvider? networkStateProvider,
-    AppLifecycleStateProvider? appLifecycleStateProvider,
+    LifecycleStateProvider? lifecycleStateProvider,
+    bool keepConnectionAliveInBackground = false,
     List<AutomaticReconnectionPolicy>? policies,
     RetryStrategy? retryStrategy,
   })  : _client = client,
         _reconnectStrategy = retryStrategy ?? RetryStrategy(),
+        _keepConnectionAliveInBackground = keepConnectionAliveInBackground,
         _policies = <AutomaticReconnectionPolicy>[
           if (policies != null) ...policies,
           WebSocketAutomaticReconnectionPolicy(
@@ -52,7 +54,7 @@ class ConnectionRecoveryHandler extends Disposable {
             InternetAvailabilityReconnectionPolicy(
               networkState: provider.state,
             ),
-          if (appLifecycleStateProvider case final provider?)
+          if (lifecycleStateProvider case final provider?)
             BackgroundStateReconnectionPolicy(
               appLifecycleState: provider.state,
             ),
@@ -66,13 +68,14 @@ class ConnectionRecoveryHandler extends Disposable {
     }
 
     // Listen to app lifecycle state changes if a provider is given.
-    if (appLifecycleStateProvider case final provider?) {
+    if (lifecycleStateProvider case final provider?) {
       provider.state.on(_onAppLifecycleStateChanged).addTo(_subscriptions);
     }
   }
 
   final StreamWebSocketClient _client;
   final RetryStrategy _reconnectStrategy;
+  final bool _keepConnectionAliveInBackground;
   final List<AutomaticReconnectionPolicy> _policies;
 
   late final _subscriptions = CompositeSubscription();
@@ -115,9 +118,7 @@ class ConnectionRecoveryHandler extends Disposable {
     _reconnectionTimer = null;
   }
 
-  bool _canBeReconnected() {
-    return _policies.every((policy) => policy.canBeReconnected());
-  }
+  bool _canBeReconnected() => _policies.every((it) => it.canBeReconnected());
 
   bool _canBeDisconnected() {
     return switch (_client.connectionState.value) {
@@ -128,15 +129,19 @@ class ConnectionRecoveryHandler extends Disposable {
 
   void _onNetworkStateChanged(NetworkState status) {
     return switch (status) {
+      NetworkState.unknown => () {}, // No action needed for unknown state.
       NetworkState.connected => reconnectIfNeeded(),
       NetworkState.disconnected => disconnectIfNeeded(),
     };
   }
 
-  void _onAppLifecycleStateChanged(AppLifecycleState state) {
+  void _onAppLifecycleStateChanged(LifecycleState state) {
     return switch (state) {
-      AppLifecycleState.foreground => reconnectIfNeeded(),
-      AppLifecycleState.background => disconnectIfNeeded(),
+      LifecycleState.unknown => () {}, // No action needed for unknown state.
+      // If we want to keep the connection alive in the background, do nothing.
+      LifecycleState.background when _keepConnectionAliveInBackground => () {},
+      LifecycleState.background => disconnectIfNeeded(),
+      LifecycleState.foreground => reconnectIfNeeded(),
     };
   }
 
@@ -146,7 +151,7 @@ class ConnectionRecoveryHandler extends Disposable {
       Connected() => _reconnectStrategy.resetConsecutiveFailures(),
       Disconnected() => _scheduleReconnectionIfNeeded(),
       // These states do not require any action.
-      Initialized() || Authenticating() || Disconnecting() => null,
+      Initialized() || Authenticating() || Disconnecting() => () {},
     };
   }
 

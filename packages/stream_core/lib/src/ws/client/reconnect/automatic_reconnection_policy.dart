@@ -52,12 +52,12 @@ class BackgroundStateReconnectionPolicy implements AutomaticReconnectionPolicy {
   BackgroundStateReconnectionPolicy({required this.appLifecycleState});
 
   /// The provider that gives the current app lifecycle state.
-  final AppLifecycleStateEmitter appLifecycleState;
+  final LifecycleStateEmitter appLifecycleState;
 
   @override
   bool canBeReconnected() {
     final state = appLifecycleState.value;
-    return state == AppLifecycleState.foreground;
+    return state == LifecycleState.foreground;
   }
 }
 
