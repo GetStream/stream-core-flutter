@@ -55,21 +55,29 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   @override
   Future<Result<void>> open(WebSocketOptions options) {
     return runSafely(() async {
-      if (_ws != null) {
-        throw StateError('Web socket is already open. Call close() first.');
-      }
+      // Close any existing connection first.
+      if (_ws != null) await close();
 
+      // Create a new WebSocket connection.
       _ws = _wsProvider.call(options);
-
-      await _ws?.ready.then((_) => _listener?.onOpen());
-
       _wsSubscription = _ws?.stream.listen(
         _onData,
-        onError: _listener?.onError,
-        onDone: () => _listener?.onClose(_ws?.closeCode, _ws?.closeReason),
+        onDone: _onDone,
         cancelOnError: false,
+        onError: _listener?.onError,
       );
+
+      return _ws?.ready.then((_) => _listener?.onOpen());
     });
+  }
+
+  void _onDone() {
+    // Capture the close code and reason before closing.
+    final closeCode = _ws?.closeCode;
+    final closeReason = _ws?.closeReason;
+
+    // Close the connection and notify the listener.
+    unawaited(close(closeCode, closeReason));
   }
 
   void _onData(Object? data) {
@@ -92,15 +100,16 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     String? closeReason = 'Closed by client',
   ]) {
     return runSafely(() async {
-      if (_ws == null) {
-        throw StateError('WebSocket is not open. Call open() first.');
-      }
+      if (_ws == null) return;
 
       await _ws?.sink.close(closeCode, closeReason);
       _ws = null;
 
       await _wsSubscription?.cancel();
       _wsSubscription = null;
+
+      // Notify the listener about the closure.
+      _listener?.onClose(closeCode, closeReason);
     });
   }
 

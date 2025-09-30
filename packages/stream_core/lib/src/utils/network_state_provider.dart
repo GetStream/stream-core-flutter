@@ -1,5 +1,6 @@
 import 'state_emitter.dart';
 
+/// A type alias for a state emitter that emits [NetworkState] values.
 typedef NetworkStateEmitter = StateEmitter<NetworkState>;
 
 /// A utility class for monitoring network connectivity changes.
@@ -16,6 +17,9 @@ abstract interface class NetworkStateProvider {
 /// This enum defines two possible values to represent the state of network
 /// connectivity: `connected` and `disconnected`.
 enum NetworkState {
+  /// The network state is unknown, e.g., the initial state before any checks.
+  unknown,
+
   /// Internet is available because at least one of the HEAD requests succeeded.
   connected,
 

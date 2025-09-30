@@ -122,7 +122,7 @@ class StreamWebSocketClient
     final result = await _engine.open(options);
 
     // If some failure occurs, disconnect and rethrow the error.
-    return result.onFailure((_, __) => disconnect()).getOrThrow();
+    return result.recover((_, __) => onClose()).getOrThrow();
   }
 
   /// Closes the WebSocket connection.
@@ -213,8 +213,7 @@ class StreamWebSocketClient
       error: WebSocketEngineException(error: error),
     );
 
-    // Update the connection state to 'disconnecting'.
-    _connectionState = WebSocketConnectionState.disconnecting(source: source);
+    return unawaited(disconnect(source: source));
   }
 
   void _handleHealthCheckEvent(WsEvent event, HealthCheckInfo info) {

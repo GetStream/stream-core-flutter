@@ -1,6 +1,6 @@
-export 'utils/app_lifecycle_state_provider.dart';
 export 'utils/comparable_extensions.dart';
 export 'utils/disposable.dart';
+export 'utils/lifecycle_state_provider.dart';
 export 'utils/list_extensions.dart';
 export 'utils/network_state_provider.dart';
 export 'utils/result.dart';
