@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:stream_core/src/query/filter.dart';
-import 'package:stream_core/src/query/filter_operator.dart';
+import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 // Test implementation of FilterField for testing purposes
