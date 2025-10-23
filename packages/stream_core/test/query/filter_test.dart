@@ -55,8 +55,8 @@ void main() {
 
         var filter = Filter.equal(field, value);
 
-        expect(filter, isA<Equal<TestModel>>());
-        filter = filter as Equal<TestModel>;
+        expect(filter, isA<EqualOperator<TestModel>>());
+        filter = filter as EqualOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.value, value);
         expect(filter.operator, FilterOperator.equal);
@@ -94,8 +94,8 @@ void main() {
 
         var filter = Filter.greater(field, value);
 
-        expect(filter, isA<Greater<TestModel>>());
-        filter = filter as Greater<TestModel>;
+        expect(filter, isA<GreaterOperator<TestModel>>());
+        filter = filter as GreaterOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.value, value);
         expect(filter.operator, FilterOperator.greater);
@@ -121,8 +121,8 @@ void main() {
 
         var filter = Filter.greaterOrEqual(field, value);
 
-        expect(filter, isA<GreaterOrEqual<TestModel>>());
-        filter = filter as GreaterOrEqual<TestModel>;
+        expect(filter, isA<GreaterOrEqualOperator<TestModel>>());
+        filter = filter as GreaterOrEqualOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.value, value);
         expect(filter.operator, FilterOperator.greaterOrEqual);
@@ -148,8 +148,8 @@ void main() {
 
         var filter = Filter.less(field, value);
 
-        expect(filter, isA<Less<TestModel>>());
-        filter = filter as Less<TestModel>;
+        expect(filter, isA<LessOperator<TestModel>>());
+        filter = filter as LessOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.value, value);
         expect(filter.operator, FilterOperator.less);
@@ -175,8 +175,8 @@ void main() {
 
         var filter = Filter.lessOrEqual(field, value);
 
-        expect(filter, isA<LessOrEqual<TestModel>>());
-        filter = filter as LessOrEqual<TestModel>;
+        expect(filter, isA<LessOrEqualOperator<TestModel>>());
+        filter = filter as LessOrEqualOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.value, value);
         expect(filter.operator, FilterOperator.lessOrEqual);
@@ -204,8 +204,8 @@ void main() {
 
         var filter = Filter.in_(field, values);
 
-        expect(filter, isA<In<TestModel>>());
-        filter = filter as In<TestModel>;
+        expect(filter, isA<InOperator<TestModel>>());
+        filter = filter as InOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.value, values);
         expect(filter.operator, FilterOperator.in_);
@@ -243,8 +243,8 @@ void main() {
 
         var filter = Filter.contains(field, value);
 
-        expect(filter, isA<Contains<TestModel>>());
-        filter = filter as Contains<TestModel>;
+        expect(filter, isA<ContainsOperator<TestModel>>());
+        filter = filter as ContainsOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.value, value);
         expect(filter.operator, FilterOperator.contains_);
@@ -271,8 +271,8 @@ void main() {
 
       var filter = Filter.exists(field, exists: exists);
 
-      expect(filter, isA<Exists<TestModel>>());
-      filter = filter as Exists<TestModel>;
+      expect(filter, isA<ExistsOperator<TestModel>>());
+      filter = filter as ExistsOperator<TestModel>;
       expect(filter.field, field);
       expect(filter.exists, exists);
       expect(filter.operator, FilterOperator.exists);
@@ -311,8 +311,8 @@ void main() {
 
         var filter = Filter.query(field, query);
 
-        expect(filter, isA<Query<TestModel>>());
-        filter = filter as Query<TestModel>;
+        expect(filter, isA<QueryOperator<TestModel>>());
+        filter = filter as QueryOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.query, query);
         expect(filter.operator, FilterOperator.query);
@@ -338,8 +338,8 @@ void main() {
 
         var filter = Filter.autoComplete(field, query);
 
-        expect(filter, isA<AutoComplete<TestModel>>());
-        filter = filter as AutoComplete<TestModel>;
+        expect(filter, isA<AutoCompleteOperator<TestModel>>());
+        filter = filter as AutoCompleteOperator<TestModel>;
         expect(filter.field, field);
         expect(filter.query, query);
         expect(filter.operator, FilterOperator.autoComplete);
@@ -366,8 +366,8 @@ void main() {
 
       var filter = Filter.pathExists(field, path);
 
-      expect(filter, isA<PathExists<TestModel>>());
-      filter = filter as PathExists<TestModel>;
+      expect(filter, isA<PathExistsOperator<TestModel>>());
+      filter = filter as PathExistsOperator<TestModel>;
       expect(filter.field, field);
       expect(filter.path, path);
       expect(filter.operator, FilterOperator.pathExists);
@@ -395,8 +395,8 @@ void main() {
 
         var andFilter = Filter.and(filters);
 
-        expect(andFilter, isA<And<TestModel>>());
-        andFilter = andFilter as And<TestModel>;
+        expect(andFilter, isA<AndOperator<TestModel>>());
+        andFilter = andFilter as AndOperator<TestModel>;
         expect(andFilter.filters, filters);
         expect(andFilter.operator, FilterOperator.and);
       });
@@ -459,8 +459,8 @@ void main() {
 
         var orFilter = Filter.or(filters);
 
-        expect(orFilter, isA<Or<TestModel>>());
-        orFilter = orFilter as Or<TestModel>;
+        expect(orFilter, isA<OrOperator<TestModel>>());
+        orFilter = orFilter as OrOperator<TestModel>;
         expect(orFilter.filters, filters);
         expect(orFilter.operator, FilterOperator.or);
       });
@@ -584,8 +584,8 @@ void main() {
 
       var logicalFilter = Filter.and([filter1, filter2]);
 
-      expect(logicalFilter, isA<And<TestModel>>());
-      logicalFilter = logicalFilter as And<TestModel>;
+      expect(logicalFilter, isA<AndOperator<TestModel>>());
+      logicalFilter = logicalFilter as AndOperator<TestModel>;
       expect(logicalFilter.filters.length, 2);
       expect(logicalFilter.filters.elementAt(0), filter1);
       expect(logicalFilter.filters.elementAt(1), filter2);

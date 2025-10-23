@@ -94,31 +94,31 @@ sealed class Filter<T extends Object> {
   const factory Filter.equal(
     FilterField<T> field,
     Object? value,
-  ) = Equal<T>;
+  ) = EqualOperator<T>;
 
   /// Greater-than filter matching [field] greater than [value].
   const factory Filter.greater(
     FilterField<T> field,
     Object? value,
-  ) = Greater<T>;
+  ) = GreaterOperator<T>;
 
   /// Greater-than-or-equal filter matching [field] >= [value].
   const factory Filter.greaterOrEqual(
     FilterField<T> field,
     Object? value,
-  ) = GreaterOrEqual<T>;
+  ) = GreaterOrEqualOperator<T>;
 
   /// Less-than filter matching [field] less than [value].
   const factory Filter.less(
     FilterField<T> field,
     Object? value,
-  ) = Less<T>;
+  ) = LessOperator<T>;
 
   /// Less-than-or-equal filter matching [field] <= [value].
   const factory Filter.lessOrEqual(
     FilterField<T> field,
     Object? value,
-  ) = LessOrEqual<T>;
+  ) = LessOrEqualOperator<T>;
 
   // List operators
 
@@ -126,13 +126,13 @@ sealed class Filter<T extends Object> {
   const factory Filter.in_(
     FilterField<T> field,
     Iterable<Object?> values,
-  ) = In<T>;
+  ) = InOperator<T>;
 
   /// Containment filter matching [field] containing [value].
   const factory Filter.contains(
     FilterField<T> field,
     Object? value,
-  ) = Contains<T>;
+  ) = ContainsOperator<T>;
 
   // Existence operator
 
@@ -140,7 +140,7 @@ sealed class Filter<T extends Object> {
   const factory Filter.exists(
     FilterField<T> field, {
     required bool exists,
-  }) = Exists<T>;
+  }) = ExistsOperator<T>;
 
   // Evaluation operators
 
@@ -148,13 +148,13 @@ sealed class Filter<T extends Object> {
   const factory Filter.query(
     FilterField<T> field,
     String query,
-  ) = Query<T>;
+  ) = QueryOperator<T>;
 
   /// Autocomplete filter matching [field] words starting with [query].
   const factory Filter.autoComplete(
     FilterField<T> field,
     String query,
-  ) = AutoComplete<T>;
+  ) = AutoCompleteOperator<T>;
 
   // Path operator
 
@@ -162,15 +162,15 @@ sealed class Filter<T extends Object> {
   const factory Filter.pathExists(
     FilterField<T> field,
     String path,
-  ) = PathExists<T>;
+  ) = PathExistsOperator<T>;
 
   // Logical operators
 
   /// Logical AND filter matching when all [filters] match.
-  const factory Filter.and(Iterable<Filter<T>> filters) = And<T>;
+  const factory Filter.and(Iterable<Filter<T>> filters) = AndOperator<T>;
 
   /// Logical OR filter matching when any [filters] match.
-  const factory Filter.or(Iterable<Filter<T>> filters) = Or<T>;
+  const factory Filter.or(Iterable<Filter<T>> filters) = OrOperator<T>;
 
   /// Whether this filter matches the given [other] instance.
   ///
@@ -232,9 +232,9 @@ sealed class ComparisonOperator<T extends Object> extends Filter<T> {
 /// - **Objects**: Key-value equality, order-insensitive for keys
 ///
 /// **Supported with**: `.equal` factory method
-final class Equal<T extends Object> extends ComparisonOperator<T> {
+final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates an equality filter for the specified [field] and [value].
-  const Equal(super.field, super.value)
+  const EqualOperator(super.field, super.value)
       : super._(operator: FilterOperator.equal);
 
   @override
@@ -252,9 +252,9 @@ final class Equal<T extends Object> extends ComparisonOperator<T> {
 /// Primarily used with numeric values and dates.
 ///
 /// **Supported with**: `.greater` factory method
-final class Greater<T extends Object> extends ComparisonOperator<T> {
+final class GreaterOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a greater-than filter for the specified [field] and [value].
-  const Greater(super.field, super.value)
+  const GreaterOperator(super.field, super.value)
       : super._(operator: FilterOperator.greater);
 
   @override
@@ -274,9 +274,10 @@ final class Greater<T extends Object> extends ComparisonOperator<T> {
 /// Greater-than-or-equal comparison filter.
 ///
 /// Primarily used with numeric values and dates.
-final class GreaterOrEqual<T extends Object> extends ComparisonOperator<T> {
+final class GreaterOrEqualOperator<T extends Object>
+    extends ComparisonOperator<T> {
   /// Creates a greater-than-or-equal filter for the specified [field] and [value].
-  const GreaterOrEqual(super.field, super.value)
+  const GreaterOrEqualOperator(super.field, super.value)
       : super._(operator: FilterOperator.greaterOrEqual);
 
   @override
@@ -296,9 +297,10 @@ final class GreaterOrEqual<T extends Object> extends ComparisonOperator<T> {
 /// Less-than comparison filter.
 ///
 /// Primarily used with numeric values and dates.
-final class Less<T extends Object> extends ComparisonOperator<T> {
+final class LessOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a less-than filter for the specified [field] and [value].
-  const Less(super.field, super.value) : super._(operator: FilterOperator.less);
+  const LessOperator(super.field, super.value)
+      : super._(operator: FilterOperator.less);
 
   @override
   bool matches(T other) {
@@ -317,9 +319,10 @@ final class Less<T extends Object> extends ComparisonOperator<T> {
 /// Less-than-or-equal comparison filter.
 ///
 /// Primarily used with numeric values and dates.
-final class LessOrEqual<T extends Object> extends ComparisonOperator<T> {
+final class LessOrEqualOperator<T extends Object>
+    extends ComparisonOperator<T> {
   /// Creates a less-than-or-equal filter for the specified [field] and [value].
-  const LessOrEqual(super.field, super.value)
+  const LessOrEqualOperator(super.field, super.value)
       : super._(operator: FilterOperator.lessOrEqual);
 
   @override
@@ -373,9 +376,9 @@ sealed class ListOperator<T extends Object> extends Filter<T> {
 /// Uses deep equality with order-sensitive comparison for arrays.
 ///
 /// **Supported with**: `.in_` factory method
-final class In<T extends Object> extends ListOperator<T> {
+final class InOperator<T extends Object> extends ListOperator<T> {
   /// Creates an 'in' filter for the specified [field] and [values] iterable.
-  const In(super.field, Iterable<Object?> super.values)
+  const InOperator(super.field, Iterable<Object?> super.values)
       : super._(operator: FilterOperator.in_);
 
   @override
@@ -398,9 +401,9 @@ final class In<T extends Object> extends ListOperator<T> {
 /// - **Single values**: Direct equality check
 ///
 /// **Supported with**: `.contains` factory method
-final class Contains<T extends Object> extends ListOperator<T> {
+final class ContainsOperator<T extends Object> extends ListOperator<T> {
   /// Creates a contains filter for the specified [field] and [value].
-  const Contains(super.field, super.value)
+  const ContainsOperator(super.field, super.value)
       : super._(operator: FilterOperator.contains_);
 
   @override
@@ -422,9 +425,9 @@ final class Contains<T extends Object> extends ListOperator<T> {
 /// Tests whether a field is present (non-null) or absent in the record.
 ///
 /// **Supported with**: `.exists` factory method
-final class Exists<T extends Object> extends Filter<T> {
+final class ExistsOperator<T extends Object> extends Filter<T> {
   /// Creates an existence filter for the specified [field] and [exists] condition.
-  const Exists(this.field, {required this.exists}) : super._();
+  const ExistsOperator(this.field, {required this.exists}) : super._();
 
   /// The field to check for existence.
   final FilterField<T> field;
@@ -487,9 +490,9 @@ sealed class EvaluationOperator<T extends Object> extends Filter<T> {
 /// Performs case-insensitive text search within the field's content.
 ///
 /// **Supported with**: `.query` factory method
-final class Query<T extends Object> extends EvaluationOperator<T> {
+final class QueryOperator<T extends Object> extends EvaluationOperator<T> {
   /// Creates a text search filter for the specified [field] and search [query].
-  const Query(super.field, super.query)
+  const QueryOperator(super.field, super.query)
       : super._(operator: FilterOperator.query);
 
   @override
@@ -507,9 +510,10 @@ final class Query<T extends Object> extends EvaluationOperator<T> {
 /// Word prefix matching filter for autocomplete.
 ///
 /// Matches field values where any word starts with the provided prefix.
-final class AutoComplete<T extends Object> extends EvaluationOperator<T> {
+final class AutoCompleteOperator<T extends Object>
+    extends EvaluationOperator<T> {
   /// Creates an autocomplete filter for the specified [field] and prefix [query].
-  const AutoComplete(super.field, super.query)
+  const AutoCompleteOperator(super.field, super.query)
       : super._(operator: FilterOperator.autoComplete);
 
   @override
@@ -535,9 +539,9 @@ final class AutoComplete<T extends Object> extends EvaluationOperator<T> {
 /// Nested JSON path existence filter.
 ///
 /// Tests whether the field contains JSON data with the specified nested path.
-final class PathExists<T extends Object> extends Filter<T> {
+final class PathExistsOperator<T extends Object> extends Filter<T> {
   /// Creates a path existence filter for the specified [field] and nested [path].
-  const PathExists(this.field, this.path) : super._();
+  const PathExistsOperator(this.field, this.path) : super._();
 
   /// The field containing JSON data to check.
   final FilterField<T> field;
@@ -609,9 +613,9 @@ sealed class LogicalOperator<T extends Object> extends Filter<T> {
 /// All provided filters must match for a record to be included.
 ///
 /// **Supported with**: `.and` factory method
-final class And<T extends Object> extends LogicalOperator<T> {
+final class AndOperator<T extends Object> extends LogicalOperator<T> {
   /// Creates a logical AND filter combining the specified [filters].
-  const And(super.filters) : super._(operator: FilterOperator.and);
+  const AndOperator(super.filters) : super._(operator: FilterOperator.and);
 
   @override
   bool matches(T other) => filters.every((filter) => filter.matches(other));
@@ -620,9 +624,9 @@ final class And<T extends Object> extends LogicalOperator<T> {
 /// Logical OR filter requiring any condition to match.
 ///
 /// At least one provided filter must match for a record to be included.
-final class Or<T extends Object> extends LogicalOperator<T> {
+final class OrOperator<T extends Object> extends LogicalOperator<T> {
   /// Creates a logical OR filter combining the specified [filters].
-  const Or(super.filters) : super._(operator: FilterOperator.or);
+  const OrOperator(super.filters) : super._(operator: FilterOperator.or);
 
   @override
   bool matches(T other) => filters.any((filter) => filter.matches(other));
