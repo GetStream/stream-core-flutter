@@ -41,7 +41,8 @@ import 'package:meta/meta.dart';
 /// print(intField?.compareTo(doubleField!));  // 0 (equal)
 /// ```
 @immutable
-class ComparableField<T extends Object> implements Comparable<ComparableField<T>> {
+class ComparableField<T extends Object>
+    implements Comparable<ComparableField<T>> {
   const ComparableField._(this.value);
 
   /// Creates a [ComparableField] from [value].
