@@ -1,246 +1,206 @@
+import '../utils.dart';
+import 'filter_operation_utils.dart';
 import 'filter_operator.dart';
 
-/// A type-safe field identifier for filtering operations.
+/// Function that extracts a field value from a model instance.
 ///
-/// This extension type wraps a String to provide compile-time type safety when
-/// specifying fields in filter operations. It implements String, making it
-/// transparent and zero-cost at runtime while ensuring only valid fields
-/// can be used in filter operations.
-///
-/// ## Supported Operators
-///
-/// All filter fields support the following operators:
-/// - **Comparison**: `.equal`, `.greater`, `.greaterOrEqual`, `.less`, `.lessOrEqual`
-/// - **List**: `.in_`, `.contains`
-/// - **Existence**: `.exists`
-/// - **Evaluation**: `.query`, `.autoComplete`
-/// - **Path**: `.pathExists`
-/// - **Logical**: `.and`, `.or`
-///
-/// Example implementation:
-/// ```dart
-/// extension type const MyFilterField(String remote) implements FilterField {
-///   /// Filter by unique identifier.
-///   ///
-///   /// **Supported operators**: `.equal`, `.in_`
-///   static const id = MyFilterField('id');
-///
-///   /// Filter by display name.
-///   ///
-///   /// **Supported operators**: `.equal`, `.query`, `.autoComplete`
-///   static const name = MyFilterField('name');
-///
-///   /// Filter by numeric age value.
-///   ///
-///   /// **Supported operators**: `.equal`, `.greater`, `.greaterOrEqual`, `.less`, `.lessOrEqual`
-///   static const age = MyFilterField('age');
-///
-///   /// Filter by creation timestamp.
-///   ///
-///   /// **Supported operators**: `.equal`, `.greater`, `.greaterOrEqual`, `.less`, `.lessOrEqual`
-///   static const createdAt = MyFilterField('created_at');
-///
-///   /// Filter by tag collections.
-///   ///
-///   /// **Supported operators**: `.in_`, `.contains`
-///   static const tags = MyFilterField('tags');
-///
-///   /// Filter by JSON metadata existence.
-///   ///
-///   /// **Supported operators**: `.exists`, `.pathExists`
-///   static const metadata = MyFilterField('metadata');
-/// }
-/// ```
-extension type FilterField(String _) implements String {}
+/// Returns the field value of type [V] from an instance of type [T].
+typedef FilterFieldValueGetter<T, V> = V? Function(T);
 
-/// A filter for querying data with type-safe field specifications.
+/// Type-safe field identifier for filtering and value extraction.
 ///
-/// The primary interface for creating filters in queries that provides
-/// comprehensive filtering capabilities with compile-time type safety.
+/// Associates a field name with a value getter function for type-safe filtering.
+/// The getter extracts field values from model instances for filter matching.
+///
+/// Use extension types to create filter field definitions for your models:
+///
+/// ```dart
+/// class User {
+///   User(this.id, this.name, this.age);
+///
+///   final String id;
+///   final String name;
+///   final int age;
+/// }
+///
+/// extension type const UserField._(FilterField<User> field)
+///     implements FilterField<User> {
+///   const UserField(String name, Object? Function(User) getter)
+///       : this._(FilterField(name, getter));
+///
+///   static const id = UserField('id', (u) => u.id);
+///   static const name = UserField('name', (u) => u.name);
+///   static const age = UserField('age', (u) => u.age);
+/// }
+///
+/// // Use in filters
+/// final filter = Filter.equal(UserField.name, 'John');
+/// final matches = filter.matches(User('1', 'John', 30)); // true
+/// ```
+class FilterField<T> {
+  const FilterField(this.remote, this.value);
+
+  /// The remote field name used in API queries.
+  final String remote;
+
+  /// The function that extracts the field value of type [T] from a model instance.
+  final FilterFieldValueGetter<T, Object> value;
+}
+
+/// Type-safe filter for querying data.
+///
+/// Provides comprehensive filtering with compile-time type safety.
 /// Supports comparison, list, existence, evaluation, path, and logical operations.
 ///
-/// Each [Filter] instance is associated with a specific [FilterField] extension type
-/// that ensures only valid fields can be used in filter operations. The extension type
-/// approach provides zero runtime overhead while maintaining full type safety.
-///
-/// ## Basic Usage
-///
 /// ```dart
-/// // Define your field types
-/// extension type const UserField(String remote) implements FilterField {
-///   static const id = UserField('id');
-///   static const name = UserField('name');
-///   static const age = UserField('age');
-///   static const email = UserField('email');
-///   static const tags = UserField('tags');
-///   static const metadata = UserField('metadata');
+/// class User {
+///   final String name;
+///   final int age;
+///   final List<String> tags;
+///   User(this.name, this.age, this.tags);
 /// }
 ///
-/// // Create complex filters with inline composition
-/// final complexFilter = Filter.and([
+/// extension type const UserField._(FilterField<User> field)
+///     implements FilterField<User> {
+///   const UserField(String name, Object? Function(User) getter)
+///       : this._(FilterField(name, getter));
+///
+///   static const name = UserField('name', (u) => u.name);
+///   static const age = UserField('age', (u) => u.age);
+///   static const tags = UserField('tags', (u) => u.tags);
+/// }
+///
+/// // Create complex filters
+/// final filter = Filter.and([
 ///   Filter.equal(UserField.name, 'John'),
-///   Filter.or([
-///     Filter.greater(UserField.age, 18),
-///     Filter.contains(UserField.email, '@company.com'),
-///   ]),
-///   Filter.in_(UserField.tags, ['admin', 'moderator']),
-///   Filter.exists(UserField.metadata, exists: true),
+///   Filter.greater(UserField.age, 18),
+///   Filter.contains(UserField.tags, 'admin'),
 /// ]);
 ///
-/// // Convert to JSON for API usage
-/// final json = complexFilter.toJson();
+/// // Use for matching
+/// final user = User('John', 25, ['admin']);
+/// print(filter.matches(user)); // true
+///
+/// // Convert to JSON for API
+/// final json = filter.toJson();
 /// ```
-sealed class Filter<F extends FilterField> {
+sealed class Filter<T extends Object> {
   /// Creates a new [Filter] instance.
   const Filter._();
 
   // Comparison operators
 
-  /// Creates an equality filter that matches values equal to [value].
-  ///
-  /// Returns an [EqualOperator] that matches when the specified [field]
-  /// exactly equals the provided [value].
-  const factory Filter.equal(F field, Object? value) =
-      EqualOperator<F, Object?>;
+  /// Equality filter matching [field] equal to [value].
+  const factory Filter.equal(
+    FilterField<T> field,
+    Object? value,
+  ) = Equal<T>;
 
-  /// Creates a greater-than filter that matches values greater than [value].
-  ///
-  /// Returns a [GreaterOperator] that matches when the specified [field]
-  /// is greater than the provided [value].
-  const factory Filter.greater(F field, Object? value) =
-      GreaterOperator<F, Object?>;
+  /// Greater-than filter matching [field] greater than [value].
+  const factory Filter.greater(
+    FilterField<T> field,
+    Object? value,
+  ) = Greater<T>;
 
-  /// Creates a greater-than-or-equal filter that matches values greater than or equal to [value].
-  ///
-  /// Returns a [GreaterOrEqualOperator] that matches when the specified [field]
-  /// is greater than or equal to the provided [value].
-  const factory Filter.greaterOrEqual(F field, Object? value) =
-      GreaterOrEqualOperator<F, Object?>;
+  /// Greater-than-or-equal filter matching [field] >= [value].
+  const factory Filter.greaterOrEqual(
+    FilterField<T> field,
+    Object? value,
+  ) = GreaterOrEqual<T>;
 
-  /// Creates a less-than filter that matches values less than [value].
-  ///
-  /// Returns a [LessOperator] that matches when the specified [field]
-  /// is less than the provided [value].
-  const factory Filter.less(F field, Object? value) = LessOperator<F, Object?>;
+  /// Less-than filter matching [field] less than [value].
+  const factory Filter.less(
+    FilterField<T> field,
+    Object? value,
+  ) = Less<T>;
 
-  /// Creates a less-than-or-equal filter that matches values less than or equal to [value].
-  ///
-  /// Returns a [LessOrEqualOperator] that matches when the specified [field]
-  /// is less than or equal to the provided [value].
-  const factory Filter.lessOrEqual(F field, Object? value) =
-      LessOrEqualOperator<F, Object?>;
+  /// Less-than-or-equal filter matching [field] <= [value].
+  const factory Filter.lessOrEqual(
+    FilterField<T> field,
+    Object? value,
+  ) = LessOrEqual<T>;
 
   // List operators
 
-  /// Creates an 'in' filter that matches values contained in the provided values.
-  ///
-  /// Returns an [InOperator] that matches when the specified [field]
-  /// value is found within the provided [values] iterable.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Match users with specific roles
-  /// final roleFilter = Filter.in_(UserField.role, ['admin', 'moderator', 'editor']);
-  ///
-  /// // Works with any Iterable
-  /// final statusFilter = Filter.in_(UserField.status, {'active', 'pending'});
-  /// ```
-  const factory Filter.in_(F field, Iterable<Object?> values) =
-      InOperator<F, Object?>;
+  /// Membership filter matching [field] value in [values].
+  const factory Filter.in_(
+    FilterField<T> field,
+    Iterable<Object?> values,
+  ) = In<T>;
 
-  /// Creates a contains filter that matches lists containing the specified value.
-  ///
-  /// Returns a [ContainsOperator] that matches when the specified [field]
-  /// (which should be a list) contains the provided [value].
-  const factory Filter.contains(F field, Object? value) =
-      ContainsOperator<F, Object?>;
+  /// Containment filter matching [field] containing [value].
+  const factory Filter.contains(
+    FilterField<T> field,
+    Object? value,
+  ) = Contains<T>;
 
   // Existence operator
 
-  /// Creates an existence filter that matches based on field presence.
-  ///
-  /// When [exists] is true, matches records where the [field] is present and not null.
-  /// When [exists] is false, matches records where the [field] is null or absent.
-  ///
-  /// Returns an [ExistsOperator] for the specified field existence check.
-  const factory Filter.exists(F field, {required bool exists}) =
-      ExistsOperator<F>;
+  /// Existence filter matching [field] presence when [exists] is true.
+  const factory Filter.exists(
+    FilterField<T> field, {
+    required bool exists,
+  }) = Exists<T>;
 
   // Evaluation operators
 
-  /// Creates a text search filter that performs full-text search on the field.
-  ///
-  /// Returns a [QueryOperator] that matches when the specified [field]
-  /// contains text matching the provided search [query]. Uses optimized
-  /// full-text search capabilities for efficient text matching and ranking.
-  const factory Filter.query(F field, String query) = QueryOperator<F>;
+  /// Full-text search filter matching [field] containing [query].
+  const factory Filter.query(
+    FilterField<T> field,
+    String query,
+  ) = Query<T>;
 
-  /// Creates an autocomplete filter that matches field values with the specified prefix.
-  ///
-  /// Returns an [AutoCompleteOperator] that matches when the specified [field]
-  /// starts with the provided [query] string.
-  const factory Filter.autoComplete(F field, String query) =
-      AutoCompleteOperator<F>;
+  /// Autocomplete filter matching [field] words starting with [query].
+  const factory Filter.autoComplete(
+    FilterField<T> field,
+    String query,
+  ) = AutoComplete<T>;
 
   // Path operator
 
-  /// Creates a path existence filter for nested JSON field checking.
-  ///
-  /// Returns a [PathExistsOperator] that matches when the specified [field]
-  /// contains JSON with the given nested [path]. Uses optimized JSON
-  /// path operations for efficient querying.
-  const factory Filter.pathExists(F field, String path) = PathExistsOperator<F>;
+  /// Nested JSON path existence filter for [field] at [path].
+  const factory Filter.pathExists(
+    FilterField<T> field,
+    String path,
+  ) = PathExists<T>;
 
   // Logical operators
 
-  /// Creates a logical AND filter that matches when all provided filters match.
+  /// Logical AND filter matching when all [filters] match.
+  const factory Filter.and(Iterable<Filter<T>> filters) = And<T>;
+
+  /// Logical OR filter matching when any [filters] match.
+  const factory Filter.or(Iterable<Filter<T>> filters) = Or<T>;
+
+  /// Whether this filter matches the given [other] instance.
   ///
-  /// Returns an [AndOperator] that combines multiple [filters] with logical AND,
-  /// matching only when every filter in the collection matches.
+  /// Evaluates filter criteria against field values extracted from [other]
+  /// using the field's value getter function.
   ///
-  /// Example:
   /// ```dart
-  /// // All conditions must be true
-  /// final strictFilter = Filter.and([
-  ///   Filter.equal(UserField.status, 'active'),
+  /// final filter = Filter.and([
+  ///   Filter.equal(UserField.name, 'John'),
   ///   Filter.greater(UserField.age, 18),
-  ///   Filter.exists(UserField.email, exists: true),
   /// ]);
+  ///
+  /// final user1 = User('1', 'John', 25);
+  /// print(filter.matches(user1)); // true
+  ///
+  /// final user2 = User('2', 'Jane', 25);
+  /// print(filter.matches(user2)); // false
   /// ```
-  const factory Filter.and(Iterable<Filter<F>> filters) = AndOperator<F>;
+  bool matches(T other);
 
-  /// Creates a logical OR filter that matches when any of the provided filters match.
-  ///
-  /// Returns an [OrOperator] that combines multiple [filters] with logical OR,
-  /// matching when at least one filter in the collection matches.
-  ///
-  /// Example:
-  /// ```dart
-  /// // Any condition can be true
-  /// final flexibleFilter = Filter.or([
-  ///   Filter.equal(UserField.role, 'admin'),
-  ///   Filter.equal(UserField.role, 'moderator'),
-  ///   Filter.greater(UserField.loginCount, 1000),
-  /// ]);
-  /// ```
-  const factory Filter.or(Iterable<Filter<F>> filters) = OrOperator<F>;
-
-  /// Converts this filter to a JSON representation for API queries.
-  ///
-  /// Returns a [Map] containing the filter structure in the format
-  /// expected by the API.
+  /// Converts this filter to JSON format for API queries.
   Map<String, Object?> toJson();
 }
 
 // region Comparison operators ($eq, $gt, $gte, $lt, $lte)
 
-/// A filter operator that compares field values using comparison operations.
+/// Base class for comparison-based filter operations.
 ///
-/// Base class for all comparison-based filtering operations including equality,
-/// greater-than, less-than, and their variants. Each comparison operator
-/// evaluates a field against a specific value using the designated comparison logic.
-sealed class ComparisonOperator<F extends FilterField, V extends Object?>
-    extends Filter<F> {
+/// Supports equality, greater-than, less-than, and their variants.
+sealed class ComparisonOperator<T extends Object> extends Filter<T> {
   const ComparisonOperator._(
     this.field,
     this.value, {
@@ -248,93 +208,142 @@ sealed class ComparisonOperator<F extends FilterField, V extends Object?>
   }) : super._();
 
   /// The field being compared in this filter operation.
-  final F field;
+  final FilterField<T> field;
 
   /// The comparison operator used for this filter.
   final FilterOperator operator;
 
   /// The value to compare the field against.
-  final V value;
+  final Object? value;
 
   @override
   Map<String, Object?> toJson() {
     return {
-      field: {operator: value},
+      field.remote: {operator: value},
     };
   }
 }
 
-/// A comparison filter that matches values equal to the specified value.
+/// Equality filter using exact value matching.
 ///
-/// Performs exact equality matching between the field value and the provided
-/// comparison value. Supports all data types including strings, numbers,
-/// booleans, and null values.
+/// Performs deep equality comparison for all data types:
+/// - **Primitives**: Standard equality (`==`)
+/// - **Arrays**: Order-sensitive, element-by-element comparison
+/// - **Objects**: Key-value equality, order-insensitive for keys
 ///
 /// **Supported with**: `.equal` factory method
-final class EqualOperator<F extends FilterField, V extends Object?>
-    extends ComparisonOperator<F, V> {
+final class Equal<T extends Object> extends ComparisonOperator<T> {
   /// Creates an equality filter for the specified [field] and [value].
-  const EqualOperator(super.field, super.value)
+  const Equal(super.field, super.value)
       : super._(operator: FilterOperator.equal);
+
+  @override
+  bool matches(T other) {
+    final fieldValue = field.value(other);
+    final comparisonValue = value;
+
+    // Deep equality: order-sensitive for arrays, order-insensitive for objects.
+    return fieldValue.deepEquals(comparisonValue);
+  }
 }
 
-/// A comparison filter that matches values greater than the specified value.
+/// Greater-than comparison filter.
 ///
-/// Performs greater-than comparison between the field value and the provided
-/// comparison value. Primarily used with numeric values and dates.
+/// Primarily used with numeric values and dates.
 ///
 /// **Supported with**: `.greater` factory method
-final class GreaterOperator<F extends FilterField, V extends Object?>
-    extends ComparisonOperator<F, V> {
+final class Greater<T extends Object> extends ComparisonOperator<T> {
   /// Creates a greater-than filter for the specified [field] and [value].
-  const GreaterOperator(super.field, super.value)
+  const Greater(super.field, super.value)
       : super._(operator: FilterOperator.greater);
+
+  @override
+  bool matches(T other) {
+    final fieldValue = ComparableField.fromValue(field.value(other));
+    final comparisonValue = ComparableField.fromValue(value);
+
+    // NULL values can't be compared.
+    if (fieldValue == null || comparisonValue == null) return false;
+
+    // Safely compare values, returning false for incomparable types.
+    final result = runSafelySync(() => fieldValue > comparisonValue);
+    return result.getOrDefault(false);
+  }
 }
 
-/// A comparison filter that matches values greater than or equal to the specified value.
+/// Greater-than-or-equal comparison filter.
 ///
-/// Performs greater-than-or-equal comparison between the field value and the
-/// provided comparison value. Primarily used with numeric values and dates.
-final class GreaterOrEqualOperator<F extends FilterField, V extends Object?>
-    extends ComparisonOperator<F, V> {
+/// Primarily used with numeric values and dates.
+final class GreaterOrEqual<T extends Object> extends ComparisonOperator<T> {
   /// Creates a greater-than-or-equal filter for the specified [field] and [value].
-  const GreaterOrEqualOperator(super.field, super.value)
+  const GreaterOrEqual(super.field, super.value)
       : super._(operator: FilterOperator.greaterOrEqual);
+
+  @override
+  bool matches(T other) {
+    final fieldValue = ComparableField.fromValue(field.value(other));
+    final comparisonValue = ComparableField.fromValue(value);
+
+    // NULL values can't be compared.
+    if (fieldValue == null || comparisonValue == null) return false;
+
+    // Safely compare values, returning false for incomparable types.
+    final result = runSafelySync(() => fieldValue >= comparisonValue);
+    return result.getOrDefault(false);
+  }
 }
 
-/// A comparison filter that matches values less than the specified value.
+/// Less-than comparison filter.
 ///
-/// Performs less-than comparison between the field value and the provided
-/// comparison value. Primarily used with numeric values and dates.
-final class LessOperator<F extends FilterField, V extends Object?>
-    extends ComparisonOperator<F, V> {
+/// Primarily used with numeric values and dates.
+final class Less<T extends Object> extends ComparisonOperator<T> {
   /// Creates a less-than filter for the specified [field] and [value].
-  const LessOperator(super.field, super.value)
-      : super._(operator: FilterOperator.less);
+  const Less(super.field, super.value) : super._(operator: FilterOperator.less);
+
+  @override
+  bool matches(T other) {
+    final fieldValue = ComparableField.fromValue(field.value(other));
+    final comparisonValue = ComparableField.fromValue(value);
+
+    // NULL values can't be compared.
+    if (fieldValue == null || comparisonValue == null) return false;
+
+    // Safely compare values, returning false for incomparable types.
+    final result = runSafelySync(() => fieldValue < comparisonValue);
+    return result.getOrDefault(false);
+  }
 }
 
-/// A comparison filter that matches values less than or equal to the specified value.
+/// Less-than-or-equal comparison filter.
 ///
-/// Performs less-than-or-equal comparison between the field value and the
-/// provided comparison value. Primarily used with numeric values and dates.
-final class LessOrEqualOperator<F extends FilterField, V extends Object?>
-    extends ComparisonOperator<F, V> {
+/// Primarily used with numeric values and dates.
+final class LessOrEqual<T extends Object> extends ComparisonOperator<T> {
   /// Creates a less-than-or-equal filter for the specified [field] and [value].
-  const LessOrEqualOperator(super.field, super.value)
+  const LessOrEqual(super.field, super.value)
       : super._(operator: FilterOperator.lessOrEqual);
+
+  @override
+  bool matches(T other) {
+    final fieldValue = ComparableField.fromValue(field.value(other));
+    final comparisonValue = ComparableField.fromValue(value);
+
+    // NULL values can't be compared.
+    if (fieldValue == null || comparisonValue == null) return false;
+
+    // Safely compare values, returning false for incomparable types.
+    final result = runSafelySync(() => fieldValue <= comparisonValue);
+    return result.getOrDefault(false);
+  }
 }
 
 // endregion
 
 // region List / multi-value operators ($in, $contains)
 
-/// A filter operator that performs list-based matching operations.
+/// Base class for list-based filter operations.
 ///
-/// Base class for filtering operations that work with collections or lists,
-/// including membership testing and containment checking. These operators
-/// are designed to handle multi-value scenarios efficiently.
-sealed class ListOperator<F extends FilterField, V extends Object?>
-    extends Filter<F> {
+/// Supports membership testing and containment checking for multi-value scenarios.
+sealed class ListOperator<T extends Object> extends Filter<T> {
   const ListOperator._(
     this.field,
     this.value, {
@@ -342,7 +351,7 @@ sealed class ListOperator<F extends FilterField, V extends Object?>
   }) : super._();
 
   /// The field being filtered in this list operation.
-  final F field;
+  final FilterField<T> field;
 
   /// The list operator used for this filter.
   final FilterOperator operator;
@@ -353,53 +362,72 @@ sealed class ListOperator<F extends FilterField, V extends Object?>
   @override
   Map<String, Object?> toJson() {
     return {
-      field: {operator: value},
+      field.remote: {operator: value},
     };
   }
 }
 
-/// A list filter that matches values contained within a specified list.
+/// Membership test filter for list containment.
 ///
-/// Performs membership testing to determine if the field value exists
-/// within the provided list of values. Useful for filtering records
-/// where a field matches any of several possible values.
+/// Tests whether the field value exists within the provided list of values.
+/// Uses deep equality with order-sensitive comparison for arrays.
 ///
 /// **Supported with**: `.in_` factory method
-final class InOperator<F extends FilterField, V extends Object?>
-    extends ListOperator<F, V> {
+final class In<T extends Object> extends ListOperator<T> {
   /// Creates an 'in' filter for the specified [field] and [values] iterable.
-  const InOperator(super.field, Iterable<V> super.values)
+  const In(super.field, Iterable<Object?> super.values)
       : super._(operator: FilterOperator.in_);
+
+  @override
+  bool matches(T other) {
+    final fieldValue = field.value(other);
+
+    final comparisonValues = value;
+    if (comparisonValues is! Iterable<Object?>) return false;
+
+    // Deep equality (order-sensitive for arrays).
+    return comparisonValues.any(fieldValue.deepEquals);
+  }
 }
 
-/// A list filter that matches lists containing the specified value.
+/// Containment filter for JSON and array subset matching.
 ///
-/// Performs containment checking to determine if the field (which should be a list)
-/// contains the provided value. Useful for filtering records where a list field
-/// includes a specific item.
-final class ContainsOperator<F extends FilterField, V extends Object?>
-    extends ListOperator<F, V> {
+/// Tests whether the field contains the specified value:
+/// - **Arrays**: Order-independent containment (all subset items must exist)
+/// - **Objects**: Recursive subset matching (all subset keys/values must exist)
+/// - **Single values**: Direct equality check
+///
+/// **Supported with**: `.contains` factory method
+final class Contains<T extends Object> extends ListOperator<T> {
   /// Creates a contains filter for the specified [field] and [value].
-  const ContainsOperator(super.field, super.value)
+  const Contains(super.field, super.value)
       : super._(operator: FilterOperator.contains_);
+
+  @override
+  bool matches(T other) {
+    final fieldValue = field.value(other);
+    final comparisonValue = value;
+
+    // Order-independent containment for arrays, recursive for objects.
+    return fieldValue.containsValue(comparisonValue);
+  }
 }
 
 // endregion
 
 // region Element / existence operators ($exists)
 
-/// A filter that matches based on field existence or absence.
+/// Field existence/absence filter.
 ///
-/// Checks whether a field exists in the record or not, regardless of its value.
-/// Useful for filtering records based on the presence or absence of optional fields.
+/// Tests whether a field is present (non-null) or absent in the record.
 ///
 /// **Supported with**: `.exists` factory method
-final class ExistsOperator<F extends FilterField> extends Filter<F> {
+final class Exists<T extends Object> extends Filter<T> {
   /// Creates an existence filter for the specified [field] and [exists] condition.
-  const ExistsOperator(this.field, {required this.exists}) : super._();
+  const Exists(this.field, {required this.exists}) : super._();
 
   /// The field to check for existence.
-  final F field;
+  final FilterField<T> field;
 
   /// Whether the field should exist (true) or not exist (false).
   final bool exists;
@@ -408,9 +436,17 @@ final class ExistsOperator<F extends FilterField> extends Filter<F> {
   FilterOperator get operator => FilterOperator.exists;
 
   @override
+  bool matches(T other) {
+    final fieldValue = field.value(other);
+    final valueExists = fieldValue != null;
+
+    return exists ? valueExists : !valueExists;
+  }
+
+  @override
   Map<String, Object?> toJson() {
     return {
-      field: {operator: exists},
+      field.remote: {operator: exists},
     };
   }
 }
@@ -419,11 +455,10 @@ final class ExistsOperator<F extends FilterField> extends Filter<F> {
 
 // region Evaluation / text operators ($q, $autocomplete)
 
-/// A filter operator that performs text-based evaluation operations.
+/// Base class for text-based evaluation filters.
 ///
-/// Base class for filtering operations that evaluate text content,
-/// including full-text search and autocomplete functionality.
-sealed class EvaluationOperator<F extends FilterField> extends Filter<F> {
+/// Supports full-text search and autocomplete functionality.
+sealed class EvaluationOperator<T extends Object> extends Filter<T> {
   const EvaluationOperator._(
     this.field,
     this.query, {
@@ -431,7 +466,7 @@ sealed class EvaluationOperator<F extends FilterField> extends Filter<F> {
   }) : super._();
 
   /// The field being evaluated in this text operation.
-  final F field;
+  final FilterField<T> field;
 
   /// The evaluation operator used for this filter.
   final FilterOperator operator;
@@ -442,49 +477,70 @@ sealed class EvaluationOperator<F extends FilterField> extends Filter<F> {
   @override
   Map<String, Object?> toJson() {
     return {
-      field: {operator: query},
+      field.remote: {operator: query},
     };
   }
 }
 
-/// An evaluation filter that performs full-text search on field content.
+/// Full-text search filter.
 ///
-/// Searches for the specified query within the field's text content using
-/// optimized full-text search capabilities, including ranking and relevance scoring.
+/// Performs case-insensitive text search within the field's content.
 ///
 /// **Supported with**: `.query` factory method
-final class QueryOperator<F extends FilterField> extends EvaluationOperator<F> {
+final class Query<T extends Object> extends EvaluationOperator<T> {
   /// Creates a text search filter for the specified [field] and search [query].
-  const QueryOperator(super.field, super.query)
+  const Query(super.field, super.query)
       : super._(operator: FilterOperator.query);
+
+  @override
+  bool matches(T other) {
+    if (query.isEmpty) return false;
+
+    final fieldValue = field.value(other);
+    if (fieldValue is! String || fieldValue.isEmpty) return false;
+
+    final queryRegex = RegExp(RegExp.escape(query), caseSensitive: false);
+    return fieldValue.contains(queryRegex);
+  }
 }
 
-/// An evaluation filter that matches field values starting with the specified prefix.
+/// Word prefix matching filter for autocomplete.
 ///
-/// Performs prefix matching for autocomplete functionality, finding records
-/// where the field value begins with the provided query string.
-final class AutoCompleteOperator<F extends FilterField>
-    extends EvaluationOperator<F> {
+/// Matches field values where any word starts with the provided prefix.
+final class AutoComplete<T extends Object> extends EvaluationOperator<T> {
   /// Creates an autocomplete filter for the specified [field] and prefix [query].
-  const AutoCompleteOperator(super.field, super.query)
+  const AutoComplete(super.field, super.query)
       : super._(operator: FilterOperator.autoComplete);
+
+  @override
+  bool matches(T other) {
+    if (query.isEmpty) return false;
+
+    final fieldValue = field.value(other);
+    if (fieldValue is! String || fieldValue.isEmpty) return false;
+
+    // Split the text into words and check for any word starting with the query prefix.
+    final splitRegex = RegExp(r'[\s\p{P}]+', unicode: true);
+    final words = fieldValue.split(splitRegex).where((word) => word.isNotEmpty);
+
+    final queryRegex = RegExp(RegExp.escape(query), caseSensitive: false);
+    return words.any((word) => word.startsWith(queryRegex));
+  }
 }
 
 // endregion
 
 // region Path operators ($path_exists)
 
-/// A filter that checks for the existence of nested JSON paths within a field.
+/// Nested JSON path existence filter.
 ///
-/// Evaluates whether the specified field contains JSON data with the given
-/// nested path. Useful for filtering records based on complex nested data structures.
-/// Uses optimized JSON path operations for efficient querying.
-final class PathExistsOperator<F extends FilterField> extends Filter<F> {
+/// Tests whether the field contains JSON data with the specified nested path.
+final class PathExists<T extends Object> extends Filter<T> {
   /// Creates a path existence filter for the specified [field] and nested [path].
-  const PathExistsOperator(this.field, this.path) : super._();
+  const PathExists(this.field, this.path) : super._();
 
   /// The field containing JSON data to check.
-  final F field;
+  final FilterField<T> field;
 
   /// The nested path to check for existence within the JSON.
   final String path;
@@ -493,9 +549,30 @@ final class PathExistsOperator<F extends FilterField> extends Filter<F> {
   FilterOperator get operator => FilterOperator.pathExists;
 
   @override
+  bool matches(T other) {
+    final root = field.value(other);
+    if (root is! Map) return false;
+    if (path.isEmpty) return false;
+
+    final pathParts = path.split('.');
+
+    Object? current = root;
+    for (final part in pathParts) {
+      // Empty path segments (e.g., from "" or "a..b") are invalid
+      if (part.isEmpty) return false;
+      if (current is! Map) return false;
+      if (!current.containsKey(part)) return false;
+
+      current = current[part];
+    }
+
+    return true;
+  }
+
+  @override
   Map<String, Object?> toJson() {
     return {
-      field: {operator: path},
+      field.remote: {operator: path},
     };
   }
 }
@@ -504,12 +581,10 @@ final class PathExistsOperator<F extends FilterField> extends Filter<F> {
 
 // region Logical operators ($and, $or)
 
-/// A filter operator that combines multiple filters using logical operations.
+/// Base class for logical filter composition.
 ///
-/// Base class for logical filtering operations that combine multiple filter
-/// conditions using AND/OR logic. Enables complex query construction through
-/// filter composition.
-sealed class LogicalOperator<F extends FilterField> extends Filter<F> {
+/// Combines multiple filters using AND/OR logic.
+sealed class LogicalOperator<T extends Object> extends Filter<T> {
   const LogicalOperator._(
     this.filters, {
     required this.operator,
@@ -519,7 +594,7 @@ sealed class LogicalOperator<F extends FilterField> extends Filter<F> {
   final FilterOperator operator;
 
   /// The list of filters to combine with logical operation.
-  final Iterable<Filter<F>> filters;
+  final Iterable<Filter<T>> filters;
 
   @override
   Map<String, Object?> toJson() {
@@ -529,26 +604,28 @@ sealed class LogicalOperator<F extends FilterField> extends Filter<F> {
   }
 }
 
-/// A logical filter that matches when all provided filters match (logical AND).
+/// Logical AND filter requiring all conditions to match.
 ///
-/// Combines multiple filter conditions where every condition must be satisfied
-/// for a record to match. Useful for creating restrictive queries that require
-/// multiple criteria to be met simultaneously.
+/// All provided filters must match for a record to be included.
 ///
 /// **Supported with**: `.and` factory method
-final class AndOperator<F extends FilterField> extends LogicalOperator<F> {
+final class And<T extends Object> extends LogicalOperator<T> {
   /// Creates a logical AND filter combining the specified [filters].
-  const AndOperator(super.filters) : super._(operator: FilterOperator.and);
+  const And(super.filters) : super._(operator: FilterOperator.and);
+
+  @override
+  bool matches(T other) => filters.every((filter) => filter.matches(other));
 }
 
-/// A logical filter that matches when any of the provided filters match (logical OR).
+/// Logical OR filter requiring any condition to match.
 ///
-/// Combines multiple filter conditions where at least one condition must be satisfied
-/// for a record to match. Useful for creating inclusive queries that accept
-/// records meeting any of several criteria.
-final class OrOperator<F extends FilterField> extends LogicalOperator<F> {
+/// At least one provided filter must match for a record to be included.
+final class Or<T extends Object> extends LogicalOperator<T> {
   /// Creates a logical OR filter combining the specified [filters].
-  const OrOperator(super.filters) : super._(operator: FilterOperator.or);
+  const Or(super.filters) : super._(operator: FilterOperator.or);
+
+  @override
+  bool matches(T other) => filters.any((filter) => filter.matches(other));
 }
 
 // endregion
