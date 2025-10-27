@@ -1869,7 +1869,8 @@ void main() {
         );
       });
 
-      test('should handle null values in optional fields (PostgreSQL semantics)',
+      test(
+          'should handle null values in optional fields (PostgreSQL semantics)',
           () {
         final modelWithNull = TestModel(name: null);
         final modelWithValue = TestModel(name: 'John');
