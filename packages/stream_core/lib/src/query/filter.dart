@@ -23,18 +23,16 @@ typedef FilterFieldValueGetter<T, V> = V? Function(T);
 ///   final int age;
 /// }
 ///
-/// extension type const UserField._(FilterField<User> field)
-///     implements FilterField<User> {
-///   const UserField(String name, Object? Function(User) getter)
-///       : this._(FilterField(name, getter));
+/// class UserFilterField extends FilterField<User> {
+///   UserFilterField(super.remote, super.value);
 ///
-///   static const id = UserField('id', (u) => u.id);
-///   static const name = UserField('name', (u) => u.name);
-///   static const age = UserField('age', (u) => u.age);
+///   static const id = UserFilterField('id', (u) => u.id);
+///   static const name = UserFilterField('name', (u) => u.name);
+///   static const age = UserFilterField('age', (u) => u.age);
 /// }
 ///
 /// // Use in filters
-/// final filter = Filter.equal(UserField.name, 'John');
+/// final filter = Filter.equal(UserFilterField.name, 'John');
 /// final matches = filter.matches(User('1', 'John', 30)); // true
 /// ```
 class FilterField<T> {

@@ -28,13 +28,8 @@ class TestModel {
 }
 
 // Test implementation of FilterField for testing purposes
-extension type const TestFilterField._(FilterField<TestModel> field)
-    implements FilterField<TestModel> {
-  // constructor to create TestFilterField from name and getter
-  TestFilterField(
-    String name,
-    Object? Function(TestModel) getter,
-  ) : this._(FilterField(name, getter));
+class TestFilterField extends FilterField<TestModel> {
+  TestFilterField(super.remote, super.value);
 
   static final id = TestFilterField('id', (it) => it.id);
   static final name = TestFilterField('name', (it) => it.name);

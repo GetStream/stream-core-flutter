@@ -130,21 +130,10 @@ class SortField<T extends Object> {
   /// The [remote] parameter specifies the field name as it appears in API queries.
   /// The [localValue] parameter is a function that extracts the corresponding value
   /// from local model instances for comparison operations.
-  factory SortField(
-    String remote,
+  SortField(
+    this.remote,
     SortFieldValueGetter<T, Object> localValue,
-  ) {
-    final comparator = SortComparator(localValue).toAny();
-    return SortField._(
-      remote: remote,
-      comparator: comparator,
-    );
-  }
-
-  const SortField._({
-    required this.remote,
-    required this.comparator,
-  });
+  ) : comparator = SortComparator(localValue).toAny();
 
   /// The remote field name used in API queries.
   final String remote;
