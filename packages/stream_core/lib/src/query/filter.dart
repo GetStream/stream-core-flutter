@@ -240,6 +240,9 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
     final fieldValue = field.value(other);
     final comparisonValue = value;
 
+    // NULL values can't be compared.
+    if (fieldValue == null || comparisonValue == null) return false;
+
     // Deep equality: order-sensitive for arrays, order-insensitive for objects.
     return fieldValue.deepEquals(comparisonValue);
   }

@@ -694,12 +694,23 @@ void main() {
         );
       });
 
-      test('should match null values', () {
-        final model = TestModel(name: null);
+      test('should not match null values (PostgreSQL semantics)', () {
+        final modelWithNull = TestModel(name: null);
+        final modelWithValue = TestModel(name: 'John');
 
-        expect(Filter.equal(TestFilterField.name, null).matches(model), isTrue);
+        // NULL = NULL → false (PostgreSQL three-valued logic)
         expect(
-          Filter.equal(TestFilterField.name, 'John').matches(model),
+          Filter.equal(TestFilterField.name, null).matches(modelWithNull),
+          isFalse,
+        );
+        // NULL = 'John' → false
+        expect(
+          Filter.equal(TestFilterField.name, 'John').matches(modelWithNull),
+          isFalse,
+        );
+        // 'John' = NULL → false
+        expect(
+          Filter.equal(TestFilterField.name, null).matches(modelWithValue),
           isFalse,
         );
       });
@@ -1302,6 +1313,79 @@ void main() {
           isFalse,
         );
       });
+
+      test('should return false for NULL comparisons (PostgreSQL semantics)',
+          () {
+        final modelWithNull = TestModel(id: null);
+        final modelWithValue = TestModel(id: '50');
+
+        // Greater: NULL > value → false
+        expect(
+          Filter.greater(TestFilterField.id, '30').matches(modelWithNull),
+          isFalse,
+        );
+        // Greater: value > NULL → false
+        expect(
+          Filter.greater(TestFilterField.id, null).matches(modelWithValue),
+          isFalse,
+        );
+        // Greater: NULL > NULL → false
+        expect(
+          Filter.greater(TestFilterField.id, null).matches(modelWithNull),
+          isFalse,
+        );
+
+        // GreaterOrEqual: NULL >= value → false
+        expect(
+          Filter.greaterOrEqual(TestFilterField.id, '30')
+              .matches(modelWithNull),
+          isFalse,
+        );
+        // GreaterOrEqual: value >= NULL → false
+        expect(
+          Filter.greaterOrEqual(TestFilterField.id, null)
+              .matches(modelWithValue),
+          isFalse,
+        );
+        // GreaterOrEqual: NULL >= NULL → false
+        expect(
+          Filter.greaterOrEqual(TestFilterField.id, null)
+              .matches(modelWithNull),
+          isFalse,
+        );
+
+        // Less: NULL < value → false
+        expect(
+          Filter.less(TestFilterField.id, '70').matches(modelWithNull),
+          isFalse,
+        );
+        // Less: value < NULL → false
+        expect(
+          Filter.less(TestFilterField.id, null).matches(modelWithValue),
+          isFalse,
+        );
+        // Less: NULL < NULL → false
+        expect(
+          Filter.less(TestFilterField.id, null).matches(modelWithNull),
+          isFalse,
+        );
+
+        // LessOrEqual: NULL <= value → false
+        expect(
+          Filter.lessOrEqual(TestFilterField.id, '70').matches(modelWithNull),
+          isFalse,
+        );
+        // LessOrEqual: value <= NULL → false
+        expect(
+          Filter.lessOrEqual(TestFilterField.id, null).matches(modelWithValue),
+          isFalse,
+        );
+        // LessOrEqual: NULL <= NULL → false
+        expect(
+          Filter.lessOrEqual(TestFilterField.id, null).matches(modelWithNull),
+          isFalse,
+        );
+      });
     });
 
     group('Exists', () {
@@ -1785,18 +1869,22 @@ void main() {
         );
       });
 
-      test('should handle null values in optional fields', () {
+      test('should handle null values in optional fields (PostgreSQL semantics)',
+          () {
         final modelWithNull = TestModel(name: null);
         final modelWithValue = TestModel(name: 'John');
 
+        // NULL = NULL → false (PostgreSQL three-valued logic)
         expect(
           Filter.equal(TestFilterField.name, null).matches(modelWithNull),
-          isTrue,
+          isFalse,
         );
+        // 'John' = NULL → false
         expect(
           Filter.equal(TestFilterField.name, null).matches(modelWithValue),
           isFalse,
         );
+        // NULL = 'John' → false
         expect(
           Filter.equal(TestFilterField.name, 'John').matches(modelWithNull),
           isFalse,
