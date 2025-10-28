@@ -1,3 +1,17 @@
+## Upcoming
+
+### 💥 BREAKING CHANGES
+
+- `FilterField` now requires a value getter function `Object? Function(T)`
+- Filter classes renamed (e.g., `EqualOperator` → `Equal`, `AndOperator` → `And`)
+- `Filter` signature changed to `Filter<T extends Object>`
+
+### ✨ Features
+
+- Added `matches(T other)` method for client-side filtering with PostgreSQL-like semantics
+- Added utility functions for deep equality, subset containment, and type-safe comparisons
+- Enhanced `Sort` comparator to handle incompatible types safely
+
 ## 0.2.0
 
 ### 💥 BREAKING CHANGES
