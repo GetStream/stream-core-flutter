@@ -25,14 +25,15 @@ extension StreamDioExceptionExtension on DioException {
     final response = this.response;
     StreamApiError? apiError;
     final data = response?.data;
-    if (data is Map<String, Object?>) {
-      apiError = StreamApiError.fromJson(data);
-    } else if (data is String) {
-      try {
+
+    try {
+      if (data is Map<String, Object?>) {
+        apiError = StreamApiError.fromJson(data);
+      } else if (data is String) {
         apiError = StreamApiError.fromJson(jsonDecode(data));
-      } catch (e) {
-        apiError = null;
       }
+    } catch (e) {
+      apiError = null;
     }
     return HttpClientException(
       message: apiError?.message ?? response?.statusMessage ?? message ?? '',
