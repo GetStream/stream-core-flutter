@@ -136,6 +136,345 @@ void main() {
         expect(result.last.content, 'World');
       });
     });
+
+    group('updateWhere', () {
+      test('should update elements matching filter condition', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+          const _TestUser(id: '3', name: 'Charlie'),
+        ];
+
+        final result = users.updateWhere(
+          (user) => user.id == '2',
+          update: (user) =>
+              _TestUser(id: user.id, name: '${user.name} Updated'),
+        );
+
+        expect(result.length, 3);
+        expect(result[0].name, 'Alice');
+        expect(result[1].name, 'Bob Updated');
+        expect(result[2].name, 'Charlie');
+        // Original list should be unchanged
+        expect(users[1].name, 'Bob');
+      });
+
+      test('should update multiple elements matching filter', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 50),
+          const _TestScore(userId: 3, points: 150),
+          const _TestScore(userId: 4, points: 75),
+        ];
+
+        final result = scores.updateWhere(
+          (score) => score.points < 100,
+          update: (score) =>
+              _TestScore(userId: score.userId, points: score.points * 2),
+        );
+
+        expect(result.length, 4);
+        expect(result[0].points, 100); // Unchanged
+        expect(result[1].points, 100); // Updated (50 * 2)
+        expect(result[2].points, 150); // Unchanged
+        expect(result[3].points, 150); // Updated (75 * 2)
+      });
+
+      test('should return same list when no elements match', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.updateWhere(
+          (user) => user.id == 'nonexistent',
+          update: (user) => _TestUser(id: user.id, name: 'Updated'),
+        );
+
+        expect(result.length, 2);
+        expect(result[0].name, 'Alice');
+        expect(result[1].name, 'Bob');
+      });
+
+      test('should update all elements when filter matches all', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.updateWhere(
+          (user) => true,
+          update: (user) =>
+              _TestUser(id: user.id, name: '${user.name} Updated'),
+        );
+
+        expect(result.length, 2);
+        expect(result[0].name, 'Alice Updated');
+        expect(result[1].name, 'Bob Updated');
+      });
+
+      test('should work with empty list', () {
+        final users = <_TestUser>[];
+
+        final result = users.updateWhere(
+          (user) => user.id == '1',
+          update: (user) => _TestUser(id: user.id, name: 'Updated'),
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test('should preserve order after update', () {
+        final activities = [
+          const _TestActivity(id: 'act1', authorId: 'user1', content: 'First'),
+          const _TestActivity(id: 'act2', authorId: 'user2', content: 'Second'),
+          const _TestActivity(id: 'act3', authorId: 'user1', content: 'Third'),
+        ];
+
+        final result = activities.updateWhere(
+          (activity) => activity.authorId == 'user1',
+          update: (activity) => _TestActivity(
+            id: activity.id,
+            authorId: activity.authorId,
+            content: '${activity.content} Updated',
+          ),
+        );
+
+        expect(result.length, 3);
+        expect(result[0].content, 'First Updated');
+        expect(result[1].content, 'Second');
+        expect(result[2].content, 'Third Updated');
+      });
+
+      test('should handle complex filter conditions', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+          const _TestScore(userId: 4, points: 250),
+        ];
+
+        final result = scores.updateWhere(
+          (score) => score.points >= 150 && score.points <= 200,
+          update: (score) =>
+              _TestScore(userId: score.userId, points: score.points + 50),
+        );
+
+        expect(result[0].points, 100); // Unchanged
+        expect(result[1].points, 250); // Updated (200 + 50)
+        expect(result[2].points, 200); // Updated (150 + 50)
+        expect(result[3].points, 250); // Unchanged
+      });
+    });
+
+    group('batchReplace', () {
+      test('should replace multiple elements based on matching keys', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+          const _TestUser(id: '3', name: 'Charlie'),
+        ];
+
+        final updates = [
+          const _TestUser(id: '1', name: 'Alice Updated'),
+          const _TestUser(id: '3', name: 'Charlie Updated'),
+        ];
+
+        final result = users.batchReplace(
+          updates,
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 3);
+        expect(result[0].name, 'Alice Updated');
+        expect(result[1].name, 'Bob'); // Unchanged
+        expect(result[2].name, 'Charlie Updated');
+        // Original list should be unchanged
+        expect(users[0].name, 'Alice');
+      });
+
+      test('should ignore elements in other list that do not match', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final updates = [
+          const _TestUser(id: '1', name: 'Alice Updated'),
+          const _TestUser(
+              id: '3', name: 'Charlie'), // Not in original, should be ignored
+          const _TestUser(
+              id: '4', name: 'David'), // Not in original, should be ignored
+        ];
+
+        final result = users.batchReplace(
+          updates,
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 2);
+        expect(result[0].name, 'Alice Updated');
+        expect(result[1].name, 'Bob'); // Unchanged
+      });
+
+      test('should work with custom update function', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+        ];
+
+        final updates = [
+          const _TestScore(userId: 1, points: 50),
+          const _TestScore(userId: 3, points: 75),
+        ];
+
+        final result = scores.batchReplace(
+          updates,
+          key: (score) => score.userId,
+          update: (original, updated) => _TestScore(
+            userId: original.userId,
+            points: original.points + updated.points,
+          ),
+        );
+
+        expect(result.length, 3);
+        expect(result[0].points, 150); // 100 + 50
+        expect(result[1].points, 200); // Unchanged
+        expect(result[2].points, 225); // 150 + 75
+      });
+
+      test('should return same list when other list is empty', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.batchReplace(
+          <_TestUser>[],
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 2);
+        expect(result[0].name, 'Alice');
+        expect(result[1].name, 'Bob');
+        expect(identical(result, users), true); // Should return same instance
+      });
+
+      test('should return same list when source list is empty', () {
+        final users = <_TestUser>[];
+        final updates = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.batchReplace(
+          updates,
+          key: (user) => user.id,
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test('should handle partial matches', () {
+        final activities = [
+          const _TestActivity(id: 'act1', authorId: 'user1', content: 'First'),
+          const _TestActivity(id: 'act2', authorId: 'user2', content: 'Second'),
+          const _TestActivity(id: 'act3', authorId: 'user3', content: 'Third'),
+          const _TestActivity(id: 'act4', authorId: 'user4', content: 'Fourth'),
+        ];
+
+        final updates = [
+          const _TestActivity(
+              id: 'act2', authorId: 'user2', content: 'Second Updated'),
+          const _TestActivity(
+              id: 'act4', authorId: 'user4', content: 'Fourth Updated'),
+        ];
+
+        final result = activities.batchReplace(
+          updates,
+          key: (activity) => activity.id,
+        );
+
+        expect(result.length, 4);
+        expect(result[0].content, 'First'); // Unchanged
+        expect(result[1].content, 'Second Updated');
+        expect(result[2].content, 'Third'); // Unchanged
+        expect(result[3].content, 'Fourth Updated');
+      });
+
+      test('should preserve order after batch replacement', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 300),
+          const _TestScore(userId: 4, points: 400),
+        ];
+
+        final updates = [
+          const _TestScore(userId: 4, points: 450),
+          const _TestScore(userId: 1, points: 150),
+        ];
+
+        final result = scores.batchReplace(
+          updates,
+          key: (score) => score.userId,
+        );
+
+        expect(result.length, 4);
+        expect(result[0].points, 150); // Updated but position preserved
+        expect(result[1].points, 200);
+        expect(result[2].points, 300);
+        expect(result[3].points, 450); // Updated but position preserved
+      });
+
+      test('should handle duplicate keys in other list (last one wins)', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final updates = [
+          const _TestUser(id: '1', name: 'Alice First'),
+          const _TestUser(id: '1', name: 'Alice Second'), // Duplicate key
+        ];
+
+        final result = users.batchReplace(
+          updates,
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 2);
+        // Last value in updates map wins
+        expect(result[0].name, 'Alice Second');
+        expect(result[1].name, 'Bob');
+      });
+
+      test('should handle complex objects with custom key', () {
+        final activities = [
+          const _TestActivity(id: 'act1', authorId: 'user1', content: 'Hello'),
+          const _TestActivity(id: 'act2', authorId: 'user2', content: 'World'),
+          const _TestActivity(id: 'act3', authorId: 'user1', content: 'Test'),
+        ];
+
+        final updates = [
+          const _TestActivity(
+              id: 'act1', authorId: 'user1', content: 'Hello Updated'),
+          const _TestActivity(
+              id: 'act3', authorId: 'user1', content: 'Test Updated'),
+        ];
+
+        final result = activities.batchReplace(
+          updates,
+          key: (activity) => activity.id,
+        );
+
+        expect(result.length, 3);
+        expect(result[0].content, 'Hello Updated');
+        expect(result[1].content, 'World'); // Unchanged
+        expect(result[2].content, 'Test Updated');
+      });
+    });
   });
 
   group('SortedListExtensions', () {
@@ -234,6 +573,170 @@ void main() {
       });
     });
 
+    group('insertUnique', () {
+      test('should insert new element when key does not exist', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.insertUnique(
+          const _TestUser(id: '3', name: 'Charlie'),
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 3);
+        expect(result.last.id, '3');
+        expect(result.last.name, 'Charlie');
+        // Original list should be unchanged
+        expect(users.length, 2);
+      });
+
+      test('should replace existing element when key exists', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.insertUnique(
+          const _TestUser(id: '1', name: 'Alice Updated'),
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 2);
+        expect(result.last.id, '1');
+        expect(result.last.name, 'Alice Updated');
+        expect(result.first.name, 'Bob');
+      });
+
+      test('should sort result when compare function is provided', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+        ];
+
+        final result = scores.insertUnique(
+          const _TestScore(userId: 4, points: 175),
+          key: (score) => score.userId,
+          compare: (a, b) =>
+              b.points.compareTo(a.points), // Descending by points
+        );
+
+        expect(result.length, 4);
+        expect(result.map((s) => s.points), [200, 175, 150, 100]);
+        expect(result.map((s) => s.userId), [2, 4, 3, 1]);
+      });
+
+      test('should replace and sort when key exists and compare is provided',
+          () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+        ];
+
+        final result = scores.insertUnique(
+          const _TestScore(userId: 2, points: 250), // Update existing
+          key: (score) => score.userId,
+          compare: (a, b) =>
+              b.points.compareTo(a.points), // Descending by points
+        );
+
+        expect(result.length, 3);
+        expect(result.map((s) => s.points), [250, 150, 100]);
+        expect(result.map((s) => s.userId), [2, 3, 1]);
+      });
+
+      test('should work with empty list', () {
+        final users = <_TestUser>[];
+
+        final result = users.insertUnique(
+          const _TestUser(id: '1', name: 'Alice'),
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 1);
+        expect(result.first.id, '1');
+        expect(result.first.name, 'Alice');
+      });
+
+      test('should work with single element list', () {
+        final users = [const _TestUser(id: '1', name: 'Alice')];
+
+        final newUser = users.insertUnique(
+          const _TestUser(id: '2', name: 'Bob'),
+          key: (user) => user.id,
+        );
+
+        final replaced = users.insertUnique(
+          const _TestUser(id: '1', name: 'Alice Updated'),
+          key: (user) => user.id,
+        );
+
+        expect(newUser.length, 2);
+        expect(newUser.last.name, 'Bob');
+        expect(replaced.length, 1);
+        expect(replaced.first.name, 'Alice Updated');
+      });
+
+      test('should preserve order when compare is null', () {
+        final activities = [
+          const _TestActivity(id: 'act1', authorId: 'user1', content: 'First'),
+          const _TestActivity(id: 'act2', authorId: 'user2', content: 'Second'),
+        ];
+
+        final result = activities.insertUnique(
+          const _TestActivity(id: 'act3', authorId: 'user3', content: 'Third'),
+          key: (activity) => activity.id,
+        );
+
+        expect(result.length, 3);
+        expect(result[0].id, 'act1');
+        expect(result[1].id, 'act2');
+        expect(result[2].id, 'act3');
+      });
+
+      test('should handle multiple elements with same key (removes all)', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+          const _TestUser(id: '1', name: 'Alice Duplicate'), // Duplicate key
+        ];
+
+        final result = users.insertUnique(
+          const _TestUser(id: '1', name: 'Alice New'),
+          key: (user) => user.id,
+        );
+
+        expect(result.length, 2);
+        expect(result.last.id, '1');
+        expect(result.last.name, 'Alice New');
+        expect(result.first.id, '2');
+      });
+
+      test('should handle complex objects with custom key', () {
+        final activities = [
+          const _TestActivity(id: 'act1', authorId: 'user1', content: 'Hello'),
+          const _TestActivity(id: 'act2', authorId: 'user2', content: 'World'),
+        ];
+
+        final result = activities.insertUnique(
+          const _TestActivity(
+            id: 'act1',
+            authorId: 'user1',
+            content: 'Hello Updated',
+          ),
+          key: (activity) => activity.id,
+          compare: (a, b) => a.content.compareTo(b.content),
+        );
+
+        expect(result.length, 2);
+        expect(result.map((a) => a.content), ['Hello Updated', 'World']);
+        expect(result.map((a) => a.id), ['act1', 'act2']);
+      });
+    });
+
     group('sortedUpsert', () {
       test('should replace existing element and maintain sorted order', () {
         final users = [
@@ -328,6 +831,77 @@ void main() {
         expect(result.length, 3);
         expect(result.map((a) => a.content), ['A', 'C', 'Z']);
         expect(result.map((a) => a.id), ['act1', 'act3', 'act2']);
+      });
+
+      test('should work with custom update function', () {
+        // Start with a sorted list (descending by points)
+        final scores = [
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+          const _TestScore(userId: 1, points: 100),
+        ];
+
+        final result = scores.sortedUpsert(
+          const _TestScore(userId: 2, points: 50),
+          key: (score) => score.userId,
+          compare: (a, b) =>
+              b.points.compareTo(a.points), // Descending by points
+          update: (original, updated) => _TestScore(
+            userId: original.userId,
+            points: original.points + updated.points, // Add points together
+          ),
+        );
+
+        expect(result.length, 3);
+        expect(result.map((s) => s.points),
+            [250, 150, 100]); // 200 + 50 = 250, sorted desc
+        expect(result.map((s) => s.userId), [2, 3, 1]);
+      });
+
+      test(
+          'should use default update behavior when update function is not provided',
+          () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+        ];
+
+        final result = scores.sortedUpsert(
+          const _TestScore(userId: 1, points: 150),
+          key: (score) => score.userId,
+          compare: (a, b) => b.points.compareTo(a.points),
+          // update parameter not provided, should use default behavior
+        );
+
+        expect(result.length, 2);
+        expect(
+            result.map((s) => s.points), [200, 150]); // Updated value preferred
+        expect(result.map((s) => s.userId), [2, 1]);
+      });
+
+      test('should handle update function that changes sort position', () {
+        // Start with a sorted list (descending by points)
+        final scores = [
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+          const _TestScore(userId: 1, points: 100),
+        ];
+
+        // Update score 2 to have more points, should move to first position
+        final result = scores.sortedUpsert(
+          const _TestScore(userId: 2, points: 300),
+          key: (score) => score.userId,
+          compare: (a, b) => b.points.compareTo(a.points),
+          update: (original, updated) => _TestScore(
+            userId: original.userId,
+            points: updated.points, // Use updated value
+          ),
+        );
+
+        expect(result.length, 3);
+        expect(result.map((s) => s.points),
+            [300, 150, 100]); // Updated score now first
+        expect(result.map((s) => s.userId), [2, 3, 1]);
       });
     });
 
