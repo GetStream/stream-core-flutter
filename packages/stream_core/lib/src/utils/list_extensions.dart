@@ -89,7 +89,7 @@ extension ListExtensions<T extends Object> on List<T> {
 
     final original = this[index];
     // Otherwise, replace the existing element at the found index
-    return [...this].also((it) => it[index] = handleUpdate(original, element));
+    return [...this].apply((it) => it[index] = handleUpdate(original, element));
   }
 
   /// Replaces multiple elements in the list based on matching keys from another list.
@@ -225,7 +225,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
     required Comparator<T> compare,
   }) {
     final insertionIndex = _upperBound(this, element, compare);
-    return [...this].also((it) => it.insert(insertionIndex, element));
+    return [...this].apply((it) => it.insert(insertionIndex, element));
   }
 
   // Finds the first position where all elements before it compare less than [element].
