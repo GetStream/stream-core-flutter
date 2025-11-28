@@ -76,7 +76,8 @@ extension ListExtensions<T extends Object> on List<T> {
     required K Function(T item) key,
     T Function(T original, T updated)? update,
   }) {
-    final index = indexWhere((e) => key(e) == key(element));
+    final elementKey = key(element);
+    final index = indexWhere((e) => key(e) == elementKey);
 
     // Add the element if it does not exist
     if (index == -1) return [...this, element];
@@ -140,26 +141,16 @@ extension ListExtensions<T extends Object> on List<T> {
 
     final lookup = {for (final item in other) key(item): item};
 
-    // Find replacements - enumerate existing items and check lookup
-    final replacements = <(int, T)>[];
-    for (var index = 0; index < length; index++) {
-      final existing = this[index];
-      final updated = lookup[key(existing)];
-      if (updated != null) {
-        replacements.add((index, updated));
-      }
-    }
-
     T handleUpdate(T original, T updated) {
       if (update != null) return update(original, updated);
       return updated; // Default behavior: prefer the updated
     }
 
-    // Create result list and apply replacements
     final result = [...this];
-    for (final (index, replacement) in replacements) {
-      final original = result[index];
-      result[index] = handleUpdate(original, replacement);
+    for (var i = 0; i < result.length; i++) {
+      final original = result[i];
+      final updated = lookup[key(original)];
+      if (updated != null) result[i] = handleUpdate(original, updated);
     }
 
     return result;
@@ -309,7 +300,8 @@ extension SortedListExtensions<T extends Object> on List<T> {
     T Function(T original, T updated)? update,
     required Comparator<T> compare,
   }) {
-    final index = indexWhere((e) => key(e) == key(element));
+    final elementKey = key(element);
+    final index = indexWhere((e) => key(e) == elementKey);
 
     // If the element does not exist, insert it at the correct position
     if (index == -1) return sortedInsert(element, compare: compare);
@@ -398,9 +390,9 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
   /// Recursively removes elements from a nested tree structure.
   ///
-  /// Searches for elements matching the test condition at any level of
+  /// Searches for elements matching the [test] condition at any level of
   /// nesting. When an element is found and removed, parent elements are
-  /// updated through the provided callback functions. Uses copy-on-write to
+  /// rebuilt through the [updateChildren] callback function. Uses copy-on-write to
   /// avoid unnecessary object creation. Time complexity: O(n * d) where n is
   /// total number of nodes and d is average depth.
   ///
@@ -429,16 +421,14 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// final cleaned = comments.removeNested(
   ///   (comment) => comment.author == 'spammer',
   ///   children: (comment) => comment.replies,
-  ///   update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
   ///   updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
   /// );
-  /// // Result: Spam comment removed, parent comments updated with modifiedAt timestamp
+  /// // Result: Spam comment removed, parent comment updated with new replies list
   ///
   /// // Remove entire comment thread
   /// final withoutThread = comments.removeNested(
   ///   (comment) => comment.text == 'I disagree',
   ///   children: (comment) => comment.replies,
-  ///   update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
   ///   updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
   /// );
   /// // Result: Entire disagreement thread removed
