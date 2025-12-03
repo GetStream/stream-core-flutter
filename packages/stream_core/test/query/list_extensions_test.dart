@@ -301,10 +301,10 @@ void main() {
 
         final updates = [
           const _TestUser(id: '1', name: 'Alice Updated'),
-          const _TestUser(
-              id: '3', name: 'Charlie'), // Not in original, should be ignored
-          const _TestUser(
-              id: '4', name: 'David'), // Not in original, should be ignored
+          // Not in original, should be ignored
+          const _TestUser(id: '3', name: 'Charlie'),
+          // Not in original, should be ignored
+          const _TestUser(id: '4', name: 'David'),
         ];
 
         final result = users.batchReplace(
@@ -386,9 +386,15 @@ void main() {
 
         final updates = [
           const _TestActivity(
-              id: 'act2', authorId: 'user2', content: 'Second Updated'),
+            id: 'act2',
+            authorId: 'user2',
+            content: 'Second Updated',
+          ),
           const _TestActivity(
-              id: 'act4', authorId: 'user4', content: 'Fourth Updated'),
+            id: 'act4',
+            authorId: 'user4',
+            content: 'Fourth Updated',
+          ),
         ];
 
         final result = activities.batchReplace(
@@ -459,9 +465,15 @@ void main() {
 
         final updates = [
           const _TestActivity(
-              id: 'act1', authorId: 'user1', content: 'Hello Updated'),
+            id: 'act1',
+            authorId: 'user1',
+            content: 'Hello Updated',
+          ),
           const _TestActivity(
-              id: 'act3', authorId: 'user1', content: 'Test Updated'),
+            id: 'act3',
+            authorId: 'user1',
+            content: 'Test Updated',
+          ),
         ];
 
         final result = activities.batchReplace(
@@ -853,8 +865,8 @@ void main() {
         );
 
         expect(result.length, 3);
-        expect(result.map((s) => s.points),
-            [250, 150, 100]); // 200 + 50 = 250, sorted desc
+        // 200 + 50 = 250, sorted desc
+        expect(result.map((s) => s.points), [250, 150, 100]);
         expect(result.map((s) => s.userId), [2, 3, 1]);
       });
 
@@ -874,8 +886,8 @@ void main() {
         );
 
         expect(result.length, 2);
-        expect(
-            result.map((s) => s.points), [200, 150]); // Updated value preferred
+        // Updated value preferred
+        expect(result.map((s) => s.points), [200, 150]);
         expect(result.map((s) => s.userId), [2, 1]);
       });
 
@@ -899,8 +911,8 @@ void main() {
         );
 
         expect(result.length, 3);
-        expect(result.map((s) => s.points),
-            [300, 150, 100]); // Updated score now first
+        // Updated score now first
+        expect(result.map((s) => s.points), [300, 150, 100]);
         expect(result.map((s) => s.userId), [2, 3, 1]);
       });
     });
