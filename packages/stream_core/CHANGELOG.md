@@ -1,3 +1,9 @@
+## Upcoming
+
+### 🐛 Bug Fixes
+
+- Fixed `StreamDioException.toClientException()` not handling invalid JSON strings gracefully
+
 ## 0.3.0
 
 ### 💥 BREAKING CHANGES
