@@ -1,4 +1,13 @@
-## Upcoming
+## 0.3.1
+
+### ✨ Features
+
+- Added `updateWhere` method for updating elements matching a filter condition
+- Added `batchReplace` method for replacing multiple elements based on matching keys
+- Added `insertUnique` method for inserting elements ensuring uniqueness by key with optional sorting
+- Added `update` parameter to `upsert` for custom merge logic when replacing existing elements
+- Added `update` parameter to `batchReplace` for custom merge logic
+- Added `update` parameter to `sortedUpsert` for custom merge logic when replacing existing elements
 
 ### 🐛 Bug Fixes
 
