@@ -16,6 +16,40 @@ extension IterableExtensions<T extends Object> on Iterable<T> {
 /// These extensions return new lists rather than modifying existing ones,
 /// following immutable patterns for safer concurrent programming.
 extension ListExtensions<T extends Object> on List<T> {
+  /// Updates all elements in the list that match the filter condition.
+  ///
+  /// Returns a new list where elements matching [filter] are transformed
+  /// using the [update] function, while non-matching elements remain unchanged.
+  /// Time complexity: O(n) where n is the list length.
+  ///
+  /// ```dart
+  /// final users = [
+  ///   User(id: '1', name: 'Alice', active: true),
+  ///   User(id: '2', name: 'Bob', active: false),
+  ///   User(id: '3', name: 'Charlie', active: true),
+  /// ];
+  ///
+  /// // Update all active users
+  /// final updated = users.updateWhere(
+  ///   (user) => user.active,
+  ///   update: (user) => user.copyWith(lastSeen: DateTime.now()),
+  /// );
+  /// // Result: Active users have updated lastSeen, inactive users unchanged
+  ///
+  /// // Update users by name
+  /// final renamed = users.updateWhere(
+  ///   (user) => user.name == 'Bob',
+  ///   update: (user) => user.copyWith(name: 'Robert'),
+  /// );
+  /// // Result: [User(name: 'Alice'), User(name: 'Robert'), User(name: 'Charlie')]
+  /// ```
+  List<T> updateWhere(
+    bool Function(T item) filter, {
+    required T Function(T original) update,
+  }) {
+    return map((it) => filter(it) ? update(it) : it).toList();
+  }
+
   /// Inserts or replaces an element in the list based on a key.
   ///
   /// If an element with the same key already exists, it will be replaced.
@@ -40,38 +74,83 @@ extension ListExtensions<T extends Object> on List<T> {
   List<T> upsert<K>(
     T element, {
     required K Function(T item) key,
+    T Function(T original, T updated)? update,
   }) {
-    final index = indexWhere((e) => key(e) == key(element));
+    final elementKey = key(element);
+    final index = indexWhere((e) => key(e) == elementKey);
 
     // Add the element if it does not exist
     if (index == -1) return [...this, element];
 
+    T handleUpdate(T original, T updated) {
+      if (update != null) return update(original, updated);
+      return updated; // Default behavior: prefer the updated
+    }
+
+    final original = this[index];
     // Otherwise, replace the existing element at the found index
-    return [...this].also((it) => it[index] = element);
+    return [...this].apply((it) => it[index] = handleUpdate(original, element));
   }
 
+  /// Replaces multiple elements in the list based on matching keys from another list.
+  ///
+  /// Elements in this list that have matching keys in [other] are replaced.
+  /// Elements in [other] that don't match any keys in this list are ignored.
+  /// This is useful for batch updates where you want to replace existing elements
+  /// but not add new ones. Time complexity: O(n + m) where n and m are the
+  /// sizes of this list and [other] respectively.
+  ///
+  /// ```dart
+  /// final users = [
+  ///   User(id: '1', name: 'Alice', score: 100),
+  ///   User(id: '2', name: 'Bob', score: 80),
+  ///   User(id: '3', name: 'Charlie', score: 60),
+  /// ];
+  ///
+  /// final updates = [
+  ///   User(id: '1', name: 'Alice', score: 150), // Update existing
+  ///   User(id: '2', name: 'Bob', score: 90),    // Update existing
+  ///   User(id: '4', name: 'David', score: 70), // Ignored (not in original)
+  /// ];
+  ///
+  /// // Default behavior: replace with new values
+  /// final updated = users.batchReplace(
+  ///   updates,
+  ///   key: (user) => user.id,
+  /// );
+  /// // Result: [User(id: '1', score: 150), User(id: '2', score: 90), User(id: '3', score: 60)]
+  ///
+  /// // Custom merge logic: add scores together
+  /// final combined = users.batchReplace(
+  ///   updates,
+  ///   key: (user) => user.id,
+  ///   update: (original, updated) => User(
+  ///     id: original.id,
+  ///     name: original.name,
+  ///     score: original.score + updated.score,
+  ///   ),
+  /// );
+  /// // Result: [User(id: '1', score: 250), User(id: '2', score: 170), User(id: '3', score: 60)]
+  /// ```
   List<T> batchReplace<K>(
     List<T> other, {
     required K Function(T item) key,
+    T Function(T original, T updated)? update,
   }) {
     if (isEmpty || other.isEmpty) return this;
 
     final lookup = {for (final item in other) key(item): item};
 
-    // Find replacements - enumerate existing items and check lookup
-    final replacements = <(int, T)>[];
-    for (var index = 0; index < length; index++) {
-      final existing = this[index];
-      final updated = lookup[key(existing)];
-      if (updated != null) {
-        replacements.add((index, updated));
-      }
+    T handleUpdate(T original, T updated) {
+      if (update != null) return update(original, updated);
+      return updated; // Default behavior: prefer the updated
     }
 
-    // Create result list and apply replacements
     final result = [...this];
-    for (final (index, replacement) in replacements) {
-      result[index] = replacement;
+    for (var i = 0; i < result.length; i++) {
+      final original = result[i];
+      final updated = lookup[key(original)];
+      if (updated != null) result[i] = handleUpdate(original, updated);
     }
 
     return result;
@@ -83,6 +162,43 @@ extension ListExtensions<T extends Object> on List<T> {
 /// These extensions maintain list order and provide efficient operations
 /// for sorted collections using binary search algorithms where applicable.
 extension SortedListExtensions<T extends Object> on List<T> {
+  /// Inserts an element into the list, ensuring uniqueness by key.
+  ///
+  /// Removes any existing element with the same key and appends the new element
+  /// to the end. Optionally sorts the result if a [compare] function is provided.
+  /// Time complexity: O(n) for filtering + O(n log n) for sorting if compare is provided.
+  ///
+  /// ```dart
+  /// final users = [
+  ///   User(id: '1', name: 'Alice', score: 100),
+  ///   User(id: '2', name: 'Bob', score: 200),
+  /// ];
+  ///
+  /// // Insert new user (no sorting)
+  /// final withNew = users.insertUniqueBy(
+  ///   User(id: '3', name: 'Charlie', score: 150),
+  ///   key: (user) => user.id,
+  /// );
+  /// // Result: [User(id: '1'), User(id: '2'), User(id: '3')]
+  ///
+  /// // Replace existing user and sort by score
+  /// final updated = users.insertUniqueBy(
+  ///   User(id: '1', name: 'Alice Updated', score: 250),
+  ///   key: (user) => user.id,
+  ///   compare: (a, b) => b.score.compareTo(a.score), // Sort by score desc
+  /// );
+  /// // Result: [User(id: '1', score: 250), User(id: '2', score: 200)]
+  /// ```
+  List<T> insertUnique<K>(
+    T element, {
+    required K Function(T item) key,
+    Comparator<T>? compare,
+  }) {
+    final elementKey = key(element);
+    final updated = where((e) => key(e) != elementKey).followedBy([element]);
+    return compare?.let(updated.sorted) ?? updated.toList();
+  }
+
   /// Inserts an element into a sorted list at the correct position.
   ///
   /// Uses binary search to find the insertion point and inserts the element
@@ -109,7 +225,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
     required Comparator<T> compare,
   }) {
     final insertionIndex = _upperBound(this, element, compare);
-    return [...this].also((it) => it.insert(insertionIndex, element));
+    return [...this].apply((it) => it.insert(insertionIndex, element));
   }
 
   // Finds the first position where all elements before it compare less than [element].
@@ -137,7 +253,8 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// Inserts or replaces an element in a sorted list based on a key.
   ///
   /// First searches for an existing element with the same key. If found,
-  /// replaces it and re-sorts the list. If not found, inserts the element
+  /// replaces it using the optional [update] callback (defaults to preferring
+  /// the updated element) and re-sorts the list. If not found, inserts the element
   /// at the correct sorted position using binary search.
   /// Time complexity: O(n) for key search + O(n log n) for sorting if replacing,
   /// O(log n) for binary search + O(n) for insertion if adding new.
@@ -148,11 +265,24 @@ extension SortedListExtensions<T extends Object> on List<T> {
   ///   User(id: '3', name: 'Charlie', score: 80)
   /// ];
   ///
-  /// // Replace existing user
+  /// // Replace existing user (default behavior: prefer updated)
   /// final updated = users.sortedUpsert(
   ///   User(id: '1', name: 'Alice', score: 150),
   ///   key: (user) => user.id,
   ///   compare: (a, b) => b.score.compareTo(a.score), // Sort by score desc
+  /// );
+  /// // Result: [User(id: '1', score: 150), User(id: '3', score: 80)]
+  ///
+  /// // Custom merge logic: add scores together
+  /// final combined = users.sortedUpsert(
+  ///   User(id: '1', name: 'Alice', score: 50),
+  ///   key: (user) => user.id,
+  ///   compare: (a, b) => b.score.compareTo(a.score),
+  ///   update: (original, updated) => User(
+  ///     id: original.id,
+  ///     name: original.name,
+  ///     score: original.score + updated.score,
+  ///   ),
   /// );
   /// // Result: [User(id: '1', score: 150), User(id: '3', score: 80)]
   ///
@@ -167,9 +297,11 @@ extension SortedListExtensions<T extends Object> on List<T> {
   List<T> sortedUpsert<K>(
     T element, {
     required K Function(T item) key,
+    T Function(T original, T updated)? update,
     required Comparator<T> compare,
   }) {
-    final index = indexWhere((e) => key(e) == key(element));
+    final elementKey = key(element);
+    final index = indexWhere((e) => key(e) == elementKey);
 
     // If the element does not exist, insert it at the correct position
     if (index == -1) return sortedInsert(element, compare: compare);
@@ -178,9 +310,17 @@ extension SortedListExtensions<T extends Object> on List<T> {
     // and re-sort the list if necessary.
 
     final updatedList = [...this];
-    updatedList.removeAt(index);
+    final original = updatedList.removeAt(index);
 
-    return updatedList.sortedInsert(element, compare: compare);
+    T handleUpdate(T original, T updated) {
+      if (update != null) return update(original, updated);
+      return updated; // Default behavior: prefer the updated
+    }
+
+    return updatedList.sortedInsert(
+      handleUpdate(original, element),
+      compare: compare,
+    );
   }
 
   /// Merges this list with another list, handling duplicates based on a key.
@@ -250,9 +390,9 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
   /// Recursively removes elements from a nested tree structure.
   ///
-  /// Searches for elements matching the test condition at any level of
+  /// Searches for elements matching the [test] condition at any level of
   /// nesting. When an element is found and removed, parent elements are
-  /// updated through the provided callback functions. Uses copy-on-write to
+  /// rebuilt through the [updateChildren] callback function. Uses copy-on-write to
   /// avoid unnecessary object creation. Time complexity: O(n * d) where n is
   /// total number of nodes and d is average depth.
   ///
@@ -281,16 +421,14 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// final cleaned = comments.removeNested(
   ///   (comment) => comment.author == 'spammer',
   ///   children: (comment) => comment.replies,
-  ///   update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
   ///   updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
   /// );
-  /// // Result: Spam comment removed, parent comments updated with modifiedAt timestamp
+  /// // Result: Spam comment removed, parent comment updated with new replies list
   ///
   /// // Remove entire comment thread
   /// final withoutThread = comments.removeNested(
   ///   (comment) => comment.text == 'I disagree',
   ///   children: (comment) => comment.replies,
-  ///   update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
   ///   updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
   /// );
   /// // Result: Entire disagreement thread removed
