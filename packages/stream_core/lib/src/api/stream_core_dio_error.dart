@@ -22,19 +22,16 @@ class StreamDioException extends DioException {
 
 extension StreamDioExceptionExtension on DioException {
   HttpClientException toClientException() {
-    final response = this.response;
-    StreamApiError? apiError;
-    final data = response?.data;
+    final apiErrorResult = runSafelySync(
+      () => switch (response?.data) {
+        final Map<String, Object?> data => StreamApiError.fromJson(data),
+        final String data => StreamApiError.fromJson(jsonDecode(data)),
+        _ => null,
+      },
+    );
 
-    try {
-      if (data is Map<String, Object?>) {
-        apiError = StreamApiError.fromJson(data);
-      } else if (data is String) {
-        apiError = StreamApiError.fromJson(jsonDecode(data));
-      }
-    } catch (e) {
-      apiError = null;
-    }
+    final apiError = apiErrorResult.getOrNull();
+
     return HttpClientException(
       message: apiError?.message ?? response?.statusMessage ?? message ?? '',
       error: apiError ?? this,
