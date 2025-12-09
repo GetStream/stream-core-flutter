@@ -99,8 +99,10 @@ extension LocationEqualityExtension on LocationCoordinate {
   /// Supports both [CircularRegion] objects and Map representations with
   /// keys: 'lat', 'lng', 'distance' (in kilometers).
   bool isNear(Object? other) {
+    // Check for CircularRegion instance.
     if (other is CircularRegion) return other.contains(this);
 
+    // Check for Map representation.
     if (other is Map) {
       final lat = (other['lat'] as num?)?.toDouble();
       if (lat == null) return false;
@@ -127,8 +129,10 @@ extension LocationEqualityExtension on LocationCoordinate {
   /// Supports both [BoundingBox] objects and Map representations with
   /// keys: 'ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'.
   bool isWithinBounds(Object? other) {
+    // Check for BoundingBox instance.
     if (other is BoundingBox) return other.contains(this);
 
+    // Check for Map representation.
     if (other is Map) {
       final neLat = (other['ne_lat'] as num?)?.toDouble();
       if (neLat == null) return false;
