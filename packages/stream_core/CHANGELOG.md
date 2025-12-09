@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added location-based filtering support with `LocationCoordinate`, `Distance`, `CircularRegion`,
+  and `BoundingBox`
+
 ## 0.3.1
 
 ### ✨ Features
