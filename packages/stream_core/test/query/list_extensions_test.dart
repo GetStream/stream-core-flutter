@@ -199,7 +199,9 @@ void main() {
 
         expect(resultNegative.length, 3);
         expect(
-            resultNegative.first.name, 'David'); // Should be clamped to start
+          resultNegative.first.name,
+          'David',
+        ); // Should be clamped to start
       });
 
       test('should use insertAt with list information', () {
