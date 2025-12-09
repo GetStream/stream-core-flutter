@@ -37,10 +37,13 @@ class LocationCoordinate {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is LocationCoordinate &&
-        runtimeType == other.runtimeType &&
-        latitude == other.latitude &&
-        longitude == other.longitude;
+    if (other is! LocationCoordinate) return false;
+
+    const epsilon = 1e-7; // ~1cm precision
+    final absLatDiff = (latitude - other.latitude).abs();
+    final absLngDiff = (longitude - other.longitude).abs();
+
+    return absLatDiff < epsilon && absLngDiff < epsilon;
   }
 
   @override
@@ -59,10 +62,8 @@ class LocationCoordinate {
   /// print('Distance: ${distance.inKilometers} km'); // ~343.56 km
   /// ```
   Distance distanceTo(LocationCoordinate other) {
-    // If the coordinates are identical, the distance is zero.
-    if (latitude == other.latitude && longitude == other.longitude) {
-      return 0.meters;
-    }
+    // If the coordinates are equal, the distance is zero.
+    if (this == other) return 0.meters;
 
     const earthRadius = 6378137.0;
 

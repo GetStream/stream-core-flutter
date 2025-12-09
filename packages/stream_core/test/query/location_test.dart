@@ -49,6 +49,28 @@ void main() {
       expect(location1, isNot(equals(location3)));
       expect(location1.hashCode, equals(location2.hashCode));
     });
+
+    test('should consider near-equal coordinates as equal', () {
+      const location1 = LocationCoordinate(
+        latitude: 37.7749,
+        longitude: -122.4194,
+      );
+
+      // Coordinates differ by less than epsilon (~1cm)
+      const location2 = LocationCoordinate(
+        latitude: 37.77490000001,
+        longitude: -122.41940000001,
+      );
+
+      // Coordinates differ by more than epsilon
+      const location3 = LocationCoordinate(
+        latitude: 37.7749001,
+        longitude: -122.4194001,
+      );
+
+      expect(location1, equals(location2));
+      expect(location1, isNot(equals(location3)));
+    });
   });
 
   group('Distance', () {
