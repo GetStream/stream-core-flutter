@@ -30,6 +30,25 @@ void main() {
       final distance = location.distanceTo(location);
       expect(distance, equals(0.meters));
     });
+
+    test('should support equality comparison', () {
+      const location1 = LocationCoordinate(
+        latitude: 37.7749,
+        longitude: -122.4194,
+      );
+      const location2 = LocationCoordinate(
+        latitude: 37.7749,
+        longitude: -122.4194,
+      );
+      const location3 = LocationCoordinate(
+        latitude: 40.7128,
+        longitude: -74.0060,
+      );
+
+      expect(location1, equals(location2));
+      expect(location1, isNot(equals(location3)));
+      expect(location1.hashCode, equals(location2.hashCode));
+    });
   });
 
   group('Distance', () {

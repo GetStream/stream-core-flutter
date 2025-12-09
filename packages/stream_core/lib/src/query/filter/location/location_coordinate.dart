@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:meta/meta.dart';
+
 import 'distance.dart';
 
 /// A geographic coordinate with latitude and longitude.
@@ -15,6 +17,7 @@ import 'distance.dart';
 /// final distance = sanFrancisco.distanceTo(newYork);
 /// print('Distance: ${distance.inKilometers} km');
 /// ```
+@immutable
 class LocationCoordinate {
   const LocationCoordinate({
     required this.latitude,
@@ -30,6 +33,18 @@ class LocationCoordinate {
   ///
   /// Valid range is -180° (West) to +180° (East).
   final double longitude;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is LocationCoordinate &&
+        runtimeType == other.runtimeType &&
+        latitude == other.latitude &&
+        longitude == other.longitude;
+  }
+
+  @override
+  int get hashCode => Object.hash(latitude, longitude);
 
   /// The distance to [other].
   ///
