@@ -1,6 +1,9 @@
-import '../utils.dart';
+import '../../utils.dart';
 import 'filter_operation_utils.dart';
 import 'filter_operator.dart';
+import 'location/bounding_box.dart';
+import 'location/circular_region.dart';
+import 'location/location_coordinate.dart';
 
 /// Function that extracts a field value from a model instance.
 ///
@@ -217,7 +220,13 @@ sealed class ComparisonOperator<T extends Object> extends Filter<T> {
   @override
   Map<String, Object?> toJson() {
     return {
-      field.remote: {operator: value},
+      field.remote: {
+        operator: switch (value) {
+          final BoundingBox bbox => bbox.toJson(),
+          final CircularRegion region => region.toJson(),
+          _ => value,
+        },
+      },
     };
   }
 }
@@ -242,6 +251,15 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
 
     // NULL values can't be compared.
     if (fieldValue == null || comparisonValue == null) return false;
+
+    // Special case for location coordinates
+    if (fieldValue is LocationCoordinate) {
+      final isNear = fieldValue.isNear(comparisonValue);
+      final isWithinBounds = fieldValue.isWithinBounds(comparisonValue);
+
+      // Match if either near or within bounds
+      return isNear || isWithinBounds;
+    }
 
     // Deep equality: order-sensitive for arrays, order-insensitive for objects.
     return fieldValue.deepEquals(comparisonValue);

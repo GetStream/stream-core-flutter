@@ -15,6 +15,7 @@ class TestModel {
     this.metadata,
     this.tags,
     this.projects,
+    this.location,
   });
 
   final String? id;
@@ -25,6 +26,7 @@ class TestModel {
   final Map<String, Object?>? metadata;
   final List<String>? tags;
   final List<Map<String, Object?>>? projects;
+  final LocationCoordinate? location;
 }
 
 // Test implementation of FilterField for testing purposes
@@ -39,6 +41,11 @@ class TestFilterField extends FilterField<TestModel> {
   static final metadata = TestFilterField('metadata', (it) => it.metadata);
   static final tags = TestFilterField('tags', (it) => it.tags);
   static final projects = TestFilterField('projects', (it) => it.projects);
+  static final near = TestFilterField('near', (it) => it.location);
+  static final withinBounds = TestFilterField(
+    'within_bounds',
+    (it) => it.location,
+  );
 }
 
 void main() {
@@ -1932,6 +1939,291 @@ void main() {
               .matches(modelWithValues),
           isTrue,
         );
+      });
+    });
+
+    group('Location Filtering', () {
+      test('should match location within CircularRegion', () {
+        const center = LocationCoordinate(
+          latitude: 37.7749,
+          longitude: -122.4194,
+        );
+
+        const nearbyLocation = LocationCoordinate(
+          latitude: 37.8149,
+          longitude: -122.4594,
+        );
+
+        const farLocation = LocationCoordinate(
+          latitude: 40.7128,
+          longitude: -74.0060,
+        );
+
+        final region = CircularRegion(
+          radius: 10.kilometers,
+          center: center,
+        );
+
+        final filter = Filter.equal(TestFilterField.near, region);
+
+        final modelNearby = TestModel(location: nearbyLocation);
+        final modelFar = TestModel(location: farLocation);
+
+        expect(filter.matches(modelNearby), isTrue);
+        expect(filter.matches(modelFar), isFalse);
+      });
+
+      test('should match location within BoundingBox', () {
+        const bbox = BoundingBox(
+          northEast: LocationCoordinate(
+            latitude: 37.8324,
+            longitude: -122.3482,
+          ),
+          southWest: LocationCoordinate(
+            latitude: 37.7079,
+            longitude: -122.5161,
+          ),
+        );
+
+        const insideLocation = LocationCoordinate(
+          latitude: 37.7749,
+          longitude: -122.4194,
+        );
+
+        const outsideLocation = LocationCoordinate(
+          latitude: 37.8044,
+          longitude: -122.2712,
+        );
+
+        final filter = Filter.equal(TestFilterField.withinBounds, bbox);
+
+        final modelInside = TestModel(location: insideLocation);
+        final modelOutside = TestModel(location: outsideLocation);
+
+        expect(filter.matches(modelInside), isTrue);
+        expect(filter.matches(modelOutside), isFalse);
+      });
+
+      test('should support Map-based circular region format', () {
+        const location = LocationCoordinate(
+          latitude: 37.7849,
+          longitude: -122.4294,
+        );
+
+        final regionMap = {
+          'lat': 37.7749,
+          'lng': -122.4194,
+          'distance': 10.0,
+        };
+
+        final filter = Filter.equal(TestFilterField.near, regionMap);
+        final model = TestModel(location: location);
+
+        expect(filter.matches(model), isTrue);
+      });
+
+      test('should support Map-based bounding box format', () {
+        const insideLocation = LocationCoordinate(
+          latitude: 41.89,
+          longitude: 12.49,
+        );
+
+        const outsideLocation = LocationCoordinate(
+          latitude: 41.95,
+          longitude: 12.49,
+        );
+
+        final bboxMap = {
+          'ne_lat': 41.91,
+          'ne_lng': 12.51,
+          'sw_lat': 41.87,
+          'sw_lng': 12.47,
+        };
+
+        final filter = Filter.equal(TestFilterField.withinBounds, bboxMap);
+
+        final modelInside = TestModel(location: insideLocation);
+        final modelOutside = TestModel(location: outsideLocation);
+
+        expect(filter.matches(modelInside), isTrue);
+        expect(filter.matches(modelOutside), isFalse);
+      });
+
+      test('should serialize CircularRegion filter to JSON', () {
+        final region = CircularRegion(
+          radius: 5.kilometers,
+          center: const LocationCoordinate(latitude: 41.89, longitude: 12.49),
+        );
+
+        final filter = Filter.equal(TestFilterField.near, region);
+
+        expect(filter.toJson(), {
+          'near': {
+            r'$eq': {
+              'lat': 41.89,
+              'lng': 12.49,
+              'distance': 5.0,
+            },
+          },
+        });
+      });
+
+      test('should serialize BoundingBox filter to JSON', () {
+        const bbox = BoundingBox(
+          northEast: LocationCoordinate(latitude: 41.91, longitude: 12.51),
+          southWest: LocationCoordinate(latitude: 41.87, longitude: 12.47),
+        );
+
+        final filter = Filter.equal(TestFilterField.withinBounds, bbox);
+
+        expect(filter.toJson(), {
+          'within_bounds': {
+            r'$eq': {
+              'ne_lat': 41.91,
+              'ne_lng': 12.51,
+              'sw_lat': 41.87,
+              'sw_lng': 12.47,
+            },
+          },
+        });
+      });
+
+      test('should work with logical operators', () {
+        const location = LocationCoordinate(
+          latitude: 37.7749,
+          longitude: -122.4194,
+        );
+
+        final region = CircularRegion(
+          radius: 10.kilometers,
+          center: location,
+        );
+
+        final filter = Filter.and([
+          Filter.equal(TestFilterField.name, 'Office'),
+          Filter.equal(TestFilterField.near, region),
+        ]);
+
+        final model = TestModel(name: 'Office', location: location);
+
+        expect(filter.matches(model), isTrue);
+      });
+
+      test('should not match when location field is null', () {
+        final region = CircularRegion(
+          radius: 10.kilometers,
+          center: const LocationCoordinate(
+            latitude: 37.7749,
+            longitude: -122.4194,
+          ),
+        );
+
+        const bbox = BoundingBox(
+          northEast: LocationCoordinate(
+            latitude: 37.8324,
+            longitude: -122.3482,
+          ),
+          southWest: LocationCoordinate(
+            latitude: 37.7079,
+            longitude: -122.5161,
+          ),
+        );
+
+        final filterNear = Filter.equal(TestFilterField.near, region);
+        final filterBounds = Filter.equal(TestFilterField.withinBounds, bbox);
+
+        final modelWithNull = TestModel(location: null);
+
+        expect(filterNear.matches(modelWithNull), isFalse);
+        expect(filterBounds.matches(modelWithNull), isFalse);
+      });
+
+      test('should not match with invalid Map format for CircularRegion', () {
+        const location = LocationCoordinate(
+          latitude: 37.7749,
+          longitude: -122.4194,
+        );
+
+        final model = TestModel(location: location);
+
+        // Missing 'distance' field
+        final invalidMap1 = {'lat': 37.7749, 'lng': -122.4194};
+        final filter1 = Filter.equal(TestFilterField.near, invalidMap1);
+
+        expect(filter1.matches(model), isFalse);
+
+        // Missing 'lng' field
+        final invalidMap2 = {'lat': 37.7749, 'distance': 10.0};
+        final filter2 = Filter.equal(TestFilterField.near, invalidMap2);
+
+        expect(filter2.matches(model), isFalse);
+      });
+
+      test('should not match with invalid Map format for BoundingBox', () {
+        const location = LocationCoordinate(
+          latitude: 37.7749,
+          longitude: -122.4194,
+        );
+
+        final model = TestModel(location: location);
+
+        // Missing 'sw_lat' field
+        final invalidMap1 = {
+          'ne_lat': 37.8324,
+          'ne_lng': -122.3482,
+          'sw_lng': -122.5161,
+        };
+
+        final filter1 = Filter.equal(TestFilterField.withinBounds, invalidMap1);
+        expect(filter1.matches(model), isFalse);
+
+        // Missing 'ne_lng' field
+        final invalidMap2 = {
+          'ne_lat': 37.8324,
+          'sw_lat': 37.7079,
+          'sw_lng': -122.5161,
+        };
+
+        final filter2 = Filter.equal(TestFilterField.withinBounds, invalidMap2);
+        expect(filter2.matches(model), isFalse);
+      });
+
+      test('should match location at exact radius boundary', () {
+        const center = LocationCoordinate(latitude: 0, longitude: 0);
+        const radiusMeters = 1000.0;
+        final region = CircularRegion(
+          radius: radiusMeters.meters,
+          center: center,
+        );
+
+        // Point approximately 1km away at equator
+        const pointAtBoundary = LocationCoordinate(
+          latitude: 0,
+          longitude: 0.00898, // ~1km at equator
+        );
+
+        final filter = Filter.equal(TestFilterField.near, region);
+        final model = TestModel(location: pointAtBoundary);
+
+        expect(filter.matches(model), isTrue);
+      });
+
+      test('should match location at exact bounding box boundary', () {
+        const bbox = BoundingBox(
+          northEast: LocationCoordinate(latitude: 38, longitude: -122),
+          southWest: LocationCoordinate(latitude: 37, longitude: -123),
+        );
+
+        const neCorner = LocationCoordinate(latitude: 38, longitude: -122);
+        const swCorner = LocationCoordinate(latitude: 37, longitude: -123);
+
+        final filter = Filter.equal(TestFilterField.withinBounds, bbox);
+
+        final modelNE = TestModel(location: neCorner);
+        final modelSW = TestModel(location: swCorner);
+
+        expect(filter.matches(modelNE), isTrue);
+        expect(filter.matches(modelSW), isTrue);
       });
     });
   });
