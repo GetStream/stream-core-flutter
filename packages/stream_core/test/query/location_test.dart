@@ -1,7 +1,4 @@
-import 'package:stream_core/src/query/filter/location/bounding_box.dart';
-import 'package:stream_core/src/query/filter/location/circular_region.dart';
-import 'package:stream_core/src/query/filter/location/distance.dart';
-import 'package:stream_core/src/query/filter/location/location_coordinate.dart';
+import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 void main() {
