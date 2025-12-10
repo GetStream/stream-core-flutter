@@ -1,3 +1,9 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `insertAt` parameter to `upsert` for controlling insertion position of new elements
+
 ## 0.3.1
 
 ### ✨ Features
