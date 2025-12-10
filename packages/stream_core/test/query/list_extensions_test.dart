@@ -135,6 +135,124 @@ void main() {
         expect(result.first.content, 'Hello Updated');
         expect(result.last.content, 'World');
       });
+
+      test('should insert at beginning when insertAt returns 0', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.upsert(
+          const _TestUser(id: '3', name: 'Charlie'),
+          key: (user) => user.id,
+          insertAt: (list) => 0,
+        );
+
+        expect(result.length, 3);
+        expect(result[0].name, 'Charlie');
+        expect(result[1].name, 'Alice');
+        expect(result[2].name, 'Bob');
+      });
+
+      test('should insert at middle position when insertAt specifies', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+          const _TestUser(id: '3', name: 'Charlie'),
+        ];
+
+        final result = users.upsert(
+          const _TestUser(id: '4', name: 'David'),
+          key: (user) => user.id,
+          insertAt: (list) => 1,
+        );
+
+        expect(result.length, 4);
+        expect(result[0].name, 'Alice');
+        expect(result[1].name, 'David');
+        expect(result[2].name, 'Bob');
+        expect(result[3].name, 'Charlie');
+      });
+
+      test('should clamp insertAt index to valid range', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        // Index too large
+        final resultLarge = users.upsert(
+          const _TestUser(id: '3', name: 'Charlie'),
+          key: (user) => user.id,
+          insertAt: (list) => 100, // Way beyond list length
+        );
+
+        expect(resultLarge.length, 3);
+        expect(resultLarge.last.name, 'Charlie'); // Should be clamped to end
+
+        // Negative index
+        final resultNegative = users.upsert(
+          const _TestUser(id: '4', name: 'David'),
+          key: (user) => user.id,
+          insertAt: (list) => -5,
+        );
+
+        expect(resultNegative.length, 3);
+        expect(
+          resultNegative.first.name,
+          'David',
+        ); // Should be clamped to start
+      });
+
+      test('should use insertAt with list information', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+        ];
+
+        // Insert at position based on list length
+        final result = scores.upsert(
+          const _TestScore(userId: 4, points: 175),
+          key: (score) => score.userId,
+          insertAt: (list) => list.length ~/ 2, // Insert at middle
+        );
+
+        expect(result.length, 4);
+        expect(result[1].userId, 4); // Inserted at index 1 (3 ~/ 2 = 1)
+      });
+
+      test('should not use insertAt when replacing existing element', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+          const _TestUser(id: '3', name: 'Charlie'),
+        ];
+
+        final result = users.upsert(
+          const _TestUser(id: '2', name: 'Bob Updated'),
+          key: (user) => user.id,
+          insertAt: (list) => 0, // Should be ignored when replacing
+        );
+
+        expect(result.length, 3);
+        expect(result[0].name, 'Alice');
+        expect(result[1].name, 'Bob Updated'); // Replaced in place
+        expect(result[2].name, 'Charlie');
+      });
+
+      test('should work with insertAt on empty list', () {
+        final users = <_TestUser>[];
+
+        final result = users.upsert(
+          const _TestUser(id: '1', name: 'Alice'),
+          key: (user) => user.id,
+          insertAt: (list) => 0,
+        );
+
+        expect(result.length, 1);
+        expect(result.first.name, 'Alice');
+      });
     });
 
     group('updateWhere', () {

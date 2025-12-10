@@ -53,7 +53,8 @@ extension ListExtensions<T extends Object> on List<T> {
   /// Inserts or replaces an element in the list based on a key.
   ///
   /// If an element with the same key already exists, it will be replaced.
-  /// Otherwise, the new element will be appended to the end of the list.
+  /// Otherwise, the new element will be inserted at the position determined by
+  /// [insertAt] (defaults to appending at the end).
   /// Time complexity: O(n) for search, O(n) for list creation.
   ///
   /// ```dart
@@ -64,23 +65,37 @@ extension ListExtensions<T extends Object> on List<T> {
   /// );
   /// // Result: [User(id: '1', name: 'Alice Updated'), User(id: '2', name: 'Bob')]
   ///
-  /// // Adding new element
+  /// // Adding new element (appends to end)
   /// final withNew = users.upsert(
   ///   User(id: '3', name: 'Charlie'),
   ///   key: (user) => user.id,
   /// );
   /// // Result: [User(id: '1', name: 'Alice'), User(id: '2', name: 'Bob'), User(id: '3', name: 'Charlie')]
+  ///
+  /// // Insert at specific position
+  /// final inserted = users.upsert(
+  ///   User(id: '3', name: 'Charlie'),
+  ///   key: (user) => user.id,
+  ///   insertAt: (list) => 0, // Insert at beginning
+  /// );
+  /// // Result: [User(id: '3', name: 'Charlie'), User(id: '1', name: 'Alice'), User(id: '2', name: 'Bob')]
   /// ```
   List<T> upsert<K>(
     T element, {
     required K Function(T item) key,
+    int Function(List<T> list)? insertAt,
     T Function(T original, T updated)? update,
   }) {
     final elementKey = key(element);
     final index = indexWhere((e) => key(e) == elementKey);
 
     // Add the element if it does not exist
-    if (index == -1) return [...this, element];
+    if (index == -1) {
+      final insertionIndex = insertAt?.call(this) ?? length;
+      // Clamp index to valid range [0, length]
+      final validIndex = insertionIndex.clamp(0, length);
+      return [...this].apply((it) => it.insert(validIndex, element));
+    }
 
     T handleUpdate(T original, T updated) {
       if (update != null) return update(original, updated);
