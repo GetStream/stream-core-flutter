@@ -1,5 +1,10 @@
 import 'package:collection/collection.dart';
 
+import 'location/bounding_box.dart';
+import 'location/circular_region.dart';
+import 'location/distance.dart';
+import 'location/location_coordinate.dart';
+
 // Deep equality checker.
 //
 // Maps are always compared with key-order-insensitivity (MapEquality).
@@ -84,5 +89,71 @@ extension JSONContainmentExtension<K, V> on Map<K, V> {
       // Value must match recursively.
       return this[entry.key].containsValue(entry.value);
     });
+  }
+}
+
+/// Extension methods for location-based filtering.
+extension LocationEqualityExtension on LocationCoordinate {
+  /// Returns `true` if this coordinate is within a [CircularRegion].
+  ///
+  /// Supports both [CircularRegion] objects and Map representations with
+  /// keys: 'lat', 'lng', 'distance' (in kilometers).
+  bool isNear(Object? other) {
+    // Check for CircularRegion instance.
+    if (other is CircularRegion) return other.contains(this);
+
+    // Check for Map representation.
+    if (other is Map) {
+      final lat = (other['lat'] as num?)?.toDouble();
+      if (lat == null) return false;
+
+      final lng = (other['lng'] as num?)?.toDouble();
+      if (lng == null) return false;
+
+      final distance = (other['distance'] as num?)?.toDouble();
+      if (distance == null) return false;
+
+      final region = CircularRegion(
+        radius: distance.kilometers,
+        center: LocationCoordinate(latitude: lat, longitude: lng),
+      );
+
+      return region.contains(this);
+    }
+
+    return false;
+  }
+
+  /// Returns `true` if this coordinate is within a [BoundingBox].
+  ///
+  /// Supports both [BoundingBox] objects and Map representations with
+  /// keys: 'ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'.
+  bool isWithinBounds(Object? other) {
+    // Check for BoundingBox instance.
+    if (other is BoundingBox) return other.contains(this);
+
+    // Check for Map representation.
+    if (other is Map) {
+      final neLat = (other['ne_lat'] as num?)?.toDouble();
+      if (neLat == null) return false;
+
+      final neLng = (other['ne_lng'] as num?)?.toDouble();
+      if (neLng == null) return false;
+
+      final swLat = (other['sw_lat'] as num?)?.toDouble();
+      if (swLat == null) return false;
+
+      final swLng = (other['sw_lng'] as num?)?.toDouble();
+      if (swLng == null) return false;
+
+      final box = BoundingBox(
+        northEast: LocationCoordinate(latitude: neLat, longitude: neLng),
+        southWest: LocationCoordinate(latitude: swLat, longitude: swLng),
+      );
+
+      return box.contains(this);
+    }
+
+    return false;
   }
 }

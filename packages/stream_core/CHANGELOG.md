@@ -2,6 +2,8 @@
 
 ### ✨ Features
 
+- Added location-based filtering support with `LocationCoordinate`, `Distance`, `CircularRegion`,
+  and `BoundingBox`
 - Added `insertAt` parameter to `upsert` for controlling insertion position of new elements
 
 ## 0.3.1
