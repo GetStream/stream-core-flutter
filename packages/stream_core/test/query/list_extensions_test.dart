@@ -393,8 +393,7 @@ void main() {
 
         final result = scores.updateWhere(
           (score) => score.userId == 1,
-          update: (score) =>
-              _TestScore(userId: score.userId, points: 250),
+          update: (score) => _TestScore(userId: score.userId, points: 250),
           compare: (a, b) => b.points.compareTo(a.points), // Descending
         );
 
@@ -404,7 +403,8 @@ void main() {
         expect(result[2].points, 150);
       });
 
-      test('should sort multiple updated elements when compare is provided', () {
+      test('should sort multiple updated elements when compare is provided',
+          () {
         final users = [
           const _TestUser(id: '1', name: 'Alice'),
           const _TestUser(id: '2', name: 'Bob'),
