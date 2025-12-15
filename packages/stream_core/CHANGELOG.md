@@ -1,3 +1,9 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `compare` parameter to `updateWhere` for optional sorting after updates
+
 ## 0.3.2
 
 ### ✨ Features

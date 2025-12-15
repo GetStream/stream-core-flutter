@@ -383,6 +383,48 @@ void main() {
         expect(result[2].points, 200); // Updated (150 + 50)
         expect(result[3].points, 250); // Unchanged
       });
+
+      test('should sort list after update when compare is provided', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+        ];
+
+        final result = scores.updateWhere(
+          (score) => score.userId == 1,
+          update: (score) =>
+              _TestScore(userId: score.userId, points: 250),
+          compare: (a, b) => b.points.compareTo(a.points), // Descending
+        );
+
+        expect(result.length, 3);
+        expect(result[0].points, 250); // Updated and now first
+        expect(result[1].points, 200);
+        expect(result[2].points, 150);
+      });
+
+      test('should sort multiple updated elements when compare is provided', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+          const _TestUser(id: '3', name: 'Charlie'),
+          const _TestUser(id: '4', name: 'David'),
+        ];
+
+        final result = users.updateWhere(
+          (user) => user.id == '2' || user.id == '4',
+          update: (user) =>
+              _TestUser(id: user.id, name: 'Z${user.name}'), // Prefix with Z
+          compare: (a, b) => a.name.compareTo(b.name), // Ascending by name
+        );
+
+        expect(result.length, 4);
+        expect(result[0].name, 'Alice');
+        expect(result[1].name, 'Charlie');
+        expect(result[2].name, 'ZBob');
+        expect(result[3].name, 'ZDavid');
+      });
     });
 
     group('batchReplace', () {
