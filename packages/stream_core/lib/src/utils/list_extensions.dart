@@ -16,40 +16,6 @@ extension IterableExtensions<T extends Object> on Iterable<T> {
 /// These extensions return new lists rather than modifying existing ones,
 /// following immutable patterns for safer concurrent programming.
 extension ListExtensions<T extends Object> on List<T> {
-  /// Updates all elements in the list that match the filter condition.
-  ///
-  /// Returns a new list where elements matching [filter] are transformed
-  /// using the [update] function, while non-matching elements remain unchanged.
-  /// Time complexity: O(n) where n is the list length.
-  ///
-  /// ```dart
-  /// final users = [
-  ///   User(id: '1', name: 'Alice', active: true),
-  ///   User(id: '2', name: 'Bob', active: false),
-  ///   User(id: '3', name: 'Charlie', active: true),
-  /// ];
-  ///
-  /// // Update all active users
-  /// final updated = users.updateWhere(
-  ///   (user) => user.active,
-  ///   update: (user) => user.copyWith(lastSeen: DateTime.now()),
-  /// );
-  /// // Result: Active users have updated lastSeen, inactive users unchanged
-  ///
-  /// // Update users by name
-  /// final renamed = users.updateWhere(
-  ///   (user) => user.name == 'Bob',
-  ///   update: (user) => user.copyWith(name: 'Robert'),
-  /// );
-  /// // Result: [User(name: 'Alice'), User(name: 'Robert'), User(name: 'Charlie')]
-  /// ```
-  List<T> updateWhere(
-    bool Function(T item) filter, {
-    required T Function(T original) update,
-  }) {
-    return map((it) => filter(it) ? update(it) : it).toList();
-  }
-
   /// Inserts or replaces an element in the list based on a key.
   ///
   /// If an element with the same key already exists, it will be replaced.
@@ -170,13 +136,117 @@ extension ListExtensions<T extends Object> on List<T> {
 
     return result;
   }
+
+  /// Splits the list into two lists based on a filter condition.
+  ///
+  /// Returns a record where the first list contains elements that match the
+  /// filter (return true), and the second list contains elements that don't
+  /// match (return false). This is useful for separating elements into two
+  /// groups in a single pass. Time complexity: O(n).
+  ///
+  /// ```dart
+  /// final numbers = [1, 2, 3, 4, 5, 6];
+  /// final (even, odd) = numbers.partition((n) => n.isEven);
+  /// // even: [2, 4, 6]
+  /// // odd: [1, 3, 5]
+  ///
+  /// final users = [
+  ///   User(id: '1', name: 'Alice', active: true),
+  ///   User(id: '2', name: 'Bob', active: false),
+  ///   User(id: '3', name: 'Charlie', active: true),
+  ///   User(id: '4', name: 'David', active: false),
+  /// ];
+  ///
+  /// // Separate active and inactive users
+  /// final (active, inactive) = users.partition((user) => user.active);
+  /// // active: [User(name: 'Alice'), User(name: 'Charlie')]
+  /// // inactive: [User(name: 'Bob'), User(name: 'David')]
+  ///
+  /// // Partition by score threshold
+  /// final scores = [
+  ///   Score(userId: '1', points: 150),
+  ///   Score(userId: '2', points: 80),
+  ///   Score(userId: '3', points: 200),
+  ///   Score(userId: '4', points: 45),
+  /// ];
+  /// final (high, low) = scores.partition((score) => score.points >= 100);
+  /// // high: [Score(points: 150), Score(points: 200)]
+  /// // low: [Score(points: 80), Score(points: 45)]
+  /// ```
+  (List<T>, List<T>) partition(bool Function(T element) test) {
+    final matching = <T>[];
+    final notMatching = <T>[];
+
+    for (final element in this) {
+      if (test(element)) {
+        matching.add(element);
+      } else {
+        notMatching.add(element);
+      }
+    }
+
+    return (matching, notMatching);
+  }
 }
 
-/// Extensions for operations on sorted lists.
+/// Extensions for list operations that provide optional or required sorting.
 ///
-/// These extensions maintain list order and provide efficient operations
-/// for sorted collections using binary search algorithms where applicable.
+/// These extensions return new lists with optional or required sorting capabilities.
+/// Some methods like [sortedInsert] and [sortedUpsert] use binary search algorithms
+/// for efficient insertion into already-sorted lists, while others like [updateWhere]
+/// and [merge] provide optional sorting as a convenience.
 extension SortedListExtensions<T extends Object> on List<T> {
+  /// Updates all elements in the list that match the filter condition.
+  ///
+  /// Returns a new list where elements matching [filter] are transformed
+  /// using the [update] function, while non-matching elements remain unchanged.
+  /// Optionally sorts the result if a [compare] function is provided.
+  /// Time complexity: O(n) where n is the list length, or O(n log n) if sorting.
+  ///
+  /// ```dart
+  /// final users = [
+  ///   User(id: '1', name: 'Alice', active: true),
+  ///   User(id: '2', name: 'Bob', active: false),
+  ///   User(id: '3', name: 'Charlie', active: true),
+  /// ];
+  ///
+  /// // Update all active users
+  /// final updated = users.updateWhere(
+  ///   (user) => user.active,
+  ///   update: (user) => user.copyWith(lastSeen: DateTime.now()),
+  /// );
+  /// // Result: Active users have updated lastSeen, inactive users unchanged
+  ///
+  /// // Update users by name
+  /// final renamed = users.updateWhere(
+  ///   (user) => user.name == 'Bob',
+  ///   update: (user) => user.copyWith(name: 'Robert'),
+  /// );
+  /// // Result: [User(name: 'Alice'), User(name: 'Robert'), User(name: 'Charlie')]
+  ///
+  /// // Update and sort by score
+  /// final scores = [
+  ///   Score(userId: '1', points: 100),
+  ///   Score(userId: '2', points: 200),
+  ///   Score(userId: '3', points: 150),
+  /// ];
+  /// final boosted = scores.updateWhere(
+  ///   (score) => score.userId == '1',
+  ///   update: (score) => score.copyWith(points: score.points + 150),
+  ///   compare: (a, b) => b.points.compareTo(a.points), // Sort descending
+  /// );
+  /// // Result: [Score(userId: '1', points: 250), Score(userId: '2', points: 200), Score(userId: '3', points: 150)]
+  /// ```
+  List<T> updateWhere(
+    bool Function(T item) filter, {
+    required T Function(T original) update,
+    Comparator<T>? compare,
+  }) {
+    final iterable = map((it) => filter(it) ? update(it) : it);
+    if (compare != null) return iterable.sorted(compare);
+    return iterable.toList();
+  }
+
   /// Inserts an element into the list, ensuring uniqueness by key.
   ///
   /// Removes any existing element with the same key and appends the new element

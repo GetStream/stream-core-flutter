@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `partition` method for splitting lists into two based on a filter condition
+- Added `compare` parameter to `updateWhere` for optional sorting after updates
+
 ## 0.3.2
 
 ### ✨ Features

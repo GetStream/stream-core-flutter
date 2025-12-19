@@ -383,6 +383,48 @@ void main() {
         expect(result[2].points, 200); // Updated (150 + 50)
         expect(result[3].points, 250); // Unchanged
       });
+
+      test('should sort list after update when compare is provided', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 3, points: 150),
+        ];
+
+        final result = scores.updateWhere(
+          (score) => score.userId == 1,
+          update: (score) => _TestScore(userId: score.userId, points: 250),
+          compare: (a, b) => b.points.compareTo(a.points), // Descending
+        );
+
+        expect(result.length, 3);
+        expect(result[0].points, 250); // Updated and now first
+        expect(result[1].points, 200);
+        expect(result[2].points, 150);
+      });
+
+      test('should sort multiple updated elements when compare is provided',
+          () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+          const _TestUser(id: '3', name: 'Charlie'),
+          const _TestUser(id: '4', name: 'David'),
+        ];
+
+        final result = users.updateWhere(
+          (user) => user.id == '2' || user.id == '4',
+          update: (user) =>
+              _TestUser(id: user.id, name: 'Z${user.name}'), // Prefix with Z
+          compare: (a, b) => a.name.compareTo(b.name), // Ascending by name
+        );
+
+        expect(result.length, 4);
+        expect(result[0].name, 'Alice');
+        expect(result[1].name, 'Charlie');
+        expect(result[2].name, 'ZBob');
+        expect(result[3].name, 'ZDavid');
+      });
     });
 
     group('batchReplace', () {
@@ -603,6 +645,53 @@ void main() {
         expect(result[0].content, 'Hello Updated');
         expect(result[1].content, 'World'); // Unchanged
         expect(result[2].content, 'Test Updated');
+      });
+    });
+
+    group('partition', () {
+      test('should split list into two lists based on filter', () {
+        final numbers = [1, 2, 3, 4, 5, 6];
+
+        final (even, odd) = numbers.partition((n) => n.isEven);
+
+        expect(even, [2, 4, 6]);
+        expect(odd, [1, 3, 5]);
+        // Original list should be unchanged
+        expect(numbers, [1, 2, 3, 4, 5, 6]);
+      });
+
+      test('should handle empty list', () {
+        final users = <_TestUser>[];
+
+        final (matching, notMatching) = users.partition((it) => it.id == '1');
+
+        expect(matching, isEmpty);
+        expect(notMatching, isEmpty);
+      });
+
+      test('should handle all or no elements matching filter', () {
+        final allMatch = [2, 4, 6, 8];
+        final (even1, odd1) = allMatch.partition((n) => n.isEven);
+        expect(even1, [2, 4, 6, 8]);
+        expect(odd1, isEmpty);
+
+        final noneMatch = [1, 3, 5, 7];
+        final (even2, odd2) = noneMatch.partition((n) => n.isEven);
+        expect(even2, isEmpty);
+        expect(odd2, [1, 3, 5, 7]);
+      });
+
+      test('should work with complex objects', () {
+        final users = [
+          const _TestUserWithStatus(id: '1', name: 'Alice', active: true),
+          const _TestUserWithStatus(id: '2', name: 'Bob', active: false),
+          const _TestUserWithStatus(id: '3', name: 'Charlie', active: true),
+        ];
+
+        final (active, inactive) = users.partition((user) => user.active);
+
+        expect(active.map((u) => u.name), ['Alice', 'Charlie']);
+        expect(inactive.map((u) => u.name), ['Bob']);
       });
     });
   });
@@ -2014,6 +2103,22 @@ class _TestUser extends Equatable {
 
   @override
   List<Object?> get props => [id, name];
+}
+
+/// Test model representing a user with active status.
+class _TestUserWithStatus extends Equatable {
+  const _TestUserWithStatus({
+    required this.id,
+    required this.name,
+    required this.active,
+  });
+
+  final String id;
+  final String name;
+  final bool active;
+
+  @override
+  List<Object?> get props => [id, name, active];
 }
 
 /// Test model representing a score with user ID and points.
