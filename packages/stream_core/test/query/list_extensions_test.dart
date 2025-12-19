@@ -647,6 +647,53 @@ void main() {
         expect(result[2].content, 'Test Updated');
       });
     });
+
+    group('partition', () {
+      test('should split list into two lists based on filter', () {
+        final numbers = [1, 2, 3, 4, 5, 6];
+
+        final (even, odd) = numbers.partition((n) => n.isEven);
+
+        expect(even, [2, 4, 6]);
+        expect(odd, [1, 3, 5]);
+        // Original list should be unchanged
+        expect(numbers, [1, 2, 3, 4, 5, 6]);
+      });
+
+      test('should handle empty list', () {
+        final users = <_TestUser>[];
+
+        final (matching, notMatching) = users.partition((it) => it.id == '1');
+
+        expect(matching, isEmpty);
+        expect(notMatching, isEmpty);
+      });
+
+      test('should handle all or no elements matching filter', () {
+        final allMatch = [2, 4, 6, 8];
+        final (even1, odd1) = allMatch.partition((n) => n.isEven);
+        expect(even1, [2, 4, 6, 8]);
+        expect(odd1, isEmpty);
+
+        final noneMatch = [1, 3, 5, 7];
+        final (even2, odd2) = noneMatch.partition((n) => n.isEven);
+        expect(even2, isEmpty);
+        expect(odd2, [1, 3, 5, 7]);
+      });
+
+      test('should work with complex objects', () {
+        final users = [
+          const _TestUserWithStatus(id: '1', name: 'Alice', active: true),
+          const _TestUserWithStatus(id: '2', name: 'Bob', active: false),
+          const _TestUserWithStatus(id: '3', name: 'Charlie', active: true),
+        ];
+
+        final (active, inactive) = users.partition((user) => user.active);
+
+        expect(active.map((u) => u.name), ['Alice', 'Charlie']);
+        expect(inactive.map((u) => u.name), ['Bob']);
+      });
+    });
   });
 
   group('SortedListExtensions', () {
@@ -2056,6 +2103,22 @@ class _TestUser extends Equatable {
 
   @override
   List<Object?> get props => [id, name];
+}
+
+/// Test model representing a user with active status.
+class _TestUserWithStatus extends Equatable {
+  const _TestUserWithStatus({
+    required this.id,
+    required this.name,
+    required this.active,
+  });
+
+  final String id;
+  final String name;
+  final bool active;
+
+  @override
+  List<Object?> get props => [id, name, active];
 }
 
 /// Test model representing a score with user ID and points.
