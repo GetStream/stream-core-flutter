@@ -1,6 +1,7 @@
 export 'utils/comparable_extensions.dart';
 export 'utils/comparable_field.dart';
 export 'utils/disposable.dart';
+export 'utils/event_emitter.dart';
 export 'utils/lifecycle_state_provider.dart';
 export 'utils/list_extensions.dart';
 export 'utils/network_state_provider.dart';
