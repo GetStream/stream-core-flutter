@@ -1,3 +1,17 @@
+## Upcoming
+
+### 💥 BREAKING CHANGES
+
+- `SharedEmitter` and `StateEmitter` now implement `Stream<T>` directly instead of exposing a `stream` getter
+- Removed `stream` getter from `SharedEmitter` and `StateEmitter`
+
+### ✨ Features
+
+- Added `hasListener` and `isClosed` properties to `SharedEmitter`
+- Added `asSharedEmitter()` and `asStateEmitter()` extension methods for read-only views
+- Added `update`, `getAndUpdate`, `updateAndGet` extension methods on `MutableStateEmitter`
+- Added `StreamEvent` base interface and `EventResolver` for event transformation
+
 ## 0.3.3
 
 ### ✨ Features
