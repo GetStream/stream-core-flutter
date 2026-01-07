@@ -168,5 +168,27 @@ void main() {
         expect(emitter.isClosed, isTrue);
       });
     });
+
+    group('extensions', () {
+      test('asStateEmitter returns StateEmitter type', () {
+        final mutableEmitter = MutableStateEmitter<int>(0);
+        addTearDown(mutableEmitter.close);
+
+        final readOnlyEmitter = mutableEmitter.asStateEmitter();
+
+        // Should be able to use as StateEmitter
+        expect(readOnlyEmitter, isA<StateEmitter<int>>());
+
+        // Should be able to read the latest value
+        expect(readOnlyEmitter.value, 0);
+
+        // Updates through mutableEmitter are reflected in read-only view
+        mutableEmitter.value = 42;
+        expect(readOnlyEmitter.value, 42);
+
+        mutableEmitter.value = 100;
+        expect(readOnlyEmitter.value, 100);
+      });
+    });
   });
 }

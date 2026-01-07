@@ -385,6 +385,27 @@ void main() {
         expect(emitter.isClosed, isTrue);
       });
     });
+
+    group('extensions', () {
+      test('asSharedEmitter returns SharedEmitter type', () async {
+        final mutableEmitter = MutableSharedEmitter<int>();
+        addTearDown(mutableEmitter.close);
+
+        final readOnlyEmitter = mutableEmitter.asSharedEmitter();
+
+        // Should be able to use as SharedEmitter
+        expect(readOnlyEmitter, isA<SharedEmitter<int>>());
+
+        // Should be able to listen
+        final values = <int>[];
+        readOnlyEmitter.listen(values.add);
+
+        // Can still emit through mutableEmitter
+        mutableEmitter.emit(42);
+        await pumpEventQueue();
+        expect(values, [42]);
+      });
+    });
   });
 
   group('SharedEmitter vs StateEmitter behavior', () {
