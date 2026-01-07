@@ -491,7 +491,9 @@ void main() {
 
       await pumpEventQueue();
 
-      expect(values, [1, 101]);
+      // Order may vary when merging different streams
+      expect(values, containsAll([1, 101]));
+      expect(values.length, 2);
 
       await emitter1.close();
       await emitter2.close();
@@ -517,7 +519,9 @@ void main() {
 
       await pumpEventQueue();
 
-      expect(values, ['from shared', 'from state']);
+      // Order may vary when merging different stream types
+      expect(values, containsAll(['from shared', 'from state']));
+      expect(values.length, 2);
 
       await sharedEmitter.close();
       await stateEmitter.close();

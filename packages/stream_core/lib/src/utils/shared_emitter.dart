@@ -161,6 +161,9 @@ extension SharedEmitterExtension<T> on SharedEmitter<T> {
   /// Throws a [TimeoutException] if [timeLimit] is exceeded before receiving
   /// an event of type [E].
   ///
+  /// Throws a [StateError] if this emitter closes before an event of type [E]
+  /// is received.
+  ///
   /// ```dart
   /// final event = await emitter.waitFor<SpecificEvent>(
   ///   timeLimit: Duration(seconds: 5),
