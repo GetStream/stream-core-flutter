@@ -240,8 +240,6 @@ void main() {
         emitter.emit(const BaseEvent('test'));
 
         expect(values.length, 1); // Synchronous - value immediately available
-
-        emitter.close();
       });
 
       test(
