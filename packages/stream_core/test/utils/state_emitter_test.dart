@@ -68,6 +68,29 @@ void main() {
 
         expect(() => emitter.value = 1, throwsStateError);
       });
+
+      test('tryEmit returns false after close', () async {
+        final emitter = MutableStateEmitter<int>(0);
+
+        expect(emitter.tryEmit(1), isTrue);
+
+        await emitter.close();
+
+        expect(emitter.tryEmit(2), isFalse);
+      });
+
+      test(
+        'tryEmit catches errors and returns false instead of throwing',
+        () async {
+          final emitter = MutableStateEmitter<int>(0);
+
+          await emitter.close();
+
+          // emit would throw, but tryEmit should catch the error
+          expect(() => emitter.emit(1), throwsStateError);
+          expect(emitter.tryEmit(1), isFalse); // Does not throw
+        },
+      );
     });
 
     group('late subscribers', () {
