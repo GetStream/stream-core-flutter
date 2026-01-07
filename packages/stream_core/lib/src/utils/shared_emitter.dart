@@ -2,72 +2,31 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
-/// A read-only emitter that allows listening for events of type [T].
+import 'result.dart';
+
+/// A read-only emitter that broadcasts events to multiple listeners.
 ///
-/// Listeners can subscribe to receive events, wait for specific event types,
-/// and register handlers for certain event types. The emitter supports
-/// type filtering, allowing listeners to only receive events of a specific
-/// subtype of [T].
+/// Similar to Kotlin's `SharedFlow`, this emitter allows multiple subscribers
+/// to receive events of type [T]. Implements [Stream] to provide stream
+/// functionality directly, allowing this emitter to be used anywhere a stream
+/// is expected.
 ///
 /// See also:
-/// - [MutableSharedEmitter] for the mutable interface that allows emitting events.
-abstract interface class SharedEmitter<T> {
-  /// The stream of events emitted by this emitter.
+/// - [MutableSharedEmitter] for the mutable variant that allows emitting events.
+/// - [SharedEmitterExtension] for convenience methods like [on] and [waitFor].
+abstract interface class SharedEmitter<T> implements Stream<T> {
+  /// Whether this emitter is closed.
   ///
-  /// Returns a [Stream] that emits events of type [T].
-  Stream<T> get stream;
-
-  /// Waits for an event of type [E] to be emitted within the specified [timeLimit].
-  ///
-  /// If such an event is emitted, it is returned. If the time limit
-  /// is exceeded without receiving the event, a [TimeoutException] is thrown.
-  ///
-  /// Returns a [Future] that completes with the first event of type [E].
-  Future<E> waitFor<E extends T>({Duration? timeLimit});
-
-  /// Registers a handler [onEvent] that will be invoked whenever an event of type [E] is emitted.
-  ///
-  /// Returns a [StreamSubscription] that can be used to manage the subscription.
-  StreamSubscription<E> on<E extends T>(
-    void Function(E event) onEvent,
-  );
-
-  /// Returns the first element that satisfies the given [test].
-  ///
-  /// If no such element is found and [orElse] is provided, calls [orElse] and returns its result.
-  /// If no element is found and [orElse] is not provided, throws a [StateError].
-  ///
-  /// Returns a [Future] that completes with the first matching element.
-  Future<T> firstWhere(
-    bool Function(T element) test, {
-    T Function()? orElse,
-  });
-
-  /// Subscribes to the emitter to receive events of type [T].
-  ///
-  /// The [onData] callback is invoked for each emitted value.
-  /// Optional callbacks for [onError], [onDone], and [cancelOnError] can also be provided.
-  ///
-  /// Returns a [StreamSubscription] that can be used to manage the subscription.
-  StreamSubscription<T> listen(
-    void Function(T value)? onData, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  });
+  /// A closed emitter cannot emit new values.
+  bool get isClosed;
 }
 
-/// A mutable emitter that allows emitting events of type [T] to multiple listeners.
+/// A mutable emitter that broadcasts events to multiple listeners.
 ///
-/// Listeners can subscribe to receive events, wait for specific event types,
-/// and register handlers for certain event types. The emitter supports
-/// type filtering, allowing listeners to only receive events of a specific
-/// subtype of [T].
+/// Extends [SharedEmitter] with the ability to emit events and close
+/// the emitter. Listeners can subscribe to receive events, wait for specific
+/// event types, and register handlers for certain event types.
 ///
-/// The emitter can be closed to release resources, after which no further
-/// events can be emitted or listened to.
-///
-/// Example usage:
 /// ```dart
 /// final emitter = MutableSharedEmitter<MyEvent>();
 ///
@@ -78,138 +37,155 @@ abstract interface class SharedEmitter<T> {
 /// emitter.emit(MyEvent());
 /// ```
 ///
-/// Make sure to call [close] when the emitter is no longer needed
-/// to avoid memory leaks.
+/// Call [close] when this emitter is no longer needed to release resources.
 ///
 /// See also:
 /// - [SharedEmitter] for the read-only interface.
 abstract interface class MutableSharedEmitter<T> extends SharedEmitter<T> {
-  /// Creates a new instance of [MutableSharedEmitter].
+  /// Creates a [MutableSharedEmitter].
   ///
-  /// When [replay] is greater than 0, the emitter will replay the last [replay] events
-  /// to new subscribers. When [sync] is `true`, events are emitted synchronously.
+  /// Supports synchronous or asynchronous event emission via [sync], and
+  /// can optionally replay the last [replay] events to new subscribers.
   factory MutableSharedEmitter({
     int replay,
     bool sync,
   }) = SharedEmitterImpl<T>;
 
-  /// Emits the [value] to the listeners.
+  /// Emits the given [value] to all active listeners.
   void emit(T value);
 
-  /// Attempts to emit the [value] to the listeners.
+  /// Attempts to emit the given [value] to all active listeners.
   ///
-  /// This method is similar to [emit], but does not throw exceptions
-  /// if the emitter is closed.
-  ///
-  /// Returns `true` if the value was successfully emitted, `false` otherwise.
+  /// Returns `true` if the value was successfully emitted, or `false` if
+  /// emission failed for any reason (e.g., emitter is closed or an error
+  /// occurred). Unlike [emit], this method never throws.
   bool tryEmit(T value);
 
-  /// Closes the emitter and releases all resources.
-  ///
-  /// No further events can be emitted or listened to after calling this method.
-  ///
-  /// Returns a [Future] that completes when the emitter is fully closed.
+  /// Whether this emitter has any active listeners.
+  bool get hasListener;
+
+  /// Closes this emitter, preventing any further events from being emitted.
   Future<dynamic> close();
 }
 
-/// The default implementation of [MutableSharedEmitter] using RxDart subjects.
+/// Default implementation of [MutableSharedEmitter] using RxDart subjects.
 ///
-/// This implementation supports synchronous or asynchronous event emission
-/// and can optionally replay recent events to new subscribers. Uses [PublishSubject]
-/// for normal operation or [ReplaySubject] when replay functionality is needed.
+/// Uses [PublishSubject] for normal operation or [ReplaySubject] when replay
+/// functionality is needed. Extends [StreamView] to delegate all stream
+/// operations to the underlying subject.
 ///
-/// Example:
 /// ```dart
 /// final emitter = MutableSharedEmitter<int>();
 ///
-/// emitter.on<int>((value) {
+/// // Can be used directly as a stream
+/// emitter.where((value) => value > 10).listen((value) {
 ///   print('Received: $value');
 /// });
 ///
-/// emitter.emit(42); // Will emit 42 to all listeners
-/// emitter.emit(10); // Will emit 10 to all listeners
+/// emitter.emit(42);
 /// ```
 ///
 /// For replay functionality:
+///
 /// ```dart
 /// final replayEmitter = MutableSharedEmitter<int>(replay: 2);
 /// replayEmitter.emit(1);
 /// replayEmitter.emit(2);
 ///
-/// // New subscribers will immediately receive the last 2 values (1, 2)
-/// replayEmitter.listen((value) => print(value));
+/// // New subscribers immediately receive the last 2 values (1, 2)
+/// replayEmitter.listen(print);
 /// ```
-///
-/// Make sure to call [close] when done to avoid memory leaks.
 ///
 /// See also:
 /// - [MutableSharedEmitter] for the interface.
-/// - [PublishSubject] from `rxdart` for the underlying stream implementation.
-class SharedEmitterImpl<T> implements MutableSharedEmitter<T> {
-  /// Creates a new instance of [SharedEmitterImpl].
+class SharedEmitterImpl<T> extends StreamView<T>
+    implements MutableSharedEmitter<T> {
+  /// Creates a [SharedEmitterImpl].
+  ///
+  /// Supports synchronous or asynchronous event emission via [sync], and
+  /// can optionally replay the last [replay] events to new subscribers.
   SharedEmitterImpl({
     int replay = 0,
     bool sync = false,
-  }) : _shared = switch (replay) {
-          0 => PublishSubject<T>(sync: sync),
-          > 0 => ReplaySubject<T>(maxSize: replay, sync: sync),
-          _ => throw ArgumentError('Replay count cannot be negative'),
-        };
+  }) : this._(_createSubject(replay, sync));
+
+  SharedEmitterImpl._(this._shared) : super(_shared);
+
+  static Subject<T> _createSubject<T>(int replay, bool sync) {
+    return switch (replay) {
+      0 => PublishSubject<T>(sync: sync),
+      > 0 => ReplaySubject<T>(maxSize: replay, sync: sync),
+      _ => throw ArgumentError('Replay count cannot be negative'),
+    };
+  }
 
   final Subject<T> _shared;
-
-  @override
-  Stream<T> get stream => _shared.stream;
 
   @override
   void emit(T value) => _shared.add(value);
 
   @override
-  bool tryEmit(T value) {
-    if (_shared.isClosed) return false;
-
-    emit(value);
-    return true;
-  }
+  bool tryEmit(T value) => runSafelySync(() => emit(value)).isSuccess;
 
   @override
+  bool get hasListener => _shared.hasListener;
+
+  @override
+  bool get isClosed => _shared.isClosed;
+
+  @override
+  Future<dynamic> close() => _shared.close();
+}
+
+/// Type conversion methods for [MutableSharedEmitter].
+extension MutableSharedEmitterExtension<T> on MutableSharedEmitter<T> {
+  /// Returns a read-only view of this emitter.
+  ///
+  /// Useful for exposing this emitter to consumers who should only be able
+  /// to listen, not emit.
+  ///
+  /// ```dart
+  /// class MyService {
+  ///   final _events = MutableSharedEmitter<Event>();
+  ///
+  ///   SharedEmitter<Event> get events => _events.asSharedEmitter();
+  /// }
+  /// ```
+  SharedEmitter<T> asSharedEmitter() => this;
+}
+
+/// Convenience methods for [SharedEmitter] event handling.
+extension SharedEmitterExtension<T> on SharedEmitter<T> {
+  /// Waits for and returns the first event of type [E] emitted by this emitter.
+  ///
+  /// Throws a [TimeoutException] if [timeLimit] is exceeded before receiving
+  /// an event of type [E].
+  ///
+  /// Throws a [StateError] if this emitter closes before an event of type [E]
+  /// is received.
+  ///
+  /// ```dart
+  /// final event = await emitter.waitFor<SpecificEvent>(
+  ///   timeLimit: Duration(seconds: 5),
+  /// );
+  /// ```
   Future<E> waitFor<E extends T>({Duration? timeLimit}) {
-    final future = _shared.whereType<E>().first;
+    final future = whereType<E>().first;
     if (timeLimit == null) return future;
 
     return future.timeout(timeLimit);
   }
 
-  @override
+  /// Listens for events of type [E] and invokes [onEvent] for each one.
+  ///
+  /// ```dart
+  /// emitter.on<UserLoggedIn>((event) {
+  ///   print('User logged in: ${event.userId}');
+  /// });
+  /// ```
   StreamSubscription<E> on<E extends T>(
     void Function(E event) onEvent,
   ) {
-    return _shared.whereType<E>().listen(onEvent);
+    return whereType<E>().listen(onEvent);
   }
-
-  @override
-  Future<T> firstWhere(
-    bool Function(T element) test, {
-    T Function()? orElse,
-  }) {
-    return _shared.firstWhere(test, orElse: orElse);
-  }
-
-  @override
-  StreamSubscription<T> listen(
-    void Function(T value)? onData, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  }) {
-    return _shared.listen(
-      onData,
-      onError: onError,
-      onDone: onDone,
-      cancelOnError: cancelOnError,
-    );
-  }
-
-  @override
-  Future<dynamic> close() => _shared.close();
 }

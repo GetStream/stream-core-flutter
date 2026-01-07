@@ -7,6 +7,5 @@ export 'ws/client/reconnect/retry_strategy.dart';
 export 'ws/client/stream_web_socket_client.dart';
 export 'ws/client/web_socket_connection_state.dart';
 export 'ws/client/web_socket_health_monitor.dart';
-export 'ws/events/event_emitter.dart';
 export 'ws/events/ws_event.dart';
 export 'ws/events/ws_request.dart';

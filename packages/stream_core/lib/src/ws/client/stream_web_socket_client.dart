@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import '../../utils.dart';
-import '../events/event_emitter.dart';
 import '../events/ws_event.dart';
 import '../events/ws_request.dart';
 import 'engine/stream_web_socket_engine.dart';
@@ -75,8 +74,8 @@ class StreamWebSocketClient
   /// The event emitter for WebSocket events.
   ///
   /// Use this to listen to incoming WebSocket events with type-safe event handling.
-  EventEmitter get events => _events;
-  late final MutableEventEmitter _events;
+  EventEmitter<WsEvent> get events => _events;
+  late final MutableEventEmitter<WsEvent> _events;
 
   /// The current connection state of the WebSocket.
   ///
