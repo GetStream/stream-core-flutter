@@ -147,6 +147,7 @@ void main() {
     group('properties', () {
       test('hasListener returns true when listeners exist', () async {
         final emitter = MutableStateEmitter<int>(0);
+        addTearDown(emitter.close);
 
         expect(emitter.hasListener, isFalse);
 
