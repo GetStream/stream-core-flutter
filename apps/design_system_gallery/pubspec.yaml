@@ -1,0 +1,28 @@
+name: design_system_gallery
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_colorpicker: ^1.1.0
+  provider: ^6.1.5+1
+  widgetbook: ^3.20.2
+  widgetbook_annotation: ^3.9.0
+  stream_core_flutter:
+    path: ../../packages/stream_core_flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  widgetbook_generator: ^3.20.1
+  build_runner: ^2.10.4
+
+flutter:
+  uses-material-design: true
