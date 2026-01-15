@@ -7,7 +7,7 @@ on:
       - synchronize
     branches:
       - main
-      - main-design-system
+      - main-design-system # Remove this once the design system is merged into main
         
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,13 +21,13 @@ jobs:
         with: 
           scopes: |
             llc
+            ui
             repo
           requireScope: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   semantic_changelog_update:
-    if: ${{ false }} # TODO: Enable after the first release
     needs: conventional_pr_title # Trigger after the [conventional_pr_title] completes
     runs-on: ubuntu-latest
     steps:
