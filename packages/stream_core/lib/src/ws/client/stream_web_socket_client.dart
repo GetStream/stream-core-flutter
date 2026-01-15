@@ -40,8 +40,7 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 ///
 /// await client.connect();
 /// ```
-class StreamWebSocketClient
-    implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
+class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
     required this.options,
@@ -81,9 +80,10 @@ class StreamWebSocketClient
   ///
   /// Emits state changes as the WebSocket transitions through different connection states.
   ConnectionStateEmitter get connectionState => _connectionStateEmitter;
-  late final _connectionStateEmitter = MutableConnectionStateEmitter(
-    const WebSocketConnectionState.initialized(),
-  );
+  late final MutableStateEmitter<WebSocketConnectionState> _connectionStateEmitter =
+      MutableConnectionStateEmitter(
+        const WebSocketConnectionState.initialized(),
+      );
 
   set _connectionState(WebSocketConnectionState connectionState) {
     // Return early if the state hasn't changed.
@@ -121,7 +121,7 @@ class StreamWebSocketClient
     final result = await _engine.open(options);
 
     // If some failure occurs, disconnect and rethrow the error.
-    return result.recover((_, __) => onClose()).getOrThrow();
+    return result.recover((_, _) => onClose()).getOrThrow();
   }
 
   /// Closes the WebSocket connection.
@@ -162,11 +162,11 @@ class StreamWebSocketClient
 
       // Any active state that wasn’t user/system initiated becomes server initiated.
       Connecting() || Authenticating() || Connected() => ServerInitiated(
-          error: WebSocketEngineException(
-            code: closeCode,
-            reason: closeReason,
-          ),
+        error: WebSocketEngineException(
+          code: closeCode,
+          reason: closeReason,
         ),
+      ),
 
       // Not meaningful to transition from these; just log and bail.
       Initialized() || Disconnected() => null,

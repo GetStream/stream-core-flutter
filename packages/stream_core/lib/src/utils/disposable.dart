@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_futureor_void, unnecessary_async
+
 import 'dart:async';
 
 import 'package:meta/meta.dart';
@@ -6,7 +8,7 @@ import 'package:meta/meta.dart';
 mixin class Disposable {
   /// Returns `true` if this object has been disposed.
   bool get isDisposed => _disposed;
-  bool _disposed = false;
+  var _disposed = false;
 
   /// Disposes of this object.
   @mustCallSuper

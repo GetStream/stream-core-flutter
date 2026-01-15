@@ -112,10 +112,11 @@ class StreamAttachmentUploader {
 ///
 /// Receives the [attachmentId] and upload [progress] as a value between 0.0 and 1.0
 /// for individual attachments during batch upload.
-typedef OnBatchUploadProgress = void Function(
-  String attachmentId,
-  double progress,
-);
+typedef OnBatchUploadProgress =
+    void Function(
+      String attachmentId,
+      double progress,
+    );
 
 /// Extension providing batch upload functionality for [StreamAttachmentUploader].
 ///
@@ -150,7 +151,8 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
         upload(
           attachment,
           onProgress: onProgress?.let(
-            (f) => (progress) => f(attachment.id, progress),
+            (f) =>
+                (progress) => f(attachment.id, progress),
           ),
         ),
       ),

@@ -1,4 +1,4 @@
-final _priorityEmojiMapper = {
+final Map<Priority, String> _priorityEmojiMapper = {
   Priority.error: '🚨',
   Priority.warning: '⚠️',
   Priority.info: 'ℹ️',
@@ -6,7 +6,7 @@ final _priorityEmojiMapper = {
   Priority.verbose: '🔍',
 };
 
-final _priorityNameMapper = {
+final Map<Priority, String> _priorityNameMapper = {
   Priority.error: 'E',
   Priority.warning: 'W',
   Priority.info: 'I',
@@ -41,7 +41,8 @@ enum Priority implements Comparable<Priority> {
   info(level: 4),
   warning(level: 5),
   error(level: 6),
-  none(level: 7);
+  none(level: 7)
+  ;
 
   const Priority({required this.level});
 

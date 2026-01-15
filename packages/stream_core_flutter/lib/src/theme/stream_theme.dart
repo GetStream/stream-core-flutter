@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:stream_core_flutter/src/theme/stream_component_factory.dart';
-import 'package:stream_core_flutter/stream_core_flutter.dart';
+import '../../stream_core_flutter.dart';
+
+import 'stream_component_factory.dart';
 
 class StreamTheme extends ThemeExtension<StreamTheme> {
   StreamTheme({
     StreamComponentFactory? componentFactory,
     this.primaryColor,
     StreamButtonTheme? buttonTheme,
-  })  : componentFactory = componentFactory ?? StreamComponentFactory(),
-        buttonTheme = buttonTheme ?? StreamButtonTheme();
+  }) : componentFactory = componentFactory ?? StreamComponentFactory(),
+       buttonTheme = buttonTheme ?? StreamButtonTheme();
 
   final StreamComponentFactory componentFactory;
 

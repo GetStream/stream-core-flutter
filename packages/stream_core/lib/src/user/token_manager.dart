@@ -68,7 +68,7 @@ class TokenManager {
   /// at a time.
   ///
   /// Returns a [Future] that resolves to a [UserToken] for the user.
-  Future<UserToken> getToken() async {
+  Future<UserToken> getToken() {
     final snapshot = _cachedToken;
     return synchronized(() async {
       // If the snapshot is no longer equal to the cached token, it means

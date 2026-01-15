@@ -54,24 +54,23 @@ class StreamApiError extends Equatable {
   Map<String, dynamic> toJson() => _$StreamApiErrorToJson(this);
 
   /// Creates a [StreamApiError] from a JSON map.
-  static StreamApiError fromJson(Map<String, dynamic> json) =>
-      _$StreamApiErrorFromJson(json);
+  static StreamApiError fromJson(Map<String, dynamic> json) => _$StreamApiErrorFromJson(json);
 
   @override
   List<Object?> get props => [
-        code,
-        details,
-        duration,
-        exceptionFields,
-        message,
-        moreInfo,
-        statusCode,
-        unrecoverable,
-      ];
+    code,
+    details,
+    duration,
+    exceptionFields,
+    message,
+    moreInfo,
+    statusCode,
+    unrecoverable,
+  ];
 }
 
-final _tokenInvalidErrorCodes = _range(40, 42);
-final _clientErrorCodes = _range(400, 499);
+final List<int> _tokenInvalidErrorCodes = _range(40, 42);
+final List<int> _clientErrorCodes = _range(400, 499);
 
 /// Extension methods for [StreamApiError] to provide convenient error type checks.
 extension StreamApiErrorExtension on StreamApiError {

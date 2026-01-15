@@ -120,10 +120,8 @@ void main() {
       final field = SortField<Person>('birthDate', (p) => p.birthDate);
       final sort = Sort.asc(field);
 
-      final person1990 =
-          Person(name: 'Person1990', age: 34, birthDate: DateTime(1990));
-      final person2000 =
-          Person(name: 'Person2000', age: 24, birthDate: DateTime(2000));
+      final person1990 = Person(name: 'Person1990', age: 34, birthDate: DateTime(1990));
+      final person2000 = Person(name: 'Person2000', age: 24, birthDate: DateTime(2000));
 
       expect(sort.compare(person1990, person2000), lessThan(0)); // 1990 < 2000
     });
@@ -156,8 +154,7 @@ void main() {
       final field = SortField<Person>('birthDate', (p) => p.birthDate);
       final sort = Sort.asc(field);
 
-      final withDate =
-          Person(name: 'WithDate', age: 30, birthDate: DateTime(1990));
+      final withDate = Person(name: 'WithDate', age: 30, birthDate: DateTime(1990));
       const withoutDate = Person(name: 'WithoutDate', age: 25);
 
       expect(
@@ -174,8 +171,7 @@ void main() {
       final field = SortField<Person>('birthDate', (p) => p.birthDate);
       final sort = Sort.asc(field, nullOrdering: NullOrdering.nullsFirst);
 
-      final withDate =
-          Person(name: 'WithDate', age: 30, birthDate: DateTime(1990));
+      final withDate = Person(name: 'WithDate', age: 30, birthDate: DateTime(1990));
       const withoutDate = Person(name: 'WithoutDate', age: 25);
 
       expect(
@@ -443,9 +439,7 @@ void main() {
 
       people.sort(sorts.compare);
 
-      final result = people
-          .map((p) => '${p.name}-${p.score?.toString() ?? 'null'}')
-          .toList();
+      final result = people.map((p) => '${p.name}-${p.score?.toString() ?? 'null'}').toList();
       expect(
         result,
         equals([

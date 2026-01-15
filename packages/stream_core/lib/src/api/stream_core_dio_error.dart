@@ -13,9 +13,9 @@ class StreamDioException extends DioException {
     StackTrace? stackTrace,
     super.message,
   }) : super(
-          error: exception,
-          stackTrace: stackTrace ?? StackTrace.current,
-        );
+         error: exception,
+         stackTrace: stackTrace ?? StackTrace.current,
+       );
 
   final ClientException exception;
 }

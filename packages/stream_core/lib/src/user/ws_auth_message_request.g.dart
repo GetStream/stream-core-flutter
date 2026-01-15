@@ -6,8 +6,7 @@ part of 'ws_auth_message_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Map<String, dynamic> _$WsAuthMessageRequestToJson(
-        WsAuthMessageRequest instance) =>
+Map<String, dynamic> _$WsAuthMessageRequestToJson(WsAuthMessageRequest instance) =>
     <String, dynamic>{
       'stringify': instance.stringify,
       'hash_code': instance.hashCode,

@@ -84,8 +84,7 @@ void main() {
         expect(() => emitter.emit(1), throwsStateError);
       });
 
-      test('tryEmit catches errors and returns false instead of throwing',
-          () async {
+      test('tryEmit catches errors and returns false instead of throwing', () async {
         final emitter = MutableSharedEmitter<int>();
         addTearDown(emitter.close);
 
@@ -409,8 +408,7 @@ void main() {
   });
 
   group('SharedEmitter vs StateEmitter behavior', () {
-    test('SharedEmitter does not emit to late subscribers by default',
-        () async {
+    test('SharedEmitter does not emit to late subscribers by default', () async {
       final emitter = MutableSharedEmitter<int>();
       addTearDown(emitter.close);
 
@@ -428,8 +426,7 @@ void main() {
       expect(values, [3]);
     });
 
-    test('StateEmitter always emits current value to new subscribers',
-        () async {
+    test('StateEmitter always emits current value to new subscribers', () async {
       final emitter = MutableStateEmitter<int>(0);
       addTearDown(emitter.close);
 

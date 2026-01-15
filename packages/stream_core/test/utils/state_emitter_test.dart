@@ -25,7 +25,7 @@ void main() {
         expect(values, [42]);
       });
 
-      test('updates value on emit', () async {
+      test('updates value on emit', () {
         final emitter = MutableStateEmitter<int>(0);
         addTearDown(emitter.close);
 
@@ -34,7 +34,7 @@ void main() {
         expect(emitter.value, 42);
       });
 
-      test('value setter works like emit', () async {
+      test('value setter works like emit', () {
         final emitter = MutableStateEmitter<int>(0);
         addTearDown(emitter.close);
 
@@ -115,7 +115,7 @@ void main() {
     });
 
     group('atomic update methods', () {
-      test('update applies function to current value', () async {
+      test('update applies function to current value', () {
         final emitter = MutableStateEmitter<int>(10);
         addTearDown(emitter.close);
 
@@ -124,7 +124,7 @@ void main() {
         expect(emitter.value, 20);
       });
 
-      test('getAndUpdate returns previous value and updates', () async {
+      test('getAndUpdate returns previous value and updates', () {
         final emitter = MutableStateEmitter<int>(10);
         addTearDown(emitter.close);
 
@@ -134,7 +134,7 @@ void main() {
         expect(emitter.value, 15);
       });
 
-      test('updateAndGet returns new value after update', () async {
+      test('updateAndGet returns new value after update', () {
         final emitter = MutableStateEmitter<int>(10);
         addTearDown(emitter.close);
 

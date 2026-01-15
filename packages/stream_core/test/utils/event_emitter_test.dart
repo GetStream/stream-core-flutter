@@ -126,8 +126,7 @@ void main() {
         expect((values.first as AnotherEvent).value, 5);
       });
 
-      test('resolver can conditionally transform based on event properties',
-          () async {
+      test('resolver can conditionally transform based on event properties', () async {
         final emitter = MutableEventEmitter<BaseEvent>(
           resolvers: [
             (event) => event.data.startsWith('transform:')

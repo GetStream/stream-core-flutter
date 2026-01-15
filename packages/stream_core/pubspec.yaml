@@ -16,7 +16,7 @@ repository: https://github.com/GetStream/stream-core-flutter
 #   2. Add it to the melos.yaml file for future updates.
 
 environment:
-  sdk: ^3.6.2
+  sdk: ^3.10.0
 
 dependencies:
   collection: ^1.19.0
