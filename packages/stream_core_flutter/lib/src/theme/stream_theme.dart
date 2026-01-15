@@ -21,10 +21,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> {
   }
 
   @override
-  StreamTheme copyWith({
-    Color? primaryColor,
-    StreamButtonTheme? buttonTheme,
-  }) {
+  StreamTheme copyWith({Color? primaryColor, StreamButtonTheme? buttonTheme}) {
     return StreamTheme(
       componentFactory: componentFactory,
       primaryColor: primaryColor ?? this.primaryColor,

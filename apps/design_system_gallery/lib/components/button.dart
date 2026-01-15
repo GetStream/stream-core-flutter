@@ -5,8 +5,6 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 // Import the widget from your app
 
-
-
 @widgetbook.UseCase(name: 'Default', type: StreamButton)
 Widget buildCoolButtonUseCase(BuildContext context) {
   return Center(
