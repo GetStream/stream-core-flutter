@@ -80,10 +80,9 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
   ///
   /// Emits state changes as the WebSocket transitions through different connection states.
   ConnectionStateEmitter get connectionState => _connectionStateEmitter;
-  late final MutableStateEmitter<WebSocketConnectionState> _connectionStateEmitter =
-      MutableConnectionStateEmitter(
-        const WebSocketConnectionState.initialized(),
-      );
+  late final _connectionStateEmitter = MutableConnectionStateEmitter(
+    const WebSocketConnectionState.initialized(),
+  );
 
   set _connectionState(WebSocketConnectionState connectionState) {
     // Return early if the state hasn't changed.

@@ -1,4 +1,4 @@
-final Map<Priority, String> _priorityEmojiMapper = {
+final _priorityEmojiMapper = {
   Priority.error: '🚨',
   Priority.warning: '⚠️',
   Priority.info: 'ℹ️',
@@ -6,7 +6,7 @@ final Map<Priority, String> _priorityEmojiMapper = {
   Priority.verbose: '🔍',
 };
 
-final Map<Priority, String> _priorityNameMapper = {
+final _priorityNameMapper = {
   Priority.error: 'E',
   Priority.warning: 'W',
   Priority.info: 'I',

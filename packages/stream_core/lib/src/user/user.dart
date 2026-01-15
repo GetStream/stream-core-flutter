@@ -53,14 +53,7 @@ class User extends Equatable {
   String get name => originalName ?? id;
 
   @override
-  List<Object?> get props => [
-    id,
-    image,
-    role,
-    type,
-    originalName,
-    custom,
-  ];
+  List<Object?> get props => [id, image, role, type, originalName, custom];
 }
 
 /// The user authorization type.
