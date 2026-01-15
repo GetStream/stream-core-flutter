@@ -7,8 +7,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> {
     StreamComponentFactory? componentFactory,
     this.primaryColor,
     StreamButtonTheme? buttonTheme,
-  }) : componentFactory = componentFactory ?? StreamComponentFactory(),
-       buttonTheme = buttonTheme ?? StreamButtonTheme();
+  })  : componentFactory = componentFactory ?? StreamComponentFactory(),
+        buttonTheme = buttonTheme ?? StreamButtonTheme();
 
   final StreamComponentFactory componentFactory;
 

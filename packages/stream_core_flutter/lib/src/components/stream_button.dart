@@ -12,13 +12,13 @@ class StreamButton extends StatelessWidget {
     Widget? iconLeft,
     Widget? iconRight,
   }) : props = StreamButtonProps(
-         label: label,
-         onTap: onTap,
-         type: type,
-         size: size,
-         iconLeft: iconLeft,
-         iconRight: iconRight,
-       );
+          label: label,
+          onTap: onTap,
+          type: type,
+          size: size,
+          iconLeft: iconLeft,
+          iconRight: iconRight,
+        );
 
   final StreamButtonProps props;
 
@@ -67,20 +67,20 @@ class DefaultStreamButton extends StatelessWidget {
 
     final colors = switch (props.type) {
       StreamButtonType.primary => _primaryColors(
-        theme,
-        streamTheme,
-        buttonTheme,
-      ),
+          theme,
+          streamTheme,
+          buttonTheme,
+        ),
       StreamButtonType.secondary => _secondaryColors(
-        theme,
-        streamTheme,
-        buttonTheme,
-      ),
+          theme,
+          streamTheme,
+          buttonTheme,
+        ),
       StreamButtonType.destructive => _destructiveColors(
-        theme,
-        streamTheme,
-        buttonTheme,
-      ),
+          theme,
+          streamTheme,
+          buttonTheme,
+        ),
     };
 
     return ElevatedButton(
@@ -111,39 +111,40 @@ class DefaultStreamButton extends StatelessWidget {
     ThemeData theme,
     StreamTheme streamTheme,
     StreamButtonTheme buttonTheme,
-  ) => _StreamButtonColors(
-    bgColor:
-        buttonTheme.primaryColor ??
-        (streamTheme.primaryColor != null
-            ? WidgetStateProperty.all(streamTheme.primaryColor!)
-            : WidgetStateProperty.all(theme.colorScheme.primary)),
-    borderColor:
-        buttonTheme.primaryColor ??
-        (streamTheme.primaryColor != null
-            ? WidgetStateProperty.all(streamTheme.primaryColor!)
-            : WidgetStateProperty.all(theme.colorScheme.primary)),
-    textColor: WidgetStateProperty.all(Colors.white),
-  );
+  ) =>
+      _StreamButtonColors(
+        bgColor: buttonTheme.primaryColor ??
+            (streamTheme.primaryColor != null
+                ? WidgetStateProperty.all(streamTheme.primaryColor!)
+                : WidgetStateProperty.all(theme.colorScheme.primary)),
+        borderColor: buttonTheme.primaryColor ??
+            (streamTheme.primaryColor != null
+                ? WidgetStateProperty.all(streamTheme.primaryColor!)
+                : WidgetStateProperty.all(theme.colorScheme.primary)),
+        textColor: WidgetStateProperty.all(Colors.white),
+      );
 
   _StreamButtonColors _secondaryColors(
     ThemeData theme,
     StreamTheme streamTheme,
     StreamButtonTheme buttonTheme,
-  ) => _StreamButtonColors(
-    bgColor: WidgetStateProperty.all(Colors.white),
-    borderColor: WidgetStateProperty.all(Colors.grey),
-    textColor: WidgetStateProperty.all(Colors.black),
-  );
+  ) =>
+      _StreamButtonColors(
+        bgColor: WidgetStateProperty.all(Colors.white),
+        borderColor: WidgetStateProperty.all(Colors.grey),
+        textColor: WidgetStateProperty.all(Colors.black),
+      );
 
   _StreamButtonColors _destructiveColors(
     ThemeData theme,
     StreamTheme streamTheme,
     StreamButtonTheme buttonTheme,
-  ) => _StreamButtonColors(
-    bgColor: WidgetStateProperty.all(Colors.red),
-    borderColor: WidgetStateProperty.all(Colors.red),
-    textColor: WidgetStateProperty.all(Colors.white),
-  );
+  ) =>
+      _StreamButtonColors(
+        bgColor: WidgetStateProperty.all(Colors.red),
+        borderColor: WidgetStateProperty.all(Colors.red),
+        textColor: WidgetStateProperty.all(Colors.white),
+      );
 }
 
 class _StreamButtonColors {
