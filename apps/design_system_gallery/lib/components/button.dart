@@ -13,7 +13,7 @@ Widget buildCoolButtonUseCase(BuildContext context) {
       onTap: () {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Button clicked')));
+        ).showSnackBar(const SnackBar(content: Text('Button clicked')));
       },
       type: context.knobs.object.dropdown(
         label: 'Type',
