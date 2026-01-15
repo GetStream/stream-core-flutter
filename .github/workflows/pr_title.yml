@@ -7,6 +7,7 @@ on:
       - synchronize
     branches:
       - main
+      - main-design-system
         
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
