@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:stream_core_flutter/src/theme/stream_component_factory.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
 
