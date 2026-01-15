@@ -69,8 +69,8 @@ class StreamApiError extends Equatable {
   ];
 }
 
-final List<int> _tokenInvalidErrorCodes = _range(40, 42);
-final List<int> _clientErrorCodes = _range(400, 499);
+final _tokenInvalidErrorCodes = _range(40, 42);
+final _clientErrorCodes = _range(400, 499);
 
 /// Extension methods for [StreamApiError] to provide convenient error type checks.
 extension StreamApiErrorExtension on StreamApiError {
