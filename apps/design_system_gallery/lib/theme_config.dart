@@ -6,7 +6,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(name: 'Default', type: ThemeConfig)
 Widget buildCoolButtonUseCase(BuildContext context) {
-  return ThemeConfig();
+  return const ThemeConfig();
 }
 
 class ThemeConfig extends StatelessWidget {
@@ -18,7 +18,7 @@ class ThemeConfig extends StatelessWidget {
 
     return Column(
       children: [
-        Text('Theme config'),
+        const Text('Theme config'),
         Row(
           spacing: 16,
           children: [
@@ -27,16 +27,13 @@ class ThemeConfig extends StatelessWidget {
               height: 25,
               color: themeConfiguration.themeData.primaryColor,
             ),
-            Text('Primary color'),
+            const Text('Primary color'),
             StreamButton(
               label: 'Pick color',
               onTap: () => pickColor(
                 context,
-                themeConfiguration.themeData.primaryColor ??
-                    Theme.of(context).colorScheme.primary,
-                (color) {
-                  themeConfiguration.setPrimaryColor(color);
-                },
+                themeConfiguration.themeData.primaryColor ?? Theme.of(context).colorScheme.primary,
+                themeConfiguration.setPrimaryColor,
               ),
             ),
           ],
@@ -45,15 +42,15 @@ class ThemeConfig extends StatelessWidget {
     );
   }
 
-  void pickColor(
+  Future<void> pickColor(
     BuildContext context,
     Color pickerColor,
     ValueChanged<Color> onColorChanged,
   ) {
-    showDialog(
+    return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Pick a color'),
+        title: const Text('Pick a color'),
         content: SingleChildScrollView(
           child: MaterialPicker(
             pickerColor: pickerColor,
@@ -66,11 +63,9 @@ class ThemeConfig extends StatelessWidget {
 }
 
 class ThemeConfiguration extends ChangeNotifier {
-  StreamTheme themeData;
-
   ThemeConfiguration({required this.themeData});
-
   ThemeConfiguration.empty() : themeData = StreamTheme();
+  StreamTheme themeData;
 
   void setPrimaryColor(Color color) {
     themeData = themeData.copyWith(primaryColor: color);

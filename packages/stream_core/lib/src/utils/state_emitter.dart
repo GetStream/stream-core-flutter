@@ -71,8 +71,7 @@ abstract interface class MutableStateEmitter<T> extends StateEmitter<T>
 ///
 /// See also:
 /// - [MutableStateEmitter] for the interface.
-class StateEmitterImpl<T> extends StreamView<T>
-    implements MutableStateEmitter<T> {
+class StateEmitterImpl<T> extends StreamView<T> implements MutableStateEmitter<T> {
   /// Creates a [StateEmitterImpl] with the given [initialValue].
   ///
   /// Supports synchronous or asynchronous state emission via [sync].

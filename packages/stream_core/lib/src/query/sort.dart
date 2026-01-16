@@ -15,7 +15,8 @@ enum SortDirection {
 
   /// Sort in descending order (Z to A, 9 to 1, etc.).
   @JsonValue(-1)
-  desc(-1);
+  desc(-1)
+  ;
 
   /// Creates a new [SortDirection] instance with the specified direction.
   const SortDirection(this.value);
@@ -32,7 +33,7 @@ enum NullOrdering {
 
   /// Null values appear at the end of the sorted list,
   /// regardless of sort direction (ASC or DESC).
-  nullsLast;
+  nullsLast,
 }
 
 /// Signature for a function that retrieves a sortable field value of type [V] from
@@ -44,12 +45,13 @@ typedef SortFieldValueGetter<T, V> = V? Function(T);
 
 /// A comparator function that compares two instances of type [T] based on
 /// a specified field, sort direction, and null ordering.
-typedef SortFieldComparator<T> = int Function(
-  T? a,
-  T? b,
-  SortDirection direction,
-  NullOrdering nullOrdering,
-);
+typedef SortFieldComparator<T> =
+    int Function(
+      T? a,
+      T? b,
+      SortDirection direction,
+      NullOrdering nullOrdering,
+    );
 
 /// A sort specification that defines how to order a collection of objects.
 ///

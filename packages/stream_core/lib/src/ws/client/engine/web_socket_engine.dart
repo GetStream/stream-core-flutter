@@ -181,8 +181,8 @@ class WebSocketEngineException with EquatableMixin implements Exception {
     String? reason,
     int? code = 0,
     this.error,
-  })  : reason = reason ?? 'Unknown',
-        code = code ?? 0;
+  }) : reason = reason ?? 'Unknown',
+       code = code ?? 0;
 
   final String reason;
   final int code;

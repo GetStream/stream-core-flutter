@@ -79,9 +79,8 @@ class LocationCoordinate {
     final latComponent = _square(sinDLat);
 
     // Calculate longitude component: sin²(Δlon/2) * cos(lat1) * cos(lat2)
-    final lonComponent = _square(sinDLon) *
-        math.cos(_degToRad(latitude)) *
-        math.cos(_degToRad(other.latitude));
+    final lonComponent =
+        _square(sinDLon) * math.cos(_degToRad(latitude)) * math.cos(_degToRad(other.latitude));
 
     // Combine components
     final a = latComponent + lonComponent;

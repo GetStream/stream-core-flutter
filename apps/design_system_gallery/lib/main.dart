@@ -1,4 +1,3 @@
-import 'package:design_system_gallery/theme_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -7,6 +6,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 // This file does not exist yet,
 // it will be generated in the next step
 import 'main.directories.g.dart';
+import 'theme_config.dart';
 
 void main() {
   runApp(const WidgetbookApp());

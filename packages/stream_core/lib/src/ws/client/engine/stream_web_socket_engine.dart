@@ -36,9 +36,9 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     WebSocketProvider? wsProvider,
     WebSocketEngineListener<Inc>? listener,
     required WebSocketMessageCodec<Inc, Out> messageCodec,
-  })  : _wsProvider = wsProvider ?? _createWebSocket,
-        _messageCodec = messageCodec,
-        _listener = listener;
+  }) : _wsProvider = wsProvider ?? _createWebSocket,
+       _messageCodec = messageCodec,
+       _listener = listener;
 
   final WebSocketProvider _wsProvider;
   final WebSocketMessageCodec<Inc, Out> _messageCodec;

@@ -1,4 +1,3 @@
-// ignore_for_file: lines_longer_than_80_chars
 // coverage:ignore-file
 
 import 'dart:math' as math;
@@ -56,10 +55,10 @@ class LoggingInterceptor extends Interceptor {
   final bool error;
 
   /// InitialTab count to logPrint json response
-  static const int initialTab = 1;
+  static const initialTab = 1;
 
   /// 1 tab length
-  static const String tabStep = '    ';
+  static const tabStep = '    ';
 
   /// Print compact json response
   final bool compact;
@@ -155,8 +154,7 @@ class LoggingInterceptor extends Interceptor {
     _printResponseHeader(_logPrintResponse, response);
     if (responseHeader) {
       final responseHeaders = <String, String>{};
-      response.headers
-          .forEach((k, list) => responseHeaders[k] = list.toString());
+      response.headers.forEach((k, list) => responseHeaders[k] = list.toString());
       _printMapAsTable(_logPrintResponse, responseHeaders, header: 'Headers');
     }
 
@@ -206,8 +204,7 @@ class LoggingInterceptor extends Interceptor {
     final method = response.requestOptions.method;
     _printBoxed(
       logPrint,
-      header:
-          'Response ║ $method ║ Status: ${response.statusCode} ${response.statusMessage}',
+      header: 'Response ║ $method ║ Status: ${response.statusCode} ${response.statusMessage}',
       text: uri.toString(),
     );
   }
@@ -225,8 +222,7 @@ class LoggingInterceptor extends Interceptor {
     void Function(Object) logPrint, [
     String pre = '',
     String suf = '╝',
-  ]) =>
-      logPrint('$pre${'═' * maxWidth}$suf');
+  ]) => logPrint('$pre${'═' * maxWidth}$suf');
 
   void _printKV(void Function(Object) logPrint, String? key, Object? v) {
     final pre = '╟ $key: ';
@@ -299,10 +295,12 @@ class LoggingInterceptor extends Interceptor {
         if (msg.length + indent.length > linWidth) {
           final lines = (msg.length / linWidth).ceil();
           for (var i = 0; i < lines; ++i) {
-            logPrint('║${_indent(indentedTabs)} ${msg.substring(
-              i * linWidth,
-              math.min<int>(i * linWidth + linWidth, msg.length),
-            )}');
+            logPrint(
+              '║${_indent(indentedTabs)} ${msg.substring(
+                i * linWidth,
+                math.min<int>(i * linWidth + linWidth, msg.length),
+              )}',
+            );
           }
         } else {
           logPrint('║${_indent(indentedTabs)} $key: $msg${!isLast ? ',' : ''}');
@@ -351,11 +349,9 @@ class LoggingInterceptor extends Interceptor {
     _printLine(logPrint, '╚');
   }
 
-  void _logPrintRequest(Object object) =>
-      logPrint(InterceptStep.request, object);
+  void _logPrintRequest(Object object) => logPrint(InterceptStep.request, object);
 
-  void _logPrintResponse(Object object) =>
-      logPrint(InterceptStep.response, object);
+  void _logPrintResponse(Object object) => logPrint(InterceptStep.response, object);
 
   void _logPrintError(Object object) => logPrint(InterceptStep.error, object);
 }
