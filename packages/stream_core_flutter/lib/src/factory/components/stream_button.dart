@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../stream_core_flutter.dart';
-import '../theme/stream_component_factory.dart';
+import '../stream_component_factory.dart' show StreamComponentBuilder;
+import '../stream_theme.dart';
+import 'stream_button_theme.dart';
 
 class StreamButton extends StatelessWidget {
   StreamButton({

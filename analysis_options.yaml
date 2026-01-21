@@ -15,7 +15,7 @@ analyzer:
     - packages/*/lib/**/*.*.dart
 
 formatter:
-  page_width: 100
+  page_width: 120
   trailing_commas: preserve
 
 linter:
@@ -23,6 +23,7 @@ linter:
     ## Disabled rules because the repository doesn't respect them (yet)
     avoid_setters_without_getters: false
     discarded_futures: false
+    comment_references: false
 
     #############
 
