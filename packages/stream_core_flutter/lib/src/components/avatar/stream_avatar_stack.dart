@@ -167,7 +167,7 @@ class StreamAvatarStack extends StatelessWidget {
       width: totalWidth,
       height: diameter,
       child: Stack(
-        alignment: AlignmentDirectional.center,
+        alignment: .center,
         children: [
           for (var i = 0; i < displayChildren.length; i++)
             Positioned(

@@ -114,8 +114,8 @@ class StreamOnlineIndicator extends StatelessWidget {
       width: effectiveSize.value,
       height: effectiveSize.value,
       duration: kThemeChangeDuration,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      foregroundDecoration: BoxDecoration(shape: BoxShape.circle, border: border),
+      decoration: BoxDecoration(shape: .circle, color: color),
+      foregroundDecoration: BoxDecoration(shape: .circle, border: border),
     );
   }
 
@@ -131,7 +131,9 @@ class StreamOnlineIndicator extends StatelessWidget {
 // Provides default values for [StreamOnlineIndicatorThemeData] based on
 // the current [StreamColorScheme].
 class _StreamOnlineIndicatorThemeDefaults extends StreamOnlineIndicatorThemeData {
-  _StreamOnlineIndicatorThemeDefaults(this.context) : _colorScheme = context.streamColorScheme;
+  _StreamOnlineIndicatorThemeDefaults(
+    this.context,
+  ) : _colorScheme = context.streamColorScheme;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;
