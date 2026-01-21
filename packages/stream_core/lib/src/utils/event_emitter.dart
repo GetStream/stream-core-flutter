@@ -57,8 +57,7 @@ typedef EventEmitter<T extends StreamEvent> = SharedEmitter<T>;
 /// See also:
 /// - [EventEmitter] for the read-only interface.
 /// - [EventResolver] for the resolver function signature.
-final class MutableEventEmitter<T extends StreamEvent> extends SharedEmitterImpl<T>
-    implements MutableSharedEmitter<T> {
+final class MutableEventEmitter<T extends StreamEvent> extends SharedEmitterImpl<T> implements MutableSharedEmitter<T> {
   /// Creates a [MutableEventEmitter] with optional event [resolvers].
   ///
   /// Resolvers are applied in order to each emitted event until one returns

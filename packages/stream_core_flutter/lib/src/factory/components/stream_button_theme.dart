@@ -1,4 +1,3 @@
-
 import 'package:flutter/widgets.dart';
 
 import '../stream_theme.dart';

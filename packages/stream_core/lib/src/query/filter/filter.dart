@@ -295,8 +295,7 @@ final class GreaterOperator<T extends Object> extends ComparisonOperator<T> {
 /// Primarily used with numeric values and dates.
 final class GreaterOrEqualOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a greater-than-or-equal filter for the specified [field] and [value].
-  const GreaterOrEqualOperator(super.field, super.value)
-    : super._(operator: FilterOperator.greaterOrEqual);
+  const GreaterOrEqualOperator(super.field, super.value) : super._(operator: FilterOperator.greaterOrEqual);
 
   @override
   bool matches(T other) {
@@ -338,8 +337,7 @@ final class LessOperator<T extends Object> extends ComparisonOperator<T> {
 /// Primarily used with numeric values and dates.
 final class LessOrEqualOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a less-than-or-equal filter for the specified [field] and [value].
-  const LessOrEqualOperator(super.field, super.value)
-    : super._(operator: FilterOperator.lessOrEqual);
+  const LessOrEqualOperator(super.field, super.value) : super._(operator: FilterOperator.lessOrEqual);
 
   @override
   bool matches(T other) {
@@ -394,8 +392,7 @@ sealed class ListOperator<T extends Object> extends Filter<T> {
 /// **Supported with**: `.in_` factory method
 final class InOperator<T extends Object> extends ListOperator<T> {
   /// Creates an 'in' filter for the specified [field] and [values] iterable.
-  const InOperator(super.field, Iterable<Object?> super.values)
-    : super._(operator: FilterOperator.in_);
+  const InOperator(super.field, Iterable<Object?> super.values) : super._(operator: FilterOperator.in_);
 
   @override
   bool matches(T other) {
@@ -526,8 +523,7 @@ final class QueryOperator<T extends Object> extends EvaluationOperator<T> {
 /// Matches field values where any word starts with the provided prefix.
 final class AutoCompleteOperator<T extends Object> extends EvaluationOperator<T> {
   /// Creates an autocomplete filter for the specified [field] and prefix [query].
-  const AutoCompleteOperator(super.field, super.query)
-    : super._(operator: FilterOperator.autoComplete);
+  const AutoCompleteOperator(super.field, super.query) : super._(operator: FilterOperator.autoComplete);
 
   @override
   bool matches(T other) {

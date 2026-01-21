@@ -124,8 +124,7 @@ class LoggingInterceptor extends Interceptor {
         final uri = err.response?.requestOptions.uri;
         _printBoxed(
           _logPrintError,
-          header:
-              'DioException ║ Status: ${err.response?.statusCode} ${err.response?.statusMessage}',
+          header: 'DioException ║ Status: ${err.response?.statusCode} ${err.response?.statusMessage}',
           text: uri.toString(),
         );
         if (err.response != null && err.response?.data != null) {
