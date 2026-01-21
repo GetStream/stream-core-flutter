@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import 'components/stream_avatar_theme.dart';
-import 'components/stream_button_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -79,7 +78,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
     // Components themes
-    StreamButtonThemeData? buttonTheme,
     StreamAvatarThemeData? avatarTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
   }) {
@@ -97,7 +95,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
-    buttonTheme ??= const StreamButtonThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
 
@@ -109,7 +106,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       colorScheme: colorScheme,
       textTheme: textTheme,
       boxShadow: boxShadow,
-      buttonTheme: buttonTheme,
       avatarTheme: avatarTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
     );
@@ -135,7 +131,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.colorScheme,
     required this.textTheme,
     required this.boxShadow,
-    required this.buttonTheme,
     required this.avatarTheme,
     required this.onlineIndicatorTheme,
   });
@@ -194,9 +189,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The box shadow (elevation) values for this theme.
   final StreamBoxShadow boxShadow;
-
-  /// The button theme for this theme.
-  final StreamButtonThemeData buttonTheme;
 
   /// The avatar theme for this theme.
   final StreamAvatarThemeData avatarTheme;

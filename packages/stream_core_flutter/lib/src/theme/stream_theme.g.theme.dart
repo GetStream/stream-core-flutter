@@ -19,7 +19,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamColorScheme? colorScheme,
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
-    StreamButtonThemeData? buttonTheme,
     StreamAvatarThemeData? avatarTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
   }) {
@@ -33,7 +32,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       colorScheme: colorScheme ?? _this.colorScheme,
       textTheme: textTheme ?? _this.textTheme,
       boxShadow: boxShadow ?? _this.boxShadow,
-      buttonTheme: buttonTheme ?? _this.buttonTheme,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
     );
@@ -59,11 +57,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           (_this.colorScheme.lerp(other.colorScheme, t) as StreamColorScheme),
       textTheme: (_this.textTheme.lerp(other.textTheme, t) as StreamTextTheme),
       boxShadow: StreamBoxShadow.lerp(_this.boxShadow, other.boxShadow, t)!,
-      buttonTheme: StreamButtonThemeData.lerp(
-        _this.buttonTheme,
-        other.buttonTheme,
-        t,
-      )!,
       avatarTheme: StreamAvatarThemeData.lerp(
         _this.avatarTheme,
         other.avatarTheme,
@@ -97,7 +90,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.colorScheme == _this.colorScheme &&
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
-        _other.buttonTheme == _this.buttonTheme &&
         _other.avatarTheme == _this.avatarTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
   }
@@ -115,7 +107,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.colorScheme,
       _this.textTheme,
       _this.boxShadow,
-      _this.buttonTheme,
       _this.avatarTheme,
       _this.onlineIndicatorTheme,
     );

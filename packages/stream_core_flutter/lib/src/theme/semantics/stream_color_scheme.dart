@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../../theme/primitives/stream_colors.dart';
@@ -654,17 +653,15 @@ class StreamBrandColor extends StreamColorSwatch {
       },
     );
   }
-
-  /// Linearly interpolates between two colors.
-  static StreamBrandColor? lerp(Color? x, Color? y, double t) => Color.lerp(x, y, t) as StreamBrandColor;
 }
 
 /// A background/foreground color pair for avatars.
 ///
 /// Used for deterministic color selection based on user identity.
 /// The palette is part of [StreamColorScheme] to support light/dark themes.
+@themeGen
 @immutable
-class StreamAvatarColorPair {
+class StreamAvatarColorPair with _$StreamAvatarColorPair {
   /// Creates an avatar color pair with the given values.
   const StreamAvatarColorPair({
     required this.backgroundColor,
@@ -682,12 +679,5 @@ class StreamAvatarColorPair {
     StreamAvatarColorPair? a,
     StreamAvatarColorPair? b,
     double t,
-  ) {
-    if (identical(a, b)) return a;
-    if (a == null && b == null) return null;
-    return StreamAvatarColorPair(
-      backgroundColor: Color.lerp(a?.backgroundColor, b?.backgroundColor, t)!,
-      foregroundColor: Color.lerp(a?.foregroundColor, b?.foregroundColor, t)!,
-    );
-  }
+  ) => _$StreamAvatarColorPair.lerp(a, b, t);
 }

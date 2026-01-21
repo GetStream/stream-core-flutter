@@ -30,7 +30,7 @@ mixin _$StreamColorScheme {
     }
 
     return StreamColorScheme.raw(
-      brand: StreamBrandColor.lerp(a.brand, b.brand, t)!,
+      brand: t < 0.5 ? a.brand : b.brand,
       accentPrimary: Color.lerp(a.accentPrimary, b.accentPrimary, t)!,
       accentSuccess: Color.lerp(a.accentSuccess, b.accentSuccess, t)!,
       accentWarning: Color.lerp(a.accentWarning, b.accentWarning, t)!,
@@ -338,5 +338,89 @@ mixin _$StreamColorScheme {
       _this.systemScrollbar,
       _this.avatarPalette,
     ]);
+  }
+}
+
+mixin _$StreamAvatarColorPair {
+  bool get canMerge => true;
+
+  static StreamAvatarColorPair? lerp(
+    StreamAvatarColorPair? a,
+    StreamAvatarColorPair? b,
+    double t,
+  ) {
+    if (identical(a, b)) {
+      return a;
+    }
+
+    if (a == null) {
+      return t == 1.0 ? b : null;
+    }
+
+    if (b == null) {
+      return t == 0.0 ? a : null;
+    }
+
+    return StreamAvatarColorPair(
+      backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t)!,
+      foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t)!,
+    );
+  }
+
+  StreamAvatarColorPair copyWith({
+    Color? backgroundColor,
+    Color? foregroundColor,
+  }) {
+    final _this = (this as StreamAvatarColorPair);
+
+    return StreamAvatarColorPair(
+      backgroundColor: backgroundColor ?? _this.backgroundColor,
+      foregroundColor: foregroundColor ?? _this.foregroundColor,
+    );
+  }
+
+  StreamAvatarColorPair merge(StreamAvatarColorPair? other) {
+    final _this = (this as StreamAvatarColorPair);
+
+    if (other == null || identical(_this, other)) {
+      return _this;
+    }
+
+    if (!other.canMerge) {
+      return other;
+    }
+
+    return copyWith(
+      backgroundColor: other.backgroundColor,
+      foregroundColor: other.foregroundColor,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final _this = (this as StreamAvatarColorPair);
+    final _other = (other as StreamAvatarColorPair);
+
+    return _other.backgroundColor == _this.backgroundColor &&
+        _other.foregroundColor == _this.foregroundColor;
+  }
+
+  @override
+  int get hashCode {
+    final _this = (this as StreamAvatarColorPair);
+
+    return Object.hash(
+      runtimeType,
+      _this.backgroundColor,
+      _this.foregroundColor,
+    );
   }
 }
