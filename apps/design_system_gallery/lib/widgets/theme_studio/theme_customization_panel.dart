@@ -1,6 +1,7 @@
 import 'dart:math' show Random;
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
 
 import '../../config/theme_configuration.dart';
@@ -35,117 +36,88 @@ StreamAvatarColorPair _generateRandomAvatarPair({required bool isDark}) {
 /// A panel widget for customizing the Stream theme.
 ///
 /// Organized into sections matching [StreamColorScheme] structure.
-class ThemeCustomizationPanel extends StatefulWidget {
-  const ThemeCustomizationPanel({
-    super.key,
-    required this.configuration,
-  });
-
-  final ThemeConfiguration configuration;
-
-  @override
-  State<ThemeCustomizationPanel> createState() => _ThemeCustomizationPanelState();
-}
-
-class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
-  final _scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+class ThemeCustomizationPanel extends StatelessWidget {
+  const ThemeCustomizationPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.configuration,
-      builder: (context, _) {
-        final streamTheme = widget.configuration.themeData;
-        final colorScheme = streamTheme.colorScheme;
-        final textTheme = streamTheme.textTheme;
-        final boxShadow = streamTheme.boxShadow;
-        final materialTheme = widget.configuration.buildMaterialTheme();
+    final colorScheme = context.streamColorScheme;
+    final spacing = context.streamSpacing;
 
-        // Wrap with Theme to apply Stream theming to all widgets
-        return Theme(
-          data: materialTheme,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: colorScheme.backgroundApp,
-              border: Border(
-                left: BorderSide(color: colorScheme.borderSurfaceSubtle),
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundApp,
+      ),
+      foregroundDecoration: BoxDecoration(
+        border: .symmetric(
+          vertical: .new(color: colorScheme.borderSurfaceSubtle),
+        ),
+      ),
+      child: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(spacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildAppearanceSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildBrandSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildAccentColorsSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildTextColorsSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildBackgroundColorsSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildBorderCoreSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildBorderUtilitySection(context),
+                    SizedBox(height: spacing.md),
+                    _buildStateColorsSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildSystemColorsSection(context),
+                    SizedBox(height: spacing.md),
+                    _buildAvatarPaletteSection(context),
+                    SizedBox(height: spacing.md),
+                  ],
+                ),
               ),
             ),
-            child: Column(
-              children: [
-                _buildHeader(colorScheme, textTheme),
-                Expanded(
-                  child: Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildAppearanceSection(colorScheme, textTheme),
-                          const SizedBox(height: 16),
-                          _buildBrandSection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildAccentColorsSection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildTextColorsSection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildBackgroundColorsSection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildBorderCoreSection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildBorderUtilitySection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildStateColorsSection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildSystemColorsSection(colorScheme, boxShadow),
-                          const SizedBox(height: 16),
-                          _buildAvatarPaletteSection(colorScheme),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
-  Widget _buildHeader(
-    StreamColorScheme colorScheme,
-    StreamTextTheme textTheme,
-  ) {
+  Widget _buildHeader(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(spacing.md),
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurface,
-        border: Border(
-          bottom: BorderSide(color: colorScheme.borderSurfaceSubtle),
-        ),
+        border: Border(bottom: .new(color: colorScheme.borderSurfaceSubtle)),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(spacing.sm),
             decoration: BoxDecoration(
               color: colorScheme.accentPrimary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.all(radius.md),
             ),
             child: Icon(Icons.tune, color: colorScheme.accentPrimary, size: 20),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: spacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,12 +143,12 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             message: 'Reset to defaults',
             child: Material(
               color: Colors.transparent,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.all(radius.sm),
               child: InkWell(
-                onTap: widget.configuration.resetToDefaults,
-                borderRadius: BorderRadius.circular(6),
+                onTap: config.resetToDefaults,
+                borderRadius: BorderRadius.all(radius.sm),
                 child: Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(spacing.sm),
                   child: Icon(
                     Icons.restart_alt,
                     color: colorScheme.textTertiary,
@@ -191,12 +163,11 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildAppearanceSection(
-    StreamColorScheme colorScheme,
-    StreamTextTheme textTheme,
-  ) {
+  Widget _buildAppearanceSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
+    final spacing = context.streamSpacing;
+
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Appearance',
       subtitle: 'brightness',
       icon: Icons.brightness_6,
@@ -206,21 +177,17 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             child: ThemeStudioModeButton(
               label: 'Light',
               icon: Icons.light_mode,
-              isSelected: widget.configuration.brightness == Brightness.light,
-              colorScheme: colorScheme,
-              textTheme: textTheme,
-              onTap: () => widget.configuration.setBrightness(Brightness.light),
+              isSelected: config.brightness == Brightness.light,
+              onTap: () => config.setBrightness(Brightness.light),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: spacing.sm),
           Expanded(
             child: ThemeStudioModeButton(
               label: 'Dark',
               icon: Icons.dark_mode,
-              isSelected: widget.configuration.brightness == Brightness.dark,
-              colorScheme: colorScheme,
-              textTheme: textTheme,
-              onTap: () => widget.configuration.setBrightness(Brightness.dark),
+              isSelected: config.brightness == Brightness.dark,
+              onTap: () => config.setBrightness(Brightness.dark),
             ),
           ),
         ],
@@ -228,34 +195,23 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildBrandSection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
-
+  Widget _buildBrandSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Brand Color',
       subtitle: 'brand',
       icon: Icons.branding_watermark,
       child: ColorPickerTile(
         label: 'brandPrimary',
         color: config.brandPrimaryColor,
-        colorScheme: colorScheme,
-        boxShadow: boxShadow,
         onColorChanged: config.setBrandPrimaryColor,
       ),
     );
   }
 
-  Widget _buildAccentColorsSection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
+  Widget _buildAccentColorsSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Accent Colors',
       subtitle: 'accent*',
       icon: Icons.color_lens,
@@ -264,36 +220,26 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'accentPrimary',
             color: config.accentPrimary,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setAccentPrimary,
           ),
           ColorPickerTile(
             label: 'accentSuccess',
             color: config.accentSuccess,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setAccentSuccess,
           ),
           ColorPickerTile(
             label: 'accentWarning',
             color: config.accentWarning,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setAccentWarning,
           ),
           ColorPickerTile(
             label: 'accentError',
             color: config.accentError,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setAccentError,
           ),
           ColorPickerTile(
             label: 'accentNeutral',
             color: config.accentNeutral,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setAccentNeutral,
           ),
         ],
@@ -301,13 +247,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildTextColorsSection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
+  Widget _buildTextColorsSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Text Colors',
       subtitle: 'text*',
       icon: Icons.format_color_text,
@@ -316,50 +258,36 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'textPrimary',
             color: config.textPrimary,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setTextPrimary,
           ),
           ColorPickerTile(
             label: 'textSecondary',
             color: config.textSecondary,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setTextSecondary,
           ),
           ColorPickerTile(
             label: 'textTertiary',
             color: config.textTertiary,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setTextTertiary,
           ),
           ColorPickerTile(
             label: 'textDisabled',
             color: config.textDisabled,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setTextDisabled,
           ),
           ColorPickerTile(
             label: 'textInverse',
             color: config.textInverse,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setTextInverse,
           ),
           ColorPickerTile(
             label: 'textLink',
             color: config.textLink,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setTextLink,
           ),
           ColorPickerTile(
             label: 'textOnAccent',
             color: config.textOnAccent,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setTextOnAccent,
           ),
         ],
@@ -367,13 +295,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildBackgroundColorsSection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
+  Widget _buildBackgroundColorsSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Background Colors',
       subtitle: 'background*',
       icon: Icons.format_paint,
@@ -382,36 +306,26 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'backgroundApp',
             color: config.backgroundApp,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBackgroundApp,
           ),
           ColorPickerTile(
             label: 'backgroundSurface',
             color: config.backgroundSurface,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBackgroundSurface,
           ),
           ColorPickerTile(
             label: 'backgroundSurfaceSubtle',
             color: config.backgroundSurfaceSubtle,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBackgroundSurfaceSubtle,
           ),
           ColorPickerTile(
             label: 'backgroundSurfaceStrong',
             color: config.backgroundSurfaceStrong,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBackgroundSurfaceStrong,
           ),
           ColorPickerTile(
             label: 'backgroundOverlay',
             color: config.backgroundOverlay,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBackgroundOverlay,
           ),
         ],
@@ -419,13 +333,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildBorderCoreSection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
+  Widget _buildBorderCoreSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Border Colors - Core',
       subtitle: 'border*',
       icon: Icons.border_all,
@@ -434,50 +344,36 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'borderSurface',
             color: config.borderSurface,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderSurface,
           ),
           ColorPickerTile(
             label: 'borderSurfaceSubtle',
             color: config.borderSurfaceSubtle,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderSurfaceSubtle,
           ),
           ColorPickerTile(
             label: 'borderSurfaceStrong',
             color: config.borderSurfaceStrong,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderSurfaceStrong,
           ),
           ColorPickerTile(
             label: 'borderOnDark',
             color: config.borderOnDark,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderOnDark,
           ),
           ColorPickerTile(
             label: 'borderOnAccent',
             color: config.borderOnAccent,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderOnAccent,
           ),
           ColorPickerTile(
             label: 'borderSubtle',
             color: config.borderSubtle,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderSubtle,
           ),
           ColorPickerTile(
             label: 'borderImage',
             color: config.borderImage,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderImage,
           ),
         ],
@@ -485,13 +381,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildBorderUtilitySection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
+  Widget _buildBorderUtilitySection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Border Colors - Utility',
       subtitle: 'border*',
       icon: Icons.border_style,
@@ -500,43 +392,31 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'borderFocus',
             color: config.borderFocus,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderFocus,
           ),
           ColorPickerTile(
             label: 'borderDisabled',
             color: config.borderDisabled,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderDisabled,
           ),
           ColorPickerTile(
             label: 'borderError',
             color: config.borderError,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderError,
           ),
           ColorPickerTile(
             label: 'borderWarning',
             color: config.borderWarning,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderWarning,
           ),
           ColorPickerTile(
             label: 'borderSuccess',
             color: config.borderSuccess,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderSuccess,
           ),
           ColorPickerTile(
             label: 'borderSelected',
             color: config.borderSelected,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setBorderSelected,
           ),
         ],
@@ -544,13 +424,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildStateColorsSection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
+  Widget _buildStateColorsSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'State Colors',
       subtitle: 'state*',
       icon: Icons.touch_app,
@@ -559,36 +435,26 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'stateHover',
             color: config.stateHover,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setStateHover,
           ),
           ColorPickerTile(
             label: 'statePressed',
             color: config.statePressed,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setStatePressed,
           ),
           ColorPickerTile(
             label: 'stateSelected',
             color: config.stateSelected,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setStateSelected,
           ),
           ColorPickerTile(
             label: 'stateFocused',
             color: config.stateFocused,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setStateFocused,
           ),
           ColorPickerTile(
             label: 'stateDisabled',
             color: config.stateDisabled,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setStateDisabled,
           ),
         ],
@@ -596,13 +462,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildSystemColorsSection(
-    StreamColorScheme colorScheme,
-    StreamBoxShadow boxShadow,
-  ) {
-    final config = widget.configuration;
+  Widget _buildSystemColorsSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'System Colors',
       subtitle: 'system*',
       icon: Icons.settings_system_daydream,
@@ -611,15 +473,11 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'systemText',
             color: config.systemText,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setSystemText,
           ),
           ColorPickerTile(
             label: 'systemScrollbar',
             color: config.systemScrollbar,
-            colorScheme: colorScheme,
-            boxShadow: boxShadow,
             onColorChanged: config.setSystemScrollbar,
           ),
         ],
@@ -627,12 +485,12 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildAvatarPaletteSection(StreamColorScheme colorScheme) {
-    final config = widget.configuration;
+  Widget _buildAvatarPaletteSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
     final palette = config.avatarPalette;
+    final spacing = context.streamSpacing;
 
     return SectionCard(
-      colorScheme: colorScheme,
       title: 'Avatar Palette',
       subtitle: 'avatarPalette',
       icon: Icons.palette,
@@ -643,7 +501,6 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             return AvatarColorPairTile(
               index: index,
               pair: pair,
-              colorScheme: colorScheme,
               onBackgroundChanged: (color) {
                 config.updateAvatarPaletteAt(
                   index,
@@ -665,9 +522,8 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
               onRemove: palette.length > 1 ? () => config.removeAvatarPaletteAt(index) : null,
             );
           }),
-          const SizedBox(height: 8),
+          SizedBox(height: spacing.sm),
           AddPaletteButton(
-            colorScheme: colorScheme,
             onTap: () {
               final isDark = config.brightness == Brightness.dark;
               config.addAvatarPaletteEntry(_generateRandomAvatarPair(isDark: isDark));

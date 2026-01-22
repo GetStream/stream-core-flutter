@@ -8,34 +8,36 @@ class ToolbarButton extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.isActive,
-    required this.colorScheme,
     required this.onTap,
   });
 
   final IconData icon;
   final String tooltip;
   final bool isActive;
-  final StreamColorScheme colorScheme;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return Tooltip(
       message: tooltip,
       child: Material(
         color: isActive ? colorScheme.accentPrimary.withValues(alpha: 0.1) : colorScheme.backgroundApp,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.all(radius.md),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.all(radius.md),
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(spacing.sm + spacing.xxs),
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.all(radius.md),
             ),
             foregroundDecoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.all(radius.md),
               border: Border.all(
                 color: isActive ? colorScheme.accentPrimary : colorScheme.borderSurfaceSubtle,
               ),

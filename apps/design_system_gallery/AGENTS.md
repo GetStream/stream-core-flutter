@@ -2,6 +2,31 @@
 
 This document provides guidance for AI agents working on the Stream Design System Gallery (Widgetbook).
 
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Project Structure](#project-structure)
+3. [Common Commands](#common-commands)
+4. [Theme & Styling](#theme--styling)
+   - [Accessing Theme](#accessing-theme-in-use-cases-context-extensions)
+   - [Styling Guidelines](#styling-guidelines)
+   - [Keeping Material Theme in Sync](#keeping-material-theme-in-sync)
+5. [Adding Content](#adding-content)
+   - [Adding Components](#adding-new-components)
+   - [Adding Semantic Tokens](#adding-semantic-token-showcases)
+   - [Adding Primitives](#adding-primitive-token-showcases)
+   - [Showcase Structure Patterns](#showcase-structure-patterns)
+   - [Category Ordering](#category-ordering)
+   - [Knobs Best Practices](#knobs-best-practices)
+6. [Technical Details](#technical-details)
+   - [ThemeConfiguration](#themeconfiguration)
+   - [Preview Wrapper](#preview-wrapper)
+7. [Troubleshooting](#troubleshooting)
+
+---
+
 ## Overview
 
 The gallery showcases Stream's design system components and foundation tokens. It uses:
@@ -23,9 +48,13 @@ apps/design_system_gallery/
 │   │   ├── stream_avatar.dart
 │   │   ├── stream_avatar_stack.dart
 │   │   └── stream_online_indicator.dart
-│   ├── semantics/                        # Semantic token showcases
+│   ├── semantics/                        # Semantic token showcases (design system level)
 │   │   ├── typography.dart               # StreamTextTheme showcase
 │   │   └── elevations.dart               # StreamBoxShadow showcase
+│   ├── primitives/                       # Primitive token showcases (raw values)
+│   │   ├── radius.dart                   # StreamRadius showcase
+│   │   ├── spacing.dart                  # StreamSpacing showcase
+│   │   └── colors.dart                   # StreamColors showcase
 │   ├── config/
 │   │   ├── theme_configuration.dart      # Theme state (colors, brightness, etc.)
 │   │   └── preview_configuration.dart    # Preview state (device, text scale)
@@ -35,6 +64,156 @@ apps/design_system_gallery/
 │       ├── toolbar/                      # Top toolbar widgets
 │       └── theme_studio/                 # Theme customization panel widgets
 ```
+
+## Common Commands
+
+```bash
+# Regenerate widgetbook directories (after adding/modifying use cases)
+dart run build_runner build --delete-conflicting-outputs
+
+# Format code
+dart format lib/
+
+# Analyze
+flutter analyze
+
+# Run gallery
+flutter run -d chrome  # or macos/windows
+```
+
+---
+
+# Theme & Styling
+
+## Accessing Theme in Use Cases (Context Extensions)
+
+**Preferred:** Use context extensions for clean, concise access:
+
+```dart
+// Recommended - use context extensions
+final colorScheme = context.streamColorScheme;
+final textTheme = context.streamTextTheme;
+final boxShadow = context.streamBoxShadow;
+final radius = context.streamRadius;
+final spacing = context.streamSpacing;
+
+// For component themes
+final avatarTheme = context.streamAvatarTheme;
+final indicatorTheme = context.streamOnlineIndicatorTheme;
+```
+
+**Alternative:** Direct access via `StreamTheme.of(context)`:
+
+```dart
+final streamTheme = StreamTheme.of(context);
+final colorScheme = streamTheme.colorScheme;
+final textTheme = streamTheme.textTheme;
+```
+
+## Styling Guidelines
+
+### Use context extensions (preferred)
+
+```dart
+// Good - use context extensions
+final colorScheme = context.streamColorScheme;
+final textTheme = context.streamTextTheme;
+style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary)
+
+// Avoid - passing parameters through widget tree
+MyWidget({required this.colorScheme, required this.textTheme})
+```
+
+### Don't pass theme data as parameters
+
+Widgets should access theme from context, not receive it as constructor parameters:
+
+```dart
+// Good - access from context in build method
+class _MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    return Text('Hello', style: textTheme.bodyDefault);
+  }
+}
+
+// Bad - passing through constructor
+class _MyWidget extends StatelessWidget {
+  final StreamColorScheme colorScheme;
+  final StreamTextTheme textTheme;
+  // ...
+}
+```
+
+### Use StreamTheme tokens
+
+```dart
+// Good
+style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary)
+
+// Bad - hardcoded values
+style: TextStyle(fontSize: 12, color: Colors.grey)
+```
+
+### Use StreamBoxShadow
+
+```dart
+// Good
+boxShadow: context.streamBoxShadow.elevation2
+
+// Bad - custom shadows
+boxShadow: [BoxShadow(blurRadius: 10, ...)]
+```
+
+### Use StreamRadius
+
+```dart
+// Good
+borderRadius: BorderRadius.all(context.streamRadius.md)
+
+// Bad - hardcoded values
+borderRadius: BorderRadius.circular(8)
+```
+
+### Border handling
+
+Use `foregroundDecoration` for borders to prevent clipping:
+
+```dart
+Container(
+  clipBehavior: Clip.antiAlias,
+  decoration: BoxDecoration(
+    color: colorScheme.backgroundSurface,
+    borderRadius: BorderRadius.circular(12),
+  ),
+  foregroundDecoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(color: colorScheme.borderSurfaceSubtle),
+  ),
+  child: ...,
+)
+```
+
+## Keeping Material Theme in Sync
+
+When modifying `ThemeConfiguration`, ensure `buildMaterialTheme()` stays updated:
+
+1. **New color properties** → Add to `ColorScheme` mapping and relevant theme components (buttons, inputs, dialogs, etc.)
+2. **New text styles** → Update `TextTheme` mapping to use appropriate Stream styles
+3. **New radius/spacing** → Update component themes that use borders/padding
+
+**Check these areas in `buildMaterialTheme()`:**
+- `ColorScheme` - maps Stream colors to Material semantic colors
+- `ThemeData` properties - `primaryColor`, `scaffoldBackgroundColor`, etc.
+- Component themes - `dialogTheme`, `appBarTheme`, `filledButtonTheme`, etc.
+- `TextTheme` - maps Stream text styles to Material text styles
+- `extensions` - must include `[themeData]` for `StreamTheme.of(context)` to work
+
+---
+
+# Adding Content
 
 ## Adding New Components
 
@@ -92,7 +271,7 @@ flutter analyze
 Semantic tokens (like `StreamTextTheme`, `StreamBoxShadow`) are showcased in `lib/semantics/`:
 
 1. Create a new file in `lib/semantics/`
-2. Use path `[App Foundation]/TokenName` in the `@UseCase` annotation
+2. Use path `[App Foundation]/Semantics/TokenName` in the `@UseCase` annotation
 3. Follow the same regeneration process as components
 
 **Example:**
@@ -100,12 +279,49 @@ Semantic tokens (like `StreamTextTheme`, `StreamBoxShadow`) are showcased in `li
 @widgetbook.UseCase(
   name: 'All Styles',
   type: StreamTextTheme,
-  path: '[App Foundation]/Typography',
+  path: '[App Foundation]/Semantics/Typography',
 )
 Widget buildStreamTextThemeShowcase(BuildContext context) {
   // Showcase implementation
 }
 ```
+
+## Adding Primitive Token Showcases
+
+Primitives (raw values like `StreamRadius`, `StreamSpacing`, `StreamColors`) are showcased in `lib/primitives/`:
+
+1. Create a new file in `lib/primitives/`
+2. Use path `[App Foundation]/Primitives/TokenName` in the `@UseCase` annotation
+
+**Example:**
+```dart
+@widgetbook.UseCase(
+  name: 'Scale',
+  type: StreamRadius,
+  path: '[App Foundation]/Primitives/Radius',
+)
+Widget buildStreamRadiusShowcase(BuildContext context) {
+  // Showcase implementation
+}
+```
+
+## Showcase Structure Patterns
+
+All primitives and semantics showcases follow a consistent structure. Reference existing files (`radius.dart`, `spacing.dart`, `typography.dart`, `elevations.dart`) for implementation examples.
+
+### Required Elements
+
+1. **`_SectionLabel` widget** - Accent-colored label for section headers (uppercase, letter-spacing)
+2. **`_QuickReference` section** - Usage patterns and common choices at the bottom
+3. **Token cards** - Visual preview (left) + info (right) layout
+
+### Card Styling Conventions
+
+- Token names: `accentPrimary` color, monospace font
+- Value chips: `backgroundSurfaceSubtle` background, `textSecondary` color
+- Usage descriptions: `textTertiary` color
+- Borders: Use `foregroundDecoration` (not `border:` in BoxDecoration)
+- Shadows: `boxShadow.elevation1`
 
 ## Category Ordering
 
@@ -116,28 +332,19 @@ The widgetbook generator sorts categories **alphabetically**. To control order, 
 
 **Current structure:**
 ```
-├── App Foundation (typography, elevations)
-└── Components (avatar, button, etc.)
+├── App Foundation
+│   ├── Primitives
+│   │   ├── Colors
+│   │   ├── Radius
+│   │   └── Spacing
+│   └── Semantics
+│       ├── Elevations
+│       └── Typography
+└── Components
+    ├── Avatar (StreamAvatar, StreamAvatarStack)
+    ├── Button
+    └── Indicator (StreamOnlineIndicator)
 ```
-
-## Theme Configuration
-
-### Accessing Theme in Use Cases
-
-```dart
-final streamTheme = StreamTheme.of(context);
-final colorScheme = streamTheme.colorScheme;
-final textTheme = streamTheme.textTheme;
-final boxShadow = streamTheme.boxShadow;
-```
-
-### Adding New Theme Properties
-
-1. Add private field and getter in `theme_configuration.dart`
-2. Add setter using `_update()` pattern
-3. Include in `_rebuildTheme()` colorScheme.copyWith()
-4. Add to `resetToDefaults()`
-5. Add UI control in `theme_customization_panel.dart`
 
 ## Knobs Best Practices
 
@@ -150,6 +357,64 @@ final boxShadow = streamTheme.boxShadow;
 - Don't add knobs that duplicate Theme Studio controls
 - Don't use deprecated `context.knobs.list` (use `object.dropdown`)
 
+---
+
+# Technical Details
+
+## ThemeConfiguration
+
+### Accessing ThemeConfiguration
+
+Use `context.read<ThemeConfiguration>()` for calling methods (no rebuild on change):
+
+```dart
+// For calling setters/methods - use read
+context.read<ThemeConfiguration>().setAccentPrimary(color);
+context.read<ThemeConfiguration>().resetToDefaults();
+```
+
+Use `context.watch<ThemeConfiguration>()` only when you need to rebuild on changes (typically only in `gallery_app.dart`).
+
+### Adding New Theme Properties
+
+1. Add private field and getter in `theme_configuration.dart`
+2. Add setter using `_update()` pattern
+3. Include in `_rebuildTheme()` colorScheme.copyWith()
+4. Add to `resetToDefaults()`
+5. Add UI control in `theme_customization_panel.dart`
+
+### Best Practices
+
+**Use class getters directly** in `buildMaterialTheme()`:
+
+```dart
+// Good - uses class getters directly
+ThemeData buildMaterialTheme() {
+  return ThemeData(
+    primaryColor: accentPrimary,  // Class getter
+    scaffoldBackgroundColor: backgroundApp,  // Class getter
+  );
+}
+
+// Avoid - unnecessary indirection
+ThemeData buildMaterialTheme() {
+  final cs = themeData.colorScheme;
+  return ThemeData(
+    primaryColor: cs.accentPrimary,  // Through colorScheme
+  );
+}
+```
+
+**Use public getters** instead of private fields within the class:
+
+```dart
+// Good
+final isDark = brightness == Brightness.dark;
+
+// Avoid
+final isDark = _brightness == Brightness.dark;
+```
+
 ## Preview Wrapper
 
 The `PreviewWrapper` applies:
@@ -159,85 +424,24 @@ The `PreviewWrapper` applies:
 
 **Important:** StreamTheme is provided via `ThemeData.extensions` so `StreamTheme.of(context)` works correctly.
 
-## Color Picker Usage
-
-When using `flutter_colorpicker`, note that it may not rebuild correctly with `StatefulBuilder`. The current implementation uses a simple local variable approach:
-
-```dart
-var pickerColor = initialColor;
-// Don't wrap in StatefulBuilder - let ColorPicker manage its own state
-ColorPicker(
-  pickerColor: pickerColor,
-  onColorChanged: (c) => pickerColor = c,
-)
-```
-
-## Styling Guidelines
-
-### Use StreamTheme tokens
-```dart
-// Good
-style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary)
-
-// Bad - hardcoded values
-style: TextStyle(fontSize: 12, color: Colors.grey)
-```
-
-### Use StreamBoxShadow
-```dart
-// Good
-boxShadow: streamTheme.boxShadow.elevation2
-
-// Bad - custom shadows
-boxShadow: [BoxShadow(blurRadius: 10, ...)]
-```
-
-### Border handling
-Use `foregroundDecoration` for borders to prevent clipping:
-```dart
-Container(
-  clipBehavior: Clip.antiAlias,
-  decoration: BoxDecoration(
-    color: colorScheme.backgroundSurface,
-    borderRadius: BorderRadius.circular(12),
-  ),
-  foregroundDecoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: colorScheme.borderSurfaceSubtle),
-  ),
-  child: ...,
-)
-```
-
-## Common Commands
-
-```bash
-# Regenerate widgetbook directories
-dart run build_runner build --delete-conflicting-outputs
-
-# Format code
-dart format lib/
-
-# Analyze
-flutter analyze
-
-# Run gallery
-flutter run -d chrome  # or macos/windows
-```
+---
 
 ## Troubleshooting
 
 ### Theme changes not reflecting in use cases
-Ensure `StreamTheme` is added to `ThemeData.extensions` in `PreviewWrapper`:
+Ensure `StreamTheme` is added to `ThemeData.extensions`:
 ```dart
-Theme(
-  data: ThemeData(
-    extensions: [streamTheme],  // Required!
-  ),
-  child: ...,
+ThemeData(
+  extensions: [streamTheme],  // Required for StreamTheme.of(context)!
 )
 ```
 
+This is done in `ThemeConfiguration.buildMaterialTheme()`.
+
 ### Generated file has wrong order
 The generator sorts alphabetically. Use category name prefixes to control order (e.g., "App Foundation" before "Components").
+
+### Widgets not updating when theme changes
+Ensure you're using context extensions (`context.streamColorScheme`) which properly depend on the inherited theme. Don't cache theme values in state.
+
 

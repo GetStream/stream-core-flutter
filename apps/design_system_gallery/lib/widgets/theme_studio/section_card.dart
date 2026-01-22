@@ -7,14 +7,12 @@ import 'package:stream_core_flutter/stream_core_flutter.dart';
 class SectionCard extends StatelessWidget {
   const SectionCard({
     super.key,
-    required this.colorScheme,
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.child,
   });
 
-  final StreamColorScheme colorScheme;
   final String title;
   final String subtitle;
   final IconData icon;
@@ -22,15 +20,20 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(spacing.sm),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurface,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.all(radius.md),
       ),
       foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.all(radius.md),
         border: Border.all(color: colorScheme.borderSurfaceSubtle),
       ),
       child: Column(
@@ -39,34 +42,31 @@ class SectionCard extends StatelessWidget {
           Row(
             children: [
               Icon(icon, color: colorScheme.textTertiary, size: 14),
-              const SizedBox(width: 6),
+              SizedBox(width: spacing.xs + spacing.xxs),
               Text(
                 title,
-                style: TextStyle(
+                style: textTheme.captionEmphasis.copyWith(
                   color: colorScheme.textPrimary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
                 ),
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: spacing.xs + spacing.xxs),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 1),
                 decoration: BoxDecoration(
                   color: colorScheme.backgroundSurfaceSubtle,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.all(radius.xs),
                 ),
                 child: Text(
                   subtitle,
-                  style: TextStyle(
+                  style: textTheme.metadataDefault.copyWith(
                     color: colorScheme.textTertiary,
-                    fontSize: 9,
                     fontFamily: 'monospace',
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: spacing.sm + spacing.xxs),
           child,
         ],
       ),

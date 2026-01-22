@@ -15,6 +15,7 @@ dependencies:
   provider: ^6.1.5+1
   stream_core_flutter:
     path: ../../packages/stream_core_flutter
+  svg_icon_widget: ^0.0.1+1
   widgetbook: ^3.20.2
   widgetbook_annotation: ^3.9.0
 
@@ -26,3 +27,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/

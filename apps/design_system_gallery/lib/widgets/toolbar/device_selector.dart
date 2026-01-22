@@ -8,28 +8,29 @@ class DeviceSelector extends StatelessWidget {
     super.key,
     required this.selectedDevice,
     required this.devices,
-    required this.colorScheme,
-    required this.textTheme,
     required this.onDeviceChanged,
   });
 
   final DeviceInfo selectedDevice;
   final List<DeviceInfo> devices;
-  final StreamColorScheme colorScheme;
-  final StreamTextTheme textTheme;
   final ValueChanged<DeviceInfo> onDeviceChanged;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: spacing.sm),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: colorScheme.backgroundApp,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.all(radius.md),
       ),
       foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.all(radius.md),
         border: Border.all(color: colorScheme.borderSurfaceSubtle),
       ),
       child: DropdownButtonHideUnderline(
@@ -59,8 +60,8 @@ class DeviceSelector extends StatelessWidget {
                     size: 14,
                     color: colorScheme.textTertiary,
                   ),
-                  const SizedBox(width: 8),
-                  Text(device.name, style: const TextStyle(fontSize: 13)),
+                  SizedBox(width: spacing.sm),
+                  Text(device.name, style: textTheme.captionDefault),
                 ],
               ),
             );

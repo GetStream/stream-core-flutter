@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
+import 'package:svg_icon_widget/svg_icon_widget.dart';
 
 import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';
+import '../../core/stream_icons.dart';
 import 'device_selector.dart';
 import 'text_scale_selector.dart';
 import 'theme_mode_toggle.dart';
@@ -24,17 +26,16 @@ class GalleryToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeConfig = context.watch<ThemeConfiguration>();
+    // Use read (not watch) - rebuilds come from Consumer in gallery_app.dart
+    final themeConfig = context.read<ThemeConfiguration>();
     final previewConfig = context.watch<PreviewConfiguration>();
-    final streamTheme = themeConfig.themeData;
-    final colorScheme = streamTheme.colorScheme;
-    final textTheme = streamTheme.textTheme;
-    final boxShadow = streamTheme.boxShadow;
-    final isDark = themeConfig.brightness == Brightness.dark;
+    final colorScheme = context.streamColorScheme;
+    final spacing = context.streamSpacing;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: spacing.md),
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurface,
         border: Border(
@@ -44,12 +45,8 @@ class GalleryToolbar extends StatelessWidget {
       child: Row(
         children: [
           // Stream Logo and title
-          _StreamBranding(
-            colorScheme: colorScheme,
-            textTheme: textTheme,
-            boxShadow: boxShadow,
-          ),
-          const SizedBox(width: 24),
+          const _StreamBranding(),
+          SizedBox(width: spacing.lg),
 
           // Toolbar controls - wrapped in Expanded to prevent overflow
           Expanded(
@@ -63,29 +60,24 @@ class GalleryToolbar extends StatelessWidget {
                     icon: previewConfig.showDeviceFrame ? Icons.devices : Icons.phone_android,
                     tooltip: 'Device Frame',
                     isActive: previewConfig.showDeviceFrame,
-                    colorScheme: colorScheme,
                     onTap: previewConfig.toggleDeviceFrame,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: spacing.sm),
 
                   // Device selector
                   if (previewConfig.showDeviceFrame) ...[
                     DeviceSelector(
                       selectedDevice: previewConfig.selectedDevice,
                       devices: PreviewConfiguration.deviceOptions,
-                      colorScheme: colorScheme,
-                      textTheme: textTheme,
                       onDeviceChanged: previewConfig.setDevice,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: spacing.sm),
                   ],
 
                   // Text scale selector
                   TextScaleSelector(
                     value: previewConfig.textScale,
                     options: PreviewConfiguration.textScaleOptions,
-                    colorScheme: colorScheme,
-                    textTheme: textTheme,
                     onChanged: previewConfig.setTextScale,
                   ),
                 ],
@@ -93,23 +85,21 @@ class GalleryToolbar extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 16),
+          SizedBox(width: spacing.md),
 
           // Theme mode toggle
           ThemeModeToggle(
             isDark: isDark,
-            colorScheme: colorScheme,
             onLightTap: () => themeConfig.setBrightness(Brightness.light),
             onDarkTap: () => themeConfig.setBrightness(Brightness.dark),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: spacing.sm),
 
           // Theme panel toggle
           ToolbarButton(
             icon: showThemePanel ? Icons.palette : Icons.palette_outlined,
             tooltip: 'Theme Studio',
             isActive: showThemePanel,
-            colorScheme: colorScheme,
             onTap: onToggleThemePanel,
           ),
         ],
@@ -120,51 +110,20 @@ class GalleryToolbar extends StatelessWidget {
 
 /// Stream branding logo and title.
 class _StreamBranding extends StatelessWidget {
-  const _StreamBranding({
-    required this.colorScheme,
-    required this.textTheme,
-    required this.boxShadow,
-  });
-
-  final StreamColorScheme colorScheme;
-  final StreamTextTheme textTheme;
-  final StreamBoxShadow boxShadow;
+  const _StreamBranding();
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Stream Logo
-        Container(
-          width: 40,
-          height: 40,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                colorScheme.accentPrimary,
-                colorScheme.accentPrimary.withValues(alpha: 0.7),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: boxShadow.elevation2,
-          ),
-          child: Center(
-            child: Text(
-              'S',
-              style: TextStyle(
-                color: colorScheme.textOnAccent,
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 14),
+        const SvgIcon(StreamIcons.logo, size: 40),
+        SizedBox(width: spacing.sm + spacing.xxs),
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,

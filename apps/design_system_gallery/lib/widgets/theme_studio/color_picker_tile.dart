@@ -8,33 +8,35 @@ class ColorPickerTile extends StatelessWidget {
     super.key,
     required this.label,
     required this.color,
-    required this.colorScheme,
-    required this.boxShadow,
     required this.onColorChanged,
   });
 
   final String label;
   final Color color;
-  final StreamColorScheme colorScheme;
-  final StreamBoxShadow boxShadow;
   final ValueChanged<Color> onColorChanged;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: EdgeInsets.only(bottom: spacing.xs + spacing.xxs),
       child: InkWell(
         onTap: () => _showColorPicker(context),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.all(radius.sm),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: spacing.sm + spacing.xxs, vertical: spacing.sm),
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: colorScheme.backgroundApp,
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.all(radius.sm),
           ),
           foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.all(radius.sm),
             border: Border.all(color: colorScheme.borderSurfaceSubtle),
           ),
           child: Row(
@@ -45,37 +47,34 @@ class ColorPickerTile extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   color: color,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.all(radius.xs),
                   boxShadow: boxShadow.elevation1,
                 ),
                 foregroundDecoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.all(radius.xs),
                   border: Border.all(
                     color: colorScheme.borderSurface.withValues(alpha: 0.3),
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: spacing.sm + spacing.xxs),
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(
+                  style: textTheme.captionDefault.copyWith(
                     color: colorScheme.textPrimary,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 11,
                     fontFamily: 'monospace',
                   ),
                 ),
               ),
               Text(
                 _colorToHex(color),
-                style: TextStyle(
+                style: textTheme.metadataDefault.copyWith(
                   color: colorScheme.textTertiary,
-                  fontSize: 9,
                   fontFamily: 'monospace',
                 ),
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: spacing.xs + spacing.xxs),
               Icon(Icons.edit, color: colorScheme.textTertiary, size: 12),
             ],
           ),
@@ -91,13 +90,16 @@ class ColorPickerTile extends StatelessWidget {
 
   Future<void> _showColorPicker(BuildContext context) async {
     var pickerColor = color;
+    final textTheme = context.streamTextTheme;
 
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           label,
-          style: const TextStyle(fontFamily: 'monospace', fontSize: 16),
+          style: textTheme.bodyEmphasis.copyWith(
+            fontFamily: 'monospace',
+          ),
         ),
         content: SingleChildScrollView(
           child: ColorPicker(

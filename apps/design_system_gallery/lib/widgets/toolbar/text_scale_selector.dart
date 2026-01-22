@@ -7,28 +7,29 @@ class TextScaleSelector extends StatelessWidget {
     super.key,
     required this.value,
     required this.options,
-    required this.colorScheme,
-    required this.textTheme,
     required this.onChanged,
   });
 
   final double value;
   final List<double> options;
-  final StreamColorScheme colorScheme;
-  final StreamTextTheme textTheme;
   final ValueChanged<double> onChanged;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: spacing.sm),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: colorScheme.backgroundApp,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.all(radius.md),
       ),
       foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.all(radius.md),
         border: Border.all(color: colorScheme.borderSurfaceSubtle),
       ),
       child: DropdownButtonHideUnderline(
@@ -54,10 +55,10 @@ class TextScaleSelector extends StatelessWidget {
                     size: 14,
                     color: colorScheme.textTertiary,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: spacing.sm),
                   Text(
                     '${(scale * 100).toInt()}%',
-                    style: const TextStyle(fontSize: 13),
+                    style: textTheme.captionDefault,
                   ),
                 ],
               ),

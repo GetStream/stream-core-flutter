@@ -8,7 +8,6 @@ class AvatarColorPairTile extends StatelessWidget {
     super.key,
     required this.index,
     required this.pair,
-    required this.colorScheme,
     required this.onBackgroundChanged,
     required this.onForegroundChanged,
     this.onRemove,
@@ -16,24 +15,28 @@ class AvatarColorPairTile extends StatelessWidget {
 
   final int index;
   final StreamAvatarColorPair pair;
-  final StreamColorScheme colorScheme;
   final ValueChanged<Color> onBackgroundChanged;
   final ValueChanged<Color> onForegroundChanged;
   final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: spacing.sm),
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(spacing.sm + spacing.xxs),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: colorScheme.backgroundApp,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.all(radius.md),
         ),
         foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.all(radius.md),
           border: Border.all(color: colorScheme.borderSurfaceSubtle),
         ),
         child: Column(
@@ -52,22 +55,18 @@ class AvatarColorPairTile extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'AB',
-                      style: TextStyle(
+                      style: textTheme.captionEmphasis.copyWith(
                         color: pair.foregroundColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: spacing.sm + spacing.xxs),
                 Expanded(
                   child: Text(
                     'Palette ${index + 1}',
-                    style: TextStyle(
+                    style: textTheme.captionEmphasis.copyWith(
                       color: colorScheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 11,
                     ),
                   ),
                 ),
@@ -85,14 +84,13 @@ class AvatarColorPairTile extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: spacing.sm),
             Row(
               children: [
                 Expanded(
                   child: _SmallColorButton(
                     label: 'backgroundColor',
                     color: pair.backgroundColor,
-                    colorScheme: colorScheme,
                     onTap: () => _showColorPicker(
                       context,
                       'backgroundColor',
@@ -101,12 +99,11 @@ class AvatarColorPairTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: spacing.sm),
                 Expanded(
                   child: _SmallColorButton(
                     label: 'foregroundColor',
                     color: pair.foregroundColor,
-                    colorScheme: colorScheme,
                     onTap: () => _showColorPicker(
                       context,
                       'foregroundColor',
@@ -130,13 +127,16 @@ class AvatarColorPairTile extends StatelessWidget {
     ValueChanged<Color> onChanged,
   ) async {
     var pickerColor = initialColor;
+    final textTheme = context.streamTextTheme;
 
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           label,
-          style: const TextStyle(fontFamily: 'monospace', fontSize: 16),
+          style: textTheme.bodyEmphasis.copyWith(
+            fontFamily: 'monospace',
+          ),
         ),
         content: SingleChildScrollView(
           child: ColorPicker(
@@ -168,29 +168,32 @@ class _SmallColorButton extends StatelessWidget {
   const _SmallColorButton({
     required this.label,
     required this.color,
-    required this.colorScheme,
     required this.onTap,
   });
 
   final String label;
   final Color color;
-  final StreamColorScheme colorScheme;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.all(radius.sm),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xs + spacing.xxs),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: colorScheme.backgroundSurface,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.all(radius.sm),
         ),
         foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.all(radius.sm),
           border: Border.all(color: colorScheme.borderSurfaceSubtle),
         ),
         child: Row(
@@ -201,22 +204,21 @@ class _SmallColorButton extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 color: color,
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.all(radius.xxs),
               ),
               foregroundDecoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.all(radius.xxs),
                 border: Border.all(
                   color: colorScheme.borderSurface.withValues(alpha: 0.3),
                 ),
               ),
             ),
-            const SizedBox(width: 6),
+            SizedBox(width: spacing.xs + spacing.xxs),
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
+                style: textTheme.metadataDefault.copyWith(
                   color: colorScheme.textSecondary,
-                  fontSize: 9,
                   fontFamily: 'monospace',
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -233,39 +235,40 @@ class _SmallColorButton extends StatelessWidget {
 class AddPaletteButton extends StatelessWidget {
   const AddPaletteButton({
     super.key,
-    required this.colorScheme,
     required this.onTap,
   });
 
-  final StreamColorScheme colorScheme;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.all(radius.md),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: EdgeInsets.symmetric(vertical: spacing.sm + spacing.xxs),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.all(radius.md),
         ),
         foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.all(radius.md),
           border: Border.all(color: colorScheme.borderSurfaceSubtle),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.add, color: colorScheme.accentPrimary, size: 16),
-            const SizedBox(width: 6),
+            SizedBox(width: spacing.xs + spacing.xxs),
             Text(
               'Add Palette Entry',
-              style: TextStyle(
+              style: textTheme.captionDefault.copyWith(
                 color: colorScheme.accentPrimary,
-                fontWeight: FontWeight.w500,
-                fontSize: 11,
               ),
             ),
           ],
