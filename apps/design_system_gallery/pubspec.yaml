@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.1.0
+  svg_icon_widget: ^0.0.1+1
   provider: ^6.1.5+1
   stream_core_flutter:
     path: ../../packages/stream_core_flutter
@@ -26,3 +27,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/

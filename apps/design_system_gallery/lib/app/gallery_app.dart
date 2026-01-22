@@ -39,8 +39,8 @@ class _StreamDesignSystemGalleryState extends State<StreamDesignSystemGallery> {
       ],
       child: Consumer<ThemeConfiguration>(
         builder: (context, themeConfig, _) {
+          final isDark = themeConfig.brightness == .dark;
           final materialTheme = themeConfig.buildMaterialTheme();
-          final isDark = themeConfig.brightness == Brightness.dark;
 
           return MaterialApp(
             title: 'Stream Design System',
@@ -48,7 +48,7 @@ class _StreamDesignSystemGalleryState extends State<StreamDesignSystemGallery> {
             // Use Stream-themed Material theme for all regular widgets
             theme: materialTheme,
             darkTheme: materialTheme,
-            themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+            themeMode: isDark ? .dark : .light,
             home: GalleryShell(
               showThemePanel: _showThemePanel,
               onToggleThemePanel: () => setState(() => _showThemePanel = !_showThemePanel),

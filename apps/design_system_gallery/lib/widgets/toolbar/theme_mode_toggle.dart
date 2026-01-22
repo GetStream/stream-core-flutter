@@ -6,26 +6,27 @@ class ThemeModeToggle extends StatelessWidget {
   const ThemeModeToggle({
     super.key,
     required this.isDark,
-    required this.colorScheme,
     required this.onLightTap,
     required this.onDarkTap,
   });
 
   final bool isDark;
-  final StreamColorScheme colorScheme;
   final VoidCallback onLightTap;
   final VoidCallback onDarkTap;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final radius = context.streamRadius;
+
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: colorScheme.backgroundApp,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.all(radius.md),
       ),
       foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.all(radius.md),
         border: Border.all(color: colorScheme.borderSurfaceSubtle),
       ),
       child: Row(
@@ -34,9 +35,8 @@ class ThemeModeToggle extends StatelessWidget {
           _ModeButton(
             icon: Icons.light_mode,
             isSelected: !isDark,
-            colorScheme: colorScheme,
             onTap: onLightTap,
-            borderRadius: const BorderRadius.horizontal(left: Radius.circular(7)),
+            borderRadius: BorderRadius.horizontal(left: Radius.circular(radius.md.x - 1)),
           ),
           ColoredBox(
             color: colorScheme.borderSurfaceSubtle,
@@ -45,9 +45,8 @@ class ThemeModeToggle extends StatelessWidget {
           _ModeButton(
             icon: Icons.dark_mode,
             isSelected: isDark,
-            colorScheme: colorScheme,
             onTap: onDarkTap,
-            borderRadius: const BorderRadius.horizontal(right: Radius.circular(7)),
+            borderRadius: BorderRadius.horizontal(right: Radius.circular(radius.md.x - 1)),
           ),
         ],
       ),
@@ -59,19 +58,20 @@ class _ModeButton extends StatelessWidget {
   const _ModeButton({
     required this.icon,
     required this.isSelected,
-    required this.colorScheme,
     required this.onTap,
     required this.borderRadius,
   });
 
   final IconData icon;
   final bool isSelected;
-  final StreamColorScheme colorScheme;
   final VoidCallback onTap;
   final BorderRadius borderRadius;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final spacing = context.streamSpacing;
+
     return Material(
       color: isSelected ? colorScheme.accentPrimary.withValues(alpha: 0.1) : Colors.transparent,
       borderRadius: borderRadius,
@@ -79,7 +79,7 @@ class _ModeButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: borderRadius,
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(spacing.sm + spacing.xxs),
           child: Icon(
             icon,
             size: 18,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:stream_core_flutter/stream_core_flutter.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../config/theme_configuration.dart';
 import '../core/preview_wrapper.dart';
 import '../widgets/theme_studio/theme_customization_panel.dart';
 import '../widgets/toolbar/toolbar.dart';
 import 'gallery_app.directories.g.dart';
+import 'home.dart';
 
 /// The main shell that wraps the widgetbook with custom Stream branding.
 ///
@@ -26,11 +26,11 @@ class GalleryShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeConfig = context.watch<ThemeConfiguration>();
-    final isDark = themeConfig.brightness == Brightness.dark;
+    final materialTheme = Theme.of(context);
+    final isDark = materialTheme.brightness == .dark;
 
     return Scaffold(
-      backgroundColor: _getShellBackground(themeConfig.brightness),
+      backgroundColor: context.streamColorScheme.backgroundApp,
       body: Column(
         children: [
           // Toolbar spans across the entire width
@@ -45,30 +45,26 @@ class GalleryShell extends StatelessWidget {
                 // Widgetbook area
                 Expanded(
                   child: Widgetbook.material(
-                    // Theme updates via themeMode/lightTheme/darkTheme props
-                    // Preview updates via PreviewWrapper's ListenableBuilder
-                    themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-                    lightTheme: themeConfig.buildMaterialTheme(),
-                    darkTheme: themeConfig.buildMaterialTheme(),
+                    lightTheme: materialTheme,
+                    darkTheme: materialTheme,
+                    themeMode: isDark ? .dark : .light,
                     directories: directories,
+                    home: const GalleryHomePage(),
                     appBuilder: (context, child) => PreviewWrapper(child: child),
                   ),
                 ),
-                // Theme customization panel - aligned with widgetbook content
-                if (showThemePanel)
-                  SizedBox(
+                // Theme customization panel
+                if (showThemePanel) ...[
+                  const SizedBox(
                     width: 340,
-                    child: ThemeCustomizationPanel(configuration: themeConfig),
+                    child: ThemeCustomizationPanel(),
                   ),
+                ],
               ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  Color _getShellBackground(Brightness brightness) {
-    return brightness == Brightness.dark ? const Color(0xFF0A0A0A) : const Color(0xFFF8F9FA);
   }
 }

@@ -389,183 +389,176 @@ class ThemeConfiguration extends ChangeNotifier {
   /// Builds a Material ThemeData that uses Stream colors.
   /// Use this for applying Stream theming to regular Flutter widgets.
   ThemeData buildMaterialTheme() {
-    final cs = _themeData.colorScheme;
-    final isDark = _brightness == Brightness.dark;
+    final ts = themeData.textTheme;
+    final radius = themeData.radius;
+    final isDark = brightness == Brightness.dark;
+
+    // Common radius values (StreamRadius returns Radius, use BorderRadius.all)
+    final componentRadius = BorderRadius.all(radius.md);
+    final dialogRadius = BorderRadius.all(radius.lg);
+    final smallRadius = BorderRadius.all(radius.sm);
+
+    // Shared ColorScheme properties - uses class getters for colors
+    final materialColorScheme = (isDark ? ColorScheme.dark : ColorScheme.light)(
+      primary: accentPrimary,
+      secondary: accentPrimary,
+      tertiary: accentNeutral,
+      error: accentError,
+      surface: backgroundSurface,
+      surfaceContainerHighest: backgroundSurfaceSubtle,
+      onPrimary: textOnAccent,
+      onSecondary: textOnAccent,
+      onSurface: textPrimary,
+      onSurfaceVariant: textSecondary,
+      onError: textOnAccent,
+      outline: borderSurface,
+      outlineVariant: borderSurfaceSubtle,
+    );
 
     return ThemeData(
-      brightness: _brightness,
+      brightness: brightness,
       useMaterial3: true,
+      colorScheme: materialColorScheme,
+      // StreamTheme extension - enables StreamTheme.of(context) and context extensions
+      extensions: [themeData],
       // Colors
-      primaryColor: cs.accentPrimary,
-      scaffoldBackgroundColor: cs.backgroundApp,
-      cardColor: cs.backgroundSurface,
-      dividerColor: cs.borderSurfaceSubtle,
-      disabledColor: cs.textDisabled,
-      hintColor: cs.textTertiary,
-      // Color Scheme
-      colorScheme: isDark
-          ? ColorScheme.dark(
-              primary: cs.accentPrimary,
-              secondary: cs.accentPrimary,
-              tertiary: cs.accentNeutral,
-              error: cs.accentError,
-              surface: cs.backgroundSurface,
-              surfaceContainerHighest: cs.backgroundSurfaceSubtle,
-              onPrimary: cs.textOnAccent,
-              onSecondary: cs.textOnAccent,
-              onSurface: cs.textPrimary,
-              onSurfaceVariant: cs.textSecondary,
-              onError: cs.textOnAccent,
-              outline: cs.borderSurface,
-              outlineVariant: cs.borderSurfaceSubtle,
-            )
-          : ColorScheme.light(
-              primary: cs.accentPrimary,
-              secondary: cs.accentPrimary,
-              tertiary: cs.accentNeutral,
-              error: cs.accentError,
-              surface: cs.backgroundSurface,
-              surfaceContainerHighest: cs.backgroundSurfaceSubtle,
-              onPrimary: cs.textOnAccent,
-              onSecondary: cs.textOnAccent,
-              onSurface: cs.textPrimary,
-              onSurfaceVariant: cs.textSecondary,
-              onError: cs.textOnAccent,
-              outline: cs.borderSurface,
-              outlineVariant: cs.borderSurfaceSubtle,
-            ),
+      primaryColor: accentPrimary,
+      scaffoldBackgroundColor: backgroundApp,
+      cardColor: backgroundSurface,
+      dividerColor: borderSurfaceSubtle,
+      disabledColor: textDisabled,
+      hintColor: textTertiary,
       // Dialog
       dialogTheme: DialogThemeData(
-        backgroundColor: cs.backgroundSurface,
+        backgroundColor: backgroundSurface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: cs.borderSurfaceSubtle),
+          borderRadius: dialogRadius,
+          side: BorderSide(color: borderSurfaceSubtle),
         ),
-        titleTextStyle: TextStyle(
-          color: cs.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        contentTextStyle: TextStyle(color: cs.textSecondary, fontSize: 14),
+        titleTextStyle: ts.bodyEmphasis.copyWith(color: textPrimary),
+        contentTextStyle: ts.bodyDefault.copyWith(color: textSecondary),
       ),
       // AppBar
       appBarTheme: AppBarTheme(
-        backgroundColor: cs.backgroundSurface,
-        foregroundColor: cs.textPrimary,
+        backgroundColor: backgroundSurface,
+        foregroundColor: textPrimary,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
       // Buttons
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: cs.accentPrimary,
-          foregroundColor: cs.textOnAccent,
-          disabledBackgroundColor: cs.stateDisabled,
-          disabledForegroundColor: cs.textDisabled,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: accentPrimary,
+          foregroundColor: textOnAccent,
+          disabledBackgroundColor: stateDisabled,
+          disabledForegroundColor: textDisabled,
+          shape: RoundedRectangleBorder(borderRadius: componentRadius),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: cs.textPrimary,
-          side: BorderSide(color: cs.borderSurface),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          foregroundColor: textPrimary,
+          side: BorderSide(color: borderSurface),
+          shape: RoundedRectangleBorder(borderRadius: componentRadius),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: cs.accentPrimary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          foregroundColor: accentPrimary,
+          shape: RoundedRectangleBorder(borderRadius: componentRadius),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: cs.backgroundSurface,
-          foregroundColor: cs.textPrimary,
+          backgroundColor: backgroundSurface,
+          foregroundColor: textPrimary,
           surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: componentRadius),
         ),
       ),
       // Input
       inputDecorationTheme: InputDecorationTheme(
-        fillColor: cs.backgroundApp,
+        fillColor: backgroundApp,
         filled: true,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: cs.borderSurface),
+          borderRadius: componentRadius,
+          borderSide: BorderSide(color: borderSurface),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: cs.borderSurfaceSubtle),
+          borderRadius: componentRadius,
+          borderSide: BorderSide(color: borderSurfaceSubtle),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: cs.accentPrimary, width: 2),
+          borderRadius: componentRadius,
+          borderSide: BorderSide(color: accentPrimary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: cs.accentError),
+          borderRadius: componentRadius,
+          borderSide: BorderSide(color: accentError),
         ),
-        hintStyle: TextStyle(color: cs.textTertiary),
-        labelStyle: TextStyle(color: cs.textSecondary),
+        hintStyle: ts.bodyDefault.copyWith(color: textTertiary),
+        labelStyle: ts.bodyDefault.copyWith(color: textSecondary),
       ),
       // Dropdown
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
-          backgroundColor: WidgetStatePropertyAll(cs.backgroundSurface),
+          backgroundColor: WidgetStatePropertyAll(backgroundSurface),
           surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(color: cs.borderSurfaceSubtle),
+              borderRadius: componentRadius,
+              side: BorderSide(color: borderSurfaceSubtle),
             ),
           ),
         ),
       ),
       // PopupMenu
       popupMenuTheme: PopupMenuThemeData(
-        color: cs.backgroundSurface,
+        color: backgroundSurface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: cs.borderSurfaceSubtle),
+          borderRadius: componentRadius,
+          side: BorderSide(color: borderSurfaceSubtle),
         ),
-        textStyle: TextStyle(color: cs.textPrimary),
+        textStyle: ts.bodyDefault.copyWith(color: textPrimary),
       ),
       // Scrollbar
       scrollbarTheme: ScrollbarThemeData(
-        thumbColor: WidgetStatePropertyAll(cs.systemScrollbar),
-        trackColor: WidgetStatePropertyAll(cs.backgroundSurfaceSubtle),
-        radius: const Radius.circular(4),
+        thumbColor: WidgetStatePropertyAll(systemScrollbar),
+        trackColor: WidgetStatePropertyAll(backgroundSurfaceSubtle),
+        radius: radius.max,
         thickness: const WidgetStatePropertyAll(6),
       ),
       // Tooltip
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: cs.backgroundSurfaceStrong,
-          borderRadius: BorderRadius.circular(6),
+          color: backgroundSurfaceStrong,
+          borderRadius: smallRadius,
         ),
-        textStyle: TextStyle(color: cs.textPrimary, fontSize: 12),
+        textStyle: ts.captionDefault.copyWith(color: textPrimary),
       ),
       // Divider
       dividerTheme: DividerThemeData(
-        color: cs.borderSurfaceSubtle,
+        color: borderSurfaceSubtle,
         thickness: 1,
       ),
       // Icon
-      iconTheme: IconThemeData(color: cs.textSecondary),
-      // Text
+      iconTheme: IconThemeData(color: textSecondary),
+      // Text - mapped to closest Stream styles by size/weight
       textTheme: TextTheme(
-        bodyLarge: TextStyle(color: cs.textPrimary),
-        bodyMedium: TextStyle(color: cs.textPrimary),
-        bodySmall: TextStyle(color: cs.textSecondary),
-        labelLarge: TextStyle(color: cs.textPrimary),
-        labelMedium: TextStyle(color: cs.textSecondary),
-        labelSmall: TextStyle(color: cs.textTertiary),
-        titleLarge: TextStyle(color: cs.textPrimary, fontWeight: FontWeight.w600),
-        titleMedium: TextStyle(color: cs.textPrimary, fontWeight: FontWeight.w600),
-        titleSmall: TextStyle(color: cs.textPrimary, fontWeight: FontWeight.w500),
+        // Titles - for app bar, dialogs, navigation
+        titleLarge: ts.headingLg.copyWith(color: textPrimary),
+        titleMedium: ts.bodyEmphasis.copyWith(color: textPrimary),
+        titleSmall: ts.captionEmphasis.copyWith(color: textPrimary),
+        // Body - main content text
+        bodyLarge: ts.bodyEmphasis.copyWith(color: textPrimary),
+        bodyMedium: ts.bodyDefault.copyWith(color: textPrimary),
+        bodySmall: ts.captionDefault.copyWith(color: textSecondary),
+        // Labels - buttons, chips, navigation items
+        labelLarge: ts.captionEmphasis.copyWith(color: textPrimary),
+        labelMedium: ts.metadataEmphasis.copyWith(color: textSecondary),
+        labelSmall: ts.metadataDefault.copyWith(color: textTertiary),
       ),
     );
   }
