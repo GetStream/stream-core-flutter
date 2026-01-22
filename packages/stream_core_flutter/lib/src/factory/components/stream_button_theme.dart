@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
-import '../../../stream_core_flutter.dart';
+
+import '../stream_theme.dart';
 
 class StreamButtonTheme {
   StreamButtonTheme({this.primaryColor});

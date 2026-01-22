@@ -1,0 +1,114 @@
+// dart format width=80
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, unused_element
+
+part of 'stream_theme.dart';
+
+// **************************************************************************
+// ThemeExtensionsGenerator
+// **************************************************************************
+
+mixin _$StreamTheme on ThemeExtension<StreamTheme> {
+  @override
+  ThemeExtension<StreamTheme> copyWith({
+    Brightness? brightness,
+    StreamRadius? radius,
+    StreamSpacing? spacing,
+    StreamTypography? typography,
+    StreamColorScheme? colorScheme,
+    StreamTextTheme? textTheme,
+    StreamBoxShadow? boxShadow,
+    StreamAvatarThemeData? avatarTheme,
+    StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+  }) {
+    final _this = (this as StreamTheme);
+
+    return StreamTheme.raw(
+      brightness: brightness ?? _this.brightness,
+      radius: radius ?? _this.radius,
+      spacing: spacing ?? _this.spacing,
+      typography: typography ?? _this.typography,
+      colorScheme: colorScheme ?? _this.colorScheme,
+      textTheme: textTheme ?? _this.textTheme,
+      boxShadow: boxShadow ?? _this.boxShadow,
+      avatarTheme: avatarTheme ?? _this.avatarTheme,
+      onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
+    );
+  }
+
+  @override
+  ThemeExtension<StreamTheme> lerp(
+    ThemeExtension<StreamTheme>? other,
+    double t,
+  ) {
+    if (other is! StreamTheme) {
+      return this;
+    }
+
+    final _this = (this as StreamTheme);
+
+    return StreamTheme.raw(
+      brightness: t < 0.5 ? _this.brightness : other.brightness,
+      radius: StreamRadius.lerp(_this.radius, other.radius, t)!,
+      spacing: StreamSpacing.lerp(_this.spacing, other.spacing, t)!,
+      typography: StreamTypography.lerp(_this.typography, other.typography, t)!,
+      colorScheme:
+          (_this.colorScheme.lerp(other.colorScheme, t) as StreamColorScheme),
+      textTheme: (_this.textTheme.lerp(other.textTheme, t) as StreamTextTheme),
+      boxShadow: StreamBoxShadow.lerp(_this.boxShadow, other.boxShadow, t)!,
+      avatarTheme: StreamAvatarThemeData.lerp(
+        _this.avatarTheme,
+        other.avatarTheme,
+        t,
+      )!,
+      onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
+        _this.onlineIndicatorTheme,
+        other.onlineIndicatorTheme,
+        t,
+      )!,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final _this = (this as StreamTheme);
+    final _other = (other as StreamTheme);
+
+    return _other.brightness == _this.brightness &&
+        _other.radius == _this.radius &&
+        _other.spacing == _this.spacing &&
+        _other.typography == _this.typography &&
+        _other.colorScheme == _this.colorScheme &&
+        _other.textTheme == _this.textTheme &&
+        _other.boxShadow == _this.boxShadow &&
+        _other.avatarTheme == _this.avatarTheme &&
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
+  }
+
+  @override
+  int get hashCode {
+    final _this = (this as StreamTheme);
+
+    return Object.hash(
+      runtimeType,
+      _this.brightness,
+      _this.radius,
+      _this.spacing,
+      _this.typography,
+      _this.colorScheme,
+      _this.textTheme,
+      _this.boxShadow,
+      _this.avatarTheme,
+      _this.onlineIndicatorTheme,
+    );
+  }
+}

@@ -65,10 +65,8 @@ class FileStreamLogger extends StreamLogger {
         _logD(() => '[initIfNeeded] no args');
         _filesDir = await config.filesDir;
         _tempsDir = await config.tempsDir;
-        _file0 = File('${_filesDir.path}$pathSeparator$_internalFile0')
-          ..createSync(recursive: true);
-        _file1 = File('${_filesDir.path}$pathSeparator$_internalFile1')
-          ..createSync(recursive: true);
+        _file0 = File('${_filesDir.path}$pathSeparator$_internalFile0')..createSync(recursive: true);
+        _file1 = File('${_filesDir.path}$pathSeparator$_internalFile1')..createSync(recursive: true);
         final File currentFile;
         if (!_file0.existsSync() || !_file1.existsSync()) {
           currentFile = _file0;

@@ -1,13 +1,14 @@
 name: design_system_gallery
-description: "A new Flutter project."
+description: "Stream Design System Gallery - A comprehensive widgetbook for exploring and customizing Stream components."
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
   sdk: ^3.10.0
+  flutter: ">=3.38.1"
 
 dependencies:
-  cupertino_icons: ^1.0.8
+  device_frame_plus: ^1.0.0
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.1.0
