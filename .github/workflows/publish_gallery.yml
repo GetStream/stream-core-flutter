@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 env:
-  FLUTTER_VERSION: "3.38.7"
   FLUTTER_CHANNEL: stable
 
 concurrency:
