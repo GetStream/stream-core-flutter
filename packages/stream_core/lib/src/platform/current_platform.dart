@@ -1,5 +1,4 @@
-import 'detector/platform_detector.dart'
-    if (dart.library.io) 'detector/platform_detector_io.dart';
+import 'detector/platform_detector.dart' if (dart.library.io) 'detector/platform_detector_io.dart';
 
 /// Platform detection utility for identifying the current runtime environment.
 ///
@@ -87,7 +86,8 @@ enum PlatformType {
   linux('linux'),
 
   /// Fuchsia: <https://fuchsia.dev/fuchsia-src/concepts>
-  fuchsia('fuchsia');
+  fuchsia('fuchsia')
+  ;
 
   /// Creates a [PlatformType] with the specified [operatingSystem] identifier.
   const PlatformType(this.operatingSystem);

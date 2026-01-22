@@ -16,14 +16,13 @@ class User extends Equatable {
     this.role = 'user',
     this.type = UserType.regular,
     Map<String, Object?>? custom,
-  })  : originalName = name,
-        custom = custom ?? const {};
+  }) : originalName = name,
+       custom = custom ?? const {};
 
   /// Creates a guest user with the provided id.
   /// - Parameter userId: the id of the user.
   /// - Returns: a guest `User`.
-  const User.guest(String userId)
-      : this(id: userId, name: userId, type: UserType.guest);
+  const User.guest(String userId) : this(id: userId, name: userId, type: UserType.guest);
 
   /// Creates an anonymous user.
   /// - Returns: an anonymous `User`.
@@ -54,14 +53,7 @@ class User extends Equatable {
   String get name => originalName ?? id;
 
   @override
-  List<Object?> get props => [
-        id,
-        image,
-        role,
-        type,
-        originalName,
-        custom,
-      ];
+  List<Object?> get props => [id, image, role, type, originalName, custom];
 }
 
 /// The user authorization type.

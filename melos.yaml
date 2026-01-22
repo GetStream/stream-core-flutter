@@ -5,18 +5,20 @@ versioning:
   mode: independent
 
 packages:
+  - apps/**
   - packages/**
 
 command:
   bootstrap:
     # Dart and Flutter environment used in the project.
     environment:
-      sdk: ^3.6.2
+      sdk: ^3.10.0
       # We are not using carat '^' syntax here because flutter don't follow semantic versioning.
-      flutter: ">=3.27.4"
+      flutter: ">=3.38.1"
 
     # List of all the dependencies used in the project.
     dependencies:
+      cached_network_image: ^3.4.1
       collection: ^1.19.0
       cross_file: ^0.3.4+2
       dio: ^5.8.0+1
@@ -28,18 +30,22 @@ command:
       meta: ^1.15.0
       mime: ^2.0.0
       rxdart: ^0.28.0
+      stream_core: ^0.4.0
+      svg_icon_widget: ^0.0.1+1
       synchronized: ^3.3.0
+      theme_extensions_builder_annotation: ^7.1.0
       uuid: ^4.5.1
       web: ^1.1.1
       web_socket_channel: ^3.0.1
 
     # List of all the dev_dependencies used in the project.
     dev_dependencies:
-      build_runner: ^2.4.15
+      build_runner: ^2.10.5
       json_serializable: ^6.9.5
       melos: ^6.2.0
       mocktail: ^1.0.4
       test: ^1.26.2
+      theme_extensions_builder: ^7.1.0
 
 scripts:
   postclean:

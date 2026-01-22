@@ -37,8 +37,7 @@ abstract interface class StateEmitter<T> implements SharedEmitter<T> {
 /// See also:
 /// - [StateEmitter] for the read-only interface.
 /// - [MutableStateEmitterExtension] for convenience methods.
-abstract interface class MutableStateEmitter<T> extends StateEmitter<T>
-    implements MutableSharedEmitter<T> {
+abstract interface class MutableStateEmitter<T> extends StateEmitter<T> implements MutableSharedEmitter<T> {
   /// Creates a [MutableStateEmitter] with the given [initialValue].
   ///
   /// Supports synchronous or asynchronous state emission via [sync].
@@ -71,8 +70,7 @@ abstract interface class MutableStateEmitter<T> extends StateEmitter<T>
 ///
 /// See also:
 /// - [MutableStateEmitter] for the interface.
-class StateEmitterImpl<T> extends StreamView<T>
-    implements MutableStateEmitter<T> {
+class StateEmitterImpl<T> extends StreamView<T> implements MutableStateEmitter<T> {
   /// Creates a [StateEmitterImpl] with the given [initialValue].
   ///
   /// Supports synchronous or asynchronous state emission via [sync].

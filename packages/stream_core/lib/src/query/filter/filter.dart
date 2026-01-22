@@ -1,3 +1,5 @@
+// ignore_for_file: matching_super_parameters
+
 import '../../utils.dart';
 import 'filter_operation_utils.dart';
 import 'filter_operator.dart';
@@ -241,8 +243,7 @@ sealed class ComparisonOperator<T extends Object> extends Filter<T> {
 /// **Supported with**: `.equal` factory method
 final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates an equality filter for the specified [field] and [value].
-  const EqualOperator(super.field, super.value)
-      : super._(operator: FilterOperator.equal);
+  const EqualOperator(super.field, super.value) : super._(operator: FilterOperator.equal);
 
   @override
   bool matches(T other) {
@@ -273,8 +274,7 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
 /// **Supported with**: `.greater` factory method
 final class GreaterOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a greater-than filter for the specified [field] and [value].
-  const GreaterOperator(super.field, super.value)
-      : super._(operator: FilterOperator.greater);
+  const GreaterOperator(super.field, super.value) : super._(operator: FilterOperator.greater);
 
   @override
   bool matches(T other) {
@@ -293,11 +293,9 @@ final class GreaterOperator<T extends Object> extends ComparisonOperator<T> {
 /// Greater-than-or-equal comparison filter.
 ///
 /// Primarily used with numeric values and dates.
-final class GreaterOrEqualOperator<T extends Object>
-    extends ComparisonOperator<T> {
+final class GreaterOrEqualOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a greater-than-or-equal filter for the specified [field] and [value].
-  const GreaterOrEqualOperator(super.field, super.value)
-      : super._(operator: FilterOperator.greaterOrEqual);
+  const GreaterOrEqualOperator(super.field, super.value) : super._(operator: FilterOperator.greaterOrEqual);
 
   @override
   bool matches(T other) {
@@ -318,8 +316,7 @@ final class GreaterOrEqualOperator<T extends Object>
 /// Primarily used with numeric values and dates.
 final class LessOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a less-than filter for the specified [field] and [value].
-  const LessOperator(super.field, super.value)
-      : super._(operator: FilterOperator.less);
+  const LessOperator(super.field, super.value) : super._(operator: FilterOperator.less);
 
   @override
   bool matches(T other) {
@@ -338,11 +335,9 @@ final class LessOperator<T extends Object> extends ComparisonOperator<T> {
 /// Less-than-or-equal comparison filter.
 ///
 /// Primarily used with numeric values and dates.
-final class LessOrEqualOperator<T extends Object>
-    extends ComparisonOperator<T> {
+final class LessOrEqualOperator<T extends Object> extends ComparisonOperator<T> {
   /// Creates a less-than-or-equal filter for the specified [field] and [value].
-  const LessOrEqualOperator(super.field, super.value)
-      : super._(operator: FilterOperator.lessOrEqual);
+  const LessOrEqualOperator(super.field, super.value) : super._(operator: FilterOperator.lessOrEqual);
 
   @override
   bool matches(T other) {
@@ -397,8 +392,7 @@ sealed class ListOperator<T extends Object> extends Filter<T> {
 /// **Supported with**: `.in_` factory method
 final class InOperator<T extends Object> extends ListOperator<T> {
   /// Creates an 'in' filter for the specified [field] and [values] iterable.
-  const InOperator(super.field, Iterable<Object?> super.values)
-      : super._(operator: FilterOperator.in_);
+  const InOperator(super.field, Iterable<Object?> super.values) : super._(operator: FilterOperator.in_);
 
   @override
   bool matches(T other) {
@@ -422,8 +416,7 @@ final class InOperator<T extends Object> extends ListOperator<T> {
 /// **Supported with**: `.contains` factory method
 final class ContainsOperator<T extends Object> extends ListOperator<T> {
   /// Creates a contains filter for the specified [field] and [value].
-  const ContainsOperator(super.field, super.value)
-      : super._(operator: FilterOperator.contains_);
+  const ContainsOperator(super.field, super.value) : super._(operator: FilterOperator.contains_);
 
   @override
   bool matches(T other) {
@@ -511,8 +504,7 @@ sealed class EvaluationOperator<T extends Object> extends Filter<T> {
 /// **Supported with**: `.query` factory method
 final class QueryOperator<T extends Object> extends EvaluationOperator<T> {
   /// Creates a text search filter for the specified [field] and search [query].
-  const QueryOperator(super.field, super.query)
-      : super._(operator: FilterOperator.query);
+  const QueryOperator(super.field, super.query) : super._(operator: FilterOperator.query);
 
   @override
   bool matches(T other) {
@@ -529,11 +521,9 @@ final class QueryOperator<T extends Object> extends EvaluationOperator<T> {
 /// Word prefix matching filter for autocomplete.
 ///
 /// Matches field values where any word starts with the provided prefix.
-final class AutoCompleteOperator<T extends Object>
-    extends EvaluationOperator<T> {
+final class AutoCompleteOperator<T extends Object> extends EvaluationOperator<T> {
   /// Creates an autocomplete filter for the specified [field] and prefix [query].
-  const AutoCompleteOperator(super.field, super.query)
-      : super._(operator: FilterOperator.autoComplete);
+  const AutoCompleteOperator(super.field, super.query) : super._(operator: FilterOperator.autoComplete);
 
   @override
   bool matches(T other) {
