@@ -18,6 +18,8 @@ import 'package:design_system_gallery/components/stream_online_indicator.dart'
     as _design_system_gallery_components_stream_online_indicator;
 import 'package:design_system_gallery/primitives/colors.dart'
     as _design_system_gallery_primitives_colors;
+import 'package:design_system_gallery/primitives/icons.dart'
+    as _design_system_gallery_primitives_icons;
 import 'package:design_system_gallery/primitives/radius.dart'
     as _design_system_gallery_primitives_radius;
 import 'package:design_system_gallery/primitives/spacing.dart'
@@ -45,6 +47,21 @@ final directories = <_widgetbook.WidgetbookNode>[
                     name: 'All Colors',
                     builder: _design_system_gallery_primitives_colors
                         .buildStreamColorsShowcase,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Icons',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'StreamIcons',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'All Icons',
+                    builder: _design_system_gallery_primitives_icons
+                        .buildStreamIconsShowcase,
                   ),
                 ],
               ),

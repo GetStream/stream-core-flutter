@@ -8,6 +8,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
+import 'stream_icon.dart';
 import 'stream_theme.dart';
 
 /// Extension on [BuildContext] for convenient access to [StreamTheme].
@@ -51,6 +52,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamBoxShadow] from the current theme.
   StreamBoxShadow get streamBoxShadow => streamTheme.boxShadow;
+
+  /// Returns the [StreamIcon] from the current theme.
+  StreamIcon get streamIcons => streamTheme.icons;
 
   /// Returns the [StreamAvatarThemeData] from the nearest ancestor.
   StreamAvatarThemeData get streamAvatarTheme => StreamAvatarTheme.of(this);

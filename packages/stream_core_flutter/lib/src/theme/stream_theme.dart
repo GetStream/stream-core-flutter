@@ -12,6 +12,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
+import 'stream_icon.dart';
 
 part 'stream_theme.g.theme.dart';
 
@@ -73,6 +74,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     TargetPlatform? platform,
     StreamRadius? radius,
     StreamSpacing? spacing,
+    StreamIcon? icons,
     StreamTypography? typography,
     StreamColorScheme? colorScheme,
     StreamTextTheme? textTheme,
@@ -98,6 +100,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
 
+    icons ??= StreamIcon();
+
     return .raw(
       brightness: brightness,
       radius: radius,
@@ -108,6 +112,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       boxShadow: boxShadow,
       avatarTheme: avatarTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
+      icons: icons,
     );
   }
 
@@ -133,6 +138,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.boxShadow,
     required this.avatarTheme,
     required this.onlineIndicatorTheme,
+    required this.icons,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -195,4 +201,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
+
+  /// The icons for this theme.
+  final StreamIcon icons;
 }

@@ -74,7 +74,7 @@ class _StreamLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SvgIcon(
-      StreamIcons.logo,
+      StreamSvgIcons.logo,
       size: 80,
     );
   }

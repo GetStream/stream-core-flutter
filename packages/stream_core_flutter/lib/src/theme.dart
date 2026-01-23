@@ -10,5 +10,8 @@ export 'theme/semantics/stream_box_shadow.dart';
 export 'theme/semantics/stream_color_scheme.dart';
 export 'theme/semantics/stream_text_theme.dart';
 
+export 'theme/stream_icon.dart';
+export 'theme/stream_icons.dart';
+
 export 'theme/stream_theme.dart';
 export 'theme/stream_theme_extensions.dart';
