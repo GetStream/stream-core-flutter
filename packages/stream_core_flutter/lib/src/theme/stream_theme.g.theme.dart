@@ -21,6 +21,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBoxShadow? boxShadow,
     StreamAvatarThemeData? avatarTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamIcon? icons,
   }) {
     final _this = (this as StreamTheme);
 
@@ -34,6 +35,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       boxShadow: boxShadow ?? _this.boxShadow,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
+      icons: icons ?? _this.icons,
     );
   }
 
@@ -67,6 +69,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.onlineIndicatorTheme,
         t,
       )!,
+      icons: t < 0.5 ? _this.icons : other.icons,
     );
   }
 
@@ -91,7 +94,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
         _other.avatarTheme == _this.avatarTheme &&
-        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
+        _other.icons == _this.icons;
   }
 
   @override
@@ -109,6 +113,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.boxShadow,
       _this.avatarTheme,
       _this.onlineIndicatorTheme,
+      _this.icons,
     );
   }
 }
