@@ -97,7 +97,7 @@ mixin _$StreamColorScheme {
   }
 
   StreamColorScheme copyWith({
-    StreamBrandColor? brand,
+    StreamColorSwatch? brand,
     Color? accentPrimary,
     Color? accentSuccess,
     Color? accentWarning,
