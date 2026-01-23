@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
+import 'stream_color_swatch_helper.dart';
+
 /// [Color] and [ColorSwatch] constants for the Stream design system.
 ///
 /// Most swatches have colors from 50 to 950. The smaller the number, the more
@@ -225,6 +227,10 @@ abstract final class StreamColors {
 @immutable
 class StreamColorSwatch extends ColorSwatch<int> {
   const StreamColorSwatch(super.primary, super._swatch);
+
+  factory StreamColorSwatch.fromColor(Color color) {
+    return StreamColorSwatch(color.toARGB32(), StreamColorSwatchHelper.generateShadeMap(color));
+  }
 
   /// The lightest shade.
   Color get shade50 => this[50]!;

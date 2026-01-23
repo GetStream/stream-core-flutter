@@ -43,7 +43,7 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Creates a light color scheme.
   factory StreamColorScheme.light({
     // Brand
-    StreamBrandColor? brand,
+    StreamColorSwatch? brand,
     // Accent
     Color? accentPrimary,
     Color? accentSuccess,
@@ -215,7 +215,7 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Creates a dark color scheme.
   factory StreamColorScheme.dark({
     // Brand
-    StreamBrandColor? brand,
+    StreamColorSwatch? brand,
     // Accent
     Color? accentPrimary,
     Color? accentSuccess,
@@ -437,7 +437,7 @@ class StreamColorScheme with _$StreamColorScheme {
   // ---- Brand ----
 
   /// The brand color swatch with shades from 50 to 950.
-  final StreamBrandColor brand;
+  final StreamColorSwatch brand;
 
   // ---- Accent colors ----
 
