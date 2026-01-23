@@ -2,7 +2,7 @@ icon_font:
   input_svg_dir: "../../scripts/icons/sources/"
   output_font_file: "lib/fonts/stream_icons_font.otf"
   
-  output_class_file: "lib/src/theme/stream_icons.dart"
+  output_class_file: "lib/src/theme/stream_icons.g.dart"
   class_name: "StreamIcons"
   package: stream_core_flutter
   format: true

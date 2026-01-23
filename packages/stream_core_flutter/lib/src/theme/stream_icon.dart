@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'stream_icons.dart';
+import 'stream_icons.g.dart';
 
 /// A class that provides access to the icons in the Stream Icons font.
 ///

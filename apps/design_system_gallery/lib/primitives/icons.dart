@@ -8,7 +8,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
   path: '[App Foundation]/Primitives/Icons',
 )
 Widget buildStreamIconsShowcase(BuildContext context) {
-  return IconsPage();
+  return const IconsPage();
 }
 
 class IconsPage extends StatefulWidget {
@@ -20,7 +20,7 @@ class IconsPage extends StatefulWidget {
 
 class _IconsPageState extends State<IconsPage> {
   final _searchController = TextEditingController();
-  String _searchQuery = '';
+  var _searchQuery = '';
 
   @override
   void dispose() {
