@@ -13,7 +13,6 @@ class StreamColorSwatchHelper {
   static Map<int, Color> generateShadeMap(Color baseColor) {
     final hslBase = HSLColor.fromColor(baseColor);
     final centerLightness = hslBase.lightness;
-    print('lightness: $centerLightness');
 
     return {
       50: _adjustLightness(hslBase, _calculateLightness(50, centerLightness)),
