@@ -10,6 +10,8 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:design_system_gallery/components/button.dart'
+    as _design_system_gallery_components_button;
 import 'package:design_system_gallery/components/stream_avatar.dart'
     as _design_system_gallery_components_stream_avatar;
 import 'package:design_system_gallery/components/stream_avatar_stack.dart'
@@ -31,6 +33,7 @@ import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookCategory(
     name: 'App Foundation',
+    isInitiallyExpanded: false,
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Primitives',
@@ -124,6 +127,7 @@ final directories = <_widgetbook.WidgetbookNode>[
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Avatar',
+        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamAvatar',
@@ -158,7 +162,44 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'Button',
+        isInitiallyExpanded: false,
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_button
+                    .buildStreamButtonPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Real-world Example',
+                builder: _design_system_gallery_components_button
+                    .buildStreamButtonExample,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Size Variants',
+                builder: _design_system_gallery_components_button
+                    .buildStreamButtonSizes,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Type Variants',
+                builder: _design_system_gallery_components_button
+                    .buildStreamButtonTypes,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'With Icons',
+                builder: _design_system_gallery_components_button
+                    .buildStreamButtonWithIcons,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Indicator',
+        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamOnlineIndicator',

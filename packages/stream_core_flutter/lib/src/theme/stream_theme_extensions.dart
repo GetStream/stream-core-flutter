@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'components/stream_avatar_theme.dart';
+import 'components/stream_button_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -54,6 +55,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamAvatarThemeData] from the nearest ancestor.
   StreamAvatarThemeData get streamAvatarTheme => StreamAvatarTheme.of(this);
+
+  /// Returns the [StreamButtonThemeData] from the nearest ancestor.
+  StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
 
   /// Returns the [StreamOnlineIndicatorThemeData] from the nearest ancestor.
   StreamOnlineIndicatorThemeData get streamOnlineIndicatorTheme => StreamOnlineIndicatorTheme.of(this);
