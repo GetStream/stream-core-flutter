@@ -91,6 +91,8 @@ class DefaultStreamButton extends StatelessWidget {
     final buttonTheme = context.streamButtonTheme;
     final defaults = _StreamButtonDefaults(context: context);
 
+    // TODO: disabled styles
+
     final themeColors = switch (props.style) {
       StreamButtonStyle.primary => buttonTheme.primaryButtonColors,
       StreamButtonStyle.secondary => buttonTheme.secondaryButtonColors,
