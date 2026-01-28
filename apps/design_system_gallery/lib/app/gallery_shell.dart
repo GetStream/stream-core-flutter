@@ -29,6 +29,24 @@ class GalleryShell extends StatelessWidget {
     final materialTheme = Theme.of(context);
     final isDark = materialTheme.brightness == .dark;
 
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+
+    final widgetbookWidget = Expanded(
+      child: Widgetbook.material(
+        lightTheme: materialTheme,
+        darkTheme: materialTheme,
+        themeMode: isDark ? .dark : .light,
+        directories: directories,
+        home: const GalleryHomePage(),
+        appBuilder: (context, child) => PreviewWrapper(child: child),
+      ),
+    );
+
+    final themePanel = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 340),
+      child: ThemeCustomizationPanel(),
+    );
+
     return Scaffold(
       backgroundColor: context.streamColorScheme.backgroundApp,
       body: Column(
@@ -40,28 +58,27 @@ class GalleryShell extends StatelessWidget {
           ),
           // Content area below toolbar
           Expanded(
-            child: Row(
-              children: [
-                // Widgetbook area
-                Expanded(
-                  child: Widgetbook.material(
-                    lightTheme: materialTheme,
-                    darkTheme: materialTheme,
-                    themeMode: isDark ? .dark : .light,
-                    directories: directories,
-                    home: const GalleryHomePage(),
-                    appBuilder: (context, child) => PreviewWrapper(child: child),
+            child: isSmallScreen
+                ? Stack(
+                    children: [
+                      widgetbookWidget,
+                      if (showThemePanel) ...[
+                        Align(alignment: Alignment.topRight, child: themePanel),
+                      ],
+                    ],
+                  )
+                : Row(
+                    children: [
+                      // Widgetbook area
+                      Expanded(
+                        child: widgetbookWidget,
+                      ),
+                      // Theme customization panel
+                      if (showThemePanel) ...[
+                        themePanel,
+                      ],
+                    ],
                   ),
-                ),
-                // Theme customization panel
-                if (showThemePanel) ...[
-                  const SizedBox(
-                    width: 340,
-                    child: ThemeCustomizationPanel(),
-                  ),
-                ],
-              ],
-            ),
           ),
         ],
       ),
