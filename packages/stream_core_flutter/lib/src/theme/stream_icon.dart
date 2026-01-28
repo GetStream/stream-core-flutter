@@ -21,6 +21,7 @@ import 'stream_icons.g.dart';
 
 class StreamIcon {
   IconData get iconApiAggregate => StreamIcons.iconApiAggregate;
+  IconData get iconApples => StreamIcons.iconApples;
   IconData get iconArrowBoxLeft => StreamIcons.iconArrowBoxLeft;
   IconData get iconArrowDown => StreamIcons.iconArrowDown;
   IconData get iconArrowLeft => StreamIcons.iconArrowLeft;
@@ -33,6 +34,7 @@ class StreamIcon {
   IconData get iconAt => StreamIcons.iconAt;
   IconData get iconAtSolid => StreamIcons.iconAtSolid;
   IconData get iconBellNotification => StreamIcons.iconBellNotification;
+  IconData get iconBrowserAISparkle => StreamIcons.iconBrowserAISparkle;
   IconData get iconBubble3ChatMessage => StreamIcons.iconBubble3ChatMessage;
   IconData get iconBubble3Solid => StreamIcons.iconBubble3Solid;
   IconData get iconBubbleAnnotation2ChatMessage => StreamIcons.iconBubbleAnnotation2ChatMessage;
@@ -43,6 +45,8 @@ class StreamIcon {
   IconData get iconCalendar1 => StreamIcons.iconCalendar1;
   IconData get iconCallCancel => StreamIcons.iconCallCancel;
   IconData get iconCamera1 => StreamIcons.iconCamera1;
+  IconData get iconCar1 => StreamIcons.iconCar1;
+  IconData get iconCat => StreamIcons.iconCat;
   IconData get iconChainLink3 => StreamIcons.iconChainLink3;
   IconData get iconChart5 => StreamIcons.iconChart5;
   IconData get iconCheckmark1Small => StreamIcons.iconCheckmark1Small;
@@ -88,14 +92,15 @@ class StreamIcon {
   IconData get iconGauge => StreamIcons.iconGauge;
   IconData get iconGoogle => StreamIcons.iconGoogle;
   IconData get iconHashtagChannel => StreamIcons.iconHashtagChannel;
+  IconData get iconHeart2 => StreamIcons.iconHeart2;
   IconData get iconHistory => StreamIcons.iconHistory;
   IconData get iconImages1Alt => StreamIcons.iconImages1Alt;
   IconData get iconInvite => StreamIcons.iconInvite;
   IconData get iconLayersBehind => StreamIcons.iconLayersBehind;
   IconData get iconLayoutGrid1 => StreamIcons.iconLayoutGrid1;
+  IconData get iconLightBulbSimple => StreamIcons.iconLightBulbSimple;
   IconData get iconLimits => StreamIcons.iconLimits;
   IconData get iconLineChart3 => StreamIcons.iconLineChart3;
-  IconData get iconLoadingCircle => StreamIcons.iconLoadingCircle;
   IconData get iconLock => StreamIcons.iconLock;
   IconData get iconMagnifyingGlassSearch => StreamIcons.iconMagnifyingGlassSearch;
   IconData get iconMapPin => StreamIcons.iconMapPin;
@@ -132,17 +137,20 @@ class StreamIcon {
   IconData get iconShapesPlusCloseSquareCircle => StreamIcons.iconShapesPlusCloseSquareCircle;
   IconData get iconShapesTriangleSquareCircle => StreamIcons.iconShapesTriangleSquareCircle;
   IconData get iconShareRedirectLink => StreamIcons.iconShareRedirectLink;
+  IconData get iconShield => StreamIcons.iconShield;
   IconData get iconSquareBehindSquare2Copy => StreamIcons.iconSquareBehindSquare2Copy;
   IconData get iconSquareCircleTopRightFeeds => StreamIcons.iconSquareCircleTopRightFeeds;
+  IconData get iconStop => StreamIcons.iconStop;
   IconData get iconTable => StreamIcons.iconTable;
   IconData get iconTeam => StreamIcons.iconTeam;
+  IconData get iconTennis => StreamIcons.iconTennis;
   IconData get iconTextToImageURLEnrichment => StreamIcons.iconTextToImageURLEnrichment;
   IconData get iconThunder => StreamIcons.iconThunder;
   IconData get iconTrashBin => StreamIcons.iconTrashBin;
   IconData get iconTrending4 => StreamIcons.iconTrending4;
+  IconData get iconUnlocked => StreamIcons.iconUnlocked;
   IconData get iconUsers => StreamIcons.iconUsers;
   IconData get iconVideo => StreamIcons.iconVideo;
-  IconData get iconVideoClip => StreamIcons.iconVideoClip;
   IconData get iconVideoSolid => StreamIcons.iconVideoSolid;
   IconData get iconVoiceAndVideo => StreamIcons.iconVoiceAndVideo;
   IconData get iconVoiceHigh => StreamIcons.iconVoiceHigh;
@@ -151,6 +159,7 @@ class StreamIcon {
 
   late final Map<String, IconData> allIcons = {
     'iconApiAggregate': iconApiAggregate,
+    'iconApples': iconApples,
     'iconArrowBoxLeft': iconArrowBoxLeft,
     'iconArrowDown': iconArrowDown,
     'iconArrowLeft': iconArrowLeft,
@@ -163,6 +172,7 @@ class StreamIcon {
     'iconAt': iconAt,
     'iconAtSolid': iconAtSolid,
     'iconBellNotification': iconBellNotification,
+    'iconBrowserAISparkle': iconBrowserAISparkle,
     'iconBubble3ChatMessage': iconBubble3ChatMessage,
     'iconBubble3Solid': iconBubble3Solid,
     'iconBubbleAnnotation2ChatMessage': iconBubbleAnnotation2ChatMessage,
@@ -173,6 +183,8 @@ class StreamIcon {
     'iconCalendar1': iconCalendar1,
     'iconCallCancel': iconCallCancel,
     'iconCamera1': iconCamera1,
+    'iconCar1': iconCar1,
+    'iconCat': iconCat,
     'iconChainLink3': iconChainLink3,
     'iconChart5': iconChart5,
     'iconCheckmark1Small': iconCheckmark1Small,
@@ -218,14 +230,15 @@ class StreamIcon {
     'iconGauge': iconGauge,
     'iconGoogle': iconGoogle,
     'iconHashtagChannel': iconHashtagChannel,
+    'iconHeart2': iconHeart2,
     'iconHistory': iconHistory,
     'iconImages1Alt': iconImages1Alt,
     'iconInvite': iconInvite,
     'iconLayersBehind': iconLayersBehind,
     'iconLayoutGrid1': iconLayoutGrid1,
+    'iconLightBulbSimple': iconLightBulbSimple,
     'iconLimits': iconLimits,
     'iconLineChart3': iconLineChart3,
-    'iconLoadingCircle': iconLoadingCircle,
     'iconLock': iconLock,
     'iconMagnifyingGlassSearch': iconMagnifyingGlassSearch,
     'iconMapPin': iconMapPin,
@@ -262,17 +275,20 @@ class StreamIcon {
     'iconShapesPlusCloseSquareCircle': iconShapesPlusCloseSquareCircle,
     'iconShapesTriangleSquareCircle': iconShapesTriangleSquareCircle,
     'iconShareRedirectLink': iconShareRedirectLink,
+    'iconShield': iconShield,
     'iconSquareBehindSquare2Copy': iconSquareBehindSquare2Copy,
     'iconSquareCircleTopRightFeeds': iconSquareCircleTopRightFeeds,
+    'iconStop': iconStop,
     'iconTable': iconTable,
     'iconTeam': iconTeam,
+    'iconTennis': iconTennis,
     'iconTextToImageURLEnrichment': iconTextToImageURLEnrichment,
     'iconThunder': iconThunder,
     'iconTrashBin': iconTrashBin,
     'iconTrending4': iconTrending4,
+    'iconUnlocked': iconUnlocked,
     'iconUsers': iconUsers,
     'iconVideo': iconVideo,
-    'iconVideoClip': iconVideoClip,
     'iconVideoSolid': iconVideoSolid,
     'iconVoiceAndVideo': iconVoiceAndVideo,
     'iconVoiceHigh': iconVoiceHigh,
