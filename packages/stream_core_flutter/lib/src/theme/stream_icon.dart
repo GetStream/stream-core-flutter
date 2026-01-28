@@ -11,7 +11,7 @@ import 'stream_icons.g.dart';
 /// ```dart
 /// class MyIcon extends StreamIcon {
 ///   @override
-///   IconData get iconApiAggregate => StreamIcons.iconApiAggregate;
+///   IconData get apiAggregate => StreamIcons.iconApiAggregate;
 /// }
 /// ```
 ///
@@ -20,279 +20,279 @@ import 'stream_icons.g.dart';
 /// ```
 
 class StreamIcon {
-  IconData get iconApiAggregate => StreamIcons.iconApiAggregate;
-  IconData get iconApples => StreamIcons.iconApples;
-  IconData get iconArrowBoxLeft => StreamIcons.iconArrowBoxLeft;
-  IconData get iconArrowDown => StreamIcons.iconArrowDown;
-  IconData get iconArrowLeft => StreamIcons.iconArrowLeft;
-  IconData get iconArrowRight => StreamIcons.iconArrowRight;
-  IconData get iconArrowRotateClockwise => StreamIcons.iconArrowRotateClockwise;
-  IconData get iconArrowRotateRightLeftRepeatRefresh => StreamIcons.iconArrowRotateRightLeftRepeatRefresh;
-  IconData get iconArrowShareLeft => StreamIcons.iconArrowShareLeft;
-  IconData get iconArrowUp => StreamIcons.iconArrowUp;
-  IconData get iconArrowsRepeatLeftRight => StreamIcons.iconArrowsRepeatLeftRight;
-  IconData get iconAt => StreamIcons.iconAt;
-  IconData get iconAtSolid => StreamIcons.iconAtSolid;
-  IconData get iconBellNotification => StreamIcons.iconBellNotification;
-  IconData get iconBrowserAISparkle => StreamIcons.iconBrowserAISparkle;
-  IconData get iconBubble3ChatMessage => StreamIcons.iconBubble3ChatMessage;
-  IconData get iconBubble3Solid => StreamIcons.iconBubble3Solid;
-  IconData get iconBubbleAnnotation2ChatMessage => StreamIcons.iconBubbleAnnotation2ChatMessage;
-  IconData get iconBubbleText6ChatMessage => StreamIcons.iconBubbleText6ChatMessage;
-  IconData get iconBubbleText6Solid => StreamIcons.iconBubbleText6Solid;
-  IconData get iconBubbleWideNotificationChatMessage => StreamIcons.iconBubbleWideNotificationChatMessage;
-  IconData get iconBubbleWideSparkleChatMessage => StreamIcons.iconBubbleWideSparkleChatMessage;
-  IconData get iconCalendar1 => StreamIcons.iconCalendar1;
-  IconData get iconCallCancel => StreamIcons.iconCallCancel;
-  IconData get iconCamera1 => StreamIcons.iconCamera1;
-  IconData get iconCar1 => StreamIcons.iconCar1;
-  IconData get iconCat => StreamIcons.iconCat;
-  IconData get iconChainLink3 => StreamIcons.iconChainLink3;
-  IconData get iconChart5 => StreamIcons.iconChart5;
-  IconData get iconCheckmark1Small => StreamIcons.iconCheckmark1Small;
-  IconData get iconCheckmark2 => StreamIcons.iconCheckmark2;
-  IconData get iconCheckmark2Small => StreamIcons.iconCheckmark2Small;
-  IconData get iconChevronDown => StreamIcons.iconChevronDown;
-  IconData get iconChevronGrabberVerticalSelector => StreamIcons.iconChevronGrabberVerticalSelector;
-  IconData get iconChevronLeft => StreamIcons.iconChevronLeft;
-  IconData get iconChevronRight => StreamIcons.iconChevronRight;
-  IconData get iconChevronTop => StreamIcons.iconChevronTop;
-  IconData get iconCircleBanSign => StreamIcons.iconCircleBanSign;
-  IconData get iconCircleCheck => StreamIcons.iconCircleCheck;
-  IconData get iconCircleInfoTooltip => StreamIcons.iconCircleInfoTooltip;
-  IconData get iconCircleMinus => StreamIcons.iconCircleMinus;
-  IconData get iconCircleQuestionmark => StreamIcons.iconCircleQuestionmark;
-  IconData get iconCircleQuestionmarkFilled => StreamIcons.iconCircleQuestionmarkFilled;
-  IconData get iconCircleX => StreamIcons.iconCircleX;
-  IconData get iconClock => StreamIcons.iconClock;
-  IconData get iconClockSolid => StreamIcons.iconClockSolid;
-  IconData get iconCode => StreamIcons.iconCode;
-  IconData get iconCodeBrackets => StreamIcons.iconCodeBrackets;
-  IconData get iconCodeEditorInsert => StreamIcons.iconCodeEditorInsert;
-  IconData get iconCompass => StreamIcons.iconCompass;
-  IconData get iconCreditCard2Billing => StreamIcons.iconCreditCard2Billing;
-  IconData get iconCrossMedium => StreamIcons.iconCrossMedium;
-  IconData get iconCrossSmall => StreamIcons.iconCrossSmall;
-  IconData get iconDotGrid2x3 => StreamIcons.iconDotGrid2x3;
-  IconData get iconDotsGrid1x3Vertical => StreamIcons.iconDotsGrid1x3Vertical;
-  IconData get iconDoupleCheckmark1Small => StreamIcons.iconDoupleCheckmark1Small;
-  IconData get iconEditBig => StreamIcons.iconEditBig;
-  IconData get iconEditBigSolid => StreamIcons.iconEditBigSolid;
-  IconData get iconEmojiAddReaction => StreamIcons.iconEmojiAddReaction;
-  IconData get iconEmojiSmile => StreamIcons.iconEmojiSmile;
-  IconData get iconExclamationCircle => StreamIcons.iconExclamationCircle;
-  IconData get iconExclamationCircle1 => StreamIcons.iconExclamationCircle1;
-  IconData get iconExclamationTriangle => StreamIcons.iconExclamationTriangle;
-  IconData get iconExclamationTriangle1 => StreamIcons.iconExclamationTriangle1;
-  IconData get iconEyeOpen => StreamIcons.iconEyeOpen;
-  IconData get iconFileBend => StreamIcons.iconFileBend;
-  IconData get iconFilledCircleInfoTooltip => StreamIcons.iconFilledCircleInfoTooltip;
-  IconData get iconFilter1 => StreamIcons.iconFilter1;
-  IconData get iconFlag2 => StreamIcons.iconFlag2;
-  IconData get iconGauge => StreamIcons.iconGauge;
-  IconData get iconGoogle => StreamIcons.iconGoogle;
-  IconData get iconHashtagChannel => StreamIcons.iconHashtagChannel;
-  IconData get iconHeart2 => StreamIcons.iconHeart2;
-  IconData get iconHistory => StreamIcons.iconHistory;
-  IconData get iconImages1Alt => StreamIcons.iconImages1Alt;
-  IconData get iconInvite => StreamIcons.iconInvite;
-  IconData get iconLayersBehind => StreamIcons.iconLayersBehind;
-  IconData get iconLayoutGrid1 => StreamIcons.iconLayoutGrid1;
-  IconData get iconLightBulbSimple => StreamIcons.iconLightBulbSimple;
-  IconData get iconLimits => StreamIcons.iconLimits;
-  IconData get iconLineChart3 => StreamIcons.iconLineChart3;
-  IconData get iconLock => StreamIcons.iconLock;
-  IconData get iconMagnifyingGlassSearch => StreamIcons.iconMagnifyingGlassSearch;
-  IconData get iconMapPin => StreamIcons.iconMapPin;
-  IconData get iconMicrophone => StreamIcons.iconMicrophone;
-  IconData get iconMicrophoneSolid => StreamIcons.iconMicrophoneSolid;
-  IconData get iconMinusLarge => StreamIcons.iconMinusLarge;
-  IconData get iconMinusSmall => StreamIcons.iconMinusSmall;
-  IconData get iconMute => StreamIcons.iconMute;
-  IconData get iconNewspaper2 => StreamIcons.iconNewspaper2;
-  IconData get iconOrganization => StreamIcons.iconOrganization;
-  IconData get iconPaperPlane => StreamIcons.iconPaperPlane;
-  IconData get iconPaperPlaneTopRight => StreamIcons.iconPaperPlaneTopRight;
-  IconData get iconPaperclip1 => StreamIcons.iconPaperclip1;
-  IconData get iconParagraphsText => StreamIcons.iconParagraphsText;
-  IconData get iconPause => StreamIcons.iconPause;
-  IconData get iconPencil => StreamIcons.iconPencil;
-  IconData get iconPeople => StreamIcons.iconPeople;
-  IconData get iconPeople2 => StreamIcons.iconPeople2;
-  IconData get iconPeopleAdd => StreamIcons.iconPeopleAdd;
-  IconData get iconPeopleAdded => StreamIcons.iconPeopleAdded;
-  IconData get iconPeopleCircle => StreamIcons.iconPeopleCircle;
-  IconData get iconPeopleCopy => StreamIcons.iconPeopleCopy;
-  IconData get iconPeopleEditUserRights => StreamIcons.iconPeopleEditUserRights;
-  IconData get iconPeopleRemove => StreamIcons.iconPeopleRemove;
-  IconData get iconPersona => StreamIcons.iconPersona;
-  IconData get iconPin => StreamIcons.iconPin;
-  IconData get iconPlaySolid => StreamIcons.iconPlaySolid;
-  IconData get iconPlusLarge => StreamIcons.iconPlusLarge;
-  IconData get iconPlusSmall => StreamIcons.iconPlusSmall;
-  IconData get iconRunShortcut => StreamIcons.iconRunShortcut;
-  IconData get iconSearchText => StreamIcons.iconSearchText;
-  IconData get iconSettingsGear2 => StreamIcons.iconSettingsGear2;
-  IconData get iconSettingsSliderVer => StreamIcons.iconSettingsSliderVer;
-  IconData get iconShapesPlusCloseSquareCircle => StreamIcons.iconShapesPlusCloseSquareCircle;
-  IconData get iconShapesTriangleSquareCircle => StreamIcons.iconShapesTriangleSquareCircle;
-  IconData get iconShareRedirectLink => StreamIcons.iconShareRedirectLink;
-  IconData get iconShield => StreamIcons.iconShield;
-  IconData get iconSquareBehindSquare2Copy => StreamIcons.iconSquareBehindSquare2Copy;
-  IconData get iconSquareCircleTopRightFeeds => StreamIcons.iconSquareCircleTopRightFeeds;
-  IconData get iconStop => StreamIcons.iconStop;
-  IconData get iconTable => StreamIcons.iconTable;
-  IconData get iconTeam => StreamIcons.iconTeam;
-  IconData get iconTennis => StreamIcons.iconTennis;
-  IconData get iconTextToImageURLEnrichment => StreamIcons.iconTextToImageURLEnrichment;
-  IconData get iconThunder => StreamIcons.iconThunder;
-  IconData get iconTrashBin => StreamIcons.iconTrashBin;
-  IconData get iconTrending4 => StreamIcons.iconTrending4;
-  IconData get iconUnlocked => StreamIcons.iconUnlocked;
-  IconData get iconUsers => StreamIcons.iconUsers;
-  IconData get iconVideo => StreamIcons.iconVideo;
-  IconData get iconVideoSolid => StreamIcons.iconVideoSolid;
-  IconData get iconVoiceAndVideo => StreamIcons.iconVoiceAndVideo;
-  IconData get iconVoiceHigh => StreamIcons.iconVoiceHigh;
-  IconData get iconVolumeFull => StreamIcons.iconVolumeFull;
-  IconData get iconWebhook => StreamIcons.iconWebhook;
+  IconData get apiAggregate => StreamIcons.iconApiAggregate;
+  IconData get apples => StreamIcons.iconApples;
+  IconData get arrowBoxLeft => StreamIcons.iconArrowBoxLeft;
+  IconData get arrowDown => StreamIcons.iconArrowDown;
+  IconData get arrowLeft => StreamIcons.iconArrowLeft;
+  IconData get arrowRight => StreamIcons.iconArrowRight;
+  IconData get arrowRotateClockwise => StreamIcons.iconArrowRotateClockwise;
+  IconData get arrowRotateRightLeftRepeatRefresh => StreamIcons.iconArrowRotateRightLeftRepeatRefresh;
+  IconData get arrowShareLeft => StreamIcons.iconArrowShareLeft;
+  IconData get arrowUp => StreamIcons.iconArrowUp;
+  IconData get arrowsRepeatLeftRight => StreamIcons.iconArrowsRepeatLeftRight;
+  IconData get at => StreamIcons.iconAt;
+  IconData get atSolid => StreamIcons.iconAtSolid;
+  IconData get bellNotification => StreamIcons.iconBellNotification;
+  IconData get browserAISparkle => StreamIcons.iconBrowserAISparkle;
+  IconData get bubble3ChatMessage => StreamIcons.iconBubble3ChatMessage;
+  IconData get bubble3Solid => StreamIcons.iconBubble3Solid;
+  IconData get bubbleAnnotation2ChatMessage => StreamIcons.iconBubbleAnnotation2ChatMessage;
+  IconData get bubbleText6ChatMessage => StreamIcons.iconBubbleText6ChatMessage;
+  IconData get bubbleText6Solid => StreamIcons.iconBubbleText6Solid;
+  IconData get bubbleWideNotificationChatMessage => StreamIcons.iconBubbleWideNotificationChatMessage;
+  IconData get bubbleWideSparkleChatMessage => StreamIcons.iconBubbleWideSparkleChatMessage;
+  IconData get calendar1 => StreamIcons.iconCalendar1;
+  IconData get callCancel => StreamIcons.iconCallCancel;
+  IconData get camera1 => StreamIcons.iconCamera1;
+  IconData get car1 => StreamIcons.iconCar1;
+  IconData get cat => StreamIcons.iconCat;
+  IconData get chainLink3 => StreamIcons.iconChainLink3;
+  IconData get chart5 => StreamIcons.iconChart5;
+  IconData get checkmark1Small => StreamIcons.iconCheckmark1Small;
+  IconData get checkmark2 => StreamIcons.iconCheckmark2;
+  IconData get checkmark2Small => StreamIcons.iconCheckmark2Small;
+  IconData get chevronDown => StreamIcons.iconChevronDown;
+  IconData get chevronGrabberVerticalSelector => StreamIcons.iconChevronGrabberVerticalSelector;
+  IconData get chevronLeft => StreamIcons.iconChevronLeft;
+  IconData get chevronRight => StreamIcons.iconChevronRight;
+  IconData get chevronTop => StreamIcons.iconChevronTop;
+  IconData get circleBanSign => StreamIcons.iconCircleBanSign;
+  IconData get circleCheck => StreamIcons.iconCircleCheck;
+  IconData get circleInfoTooltip => StreamIcons.iconCircleInfoTooltip;
+  IconData get circleMinus => StreamIcons.iconCircleMinus;
+  IconData get circleQuestionmark => StreamIcons.iconCircleQuestionmark;
+  IconData get circleQuestionmarkFilled => StreamIcons.iconCircleQuestionmarkFilled;
+  IconData get circleX => StreamIcons.iconCircleX;
+  IconData get clock => StreamIcons.iconClock;
+  IconData get clockSolid => StreamIcons.iconClockSolid;
+  IconData get code => StreamIcons.iconCode;
+  IconData get codeBrackets => StreamIcons.iconCodeBrackets;
+  IconData get codeEditorInsert => StreamIcons.iconCodeEditorInsert;
+  IconData get compass => StreamIcons.iconCompass;
+  IconData get creditCard2Billing => StreamIcons.iconCreditCard2Billing;
+  IconData get crossMedium => StreamIcons.iconCrossMedium;
+  IconData get crossSmall => StreamIcons.iconCrossSmall;
+  IconData get dotGrid2x3 => StreamIcons.iconDotGrid2x3;
+  IconData get dotsGrid1x3Vertical => StreamIcons.iconDotsGrid1x3Vertical;
+  IconData get doupleCheckmark1Small => StreamIcons.iconDoupleCheckmark1Small;
+  IconData get editBig => StreamIcons.iconEditBig;
+  IconData get editBigSolid => StreamIcons.iconEditBigSolid;
+  IconData get emojiAddReaction => StreamIcons.iconEmojiAddReaction;
+  IconData get emojiSmile => StreamIcons.iconEmojiSmile;
+  IconData get exclamationCircle => StreamIcons.iconExclamationCircle;
+  IconData get exclamationCircle1 => StreamIcons.iconExclamationCircle1;
+  IconData get exclamationTriangle => StreamIcons.iconExclamationTriangle;
+  IconData get exclamationTriangle1 => StreamIcons.iconExclamationTriangle1;
+  IconData get eyeOpen => StreamIcons.iconEyeOpen;
+  IconData get fileBend => StreamIcons.iconFileBend;
+  IconData get filledCircleInfoTooltip => StreamIcons.iconFilledCircleInfoTooltip;
+  IconData get filter1 => StreamIcons.iconFilter1;
+  IconData get flag2 => StreamIcons.iconFlag2;
+  IconData get gauge => StreamIcons.iconGauge;
+  IconData get google => StreamIcons.iconGoogle;
+  IconData get hashtagChannel => StreamIcons.iconHashtagChannel;
+  IconData get heart2 => StreamIcons.iconHeart2;
+  IconData get history => StreamIcons.iconHistory;
+  IconData get images1Alt => StreamIcons.iconImages1Alt;
+  IconData get invite => StreamIcons.iconInvite;
+  IconData get layersBehind => StreamIcons.iconLayersBehind;
+  IconData get layoutGrid1 => StreamIcons.iconLayoutGrid1;
+  IconData get lightBulbSimple => StreamIcons.iconLightBulbSimple;
+  IconData get limits => StreamIcons.iconLimits;
+  IconData get lineChart3 => StreamIcons.iconLineChart3;
+  IconData get lock => StreamIcons.iconLock;
+  IconData get magnifyingGlassSearch => StreamIcons.iconMagnifyingGlassSearch;
+  IconData get mapPin => StreamIcons.iconMapPin;
+  IconData get microphone => StreamIcons.iconMicrophone;
+  IconData get microphoneSolid => StreamIcons.iconMicrophoneSolid;
+  IconData get minusLarge => StreamIcons.iconMinusLarge;
+  IconData get minusSmall => StreamIcons.iconMinusSmall;
+  IconData get mute => StreamIcons.iconMute;
+  IconData get newspaper2 => StreamIcons.iconNewspaper2;
+  IconData get organization => StreamIcons.iconOrganization;
+  IconData get paperPlane => StreamIcons.iconPaperPlane;
+  IconData get paperPlaneTopRight => StreamIcons.iconPaperPlaneTopRight;
+  IconData get paperclip1 => StreamIcons.iconPaperclip1;
+  IconData get paragraphsText => StreamIcons.iconParagraphsText;
+  IconData get pause => StreamIcons.iconPause;
+  IconData get pencil => StreamIcons.iconPencil;
+  IconData get people => StreamIcons.iconPeople;
+  IconData get people2 => StreamIcons.iconPeople2;
+  IconData get peopleAdd => StreamIcons.iconPeopleAdd;
+  IconData get peopleAdded => StreamIcons.iconPeopleAdded;
+  IconData get peopleCircle => StreamIcons.iconPeopleCircle;
+  IconData get peopleCopy => StreamIcons.iconPeopleCopy;
+  IconData get peopleEditUserRights => StreamIcons.iconPeopleEditUserRights;
+  IconData get peopleRemove => StreamIcons.iconPeopleRemove;
+  IconData get persona => StreamIcons.iconPersona;
+  IconData get pin => StreamIcons.iconPin;
+  IconData get playSolid => StreamIcons.iconPlaySolid;
+  IconData get plusLarge => StreamIcons.iconPlusLarge;
+  IconData get plusSmall => StreamIcons.iconPlusSmall;
+  IconData get runShortcut => StreamIcons.iconRunShortcut;
+  IconData get searchText => StreamIcons.iconSearchText;
+  IconData get settingsGear2 => StreamIcons.iconSettingsGear2;
+  IconData get settingsSliderVer => StreamIcons.iconSettingsSliderVer;
+  IconData get shapesPlusCloseSquareCircle => StreamIcons.iconShapesPlusCloseSquareCircle;
+  IconData get shapesTriangleSquareCircle => StreamIcons.iconShapesTriangleSquareCircle;
+  IconData get shareRedirectLink => StreamIcons.iconShareRedirectLink;
+  IconData get shield => StreamIcons.iconShield;
+  IconData get squareBehindSquare2Copy => StreamIcons.iconSquareBehindSquare2Copy;
+  IconData get squareCircleTopRightFeeds => StreamIcons.iconSquareCircleTopRightFeeds;
+  IconData get stop => StreamIcons.iconStop;
+  IconData get table => StreamIcons.iconTable;
+  IconData get team => StreamIcons.iconTeam;
+  IconData get tennis => StreamIcons.iconTennis;
+  IconData get textToImageURLEnrichment => StreamIcons.iconTextToImageURLEnrichment;
+  IconData get thunder => StreamIcons.iconThunder;
+  IconData get trashBin => StreamIcons.iconTrashBin;
+  IconData get trending4 => StreamIcons.iconTrending4;
+  IconData get unlocked => StreamIcons.iconUnlocked;
+  IconData get users => StreamIcons.iconUsers;
+  IconData get video => StreamIcons.iconVideo;
+  IconData get videoSolid => StreamIcons.iconVideoSolid;
+  IconData get voiceAndVideo => StreamIcons.iconVoiceAndVideo;
+  IconData get voiceHigh => StreamIcons.iconVoiceHigh;
+  IconData get volumeFull => StreamIcons.iconVolumeFull;
+  IconData get webhook => StreamIcons.iconWebhook;
 
   late final Map<String, IconData> allIcons = {
-    'iconApiAggregate': iconApiAggregate,
-    'iconApples': iconApples,
-    'iconArrowBoxLeft': iconArrowBoxLeft,
-    'iconArrowDown': iconArrowDown,
-    'iconArrowLeft': iconArrowLeft,
-    'iconArrowRight': iconArrowRight,
-    'iconArrowRotateClockwise': iconArrowRotateClockwise,
-    'iconArrowRotateRightLeftRepeatRefresh': iconArrowRotateRightLeftRepeatRefresh,
-    'iconArrowShareLeft': iconArrowShareLeft,
-    'iconArrowUp': iconArrowUp,
-    'iconArrowsRepeatLeftRight': iconArrowsRepeatLeftRight,
-    'iconAt': iconAt,
-    'iconAtSolid': iconAtSolid,
-    'iconBellNotification': iconBellNotification,
-    'iconBrowserAISparkle': iconBrowserAISparkle,
-    'iconBubble3ChatMessage': iconBubble3ChatMessage,
-    'iconBubble3Solid': iconBubble3Solid,
-    'iconBubbleAnnotation2ChatMessage': iconBubbleAnnotation2ChatMessage,
-    'iconBubbleText6ChatMessage': iconBubbleText6ChatMessage,
-    'iconBubbleText6Solid': iconBubbleText6Solid,
-    'iconBubbleWideNotificationChatMessage': iconBubbleWideNotificationChatMessage,
-    'iconBubbleWideSparkleChatMessage': iconBubbleWideSparkleChatMessage,
-    'iconCalendar1': iconCalendar1,
-    'iconCallCancel': iconCallCancel,
-    'iconCamera1': iconCamera1,
-    'iconCar1': iconCar1,
-    'iconCat': iconCat,
-    'iconChainLink3': iconChainLink3,
-    'iconChart5': iconChart5,
-    'iconCheckmark1Small': iconCheckmark1Small,
-    'iconCheckmark2': iconCheckmark2,
-    'iconCheckmark2Small': iconCheckmark2Small,
-    'iconChevronDown': iconChevronDown,
-    'iconChevronGrabberVerticalSelector': iconChevronGrabberVerticalSelector,
-    'iconChevronLeft': iconChevronLeft,
-    'iconChevronRight': iconChevronRight,
-    'iconChevronTop': iconChevronTop,
-    'iconCircleBanSign': iconCircleBanSign,
-    'iconCircleCheck': iconCircleCheck,
-    'iconCircleInfoTooltip': iconCircleInfoTooltip,
-    'iconCircleMinus': iconCircleMinus,
-    'iconCircleQuestionmark': iconCircleQuestionmark,
-    'iconCircleQuestionmarkFilled': iconCircleQuestionmarkFilled,
-    'iconCircleX': iconCircleX,
-    'iconClock': iconClock,
-    'iconClockSolid': iconClockSolid,
-    'iconCode': iconCode,
-    'iconCodeBrackets': iconCodeBrackets,
-    'iconCodeEditorInsert': iconCodeEditorInsert,
-    'iconCompass': iconCompass,
-    'iconCreditCard2Billing': iconCreditCard2Billing,
-    'iconCrossMedium': iconCrossMedium,
-    'iconCrossSmall': iconCrossSmall,
-    'iconDotGrid2x3': iconDotGrid2x3,
-    'iconDotsGrid1x3Vertical': iconDotsGrid1x3Vertical,
-    'iconDoupleCheckmark1Small': iconDoupleCheckmark1Small,
-    'iconEditBig': iconEditBig,
-    'iconEditBigSolid': iconEditBigSolid,
-    'iconEmojiAddReaction': iconEmojiAddReaction,
-    'iconEmojiSmile': iconEmojiSmile,
-    'iconExclamationCircle': iconExclamationCircle,
-    'iconExclamationCircle1': iconExclamationCircle1,
-    'iconExclamationTriangle': iconExclamationTriangle,
-    'iconExclamationTriangle1': iconExclamationTriangle1,
-    'iconEyeOpen': iconEyeOpen,
-    'iconFileBend': iconFileBend,
-    'iconFilledCircleInfoTooltip': iconFilledCircleInfoTooltip,
-    'iconFilter1': iconFilter1,
-    'iconFlag2': iconFlag2,
-    'iconGauge': iconGauge,
-    'iconGoogle': iconGoogle,
-    'iconHashtagChannel': iconHashtagChannel,
-    'iconHeart2': iconHeart2,
-    'iconHistory': iconHistory,
-    'iconImages1Alt': iconImages1Alt,
-    'iconInvite': iconInvite,
-    'iconLayersBehind': iconLayersBehind,
-    'iconLayoutGrid1': iconLayoutGrid1,
-    'iconLightBulbSimple': iconLightBulbSimple,
-    'iconLimits': iconLimits,
-    'iconLineChart3': iconLineChart3,
-    'iconLock': iconLock,
-    'iconMagnifyingGlassSearch': iconMagnifyingGlassSearch,
-    'iconMapPin': iconMapPin,
-    'iconMicrophone': iconMicrophone,
-    'iconMicrophoneSolid': iconMicrophoneSolid,
-    'iconMinusLarge': iconMinusLarge,
-    'iconMinusSmall': iconMinusSmall,
-    'iconMute': iconMute,
-    'iconNewspaper2': iconNewspaper2,
-    'iconOrganization': iconOrganization,
-    'iconPaperPlane': iconPaperPlane,
-    'iconPaperPlaneTopRight': iconPaperPlaneTopRight,
-    'iconPaperclip1': iconPaperclip1,
-    'iconParagraphsText': iconParagraphsText,
-    'iconPause': iconPause,
-    'iconPencil': iconPencil,
-    'iconPeople': iconPeople,
-    'iconPeople2': iconPeople2,
-    'iconPeopleAdd': iconPeopleAdd,
-    'iconPeopleAdded': iconPeopleAdded,
-    'iconPeopleCircle': iconPeopleCircle,
-    'iconPeopleCopy': iconPeopleCopy,
-    'iconPeopleEditUserRights': iconPeopleEditUserRights,
-    'iconPeopleRemove': iconPeopleRemove,
-    'iconPersona': iconPersona,
-    'iconPin': iconPin,
-    'iconPlaySolid': iconPlaySolid,
-    'iconPlusLarge': iconPlusLarge,
-    'iconPlusSmall': iconPlusSmall,
-    'iconRunShortcut': iconRunShortcut,
-    'iconSearchText': iconSearchText,
-    'iconSettingsGear2': iconSettingsGear2,
-    'iconSettingsSliderVer': iconSettingsSliderVer,
-    'iconShapesPlusCloseSquareCircle': iconShapesPlusCloseSquareCircle,
-    'iconShapesTriangleSquareCircle': iconShapesTriangleSquareCircle,
-    'iconShareRedirectLink': iconShareRedirectLink,
-    'iconShield': iconShield,
-    'iconSquareBehindSquare2Copy': iconSquareBehindSquare2Copy,
-    'iconSquareCircleTopRightFeeds': iconSquareCircleTopRightFeeds,
-    'iconStop': iconStop,
-    'iconTable': iconTable,
-    'iconTeam': iconTeam,
-    'iconTennis': iconTennis,
-    'iconTextToImageURLEnrichment': iconTextToImageURLEnrichment,
-    'iconThunder': iconThunder,
-    'iconTrashBin': iconTrashBin,
-    'iconTrending4': iconTrending4,
-    'iconUnlocked': iconUnlocked,
-    'iconUsers': iconUsers,
-    'iconVideo': iconVideo,
-    'iconVideoSolid': iconVideoSolid,
-    'iconVoiceAndVideo': iconVoiceAndVideo,
-    'iconVoiceHigh': iconVoiceHigh,
-    'iconVolumeFull': iconVolumeFull,
-    'iconWebhook': iconWebhook,
+    'apiAggregate': apiAggregate,
+    'apples': apples,
+    'arrowBoxLeft': arrowBoxLeft,
+    'arrowDown': arrowDown,
+    'arrowLeft': arrowLeft,
+    'arrowRight': arrowRight,
+    'arrowRotateClockwise': arrowRotateClockwise,
+    'arrowRotateRightLeftRepeatRefresh': arrowRotateRightLeftRepeatRefresh,
+    'arrowShareLeft': arrowShareLeft,
+    'arrowUp': arrowUp,
+    'arrowsRepeatLeftRight': arrowsRepeatLeftRight,
+    'at': at,
+    'atSolid': atSolid,
+    'bellNotification': bellNotification,
+    'browserAISparkle': browserAISparkle,
+    'bubble3ChatMessage': bubble3ChatMessage,
+    'bubble3Solid': bubble3Solid,
+    'bubbleAnnotation2ChatMessage': bubbleAnnotation2ChatMessage,
+    'bubbleText6ChatMessage': bubbleText6ChatMessage,
+    'bubbleText6Solid': bubbleText6Solid,
+    'bubbleWideNotificationChatMessage': bubbleWideNotificationChatMessage,
+    'bubbleWideSparkleChatMessage': bubbleWideSparkleChatMessage,
+    'calendar1': calendar1,
+    'callCancel': callCancel,
+    'camera1': camera1,
+    'car1': car1,
+    'cat': cat,
+    'chainLink3': chainLink3,
+    'chart5': chart5,
+    'checkmark1Small': checkmark1Small,
+    'checkmark2': checkmark2,
+    'checkmark2Small': checkmark2Small,
+    'chevronDown': chevronDown,
+    'chevronGrabberVerticalSelector': chevronGrabberVerticalSelector,
+    'chevronLeft': chevronLeft,
+    'chevronRight': chevronRight,
+    'chevronTop': chevronTop,
+    'circleBanSign': circleBanSign,
+    'circleCheck': circleCheck,
+    'circleInfoTooltip': circleInfoTooltip,
+    'circleMinus': circleMinus,
+    'circleQuestionmark': circleQuestionmark,
+    'circleQuestionmarkFilled': circleQuestionmarkFilled,
+    'circleX': circleX,
+    'clock': clock,
+    'clockSolid': clockSolid,
+    'code': code,
+    'codeBrackets': codeBrackets,
+    'codeEditorInsert': codeEditorInsert,
+    'compass': compass,
+    'creditCard2Billing': creditCard2Billing,
+    'crossMedium': crossMedium,
+    'crossSmall': crossSmall,
+    'dotGrid2x3': dotGrid2x3,
+    'dotsGrid1x3Vertical': dotsGrid1x3Vertical,
+    'doupleCheckmark1Small': doupleCheckmark1Small,
+    'editBig': editBig,
+    'editBigSolid': editBigSolid,
+    'emojiAddReaction': emojiAddReaction,
+    'emojiSmile': emojiSmile,
+    'exclamationCircle': exclamationCircle,
+    'exclamationCircle1': exclamationCircle1,
+    'exclamationTriangle': exclamationTriangle,
+    'exclamationTriangle1': exclamationTriangle1,
+    'eyeOpen': eyeOpen,
+    'fileBend': fileBend,
+    'filledCircleInfoTooltip': filledCircleInfoTooltip,
+    'filter1': filter1,
+    'flag2': flag2,
+    'gauge': gauge,
+    'google': google,
+    'hashtagChannel': hashtagChannel,
+    'heart2': heart2,
+    'history': history,
+    'images1Alt': images1Alt,
+    'invite': invite,
+    'layersBehind': layersBehind,
+    'layoutGrid1': layoutGrid1,
+    'lightBulbSimple': lightBulbSimple,
+    'limits': limits,
+    'lineChart3': lineChart3,
+    'lock': lock,
+    'magnifyingGlassSearch': magnifyingGlassSearch,
+    'mapPin': mapPin,
+    'microphone': microphone,
+    'microphoneSolid': microphoneSolid,
+    'minusLarge': minusLarge,
+    'minusSmall': minusSmall,
+    'mute': mute,
+    'newspaper2': newspaper2,
+    'organization': organization,
+    'paperPlane': paperPlane,
+    'paperPlaneTopRight': paperPlaneTopRight,
+    'paperclip1': paperclip1,
+    'paragraphsText': paragraphsText,
+    'pause': pause,
+    'pencil': pencil,
+    'people': people,
+    'people2': people2,
+    'peopleAdd': peopleAdd,
+    'peopleAdded': peopleAdded,
+    'peopleCircle': peopleCircle,
+    'peopleCopy': peopleCopy,
+    'peopleEditUserRights': peopleEditUserRights,
+    'peopleRemove': peopleRemove,
+    'persona': persona,
+    'pin': pin,
+    'playSolid': playSolid,
+    'plusLarge': plusLarge,
+    'plusSmall': plusSmall,
+    'runShortcut': runShortcut,
+    'searchText': searchText,
+    'settingsGear2': settingsGear2,
+    'settingsSliderVer': settingsSliderVer,
+    'shapesPlusCloseSquareCircle': shapesPlusCloseSquareCircle,
+    'shapesTriangleSquareCircle': shapesTriangleSquareCircle,
+    'shareRedirectLink': shareRedirectLink,
+    'shield': shield,
+    'squareBehindSquare2Copy': squareBehindSquare2Copy,
+    'squareCircleTopRightFeeds': squareCircleTopRightFeeds,
+    'stop': stop,
+    'table': table,
+    'team': team,
+    'tennis': tennis,
+    'textToImageURLEnrichment': textToImageURLEnrichment,
+    'thunder': thunder,
+    'trashBin': trashBin,
+    'trending4': trending4,
+    'unlocked': unlocked,
+    'users': users,
+    'video': video,
+    'videoSolid': videoSolid,
+    'voiceAndVideo': voiceAndVideo,
+    'voiceHigh': voiceHigh,
+    'volumeFull': volumeFull,
+    'webhook': webhook,
   };
 }
