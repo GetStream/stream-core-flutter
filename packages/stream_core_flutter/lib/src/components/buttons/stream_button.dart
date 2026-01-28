@@ -91,22 +91,22 @@ class DefaultStreamButton extends StatelessWidget {
     final buttonTheme = context.streamButtonTheme;
     final defaults = _StreamButtonDefaults(context: context);
 
-    // TODO: disabled styles
+    final isDisabled = props.onTap == null;
 
     final themeColors = switch (props.style) {
-      StreamButtonStyle.primary => buttonTheme.primaryButtonColors,
-      StreamButtonStyle.secondary => buttonTheme.secondaryButtonColors,
-      StreamButtonStyle.destructive => buttonTheme.destructiveButtonColors,
+      StreamButtonStyle.primary => isDisabled ? buttonTheme.disabledPrimaryButtonColors : buttonTheme.primaryButtonColors,
+      StreamButtonStyle.secondary => isDisabled ? buttonTheme.disabledSecondaryButtonColors : buttonTheme.secondaryButtonColors,
+      StreamButtonStyle.destructive => isDisabled ? buttonTheme.disabledDestructiveButtonColors : buttonTheme.destructiveButtonColors,
     };
 
     final defaultColors = switch (props.style) {
-      StreamButtonStyle.primary => defaults.primaryColors,
-      StreamButtonStyle.secondary => defaults.secondaryColors,
-      StreamButtonStyle.destructive => defaults.destructiveColors,
+      StreamButtonStyle.primary => isDisabled ? defaults.disabledColors : defaults.primaryColors,
+      StreamButtonStyle.secondary => isDisabled ? defaults.disabledColors : defaults.secondaryColors,
+      StreamButtonStyle.destructive => isDisabled ? defaults.disabledColors : defaults.destructiveColors,
     };
 
     final backgroundColor = switch (props.type) {
-      StreamButtonType.solid => themeColors?.solidBackgroundColor ?? defaultColors.solidBackgroundColor,
+      StreamButtonType.solid =>  themeColors?.solidBackgroundColor ?? defaultColors.solidBackgroundColor,
       StreamButtonType.outline => Colors.transparent,
       StreamButtonType.ghost => Colors.transparent,
     };
@@ -194,5 +194,13 @@ class _StreamButtonDefaults {
     outlineBorderColor: _colorScheme.accentError,
     outlineForegroundColor: _colorScheme.textOnAccent,
     ghostForegroundColor: _colorScheme.textOnAccent,
+  );
+
+  StreamButtonColors get disabledColors => StreamButtonColors(
+    solidBackgroundColor: _colorScheme.backgroundDisabled,
+    solidForegroundColor: _colorScheme.textDisabled,
+    outlineBorderColor: _colorScheme.borderDefault,
+    outlineForegroundColor: _colorScheme.textDisabled,
+    ghostForegroundColor: _colorScheme.textDisabled,
   );
 }

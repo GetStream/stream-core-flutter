@@ -33,28 +33,47 @@ mixin _$StreamButtonThemeData {
       primaryButtonColors: t < 0.5
           ? a.primaryButtonColors
           : b.primaryButtonColors,
+      disabledPrimaryButtonColors: t < 0.5
+          ? a.disabledPrimaryButtonColors
+          : b.disabledPrimaryButtonColors,
       secondaryButtonColors: t < 0.5
           ? a.secondaryButtonColors
           : b.secondaryButtonColors,
+      disabledSecondaryButtonColors: t < 0.5
+          ? a.disabledSecondaryButtonColors
+          : b.disabledSecondaryButtonColors,
       destructiveButtonColors: t < 0.5
           ? a.destructiveButtonColors
           : b.destructiveButtonColors,
+      disabledDestructiveButtonColors: t < 0.5
+          ? a.disabledDestructiveButtonColors
+          : b.disabledDestructiveButtonColors,
     );
   }
 
   StreamButtonThemeData copyWith({
     StreamButtonColors? primaryButtonColors,
+    StreamButtonColors? disabledPrimaryButtonColors,
     StreamButtonColors? secondaryButtonColors,
+    StreamButtonColors? disabledSecondaryButtonColors,
     StreamButtonColors? destructiveButtonColors,
+    StreamButtonColors? disabledDestructiveButtonColors,
   }) {
     final _this = (this as StreamButtonThemeData);
 
     return StreamButtonThemeData(
       primaryButtonColors: primaryButtonColors ?? _this.primaryButtonColors,
+      disabledPrimaryButtonColors:
+          disabledPrimaryButtonColors ?? _this.disabledPrimaryButtonColors,
       secondaryButtonColors:
           secondaryButtonColors ?? _this.secondaryButtonColors,
+      disabledSecondaryButtonColors:
+          disabledSecondaryButtonColors ?? _this.disabledSecondaryButtonColors,
       destructiveButtonColors:
           destructiveButtonColors ?? _this.destructiveButtonColors,
+      disabledDestructiveButtonColors:
+          disabledDestructiveButtonColors ??
+          _this.disabledDestructiveButtonColors,
     );
   }
 
@@ -73,12 +92,27 @@ mixin _$StreamButtonThemeData {
       primaryButtonColors:
           _this.primaryButtonColors?.merge(other.primaryButtonColors) ??
           other.primaryButtonColors,
+      disabledPrimaryButtonColors:
+          _this.disabledPrimaryButtonColors?.merge(
+            other.disabledPrimaryButtonColors,
+          ) ??
+          other.disabledPrimaryButtonColors,
       secondaryButtonColors:
           _this.secondaryButtonColors?.merge(other.secondaryButtonColors) ??
           other.secondaryButtonColors,
+      disabledSecondaryButtonColors:
+          _this.disabledSecondaryButtonColors?.merge(
+            other.disabledSecondaryButtonColors,
+          ) ??
+          other.disabledSecondaryButtonColors,
       destructiveButtonColors:
           _this.destructiveButtonColors?.merge(other.destructiveButtonColors) ??
           other.destructiveButtonColors,
+      disabledDestructiveButtonColors:
+          _this.disabledDestructiveButtonColors?.merge(
+            other.disabledDestructiveButtonColors,
+          ) ??
+          other.disabledDestructiveButtonColors,
     );
   }
 
@@ -96,8 +130,14 @@ mixin _$StreamButtonThemeData {
     final _other = (other as StreamButtonThemeData);
 
     return _other.primaryButtonColors == _this.primaryButtonColors &&
+        _other.disabledPrimaryButtonColors ==
+            _this.disabledPrimaryButtonColors &&
         _other.secondaryButtonColors == _this.secondaryButtonColors &&
-        _other.destructiveButtonColors == _this.destructiveButtonColors;
+        _other.disabledSecondaryButtonColors ==
+            _this.disabledSecondaryButtonColors &&
+        _other.destructiveButtonColors == _this.destructiveButtonColors &&
+        _other.disabledDestructiveButtonColors ==
+            _this.disabledDestructiveButtonColors;
   }
 
   @override
@@ -107,8 +147,11 @@ mixin _$StreamButtonThemeData {
     return Object.hash(
       runtimeType,
       _this.primaryButtonColors,
+      _this.disabledPrimaryButtonColors,
       _this.secondaryButtonColors,
+      _this.disabledSecondaryButtonColors,
       _this.destructiveButtonColors,
+      _this.disabledDestructiveButtonColors,
     );
   }
 }

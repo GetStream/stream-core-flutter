@@ -66,6 +66,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundDisabled,
     // Border - Core
     Color? borderSurface,
     Color? borderSurfaceSubtle,
@@ -119,6 +120,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceSubtle ??= StreamColors.slate.shade100;
     backgroundSurfaceStrong ??= StreamColors.slate.shade200;
     backgroundOverlay ??= StreamColors.black10;
+    backgroundDisabled ??= StreamColors.slate.shade100;
 
     // Border - Core
     borderSurface ??= StreamColors.slate.shade400;
@@ -192,6 +194,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
+      backgroundDisabled: backgroundDisabled,
       borderDefault: borderDefault,
       borderSurface: borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle,
@@ -241,6 +244,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundDisabled,
     // Border - Core
     Color? borderDefault,
     Color? borderSurface,
@@ -294,6 +298,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceSubtle ??= StreamColors.neutral.shade800;
     backgroundSurfaceStrong ??= StreamColors.neutral.shade700;
     backgroundOverlay ??= StreamColors.black50;
+    backgroundDisabled ??= StreamColors.neutral.shade900;
 
     // Border - Core
     borderDefault ??= StreamColors.neutral.shade800;
@@ -367,6 +372,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
+      backgroundDisabled: backgroundDisabled,
       borderDefault: borderDefault,
       borderSurface: borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle,
@@ -414,6 +420,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundSurfaceSubtle,
     required this.backgroundSurfaceStrong,
     required this.backgroundOverlay,
+    required this.backgroundDisabled,
     // Border - Core
     required this.borderDefault,
     required this.borderSurface,
@@ -504,6 +511,9 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The overlay background color.
   final Color backgroundOverlay;
+
+  /// The disabled background color.
+  final Color backgroundDisabled;
 
   // ---- Border colors - Core ----
 

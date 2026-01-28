@@ -33,13 +33,19 @@ class StreamButtonTheme extends InheritedTheme {
 class StreamButtonThemeData with _$StreamButtonThemeData {
   const StreamButtonThemeData({
     this.primaryButtonColors,
+    this.disabledPrimaryButtonColors,
     this.secondaryButtonColors,
+    this.disabledSecondaryButtonColors,
     this.destructiveButtonColors,
+    this.disabledDestructiveButtonColors,
   });
 
   final StreamButtonColors? primaryButtonColors;
+  final StreamButtonColors? disabledPrimaryButtonColors;
   final StreamButtonColors? secondaryButtonColors;
+  final StreamButtonColors? disabledSecondaryButtonColors;
   final StreamButtonColors? destructiveButtonColors;
+  final StreamButtonColors? disabledDestructiveButtonColors;
 }
 
 @themeGen
