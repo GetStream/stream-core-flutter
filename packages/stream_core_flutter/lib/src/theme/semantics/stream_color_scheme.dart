@@ -123,6 +123,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundDisabled ??= StreamColors.slate.shade100;
 
     // Border - Core
+    borderDefault ??= light_tokens.StreamTokens.borderCoreDefault;
     borderSurface ??= StreamColors.slate.shade400;
     borderSurfaceSubtle ??= StreamColors.slate.shade200;
     borderSurfaceStrong ??= StreamColors.slate.shade600;
@@ -132,7 +133,6 @@ class StreamColorScheme with _$StreamColorScheme {
     borderImage ??= StreamColors.black10;
 
     // Border - Utility
-    borderDefault ??= StreamColors.slate.shade150;
     borderFocus ??= brand.shade300;
     borderDisabled ??= StreamColors.slate.shade100;
     borderError ??= accentError;
@@ -301,7 +301,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundDisabled ??= StreamColors.neutral.shade900;
 
     // Border - Core
-    borderDefault ??= StreamColors.neutral.shade800;
+    borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
     borderSurface ??= StreamColors.neutral.shade500;
     borderSurfaceSubtle ??= StreamColors.neutral.shade700;
     borderSurfaceStrong ??= StreamColors.neutral.shade400;
@@ -512,12 +512,12 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The overlay background color.
   final Color backgroundOverlay;
 
-  /// The disabled background color.
+  /// Disabled background for inputs, buttons, or chips.
   final Color backgroundDisabled;
 
   // ---- Border colors - Core ----
 
-  /// The default border color.
+  /// Standard surface border
   final Color borderDefault;
 
   /// The standard surface border color.
