@@ -94,9 +94,12 @@ class DefaultStreamButton extends StatelessWidget {
     final isDisabled = props.onTap == null;
 
     final themeColors = switch (props.style) {
-      StreamButtonStyle.primary => isDisabled ? buttonTheme.disabledPrimaryButtonColors : buttonTheme.primaryButtonColors,
-      StreamButtonStyle.secondary => isDisabled ? buttonTheme.disabledSecondaryButtonColors : buttonTheme.secondaryButtonColors,
-      StreamButtonStyle.destructive => isDisabled ? buttonTheme.disabledDestructiveButtonColors : buttonTheme.destructiveButtonColors,
+      StreamButtonStyle.primary =>
+        isDisabled ? buttonTheme.disabledPrimaryButtonColors : buttonTheme.primaryButtonColors,
+      StreamButtonStyle.secondary =>
+        isDisabled ? buttonTheme.disabledSecondaryButtonColors : buttonTheme.secondaryButtonColors,
+      StreamButtonStyle.destructive =>
+        isDisabled ? buttonTheme.disabledDestructiveButtonColors : buttonTheme.destructiveButtonColors,
     };
 
     final defaultColors = switch (props.style) {
@@ -106,7 +109,7 @@ class DefaultStreamButton extends StatelessWidget {
     };
 
     final backgroundColor = switch (props.type) {
-      StreamButtonType.solid =>  themeColors?.solidBackgroundColor ?? defaultColors.solidBackgroundColor,
+      StreamButtonType.solid => themeColors?.solidBackgroundColor ?? defaultColors.solidBackgroundColor,
       StreamButtonType.outline => Colors.transparent,
       StreamButtonType.ghost => Colors.transparent,
     };

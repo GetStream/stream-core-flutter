@@ -68,6 +68,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundOverlay,
     Color? backgroundDisabled,
     // Border - Core
+    Color? borderDefault,
     Color? borderSurface,
     Color? borderSurfaceSubtle,
     Color? borderSurfaceStrong,
@@ -76,7 +77,6 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderSubtle,
     Color? borderImage,
     // Border - Utility
-    Color? borderDefault,
     Color? borderFocus,
     Color? borderDisabled,
     Color? borderError,
