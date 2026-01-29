@@ -116,6 +116,17 @@ const _supportedMimeTypes = <FileTypeCategory, List<String>>{
     'audio/aiff',
     'audio/alac',
   ],
+  FileTypeCategory.video: [
+    'video/mp4',
+    'video/mpeg',
+    'video/x-msvideo',
+    'video/webm',
+    'video/ogg',
+    'video/quicktime',
+    'video/3gpp',
+    'video/3gpp2',
+    'video/mp2t',
+  ],
   FileTypeCategory.compression: [
     'application/zip',
     'application/x-7z-compressed',
