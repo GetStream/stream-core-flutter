@@ -30,50 +30,23 @@ mixin _$StreamButtonThemeData {
     }
 
     return StreamButtonThemeData(
-      primaryButtonColors: t < 0.5
-          ? a.primaryButtonColors
-          : b.primaryButtonColors,
-      disabledPrimaryButtonColors: t < 0.5
-          ? a.disabledPrimaryButtonColors
-          : b.disabledPrimaryButtonColors,
-      secondaryButtonColors: t < 0.5
-          ? a.secondaryButtonColors
-          : b.secondaryButtonColors,
-      disabledSecondaryButtonColors: t < 0.5
-          ? a.disabledSecondaryButtonColors
-          : b.disabledSecondaryButtonColors,
-      destructiveButtonColors: t < 0.5
-          ? a.destructiveButtonColors
-          : b.destructiveButtonColors,
-      disabledDestructiveButtonColors: t < 0.5
-          ? a.disabledDestructiveButtonColors
-          : b.disabledDestructiveButtonColors,
+      primary: t < 0.5 ? a.primary : b.primary,
+      secondary: t < 0.5 ? a.secondary : b.secondary,
+      destructive: t < 0.5 ? a.destructive : b.destructive,
     );
   }
 
   StreamButtonThemeData copyWith({
-    StreamButtonColors? primaryButtonColors,
-    StreamButtonColors? disabledPrimaryButtonColors,
-    StreamButtonColors? secondaryButtonColors,
-    StreamButtonColors? disabledSecondaryButtonColors,
-    StreamButtonColors? destructiveButtonColors,
-    StreamButtonColors? disabledDestructiveButtonColors,
+    StreamButtonTypeStyle? primary,
+    StreamButtonTypeStyle? secondary,
+    StreamButtonTypeStyle? destructive,
   }) {
     final _this = (this as StreamButtonThemeData);
 
     return StreamButtonThemeData(
-      primaryButtonColors: primaryButtonColors ?? _this.primaryButtonColors,
-      disabledPrimaryButtonColors:
-          disabledPrimaryButtonColors ?? _this.disabledPrimaryButtonColors,
-      secondaryButtonColors:
-          secondaryButtonColors ?? _this.secondaryButtonColors,
-      disabledSecondaryButtonColors:
-          disabledSecondaryButtonColors ?? _this.disabledSecondaryButtonColors,
-      destructiveButtonColors:
-          destructiveButtonColors ?? _this.destructiveButtonColors,
-      disabledDestructiveButtonColors:
-          disabledDestructiveButtonColors ??
-          _this.disabledDestructiveButtonColors,
+      primary: primary ?? _this.primary,
+      secondary: secondary ?? _this.secondary,
+      destructive: destructive ?? _this.destructive,
     );
   }
 
@@ -89,30 +62,10 @@ mixin _$StreamButtonThemeData {
     }
 
     return copyWith(
-      primaryButtonColors:
-          _this.primaryButtonColors?.merge(other.primaryButtonColors) ??
-          other.primaryButtonColors,
-      disabledPrimaryButtonColors:
-          _this.disabledPrimaryButtonColors?.merge(
-            other.disabledPrimaryButtonColors,
-          ) ??
-          other.disabledPrimaryButtonColors,
-      secondaryButtonColors:
-          _this.secondaryButtonColors?.merge(other.secondaryButtonColors) ??
-          other.secondaryButtonColors,
-      disabledSecondaryButtonColors:
-          _this.disabledSecondaryButtonColors?.merge(
-            other.disabledSecondaryButtonColors,
-          ) ??
-          other.disabledSecondaryButtonColors,
-      destructiveButtonColors:
-          _this.destructiveButtonColors?.merge(other.destructiveButtonColors) ??
-          other.destructiveButtonColors,
-      disabledDestructiveButtonColors:
-          _this.disabledDestructiveButtonColors?.merge(
-            other.disabledDestructiveButtonColors,
-          ) ??
-          other.disabledDestructiveButtonColors,
+      primary: _this.primary?.merge(other.primary) ?? other.primary,
+      secondary: _this.secondary?.merge(other.secondary) ?? other.secondary,
+      destructive:
+          _this.destructive?.merge(other.destructive) ?? other.destructive,
     );
   }
 
@@ -129,15 +82,9 @@ mixin _$StreamButtonThemeData {
     final _this = (this as StreamButtonThemeData);
     final _other = (other as StreamButtonThemeData);
 
-    return _other.primaryButtonColors == _this.primaryButtonColors &&
-        _other.disabledPrimaryButtonColors ==
-            _this.disabledPrimaryButtonColors &&
-        _other.secondaryButtonColors == _this.secondaryButtonColors &&
-        _other.disabledSecondaryButtonColors ==
-            _this.disabledSecondaryButtonColors &&
-        _other.destructiveButtonColors == _this.destructiveButtonColors &&
-        _other.disabledDestructiveButtonColors ==
-            _this.disabledDestructiveButtonColors;
+    return _other.primary == _this.primary &&
+        _other.secondary == _this.secondary &&
+        _other.destructive == _this.destructive;
   }
 
   @override
@@ -146,22 +93,19 @@ mixin _$StreamButtonThemeData {
 
     return Object.hash(
       runtimeType,
-      _this.primaryButtonColors,
-      _this.disabledPrimaryButtonColors,
-      _this.secondaryButtonColors,
-      _this.disabledSecondaryButtonColors,
-      _this.destructiveButtonColors,
-      _this.disabledDestructiveButtonColors,
+      _this.primary,
+      _this.secondary,
+      _this.destructive,
     );
   }
 }
 
-mixin _$StreamButtonColors {
+mixin _$StreamButtonTypeStyle {
   bool get canMerge => true;
 
-  static StreamButtonColors? lerp(
-    StreamButtonColors? a,
-    StreamButtonColors? b,
+  static StreamButtonTypeStyle? lerp(
+    StreamButtonTypeStyle? a,
+    StreamButtonTypeStyle? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -176,56 +120,29 @@ mixin _$StreamButtonColors {
       return t == 0.0 ? a : null;
     }
 
-    return StreamButtonColors(
-      solidBackgroundColor: Color.lerp(
-        a.solidBackgroundColor,
-        b.solidBackgroundColor,
-        t,
-      ),
-      solidForegroundColor: Color.lerp(
-        a.solidForegroundColor,
-        b.solidForegroundColor,
-        t,
-      ),
-      outlineBorderColor: Color.lerp(
-        a.outlineBorderColor,
-        b.outlineBorderColor,
-        t,
-      ),
-      outlineForegroundColor: Color.lerp(
-        a.outlineForegroundColor,
-        b.outlineForegroundColor,
-        t,
-      ),
-      ghostForegroundColor: Color.lerp(
-        a.ghostForegroundColor,
-        b.ghostForegroundColor,
-        t,
-      ),
+    return StreamButtonTypeStyle(
+      solid: t < 0.5 ? a.solid : b.solid,
+      outline: t < 0.5 ? a.outline : b.outline,
+      ghost: t < 0.5 ? a.ghost : b.ghost,
     );
   }
 
-  StreamButtonColors copyWith({
-    Color? solidBackgroundColor,
-    Color? solidForegroundColor,
-    Color? outlineBorderColor,
-    Color? outlineForegroundColor,
-    Color? ghostForegroundColor,
+  StreamButtonTypeStyle copyWith({
+    StreamButtonThemeStyle? solid,
+    StreamButtonThemeStyle? outline,
+    StreamButtonThemeStyle? ghost,
   }) {
-    final _this = (this as StreamButtonColors);
+    final _this = (this as StreamButtonTypeStyle);
 
-    return StreamButtonColors(
-      solidBackgroundColor: solidBackgroundColor ?? _this.solidBackgroundColor,
-      solidForegroundColor: solidForegroundColor ?? _this.solidForegroundColor,
-      outlineBorderColor: outlineBorderColor ?? _this.outlineBorderColor,
-      outlineForegroundColor:
-          outlineForegroundColor ?? _this.outlineForegroundColor,
-      ghostForegroundColor: ghostForegroundColor ?? _this.ghostForegroundColor,
+    return StreamButtonTypeStyle(
+      solid: solid ?? _this.solid,
+      outline: outline ?? _this.outline,
+      ghost: ghost ?? _this.ghost,
     );
   }
 
-  StreamButtonColors merge(StreamButtonColors? other) {
-    final _this = (this as StreamButtonColors);
+  StreamButtonTypeStyle merge(StreamButtonTypeStyle? other) {
+    final _this = (this as StreamButtonTypeStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -236,11 +153,9 @@ mixin _$StreamButtonColors {
     }
 
     return copyWith(
-      solidBackgroundColor: other.solidBackgroundColor,
-      solidForegroundColor: other.solidForegroundColor,
-      outlineBorderColor: other.outlineBorderColor,
-      outlineForegroundColor: other.outlineForegroundColor,
-      ghostForegroundColor: other.ghostForegroundColor,
+      solid: other.solid,
+      outline: other.outline,
+      ghost: other.ghost,
     );
   }
 
@@ -254,27 +169,18 @@ mixin _$StreamButtonColors {
       return false;
     }
 
-    final _this = (this as StreamButtonColors);
-    final _other = (other as StreamButtonColors);
+    final _this = (this as StreamButtonTypeStyle);
+    final _other = (other as StreamButtonTypeStyle);
 
-    return _other.solidBackgroundColor == _this.solidBackgroundColor &&
-        _other.solidForegroundColor == _this.solidForegroundColor &&
-        _other.outlineBorderColor == _this.outlineBorderColor &&
-        _other.outlineForegroundColor == _this.outlineForegroundColor &&
-        _other.ghostForegroundColor == _this.ghostForegroundColor;
+    return _other.solid == _this.solid &&
+        _other.outline == _this.outline &&
+        _other.ghost == _this.ghost;
   }
 
   @override
   int get hashCode {
-    final _this = (this as StreamButtonColors);
+    final _this = (this as StreamButtonTypeStyle);
 
-    return Object.hash(
-      runtimeType,
-      _this.solidBackgroundColor,
-      _this.solidForegroundColor,
-      _this.outlineBorderColor,
-      _this.outlineForegroundColor,
-      _this.ghostForegroundColor,
-    );
+    return Object.hash(runtimeType, _this.solid, _this.outline, _this.ghost);
   }
 }

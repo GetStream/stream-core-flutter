@@ -91,40 +91,33 @@ class DefaultStreamButton extends StatelessWidget {
     final buttonTheme = context.streamButtonTheme;
     final defaults = _StreamButtonDefaults(context: context);
 
-    final isDisabled = props.onTap == null;
-
-    final themeColors = switch (props.style) {
-      StreamButtonStyle.primary =>
-        isDisabled ? buttonTheme.disabledPrimaryButtonColors : buttonTheme.primaryButtonColors,
-      StreamButtonStyle.secondary =>
-        isDisabled ? buttonTheme.disabledSecondaryButtonColors : buttonTheme.secondaryButtonColors,
-      StreamButtonStyle.destructive =>
-        isDisabled ? buttonTheme.disabledDestructiveButtonColors : buttonTheme.destructiveButtonColors,
+    final themeButtonTypeStyle = switch (props.style) {
+      StreamButtonStyle.primary => buttonTheme.primary,
+      StreamButtonStyle.secondary => buttonTheme.secondary,
+      StreamButtonStyle.destructive => buttonTheme.destructive,
     };
 
-    final defaultColors = switch (props.style) {
-      StreamButtonStyle.primary => isDisabled ? defaults.disabledColors : defaults.primaryColors,
-      StreamButtonStyle.secondary => isDisabled ? defaults.disabledColors : defaults.secondaryColors,
-      StreamButtonStyle.destructive => isDisabled ? defaults.disabledColors : defaults.destructiveColors,
+    final themeStyle = switch (props.type) {
+      StreamButtonType.solid => themeButtonTypeStyle?.solid,
+      StreamButtonType.outline => themeButtonTypeStyle?.outline,
+      StreamButtonType.ghost => themeButtonTypeStyle?.ghost,
     };
 
-    final backgroundColor = switch (props.type) {
-      StreamButtonType.solid => themeColors?.solidBackgroundColor ?? defaultColors.solidBackgroundColor,
-      StreamButtonType.outline => Colors.transparent,
-      StreamButtonType.ghost => Colors.transparent,
+    final defaultButtonTypeStyle = switch (props.style) {
+      StreamButtonStyle.primary => defaults.primary,
+      StreamButtonStyle.secondary => defaults.secondary,
+      StreamButtonStyle.destructive => defaults.destructive,
+    };
+    final defaultStyle = switch (props.type) {
+      StreamButtonType.solid => defaultButtonTypeStyle.solid,
+      StreamButtonType.outline => defaultButtonTypeStyle.outline,
+      StreamButtonType.ghost => defaultButtonTypeStyle.ghost,
     };
 
-    final foregroundColor = switch (props.type) {
-      StreamButtonType.solid => themeColors?.solidForegroundColor ?? defaultColors.solidForegroundColor,
-      StreamButtonType.outline => themeColors?.outlineForegroundColor ?? defaultColors.outlineForegroundColor,
-      StreamButtonType.ghost => themeColors?.ghostForegroundColor ?? defaultColors.ghostForegroundColor,
-    };
-
-    final borderColor = switch (props.type) {
-      StreamButtonType.solid => null,
-      StreamButtonType.outline => themeColors?.outlineBorderColor ?? defaultColors.outlineBorderColor,
-      StreamButtonType.ghost => null,
-    };
+    final backgroundColor =
+        themeStyle?.backgroundColor ?? defaultStyle?.backgroundColor ?? WidgetStateProperty.all(Colors.transparent);
+    final foregroundColor = themeStyle?.foregroundColor ?? defaultStyle?.foregroundColor;
+    final borderColor = themeStyle?.borderColor ?? defaultStyle?.borderColor;
 
     final minimumSize = switch (props.size) {
       StreamButtonSize.small => 32.0,
@@ -137,14 +130,14 @@ class DefaultStreamButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: props.onTap,
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(backgroundColor),
-        foregroundColor: WidgetStateProperty.all(foregroundColor),
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
         minimumSize: WidgetStateProperty.all(Size(minimumSize, minimumSize)),
         padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: spacing.md)),
         side: borderColor == null
             ? null
-            : WidgetStateProperty.all(
-                BorderSide(color: borderColor),
+            : WidgetStateProperty.resolveWith(
+                (states) => BorderSide(color: borderColor.resolve(states)),
               ),
         elevation: WidgetStateProperty.all(0),
         shape: props.label == null
@@ -175,35 +168,76 @@ class _StreamButtonDefaults {
   final BuildContext context;
   final StreamColorScheme _colorScheme;
 
-  StreamButtonColors get primaryColors => StreamButtonColors(
-    solidBackgroundColor: _colorScheme.brand.shade500,
-    solidForegroundColor: _colorScheme.textOnAccent,
-    outlineBorderColor: _colorScheme.brand.shade200,
-    outlineForegroundColor: _colorScheme.brand.shade500,
-    ghostForegroundColor: _colorScheme.brand.shade500,
+  StreamButtonTypeStyle get primary => StreamButtonTypeStyle(
+    solid: StreamButtonThemeStyle(
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) =>
+            states.contains(WidgetState.disabled) ? _colorScheme.backgroundDisabled : _colorScheme.brand.shade500,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
+      ),
+    ),
+    outline: StreamButtonThemeStyle(
+      borderColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.brand.shade200,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.brand.shade500,
+      ),
+    ),
+    ghost: StreamButtonThemeStyle(
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.brand.shade500,
+      ),
+    ),
   );
 
-  StreamButtonColors get secondaryColors => StreamButtonColors(
-    solidBackgroundColor: _colorScheme.backgroundSurface,
-    solidForegroundColor: _colorScheme.textPrimary,
-    outlineBorderColor: _colorScheme.borderDefault,
-    outlineForegroundColor: _colorScheme.textPrimary,
-    ghostForegroundColor: _colorScheme.textPrimary,
+  StreamButtonTypeStyle get secondary => StreamButtonTypeStyle(
+    solid: StreamButtonThemeStyle(
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) =>
+            states.contains(WidgetState.disabled) ? _colorScheme.backgroundDisabled : _colorScheme.backgroundSurface,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textPrimary,
+      ),
+    ),
+    outline: StreamButtonThemeStyle(
+      borderColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.brand.shade200,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.brand.shade500,
+      ),
+    ),
+    ghost: StreamButtonThemeStyle(
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textPrimary,
+      ),
+    ),
   );
-
-  StreamButtonColors get destructiveColors => StreamButtonColors(
-    solidBackgroundColor: _colorScheme.accentError,
-    solidForegroundColor: _colorScheme.textOnAccent,
-    outlineBorderColor: _colorScheme.accentError,
-    outlineForegroundColor: _colorScheme.textOnAccent,
-    ghostForegroundColor: _colorScheme.textOnAccent,
-  );
-
-  StreamButtonColors get disabledColors => StreamButtonColors(
-    solidBackgroundColor: _colorScheme.backgroundDisabled,
-    solidForegroundColor: _colorScheme.textDisabled,
-    outlineBorderColor: _colorScheme.borderDefault,
-    outlineForegroundColor: _colorScheme.textDisabled,
-    ghostForegroundColor: _colorScheme.textDisabled,
+  StreamButtonTypeStyle get destructive => StreamButtonTypeStyle(
+    solid: StreamButtonThemeStyle(
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.backgroundDisabled : _colorScheme.accentError,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
+      ),
+    ),
+    outline: StreamButtonThemeStyle(
+      borderColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.accentError,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
+      ),
+    ),
+    ghost: StreamButtonThemeStyle(
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
+      ),
+    ),
   );
 }

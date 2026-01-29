@@ -32,36 +32,38 @@ class StreamButtonTheme extends InheritedTheme {
 @immutable
 class StreamButtonThemeData with _$StreamButtonThemeData {
   const StreamButtonThemeData({
-    this.primaryButtonColors,
-    this.disabledPrimaryButtonColors,
-    this.secondaryButtonColors,
-    this.disabledSecondaryButtonColors,
-    this.destructiveButtonColors,
-    this.disabledDestructiveButtonColors,
+    this.primary,
+    this.secondary,
+    this.destructive,
   });
 
-  final StreamButtonColors? primaryButtonColors;
-  final StreamButtonColors? disabledPrimaryButtonColors;
-  final StreamButtonColors? secondaryButtonColors;
-  final StreamButtonColors? disabledSecondaryButtonColors;
-  final StreamButtonColors? destructiveButtonColors;
-  final StreamButtonColors? disabledDestructiveButtonColors;
+  final StreamButtonTypeStyle? primary;
+  final StreamButtonTypeStyle? secondary;
+  final StreamButtonTypeStyle? destructive;
 }
 
 @themeGen
 @immutable
-class StreamButtonColors with _$StreamButtonColors {
-  const StreamButtonColors({
-    this.solidBackgroundColor,
-    this.solidForegroundColor,
-    this.outlineBorderColor,
-    this.outlineForegroundColor,
-    this.ghostForegroundColor,
+class StreamButtonTypeStyle with _$StreamButtonTypeStyle {
+  const StreamButtonTypeStyle({
+    this.solid,
+    this.outline,
+    this.ghost,
   });
 
-  final Color? solidBackgroundColor;
-  final Color? solidForegroundColor;
-  final Color? outlineBorderColor;
-  final Color? outlineForegroundColor;
-  final Color? ghostForegroundColor;
+  final StreamButtonThemeStyle? solid;
+  final StreamButtonThemeStyle? outline;
+  final StreamButtonThemeStyle? ghost;
+}
+
+class StreamButtonThemeStyle {
+  const StreamButtonThemeStyle({
+    this.backgroundColor,
+    this.foregroundColor,
+    this.borderColor,
+  });
+
+  final WidgetStateProperty<Color>? backgroundColor;
+  final WidgetStateProperty<Color>? foregroundColor;
+  final WidgetStateProperty<Color>? borderColor;
 }
