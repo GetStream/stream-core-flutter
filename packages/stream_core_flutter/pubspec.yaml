@@ -11,6 +11,7 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter:
     sdk: flutter
+  flutter_svg: ^2.2.3
   stream_core: ^0.4.0
   theme_extensions_builder_annotation: ^7.1.0
 
@@ -19,3 +20,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   theme_extensions_builder: ^7.1.0
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/file_type/

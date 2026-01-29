@@ -10,6 +10,8 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:design_system_gallery/components/accessories/file_type_icons.dart'
+    as _design_system_gallery_components_accessories_file_type_icons;
 import 'package:design_system_gallery/components/stream_avatar.dart'
     as _design_system_gallery_components_stream_avatar;
 import 'package:design_system_gallery/components/stream_avatar_stack.dart'
@@ -122,6 +124,33 @@ final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookCategory(
     name: 'Components',
     children: [
+      _widgetbook.WidgetbookFolder(
+        name: 'Accessories',
+        children: [
+          _widgetbook.WidgetbookFolder(
+            name: 'File Type Icon',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'FileTypeIcon',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Playground',
+                    builder:
+                        _design_system_gallery_components_accessories_file_type_icons
+                            .buildFileTypeIconPlayground,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Showcase',
+                    builder:
+                        _design_system_gallery_components_accessories_file_type_icons
+                            .buildFileTypeIconShowcase,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
       _widgetbook.WidgetbookFolder(
         name: 'Avatar',
         children: [
