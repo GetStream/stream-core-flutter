@@ -43,8 +43,8 @@ class GalleryShell extends StatelessWidget {
     );
 
     final themePanel = ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 340),
-      child: ThemeCustomizationPanel(),
+      constraints: const BoxConstraints(maxWidth: 340),
+      child: const ThemeCustomizationPanel(),
     );
 
     return Scaffold(
