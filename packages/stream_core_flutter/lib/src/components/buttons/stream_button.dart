@@ -205,10 +205,10 @@ class _StreamButtonDefaults {
     ),
     outline: StreamButtonThemeStyle(
       borderColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.brand.shade200,
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.borderDefault,
       ),
       foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.brand.shade500,
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textPrimary,
       ),
     ),
     ghost: StreamButtonThemeStyle(
@@ -231,12 +231,12 @@ class _StreamButtonDefaults {
         (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.accentError,
       ),
       foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.accentError,
       ),
     ),
     ghost: StreamButtonThemeStyle(
       foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
+        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.accentError,
       ),
     ),
   );

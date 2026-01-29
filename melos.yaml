@@ -126,6 +126,10 @@ scripts:
     melos exec -c 1 --fail-fast --depends-on=flutter_localizations -- \
      "flutter gen-l10n && dart format ."
 
+  test:ci:
+    run: melos run test:dart --no-select && melos run test:flutter_ci --no-select
+    description: Run all Dart & Flutter tests in this project.
+
   test:all:
     run: melos run test:dart --no-select && melos run test:flutter --no-select
     description: Run all Dart & Flutter tests in this project.
@@ -140,6 +144,13 @@ scripts:
   test:flutter:
     run: melos exec -c 4 --fail-fast -- "flutter test --coverage"
     description: Run Flutter tests for a specific package in this project.
+    packageFilters:
+      flutter: true
+      dirExists: test
+
+  test:flutter_ci:
+    run: melos exec -c 4 --fail-fast -- "flutter test --dart-define=IS_CI=true --coverage"
+    description: Run Flutter tests on CI for a specific package in this project.
     packageFilters:
       flutter: true
       dirExists: test
