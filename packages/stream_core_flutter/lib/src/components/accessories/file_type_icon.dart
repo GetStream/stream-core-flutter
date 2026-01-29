@@ -47,13 +47,18 @@ class FileTypeIcon extends StatelessWidget {
           },
           right: 0,
           left: 0,
-          child: Text(
-            extension ?? '',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: StreamColors.white,
-              fontWeight: .bold,
-              fontSize: 8,
+          // We never want the text on the icon to be scaled, so we clamp the text scale factor to 1.
+          child: StreamTextScaleFactorClamper(
+            minTextScaleFactor: 1,
+            maxTextScaleFactor: 1,
+            child: Text(
+              extension ?? '',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: StreamColors.white,
+                fontWeight: .bold,
+                fontSize: 8,
+              ),
             ),
           ),
         ),
