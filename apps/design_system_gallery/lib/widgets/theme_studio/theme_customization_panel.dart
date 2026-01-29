@@ -36,8 +36,21 @@ StreamAvatarColorPair _generateRandomAvatarPair({required bool isDark}) {
 /// A panel widget for customizing the Stream theme.
 ///
 /// Organized into sections matching [StreamColorScheme] structure.
-class ThemeCustomizationPanel extends StatelessWidget {
+class ThemeCustomizationPanel extends StatefulWidget {
   const ThemeCustomizationPanel({super.key});
+
+  @override
+  State<ThemeCustomizationPanel> createState() => _ThemeCustomizationPanelState();
+}
+
+class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
+  final _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +71,10 @@ class ThemeCustomizationPanel extends StatelessWidget {
           _buildHeader(context),
           Expanded(
             child: Scrollbar(
+              controller: _scrollController,
               thumbVisibility: true,
               child: SingleChildScrollView(
+                controller: _scrollController,
                 padding: EdgeInsets.all(spacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
