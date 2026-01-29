@@ -3,6 +3,21 @@ import 'package:stream_core_flutter/stream_core_flutter.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
+/// Returns a typical file extension for the given category.
+String _getExtension(FileTypeCategory category) {
+  return switch (category) {
+    FileTypeCategory.pdf => 'pdf',
+    FileTypeCategory.text => 'doc',
+    FileTypeCategory.presentation => 'ppt',
+    FileTypeCategory.spreadsheet => 'xls',
+    FileTypeCategory.code => 'dart',
+    FileTypeCategory.video => 'mp4',
+    FileTypeCategory.audio => 'mp3',
+    FileTypeCategory.compression => 'zip',
+    FileTypeCategory.other => 'wkq',
+  };
+}
+
 // =============================================================================
 // Playground
 // =============================================================================
@@ -29,11 +44,17 @@ Widget buildFileTypeIconPlayground(BuildContext context) {
     description: 'Icon size preset.',
   );
 
+  final extension = context.knobs.string(
+    label: 'Extension',
+    initialValue: 'pdf',
+    description: 'File extension text displayed on the icon (e.g., pdf, doc, mp4).',
+  );
+
   return Center(
     child: FileTypeIcon(
       category: category,
       size: size,
-      extension: 'pdf',
+      extension: extension.isNotEmpty ? extension : null,
     ),
   );
 }
@@ -73,6 +94,261 @@ Widget buildFileTypeIconShowcase(BuildContext context) {
       ),
     ),
   );
+}
+
+// =============================================================================
+// MIME Types
+// =============================================================================
+
+/// All supported MIME types grouped by category.
+const _supportedMimeTypes = <FileTypeCategory, List<String>>{
+  FileTypeCategory.pdf: [
+    'application/pdf',
+  ],
+  FileTypeCategory.audio: [
+    'audio/mpeg',
+    'audio/aac',
+    'audio/wav',
+    'audio/x-wav',
+    'audio/flac',
+    'audio/mp4',
+    'audio/ogg',
+    'audio/aiff',
+    'audio/alac',
+  ],
+  FileTypeCategory.compression: [
+    'application/zip',
+    'application/x-7z-compressed',
+    'application/x-arj',
+    'application/vnd.debian.binary-package',
+    'application/x-apple-diskimage',
+    'application/x-rar-compressed',
+    'application/x-rpm',
+    'application/x-compress',
+  ],
+  FileTypeCategory.presentation: [
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.apple.keynote',
+    'application/vnd.oasis.opendocument.presentation',
+  ],
+  FileTypeCategory.spreadsheet: [
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel.sheet.macroEnabled.12',
+    'application/vnd.oasis.opendocument.spreadsheet',
+  ],
+  FileTypeCategory.text: [
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.oasis.opendocument.text',
+    'text/plain',
+    'application/rtf',
+    'application/x-tex',
+    'application/vnd.wordperfect',
+  ],
+  FileTypeCategory.code: [
+    'text/html',
+    'text/csv',
+    'application/xml',
+    'text/markdown',
+    'application/x-tar',
+  ],
+  FileTypeCategory.other: [
+    'application/x-wiki',
+    'application/octet-stream',
+  ],
+};
+
+@widgetbook.UseCase(
+  name: 'MIME Types',
+  type: FileTypeIcon,
+  path: '[Components]/Accessories/File Type Icon',
+)
+Widget buildFileTypeIconMimeTypes(BuildContext context) {
+  final colorScheme = context.streamColorScheme;
+  final textTheme = context.streamTextTheme;
+  final spacing = context.streamSpacing;
+
+  return DefaultTextStyle(
+    style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),
+    child: SingleChildScrollView(
+      padding: EdgeInsets.all(spacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Supported MIME Types',
+            style: textTheme.headingSm.copyWith(color: colorScheme.textPrimary),
+          ),
+          SizedBox(height: spacing.xs),
+          Text(
+            'Use FileTypeIcon.fromMimeType() to automatically resolve the icon and extension from a MIME type.',
+            style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary),
+          ),
+          SizedBox(height: spacing.lg),
+          for (final category in _supportedMimeTypes.keys) ...[
+            _MimeTypeCategorySection(
+              category: category,
+              mimeTypes: _supportedMimeTypes[category]!,
+            ),
+            SizedBox(height: spacing.lg),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
+class _MimeTypeCategorySection extends StatelessWidget {
+  const _MimeTypeCategorySection({
+    required this.category,
+    required this.mimeTypes,
+  });
+
+  final FileTypeCategory category;
+  final List<String> mimeTypes;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundSurface,
+        borderRadius: BorderRadius.all(radius.lg),
+        boxShadow: boxShadow.elevation1,
+      ),
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.all(radius.lg),
+        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(spacing.md),
+            color: colorScheme.backgroundSurfaceSubtle,
+            child: Row(
+              children: [
+                FileTypeIcon(
+                  category: category,
+                  extension: _getExtension(category),
+                ),
+                SizedBox(width: spacing.sm),
+                Text(
+                  category.name.toUpperCase(),
+                  style: textTheme.captionEmphasis.copyWith(
+                    color: colorScheme.textPrimary,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                SizedBox(width: spacing.sm),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.xs + spacing.xxs,
+                    vertical: spacing.xxs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.accentPrimary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.all(radius.xs),
+                  ),
+                  child: Text(
+                    '${mimeTypes.length} types',
+                    style: textTheme.metadataEmphasis.copyWith(
+                      color: colorScheme.accentPrimary,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // MIME type list
+          Padding(
+            padding: EdgeInsets.all(spacing.md),
+            child: Wrap(
+              spacing: spacing.sm,
+              runSpacing: spacing.sm,
+              children: mimeTypes.map((mimeType) => _MimeTypeChip(mimeType: mimeType)).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MimeTypeChip extends StatelessWidget {
+  const _MimeTypeChip({required this.mimeType});
+
+  final String mimeType;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    final (_, extension) = FileTypeIcon.getExtension(mimeType);
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 320),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.sm,
+          vertical: spacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: colorScheme.backgroundSurfaceSubtle,
+          borderRadius: BorderRadius.all(radius.sm),
+          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FileTypeIcon.fromMimeType(mimeType: mimeType),
+            SizedBox(width: spacing.sm),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    mimeType,
+                    style: textTheme.metadataDefault.copyWith(
+                      color: colorScheme.textPrimary,
+                      fontFamily: 'monospace',
+                      fontSize: 11,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (extension != null)
+                    Text(
+                      '.$extension',
+                      style: textTheme.metadataEmphasis.copyWith(
+                        color: colorScheme.accentPrimary,
+                        fontFamily: 'monospace',
+                        fontSize: 10,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // =============================================================================
@@ -148,6 +424,7 @@ class _CategoryCard extends StatelessWidget {
                 child: FileTypeIcon(
                   category: category,
                   size: FileTypeIconSize.s48,
+                  extension: _getExtension(category),
                 ),
               ),
             ),
@@ -382,6 +659,14 @@ class _FileListItem extends StatelessWidget {
   final String fileName;
   final String fileSize;
 
+  String? _extractExtension(String fileName) {
+    final parts = fileName.split('.');
+    if (parts.length > 1) {
+      return parts.last.toLowerCase();
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
@@ -390,7 +675,10 @@ class _FileListItem extends StatelessWidget {
 
     return Row(
       children: [
-        FileTypeIcon(category: category),
+        FileTypeIcon(
+          category: category,
+          extension: _extractExtension(fileName),
+        ),
         SizedBox(width: spacing.sm),
         Expanded(
           child: Column(
@@ -443,6 +731,7 @@ class _FileGridItem extends StatelessWidget {
           FileTypeIcon(
             category: category,
             size: FileTypeIconSize.s48,
+            extension: _getExtension(category),
           ),
           SizedBox(height: spacing.xs),
           Text(

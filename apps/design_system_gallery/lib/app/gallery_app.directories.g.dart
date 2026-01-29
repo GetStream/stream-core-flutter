@@ -134,6 +134,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'FileTypeIcon',
                 useCases: [
                   _widgetbook.WidgetbookUseCase(
+                    name: 'MIME Types',
+                    builder:
+                        _design_system_gallery_components_accessories_file_type_icons
+                            .buildFileTypeIconMimeTypes,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
                     name: 'Playground',
                     builder:
                         _design_system_gallery_components_accessories_file_type_icons

@@ -11,6 +11,21 @@ class FileTypeIcon extends StatelessWidget {
     this.size = .s40,
   });
 
+  factory FileTypeIcon.fromMimeType({
+    Key? key,
+    required String mimeType,
+    FileTypeIconSize size = .s40,
+  }) {
+    final (category, extension) = getExtension(mimeType);
+
+    return FileTypeIcon(
+      key: key,
+      category: category,
+      extension: extension,
+      size: size,
+    );
+  }
+
   final FileTypeCategory category;
   final String? extension;
   final FileTypeIconSize size;
@@ -45,6 +60,52 @@ class FileTypeIcon extends StatelessWidget {
       ],
     );
   }
+
+  static (FileTypeCategory category, String? fileExtension) getExtension(String? mimeType) => switch (mimeType) {
+    'audio/mpeg' => (FileTypeCategory.audio, 'mp3'),
+    'audio/aac' => (FileTypeCategory.audio, 'aac'),
+    'audio/wav' || 'audio/x-wav' => (FileTypeCategory.audio, 'wav'),
+    'audio/flac' => (FileTypeCategory.audio, 'flac'),
+    'audio/mp4' => (FileTypeCategory.audio, 'm4a'),
+    'audio/ogg' => (FileTypeCategory.audio, 'ogg'),
+    'audio/aiff' => (FileTypeCategory.audio, 'aiff'),
+    'audio/alac' => (FileTypeCategory.audio, 'alac'),
+    'application/zip' => (FileTypeCategory.compression, 'zip'),
+    'application/x-7z-compressed' => (FileTypeCategory.compression, '7z'),
+    'application/x-arj' => (FileTypeCategory.compression, 'arj'),
+    'application/vnd.debian.binary-package' => (FileTypeCategory.compression, 'deb'),
+    'application/x-apple-diskimage' => (FileTypeCategory.compression, 'pkg'),
+    'application/x-rar-compressed' => (FileTypeCategory.compression, 'rar'),
+    'application/x-rpm' => (FileTypeCategory.compression, 'rpm'),
+    'application/x-tar' => (FileTypeCategory.code, 'tar'),
+    'application/x-compress' => (FileTypeCategory.compression, 'z'),
+    'application/vnd.ms-powerpoint' => (FileTypeCategory.presentation, 'ppt'),
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation' => (
+      FileTypeCategory.presentation,
+      'pptx',
+    ),
+    'application/vnd.apple.keynote' => (FileTypeCategory.presentation, 'key'),
+    'application/vnd.oasis.opendocument.presentation' => (FileTypeCategory.presentation, 'odp'),
+    'application/vnd.ms-excel' => (FileTypeCategory.spreadsheet, 'xls'),
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => (FileTypeCategory.spreadsheet, 'xlsx'),
+    'application/vnd.ms-excel.sheet.macroEnabled.12' => (FileTypeCategory.spreadsheet, 'xlsm'),
+    'application/vnd.oasis.opendocument.spreadsheet' => (FileTypeCategory.spreadsheet, 'ods'),
+    'application/msword' => (FileTypeCategory.text, 'doc'),
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => (FileTypeCategory.text, 'docx'),
+    'application/vnd.oasis.opendocument.text' => (FileTypeCategory.text, 'odt'),
+    'text/plain' => (FileTypeCategory.text, 'txt'),
+    'application/rtf' => (FileTypeCategory.text, 'rtf'),
+    'application/x-tex' => (FileTypeCategory.text, 'tex'),
+    'application/vnd.wordperfect' => (FileTypeCategory.text, 'wdp'),
+    'text/html' => (FileTypeCategory.code, 'html'),
+    'text/csv' => (FileTypeCategory.code, 'csv'),
+    'application/xml' => (FileTypeCategory.code, 'xml'),
+    'text/markdown' => (FileTypeCategory.code, 'md'),
+    'application/octet-stream' => (FileTypeCategory.other, null),
+    'application/pdf' => (FileTypeCategory.pdf, 'pdf'),
+    'application/x-wiki' => (FileTypeCategory.other, 'wkq'),
+    _ => (FileTypeCategory.other, null),
+  };
 }
 
 enum FileTypeIconSize {
