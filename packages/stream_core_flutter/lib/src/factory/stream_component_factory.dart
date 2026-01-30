@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'components/stream_button.dart' show DefaultStreamButton, StreamButtonProps;
+import '../components/buttons/stream_button.dart' show DefaultStreamButton, StreamButtonProps;
 import '../components/accessories/file_type_icon.dart' show DefaultStreamFileTypeIcon, StreamFileTypeIconProps;
 
 typedef StreamComponentBuilder<T> = Widget Function(BuildContext context, T props);

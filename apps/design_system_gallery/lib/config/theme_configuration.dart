@@ -336,7 +336,7 @@ class ThemeConfiguration extends ChangeNotifier {
       // Brand
       brand: _brandPrimaryColor == null
           ? null
-          : StreamColorSwatch.fromColor(_brandPrimaryColor ?? StreamColors.blue.shade500),
+          : StreamColorSwatch.fromColor(_brandPrimaryColor ?? StreamColors.blue.shade500, brightness: _brightness),
       // Accent - brand primary affects accentPrimary
       accentPrimary: effectiveAccentPrimary,
       accentSuccess: _accentSuccess,

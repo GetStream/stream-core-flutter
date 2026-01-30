@@ -23,11 +23,14 @@ jobs:
   analyze:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    env:
+      IS_CI: 'true'
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          lfs: 'true'
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2

@@ -20,7 +20,9 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
     StreamAvatarThemeData? avatarTheme,
+    StreamButtonThemeData? buttonTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamComponentFactory? componentFactory,
   }) {
     final _this = (this as StreamTheme);
 
@@ -33,7 +35,9 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       textTheme: textTheme ?? _this.textTheme,
       boxShadow: boxShadow ?? _this.boxShadow,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
+      buttonTheme: buttonTheme ?? _this.buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
+      componentFactory: componentFactory ?? _this.componentFactory,
     );
   }
 
@@ -62,11 +66,15 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.avatarTheme,
         t,
       )!,
+      buttonTheme: t < 0.5 ? _this.buttonTheme : other.buttonTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
         _this.onlineIndicatorTheme,
         other.onlineIndicatorTheme,
         t,
       )!,
+      componentFactory: t < 0.5
+          ? _this.componentFactory
+          : other.componentFactory,
     );
   }
 
@@ -91,7 +99,9 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
         _other.avatarTheme == _this.avatarTheme &&
-        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
+        _other.buttonTheme == _this.buttonTheme &&
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
+        _other.componentFactory == _this.componentFactory;
   }
 
   @override
@@ -108,7 +118,9 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.textTheme,
       _this.boxShadow,
       _this.avatarTheme,
+      _this.buttonTheme,
       _this.onlineIndicatorTheme,
+      _this.componentFactory,
     );
   }
 }
