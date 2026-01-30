@@ -3,22 +3,22 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../stream_core_flutter.dart';
 
-class FileTypeIcon extends StatelessWidget {
-  const FileTypeIcon({
+class StreamFileTypeIcon extends StatelessWidget {
+  const StreamFileTypeIcon({
     super.key,
     required this.category,
     this.extension,
     this.size = .s40,
   });
 
-  factory FileTypeIcon.fromMimeType({
+  factory StreamFileTypeIcon.fromMimeType({
     Key? key,
     required String mimeType,
     FileTypeIconSize size = .s40,
   }) {
     final (category, extension) = getExtension(mimeType);
 
-    return FileTypeIcon(
+    return StreamFileTypeIcon(
       key: key,
       category: category,
       extension: extension,

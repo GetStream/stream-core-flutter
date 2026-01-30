@@ -24,7 +24,7 @@ String _getExtension(FileTypeCategory category) {
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: FileTypeIcon,
+  type: StreamFileTypeIcon,
   path: '[Components]/Accessories/File Type Icon',
 )
 Widget buildFileTypeIconPlayground(BuildContext context) {
@@ -51,7 +51,7 @@ Widget buildFileTypeIconPlayground(BuildContext context) {
   );
 
   return Center(
-    child: FileTypeIcon(
+    child: StreamFileTypeIcon(
       category: category,
       size: size,
       extension: extension.isNotEmpty ? extension : null,
@@ -65,7 +65,7 @@ Widget buildFileTypeIconPlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: FileTypeIcon,
+  type: StreamFileTypeIcon,
   path: '[Components]/Accessories/File Type Icon',
 )
 Widget buildFileTypeIconShowcase(BuildContext context) {
@@ -173,7 +173,7 @@ const _supportedMimeTypes = <FileTypeCategory, List<String>>{
 
 @widgetbook.UseCase(
   name: 'MIME Types',
-  type: FileTypeIcon,
+  type: StreamFileTypeIcon,
   path: '[Components]/Accessories/File Type Icon',
 )
 Widget buildFileTypeIconMimeTypes(BuildContext context) {
@@ -250,7 +250,7 @@ class _MimeTypeCategorySection extends StatelessWidget {
             color: colorScheme.backgroundSurfaceSubtle,
             child: Row(
               children: [
-                FileTypeIcon(
+                StreamFileTypeIcon(
                   category: category,
                   extension: _getExtension(category),
                 ),
@@ -310,7 +310,7 @@ class _MimeTypeChip extends StatelessWidget {
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
-    final (_, extension) = FileTypeIcon.getExtension(mimeType);
+    final (_, extension) = StreamFileTypeIcon.getExtension(mimeType);
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 320),
@@ -327,7 +327,7 @@ class _MimeTypeChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FileTypeIcon.fromMimeType(mimeType: mimeType),
+            StreamFileTypeIcon.fromMimeType(mimeType: mimeType),
             SizedBox(width: spacing.sm),
             Flexible(
               child: Column(
@@ -432,7 +432,7 @@ class _CategoryCard extends StatelessWidget {
               width: 80,
               height: 80,
               child: Center(
-                child: FileTypeIcon(
+                child: StreamFileTypeIcon(
                   category: category,
                   size: FileTypeIconSize.s48,
                   extension: _getExtension(category),
@@ -553,7 +553,7 @@ class _SizeItem extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        FileTypeIcon(
+        StreamFileTypeIcon(
           category: FileTypeCategory.pdf,
           size: size,
           extension: 'pdf',
@@ -686,7 +686,7 @@ class _FileListItem extends StatelessWidget {
 
     return Row(
       children: [
-        FileTypeIcon(
+        StreamFileTypeIcon(
           category: category,
           extension: _extractExtension(fileName),
         ),
@@ -739,7 +739,7 @@ class _FileGridItem extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FileTypeIcon(
+          StreamFileTypeIcon(
             category: category,
             size: FileTypeIconSize.s48,
             extension: _getExtension(category),
