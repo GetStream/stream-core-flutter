@@ -13,6 +13,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   @override
   ThemeExtension<StreamTheme> copyWith({
     Brightness? brightness,
+    StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
     StreamTypography? typography,
@@ -21,12 +22,12 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBoxShadow? boxShadow,
     StreamAvatarThemeData? avatarTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
-    StreamIcons? icons,
   }) {
     final _this = (this as StreamTheme);
 
     return StreamTheme.raw(
       brightness: brightness ?? _this.brightness,
+      icons: icons ?? _this.icons,
       radius: radius ?? _this.radius,
       spacing: spacing ?? _this.spacing,
       typography: typography ?? _this.typography,
@@ -35,7 +36,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       boxShadow: boxShadow ?? _this.boxShadow,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
-      icons: icons ?? _this.icons,
     );
   }
 
@@ -52,6 +52,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: t < 0.5 ? _this.brightness : other.brightness,
+      icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
       radius: StreamRadius.lerp(_this.radius, other.radius, t)!,
       spacing: StreamSpacing.lerp(_this.spacing, other.spacing, t)!,
       typography: StreamTypography.lerp(_this.typography, other.typography, t)!,
@@ -69,7 +70,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.onlineIndicatorTheme,
         t,
       )!,
-      icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
     );
   }
 
@@ -87,6 +87,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _other = (other as StreamTheme);
 
     return _other.brightness == _this.brightness &&
+        _other.icons == _this.icons &&
         _other.radius == _this.radius &&
         _other.spacing == _this.spacing &&
         _other.typography == _this.typography &&
@@ -94,8 +95,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
         _other.avatarTheme == _this.avatarTheme &&
-        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
-        _other.icons == _this.icons;
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
   }
 
   @override
@@ -105,6 +105,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     return Object.hash(
       runtimeType,
       _this.brightness,
+      _this.icons,
       _this.radius,
       _this.spacing,
       _this.typography,
@@ -113,7 +114,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.boxShadow,
       _this.avatarTheme,
       _this.onlineIndicatorTheme,
-      _this.icons,
     );
   }
 }

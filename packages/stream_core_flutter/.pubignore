@@ -1,2 +1,2 @@
-# Exclude icon sources from published package
-assets/icons/
+# Exclude assets source from published package
+assets_source/
