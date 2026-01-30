@@ -21,7 +21,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBoxShadow? boxShadow,
     StreamAvatarThemeData? avatarTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
-    StreamIcon? icons,
+    StreamIcons? icons,
   }) {
     final _this = (this as StreamTheme);
 
@@ -69,7 +69,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.onlineIndicatorTheme,
         t,
       )!,
-      icons: t < 0.5 ? _this.icons : other.icons,
+      icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
     );
   }
 

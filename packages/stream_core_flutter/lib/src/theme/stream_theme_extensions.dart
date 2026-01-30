@@ -2,13 +2,13 @@ import 'package:flutter/widgets.dart';
 
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
 import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
-import 'stream_icon.dart';
 import 'stream_theme.dart';
 
 /// Extension on [BuildContext] for convenient access to [StreamTheme].
@@ -38,6 +38,9 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamColorScheme] from the current theme.
   StreamColorScheme get streamColorScheme => streamTheme.colorScheme;
 
+  /// Returns the [StreamIcons] from the current theme.
+  StreamIcons get streamIcons => streamTheme.icons;
+
   /// Returns the [StreamTextTheme] from the current theme.
   StreamTextTheme get streamTextTheme => streamTheme.textTheme;
 
@@ -52,9 +55,6 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamBoxShadow] from the current theme.
   StreamBoxShadow get streamBoxShadow => streamTheme.boxShadow;
-
-  /// Returns the [StreamIcon] from the current theme.
-  StreamIcon get streamIcons => streamTheme.icons;
 
   /// Returns the [StreamAvatarThemeData] from the nearest ancestor.
   StreamAvatarThemeData get streamAvatarTheme => StreamAvatarTheme.of(this);

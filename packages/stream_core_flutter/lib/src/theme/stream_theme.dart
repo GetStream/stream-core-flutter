@@ -6,13 +6,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
 import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
-import 'stream_icon.dart';
 
 part 'stream_theme.g.theme.dart';
 
@@ -72,9 +72,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme({
     Brightness brightness = .light,
     TargetPlatform? platform,
+    StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
-    StreamIcon? icons,
     StreamTypography? typography,
     StreamColorScheme? colorScheme,
     StreamTextTheme? textTheme,
@@ -100,8 +100,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
 
-    icons ??= StreamIcon();
-
     return .raw(
       brightness: brightness,
       radius: radius,
@@ -112,7 +110,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       boxShadow: boxShadow,
       avatarTheme: avatarTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
-      icons: icons,
+      icons: const StreamIcons().merge(icons),
     );
   }
 
@@ -173,6 +171,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The brightness of this theme.
   final Brightness brightness;
 
+  /// The icons for this theme.
+  final StreamIcons icons;
+
   /// The border radius values for this theme.
   final StreamRadius radius;
 
@@ -201,7 +202,4 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
-
-  /// The icons for this theme.
-  final StreamIcon icons;
 }
