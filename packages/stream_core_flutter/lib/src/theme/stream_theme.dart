@@ -91,6 +91,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final isDark = brightness == Brightness.dark;
 
     // Primitives
+    icons ??= const StreamIcons();
     radius ??= StreamRadius(platform: platform);
     spacing ??= const StreamSpacing();
     typography ??= StreamTypography(platform: platform);
@@ -109,6 +110,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     return .raw(
       brightness: brightness,
+      icons: icons,
       radius: radius,
       spacing: spacing,
       typography: typography,
@@ -118,7 +120,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       buttonTheme: buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
-      icons: const StreamIcons().merge(icons),
       componentFactory: componentFactory,
     );
   }
