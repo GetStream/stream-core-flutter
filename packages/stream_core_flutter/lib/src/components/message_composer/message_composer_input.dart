@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+import '../../../stream_core_flutter.dart';
+import '../../factory/stream_component_factory.dart';
+
+class StreamMessageComposerInput extends StatelessWidget {
+  const StreamMessageComposerInput({super.key, required this.props});
+
+  final MessageComposerComponentProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamTheme.of(
+      context,
+    ).componentFactory.messageComposer.input(context, props);
+  }
+}
+
+class DefaultStreamMessageComposerInput extends StatelessWidget {
+  const DefaultStreamMessageComposerInput({super.key, required this.props});
+
+  static StreamComponentBuilder<MessageComposerComponentProps> get factory =>
+      (context, props) => DefaultStreamMessageComposerInput(props: props);
+
+  final MessageComposerComponentProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: Add message composer theme
+
+    return Container(
+      decoration: BoxDecoration(
+        color: context.streamColorScheme.backgroundElevation1,
+        borderRadius: BorderRadius.all(context.streamRadius.xxxl),
+        border: Border.all(
+          color: context.streamColorScheme.borderDefault,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          StreamMessageComposerInputHeader(props: props),
+          Row(
+            children: [
+              StreamMessageComposerInputLeading(props: props),
+              Expanded(child: _MessageComposerInputField(props: props)),
+              StreamMessageComposerInputTrailing(props: props),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MessageComposerInputField extends StatelessWidget {
+  const _MessageComposerInputField({required this.props});
+
+  final MessageComposerComponentProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultBorderRadius = context.streamRadius.lg;
+    final composerBorderRadius = context.streamRadius.xxxl;
+
+    final border = OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.only(
+        bottomLeft: composerBorderRadius,
+        bottomRight: defaultBorderRadius,
+        topLeft: defaultBorderRadius,
+        topRight: defaultBorderRadius,
+      ),
+    );
+
+    return TextField(
+      decoration: InputDecoration(
+        border: border,
+        focusedBorder: border,
+        enabledBorder: border,
+        errorBorder: border,
+        disabledBorder: border,
+        fillColor: Colors.transparent,
+        hintText: 'Placeholder',
+      ),
+    );
+  }
+}

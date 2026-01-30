@@ -69,6 +69,31 @@ mixin _$StreamColorScheme {
         b.backgroundDisabled,
         t,
       )!,
+      backgroundElevation0: Color.lerp(
+        a.backgroundElevation0,
+        b.backgroundElevation0,
+        t,
+      )!,
+      backgroundElevation1: Color.lerp(
+        a.backgroundElevation1,
+        b.backgroundElevation1,
+        t,
+      )!,
+      backgroundElevation2: Color.lerp(
+        a.backgroundElevation2,
+        b.backgroundElevation2,
+        t,
+      )!,
+      backgroundElevation3: Color.lerp(
+        a.backgroundElevation3,
+        b.backgroundElevation3,
+        t,
+      )!,
+      backgroundElevation4: Color.lerp(
+        a.backgroundElevation4,
+        b.backgroundElevation4,
+        t,
+      )!,
       borderDefault: Color.lerp(a.borderDefault, b.borderDefault, t)!,
       borderSurface: Color.lerp(a.borderSurface, b.borderSurface, t)!,
       borderSurfaceSubtle: Color.lerp(
@@ -122,6 +147,11 @@ mixin _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    Color? backgroundElevation0,
+    Color? backgroundElevation1,
+    Color? backgroundElevation2,
+    Color? backgroundElevation3,
+    Color? backgroundElevation4,
     Color? borderDefault,
     Color? borderSurface,
     Color? borderSurfaceSubtle,
@@ -169,6 +199,11 @@ mixin _$StreamColorScheme {
           backgroundSurfaceStrong ?? _this.backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay ?? _this.backgroundOverlay,
       backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
+      backgroundElevation0: backgroundElevation0 ?? _this.backgroundElevation0,
+      backgroundElevation1: backgroundElevation1 ?? _this.backgroundElevation1,
+      backgroundElevation2: backgroundElevation2 ?? _this.backgroundElevation2,
+      backgroundElevation3: backgroundElevation3 ?? _this.backgroundElevation3,
+      backgroundElevation4: backgroundElevation4 ?? _this.backgroundElevation4,
       borderDefault: borderDefault ?? _this.borderDefault,
       borderSurface: borderSurface ?? _this.borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle ?? _this.borderSurfaceSubtle,
@@ -225,6 +260,11 @@ mixin _$StreamColorScheme {
       backgroundSurfaceStrong: other.backgroundSurfaceStrong,
       backgroundOverlay: other.backgroundOverlay,
       backgroundDisabled: other.backgroundDisabled,
+      backgroundElevation0: other.backgroundElevation0,
+      backgroundElevation1: other.backgroundElevation1,
+      backgroundElevation2: other.backgroundElevation2,
+      backgroundElevation3: other.backgroundElevation3,
+      backgroundElevation4: other.backgroundElevation4,
       borderDefault: other.borderDefault,
       borderSurface: other.borderSurface,
       borderSurfaceSubtle: other.borderSurfaceSubtle,
@@ -282,6 +322,11 @@ mixin _$StreamColorScheme {
         _other.backgroundSurfaceStrong == _this.backgroundSurfaceStrong &&
         _other.backgroundOverlay == _this.backgroundOverlay &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
+        _other.backgroundElevation0 == _this.backgroundElevation0 &&
+        _other.backgroundElevation1 == _this.backgroundElevation1 &&
+        _other.backgroundElevation2 == _this.backgroundElevation2 &&
+        _other.backgroundElevation3 == _this.backgroundElevation3 &&
+        _other.backgroundElevation4 == _this.backgroundElevation4 &&
         _other.borderDefault == _this.borderDefault &&
         _other.borderSurface == _this.borderSurface &&
         _other.borderSurfaceSubtle == _this.borderSurfaceSubtle &&
@@ -331,6 +376,11 @@ mixin _$StreamColorScheme {
       _this.backgroundSurfaceStrong,
       _this.backgroundOverlay,
       _this.backgroundDisabled,
+      _this.backgroundElevation0,
+      _this.backgroundElevation1,
+      _this.backgroundElevation2,
+      _this.backgroundElevation3,
+      _this.backgroundElevation4,
       _this.borderDefault,
       _this.borderSurface,
       _this.borderSurfaceSubtle,

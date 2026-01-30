@@ -67,6 +67,12 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    // Background - Elevation
+    Color? backgroundElevation0,
+    Color? backgroundElevation1,
+    Color? backgroundElevation2,
+    Color? backgroundElevation3,
+    Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
     Color? borderSurface,
@@ -121,6 +127,12 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceStrong ??= StreamColors.slate.shade200;
     backgroundOverlay ??= StreamColors.black10;
     backgroundDisabled ??= StreamColors.slate.shade100;
+
+    backgroundElevation0 ??= light_tokens.StreamTokens.backgroundElevationElevation0;
+    backgroundElevation1 ??= light_tokens.StreamTokens.backgroundElevationElevation1;
+    backgroundElevation2 ??= light_tokens.StreamTokens.backgroundElevationElevation2;
+    backgroundElevation3 ??= light_tokens.StreamTokens.backgroundElevationElevation3;
+    backgroundElevation4 ??= light_tokens.StreamTokens.backgroundElevationElevation4;
 
     // Border - Core
     borderDefault ??= light_tokens.StreamTokens.borderCoreDefault;
@@ -195,6 +207,11 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
       backgroundDisabled: backgroundDisabled,
+      backgroundElevation0: backgroundElevation0,
+      backgroundElevation1: backgroundElevation1,
+      backgroundElevation2: backgroundElevation2,
+      backgroundElevation3: backgroundElevation3,
+      backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
       borderSurface: borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle,
@@ -245,6 +262,12 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    // Background - Elevation
+    Color? backgroundElevation0,
+    Color? backgroundElevation1,
+    Color? backgroundElevation2,
+    Color? backgroundElevation3,
+    Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
     Color? borderSurface,
@@ -299,6 +322,12 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceStrong ??= StreamColors.neutral.shade700;
     backgroundOverlay ??= StreamColors.black50;
     backgroundDisabled ??= StreamColors.neutral.shade900;
+
+    backgroundElevation0 ??= dark_tokens.StreamTokens.backgroundElevationElevation0;
+    backgroundElevation1 ??= dark_tokens.StreamTokens.backgroundElevationElevation1;
+    backgroundElevation2 ??= dark_tokens.StreamTokens.backgroundElevationElevation2;
+    backgroundElevation3 ??= dark_tokens.StreamTokens.backgroundElevationElevation3;
+    backgroundElevation4 ??= dark_tokens.StreamTokens.backgroundElevationElevation4;
 
     // Border - Core
     borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
@@ -373,6 +402,11 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
       backgroundDisabled: backgroundDisabled,
+      backgroundElevation0: backgroundElevation0,
+      backgroundElevation1: backgroundElevation1,
+      backgroundElevation2: backgroundElevation2,
+      backgroundElevation3: backgroundElevation3,
+      backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
       borderSurface: borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle,
@@ -421,6 +455,12 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundSurfaceStrong,
     required this.backgroundOverlay,
     required this.backgroundDisabled,
+    // Background - Elevation
+    required this.backgroundElevation0,
+    required this.backgroundElevation1,
+    required this.backgroundElevation2,
+    required this.backgroundElevation3,
+    required this.backgroundElevation4,
     // Border - Core
     required this.borderDefault,
     required this.borderSurface,
@@ -514,6 +554,23 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Disabled background for inputs, buttons, or chips.
   final Color backgroundDisabled;
+
+  // ---- Background - Elevation ----
+
+  /// The elevation 0 background color.
+  final Color backgroundElevation0;
+
+  /// The elevation 1 background color.
+  final Color backgroundElevation1;
+
+  /// The elevation 2 background color.
+  final Color backgroundElevation2;
+
+  /// The elevation 3 background color.
+  final Color backgroundElevation3;
+
+  /// The elevation 4 background color.
+  final Color backgroundElevation4;
 
   // ---- Border colors - Core ----
 
