@@ -27,7 +27,7 @@ class DefaultStreamMessageComposerLeading extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: Implement the leading component
     return StreamButton.icon(
-      icon: Icons.add,
+      icon: context.streamIcons.plusLarge,
       type: StreamButtonType.outline,
       style: StreamButtonStyle.secondary,
       size: StreamButtonSize.large,

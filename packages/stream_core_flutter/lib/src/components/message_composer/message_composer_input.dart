@@ -61,6 +61,8 @@ class _MessageComposerInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: fully implement the input field
+    
     final defaultBorderRadius = context.streamRadius.lg;
     final composerBorderRadius = context.streamRadius.xxxl;
 
@@ -75,6 +77,7 @@ class _MessageComposerInputField extends StatelessWidget {
     );
 
     return TextField(
+      controller: props.controller,
       decoration: InputDecoration(
         border: border,
         focusedBorder: border,

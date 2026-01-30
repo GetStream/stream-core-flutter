@@ -31,6 +31,8 @@ Widget buildStreamMessageComposerStructure(BuildContext context) {
   final colorScheme = theme.colorScheme;
   final textTheme = theme.textTheme;
 
+  final componentProps = MessageComposerComponentProps(controller: TextEditingController());
+
   return SingleChildScrollView(
     padding: const EdgeInsets.all(24),
     child: Center(
@@ -69,34 +71,34 @@ Widget buildStreamMessageComposerStructure(BuildContext context) {
             const SizedBox(height: 16),
 
             // Leading
-            const _ComponentCard(
+            _ComponentCard(
               label: 'StreamMessageComposerLeading',
               description: 'Action button(s) before the input',
-              child: StreamMessageComposerLeading(props: MessageComposerComponentProps()),
+              child: StreamMessageComposerLeading(props: componentProps),
             ),
             const SizedBox(height: 16),
 
             // Input
-            const _ComponentCard(
+            _ComponentCard(
               label: 'StreamMessageComposerInput',
               description: 'Input area with header, text field, and actions',
-              child: StreamMessageComposerInput(props: MessageComposerComponentProps()),
+              child: StreamMessageComposerInput(props: componentProps),
             ),
             const SizedBox(height: 16),
 
             // Input Header
-            const _ComponentCard(
+            _ComponentCard(
               label: 'StreamMessageComposerInputHeader',
               description: 'Header slots for replies, attachments, etc.',
-              child: StreamMessageComposerInputHeader(props: MessageComposerComponentProps()),
+              child: StreamMessageComposerInputHeader(props: componentProps),
             ),
             const SizedBox(height: 16),
 
             // Input Trailing
-            const _ComponentCard(
+            _ComponentCard(
               label: 'StreamMessageComposerInputTrailing',
               description: 'Send button or other trailing actions',
-              child: StreamMessageComposerInputTrailing(props: MessageComposerComponentProps()),
+              child: StreamMessageComposerInputTrailing(props: componentProps),
             ),
           ],
         ),

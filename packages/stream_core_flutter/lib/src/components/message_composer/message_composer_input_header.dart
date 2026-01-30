@@ -27,6 +27,7 @@ class DefaultStreamMessageComposerInputHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Implement the header component
     return Padding(
       padding: EdgeInsets.only(
         left: context.streamSpacing.xs,

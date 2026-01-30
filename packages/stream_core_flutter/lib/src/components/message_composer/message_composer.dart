@@ -23,10 +23,14 @@ class MessageComposerProps {
 /// These properties are all the same, so features such as 'add attachment',
 /// can be added to any of the sub-components.
 class MessageComposerComponentProps {
-  const MessageComposerComponentProps();
+  const MessageComposerComponentProps({
+    required this.controller,
+  });
+
+  final TextEditingController controller;
 }
 
-class DefaultMessageComposer extends StatelessWidget {
+class DefaultMessageComposer extends StatefulWidget {
   const DefaultMessageComposer({super.key, required this.props});
 
   static StreamComponentBuilder<MessageComposerProps> get factory =>
@@ -35,10 +39,29 @@ class DefaultMessageComposer extends StatelessWidget {
   final MessageComposerProps props;
 
   @override
+  State<DefaultMessageComposer> createState() => _DefaultMessageComposerState();
+}
+
+class _DefaultMessageComposerState extends State<DefaultMessageComposer> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    final componentProps = MessageComposerComponentProps();
+    final componentProps = MessageComposerComponentProps(controller: _controller);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,

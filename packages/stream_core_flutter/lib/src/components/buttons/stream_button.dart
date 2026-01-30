@@ -126,13 +126,15 @@ class DefaultStreamButton extends StatelessWidget {
     };
 
     const iconSize = 20.0;
+    final isIconButton = props.label == null;
 
     return ElevatedButton(
       onPressed: props.onTap,
       style: ButtonStyle(
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        minimumSize: WidgetStateProperty.all(Size(minimumSize, minimumSize)),
+        minimumSize: isIconButton ? null : WidgetStateProperty.all(Size(minimumSize, minimumSize)),
+        fixedSize: isIconButton ? WidgetStateProperty.all(Size(minimumSize, minimumSize)) : null,
         padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: spacing.md)),
         side: borderColor == null
             ? null
