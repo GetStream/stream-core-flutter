@@ -272,6 +272,7 @@ class ThemeConfiguration extends ChangeNotifier {
   }
 
   void resetToDefaults() {
+    _brandPrimaryColor = null;
     // Accent
     _accentPrimary = null;
     _accentSuccess = null;
@@ -332,6 +333,10 @@ class ThemeConfiguration extends ChangeNotifier {
     final effectiveAccentPrimary = _accentPrimary ?? _brandPrimaryColor;
 
     final colorScheme = baseColorScheme.copyWith(
+      // Brand
+      brand: _brandPrimaryColor == null
+          ? null
+          : StreamColorSwatch.fromColor(_brandPrimaryColor ?? StreamColors.blue.shade500, brightness: _brightness),
       // Accent - brand primary affects accentPrimary
       accentPrimary: effectiveAccentPrimary,
       accentSuccess: _accentSuccess,

@@ -15,13 +15,17 @@ dependencies:
   theme_extensions_builder_annotation: ^7.1.0
 
 dev_dependencies:
+  alchemist: ^0.13.0
   build_runner: ^2.10.5
   flutter_test:
     sdk: flutter
   theme_extensions_builder: ^7.1.0
 
 flutter:
+  uses-material-design: true
+
   fonts:
     - family: Stream Icons
       fonts:
         - asset: packages/stream_core_flutter/fonts/stream_icons_font.otf
+

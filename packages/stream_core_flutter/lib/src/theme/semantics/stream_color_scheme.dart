@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../../theme/primitives/stream_colors.dart';
+import '../primitives/tokens/dark/stream_tokens.dart' as dark_tokens;
+import '../primitives/tokens/light/stream_tokens.dart' as light_tokens;
 
 part 'stream_color_scheme.g.theme.dart';
 
@@ -43,7 +45,7 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Creates a light color scheme.
   factory StreamColorScheme.light({
     // Brand
-    StreamBrandColor? brand,
+    StreamColorSwatch? brand,
     // Accent
     Color? accentPrimary,
     Color? accentSuccess,
@@ -64,7 +66,9 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundDisabled,
     // Border - Core
+    Color? borderDefault,
     Color? borderSurface,
     Color? borderSurfaceSubtle,
     Color? borderSurfaceStrong,
@@ -116,8 +120,10 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceSubtle ??= StreamColors.slate.shade100;
     backgroundSurfaceStrong ??= StreamColors.slate.shade200;
     backgroundOverlay ??= StreamColors.black10;
+    backgroundDisabled ??= StreamColors.slate.shade100;
 
     // Border - Core
+    borderDefault ??= light_tokens.StreamTokens.borderCoreDefault;
     borderSurface ??= StreamColors.slate.shade400;
     borderSurfaceSubtle ??= StreamColors.slate.shade200;
     borderSurfaceStrong ??= StreamColors.slate.shade600;
@@ -188,6 +194,8 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
+      backgroundDisabled: backgroundDisabled,
+      borderDefault: borderDefault,
       borderSurface: borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle,
       borderSurfaceStrong: borderSurfaceStrong,
@@ -215,7 +223,7 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Creates a dark color scheme.
   factory StreamColorScheme.dark({
     // Brand
-    StreamBrandColor? brand,
+    StreamColorSwatch? brand,
     // Accent
     Color? accentPrimary,
     Color? accentSuccess,
@@ -236,7 +244,9 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundDisabled,
     // Border - Core
+    Color? borderDefault,
     Color? borderSurface,
     Color? borderSurfaceSubtle,
     Color? borderSurfaceStrong,
@@ -288,8 +298,10 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceSubtle ??= StreamColors.neutral.shade800;
     backgroundSurfaceStrong ??= StreamColors.neutral.shade700;
     backgroundOverlay ??= StreamColors.black50;
+    backgroundDisabled ??= StreamColors.neutral.shade900;
 
     // Border - Core
+    borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
     borderSurface ??= StreamColors.neutral.shade500;
     borderSurfaceSubtle ??= StreamColors.neutral.shade700;
     borderSurfaceStrong ??= StreamColors.neutral.shade400;
@@ -360,6 +372,8 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
+      backgroundDisabled: backgroundDisabled,
+      borderDefault: borderDefault,
       borderSurface: borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle,
       borderSurfaceStrong: borderSurfaceStrong,
@@ -406,7 +420,9 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundSurfaceSubtle,
     required this.backgroundSurfaceStrong,
     required this.backgroundOverlay,
+    required this.backgroundDisabled,
     // Border - Core
+    required this.borderDefault,
     required this.borderSurface,
     required this.borderSurfaceSubtle,
     required this.borderSurfaceStrong,
@@ -437,7 +453,7 @@ class StreamColorScheme with _$StreamColorScheme {
   // ---- Brand ----
 
   /// The brand color swatch with shades from 50 to 950.
-  final StreamBrandColor brand;
+  final StreamColorSwatch brand;
 
   // ---- Accent colors ----
 
@@ -496,7 +512,13 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The overlay background color.
   final Color backgroundOverlay;
 
+  /// Disabled background for inputs, buttons, or chips.
+  final Color backgroundDisabled;
+
   // ---- Border colors - Core ----
+
+  /// Standard surface border
+  final Color borderDefault;
 
   /// The standard surface border color.
   final Color borderSurface;
@@ -610,21 +632,21 @@ class StreamBrandColor extends StreamColorSwatch {
   ///
   /// Defaults to blue with shade500 as the primary color.
   factory StreamBrandColor.light() {
-    final primaryColorValue = StreamColors.blue.shade500.toARGB32();
+    final primaryColorValue = light_tokens.StreamTokens.brand500.toARGB32();
     return ._(
       primaryColorValue,
       <int, Color>{
-        50: StreamColors.blue.shade50,
-        100: StreamColors.blue.shade100,
-        200: StreamColors.blue.shade200,
-        300: StreamColors.blue.shade300,
-        400: StreamColors.blue.shade400,
+        50: light_tokens.StreamTokens.brand50,
+        100: light_tokens.StreamTokens.brand100,
+        150: light_tokens.StreamTokens.brand150,
+        200: light_tokens.StreamTokens.brand200,
+        300: light_tokens.StreamTokens.brand300,
+        400: light_tokens.StreamTokens.brand400,
         500: Color(primaryColorValue),
-        600: StreamColors.blue.shade600,
-        700: StreamColors.blue.shade700,
-        800: StreamColors.blue.shade800,
-        900: StreamColors.blue.shade900,
-        950: StreamColors.blue.shade950,
+        600: light_tokens.StreamTokens.brand600,
+        700: light_tokens.StreamTokens.brand700,
+        800: light_tokens.StreamTokens.brand800,
+        900: light_tokens.StreamTokens.brand900,
       },
     );
   }
@@ -635,21 +657,21 @@ class StreamBrandColor extends StreamColorSwatch {
   /// are inverted for dark mode, with lighter shades becoming darker and
   /// vice versa.
   factory StreamBrandColor.dark() {
-    final primaryColorValue = StreamColors.blue.shade400.toARGB32();
+    final primaryColorValue = dark_tokens.StreamTokens.brand500.toARGB32();
     return ._(
       primaryColorValue,
       <int, Color>{
-        50: StreamColors.blue.shade900,
-        100: StreamColors.blue.shade800,
-        200: StreamColors.blue.shade700,
-        300: StreamColors.blue.shade600,
-        400: StreamColors.blue.shade500,
+        50: dark_tokens.StreamTokens.brand50,
+        100: dark_tokens.StreamTokens.brand100,
+        150: dark_tokens.StreamTokens.brand150,
+        200: dark_tokens.StreamTokens.brand200,
+        300: dark_tokens.StreamTokens.brand300,
+        400: dark_tokens.StreamTokens.brand400,
         500: Color(primaryColorValue),
-        600: StreamColors.blue.shade300,
-        700: StreamColors.blue.shade200,
-        800: StreamColors.blue.shade100,
-        900: StreamColors.blue.shade50,
-        950: StreamColors.white,
+        600: dark_tokens.StreamTokens.brand600,
+        700: dark_tokens.StreamTokens.brand700,
+        800: dark_tokens.StreamTokens.brand800,
+        900: dark_tokens.StreamTokens.brand900,
       },
     );
   }
