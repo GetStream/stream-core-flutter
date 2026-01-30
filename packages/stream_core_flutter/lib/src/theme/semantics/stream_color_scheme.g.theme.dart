@@ -64,6 +64,12 @@ mixin _$StreamColorScheme {
         b.backgroundOverlay,
         t,
       )!,
+      backgroundDisabled: Color.lerp(
+        a.backgroundDisabled,
+        b.backgroundDisabled,
+        t,
+      )!,
+      borderDefault: Color.lerp(a.borderDefault, b.borderDefault, t)!,
       borderSurface: Color.lerp(a.borderSurface, b.borderSurface, t)!,
       borderSurfaceSubtle: Color.lerp(
         a.borderSurfaceSubtle,
@@ -115,6 +121,8 @@ mixin _$StreamColorScheme {
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundDisabled,
+    Color? borderDefault,
     Color? borderSurface,
     Color? borderSurfaceSubtle,
     Color? borderSurfaceStrong,
@@ -160,6 +168,8 @@ mixin _$StreamColorScheme {
       backgroundSurfaceStrong:
           backgroundSurfaceStrong ?? _this.backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay ?? _this.backgroundOverlay,
+      backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
+      borderDefault: borderDefault ?? _this.borderDefault,
       borderSurface: borderSurface ?? _this.borderSurface,
       borderSurfaceSubtle: borderSurfaceSubtle ?? _this.borderSurfaceSubtle,
       borderSurfaceStrong: borderSurfaceStrong ?? _this.borderSurfaceStrong,
@@ -214,6 +224,8 @@ mixin _$StreamColorScheme {
       backgroundSurfaceSubtle: other.backgroundSurfaceSubtle,
       backgroundSurfaceStrong: other.backgroundSurfaceStrong,
       backgroundOverlay: other.backgroundOverlay,
+      backgroundDisabled: other.backgroundDisabled,
+      borderDefault: other.borderDefault,
       borderSurface: other.borderSurface,
       borderSurfaceSubtle: other.borderSurfaceSubtle,
       borderSurfaceStrong: other.borderSurfaceStrong,
@@ -269,6 +281,8 @@ mixin _$StreamColorScheme {
         _other.backgroundSurfaceSubtle == _this.backgroundSurfaceSubtle &&
         _other.backgroundSurfaceStrong == _this.backgroundSurfaceStrong &&
         _other.backgroundOverlay == _this.backgroundOverlay &&
+        _other.backgroundDisabled == _this.backgroundDisabled &&
+        _other.borderDefault == _this.borderDefault &&
         _other.borderSurface == _this.borderSurface &&
         _other.borderSurfaceSubtle == _this.borderSurfaceSubtle &&
         _other.borderSurfaceStrong == _this.borderSurfaceStrong &&
@@ -316,6 +330,8 @@ mixin _$StreamColorScheme {
       _this.backgroundSurfaceSubtle,
       _this.backgroundSurfaceStrong,
       _this.backgroundOverlay,
+      _this.backgroundDisabled,
+      _this.borderDefault,
       _this.borderSurface,
       _this.borderSurfaceSubtle,
       _this.borderSurfaceStrong,
