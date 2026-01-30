@@ -8,6 +8,7 @@ import '../factory/stream_component_factory.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
 import 'primitives/stream_typography.dart';
@@ -73,6 +74,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme({
     Brightness brightness = .light,
     TargetPlatform? platform,
+    StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
     StreamTypography? typography,
@@ -89,6 +91,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final isDark = brightness == Brightness.dark;
 
     // Primitives
+    icons ??= const StreamIcons();
     radius ??= StreamRadius(platform: platform);
     spacing ??= const StreamSpacing();
     typography ??= StreamTypography(platform: platform);
@@ -107,6 +110,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     return .raw(
       brightness: brightness,
+      icons: icons,
       radius: radius,
       spacing: spacing,
       typography: typography,
@@ -134,6 +138,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   const StreamTheme.raw({
     required this.brightness,
+    required this.icons,
     required this.radius,
     required this.spacing,
     required this.typography,
@@ -177,6 +182,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The brightness of this theme.
   final Brightness brightness;
+
+  /// The icons for this theme.
+  final StreamIcons icons;
 
   /// The border radius values for this theme.
   final StreamRadius radius;

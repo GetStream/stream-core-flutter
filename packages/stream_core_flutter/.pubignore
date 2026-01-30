@@ -1,0 +1,2 @@
+# Exclude assets source from published package
+assets_source/

@@ -2,6 +2,7 @@ export 'theme/components/stream_avatar_theme.dart';
 export 'theme/components/stream_online_indicator_theme.dart';
 
 export 'theme/primitives/stream_colors.dart';
+export 'theme/primitives/stream_icons.dart';
 export 'theme/primitives/stream_radius.dart';
 export 'theme/primitives/stream_spacing.dart';
 export 'theme/primitives/stream_typography.dart';
