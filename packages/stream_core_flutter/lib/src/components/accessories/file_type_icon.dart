@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../stream_core_flutter.dart';
+import '../../factory/stream_component_factory.dart';
 
 class StreamFileTypeIcon extends StatelessWidget {
   const StreamFileTypeIcon({
@@ -30,41 +31,11 @@ class StreamFileTypeIcon extends StatelessWidget {
   final String? extension;
   final FileTypeIconSize size;
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SvgPicture.asset(
-          package: 'stream_core_flutter',
-          category.getIconAssetName(size),
-          width: size.width,
-          height: size.height,
-        ),
-        Positioned(
-          bottom: switch (size) {
-            FileTypeIconSize.s48 => 5,
-            FileTypeIconSize.s40 => 4,
-          },
-          right: 0,
-          left: 0,
-          // We never want the text on the icon to be scaled, so we clamp the text scale factor to 1.
-          child: StreamTextScaleFactorClamper(
-            minTextScaleFactor: 1,
-            maxTextScaleFactor: 1,
-            child: Text(
-              extension ?? '',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: StreamColors.white,
-                fontWeight: .bold,
-                fontSize: 8,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  StreamFileTypeIconProps get props => StreamFileTypeIconProps(
+    category: category,
+    extension: extension,
+    size: size,
+  );
 
   static (FileTypeCategory category, String? fileExtension) getExtension(String? mimeType) => switch (mimeType) {
     'audio/mpeg' => (FileTypeCategory.audio, 'mp3'),
@@ -120,6 +91,74 @@ class StreamFileTypeIcon extends StatelessWidget {
     'application/x-wiki' => (FileTypeCategory.other, 'wkq'),
     _ => (FileTypeCategory.other, null),
   };
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamTheme.of(
+      context,
+    ).componentFactory.fileTypeIconFactory(context, props);
+  }
+}
+
+class StreamFileTypeIconProps {
+  const StreamFileTypeIconProps({
+    required this.category,
+    required this.extension,
+    required this.size,
+  });
+
+  final FileTypeCategory category;
+  final String? extension;
+  final FileTypeIconSize size;
+}
+
+class DefaultStreamFileTypeIcon extends StatelessWidget {
+  const DefaultStreamFileTypeIcon({super.key, required this.props});
+
+  static StreamComponentBuilder<StreamFileTypeIconProps> get factory =>
+      (context, props) => DefaultStreamFileTypeIcon(props: props);
+
+  final StreamFileTypeIconProps props;
+
+  FileTypeCategory get category => props.category;
+  String? get extension => props.extension;
+  FileTypeIconSize get size => props.size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        SvgPicture.asset(
+          package: 'stream_core_flutter',
+          category.getIconAssetName(size),
+          width: size.width,
+          height: size.height,
+        ),
+        Positioned(
+          bottom: switch (size) {
+            FileTypeIconSize.s48 => 5,
+            FileTypeIconSize.s40 => 4,
+          },
+          right: 0,
+          left: 0,
+          // We never want the text on the icon to be scaled, so we clamp the text scale factor to 1.
+          child: StreamTextScaleFactorClamper(
+            minTextScaleFactor: 1,
+            maxTextScaleFactor: 1,
+            child: Text(
+              extension ?? '',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: StreamColors.white,
+                fontWeight: .bold,
+                fontSize: 8,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 enum FileTypeIconSize {
