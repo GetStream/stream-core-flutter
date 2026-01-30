@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
@@ -79,28 +81,29 @@ class _DefaultMessageComposerState extends State<DefaultMessageComposer> {
       onAddAttachment: () {},
       isFloating: widget.props.isFloating,
     );
+    final bottomPaddingSafeArea = MediaQuery.of(context).padding.bottom;
+    final minimumBottomPadding = spacing.md;
+    final bottomPadding = math.max(bottomPaddingSafeArea, minimumBottomPadding);
 
-    return SafeArea(
-      child: Container(
-        padding: EdgeInsets.only(top: spacing.md),
-        decoration: widget.props.isFloating
-            ? null
-            : BoxDecoration(
-                color: context.streamColorScheme.backgroundElevation1,
-                border: Border(
-                  top: BorderSide(color: context.streamColorScheme.borderDefault),
-                ),
+    return Container(
+      padding: EdgeInsets.only(top: spacing.md, bottom: bottomPadding),
+      decoration: widget.props.isFloating
+          ? null
+          : BoxDecoration(
+              color: context.streamColorScheme.backgroundElevation1,
+              border: Border(
+                top: BorderSide(color: context.streamColorScheme.borderDefault),
               ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            SizedBox(width: spacing.md),
-            StreamMessageComposerLeading(props: componentProps),
-            Expanded(child: StreamMessageComposerInput(props: componentProps)),
-            StreamMessageComposerTrailing(props: componentProps),
-            SizedBox(width: spacing.md),
-          ],
-        ),
+            ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          SizedBox(width: spacing.md),
+          StreamMessageComposerLeading(props: componentProps),
+          Expanded(child: StreamMessageComposerInput(props: componentProps)),
+          StreamMessageComposerTrailing(props: componentProps),
+          SizedBox(width: spacing.md),
+        ],
       ),
     );
   }

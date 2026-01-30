@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
+import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 // =============================================================================
@@ -188,76 +189,118 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
   final colorScheme = theme.colorScheme;
   final textTheme = theme.textTheme;
 
-  return Center(
-    child: Container(
-      decoration: BoxDecoration(
-        color: colorScheme.backgroundSurface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
+  final isFloating = context.knobs.boolean(
+    label: 'Floating',
+    initialValue: false,
+    description: 'When true, the composer has no background or border.',
+  );
+
+  // Sample messages for scrollable list
+  const messages = [
+    (message: 'Hey! How are you doing today?', isMe: false),
+    (message: "I'm doing great, thanks for asking!", isMe: true),
+    (message: 'Did you see the new design updates?', isMe: false),
+    (message: 'Yes! They look amazing. Great work on the color scheme.', isMe: true),
+    (message: 'Thanks! We spent a lot of time on the details.', isMe: false),
+    (message: 'It really shows. The typography is much cleaner now.', isMe: true),
+    (message: 'Glad you like it! Any feedback?', isMe: false),
+    (message: 'Maybe we could add more spacing in some areas?', isMe: true),
+    (message: "Good point, I'll look into that.", isMe: false),
+    (message: 'Perfect! Let me know if you need any help.', isMe: true),
+    (message: 'Should be finished by tomorrow.', isMe: false),
+    (message: 'Great! Thanks for the update.', isMe: true),
+    (message: "No problem! You're welcome.", isMe: false),
+    (message: 'I need to go now. See you later!', isMe: false),
+    (message: 'Bye! Take care.', isMe: true),
+    (message: 'Thanks! You too!', isMe: false),
+    (message: 'See you soon!', isMe: true),
+    (message: 'Bye!', isMe: false),
+    (message: 'See you soon!', isMe: true),
+  ];
+
+  return Scaffold(
+    appBar: AppBar(
+      title: Row(
         children: [
-          // Chat header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: colorScheme.borderSurfaceSubtle),
+          StreamAvatar(
+            size: StreamAvatarSize.sm,
+            placeholder: (context) => const Text('JD'),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'John Doe',
+                style: textTheme.bodyEmphasis.copyWith(
+                  color: colorScheme.textPrimary,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                StreamAvatar(
-                  size: StreamAvatarSize.sm,
-                  placeholder: (context) => const Text('JD'),
+              Text(
+                'Online',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.accentSuccess,
                 ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'John Doe',
-                      style: textTheme.bodyEmphasis.copyWith(
-                        color: colorScheme.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      'Online',
-                      style: textTheme.captionDefault.copyWith(
-                        color: colorScheme.accentSuccess,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          // Messages area (mock)
-          Container(
-            padding: const EdgeInsets.all(16),
-            height: 200,
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _MessageBubble(
-                  message: 'Hey! How are you?',
-                  isMe: false,
-                ),
-                SizedBox(height: 8),
-                _MessageBubble(
-                  message: "I'm doing great, thanks!",
-                  isMe: true,
-                ),
-              ],
-            ),
-          ),
-          // Composer
-          const StreamMessageComposer(
-            isFloating: true,
+              ),
+            ],
           ),
         ],
       ),
     ),
+    body: isFloating
+        ? Stack(
+            children: [
+              // Scrollable messages area (with bottom padding for composer)
+              ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 250),
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final msg = messages[index];
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: index < messages.length - 1 ? 8 : 0,
+                    ),
+                    child: _MessageBubble(
+                      message: msg.message,
+                      isMe: msg.isMe,
+                    ),
+                  );
+                },
+              ),
+              // Floating composer at bottom
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: StreamMessageComposer(isFloating: true),
+              ),
+            ],
+          )
+        : Column(
+            children: [
+              // Scrollable messages area
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = messages[index];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index < messages.length - 1 ? 8 : 0,
+                      ),
+                      child: _MessageBubble(
+                        message: msg.message,
+                        isMe: msg.isMe,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Non-floating composer
+              const StreamMessageComposer(isFloating: false),
+            ],
+          ),
   );
 }
 

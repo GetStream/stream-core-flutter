@@ -37,7 +37,6 @@ import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookCategory(
     name: 'App Foundation',
-    isInitiallyExpanded: false,
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Primitives',
@@ -146,7 +145,6 @@ final directories = <_widgetbook.WidgetbookNode>[
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Avatar',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamAvatar',
@@ -182,7 +180,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Button',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamButton',
@@ -218,7 +215,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Indicator',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamOnlineIndicator',
@@ -241,7 +237,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Message Composer',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamMessageComposer',
