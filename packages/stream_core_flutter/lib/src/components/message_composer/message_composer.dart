@@ -4,19 +4,28 @@ import '../../../stream_core_flutter.dart';
 import '../../factory/stream_component_factory.dart';
 
 class StreamMessageComposer extends StatelessWidget {
-  const StreamMessageComposer({super.key});
+  const StreamMessageComposer({
+    super.key,
+    this.isFloating = false,
+  });
+
+  final bool isFloating;
 
   @override
   Widget build(BuildContext context) {
     return StreamTheme.of(
       context,
-    ).componentFactory.messageComposer.messageComposer(context, const MessageComposerProps());
+    ).componentFactory.messageComposer.messageComposer(context, MessageComposerProps(isFloating: isFloating));
   }
 }
 
 /// Properties to build the main message composer component
 class MessageComposerProps {
-  const MessageComposerProps();
+  const MessageComposerProps({
+    this.isFloating = false,
+  });
+
+  final bool isFloating;
 }
 
 /// Properties to build any of the sub-components.
@@ -25,9 +34,13 @@ class MessageComposerProps {
 class MessageComposerComponentProps {
   const MessageComposerComponentProps({
     required this.controller,
+    this.onAddAttachment,
+    this.isFloating = false,
   });
 
   final TextEditingController controller;
+  final VoidCallback? onAddAttachment;
+  final bool isFloating;
 }
 
 class DefaultMessageComposer extends StatefulWidget {
@@ -61,18 +74,34 @@ class _DefaultMessageComposerState extends State<DefaultMessageComposer> {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    final componentProps = MessageComposerComponentProps(controller: _controller);
+    final componentProps = MessageComposerComponentProps(
+      controller: _controller,
+      onAddAttachment: () {},
+      isFloating: widget.props.isFloating,
+    );
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        SizedBox(width: spacing.md),
-        StreamMessageComposerLeading(props: componentProps),
-        SizedBox(width: spacing.xs),
-        Expanded(child: StreamMessageComposerInput(props: componentProps)),
-        StreamMessageComposerTrailing(props: componentProps),
-        SizedBox(width: spacing.md),
-      ],
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.only(top: spacing.md),
+        decoration: widget.props.isFloating
+            ? null
+            : BoxDecoration(
+                color: context.streamColorScheme.backgroundElevation1,
+                border: Border(
+                  top: BorderSide(color: context.streamColorScheme.borderDefault),
+                ),
+              ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SizedBox(width: spacing.md),
+            StreamMessageComposerLeading(props: componentProps),
+            Expanded(child: StreamMessageComposerInput(props: componentProps)),
+            StreamMessageComposerTrailing(props: componentProps),
+            SizedBox(width: spacing.md),
+          ],
+        ),
+      ),
     );
   }
 }

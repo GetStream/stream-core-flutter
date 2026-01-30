@@ -29,13 +29,14 @@ class DefaultStreamMessageComposerInput extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: Add message composer theme
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: context.streamColorScheme.backgroundElevation1,
         borderRadius: BorderRadius.all(context.streamRadius.xxxl),
         border: Border.all(
           color: context.streamColorScheme.borderDefault,
         ),
+        boxShadow: props.isFloating ? context.streamBoxShadow.elevation3 : null,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -62,7 +63,7 @@ class _MessageComposerInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: fully implement the input field
-    
+
     final defaultBorderRadius = context.streamRadius.lg;
     final composerBorderRadius = context.streamRadius.xxxl;
 

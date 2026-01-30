@@ -31,6 +31,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonType type = StreamButtonType.solid,
     StreamButtonSize size = StreamButtonSize.medium,
     IconData? icon,
+    bool isFloating = false,
   }) : props = StreamButtonProps(
          label: null,
          onTap: onTap,
@@ -39,6 +40,7 @@ class StreamButton extends StatelessWidget {
          size: size,
          iconLeft: icon,
          iconRight: null,
+         isFloating: isFloating,
        );
 
   final StreamButtonProps props;
@@ -60,6 +62,7 @@ class StreamButtonProps {
     required this.size,
     required this.iconLeft,
     required this.iconRight,
+    this.isFloating = false,
   });
 
   final String? label;
@@ -69,6 +72,7 @@ class StreamButtonProps {
   final StreamButtonSize size;
   final IconData? iconLeft;
   final IconData? iconRight;
+  final bool isFloating;
 }
 
 enum StreamButtonStyle { primary, secondary, destructive }
@@ -89,6 +93,7 @@ class DefaultStreamButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
     final buttonTheme = context.streamButtonTheme;
+    final colorScheme = context.streamColorScheme;
     final defaults = _StreamButtonDefaults(context: context);
 
     final themeButtonTypeStyle = switch (props.style) {
@@ -114,8 +119,12 @@ class DefaultStreamButton extends StatelessWidget {
       StreamButtonType.ghost => defaultButtonTypeStyle.ghost,
     };
 
+    final fallbackBackgroundColor = props.isFloating ? colorScheme.backgroundElevation1 : Colors.transparent;
+
     final backgroundColor =
-        themeStyle?.backgroundColor ?? defaultStyle?.backgroundColor ?? WidgetStateProperty.all(Colors.transparent);
+        themeStyle?.backgroundColor ??
+        defaultStyle?.backgroundColor ??
+        WidgetStateProperty.all(fallbackBackgroundColor);
     final foregroundColor = themeStyle?.foregroundColor ?? defaultStyle?.foregroundColor;
     final borderColor = themeStyle?.borderColor ?? defaultStyle?.borderColor;
 
@@ -135,13 +144,13 @@ class DefaultStreamButton extends StatelessWidget {
         foregroundColor: foregroundColor,
         minimumSize: isIconButton ? null : WidgetStateProperty.all(Size(minimumSize, minimumSize)),
         fixedSize: isIconButton ? WidgetStateProperty.all(Size(minimumSize, minimumSize)) : null,
+        elevation: WidgetStateProperty.all(props.isFloating ? 4 : 0),
         padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: spacing.md)),
         side: borderColor == null
             ? null
             : WidgetStateProperty.resolveWith(
                 (states) => BorderSide(color: borderColor.resolve(states)),
               ),
-        elevation: WidgetStateProperty.all(0),
         shape: props.label == null
             ? WidgetStateProperty.all(const CircleBorder())
             : WidgetStateProperty.all(

@@ -26,12 +26,24 @@ class DefaultStreamMessageComposerLeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: Implement the leading component
-    return StreamButton.icon(
-      icon: context.streamIcons.plusLarge,
-      type: StreamButtonType.outline,
-      style: StreamButtonStyle.secondary,
-      size: StreamButtonSize.large,
-      onTap: () {},
+    final spacing = context.streamSpacing;
+    if (props.onAddAttachment == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        StreamButton.icon(
+          isFloating: props.isFloating,
+          icon: context.streamIcons.plusLarge,
+          type: StreamButtonType.outline,
+          style: StreamButtonStyle.secondary,
+          size: StreamButtonSize.large,
+          onTap: () {},
+        ),
+        SizedBox(width: spacing.xs),
+      ],
     );
   }
 }

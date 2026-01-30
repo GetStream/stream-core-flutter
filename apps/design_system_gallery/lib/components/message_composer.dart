@@ -190,13 +190,11 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
 
   return Center(
     child: Container(
-      constraints: const BoxConstraints(maxWidth: 400),
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           // Chat header
           Container(
@@ -254,14 +252,8 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
             ),
           ),
           // Composer
-          Container(
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: colorScheme.borderSurfaceSubtle),
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: const StreamMessageComposer(),
+          const StreamMessageComposer(
+            isFloating: true,
           ),
         ],
       ),
