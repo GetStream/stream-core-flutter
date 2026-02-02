@@ -10,10 +10,10 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:design_system_gallery/components/accessories/stream_file_type_icons.dart'
+    as _design_system_gallery_components_accessories_stream_file_type_icons;
 import 'package:design_system_gallery/components/button.dart'
     as _design_system_gallery_components_button;
-import 'package:design_system_gallery/components/accessories/file_type_icons.dart'
-    as _design_system_gallery_components_accessories_file_type_icons;
 import 'package:design_system_gallery/components/stream_avatar.dart'
     as _design_system_gallery_components_stream_avatar;
 import 'package:design_system_gallery/components/stream_avatar_stack.dart'
@@ -35,7 +35,6 @@ import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookCategory(
     name: 'App Foundation',
-    isInitiallyExpanded: false,
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Primitives',
@@ -130,31 +129,20 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'Accessories',
         children: [
-          _widgetbook.WidgetbookFolder(
-            name: 'File Type Icon',
-            children: [
-              _widgetbook.WidgetbookComponent(
-                name: 'FileTypeIcon',
-                useCases: [
-                  _widgetbook.WidgetbookUseCase(
-                    name: 'MIME Types',
-                    builder:
-                        _design_system_gallery_components_accessories_file_type_icons
-                            .buildFileTypeIconMimeTypes,
-                  ),
-                  _widgetbook.WidgetbookUseCase(
-                    name: 'Playground',
-                    builder:
-                        _design_system_gallery_components_accessories_file_type_icons
-                            .buildFileTypeIconPlayground,
-                  ),
-                  _widgetbook.WidgetbookUseCase(
-                    name: 'Showcase',
-                    builder:
-                        _design_system_gallery_components_accessories_file_type_icons
-                            .buildFileTypeIconShowcase,
-                  ),
-                ],
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamFileTypeIcon',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_accessories_stream_file_type_icons
+                        .buildFileTypeIconPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_accessories_stream_file_type_icons
+                        .buildFileTypeIconShowcase,
               ),
             ],
           ),
@@ -162,7 +150,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Avatar',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamAvatar',
@@ -198,7 +185,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Button',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamButton',
@@ -234,7 +220,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Indicator',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamOnlineIndicator',

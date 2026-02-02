@@ -1,5 +1,4 @@
-export 'components/accessories/file_type_icon.dart';
-export 'components/accessories/text_scale_clamper.dart';
+export 'components/accessories/stream_file_type_icon.dart' hide DefaultStreamFileTypeIcon;
 export 'components/avatar/stream_avatar.dart';
 export 'components/avatar/stream_avatar_stack.dart';
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
