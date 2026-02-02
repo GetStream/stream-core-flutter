@@ -133,6 +133,7 @@ class StreamBadgeCount extends StatelessWidget {
     );
   }
 
+  // Returns the appropriate text style for the given badge size.
   TextStyle _textStyleForSize(
     StreamBadgeCountSize size,
     StreamTextTheme textTheme,
@@ -141,6 +142,7 @@ class StreamBadgeCount extends StatelessWidget {
     .sm || .md => textTheme.numericXl,
   };
 
+  // Returns the appropriate padding for the given badge size.
   EdgeInsetsGeometry _paddingForSize(
     StreamBadgeCountSize size,
     StreamSpacing spacing,

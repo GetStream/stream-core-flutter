@@ -183,6 +183,7 @@ class StreamAvatarStack extends StatelessWidget {
     );
   }
 
+  // Returns the appropriate avatar size for the given stack size.
   StreamAvatarSize _avatarSizeForStackSize(
     StreamAvatarStackSize size,
   ) => switch (size) {
@@ -190,6 +191,7 @@ class StreamAvatarStack extends StatelessWidget {
     .sm => StreamAvatarSize.sm,
   };
 
+  // Returns the appropriate badge count size for the given stack size.
   StreamBadgeCountSize _badgeCountSizeForStackSize(
     StreamAvatarStackSize size,
   ) => switch (size) {

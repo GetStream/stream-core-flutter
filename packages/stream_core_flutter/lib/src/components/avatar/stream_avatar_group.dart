@@ -145,6 +145,7 @@ class StreamAvatarGroup extends StatelessWidget {
     );
   }
 
+  // Build the widget for 1 avatar.
   Widget _buildForOne(
     BuildContext context,
     Iterable<Widget> avatars,
@@ -172,6 +173,7 @@ class StreamAvatarGroup extends StatelessWidget {
     );
   }
 
+  // Build the widget for 2 avatars.
   Widget _buildForTwo(
     BuildContext context,
     Iterable<Widget> avatars,
@@ -198,6 +200,7 @@ class StreamAvatarGroup extends StatelessWidget {
     );
   }
 
+  // Builds the widget for 3 avatars.
   Widget _buildForThree(
     BuildContext context,
     Iterable<Widget> avatars,
@@ -231,6 +234,7 @@ class StreamAvatarGroup extends StatelessWidget {
     );
   }
 
+  // Builds the widget for 4 avatars.
   Widget _buildForFour(
     BuildContext context,
     Iterable<Widget> avatars,
@@ -271,6 +275,7 @@ class StreamAvatarGroup extends StatelessWidget {
     );
   }
 
+  // Builds the widget for 4 or more avatars.
   Widget _buildForFourOrMore(
     BuildContext context,
     Iterable<Widget> avatars,
@@ -304,6 +309,7 @@ class StreamAvatarGroup extends StatelessWidget {
     );
   }
 
+  // Returns the appropriate avatar size for the given group size.
   StreamAvatarSize _avatarSizeForGroupSize(
     StreamAvatarGroupSize size,
   ) => switch (size) {
@@ -311,6 +317,7 @@ class StreamAvatarGroup extends StatelessWidget {
     .xl => StreamAvatarSize.lg,
   };
 
+  // Returns the appropriate badge count size for the given group size.
   StreamBadgeCountSize _badgeCountSizeForGroupSize(
     StreamAvatarGroupSize size,
   ) => switch (size) {
