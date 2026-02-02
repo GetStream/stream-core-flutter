@@ -29,7 +29,6 @@ Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
 
   final withChild = context.knobs.boolean(
     label: 'With Child',
-    initialValue: false,
     description: 'Wrap an avatar as child (Badge-like behavior).',
   );
 
@@ -64,7 +63,6 @@ Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
 
   final offsetX = context.knobs.double.slider(
     label: 'Offset X',
-    initialValue: 0,
     min: -10,
     max: 10,
     description: 'Horizontal offset for fine-tuning position.',
@@ -72,7 +70,6 @@ Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
 
   final offsetY = context.knobs.double.slider(
     label: 'Offset Y',
-    initialValue: 0,
     min: -10,
     max: 10,
     description: 'Vertical offset for fine-tuning position.',
