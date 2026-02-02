@@ -122,7 +122,7 @@ class _StreamBranding extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Stream Logo
-        const SvgIcon(StreamIcons.logo, size: 40),
+        const SvgIcon(StreamSvgIcons.logo, size: 40),
         SizedBox(width: spacing.sm + spacing.xxs),
         Column(
           mainAxisAlignment: MainAxisAlignment.center,

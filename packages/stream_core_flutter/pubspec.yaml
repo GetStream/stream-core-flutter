@@ -26,3 +26,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/file_type/
+
+  fonts:
+    - family: Stream Icons
+      fonts:
+        - asset: packages/stream_core_flutter/fonts/stream_icons_font.otf
+

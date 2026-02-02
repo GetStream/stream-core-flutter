@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
 import 'primitives/stream_typography.dart';
@@ -37,6 +38,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamColorScheme] from the current theme.
   StreamColorScheme get streamColorScheme => streamTheme.colorScheme;
+
+  /// Returns the [StreamIcons] from the current theme.
+  StreamIcons get streamIcons => streamTheme.icons;
 
   /// Returns the [StreamTextTheme] from the current theme.
   StreamTextTheme get streamTextTheme => streamTheme.textTheme;
