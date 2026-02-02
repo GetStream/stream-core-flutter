@@ -162,18 +162,22 @@ class StreamAvatarStack extends StatelessWidget {
       width: totalWidth,
       height: math.max(diameter, badgeDiameter),
       duration: kThemeChangeDuration,
-      child: StreamAvatarTheme(
-        data: StreamAvatarThemeData(size: avatarSize),
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            for (var i = 0; i < displayChildren.length; i++)
-              Positioned(
-                left: i * visiblePortion,
-                child: displayChildren[i],
-              ),
-          ],
+      // Need to disable text scaling here so that the text doesn't
+      // escape the avatar when the textScaleFactor is large.
+      child: MediaQuery.withNoTextScaling(
+        child: StreamAvatarTheme(
+          data: StreamAvatarThemeData(size: avatarSize),
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              for (var i = 0; i < displayChildren.length; i++)
+                Positioned(
+                  left: i * visiblePortion,
+                  child: displayChildren[i],
+                ),
+            ],
+          ),
         ),
       ),
     );

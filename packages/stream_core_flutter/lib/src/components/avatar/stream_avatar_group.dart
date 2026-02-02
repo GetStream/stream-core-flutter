@@ -117,25 +117,29 @@ class StreamAvatarGroup extends StatelessWidget {
       height: effectiveSize.value,
       padding: const EdgeInsets.all(avatarBorderWidth),
       duration: kThemeChangeDuration,
-      child: StreamAvatarTheme(
-        data: StreamAvatarThemeData(
-          size: avatarSize,
-          border: Border.all(
-            width: avatarBorderWidth,
-            color: colorScheme.borderOnDark,
-            strokeAlign: BorderSide.strokeAlignOutside,
+      // Need to disable text scaling here so that the text doesn't
+      // escape the avatar when the textScaleFactor is large.
+      child: MediaQuery.withNoTextScaling(
+        child: StreamAvatarTheme(
+          data: StreamAvatarThemeData(
+            size: avatarSize,
+            border: Border.all(
+              width: avatarBorderWidth,
+              color: colorScheme.borderOnDark,
+              strokeAlign: BorderSide.strokeAlignOutside,
+            ),
           ),
-        ),
-        child: StreamBadgeCountTheme(
-          data: StreamBadgeCountThemeData(size: badgeCountSize),
-          child: Builder(
-            builder: (context) => switch (children.length) {
-              1 => _buildForOne(context, children),
-              2 => _buildForTwo(context, children),
-              3 => _buildForThree(context, children),
-              4 => _buildForFour(context, children),
-              _ => _buildForFourOrMore(context, children),
-            },
+          child: StreamBadgeCountTheme(
+            data: StreamBadgeCountThemeData(size: badgeCountSize),
+            child: Builder(
+              builder: (context) => switch (children.length) {
+                1 => _buildForOne(context, children),
+                2 => _buildForTwo(context, children),
+                3 => _buildForThree(context, children),
+                4 => _buildForFour(context, children),
+                _ => _buildForFourOrMore(context, children),
+              },
+            ),
           ),
         ),
       ),
@@ -154,7 +158,7 @@ class StreamAvatarGroup extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.topStart,
             child: StreamAvatar(
-              placeholder: (_) => const Icon(Icons.person),
+              placeholder: (context) => Icon(context.streamIcons.people),
             ),
           ),
         ),
