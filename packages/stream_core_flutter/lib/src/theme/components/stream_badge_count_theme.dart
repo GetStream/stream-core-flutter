@@ -21,7 +21,8 @@ enum StreamBadgeCountSize {
   sm(24),
 
   /// Medium badge (32px height).
-  md(32);
+  md(32)
+  ;
 
   /// Constructs a [StreamBadgeCountSize] with the given height.
   const StreamBadgeCountSize(this.value);
