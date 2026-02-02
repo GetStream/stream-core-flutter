@@ -4,6 +4,7 @@
 library;
 
 export 'device_selector.dart';
+export 'text_direction_selector.dart';
 export 'text_scale_selector.dart';
 export 'theme_mode_toggle.dart';
 export 'toolbar.dart';

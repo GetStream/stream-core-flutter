@@ -119,8 +119,7 @@ class _SizeVariantsSection extends StatelessWidget {
                 children: [
                   for (final size in StreamBadgeCountSize.values) ...[
                     _SizeDemo(size: size),
-                    if (size != StreamBadgeCountSize.values.last)
-                      SizedBox(width: spacing.xl),
+                    if (size != StreamBadgeCountSize.values.last) SizedBox(width: spacing.xl),
                   ],
                 ],
               ),

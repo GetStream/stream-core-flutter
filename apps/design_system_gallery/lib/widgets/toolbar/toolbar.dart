@@ -7,6 +7,7 @@ import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';
 import '../../core/stream_icons.dart';
 import 'device_selector.dart';
+import 'text_direction_selector.dart';
 import 'text_scale_selector.dart';
 import 'theme_mode_toggle.dart';
 import 'toolbar_button.dart';
@@ -79,6 +80,14 @@ class GalleryToolbar extends StatelessWidget {
                     value: previewConfig.textScale,
                     options: PreviewConfiguration.textScaleOptions,
                     onChanged: previewConfig.setTextScale,
+                  ),
+                  SizedBox(width: spacing.sm),
+
+                  // Text direction selector (LTR/RTL)
+                  TextDirectionSelector(
+                    value: previewConfig.textDirection,
+                    options: PreviewConfiguration.textDirectionOptions,
+                    onChanged: previewConfig.setTextDirection,
                   ),
                 ],
               ),
