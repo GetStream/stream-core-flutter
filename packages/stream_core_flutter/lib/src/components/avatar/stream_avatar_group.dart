@@ -115,7 +115,6 @@ class StreamAvatarGroup extends StatelessWidget {
     return AnimatedContainer(
       width: effectiveSize.value,
       height: effectiveSize.value,
-      padding: const EdgeInsets.all(avatarBorderWidth),
       duration: kThemeChangeDuration,
       // Need to disable text scaling here so that the text doesn't
       // escape the avatar when the textScaleFactor is large.
@@ -153,6 +152,7 @@ class StreamAvatarGroup extends StatelessWidget {
     final avatarOne = avatars.first;
 
     return Stack(
+      clipBehavior: .none,
       children: [
         Positioned.fill(
           child: Align(
@@ -180,6 +180,7 @@ class StreamAvatarGroup extends StatelessWidget {
     final avatarTwo = avatars.last;
 
     return Stack(
+      clipBehavior: .none,
       children: [
         Positioned.fill(
           child: Align(
@@ -206,6 +207,7 @@ class StreamAvatarGroup extends StatelessWidget {
     final avatarThree = avatars.last;
 
     return Stack(
+      clipBehavior: .none,
       children: [
         Positioned.fill(
           child: Align(
@@ -239,6 +241,7 @@ class StreamAvatarGroup extends StatelessWidget {
     final avatarFour = avatars.last;
 
     return Stack(
+      clipBehavior: .none,
       children: [
         Positioned.fill(
           child: Align(
@@ -277,6 +280,7 @@ class StreamAvatarGroup extends StatelessWidget {
     final extraCount = avatars.length - 2;
 
     return Stack(
+      clipBehavior: .none,
       children: [
         Positioned.fill(
           child: Align(
