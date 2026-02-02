@@ -9,93 +9,27 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: StreamOnlineIndicator,
-  path: '[Components]/Indicator',
+  type: StreamBadgeCount,
+  path: '[Components]/Badge',
 )
-Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
-  final isOnline = context.knobs.boolean(
-    label: 'Is Online',
-    initialValue: true,
-    description: 'Whether the user is currently online.',
+Widget buildStreamBadgeCountPlayground(BuildContext context) {
+  final label = context.knobs.string(
+    label: 'Label',
+    initialValue: '5',
+    description: 'The text to display in the badge.',
   );
 
-  final size = context.knobs.object.dropdown<StreamOnlineIndicatorSize>(
+  final size = context.knobs.object.dropdown<StreamBadgeCountSize>(
     label: 'Size',
-    options: StreamOnlineIndicatorSize.values,
-    initialOption: StreamOnlineIndicatorSize.lg,
-    labelBuilder: (option) => option.name.toUpperCase(),
-    description: 'The size of the indicator.',
+    options: StreamBadgeCountSize.values,
+    initialOption: StreamBadgeCountSize.xs,
+    labelBuilder: (option) => '${option.name.toUpperCase()} (${option.value.toInt()}px)',
+    description: 'The size of the badge.',
   );
-
-  final withChild = context.knobs.boolean(
-    label: 'With Child',
-    initialValue: false,
-    description: 'Wrap an avatar as child (Badge-like behavior).',
-  );
-
-  final alignment = context.knobs.object.dropdown<AlignmentDirectional>(
-    label: 'Alignment',
-    options: const [
-      AlignmentDirectional.topStart,
-      AlignmentDirectional.topCenter,
-      AlignmentDirectional.topEnd,
-      AlignmentDirectional.centerStart,
-      AlignmentDirectional.center,
-      AlignmentDirectional.centerEnd,
-      AlignmentDirectional.bottomStart,
-      AlignmentDirectional.bottomCenter,
-      AlignmentDirectional.bottomEnd,
-    ],
-    initialOption: AlignmentDirectional.topEnd,
-    labelBuilder: (option) => switch (option) {
-      AlignmentDirectional.topStart => 'Top Start',
-      AlignmentDirectional.topCenter => 'Top Center',
-      AlignmentDirectional.topEnd => 'Top End',
-      AlignmentDirectional.centerStart => 'Center Start',
-      AlignmentDirectional.center => 'Center',
-      AlignmentDirectional.centerEnd => 'Center End',
-      AlignmentDirectional.bottomStart => 'Bottom Start',
-      AlignmentDirectional.bottomCenter => 'Bottom Center',
-      AlignmentDirectional.bottomEnd => 'Bottom End',
-      _ => option.toString(),
-    },
-    description: 'Alignment of indicator relative to child (directional for RTL support).',
-  );
-
-  final offsetX = context.knobs.double.slider(
-    label: 'Offset X',
-    initialValue: 0,
-    min: -10,
-    max: 10,
-    description: 'Horizontal offset for fine-tuning position.',
-  );
-
-  final offsetY = context.knobs.double.slider(
-    label: 'Offset Y',
-    initialValue: 0,
-    min: -10,
-    max: 10,
-    description: 'Vertical offset for fine-tuning position.',
-  );
-
-  if (withChild) {
-    return Center(
-      child: StreamOnlineIndicator(
-        isOnline: isOnline,
-        size: size,
-        alignment: alignment,
-        offset: Offset(offsetX, offsetY),
-        child: StreamAvatar(
-          size: StreamAvatarSize.lg,
-          placeholder: (context) => const Text('AB'),
-        ),
-      ),
-    );
-  }
 
   return Center(
-    child: StreamOnlineIndicator(
-      isOnline: isOnline,
+    child: StreamBadgeCount(
+      label: label,
       size: size,
     ),
   );
@@ -107,10 +41,10 @@ Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: StreamOnlineIndicator,
-  path: '[Components]/Indicator',
+  type: StreamBadgeCount,
+  path: '[Components]/Badge',
 )
-Widget buildStreamOnlineIndicatorShowcase(BuildContext context) {
+Widget buildStreamBadgeCountShowcase(BuildContext context) {
   final colorScheme = context.streamColorScheme;
   final textTheme = context.streamTextTheme;
   final spacing = context.streamSpacing;
@@ -126,8 +60,8 @@ Widget buildStreamOnlineIndicatorShowcase(BuildContext context) {
           const _SizeVariantsSection(),
           SizedBox(height: spacing.xl),
 
-          // Alignment variants
-          const _AlignmentVariantsSection(),
+          // Count variants
+          const _CountVariantsSection(),
           SizedBox(height: spacing.xl),
 
           // Usage patterns
@@ -174,38 +108,19 @@ class _SizeVariantsSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Online states
               Text(
-                'Online',
-                style: textTheme.captionEmphasis.copyWith(
-                  color: colorScheme.textPrimary,
+                'Badge sizes scale with count display',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textSecondary,
                 ),
               ),
-              SizedBox(height: spacing.sm),
+              SizedBox(height: spacing.md),
               Row(
                 children: [
-                  for (final size in StreamOnlineIndicatorSize.values) ...[
-                    _SizeDemo(size: size, isOnline: true),
-                    if (size != StreamOnlineIndicatorSize.values.last) SizedBox(width: spacing.xl),
-                  ],
-                ],
-              ),
-              SizedBox(height: spacing.md),
-              Divider(color: colorScheme.borderSurfaceSubtle),
-              SizedBox(height: spacing.md),
-              // Offline states
-              Text(
-                'Offline',
-                style: textTheme.captionEmphasis.copyWith(
-                  color: colorScheme.textPrimary,
-                ),
-              ),
-              SizedBox(height: spacing.sm),
-              Row(
-                children: [
-                  for (final size in StreamOnlineIndicatorSize.values) ...[
-                    _SizeDemo(size: size, isOnline: false),
-                    if (size != StreamOnlineIndicatorSize.values.last) SizedBox(width: spacing.xl),
+                  for (final size in StreamBadgeCountSize.values) ...[
+                    _SizeDemo(size: size),
+                    if (size != StreamBadgeCountSize.values.last)
+                      SizedBox(width: spacing.xl),
                   ],
                 ],
               ),
@@ -218,17 +133,15 @@ class _SizeVariantsSection extends StatelessWidget {
 }
 
 class _SizeDemo extends StatelessWidget {
-  const _SizeDemo({required this.size, required this.isOnline});
+  const _SizeDemo({required this.size});
 
-  final StreamOnlineIndicatorSize size;
-  final bool isOnline;
+  final StreamBadgeCountSize size;
 
-  String _getPixelSize(StreamOnlineIndicatorSize size) {
+  String _getPixelSize(StreamBadgeCountSize size) {
     return switch (size) {
-      StreamOnlineIndicatorSize.sm => '8px',
-      StreamOnlineIndicatorSize.md => '12px',
-      StreamOnlineIndicatorSize.lg => '14px',
-      StreamOnlineIndicatorSize.xl => '16px',
+      StreamBadgeCountSize.xs => '20px',
+      StreamBadgeCountSize.sm => '24px',
+      StreamBadgeCountSize.md => '32px',
     };
   }
 
@@ -241,11 +154,11 @@ class _SizeDemo extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          width: 32,
+          width: 48,
           height: 32,
           child: Center(
-            child: StreamOnlineIndicator(
-              isOnline: isOnline,
+            child: StreamBadgeCount(
+              label: '5',
               size: size,
             ),
           ),
@@ -272,11 +185,11 @@ class _SizeDemo extends StatelessWidget {
 }
 
 // =============================================================================
-// Alignment Variants Section
+// Count Variants Section
 // =============================================================================
 
-class _AlignmentVariantsSection extends StatelessWidget {
-  const _AlignmentVariantsSection();
+class _CountVariantsSection extends StatelessWidget {
+  const _CountVariantsSection();
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +202,7 @@ class _AlignmentVariantsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionLabel(label: 'ALIGNMENT VARIANTS'),
+        const _SectionLabel(label: 'COUNT VARIANTS'),
         SizedBox(height: spacing.md),
         Container(
           width: double.infinity,
@@ -308,32 +221,21 @@ class _AlignmentVariantsSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Badge-like positioning with child',
-                style: textTheme.captionEmphasis.copyWith(
-                  color: colorScheme.textPrimary,
+                'Badge adapts width based on count',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textSecondary,
                 ),
               ),
               SizedBox(height: spacing.md),
               Wrap(
-                spacing: spacing.xl,
-                runSpacing: spacing.lg,
+                spacing: spacing.md,
+                runSpacing: spacing.md,
                 children: const [
-                  _AlignmentDemo(
-                    alignment: AlignmentDirectional.topStart,
-                    label: 'topStart',
-                  ),
-                  _AlignmentDemo(
-                    alignment: AlignmentDirectional.topEnd,
-                    label: 'topEnd',
-                  ),
-                  _AlignmentDemo(
-                    alignment: AlignmentDirectional.bottomStart,
-                    label: 'bottomStart',
-                  ),
-                  _AlignmentDemo(
-                    alignment: AlignmentDirectional.bottomEnd,
-                    label: 'bottomEnd',
-                  ),
+                  _CountDemo(count: 1),
+                  _CountDemo(count: 9),
+                  _CountDemo(count: 25),
+                  _CountDemo(count: 99),
+                  _CountDemo(count: 100),
                 ],
               ),
             ],
@@ -344,11 +246,10 @@ class _AlignmentVariantsSection extends StatelessWidget {
   }
 }
 
-class _AlignmentDemo extends StatelessWidget {
-  const _AlignmentDemo({required this.alignment, required this.label});
+class _CountDemo extends StatelessWidget {
+  const _CountDemo({required this.count});
 
-  final AlignmentGeometry alignment;
-  final String label;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
@@ -356,22 +257,16 @@ class _AlignmentDemo extends StatelessWidget {
     final textTheme = context.streamTextTheme;
     final spacing = context.streamSpacing;
 
+    final displayText = count > 99 ? '99+' : '$count';
+
     return Column(
       children: [
-        StreamOnlineIndicator(
-          isOnline: true,
-          size: StreamOnlineIndicatorSize.lg,
-          alignment: alignment,
-          child: StreamAvatar(
-            size: StreamAvatarSize.lg,
-            placeholder: (context) => const Text('AB'),
-          ),
-        ),
-        SizedBox(height: spacing.sm),
+        StreamBadgeCount(label: displayText),
+        SizedBox(height: spacing.xs),
         Text(
-          label,
-          style: textTheme.metadataEmphasis.copyWith(
-            color: colorScheme.accentPrimary,
+          displayText,
+          style: textTheme.metadataDefault.copyWith(
+            color: colorScheme.textTertiary,
             fontFamily: 'monospace',
           ),
         ),
@@ -397,71 +292,79 @@ class _UsagePatternsSection extends StatelessWidget {
         const _SectionLabel(label: 'USAGE PATTERNS'),
         SizedBox(height: spacing.md),
 
-        // Avatar with indicator
+        // Avatar with badge
         const _ExampleCard(
-          title: 'Avatar with Status',
-          description: 'Indicator positioned on avatar corner',
-          child: Row(
-            spacing: 24,
-            children: [
-              _AvatarWithIndicator(
-                name: 'Sarah Chen',
-                isOnline: true,
-              ),
-              _AvatarWithIndicator(
-                name: 'Alex Kim',
-                isOnline: true,
-              ),
-              _AvatarWithIndicator(
-                name: 'Jordan Lee',
-                isOnline: false,
-              ),
-              _AvatarWithIndicator(
-                name: 'Taylor Park',
-                isOnline: true,
-              ),
-            ],
-          ),
+          title: 'Avatar with Badge',
+          description: 'Badge positioned on avatar corner',
+          child: _AvatarWithBadgeGroup(),
         ),
         SizedBox(height: spacing.sm),
 
-        // Inline status
+        // List item with badge
         const _ExampleCard(
-          title: 'Inline Status',
-          description: 'Indicator next to user name',
-          child: _InlineStatusGroup(),
+          title: 'List Item',
+          description: 'Badge in channel list item',
+          child: _ListItemExample(),
         ),
       ],
     );
   }
 }
 
-class _AvatarWithIndicator extends StatelessWidget {
-  const _AvatarWithIndicator({
+class _AvatarWithBadgeGroup extends StatelessWidget {
+  const _AvatarWithBadgeGroup();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return Row(
+      children: [
+        const _AvatarWithBadge(name: 'John', count: 3),
+        SizedBox(width: spacing.lg),
+        const _AvatarWithBadge(name: 'Sarah', count: 12),
+        SizedBox(width: spacing.lg),
+        const _AvatarWithBadge(name: 'Alex', count: 99),
+        SizedBox(width: spacing.lg),
+        const _AvatarWithBadge(name: 'Team', count: 150),
+      ],
+    );
+  }
+}
+
+class _AvatarWithBadge extends StatelessWidget {
+  const _AvatarWithBadge({
     required this.name,
-    required this.isOnline,
+    required this.count,
   });
 
   final String name;
-  final bool isOnline;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = context.streamTextTheme;
     final colorScheme = context.streamColorScheme;
     final spacing = context.streamSpacing;
-    final initials = name.split(' ').map((n) => n[0]).join();
 
     return Column(
       children: [
-        // Using the new child parameter (Badge-like behavior)
-        StreamOnlineIndicator(
-          isOnline: isOnline,
-          size: StreamOnlineIndicatorSize.lg,
-          child: StreamAvatar(
-            size: StreamAvatarSize.lg,
-            placeholder: (context) => Text(initials),
-          ),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            StreamAvatar(
+              size: StreamAvatarSize.lg,
+              placeholder: (context) => Text(name[0]),
+            ),
+            Positioned(
+              right: -4,
+              top: -4,
+              child: StreamBadgeCount(
+                label: count > 99 ? '99+' : '$count',
+                size: StreamBadgeCountSize.xs,
+              ),
+            ),
+          ],
         ),
         SizedBox(height: spacing.sm),
         Text(
@@ -470,43 +373,46 @@ class _AvatarWithIndicator extends StatelessWidget {
             color: colorScheme.textPrimary,
           ),
         ),
-        Text(
-          isOnline ? 'Online' : 'Offline',
-          style: textTheme.metadataDefault.copyWith(
-            color: isOnline ? colorScheme.accentSuccess : colorScheme.textTertiary,
-          ),
-        ),
       ],
     );
   }
 }
 
-class _InlineStatusGroup extends StatelessWidget {
-  const _InlineStatusGroup();
+class _ListItemExample extends StatelessWidget {
+  const _ListItemExample();
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const _InlineStatus(name: 'Online User', isOnline: true),
+        const _ChannelListItem(
+          name: 'Design Team',
+          message: 'New mockups ready for review',
+          count: 3,
+        ),
         SizedBox(height: spacing.sm),
-        const _InlineStatus(name: 'Away User', isOnline: false),
+        const _ChannelListItem(
+          name: 'Engineering',
+          message: 'PR merged successfully',
+          count: 12,
+        ),
       ],
     );
   }
 }
 
-class _InlineStatus extends StatelessWidget {
-  const _InlineStatus({
+class _ChannelListItem extends StatelessWidget {
+  const _ChannelListItem({
     required this.name,
-    required this.isOnline,
+    required this.message,
+    required this.count,
   });
 
   final String name;
-  final bool isOnline;
+  final String message;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
@@ -515,19 +421,35 @@ class _InlineStatus extends StatelessWidget {
     final spacing = context.streamSpacing;
 
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        StreamOnlineIndicator(
-          isOnline: isOnline,
-          size: StreamOnlineIndicatorSize.sm,
+        StreamAvatar(
+          size: StreamAvatarSize.lg,
+          placeholder: (context) => Text(name[0]),
         ),
         SizedBox(width: spacing.sm),
-        Text(
-          name,
-          style: textTheme.captionDefault.copyWith(
-            color: colorScheme.textPrimary,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: textTheme.bodyEmphasis.copyWith(
+                  color: colorScheme.textPrimary,
+                ),
+              ),
+              Text(
+                message,
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
+        SizedBox(width: spacing.sm),
+        StreamBadgeCount(label: '$count'),
       ],
     );
   }

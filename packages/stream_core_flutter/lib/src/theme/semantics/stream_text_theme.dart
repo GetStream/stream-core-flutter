@@ -50,6 +50,7 @@ class StreamTextTheme with _$StreamTextTheme {
     TextStyle? metadataEmphasis,
     TextStyle? metadataLink,
     TextStyle? metadataLinkEmphasis,
+    TextStyle? numericXl,
     TextStyle? numericLg,
     TextStyle? numericMd,
     TextStyle? numericSm,
@@ -175,6 +176,13 @@ class StreamTextTheme with _$StreamTextTheme {
     );
 
     // Numeric styles
+    numericXl ??= TextStyle(
+      fontSize: fontSize.sm,
+      fontWeight: fontWeight.bold,
+      height: 14 / fontSize.sm,
+      fontStyle: FontStyle.normal,
+      decoration: TextDecoration.none,
+    );
     numericLg ??= TextStyle(
       fontSize: fontSize.xs,
       fontWeight: fontWeight.bold,
@@ -213,6 +221,7 @@ class StreamTextTheme with _$StreamTextTheme {
       metadataEmphasis: metadataEmphasis,
       metadataLink: metadataLink,
       metadataLinkEmphasis: metadataLinkEmphasis,
+      numericXl: numericXl,
       numericLg: numericLg,
       numericMd: numericMd,
       numericSm: numericSm,
@@ -235,6 +244,7 @@ class StreamTextTheme with _$StreamTextTheme {
     required this.metadataEmphasis,
     required this.metadataLink,
     required this.metadataLinkEmphasis,
+    required this.numericXl,
     required this.numericLg,
     required this.numericMd,
     required this.numericSm,
@@ -314,6 +324,11 @@ class StreamTextTheme with _$StreamTextTheme {
   ///
   /// Uses semibold weight, xs font size, and tight line height.
   final TextStyle metadataLinkEmphasis;
+
+  /// Extra large numeric text style.
+  ///
+  /// Uses bold weight and sm font size. Optimized for displaying numbers.
+  final TextStyle numericXl;
 
   /// Large numeric text style.
   ///
@@ -521,6 +536,17 @@ class StreamTextTheme with _$StreamTextTheme {
       decoration: decoration,
     ),
     metadataLinkEmphasis: metadataLinkEmphasis.apply(
+      color: color,
+      package: package,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+      heightFactor: heightFactor,
+      heightDelta: heightDelta,
+      fontSizeFactor: fontSizeFactor,
+      fontSizeDelta: fontSizeDelta,
+      decoration: decoration,
+    ),
+    numericXl: numericXl.apply(
       color: color,
       package: package,
       fontFamily: fontFamily,

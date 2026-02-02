@@ -14,8 +14,12 @@ import 'package:design_system_gallery/components/button.dart'
     as _design_system_gallery_components_button;
 import 'package:design_system_gallery/components/stream_avatar.dart'
     as _design_system_gallery_components_stream_avatar;
+import 'package:design_system_gallery/components/stream_avatar_group.dart'
+    as _design_system_gallery_components_stream_avatar_group;
 import 'package:design_system_gallery/components/stream_avatar_stack.dart'
     as _design_system_gallery_components_stream_avatar_stack;
+import 'package:design_system_gallery/components/stream_badge_count.dart'
+    as _design_system_gallery_components_stream_badge_count;
 import 'package:design_system_gallery/components/stream_online_indicator.dart'
     as _design_system_gallery_components_stream_online_indicator;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -35,7 +39,6 @@ import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookCategory(
     name: 'App Foundation',
-    isInitiallyExpanded: false,
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Primitives',
@@ -144,7 +147,6 @@ final directories = <_widgetbook.WidgetbookNode>[
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Avatar',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamAvatar',
@@ -158,6 +160,21 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Showcase',
                 builder: _design_system_gallery_components_stream_avatar
                     .buildStreamAvatarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamAvatarGroup',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_stream_avatar_group
+                    .buildStreamAvatarGroupPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_stream_avatar_group
+                    .buildStreamAvatarGroupShowcase,
               ),
             ],
           ),
@@ -179,8 +196,27 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'Badge',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamBadgeCount',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_stream_badge_count
+                    .buildStreamBadgeCountPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_stream_badge_count
+                    .buildStreamBadgeCountShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Button',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamButton',
@@ -216,7 +252,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Indicator',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamOnlineIndicator',

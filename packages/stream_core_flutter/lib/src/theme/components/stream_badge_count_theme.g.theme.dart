@@ -3,18 +3,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, unused_element
 
-part of 'stream_avatar_theme.dart';
+part of 'stream_badge_count_theme.dart';
 
 // **************************************************************************
 // ThemeGenGenerator
 // **************************************************************************
 
-mixin _$StreamAvatarThemeData {
+mixin _$StreamBadgeCountThemeData {
   bool get canMerge => true;
 
-  static StreamAvatarThemeData? lerp(
-    StreamAvatarThemeData? a,
-    StreamAvatarThemeData? b,
+  static StreamBadgeCountThemeData? lerp(
+    StreamBadgeCountThemeData? a,
+    StreamBadgeCountThemeData? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -29,32 +29,32 @@ mixin _$StreamAvatarThemeData {
       return t == 0.0 ? a : null;
     }
 
-    return StreamAvatarThemeData(
+    return StreamBadgeCountThemeData(
       size: t < 0.5 ? a.size : b.size,
+      textColor: Color.lerp(a.textColor, b.textColor, t),
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
-      foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
-      border: BoxBorder.lerp(a.border, b.border, t),
+      borderColor: Color.lerp(a.borderColor, b.borderColor, t),
     );
   }
 
-  StreamAvatarThemeData copyWith({
-    StreamAvatarSize? size,
+  StreamBadgeCountThemeData copyWith({
+    StreamBadgeCountSize? size,
+    Color? textColor,
     Color? backgroundColor,
-    Color? foregroundColor,
-    BoxBorder? border,
+    Color? borderColor,
   }) {
-    final _this = (this as StreamAvatarThemeData);
+    final _this = (this as StreamBadgeCountThemeData);
 
-    return StreamAvatarThemeData(
+    return StreamBadgeCountThemeData(
       size: size ?? _this.size,
+      textColor: textColor ?? _this.textColor,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
-      foregroundColor: foregroundColor ?? _this.foregroundColor,
-      border: border ?? _this.border,
+      borderColor: borderColor ?? _this.borderColor,
     );
   }
 
-  StreamAvatarThemeData merge(StreamAvatarThemeData? other) {
-    final _this = (this as StreamAvatarThemeData);
+  StreamBadgeCountThemeData merge(StreamBadgeCountThemeData? other) {
+    final _this = (this as StreamBadgeCountThemeData);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -66,9 +66,9 @@ mixin _$StreamAvatarThemeData {
 
     return copyWith(
       size: other.size,
+      textColor: other.textColor,
       backgroundColor: other.backgroundColor,
-      foregroundColor: other.foregroundColor,
-      border: other.border,
+      borderColor: other.borderColor,
     );
   }
 
@@ -82,25 +82,25 @@ mixin _$StreamAvatarThemeData {
       return false;
     }
 
-    final _this = (this as StreamAvatarThemeData);
-    final _other = (other as StreamAvatarThemeData);
+    final _this = (this as StreamBadgeCountThemeData);
+    final _other = (other as StreamBadgeCountThemeData);
 
     return _other.size == _this.size &&
+        _other.textColor == _this.textColor &&
         _other.backgroundColor == _this.backgroundColor &&
-        _other.foregroundColor == _this.foregroundColor &&
-        _other.border == _this.border;
+        _other.borderColor == _this.borderColor;
   }
 
   @override
   int get hashCode {
-    final _this = (this as StreamAvatarThemeData);
+    final _this = (this as StreamBadgeCountThemeData);
 
     return Object.hash(
       runtimeType,
       _this.size,
+      _this.textColor,
       _this.backgroundColor,
-      _this.foregroundColor,
-      _this.border,
+      _this.borderColor,
     );
   }
 }

@@ -122,8 +122,8 @@ class StreamAvatar extends StatelessWidget {
 
   /// Whether to show a border around the avatar.
   ///
-  /// Defaults to true. The border color is determined by
-  /// [StreamAvatarThemeData.borderColor].
+  /// Defaults to true. The border style is determined by
+  /// [StreamAvatarThemeData.border].
   final bool showBorder;
 
   @override
@@ -136,9 +136,9 @@ class StreamAvatar extends StatelessWidget {
     final effectiveSize = size ?? avatarTheme.size ?? defaults.size;
     final effectiveBackgroundColor = backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
-    final effectiveBorderColor = avatarTheme.borderColor ?? defaults.borderColor;
+    final effectiveBorder = avatarTheme.border ?? defaults.border;
 
-    final border = showBorder ? Border.all(color: effectiveBorderColor) : null;
+    final border = showBorder ? effectiveBorder : null;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);
     final iconTheme = theme.iconTheme.copyWith(color: effectiveForegroundColor, size: _iconSizeForSize(effectiveSize));
 
@@ -184,6 +184,7 @@ class StreamAvatar extends StatelessWidget {
     .xs => textTheme.metadataEmphasis,
     .sm || .md => textTheme.captionEmphasis,
     .lg => textTheme.bodyEmphasis,
+    .xl => textTheme.headingLg,
   };
 
   // Returns the appropriate icon size for the given avatar size.
@@ -194,6 +195,7 @@ class StreamAvatar extends StatelessWidget {
     .sm => 12,
     .md => 16,
     .lg => 20,
+    .xl => 32,
   };
 }
 
@@ -216,7 +218,7 @@ class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
   StreamAvatarSize get size => StreamAvatarSize.lg;
 
   @override
-  Color get borderColor => StreamColors.black10;
+  BoxBorder get border => Border.all(color: StreamColors.black10);
 
   @override
   Color get backgroundColor => _colorScheme.avatarPalette.first.backgroundColor;

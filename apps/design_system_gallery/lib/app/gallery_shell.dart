@@ -48,7 +48,7 @@ class GalleryShell extends StatelessWidget {
                     lightTheme: materialTheme,
                     darkTheme: materialTheme,
                     themeMode: isDark ? .dark : .light,
-                    directories: directories,
+                    directories: _collapseDirectories(directories),
                     home: const GalleryHomePage(),
                     appBuilder: (context, child) => PreviewWrapper(child: child),
                   ),
@@ -67,4 +67,53 @@ class GalleryShell extends StatelessWidget {
       ),
     );
   }
+}
+
+// Transforms a list of [WidgetbookNode]s to have their children collapsed
+// by default.
+//
+// This recursively processes all nodes and creates new instances with
+// `isInitiallyExpanded: false` for nodes that have children.
+List<WidgetbookNode> _collapseDirectories(
+  List<WidgetbookNode> nodes,
+) => nodes.map(_collapseNode).toList();
+
+WidgetbookNode _collapseNode(
+  WidgetbookNode node,
+) {
+  if (node is WidgetbookCategory) {
+    // Keep the category expanded by default, but collapse its children
+    return WidgetbookCategory(
+      name: node.name,
+      children: node.children?.map(_collapseNode).toList(),
+    );
+  }
+
+  if (node is WidgetbookFolder) {
+    // Keep the folder and its children collapsed by default
+    return WidgetbookFolder(
+      name: node.name,
+      isInitiallyExpanded: false,
+      children: node.children?.map(_collapseNode).toList(),
+    );
+  }
+
+  if (node is WidgetbookComponent) {
+    // Keep the component and its use cases collapsed by default
+    return WidgetbookComponent(
+      name: node.name,
+      isInitiallyExpanded: false,
+      useCases: [
+        ...node.useCases.map(
+          (useCase) => WidgetbookUseCase(
+            name: useCase.name,
+            builder: useCase.builder,
+            designLink: useCase.designLink,
+          ),
+        ),
+      ],
+    );
+  }
+
+  return node;
 }

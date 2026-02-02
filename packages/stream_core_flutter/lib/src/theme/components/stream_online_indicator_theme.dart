@@ -5,6 +5,35 @@ import '../stream_theme.dart';
 
 part 'stream_online_indicator_theme.g.theme.dart';
 
+/// Predefined sizes for the online indicator.
+///
+/// Each size corresponds to a specific diameter in logical pixels.
+///
+/// See also:
+///
+///  * [StreamOnlineIndicator], which uses these size variants.
+///  * [StreamOnlineIndicatorThemeData.size], for setting a global default size.
+enum StreamOnlineIndicatorSize {
+  /// Small indicator (8px diameter).
+  sm(8),
+
+  /// Medium indicator (12px diameter).
+  md(12),
+
+  /// Large indicator (14px diameter).
+  lg(14),
+
+  /// Extra large indicator (16px diameter).
+  xl(16)
+  ;
+
+  /// Constructs a [StreamOnlineIndicatorSize] with the given diameter.
+  const StreamOnlineIndicatorSize(this.value);
+
+  /// The diameter of the indicator in logical pixels.
+  final double value;
+}
+
 /// Applies an online indicator theme to descendant [StreamOnlineIndicator]
 /// widgets.
 ///
@@ -94,10 +123,18 @@ class StreamOnlineIndicatorTheme extends InheritedTheme {
 class StreamOnlineIndicatorThemeData with _$StreamOnlineIndicatorThemeData {
   /// Creates an online indicator theme with optional style overrides.
   const StreamOnlineIndicatorThemeData({
+    this.size,
     this.backgroundOnline,
     this.backgroundOffline,
     this.borderColor,
+    this.alignment,
+    this.offset,
   });
+
+  /// The default size for online indicators.
+  ///
+  /// Falls back to [StreamOnlineIndicatorSize.lg].
+  final StreamOnlineIndicatorSize? size;
 
   /// The background color for online presence indicators.
   ///
@@ -114,6 +151,18 @@ class StreamOnlineIndicatorThemeData with _$StreamOnlineIndicatorThemeData {
   /// A thin outline around the presence dot that matches the surface behind
   /// the avatar.
   final Color? borderColor;
+
+  /// The alignment of the indicator relative to the child widget.
+  ///
+  /// Only used when [StreamOnlineIndicator.child] is provided.
+  /// Falls back to [AlignmentDirectional.topEnd].
+  final AlignmentGeometry? alignment;
+
+  /// The offset for fine-tuning indicator position.
+  ///
+  /// Applied after alignment to adjust the indicator's final position.
+  /// Falls back to [Offset.zero].
+  final Offset? offset;
 
   /// Linearly interpolate between two [StreamOnlineIndicatorThemeData] objects.
   static StreamOnlineIndicatorThemeData? lerp(
