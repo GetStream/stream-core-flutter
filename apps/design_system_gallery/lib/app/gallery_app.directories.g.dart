@@ -10,6 +10,8 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:design_system_gallery/components/accessories/stream_file_type_icons.dart'
+    as _design_system_gallery_components_accessories_stream_file_type_icons;
 import 'package:design_system_gallery/components/button.dart'
     as _design_system_gallery_components_button;
 import 'package:design_system_gallery/components/stream_avatar.dart'
@@ -35,7 +37,6 @@ import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookCategory(
     name: 'App Foundation',
-    isInitiallyExpanded: false,
     children: [
       _widgetbook.WidgetbookFolder(
         name: 'Primitives',
@@ -143,8 +144,29 @@ final directories = <_widgetbook.WidgetbookNode>[
     name: 'Components',
     children: [
       _widgetbook.WidgetbookFolder(
+        name: 'Accessories',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamFileTypeIcon',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_accessories_stream_file_type_icons
+                        .buildFileTypeIconPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_accessories_stream_file_type_icons
+                        .buildFileTypeIconShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Avatar',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamAvatar',
@@ -180,7 +202,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Button',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamButton',
@@ -216,7 +237,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       ),
       _widgetbook.WidgetbookFolder(
         name: 'Indicator',
-        isInitiallyExpanded: false,
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamOnlineIndicator',

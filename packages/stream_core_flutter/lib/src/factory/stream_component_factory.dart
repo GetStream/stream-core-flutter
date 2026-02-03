@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../components/accessories/stream_file_type_icon.dart' show DefaultStreamFileTypeIcon, StreamFileTypeIconProps;
 import '../components/buttons/stream_button.dart' show DefaultStreamButton, StreamButtonProps;
 
 typedef StreamComponentBuilder<T> = Widget Function(BuildContext context, T props);
@@ -8,7 +9,10 @@ typedef StreamComponentBuilder<T> = Widget Function(BuildContext context, T prop
 class StreamComponentFactory {
   StreamComponentFactory({
     StreamComponentBuilder<StreamButtonProps>? buttonFactory,
-  }) : buttonFactory = buttonFactory ?? DefaultStreamButton.factory;
+    StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIconFactory,
+  }) : buttonFactory = buttonFactory ?? DefaultStreamButton.factory,
+       fileTypeIconFactory = fileTypeIconFactory ?? DefaultStreamFileTypeIcon.factory;
 
   StreamComponentBuilder<StreamButtonProps> buttonFactory;
+  StreamComponentBuilder<StreamFileTypeIconProps> fileTypeIconFactory;
 }
