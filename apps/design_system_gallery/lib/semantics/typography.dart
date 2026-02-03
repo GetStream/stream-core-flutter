@@ -88,6 +88,7 @@ class _TypeScale extends StatelessWidget {
         'NUMERIC',
         'Numbers and counters',
         [
+          ('numericXl', textTheme.numericXl, 'Extra large counters'),
           ('numericLg', textTheme.numericLg, 'Large counters, stats'),
           ('numericMd', textTheme.numericMd, 'Badges, indicators'),
           ('numericSm', textTheme.numericSm, 'Small counts'),
@@ -431,7 +432,7 @@ class _CompleteReference extends StatelessWidget {
                   ),
                   _SizeTag(
                     label: 'numeric',
-                    sizes: '22 / 14 / 10',
+                    sizes: '14 / 12 / 10 / 8',
                   ),
                 ],
               ),

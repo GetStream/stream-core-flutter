@@ -61,6 +61,7 @@ mixin _$StreamTextTheme {
         b.metadataLinkEmphasis,
         t,
       )!,
+      numericXl: TextStyle.lerp(a.numericXl, b.numericXl, t)!,
       numericLg: TextStyle.lerp(a.numericLg, b.numericLg, t)!,
       numericMd: TextStyle.lerp(a.numericMd, b.numericMd, t)!,
       numericSm: TextStyle.lerp(a.numericSm, b.numericSm, t)!,
@@ -83,6 +84,7 @@ mixin _$StreamTextTheme {
     TextStyle? metadataEmphasis,
     TextStyle? metadataLink,
     TextStyle? metadataLinkEmphasis,
+    TextStyle? numericXl,
     TextStyle? numericLg,
     TextStyle? numericMd,
     TextStyle? numericSm,
@@ -105,6 +107,7 @@ mixin _$StreamTextTheme {
       metadataEmphasis: metadataEmphasis ?? _this.metadataEmphasis,
       metadataLink: metadataLink ?? _this.metadataLink,
       metadataLinkEmphasis: metadataLinkEmphasis ?? _this.metadataLinkEmphasis,
+      numericXl: numericXl ?? _this.numericXl,
       numericLg: numericLg ?? _this.numericLg,
       numericMd: numericMd ?? _this.numericMd,
       numericSm: numericSm ?? _this.numericSm,
@@ -142,6 +145,7 @@ mixin _$StreamTextTheme {
       metadataLinkEmphasis: _this.metadataLinkEmphasis.merge(
         other.metadataLinkEmphasis,
       ),
+      numericXl: _this.numericXl.merge(other.numericXl),
       numericLg: _this.numericLg.merge(other.numericLg),
       numericMd: _this.numericMd.merge(other.numericMd),
       numericSm: _this.numericSm.merge(other.numericSm),
@@ -176,6 +180,7 @@ mixin _$StreamTextTheme {
         _other.metadataEmphasis == _this.metadataEmphasis &&
         _other.metadataLink == _this.metadataLink &&
         _other.metadataLinkEmphasis == _this.metadataLinkEmphasis &&
+        _other.numericXl == _this.numericXl &&
         _other.numericLg == _this.numericLg &&
         _other.numericMd == _this.numericMd &&
         _other.numericSm == _this.numericSm;
@@ -202,6 +207,7 @@ mixin _$StreamTextTheme {
       _this.metadataEmphasis,
       _this.metadataLink,
       _this.metadataLinkEmphasis,
+      _this.numericXl,
       _this.numericLg,
       _this.numericMd,
       _this.numericSm,

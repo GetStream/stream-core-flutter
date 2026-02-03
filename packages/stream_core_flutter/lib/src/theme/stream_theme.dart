@@ -6,6 +6,7 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 import '../factory/stream_component_factory.dart';
 import 'components/stream_avatar_theme.dart';
+import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'primitives/stream_icons.dart';
@@ -83,6 +84,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamBoxShadow? boxShadow,
     // Components themes
     StreamAvatarThemeData? avatarTheme,
+    StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamComponentFactory? componentFactory,
@@ -103,6 +105,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     // Components
     avatarTheme ??= const StreamAvatarThemeData();
+    badgeCountTheme ??= const StreamBadgeCountThemeData();
     buttonTheme ??= const StreamButtonThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
 
@@ -118,6 +121,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       textTheme: textTheme,
       boxShadow: boxShadow,
       avatarTheme: avatarTheme,
+      badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       componentFactory: componentFactory,
@@ -146,6 +150,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.textTheme,
     required this.boxShadow,
     required this.avatarTheme,
+    required this.badgeCountTheme,
     required this.buttonTheme,
     required this.onlineIndicatorTheme,
     required this.componentFactory,
@@ -211,6 +216,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The avatar theme for this theme.
   final StreamAvatarThemeData avatarTheme;
+
+  /// The badge count theme for this theme.
+  final StreamBadgeCountThemeData badgeCountTheme;
 
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
