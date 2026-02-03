@@ -64,17 +64,11 @@ class _MessageComposerInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: fully implement the input field
 
-    final defaultBorderRadius = context.streamRadius.lg;
     final composerBorderRadius = context.streamRadius.xxxl;
 
     final border = OutlineInputBorder(
       borderSide: BorderSide.none,
-      borderRadius: BorderRadius.only(
-        bottomLeft: composerBorderRadius,
-        bottomRight: defaultBorderRadius,
-        topLeft: defaultBorderRadius,
-        topRight: defaultBorderRadius,
-      ),
+      borderRadius: BorderRadius.all(composerBorderRadius),
     );
 
     return TextField(

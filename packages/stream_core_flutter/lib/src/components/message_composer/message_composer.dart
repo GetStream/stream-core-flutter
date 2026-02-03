@@ -5,59 +5,66 @@ import 'package:flutter/widgets.dart';
 import '../../../stream_core_flutter.dart';
 import '../../factory/stream_component_factory.dart';
 
-class StreamMessageComposer extends StatelessWidget {
+class StreamMessageComposer<T extends MessageData> extends StatelessWidget {
   const StreamMessageComposer({
     super.key,
     this.isFloating = false,
+    this.messageData,
   });
 
   final bool isFloating;
+  final T? messageData;
 
   @override
   Widget build(BuildContext context) {
     return StreamTheme.of(
       context,
-    ).componentFactory.messageComposer.messageComposer(context, MessageComposerProps(isFloating: isFloating));
+    ).componentFactory.messageComposer.messageComposer(
+      context,
+      MessageComposerProps(isFloating: isFloating, messageData: messageData),
+    );
   }
 }
 
 /// Properties to build the main message composer component
-class MessageComposerProps {
+class MessageComposerProps<T extends MessageData> {
   const MessageComposerProps({
     this.isFloating = false,
+    this.messageData,
   });
 
   final bool isFloating;
+  final T? messageData;
 }
 
 /// Properties to build any of the sub-components.
 /// These properties are all the same, so features such as 'add attachment',
 /// can be added to any of the sub-components.
-class MessageComposerComponentProps {
+class MessageComposerComponentProps<T extends MessageData> {
   const MessageComposerComponentProps({
     required this.controller,
-    this.onAddAttachment,
     this.isFloating = false,
+    this.messageData,
   });
 
   final TextEditingController controller;
-  final VoidCallback? onAddAttachment;
   final bool isFloating;
+  final T? messageData;
 }
 
-class DefaultMessageComposer extends StatefulWidget {
+class DefaultMessageComposer<T extends MessageData> extends StatefulWidget {
   const DefaultMessageComposer({super.key, required this.props});
 
-  static StreamComponentBuilder<MessageComposerProps> get factory =>
-      (context, props) => DefaultMessageComposer(props: props);
+  static StreamComponentBuilder<MessageComposerProps<MessageData>> get factory =>
+      (context, props) => DefaultMessageComposer<MessageData>(props: props);
 
-  final MessageComposerProps props;
+  final MessageComposerProps<T> props;
 
   @override
-  State<DefaultMessageComposer> createState() => _DefaultMessageComposerState();
+  State<DefaultMessageComposer<T>> createState() => _DefaultMessageComposerState();
 }
 
-class _DefaultMessageComposerState extends State<DefaultMessageComposer> {
+class _DefaultMessageComposerState<T extends MessageData> extends State<DefaultMessageComposer<T>> {
   late TextEditingController _controller;
 
   @override
@@ -78,8 +85,8 @@ class _DefaultMessageComposerState extends State<DefaultMessageComposer> {
 
     final componentProps = MessageComposerComponentProps(
       controller: _controller,
-      onAddAttachment: () {},
       isFloating: widget.props.isFloating,
+      messageData: widget.props.messageData,
     );
     final bottomPaddingSafeArea = MediaQuery.of(context).padding.bottom;
     final minimumBottomPadding = spacing.md;
@@ -108,3 +115,5 @@ class _DefaultMessageComposerState extends State<DefaultMessageComposer> {
     );
   }
 }
+
+class MessageData {}

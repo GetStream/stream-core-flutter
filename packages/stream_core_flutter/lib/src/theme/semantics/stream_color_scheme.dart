@@ -52,6 +52,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentBlack,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -67,6 +68,8 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    Color? backgroundInverse,
+
     // Background - Elevation
     Color? backgroundElevation0,
     Color? backgroundElevation1,
@@ -110,6 +113,7 @@ class StreamColorScheme with _$StreamColorScheme {
     accentWarning ??= StreamColors.yellow.shade500;
     accentError ??= StreamColors.red.shade500;
     accentNeutral ??= StreamColors.slate.shade500;
+    accentBlack ??= light_tokens.StreamTokens.accentBlack;
 
     // Text
     textPrimary ??= StreamColors.slate.shade900;
@@ -127,6 +131,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceStrong ??= StreamColors.slate.shade200;
     backgroundOverlay ??= StreamColors.black10;
     backgroundDisabled ??= StreamColors.slate.shade100;
+    backgroundInverse ??= light_tokens.StreamTokens.badgeBgInverse; // TODO move to backgroundCoreInverse
 
     backgroundElevation0 ??= light_tokens.StreamTokens.backgroundElevationElevation0;
     backgroundElevation1 ??= light_tokens.StreamTokens.backgroundElevationElevation1;
@@ -194,6 +199,7 @@ class StreamColorScheme with _$StreamColorScheme {
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
+      accentBlack: accentBlack,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -207,6 +213,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
       backgroundDisabled: backgroundDisabled,
+      backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
@@ -247,6 +254,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentBlack,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -262,6 +270,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    Color? backgroundInverse,
     // Background - Elevation
     Color? backgroundElevation0,
     Color? backgroundElevation1,
@@ -305,6 +314,7 @@ class StreamColorScheme with _$StreamColorScheme {
     accentWarning ??= StreamColors.yellow.shade400;
     accentError ??= StreamColors.red.shade400;
     accentNeutral ??= StreamColors.neutral.shade500;
+    accentBlack ??= dark_tokens.StreamTokens.accentBlack;
 
     // Text
     textPrimary ??= StreamColors.neutral.shade50;
@@ -322,6 +332,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceStrong ??= StreamColors.neutral.shade700;
     backgroundOverlay ??= StreamColors.black50;
     backgroundDisabled ??= StreamColors.neutral.shade900;
+    backgroundInverse ??= dark_tokens.StreamTokens.badgeBgInverse; // TODO move to backgroundCoreInverse
 
     backgroundElevation0 ??= dark_tokens.StreamTokens.backgroundElevationElevation0;
     backgroundElevation1 ??= dark_tokens.StreamTokens.backgroundElevationElevation1;
@@ -389,6 +400,7 @@ class StreamColorScheme with _$StreamColorScheme {
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
+      accentBlack: accentBlack,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -402,6 +414,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
       backgroundDisabled: backgroundDisabled,
+      backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
@@ -440,6 +453,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.accentWarning,
     required this.accentError,
     required this.accentNeutral,
+    required this.accentBlack,
     // Text
     required this.textPrimary,
     required this.textSecondary,
@@ -455,6 +469,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundSurfaceStrong,
     required this.backgroundOverlay,
     required this.backgroundDisabled,
+    required this.backgroundInverse,
     // Background - Elevation
     required this.backgroundElevation0,
     required this.backgroundElevation1,
@@ -512,6 +527,9 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The neutral accent color.
   final Color accentNeutral;
 
+  /// The black accent color.
+  final Color accentBlack;
+
   // ---- Text colors ----
 
   /// The primary text color.
@@ -554,6 +572,9 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Disabled background for inputs, buttons, or chips.
   final Color backgroundDisabled;
+
+  /// The inverse background color.
+  final Color backgroundInverse;
 
   // ---- Background - Elevation ----
 

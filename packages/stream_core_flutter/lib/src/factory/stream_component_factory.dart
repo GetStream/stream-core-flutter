@@ -9,15 +9,15 @@ typedef StreamComponentBuilder<T> = Widget Function(BuildContext context, T prop
 class StreamComponentFactory {
   StreamComponentFactory({
     StreamComponentBuilder<StreamButtonProps>? buttonFactory,
-    StreamMessageComposerFactory? messageComposer,
+    StreamMessageComposerFactory<dynamic>? messageComposer,
   }) : buttonFactory = buttonFactory ?? DefaultStreamButton.factory,
        messageComposer = messageComposer ?? StreamMessageComposerFactory();
 
   StreamComponentBuilder<StreamButtonProps> buttonFactory;
-  StreamMessageComposerFactory messageComposer;
+  StreamMessageComposerFactory<dynamic> messageComposer;
 }
 
-class StreamMessageComposerFactory {
+class StreamMessageComposerFactory<T> {
   StreamMessageComposerFactory({
     StreamComponentBuilder<MessageComposerProps>? messageComposer,
     StreamComponentBuilder<MessageComposerComponentProps>? leading,

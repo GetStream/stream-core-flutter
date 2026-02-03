@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../stream_core_flutter.dart';
 import '../../factory/stream_component_factory.dart';
 
-class StreamMessageComposerLeading extends StatelessWidget {
+class StreamMessageComposerLeading<T extends MessageData> extends StatelessWidget {
   const StreamMessageComposerLeading({super.key, required this.props});
-  final MessageComposerComponentProps props;
+  final MessageComposerComponentProps<T> props;
 
   @override
   Widget build(BuildContext context) {
@@ -15,35 +15,16 @@ class StreamMessageComposerLeading extends StatelessWidget {
   }
 }
 
-class DefaultStreamMessageComposerLeading extends StatelessWidget {
+class DefaultStreamMessageComposerLeading<T extends MessageData> extends StatelessWidget {
   const DefaultStreamMessageComposerLeading({super.key, required this.props});
 
   static StreamComponentBuilder<MessageComposerComponentProps> get factory =>
       (context, props) => DefaultStreamMessageComposerLeading(props: props);
 
-  final MessageComposerComponentProps props;
+  final MessageComposerComponentProps<T> props;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Implement the leading component
-    final spacing = context.streamSpacing;
-    if (props.onAddAttachment == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        StreamButton.icon(
-          isFloating: props.isFloating,
-          icon: context.streamIcons.plusLarge,
-          type: StreamButtonType.outline,
-          style: StreamButtonStyle.secondary,
-          size: StreamButtonSize.large,
-          onTap: () {},
-        ),
-        SizedBox(width: spacing.xs),
-      ],
-    );
+    return const SizedBox.shrink();
   }
 }
