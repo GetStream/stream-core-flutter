@@ -131,7 +131,7 @@ class StreamAvatarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(children.isNotEmpty, 'StreamAvatarStack must have at least one child');
+    if (children.isEmpty) return const SizedBox.shrink();
 
     final effectiveSize = size ?? StreamAvatarStackSize.sm;
     final avatarSize = _avatarSizeForStackSize(effectiveSize);

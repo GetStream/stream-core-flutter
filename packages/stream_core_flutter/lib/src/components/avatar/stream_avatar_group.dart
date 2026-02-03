@@ -102,7 +102,7 @@ class StreamAvatarGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(children.isNotEmpty, 'StreamAvatarGroup must have at least one child');
+    if (children.isEmpty) return const SizedBox.shrink();
 
     final colorScheme = context.streamColorScheme;
 
