@@ -114,7 +114,7 @@ class _TypeScale extends StatelessWidget {
               ),
               foregroundDecoration: BoxDecoration(
                 borderRadius: BorderRadius.all(radius.lg),
-                border: Border.all(color: colorScheme.borderSurfaceSubtle),
+                border: Border.all(color: colorScheme.borderSubtle),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +210,7 @@ class _TypeStyleCard extends StatelessWidget {
         decoration: BoxDecoration(
           border: showBorder
               ? Border(
-                  bottom: BorderSide(color: colorScheme.borderSurfaceSubtle),
+                  bottom: BorderSide(color: colorScheme.borderSubtle),
                 )
               : null,
         ),
@@ -365,7 +365,7 @@ class _CompleteReference extends StatelessWidget {
           ),
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+            border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,7 +401,7 @@ class _CompleteReference extends StatelessWidget {
                 description: 'SemiBold weight, underlined',
               ),
               SizedBox(height: spacing.md),
-              Divider(color: colorScheme.borderSurfaceSubtle),
+              Divider(color: colorScheme.borderSubtle),
               SizedBox(height: spacing.md),
               Text(
                 'Size Scale',
@@ -524,7 +524,7 @@ class _SizeTag extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurfaceSubtle,
         borderRadius: BorderRadius.all(radius.sm),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

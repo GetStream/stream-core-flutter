@@ -352,7 +352,7 @@ Widget buildStreamButtonExample(BuildContext context) {
             ),
             foregroundDecoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.borderSurfaceSubtle),
+              border: Border.all(color: colorScheme.borderSubtle),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,7 +405,7 @@ Widget buildStreamButtonExample(BuildContext context) {
             ),
             foregroundDecoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.borderSurfaceSubtle),
+              border: Border.all(color: colorScheme.borderSubtle),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

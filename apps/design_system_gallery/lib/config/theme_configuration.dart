@@ -57,13 +57,13 @@ class ThemeConfiguration extends ChangeNotifier {
   // =========================================================================
   // Border Colors - Core
   // =========================================================================
-  Color? _borderSurface;
-  Color? _borderSurfaceSubtle;
-  Color? _borderSurfaceStrong;
+  Color? _borderDefault;
+  Color? _borderSubtle;
+  Color? _borderStrong;
   Color? _borderOnDark;
   Color? _borderOnAccent;
-  Color? _borderSubtle;
-  Color? _borderImage;
+  Color? _borderOpacity10;
+  Color? _borderOpacity25;
 
   // =========================================================================
   // Border Colors - Utility
@@ -132,13 +132,13 @@ class ThemeConfiguration extends ChangeNotifier {
   // =========================================================================
   // Getters - Border Core
   // =========================================================================
-  Color get borderSurface => _borderSurface ?? _themeData.colorScheme.borderSurface;
-  Color get borderSurfaceSubtle => _borderSurfaceSubtle ?? _themeData.colorScheme.borderSurfaceSubtle;
-  Color get borderSurfaceStrong => _borderSurfaceStrong ?? _themeData.colorScheme.borderSurfaceStrong;
+  Color get borderDefault => _borderDefault ?? _themeData.colorScheme.borderDefault;
+  Color get borderSubtle => _borderSubtle ?? _themeData.colorScheme.borderSubtle;
+  Color get borderStrong => _borderStrong ?? _themeData.colorScheme.borderStrong;
   Color get borderOnDark => _borderOnDark ?? _themeData.colorScheme.borderOnDark;
   Color get borderOnAccent => _borderOnAccent ?? _themeData.colorScheme.borderOnAccent;
-  Color get borderSubtle => _borderSubtle ?? _themeData.colorScheme.borderSubtle;
-  Color get borderImage => _borderImage ?? _themeData.colorScheme.borderImage;
+  Color get borderOpacity10 => _borderOpacity10 ?? _themeData.colorScheme.borderOpacity10;
+  Color get borderOpacity25 => _borderOpacity25 ?? _themeData.colorScheme.borderOpacity25;
 
   // =========================================================================
   // Getters - Border Utility
@@ -210,13 +210,13 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundOverlay(Color color) => _update(() => _backgroundOverlay = color);
 
   // Border Core
-  void setBorderSurface(Color color) => _update(() => _borderSurface = color);
-  void setBorderSurfaceSubtle(Color color) => _update(() => _borderSurfaceSubtle = color);
-  void setBorderSurfaceStrong(Color color) => _update(() => _borderSurfaceStrong = color);
+  void setBorderDefault(Color color) => _update(() => _borderDefault = color);
+  void setBorderSubtle(Color color) => _update(() => _borderSubtle = color);
+  void setBorderStrong(Color color) => _update(() => _borderStrong = color);
   void setBorderOnDark(Color color) => _update(() => _borderOnDark = color);
   void setBorderOnAccent(Color color) => _update(() => _borderOnAccent = color);
-  void setBorderSubtle(Color color) => _update(() => _borderSubtle = color);
-  void setBorderImage(Color color) => _update(() => _borderImage = color);
+  void setBorderOpacity10(Color color) => _update(() => _borderOpacity10 = color);
+  void setBorderOpacity25(Color color) => _update(() => _borderOpacity25 = color);
 
   // Border Utility
   void setBorderFocus(Color color) => _update(() => _borderFocus = color);
@@ -294,13 +294,13 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundSurfaceStrong = null;
     _backgroundOverlay = null;
     // Border Core
-    _borderSurface = null;
-    _borderSurfaceSubtle = null;
-    _borderSurfaceStrong = null;
+    _borderDefault = null;
+    _borderSubtle = null;
+    _borderStrong = null;
     _borderOnDark = null;
     _borderOnAccent = null;
-    _borderSubtle = null;
-    _borderImage = null;
+    _borderOpacity10 = null;
+    _borderOpacity25 = null;
     // Border Utility
     _borderFocus = null;
     _borderDisabled = null;
@@ -358,13 +358,10 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundSurfaceStrong: _backgroundSurfaceStrong,
       backgroundOverlay: _backgroundOverlay,
       // Border Core
-      borderSurface: _borderSurface,
-      borderSurfaceSubtle: _borderSurfaceSubtle,
-      borderSurfaceStrong: _borderSurfaceStrong,
+      borderDefault: _borderDefault,
+      borderSubtle: _borderSubtle,
       borderOnDark: _borderOnDark,
       borderOnAccent: _borderOnAccent,
-      borderSubtle: _borderSubtle,
-      borderImage: _borderImage,
       // Border Utility
       borderFocus: _borderFocus,
       borderDisabled: _borderDisabled,
@@ -416,8 +413,8 @@ class ThemeConfiguration extends ChangeNotifier {
       onSurface: textPrimary,
       onSurfaceVariant: textSecondary,
       onError: textOnAccent,
-      outline: borderSurface,
-      outlineVariant: borderSurfaceSubtle,
+      outline: borderDefault,
+      outlineVariant: borderSubtle,
     );
 
     return ThemeData(
@@ -430,7 +427,7 @@ class ThemeConfiguration extends ChangeNotifier {
       primaryColor: accentPrimary,
       scaffoldBackgroundColor: backgroundApp,
       cardColor: backgroundSurface,
-      dividerColor: borderSurfaceSubtle,
+      dividerColor: borderDefault,
       disabledColor: textDisabled,
       hintColor: textTertiary,
       // Dialog
@@ -439,7 +436,7 @@ class ThemeConfiguration extends ChangeNotifier {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: dialogRadius,
-          side: BorderSide(color: borderSurfaceSubtle),
+          side: BorderSide(color: borderSubtle),
         ),
         titleTextStyle: ts.bodyEmphasis.copyWith(color: textPrimary),
         contentTextStyle: ts.bodyDefault.copyWith(color: textSecondary),
@@ -464,7 +461,7 @@ class ThemeConfiguration extends ChangeNotifier {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: textPrimary,
-          side: BorderSide(color: borderSurface),
+          side: BorderSide(color: borderDefault),
           shape: RoundedRectangleBorder(borderRadius: componentRadius),
         ),
       ),
@@ -488,11 +485,11 @@ class ThemeConfiguration extends ChangeNotifier {
         filled: true,
         border: OutlineInputBorder(
           borderRadius: componentRadius,
-          borderSide: BorderSide(color: borderSurface),
+          borderSide: BorderSide(color: borderStrong),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: componentRadius,
-          borderSide: BorderSide(color: borderSurfaceSubtle),
+          borderSide: BorderSide(color: borderStrong),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: componentRadius,
@@ -513,7 +510,7 @@ class ThemeConfiguration extends ChangeNotifier {
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
               borderRadius: componentRadius,
-              side: BorderSide(color: borderSurfaceSubtle),
+              side: BorderSide(color: borderStrong),
             ),
           ),
         ),
@@ -524,7 +521,7 @@ class ThemeConfiguration extends ChangeNotifier {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: componentRadius,
-          side: BorderSide(color: borderSurfaceSubtle),
+          side: BorderSide(color: borderStrong),
         ),
         textStyle: ts.bodyDefault.copyWith(color: textPrimary),
       ),
@@ -545,7 +542,7 @@ class ThemeConfiguration extends ChangeNotifier {
       ),
       // Divider
       dividerTheme: DividerThemeData(
-        color: borderSurfaceSubtle,
+        color: borderDefault,
         thickness: 1,
       ),
       // Icon

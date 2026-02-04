@@ -60,7 +60,7 @@ class PreviewWrapper extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.xl),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderDefault),
         ),
         child: content,
       ),

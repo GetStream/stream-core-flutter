@@ -63,7 +63,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
       ),
       foregroundDecoration: BoxDecoration(
         border: .symmetric(
-          vertical: .new(color: colorScheme.borderSurfaceSubtle),
+          vertical: .new(color: colorScheme.borderDefault),
         ),
       ),
       child: Column(
@@ -120,7 +120,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
       padding: EdgeInsets.all(spacing.md),
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurface,
-        border: Border(bottom: .new(color: colorScheme.borderSurfaceSubtle)),
+        border: Border(bottom: .new(color: colorScheme.borderDefault)),
       ),
       child: Row(
         children: [
@@ -357,19 +357,19 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
       child: Column(
         children: [
           ColorPickerTile(
-            label: 'borderSurface',
-            color: config.borderSurface,
-            onColorChanged: config.setBorderSurface,
+            label: 'borderDefault',
+            color: config.borderDefault,
+            onColorChanged: config.setBorderDefault,
           ),
           ColorPickerTile(
-            label: 'borderSurfaceSubtle',
-            color: config.borderSurfaceSubtle,
-            onColorChanged: config.setBorderSurfaceSubtle,
+            label: 'borderSubtle',
+            color: config.borderSubtle,
+            onColorChanged: config.setBorderSubtle,
           ),
           ColorPickerTile(
-            label: 'borderSurfaceStrong',
-            color: config.borderSurfaceStrong,
-            onColorChanged: config.setBorderSurfaceStrong,
+            label: 'borderStrong',
+            color: config.borderStrong,
+            onColorChanged: config.setBorderStrong,
           ),
           ColorPickerTile(
             label: 'borderOnDark',
@@ -382,14 +382,14 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBorderOnAccent,
           ),
           ColorPickerTile(
-            label: 'borderSubtle',
-            color: config.borderSubtle,
-            onColorChanged: config.setBorderSubtle,
+            label: 'borderOpacity10',
+            color: config.borderOpacity10,
+            onColorChanged: config.setBorderOpacity10,
           ),
           ColorPickerTile(
-            label: 'borderImage',
-            color: config.borderImage,
-            onColorChanged: config.setBorderImage,
+            label: 'borderOpacity25',
+            color: config.borderOpacity25,
+            onColorChanged: config.setBorderOpacity25,
           ),
         ],
       ),
