@@ -73,7 +73,7 @@ class _ModeButton extends StatelessWidget {
     final spacing = context.streamSpacing;
 
     return Material(
-      color: isSelected ? colorScheme.accentPrimary.withValues(alpha: 0.1) : Colors.transparent,
+      color: isSelected ? colorScheme.accentPrimary.withValues(alpha: 0.1) : StreamColors.transparent,
       borderRadius: borderRadius,
       child: InkWell(
         onTap: onTap,

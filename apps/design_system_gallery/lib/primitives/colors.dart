@@ -293,7 +293,7 @@ class _NeutralStrip extends StatelessWidget {
             children: colors.map((entry) {
               final (name, color, opacity) = entry;
               final brightness = ThemeData.estimateBrightnessForColor(color);
-              final textColor = brightness == Brightness.dark ? Colors.white : Colors.black;
+              final textColor = brightness == Brightness.dark ? StreamColors.white : StreamColors.black;
 
               return Expanded(
                 child: InkWell(

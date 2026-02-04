@@ -18,7 +18,6 @@ class ThemeConfiguration extends ChangeNotifier {
   // =========================================================================
   // Core State
   // =========================================================================
-
   var _themeData = StreamTheme.light();
   StreamTheme get themeData => _themeData;
 
@@ -53,6 +52,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundSurfaceSubtle;
   Color? _backgroundSurfaceStrong;
   Color? _backgroundOverlay;
+  Color? _backgroundDisabled;
 
   // =========================================================================
   // Border Colors - Core
@@ -128,6 +128,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundSurfaceSubtle => _backgroundSurfaceSubtle ?? _themeData.colorScheme.backgroundSurfaceSubtle;
   Color get backgroundSurfaceStrong => _backgroundSurfaceStrong ?? _themeData.colorScheme.backgroundSurfaceStrong;
   Color get backgroundOverlay => _backgroundOverlay ?? _themeData.colorScheme.backgroundOverlay;
+  Color get backgroundDisabled => _backgroundDisabled ?? _themeData.colorScheme.backgroundDisabled;
 
   // =========================================================================
   // Getters - Border Core
@@ -208,6 +209,7 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundSurfaceSubtle(Color color) => _update(() => _backgroundSurfaceSubtle = color);
   void setBackgroundSurfaceStrong(Color color) => _update(() => _backgroundSurfaceStrong = color);
   void setBackgroundOverlay(Color color) => _update(() => _backgroundOverlay = color);
+  void setBackgroundDisabled(Color color) => _update(() => _backgroundDisabled = color);
 
   // Border Core
   void setBorderDefault(Color color) => _update(() => _borderDefault = color);
@@ -293,6 +295,7 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundSurfaceSubtle = null;
     _backgroundSurfaceStrong = null;
     _backgroundOverlay = null;
+    _backgroundDisabled = null;
     // Border Core
     _borderDefault = null;
     _borderSubtle = null;
@@ -329,27 +332,45 @@ class ThemeConfiguration extends ChangeNotifier {
   void _rebuildTheme() {
     final baseColorScheme = _brightness == Brightness.dark ? StreamColorScheme.dark() : StreamColorScheme.light();
 
-    // If brand primary is set, use it for accentPrimary (unless explicitly overridden)
+    // Compute effective brand swatch (if brand primary is customized)
+    final effectiveBrand = _brandPrimaryColor != null
+        ? StreamColorSwatch.fromColor(_brandPrimaryColor!, brightness: _brightness)
+        : null;
+
+    // Derived from brand: accentPrimary defaults to brand.shade500
     final effectiveAccentPrimary = _accentPrimary ?? _brandPrimaryColor;
+
+    // Derived from brand: borderFocus defaults to brand.shade300
+    final effectiveBorderFocus = _borderFocus ?? effectiveBrand?.shade300;
+
+    // Derived from brand: stateFocused defaults to brand.shade100
+    final effectiveStateFocused = _stateFocused ?? effectiveBrand?.shade100;
+
+    // Derived from accentPrimary: textLink and borderSelected
+    final effectiveTextLink = _textLink ?? effectiveAccentPrimary;
+    final effectiveBorderSelected = _borderSelected ?? effectiveAccentPrimary;
+
+    // Derived from other accents: border utility colors
+    final effectiveBorderError = _borderError ?? _accentError;
+    final effectiveBorderWarning = _borderWarning ?? _accentWarning;
+    final effectiveBorderSuccess = _borderSuccess ?? _accentSuccess;
 
     final colorScheme = baseColorScheme.copyWith(
       // Brand
-      brand: _brandPrimaryColor == null
-          ? null
-          : StreamColorSwatch.fromColor(_brandPrimaryColor ?? StreamColors.blue.shade500, brightness: _brightness),
+      brand: effectiveBrand,
       // Accent - brand primary affects accentPrimary
       accentPrimary: effectiveAccentPrimary,
       accentSuccess: _accentSuccess,
       accentWarning: _accentWarning,
       accentError: _accentError,
       accentNeutral: _accentNeutral,
-      // Text
+      // Text - textLink derived from accentPrimary
       textPrimary: _textPrimary,
       textSecondary: _textSecondary,
       textTertiary: _textTertiary,
       textDisabled: _textDisabled,
       textInverse: _textInverse,
-      textLink: _textLink,
+      textLink: effectiveTextLink,
       textOnAccent: _textOnAccent,
       // Background
       backgroundApp: _backgroundApp,
@@ -357,6 +378,7 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundSurfaceSubtle: _backgroundSurfaceSubtle,
       backgroundSurfaceStrong: _backgroundSurfaceStrong,
       backgroundOverlay: _backgroundOverlay,
+      backgroundDisabled: _backgroundDisabled,
       // Border Core
       borderDefault: _borderDefault,
       borderSubtle: _borderSubtle,
@@ -365,18 +387,18 @@ class ThemeConfiguration extends ChangeNotifier {
       borderOnAccent: _borderOnAccent,
       borderOpacity10: _borderOpacity10,
       borderOpacity25: _borderOpacity25,
-      // Border Utility
-      borderFocus: _borderFocus,
+      // Border Utility - derived from brand and accents
+      borderFocus: effectiveBorderFocus,
       borderDisabled: _borderDisabled,
-      borderError: _borderError,
-      borderWarning: _borderWarning,
-      borderSuccess: _borderSuccess,
-      borderSelected: _borderSelected,
-      // State
+      borderError: effectiveBorderError,
+      borderWarning: effectiveBorderWarning,
+      borderSuccess: effectiveBorderSuccess,
+      borderSelected: effectiveBorderSelected,
+      // State - stateFocused derived from brand
       stateHover: _stateHover,
       statePressed: _statePressed,
       stateSelected: _stateSelected,
-      stateFocused: _stateFocused,
+      stateFocused: effectiveStateFocused,
       stateDisabled: _stateDisabled,
       // System
       systemText: _systemText,
@@ -430,13 +452,13 @@ class ThemeConfiguration extends ChangeNotifier {
       primaryColor: accentPrimary,
       scaffoldBackgroundColor: backgroundApp,
       cardColor: backgroundSurface,
-      dividerColor: borderDefault,
+      dividerColor: borderSubtle,
       disabledColor: textDisabled,
       hintColor: textTertiary,
       // Dialog
       dialogTheme: DialogThemeData(
         backgroundColor: backgroundSurface,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: StreamColors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: dialogRadius,
           side: BorderSide(color: borderSubtle),
@@ -448,7 +470,7 @@ class ThemeConfiguration extends ChangeNotifier {
       appBarTheme: AppBarTheme(
         backgroundColor: backgroundSurface,
         foregroundColor: textPrimary,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: StreamColors.transparent,
         elevation: 0,
       ),
       // Buttons
@@ -478,7 +500,7 @@ class ThemeConfiguration extends ChangeNotifier {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundSurface,
           foregroundColor: textPrimary,
-          surfaceTintColor: Colors.transparent,
+          surfaceTintColor: StreamColors.transparent,
           shape: RoundedRectangleBorder(borderRadius: componentRadius),
         ),
       ),
@@ -488,11 +510,11 @@ class ThemeConfiguration extends ChangeNotifier {
         filled: true,
         border: OutlineInputBorder(
           borderRadius: componentRadius,
-          borderSide: BorderSide(color: borderStrong),
+          borderSide: BorderSide(color: borderDefault),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: componentRadius,
-          borderSide: BorderSide(color: borderStrong),
+          borderSide: BorderSide(color: borderDefault),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: componentRadius,
@@ -509,11 +531,11 @@ class ThemeConfiguration extends ChangeNotifier {
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
           backgroundColor: WidgetStatePropertyAll(backgroundSurface),
-          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          surfaceTintColor: const WidgetStatePropertyAll(StreamColors.transparent),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
               borderRadius: componentRadius,
-              side: BorderSide(color: borderStrong),
+              side: BorderSide(color: borderSubtle),
             ),
           ),
         ),
@@ -521,10 +543,10 @@ class ThemeConfiguration extends ChangeNotifier {
       // PopupMenu
       popupMenuTheme: PopupMenuThemeData(
         color: backgroundSurface,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: StreamColors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: componentRadius,
-          side: BorderSide(color: borderStrong),
+          side: BorderSide(color: borderSubtle),
         ),
         textStyle: ts.bodyDefault.copyWith(color: textPrimary),
       ),
@@ -545,7 +567,7 @@ class ThemeConfiguration extends ChangeNotifier {
       ),
       // Divider
       dividerTheme: DividerThemeData(
-        color: borderDefault,
+        color: borderSubtle,
         thickness: 1,
       ),
       // Icon

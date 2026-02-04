@@ -157,7 +157,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           Tooltip(
             message: 'Reset to defaults',
             child: Material(
-              color: Colors.transparent,
+              color: StreamColors.transparent,
               borderRadius: BorderRadius.all(radius.sm),
               child: InkWell(
                 onTap: config.resetToDefaults,
@@ -342,6 +342,11 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             label: 'backgroundOverlay',
             color: config.backgroundOverlay,
             onColorChanged: config.setBackgroundOverlay,
+          ),
+          ColorPickerTile(
+            label: 'backgroundDisabled',
+            color: config.backgroundDisabled,
+            onColorChanged: config.setBackgroundDisabled,
           ),
         ],
       ),

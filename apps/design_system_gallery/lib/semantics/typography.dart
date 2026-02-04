@@ -52,6 +52,7 @@ class _TypeScale extends StatelessWidget {
           ('headingLg', textTheme.headingLg, 'Page titles, hero text'),
           ('headingMd', textTheme.headingMd, 'Section headers'),
           ('headingSm', textTheme.headingSm, 'Card titles, dialogs'),
+          ('headingXs', textTheme.headingXs, 'Small labels, overlines'),
         ],
       ),
       (
@@ -416,7 +417,7 @@ class _CompleteReference extends StatelessWidget {
                 children: const [
                   _SizeTag(
                     label: 'heading',
-                    sizes: '24 / 20 / 18',
+                    sizes: '20 / 18 / 16 / 12',
                   ),
                   _SizeTag(
                     label: 'body',
