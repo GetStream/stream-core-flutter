@@ -40,7 +40,7 @@ class GalleryToolbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurface,
         border: Border(
-          bottom: BorderSide(color: colorScheme.borderSurfaceSubtle),
+          bottom: BorderSide(color: colorScheme.borderDefault),
         ),
       ),
       child: Row(

@@ -125,7 +125,7 @@ class _FeatureChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurfaceSubtle,
         borderRadius: BorderRadius.all(radius.md),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderDefault),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

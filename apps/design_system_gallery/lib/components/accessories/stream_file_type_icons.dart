@@ -161,7 +161,7 @@ class _FileTypeCard extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.lg),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderSubtle),
         ),
         child: Row(
           children: [
@@ -268,7 +268,7 @@ class _SizeCard extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.lg),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderSubtle),
         ),
         child: Row(
           children: [
@@ -368,7 +368,7 @@ class _QuickReferenceSection extends StatelessWidget {
           ),
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+            border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +399,7 @@ class _QuickReferenceSection extends StatelessWidget {
                 ],
               ),
               SizedBox(height: spacing.md),
-              Divider(color: colorScheme.borderSurfaceSubtle),
+              Divider(color: colorScheme.borderSubtle),
               SizedBox(height: spacing.sm),
               Row(
                 children: [
@@ -448,7 +448,7 @@ class _MimeTypeExample extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurfaceSubtle,
         borderRadius: BorderRadius.all(radius.sm),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -551,7 +551,7 @@ class _MessageAttachmentExample extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurfaceSubtle,
         borderRadius: BorderRadius.all(radius.md),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Row(
         children: [
@@ -724,7 +724,7 @@ class _ExampleCard extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.lg),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -752,7 +752,7 @@ class _ExampleCard extends StatelessWidget {
           ),
           Divider(
             height: 1,
-            color: colorScheme.borderSurfaceSubtle,
+            color: colorScheme.borderSubtle,
           ),
           // Content
           Container(

@@ -39,7 +39,7 @@ class ToolbarButton extends StatelessWidget {
             foregroundDecoration: BoxDecoration(
               borderRadius: BorderRadius.all(radius.md),
               border: Border.all(
-                color: isActive ? colorScheme.accentPrimary : colorScheme.borderSurfaceSubtle,
+                color: isActive ? colorScheme.accentPrimary : colorScheme.borderDefault,
               ),
             ),
             child: Icon(

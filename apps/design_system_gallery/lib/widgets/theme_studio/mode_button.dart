@@ -38,7 +38,7 @@ class ThemeStudioModeButton extends StatelessWidget {
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.md),
             border: Border.all(
-              color: isSelected ? colorScheme.accentPrimary : colorScheme.borderSurfaceSubtle,
+              color: isSelected ? colorScheme.accentPrimary : colorScheme.borderDefault,
               width: isSelected ? 2 : 1,
             ),
           ),

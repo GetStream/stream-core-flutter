@@ -144,7 +144,7 @@ class _ConfigurationSection extends StatelessWidget {
           ),
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+            border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,7 +186,7 @@ class _ConfigurationSection extends StatelessWidget {
                 ],
               ),
               SizedBox(height: spacing.md),
-              Divider(color: colorScheme.borderSurfaceSubtle),
+              Divider(color: colorScheme.borderSubtle),
               SizedBox(height: spacing.md),
               // Max avatars demonstration
               Text(
@@ -456,7 +456,7 @@ class _ExampleCard extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.lg),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -484,7 +484,7 @@ class _ExampleCard extends StatelessWidget {
           ),
           Divider(
             height: 1,
-            color: colorScheme.borderSurfaceSubtle,
+            color: colorScheme.borderSubtle,
           ),
           // Content
           Container(
