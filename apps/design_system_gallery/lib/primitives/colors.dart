@@ -146,10 +146,13 @@ class _FullWidthSwatchCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: spacing.sm),
-                  Text(
-                    '— ${data.usage}',
-                    style: textTheme.captionDefault.copyWith(
-                      color: colorScheme.textTertiary,
+                  Expanded(
+                    child: Text(
+                      '— ${data.usage}',
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.captionDefault.copyWith(
+                        color: colorScheme.textTertiary,
+                      ),
                     ),
                   ),
                 ],
