@@ -2,54 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
-import '../../factory/stream_component_factory.dart';
 
-class StreamMessageComposerInputTrailing extends StatelessWidget {
-  const StreamMessageComposerInputTrailing({super.key, required this.props});
+class StreamMessageComposerInputTrailing extends StatefulWidget {
+  const StreamMessageComposerInputTrailing({
+    super.key,
+    required this.controller,
+    required this.onSendPressed,
+    required this.onMicrophonePressed,
+  });
 
-  final MessageComposerComponentProps props;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamTheme.of(
-      context,
-    ).componentFactory.messageComposer.inputTrailing(context, props);
-  }
-}
-
-class DefaultStreamMessageComposerInputTrailing extends StatefulWidget {
-  const DefaultStreamMessageComposerInputTrailing({super.key, required this.props});
-
-  static StreamComponentBuilder<MessageComposerComponentProps> get factory =>
-      (context, props) => DefaultStreamMessageComposerInputTrailing(props: props);
-
-  final MessageComposerComponentProps props;
+  final TextEditingController controller;
+  final VoidCallback onSendPressed;
+  final VoidCallback? onMicrophonePressed;
 
   @override
-  State<DefaultStreamMessageComposerInputTrailing> createState() => _DefaultStreamMessageComposerInputTrailingState();
+  State<StreamMessageComposerInputTrailing> createState() => _StreamMessageComposerInputTrailingState();
 }
 
-class _DefaultStreamMessageComposerInputTrailingState extends State<DefaultStreamMessageComposerInputTrailing> {
+class _StreamMessageComposerInputTrailingState extends State<StreamMessageComposerInputTrailing> {
   var _hasText = false;
 
   @override
   void initState() {
     super.initState();
-    widget.props.controller.addListener(_onInputTextChanged);
-    _hasText = widget.props.controller.text.isNotEmpty;
+    widget.controller.addListener(_onInputTextChanged);
+    _hasText = widget.controller.text.isNotEmpty;
   }
 
   @override
-  void didUpdateWidget(DefaultStreamMessageComposerInputTrailing oldWidget) {
+  void didUpdateWidget(StreamMessageComposerInputTrailing oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.props.controller != oldWidget.props.controller) {
-      oldWidget.props.controller.removeListener(_onInputTextChanged);
-      widget.props.controller.addListener(_onInputTextChanged);
+    if (widget.controller != oldWidget.controller) {
+      oldWidget.controller.removeListener(_onInputTextChanged);
+      widget.controller.addListener(_onInputTextChanged);
     }
   }
 
   void _onInputTextChanged() {
-    final hasText = widget.props.controller.text.isNotEmpty;
+    final hasText = widget.controller.text.isNotEmpty;
     if (_hasText != hasText) {
       setState(() => _hasText = hasText);
     }
@@ -59,7 +49,7 @@ class _DefaultStreamMessageComposerInputTrailingState extends State<DefaultStrea
   Widget build(BuildContext context) {
     // TODO: Implement the trailing component
 
-    if (_hasText) {
+    if (_hasText || widget.onMicrophonePressed == null) {
       return StreamButton.icon(
         key: _messageComposerInputTrailingSendKey,
         icon: context.streamIcons.paperPlane,

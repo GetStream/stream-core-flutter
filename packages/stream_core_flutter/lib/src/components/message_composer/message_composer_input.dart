@@ -5,25 +5,22 @@ import '../../../stream_core_flutter.dart';
 import '../../factory/stream_component_factory.dart';
 
 class StreamMessageComposerInput extends StatelessWidget {
-  const StreamMessageComposerInput({super.key, required this.props});
+  const StreamMessageComposerInput({
+    super.key,
+    required this.controller,
+    this.placeholder = '',
+    this.isFloating = false,
+    this.inputLeading,
+    this.inputTrailing,
+    this.inputHeader,
+  });
 
-  final MessageComposerComponentProps props;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamTheme.of(
-      context,
-    ).componentFactory.messageComposer.input(context, props);
-  }
-}
-
-class DefaultStreamMessageComposerInput extends StatelessWidget {
-  const DefaultStreamMessageComposerInput({super.key, required this.props});
-
-  static StreamComponentBuilder<MessageComposerComponentProps> get factory =>
-      (context, props) => DefaultStreamMessageComposerInput(props: props);
-
-  final MessageComposerComponentProps props;
+  final TextEditingController controller;
+  final String placeholder;
+  final bool isFloating;
+  final Widget? inputLeading;
+  final Widget? inputTrailing;
+  final Widget? inputHeader;
 
   @override
   Widget build(BuildContext context) {
@@ -36,17 +33,22 @@ class DefaultStreamMessageComposerInput extends StatelessWidget {
         border: Border.all(
           color: context.streamColorScheme.borderDefault,
         ),
-        boxShadow: props.isFloating ? context.streamBoxShadow.elevation3 : null,
+        boxShadow: isFloating ? context.streamBoxShadow.elevation3 : null,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          StreamMessageComposerInputHeader(props: props),
+          ?inputHeader,
           Row(
             children: [
-              StreamMessageComposerInputLeading(props: props),
-              Expanded(child: _MessageComposerInputField(props: props)),
-              StreamMessageComposerInputTrailing(props: props),
+              ?inputLeading,
+              Expanded(
+                child: _MessageComposerInputField(
+                  controller: controller,
+                  placeholder: placeholder,
+                ),
+              ),
+              ?inputTrailing,
             ],
           ),
         ],
@@ -56,9 +58,10 @@ class DefaultStreamMessageComposerInput extends StatelessWidget {
 }
 
 class _MessageComposerInputField extends StatelessWidget {
-  const _MessageComposerInputField({required this.props});
+  _MessageComposerInputField({required this.controller, required this.placeholder});
 
-  final MessageComposerComponentProps props;
+  TextEditingController controller;
+  String placeholder;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +75,7 @@ class _MessageComposerInputField extends StatelessWidget {
     );
 
     return TextField(
-      controller: props.controller,
+      controller: controller,
       decoration: InputDecoration(
         border: border,
         focusedBorder: border,
@@ -81,7 +84,7 @@ class _MessageComposerInputField extends StatelessWidget {
         disabledBorder: border,
         fillColor: Colors.transparent,
         contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-        hintText: 'Placeholder',
+        hintText: placeholder,
       ),
     );
   }
