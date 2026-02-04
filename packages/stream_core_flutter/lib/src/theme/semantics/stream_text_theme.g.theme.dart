@@ -33,6 +33,7 @@ mixin _$StreamTextTheme {
       headingLg: TextStyle.lerp(a.headingLg, b.headingLg, t)!,
       headingMd: TextStyle.lerp(a.headingMd, b.headingMd, t)!,
       headingSm: TextStyle.lerp(a.headingSm, b.headingSm, t)!,
+      headingXs: TextStyle.lerp(a.headingXs, b.headingXs, t)!,
       bodyDefault: TextStyle.lerp(a.bodyDefault, b.bodyDefault, t)!,
       bodyEmphasis: TextStyle.lerp(a.bodyEmphasis, b.bodyEmphasis, t)!,
       bodyLink: TextStyle.lerp(a.bodyLink, b.bodyLink, t)!,
@@ -72,6 +73,7 @@ mixin _$StreamTextTheme {
     TextStyle? headingLg,
     TextStyle? headingMd,
     TextStyle? headingSm,
+    TextStyle? headingXs,
     TextStyle? bodyDefault,
     TextStyle? bodyEmphasis,
     TextStyle? bodyLink,
@@ -95,6 +97,7 @@ mixin _$StreamTextTheme {
       headingLg: headingLg ?? _this.headingLg,
       headingMd: headingMd ?? _this.headingMd,
       headingSm: headingSm ?? _this.headingSm,
+      headingXs: headingXs ?? _this.headingXs,
       bodyDefault: bodyDefault ?? _this.bodyDefault,
       bodyEmphasis: bodyEmphasis ?? _this.bodyEmphasis,
       bodyLink: bodyLink ?? _this.bodyLink,
@@ -129,6 +132,7 @@ mixin _$StreamTextTheme {
       headingLg: _this.headingLg.merge(other.headingLg),
       headingMd: _this.headingMd.merge(other.headingMd),
       headingSm: _this.headingSm.merge(other.headingSm),
+      headingXs: _this.headingXs.merge(other.headingXs),
       bodyDefault: _this.bodyDefault.merge(other.bodyDefault),
       bodyEmphasis: _this.bodyEmphasis.merge(other.bodyEmphasis),
       bodyLink: _this.bodyLink.merge(other.bodyLink),
@@ -168,6 +172,7 @@ mixin _$StreamTextTheme {
     return _other.headingLg == _this.headingLg &&
         _other.headingMd == _this.headingMd &&
         _other.headingSm == _this.headingSm &&
+        _other.headingXs == _this.headingXs &&
         _other.bodyDefault == _this.bodyDefault &&
         _other.bodyEmphasis == _this.bodyEmphasis &&
         _other.bodyLink == _this.bodyLink &&
@@ -190,11 +195,12 @@ mixin _$StreamTextTheme {
   int get hashCode {
     final _this = (this as StreamTextTheme);
 
-    return Object.hash(
+    return Object.hashAll([
       runtimeType,
       _this.headingLg,
       _this.headingMd,
       _this.headingSm,
+      _this.headingXs,
       _this.bodyDefault,
       _this.bodyEmphasis,
       _this.bodyLink,
@@ -211,6 +217,6 @@ mixin _$StreamTextTheme {
       _this.numericLg,
       _this.numericMd,
       _this.numericSm,
-    );
+    ]);
   }
 }
