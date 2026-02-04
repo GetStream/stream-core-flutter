@@ -1,10 +1,10 @@
 import 'package:device_frame_plus/device_frame_plus.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 /// Preview configuration for device frame and text scale.
 ///
-/// Manages the device frame, text scale, and device frame visibility
-/// for the widget preview area.
+/// Manages the device frame, text scale, text direction, and device frame
+/// visibility for the widget preview area.
 class PreviewConfiguration extends ChangeNotifier {
   PreviewConfiguration();
 
@@ -15,6 +15,7 @@ class PreviewConfiguration extends ChangeNotifier {
   DeviceInfo _selectedDevice = Devices.ios.iPhone13ProMax;
   var _textScale = 1.0;
   var _showDeviceFrame = false;
+  var _textDirection = TextDirection.ltr;
 
   // =========================================================================
   // Getters
@@ -23,6 +24,7 @@ class PreviewConfiguration extends ChangeNotifier {
   DeviceInfo get selectedDevice => _selectedDevice;
   double get textScale => _textScale;
   bool get showDeviceFrame => _showDeviceFrame;
+  TextDirection get textDirection => _textDirection;
 
   // =========================================================================
   // Static Options
@@ -38,6 +40,8 @@ class PreviewConfiguration extends ChangeNotifier {
   ];
 
   static const textScaleOptions = <double>[0.85, 1, 1.15, 1.3, 2];
+
+  static const textDirectionOptions = TextDirection.values;
 
   // =========================================================================
   // Setters
@@ -57,6 +61,12 @@ class PreviewConfiguration extends ChangeNotifier {
 
   void toggleDeviceFrame() {
     _showDeviceFrame = !_showDeviceFrame;
+    notifyListeners();
+  }
+
+  void setTextDirection(TextDirection direction) {
+    if (_textDirection == direction) return;
+    _textDirection = direction;
     notifyListeners();
   }
 }

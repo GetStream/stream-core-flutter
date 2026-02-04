@@ -23,13 +23,16 @@ class PreviewWrapper extends StatelessWidget {
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
-    final content = MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaler: TextScaler.linear(previewConfig.textScale),
-      ),
-      child: ColoredBox(
-        color: colorScheme.backgroundApp,
-        child: child,
+    final content = Directionality(
+      textDirection: previewConfig.textDirection,
+      child: MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaler: TextScaler.linear(previewConfig.textScale),
+        ),
+        child: ColoredBox(
+          color: colorScheme.backgroundApp,
+          child: child,
+        ),
       ),
     );
 

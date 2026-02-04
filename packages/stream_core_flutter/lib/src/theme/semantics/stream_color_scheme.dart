@@ -109,7 +109,7 @@ class StreamColorScheme with _$StreamColorScheme {
 
     // Accent
     accentPrimary ??= brand.shade500;
-    accentSuccess ??= StreamColors.green.shade500;
+    accentSuccess ??= StreamColors.green.shade300;
     accentWarning ??= StreamColors.yellow.shade500;
     accentError ??= StreamColors.red.shade500;
     accentNeutral ??= StreamColors.slate.shade500;
@@ -310,7 +310,7 @@ class StreamColorScheme with _$StreamColorScheme {
 
     // Accent
     accentPrimary ??= brand.shade500;
-    accentSuccess ??= StreamColors.green.shade400;
+    accentSuccess ??= StreamColors.green.shade200;
     accentWarning ??= StreamColors.yellow.shade400;
     accentError ??= StreamColors.red.shade400;
     accentNeutral ??= StreamColors.neutral.shade500;

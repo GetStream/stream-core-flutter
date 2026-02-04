@@ -10,6 +10,8 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:design_system_gallery/components/accessories/stream_file_type_icons.dart'
+    as _design_system_gallery_components_accessories_stream_file_type_icons;
 import 'package:design_system_gallery/components/button.dart'
     as _design_system_gallery_components_button;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
@@ -18,8 +20,12 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/stream_avatar.dart'
     as _design_system_gallery_components_stream_avatar;
+import 'package:design_system_gallery/components/stream_avatar_group.dart'
+    as _design_system_gallery_components_stream_avatar_group;
 import 'package:design_system_gallery/components/stream_avatar_stack.dart'
     as _design_system_gallery_components_stream_avatar_stack;
+import 'package:design_system_gallery/components/stream_badge_count.dart'
+    as _design_system_gallery_components_stream_badge_count;
 import 'package:design_system_gallery/components/stream_online_indicator.dart'
     as _design_system_gallery_components_stream_online_indicator;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -146,6 +152,28 @@ final directories = <_widgetbook.WidgetbookNode>[
     name: 'Components',
     children: [
       _widgetbook.WidgetbookFolder(
+        name: 'Accessories',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamFileTypeIcon',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_accessories_stream_file_type_icons
+                        .buildFileTypeIconPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_accessories_stream_file_type_icons
+                        .buildFileTypeIconShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Avatar',
         children: [
           _widgetbook.WidgetbookComponent(
@@ -164,6 +192,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'StreamAvatarGroup',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_stream_avatar_group
+                    .buildStreamAvatarGroupPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_stream_avatar_group
+                    .buildStreamAvatarGroupShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StreamAvatarStack',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -175,6 +218,26 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Showcase',
                 builder: _design_system_gallery_components_stream_avatar_stack
                     .buildStreamAvatarStackShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Badge',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamBadgeCount',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_stream_badge_count
+                    .buildStreamBadgeCountPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_stream_badge_count
+                    .buildStreamBadgeCountShowcase,
               ),
             ],
           ),

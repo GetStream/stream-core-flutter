@@ -27,6 +27,69 @@ Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
     description: 'The size of the indicator.',
   );
 
+  final withChild = context.knobs.boolean(
+    label: 'With Child',
+    description: 'Wrap an avatar as child (Badge-like behavior).',
+  );
+
+  final alignment = context.knobs.object.dropdown<AlignmentDirectional>(
+    label: 'Alignment',
+    options: const [
+      AlignmentDirectional.topStart,
+      AlignmentDirectional.topCenter,
+      AlignmentDirectional.topEnd,
+      AlignmentDirectional.centerStart,
+      AlignmentDirectional.center,
+      AlignmentDirectional.centerEnd,
+      AlignmentDirectional.bottomStart,
+      AlignmentDirectional.bottomCenter,
+      AlignmentDirectional.bottomEnd,
+    ],
+    initialOption: AlignmentDirectional.topEnd,
+    labelBuilder: (option) => switch (option) {
+      AlignmentDirectional.topStart => 'Top Start',
+      AlignmentDirectional.topCenter => 'Top Center',
+      AlignmentDirectional.topEnd => 'Top End',
+      AlignmentDirectional.centerStart => 'Center Start',
+      AlignmentDirectional.center => 'Center',
+      AlignmentDirectional.centerEnd => 'Center End',
+      AlignmentDirectional.bottomStart => 'Bottom Start',
+      AlignmentDirectional.bottomCenter => 'Bottom Center',
+      AlignmentDirectional.bottomEnd => 'Bottom End',
+      _ => option.toString(),
+    },
+    description: 'Alignment of indicator relative to child (directional for RTL support).',
+  );
+
+  final offsetX = context.knobs.double.slider(
+    label: 'Offset X',
+    min: -10,
+    max: 10,
+    description: 'Horizontal offset for fine-tuning position.',
+  );
+
+  final offsetY = context.knobs.double.slider(
+    label: 'Offset Y',
+    min: -10,
+    max: 10,
+    description: 'Vertical offset for fine-tuning position.',
+  );
+
+  if (withChild) {
+    return Center(
+      child: StreamOnlineIndicator(
+        isOnline: isOnline,
+        size: size,
+        alignment: alignment,
+        offset: Offset(offsetX, offsetY),
+        child: StreamAvatar(
+          size: StreamAvatarSize.lg,
+          placeholder: (context) => const Text('AB'),
+        ),
+      ),
+    );
+  }
+
   return Center(
     child: StreamOnlineIndicator(
       isOnline: isOnline,
@@ -58,6 +121,10 @@ Widget buildStreamOnlineIndicatorShowcase(BuildContext context) {
         children: [
           // Size variants
           const _SizeVariantsSection(),
+          SizedBox(height: spacing.xl),
+
+          // Alignment variants
+          const _AlignmentVariantsSection(),
           SizedBox(height: spacing.xl),
 
           // Usage patterns
@@ -158,6 +225,7 @@ class _SizeDemo extends StatelessWidget {
       StreamOnlineIndicatorSize.sm => '8px',
       StreamOnlineIndicatorSize.md => '12px',
       StreamOnlineIndicatorSize.lg => '14px',
+      StreamOnlineIndicatorSize.xl => '16px',
     };
   }
 
@@ -193,6 +261,115 @@ class _SizeDemo extends StatelessWidget {
             color: colorScheme.textTertiary,
             fontFamily: 'monospace',
             fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Alignment Variants Section
+// =============================================================================
+
+class _AlignmentVariantsSection extends StatelessWidget {
+  const _AlignmentVariantsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionLabel(label: 'ALIGNMENT VARIANTS'),
+        SizedBox(height: spacing.md),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurface,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Badge-like positioning with child',
+                style: textTheme.captionEmphasis.copyWith(
+                  color: colorScheme.textPrimary,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Wrap(
+                spacing: spacing.xl,
+                runSpacing: spacing.lg,
+                children: const [
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.topStart,
+                    label: 'topStart',
+                  ),
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.topEnd,
+                    label: 'topEnd',
+                  ),
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.bottomStart,
+                    label: 'bottomStart',
+                  ),
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    label: 'bottomEnd',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AlignmentDemo extends StatelessWidget {
+  const _AlignmentDemo({required this.alignment, required this.label});
+
+  final AlignmentGeometry alignment;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      children: [
+        StreamOnlineIndicator(
+          isOnline: true,
+          size: StreamOnlineIndicatorSize.lg,
+          alignment: alignment,
+          child: StreamAvatar(
+            size: StreamAvatarSize.lg,
+            placeholder: (context) => const Text('AB'),
+          ),
+        ),
+        SizedBox(height: spacing.sm),
+        Text(
+          label,
+          style: textTheme.metadataEmphasis.copyWith(
+            color: colorScheme.accentPrimary,
+            fontFamily: 'monospace',
           ),
         ),
       ],
@@ -274,22 +451,14 @@ class _AvatarWithIndicator extends StatelessWidget {
 
     return Column(
       children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            StreamAvatar(
-              size: StreamAvatarSize.lg,
-              placeholder: (context) => Text(initials),
-            ),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: StreamOnlineIndicator(
-                isOnline: isOnline,
-                size: StreamOnlineIndicatorSize.lg,
-              ),
-            ),
-          ],
+        // Using the new child parameter (Badge-like behavior)
+        StreamOnlineIndicator(
+          isOnline: isOnline,
+          size: StreamOnlineIndicatorSize.lg,
+          child: StreamAvatar(
+            size: StreamAvatarSize.lg,
+            placeholder: (context) => Text(initials),
+          ),
         ),
         SizedBox(height: spacing.sm),
         Text(

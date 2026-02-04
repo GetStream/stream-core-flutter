@@ -21,6 +21,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
     StreamAvatarThemeData? avatarTheme,
+    StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamComponentFactory? componentFactory,
@@ -37,6 +38,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       textTheme: textTheme ?? _this.textTheme,
       boxShadow: boxShadow ?? _this.boxShadow,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
+      badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
       componentFactory: componentFactory ?? _this.componentFactory,
@@ -67,6 +69,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       avatarTheme: StreamAvatarThemeData.lerp(
         _this.avatarTheme,
         other.avatarTheme,
+        t,
+      )!,
+      badgeCountTheme: StreamBadgeCountThemeData.lerp(
+        _this.badgeCountTheme,
+        other.badgeCountTheme,
         t,
       )!,
       buttonTheme: t < 0.5 ? _this.buttonTheme : other.buttonTheme,
@@ -103,6 +110,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
         _other.avatarTheme == _this.avatarTheme &&
+        _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.componentFactory == _this.componentFactory;
@@ -123,6 +131,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.textTheme,
       _this.boxShadow,
       _this.avatarTheme,
+      _this.badgeCountTheme,
       _this.buttonTheme,
       _this.onlineIndicatorTheme,
       _this.componentFactory,

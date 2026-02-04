@@ -31,8 +31,8 @@ Widget buildStreamAvatarStackPlayground(BuildContext context) {
 
   final size = context.knobs.object.dropdown(
     label: 'Size',
-    options: StreamAvatarSize.values,
-    initialOption: StreamAvatarSize.md,
+    options: StreamAvatarStackSize.values,
+    initialOption: StreamAvatarStackSize.sm,
     labelBuilder: (option) => '${option.name.toUpperCase()} (${option.value.toInt()}px)',
     description: 'Size of each avatar in the stack.',
   );
@@ -248,7 +248,7 @@ class _OverlapDemo extends StatelessWidget {
     return Column(
       children: [
         StreamAvatarStack(
-          size: StreamAvatarSize.sm,
+          size: StreamAvatarStackSize.sm,
           overlap: overlap,
           children: [
             for (var i = 0; i < 3; i++)
@@ -294,7 +294,7 @@ class _MaxDemo extends StatelessWidget {
     return Column(
       children: [
         StreamAvatarStack(
-          size: StreamAvatarSize.sm,
+          size: StreamAvatarStackSize.sm,
           max: max,
           children: [
             for (var i = 0; i < count; i++)
@@ -346,7 +346,7 @@ class _UsagePatternsSection extends StatelessWidget {
           child: Row(
             children: [
               StreamAvatarStack(
-                size: StreamAvatarSize.sm,
+                size: StreamAvatarStackSize.sm,
                 children: [
                   for (var i = 0; i < 3; i++)
                     StreamAvatar(
@@ -388,7 +388,7 @@ class _UsagePatternsSection extends StatelessWidget {
           child: Row(
             children: [
               StreamAvatarStack(
-                size: StreamAvatarSize.sm,
+                size: StreamAvatarStackSize.sm,
                 max: 4,
                 children: [
                   for (var i = 0; i < 8; i++)

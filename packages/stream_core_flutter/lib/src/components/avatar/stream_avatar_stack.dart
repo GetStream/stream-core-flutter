@@ -1,8 +1,32 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../theme/components/stream_avatar_theme.dart';
-import '../../theme/stream_theme_extensions.dart';
-import 'stream_avatar.dart';
+import '../../theme/components/stream_badge_count_theme.dart';
+import '../badge/stream_badge_count.dart';
+
+/// Predefined avatar stack sizes.
+///
+/// Each size corresponds to a specific diameter in logical pixels.
+///
+/// See also:
+///
+///  * [StreamAvatarStack], which uses these size variants.
+enum StreamAvatarStackSize {
+  /// Extra small avatar stack (20px diameter).
+  xs(20),
+
+  /// Small avatar stack (24px diameter).
+  sm(24)
+  ;
+
+  /// Constructs a [StreamAvatarStackSize] with the given diameter.
+  const StreamAvatarStackSize(this.value);
+
+  /// The diameter of the avatar stack in logical pixels.
+  final double value;
+}
 
 /// A widget that displays a stack of [StreamAvatar] widgets with overlap.
 ///
@@ -26,7 +50,7 @@ import 'stream_avatar.dart';
 ///
 /// {@tool snippet}
 ///
-/// With max limit showing "+X" for overflow:
+/// With max limit showing overflow badge:
 ///
 /// ```dart
 /// StreamAvatarStack(
@@ -39,7 +63,7 @@ import 'stream_avatar.dart';
 ///     StreamAvatar(placeholder: (context) => Text('E')),
 ///   ],
 /// )
-/// // Shows: [A] [B] [C] [+2]
+/// // Shows: [A] [B] [C] [StreamBadgeCount with +2]
 /// ```
 /// {@end-tool}
 ///
@@ -49,7 +73,7 @@ import 'stream_avatar.dart';
 ///
 /// ```dart
 /// StreamAvatarStack(
-///   size: StreamAvatarSize.sm,
+///   size: StreamAvatarStackSize.sm,
 ///   overlap: 0.5, // 50% overlap
 ///   children: [
 ///     StreamAvatar(placeholder: (context) => Text('A')),
@@ -62,7 +86,9 @@ import 'stream_avatar.dart';
 ///
 /// See also:
 ///
+///  * [StreamAvatarStackSize], which defines the available size variants.
 ///  * [StreamAvatar], the individual avatar widget.
+///  * [StreamBadgeCount], used for the overflow indicator.
 ///  * [StreamAvatarThemeData], for customizing avatar theme properties.
 class StreamAvatarStack extends StatelessWidget {
   /// Creates a [StreamAvatarStack] with the given children.
@@ -76,19 +102,17 @@ class StreamAvatarStack extends StatelessWidget {
     required this.children,
     this.overlap = 0.33,
     this.max = 5,
-    this.extraAvatarBuilder,
   }) : assert(max >= 2, 'max must be at least 2');
 
   /// The list of widgets to display in the stack.
   ///
   /// Typically a list of [StreamAvatar] widgets.
-  final List<Widget> children;
+  final Iterable<Widget> children;
 
-  /// The size of the avatars in the stack.
+  /// The size of the avatar stack.
   ///
-  /// If null, uses [StreamAvatarThemeData.size], or falls back to
-  /// [StreamAvatarSize.lg].
-  final StreamAvatarSize? size;
+  /// If null, defaults to [StreamAvatarStackSize.sm].
+  final StreamAvatarStackSize? size;
 
   /// How much each avatar overlaps the previous one, as a fraction of size.
   ///
@@ -97,46 +121,24 @@ class StreamAvatarStack extends StatelessWidget {
   /// - `1.0`: Fully stacked
   final double overlap;
 
-  /// Maximum number of avatars to display before showing "+X".
+  /// Maximum number of avatars to display before showing overflow badge.
   ///
   /// When [children] exceeds this value, displays [max] avatars followed
-  /// by a "+X" avatar showing the overflow count.
+  /// by a [StreamBadgeCount] showing the overflow count.
   ///
   /// Must be at least 2. Defaults to 5.
   final int max;
-
-  /// Builder for the extra avatar showing the overflow count.
-  ///
-  /// If null, a default [StreamAvatar] with "+X" text is used.
-  ///
-  /// The [extraCount] parameter indicates how many avatars are hidden.
-  ///
-  /// {@tool snippet}
-  ///
-  /// Custom extra avatar:
-  ///
-  /// ```dart
-  /// StreamAvatarStack(
-  ///   max: 3,
-  ///   extraAvatarBuilder: (context, extraCount) => StreamAvatar(
-  ///     backgroundColor: Colors.grey,
-  ///     placeholder: (context) => Text('+$extraCount'),
-  ///   ),
-  ///   children: [...],
-  /// )
-  /// ```
-  /// {@end-tool}
-  final Widget Function(BuildContext context, int extraCount)? extraAvatarBuilder;
 
   @override
   Widget build(BuildContext context) {
     if (children.isEmpty) return const SizedBox.shrink();
 
-    final avatarTheme = context.streamAvatarTheme;
-    final colorScheme = context.streamColorScheme;
+    final effectiveSize = size ?? StreamAvatarStackSize.sm;
+    final avatarSize = _avatarSizeForStackSize(effectiveSize);
+    final extraBadgeSize = _badgeCountSizeForStackSize(effectiveSize);
 
-    final effectiveSize = size ?? avatarTheme.size ?? .lg;
-    final diameter = effectiveSize.value;
+    final diameter = avatarSize.value;
+    final badgeDiameter = extraBadgeSize.value;
 
     // Split children into visible and overflow
     final visible = children.take(max).toList();
@@ -145,40 +147,55 @@ class StreamAvatarStack extends StatelessWidget {
     // Build the list of widgets to display
     final displayChildren = <Widget>[
       ...visible,
-      if (extraCount > 0) ...[
-        switch (extraAvatarBuilder) {
-          final builder? => builder.call(context, extraCount),
-          _ => StreamAvatar(
-            backgroundColor: colorScheme.backgroundSurfaceStrong,
-            foregroundColor: colorScheme.textSecondary,
-            placeholder: (context) => Text('+$extraCount'),
-          ),
-        },
-      ],
+      if (extraCount > 0) StreamBadgeCount(label: '+$extraCount', size: extraBadgeSize),
     ];
 
     // Calculate the offset between each avatar (how much of each avatar is visible)
     final visiblePortion = diameter * (1 - overlap);
+    final badgeVisiblePortion = badgeDiameter * (1 - overlap);
 
     // Total width: first avatar full + remaining avatars visible portion
-    final totalWidth = diameter + (displayChildren.length - 1) * visiblePortion;
+    var totalWidth = diameter + (visible.length - 1) * visiblePortion;
+    if (extraCount > 0) totalWidth += badgeVisiblePortion;
 
-    return SizedBox(
+    return AnimatedContainer(
       width: totalWidth,
-      height: diameter,
-      child: Stack(
-        alignment: .center,
-        children: [
-          for (var i = 0; i < displayChildren.length; i++)
-            Positioned(
-              left: i * visiblePortion,
-              child: StreamAvatarTheme(
-                data: StreamAvatarThemeData(size: effectiveSize),
-                child: displayChildren[i],
-              ),
-            ),
-        ],
+      height: math.max(diameter, badgeDiameter),
+      duration: kThemeChangeDuration,
+      // Need to disable text scaling here so that the text doesn't
+      // escape the avatar when the textScaleFactor is large.
+      child: MediaQuery.withNoTextScaling(
+        child: StreamAvatarTheme(
+          data: StreamAvatarThemeData(size: avatarSize),
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              for (var i = 0; i < displayChildren.length; i++)
+                Positioned(
+                  left: i * visiblePortion,
+                  child: displayChildren[i],
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
+
+  // Returns the appropriate avatar size for the given stack size.
+  StreamAvatarSize _avatarSizeForStackSize(
+    StreamAvatarStackSize size,
+  ) => switch (size) {
+    .xs => StreamAvatarSize.xs,
+    .sm => StreamAvatarSize.sm,
+  };
+
+  // Returns the appropriate badge count size for the given stack size.
+  StreamBadgeCountSize _badgeCountSizeForStackSize(
+    StreamAvatarStackSize size,
+  ) => switch (size) {
+    .xs => StreamBadgeCountSize.xs,
+    .sm => StreamBadgeCountSize.sm,
+  };
 }
