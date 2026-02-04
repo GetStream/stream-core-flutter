@@ -360,8 +360,11 @@ class ThemeConfiguration extends ChangeNotifier {
       // Border Core
       borderDefault: _borderDefault,
       borderSubtle: _borderSubtle,
+      borderStrong: _borderStrong,
       borderOnDark: _borderOnDark,
       borderOnAccent: _borderOnAccent,
+      borderOpacity10: _borderOpacity10,
+      borderOpacity25: _borderOpacity25,
       // Border Utility
       borderFocus: _borderFocus,
       borderDisabled: _borderDisabled,
