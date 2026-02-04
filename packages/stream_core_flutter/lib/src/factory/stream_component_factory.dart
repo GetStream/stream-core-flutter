@@ -7,29 +7,29 @@ import '../components/message_composer.dart';
 
 typedef StreamComponentBuilder<T> = Widget Function(BuildContext context, T props);
 
-class StreamComponentFactory {
+class StreamComponentFactory<MessageComposerData extends MessageData> {
   StreamComponentFactory({
     StreamComponentBuilder<StreamButtonProps>? buttonFactory,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIconFactory,
-    StreamMessageComposerFactory<dynamic>? messageComposer,
+    StreamMessageComposerFactory<MessageComposerData>? messageComposer,
   }) : buttonFactory = buttonFactory ?? DefaultStreamButton.factory,
        fileTypeIconFactory = fileTypeIconFactory ?? DefaultStreamFileTypeIcon.factory,
        messageComposer = messageComposer ?? StreamMessageComposerFactory();
 
   StreamComponentBuilder<StreamButtonProps> buttonFactory;
   StreamComponentBuilder<StreamFileTypeIconProps> fileTypeIconFactory;
-  StreamMessageComposerFactory<dynamic> messageComposer;
+  StreamMessageComposerFactory<MessageComposerData> messageComposer;
 }
 
-class StreamMessageComposerFactory<T> {
+class StreamMessageComposerFactory<T extends MessageData> {
   StreamMessageComposerFactory({
-    StreamComponentBuilder<MessageComposerProps>? messageComposer,
-    StreamComponentBuilder<MessageComposerComponentProps>? leading,
-    StreamComponentBuilder<MessageComposerComponentProps>? trailing,
-    StreamComponentBuilder<MessageComposerComponentProps>? input,
-    StreamComponentBuilder<MessageComposerComponentProps>? inputLeading,
-    StreamComponentBuilder<MessageComposerComponentProps>? inputHeader,
-    StreamComponentBuilder<MessageComposerComponentProps>? inputTrailing,
+    StreamComponentBuilder<MessageComposerProps<T>>? messageComposer,
+    StreamComponentBuilder<MessageComposerComponentProps<T>>? leading,
+    StreamComponentBuilder<MessageComposerComponentProps<T>>? trailing,
+    StreamComponentBuilder<MessageComposerComponentProps<T>>? input,
+    StreamComponentBuilder<MessageComposerComponentProps<T>>? inputLeading,
+    StreamComponentBuilder<MessageComposerComponentProps<T>>? inputHeader,
+    StreamComponentBuilder<MessageComposerComponentProps<T>>? inputTrailing,
   }) : messageComposer = messageComposer ?? DefaultMessageComposer.factory,
        leading = leading ?? DefaultStreamMessageComposerLeading.factory,
        trailing = trailing ?? DefaultStreamMessageComposerTrailing.factory,
@@ -38,11 +38,11 @@ class StreamMessageComposerFactory<T> {
        inputHeader = inputHeader ?? DefaultStreamMessageComposerInputHeader.factory,
        inputTrailing = inputTrailing ?? DefaultStreamMessageComposerInputTrailing.factory;
 
-  StreamComponentBuilder<MessageComposerProps> messageComposer;
-  StreamComponentBuilder<MessageComposerComponentProps> leading;
-  StreamComponentBuilder<MessageComposerComponentProps> trailing;
-  StreamComponentBuilder<MessageComposerComponentProps> input;
-  StreamComponentBuilder<MessageComposerComponentProps> inputLeading;
-  StreamComponentBuilder<MessageComposerComponentProps> inputHeader;
-  StreamComponentBuilder<MessageComposerComponentProps> inputTrailing;
+  StreamComponentBuilder<MessageComposerProps<T>> messageComposer;
+  StreamComponentBuilder<MessageComposerComponentProps<T>> leading;
+  StreamComponentBuilder<MessageComposerComponentProps<T>> trailing;
+  StreamComponentBuilder<MessageComposerComponentProps<T>> input;
+  StreamComponentBuilder<MessageComposerComponentProps<T>> inputLeading;
+  StreamComponentBuilder<MessageComposerComponentProps<T>> inputHeader;
+  StreamComponentBuilder<MessageComposerComponentProps<T>> inputTrailing;
 }

@@ -80,6 +80,7 @@ class _MessageComposerInputField extends StatelessWidget {
         errorBorder: border,
         disabledBorder: border,
         fillColor: Colors.transparent,
+        contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
         hintText: 'Placeholder',
       ),
     );
