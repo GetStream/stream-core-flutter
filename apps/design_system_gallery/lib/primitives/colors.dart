@@ -40,7 +40,7 @@ class _ColorSwatchesList extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    const swatches = [
+    final swatches = [
       _SwatchData(
         name: 'blue',
         swatch: StreamColors.blue,
@@ -106,7 +106,7 @@ class _FullWidthSwatchCard extends StatelessWidget {
     final boxShadow = context.streamBoxShadow;
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
-    final shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+    final shades = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900];
 
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.md),

@@ -1,0 +1,38 @@
+name: update_goldens
+
+on: workflow_dispatch
+
+jobs:
+  update_goldens:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ssh-key: ${{ secrets.BOT_SSH_PRIVATE_KEY }}
+
+      - name: 🐦 Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+          channel: stable
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: 📦 Install Tools
+        run: flutter pub global activate melos
+
+      - name: 🔧 Bootstrap Workspace
+        run: melos bootstrap --verbose
+
+      - name: 🖼️ Update Goldens
+        continue-on-error: true
+        run: melos run update:goldens
+
+      - name: 📤 Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: Update Goldens"
+          file_pattern: "**/test/**/goldens/*.png"
+          commit_user_name: "Stream SDK Bot"
+          commit_user_email: "60655709+Stream-SDK-Bot@users.noreply.github.com"

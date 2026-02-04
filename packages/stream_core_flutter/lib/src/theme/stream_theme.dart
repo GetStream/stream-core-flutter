@@ -4,8 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../factory/stream_component_factory.dart';
 import 'components/stream_avatar_theme.dart';
+import 'components/stream_badge_count_theme.dart';
+import 'components/stream_button_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
 import 'primitives/stream_typography.dart';
@@ -71,6 +75,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme({
     Brightness brightness = .light,
     TargetPlatform? platform,
+    StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
     StreamTypography? typography,
@@ -79,12 +84,16 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamBoxShadow? boxShadow,
     // Components themes
     StreamAvatarThemeData? avatarTheme,
+    StreamBadgeCountThemeData? badgeCountTheme,
+    StreamButtonThemeData? buttonTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamComponentFactory? componentFactory,
   }) {
     platform ??= defaultTargetPlatform;
     final isDark = brightness == Brightness.dark;
 
     // Primitives
+    icons ??= const StreamIcons();
     radius ??= StreamRadius(platform: platform);
     spacing ??= const StreamSpacing();
     typography ??= StreamTypography(platform: platform);
@@ -96,10 +105,15 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     // Components
     avatarTheme ??= const StreamAvatarThemeData();
+    badgeCountTheme ??= const StreamBadgeCountThemeData();
+    buttonTheme ??= const StreamButtonThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
+
+    componentFactory ??= StreamComponentFactory();
 
     return .raw(
       brightness: brightness,
+      icons: icons,
       radius: radius,
       spacing: spacing,
       typography: typography,
@@ -107,7 +121,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       textTheme: textTheme,
       boxShadow: boxShadow,
       avatarTheme: avatarTheme,
+      badgeCountTheme: badgeCountTheme,
+      buttonTheme: buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
+      componentFactory: componentFactory,
     );
   }
 
@@ -125,6 +142,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   const StreamTheme.raw({
     required this.brightness,
+    required this.icons,
     required this.radius,
     required this.spacing,
     required this.typography,
@@ -132,7 +150,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.textTheme,
     required this.boxShadow,
     required this.avatarTheme,
+    required this.badgeCountTheme,
+    required this.buttonTheme,
     required this.onlineIndicatorTheme,
+    required this.componentFactory,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -167,6 +188,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The brightness of this theme.
   final Brightness brightness;
 
+  /// The icons for this theme.
+  final StreamIcons icons;
+
   /// The border radius values for this theme.
   final StreamRadius radius;
 
@@ -193,6 +217,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The avatar theme for this theme.
   final StreamAvatarThemeData avatarTheme;
 
+  /// The badge count theme for this theme.
+  final StreamBadgeCountThemeData badgeCountTheme;
+
+  /// The button theme for this theme.
+  final StreamButtonThemeData buttonTheme;
+
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
+
+  final StreamComponentFactory componentFactory;
 }

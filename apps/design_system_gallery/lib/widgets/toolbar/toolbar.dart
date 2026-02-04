@@ -7,6 +7,7 @@ import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';
 import '../../core/stream_icons.dart';
 import 'device_selector.dart';
+import 'text_direction_selector.dart';
 import 'text_scale_selector.dart';
 import 'theme_mode_toggle.dart';
 import 'toolbar_button.dart';
@@ -80,6 +81,14 @@ class GalleryToolbar extends StatelessWidget {
                     options: PreviewConfiguration.textScaleOptions,
                     onChanged: previewConfig.setTextScale,
                   ),
+                  SizedBox(width: spacing.sm),
+
+                  // Text direction selector (LTR/RTL)
+                  TextDirectionSelector(
+                    value: previewConfig.textDirection,
+                    options: PreviewConfiguration.textDirectionOptions,
+                    onChanged: previewConfig.setTextDirection,
+                  ),
                 ],
               ),
             ),
@@ -122,7 +131,7 @@ class _StreamBranding extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Stream Logo
-        const SvgIcon(StreamIcons.logo, size: 40),
+        const SvgIcon(StreamSvgIcons.logo, size: 40),
         SizedBox(width: spacing.sm + spacing.xxs),
         Column(
           mainAxisAlignment: MainAxisAlignment.center,

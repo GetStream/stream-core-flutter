@@ -13,6 +13,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   @override
   ThemeExtension<StreamTheme> copyWith({
     Brightness? brightness,
+    StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
     StreamTypography? typography,
@@ -20,12 +21,16 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
     StreamAvatarThemeData? avatarTheme,
+    StreamBadgeCountThemeData? badgeCountTheme,
+    StreamButtonThemeData? buttonTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamComponentFactory? componentFactory,
   }) {
     final _this = (this as StreamTheme);
 
     return StreamTheme.raw(
       brightness: brightness ?? _this.brightness,
+      icons: icons ?? _this.icons,
       radius: radius ?? _this.radius,
       spacing: spacing ?? _this.spacing,
       typography: typography ?? _this.typography,
@@ -33,7 +38,10 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       textTheme: textTheme ?? _this.textTheme,
       boxShadow: boxShadow ?? _this.boxShadow,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
+      badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
+      buttonTheme: buttonTheme ?? _this.buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
+      componentFactory: componentFactory ?? _this.componentFactory,
     );
   }
 
@@ -50,6 +58,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: t < 0.5 ? _this.brightness : other.brightness,
+      icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
       radius: StreamRadius.lerp(_this.radius, other.radius, t)!,
       spacing: StreamSpacing.lerp(_this.spacing, other.spacing, t)!,
       typography: StreamTypography.lerp(_this.typography, other.typography, t)!,
@@ -62,11 +71,20 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.avatarTheme,
         t,
       )!,
+      badgeCountTheme: StreamBadgeCountThemeData.lerp(
+        _this.badgeCountTheme,
+        other.badgeCountTheme,
+        t,
+      )!,
+      buttonTheme: t < 0.5 ? _this.buttonTheme : other.buttonTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
         _this.onlineIndicatorTheme,
         other.onlineIndicatorTheme,
         t,
       )!,
+      componentFactory: t < 0.5
+          ? _this.componentFactory
+          : other.componentFactory,
     );
   }
 
@@ -84,6 +102,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _other = (other as StreamTheme);
 
     return _other.brightness == _this.brightness &&
+        _other.icons == _this.icons &&
         _other.radius == _this.radius &&
         _other.spacing == _this.spacing &&
         _other.typography == _this.typography &&
@@ -91,7 +110,10 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
         _other.avatarTheme == _this.avatarTheme &&
-        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
+        _other.badgeCountTheme == _this.badgeCountTheme &&
+        _other.buttonTheme == _this.buttonTheme &&
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
+        _other.componentFactory == _this.componentFactory;
   }
 
   @override
@@ -101,6 +123,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     return Object.hash(
       runtimeType,
       _this.brightness,
+      _this.icons,
       _this.radius,
       _this.spacing,
       _this.typography,
@@ -108,7 +131,10 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.textTheme,
       _this.boxShadow,
       _this.avatarTheme,
+      _this.badgeCountTheme,
+      _this.buttonTheme,
       _this.onlineIndicatorTheme,
+      _this.componentFactory,
     );
   }
 }

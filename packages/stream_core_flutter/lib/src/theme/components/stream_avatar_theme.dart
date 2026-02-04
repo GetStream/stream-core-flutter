@@ -25,7 +25,10 @@ enum StreamAvatarSize {
   md(32),
 
   /// Large avatar (40px diameter).
-  lg(40)
+  lg(40),
+
+  /// Extra large avatar (64px diameter).
+  xl(64)
   ;
 
   /// Constructs a [StreamAvatarSize] with the given diameter.
@@ -107,7 +110,7 @@ class StreamAvatarTheme extends InheritedTheme {
 ///   avatarTheme: StreamAvatarThemeData(
 ///     backgroundColor: Colors.grey.shade200,
 ///     foregroundColor: Colors.grey.shade800,
-///     borderColor: Colors.grey.shade300,
+///     border: Border.all(color: Colors.grey.shade300, width: 2),
 ///   ),
 /// )
 /// ```
@@ -126,7 +129,7 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
     this.size,
     this.backgroundColor,
     this.foregroundColor,
-    this.borderColor,
+    this.border,
   });
 
   /// The default size for avatars.
@@ -145,10 +148,11 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
   /// Applied to text (initials) and icons when no image is available.
   final Color? foregroundColor;
 
-  /// The border color for this avatar.
+  /// The border for this avatar.
   ///
-  /// Applied when [StreamAvatar.showBorder] is true.
-  final Color? borderColor;
+  /// Applied when [StreamAvatar.showBorder] is true. Allows customization
+  /// of both border color and width.
+  final BoxBorder? border;
 
   /// Linearly interpolate between two [StreamAvatarThemeData] objects.
   static StreamAvatarThemeData? lerp(

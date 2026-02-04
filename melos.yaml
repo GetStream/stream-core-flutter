@@ -23,6 +23,7 @@ command:
       cross_file: ^0.3.4+2
       dio: ^5.8.0+1
       equatable: ^2.0.7
+      flutter_svg: ^2.2.3
       http_parser: ^4.1.2
       intl: ">=0.19.0 <=0.21.0"
       jose: ^0.3.4
@@ -113,6 +114,10 @@ scripts:
   generate:all:
     run: melos run generate:dart && melos run generate:flutter
     description: Build all generated files for Dart & Flutter packages in this project.
+
+  generate:icons:
+    run: melos exec -c 1 --file-exists="stream_icons.yaml" -- "dart run \$MELOS_ROOT_PATH/scripts/generate_icons.dart"
+    description: Generate icon font and Dart classes from SVG files.
 
   generate:dart:
     run: melos exec -c 1 --depends-on="build_runner" --no-flutter -- "dart run build_runner build --delete-conflicting-outputs"

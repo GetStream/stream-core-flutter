@@ -4,39 +4,17 @@ import '../../theme/components/stream_online_indicator_theme.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
-/// Predefined sizes for the online indicator.
-///
-/// Each size corresponds to a specific diameter in logical pixels.
-///
-/// See also:
-///
-///  * [StreamOnlineIndicator], which uses these size variants.
-///  * [StreamOnlineIndicatorThemeData], for customizing indicator appearance.
-enum StreamOnlineIndicatorSize {
-  /// Small indicator (8px diameter).
-  sm(8),
-
-  /// Medium indicator (12px diameter).
-  md(12),
-
-  /// Large indicator (14px diameter).
-  lg(14)
-  ;
-
-  const StreamOnlineIndicatorSize(this.value);
-
-  /// The diameter of the indicator in logical pixels.
-  final double value;
-}
-
 /// A circular indicator showing online/offline presence status.
 ///
 /// This indicator is typically positioned on or near an avatar to show
 /// whether a user is currently online or offline.
 ///
+/// When [child] is provided, the indicator is automatically positioned
+/// relative to the child using a [Stack], similar to Flutter's [Badge] widget.
+///
 /// {@tool snippet}
 ///
-/// Basic usage:
+/// Basic usage (standalone indicator):
 ///
 /// ```dart
 /// StreamOnlineIndicator(isOnline: true)
@@ -45,18 +23,26 @@ enum StreamOnlineIndicatorSize {
 ///
 /// {@tool snippet}
 ///
-/// Positioned on an avatar:
+/// With a child widget (automatically positioned):
 ///
 /// ```dart
-/// Stack(
-///   children: [
-///     StreamAvatar(placeholder: (context) => Text('AB')),
-///     Positioned(
-///       right: 0,
-///       bottom: 0,
-///       child: StreamOnlineIndicator(isOnline: user.isOnline),
-///     ),
-///   ],
+/// StreamOnlineIndicator(
+///   isOnline: user.isOnline,
+///   child: StreamAvatar(placeholder: (context) => Text('AB')),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Custom positioning:
+///
+/// ```dart
+/// StreamOnlineIndicator(
+///   isOnline: true,
+///   alignment: Alignment.topRight,
+///   offset: Offset(2, -2),
+///   child: StreamAvatar(placeholder: (context) => Text('AB')),
 /// )
 /// ```
 /// {@end-tool}
@@ -80,10 +66,16 @@ enum StreamOnlineIndicatorSize {
 ///  * [StreamAvatar], which often displays this indicator.
 class StreamOnlineIndicator extends StatelessWidget {
   /// Creates an online indicator.
+  ///
+  /// If [child] is provided, the indicator will be positioned relative to the
+  /// child using [alignment] and [offset].
   const StreamOnlineIndicator({
     super.key,
     required this.isOnline,
     this.size,
+    this.child,
+    this.alignment,
+    this.offset,
   });
 
   /// Whether the user is online.
@@ -94,15 +86,35 @@ class StreamOnlineIndicator extends StatelessWidget {
 
   /// The size of the indicator.
   ///
-  /// Defaults to [StreamOnlineIndicatorSize.lg].
+  /// If null, uses [StreamOnlineIndicatorThemeData.size], or falls back to
+  /// [StreamOnlineIndicatorSize.lg].
   final StreamOnlineIndicatorSize? size;
+
+  /// The widget below this widget in the tree.
+  ///
+  /// When provided, the indicator is positioned relative to this child
+  /// using a [Stack]. When null, only the indicator is displayed.
+  final Widget? child;
+
+  /// The alignment of the indicator relative to [child].
+  ///
+  /// Only used when [child] is provided.
+  /// Falls back to [StreamOnlineIndicatorThemeData.alignment], or
+  /// [AlignmentDirectional.topEnd].
+  final AlignmentGeometry? alignment;
+
+  /// The offset for fine-tuning indicator position.
+  ///
+  /// Applied after [alignment] to adjust the indicator's final position.
+  /// Falls back to [StreamOnlineIndicatorThemeData.offset], or [Offset.zero].
+  final Offset? offset;
 
   @override
   Widget build(BuildContext context) {
     final onlineIndicatorTheme = context.streamOnlineIndicatorTheme;
     final defaults = _StreamOnlineIndicatorThemeDefaults(context);
 
-    final effectiveSize = size ?? StreamOnlineIndicatorSize.lg;
+    final effectiveSize = size ?? onlineIndicatorTheme.size ?? defaults.size;
     final effectiveBackgroundOnline = onlineIndicatorTheme.backgroundOnline ?? defaults.backgroundOnline;
     final effectiveBackgroundOffline = onlineIndicatorTheme.backgroundOffline ?? defaults.backgroundOffline;
     final effectiveBorderColor = onlineIndicatorTheme.borderColor ?? defaults.borderColor;
@@ -110,12 +122,35 @@ class StreamOnlineIndicator extends StatelessWidget {
     final color = isOnline ? effectiveBackgroundOnline : effectiveBackgroundOffline;
     final border = Border.all(color: effectiveBorderColor, width: _borderWidthForSize(effectiveSize));
 
-    return AnimatedContainer(
+    final indicator = AnimatedContainer(
       width: effectiveSize.value,
       height: effectiveSize.value,
       duration: kThemeChangeDuration,
-      decoration: BoxDecoration(shape: .circle, color: color),
-      foregroundDecoration: BoxDecoration(shape: .circle, border: border),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+      foregroundDecoration: BoxDecoration(shape: BoxShape.circle, border: border),
+    );
+
+    // If no child, just return the indicator.
+    if (child == null) return indicator;
+
+    // Otherwise, wrap in Stack like Badge.
+    final effectiveAlignment = alignment ?? onlineIndicatorTheme.alignment ?? defaults.alignment;
+    final effectiveOffset = offset ?? onlineIndicatorTheme.offset ?? defaults.offset;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        child!,
+        Positioned.fill(
+          child: Align(
+            alignment: effectiveAlignment,
+            child: Transform.translate(
+              offset: effectiveOffset,
+              child: indicator,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -124,7 +159,7 @@ class StreamOnlineIndicator extends StatelessWidget {
     StreamOnlineIndicatorSize size,
   ) => switch (size) {
     .sm => 1,
-    .md || .lg => 2,
+    .md || .lg || .xl => 2,
   };
 }
 
@@ -139,6 +174,9 @@ class _StreamOnlineIndicatorThemeDefaults extends StreamOnlineIndicatorThemeData
   final StreamColorScheme _colorScheme;
 
   @override
+  StreamOnlineIndicatorSize get size => StreamOnlineIndicatorSize.lg;
+
+  @override
   Color get backgroundOnline => _colorScheme.accentSuccess;
 
   @override
@@ -146,4 +184,10 @@ class _StreamOnlineIndicatorThemeDefaults extends StreamOnlineIndicatorThemeData
 
   @override
   Color get borderColor => _colorScheme.borderOnDark;
+
+  @override
+  AlignmentGeometry get alignment => AlignmentDirectional.topEnd;
+
+  @override
+  Offset get offset => Offset.zero;
 }
