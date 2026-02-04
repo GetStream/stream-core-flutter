@@ -8,12 +8,16 @@ import '../widgets/toolbar/toolbar.dart';
 import 'gallery_app.directories.g.dart';
 import 'home.dart';
 
+/// Width of the theme customization panel.
+const kThemePanelWidth = 340.0;
+
+/// Widgetbook's breakpoint for desktop mode.
+const kWidgetbookDesktopBreakpoint = 840.0;
+
+/// Animation duration for panel transitions.
+const kPanelAnimationDuration = Duration(milliseconds: 250);
+
 /// The main shell that wraps the widgetbook with custom Stream branding.
-///
-/// This widget provides the overall layout including:
-/// - Top toolbar with branding and controls
-/// - Main widgetbook content area
-/// - Optional theme customization panel
 class GalleryShell extends StatelessWidget {
   const GalleryShell({
     super.key,
@@ -28,23 +32,19 @@ class GalleryShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final materialTheme = Theme.of(context);
     final isDark = materialTheme.brightness == .dark;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
-    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+    // Use overlay on small screens, side-by-side on large screens
+    final widgetbookWidth = showThemePanel ? screenWidth - kThemePanelWidth : screenWidth;
+    final useOverlay = widgetbookWidth < kWidgetbookDesktopBreakpoint;
 
-    final widgetbookWidget = Expanded(
-      child: Widgetbook.material(
-        lightTheme: materialTheme,
-        darkTheme: materialTheme,
-        themeMode: isDark ? .dark : .light,
-        directories: _collapseDirectories(directories),
-        home: const GalleryHomePage(),
-        appBuilder: (context, child) => PreviewWrapper(child: child),
-      ),
-    );
-
-    final themePanel = ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 340),
-      child: const ThemeCustomizationPanel(),
+    final widgetbook = Widgetbook.material(
+      lightTheme: materialTheme,
+      darkTheme: materialTheme,
+      themeMode: isDark ? .dark : .light,
+      directories: _collapseDirectories(directories),
+      home: const GalleryHomePage(),
+      appBuilder: (context, child) => PreviewWrapper(child: child),
     );
 
     return Scaffold(
@@ -58,27 +58,27 @@ class GalleryShell extends StatelessWidget {
           ),
           // Content area below toolbar
           Expanded(
-            child: isSmallScreen
-                ? Stack(
-                    children: [
-                      widgetbookWidget,
-                      if (showThemePanel) ...[
-                        Align(alignment: Alignment.topRight, child: themePanel),
-                      ],
-                    ],
-                  )
-                : Row(
-                    children: [
-                      // Widgetbook area
-                      Expanded(
-                        child: widgetbookWidget,
-                      ),
-                      // Theme customization panel
-                      if (showThemePanel) ...[
-                        themePanel,
-                      ],
-                    ],
+            child: Stack(
+              children: [
+                // Widgetbook area
+                AnimatedPadding(
+                  curve: Curves.easeInOut,
+                  duration: kPanelAnimationDuration,
+                  padding: .only(right: (!useOverlay && showThemePanel) ? kThemePanelWidth : 0),
+                  child: widgetbook,
+                ),
+                // Theme customization panel
+                Align(
+                  alignment: .centerRight,
+                  child: AnimatedSlide(
+                    duration: kPanelAnimationDuration,
+                    curve: Curves.easeInOut,
+                    offset: showThemePanel ? Offset.zero : const Offset(1, 0),
+                    child: const SizedBox(width: kThemePanelWidth, child: ThemeCustomizationPanel()),
                   ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
