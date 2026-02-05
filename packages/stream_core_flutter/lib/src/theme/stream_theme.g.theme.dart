@@ -24,7 +24,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
-    StreamComponentFactory? componentFactory,
   }) {
     final _this = (this as StreamTheme);
 
@@ -41,7 +40,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
-      componentFactory: componentFactory ?? _this.componentFactory,
     );
   }
 
@@ -82,9 +80,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.onlineIndicatorTheme,
         t,
       )!,
-      componentFactory: t < 0.5
-          ? _this.componentFactory
-          : other.componentFactory,
     );
   }
 
@@ -112,8 +107,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
-        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
-        _other.componentFactory == _this.componentFactory;
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
   }
 
   @override
@@ -134,7 +128,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.badgeCountTheme,
       _this.buttonTheme,
       _this.onlineIndicatorTheme,
-      _this.componentFactory,
     );
   }
 }

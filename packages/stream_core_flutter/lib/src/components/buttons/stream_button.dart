@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../stream_core_flutter.dart';
-import '../../factory/stream_component_factory.dart' show StreamComponentBuilder;
-import '../../theme/components/stream_button_theme.dart';
+import '../../components.dart';
+import '../../theme.dart';
 
 class StreamButton extends StatelessWidget {
   StreamButton({
@@ -45,9 +44,9 @@ class StreamButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamTheme.of(
-      context,
-    ).componentFactory.buttonFactory(context, props);
+    final builder = StreamComponentFactory.maybeOf(context)?.button;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamButton(props: props);
   }
 }
 
@@ -79,9 +78,6 @@ enum StreamButtonType { solid, outline, ghost }
 
 class DefaultStreamButton extends StatelessWidget {
   const DefaultStreamButton({super.key, required this.props});
-
-  static StreamComponentBuilder<StreamButtonProps> get factory =>
-      (context, props) => DefaultStreamButton(props: props);
 
   final StreamButtonProps props;
 
