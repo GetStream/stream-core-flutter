@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_badge_count_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
@@ -69,8 +70,35 @@ import '../../theme/stream_theme_extensions.dart';
 ///  * [StreamAvatar], which often displays this badge.
 class StreamBadgeCount extends StatelessWidget {
   /// Creates a badge count indicator.
-  const StreamBadgeCount({
+  StreamBadgeCount({
     super.key,
+    StreamBadgeCountSize? size,
+    required String label,
+  }) : props = .new(size: size, label: label);
+
+  /// The properties that configure this badge count.
+  final StreamBadgeCountProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.maybeOf(context)?.badgeCount;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamBadgeCount(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamBadgeCount].
+///
+/// This class holds all the configuration options for a badge count,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamBadgeCount], which uses these properties.
+///  * [DefaultStreamBadgeCount], the default implementation.
+class StreamBadgeCountProps {
+  /// Creates properties for a badge count.
+  const StreamBadgeCountProps({
     this.size,
     required this.label,
   });
@@ -86,6 +114,23 @@ class StreamBadgeCount extends StatelessWidget {
   /// If null, uses [StreamBadgeCountThemeData.size], or falls back to
   /// [StreamBadgeCountSize.xs].
   final StreamBadgeCountSize? size;
+}
+
+/// The default implementation of [StreamBadgeCount].
+///
+/// This widget renders the badge count with theming support.
+/// It's used as the default factory implementation in [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamBadgeCount], the public API widget.
+///  * [StreamBadgeCountProps], which configures this widget.
+class DefaultStreamBadgeCount extends StatelessWidget {
+  /// Creates a default badge count with the given [props].
+  const DefaultStreamBadgeCount({super.key, required this.props});
+
+  /// The properties that configure this badge count.
+  final StreamBadgeCountProps props;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +141,7 @@ class StreamBadgeCount extends StatelessWidget {
     final badgeCountTheme = context.streamBadgeCountTheme;
     final defaults = _StreamBadgeCountThemeDefaults(context);
 
-    final effectiveSize = size ?? badgeCountTheme.size ?? defaults.size;
+    final effectiveSize = props.size ?? badgeCountTheme.size ?? defaults.size;
     final effectiveBackgroundColor = badgeCountTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveBorderColor = badgeCountTheme.borderColor ?? defaults.borderColor;
     final effectiveTextColor = badgeCountTheme.textColor ?? defaults.textColor;
@@ -127,7 +172,7 @@ class StreamBadgeCount extends StatelessWidget {
         ),
         child: DefaultTextStyle(
           style: textStyle,
-          child: Text(label),
+          child: Text(props.label),
         ),
       ),
     );

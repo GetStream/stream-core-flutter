@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/components/stream_badge_count_theme.dart';
 import '../badge/stream_badge_count.dart';
@@ -96,13 +97,43 @@ class StreamAvatarStack extends StatelessWidget {
   /// The [children] are typically [StreamAvatar] widgets.
   /// The [overlap] controls how much each avatar overlaps the previous one,
   /// ranging from 0.0 (no overlap) to 1.0 (fully stacked).
-  const StreamAvatarStack({
+  StreamAvatarStack({
     super.key,
+    StreamAvatarStackSize? size,
+    required Iterable<Widget> children,
+    double overlap = 0.33,
+    int max = 5,
+  }) : assert(max >= 2, 'max must be at least 2'),
+       props = .new(size: size, children: children, overlap: overlap, max: max);
+
+  /// The properties that configure this avatar stack.
+  final StreamAvatarStackProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.maybeOf(context)?.avatarStack;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamAvatarStack(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamAvatarStack].
+///
+/// This class holds all the configuration options for an avatar stack,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamAvatarStack], which uses these properties.
+///  * [DefaultStreamAvatarStack], the default implementation.
+class StreamAvatarStackProps {
+  /// Creates properties for an avatar stack.
+  const StreamAvatarStackProps({
     this.size,
     required this.children,
     this.overlap = 0.33,
     this.max = 5,
-  }) : assert(max >= 2, 'max must be at least 2');
+  });
 
   /// The list of widgets to display in the stack.
   ///
@@ -128,12 +159,29 @@ class StreamAvatarStack extends StatelessWidget {
   ///
   /// Must be at least 2. Defaults to 5.
   final int max;
+}
+
+/// The default implementation of [StreamAvatarStack].
+///
+/// This widget renders the avatar stack with theming support.
+/// It's used as the default factory implementation in [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamAvatarStack], the public API widget.
+///  * [StreamAvatarStackProps], which configures this widget.
+class DefaultStreamAvatarStack extends StatelessWidget {
+  /// Creates a default avatar stack with the given [props].
+  const DefaultStreamAvatarStack({super.key, required this.props});
+
+  /// The properties that configure this avatar stack.
+  final StreamAvatarStackProps props;
 
   @override
   Widget build(BuildContext context) {
-    if (children.isEmpty) return const SizedBox.shrink();
+    if (props.children.isEmpty) return const SizedBox.shrink();
 
-    final effectiveSize = size ?? StreamAvatarStackSize.sm;
+    final effectiveSize = props.size ?? StreamAvatarStackSize.sm;
     final avatarSize = _avatarSizeForStackSize(effectiveSize);
     final extraBadgeSize = _badgeCountSizeForStackSize(effectiveSize);
 
@@ -141,8 +189,8 @@ class StreamAvatarStack extends StatelessWidget {
     final badgeDiameter = extraBadgeSize.value;
 
     // Split children into visible and overflow
-    final visible = children.take(max).toList();
-    final extraCount = children.length - visible.length;
+    final visible = props.children.take(props.max).toList();
+    final extraCount = props.children.length - visible.length;
 
     // Build the list of widgets to display
     final displayChildren = <Widget>[
@@ -151,8 +199,8 @@ class StreamAvatarStack extends StatelessWidget {
     ];
 
     // Calculate the offset between each avatar (how much of each avatar is visible)
-    final visiblePortion = diameter * (1 - overlap);
-    final badgeVisiblePortion = badgeDiameter * (1 - overlap);
+    final visiblePortion = diameter * (1 - props.overlap);
+    final badgeVisiblePortion = badgeDiameter * (1 - props.overlap);
 
     // Total width: first avatar full + remaining avatars visible portion
     var totalWidth = diameter + (visible.length - 1) * visiblePortion;

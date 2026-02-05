@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_online_indicator_theme.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -69,8 +70,44 @@ class StreamOnlineIndicator extends StatelessWidget {
   ///
   /// If [child] is provided, the indicator will be positioned relative to the
   /// child using [alignment] and [offset].
-  const StreamOnlineIndicator({
+  StreamOnlineIndicator({
     super.key,
+    required bool isOnline,
+    StreamOnlineIndicatorSize? size,
+    Widget? child,
+    AlignmentGeometry? alignment,
+    Offset? offset,
+  }) : props = .new(
+         isOnline: isOnline,
+         size: size,
+         child: child,
+         alignment: alignment,
+         offset: offset,
+       );
+
+  /// The properties that configure this online indicator.
+  final StreamOnlineIndicatorProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.maybeOf(context)?.onlineIndicator;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamOnlineIndicator(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamOnlineIndicator].
+///
+/// This class holds all the configuration options for an online indicator,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamOnlineIndicator], which uses these properties.
+///  * [DefaultStreamOnlineIndicator], the default implementation.
+class StreamOnlineIndicatorProps {
+  /// Creates properties for an online indicator.
+  const StreamOnlineIndicatorProps({
     required this.isOnline,
     this.size,
     this.child,
@@ -108,19 +145,39 @@ class StreamOnlineIndicator extends StatelessWidget {
   /// Applied after [alignment] to adjust the indicator's final position.
   /// Falls back to [StreamOnlineIndicatorThemeData.offset], or [Offset.zero].
   final Offset? offset;
+}
+
+/// The default implementation of [StreamOnlineIndicator].
+///
+/// This widget renders the online indicator with theming support.
+/// It's used as the default factory implementation in [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamOnlineIndicator], the public API widget.
+///  * [StreamOnlineIndicatorProps], which configures this widget.
+class DefaultStreamOnlineIndicator extends StatelessWidget {
+  /// Creates a default online indicator with the given [props].
+  const DefaultStreamOnlineIndicator({super.key, required this.props});
+
+  /// The properties that configure this online indicator.
+  final StreamOnlineIndicatorProps props;
 
   @override
   Widget build(BuildContext context) {
     final onlineIndicatorTheme = context.streamOnlineIndicatorTheme;
     final defaults = _StreamOnlineIndicatorThemeDefaults(context);
 
-    final effectiveSize = size ?? onlineIndicatorTheme.size ?? defaults.size;
+    final effectiveSize = props.size ?? onlineIndicatorTheme.size ?? defaults.size;
     final effectiveBackgroundOnline = onlineIndicatorTheme.backgroundOnline ?? defaults.backgroundOnline;
     final effectiveBackgroundOffline = onlineIndicatorTheme.backgroundOffline ?? defaults.backgroundOffline;
     final effectiveBorderColor = onlineIndicatorTheme.borderColor ?? defaults.borderColor;
 
-    final color = isOnline ? effectiveBackgroundOnline : effectiveBackgroundOffline;
-    final border = Border.all(color: effectiveBorderColor, width: _borderWidthForSize(effectiveSize));
+    final color = props.isOnline ? effectiveBackgroundOnline : effectiveBackgroundOffline;
+    final border = Border.all(
+      color: effectiveBorderColor,
+      width: _borderWidthForSize(effectiveSize),
+    );
 
     final indicator = AnimatedContainer(
       width: effectiveSize.value,
@@ -131,16 +188,16 @@ class StreamOnlineIndicator extends StatelessWidget {
     );
 
     // If no child, just return the indicator.
-    if (child == null) return indicator;
+    if (props.child == null) return indicator;
 
     // Otherwise, wrap in Stack like Badge.
-    final effectiveAlignment = alignment ?? onlineIndicatorTheme.alignment ?? defaults.alignment;
-    final effectiveOffset = offset ?? onlineIndicatorTheme.offset ?? defaults.offset;
+    final effectiveAlignment = props.alignment ?? onlineIndicatorTheme.alignment ?? defaults.alignment;
+    final effectiveOffset = props.offset ?? onlineIndicatorTheme.offset ?? defaults.offset;
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        child!,
+        props.child!,
         Positioned.fill(
           child: Align(
             alignment: effectiveAlignment,

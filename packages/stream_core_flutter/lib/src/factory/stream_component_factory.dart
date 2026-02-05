@@ -150,9 +150,34 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// Any builder not provided (null) will cause the component to use its
   /// default implementation.
   const StreamComponentBuilders({
+    this.avatar,
+    this.avatarGroup,
+    this.avatarStack,
+    this.badgeCount,
     this.button,
     this.fileTypeIcon,
+    this.onlineIndicator,
   });
+
+  /// Custom builder for avatar widgets.
+  ///
+  /// When null, [StreamAvatar] uses [DefaultStreamAvatar].
+  final StreamComponentBuilder<StreamAvatarProps>? avatar;
+
+  /// Custom builder for avatar group widgets.
+  ///
+  /// When null, [StreamAvatarGroup] uses [DefaultStreamAvatarGroup].
+  final StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup;
+
+  /// Custom builder for avatar stack widgets.
+  ///
+  /// When null, [StreamAvatarStack] uses [DefaultStreamAvatarStack].
+  final StreamComponentBuilder<StreamAvatarStackProps>? avatarStack;
+
+  /// Custom builder for badge count widgets.
+  ///
+  /// When null, [StreamBadgeCount] uses [DefaultStreamBadgeCount].
+  final StreamComponentBuilder<StreamBadgeCountProps>? badgeCount;
 
   /// Custom builder for button widgets.
   ///
@@ -163,6 +188,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamFileTypeIcon] uses [DefaultStreamFileTypeIcon].
   final StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon;
+
+  /// Custom builder for online indicator widgets.
+  ///
+  /// When null, [StreamOnlineIndicator] uses [DefaultStreamOnlineIndicator].
+  final StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator;
 }
 
 /// Extension on [BuildContext] for convenient access to [StreamComponentBuilders].

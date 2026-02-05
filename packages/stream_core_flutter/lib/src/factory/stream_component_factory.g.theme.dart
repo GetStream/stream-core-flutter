@@ -30,20 +30,35 @@ mixin _$StreamComponentBuilders {
     }
 
     return StreamComponentBuilders(
+      avatar: t < 0.5 ? a.avatar : b.avatar,
+      avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
+      avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
+      badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
       button: t < 0.5 ? a.button : b.button,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
+      onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
     );
   }
 
   StreamComponentBuilders copyWith({
+    Widget Function(BuildContext, StreamAvatarProps)? avatar,
+    Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
+    Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
+    Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
     Widget Function(BuildContext, StreamButtonProps)? button,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
+    Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
   }) {
     final _this = (this as StreamComponentBuilders);
 
     return StreamComponentBuilders(
+      avatar: avatar ?? _this.avatar,
+      avatarGroup: avatarGroup ?? _this.avatarGroup,
+      avatarStack: avatarStack ?? _this.avatarStack,
+      badgeCount: badgeCount ?? _this.badgeCount,
       button: button ?? _this.button,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
+      onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
     );
   }
 
@@ -58,7 +73,15 @@ mixin _$StreamComponentBuilders {
       return other;
     }
 
-    return copyWith(button: other.button, fileTypeIcon: other.fileTypeIcon);
+    return copyWith(
+      avatar: other.avatar,
+      avatarGroup: other.avatarGroup,
+      avatarStack: other.avatarStack,
+      badgeCount: other.badgeCount,
+      button: other.button,
+      fileTypeIcon: other.fileTypeIcon,
+      onlineIndicator: other.onlineIndicator,
+    );
   }
 
   @override
@@ -74,14 +97,28 @@ mixin _$StreamComponentBuilders {
     final _this = (this as StreamComponentBuilders);
     final _other = (other as StreamComponentBuilders);
 
-    return _other.button == _this.button &&
-        _other.fileTypeIcon == _this.fileTypeIcon;
+    return _other.avatar == _this.avatar &&
+        _other.avatarGroup == _this.avatarGroup &&
+        _other.avatarStack == _this.avatarStack &&
+        _other.badgeCount == _this.badgeCount &&
+        _other.button == _this.button &&
+        _other.fileTypeIcon == _this.fileTypeIcon &&
+        _other.onlineIndicator == _this.onlineIndicator;
   }
 
   @override
   int get hashCode {
     final _this = (this as StreamComponentBuilders);
 
-    return Object.hash(runtimeType, _this.button, _this.fileTypeIcon);
+    return Object.hash(
+      runtimeType,
+      _this.avatar,
+      _this.avatarGroup,
+      _this.avatarStack,
+      _this.badgeCount,
+      _this.button,
+      _this.fileTypeIcon,
+      _this.onlineIndicator,
+    );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../components.dart';
-import '../../theme.dart';
+import '../../factory/stream_component_factory.dart';
+import '../../theme/components/stream_button_theme.dart';
+import '../../theme/semantics/stream_color_scheme.dart';
+import '../../theme/stream_theme_extensions.dart';
 
 class StreamButton extends StatelessWidget {
   StreamButton({
@@ -13,7 +15,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonSize size = StreamButtonSize.medium,
     IconData? iconLeft,
     IconData? iconRight,
-  }) : props = StreamButtonProps(
+  }) : props = .new(
          label: label,
          onTap: onTap,
          style: style,
@@ -30,7 +32,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonType type = StreamButtonType.solid,
     StreamButtonSize size = StreamButtonSize.medium,
     IconData? icon,
-  }) : props = StreamButtonProps(
+  }) : props = .new(
          label: null,
          onTap: onTap,
          style: style,

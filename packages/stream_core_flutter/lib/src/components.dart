@@ -1,9 +1,9 @@
 export 'components/accessories/stream_file_type_icon.dart' hide DefaultStreamFileTypeIcon;
-export 'components/avatar/stream_avatar.dart';
-export 'components/avatar/stream_avatar_group.dart';
-export 'components/avatar/stream_avatar_stack.dart';
-export 'components/badge/stream_badge_count.dart';
+export 'components/avatar/stream_avatar.dart' hide DefaultStreamAvatar;
+export 'components/avatar/stream_avatar_group.dart' hide DefaultStreamAvatarGroup;
+export 'components/avatar/stream_avatar_stack.dart' hide DefaultStreamAvatarStack;
+export 'components/badge/stream_badge_count.dart' hide DefaultStreamBadgeCount;
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
-export 'components/indicator/stream_online_indicator.dart';
+export 'components/indicator/stream_online_indicator.dart' hide DefaultStreamOnlineIndicator;
 
 export 'factory/stream_component_factory.dart';
