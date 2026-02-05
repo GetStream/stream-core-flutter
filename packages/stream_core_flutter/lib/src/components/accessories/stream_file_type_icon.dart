@@ -1,8 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../components.dart';
-import '../../theme.dart';
+import '../../factory/stream_component_factory.dart';
+import '../../theme/primitives/stream_colors.dart';
+import '../../theme/stream_theme_extensions.dart';
 
 /// Predefined sizes for the file type icon.
 ///
