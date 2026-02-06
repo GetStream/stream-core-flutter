@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../stream_core_flutter.dart';
-import '../../factory/stream_component_factory.dart' show StreamComponentBuilder;
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_button_theme.dart';
+import '../../theme/semantics/stream_color_scheme.dart';
+import '../../theme/stream_theme_extensions.dart';
 
 class StreamButton extends StatelessWidget {
   StreamButton({
@@ -14,7 +15,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonSize size = StreamButtonSize.medium,
     IconData? iconLeft,
     IconData? iconRight,
-  }) : props = StreamButtonProps(
+  }) : props = .new(
          label: label,
          onTap: onTap,
          style: style,
@@ -31,7 +32,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonType type = StreamButtonType.solid,
     StreamButtonSize size = StreamButtonSize.medium,
     IconData? icon,
-  }) : props = StreamButtonProps(
+  }) : props = .new(
          label: null,
          onTap: onTap,
          style: style,
@@ -45,9 +46,9 @@ class StreamButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamTheme.of(
-      context,
-    ).componentFactory.buttonFactory(context, props);
+    final builder = StreamComponentFactory.maybeOf(context)?.button;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamButton(props: props);
   }
 }
 
@@ -79,9 +80,6 @@ enum StreamButtonType { solid, outline, ghost }
 
 class DefaultStreamButton extends StatelessWidget {
   const DefaultStreamButton({super.key, required this.props});
-
-  static StreamComponentBuilder<StreamButtonProps> get factory =>
-      (context, props) => DefaultStreamButton(props: props);
 
   final StreamButtonProps props;
 

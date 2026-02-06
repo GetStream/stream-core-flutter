@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
@@ -76,8 +77,46 @@ class StreamAvatar extends StatelessWidget {
   ///
   /// The [placeholder] is required and is shown when [imageUrl] is null,
   /// while the image is loading, or if the image fails to load.
-  const StreamAvatar({
+  StreamAvatar({
     super.key,
+    StreamAvatarSize? size,
+    String? imageUrl,
+    required WidgetBuilder placeholder,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    bool showBorder = true,
+  }) : props = .new(
+         size: size,
+         imageUrl: imageUrl,
+         placeholder: placeholder,
+         backgroundColor: backgroundColor,
+         foregroundColor: foregroundColor,
+         showBorder: showBorder,
+       );
+
+  /// The properties that configure this avatar.
+  final StreamAvatarProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.maybeOf(context)?.avatar;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamAvatar(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamAvatar].
+///
+/// This class holds all the configuration options for an avatar,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamAvatar], which uses these properties.
+///  * [DefaultStreamAvatar], the default implementation.
+class StreamAvatarProps {
+  /// Creates properties for an avatar.
+  const StreamAvatarProps({
     this.size,
     this.imageUrl,
     required this.placeholder,
@@ -125,6 +164,23 @@ class StreamAvatar extends StatelessWidget {
   /// Defaults to true. The border style is determined by
   /// [StreamAvatarThemeData.border].
   final bool showBorder;
+}
+
+/// The default implementation of [StreamAvatar].
+///
+/// This widget renders the avatar with theming support.
+/// It's used as the default factory implementation in [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamAvatar], the public API widget.
+///  * [StreamAvatarProps], which configures this widget.
+class DefaultStreamAvatar extends StatelessWidget {
+  /// Creates a default avatar with the given [props].
+  const DefaultStreamAvatar({super.key, required this.props});
+
+  /// The properties that configure this avatar.
+  final StreamAvatarProps props;
 
   @override
   Widget build(BuildContext context) {
@@ -133,14 +189,17 @@ class StreamAvatar extends StatelessWidget {
     final avatarTheme = context.streamAvatarTheme;
     final defaults = _StreamAvatarThemeDefaults(context);
 
-    final effectiveSize = size ?? avatarTheme.size ?? defaults.size;
-    final effectiveBackgroundColor = backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
-    final effectiveForegroundColor = foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
+    final effectiveSize = props.size ?? avatarTheme.size ?? defaults.size;
+    final effectiveBackgroundColor = props.backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
+    final effectiveForegroundColor = props.foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
 
-    final border = showBorder ? effectiveBorder : null;
+    final border = props.showBorder ? effectiveBorder : null;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);
-    final iconTheme = theme.iconTheme.copyWith(color: effectiveForegroundColor, size: _iconSizeForSize(effectiveSize));
+    final iconTheme = theme.iconTheme.copyWith(
+      color: effectiveForegroundColor,
+      size: _iconSizeForSize(effectiveSize),
+    );
 
     return AnimatedContainer(
       alignment: .center,
@@ -158,16 +217,16 @@ class StreamAvatar extends StatelessWidget {
             data: iconTheme,
             child: DefaultTextStyle(
               style: textStyle,
-              child: switch (imageUrl) {
+              child: switch (props.imageUrl) {
                 final imageUrl? => CachedNetworkImage(
                   fit: .cover,
                   imageUrl: imageUrl,
                   width: effectiveSize.value,
                   height: effectiveSize.value,
-                  placeholder: (context, _) => Center(child: placeholder.call(context)),
-                  errorWidget: (context, _, _) => Center(child: placeholder.call(context)),
+                  placeholder: (context, _) => Center(child: props.placeholder.call(context)),
+                  errorWidget: (context, _, _) => Center(child: props.placeholder.call(context)),
                 ),
-                _ => placeholder.call(context),
+                _ => props.placeholder.call(context),
               },
             ),
           ),

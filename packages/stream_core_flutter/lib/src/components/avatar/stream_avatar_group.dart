@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/components/stream_badge_count_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -84,8 +85,35 @@ enum StreamAvatarGroupSize {
 ///  * [StreamAvatarThemeData], which provides theme-level customization.
 class StreamAvatarGroup extends StatelessWidget {
   /// Creates a Stream avatar group.
-  const StreamAvatarGroup({
+  StreamAvatarGroup({
     super.key,
+    StreamAvatarGroupSize? size,
+    required Iterable<Widget> children,
+  }) : props = .new(size: size, children: children);
+
+  /// The properties that configure this avatar group.
+  final StreamAvatarGroupProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.maybeOf(context)?.avatarGroup;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamAvatarGroup(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamAvatarGroup].
+///
+/// This class holds all the configuration options for an avatar group,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamAvatarGroup], which uses these properties.
+///  * [DefaultStreamAvatarGroup], the default implementation.
+class StreamAvatarGroupProps {
+  /// Creates properties for an avatar group.
+  const StreamAvatarGroupProps({
     this.size,
     required this.children,
   });
@@ -99,14 +127,31 @@ class StreamAvatarGroup extends StatelessWidget {
   ///
   /// If null, defaults to [StreamAvatarGroupSize.lg].
   final StreamAvatarGroupSize? size;
+}
+
+/// The default implementation of [StreamAvatarGroup].
+///
+/// This widget renders the avatar group with theming support.
+/// It's used as the default factory implementation in [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamAvatarGroup], the public API widget.
+///  * [StreamAvatarGroupProps], which configures this widget.
+class DefaultStreamAvatarGroup extends StatelessWidget {
+  /// Creates a default avatar group with the given [props].
+  const DefaultStreamAvatarGroup({super.key, required this.props});
+
+  /// The properties that configure this avatar group.
+  final StreamAvatarGroupProps props;
 
   @override
   Widget build(BuildContext context) {
-    if (children.isEmpty) return const SizedBox.shrink();
+    if (props.children.isEmpty) return const SizedBox.shrink();
 
     final colorScheme = context.streamColorScheme;
 
-    final effectiveSize = size ?? StreamAvatarGroupSize.lg;
+    final effectiveSize = props.size ?? StreamAvatarGroupSize.lg;
     final avatarSize = _avatarSizeForGroupSize(effectiveSize);
     final badgeCountSize = _badgeCountSizeForGroupSize(effectiveSize);
 
@@ -131,12 +176,12 @@ class StreamAvatarGroup extends StatelessWidget {
           child: StreamBadgeCountTheme(
             data: StreamBadgeCountThemeData(size: badgeCountSize),
             child: Builder(
-              builder: (context) => switch (children.length) {
-                1 => _buildForOne(context, children),
-                2 => _buildForTwo(context, children),
-                3 => _buildForThree(context, children),
-                4 => _buildForFour(context, children),
-                _ => _buildForFourOrMore(context, children),
+              builder: (context) => switch (props.children.length) {
+                1 => _buildForOne(context, props.children),
+                2 => _buildForTwo(context, props.children),
+                3 => _buildForThree(context, props.children),
+                4 => _buildForFour(context, props.children),
+                _ => _buildForFourOrMore(context, props.children),
               },
             ),
           ),
