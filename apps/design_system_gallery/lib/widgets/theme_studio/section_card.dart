@@ -34,7 +34,7 @@ class SectionCard extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.md),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

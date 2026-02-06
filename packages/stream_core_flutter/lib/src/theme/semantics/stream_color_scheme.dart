@@ -78,13 +78,12 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
-    Color? borderSurface,
-    Color? borderSurfaceSubtle,
-    Color? borderSurfaceStrong,
+    Color? borderSubtle,
+    Color? borderStrong,
     Color? borderOnDark,
     Color? borderOnAccent,
-    Color? borderSubtle,
-    Color? borderImage,
+    Color? borderOpacity10,
+    Color? borderOpacity25,
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
@@ -109,29 +108,30 @@ class StreamColorScheme with _$StreamColorScheme {
 
     // Accent
     accentPrimary ??= brand.shade500;
-    accentSuccess ??= StreamColors.green.shade300;
-    accentWarning ??= StreamColors.yellow.shade500;
-    accentError ??= StreamColors.red.shade500;
-    accentNeutral ??= StreamColors.slate.shade500;
+    accentSuccess ??= light_tokens.StreamTokens.accentSuccess;
+    accentWarning ??= light_tokens.StreamTokens.accentWarning;
+    accentError ??= light_tokens.StreamTokens.accentError;
+    accentNeutral ??= light_tokens.StreamTokens.accentNeutral;
     accentBlack ??= light_tokens.StreamTokens.accentBlack;
 
     // Text
-    textPrimary ??= StreamColors.slate.shade900;
-    textSecondary ??= StreamColors.slate.shade700;
-    textTertiary ??= StreamColors.slate.shade600;
-    textDisabled ??= StreamColors.slate.shade400;
-    textInverse ??= StreamColors.white;
+    textPrimary ??= light_tokens.StreamTokens.textPrimary;
+    textSecondary ??= light_tokens.StreamTokens.textSecondary;
+    textTertiary ??= light_tokens.StreamTokens.textTertiary;
+    textDisabled ??= light_tokens.StreamTokens.textDisabled;
+    textInverse ??= light_tokens.StreamTokens.textInverse;
     textLink ??= accentPrimary;
-    textOnAccent ??= StreamColors.white;
+    textOnAccent ??= light_tokens.StreamTokens.textOnAccent;
 
     // Background
-    backgroundApp ??= StreamColors.white;
-    backgroundSurface ??= StreamColors.slate.shade50;
-    backgroundSurfaceSubtle ??= StreamColors.slate.shade100;
-    backgroundSurfaceStrong ??= StreamColors.slate.shade200;
-    backgroundOverlay ??= StreamColors.black10;
-    backgroundDisabled ??= StreamColors.slate.shade100;
-    backgroundInverse ??= light_tokens.StreamTokens.badgeBgInverse; // TODO move to backgroundCoreInverse
+
+    backgroundApp ??= light_tokens.StreamTokens.backgroundCoreApp;
+    backgroundSurface ??= light_tokens.StreamTokens.backgroundCoreSurface;
+    backgroundSurfaceSubtle ??= light_tokens.StreamTokens.backgroundCoreSurfaceSubtle;
+    backgroundSurfaceStrong ??= light_tokens.StreamTokens.backgroundCoreSurfaceStrong;
+    backgroundOverlay ??= light_tokens.StreamTokens.backgroundCoreOverlay;
+    backgroundDisabled ??= light_tokens.StreamTokens.backgroundCoreDisabled;
+    backgroundInverse ??= light_tokens.StreamTokens.backgroundCoreInverse;
 
     backgroundElevation0 ??= light_tokens.StreamTokens.backgroundElevationElevation0;
     backgroundElevation1 ??= light_tokens.StreamTokens.backgroundElevationElevation1;
@@ -141,32 +141,31 @@ class StreamColorScheme with _$StreamColorScheme {
 
     // Border - Core
     borderDefault ??= light_tokens.StreamTokens.borderCoreDefault;
-    borderSurface ??= StreamColors.slate.shade400;
-    borderSurfaceSubtle ??= StreamColors.slate.shade200;
-    borderSurfaceStrong ??= StreamColors.slate.shade600;
-    borderOnDark ??= StreamColors.white;
-    borderOnAccent ??= StreamColors.white;
-    borderSubtle ??= StreamColors.slate.shade100;
-    borderImage ??= StreamColors.black10;
+    borderSubtle ??= light_tokens.StreamTokens.borderCoreSubtle;
+    borderStrong ??= light_tokens.StreamTokens.borderCoreStrong;
+    borderOnDark ??= light_tokens.StreamTokens.borderCoreOnDark;
+    borderOnAccent ??= light_tokens.StreamTokens.borderCoreOnAccent;
+    borderOpacity10 ??= light_tokens.StreamTokens.borderCoreOpacity10;
+    borderOpacity25 ??= light_tokens.StreamTokens.borderCoreOpacity25;
 
     // Border - Utility
     borderFocus ??= brand.shade300;
-    borderDisabled ??= StreamColors.slate.shade100;
+    borderDisabled ??= light_tokens.StreamTokens.borderUtilityDisabled;
     borderError ??= accentError;
     borderWarning ??= accentWarning;
     borderSuccess ??= accentSuccess;
     borderSelected ??= accentPrimary;
 
     // State
-    stateHover ??= StreamColors.black5;
-    statePressed ??= StreamColors.black10;
-    stateSelected ??= StreamColors.black10;
+    stateHover ??= light_tokens.StreamTokens.backgroundCoreHover;
+    statePressed ??= light_tokens.StreamTokens.backgroundCorePressed;
+    stateSelected ??= light_tokens.StreamTokens.backgroundCoreSelected;
     stateFocused ??= brand.shade100;
-    stateDisabled ??= StreamColors.slate.shade200;
+    stateDisabled ??= light_tokens.StreamTokens.backgroundCoreDisabled;
 
     // System
-    systemText ??= StreamColors.black;
-    systemScrollbar ??= StreamColors.black50;
+    systemText ??= light_tokens.StreamTokens.systemText;
+    systemScrollbar ??= light_tokens.StreamTokens.systemScrollbar;
 
     // Avatar
     avatarPalette ??= [
@@ -220,13 +219,12 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundElevation3: backgroundElevation3,
       backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
-      borderSurface: borderSurface,
-      borderSurfaceSubtle: borderSurfaceSubtle,
-      borderSurfaceStrong: borderSurfaceStrong,
       borderOnDark: borderOnDark,
       borderOnAccent: borderOnAccent,
       borderSubtle: borderSubtle,
-      borderImage: borderImage,
+      borderStrong: borderStrong,
+      borderOpacity10: borderOpacity10,
+      borderOpacity25: borderOpacity25,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
       borderError: borderError,
@@ -279,13 +277,12 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
-    Color? borderSurface,
-    Color? borderSurfaceSubtle,
-    Color? borderSurfaceStrong,
+    Color? borderSubtle,
+    Color? borderStrong,
+    Color? borderOpacity10,
+    Color? borderOpacity25,
     Color? borderOnDark,
     Color? borderOnAccent,
-    Color? borderSubtle,
-    Color? borderImage,
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
@@ -310,29 +307,29 @@ class StreamColorScheme with _$StreamColorScheme {
 
     // Accent
     accentPrimary ??= brand.shade500;
-    accentSuccess ??= StreamColors.green.shade200;
-    accentWarning ??= StreamColors.yellow.shade400;
-    accentError ??= StreamColors.red.shade400;
-    accentNeutral ??= StreamColors.neutral.shade500;
+    accentSuccess ??= dark_tokens.StreamTokens.accentSuccess;
+    accentWarning ??= dark_tokens.StreamTokens.accentWarning;
+    accentError ??= dark_tokens.StreamTokens.accentError;
+    accentNeutral ??= dark_tokens.StreamTokens.accentNeutral;
     accentBlack ??= dark_tokens.StreamTokens.accentBlack;
 
     // Text
-    textPrimary ??= StreamColors.neutral.shade50;
-    textSecondary ??= StreamColors.neutral.shade300;
-    textTertiary ??= StreamColors.neutral.shade400;
-    textDisabled ??= StreamColors.neutral.shade600;
-    textInverse ??= StreamColors.black;
+    textPrimary ??= dark_tokens.StreamTokens.textPrimary;
+    textSecondary ??= dark_tokens.StreamTokens.textSecondary;
+    textTertiary ??= dark_tokens.StreamTokens.textTertiary;
+    textDisabled ??= dark_tokens.StreamTokens.textDisabled;
+    textInverse ??= dark_tokens.StreamTokens.textInverse;
     textLink ??= accentPrimary;
-    textOnAccent ??= StreamColors.white;
+    textOnAccent ??= dark_tokens.StreamTokens.textOnAccent;
 
     // Background
-    backgroundApp ??= StreamColors.black;
-    backgroundSurface ??= StreamColors.neutral.shade900;
-    backgroundSurfaceSubtle ??= StreamColors.neutral.shade800;
-    backgroundSurfaceStrong ??= StreamColors.neutral.shade700;
-    backgroundOverlay ??= StreamColors.black50;
-    backgroundDisabled ??= StreamColors.neutral.shade900;
-    backgroundInverse ??= dark_tokens.StreamTokens.badgeBgInverse; // TODO move to backgroundCoreInverse
+    backgroundApp ??= dark_tokens.StreamTokens.backgroundCoreApp;
+    backgroundSurface ??= dark_tokens.StreamTokens.backgroundCoreSurface;
+    backgroundSurfaceSubtle ??= dark_tokens.StreamTokens.backgroundCoreSurfaceSubtle;
+    backgroundSurfaceStrong ??= dark_tokens.StreamTokens.backgroundCoreSurfaceStrong;
+    backgroundOverlay ??= dark_tokens.StreamTokens.backgroundCoreOverlay;
+    backgroundDisabled ??= dark_tokens.StreamTokens.backgroundCoreDisabled;
+    backgroundInverse ??= dark_tokens.StreamTokens.backgroundCoreInverse;
 
     backgroundElevation0 ??= dark_tokens.StreamTokens.backgroundElevationElevation0;
     backgroundElevation1 ??= dark_tokens.StreamTokens.backgroundElevationElevation1;
@@ -342,32 +339,31 @@ class StreamColorScheme with _$StreamColorScheme {
 
     // Border - Core
     borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
-    borderSurface ??= StreamColors.neutral.shade500;
-    borderSurfaceSubtle ??= StreamColors.neutral.shade700;
-    borderSurfaceStrong ??= StreamColors.neutral.shade400;
-    borderOnDark ??= StreamColors.white;
-    borderOnAccent ??= StreamColors.white;
-    borderSubtle ??= StreamColors.neutral.shade800;
-    borderImage ??= StreamColors.white20;
+    borderSubtle ??= dark_tokens.StreamTokens.borderCoreSubtle;
+    borderStrong ??= dark_tokens.StreamTokens.borderCoreStrong;
+    borderOpacity10 ??= dark_tokens.StreamTokens.borderCoreOpacity10;
+    borderOpacity25 ??= dark_tokens.StreamTokens.borderCoreOpacity25;
+    borderOnDark ??= dark_tokens.StreamTokens.borderCoreOnDark;
+    borderOnAccent ??= dark_tokens.StreamTokens.borderCoreOnAccent;
 
     // Border - Utility
     borderFocus ??= brand.shade300;
-    borderDisabled ??= StreamColors.neutral.shade800;
+    borderDisabled ??= dark_tokens.StreamTokens.borderUtilityDisabled;
     borderError ??= accentError;
     borderWarning ??= accentWarning;
     borderSuccess ??= accentSuccess;
-    borderSelected ??= StreamColors.white;
+    borderSelected ??= accentPrimary;
 
     // State
-    stateHover ??= StreamColors.black5;
-    statePressed ??= StreamColors.black10;
-    stateSelected ??= StreamColors.black10;
+    stateHover ??= dark_tokens.StreamTokens.backgroundCoreHover;
+    statePressed ??= dark_tokens.StreamTokens.backgroundCorePressed;
+    stateSelected ??= dark_tokens.StreamTokens.backgroundCoreSelected;
     stateFocused ??= brand.shade100;
-    stateDisabled ??= StreamColors.neutral.shade800;
+    stateDisabled ??= dark_tokens.StreamTokens.backgroundCoreDisabled;
 
     // System
-    systemText ??= StreamColors.white;
-    systemScrollbar ??= StreamColors.white50;
+    systemText ??= dark_tokens.StreamTokens.systemText;
+    systemScrollbar ??= dark_tokens.StreamTokens.systemScrollbar;
 
     // Avatar
     avatarPalette ??= [
@@ -421,13 +417,12 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundElevation3: backgroundElevation3,
       backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
-      borderSurface: borderSurface,
-      borderSurfaceSubtle: borderSurfaceSubtle,
-      borderSurfaceStrong: borderSurfaceStrong,
+      borderStrong: borderStrong,
+      borderOpacity10: borderOpacity10,
+      borderOpacity25: borderOpacity25,
       borderOnDark: borderOnDark,
       borderOnAccent: borderOnAccent,
       borderSubtle: borderSubtle,
-      borderImage: borderImage,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
       borderError: borderError,
@@ -478,13 +473,12 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundElevation4,
     // Border - Core
     required this.borderDefault,
-    required this.borderSurface,
-    required this.borderSurfaceSubtle,
-    required this.borderSurfaceStrong,
+    required this.borderSubtle,
+    required this.borderStrong,
     required this.borderOnDark,
     required this.borderOnAccent,
-    required this.borderSubtle,
-    required this.borderImage,
+    required this.borderOpacity10,
+    required this.borderOpacity25,
     // Border - Utility
     required this.borderFocus,
     required this.borderDisabled,
@@ -598,14 +592,11 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Standard surface border
   final Color borderDefault;
 
-  /// The standard surface border color.
-  final Color borderSurface;
-
   /// The subtle surface border color for separators.
-  final Color borderSurfaceSubtle;
+  final Color borderSubtle;
 
   /// The strong surface border color.
-  final Color borderSurfaceStrong;
+  final Color borderStrong;
 
   /// The border color on dark backgrounds.
   final Color borderOnDark;
@@ -613,11 +604,11 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The border color on accent backgrounds.
   final Color borderOnAccent;
 
-  /// The subtle border color for light outlines.
-  final Color borderSubtle;
+  /// The 10% opacity border color.
+  final Color borderOpacity10;
 
-  /// The image frame border color.
-  final Color borderImage;
+  /// The 25% opacity border color.
+  final Color borderOpacity25;
 
   // ---- Border colors - Utility ----
 

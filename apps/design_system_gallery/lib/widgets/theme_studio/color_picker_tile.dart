@@ -37,7 +37,7 @@ class ColorPickerTile extends StatelessWidget {
           ),
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.sm),
-            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+            border: Border.all(color: colorScheme.borderDefault),
           ),
           child: Row(
             children: [
@@ -53,7 +53,7 @@ class ColorPickerTile extends StatelessWidget {
                 foregroundDecoration: BoxDecoration(
                   borderRadius: BorderRadius.all(radius.xs),
                   border: Border.all(
-                    color: colorScheme.borderSurface.withValues(alpha: 0.3),
+                    color: colorScheme.borderDefault.withValues(alpha: 0.3),
                   ),
                 ),
               ),

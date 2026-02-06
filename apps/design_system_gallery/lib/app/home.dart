@@ -125,7 +125,7 @@ class _FeatureChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurfaceSubtle,
         borderRadius: BorderRadius.all(radius.md),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderDefault),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -176,10 +176,12 @@ class _GettingStartedHint extends StatelessWidget {
             color: colorScheme.accentPrimary,
           ),
           SizedBox(width: spacing.sm),
-          Text(
-            'Select a component from the sidebar to get started',
-            style: textTheme.captionDefault.copyWith(
-              color: colorScheme.accentPrimary,
+          Flexible(
+            child: Text(
+              'Select a component from the sidebar to get started',
+              style: textTheme.captionDefault.copyWith(
+                color: colorScheme.accentPrimary,
+              ),
             ),
           ),
         ],

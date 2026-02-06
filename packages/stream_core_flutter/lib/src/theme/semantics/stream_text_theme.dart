@@ -38,6 +38,7 @@ class StreamTextTheme with _$StreamTextTheme {
     TextStyle? headingLg,
     TextStyle? headingMd,
     TextStyle? headingSm,
+    TextStyle? headingXs,
     TextStyle? bodyDefault,
     TextStyle? bodyEmphasis,
     TextStyle? bodyLink,
@@ -81,6 +82,13 @@ class StreamTextTheme with _$StreamTextTheme {
       fontSize: fontSize.md,
       fontWeight: fontWeight.semibold,
       height: lineHeight.tight / fontSize.md,
+      fontStyle: FontStyle.normal,
+      decoration: TextDecoration.none,
+    );
+    headingXs ??= TextStyle(
+      fontSize: fontSize.xs,
+      fontWeight: fontWeight.semibold,
+      height: lineHeight.tight / fontSize.xs,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
@@ -209,6 +217,7 @@ class StreamTextTheme with _$StreamTextTheme {
       headingLg: headingLg,
       headingMd: headingMd,
       headingSm: headingSm,
+      headingXs: headingXs,
       bodyDefault: bodyDefault,
       bodyEmphasis: bodyEmphasis,
       bodyLink: bodyLink,
@@ -232,6 +241,7 @@ class StreamTextTheme with _$StreamTextTheme {
     required this.headingLg,
     required this.headingMd,
     required this.headingSm,
+    required this.headingXs,
     required this.bodyDefault,
     required this.bodyEmphasis,
     required this.bodyLink,
@@ -264,6 +274,11 @@ class StreamTextTheme with _$StreamTextTheme {
   ///
   /// Uses semibold weight, md font size, and tight line height.
   final TextStyle headingSm;
+
+  /// Extra small heading text style.
+  ///
+  /// Uses semibold weight, xs font size, and tight line height.
+  final TextStyle headingXs;
 
   /// Default body text style.
   ///
@@ -404,6 +419,17 @@ class StreamTextTheme with _$StreamTextTheme {
       decoration: decoration,
     ),
     headingSm: headingSm.apply(
+      color: color,
+      package: package,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+      heightFactor: heightFactor,
+      heightDelta: heightDelta,
+      fontSizeFactor: fontSizeFactor,
+      fontSizeDelta: fontSizeDelta,
+      decoration: decoration,
+    ),
+    headingXs: headingXs.apply(
       color: color,
       package: package,
       fontFamily: fontFamily,

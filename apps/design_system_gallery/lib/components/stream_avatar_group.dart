@@ -153,7 +153,7 @@ class _SizeCard extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.lg),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderSubtle),
         ),
         child: Row(
           children: [
@@ -261,7 +261,7 @@ class _AvatarCountSection extends StatelessWidget {
           ),
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+            border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +469,7 @@ class _ExampleCard extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.lg),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -497,7 +497,7 @@ class _ExampleCard extends StatelessWidget {
           ),
           Divider(
             height: 1,
-            color: colorScheme.borderSurfaceSubtle,
+            color: colorScheme.borderSubtle,
           ),
           // Content
           Container(

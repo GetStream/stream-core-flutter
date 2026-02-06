@@ -52,6 +52,7 @@ class _TypeScale extends StatelessWidget {
           ('headingLg', textTheme.headingLg, 'Page titles, hero text'),
           ('headingMd', textTheme.headingMd, 'Section headers'),
           ('headingSm', textTheme.headingSm, 'Card titles, dialogs'),
+          ('headingXs', textTheme.headingXs, 'Small labels, overlines'),
         ],
       ),
       (
@@ -114,7 +115,7 @@ class _TypeScale extends StatelessWidget {
               ),
               foregroundDecoration: BoxDecoration(
                 borderRadius: BorderRadius.all(radius.lg),
-                border: Border.all(color: colorScheme.borderSurfaceSubtle),
+                border: Border.all(color: colorScheme.borderSubtle),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +211,7 @@ class _TypeStyleCard extends StatelessWidget {
         decoration: BoxDecoration(
           border: showBorder
               ? Border(
-                  bottom: BorderSide(color: colorScheme.borderSurfaceSubtle),
+                  bottom: BorderSide(color: colorScheme.borderSubtle),
                 )
               : null,
         ),
@@ -365,7 +366,7 @@ class _CompleteReference extends StatelessWidget {
           ),
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+            border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,7 +402,7 @@ class _CompleteReference extends StatelessWidget {
                 description: 'SemiBold weight, underlined',
               ),
               SizedBox(height: spacing.md),
-              Divider(color: colorScheme.borderSurfaceSubtle),
+              Divider(color: colorScheme.borderSubtle),
               SizedBox(height: spacing.md),
               Text(
                 'Size Scale',
@@ -416,7 +417,7 @@ class _CompleteReference extends StatelessWidget {
                 children: const [
                   _SizeTag(
                     label: 'heading',
-                    sizes: '24 / 20 / 18',
+                    sizes: '20 / 18 / 16 / 12',
                   ),
                   _SizeTag(
                     label: 'body',
@@ -524,7 +525,7 @@ class _SizeTag extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurfaceSubtle,
         borderRadius: BorderRadius.all(radius.sm),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -101,21 +101,12 @@ mixin _$StreamColorScheme {
         t,
       )!,
       borderDefault: Color.lerp(a.borderDefault, b.borderDefault, t)!,
-      borderSurface: Color.lerp(a.borderSurface, b.borderSurface, t)!,
-      borderSurfaceSubtle: Color.lerp(
-        a.borderSurfaceSubtle,
-        b.borderSurfaceSubtle,
-        t,
-      )!,
-      borderSurfaceStrong: Color.lerp(
-        a.borderSurfaceStrong,
-        b.borderSurfaceStrong,
-        t,
-      )!,
+      borderSubtle: Color.lerp(a.borderSubtle, b.borderSubtle, t)!,
+      borderStrong: Color.lerp(a.borderStrong, b.borderStrong, t)!,
       borderOnDark: Color.lerp(a.borderOnDark, b.borderOnDark, t)!,
       borderOnAccent: Color.lerp(a.borderOnAccent, b.borderOnAccent, t)!,
-      borderSubtle: Color.lerp(a.borderSubtle, b.borderSubtle, t)!,
-      borderImage: Color.lerp(a.borderImage, b.borderImage, t)!,
+      borderOpacity10: Color.lerp(a.borderOpacity10, b.borderOpacity10, t)!,
+      borderOpacity25: Color.lerp(a.borderOpacity25, b.borderOpacity25, t)!,
       borderFocus: Color.lerp(a.borderFocus, b.borderFocus, t)!,
       borderDisabled: Color.lerp(a.borderDisabled, b.borderDisabled, t)!,
       borderError: Color.lerp(a.borderError, b.borderError, t)!,
@@ -161,13 +152,12 @@ mixin _$StreamColorScheme {
     Color? backgroundElevation3,
     Color? backgroundElevation4,
     Color? borderDefault,
-    Color? borderSurface,
-    Color? borderSurfaceSubtle,
-    Color? borderSurfaceStrong,
+    Color? borderSubtle,
+    Color? borderStrong,
     Color? borderOnDark,
     Color? borderOnAccent,
-    Color? borderSubtle,
-    Color? borderImage,
+    Color? borderOpacity10,
+    Color? borderOpacity25,
     Color? borderFocus,
     Color? borderDisabled,
     Color? borderError,
@@ -215,13 +205,12 @@ mixin _$StreamColorScheme {
       backgroundElevation3: backgroundElevation3 ?? _this.backgroundElevation3,
       backgroundElevation4: backgroundElevation4 ?? _this.backgroundElevation4,
       borderDefault: borderDefault ?? _this.borderDefault,
-      borderSurface: borderSurface ?? _this.borderSurface,
-      borderSurfaceSubtle: borderSurfaceSubtle ?? _this.borderSurfaceSubtle,
-      borderSurfaceStrong: borderSurfaceStrong ?? _this.borderSurfaceStrong,
+      borderSubtle: borderSubtle ?? _this.borderSubtle,
+      borderStrong: borderStrong ?? _this.borderStrong,
       borderOnDark: borderOnDark ?? _this.borderOnDark,
       borderOnAccent: borderOnAccent ?? _this.borderOnAccent,
-      borderSubtle: borderSubtle ?? _this.borderSubtle,
-      borderImage: borderImage ?? _this.borderImage,
+      borderOpacity10: borderOpacity10 ?? _this.borderOpacity10,
+      borderOpacity25: borderOpacity25 ?? _this.borderOpacity25,
       borderFocus: borderFocus ?? _this.borderFocus,
       borderDisabled: borderDisabled ?? _this.borderDisabled,
       borderError: borderError ?? _this.borderError,
@@ -278,13 +267,12 @@ mixin _$StreamColorScheme {
       backgroundElevation3: other.backgroundElevation3,
       backgroundElevation4: other.backgroundElevation4,
       borderDefault: other.borderDefault,
-      borderSurface: other.borderSurface,
-      borderSurfaceSubtle: other.borderSurfaceSubtle,
-      borderSurfaceStrong: other.borderSurfaceStrong,
+      borderSubtle: other.borderSubtle,
+      borderStrong: other.borderStrong,
       borderOnDark: other.borderOnDark,
       borderOnAccent: other.borderOnAccent,
-      borderSubtle: other.borderSubtle,
-      borderImage: other.borderImage,
+      borderOpacity10: other.borderOpacity10,
+      borderOpacity25: other.borderOpacity25,
       borderFocus: other.borderFocus,
       borderDisabled: other.borderDisabled,
       borderError: other.borderError,
@@ -342,13 +330,12 @@ mixin _$StreamColorScheme {
         _other.backgroundElevation3 == _this.backgroundElevation3 &&
         _other.backgroundElevation4 == _this.backgroundElevation4 &&
         _other.borderDefault == _this.borderDefault &&
-        _other.borderSurface == _this.borderSurface &&
-        _other.borderSurfaceSubtle == _this.borderSurfaceSubtle &&
-        _other.borderSurfaceStrong == _this.borderSurfaceStrong &&
+        _other.borderSubtle == _this.borderSubtle &&
+        _other.borderStrong == _this.borderStrong &&
         _other.borderOnDark == _this.borderOnDark &&
         _other.borderOnAccent == _this.borderOnAccent &&
-        _other.borderSubtle == _this.borderSubtle &&
-        _other.borderImage == _this.borderImage &&
+        _other.borderOpacity10 == _this.borderOpacity10 &&
+        _other.borderOpacity25 == _this.borderOpacity25 &&
         _other.borderFocus == _this.borderFocus &&
         _other.borderDisabled == _this.borderDisabled &&
         _other.borderError == _this.borderError &&
@@ -398,13 +385,12 @@ mixin _$StreamColorScheme {
       _this.backgroundElevation3,
       _this.backgroundElevation4,
       _this.borderDefault,
-      _this.borderSurface,
-      _this.borderSurfaceSubtle,
-      _this.borderSurfaceStrong,
+      _this.borderSubtle,
+      _this.borderStrong,
       _this.borderOnDark,
       _this.borderOnAccent,
-      _this.borderSubtle,
-      _this.borderImage,
+      _this.borderOpacity10,
+      _this.borderOpacity25,
       _this.borderFocus,
       _this.borderDisabled,
       _this.borderError,

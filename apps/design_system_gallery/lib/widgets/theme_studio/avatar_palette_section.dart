@@ -37,7 +37,7 @@ class AvatarColorPairTile extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.md),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderDefault),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +194,7 @@ class _SmallColorButton extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.sm),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderDefault),
         ),
         child: Row(
           children: [
@@ -209,7 +209,7 @@ class _SmallColorButton extends StatelessWidget {
               foregroundDecoration: BoxDecoration(
                 borderRadius: BorderRadius.all(radius.xxs),
                 border: Border.all(
-                  color: colorScheme.borderSurface.withValues(alpha: 0.3),
+                  color: colorScheme.borderDefault.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -258,7 +258,7 @@ class AddPaletteButton extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.md),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderDefault),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -122,7 +122,7 @@ class _SearchBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.backgroundSurfaceSubtle,
         borderRadius: BorderRadius.all(radius.lg),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: TextField(
         controller: controller,
@@ -233,7 +233,7 @@ class _IconCard extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.lg),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderSubtle),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -305,7 +305,7 @@ class _EmptyState extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.lg),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Column(
         children: [
@@ -361,7 +361,7 @@ class _QuickReference extends StatelessWidget {
           ),
           foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSurfaceSubtle),
+            border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,7 +389,7 @@ class _QuickReference extends StatelessWidget {
                 ),
               ),
               SizedBox(height: spacing.md),
-              Divider(color: colorScheme.borderSurfaceSubtle),
+              Divider(color: colorScheme.borderSubtle),
               SizedBox(height: spacing.md),
               Text(
                 'Themed Icons',

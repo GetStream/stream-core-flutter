@@ -119,7 +119,7 @@ class _FullWidthSwatchCard extends StatelessWidget {
         ),
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.lg),
-          border: Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: Border.all(color: colorScheme.borderSubtle),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,10 +146,13 @@ class _FullWidthSwatchCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: spacing.sm),
-                  Text(
-                    '— ${data.usage}',
-                    style: textTheme.captionDefault.copyWith(
-                      color: colorScheme.textTertiary,
+                  Expanded(
+                    child: Text(
+                      '— ${data.usage}',
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.captionDefault.copyWith(
+                        color: colorScheme.textTertiary,
+                      ),
                     ),
                   ),
                 ],
@@ -271,7 +274,7 @@ class _NeutralStrip extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.lg),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,7 +296,7 @@ class _NeutralStrip extends StatelessWidget {
             children: colors.map((entry) {
               final (name, color, opacity) = entry;
               final brightness = ThemeData.estimateBrightnessForColor(color);
-              final textColor = brightness == Brightness.dark ? Colors.white : Colors.black;
+              final textColor = brightness == Brightness.dark ? StreamColors.white : StreamColors.black;
 
               return Expanded(
                 child: InkWell(
@@ -379,7 +382,7 @@ class _TransparentTile extends StatelessWidget {
         foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.all(radius.lg),
           border: Border.all(
-            color: colorScheme.borderSurface,
+            color: colorScheme.borderDefault,
           ),
         ),
         child: Row(
@@ -390,13 +393,13 @@ class _TransparentTile extends StatelessWidget {
               height: 40,
               foregroundDecoration: BoxDecoration(
                 borderRadius: BorderRadius.all(radius.md),
-                border: Border.all(color: colorScheme.borderSurfaceSubtle),
+                border: Border.all(color: colorScheme.borderSubtle),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.all(radius.md),
                 child: CustomPaint(
                   painter: _CheckerboardPainter(
-                    color: colorScheme.borderSurfaceSubtle,
+                    color: colorScheme.borderSubtle,
                   ),
                 ),
               ),

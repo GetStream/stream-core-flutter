@@ -1,8 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../factory/stream_component_factory.dart' show StreamComponentBuilder;
-import '../../theme.dart';
+import '../../factory/stream_component_factory.dart';
+import '../../theme/primitives/stream_colors.dart';
+import '../../theme/stream_theme_extensions.dart';
 
 /// Predefined sizes for the file type icon.
 ///
@@ -236,8 +237,9 @@ class StreamFileTypeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final componentFactory = StreamTheme.of(context).componentFactory;
-    return componentFactory.fileTypeIconFactory.call(context, props);
+    final builder = StreamComponentFactory.maybeOf(context)?.fileTypeIcon;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamFileTypeIcon(props: props);
   }
 }
 
@@ -291,13 +293,6 @@ class DefaultStreamFileTypeIcon extends StatelessWidget {
 
   /// The properties that configure this file type icon.
   final StreamFileTypeIconProps props;
-
-  /// The factory method for creating [DefaultStreamFileTypeIcon] instances.
-  ///
-  /// This is used by [StreamComponentFactory] to create file type icons.
-  static StreamComponentBuilder<StreamFileTypeIconProps> get factory {
-    return (context, props) => DefaultStreamFileTypeIcon(props: props);
-  }
 
   @override
   Widget build(BuildContext context) {

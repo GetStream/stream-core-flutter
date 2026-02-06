@@ -31,7 +31,7 @@ class DeviceSelector extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.md),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderDefault),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<DeviceInfo>(

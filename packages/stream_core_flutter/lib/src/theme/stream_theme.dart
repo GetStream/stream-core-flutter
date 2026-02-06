@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
-import '../factory/stream_component_factory.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
@@ -87,7 +86,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
-    StreamComponentFactory? componentFactory,
   }) {
     platform ??= defaultTargetPlatform;
     final isDark = brightness == Brightness.dark;
@@ -109,8 +107,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     buttonTheme ??= const StreamButtonThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
 
-    componentFactory ??= StreamComponentFactory();
-
     return .raw(
       brightness: brightness,
       icons: icons,
@@ -124,7 +120,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
-      componentFactory: componentFactory,
     );
   }
 
@@ -153,7 +148,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.badgeCountTheme,
     required this.buttonTheme,
     required this.onlineIndicatorTheme,
-    required this.componentFactory,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -225,6 +219,4 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
-
-  final StreamComponentFactory componentFactory;
 }

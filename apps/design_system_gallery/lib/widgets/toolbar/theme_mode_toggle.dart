@@ -27,7 +27,7 @@ class ThemeModeToggle extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(radius.md),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
+        border: Border.all(color: colorScheme.borderDefault),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -39,7 +39,7 @@ class ThemeModeToggle extends StatelessWidget {
             borderRadius: BorderRadius.horizontal(left: Radius.circular(radius.md.x - 1)),
           ),
           ColoredBox(
-            color: colorScheme.borderSurfaceSubtle,
+            color: colorScheme.borderDefault,
             child: const SizedBox(width: 1, height: 28),
           ),
           _ModeButton(
@@ -73,7 +73,7 @@ class _ModeButton extends StatelessWidget {
     final spacing = context.streamSpacing;
 
     return Material(
-      color: isSelected ? colorScheme.accentPrimary.withValues(alpha: 0.1) : Colors.transparent,
+      color: isSelected ? colorScheme.accentPrimary.withValues(alpha: 0.1) : StreamColors.transparent,
       borderRadius: borderRadius,
       child: InkWell(
         onTap: onTap,
