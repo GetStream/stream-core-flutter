@@ -9,170 +9,23 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: StreamMessageComposer,
+  type: StreamBaseMessageComposer,
   path: '[Components]/Message Composer',
 )
 Widget buildStreamMessageComposerPlayground(BuildContext context) {
-  return const Center(
-    child: StreamMessageComposer(),
-  );
-}
+  final textEditingController = TextEditingController();
 
-// =============================================================================
-// Component Structure
-// =============================================================================
-
-@widgetbook.UseCase(
-  name: 'Component Structure',
-  type: StreamMessageComposer,
-  path: '[Components]/Message Composer',
-)
-Widget buildStreamMessageComposerStructure(BuildContext context) {
-  final theme = StreamTheme.of(context);
-  final colorScheme = theme.colorScheme;
-  final textTheme = theme.textTheme;
-
-  final componentProps = MessageComposerComponentProps(controller: TextEditingController());
-
-  return SingleChildScrollView(
-    padding: const EdgeInsets.all(24),
-    child: Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
-        decoration: BoxDecoration(
-          color: colorScheme.backgroundSurface,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Message Composer Structure',
-              style: textTheme.headingSm.copyWith(
-                color: colorScheme.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'The composer is built from customizable sub-components:',
-              style: textTheme.bodyDefault.copyWith(
-                color: colorScheme.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Full Composer
-            const _ComponentCard(
-              label: 'StreamMessageComposer',
-              description: 'Main composer widget',
-              child: StreamMessageComposer(),
-            ),
-            const SizedBox(height: 16),
-
-            // Leading
-            _ComponentCard(
-              label: 'StreamMessageComposerLeading',
-              description: 'Action button(s) before the input',
-              child: StreamMessageComposerLeading(props: componentProps),
-            ),
-            const SizedBox(height: 16),
-
-            // Input
-            _ComponentCard(
-              label: 'StreamMessageComposerInput',
-              description: 'Input area with header, text field, and actions',
-              child: StreamMessageComposerInput(props: componentProps),
-            ),
-            const SizedBox(height: 16),
-
-            // Input Header
-            _ComponentCard(
-              label: 'StreamMessageComposerInputHeader',
-              description: 'Header slots for replies, attachments, etc.',
-              child: StreamMessageComposerInputHeader(props: componentProps),
-            ),
-            const SizedBox(height: 16),
-
-            // Input Trailing
-            _ComponentCard(
-              label: 'StreamMessageComposerInputTrailing',
-              description: 'Send button or other trailing actions',
-              child: StreamMessageComposerInputTrailing(props: componentProps),
-            ),
-          ],
-        ),
+  return Center(
+    child: StreamBaseMessageComposer(
+      controller: textEditingController,
+      isFloating: false,
+      inputTrailing: StreamMessageComposerInputTrailing(
+        controller: textEditingController,
+        onSendPressed: () {},
+        onMicrophonePressed: () {},
       ),
     ),
   );
-}
-
-class _ComponentCard extends StatelessWidget {
-  const _ComponentCard({
-    required this.label,
-    required this.description,
-    required this.child,
-  });
-
-  final String label;
-  final String description;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = StreamTheme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: colorScheme.backgroundApp,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.borderSurfaceSubtle),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: textTheme.captionEmphasis.copyWith(
-                    color: colorScheme.accentPrimary,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: textTheme.captionDefault.copyWith(
-                    color: colorScheme.textTertiary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            color: colorScheme.borderSurfaceSubtle,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: child,
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // =============================================================================
@@ -181,7 +34,7 @@ class _ComponentCard extends StatelessWidget {
 
 @widgetbook.UseCase(
   name: 'Real-world Example',
-  type: StreamMessageComposer,
+  type: StreamBaseMessageComposer,
   path: '[Components]/Message Composer',
 )
 Widget buildStreamMessageComposerExample(BuildContext context) {
@@ -191,7 +44,6 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
 
   final isFloating = context.knobs.boolean(
     label: 'Floating',
-    initialValue: false,
     description: 'When true, the composer has no background or border.',
   );
 
@@ -217,6 +69,8 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
     (message: 'Bye!', isMe: false),
     (message: 'See you soon!', isMe: true),
   ];
+
+  final textEditingController = TextEditingController();
 
   return Scaffold(
     appBar: AppBar(
@@ -268,11 +122,19 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
                 },
               ),
               // Floating composer at bottom
-              const Positioned(
+              Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: StreamMessageComposer(isFloating: true),
+                child: StreamBaseMessageComposer(
+                  controller: textEditingController,
+                  isFloating: true,
+                  inputTrailing: StreamMessageComposerInputTrailing(
+                    controller: textEditingController,
+                    onSendPressed: () {},
+                    onMicrophonePressed: () {},
+                  ),
+                ),
               ),
             ],
           )
@@ -298,7 +160,15 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
                 ),
               ),
               // Non-floating composer
-              const StreamMessageComposer(isFloating: false),
+              StreamBaseMessageComposer(
+                controller: textEditingController,
+                isFloating: false,
+                inputTrailing: StreamMessageComposerInputTrailing(
+                  controller: textEditingController,
+                  onSendPressed: () {},
+                  onMicrophonePressed: () {},
+                ),
+              ),
             ],
           ),
   );
@@ -326,7 +196,7 @@ class _MessageBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: isMe ? colorScheme.accentPrimary : colorScheme.backgroundApp,
           borderRadius: BorderRadius.circular(16),
-          border: isMe ? null : Border.all(color: colorScheme.borderSurfaceSubtle),
+          border: isMe ? null : Border.all(color: colorScheme.borderSubtle),
         ),
         child: Text(
           message,

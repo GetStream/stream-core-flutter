@@ -315,14 +315,8 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'StreamMessageComposer',
+            name: 'StreamBaseMessageComposer',
             useCases: [
-              _widgetbook.WidgetbookUseCase(
-                name: 'Component Structure',
-                builder:
-                    _design_system_gallery_components_message_composer_message_composer
-                        .buildStreamMessageComposerStructure,
-              ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:

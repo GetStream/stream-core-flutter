@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
-import '../../factory/stream_component_factory.dart';
 
 class StreamMessageComposerInput extends StatelessWidget {
   const StreamMessageComposerInput({
@@ -61,15 +59,15 @@ class StreamMessageComposerInput extends StatelessWidget {
 }
 
 class _MessageComposerInputField extends StatelessWidget {
-  _MessageComposerInputField({
+  const _MessageComposerInputField({
     required this.controller,
     required this.placeholder,
     this.focusNode,
   });
 
-  TextEditingController controller;
-  String placeholder;
-  FocusNode? focusNode;
+  final TextEditingController controller;
+  final String placeholder;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {

@@ -142,6 +142,7 @@ class DefaultStreamButton extends StatelessWidget {
         foregroundColor: foregroundColor,
         minimumSize: WidgetStateProperty.all(Size(minimumSize, minimumSize)),
         maximumSize: isIconButton ? WidgetStateProperty.all(Size(minimumSize, minimumSize)) : null,
+        tapTargetSize: MaterialTapTargetSize.padded,
         elevation: WidgetStateProperty.all(props.isFloating ? 4 : 0),
         padding: WidgetStateProperty.all(
           isIconButton ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: spacing.md),
