@@ -142,10 +142,13 @@ class DefaultStreamButton extends StatelessWidget {
       style: ButtonStyle(
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        minimumSize: isIconButton ? null : WidgetStateProperty.all(Size(minimumSize, minimumSize)),
-        fixedSize: isIconButton ? WidgetStateProperty.all(Size(minimumSize, minimumSize)) : null,
+        minimumSize: WidgetStateProperty.all(Size(minimumSize, minimumSize)),
+        maximumSize: isIconButton ? WidgetStateProperty.all(Size(minimumSize, minimumSize)) : null,
         elevation: WidgetStateProperty.all(props.isFloating ? 4 : 0),
-        padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: spacing.md)),
+        padding: WidgetStateProperty.all(
+          isIconButton ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: spacing.md),
+        ),
+
         side: borderColor == null
             ? null
             : WidgetStateProperty.resolveWith(
@@ -154,27 +157,29 @@ class DefaultStreamButton extends StatelessWidget {
         shape: props.label == null
             ? WidgetStateProperty.all(const CircleBorder())
             : WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.all(context.streamRadius.max)),
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(context.streamRadius.max),
+                ),
               ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: spacing.xs,
-        children: [
-          if (props.iconLeft case final iconLeft?) Icon(iconLeft, size: iconSize),
-          if (props.label case final label?) Text(label),
-          if (props.iconRight case final iconRight?) Icon(iconRight, size: iconSize),
-        ],
-      ),
+      child: isIconButton
+          ? Icon(props.iconLeft, size: iconSize)
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: spacing.xs,
+              children: [
+                if (props.iconLeft case final iconLeft?) Icon(iconLeft, size: iconSize),
+                if (props.label case final label?) Text(label),
+                if (props.iconRight case final iconRight?) Icon(iconRight, size: iconSize),
+              ],
+            ),
     );
   }
 }
 
 class _StreamButtonDefaults {
-  _StreamButtonDefaults({
-    required this.context,
-  }) : _colorScheme = context.streamColorScheme;
+  _StreamButtonDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;

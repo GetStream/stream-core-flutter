@@ -54,7 +54,7 @@ class _StreamMessageComposerInputTrailingState extends State<StreamMessageCompos
         key: _messageComposerInputTrailingSendKey,
         icon: context.streamIcons.paperPlane,
         size: StreamButtonSize.small,
-        onTap: () {},
+        onTap: widget.onSendPressed,
       );
     }
     return StreamButton.icon(
@@ -63,7 +63,7 @@ class _StreamMessageComposerInputTrailingState extends State<StreamMessageCompos
       type: StreamButtonType.ghost,
       style: StreamButtonStyle.secondary,
       size: StreamButtonSize.small,
-      onTap: () {},
+      onTap: widget.onMicrophonePressed,
     );
   }
 }
