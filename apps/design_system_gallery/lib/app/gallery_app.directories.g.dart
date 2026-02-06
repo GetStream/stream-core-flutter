@@ -14,6 +14,10 @@ import 'package:design_system_gallery/components/accessories/stream_file_type_ic
     as _design_system_gallery_components_accessories_stream_file_type_icons;
 import 'package:design_system_gallery/components/button.dart'
     as _design_system_gallery_components_button;
+import 'package:design_system_gallery/components/message_composer/message_composer.dart'
+    as _design_system_gallery_components_message_composer_message_composer;
+import 'package:design_system_gallery/components/message_composer/message_composer_attachment_media_file.dart'
+    as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/stream_avatar.dart'
     as _design_system_gallery_components_stream_avatar;
 import 'package:design_system_gallery/components/stream_avatar_group.dart'
@@ -291,6 +295,39 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_stream_online_indicator
                         .buildStreamOnlineIndicatorShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Message Composer',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'MessageComposerAttachmentMediaFile',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_media_file
+                        .buildMessageComposerAttachmentMediaFilePlayground,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamBaseMessageComposer',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer
+                        .buildStreamMessageComposerPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Real-world Example',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer
+                        .buildStreamMessageComposerExample,
               ),
             ],
           ),
