@@ -13,6 +13,7 @@ class StreamMessageComposerInput extends StatelessWidget {
     this.inputLeading,
     this.inputTrailing,
     this.inputHeader,
+    this.focusNode,
   });
 
   final TextEditingController controller;
@@ -21,6 +22,7 @@ class StreamMessageComposerInput extends StatelessWidget {
   final Widget? inputLeading;
   final Widget? inputTrailing;
   final Widget? inputHeader;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +48,7 @@ class StreamMessageComposerInput extends StatelessWidget {
                 child: _MessageComposerInputField(
                   controller: controller,
                   placeholder: placeholder,
+                  focusNode: focusNode,
                 ),
               ),
               ?inputTrailing,
@@ -58,10 +61,15 @@ class StreamMessageComposerInput extends StatelessWidget {
 }
 
 class _MessageComposerInputField extends StatelessWidget {
-  _MessageComposerInputField({required this.controller, required this.placeholder});
+  _MessageComposerInputField({
+    required this.controller,
+    required this.placeholder,
+    this.focusNode,
+  });
 
   TextEditingController controller;
   String placeholder;
+  FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +84,7 @@ class _MessageComposerInputField extends StatelessWidget {
 
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       decoration: InputDecoration(
         border: border,
         focusedBorder: border,

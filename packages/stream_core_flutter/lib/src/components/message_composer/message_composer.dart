@@ -10,6 +10,7 @@ class StreamBaseMessageComposer extends StatefulWidget {
     required this.controller,
     required this.isFloating,
     this.placeholder = '',
+    this.focusNode,
     this.composerLeading,
     this.composerTrailing,
     this.inputLeading,
@@ -20,6 +21,7 @@ class StreamBaseMessageComposer extends StatefulWidget {
   final TextEditingController? controller;
   final bool isFloating;
   final String placeholder;
+  final FocusNode? focusNode;
 
   final Widget? composerLeading;
   final Widget? composerTrailing;
@@ -96,6 +98,7 @@ class _StreamBaseMessageComposerState extends State<StreamBaseMessageComposer> {
               inputLeading: widget.inputLeading,
               inputTrailing: widget.inputTrailing,
               inputHeader: widget.inputHeader,
+              focusNode: widget.focusNode,
             ),
           ),
           ?widget.composerTrailing,
