@@ -14,6 +14,8 @@ import 'package:design_system_gallery/components/accessories/stream_file_type_ic
     as _design_system_gallery_components_accessories_stream_file_type_icons;
 import 'package:design_system_gallery/components/button.dart'
     as _design_system_gallery_components_button;
+import 'package:design_system_gallery/components/buttons/stream_emoji_button.dart'
+    as _design_system_gallery_components_buttons_stream_emoji_button;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
@@ -32,6 +34,8 @@ import 'package:design_system_gallery/components/stream_badge_count.dart'
     as _design_system_gallery_components_stream_badge_count;
 import 'package:design_system_gallery/components/stream_online_indicator.dart'
     as _design_system_gallery_components_stream_online_indicator;
+import 'package:design_system_gallery/components/stream_reaction_picker_sheet.dart'
+    as _design_system_gallery_components_stream_reaction_picker_sheet;
 import 'package:design_system_gallery/primitives/colors.dart'
     as _design_system_gallery_primitives_colors;
 import 'package:design_system_gallery/primitives/icons.dart'
@@ -280,6 +284,23 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamEmojiButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_buttons_stream_emoji_button
+                        .buildStreamEmojiButtonPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_buttons_stream_emoji_button
+                        .buildStreamEmojiButtonShowcase,
+              ),
+            ],
+          ),
         ],
       ),
       _widgetbook.WidgetbookFolder(
@@ -354,6 +375,22 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer
                         .buildStreamMessageComposerExample,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Reaction',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'Widget',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_stream_reaction_picker_sheet
+                        .buildStreamReactionPickerSheetDefault,
               ),
             ],
           ),

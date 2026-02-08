@@ -35,6 +35,7 @@ mixin _$StreamComponentBuilders {
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
       button: t < 0.5 ? a.button : b.button,
+      emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
     );
@@ -46,6 +47,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
     Widget Function(BuildContext, StreamButtonProps)? button,
+    Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
   }) {
@@ -57,6 +59,7 @@ mixin _$StreamComponentBuilders {
       avatarStack: avatarStack ?? _this.avatarStack,
       badgeCount: badgeCount ?? _this.badgeCount,
       button: button ?? _this.button,
+      emojiButton: emojiButton ?? _this.emojiButton,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
     );
@@ -79,6 +82,7 @@ mixin _$StreamComponentBuilders {
       avatarStack: other.avatarStack,
       badgeCount: other.badgeCount,
       button: other.button,
+      emojiButton: other.emojiButton,
       fileTypeIcon: other.fileTypeIcon,
       onlineIndicator: other.onlineIndicator,
     );
@@ -102,6 +106,7 @@ mixin _$StreamComponentBuilders {
         _other.avatarStack == _this.avatarStack &&
         _other.badgeCount == _this.badgeCount &&
         _other.button == _this.button &&
+        _other.emojiButton == _this.emojiButton &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.onlineIndicator == _this.onlineIndicator;
   }
@@ -117,6 +122,7 @@ mixin _$StreamComponentBuilders {
       _this.avatarStack,
       _this.badgeCount,
       _this.button,
+      _this.emojiButton,
       _this.fileTypeIcon,
       _this.onlineIndicator,
     );

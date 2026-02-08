@@ -155,6 +155,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.avatarStack,
     this.badgeCount,
     this.button,
+    this.emojiButton,
     this.fileTypeIcon,
     this.onlineIndicator,
   });
@@ -183,6 +184,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamButton] uses [DefaultStreamButton].
   final StreamComponentBuilder<StreamButtonProps>? button;
+
+  /// Custom builder for emoji button widgets.
+  ///
+  /// When null, [StreamEmojiButton] uses [DefaultStreamEmojiButton].
+  final StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton;
 
   /// Custom builder for file type icon widgets.
   ///

@@ -7,6 +7,7 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
@@ -87,6 +88,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
@@ -109,6 +111,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     buttonTheme ??= const StreamButtonThemeData();
+    emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
@@ -125,6 +128,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
+      emojiButtonTheme: emojiButtonTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
@@ -155,6 +159,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.avatarTheme,
     required this.badgeCountTheme,
     required this.buttonTheme,
+    required this.emojiButtonTheme,
     required this.messageTheme,
     required this.inputTheme,
     required this.onlineIndicatorTheme,
@@ -226,6 +231,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
+
+  /// The emoji button theme for this theme.
+  final StreamEmojiButtonThemeData emojiButtonTheme;
 
   /// The message theme for this theme.
   final StreamMessageThemeData messageTheme;
