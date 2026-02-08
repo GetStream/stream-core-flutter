@@ -140,7 +140,9 @@ class StreamEmojiButtonThemeData with _$StreamEmojiButtonThemeData {
 ///
 ///  * [StreamEmojiButtonThemeData], which wraps this style for theming.
 ///  * [StreamEmojiButton], which uses this styling.
-class StreamEmojiButtonThemeStyle {
+@themeGen
+@immutable
+class StreamEmojiButtonThemeStyle with _$StreamEmojiButtonThemeStyle {
   /// Creates emoji button style properties.
   const StreamEmojiButtonThemeStyle({
     this.size,
@@ -175,4 +177,11 @@ class StreamEmojiButtonThemeStyle {
   ///
   /// Supports state-based borders for different interaction states.
   final WidgetStateBorderSide? side;
+
+  /// Linearly interpolate between two [StreamEmojiButtonThemeStyle] objects.
+  static StreamEmojiButtonThemeStyle? lerp(
+    StreamEmojiButtonThemeStyle? a,
+    StreamEmojiButtonThemeStyle? b,
+    double t,
+  ) => _$StreamEmojiButtonThemeStyle.lerp(a, b, t);
 }
