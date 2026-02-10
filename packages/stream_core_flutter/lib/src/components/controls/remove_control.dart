@@ -14,19 +14,22 @@ class RemoveControl extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.accentBlack,
-        shape: BoxShape.circle,
-        border: Border.all(color: colorScheme.borderOnDark, width: 2),
-      ),
-      alignment: Alignment.center,
-      height: 20,
-      width: 20,
-      child: Icon(
-        context.streamIcons.crossSmall,
-        color: colorScheme.textOnAccent,
-        size: 10,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.accentBlack,
+          shape: BoxShape.circle,
+          border: Border.all(color: colorScheme.borderOnDark, width: 2),
+        ),
+        alignment: Alignment.center,
+        height: 20,
+        width: 20,
+        child: Icon(
+          context.streamIcons.crossSmall,
+          color: colorScheme.textOnAccent,
+          size: 10,
+        ),
       ),
     );
   }
