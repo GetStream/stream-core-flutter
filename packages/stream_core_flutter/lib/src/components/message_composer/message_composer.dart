@@ -153,5 +153,7 @@ class ChatThemeDefaults {
     borderOutgoing: _colorScheme.brand.shade100,
     borderOnChatIncoming: _colorScheme.borderOnSurface,
     borderOnChatOutgoing: _colorScheme.brand.shade300,
+    replyIndicatorIncoming: _colorScheme.borderOnSurface,
+    replyIndicatorOutgoing: _colorScheme.brand.shade400,
   );
 }

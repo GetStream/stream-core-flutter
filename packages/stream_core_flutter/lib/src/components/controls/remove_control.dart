@@ -25,7 +25,7 @@ class RemoveControl extends StatelessWidget {
       width: 20,
       child: Icon(
         context.streamIcons.crossSmall,
-        color: colorScheme.textInverse,
+        color: colorScheme.textOnAccent,
         size: 10,
       ),
     );

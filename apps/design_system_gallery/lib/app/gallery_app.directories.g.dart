@@ -18,6 +18,8 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_media_file.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
+import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
+    as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
 import 'package:design_system_gallery/components/stream_avatar.dart'
     as _design_system_gallery_components_stream_avatar;
 import 'package:design_system_gallery/components/stream_avatar_group.dart'
@@ -311,6 +313,17 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer_attachment_media_file
                         .buildMessageComposerAttachmentMediaFilePlayground,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'MessageComposerAttachmentReply',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_reply
+                        .buildMessageComposerAttachmentReplyPlayground,
               ),
             ],
           ),
