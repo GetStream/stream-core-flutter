@@ -32,6 +32,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonType type = StreamButtonType.solid,
     StreamButtonSize size = StreamButtonSize.medium,
     IconData? icon,
+    bool isFloating = false,
   }) : props = .new(
          label: null,
          onTap: onTap,
@@ -40,6 +41,7 @@ class StreamButton extends StatelessWidget {
          size: size,
          iconLeft: icon,
          iconRight: null,
+         isFloating: isFloating,
        );
 
   final StreamButtonProps props;
@@ -61,6 +63,7 @@ class StreamButtonProps {
     required this.size,
     required this.iconLeft,
     required this.iconRight,
+    this.isFloating = false,
   });
 
   final String? label;
@@ -70,6 +73,7 @@ class StreamButtonProps {
   final StreamButtonSize size;
   final IconData? iconLeft;
   final IconData? iconRight;
+  final bool isFloating;
 }
 
 enum StreamButtonStyle { primary, secondary, destructive }
@@ -87,6 +91,7 @@ class DefaultStreamButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
     final buttonTheme = context.streamButtonTheme;
+    final colorScheme = context.streamColorScheme;
     final defaults = _StreamButtonDefaults(context: context);
 
     final themeButtonTypeStyle = switch (props.style) {
@@ -112,8 +117,12 @@ class DefaultStreamButton extends StatelessWidget {
       StreamButtonType.ghost => defaultButtonTypeStyle.ghost,
     };
 
+    final fallbackBackgroundColor = props.isFloating ? colorScheme.backgroundElevation1 : Colors.transparent;
+
     final backgroundColor =
-        themeStyle?.backgroundColor ?? defaultStyle?.backgroundColor ?? WidgetStateProperty.all(Colors.transparent);
+        themeStyle?.backgroundColor ??
+        defaultStyle?.backgroundColor ??
+        WidgetStateProperty.all(fallbackBackgroundColor);
     final foregroundColor = themeStyle?.foregroundColor ?? defaultStyle?.foregroundColor;
     final borderColor = themeStyle?.borderColor ?? defaultStyle?.borderColor;
 
@@ -124,6 +133,7 @@ class DefaultStreamButton extends StatelessWidget {
     };
 
     const iconSize = 20.0;
+    final isIconButton = props.label == null;
 
     return ElevatedButton(
       onPressed: props.onTap,
@@ -131,37 +141,44 @@ class DefaultStreamButton extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         minimumSize: WidgetStateProperty.all(Size(minimumSize, minimumSize)),
-        padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: spacing.md)),
+        maximumSize: isIconButton ? WidgetStateProperty.all(Size(minimumSize, minimumSize)) : null,
+        tapTargetSize: MaterialTapTargetSize.padded,
+        elevation: WidgetStateProperty.all(props.isFloating ? 4 : 0),
+        padding: WidgetStateProperty.all(
+          isIconButton ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: spacing.md),
+        ),
+
         side: borderColor == null
             ? null
             : WidgetStateProperty.resolveWith(
                 (states) => BorderSide(color: borderColor.resolve(states)),
               ),
-        elevation: WidgetStateProperty.all(0),
         shape: props.label == null
             ? WidgetStateProperty.all(const CircleBorder())
             : WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.all(context.streamRadius.max)),
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(context.streamRadius.max),
+                ),
               ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: spacing.xs,
-        children: [
-          if (props.iconLeft case final iconLeft?) Icon(iconLeft, size: iconSize),
-          if (props.label case final label?) Text(label),
-          if (props.iconRight case final iconRight?) Icon(iconRight, size: iconSize),
-        ],
-      ),
+      child: isIconButton
+          ? Icon(props.iconLeft, size: iconSize)
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: spacing.xs,
+              children: [
+                if (props.iconLeft case final iconLeft?) Icon(iconLeft, size: iconSize),
+                if (props.label case final label?) Text(label),
+                if (props.iconRight case final iconRight?) Icon(iconRight, size: iconSize),
+              ],
+            ),
     );
   }
 }
 
 class _StreamButtonDefaults {
-  _StreamButtonDefaults({
-    required this.context,
-  }) : _colorScheme = context.streamColorScheme;
+  _StreamButtonDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;

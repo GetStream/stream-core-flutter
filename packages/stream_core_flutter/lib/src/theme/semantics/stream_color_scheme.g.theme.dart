@@ -36,6 +36,7 @@ mixin _$StreamColorScheme {
       accentWarning: Color.lerp(a.accentWarning, b.accentWarning, t)!,
       accentError: Color.lerp(a.accentError, b.accentError, t)!,
       accentNeutral: Color.lerp(a.accentNeutral, b.accentNeutral, t)!,
+      accentBlack: Color.lerp(a.accentBlack, b.accentBlack, t)!,
       textPrimary: Color.lerp(a.textPrimary, b.textPrimary, t)!,
       textSecondary: Color.lerp(a.textSecondary, b.textSecondary, t)!,
       textTertiary: Color.lerp(a.textTertiary, b.textTertiary, t)!,
@@ -69,6 +70,36 @@ mixin _$StreamColorScheme {
         b.backgroundDisabled,
         t,
       )!,
+      backgroundInverse: Color.lerp(
+        a.backgroundInverse,
+        b.backgroundInverse,
+        t,
+      )!,
+      backgroundElevation0: Color.lerp(
+        a.backgroundElevation0,
+        b.backgroundElevation0,
+        t,
+      )!,
+      backgroundElevation1: Color.lerp(
+        a.backgroundElevation1,
+        b.backgroundElevation1,
+        t,
+      )!,
+      backgroundElevation2: Color.lerp(
+        a.backgroundElevation2,
+        b.backgroundElevation2,
+        t,
+      )!,
+      backgroundElevation3: Color.lerp(
+        a.backgroundElevation3,
+        b.backgroundElevation3,
+        t,
+      )!,
+      backgroundElevation4: Color.lerp(
+        a.backgroundElevation4,
+        b.backgroundElevation4,
+        t,
+      )!,
       borderDefault: Color.lerp(a.borderDefault, b.borderDefault, t)!,
       borderSubtle: Color.lerp(a.borderSubtle, b.borderSubtle, t)!,
       borderStrong: Color.lerp(a.borderStrong, b.borderStrong, t)!,
@@ -100,6 +131,7 @@ mixin _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentBlack,
     Color? textPrimary,
     Color? textSecondary,
     Color? textTertiary,
@@ -113,6 +145,12 @@ mixin _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    Color? backgroundInverse,
+    Color? backgroundElevation0,
+    Color? backgroundElevation1,
+    Color? backgroundElevation2,
+    Color? backgroundElevation3,
+    Color? backgroundElevation4,
     Color? borderDefault,
     Color? borderSubtle,
     Color? borderStrong,
@@ -144,6 +182,7 @@ mixin _$StreamColorScheme {
       accentWarning: accentWarning ?? _this.accentWarning,
       accentError: accentError ?? _this.accentError,
       accentNeutral: accentNeutral ?? _this.accentNeutral,
+      accentBlack: accentBlack ?? _this.accentBlack,
       textPrimary: textPrimary ?? _this.textPrimary,
       textSecondary: textSecondary ?? _this.textSecondary,
       textTertiary: textTertiary ?? _this.textTertiary,
@@ -159,6 +198,12 @@ mixin _$StreamColorScheme {
           backgroundSurfaceStrong ?? _this.backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay ?? _this.backgroundOverlay,
       backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
+      backgroundInverse: backgroundInverse ?? _this.backgroundInverse,
+      backgroundElevation0: backgroundElevation0 ?? _this.backgroundElevation0,
+      backgroundElevation1: backgroundElevation1 ?? _this.backgroundElevation1,
+      backgroundElevation2: backgroundElevation2 ?? _this.backgroundElevation2,
+      backgroundElevation3: backgroundElevation3 ?? _this.backgroundElevation3,
+      backgroundElevation4: backgroundElevation4 ?? _this.backgroundElevation4,
       borderDefault: borderDefault ?? _this.borderDefault,
       borderSubtle: borderSubtle ?? _this.borderSubtle,
       borderStrong: borderStrong ?? _this.borderStrong,
@@ -201,6 +246,7 @@ mixin _$StreamColorScheme {
       accentWarning: other.accentWarning,
       accentError: other.accentError,
       accentNeutral: other.accentNeutral,
+      accentBlack: other.accentBlack,
       textPrimary: other.textPrimary,
       textSecondary: other.textSecondary,
       textTertiary: other.textTertiary,
@@ -214,6 +260,12 @@ mixin _$StreamColorScheme {
       backgroundSurfaceStrong: other.backgroundSurfaceStrong,
       backgroundOverlay: other.backgroundOverlay,
       backgroundDisabled: other.backgroundDisabled,
+      backgroundInverse: other.backgroundInverse,
+      backgroundElevation0: other.backgroundElevation0,
+      backgroundElevation1: other.backgroundElevation1,
+      backgroundElevation2: other.backgroundElevation2,
+      backgroundElevation3: other.backgroundElevation3,
+      backgroundElevation4: other.backgroundElevation4,
       borderDefault: other.borderDefault,
       borderSubtle: other.borderSubtle,
       borderStrong: other.borderStrong,
@@ -257,6 +309,7 @@ mixin _$StreamColorScheme {
         _other.accentWarning == _this.accentWarning &&
         _other.accentError == _this.accentError &&
         _other.accentNeutral == _this.accentNeutral &&
+        _other.accentBlack == _this.accentBlack &&
         _other.textPrimary == _this.textPrimary &&
         _other.textSecondary == _this.textSecondary &&
         _other.textTertiary == _this.textTertiary &&
@@ -270,6 +323,12 @@ mixin _$StreamColorScheme {
         _other.backgroundSurfaceStrong == _this.backgroundSurfaceStrong &&
         _other.backgroundOverlay == _this.backgroundOverlay &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
+        _other.backgroundInverse == _this.backgroundInverse &&
+        _other.backgroundElevation0 == _this.backgroundElevation0 &&
+        _other.backgroundElevation1 == _this.backgroundElevation1 &&
+        _other.backgroundElevation2 == _this.backgroundElevation2 &&
+        _other.backgroundElevation3 == _this.backgroundElevation3 &&
+        _other.backgroundElevation4 == _this.backgroundElevation4 &&
         _other.borderDefault == _this.borderDefault &&
         _other.borderSubtle == _this.borderSubtle &&
         _other.borderStrong == _this.borderStrong &&
@@ -305,6 +364,7 @@ mixin _$StreamColorScheme {
       _this.accentWarning,
       _this.accentError,
       _this.accentNeutral,
+      _this.accentBlack,
       _this.textPrimary,
       _this.textSecondary,
       _this.textTertiary,
@@ -318,6 +378,12 @@ mixin _$StreamColorScheme {
       _this.backgroundSurfaceStrong,
       _this.backgroundOverlay,
       _this.backgroundDisabled,
+      _this.backgroundInverse,
+      _this.backgroundElevation0,
+      _this.backgroundElevation1,
+      _this.backgroundElevation2,
+      _this.backgroundElevation3,
+      _this.backgroundElevation4,
       _this.borderDefault,
       _this.borderSubtle,
       _this.borderStrong,

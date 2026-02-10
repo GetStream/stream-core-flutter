@@ -3,7 +3,8 @@ export 'components/avatar/stream_avatar.dart' hide DefaultStreamAvatar;
 export 'components/avatar/stream_avatar_group.dart' hide DefaultStreamAvatarGroup;
 export 'components/avatar/stream_avatar_stack.dart' hide DefaultStreamAvatarStack;
 export 'components/badge/stream_badge_count.dart' hide DefaultStreamBadgeCount;
+export 'components/badge/stream_online_indicator.dart' hide DefaultStreamOnlineIndicator;
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
-export 'components/indicator/stream_online_indicator.dart' hide DefaultStreamOnlineIndicator;
+export 'components/message_composer.dart';
 
 export 'factory/stream_component_factory.dart';

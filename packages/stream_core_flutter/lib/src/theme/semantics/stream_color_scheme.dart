@@ -52,6 +52,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentBlack,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -67,6 +68,14 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    Color? backgroundInverse,
+
+    // Background - Elevation
+    Color? backgroundElevation0,
+    Color? backgroundElevation1,
+    Color? backgroundElevation2,
+    Color? backgroundElevation3,
+    Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
     Color? borderSubtle,
@@ -103,6 +112,7 @@ class StreamColorScheme with _$StreamColorScheme {
     accentWarning ??= light_tokens.StreamTokens.accentWarning;
     accentError ??= light_tokens.StreamTokens.accentError;
     accentNeutral ??= light_tokens.StreamTokens.accentNeutral;
+    accentBlack ??= light_tokens.StreamTokens.accentBlack;
 
     // Text
     textPrimary ??= light_tokens.StreamTokens.textPrimary;
@@ -114,12 +124,20 @@ class StreamColorScheme with _$StreamColorScheme {
     textOnAccent ??= light_tokens.StreamTokens.textOnAccent;
 
     // Background
+
     backgroundApp ??= light_tokens.StreamTokens.backgroundCoreApp;
     backgroundSurface ??= light_tokens.StreamTokens.backgroundCoreSurface;
     backgroundSurfaceSubtle ??= light_tokens.StreamTokens.backgroundCoreSurfaceSubtle;
     backgroundSurfaceStrong ??= light_tokens.StreamTokens.backgroundCoreSurfaceStrong;
     backgroundOverlay ??= light_tokens.StreamTokens.backgroundCoreOverlay;
     backgroundDisabled ??= light_tokens.StreamTokens.backgroundCoreDisabled;
+    backgroundInverse ??= light_tokens.StreamTokens.backgroundCoreInverse;
+
+    backgroundElevation0 ??= light_tokens.StreamTokens.backgroundElevationElevation0;
+    backgroundElevation1 ??= light_tokens.StreamTokens.backgroundElevationElevation1;
+    backgroundElevation2 ??= light_tokens.StreamTokens.backgroundElevationElevation2;
+    backgroundElevation3 ??= light_tokens.StreamTokens.backgroundElevationElevation3;
+    backgroundElevation4 ??= light_tokens.StreamTokens.backgroundElevationElevation4;
 
     // Border - Core
     borderDefault ??= light_tokens.StreamTokens.borderCoreDefault;
@@ -180,6 +198,7 @@ class StreamColorScheme with _$StreamColorScheme {
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
+      accentBlack: accentBlack,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -193,6 +212,12 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
       backgroundDisabled: backgroundDisabled,
+      backgroundInverse: backgroundInverse,
+      backgroundElevation0: backgroundElevation0,
+      backgroundElevation1: backgroundElevation1,
+      backgroundElevation2: backgroundElevation2,
+      backgroundElevation3: backgroundElevation3,
+      backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
       borderOnDark: borderOnDark,
       borderOnAccent: borderOnAccent,
@@ -227,6 +252,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentBlack,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -242,6 +268,13 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
     Color? backgroundDisabled,
+    Color? backgroundInverse,
+    // Background - Elevation
+    Color? backgroundElevation0,
+    Color? backgroundElevation1,
+    Color? backgroundElevation2,
+    Color? backgroundElevation3,
+    Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
     Color? borderSubtle,
@@ -278,6 +311,7 @@ class StreamColorScheme with _$StreamColorScheme {
     accentWarning ??= dark_tokens.StreamTokens.accentWarning;
     accentError ??= dark_tokens.StreamTokens.accentError;
     accentNeutral ??= dark_tokens.StreamTokens.accentNeutral;
+    accentBlack ??= dark_tokens.StreamTokens.accentBlack;
 
     // Text
     textPrimary ??= dark_tokens.StreamTokens.textPrimary;
@@ -295,6 +329,13 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceStrong ??= dark_tokens.StreamTokens.backgroundCoreSurfaceStrong;
     backgroundOverlay ??= dark_tokens.StreamTokens.backgroundCoreOverlay;
     backgroundDisabled ??= dark_tokens.StreamTokens.backgroundCoreDisabled;
+    backgroundInverse ??= dark_tokens.StreamTokens.backgroundCoreInverse;
+
+    backgroundElevation0 ??= dark_tokens.StreamTokens.backgroundElevationElevation0;
+    backgroundElevation1 ??= dark_tokens.StreamTokens.backgroundElevationElevation1;
+    backgroundElevation2 ??= dark_tokens.StreamTokens.backgroundElevationElevation2;
+    backgroundElevation3 ??= dark_tokens.StreamTokens.backgroundElevationElevation3;
+    backgroundElevation4 ??= dark_tokens.StreamTokens.backgroundElevationElevation4;
 
     // Border - Core
     borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
@@ -355,6 +396,7 @@ class StreamColorScheme with _$StreamColorScheme {
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
+      accentBlack: accentBlack,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -368,6 +410,12 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
       backgroundDisabled: backgroundDisabled,
+      backgroundInverse: backgroundInverse,
+      backgroundElevation0: backgroundElevation0,
+      backgroundElevation1: backgroundElevation1,
+      backgroundElevation2: backgroundElevation2,
+      backgroundElevation3: backgroundElevation3,
+      backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
       borderStrong: borderStrong,
       borderOpacity10: borderOpacity10,
@@ -400,6 +448,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.accentWarning,
     required this.accentError,
     required this.accentNeutral,
+    required this.accentBlack,
     // Text
     required this.textPrimary,
     required this.textSecondary,
@@ -415,6 +464,13 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundSurfaceStrong,
     required this.backgroundOverlay,
     required this.backgroundDisabled,
+    required this.backgroundInverse,
+    // Background - Elevation
+    required this.backgroundElevation0,
+    required this.backgroundElevation1,
+    required this.backgroundElevation2,
+    required this.backgroundElevation3,
+    required this.backgroundElevation4,
     // Border - Core
     required this.borderDefault,
     required this.borderSubtle,
@@ -465,6 +521,9 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The neutral accent color.
   final Color accentNeutral;
 
+  /// The black accent color.
+  final Color accentBlack;
+
   // ---- Text colors ----
 
   /// The primary text color.
@@ -507,6 +566,26 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Disabled background for inputs, buttons, or chips.
   final Color backgroundDisabled;
+
+  /// The inverse background color.
+  final Color backgroundInverse;
+
+  // ---- Background - Elevation ----
+
+  /// The elevation 0 background color.
+  final Color backgroundElevation0;
+
+  /// The elevation 1 background color.
+  final Color backgroundElevation1;
+
+  /// The elevation 2 background color.
+  final Color backgroundElevation2;
+
+  /// The elevation 3 background color.
+  final Color backgroundElevation3;
+
+  /// The elevation 4 background color.
+  final Color backgroundElevation4;
 
   // ---- Border colors - Core ----
 
