@@ -44,6 +44,7 @@ mixin _$StreamColorScheme {
       textInverse: Color.lerp(a.textInverse, b.textInverse, t)!,
       textLink: Color.lerp(a.textLink, b.textLink, t)!,
       textOnAccent: Color.lerp(a.textOnAccent, b.textOnAccent, t)!,
+      textOnDark: Color.lerp(a.textOnDark, b.textOnDark, t)!,
       backgroundApp: Color.lerp(a.backgroundApp, b.backgroundApp, t)!,
       backgroundSurface: Color.lerp(
         a.backgroundSurface,
@@ -63,6 +64,16 @@ mixin _$StreamColorScheme {
       backgroundOverlay: Color.lerp(
         a.backgroundOverlay,
         b.backgroundOverlay,
+        t,
+      )!,
+      backgroundOverlayLight: Color.lerp(
+        a.backgroundOverlayLight,
+        b.backgroundOverlayLight,
+        t,
+      )!,
+      backgroundOverlayDark: Color.lerp(
+        a.backgroundOverlayDark,
+        b.backgroundOverlayDark,
         t,
       )!,
       backgroundDisabled: Color.lerp(
@@ -105,6 +116,7 @@ mixin _$StreamColorScheme {
       borderStrong: Color.lerp(a.borderStrong, b.borderStrong, t)!,
       borderOnDark: Color.lerp(a.borderOnDark, b.borderOnDark, t)!,
       borderOnAccent: Color.lerp(a.borderOnAccent, b.borderOnAccent, t)!,
+      borderOnSurface: Color.lerp(a.borderOnSurface, b.borderOnSurface, t)!,
       borderOpacity10: Color.lerp(a.borderOpacity10, b.borderOpacity10, t)!,
       borderOpacity25: Color.lerp(a.borderOpacity25, b.borderOpacity25, t)!,
       borderFocus: Color.lerp(a.borderFocus, b.borderFocus, t)!,
@@ -139,11 +151,14 @@ mixin _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
+    Color? textOnDark,
     Color? backgroundApp,
     Color? backgroundSurface,
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundOverlayLight,
+    Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
     Color? backgroundElevation0,
@@ -156,6 +171,7 @@ mixin _$StreamColorScheme {
     Color? borderStrong,
     Color? borderOnDark,
     Color? borderOnAccent,
+    Color? borderOnSurface,
     Color? borderOpacity10,
     Color? borderOpacity25,
     Color? borderFocus,
@@ -190,6 +206,7 @@ mixin _$StreamColorScheme {
       textInverse: textInverse ?? _this.textInverse,
       textLink: textLink ?? _this.textLink,
       textOnAccent: textOnAccent ?? _this.textOnAccent,
+      textOnDark: textOnDark ?? _this.textOnDark,
       backgroundApp: backgroundApp ?? _this.backgroundApp,
       backgroundSurface: backgroundSurface ?? _this.backgroundSurface,
       backgroundSurfaceSubtle:
@@ -197,6 +214,10 @@ mixin _$StreamColorScheme {
       backgroundSurfaceStrong:
           backgroundSurfaceStrong ?? _this.backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay ?? _this.backgroundOverlay,
+      backgroundOverlayLight:
+          backgroundOverlayLight ?? _this.backgroundOverlayLight,
+      backgroundOverlayDark:
+          backgroundOverlayDark ?? _this.backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
       backgroundInverse: backgroundInverse ?? _this.backgroundInverse,
       backgroundElevation0: backgroundElevation0 ?? _this.backgroundElevation0,
@@ -209,6 +230,7 @@ mixin _$StreamColorScheme {
       borderStrong: borderStrong ?? _this.borderStrong,
       borderOnDark: borderOnDark ?? _this.borderOnDark,
       borderOnAccent: borderOnAccent ?? _this.borderOnAccent,
+      borderOnSurface: borderOnSurface ?? _this.borderOnSurface,
       borderOpacity10: borderOpacity10 ?? _this.borderOpacity10,
       borderOpacity25: borderOpacity25 ?? _this.borderOpacity25,
       borderFocus: borderFocus ?? _this.borderFocus,
@@ -254,11 +276,14 @@ mixin _$StreamColorScheme {
       textInverse: other.textInverse,
       textLink: other.textLink,
       textOnAccent: other.textOnAccent,
+      textOnDark: other.textOnDark,
       backgroundApp: other.backgroundApp,
       backgroundSurface: other.backgroundSurface,
       backgroundSurfaceSubtle: other.backgroundSurfaceSubtle,
       backgroundSurfaceStrong: other.backgroundSurfaceStrong,
       backgroundOverlay: other.backgroundOverlay,
+      backgroundOverlayLight: other.backgroundOverlayLight,
+      backgroundOverlayDark: other.backgroundOverlayDark,
       backgroundDisabled: other.backgroundDisabled,
       backgroundInverse: other.backgroundInverse,
       backgroundElevation0: other.backgroundElevation0,
@@ -271,6 +296,7 @@ mixin _$StreamColorScheme {
       borderStrong: other.borderStrong,
       borderOnDark: other.borderOnDark,
       borderOnAccent: other.borderOnAccent,
+      borderOnSurface: other.borderOnSurface,
       borderOpacity10: other.borderOpacity10,
       borderOpacity25: other.borderOpacity25,
       borderFocus: other.borderFocus,
@@ -317,11 +343,14 @@ mixin _$StreamColorScheme {
         _other.textInverse == _this.textInverse &&
         _other.textLink == _this.textLink &&
         _other.textOnAccent == _this.textOnAccent &&
+        _other.textOnDark == _this.textOnDark &&
         _other.backgroundApp == _this.backgroundApp &&
         _other.backgroundSurface == _this.backgroundSurface &&
         _other.backgroundSurfaceSubtle == _this.backgroundSurfaceSubtle &&
         _other.backgroundSurfaceStrong == _this.backgroundSurfaceStrong &&
         _other.backgroundOverlay == _this.backgroundOverlay &&
+        _other.backgroundOverlayLight == _this.backgroundOverlayLight &&
+        _other.backgroundOverlayDark == _this.backgroundOverlayDark &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
         _other.backgroundInverse == _this.backgroundInverse &&
         _other.backgroundElevation0 == _this.backgroundElevation0 &&
@@ -334,6 +363,7 @@ mixin _$StreamColorScheme {
         _other.borderStrong == _this.borderStrong &&
         _other.borderOnDark == _this.borderOnDark &&
         _other.borderOnAccent == _this.borderOnAccent &&
+        _other.borderOnSurface == _this.borderOnSurface &&
         _other.borderOpacity10 == _this.borderOpacity10 &&
         _other.borderOpacity25 == _this.borderOpacity25 &&
         _other.borderFocus == _this.borderFocus &&
@@ -372,11 +402,14 @@ mixin _$StreamColorScheme {
       _this.textInverse,
       _this.textLink,
       _this.textOnAccent,
+      _this.textOnDark,
       _this.backgroundApp,
       _this.backgroundSurface,
       _this.backgroundSurfaceSubtle,
       _this.backgroundSurfaceStrong,
       _this.backgroundOverlay,
+      _this.backgroundOverlayLight,
+      _this.backgroundOverlayDark,
       _this.backgroundDisabled,
       _this.backgroundInverse,
       _this.backgroundElevation0,
@@ -389,6 +422,7 @@ mixin _$StreamColorScheme {
       _this.borderStrong,
       _this.borderOnDark,
       _this.borderOnAccent,
+      _this.borderOnSurface,
       _this.borderOpacity10,
       _this.borderOpacity25,
       _this.borderFocus,

@@ -1,8 +1,11 @@
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
+import '../../theme/components/stream_chat_theme.dart';
+import '../../theme/components/stream_input_theme.dart';
 
 class StreamBaseMessageComposer extends StatefulWidget {
   const StreamBaseMessageComposer({
@@ -110,3 +113,45 @@ class _StreamBaseMessageComposerState extends State<StreamBaseMessageComposer> {
 }
 
 class MessageData {}
+
+class InputThemeDefaults {
+  InputThemeDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+
+  StreamInputThemeData get data => StreamInputThemeData(
+    textColor: _colorScheme.textPrimary,
+    placeholderColor: _colorScheme.textTertiary,
+    disabledColor: _colorScheme.textDisabled,
+    iconColor: _colorScheme.textTertiary,
+    borderColor: _colorScheme.borderDefault,
+  );
+}
+
+class ChatThemeDefaults {
+  ChatThemeDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+
+  StreamChatThemeData get data => StreamChatThemeData(
+    backgroundIncoming: _colorScheme.backgroundSurface,
+    backgroundOutgoing: _colorScheme.brand.shade100,
+    backgroundAttachmentIncoming: _colorScheme.backgroundSurfaceStrong,
+    backgroundAttachmentOutgoing: _colorScheme.brand.shade150,
+    backgroundTypingIndicator: _colorScheme.accentNeutral,
+    textIncoming: _colorScheme.textPrimary,
+    textOutgoing: _colorScheme.brand.shade900,
+    textUsername: _colorScheme.textSecondary,
+    textTimestamp: _colorScheme.textTertiary,
+    textMention: _colorScheme.textLink,
+    textLink: _colorScheme.textLink,
+    textReaction: _colorScheme.textSecondary,
+    textSystem: _colorScheme.textSecondary,
+    borderIncoming: _colorScheme.borderSubtle,
+    borderOutgoing: _colorScheme.brand.shade100,
+    borderOnChatIncoming: _colorScheme.borderOnSurface,
+    borderOnChatOutgoing: _colorScheme.brand.shade300,
+  );
+}

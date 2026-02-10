@@ -7,6 +7,8 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_chat_theme.dart';
+import 'components/stream_input_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
@@ -85,6 +87,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamChatThemeData? chatTheme,
+    StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
   }) {
     platform ??= defaultTargetPlatform;
@@ -105,6 +109,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     buttonTheme ??= const StreamButtonThemeData();
+    chatTheme ??= const StreamChatThemeData();
+    inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
 
     return .raw(
@@ -119,6 +125,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
+      chatTheme: chatTheme,
+      inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
     );
   }
@@ -147,6 +155,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.avatarTheme,
     required this.badgeCountTheme,
     required this.buttonTheme,
+    required this.chatTheme,
+    required this.inputTheme,
     required this.onlineIndicatorTheme,
   });
 
@@ -216,6 +226,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
+
+  /// The chat theme for this theme.
+  final StreamChatThemeData chatTheme;
+
+  /// The input theme for this theme.
+  final StreamInputThemeData inputTheme;
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;

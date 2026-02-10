@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_chat_theme.dart';
+import 'components/stream_input_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
@@ -66,6 +68,12 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
+
+  /// Returns the [StreamChatThemeData] from the nearest ancestor.
+  StreamChatThemeData get streamChatTheme => StreamChatTheme.of(this);
+
+  /// Returns the [StreamInputThemeData] from the nearest ancestor.
+  StreamInputThemeData get streamInputTheme => StreamInputTheme.of(this);
 
   /// Returns the [StreamOnlineIndicatorThemeData] from the nearest ancestor.
   StreamOnlineIndicatorThemeData get streamOnlineIndicatorTheme => StreamOnlineIndicatorTheme.of(this);
