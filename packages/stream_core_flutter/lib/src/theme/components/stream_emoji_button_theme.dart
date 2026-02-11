@@ -149,8 +149,9 @@ class StreamEmojiButtonThemeStyle with _$StreamEmojiButtonThemeStyle {
     this.backgroundColor,
     this.foregroundColor,
     this.overlayColor,
-    this.side,
-  });
+    WidgetStateProperty<BorderSide?>? side,
+  }) // TODO: Fix this or try to find something better
+  : side = side as WidgetStateBorderSide?;
 
   /// The size of emoji buttons.
   ///
