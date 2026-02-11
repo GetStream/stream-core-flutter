@@ -24,8 +24,6 @@ class StreamMessageComposerInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Add message composer theme
-
     return DecoratedBox(
       decoration: BoxDecoration(
         color: context.streamColorScheme.backgroundElevation1,
@@ -82,23 +80,28 @@ class _MessageComposerInputField extends StatelessWidget {
       borderRadius: BorderRadius.all(composerBorderRadius),
     );
 
-    return TextField(
-      controller: controller,
-      focusNode: focusNode,
-      style: TextStyle(
-        color: inputTheme.textColor ?? inputDefaults.textColor,
-      ),
-      decoration: InputDecoration(
-        border: border,
-        focusedBorder: border,
-        enabledBorder: border,
-        errorBorder: border,
-        disabledBorder: border,
-        fillColor: Colors.transparent,
-        contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-        hintText: placeholder,
-        hintStyle: TextStyle(
-          color: inputTheme.placeholderColor ?? inputDefaults.placeholderColor,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 124),
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        style: TextStyle(
+          color: inputTheme.textColor ?? inputDefaults.textColor,
+        ),
+        expands: true,
+        maxLines: null,
+        decoration: InputDecoration(
+          border: border,
+          focusedBorder: border,
+          enabledBorder: border,
+          errorBorder: border,
+          disabledBorder: border,
+          fillColor: Colors.transparent,
+          contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          hintText: placeholder,
+          hintStyle: TextStyle(
+            color: inputTheme.placeholderColor ?? inputDefaults.placeholderColor,
+          ),
         ),
       ),
     );

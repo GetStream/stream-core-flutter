@@ -16,6 +16,8 @@ import 'package:design_system_gallery/components/button.dart'
     as _design_system_gallery_components_button;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
+import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
+    as _design_system_gallery_components_message_composer_message_composer_attachment_link_preview;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_media_file.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
@@ -305,6 +307,17 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'Message Composer',
         children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'MessageComposerAttachmentLinkPreview',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_link_preview
+                        .buildMessageComposerAttachmentLinkPreviewPlayground,
+              ),
+            ],
+          ),
           _widgetbook.WidgetbookComponent(
             name: 'MessageComposerAttachmentMediaFile',
             useCases: [

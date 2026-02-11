@@ -10,7 +10,7 @@ class MediaBadge extends StatelessWidget {
   });
 
   final MediaBadgeType type;
-  final Duration duration;
+  final Duration? duration;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class MediaBadge extends StatelessWidget {
             color: context.streamColorScheme.textPrimary,
           ),
 
-          Text(duration.toReadableString()),
+          if (duration case final duration?) Text(duration.toReadableString()),
         ],
       ),
     );
