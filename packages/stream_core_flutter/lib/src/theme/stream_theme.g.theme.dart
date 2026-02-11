@@ -23,6 +23,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamMessageThemeData? messageTheme,
+    StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
   }) {
     final _this = (this as StreamTheme);
@@ -39,6 +41,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
+      messageTheme: messageTheme ?? _this.messageTheme,
+      inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
     );
   }
@@ -75,6 +79,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         t,
       )!,
       buttonTheme: t < 0.5 ? _this.buttonTheme : other.buttonTheme,
+      messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
+      inputTheme: t < 0.5 ? _this.inputTheme : other.inputTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
         _this.onlineIndicatorTheme,
         other.onlineIndicatorTheme,
@@ -107,6 +113,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
+        _other.messageTheme == _this.messageTheme &&
+        _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
   }
 
@@ -127,6 +135,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.buttonTheme,
+      _this.messageTheme,
+      _this.inputTheme,
       _this.onlineIndicatorTheme,
     );
   }

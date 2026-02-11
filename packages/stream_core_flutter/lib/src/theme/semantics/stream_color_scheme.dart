@@ -61,12 +61,15 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
+    Color? textOnDark,
     // Background
     Color? backgroundApp,
     Color? backgroundSurface,
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundOverlayLight,
+    Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
 
@@ -82,6 +85,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderStrong,
     Color? borderOnDark,
     Color? borderOnAccent,
+    Color? borderOnSurface,
     Color? borderOpacity10,
     Color? borderOpacity25,
     // Border - Utility
@@ -122,6 +126,7 @@ class StreamColorScheme with _$StreamColorScheme {
     textInverse ??= light_tokens.StreamTokens.textInverse;
     textLink ??= accentPrimary;
     textOnAccent ??= light_tokens.StreamTokens.textOnAccent;
+    textOnDark ??= light_tokens.StreamTokens.textOnDark;
 
     // Background
 
@@ -130,6 +135,8 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceSubtle ??= light_tokens.StreamTokens.backgroundCoreSurfaceSubtle;
     backgroundSurfaceStrong ??= light_tokens.StreamTokens.backgroundCoreSurfaceStrong;
     backgroundOverlay ??= light_tokens.StreamTokens.backgroundCoreOverlay;
+    backgroundOverlayLight ??= light_tokens.StreamTokens.backgroundCoreOverlayLight;
+    backgroundOverlayDark ??= light_tokens.StreamTokens.backgroundCoreOverlayDark;
     backgroundDisabled ??= light_tokens.StreamTokens.backgroundCoreDisabled;
     backgroundInverse ??= light_tokens.StreamTokens.backgroundCoreInverse;
 
@@ -145,6 +152,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderStrong ??= light_tokens.StreamTokens.borderCoreStrong;
     borderOnDark ??= light_tokens.StreamTokens.borderCoreOnDark;
     borderOnAccent ??= light_tokens.StreamTokens.borderCoreOnAccent;
+    borderOnSurface ??= light_tokens.StreamTokens.borderCoreOnSurface;
     borderOpacity10 ??= light_tokens.StreamTokens.borderCoreOpacity10;
     borderOpacity25 ??= light_tokens.StreamTokens.borderCoreOpacity25;
 
@@ -206,11 +214,14 @@ class StreamColorScheme with _$StreamColorScheme {
       textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
+      textOnDark: textOnDark,
       backgroundApp: backgroundApp,
       backgroundSurface: backgroundSurface,
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
+      backgroundOverlayLight: backgroundOverlayLight,
+      backgroundOverlayDark: backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
@@ -221,6 +232,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderDefault: borderDefault,
       borderOnDark: borderOnDark,
       borderOnAccent: borderOnAccent,
+      borderOnSurface: borderOnSurface,
       borderSubtle: borderSubtle,
       borderStrong: borderStrong,
       borderOpacity10: borderOpacity10,
@@ -261,12 +273,15 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
+    Color? textOnDark,
     // Background
     Color? backgroundApp,
     Color? backgroundSurface,
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
     Color? backgroundOverlay,
+    Color? backgroundOverlayLight,
+    Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
     // Background - Elevation
@@ -283,6 +298,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderOpacity25,
     Color? borderOnDark,
     Color? borderOnAccent,
+    Color? borderOnSurface,
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
@@ -321,6 +337,7 @@ class StreamColorScheme with _$StreamColorScheme {
     textInverse ??= dark_tokens.StreamTokens.textInverse;
     textLink ??= accentPrimary;
     textOnAccent ??= dark_tokens.StreamTokens.textOnAccent;
+    textOnDark ??= dark_tokens.StreamTokens.textOnDark;
 
     // Background
     backgroundApp ??= dark_tokens.StreamTokens.backgroundCoreApp;
@@ -328,6 +345,8 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceSubtle ??= dark_tokens.StreamTokens.backgroundCoreSurfaceSubtle;
     backgroundSurfaceStrong ??= dark_tokens.StreamTokens.backgroundCoreSurfaceStrong;
     backgroundOverlay ??= dark_tokens.StreamTokens.backgroundCoreOverlay;
+    backgroundOverlayLight ??= dark_tokens.StreamTokens.backgroundCoreOverlayLight;
+    backgroundOverlayDark ??= dark_tokens.StreamTokens.backgroundCoreOverlayDark;
     backgroundDisabled ??= dark_tokens.StreamTokens.backgroundCoreDisabled;
     backgroundInverse ??= dark_tokens.StreamTokens.backgroundCoreInverse;
 
@@ -345,6 +364,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderOpacity25 ??= dark_tokens.StreamTokens.borderCoreOpacity25;
     borderOnDark ??= dark_tokens.StreamTokens.borderCoreOnDark;
     borderOnAccent ??= dark_tokens.StreamTokens.borderCoreOnAccent;
+    borderOnSurface ??= dark_tokens.StreamTokens.borderCoreOnSurface;
 
     // Border - Utility
     borderFocus ??= brand.shade300;
@@ -404,11 +424,14 @@ class StreamColorScheme with _$StreamColorScheme {
       textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
+      textOnDark: textOnDark,
       backgroundApp: backgroundApp,
       backgroundSurface: backgroundSurface,
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundOverlay: backgroundOverlay,
+      backgroundOverlayLight: backgroundOverlayLight,
+      backgroundOverlayDark: backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
@@ -422,6 +445,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderOpacity25: borderOpacity25,
       borderOnDark: borderOnDark,
       borderOnAccent: borderOnAccent,
+      borderOnSurface: borderOnSurface,
       borderSubtle: borderSubtle,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
@@ -457,12 +481,15 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.textInverse,
     required this.textLink,
     required this.textOnAccent,
+    required this.textOnDark,
     // Background
     required this.backgroundApp,
     required this.backgroundSurface,
     required this.backgroundSurfaceSubtle,
     required this.backgroundSurfaceStrong,
     required this.backgroundOverlay,
+    required this.backgroundOverlayLight,
+    required this.backgroundOverlayDark,
     required this.backgroundDisabled,
     required this.backgroundInverse,
     // Background - Elevation
@@ -477,6 +504,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.borderStrong,
     required this.borderOnDark,
     required this.borderOnAccent,
+    required this.borderOnSurface,
     required this.borderOpacity10,
     required this.borderOpacity25,
     // Border - Utility
@@ -547,6 +575,9 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The text color on accent backgrounds.
   final Color textOnAccent;
 
+  /// The text color on dark backgrounds.
+  final Color textOnDark;
+
   // ---- Background colors ----
 
   /// The main app background color.
@@ -563,6 +594,12 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The overlay background color.
   final Color backgroundOverlay;
+
+  /// The light overlay background color.
+  final Color backgroundOverlayLight;
+
+  /// The dark overlay background color.
+  final Color backgroundOverlayDark;
 
   /// Disabled background for inputs, buttons, or chips.
   final Color backgroundDisabled;
@@ -603,6 +640,9 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The border color on accent backgrounds.
   final Color borderOnAccent;
+
+  /// The border color on surface backgrounds.
+  final Color borderOnSurface;
 
   /// The 10% opacity border color.
   final Color borderOpacity10;

@@ -74,6 +74,8 @@ class _MessageComposerInputField extends StatelessWidget {
     // TODO: fully implement the input field
 
     final composerBorderRadius = context.streamRadius.xxxl;
+    final inputTheme = context.streamInputTheme;
+    final inputDefaults = InputThemeDefaults(context: context).data;
 
     final border = OutlineInputBorder(
       borderSide: BorderSide.none,
@@ -83,6 +85,9 @@ class _MessageComposerInputField extends StatelessWidget {
     return TextField(
       controller: controller,
       focusNode: focusNode,
+      style: TextStyle(
+        color: inputTheme.textColor ?? inputDefaults.textColor,
+      ),
       decoration: InputDecoration(
         border: border,
         focusedBorder: border,
@@ -92,6 +97,9 @@ class _MessageComposerInputField extends StatelessWidget {
         fillColor: Colors.transparent,
         contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
         hintText: placeholder,
+        hintStyle: TextStyle(
+          color: inputTheme.placeholderColor ?? inputDefaults.placeholderColor,
+        ),
       ),
     );
   }
