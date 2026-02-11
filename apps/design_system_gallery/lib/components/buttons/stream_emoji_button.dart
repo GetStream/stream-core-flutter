@@ -154,8 +154,7 @@ class _SizeVariantsSection extends StatelessWidget {
                 children: [
                   for (final size in StreamEmojiButtonSize.values) ...[
                     _SizeDemo(size: size),
-                    if (size != StreamEmojiButtonSize.values.last)
-                      SizedBox(width: spacing.xl),
+                    if (size != StreamEmojiButtonSize.values.last) SizedBox(width: spacing.xl),
                   ],
                 ],
               ),
@@ -518,8 +517,7 @@ class _SectionLabel extends StatelessWidget {
 // Helpers
 // =============================================================================
 
-Emoji _byName(String name) =>
-    UnicodeEmojis.allEmojis.firstWhere((e) => e.name == name);
+Emoji _byName(String name) => UnicodeEmojis.allEmojis.firstWhere((e) => e.name == name);
 
 final _sampleEmojis = [
   _byName('thumbs up sign'),
