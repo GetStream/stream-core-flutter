@@ -5,33 +5,33 @@ import '../../../stream_core_flutter.dart';
 
 part 'stream_chat_theme.g.theme.dart';
 
-class StreamChatTheme extends InheritedTheme {
-  const StreamChatTheme({
+class StreamMessageTheme extends InheritedTheme {
+  const StreamMessageTheme({
     super.key,
     required this.data,
     required super.child,
   });
 
-  final StreamChatThemeData data;
+  final StreamMessageThemeData data;
 
-  static StreamChatThemeData of(BuildContext context) {
-    final localTheme = context.dependOnInheritedWidgetOfExactType<StreamChatTheme>();
-    return StreamTheme.of(context).chatTheme.merge(localTheme?.data);
+  static StreamMessageThemeData of(BuildContext context) {
+    final localTheme = context.dependOnInheritedWidgetOfExactType<StreamMessageTheme>();
+    return StreamTheme.of(context).messageTheme.merge(localTheme?.data);
   }
 
   @override
   Widget wrap(BuildContext context, Widget child) {
-    return StreamChatTheme(data: data, child: child);
+    return StreamMessageTheme(data: data, child: child);
   }
 
   @override
-  bool updateShouldNotify(StreamChatTheme oldWidget) => data != oldWidget.data;
+  bool updateShouldNotify(StreamMessageTheme oldWidget) => data != oldWidget.data;
 }
 
 @themeGen
 @immutable
-class StreamChatThemeData with _$StreamChatThemeData {
-  const StreamChatThemeData({
+class StreamMessageThemeData with _$StreamChatThemeData {
+  const StreamMessageThemeData({
     this.backgroundIncoming,
     this.backgroundOutgoing,
     this.backgroundAttachmentIncoming,

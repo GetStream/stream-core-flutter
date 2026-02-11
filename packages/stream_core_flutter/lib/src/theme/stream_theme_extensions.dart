@@ -69,8 +69,8 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
 
-  /// Returns the [StreamChatThemeData] from the nearest ancestor.
-  StreamChatThemeData get streamChatTheme => StreamChatTheme.of(this);
+  /// Returns the [StreamMessageThemeData] from the nearest ancestor.
+  StreamMessageThemeData get streamMessageTheme => StreamMessageTheme.of(this);
 
   /// Returns the [StreamInputThemeData] from the nearest ancestor.
   StreamInputThemeData get streamInputTheme => StreamInputTheme.of(this);

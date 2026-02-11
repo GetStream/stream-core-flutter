@@ -129,13 +129,13 @@ class InputThemeDefaults {
   );
 }
 
-class ChatThemeDefaults {
-  ChatThemeDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
+class MessageThemeDefaults {
+  MessageThemeDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;
 
-  StreamChatThemeData get data => StreamChatThemeData(
+  StreamMessageThemeData get data => StreamMessageThemeData(
     backgroundIncoming: _colorScheme.backgroundSurface,
     backgroundOutgoing: _colorScheme.brand.shade100,
     backgroundAttachmentIncoming: _colorScheme.backgroundSurfaceStrong,

@@ -87,7 +87,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
-    StreamChatThemeData? chatTheme,
+    StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
   }) {
@@ -109,7 +109,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     buttonTheme ??= const StreamButtonThemeData();
-    chatTheme ??= const StreamChatThemeData();
+    messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
 
@@ -125,7 +125,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
-      chatTheme: chatTheme,
+      messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
     );
@@ -155,7 +155,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.avatarTheme,
     required this.badgeCountTheme,
     required this.buttonTheme,
-    required this.chatTheme,
+    required this.messageTheme,
     required this.inputTheme,
     required this.onlineIndicatorTheme,
   });
@@ -227,8 +227,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
 
-  /// The chat theme for this theme.
-  final StreamChatThemeData chatTheme;
+  /// The message theme for this theme.
+  final StreamMessageThemeData messageTheme;
 
   /// The input theme for this theme.
   final StreamInputThemeData inputTheme;

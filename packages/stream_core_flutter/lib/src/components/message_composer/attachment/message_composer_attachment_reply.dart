@@ -22,15 +22,15 @@ class MessageComposerAttachmentReply extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatTheme = context.streamChatTheme;
-    final chatDefaults = ChatThemeDefaults(context: context).data;
+    final messageTheme = context.streamMessageTheme;
+    final messageDefaults = MessageThemeDefaults(context: context).data;
     final indicatorColor = switch (style) {
-      ReplyStyle.incoming => chatTheme.replyIndicatorIncoming ?? chatDefaults.replyIndicatorIncoming!,
-      ReplyStyle.outgoing => chatTheme.replyIndicatorOutgoing ?? chatDefaults.replyIndicatorOutgoing!,
+      ReplyStyle.incoming => messageTheme.replyIndicatorIncoming ?? messageDefaults.replyIndicatorIncoming!,
+      ReplyStyle.outgoing => messageTheme.replyIndicatorOutgoing ?? messageDefaults.replyIndicatorOutgoing!,
     };
     final backgroundColor = switch (style) {
-      ReplyStyle.incoming => chatTheme.backgroundIncoming ?? chatDefaults.backgroundIncoming,
-      ReplyStyle.outgoing => chatTheme.backgroundOutgoing ?? chatDefaults.backgroundOutgoing,
+      ReplyStyle.incoming => messageTheme.backgroundIncoming ?? messageDefaults.backgroundIncoming,
+      ReplyStyle.outgoing => messageTheme.backgroundOutgoing ?? messageDefaults.backgroundOutgoing,
     };
 
     final spacing = context.streamSpacing;
