@@ -17,6 +17,7 @@ dependencies:
   stream_core_flutter:
     path: ../../packages/stream_core_flutter
   svg_icon_widget: ^0.0.1+1
+  unicode_emojis: ^0.5.1
   widgetbook: ^3.20.2
   widgetbook_annotation: ^3.9.0
 

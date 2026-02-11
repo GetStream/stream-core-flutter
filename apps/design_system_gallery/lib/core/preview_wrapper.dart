@@ -31,7 +31,13 @@ class PreviewWrapper extends StatelessWidget {
         ),
         child: ColoredBox(
           color: colorScheme.backgroundApp,
-          child: child,
+          child: ScaffoldMessenger(
+            child: Navigator(
+              onGenerateRoute: (_) => MaterialPageRoute(
+                builder: (_) => Scaffold(body: child),
+              ),
+            ),
+          ),
         ),
       ),
     );
