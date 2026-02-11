@@ -24,8 +24,6 @@ class StreamMessageComposerInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Add message composer theme
-
     return DecoratedBox(
       decoration: BoxDecoration(
         color: context.streamColorScheme.backgroundElevation1,
