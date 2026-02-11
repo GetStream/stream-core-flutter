@@ -11,7 +11,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(
   name: 'Playground',
   type: StreamEmojiButton,
-  path: '[Components]/Button',
+  path: '[Components]/Buttons',
 )
 Widget buildStreamEmojiButtonPlayground(BuildContext context) {
   return const _PlaygroundDemo();
@@ -80,7 +80,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
 @widgetbook.UseCase(
   name: 'Showcase',
   type: StreamEmojiButton,
-  path: '[Components]/Button',
+  path: '[Components]/Buttons',
 )
 Widget buildStreamEmojiButtonShowcase(BuildContext context) {
   final colorScheme = context.streamColorScheme;

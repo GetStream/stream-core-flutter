@@ -274,10 +274,27 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamOnlineIndicator',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_badge_stream_online_indicator
+                        .buildStreamOnlineIndicatorPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_badge_stream_online_indicator
+                        .buildStreamOnlineIndicatorShowcase,
+              ),
+            ],
+          ),
         ],
       ),
       _widgetbook.WidgetbookFolder(
-        name: 'Button',
+        name: 'Buttons',
         children: [
           _widgetbook.WidgetbookComponent(
             name: 'StreamButton',
@@ -323,28 +340,6 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_buttons_stream_emoji_button
                         .buildStreamEmojiButtonShowcase,
-              ),
-            ],
-          ),
-        ],
-      ),
-      _widgetbook.WidgetbookFolder(
-        name: 'Indicator',
-        children: [
-          _widgetbook.WidgetbookComponent(
-            name: 'StreamOnlineIndicator',
-            useCases: [
-              _widgetbook.WidgetbookUseCase(
-                name: 'Playground',
-                builder:
-                    _design_system_gallery_components_badge_stream_online_indicator
-                        .buildStreamOnlineIndicatorPlayground,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Showcase',
-                builder:
-                    _design_system_gallery_components_badge_stream_online_indicator
-                        .buildStreamOnlineIndicatorShowcase,
               ),
             ],
           ),

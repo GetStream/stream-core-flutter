@@ -10,7 +10,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(
   name: 'Playground',
   type: StreamButton,
-  path: '[Components]/Button',
+  path: '[Components]/Buttons',
 )
 Widget buildStreamButtonPlayground(BuildContext context) {
   final label = context.knobs.string(
@@ -90,7 +90,7 @@ Widget buildStreamButtonPlayground(BuildContext context) {
 @widgetbook.UseCase(
   name: 'Type Variants',
   type: StreamButton,
-  path: '[Components]/Button',
+  path: '[Components]/Buttons',
 )
 Widget buildStreamButtonTypes(BuildContext context) {
   final theme = StreamTheme.of(context);
@@ -142,7 +142,7 @@ Widget buildStreamButtonTypes(BuildContext context) {
 @widgetbook.UseCase(
   name: 'Size Variants',
   type: StreamButton,
-  path: '[Components]/Button',
+  path: '[Components]/Buttons',
 )
 Widget buildStreamButtonSizes(BuildContext context) {
   final theme = StreamTheme.of(context);
@@ -194,7 +194,7 @@ Widget buildStreamButtonSizes(BuildContext context) {
 @widgetbook.UseCase(
   name: 'With Icons',
   type: StreamButton,
-  path: '[Components]/Button',
+  path: '[Components]/Buttons',
 )
 Widget buildStreamButtonWithIcons(BuildContext context) {
   final theme = StreamTheme.of(context);
@@ -316,7 +316,7 @@ Widget buildStreamButtonWithIcons(BuildContext context) {
 @widgetbook.UseCase(
   name: 'Real-world Example',
   type: StreamButton,
-  path: '[Components]/Button',
+  path: '[Components]/Buttons',
 )
 Widget buildStreamButtonExample(BuildContext context) {
   final theme = StreamTheme.of(context);
