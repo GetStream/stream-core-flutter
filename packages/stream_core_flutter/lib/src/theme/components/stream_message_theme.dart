@@ -3,7 +3,7 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 import '../../../stream_core_flutter.dart';
 
-part 'stream_chat_theme.g.theme.dart';
+part 'stream_message_theme.g.theme.dart';
 
 class StreamMessageTheme extends InheritedTheme {
   const StreamMessageTheme({
@@ -30,7 +30,7 @@ class StreamMessageTheme extends InheritedTheme {
 
 @themeGen
 @immutable
-class StreamMessageThemeData with _$StreamChatThemeData {
+class StreamMessageThemeData with _$StreamMessageThemeData {
   const StreamMessageThemeData({
     this.backgroundIncoming,
     this.backgroundOutgoing,

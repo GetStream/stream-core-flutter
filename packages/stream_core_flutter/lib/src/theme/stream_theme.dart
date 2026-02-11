@@ -7,8 +7,8 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
-import 'components/stream_chat_theme.dart';
 import 'components/stream_input_theme.dart';
+import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';

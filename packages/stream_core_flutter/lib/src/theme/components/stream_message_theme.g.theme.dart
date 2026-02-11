@@ -3,18 +3,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, unused_element
 
-part of 'stream_chat_theme.dart';
+part of 'stream_message_theme.dart';
 
 // **************************************************************************
 // ThemeGenGenerator
 // **************************************************************************
 
-mixin _$StreamChatThemeData {
+mixin _$StreamMessageThemeData {
   bool get canMerge => true;
 
-  static StreamChatThemeData? lerp(
-    StreamChatThemeData? a,
-    StreamChatThemeData? b,
+  static StreamMessageThemeData? lerp(
+    StreamMessageThemeData? a,
+    StreamMessageThemeData? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -29,7 +29,7 @@ mixin _$StreamChatThemeData {
       return t == 0.0 ? a : null;
     }
 
-    return StreamChatThemeData(
+    return StreamMessageThemeData(
       backgroundIncoming: Color.lerp(
         a.backgroundIncoming,
         b.backgroundIncoming,
@@ -58,6 +58,7 @@ mixin _$StreamChatThemeData {
       textIncoming: Color.lerp(a.textIncoming, b.textIncoming, t),
       textOutgoing: Color.lerp(a.textOutgoing, b.textOutgoing, t),
       textUsername: Color.lerp(a.textUsername, b.textUsername, t),
+      textTimestamp: Color.lerp(a.textTimestamp, b.textTimestamp, t),
       textMention: Color.lerp(a.textMention, b.textMention, t),
       textLink: Color.lerp(a.textLink, b.textLink, t),
       textReaction: Color.lerp(a.textReaction, b.textReaction, t),
@@ -123,7 +124,7 @@ mixin _$StreamChatThemeData {
     );
   }
 
-  StreamChatThemeData copyWith({
+  StreamMessageThemeData copyWith({
     Color? backgroundIncoming,
     Color? backgroundOutgoing,
     Color? backgroundAttachmentIncoming,
@@ -132,6 +133,7 @@ mixin _$StreamChatThemeData {
     Color? textIncoming,
     Color? textOutgoing,
     Color? textUsername,
+    Color? textTimestamp,
     Color? textMention,
     Color? textLink,
     Color? textReaction,
@@ -151,9 +153,9 @@ mixin _$StreamChatThemeData {
     Color? waveFormBar,
     Color? waveFormBarPlaying,
   }) {
-    final _this = (this as StreamChatThemeData);
+    final _this = (this as StreamMessageThemeData);
 
-    return StreamChatThemeData(
+    return StreamMessageThemeData(
       backgroundIncoming: backgroundIncoming ?? _this.backgroundIncoming,
       backgroundOutgoing: backgroundOutgoing ?? _this.backgroundOutgoing,
       backgroundAttachmentIncoming:
@@ -165,6 +167,7 @@ mixin _$StreamChatThemeData {
       textIncoming: textIncoming ?? _this.textIncoming,
       textOutgoing: textOutgoing ?? _this.textOutgoing,
       textUsername: textUsername ?? _this.textUsername,
+      textTimestamp: textTimestamp ?? _this.textTimestamp,
       textMention: textMention ?? _this.textMention,
       textLink: textLink ?? _this.textLink,
       textReaction: textReaction ?? _this.textReaction,
@@ -192,8 +195,8 @@ mixin _$StreamChatThemeData {
     );
   }
 
-  StreamChatThemeData merge(StreamChatThemeData? other) {
-    final _this = (this as StreamChatThemeData);
+  StreamMessageThemeData merge(StreamMessageThemeData? other) {
+    final _this = (this as StreamMessageThemeData);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -212,6 +215,7 @@ mixin _$StreamChatThemeData {
       textIncoming: other.textIncoming,
       textOutgoing: other.textOutgoing,
       textUsername: other.textUsername,
+      textTimestamp: other.textTimestamp,
       textMention: other.textMention,
       textLink: other.textLink,
       textReaction: other.textReaction,
@@ -243,8 +247,8 @@ mixin _$StreamChatThemeData {
       return false;
     }
 
-    final _this = (this as StreamChatThemeData);
-    final _other = (other as StreamChatThemeData);
+    final _this = (this as StreamMessageThemeData);
+    final _other = (other as StreamMessageThemeData);
 
     return _other.backgroundIncoming == _this.backgroundIncoming &&
         _other.backgroundOutgoing == _this.backgroundOutgoing &&
@@ -256,6 +260,7 @@ mixin _$StreamChatThemeData {
         _other.textIncoming == _this.textIncoming &&
         _other.textOutgoing == _this.textOutgoing &&
         _other.textUsername == _this.textUsername &&
+        _other.textTimestamp == _this.textTimestamp &&
         _other.textMention == _this.textMention &&
         _other.textLink == _this.textLink &&
         _other.textReaction == _this.textReaction &&
@@ -278,7 +283,7 @@ mixin _$StreamChatThemeData {
 
   @override
   int get hashCode {
-    final _this = (this as StreamChatThemeData);
+    final _this = (this as StreamMessageThemeData);
 
     return Object.hashAll([
       runtimeType,
@@ -290,6 +295,7 @@ mixin _$StreamChatThemeData {
       _this.textIncoming,
       _this.textOutgoing,
       _this.textUsername,
+      _this.textTimestamp,
       _this.textMention,
       _this.textLink,
       _this.textReaction,
