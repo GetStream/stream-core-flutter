@@ -38,6 +38,7 @@ class StreamMessageComposerInput extends StatelessWidget {
         children: [
           ?inputHeader,
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               ?inputLeading,
               Expanded(
