@@ -88,7 +88,6 @@ class _MessageComposerInputField extends StatelessWidget {
         style: TextStyle(
           color: inputTheme.textColor ?? inputDefaults.textColor,
         ),
-        expands: true,
         maxLines: null,
         decoration: InputDecoration(
           border: border,
