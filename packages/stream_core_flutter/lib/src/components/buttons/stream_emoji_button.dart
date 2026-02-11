@@ -163,7 +163,8 @@ class DefaultStreamEmojiButton extends StatelessWidget {
       onPressed: props.onPressed,
       onLongPress: props.onLongPress,
       isSelected: props.isSelected,
-      icon: StreamEmoji(size: emojiSize, emoji: props.emoji),
+      iconSize: emojiSize.value,
+      icon: StreamEmoji(emoji: props.emoji),
       style: ButtonStyle(
         fixedSize: .all(.square(effectiveSize.value)),
         minimumSize: .all(.square(effectiveSize.value)),
@@ -182,7 +183,7 @@ class DefaultStreamEmojiButton extends StatelessWidget {
   StreamEmojiSize _emojiSizeForButtonSize(
     StreamEmojiButtonSize buttonSize,
   ) => switch (buttonSize) {
-    .md => StreamEmojiSize.sm,
+    .md => StreamEmojiSize.md,
     .lg => StreamEmojiSize.md,
     .xl => StreamEmojiSize.lg,
   };
