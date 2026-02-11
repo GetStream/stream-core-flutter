@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../stream_core_flutter.dart';
+import '../../factory/stream_component_factory.dart';
+
 /// Predefined sizes for emoji display.
 ///
 /// Each size corresponds to a specific dimension in logical pixels,
@@ -67,46 +70,108 @@ enum StreamEmojiSize {
 ///
 /// {@tool snippet}
 ///
-/// Default size (medium):
+/// Default size (uses IconTheme or medium):
 ///
 /// ```dart
 /// StreamEmoji(emoji: Text('🔥'))
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// Use with IconButton (size controlled via iconSize):
+///
+/// ```dart
+/// IconButton(
+///   iconSize: 32,  // Size applied to StreamEmoji via IconTheme
+///   icon: StreamEmoji(emoji: Text('👍')),
+///   onPressed: () {},
+/// )
+/// ```
+/// {@end-tool}
+///
+/// **Best Practice:** When using `StreamEmoji` inside an `IconButton`, set the
+/// size using `IconButton.iconSize` instead of `StreamEmoji.size`. The emoji
+/// will automatically inherit the size from the button's `IconTheme`.
+///
 /// See also:
 ///
 ///  * [StreamEmojiSize], which defines the available size variants.
 class StreamEmoji extends StatelessWidget {
   /// Creates an emoji display widget.
-  ///
-  /// The [emoji] parameter is required and can be any widget (typically
-  /// [Text] for emoji characters or [Icon] for Material icons).
-  ///
-  /// If [size] is not provided, defaults to [StreamEmojiSize.md].
-  const StreamEmoji({
+  StreamEmoji({
     super.key,
-    this.size = .md,
+    StreamEmojiSize? size,
+    required Widget emoji,
+  }) : props = .new(size: size, emoji: emoji);
+
+  /// The props controlling the appearance of this emoji.
+  final StreamEmojiProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.maybeOf(context)?.emoji;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamEmoji(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamEmoji].
+///
+/// This class holds all the configuration options for an emoji display,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamEmoji], which uses these properties.
+@immutable
+class StreamEmojiProps {
+  /// Creates emoji properties.
+  const StreamEmojiProps({
+    required this.size,
     required this.emoji,
   });
 
   /// The size of the emoji container.
   ///
-  /// Determines the width and height of the square container.
-  /// Defaults to [StreamEmojiSize.md] (24px).
-  final StreamEmojiSize size;
+  /// If null, uses [IconTheme.of(context).size] if available,
+  /// otherwise defaults to [StreamEmojiSize.md] (24px).
+  final StreamEmojiSize? size;
 
   /// The emoji or icon widget to display.
   ///
   /// Typically a [Text] widget containing a Unicode emoji character,
   /// or an [Icon] widget for Material Design icons.
   final Widget emoji;
+}
+
+/// Default implementation of [StreamEmoji].
+///
+/// This is the standard emoji display widget used when no custom builder
+/// is provided via [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamEmoji], which delegates to this widget by default.
+///  * [StreamComponentFactory], for providing custom emoji builders.
+class DefaultStreamEmoji extends StatelessWidget {
+  /// Creates a default emoji display widget.
+  const DefaultStreamEmoji({
+    super.key,
+    required this.props,
+  });
+
+  /// The props controlling the appearance of this emoji.
+  final StreamEmojiProps props;
 
   @override
   Widget build(BuildContext context) {
+    final iconTheme = IconTheme.of(context);
+    final effectiveSize = props.size?.value ?? iconTheme.size ?? StreamEmojiSize.md.value;
+
     return SizedBox(
-      width: size.value,
-      height: size.value,
+      width: effectiveSize,
+      height: effectiveSize,
       child: Center(
         child: MediaQuery.withNoTextScaling(
           child: FittedBox(
@@ -114,8 +179,9 @@ class StreamEmoji extends StatelessWidget {
             child: DefaultTextStyle.merge(
               textAlign: .center,
               style: TextStyle(
-                fontSize: size.value,
                 height: 1,
+                decoration: .none,
+                fontSize: effectiveSize,
                 // Commonly available fallback fonts for emoji rendering.
                 fontFamilyFallback: const [
                   'Apple Color Emoji', // iOS and macOS.
@@ -127,7 +193,7 @@ class StreamEmoji extends StatelessWidget {
                 applyHeightToFirstAscent: false,
                 applyHeightToLastDescent: false,
               ),
-              child: emoji,
+              child: props.emoji,
             ),
           ),
         ),
