@@ -21,10 +21,10 @@ class MessageComposerAttachmentLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatTheme = context.streamChatTheme;
-    final chatDefaults = ChatThemeDefaults(context: context).data;
-    final backgroundColor = chatTheme.backgroundOutgoing ?? chatDefaults.backgroundOutgoing;
-    final textColor = chatTheme.textOutgoing ?? chatDefaults.textOutgoing;
+    final messageTheme = context.streamMessageTheme;
+    final messageDefaults = MessageThemeDefaults(context: context).data;
+    final backgroundColor = messageTheme.backgroundOutgoing ?? messageDefaults.backgroundOutgoing;
+    final textColor = messageTheme.textOutgoing ?? messageDefaults.textOutgoing;
 
     final titleStyle = context.streamTextTheme.metadataEmphasis.copyWith(color: textColor);
     final bodyStyle = context.streamTextTheme.metadataDefault.copyWith(color: textColor);
