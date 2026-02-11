@@ -38,6 +38,7 @@ class StreamMessageComposerInput extends StatelessWidget {
         children: [
           ?inputHeader,
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               ?inputLeading,
               Expanded(
@@ -88,7 +89,6 @@ class _MessageComposerInputField extends StatelessWidget {
         style: TextStyle(
           color: inputTheme.textColor ?? inputDefaults.textColor,
         ),
-        expands: true,
         maxLines: null,
         decoration: InputDecoration(
           border: border,
