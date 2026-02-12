@@ -22,16 +22,15 @@ class MessageComposerAttachmentReply extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final messageTheme = context.streamMessageTheme;
-    final messageDefaults = MessageThemeDefaults(context: context).data;
-    final indicatorColor = switch (style) {
-      ReplyStyle.incoming => messageTheme.replyIndicatorIncoming ?? messageDefaults.replyIndicatorIncoming!,
-      ReplyStyle.outgoing => messageTheme.replyIndicatorOutgoing ?? messageDefaults.replyIndicatorOutgoing!,
+    final messageTheme = context.streamMessageTheme.mergeWithDefaults(context);
+    final messageStyle = switch (style) {
+      ReplyStyle.incoming => messageTheme.incoming,
+      ReplyStyle.outgoing => messageTheme.outgoing,
     };
-    final backgroundColor = switch (style) {
-      ReplyStyle.incoming => messageTheme.backgroundIncoming ?? messageDefaults.backgroundIncoming,
-      ReplyStyle.outgoing => messageTheme.backgroundOutgoing ?? messageDefaults.backgroundOutgoing,
-    };
+
+    final indicatorColor = messageStyle?.replyIndicatorColor;
+    final backgroundColor = messageStyle?.backgroundColor;
+    final textColor = messageStyle?.textColor;
 
     final spacing = context.streamSpacing;
     return Stack(
@@ -61,14 +60,19 @@ class MessageComposerAttachmentReply extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: context.streamTextTheme.metadataEmphasis),
+                      Text(title, style: context.streamTextTheme.metadataEmphasis.copyWith(color: textColor)),
                       Row(
                         children: [
                           if (image != null) ...[
                             Icon(context.streamIcons.camera1, size: 12),
                             SizedBox(width: spacing.xxs),
                           ],
-                          Expanded(child: Text(subtitle, style: context.streamTextTheme.metadataDefault)),
+                          Expanded(
+                            child: Text(
+                              subtitle,
+                              style: context.streamTextTheme.metadataDefault.copyWith(color: textColor),
+                            ),
+                          ),
                         ],
                       ),
                     ],

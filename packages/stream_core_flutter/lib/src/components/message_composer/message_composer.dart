@@ -128,32 +128,3 @@ class InputThemeDefaults {
     borderColor: _colorScheme.borderDefault,
   );
 }
-
-class MessageThemeDefaults {
-  MessageThemeDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
-
-  final BuildContext context;
-  final StreamColorScheme _colorScheme;
-
-  StreamMessageThemeData get data => StreamMessageThemeData(
-    backgroundIncoming: _colorScheme.backgroundSurface,
-    backgroundOutgoing: _colorScheme.brand.shade100,
-    backgroundAttachmentIncoming: _colorScheme.backgroundSurfaceStrong,
-    backgroundAttachmentOutgoing: _colorScheme.brand.shade150,
-    backgroundTypingIndicator: _colorScheme.accentNeutral,
-    textIncoming: _colorScheme.textPrimary,
-    textOutgoing: _colorScheme.brand.shade900,
-    textUsername: _colorScheme.textSecondary,
-    textTimestamp: _colorScheme.textTertiary,
-    textMention: _colorScheme.textLink,
-    textLink: _colorScheme.textLink,
-    textReaction: _colorScheme.textSecondary,
-    textSystem: _colorScheme.textSecondary,
-    borderIncoming: _colorScheme.borderSubtle,
-    borderOutgoing: _colorScheme.brand.shade100,
-    borderOnChatIncoming: _colorScheme.borderOnSurface,
-    borderOnChatOutgoing: _colorScheme.brand.shade300,
-    replyIndicatorIncoming: _colorScheme.borderOnSurface,
-    replyIndicatorOutgoing: _colorScheme.brand.shade400,
-  );
-}

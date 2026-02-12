@@ -30,168 +30,20 @@ mixin _$StreamMessageThemeData {
     }
 
     return StreamMessageThemeData(
-      backgroundIncoming: Color.lerp(
-        a.backgroundIncoming,
-        b.backgroundIncoming,
-        t,
-      ),
-      backgroundOutgoing: Color.lerp(
-        a.backgroundOutgoing,
-        b.backgroundOutgoing,
-        t,
-      ),
-      backgroundAttachmentIncoming: Color.lerp(
-        a.backgroundAttachmentIncoming,
-        b.backgroundAttachmentIncoming,
-        t,
-      ),
-      backgroundAttachmentOutgoing: Color.lerp(
-        a.backgroundAttachmentOutgoing,
-        b.backgroundAttachmentOutgoing,
-        t,
-      ),
-      backgroundTypingIndicator: Color.lerp(
-        a.backgroundTypingIndicator,
-        b.backgroundTypingIndicator,
-        t,
-      ),
-      textIncoming: Color.lerp(a.textIncoming, b.textIncoming, t),
-      textOutgoing: Color.lerp(a.textOutgoing, b.textOutgoing, t),
-      textUsername: Color.lerp(a.textUsername, b.textUsername, t),
-      textTimestamp: Color.lerp(a.textTimestamp, b.textTimestamp, t),
-      textMention: Color.lerp(a.textMention, b.textMention, t),
-      textLink: Color.lerp(a.textLink, b.textLink, t),
-      textReaction: Color.lerp(a.textReaction, b.textReaction, t),
-      textSystem: Color.lerp(a.textSystem, b.textSystem, t),
-      borderIncoming: Color.lerp(a.borderIncoming, b.borderIncoming, t),
-      borderOutgoing: Color.lerp(a.borderOutgoing, b.borderOutgoing, t),
-      borderOnChatIncoming: Color.lerp(
-        a.borderOnChatIncoming,
-        b.borderOnChatIncoming,
-        t,
-      ),
-      borderOnChatOutgoing: Color.lerp(
-        a.borderOnChatOutgoing,
-        b.borderOnChatOutgoing,
-        t,
-      ),
-      threadConnectorIncoming: Color.lerp(
-        a.threadConnectorIncoming,
-        b.threadConnectorIncoming,
-        t,
-      ),
-      threadConnectorOutgoing: Color.lerp(
-        a.threadConnectorOutgoing,
-        b.threadConnectorOutgoing,
-        t,
-      ),
-      progressTrackIncoming: Color.lerp(
-        a.progressTrackIncoming,
-        b.progressTrackIncoming,
-        t,
-      ),
-      progressTrackOutgoing: Color.lerp(
-        a.progressTrackOutgoing,
-        b.progressTrackOutgoing,
-        t,
-      ),
-      progressFillIncoming: Color.lerp(
-        a.progressFillIncoming,
-        b.progressFillIncoming,
-        t,
-      ),
-      progressFillOutgoing: Color.lerp(
-        a.progressFillOutgoing,
-        b.progressFillOutgoing,
-        t,
-      ),
-      replyIndicatorIncoming: Color.lerp(
-        a.replyIndicatorIncoming,
-        b.replyIndicatorIncoming,
-        t,
-      ),
-      replyIndicatorOutgoing: Color.lerp(
-        a.replyIndicatorOutgoing,
-        b.replyIndicatorOutgoing,
-        t,
-      ),
-      waveFormBar: Color.lerp(a.waveFormBar, b.waveFormBar, t),
-      waveFormBarPlaying: Color.lerp(
-        a.waveFormBarPlaying,
-        b.waveFormBarPlaying,
-        t,
-      ),
+      incoming: t < 0.5 ? a.incoming : b.incoming,
+      outgoing: t < 0.5 ? a.outgoing : b.outgoing,
     );
   }
 
   StreamMessageThemeData copyWith({
-    Color? backgroundIncoming,
-    Color? backgroundOutgoing,
-    Color? backgroundAttachmentIncoming,
-    Color? backgroundAttachmentOutgoing,
-    Color? backgroundTypingIndicator,
-    Color? textIncoming,
-    Color? textOutgoing,
-    Color? textUsername,
-    Color? textTimestamp,
-    Color? textMention,
-    Color? textLink,
-    Color? textReaction,
-    Color? textSystem,
-    Color? borderIncoming,
-    Color? borderOutgoing,
-    Color? borderOnChatIncoming,
-    Color? borderOnChatOutgoing,
-    Color? threadConnectorIncoming,
-    Color? threadConnectorOutgoing,
-    Color? progressTrackIncoming,
-    Color? progressTrackOutgoing,
-    Color? progressFillIncoming,
-    Color? progressFillOutgoing,
-    Color? replyIndicatorIncoming,
-    Color? replyIndicatorOutgoing,
-    Color? waveFormBar,
-    Color? waveFormBarPlaying,
+    StreamThemeMessageStyle? incoming,
+    StreamThemeMessageStyle? outgoing,
   }) {
     final _this = (this as StreamMessageThemeData);
 
     return StreamMessageThemeData(
-      backgroundIncoming: backgroundIncoming ?? _this.backgroundIncoming,
-      backgroundOutgoing: backgroundOutgoing ?? _this.backgroundOutgoing,
-      backgroundAttachmentIncoming:
-          backgroundAttachmentIncoming ?? _this.backgroundAttachmentIncoming,
-      backgroundAttachmentOutgoing:
-          backgroundAttachmentOutgoing ?? _this.backgroundAttachmentOutgoing,
-      backgroundTypingIndicator:
-          backgroundTypingIndicator ?? _this.backgroundTypingIndicator,
-      textIncoming: textIncoming ?? _this.textIncoming,
-      textOutgoing: textOutgoing ?? _this.textOutgoing,
-      textUsername: textUsername ?? _this.textUsername,
-      textTimestamp: textTimestamp ?? _this.textTimestamp,
-      textMention: textMention ?? _this.textMention,
-      textLink: textLink ?? _this.textLink,
-      textReaction: textReaction ?? _this.textReaction,
-      textSystem: textSystem ?? _this.textSystem,
-      borderIncoming: borderIncoming ?? _this.borderIncoming,
-      borderOutgoing: borderOutgoing ?? _this.borderOutgoing,
-      borderOnChatIncoming: borderOnChatIncoming ?? _this.borderOnChatIncoming,
-      borderOnChatOutgoing: borderOnChatOutgoing ?? _this.borderOnChatOutgoing,
-      threadConnectorIncoming:
-          threadConnectorIncoming ?? _this.threadConnectorIncoming,
-      threadConnectorOutgoing:
-          threadConnectorOutgoing ?? _this.threadConnectorOutgoing,
-      progressTrackIncoming:
-          progressTrackIncoming ?? _this.progressTrackIncoming,
-      progressTrackOutgoing:
-          progressTrackOutgoing ?? _this.progressTrackOutgoing,
-      progressFillIncoming: progressFillIncoming ?? _this.progressFillIncoming,
-      progressFillOutgoing: progressFillOutgoing ?? _this.progressFillOutgoing,
-      replyIndicatorIncoming:
-          replyIndicatorIncoming ?? _this.replyIndicatorIncoming,
-      replyIndicatorOutgoing:
-          replyIndicatorOutgoing ?? _this.replyIndicatorOutgoing,
-      waveFormBar: waveFormBar ?? _this.waveFormBar,
-      waveFormBarPlaying: waveFormBarPlaying ?? _this.waveFormBarPlaying,
+      incoming: incoming ?? _this.incoming,
+      outgoing: outgoing ?? _this.outgoing,
     );
   }
 
@@ -207,33 +59,8 @@ mixin _$StreamMessageThemeData {
     }
 
     return copyWith(
-      backgroundIncoming: other.backgroundIncoming,
-      backgroundOutgoing: other.backgroundOutgoing,
-      backgroundAttachmentIncoming: other.backgroundAttachmentIncoming,
-      backgroundAttachmentOutgoing: other.backgroundAttachmentOutgoing,
-      backgroundTypingIndicator: other.backgroundTypingIndicator,
-      textIncoming: other.textIncoming,
-      textOutgoing: other.textOutgoing,
-      textUsername: other.textUsername,
-      textTimestamp: other.textTimestamp,
-      textMention: other.textMention,
-      textLink: other.textLink,
-      textReaction: other.textReaction,
-      textSystem: other.textSystem,
-      borderIncoming: other.borderIncoming,
-      borderOutgoing: other.borderOutgoing,
-      borderOnChatIncoming: other.borderOnChatIncoming,
-      borderOnChatOutgoing: other.borderOnChatOutgoing,
-      threadConnectorIncoming: other.threadConnectorIncoming,
-      threadConnectorOutgoing: other.threadConnectorOutgoing,
-      progressTrackIncoming: other.progressTrackIncoming,
-      progressTrackOutgoing: other.progressTrackOutgoing,
-      progressFillIncoming: other.progressFillIncoming,
-      progressFillOutgoing: other.progressFillOutgoing,
-      replyIndicatorIncoming: other.replyIndicatorIncoming,
-      replyIndicatorOutgoing: other.replyIndicatorOutgoing,
-      waveFormBar: other.waveFormBar,
-      waveFormBarPlaying: other.waveFormBarPlaying,
+      incoming: _this.incoming?.merge(other.incoming) ?? other.incoming,
+      outgoing: _this.outgoing?.merge(other.outgoing) ?? other.outgoing,
     );
   }
 
@@ -250,70 +77,243 @@ mixin _$StreamMessageThemeData {
     final _this = (this as StreamMessageThemeData);
     final _other = (other as StreamMessageThemeData);
 
-    return _other.backgroundIncoming == _this.backgroundIncoming &&
-        _other.backgroundOutgoing == _this.backgroundOutgoing &&
-        _other.backgroundAttachmentIncoming ==
-            _this.backgroundAttachmentIncoming &&
-        _other.backgroundAttachmentOutgoing ==
-            _this.backgroundAttachmentOutgoing &&
-        _other.backgroundTypingIndicator == _this.backgroundTypingIndicator &&
-        _other.textIncoming == _this.textIncoming &&
-        _other.textOutgoing == _this.textOutgoing &&
-        _other.textUsername == _this.textUsername &&
-        _other.textTimestamp == _this.textTimestamp &&
-        _other.textMention == _this.textMention &&
-        _other.textLink == _this.textLink &&
-        _other.textReaction == _this.textReaction &&
-        _other.textSystem == _this.textSystem &&
-        _other.borderIncoming == _this.borderIncoming &&
-        _other.borderOutgoing == _this.borderOutgoing &&
-        _other.borderOnChatIncoming == _this.borderOnChatIncoming &&
-        _other.borderOnChatOutgoing == _this.borderOnChatOutgoing &&
-        _other.threadConnectorIncoming == _this.threadConnectorIncoming &&
-        _other.threadConnectorOutgoing == _this.threadConnectorOutgoing &&
-        _other.progressTrackIncoming == _this.progressTrackIncoming &&
-        _other.progressTrackOutgoing == _this.progressTrackOutgoing &&
-        _other.progressFillIncoming == _this.progressFillIncoming &&
-        _other.progressFillOutgoing == _this.progressFillOutgoing &&
-        _other.replyIndicatorIncoming == _this.replyIndicatorIncoming &&
-        _other.replyIndicatorOutgoing == _this.replyIndicatorOutgoing &&
-        _other.waveFormBar == _this.waveFormBar &&
-        _other.waveFormBarPlaying == _this.waveFormBarPlaying;
+    return _other.incoming == _this.incoming &&
+        _other.outgoing == _this.outgoing;
   }
 
   @override
   int get hashCode {
     final _this = (this as StreamMessageThemeData);
 
-    return Object.hashAll([
+    return Object.hash(runtimeType, _this.incoming, _this.outgoing);
+  }
+}
+
+mixin _$StreamThemeMessageStyle {
+  bool get canMerge => true;
+
+  static StreamThemeMessageStyle? lerp(
+    StreamThemeMessageStyle? a,
+    StreamThemeMessageStyle? b,
+    double t,
+  ) {
+    if (identical(a, b)) {
+      return a;
+    }
+
+    if (a == null) {
+      return t == 1.0 ? b : null;
+    }
+
+    if (b == null) {
+      return t == 0.0 ? a : null;
+    }
+
+    return StreamThemeMessageStyle(
+      backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+      backgroundAttachmentColor: Color.lerp(
+        a.backgroundAttachmentColor,
+        b.backgroundAttachmentColor,
+        t,
+      ),
+      backgroundTypingIndicatorColor: Color.lerp(
+        a.backgroundTypingIndicatorColor,
+        b.backgroundTypingIndicatorColor,
+        t,
+      ),
+      textColor: Color.lerp(a.textColor, b.textColor, t),
+      textUsernameColor: Color.lerp(
+        a.textUsernameColor,
+        b.textUsernameColor,
+        t,
+      ),
+      textTimestampColor: Color.lerp(
+        a.textTimestampColor,
+        b.textTimestampColor,
+        t,
+      ),
+      textMentionColor: Color.lerp(a.textMentionColor, b.textMentionColor, t),
+      textLinkColor: Color.lerp(a.textLinkColor, b.textLinkColor, t),
+      textReactionColor: Color.lerp(
+        a.textReactionColor,
+        b.textReactionColor,
+        t,
+      ),
+      textSystemColor: Color.lerp(a.textSystemColor, b.textSystemColor, t),
+      borderColor: Color.lerp(a.borderColor, b.borderColor, t),
+      borderOnChatColor: Color.lerp(
+        a.borderOnChatColor,
+        b.borderOnChatColor,
+        t,
+      ),
+      threadConnectorColor: Color.lerp(
+        a.threadConnectorColor,
+        b.threadConnectorColor,
+        t,
+      ),
+      progressTrackColor: Color.lerp(
+        a.progressTrackColor,
+        b.progressTrackColor,
+        t,
+      ),
+      progressFillColor: Color.lerp(
+        a.progressFillColor,
+        b.progressFillColor,
+        t,
+      ),
+      replyIndicatorColor: Color.lerp(
+        a.replyIndicatorColor,
+        b.replyIndicatorColor,
+        t,
+      ),
+      waveFormBarColor: Color.lerp(a.waveFormBarColor, b.waveFormBarColor, t),
+      waveFormBarPlayingColor: Color.lerp(
+        a.waveFormBarPlayingColor,
+        b.waveFormBarPlayingColor,
+        t,
+      ),
+    );
+  }
+
+  StreamThemeMessageStyle copyWith({
+    Color? backgroundColor,
+    Color? backgroundAttachmentColor,
+    Color? backgroundTypingIndicatorColor,
+    Color? textColor,
+    Color? textUsernameColor,
+    Color? textTimestampColor,
+    Color? textMentionColor,
+    Color? textLinkColor,
+    Color? textReactionColor,
+    Color? textSystemColor,
+    Color? borderColor,
+    Color? borderOnChatColor,
+    Color? threadConnectorColor,
+    Color? progressTrackColor,
+    Color? progressFillColor,
+    Color? replyIndicatorColor,
+    Color? waveFormBarColor,
+    Color? waveFormBarPlayingColor,
+  }) {
+    final _this = (this as StreamThemeMessageStyle);
+
+    return StreamThemeMessageStyle(
+      backgroundColor: backgroundColor ?? _this.backgroundColor,
+      backgroundAttachmentColor:
+          backgroundAttachmentColor ?? _this.backgroundAttachmentColor,
+      backgroundTypingIndicatorColor:
+          backgroundTypingIndicatorColor ??
+          _this.backgroundTypingIndicatorColor,
+      textColor: textColor ?? _this.textColor,
+      textUsernameColor: textUsernameColor ?? _this.textUsernameColor,
+      textTimestampColor: textTimestampColor ?? _this.textTimestampColor,
+      textMentionColor: textMentionColor ?? _this.textMentionColor,
+      textLinkColor: textLinkColor ?? _this.textLinkColor,
+      textReactionColor: textReactionColor ?? _this.textReactionColor,
+      textSystemColor: textSystemColor ?? _this.textSystemColor,
+      borderColor: borderColor ?? _this.borderColor,
+      borderOnChatColor: borderOnChatColor ?? _this.borderOnChatColor,
+      threadConnectorColor: threadConnectorColor ?? _this.threadConnectorColor,
+      progressTrackColor: progressTrackColor ?? _this.progressTrackColor,
+      progressFillColor: progressFillColor ?? _this.progressFillColor,
+      replyIndicatorColor: replyIndicatorColor ?? _this.replyIndicatorColor,
+      waveFormBarColor: waveFormBarColor ?? _this.waveFormBarColor,
+      waveFormBarPlayingColor:
+          waveFormBarPlayingColor ?? _this.waveFormBarPlayingColor,
+    );
+  }
+
+  StreamThemeMessageStyle merge(StreamThemeMessageStyle? other) {
+    final _this = (this as StreamThemeMessageStyle);
+
+    if (other == null || identical(_this, other)) {
+      return _this;
+    }
+
+    if (!other.canMerge) {
+      return other;
+    }
+
+    return copyWith(
+      backgroundColor: other.backgroundColor,
+      backgroundAttachmentColor: other.backgroundAttachmentColor,
+      backgroundTypingIndicatorColor: other.backgroundTypingIndicatorColor,
+      textColor: other.textColor,
+      textUsernameColor: other.textUsernameColor,
+      textTimestampColor: other.textTimestampColor,
+      textMentionColor: other.textMentionColor,
+      textLinkColor: other.textLinkColor,
+      textReactionColor: other.textReactionColor,
+      textSystemColor: other.textSystemColor,
+      borderColor: other.borderColor,
+      borderOnChatColor: other.borderOnChatColor,
+      threadConnectorColor: other.threadConnectorColor,
+      progressTrackColor: other.progressTrackColor,
+      progressFillColor: other.progressFillColor,
+      replyIndicatorColor: other.replyIndicatorColor,
+      waveFormBarColor: other.waveFormBarColor,
+      waveFormBarPlayingColor: other.waveFormBarPlayingColor,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final _this = (this as StreamThemeMessageStyle);
+    final _other = (other as StreamThemeMessageStyle);
+
+    return _other.backgroundColor == _this.backgroundColor &&
+        _other.backgroundAttachmentColor == _this.backgroundAttachmentColor &&
+        _other.backgroundTypingIndicatorColor ==
+            _this.backgroundTypingIndicatorColor &&
+        _other.textColor == _this.textColor &&
+        _other.textUsernameColor == _this.textUsernameColor &&
+        _other.textTimestampColor == _this.textTimestampColor &&
+        _other.textMentionColor == _this.textMentionColor &&
+        _other.textLinkColor == _this.textLinkColor &&
+        _other.textReactionColor == _this.textReactionColor &&
+        _other.textSystemColor == _this.textSystemColor &&
+        _other.borderColor == _this.borderColor &&
+        _other.borderOnChatColor == _this.borderOnChatColor &&
+        _other.threadConnectorColor == _this.threadConnectorColor &&
+        _other.progressTrackColor == _this.progressTrackColor &&
+        _other.progressFillColor == _this.progressFillColor &&
+        _other.replyIndicatorColor == _this.replyIndicatorColor &&
+        _other.waveFormBarColor == _this.waveFormBarColor &&
+        _other.waveFormBarPlayingColor == _this.waveFormBarPlayingColor;
+  }
+
+  @override
+  int get hashCode {
+    final _this = (this as StreamThemeMessageStyle);
+
+    return Object.hash(
       runtimeType,
-      _this.backgroundIncoming,
-      _this.backgroundOutgoing,
-      _this.backgroundAttachmentIncoming,
-      _this.backgroundAttachmentOutgoing,
-      _this.backgroundTypingIndicator,
-      _this.textIncoming,
-      _this.textOutgoing,
-      _this.textUsername,
-      _this.textTimestamp,
-      _this.textMention,
-      _this.textLink,
-      _this.textReaction,
-      _this.textSystem,
-      _this.borderIncoming,
-      _this.borderOutgoing,
-      _this.borderOnChatIncoming,
-      _this.borderOnChatOutgoing,
-      _this.threadConnectorIncoming,
-      _this.threadConnectorOutgoing,
-      _this.progressTrackIncoming,
-      _this.progressTrackOutgoing,
-      _this.progressFillIncoming,
-      _this.progressFillOutgoing,
-      _this.replyIndicatorIncoming,
-      _this.replyIndicatorOutgoing,
-      _this.waveFormBar,
-      _this.waveFormBarPlaying,
-    ]);
+      _this.backgroundColor,
+      _this.backgroundAttachmentColor,
+      _this.backgroundTypingIndicatorColor,
+      _this.textColor,
+      _this.textUsernameColor,
+      _this.textTimestampColor,
+      _this.textMentionColor,
+      _this.textLinkColor,
+      _this.textReactionColor,
+      _this.textSystemColor,
+      _this.borderColor,
+      _this.borderOnChatColor,
+      _this.threadConnectorColor,
+      _this.progressTrackColor,
+      _this.progressFillColor,
+      _this.replyIndicatorColor,
+      _this.waveFormBarColor,
+      _this.waveFormBarPlayingColor,
+    );
   }
 }
