@@ -4,6 +4,8 @@ export 'theme/components/stream_avatar_theme.dart';
 export 'theme/components/stream_badge_count_theme.dart';
 export 'theme/components/stream_button_theme.dart';
 export 'theme/components/stream_emoji_button_theme.dart';
+export 'theme/components/stream_input_theme.dart';
+export 'theme/components/stream_message_theme.dart';
 export 'theme/components/stream_online_indicator_theme.dart';
 
 export 'theme/primitives/stream_colors.dart';

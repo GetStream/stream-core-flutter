@@ -32,66 +32,104 @@ class StreamMessageTheme extends InheritedTheme {
 @immutable
 class StreamMessageThemeData with _$StreamMessageThemeData {
   const StreamMessageThemeData({
-    this.backgroundIncoming,
-    this.backgroundOutgoing,
-    this.backgroundAttachmentIncoming,
-    this.backgroundAttachmentOutgoing,
-    this.backgroundTypingIndicator,
-    this.textIncoming,
-    this.textOutgoing,
-    this.textUsername,
-    this.textTimestamp,
-    this.textMention,
-    this.textLink,
-    this.textReaction,
-    this.textSystem,
-    this.borderIncoming,
-    this.borderOutgoing,
-    this.borderOnChatIncoming,
-    this.borderOnChatOutgoing,
-    this.threadConnectorIncoming,
-    this.threadConnectorOutgoing,
-    this.progressTrackIncoming,
-    this.progressTrackOutgoing,
-    this.progressFillIncoming,
-    this.progressFillOutgoing,
-    this.replyIndicatorIncoming,
-    this.replyIndicatorOutgoing,
-    this.waveFormBar,
-    this.waveFormBarPlaying,
+    this.incoming,
+    this.outgoing,
   });
 
-  final Color? backgroundIncoming;
-  final Color? backgroundOutgoing;
-  final Color? backgroundAttachmentIncoming;
-  final Color? backgroundAttachmentOutgoing;
-  final Color? backgroundTypingIndicator;
+  final StreamMessageStyle? incoming;
+  final StreamMessageStyle? outgoing;
 
-  final Color? textIncoming;
-  final Color? textOutgoing;
-  final Color? textUsername;
-  final Color? textTimestamp;
-  final Color? textMention;
-  final Color? textLink;
-  final Color? textReaction;
-  final Color? textSystem;
+  StreamMessageThemeData mergeWithDefaults(BuildContext context) {
+    final defaults = _MessageThemeDefaults(context: context);
+    return StreamMessageThemeData(incoming: defaults.incoming, outgoing: defaults.outgoing).merge(this);
+  }
+}
 
-  final Color? borderIncoming;
-  final Color? borderOutgoing;
-  final Color? borderOnChatIncoming;
-  final Color? borderOnChatOutgoing;
+@themeGen
+@immutable
+class StreamMessageStyle with _$StreamMessageStyle {
+  const StreamMessageStyle({
+    this.backgroundColor,
+    this.backgroundAttachmentColor,
+    this.backgroundTypingIndicatorColor,
+    this.textColor,
+    this.textUsernameColor,
+    this.textTimestampColor,
+    this.textMentionColor,
+    this.textLinkColor,
+    this.textReactionColor,
+    this.textSystemColor,
+    this.borderColor,
+    this.borderOnChatColor,
+    this.threadConnectorColor,
+    this.progressTrackColor,
+    this.progressFillColor,
+    this.replyIndicatorColor,
+    this.waveFormBarColor,
+    this.waveFormBarPlayingColor,
+  });
 
-  final Color? threadConnectorIncoming;
-  final Color? threadConnectorOutgoing;
+  final Color? backgroundColor;
+  final Color? backgroundAttachmentColor;
+  final Color? backgroundTypingIndicatorColor;
 
-  final Color? progressTrackIncoming;
-  final Color? progressTrackOutgoing;
-  final Color? progressFillIncoming;
-  final Color? progressFillOutgoing;
+  final Color? textColor;
+  final Color? textUsernameColor;
+  final Color? textTimestampColor;
+  final Color? textMentionColor;
+  final Color? textLinkColor;
+  final Color? textReactionColor;
+  final Color? textSystemColor;
 
-  final Color? replyIndicatorIncoming;
-  final Color? replyIndicatorOutgoing;
+  final Color? borderColor;
+  final Color? borderOnChatColor;
 
-  final Color? waveFormBar;
-  final Color? waveFormBarPlaying;
+  final Color? threadConnectorColor;
+
+  final Color? progressTrackColor;
+  final Color? progressFillColor;
+
+  final Color? replyIndicatorColor;
+
+  final Color? waveFormBarColor;
+  final Color? waveFormBarPlayingColor;
+}
+
+class _MessageThemeDefaults {
+  _MessageThemeDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+
+  StreamMessageStyle get incoming => StreamMessageStyle(
+    backgroundColor: _colorScheme.backgroundSurface,
+    backgroundAttachmentColor: _colorScheme.backgroundSurfaceStrong,
+    backgroundTypingIndicatorColor: _colorScheme.accentNeutral,
+    textColor: _colorScheme.textPrimary,
+    textUsernameColor: _colorScheme.textSecondary,
+    textTimestampColor: _colorScheme.textTertiary,
+    textMentionColor: _colorScheme.textLink,
+    textLinkColor: _colorScheme.textLink,
+    textReactionColor: _colorScheme.textSecondary,
+    textSystemColor: _colorScheme.textSecondary,
+    borderColor: _colorScheme.borderSubtle,
+    borderOnChatColor: _colorScheme.borderOnSurface,
+    replyIndicatorColor: _colorScheme.borderOnSurface,
+  );
+
+  StreamMessageStyle get outgoing => StreamMessageStyle(
+    backgroundColor: _colorScheme.brand.shade100,
+    backgroundAttachmentColor: _colorScheme.brand.shade150,
+    backgroundTypingIndicatorColor: _colorScheme.accentNeutral,
+    textColor: _colorScheme.brand.shade900,
+    textUsernameColor: _colorScheme.textSecondary,
+    textTimestampColor: _colorScheme.textTertiary,
+    textMentionColor: _colorScheme.textLink,
+    textLinkColor: _colorScheme.textLink,
+    textReactionColor: _colorScheme.textSecondary,
+    textSystemColor: _colorScheme.textSecondary,
+    borderColor: _colorScheme.brand.shade100,
+    borderOnChatColor: _colorScheme.brand.shade300,
+    replyIndicatorColor: _colorScheme.brand.shade400,
+  );
 }

@@ -76,6 +76,42 @@ void main() {
         ],
       ),
     );
+
+    goldenTest(
+      'renders custom theme style matrix',
+      fileName: 'message_composer_attachment_reply_custom_matrix',
+      builder: () => GoldenTestGroup(
+        scenarioConstraints: const BoxConstraints(maxWidth: 360),
+        children: [
+          for (final style in ReplyStyle.values)
+            GoldenTestScenario(
+              name: style.name,
+              child: _buildReplyInTheme(
+                StreamMessageTheme(
+                  data: const StreamMessageThemeData(
+                    incoming: StreamMessageStyle(
+                      backgroundColor: Colors.red,
+                      replyIndicatorColor: Colors.green,
+                      textColor: Colors.white,
+                    ),
+                    outgoing: StreamMessageStyle(
+                      backgroundColor: Colors.blue,
+                      replyIndicatorColor: Colors.yellow,
+                      textColor: Colors.white,
+                    ),
+                  ),
+                  child: MessageComposerAttachmentReply(
+                    title: 'Reply to John Doe',
+                    subtitle: 'We had a great time during our holiday.',
+                    onRemovePressed: null,
+                    style: style,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   });
 }
 
