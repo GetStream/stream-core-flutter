@@ -129,12 +129,11 @@ class _SizeVariantsSection extends StatelessWidget {
                 ),
               ),
               SizedBox(height: spacing.md),
-              Row(
+              Wrap(
+                spacing: spacing.xl,
+                runSpacing: spacing.xl,
                 children: [
-                  for (final size in StreamEmojiSize.values) ...[
-                    _SizeDemo(size: size),
-                    if (size != StreamEmojiSize.values.last) SizedBox(width: spacing.xl),
-                  ],
+                  for (final size in StreamEmojiSize.values) _SizeDemo(size: size),
                 ],
               ),
             ],

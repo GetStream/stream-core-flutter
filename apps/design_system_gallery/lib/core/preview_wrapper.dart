@@ -7,8 +7,15 @@ import '../config/preview_configuration.dart';
 
 /// Wrapper widget that applies device frame and text scale to the preview.
 ///
-/// Uses [ListenableBuilder] to explicitly react to [PreviewConfiguration] changes.
-/// StreamTheme is already available via MaterialApp's theme extensions.
+/// Uses a nested [Navigator] so that dialogs and bottom sheets open within
+/// the preview container rather than covering the entire gallery app.
+///
+/// The declarative [Navigator.pages] API is used instead of [onGenerateRoute]
+/// so that theme changes propagate into the route content without recreating
+/// the navigator (which would reset use-case state).
+///
+/// A [GlobalObjectKey] is used on the [Navigator] so that toggling the device
+/// frame on/off reparents the navigator without losing state.
 class PreviewWrapper extends StatelessWidget {
   const PreviewWrapper({super.key, required this.child});
 
@@ -23,20 +30,24 @@ class PreviewWrapper extends StatelessWidget {
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
-    final content = Directionality(
-      textDirection: previewConfig.textDirection,
-      child: MediaQuery(
+    final content = Builder(
+      builder: (context) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          textScaler: TextScaler.linear(previewConfig.textScale),
+          textScaler: .linear(previewConfig.textScale),
         ),
-        child: ColoredBox(
-          color: colorScheme.backgroundApp,
-          child: ScaffoldMessenger(
-            child: Navigator(
-              onGenerateRoute: (_) => MaterialPageRoute(
-                builder: (_) => Scaffold(body: child),
+        child: Directionality(
+          textDirection: previewConfig.textDirection,
+          child: Navigator(
+            key: const GlobalObjectKey('preview-navigator'),
+            pages: [
+              MaterialPage(
+                child: ScaffoldMessenger(
+                  child: Scaffold(body: child),
+                ),
               ),
-            ),
+            ],
+            // no-op as the preview page should never be popped
+            onDidRemovePage: (_) {},
           ),
         ),
       ),
@@ -60,7 +71,6 @@ class PreviewWrapper extends StatelessWidget {
         margin: EdgeInsets.all(spacing.lg),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: colorScheme.backgroundApp,
           borderRadius: BorderRadius.all(radius.xl),
           boxShadow: boxShadow.elevation3,
         ),

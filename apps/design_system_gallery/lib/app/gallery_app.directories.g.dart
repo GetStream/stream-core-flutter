@@ -305,24 +305,9 @@ final directories = <_widgetbook.WidgetbookNode>[
                     .buildStreamButtonPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
-                name: 'Real-world Example',
+                name: 'Showcase',
                 builder: _design_system_gallery_components_buttons_button
-                    .buildStreamButtonExample,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Size Variants',
-                builder: _design_system_gallery_components_buttons_button
-                    .buildStreamButtonSizes,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Type Variants',
-                builder: _design_system_gallery_components_buttons_button
-                    .buildStreamButtonTypes,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'With Icons',
-                builder: _design_system_gallery_components_buttons_button
-                    .buildStreamButtonWithIcons,
+                    .buildStreamButtonShowcase,
               ),
             ],
           ),
