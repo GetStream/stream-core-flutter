@@ -2,19 +2,64 @@ import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_button_theme.dart';
+import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
+/// A versatile button with support for multiple styles, types, and sizes.
+///
+/// [StreamButton] renders a label-based button or an icon-only button via the
+/// [StreamButton.icon] constructor. The button adapts its appearance based on
+/// the combination of [StreamButtonStyle], [StreamButtonType], and interaction
+/// state (hover, pressed, disabled, selected).
+///
+/// All visual states can be customized via [StreamButtonTheme].
+///
+/// {@tool snippet}
+///
+/// Display a primary solid button:
+///
+/// ```dart
+/// StreamButton(
+///   label: 'Submit',
+///   onTap: () => print('submitted'),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Display a selectable ghost button:
+///
+/// ```dart
+/// StreamButton(
+///   label: 'Filter',
+///   style: StreamButtonStyle.secondary,
+///   type: StreamButtonType.ghost,
+///   isSelected: isActive,
+///   onTap: () => toggleFilter(),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// See also:
+///
+///  * [StreamButtonTheme], for customizing button appearance.
+///  * [StreamButtonStyle], for available style variants.
+///  * [StreamButtonType], for available type variants.
+///  * [StreamButtonSize], for available size variants.
 class StreamButton extends StatelessWidget {
+  /// Creates a label button with optional leading and trailing icons.
   StreamButton({
     super.key,
     required String label,
     VoidCallback? onTap,
-    StreamButtonStyle style = StreamButtonStyle.primary,
-    StreamButtonType type = StreamButtonType.solid,
-    StreamButtonSize size = StreamButtonSize.medium,
+    StreamButtonStyle style = .primary,
+    StreamButtonType type = .solid,
+    StreamButtonSize size = .medium,
     IconData? iconLeft,
     IconData? iconRight,
+    bool? isSelected,
   }) : props = .new(
          label: label,
          onTap: onTap,
@@ -23,27 +68,32 @@ class StreamButton extends StatelessWidget {
          size: size,
          iconLeft: iconLeft,
          iconRight: iconRight,
+         isSelected: isSelected,
        );
 
+  /// Creates a circular icon-only button.
+  ///
+  /// Set [isFloating] to true for an floating button with a shadow.
   StreamButton.icon({
     super.key,
     VoidCallback? onTap,
-    StreamButtonStyle style = StreamButtonStyle.primary,
-    StreamButtonType type = StreamButtonType.solid,
-    StreamButtonSize size = StreamButtonSize.medium,
+    StreamButtonStyle style = .primary,
+    StreamButtonType type = .solid,
+    StreamButtonSize size = .medium,
     IconData? icon,
-    bool isFloating = false,
+    bool? isFloating,
+    bool? isSelected,
   }) : props = .new(
-         label: null,
          onTap: onTap,
          style: style,
          type: type,
          size: size,
          iconLeft: icon,
-         iconRight: null,
          isFloating: isFloating,
+         isSelected: isSelected,
        );
 
+  /// The props controlling the appearance and behavior of this button.
   final StreamButtonProps props;
 
   @override
@@ -54,205 +104,643 @@ class StreamButton extends StatelessWidget {
   }
 }
 
+/// Properties for configuring a [StreamButton].
+///
+/// This class holds all the configuration options for a button,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamButton], which uses these properties.
+///  * [DefaultStreamButton], the default implementation.
 class StreamButtonProps {
+  /// Creates properties for a button.
   const StreamButtonProps({
-    required this.label,
-    required this.onTap,
-    required this.style,
-    required this.type,
-    required this.size,
-    required this.iconLeft,
-    required this.iconRight,
-    this.isFloating = false,
+    this.label,
+    this.onTap,
+    this.style = .primary,
+    this.type = .solid,
+    this.size = .medium,
+    this.iconLeft,
+    this.iconRight,
+    this.isFloating,
+    this.isSelected,
   });
 
+  /// The label text displayed on the button.
+  ///
+  /// If null, the button is rendered as a circular icon-only button.
   final String? label;
+
+  /// Called when the button is pressed.
+  ///
+  /// If null, the button will be disabled.
   final VoidCallback? onTap;
+
+  /// The visual style variant of the button.
+  ///
+  /// Determines the color scheme used (primary, secondary, destructive).
   final StreamButtonStyle style;
+
+  /// The type variant of the button.
+  ///
+  /// Controls the visual weight (solid, outline, ghost).
   final StreamButtonType type;
+
+  /// The size of the button.
   final StreamButtonSize size;
+
+  /// The icon displayed on the left side of the label.
   final IconData? iconLeft;
+
+  /// The icon displayed on the right side of the label.
   final IconData? iconRight;
-  final bool isFloating;
+
+  /// Whether the button has a floating (elevated) appearance.
+  ///
+  /// When true, the button gains elevation and a background fill
+  /// for outline and ghost types.
+  /// When false or null, the button is not floating.
+  final bool? isFloating;
+
+  /// Whether the button is in a selected state.
+  ///
+  /// When true, the button displays selected styling.
+  /// When false or null, the button is not selected.
+  final bool? isSelected;
 }
 
-enum StreamButtonStyle { primary, secondary, destructive }
+/// The color scheme variant for a [StreamButton].
+///
+/// Each style maps to a distinct set of colors defined in the theme.
+enum StreamButtonStyle {
+  /// Uses the brand/accent color scheme.
+  primary,
 
-enum StreamButtonSize { small, medium, large }
+  /// Uses the neutral/surface color scheme.
+  secondary,
 
-enum StreamButtonType { solid, outline, ghost }
+  /// Uses the error/danger color scheme.
+  destructive,
+}
 
-class DefaultStreamButton extends StatelessWidget {
+/// The visual weight variant for a [StreamButton].
+///
+/// Controls how prominently the button is displayed.
+enum StreamButtonType {
+  /// Filled background with high visual emphasis.
+  solid,
+
+  /// Bordered with transparent background for medium emphasis.
+  outline,
+
+  /// No border or background for low emphasis.
+  ghost,
+}
+
+/// Predefined sizes for [StreamButton].
+///
+/// Each size corresponds to a specific dimension in logical pixels.
+///
+/// See also:
+///
+///  * [StreamButtonThemeData], for setting global button styles.
+enum StreamButtonSize {
+  /// Small button (32px).
+  small(32),
+
+  /// Medium button (40px).
+  medium(40),
+
+  /// Large button (48px).
+  large(48)
+  ;
+
+  /// Constructs a [StreamButtonSize] with the given dimension.
+  const StreamButtonSize(this.value);
+
+  /// The dimension of the button in logical pixels.
+  final double value;
+}
+
+/// Default implementation of [StreamButton].
+///
+/// Renders the button using [ElevatedButton] with theme-aware styling and
+/// state-based visual feedback. Uses [WidgetStatesController] to manage
+/// the selected state.
+class DefaultStreamButton extends StatefulWidget {
+  /// Creates a default button.
   const DefaultStreamButton({super.key, required this.props});
 
+  /// The props controlling the appearance and behavior of this button.
   final StreamButtonProps props;
 
   @override
+  State<DefaultStreamButton> createState() => _DefaultStreamButtonState();
+}
+
+class _DefaultStreamButtonState extends State<DefaultStreamButton> {
+  StreamButtonProps get props => widget.props;
+  late final WidgetStatesController _statesController;
+
+  @override
+  void initState() {
+    super.initState();
+    _statesController = WidgetStatesController(
+      <WidgetState>{if (props.isSelected ?? false) WidgetState.selected},
+    );
+  }
+
+  @override
+  void didUpdateWidget(DefaultStreamButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _statesController.update(WidgetState.selected, props.isSelected ?? false);
+  }
+
+  @override
+  void dispose() {
+    _statesController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final radius = context.streamRadius;
     final spacing = context.streamSpacing;
     final buttonTheme = context.streamButtonTheme;
-    final colorScheme = context.streamColorScheme;
-    final defaults = _StreamButtonDefaults(context: context);
 
-    final themeButtonTypeStyle = switch (props.style) {
-      StreamButtonStyle.primary => buttonTheme.primary,
-      StreamButtonStyle.secondary => buttonTheme.secondary,
-      StreamButtonStyle.destructive => buttonTheme.destructive,
+    final themeStyle = switch ((props.style, props.type)) {
+      (.primary, .solid) => buttonTheme.primary?.solid,
+      (.primary, .outline) => buttonTheme.primary?.outline,
+      (.primary, .ghost) => buttonTheme.primary?.ghost,
+      (.secondary, .solid) => buttonTheme.secondary?.solid,
+      (.secondary, .outline) => buttonTheme.secondary?.outline,
+      (.secondary, .ghost) => buttonTheme.secondary?.ghost,
+      (.destructive, .solid) => buttonTheme.destructive?.solid,
+      (.destructive, .outline) => buttonTheme.destructive?.outline,
+      (.destructive, .ghost) => buttonTheme.destructive?.ghost,
     };
 
-    final themeStyle = switch (props.type) {
-      StreamButtonType.solid => themeButtonTypeStyle?.solid,
-      StreamButtonType.outline => themeButtonTypeStyle?.outline,
-      StreamButtonType.ghost => themeButtonTypeStyle?.ghost,
+    final isFloating = props.isFloating ?? false;
+    final defaults = switch ((props.style, props.type)) {
+      (.primary, .solid) => _PrimarySolidDefaults(context, isFloating: isFloating),
+      (.primary, .outline) => _PrimaryOutlineDefaults(context, isFloating: isFloating),
+      (.primary, .ghost) => _PrimaryGhostDefaults(context, isFloating: isFloating),
+      (.secondary, .solid) => _SecondarySolidDefaults(context, isFloating: isFloating),
+      (.secondary, .outline) => _SecondaryOutlineDefaults(context, isFloating: isFloating),
+      (.secondary, .ghost) => _SecondaryGhostDefaults(context, isFloating: isFloating),
+      (.destructive, .solid) => _DestructiveSolidDefaults(context, isFloating: isFloating),
+      (.destructive, .outline) => _DestructiveOutlineDefaults(context, isFloating: isFloating),
+      (.destructive, .ghost) => _DestructiveGhostDefaults(context, isFloating: isFloating),
     };
 
-    final defaultButtonTypeStyle = switch (props.style) {
-      StreamButtonStyle.primary => defaults.primary,
-      StreamButtonStyle.secondary => defaults.secondary,
-      StreamButtonStyle.destructive => defaults.destructive,
-    };
-    final defaultStyle = switch (props.type) {
-      StreamButtonType.solid => defaultButtonTypeStyle.solid,
-      StreamButtonType.outline => defaultButtonTypeStyle.outline,
-      StreamButtonType.ghost => defaultButtonTypeStyle.ghost,
-    };
+    final effectiveBackgroundColor = themeStyle?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveForegroundColor = themeStyle?.foregroundColor ?? defaults.foregroundColor;
+    final effectiveBorderColor = themeStyle?.borderColor ?? defaults.borderColor;
+    final effectiveOverlayColor = themeStyle?.overlayColor ?? defaults.overlayColor;
+    final effectiveElevation = themeStyle?.elevation ?? defaults.elevation;
 
-    final fallbackBackgroundColor = props.isFloating ? colorScheme.backgroundElevation1 : Colors.transparent;
-
-    final backgroundColor =
-        themeStyle?.backgroundColor ??
-        defaultStyle?.backgroundColor ??
-        WidgetStateProperty.all(fallbackBackgroundColor);
-    final foregroundColor = themeStyle?.foregroundColor ?? defaultStyle?.foregroundColor;
-    final borderColor = themeStyle?.borderColor ?? defaultStyle?.borderColor;
-
-    final minimumSize = switch (props.size) {
-      StreamButtonSize.small => 32.0,
-      StreamButtonSize.medium => 40.0,
-      StreamButtonSize.large => 48.0,
-    };
-
-    const iconSize = 20.0;
+    final buttonSize = props.size.value;
     final isIconButton = props.label == null;
 
     return ElevatedButton(
       onPressed: props.onTap,
+      statesController: _statesController,
       style: ButtonStyle(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        minimumSize: WidgetStateProperty.all(Size(minimumSize, minimumSize)),
-        maximumSize: isIconButton ? WidgetStateProperty.all(Size(minimumSize, minimumSize)) : null,
-        tapTargetSize: MaterialTapTargetSize.padded,
-        elevation: WidgetStateProperty.all(props.isFloating ? 4 : 0),
-        padding: WidgetStateProperty.all(
-          isIconButton ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: spacing.md),
-        ),
-
-        side: borderColor == null
-            ? null
-            : WidgetStateProperty.resolveWith(
-                (states) => BorderSide(color: borderColor.resolve(states)),
-              ),
-        shape: props.label == null
-            ? WidgetStateProperty.all(const CircleBorder())
-            : WidgetStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(context.streamRadius.max),
-                ),
-              ),
+        iconSize: .all(20),
+        tapTargetSize: .padded,
+        visualDensity: .standard,
+        elevation: effectiveElevation,
+        backgroundColor: effectiveBackgroundColor,
+        foregroundColor: effectiveForegroundColor,
+        overlayColor: effectiveOverlayColor,
+        minimumSize: .all(.square(buttonSize)),
+        maximumSize: .all(isIconButton ? .square(buttonSize) : .fromHeight(buttonSize)),
+        padding: .all(isIconButton ? .zero : .symmetric(horizontal: spacing.md)),
+        side: switch (effectiveBorderColor) {
+          final color? => .resolveWith((states) => .new(color: color.resolve(states))),
+          _ => null,
+        },
+        shape: switch (props.label) {
+          null => .all(const CircleBorder()),
+          _ => .all(RoundedRectangleBorder(borderRadius: .all(radius.max))),
+        },
       ),
-      child: isIconButton
-          ? Icon(props.iconLeft, size: iconSize)
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: spacing.xs,
-              children: [
-                if (props.iconLeft case final iconLeft?) Icon(iconLeft, size: iconSize),
-                if (props.label case final label?) Text(label),
-                if (props.iconRight case final iconRight?) Icon(iconRight, size: iconSize),
-              ],
-            ),
+      child: switch (isIconButton) {
+        true => Icon(props.iconLeft),
+        false => Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: spacing.xs,
+          children: [
+            if (props.iconLeft case final iconLeft?) Icon(iconLeft),
+            if (props.label case final label?) Flexible(child: Text(label)),
+            if (props.iconRight case final iconRight?) Icon(iconRight),
+          ],
+        ),
+      },
     );
   }
 }
 
-class _StreamButtonDefaults {
-  _StreamButtonDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
+// -- Primary defaults -------------------------------------------------------
+
+// Default style for primary solid buttons.
+class _PrimarySolidDefaults extends StreamButtonThemeStyle {
+  _PrimarySolidDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;
+  final bool isFloating;
 
-  StreamButtonTypeStyle get primary => StreamButtonTypeStyle(
-    solid: StreamButtonThemeStyle(
-      backgroundColor: WidgetStateProperty.resolveWith(
-        (states) =>
-            states.contains(WidgetState.disabled) ? _colorScheme.backgroundDisabled : _colorScheme.brand.shade500,
-      ),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
-      ),
-    ),
-    outline: StreamButtonThemeStyle(
-      borderColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.brand.shade200,
-      ),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.brand.shade500,
-      ),
-    ),
-    ghost: StreamButtonThemeStyle(
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.brand.shade500,
-      ),
-    ),
-  );
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.backgroundDisabled;
+    final base = _colorScheme.accentPrimary;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
 
-  StreamButtonTypeStyle get secondary => StreamButtonTypeStyle(
-    solid: StreamButtonThemeStyle(
-      backgroundColor: WidgetStateProperty.resolveWith(
-        (states) =>
-            states.contains(WidgetState.disabled) ? _colorScheme.backgroundDisabled : _colorScheme.backgroundSurface,
-      ),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textPrimary,
-      ),
-    ),
-    outline: StreamButtonThemeStyle(
-      borderColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.borderDefault,
-      ),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textPrimary,
-      ),
-    ),
-    ghost: StreamButtonThemeStyle(
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textPrimary,
-      ),
-    ),
-  );
-  StreamButtonTypeStyle get destructive => StreamButtonTypeStyle(
-    solid: StreamButtonThemeStyle(
-      backgroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.backgroundDisabled : _colorScheme.accentError,
-      ),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textOnAccent,
-      ),
-    ),
-    outline: StreamButtonThemeStyle(
-      borderColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.borderDefault : _colorScheme.accentError,
-      ),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.accentError,
-      ),
-    ),
-    ghost: StreamButtonThemeStyle(
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.accentError,
-      ),
-    ),
-  );
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.textOnAccent;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// Default style for primary outline buttons.
+class _PrimaryOutlineDefaults extends StreamButtonThemeStyle {
+  _PrimaryOutlineDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
+    final base = isFloating ? _colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get borderColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.borderDisabled;
+    return _colorScheme.brand.shade200;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.accentPrimary;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// Default style for primary ghost buttons.
+class _PrimaryGhostDefaults extends StreamButtonThemeStyle {
+  _PrimaryGhostDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
+    final base = isFloating ? _colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.accentPrimary;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// -- Secondary defaults -----------------------------------------------------
+
+// Default style for secondary solid buttons.
+class _SecondarySolidDefaults extends StreamButtonThemeStyle {
+  _SecondarySolidDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.backgroundDisabled;
+    final base = _colorScheme.backgroundSurface;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.textPrimary;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// Default style for secondary outline buttons.
+class _SecondaryOutlineDefaults extends StreamButtonThemeStyle {
+  _SecondaryOutlineDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
+    final base = isFloating ? _colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.textPrimary;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get borderColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.borderDisabled;
+    return _colorScheme.borderDefault;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// Default style for secondary ghost buttons.
+class _SecondaryGhostDefaults extends StreamButtonThemeStyle {
+  _SecondaryGhostDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
+    final base = isFloating ? _colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.textPrimary;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// -- Destructive defaults ---------------------------------------------------
+
+// Default style for destructive solid buttons.
+class _DestructiveSolidDefaults extends StreamButtonThemeStyle {
+  _DestructiveSolidDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.backgroundDisabled;
+    final base = _colorScheme.accentError;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.textOnAccent;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// Default style for destructive outline buttons.
+class _DestructiveOutlineDefaults extends StreamButtonThemeStyle {
+  _DestructiveOutlineDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
+    final base = isFloating ? _colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get borderColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.borderDisabled;
+    return _colorScheme.accentError;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.accentError;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
+}
+
+// Default style for destructive ghost buttons.
+class _DestructiveGhostDefaults extends StreamButtonThemeStyle {
+  _DestructiveGhostDefaults(
+    this.context, {
+    required this.isFloating,
+  }) : _colorScheme = context.streamColorScheme;
+
+  final BuildContext context;
+  final StreamColorScheme _colorScheme;
+  final bool isFloating;
+
+  @override
+  WidgetStateProperty<Color>? get backgroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
+    final base = isFloating ? _colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    return base;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.accentError;
+  });
+
+  @override
+  WidgetStateProperty<Color>? get overlayColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    return StreamColors.transparent;
+  });
+
+  @override
+  WidgetStateProperty<double>? get elevation => WidgetStateProperty.resolveWith((states) {
+    if (!isFloating) return 0;
+    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.pressed)) return 6.0;
+    if (states.contains(WidgetState.hovered)) return 8.0;
+    return 6.0;
+  });
 }
