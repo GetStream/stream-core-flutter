@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
-import '../../theme/components/stream_input_theme.dart';
-import '../../theme/components/stream_message_theme.dart';
 
 class StreamBaseMessageComposer extends StatefulWidget {
   const StreamBaseMessageComposer({
