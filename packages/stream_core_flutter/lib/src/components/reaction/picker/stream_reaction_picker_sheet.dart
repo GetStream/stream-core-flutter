@@ -164,6 +164,7 @@ class StreamReactionPickerSheet extends StatefulWidget {
 
     return showModalBottomSheet<Emoji>(
       context: context,
+      useSafeArea: true,
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: effectiveBackgroundColor,
@@ -476,50 +477,26 @@ class _CategoryTabBarState extends State<_CategoryTabBar> {
       ),
       child: SingleChildScrollView(
         scrollDirection: .horizontal,
-        padding: EdgeInsetsDirectional.only(
-          start: spacing.md,
-          end: spacing.md,
-          top: spacing.xs,
+        padding: EdgeInsetsDirectional.symmetric(
+          vertical: spacing.xs,
+          horizontal: spacing.md,
         ),
         child: Row(
           spacing: spacing.xxxs,
           children: [
             for (final category in widget.categories)
-              _CategoryTab(
+              StreamButton.icon(
                 key: _tabKeys[category],
                 icon: category.icon(context),
-                isActive: category == widget.activeCategory,
+                style: StreamButtonStyle.secondary,
+                type: StreamButtonType.ghost,
+                size: StreamButtonSize.large,
+                isSelected: category == widget.activeCategory,
                 onTap: () => widget.onCategorySelected(category),
               ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _CategoryTab extends StatelessWidget {
-  const _CategoryTab({
-    super.key,
-    required this.icon,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-
-    // TODO: Use StreamIconButton when available (with isSelected support)
-    return StreamEmojiButton(
-      size: .lg,
-      emoji: Icon(icon, color: colorScheme.textSecondary),
-      isSelected: isActive,
-      onPressed: onTap,
     );
   }
 }
