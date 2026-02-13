@@ -10,7 +10,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(
   name: 'Playground',
   type: StreamOnlineIndicator,
-  path: '[Components]/Indicator',
+  path: '[Components]/Badge',
 )
 Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
   final isOnline = context.knobs.boolean(
@@ -105,7 +105,7 @@ Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
 @widgetbook.UseCase(
   name: 'Showcase',
   type: StreamOnlineIndicator,
-  path: '[Components]/Indicator',
+  path: '[Components]/Badge',
 )
 Widget buildStreamOnlineIndicatorShowcase(BuildContext context) {
   final colorScheme = context.streamColorScheme;

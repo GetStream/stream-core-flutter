@@ -29,6 +29,7 @@ class StreamSpacing with _$StreamSpacing {
   /// Creates a [StreamSpacing] with the default values.
   const StreamSpacing({
     this.none = 0,
+    this.xxxs = 2,
     this.xxs = 4,
     this.xs = 8,
     this.sm = 12,
@@ -43,6 +44,11 @@ class StreamSpacing with _$StreamSpacing {
   ///
   /// Used for tight component joins.
   final double none;
+
+  /// Extra extra extra small spacing.
+  ///
+  /// Used for very tight spacing between closely related elements.
+  final double xxxs;
 
   /// Base unit spacing.
   ///
