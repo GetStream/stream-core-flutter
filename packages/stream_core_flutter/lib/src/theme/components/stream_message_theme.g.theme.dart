@@ -36,8 +36,8 @@ mixin _$StreamMessageThemeData {
   }
 
   StreamMessageThemeData copyWith({
-    StreamThemeMessageStyle? incoming,
-    StreamThemeMessageStyle? outgoing,
+    StreamMessageStyle? incoming,
+    StreamMessageStyle? outgoing,
   }) {
     final _this = (this as StreamMessageThemeData);
 
@@ -89,12 +89,12 @@ mixin _$StreamMessageThemeData {
   }
 }
 
-mixin _$StreamThemeMessageStyle {
+mixin _$StreamMessageStyle {
   bool get canMerge => true;
 
-  static StreamThemeMessageStyle? lerp(
-    StreamThemeMessageStyle? a,
-    StreamThemeMessageStyle? b,
+  static StreamMessageStyle? lerp(
+    StreamMessageStyle? a,
+    StreamMessageStyle? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -109,7 +109,7 @@ mixin _$StreamThemeMessageStyle {
       return t == 0.0 ? a : null;
     }
 
-    return StreamThemeMessageStyle(
+    return StreamMessageStyle(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       backgroundAttachmentColor: Color.lerp(
         a.backgroundAttachmentColor,
@@ -175,7 +175,7 @@ mixin _$StreamThemeMessageStyle {
     );
   }
 
-  StreamThemeMessageStyle copyWith({
+  StreamMessageStyle copyWith({
     Color? backgroundColor,
     Color? backgroundAttachmentColor,
     Color? backgroundTypingIndicatorColor,
@@ -195,9 +195,9 @@ mixin _$StreamThemeMessageStyle {
     Color? waveFormBarColor,
     Color? waveFormBarPlayingColor,
   }) {
-    final _this = (this as StreamThemeMessageStyle);
+    final _this = (this as StreamMessageStyle);
 
-    return StreamThemeMessageStyle(
+    return StreamMessageStyle(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       backgroundAttachmentColor:
           backgroundAttachmentColor ?? _this.backgroundAttachmentColor,
@@ -223,8 +223,8 @@ mixin _$StreamThemeMessageStyle {
     );
   }
 
-  StreamThemeMessageStyle merge(StreamThemeMessageStyle? other) {
-    final _this = (this as StreamThemeMessageStyle);
+  StreamMessageStyle merge(StreamMessageStyle? other) {
+    final _this = (this as StreamMessageStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -266,8 +266,8 @@ mixin _$StreamThemeMessageStyle {
       return false;
     }
 
-    final _this = (this as StreamThemeMessageStyle);
-    final _other = (other as StreamThemeMessageStyle);
+    final _this = (this as StreamMessageStyle);
+    final _other = (other as StreamMessageStyle);
 
     return _other.backgroundColor == _this.backgroundColor &&
         _other.backgroundAttachmentColor == _this.backgroundAttachmentColor &&
@@ -292,7 +292,7 @@ mixin _$StreamThemeMessageStyle {
 
   @override
   int get hashCode {
-    final _this = (this as StreamThemeMessageStyle);
+    final _this = (this as StreamMessageStyle);
 
     return Object.hash(
       runtimeType,

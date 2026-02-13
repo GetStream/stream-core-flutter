@@ -36,8 +36,8 @@ class StreamMessageThemeData with _$StreamMessageThemeData {
     this.outgoing,
   });
 
-  final StreamThemeMessageStyle? incoming;
-  final StreamThemeMessageStyle? outgoing;
+  final StreamMessageStyle? incoming;
+  final StreamMessageStyle? outgoing;
 
   StreamMessageThemeData mergeWithDefaults(BuildContext context) {
     final defaults = _MessageThemeDefaults(context: context);
@@ -47,8 +47,8 @@ class StreamMessageThemeData with _$StreamMessageThemeData {
 
 @themeGen
 @immutable
-class StreamThemeMessageStyle with _$StreamThemeMessageStyle {
-  const StreamThemeMessageStyle({
+class StreamMessageStyle with _$StreamMessageStyle {
+  const StreamMessageStyle({
     this.backgroundColor,
     this.backgroundAttachmentColor,
     this.backgroundTypingIndicatorColor,
@@ -101,7 +101,7 @@ class _MessageThemeDefaults {
   final BuildContext context;
   final StreamColorScheme _colorScheme;
 
-  StreamThemeMessageStyle get incoming => StreamThemeMessageStyle(
+  StreamMessageStyle get incoming => StreamMessageStyle(
     backgroundColor: _colorScheme.backgroundSurface,
     backgroundAttachmentColor: _colorScheme.backgroundSurfaceStrong,
     backgroundTypingIndicatorColor: _colorScheme.accentNeutral,
@@ -117,7 +117,7 @@ class _MessageThemeDefaults {
     replyIndicatorColor: _colorScheme.borderOnSurface,
   );
 
-  StreamThemeMessageStyle get outgoing => StreamThemeMessageStyle(
+  StreamMessageStyle get outgoing => StreamMessageStyle(
     backgroundColor: _colorScheme.brand.shade100,
     backgroundAttachmentColor: _colorScheme.brand.shade150,
     backgroundTypingIndicatorColor: _colorScheme.accentNeutral,

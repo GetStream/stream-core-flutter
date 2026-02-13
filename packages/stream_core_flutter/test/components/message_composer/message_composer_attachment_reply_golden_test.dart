@@ -89,12 +89,12 @@ void main() {
               child: _buildReplyInTheme(
                 StreamMessageTheme(
                   data: const StreamMessageThemeData(
-                    incoming: StreamThemeMessageStyle(
+                    incoming: StreamMessageStyle(
                       backgroundColor: Colors.red,
                       replyIndicatorColor: Colors.green,
                       textColor: Colors.white,
                     ),
-                    outgoing: StreamThemeMessageStyle(
+                    outgoing: StreamMessageStyle(
                       backgroundColor: Colors.blue,
                       replyIndicatorColor: Colors.yellow,
                       textColor: Colors.white,
