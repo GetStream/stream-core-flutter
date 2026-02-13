@@ -2,12 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
 
-class MediaBadge extends StatelessWidget {
-  const MediaBadge({
-    super.key,
-    required this.type,
-    required this.duration,
-  });
+class StreamMediaBadge extends StatelessWidget {
+  const StreamMediaBadge({super.key, required this.type, this.duration});
 
   final MediaBadgeType type;
   final Duration? duration;
@@ -17,13 +13,14 @@ class MediaBadge extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.streamColorScheme.backgroundInverse,
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.all(context.streamRadius.max),
       ),
       padding: EdgeInsets.symmetric(
         horizontal: context.streamSpacing.xs,
         vertical: context.streamSpacing.xxs,
       ),
-      child: Column(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             switch (type) {
@@ -31,10 +28,14 @@ class MediaBadge extends StatelessWidget {
               MediaBadgeType.audio => context.streamIcons.microphoneSolid,
             },
             size: 12,
-            color: context.streamColorScheme.textPrimary,
+            color: context.streamColorScheme.textOnDark,
           ),
 
-          if (duration case final duration?) Text(duration.toReadableString()),
+          if (duration case final duration?)
+            Text(
+              duration.toReadableString(),
+              style: context.streamTextTheme.numericMd.copyWith(color: context.streamColorScheme.textOnDark),
+            ),
         ],
       ),
     );
@@ -53,7 +54,4 @@ extension on Duration {
   }
 }
 
-enum MediaBadgeType {
-  video,
-  audio,
-}
+enum MediaBadgeType { video, audio }

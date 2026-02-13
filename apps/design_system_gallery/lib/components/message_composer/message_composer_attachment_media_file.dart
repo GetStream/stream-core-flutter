@@ -13,7 +13,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 )
 Widget buildMessageComposerAttachmentMediaFilePlayground(BuildContext context) {
   return Center(
-    child: MessageComposerAttachmentMediaFile(
+    child: MessageComposerAttachmentMediaFile.image(
       image: const AssetImage('assets/attachment_image.png'),
       onRemovePressed: () {},
     ),

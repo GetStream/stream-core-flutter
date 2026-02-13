@@ -24,13 +24,16 @@ class StreamMessageComposerInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: context.streamColorScheme.backgroundElevation1,
+    return Container(
+      foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(context.streamRadius.xxxl),
         border: Border.all(
           color: context.streamColorScheme.borderDefault,
         ),
+      ),
+      decoration: BoxDecoration(
+        color: context.streamColorScheme.backgroundElevation1,
+        borderRadius: BorderRadius.all(context.streamRadius.xxxl),
         boxShadow: isFloating ? context.streamBoxShadow.elevation3 : null,
       ),
       child: Column(

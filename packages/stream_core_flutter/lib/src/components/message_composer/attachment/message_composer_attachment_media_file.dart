@@ -4,10 +4,30 @@ import '../../../../stream_core_flutter.dart';
 import '../../controls/remove_control.dart';
 
 class MessageComposerAttachmentMediaFile extends StatelessWidget {
-  const MessageComposerAttachmentMediaFile({super.key, required this.image, required this.onRemovePressed});
+  const MessageComposerAttachmentMediaFile({
+    super.key,
+    required this.child,
+    this.onRemovePressed,
+    this.mediaBadge,
+  });
 
-  final ImageProvider image;
-  final VoidCallback onRemovePressed;
+  MessageComposerAttachmentMediaFile.image({
+    super.key,
+    required ImageProvider image,
+    required this.onRemovePressed,
+    ImageFrameBuilder? frameBuilder,
+    ImageErrorWidgetBuilder? errorBuilder,
+    this.mediaBadge,
+  }) : child = Image(
+         image: image,
+         frameBuilder: frameBuilder,
+         errorBuilder: errorBuilder,
+         fit: BoxFit.cover,
+       );
+
+  final Widget child;
+  final Widget? mediaBadge;
+  final VoidCallback? onRemovePressed;
 
   @override
   Widget build(BuildContext context) {
@@ -19,19 +39,32 @@ class MessageComposerAttachmentMediaFile extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(context.streamSpacing.xxs),
             child: Container(
-              decoration: BoxDecoration(
+              clipBehavior: Clip.antiAlias,
+              foregroundDecoration: BoxDecoration(
                 borderRadius: BorderRadius.all(context.streamRadius.lg),
                 border: Border.all(
                   color: context.streamColorScheme.borderDefault.withAlpha(25),
                 ),
-                image: DecorationImage(image: image, fit: BoxFit.cover),
               ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(context.streamRadius.lg),
+              ),
+              child: child,
             ),
           ),
-          Align(
-            alignment: Alignment.topRight,
-            child: RemoveControl(onPressed: onRemovePressed),
-          ),
+          if (onRemovePressed case final VoidCallback onRemovePressed?)
+            Align(
+              alignment: Alignment.topRight,
+              child: RemoveControl(onPressed: onRemovePressed),
+            ),
+          if (mediaBadge case final Widget mediaBadge?)
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: EdgeInsets.all(context.streamSpacing.xs),
+                child: mediaBadge,
+              ),
+            ),
         ],
       ),
     );
