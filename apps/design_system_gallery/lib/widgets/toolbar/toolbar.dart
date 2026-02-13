@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
 import 'package:svg_icon_widget/svg_icon_widget.dart';
@@ -7,11 +7,13 @@ import 'package:svg_icon_widget/svg_icon_widget.dart';
 import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';
 import '../../core/stream_icons.dart';
+import 'debug_paint_toggle.dart';
 import 'device_selector.dart';
 import 'text_direction_selector.dart';
 import 'text_scale_selector.dart';
 import 'theme_mode_toggle.dart';
 import 'toolbar_button.dart';
+import 'widget_select_toggle.dart';
 
 /// The main toolbar for the design system gallery.
 ///
@@ -55,6 +57,7 @@ class GalleryToolbar extends StatelessWidget {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
+                spacing: spacing.sm,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Device frame toggle
@@ -64,17 +67,14 @@ class GalleryToolbar extends StatelessWidget {
                     isActive: previewConfig.showDeviceFrame,
                     onTap: previewConfig.toggleDeviceFrame,
                   ),
-                  SizedBox(width: spacing.sm),
 
-                  // Device selector
-                  if (previewConfig.showDeviceFrame) ...[
+                  // Device frame options
+                  if (previewConfig.showDeviceFrame)
                     DeviceSelector(
                       selectedDevice: previewConfig.selectedDevice,
                       devices: PreviewConfiguration.deviceOptions,
                       onDeviceChanged: previewConfig.setDevice,
                     ),
-                    SizedBox(width: spacing.sm),
-                  ],
 
                   // Text scale selector
                   TextScaleSelector(
@@ -82,7 +82,6 @@ class GalleryToolbar extends StatelessWidget {
                     options: PreviewConfiguration.textScaleOptions,
                     onChanged: previewConfig.setTextScale,
                   ),
-                  SizedBox(width: spacing.sm),
 
                   // Text direction selector (LTR/RTL)
                   TextDirectionSelector(
@@ -90,10 +89,12 @@ class GalleryToolbar extends StatelessWidget {
                     options: PreviewConfiguration.textDirectionOptions,
                     onChanged: previewConfig.setTextDirection,
                   ),
-                  SizedBox(width: spacing.sm),
 
-                  // Debug paint toggle
-                  const _DebugPaintToggle(),
+                  // Debug tools (debug mode only)
+                  if (kDebugMode) ...[
+                    const DebugPaintToggle(),
+                    const WidgetSelectToggle(),
+                  ],
                 ],
               ),
             ),
@@ -122,7 +123,7 @@ class GalleryToolbar extends StatelessWidget {
   }
 }
 
-/// Stream branding logo and title.
+// Stream branding logo and title.
 class _StreamBranding extends StatelessWidget {
   const _StreamBranding();
 
@@ -158,37 +159,6 @@ class _StreamBranding extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-/// Debug paint toggle button for visualizing layout bounds.
-class _DebugPaintToggle extends StatefulWidget {
-  const _DebugPaintToggle();
-
-  @override
-  State<_DebugPaintToggle> createState() => _DebugPaintToggleState();
-}
-
-class _DebugPaintToggleState extends State<_DebugPaintToggle> {
-  var _isActive = false;
-
-  void _toggleDebugPaint() {
-    setState(() {
-      _isActive = !_isActive;
-      debugPaintSizeEnabled = _isActive;
-    });
-    // Force a repaint to show/hide the debug bounds immediately
-    WidgetsBinding.instance.performReassemble();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ToolbarButton(
-      icon: _isActive ? Icons.grid_on : Icons.grid_off,
-      tooltip: 'Layout Bounds',
-      isActive: _isActive,
-      onTap: _toggleDebugPaint,
     );
   }
 }
