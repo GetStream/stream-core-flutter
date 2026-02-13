@@ -27,6 +27,7 @@ mixin _$StreamSpacing {
 
     return StreamSpacing(
       none: lerpDouble$(a.none, b.none, t)!,
+      xxxs: lerpDouble$(a.xxxs, b.xxxs, t)!,
       xxs: lerpDouble$(a.xxs, b.xxs, t)!,
       xs: lerpDouble$(a.xs, b.xs, t)!,
       sm: lerpDouble$(a.sm, b.sm, t)!,
@@ -40,6 +41,7 @@ mixin _$StreamSpacing {
 
   StreamSpacing copyWith({
     double? none,
+    double? xxxs,
     double? xxs,
     double? xs,
     double? sm,
@@ -53,6 +55,7 @@ mixin _$StreamSpacing {
 
     return StreamSpacing(
       none: none ?? _this.none,
+      xxxs: xxxs ?? _this.xxxs,
       xxs: xxs ?? _this.xxs,
       xs: xs ?? _this.xs,
       sm: sm ?? _this.sm,
@@ -77,6 +80,7 @@ mixin _$StreamSpacing {
 
     return copyWith(
       none: other.none,
+      xxxs: other.xxxs,
       xxs: other.xxs,
       xs: other.xs,
       sm: other.sm,
@@ -102,6 +106,7 @@ mixin _$StreamSpacing {
     final _other = (other as StreamSpacing);
 
     return _other.none == _this.none &&
+        _other.xxxs == _this.xxxs &&
         _other.xxs == _this.xxs &&
         _other.xs == _this.xs &&
         _other.sm == _this.sm &&
@@ -119,6 +124,7 @@ mixin _$StreamSpacing {
     return Object.hash(
       runtimeType,
       _this.none,
+      _this.xxxs,
       _this.xxs,
       _this.xs,
       _this.sm,

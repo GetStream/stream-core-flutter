@@ -42,6 +42,7 @@ class _SpacingCardsList extends StatelessWidget {
 
     final allSpacing = [
       _SpacingData(name: 'none', value: spacing.none, usage: 'No spacing, tight joins'),
+      _SpacingData(name: 'xxxs', value: spacing.xxxs, usage: 'Very tight gaps (tab icons)'),
       _SpacingData(name: 'xxs', value: spacing.xxs, usage: 'Minimal gaps (icon+text)'),
       _SpacingData(name: 'xs', value: spacing.xs, usage: 'Inline elements, small gaps'),
       _SpacingData(name: 'sm', value: spacing.sm, usage: 'Button padding, list gaps'),
@@ -269,22 +270,22 @@ class _QuickReference extends StatelessWidget {
               Divider(color: colorScheme.borderSubtle),
               SizedBox(height: spacing.md),
               Text(
-                '8px Grid System',
+                'Spacing Scale',
                 style: textTheme.captionEmphasis.copyWith(
                   color: colorScheme.textPrimary,
                 ),
               ),
               SizedBox(height: spacing.sm),
               Text(
-                'All spacing values follow a consistent 4/8px grid for visual harmony.',
+                'Spacing values follow a consistent scale (2, 4, 8, 12, 16...) for visual hierarchy.',
                 style: textTheme.captionDefault.copyWith(
                   color: colorScheme.textSecondary,
                 ),
               ),
               SizedBox(height: spacing.sm),
               const _UsageHint(
-                token: 'xxs-xs',
-                description: 'Fine adjustments (2-4px)',
+                token: 'xxxs-xs',
+                description: 'Fine adjustments (2-8px)',
               ),
               SizedBox(height: spacing.sm),
               const _UsageHint(
