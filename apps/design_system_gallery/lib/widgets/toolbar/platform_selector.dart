@@ -74,22 +74,22 @@ class PlatformSelector extends StatelessWidget {
   }
 
   static String _labelFor(TargetPlatform? platform) => switch (platform) {
-        null => 'System',
-        TargetPlatform.android => 'Android',
-        TargetPlatform.iOS => 'iOS',
-        TargetPlatform.macOS => 'macOS',
-        TargetPlatform.windows => 'Windows',
-        TargetPlatform.linux => 'Linux',
-        TargetPlatform.fuchsia => 'Fuchsia',
-      };
+    null => 'System',
+    TargetPlatform.android => 'Android',
+    TargetPlatform.iOS => 'iOS',
+    TargetPlatform.macOS => 'macOS',
+    TargetPlatform.windows => 'Windows',
+    TargetPlatform.linux => 'Linux',
+    TargetPlatform.fuchsia => 'Fuchsia',
+  };
 
   static IconData _iconFor(TargetPlatform? platform) => switch (platform) {
-        null => Icons.settings_suggest,
-        TargetPlatform.android => Icons.android,
-        TargetPlatform.iOS => Icons.phone_iphone,
-        TargetPlatform.macOS => Icons.laptop_mac,
-        TargetPlatform.windows => Icons.desktop_windows,
-        TargetPlatform.linux => Icons.terminal,
-        TargetPlatform.fuchsia => Icons.all_inclusive,
-      };
+    null => Icons.settings_suggest,
+    TargetPlatform.android => Icons.android,
+    TargetPlatform.iOS => Icons.phone_iphone,
+    TargetPlatform.macOS => Icons.laptop_mac,
+    TargetPlatform.windows => Icons.desktop_windows,
+    TargetPlatform.linux => Icons.terminal,
+    TargetPlatform.fuchsia => Icons.all_inclusive,
+  };
 }
