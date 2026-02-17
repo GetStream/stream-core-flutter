@@ -23,6 +23,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamContextMenuThemeData? contextMenuTheme,
+    StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
@@ -42,6 +44,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
+      contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
+      contextMenuItemTheme: contextMenuItemTheme ?? _this.contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
@@ -81,6 +85,16 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         t,
       )!,
       buttonTheme: t < 0.5 ? _this.buttonTheme : other.buttonTheme,
+      contextMenuTheme: StreamContextMenuThemeData.lerp(
+        _this.contextMenuTheme,
+        other.contextMenuTheme,
+        t,
+      )!,
+      contextMenuItemTheme: StreamContextMenuItemThemeData.lerp(
+        _this.contextMenuItemTheme,
+        other.contextMenuItemTheme,
+        t,
+      )!,
       emojiButtonTheme: StreamEmojiButtonThemeData.lerp(
         _this.emojiButtonTheme,
         other.emojiButtonTheme,
@@ -120,6 +134,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
+        _other.contextMenuTheme == _this.contextMenuTheme &&
+        _other.contextMenuItemTheme == _this.contextMenuItemTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
@@ -143,6 +159,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.buttonTheme,
+      _this.contextMenuTheme,
+      _this.contextMenuItemTheme,
       _this.emojiButtonTheme,
       _this.messageTheme,
       _this.inputTheme,

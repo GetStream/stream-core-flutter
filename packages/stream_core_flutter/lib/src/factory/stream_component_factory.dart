@@ -155,6 +155,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.avatarStack,
     this.badgeCount,
     this.button,
+    this.contextMenuItem,
     this.emoji,
     this.emojiButton,
     this.fileTypeIcon,
@@ -185,6 +186,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamButton] uses [DefaultStreamButton].
   final StreamComponentBuilder<StreamButtonProps>? button;
+
+  /// Custom builder for context menu item widgets.
+  ///
+  /// When null, [StreamContextMenuItem] uses [DefaultStreamContextMenuItem].
+  final StreamComponentBuilder<StreamContextMenuItemProps>? contextMenuItem;
 
   /// Custom builder for emoji widgets.
   ///
