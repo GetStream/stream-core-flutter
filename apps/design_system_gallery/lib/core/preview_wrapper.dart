@@ -30,8 +30,6 @@ class PreviewWrapper extends StatelessWidget {
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
-    final targetPlatform = previewConfig.targetPlatform;
-
     Widget content = Builder(
       builder: (context) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -58,11 +56,8 @@ class PreviewWrapper extends StatelessWidget {
     // Apply platform override to both Material theme and Stream theme so
     // that platform-aware primitives (e.g. StreamRadius, StreamTypography)
     // resolve correctly for the selected platform.
-    if (targetPlatform != null) {
-      content = _PlatformOverride(
-        platform: targetPlatform,
-        child: content,
-      );
+    if (previewConfig.targetPlatform case final targetPlatform?) {
+      content = _PlatformOverride(platform: targetPlatform, child: content);
     }
 
     if (previewConfig.showDeviceFrame) {
@@ -98,9 +93,8 @@ class PreviewWrapper extends StatelessWidget {
 
 /// Overrides the target platform for both Material and Stream themes.
 ///
-/// Rebuilds [StreamTheme] with the given [platform] so that platform-aware
-/// primitives like [StreamRadius] and [StreamTypography] use the correct
-/// platform-specific values.
+/// Uses [StreamTheme.applyPlatform] to recompute platform-dependent
+/// primitives while preserving all other theme customizations.
 class _PlatformOverride extends StatelessWidget {
   const _PlatformOverride({
     required this.platform,
@@ -112,23 +106,15 @@ class _PlatformOverride extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentTheme = Theme.of(context);
-    final currentStreamTheme = context.streamTheme;
-
-    // Rebuild StreamTheme with the overridden platform so that
-    // platform-aware values (radius, typography) are recalculated.
-    final overriddenStreamTheme = StreamTheme(
-      brightness: currentStreamTheme.brightness,
-      platform: platform,
-      colorScheme: currentStreamTheme.colorScheme,
-    );
+    final theme = Theme.of(context);
+    final streamTheme = context.streamTheme;
 
     return Theme(
-      data: currentTheme.copyWith(
+      data: theme.copyWith(
         platform: platform,
         extensions: {
-          ...currentTheme.extensions.values,
-          overriddenStreamTheme,
+          ...theme.extensions.values,
+          streamTheme.applyPlatform(platform),
         },
       ),
       child: child,

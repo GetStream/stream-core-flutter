@@ -259,4 +259,45 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
+
+  /// Creates a copy of this theme but with platform-dependent primitives
+  /// recomputed for the given [platform].
+  ///
+  /// All other values including component-level theme customizations are
+  /// preserved.
+  ///
+  /// {@tool snippet}
+  ///
+  /// Apply iOS platform to an existing theme:
+  ///
+  /// ```dart
+  /// final theme = StreamTheme.light();
+  /// final iosTheme = theme.applyPlatform(TargetPlatform.iOS);
+  /// ```
+  /// {@end-tool}
+  StreamTheme applyPlatform(TargetPlatform platform) {
+    final newRadius = StreamRadius(platform: platform);
+    final newTypography = StreamTypography(platform: platform);
+    final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
+
+    return StreamTheme.raw(
+      brightness: brightness,
+      icons: icons,
+      radius: newRadius,
+      spacing: spacing,
+      typography: newTypography,
+      colorScheme: colorScheme,
+      textTheme: newTextTheme,
+      boxShadow: boxShadow,
+      avatarTheme: avatarTheme,
+      badgeCountTheme: badgeCountTheme,
+      buttonTheme: buttonTheme,
+      contextMenuTheme: contextMenuTheme,
+      contextMenuItemTheme: contextMenuItemTheme,
+      emojiButtonTheme: emojiButtonTheme,
+      messageTheme: messageTheme,
+      inputTheme: inputTheme,
+      onlineIndicatorTheme: onlineIndicatorTheme,
+    );
+  }
 }
