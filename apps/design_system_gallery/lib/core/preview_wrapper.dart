@@ -30,7 +30,9 @@ class PreviewWrapper extends StatelessWidget {
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
-    final content = Builder(
+    final targetPlatform = previewConfig.targetPlatform;
+
+    Widget content = Builder(
       builder: (context) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
           textScaler: .linear(previewConfig.textScale),
@@ -52,6 +54,16 @@ class PreviewWrapper extends StatelessWidget {
         ),
       ),
     );
+
+    // Apply platform override to both Material theme and Stream theme so
+    // that platform-aware primitives (e.g. StreamRadius, StreamTypography)
+    // resolve correctly for the selected platform.
+    if (targetPlatform != null) {
+      content = _PlatformOverride(
+        platform: targetPlatform,
+        child: content,
+      );
+    }
 
     if (previewConfig.showDeviceFrame) {
       return Center(
@@ -80,6 +92,46 @@ class PreviewWrapper extends StatelessWidget {
         ),
         child: content,
       ),
+    );
+  }
+}
+
+/// Overrides the target platform for both Material and Stream themes.
+///
+/// Rebuilds [StreamTheme] with the given [platform] so that platform-aware
+/// primitives like [StreamRadius] and [StreamTypography] use the correct
+/// platform-specific values.
+class _PlatformOverride extends StatelessWidget {
+  const _PlatformOverride({
+    required this.platform,
+    required this.child,
+  });
+
+  final TargetPlatform platform;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentTheme = Theme.of(context);
+    final currentStreamTheme = context.streamTheme;
+
+    // Rebuild StreamTheme with the overridden platform so that
+    // platform-aware values (radius, typography) are recalculated.
+    final overriddenStreamTheme = StreamTheme(
+      brightness: currentStreamTheme.brightness,
+      platform: platform,
+      colorScheme: currentStreamTheme.colorScheme,
+    );
+
+    return Theme(
+      data: currentTheme.copyWith(
+        platform: platform,
+        extensions: {
+          ...currentTheme.extensions.values,
+          overriddenStreamTheme,
+        },
+      ),
+      child: child,
     );
   }
 }
