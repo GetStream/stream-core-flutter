@@ -7,6 +7,8 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_context_menu_item_theme.dart';
+import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_message_theme.dart';
@@ -88,6 +90,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamContextMenuThemeData? contextMenuTheme,
+    StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
@@ -111,6 +115,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     buttonTheme ??= const StreamButtonThemeData();
+    contextMenuTheme ??= const StreamContextMenuThemeData();
+    contextMenuItemTheme ??= const StreamContextMenuItemThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
@@ -128,6 +134,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
+      contextMenuTheme: contextMenuTheme,
+      contextMenuItemTheme: contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
@@ -159,6 +167,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.avatarTheme,
     required this.badgeCountTheme,
     required this.buttonTheme,
+    required this.contextMenuTheme,
+    required this.contextMenuItemTheme,
     required this.emojiButtonTheme,
     required this.messageTheme,
     required this.inputTheme,
@@ -232,6 +242,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
 
+  /// The context menu theme for this theme.
+  final StreamContextMenuThemeData contextMenuTheme;
+
+  /// The context menu item theme for this theme.
+  final StreamContextMenuItemThemeData contextMenuItemTheme;
+
   /// The emoji button theme for this theme.
   final StreamEmojiButtonThemeData emojiButtonTheme;
 
@@ -243,4 +259,45 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
+
+  /// Creates a copy of this theme but with platform-dependent primitives
+  /// recomputed for the given [platform].
+  ///
+  /// All other values including component-level theme customizations are
+  /// preserved.
+  ///
+  /// {@tool snippet}
+  ///
+  /// Apply iOS platform to an existing theme:
+  ///
+  /// ```dart
+  /// final theme = StreamTheme.light();
+  /// final iosTheme = theme.applyPlatform(TargetPlatform.iOS);
+  /// ```
+  /// {@end-tool}
+  StreamTheme applyPlatform(TargetPlatform platform) {
+    final newRadius = StreamRadius(platform: platform);
+    final newTypography = StreamTypography(platform: platform);
+    final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
+
+    return StreamTheme.raw(
+      brightness: brightness,
+      icons: icons,
+      radius: newRadius,
+      spacing: spacing,
+      typography: newTypography,
+      colorScheme: colorScheme,
+      textTheme: newTextTheme,
+      boxShadow: boxShadow,
+      avatarTheme: avatarTheme,
+      badgeCountTheme: badgeCountTheme,
+      buttonTheme: buttonTheme,
+      contextMenuTheme: contextMenuTheme,
+      contextMenuItemTheme: contextMenuItemTheme,
+      emojiButtonTheme: emojiButtonTheme,
+      messageTheme: messageTheme,
+      inputTheme: inputTheme,
+      onlineIndicatorTheme: onlineIndicatorTheme,
+    );
+  }
 }

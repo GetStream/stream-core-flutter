@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_context_menu_item_theme.dart';
+import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_message_theme.dart';
@@ -69,6 +71,12 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
+
+  /// Returns the [StreamContextMenuThemeData] from the nearest ancestor.
+  StreamContextMenuThemeData get streamContextMenuTheme => StreamContextMenuTheme.of(this);
+
+  /// Returns the [StreamContextMenuItemThemeData] from the nearest ancestor.
+  StreamContextMenuItemThemeData get streamContextMenuItemTheme => StreamContextMenuItemTheme.of(this);
 
   /// Returns the [StreamEmojiButtonThemeData] from the nearest ancestor.
   StreamEmojiButtonThemeData get streamEmojiButtonTheme => StreamEmojiButtonTheme.of(this);

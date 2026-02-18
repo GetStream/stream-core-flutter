@@ -30,7 +30,7 @@ class PreviewWrapper extends StatelessWidget {
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
-    final content = Builder(
+    Widget content = Builder(
       builder: (context) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
           textScaler: .linear(previewConfig.textScale),
@@ -52,6 +52,13 @@ class PreviewWrapper extends StatelessWidget {
         ),
       ),
     );
+
+    // Apply platform override to both Material theme and Stream theme so
+    // that platform-aware primitives (e.g. StreamRadius, StreamTypography)
+    // resolve correctly for the selected platform.
+    if (previewConfig.targetPlatform case final targetPlatform?) {
+      content = _PlatformOverride(platform: targetPlatform, child: content);
+    }
 
     if (previewConfig.showDeviceFrame) {
       return Center(
@@ -80,6 +87,37 @@ class PreviewWrapper extends StatelessWidget {
         ),
         child: content,
       ),
+    );
+  }
+}
+
+/// Overrides the target platform for both Material and Stream themes.
+///
+/// Uses [StreamTheme.applyPlatform] to recompute platform-dependent
+/// primitives while preserving all other theme customizations.
+class _PlatformOverride extends StatelessWidget {
+  const _PlatformOverride({
+    required this.platform,
+    required this.child,
+  });
+
+  final TargetPlatform platform;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final streamTheme = context.streamTheme;
+
+    return Theme(
+      data: theme.copyWith(
+        platform: platform,
+        extensions: {
+          ...theme.extensions.values,
+          streamTheme.applyPlatform(platform),
+        },
+      ),
+      child: child,
     );
   }
 }

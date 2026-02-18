@@ -138,6 +138,7 @@ class StreamButtonThemeStyle {
     this.borderColor,
     this.overlayColor,
     this.elevation,
+    this.iconSize,
   });
 
   /// The background color for the button.
@@ -165,4 +166,9 @@ class StreamButtonThemeStyle {
   ///
   /// Controls the shadow depth. Typically non-zero only for floating buttons.
   final WidgetStateProperty<double>? elevation;
+
+  /// The size of icons inside the button.
+  ///
+  /// If null, defaults to 20.
+  final WidgetStateProperty<double>? iconSize;
 }
