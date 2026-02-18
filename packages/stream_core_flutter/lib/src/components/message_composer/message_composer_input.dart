@@ -10,6 +10,7 @@ class StreamMessageComposerInput extends StatelessWidget {
     this.isFloating = false,
     this.inputLeading,
     this.inputTrailing,
+    this.inputBody,
     this.inputHeader,
     this.focusNode,
   });
@@ -19,6 +20,7 @@ class StreamMessageComposerInput extends StatelessWidget {
   final bool isFloating;
   final Widget? inputLeading;
   final Widget? inputTrailing;
+  final Widget? inputBody;
   final Widget? inputHeader;
   final FocusNode? focusNode;
 
@@ -45,11 +47,13 @@ class StreamMessageComposerInput extends StatelessWidget {
             children: [
               ?inputLeading,
               Expanded(
-                child: _MessageComposerInputField(
-                  controller: controller,
-                  placeholder: placeholder,
-                  focusNode: focusNode,
-                ),
+                child:
+                    inputBody ??
+                    _MessageComposerInputField(
+                      controller: controller,
+                      placeholder: placeholder,
+                      focusNode: focusNode,
+                    ),
               ),
               ?inputTrailing,
             ],

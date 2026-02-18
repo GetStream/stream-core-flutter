@@ -8,12 +8,12 @@ class StreamMessageComposerInputTrailing extends StatefulWidget {
     super.key,
     required this.controller,
     required this.onSendPressed,
-    required this.onMicrophonePressed,
+    required this.voiceRecordingCallback,
   });
 
   final TextEditingController controller;
   final VoidCallback onSendPressed;
-  final VoidCallback? onMicrophonePressed;
+  final VoiceRecordingCallback? voiceRecordingCallback;
 
   @override
   State<StreamMessageComposerInputTrailing> createState() => _StreamMessageComposerInputTrailingState();
@@ -46,10 +46,16 @@ class _StreamMessageComposerInputTrailingState extends State<StreamMessageCompos
   }
 
   @override
+  void dispose() {
+    widget.controller.removeListener(_onInputTextChanged);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO: Implement the trailing component
 
-    if (_hasText || widget.onMicrophonePressed == null) {
+    if (_hasText || widget.voiceRecordingCallback == null) {
       return StreamButton.icon(
         key: _messageComposerInputTrailingSendKey,
         icon: context.streamIcons.paperPlane,
@@ -57,15 +63,38 @@ class _StreamMessageComposerInputTrailingState extends State<StreamMessageCompos
         onTap: widget.onSendPressed,
       );
     }
-    return StreamButton.icon(
+    return StreamVoiceRecordingButton(voiceRecordingCallback: widget.voiceRecordingCallback!);
+  }
+}
+
+class StreamVoiceRecordingButton extends StatelessWidget {
+  const StreamVoiceRecordingButton({super.key, required this.voiceRecordingCallback});
+
+  final VoiceRecordingCallback voiceRecordingCallback;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
       key: _messageComposerInputTrailingMicrophoneKey,
-      icon: context.streamIcons.microphone,
-      type: StreamButtonType.ghost,
-      style: StreamButtonStyle.secondary,
-      size: StreamButtonSize.small,
-      onTap: widget.onMicrophonePressed,
+      onLongPress: voiceRecordingCallback.onStart,
+      onLongPressEnd: (details) => voiceRecordingCallback.onStop(),
+      behavior: HitTestBehavior.translucent,
+      child: StreamButton.icon(
+        icon: context.streamIcons.microphone,
+        type: StreamButtonType.ghost,
+        style: StreamButtonStyle.secondary,
+        size: StreamButtonSize.small,
+        onTap: () {},
+      ),
     );
   }
+}
+
+class VoiceRecordingCallback {
+  VoiceRecordingCallback({required this.onStart, required this.onStop});
+
+  final VoidCallback onStart;
+  final VoidCallback onStop;
 }
 
 final _messageComposerInputTrailingSendKey = UniqueKey();

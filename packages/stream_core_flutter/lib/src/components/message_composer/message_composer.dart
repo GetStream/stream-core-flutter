@@ -16,6 +16,7 @@ class StreamBaseMessageComposer extends StatefulWidget {
     this.composerTrailing,
     this.inputLeading,
     this.inputTrailing,
+    this.inputBody,
     this.inputHeader,
   });
 
@@ -28,6 +29,7 @@ class StreamBaseMessageComposer extends StatefulWidget {
   final Widget? composerTrailing;
   final Widget? inputLeading;
   final Widget? inputTrailing;
+  final Widget? inputBody;
   final Widget? inputHeader;
 
   @override
@@ -98,6 +100,7 @@ class _StreamBaseMessageComposerState extends State<StreamBaseMessageComposer> {
               isFloating: widget.isFloating,
               inputLeading: widget.inputLeading,
               inputTrailing: widget.inputTrailing,
+              inputBody: widget.inputBody,
               inputHeader: widget.inputHeader,
               focusNode: widget.focusNode,
             ),
