@@ -27,6 +27,7 @@ class StreamMessageComposerInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.antiAlias,
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(context.streamRadius.xxxl),
         border: Border.all(

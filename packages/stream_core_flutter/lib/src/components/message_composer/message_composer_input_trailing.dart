@@ -3,98 +3,98 @@ import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
 
-class StreamMessageComposerInputTrailing extends StatefulWidget {
-  const StreamMessageComposerInputTrailing({
+enum StreamMessageComposerInputTrailingState {
+  send,
+  microphone,
+  voiceRecordingActive,
+}
+
+class StreamBaseMessageComposerInputTrailing extends StatelessWidget {
+  const StreamBaseMessageComposerInputTrailing({
     super.key,
     required this.controller,
     required this.onSendPressed,
     required this.voiceRecordingCallback,
+    this.buttonState = StreamMessageComposerInputTrailingState.send,
   });
 
   final TextEditingController controller;
   final VoidCallback onSendPressed;
   final VoiceRecordingCallback? voiceRecordingCallback;
-
-  @override
-  State<StreamMessageComposerInputTrailing> createState() => _StreamMessageComposerInputTrailingState();
-}
-
-class _StreamMessageComposerInputTrailingState extends State<StreamMessageComposerInputTrailing> {
-  var _hasText = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_onInputTextChanged);
-    _hasText = widget.controller.text.isNotEmpty;
-  }
-
-  @override
-  void didUpdateWidget(StreamMessageComposerInputTrailing oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.controller != oldWidget.controller) {
-      oldWidget.controller.removeListener(_onInputTextChanged);
-      widget.controller.addListener(_onInputTextChanged);
-    }
-  }
-
-  void _onInputTextChanged() {
-    final hasText = widget.controller.text.isNotEmpty;
-    if (_hasText != hasText) {
-      setState(() => _hasText = hasText);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_onInputTextChanged);
-    super.dispose();
-  }
+  final StreamMessageComposerInputTrailingState buttonState;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Implement the trailing component
-
-    if (_hasText || widget.voiceRecordingCallback == null) {
+    if (buttonState == StreamMessageComposerInputTrailingState.send || voiceRecordingCallback == null) {
       return StreamButton.icon(
         key: _messageComposerInputTrailingSendKey,
         icon: context.streamIcons.paperPlane,
         size: StreamButtonSize.small,
-        onTap: widget.onSendPressed,
+        onTap: onSendPressed,
       );
     }
-    return StreamVoiceRecordingButton(voiceRecordingCallback: widget.voiceRecordingCallback!);
+    return StreamVoiceRecordingButton(
+      voiceRecordingCallback: voiceRecordingCallback!,
+      isRecording: buttonState == StreamMessageComposerInputTrailingState.voiceRecordingActive,
+    );
   }
 }
 
 class StreamVoiceRecordingButton extends StatelessWidget {
-  const StreamVoiceRecordingButton({super.key, required this.voiceRecordingCallback});
+  const StreamVoiceRecordingButton({
+    super.key,
+    required this.voiceRecordingCallback,
+    required this.isRecording,
+  });
 
   final VoiceRecordingCallback voiceRecordingCallback;
+  final bool isRecording;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       key: _messageComposerInputTrailingMicrophoneKey,
-      onLongPress: voiceRecordingCallback.onStart,
-      onLongPressEnd: (details) => voiceRecordingCallback.onStop(),
+      onLongPress: voiceRecordingCallback.onLongPressStart,
+      onLongPressCancel: voiceRecordingCallback.onLongPressCancel,
+      onLongPressEnd: voiceRecordingCallback.onLongPressEnd,
+      onLongPressMoveUpdate: voiceRecordingCallback.onLongPressMoveUpdate,
       behavior: HitTestBehavior.translucent,
-      child: StreamButton.icon(
-        icon: context.streamIcons.microphone,
-        type: StreamButtonType.ghost,
-        style: StreamButtonStyle.secondary,
-        size: StreamButtonSize.small,
-        onTap: () {},
+      child: StreamButtonTheme(
+        data: StreamButtonThemeData(
+          secondary: StreamButtonTypeStyle(
+            ghost: StreamButtonThemeStyle(
+              backgroundColor: isRecording
+                  ? WidgetStateProperty.all(
+                      context.streamColorScheme.statePressed,
+                    )
+                  : null,
+            ),
+          ),
+        ),
+        child: StreamButton.icon(
+          icon: context.streamIcons.microphone,
+          type: StreamButtonType.ghost,
+          style: StreamButtonStyle.secondary,
+          size: StreamButtonSize.small,
+          onTap: () {},
+        ),
       ),
     );
   }
 }
 
 class VoiceRecordingCallback {
-  VoiceRecordingCallback({required this.onStart, required this.onStop});
+   VoiceRecordingCallback({
+    required this.onLongPressStart,
+    required this.onLongPressCancel,
+    required this.onLongPressEnd,
+    this.onLongPressMoveUpdate,
+  });
 
-  final VoidCallback onStart;
-  final VoidCallback onStop;
+  final VoidCallback onLongPressStart;
+  final VoidCallback onLongPressCancel;
+  final GestureLongPressEndCallback onLongPressEnd;
+  final GestureLongPressMoveUpdateCallback? onLongPressMoveUpdate;
 }
 
 final _messageComposerInputTrailingSendKey = UniqueKey();

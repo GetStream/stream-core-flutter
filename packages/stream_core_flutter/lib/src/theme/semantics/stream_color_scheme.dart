@@ -742,22 +742,19 @@ class StreamBrandColor extends StreamColorSwatch {
   /// Defaults to blue with shade500 as the primary color.
   factory StreamBrandColor.light() {
     final primaryColorValue = light_tokens.StreamTokens.brand500.toARGB32();
-    return ._(
-      primaryColorValue,
-      <int, Color>{
-        50: light_tokens.StreamTokens.brand50,
-        100: light_tokens.StreamTokens.brand100,
-        150: light_tokens.StreamTokens.brand150,
-        200: light_tokens.StreamTokens.brand200,
-        300: light_tokens.StreamTokens.brand300,
-        400: light_tokens.StreamTokens.brand400,
-        500: Color(primaryColorValue),
-        600: light_tokens.StreamTokens.brand600,
-        700: light_tokens.StreamTokens.brand700,
-        800: light_tokens.StreamTokens.brand800,
-        900: light_tokens.StreamTokens.brand900,
-      },
-    );
+    return ._(primaryColorValue, <int, Color>{
+      50: light_tokens.StreamTokens.brand50,
+      100: light_tokens.StreamTokens.brand100,
+      150: light_tokens.StreamTokens.brand150,
+      200: light_tokens.StreamTokens.brand200,
+      300: light_tokens.StreamTokens.brand300,
+      400: light_tokens.StreamTokens.brand400,
+      500: Color(primaryColorValue),
+      600: light_tokens.StreamTokens.brand600,
+      700: light_tokens.StreamTokens.brand700,
+      800: light_tokens.StreamTokens.brand800,
+      900: light_tokens.StreamTokens.brand900,
+    });
   }
 
   /// Creates a dark theme brand color swatch.
@@ -767,22 +764,19 @@ class StreamBrandColor extends StreamColorSwatch {
   /// vice versa.
   factory StreamBrandColor.dark() {
     final primaryColorValue = dark_tokens.StreamTokens.brand500.toARGB32();
-    return ._(
-      primaryColorValue,
-      <int, Color>{
-        50: dark_tokens.StreamTokens.brand50,
-        100: dark_tokens.StreamTokens.brand100,
-        150: dark_tokens.StreamTokens.brand150,
-        200: dark_tokens.StreamTokens.brand200,
-        300: dark_tokens.StreamTokens.brand300,
-        400: dark_tokens.StreamTokens.brand400,
-        500: Color(primaryColorValue),
-        600: dark_tokens.StreamTokens.brand600,
-        700: dark_tokens.StreamTokens.brand700,
-        800: dark_tokens.StreamTokens.brand800,
-        900: dark_tokens.StreamTokens.brand900,
-      },
-    );
+    return ._(primaryColorValue, <int, Color>{
+      50: dark_tokens.StreamTokens.brand50,
+      100: dark_tokens.StreamTokens.brand100,
+      150: dark_tokens.StreamTokens.brand150,
+      200: dark_tokens.StreamTokens.brand200,
+      300: dark_tokens.StreamTokens.brand300,
+      400: dark_tokens.StreamTokens.brand400,
+      500: Color(primaryColorValue),
+      600: dark_tokens.StreamTokens.brand600,
+      700: dark_tokens.StreamTokens.brand700,
+      800: dark_tokens.StreamTokens.brand800,
+      900: dark_tokens.StreamTokens.brand900,
+    });
   }
 }
 

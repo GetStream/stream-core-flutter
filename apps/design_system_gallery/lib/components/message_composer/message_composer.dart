@@ -7,6 +7,13 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 // Playground
 // =============================================================================
 
+final emptyVoiceRecordingCallback = VoiceRecordingCallback(
+  onLongPressStart: () {},
+  onLongPressCancel: () {},
+  onLongPressEnd: (_) {},
+  onLongPressMoveUpdate: (_) {},
+);
+
 @widgetbook.UseCase(
   name: 'Playground',
   type: StreamBaseMessageComposer,
@@ -19,10 +26,11 @@ Widget buildStreamMessageComposerPlayground(BuildContext context) {
     child: StreamBaseMessageComposer(
       controller: textEditingController,
       isFloating: false,
-      inputTrailing: StreamMessageComposerInputTrailing(
+      inputTrailing: StreamBaseMessageComposerInputTrailing(
         controller: textEditingController,
         onSendPressed: () {},
-        onMicrophonePressed: () {},
+        voiceRecordingCallback: emptyVoiceRecordingCallback,
+        buttonState: StreamMessageComposerInputTrailingState.microphone,
       ),
     ),
   );
@@ -129,10 +137,11 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
                 child: StreamBaseMessageComposer(
                   controller: textEditingController,
                   isFloating: true,
-                  inputTrailing: StreamMessageComposerInputTrailing(
+                  inputTrailing: StreamBaseMessageComposerInputTrailing(
                     controller: textEditingController,
                     onSendPressed: () {},
-                    onMicrophonePressed: () {},
+                    voiceRecordingCallback: emptyVoiceRecordingCallback,
+                    buttonState: StreamMessageComposerInputTrailingState.microphone,
                   ),
                 ),
               ),
@@ -163,10 +172,11 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
               StreamBaseMessageComposer(
                 controller: textEditingController,
                 isFloating: false,
-                inputTrailing: StreamMessageComposerInputTrailing(
+                inputTrailing: StreamBaseMessageComposerInputTrailing(
                   controller: textEditingController,
                   onSendPressed: () {},
-                  onMicrophonePressed: () {},
+                  voiceRecordingCallback: emptyVoiceRecordingCallback,
+                  buttonState: StreamMessageComposerInputTrailingState.microphone,
                 ),
               ),
             ],
