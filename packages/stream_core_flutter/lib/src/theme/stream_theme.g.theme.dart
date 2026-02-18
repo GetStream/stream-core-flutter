@@ -29,6 +29,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamProgressBarThemeData? progressBarTheme,
   }) {
     final _this = (this as StreamTheme);
 
@@ -50,6 +51,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
+      progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
     );
   }
 
@@ -84,7 +86,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.badgeCountTheme,
         t,
       )!,
-      buttonTheme: t < 0.5 ? _this.buttonTheme : other.buttonTheme,
+      buttonTheme: StreamButtonThemeData.lerp(
+        _this.buttonTheme,
+        other.buttonTheme,
+        t,
+      )!,
       contextMenuTheme: StreamContextMenuThemeData.lerp(
         _this.contextMenuTheme,
         other.contextMenuTheme,
@@ -105,6 +111,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
         _this.onlineIndicatorTheme,
         other.onlineIndicatorTheme,
+        t,
+      )!,
+      progressBarTheme: StreamProgressBarThemeData.lerp(
+        _this.progressBarTheme,
+        other.progressBarTheme,
         t,
       )!,
     );
@@ -139,7 +150,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
-        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
+        _other.progressBarTheme == _this.progressBarTheme;
   }
 
   @override
@@ -165,6 +177,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,
+      _this.progressBarTheme,
     );
   }
 }

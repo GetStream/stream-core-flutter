@@ -9,6 +9,7 @@ export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
 export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButton;
 export 'components/context_menu/stream_context_menu.dart';
 export 'components/context_menu/stream_context_menu_item.dart' hide DefaultStreamContextMenuItem;
+export 'components/controls/stream_progress_bar.dart' hide DefaultStreamProgressBar;
 export 'components/message_composer.dart';
 export 'components/reaction/picker/stream_reaction_picker_sheet.dart';
 
