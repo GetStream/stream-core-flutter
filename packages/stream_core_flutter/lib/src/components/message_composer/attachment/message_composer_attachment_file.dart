@@ -19,7 +19,6 @@ class MessageComposerAttachmentFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final messageTheme = context.streamMessageTheme.mergeWithDefaults(context);
     final textColor = context.streamColorScheme.textPrimary;
 
     final titleStyle = context.streamTextTheme.captionEmphasis.copyWith(color: textColor);
@@ -40,7 +39,6 @@ class MessageComposerAttachmentFile extends StatelessWidget {
             borderRadius: BorderRadius.all(context.streamRadius.lg),
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               ?fileTypeIcon,
               SizedBox(width: spacing.xs),
