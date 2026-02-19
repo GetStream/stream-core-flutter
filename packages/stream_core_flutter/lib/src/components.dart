@@ -8,6 +8,7 @@ export 'components/badge/stream_media_badge.dart';
 export 'components/badge/stream_online_indicator.dart' hide DefaultStreamOnlineIndicator;
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
 export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButton;
+export 'components/controls/stream_remove_control.dart';
 export 'components/message_composer.dart';
 export 'components/reaction/picker/stream_reaction_picker_sheet.dart';
 

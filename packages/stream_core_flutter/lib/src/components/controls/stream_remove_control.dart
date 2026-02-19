@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
 
-class RemoveControl extends StatelessWidget {
-  const RemoveControl({
+class StreamRemoveControl extends StatelessWidget {
+  const StreamRemoveControl({
     super.key,
     required this.onPressed,
   });

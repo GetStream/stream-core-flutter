@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
-import '../../controls/remove_control.dart';
 
 class MessageComposerAttachmentLinkPreview extends StatelessWidget {
   const MessageComposerAttachmentLinkPreview({
@@ -95,7 +94,7 @@ class MessageComposerAttachmentLinkPreview extends StatelessWidget {
         if (onRemovePressed case final VoidCallback onRemovePressed?)
           Align(
             alignment: Alignment.topRight,
-            child: RemoveControl(onPressed: onRemovePressed),
+            child: StreamRemoveControl(onPressed: onRemovePressed),
           ),
       ],
     );

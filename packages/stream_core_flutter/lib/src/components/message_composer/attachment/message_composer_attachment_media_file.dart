@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
-import '../../controls/remove_control.dart';
 
 class MessageComposerAttachmentMediaFile extends StatelessWidget {
   const MessageComposerAttachmentMediaFile({
@@ -55,7 +54,7 @@ class MessageComposerAttachmentMediaFile extends StatelessWidget {
           if (onRemovePressed case final VoidCallback onRemovePressed?)
             Align(
               alignment: Alignment.topRight,
-              child: RemoveControl(onPressed: onRemovePressed),
+              child: StreamRemoveControl(onPressed: onRemovePressed),
             ),
           if (mediaBadge case final Widget mediaBadge?)
             Align(
