@@ -84,7 +84,7 @@ class StreamVoiceRecordingButton extends StatelessWidget {
 }
 
 class VoiceRecordingCallback {
-   VoiceRecordingCallback({
+  VoiceRecordingCallback({
     required this.onLongPressStart,
     required this.onLongPressCancel,
     required this.onLongPressEnd,
