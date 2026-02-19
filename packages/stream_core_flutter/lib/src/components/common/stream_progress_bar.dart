@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../theme.dart';
 import '../../theme/components/stream_progress_bar_theme.dart';
 import '../../theme/primitives/stream_radius.dart';
-import '../../theme/primitives/tokens/dark/stream_tokens.dart' as dark_tokens;
-import '../../theme/primitives/tokens/light/stream_tokens.dart' as light_tokens;
+import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// A linear progress indicator styled for the Stream design system.

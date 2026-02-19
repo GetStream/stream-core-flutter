@@ -10,7 +10,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(
   name: 'Playground',
   type: StreamProgressBar,
-  path: '[Components]/Controls',
+  path: '[Components]/Common',
 )
 Widget buildStreamProgressBarPlayground(BuildContext context) {
   final colorScheme = context.streamColorScheme;
@@ -19,13 +19,11 @@ Widget buildStreamProgressBarPlayground(BuildContext context) {
 
   final indeterminate = context.knobs.boolean(
     label: 'Indeterminate',
-    description: 'When enabled, shows a looping animation instead of a '
-        'fixed fill.',
+    description: 'When enabled, shows a looping animation instead of a fixed fill.',
   );
 
   final value = context.knobs.double.slider(
     label: 'Value',
-    min: 0,
     max: 1,
     initialValue: 0.5,
     divisions: 20,
@@ -43,7 +41,6 @@ Widget buildStreamProgressBarPlayground(BuildContext context) {
 
   final borderRadius = context.knobs.double.slider(
     label: 'Border Radius',
-    min: 0,
     max: 16,
     initialValue: 8,
     divisions: 16,
@@ -51,7 +48,7 @@ Widget buildStreamProgressBarPlayground(BuildContext context) {
   );
 
   final effectiveValue = indeterminate ? null : value;
-  final percentage = ((value * 100).round());
+  final percentage = (value * 100).round();
 
   return Center(
     child: ConstrainedBox(
@@ -84,7 +81,7 @@ Widget buildStreamProgressBarPlayground(BuildContext context) {
 @widgetbook.UseCase(
   name: 'Showcase',
   type: StreamProgressBar,
-  path: '[Components]/Controls',
+  path: '[Components]/Common',
 )
 Widget buildStreamProgressBarShowcase(BuildContext context) {
   final colorScheme = context.streamColorScheme;
@@ -121,7 +118,6 @@ class _StatesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
     final boxShadow = context.streamBoxShadow;
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
@@ -148,28 +144,28 @@ class _StatesSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: spacing.md,
             children: [
-              _StateDemo(
+              const _StateDemo(
                 label: 'Determinate',
                 description: 'Fixed value showing specific progress',
-                child: const StreamProgressBar(value: 0.6),
+                child: StreamProgressBar(value: 0.6),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
-              _StateDemo(
+              const _StateDemo(
                 label: 'Indeterminate',
                 description: 'Looping animation for unknown duration',
-                child: const StreamProgressBar(),
+                child: StreamProgressBar(),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
-              _StateDemo(
+              const _StateDemo(
                 label: 'Empty',
                 description: 'Zero progress',
-                child: const StreamProgressBar(value: 0),
+                child: StreamProgressBar(value: 0),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
-              _StateDemo(
+              const _StateDemo(
                 label: 'Complete',
                 description: 'Full progress',
-                child: const StreamProgressBar(value: 1),
+                child: StreamProgressBar(value: 1),
               ),
             ],
           ),
