@@ -23,6 +23,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
@@ -45,6 +46,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
+      checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
       contextMenuItemTheme: contextMenuItemTheme ?? _this.contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
@@ -89,6 +91,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       buttonTheme: StreamButtonThemeData.lerp(
         _this.buttonTheme,
         other.buttonTheme,
+        t,
+      )!,
+      checkboxTheme: StreamCheckboxThemeData.lerp(
+        _this.checkboxTheme,
+        other.checkboxTheme,
         t,
       )!,
       contextMenuTheme: StreamContextMenuThemeData.lerp(
@@ -145,6 +152,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
+        _other.checkboxTheme == _this.checkboxTheme &&
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuItemTheme == _this.contextMenuItemTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
@@ -171,6 +179,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.buttonTheme,
+      _this.checkboxTheme,
       _this.contextMenuTheme,
       _this.contextMenuItemTheme,
       _this.emojiButtonTheme,

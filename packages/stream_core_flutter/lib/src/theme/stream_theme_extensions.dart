@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_checkbox_theme.dart';
 import 'components/stream_context_menu_item_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
@@ -72,6 +73,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
+
+  /// Returns the [StreamCheckboxThemeData] from the nearest ancestor.
+  StreamCheckboxThemeData get streamCheckboxTheme => StreamCheckboxTheme.of(this);
 
   /// Returns the [StreamContextMenuThemeData] from the nearest ancestor.
   StreamContextMenuThemeData get streamContextMenuTheme => StreamContextMenuTheme.of(this);
