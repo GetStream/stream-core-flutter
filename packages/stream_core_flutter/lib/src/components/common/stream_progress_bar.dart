@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_progress_bar_theme.dart';
 import '../../theme/primitives/stream_radius.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
@@ -59,8 +60,44 @@ class StreamProgressBar extends StatelessWidget {
   ///
   /// If [value] is non-null, it must be between 0.0 and 1.0.
   /// If [value] is null, the progress bar shows an indeterminate animation.
-  const StreamProgressBar({
+  StreamProgressBar({
     super.key,
+    double? value,
+    Color? trackColor,
+    Color? fillColor,
+    double? minHeight,
+    BorderRadiusGeometry? borderRadius,
+  }) : props = .new(
+         value: value,
+         trackColor: trackColor,
+         fillColor: fillColor,
+         minHeight: minHeight,
+         borderRadius: borderRadius,
+       );
+
+  /// The props controlling the appearance and behavior of this progress bar.
+  final StreamProgressBarProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.maybeOf(context)?.progressBar;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamProgressBar(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamProgressBar].
+///
+/// This class holds all the configuration options for a progress bar,
+/// allowing them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamProgressBar], which uses these properties.
+///  * [DefaultStreamProgressBar], the default implementation.
+class StreamProgressBarProps {
+  /// Creates properties for a progress bar.
+  const StreamProgressBarProps({
     this.value,
     this.trackColor,
     this.fillColor,
@@ -97,66 +134,37 @@ class StreamProgressBar extends StatelessWidget {
   /// If null, uses [StreamProgressBarThemeData.borderRadius], or falls back
   /// to the design system's max radius.
   final BorderRadiusGeometry? borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultStreamProgressBar(
-      value: value,
-      trackColor: trackColor,
-      fillColor: fillColor,
-      minHeight: minHeight,
-      borderRadius: borderRadius,
-    );
-  }
 }
 
-/// The default implementation of [StreamProgressBar].
+/// Default implementation of [StreamProgressBar].
 ///
-/// This widget renders the progress bar with theming support.
+/// Renders a progress bar using [LinearProgressIndicator]. Styling is resolved
+/// from widget props, theme, and built-in defaults in that order.
 ///
 /// See also:
 ///
 ///  * [StreamProgressBar], the public API widget.
 class DefaultStreamProgressBar extends StatelessWidget {
   /// Creates a default Stream progress bar.
-  const DefaultStreamProgressBar({
-    super.key,
-    this.value,
-    this.trackColor,
-    this.fillColor,
-    this.minHeight,
-    this.borderRadius,
-  });
+  const DefaultStreamProgressBar({super.key, required this.props});
 
-  /// The progress value from 0.0 to 1.0, or null for indeterminate.
-  final double? value;
-
-  /// The color of the unfilled track.
-  final Color? trackColor;
-
-  /// The color of the filled portion.
-  final Color? fillColor;
-
-  /// The minimum height of the progress bar.
-  final double? minHeight;
-
-  /// The border radius of the progress bar.
-  final BorderRadiusGeometry? borderRadius;
+  /// The props controlling the appearance and behavior of this progress bar.
+  final StreamProgressBarProps props;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.streamProgressBarTheme;
-    final defaults = _StreamProgressBarThemeDefaults(context);
+    final defaults = _StreamProgressBarStyleDefaults(context);
 
-    final effectiveTrackColor = trackColor ?? theme.trackColor ?? defaults.trackColor;
-    final effectiveFillColor = fillColor ?? theme.fillColor ?? defaults.fillColor;
-    final effectiveMinHeight = minHeight ?? theme.minHeight ?? defaults.minHeight;
-    final effectiveBorderRadius = borderRadius ?? theme.borderRadius ?? defaults.borderRadius;
+    final effectiveTrackColor = props.trackColor ?? theme.trackColor ?? defaults.trackColor;
+    final effectiveFillColor = props.fillColor ?? theme.fillColor ?? defaults.fillColor;
+    final effectiveMinHeight = props.minHeight ?? theme.minHeight ?? defaults.minHeight;
+    final effectiveBorderRadius = props.borderRadius ?? theme.borderRadius ?? defaults.borderRadius;
 
     return LinearProgressIndicator(
       trackGap: 0,
       stopIndicatorRadius: 0,
-      value: value?.clamp(0.0, 1.0),
+      value: props.value?.clamp(0.0, 1.0),
       backgroundColor: effectiveTrackColor,
       color: effectiveFillColor,
       minHeight: effectiveMinHeight,
@@ -165,15 +173,10 @@ class DefaultStreamProgressBar extends StatelessWidget {
   }
 }
 
-// Default theme values for [StreamProgressBar].
-//
-// These defaults are used when no explicit value is provided via
-// constructor parameters or [StreamProgressBarThemeData].
-//
-// The defaults are context-aware and use colors from the current
-// [StreamColorScheme].
-class _StreamProgressBarThemeDefaults extends StreamProgressBarThemeData {
-  _StreamProgressBarThemeDefaults(this.context);
+// Provides default values for [StreamProgressBarThemeData] based on the
+// current [StreamColorScheme].
+class _StreamProgressBarStyleDefaults extends StreamProgressBarThemeData {
+  _StreamProgressBarStyleDefaults(this.context);
 
   final BuildContext context;
 

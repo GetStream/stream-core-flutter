@@ -41,6 +41,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
+      progressBar: t < 0.5 ? a.progressBar : b.progressBar,
     );
   }
 
@@ -56,6 +57,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
+    Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
   }) {
     final _this = (this as StreamComponentBuilders);
 
@@ -71,6 +73,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: emojiButton ?? _this.emojiButton,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
+      progressBar: progressBar ?? _this.progressBar,
     );
   }
 
@@ -97,6 +100,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: other.emojiButton,
       fileTypeIcon: other.fileTypeIcon,
       onlineIndicator: other.onlineIndicator,
+      progressBar: other.progressBar,
     );
   }
 
@@ -123,7 +127,8 @@ mixin _$StreamComponentBuilders {
         _other.emoji == _this.emoji &&
         _other.emojiButton == _this.emojiButton &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
-        _other.onlineIndicator == _this.onlineIndicator;
+        _other.onlineIndicator == _this.onlineIndicator &&
+        _other.progressBar == _this.progressBar;
   }
 
   @override
@@ -143,6 +148,7 @@ mixin _$StreamComponentBuilders {
       _this.emojiButton,
       _this.fileTypeIcon,
       _this.onlineIndicator,
+      _this.progressBar,
     );
   }
 }

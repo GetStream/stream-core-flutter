@@ -144,25 +144,25 @@ class _StatesSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: spacing.md,
             children: [
-              const _StateDemo(
+              _StateDemo(
                 label: 'Determinate',
                 description: 'Fixed value showing specific progress',
                 child: StreamProgressBar(value: 0.6),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
-              const _StateDemo(
+              _StateDemo(
                 label: 'Indeterminate',
                 description: 'Looping animation for unknown duration',
                 child: StreamProgressBar(),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
-              const _StateDemo(
+              _StateDemo(
                 label: 'Empty',
                 description: 'Zero progress',
                 child: StreamProgressBar(value: 0),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
-              const _StateDemo(
+              _StateDemo(
                 label: 'Complete',
                 description: 'Full progress',
                 child: StreamProgressBar(value: 1),
@@ -550,7 +550,7 @@ class _FileUploadExample extends StatelessWidget {
             ),
           ],
         ),
-        const StreamProgressBar(value: 0.73),
+        StreamProgressBar(value: 0.73),
         Text(
           '2.4 MB of 3.3 MB',
           style: textTheme.metadataDefault.copyWith(

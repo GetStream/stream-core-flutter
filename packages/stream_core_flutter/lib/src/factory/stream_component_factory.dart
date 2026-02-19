@@ -161,6 +161,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.emojiButton,
     this.fileTypeIcon,
     this.onlineIndicator,
+    this.progressBar,
   });
 
   /// Custom builder for avatar widgets.
@@ -217,6 +218,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamOnlineIndicator] uses [DefaultStreamOnlineIndicator].
   final StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator;
+
+  /// Custom builder for progress bar widgets.
+  ///
+  /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
+  final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
 }
 
 /// Extension on [BuildContext] for convenient access to [StreamComponentBuilders].

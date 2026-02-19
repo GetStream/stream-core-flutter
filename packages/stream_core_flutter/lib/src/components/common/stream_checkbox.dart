@@ -64,7 +64,7 @@ class StreamCheckbox extends StatelessWidget {
     StreamCheckboxSize? size,
     OutlinedBorder? shape,
     String? semanticLabel,
-  }) : props = StreamCheckboxProps(
+  }) : props = .new(
          value: value,
          onChanged: onChanged,
          size: size,
@@ -82,7 +82,7 @@ class StreamCheckbox extends StatelessWidget {
     required ValueChanged<bool>? onChanged,
     StreamCheckboxSize? size,
     String? semanticLabel,
-  }) : props = StreamCheckboxProps(
+  }) : props = .new(
          value: value,
          onChanged: onChanged,
          size: size,
