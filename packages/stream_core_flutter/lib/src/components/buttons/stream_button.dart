@@ -319,7 +319,13 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
         maximumSize: .all(isIconButton ? .square(buttonSize) : .fromHeight(buttonSize)),
         padding: .all(isIconButton ? .zero : .symmetric(horizontal: spacing.md)),
         side: switch (effectiveBorderColor) {
-          final color? => .resolveWith((states) => .new(color: color.resolve(states))),
+          final color? => .resolveWith(
+            (states) {
+              final resolvedColor = color.resolve(states);
+              if (resolvedColor == null) return null;
+              return BorderSide(color: resolvedColor);
+            },
+          ),
           _ => null,
         },
         shape: switch (props.label) {

@@ -7,12 +7,14 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_checkbox_theme.dart';
 import 'components/stream_context_menu_item_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'components/stream_progress_bar_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -90,12 +92,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamProgressBarThemeData? progressBarTheme,
   }) {
     platform ??= defaultTargetPlatform;
     final isDark = brightness == Brightness.dark;
@@ -115,12 +119,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     buttonTheme ??= const StreamButtonThemeData();
+    checkboxTheme ??= const StreamCheckboxThemeData();
     contextMenuTheme ??= const StreamContextMenuThemeData();
     contextMenuItemTheme ??= const StreamContextMenuItemThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
+    progressBarTheme ??= const StreamProgressBarThemeData();
 
     return .raw(
       brightness: brightness,
@@ -134,12 +140,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
+      checkboxTheme: checkboxTheme,
       contextMenuTheme: contextMenuTheme,
       contextMenuItemTheme: contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
+      progressBarTheme: progressBarTheme,
     );
   }
 
@@ -167,12 +175,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.avatarTheme,
     required this.badgeCountTheme,
     required this.buttonTheme,
+    required this.checkboxTheme,
     required this.contextMenuTheme,
     required this.contextMenuItemTheme,
     required this.emojiButtonTheme,
     required this.messageTheme,
     required this.inputTheme,
     required this.onlineIndicatorTheme,
+    required this.progressBarTheme,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -242,6 +252,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
 
+  /// The checkbox theme for this theme.
+  final StreamCheckboxThemeData checkboxTheme;
+
   /// The context menu theme for this theme.
   final StreamContextMenuThemeData contextMenuTheme;
 
@@ -259,6 +272,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
+
+  /// The progress bar theme for this theme.
+  final StreamProgressBarThemeData progressBarTheme;
 
   /// Creates a copy of this theme but with platform-dependent primitives
   /// recomputed for the given [platform].
@@ -292,12 +308,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       buttonTheme: buttonTheme,
+      checkboxTheme: checkboxTheme,
       contextMenuTheme: contextMenuTheme,
       contextMenuItemTheme: contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
+      progressBarTheme: progressBarTheme,
     );
   }
 }

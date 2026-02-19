@@ -3,12 +3,14 @@ import 'package:flutter/widgets.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
+import 'components/stream_checkbox_theme.dart';
 import 'components/stream_context_menu_item_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'components/stream_progress_bar_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -72,6 +74,9 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
 
+  /// Returns the [StreamCheckboxThemeData] from the nearest ancestor.
+  StreamCheckboxThemeData get streamCheckboxTheme => StreamCheckboxTheme.of(this);
+
   /// Returns the [StreamContextMenuThemeData] from the nearest ancestor.
   StreamContextMenuThemeData get streamContextMenuTheme => StreamContextMenuTheme.of(this);
 
@@ -89,4 +94,7 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamOnlineIndicatorThemeData] from the nearest ancestor.
   StreamOnlineIndicatorThemeData get streamOnlineIndicatorTheme => StreamOnlineIndicatorTheme.of(this);
+
+  /// Returns the [StreamProgressBarThemeData] from the nearest ancestor.
+  StreamProgressBarThemeData get streamProgressBarTheme => StreamProgressBarTheme.of(this);
 }

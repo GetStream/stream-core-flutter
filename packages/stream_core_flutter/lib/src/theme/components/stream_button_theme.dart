@@ -92,6 +92,13 @@ class StreamButtonThemeData with _$StreamButtonThemeData {
 
   /// Styles for destructive (error/danger) buttons.
   final StreamButtonTypeStyle? destructive;
+
+  /// Linearly interpolate between two [StreamButtonThemeData] objects.
+  static StreamButtonThemeData? lerp(
+    StreamButtonThemeData? a,
+    StreamButtonThemeData? b,
+    double t,
+  ) => _$StreamButtonThemeData.lerp(a, b, t);
 }
 
 /// Organizes button theme styles by [StreamButtonType] variant.
@@ -118,6 +125,13 @@ class StreamButtonTypeStyle with _$StreamButtonTypeStyle {
 
   /// Style for ghost (borderless) buttons.
   final StreamButtonThemeStyle? ghost;
+
+  /// Linearly interpolate between two [StreamButtonTypeStyle] objects.
+  static StreamButtonTypeStyle? lerp(
+    StreamButtonTypeStyle? a,
+    StreamButtonTypeStyle? b,
+    double t,
+  ) => _$StreamButtonTypeStyle.lerp(a, b, t);
 }
 
 /// Visual styling properties for a single button style/type combination.
@@ -130,7 +144,9 @@ class StreamButtonTypeStyle with _$StreamButtonTypeStyle {
 ///
 ///  * [StreamButtonTypeStyle], which wraps this style per type variant.
 ///  * [StreamButton], which uses this styling.
-class StreamButtonThemeStyle {
+@themeGen
+@immutable
+class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
   /// Creates button style properties.
   const StreamButtonThemeStyle({
     this.backgroundColor,
@@ -145,30 +161,37 @@ class StreamButtonThemeStyle {
   ///
   /// Supports state-based colors for different interaction states
   /// (default, hover, pressed, disabled, selected).
-  final WidgetStateProperty<Color>? backgroundColor;
+  final WidgetStateProperty<Color?>? backgroundColor;
 
   /// The foreground color for the button text and icons.
   ///
   /// Supports state-based colors for different interaction states.
-  final WidgetStateProperty<Color>? foregroundColor;
+  final WidgetStateProperty<Color?>? foregroundColor;
 
   /// The border color for the button.
   ///
   /// Typically used by outline-type buttons. If null, no border is rendered.
-  final WidgetStateProperty<Color>? borderColor;
+  final WidgetStateProperty<Color?>? borderColor;
 
   /// The overlay color for the button's interaction feedback.
   ///
   /// Supports state-based colors for hover and press states.
-  final WidgetStateProperty<Color>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
 
   /// The elevation of the button.
   ///
   /// Controls the shadow depth. Typically non-zero only for floating buttons.
-  final WidgetStateProperty<double>? elevation;
+  final WidgetStateProperty<double?>? elevation;
 
   /// The size of icons inside the button.
   ///
   /// If null, defaults to 20.
-  final WidgetStateProperty<double>? iconSize;
+  final WidgetStateProperty<double?>? iconSize;
+
+  /// Linearly interpolate between two [StreamButtonThemeStyle] objects.
+  static StreamButtonThemeStyle? lerp(
+    StreamButtonThemeStyle? a,
+    StreamButtonThemeStyle? b,
+    double t,
+  ) => _$StreamButtonThemeStyle.lerp(a, b, t);
 }
