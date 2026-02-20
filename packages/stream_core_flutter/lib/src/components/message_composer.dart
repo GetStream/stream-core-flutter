@@ -1,3 +1,4 @@
+export 'message_composer/attachment/message_composer_attachment_container.dart';
 export 'message_composer/attachment/message_composer_attachment_file.dart';
 export 'message_composer/attachment/message_composer_attachment_link_preview.dart';
 export 'message_composer/attachment/message_composer_attachment_media_file.dart';

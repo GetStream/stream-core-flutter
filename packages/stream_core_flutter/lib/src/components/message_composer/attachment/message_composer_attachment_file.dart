@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
+import 'message_composer_attachment_container.dart';
 
 class MessageComposerAttachmentFile extends StatelessWidget {
   const MessageComposerAttachmentFile({
@@ -19,53 +20,35 @@ class MessageComposerAttachmentFile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = context.streamColorScheme.textPrimary;
-
     final titleStyle = context.streamTextTheme.captionEmphasis.copyWith(color: textColor);
-
     final spacing = context.streamSpacing;
-    return Stack(
-      children: [
-        Container(
-          margin: EdgeInsets.all(spacing.xxs),
-          padding: EdgeInsets.fromLTRB(spacing.md, spacing.md, spacing.sm, spacing.md),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.all(context.streamRadius.lg),
-            border: Border.all(
-              color: context.streamColorScheme.borderDefault,
+
+    return StreamMessageComposerAttachmentContainer(
+      padding: EdgeInsets.fromLTRB(spacing.md, spacing.md, spacing.sm, spacing.md),
+      onRemovePressed: onRemovePressed,
+      borderColor: context.streamColorScheme.borderDefault,
+      child: Row(
+        children: [
+          ?fileTypeIcon,
+          SizedBox(width: spacing.xs),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (title case final title?)
+                  Text(
+                    title,
+                    style: titleStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ?subtitle,
+              ],
             ),
           ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(context.streamRadius.lg),
-          ),
-          child: Row(
-            children: [
-              ?fileTypeIcon,
-              SizedBox(width: spacing.xs),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (title case final title?)
-                      Text(
-                        title,
-                        style: titleStyle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ?subtitle,
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (onRemovePressed case final VoidCallback onRemovePressed?)
-          Align(
-            alignment: Alignment.topRight,
-            child: StreamRemoveControl(onPressed: onRemovePressed),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
