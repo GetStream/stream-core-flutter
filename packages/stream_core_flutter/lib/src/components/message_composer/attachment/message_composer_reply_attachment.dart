@@ -3,8 +3,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
 
-class MessageComposerAttachmentReply extends StatelessWidget {
-  const MessageComposerAttachmentReply({
+class MessageComposerReplyAttachment extends StatelessWidget {
+  const MessageComposerReplyAttachment({
     super.key,
     required this.title,
     required this.subtitle,

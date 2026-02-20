@@ -2,15 +2,15 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
 
-class MessageComposerAttachmentMediaFile extends StatelessWidget {
-  const MessageComposerAttachmentMediaFile({
+class MessageComposerMediaFileAttachment extends StatelessWidget {
+  const MessageComposerMediaFileAttachment({
     super.key,
     required this.child,
     this.onRemovePressed,
     this.mediaBadge,
   });
 
-  MessageComposerAttachmentMediaFile.image({
+  MessageComposerMediaFileAttachment.image({
     super.key,
     required ImageProvider image,
     required this.onRemovePressed,

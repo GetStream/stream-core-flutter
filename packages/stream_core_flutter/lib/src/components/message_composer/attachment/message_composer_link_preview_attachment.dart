@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
 
-class MessageComposerAttachmentLinkPreview extends StatelessWidget {
-  const MessageComposerAttachmentLinkPreview({
+class MessageComposerLinkPreviewAttachment extends StatelessWidget {
+  const MessageComposerLinkPreviewAttachment({
     super.key,
     this.title,
     this.subtitle,

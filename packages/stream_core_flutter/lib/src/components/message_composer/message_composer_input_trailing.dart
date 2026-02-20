@@ -9,8 +9,8 @@ enum StreamMessageComposerInputTrailingState {
   voiceRecordingActive,
 }
 
-class StreamBaseMessageComposerInputTrailing extends StatelessWidget {
-  const StreamBaseMessageComposerInputTrailing({
+class StreamCoreMessageComposerInputTrailing extends StatelessWidget {
+  const StreamCoreMessageComposerInputTrailing({
     super.key,
     required this.controller,
     required this.onSendPressed,

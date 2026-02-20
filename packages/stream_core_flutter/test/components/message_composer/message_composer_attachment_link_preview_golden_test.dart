@@ -18,7 +18,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerAttachmentLinkPreview(
+              const MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -29,7 +29,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -40,7 +40,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_no_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -52,7 +52,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -64,7 +64,7 @@ void main() {
           GoldenTestScenario(
             name: 'url_only_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerAttachmentLinkPreview(
+              const MessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
                 url: 'https://getstream.io/',
@@ -75,7 +75,7 @@ void main() {
           GoldenTestScenario(
             name: 'url_only_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
                 url: 'https://getstream.io/',
@@ -96,7 +96,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerAttachmentLinkPreview(
+              const MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -108,7 +108,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -120,7 +120,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_no_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -133,7 +133,7 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: 'Getting started with Stream',
                 subtitle: 'Build in-app messaging with our flexible SDKs.',
                 url: 'https://getstream.io/chat/docs/',
@@ -146,7 +146,7 @@ void main() {
           GoldenTestScenario(
             name: 'url_only_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerAttachmentLinkPreview(
+              const MessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
                 url: 'https://getstream.io/',
@@ -158,7 +158,7 @@ void main() {
           GoldenTestScenario(
             name: 'url_only_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerAttachmentLinkPreview(
+              MessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
                 url: 'https://getstream.io/',

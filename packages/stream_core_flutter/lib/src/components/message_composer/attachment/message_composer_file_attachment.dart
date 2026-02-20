@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
 
-class MessageComposerAttachmentFile extends StatelessWidget {
-  const MessageComposerAttachmentFile({
+class MessageComposerFileAttachment extends StatelessWidget {
+  const MessageComposerFileAttachment({
     super.key,
     this.title,
     this.fileTypeIcon,

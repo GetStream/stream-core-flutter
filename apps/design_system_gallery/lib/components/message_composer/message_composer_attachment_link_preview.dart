@@ -9,7 +9,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: MessageComposerAttachmentLinkPreview,
+  type: MessageComposerLinkPreviewAttachment,
   path: '[Components]/Message Composer',
 )
 Widget buildMessageComposerAttachmentLinkPreviewPlayground(BuildContext context) {
@@ -42,7 +42,7 @@ Widget buildMessageComposerAttachmentLinkPreviewPlayground(BuildContext context)
   return Center(
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360),
-      child: MessageComposerAttachmentLinkPreview(
+      child: MessageComposerLinkPreviewAttachment(
         title: title.isEmpty ? null : title,
         subtitle: subtitle.isEmpty ? null : subtitle,
         url: url.isEmpty ? null : url,

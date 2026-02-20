@@ -9,7 +9,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: MessageComposerAttachmentReply,
+  type: MessageComposerReplyAttachment,
   path: '[Components]/Message Composer',
 )
 Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
@@ -24,7 +24,7 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
   return Center(
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360),
-      child: MessageComposerAttachmentReply(
+      child: MessageComposerReplyAttachment(
         title: 'Reply to John Doe',
         subtitle: 'We had a great time during our holiday.',
         image: const AssetImage('assets/attachment_image.png'),

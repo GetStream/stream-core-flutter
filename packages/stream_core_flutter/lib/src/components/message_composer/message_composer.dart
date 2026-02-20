@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../stream_core_flutter.dart';
 
-class StreamBaseMessageComposer extends StatefulWidget {
-  const StreamBaseMessageComposer({
+class StreamCoreMessageComposer extends StatefulWidget {
+  const StreamCoreMessageComposer({
     super.key,
     required this.controller,
     required this.isFloating,
@@ -33,10 +33,10 @@ class StreamBaseMessageComposer extends StatefulWidget {
   final Widget? inputHeader;
 
   @override
-  State<StreamBaseMessageComposer> createState() => _StreamBaseMessageComposerState();
+  State<StreamCoreMessageComposer> createState() => _StreamCoreMessageComposerState();
 }
 
-class _StreamBaseMessageComposerState extends State<StreamBaseMessageComposer> {
+class _StreamCoreMessageComposerState extends State<StreamCoreMessageComposer> {
   late TextEditingController _controller;
 
   @override
@@ -46,7 +46,7 @@ class _StreamBaseMessageComposerState extends State<StreamBaseMessageComposer> {
   }
 
   @override
-  void didUpdateWidget(StreamBaseMessageComposer oldWidget) {
+  void didUpdateWidget(StreamCoreMessageComposer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
       _disposeController(oldWidget);
@@ -64,7 +64,7 @@ class _StreamBaseMessageComposerState extends State<StreamBaseMessageComposer> {
     _controller = widget.controller ?? TextEditingController();
   }
 
-  void _disposeController(StreamBaseMessageComposer widget) {
+  void _disposeController(StreamCoreMessageComposer widget) {
     if (widget.controller == null) {
       _controller.dispose();
     }

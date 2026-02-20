@@ -17,7 +17,7 @@ void main() {
             GoldenTestScenario(
               name: '${style.name}_no_remove',
               child: _buildReplyInTheme(
-                MessageComposerAttachmentReply(
+                MessageComposerReplyAttachment(
                   title: 'Reply to John Doe',
                   subtitle: 'We had a great time during our holiday.',
                   onRemovePressed: null,
@@ -29,7 +29,7 @@ void main() {
             GoldenTestScenario(
               name: '${style.name}_with_remove',
               child: _buildReplyInTheme(
-                MessageComposerAttachmentReply(
+                MessageComposerReplyAttachment(
                   title: 'Reply to John Doe',
                   subtitle: 'We had a great time during our holiday.',
                   onRemovePressed: () {},
@@ -51,7 +51,7 @@ void main() {
             GoldenTestScenario(
               name: '${style.name}_no_remove',
               child: _buildReplyInTheme(
-                MessageComposerAttachmentReply(
+                MessageComposerReplyAttachment(
                   title: 'Reply to John Doe',
                   subtitle: 'We had a great time during our holiday.',
                   onRemovePressed: null,
@@ -64,7 +64,7 @@ void main() {
             GoldenTestScenario(
               name: '${style.name}_with_remove',
               child: _buildReplyInTheme(
-                MessageComposerAttachmentReply(
+                MessageComposerReplyAttachment(
                   title: 'Reply to John Doe',
                   subtitle: 'We had a great time during our holiday.',
                   onRemovePressed: () {},
@@ -100,7 +100,7 @@ void main() {
                       textColor: Colors.white,
                     ),
                   ),
-                  child: MessageComposerAttachmentReply(
+                  child: MessageComposerReplyAttachment(
                     title: 'Reply to John Doe',
                     subtitle: 'We had a great time during our holiday.',
                     onRemovePressed: null,
