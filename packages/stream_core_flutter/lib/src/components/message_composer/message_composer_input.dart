@@ -10,6 +10,7 @@ class StreamMessageComposerInput extends StatelessWidget {
     this.isFloating = false,
     this.inputLeading,
     this.inputTrailing,
+    this.inputBody,
     this.inputHeader,
     this.focusNode,
   });
@@ -19,18 +20,23 @@ class StreamMessageComposerInput extends StatelessWidget {
   final bool isFloating;
   final Widget? inputLeading;
   final Widget? inputTrailing;
+  final Widget? inputBody;
   final Widget? inputHeader;
   final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: context.streamColorScheme.backgroundElevation1,
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.all(context.streamRadius.xxxl),
         border: Border.all(
           color: context.streamColorScheme.borderDefault,
         ),
+      ),
+      decoration: BoxDecoration(
+        color: context.streamColorScheme.backgroundElevation1,
+        borderRadius: BorderRadius.all(context.streamRadius.xxxl),
         boxShadow: isFloating ? context.streamBoxShadow.elevation3 : null,
       ),
       child: Column(
@@ -42,11 +48,13 @@ class StreamMessageComposerInput extends StatelessWidget {
             children: [
               ?inputLeading,
               Expanded(
-                child: _MessageComposerInputField(
-                  controller: controller,
-                  placeholder: placeholder,
-                  focusNode: focusNode,
-                ),
+                child:
+                    inputBody ??
+                    _MessageComposerInputField(
+                      controller: controller,
+                      placeholder: placeholder,
+                      focusNode: focusNode,
+                    ),
               ),
               ?inputTrailing,
             ],

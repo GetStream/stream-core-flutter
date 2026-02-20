@@ -7,22 +7,30 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 // Playground
 // =============================================================================
 
+final emptyVoiceRecordingCallback = VoiceRecordingCallback(
+  onLongPressStart: () {},
+  onLongPressCancel: () {},
+  onLongPressEnd: (_) {},
+  onLongPressMoveUpdate: (_) {},
+);
+
 @widgetbook.UseCase(
   name: 'Playground',
-  type: StreamBaseMessageComposer,
+  type: StreamCoreMessageComposer,
   path: '[Components]/Message Composer',
 )
 Widget buildStreamMessageComposerPlayground(BuildContext context) {
   final textEditingController = TextEditingController();
 
   return Center(
-    child: StreamBaseMessageComposer(
+    child: StreamCoreMessageComposer(
       controller: textEditingController,
       isFloating: false,
-      inputTrailing: StreamMessageComposerInputTrailing(
+      inputTrailing: StreamCoreMessageComposerInputTrailing(
         controller: textEditingController,
         onSendPressed: () {},
-        onMicrophonePressed: () {},
+        voiceRecordingCallback: emptyVoiceRecordingCallback,
+        buttonState: StreamMessageComposerInputTrailingState.microphone,
       ),
     ),
   );
@@ -34,7 +42,7 @@ Widget buildStreamMessageComposerPlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Real-world Example',
-  type: StreamBaseMessageComposer,
+  type: StreamCoreMessageComposer,
   path: '[Components]/Message Composer',
 )
 Widget buildStreamMessageComposerExample(BuildContext context) {
@@ -126,13 +134,14 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: StreamBaseMessageComposer(
+                child: StreamCoreMessageComposer(
                   controller: textEditingController,
                   isFloating: true,
-                  inputTrailing: StreamMessageComposerInputTrailing(
+                  inputTrailing: StreamCoreMessageComposerInputTrailing(
                     controller: textEditingController,
                     onSendPressed: () {},
-                    onMicrophonePressed: () {},
+                    voiceRecordingCallback: emptyVoiceRecordingCallback,
+                    buttonState: StreamMessageComposerInputTrailingState.microphone,
                   ),
                 ),
               ),
@@ -160,13 +169,14 @@ Widget buildStreamMessageComposerExample(BuildContext context) {
                 ),
               ),
               // Non-floating composer
-              StreamBaseMessageComposer(
+              StreamCoreMessageComposer(
                 controller: textEditingController,
                 isFloating: false,
-                inputTrailing: StreamMessageComposerInputTrailing(
+                inputTrailing: StreamCoreMessageComposerInputTrailing(
                   controller: textEditingController,
                   onSendPressed: () {},
-                  onMicrophonePressed: () {},
+                  voiceRecordingCallback: emptyVoiceRecordingCallback,
+                  buttonState: StreamMessageComposerInputTrailingState.microphone,
                 ),
               ),
             ],
