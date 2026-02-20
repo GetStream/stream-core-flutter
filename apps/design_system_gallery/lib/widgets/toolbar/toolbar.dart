@@ -9,6 +9,7 @@ import '../../config/theme_configuration.dart';
 import '../../core/stream_icons.dart';
 import 'debug_paint_toggle.dart';
 import 'device_selector.dart';
+import 'platform_selector.dart';
 import 'text_direction_selector.dart';
 import 'text_scale_selector.dart';
 import 'theme_mode_toggle.dart';
@@ -88,6 +89,13 @@ class GalleryToolbar extends StatelessWidget {
                     value: previewConfig.textDirection,
                     options: PreviewConfiguration.textDirectionOptions,
                     onChanged: previewConfig.setTextDirection,
+                  ),
+
+                  // Platform override selector
+                  PlatformSelector(
+                    value: previewConfig.targetPlatform,
+                    options: PreviewConfiguration.platformOptions,
+                    onChanged: previewConfig.setTargetPlatform,
                   ),
 
                   // Debug tools (debug mode only)

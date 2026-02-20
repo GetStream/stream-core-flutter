@@ -155,10 +155,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.avatarStack,
     this.badgeCount,
     this.button,
+    this.checkbox,
+    this.contextMenuItem,
     this.emoji,
     this.emojiButton,
     this.fileTypeIcon,
     this.onlineIndicator,
+    this.progressBar,
   });
 
   /// Custom builder for avatar widgets.
@@ -186,6 +189,16 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamButton] uses [DefaultStreamButton].
   final StreamComponentBuilder<StreamButtonProps>? button;
 
+  /// Custom builder for checkbox widgets.
+  ///
+  /// When null, [StreamCheckbox] uses [DefaultStreamCheckbox].
+  final StreamComponentBuilder<StreamCheckboxProps>? checkbox;
+
+  /// Custom builder for context menu item widgets.
+  ///
+  /// When null, [StreamContextMenuItem] uses [DefaultStreamContextMenuItem].
+  final StreamComponentBuilder<StreamContextMenuItemProps>? contextMenuItem;
+
   /// Custom builder for emoji widgets.
   ///
   /// When null, [StreamEmoji] uses [DefaultStreamEmoji].
@@ -205,6 +218,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamOnlineIndicator] uses [DefaultStreamOnlineIndicator].
   final StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator;
+
+  /// Custom builder for progress bar widgets.
+  ///
+  /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
+  final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
 }
 
 /// Extension on [BuildContext] for convenient access to [StreamComponentBuilders].

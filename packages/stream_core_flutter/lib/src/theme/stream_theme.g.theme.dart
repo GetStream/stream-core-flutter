@@ -23,10 +23,14 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamCheckboxThemeData? checkboxTheme,
+    StreamContextMenuThemeData? contextMenuTheme,
+    StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamProgressBarThemeData? progressBarTheme,
   }) {
     final _this = (this as StreamTheme);
 
@@ -42,10 +46,14 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
+      checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
+      contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
+      contextMenuItemTheme: contextMenuItemTheme ?? _this.contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
+      progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
     );
   }
 
@@ -80,7 +88,26 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.badgeCountTheme,
         t,
       )!,
-      buttonTheme: t < 0.5 ? _this.buttonTheme : other.buttonTheme,
+      buttonTheme: StreamButtonThemeData.lerp(
+        _this.buttonTheme,
+        other.buttonTheme,
+        t,
+      )!,
+      checkboxTheme: StreamCheckboxThemeData.lerp(
+        _this.checkboxTheme,
+        other.checkboxTheme,
+        t,
+      )!,
+      contextMenuTheme: StreamContextMenuThemeData.lerp(
+        _this.contextMenuTheme,
+        other.contextMenuTheme,
+        t,
+      )!,
+      contextMenuItemTheme: StreamContextMenuItemThemeData.lerp(
+        _this.contextMenuItemTheme,
+        other.contextMenuItemTheme,
+        t,
+      )!,
       emojiButtonTheme: StreamEmojiButtonThemeData.lerp(
         _this.emojiButtonTheme,
         other.emojiButtonTheme,
@@ -91,6 +118,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
         _this.onlineIndicatorTheme,
         other.onlineIndicatorTheme,
+        t,
+      )!,
+      progressBarTheme: StreamProgressBarThemeData.lerp(
+        _this.progressBarTheme,
+        other.progressBarTheme,
         t,
       )!,
     );
@@ -120,10 +152,14 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
+        _other.checkboxTheme == _this.checkboxTheme &&
+        _other.contextMenuTheme == _this.contextMenuTheme &&
+        _other.contextMenuItemTheme == _this.contextMenuItemTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
-        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme;
+        _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
+        _other.progressBarTheme == _this.progressBarTheme;
   }
 
   @override
@@ -143,10 +179,14 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.buttonTheme,
+      _this.checkboxTheme,
+      _this.contextMenuTheme,
+      _this.contextMenuItemTheme,
       _this.emojiButtonTheme,
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,
+      _this.progressBarTheme,
     );
   }
 }

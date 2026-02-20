@@ -30,9 +30,9 @@ mixin _$StreamButtonThemeData {
     }
 
     return StreamButtonThemeData(
-      primary: t < 0.5 ? a.primary : b.primary,
-      secondary: t < 0.5 ? a.secondary : b.secondary,
-      destructive: t < 0.5 ? a.destructive : b.destructive,
+      primary: StreamButtonTypeStyle.lerp(a.primary, b.primary, t),
+      secondary: StreamButtonTypeStyle.lerp(a.secondary, b.secondary, t),
+      destructive: StreamButtonTypeStyle.lerp(a.destructive, b.destructive, t),
     );
   }
 
@@ -121,9 +121,9 @@ mixin _$StreamButtonTypeStyle {
     }
 
     return StreamButtonTypeStyle(
-      solid: t < 0.5 ? a.solid : b.solid,
-      outline: t < 0.5 ? a.outline : b.outline,
-      ghost: t < 0.5 ? a.ghost : b.ghost,
+      solid: StreamButtonThemeStyle.lerp(a.solid, b.solid, t),
+      outline: StreamButtonThemeStyle.lerp(a.outline, b.outline, t),
+      ghost: StreamButtonThemeStyle.lerp(a.ghost, b.ghost, t),
     );
   }
 
@@ -153,9 +153,9 @@ mixin _$StreamButtonTypeStyle {
     }
 
     return copyWith(
-      solid: other.solid,
-      outline: other.outline,
-      ghost: other.ghost,
+      solid: _this.solid?.merge(other.solid) ?? other.solid,
+      outline: _this.outline?.merge(other.outline) ?? other.outline,
+      ghost: _this.ghost?.merge(other.ghost) ?? other.ghost,
     );
   }
 
@@ -182,5 +182,143 @@ mixin _$StreamButtonTypeStyle {
     final _this = (this as StreamButtonTypeStyle);
 
     return Object.hash(runtimeType, _this.solid, _this.outline, _this.ghost);
+  }
+}
+
+mixin _$StreamButtonThemeStyle {
+  bool get canMerge => true;
+
+  static StreamButtonThemeStyle? lerp(
+    StreamButtonThemeStyle? a,
+    StreamButtonThemeStyle? b,
+    double t,
+  ) {
+    if (identical(a, b)) {
+      return a;
+    }
+
+    if (a == null) {
+      return t == 1.0 ? b : null;
+    }
+
+    if (b == null) {
+      return t == 0.0 ? a : null;
+    }
+
+    return StreamButtonThemeStyle(
+      backgroundColor: WidgetStateProperty.lerp<Color?>(
+        a.backgroundColor,
+        b.backgroundColor,
+        t,
+        Color.lerp,
+      ),
+      foregroundColor: WidgetStateProperty.lerp<Color?>(
+        a.foregroundColor,
+        b.foregroundColor,
+        t,
+        Color.lerp,
+      ),
+      borderColor: WidgetStateProperty.lerp<Color?>(
+        a.borderColor,
+        b.borderColor,
+        t,
+        Color.lerp,
+      ),
+      overlayColor: WidgetStateProperty.lerp<Color?>(
+        a.overlayColor,
+        b.overlayColor,
+        t,
+        Color.lerp,
+      ),
+      elevation: WidgetStateProperty.lerp<double?>(
+        a.elevation,
+        b.elevation,
+        t,
+        lerpDouble$,
+      ),
+      iconSize: WidgetStateProperty.lerp<double?>(
+        a.iconSize,
+        b.iconSize,
+        t,
+        lerpDouble$,
+      ),
+    );
+  }
+
+  StreamButtonThemeStyle copyWith({
+    WidgetStateProperty<Color?>? backgroundColor,
+    WidgetStateProperty<Color?>? foregroundColor,
+    WidgetStateProperty<Color?>? borderColor,
+    WidgetStateProperty<Color?>? overlayColor,
+    WidgetStateProperty<double?>? elevation,
+    WidgetStateProperty<double?>? iconSize,
+  }) {
+    final _this = (this as StreamButtonThemeStyle);
+
+    return StreamButtonThemeStyle(
+      backgroundColor: backgroundColor ?? _this.backgroundColor,
+      foregroundColor: foregroundColor ?? _this.foregroundColor,
+      borderColor: borderColor ?? _this.borderColor,
+      overlayColor: overlayColor ?? _this.overlayColor,
+      elevation: elevation ?? _this.elevation,
+      iconSize: iconSize ?? _this.iconSize,
+    );
+  }
+
+  StreamButtonThemeStyle merge(StreamButtonThemeStyle? other) {
+    final _this = (this as StreamButtonThemeStyle);
+
+    if (other == null || identical(_this, other)) {
+      return _this;
+    }
+
+    if (!other.canMerge) {
+      return other;
+    }
+
+    return copyWith(
+      backgroundColor: other.backgroundColor,
+      foregroundColor: other.foregroundColor,
+      borderColor: other.borderColor,
+      overlayColor: other.overlayColor,
+      elevation: other.elevation,
+      iconSize: other.iconSize,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final _this = (this as StreamButtonThemeStyle);
+    final _other = (other as StreamButtonThemeStyle);
+
+    return _other.backgroundColor == _this.backgroundColor &&
+        _other.foregroundColor == _this.foregroundColor &&
+        _other.borderColor == _this.borderColor &&
+        _other.overlayColor == _this.overlayColor &&
+        _other.elevation == _this.elevation &&
+        _other.iconSize == _this.iconSize;
+  }
+
+  @override
+  int get hashCode {
+    final _this = (this as StreamButtonThemeStyle);
+
+    return Object.hash(
+      runtimeType,
+      _this.backgroundColor,
+      _this.foregroundColor,
+      _this.borderColor,
+      _this.overlayColor,
+      _this.elevation,
+      _this.iconSize,
+    );
   }
 }

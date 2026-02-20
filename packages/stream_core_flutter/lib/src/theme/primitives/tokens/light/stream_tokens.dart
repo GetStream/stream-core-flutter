@@ -449,7 +449,7 @@ class StreamTokens {
   static const backgroundCoreScrim = Color(0x40000000);
   static const backgroundCoreSurface = Color(0xFFEBEEF1);
   static const backgroundCoreSurfaceSubtle = Color(0xFFF6F8FA);
-  static const backgroundCoreSurfaceStrong = Color(0xFFD5DBE1);
+  static const backgroundCoreSurfaceStrong = Color(0xFFC0C8D2);
   static const backgroundCoreOverlay = Color(0xBFFFFFFF);
   static const backgroundCoreInverse = Color(0xFF1A1B25);
   static const backgroundCoreOverlayLight = Color(0xBFFFFFFF);
