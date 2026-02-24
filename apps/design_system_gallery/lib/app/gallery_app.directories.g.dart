@@ -401,7 +401,7 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerAttachmentLinkPreview',
+            name: 'MessageComposerLinkPreviewAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -412,7 +412,7 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerAttachmentMediaFile',
+            name: 'MessageComposerMediaFileAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -423,7 +423,7 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerAttachmentReply',
+            name: 'MessageComposerReplyAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -434,7 +434,7 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'StreamBaseMessageComposer',
+            name: 'StreamCoreMessageComposer',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',

@@ -36,7 +36,7 @@ mixin _$StreamComponentBuilders {
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
       button: t < 0.5 ? a.button : b.button,
       checkbox: t < 0.5 ? a.checkbox : b.checkbox,
-      contextMenuItem: t < 0.5 ? a.contextMenuItem : b.contextMenuItem,
+      contextMenuAction: t < 0.5 ? a.contextMenuAction : b.contextMenuAction,
       emoji: t < 0.5 ? a.emoji : b.emoji,
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
@@ -52,7 +52,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
     Widget Function(BuildContext, StreamButtonProps)? button,
     Widget Function(BuildContext, StreamCheckboxProps)? checkbox,
-    Widget Function(BuildContext, StreamContextMenuItemProps)? contextMenuItem,
+    Widget Function(BuildContext, StreamContextMenuActionProps<dynamic>)?
+    contextMenuAction,
     Widget Function(BuildContext, StreamEmojiProps)? emoji,
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
@@ -68,7 +69,7 @@ mixin _$StreamComponentBuilders {
       badgeCount: badgeCount ?? _this.badgeCount,
       button: button ?? _this.button,
       checkbox: checkbox ?? _this.checkbox,
-      contextMenuItem: contextMenuItem ?? _this.contextMenuItem,
+      contextMenuAction: contextMenuAction ?? _this.contextMenuAction,
       emoji: emoji ?? _this.emoji,
       emojiButton: emojiButton ?? _this.emojiButton,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
@@ -95,7 +96,7 @@ mixin _$StreamComponentBuilders {
       badgeCount: other.badgeCount,
       button: other.button,
       checkbox: other.checkbox,
-      contextMenuItem: other.contextMenuItem,
+      contextMenuAction: other.contextMenuAction,
       emoji: other.emoji,
       emojiButton: other.emojiButton,
       fileTypeIcon: other.fileTypeIcon,
@@ -123,7 +124,7 @@ mixin _$StreamComponentBuilders {
         _other.badgeCount == _this.badgeCount &&
         _other.button == _this.button &&
         _other.checkbox == _this.checkbox &&
-        _other.contextMenuItem == _this.contextMenuItem &&
+        _other.contextMenuAction == _this.contextMenuAction &&
         _other.emoji == _this.emoji &&
         _other.emojiButton == _this.emojiButton &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
@@ -143,7 +144,7 @@ mixin _$StreamComponentBuilders {
       _this.badgeCount,
       _this.button,
       _this.checkbox,
-      _this.contextMenuItem,
+      _this.contextMenuAction,
       _this.emoji,
       _this.emojiButton,
       _this.fileTypeIcon,

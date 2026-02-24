@@ -24,58 +24,51 @@ class _PlaygroundDemo extends StatefulWidget {
 }
 
 class _PlaygroundDemoState extends State<_PlaygroundDemo> {
+  String? _inlineTapped;
+  String? _dialogReturned;
+
   @override
   Widget build(BuildContext context) {
     final icons = context.streamIcons;
+    final spacing = context.streamSpacing;
 
-    final itemCount = context.knobs.int.slider(
-      label: 'Item Count',
+    final actionCount = context.knobs.int.slider(
+      label: 'Action Count',
       initialValue: 5,
       min: 1,
       max: 8,
-      description: 'Number of regular menu items to display.',
+      description: 'Number of regular menu actions to display.',
     );
 
     final showLeadingIcon = context.knobs.boolean(
       label: 'Leading Icon',
       initialValue: true,
-      description: 'Show an icon before each item label.',
+      description: 'Show an icon before each action label.',
     );
 
     final showTrailingIcon = context.knobs.boolean(
       label: 'Trailing Icon',
-      description: 'Show a chevron after each item label.',
+      description: 'Show a chevron after each action label.',
     );
 
     final showSeparator = context.knobs.boolean(
       label: 'Separator',
       initialValue: true,
-      description: 'Show a divider before the last item group.',
+      description: 'Show a divider before the destructive group.',
     );
 
-    final showDestructiveItem = context.knobs.boolean(
-      label: 'Destructive Item',
+    final showDestructiveAction = context.knobs.boolean(
+      label: 'Destructive Action',
       initialValue: true,
       description: 'Include a destructive action at the end.',
     );
 
-    final hasDisabledItem = context.knobs.boolean(
-      label: 'Disabled Item',
-      description: 'Make the second item disabled.',
+    final hasDisabledAction = context.knobs.boolean(
+      label: 'Disabled Action',
+      description: 'Make the second action disabled.',
     );
 
-    void onTap(String label) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('Tapped: $label'),
-            duration: const Duration(seconds: 1),
-          ),
-        );
-    }
-
-    final itemData = <({String label, IconData icon})>[
+    final actionData = <({String label, IconData icon})>[
       (label: 'Reply', icon: icons.arrowShareLeft),
       (label: 'Thread Reply', icon: icons.bubbleText6ChatMessage),
       (label: 'Pin to Conversation', icon: icons.pin),
@@ -86,25 +79,129 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       (label: 'Flag Message', icon: icons.flag2),
     ];
 
-    final items = <Widget>[
-      for (var i = 0; i < itemCount; i++)
-        StreamContextMenuItem(
-          label: Text(itemData[i].label),
-          leading: showLeadingIcon ? Icon(itemData[i].icon) : null,
-          trailing: showTrailingIcon ? Icon(icons.chevronRight) : null,
-          onPressed: (hasDisabledItem && i == 1) ? null : () => onTap(itemData[i].label),
-        ),
-      if (showSeparator && showDestructiveItem) const StreamContextMenuSeparator(),
-      if (showDestructiveItem)
-        StreamContextMenuItem.destructive(
-          label: const Text('Delete Message'),
-          leading: showLeadingIcon ? Icon(icons.trashBin) : null,
-          onPressed: () => onTap('Delete Message'),
-        ),
-    ];
+    List<Widget> buildInlineActions() {
+      return [
+        for (var i = 0; i < actionCount; i++)
+          StreamContextMenuAction<String>(
+            value: actionData[i].label,
+            label: Text(actionData[i].label),
+            leading: showLeadingIcon ? Icon(actionData[i].icon) : null,
+            trailing: showTrailingIcon ? Icon(icons.chevronRight) : null,
+            enabled: !(hasDisabledAction && i == 1),
+            onTap: () => setState(() => _inlineTapped = actionData[i].label),
+          ),
+        if (showSeparator && showDestructiveAction) const StreamContextMenuSeparator(),
+        if (showDestructiveAction)
+          StreamContextMenuAction<String>.destructive(
+            value: 'Delete Message',
+            label: const Text('Delete Message'),
+            leading: showLeadingIcon ? Icon(icons.trashBin) : null,
+            onTap: () => setState(() => _inlineTapped = 'Delete Message'),
+          ),
+      ];
+    }
+
+    List<Widget> buildDialogActions() {
+      return [
+        for (var i = 0; i < actionCount; i++)
+          StreamContextMenuAction<String>(
+            value: actionData[i].label,
+            label: Text(actionData[i].label),
+            leading: showLeadingIcon ? Icon(actionData[i].icon) : null,
+            trailing: showTrailingIcon ? Icon(icons.chevronRight) : null,
+            enabled: !(hasDisabledAction && i == 1),
+          ),
+        if (showSeparator && showDestructiveAction) const StreamContextMenuSeparator(),
+        if (showDestructiveAction)
+          StreamContextMenuAction<String>.destructive(
+            value: 'Delete Message',
+            label: const Text('Delete Message'),
+            leading: showLeadingIcon ? Icon(icons.trashBin) : null,
+          ),
+      ];
+    }
+
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
 
     return Center(
-      child: StreamContextMenu(children: items),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(vertical: spacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Inline header.
+            Text(
+              'Inline',
+              style: textTheme.captionEmphasis.copyWith(
+                color: colorScheme.textPrimary,
+              ),
+            ),
+            SizedBox(height: spacing.xxs),
+            Text(
+              'Rendered directly — taps fire onTap',
+              style: textTheme.metadataDefault.copyWith(
+                color: colorScheme.textTertiary,
+              ),
+            ),
+            SizedBox(height: spacing.sm),
+
+            StreamContextMenu(children: buildInlineActions()),
+            SizedBox(height: spacing.xs),
+            _ResultChip(
+              label: _inlineTapped != null ? 'onTap: "$_inlineTapped"' : 'Tap an action',
+              isActive: _inlineTapped != null,
+            ),
+
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: spacing.xl),
+              child: Divider(indent: spacing.xl, endIndent: spacing.xl),
+            ),
+
+            // Dialog header.
+            Text(
+              'Dialog',
+              style: textTheme.captionEmphasis.copyWith(
+                color: colorScheme.textPrimary,
+              ),
+            ),
+            SizedBox(height: spacing.xxs),
+            Text(
+              'Opened in a route — taps return value via pop',
+              style: textTheme.metadataDefault.copyWith(
+                color: colorScheme.textTertiary,
+              ),
+            ),
+            SizedBox(height: spacing.sm),
+
+            StreamButton(
+              label: 'Open as Dialog',
+              type: StreamButtonType.outline,
+              size: StreamButtonSize.small,
+              onTap: () async {
+                final result = await showDialog<String>(
+                  context: context,
+                  useRootNavigator: false,
+                  builder: (_) => Dialog(
+                    backgroundColor: StreamColors.transparent,
+                    child: StreamContextMenu(
+                      children: buildDialogActions(),
+                    ),
+                  ),
+                );
+                if (mounted && result != null) {
+                  setState(() => _dialogReturned = result);
+                }
+              },
+            ),
+            SizedBox(height: spacing.xs),
+            _ResultChip(
+              label: _dialogReturned != null ? 'value: "$_dialogReturned"' : 'Open and select',
+              isActive: _dialogReturned != null,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -130,9 +227,13 @@ Widget buildStreamContextMenuShowcase(BuildContext context) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _ItemStatesSection(),
+          const _ActionStatesSection(),
           SizedBox(height: spacing.xl),
           const _MenuCompositionsSection(),
+          SizedBox(height: spacing.xl),
+          const _DialogIntegrationSection(),
+          SizedBox(height: spacing.xl),
+          const _CustomThemingSection(),
           SizedBox(height: spacing.xl),
           const _RealWorldSection(),
         ],
@@ -142,11 +243,11 @@ Widget buildStreamContextMenuShowcase(BuildContext context) {
 }
 
 // =============================================================================
-// Item States Section
+// Action States Section
 // =============================================================================
 
-class _ItemStatesSection extends StatelessWidget {
-  const _ItemStatesSection();
+class _ActionStatesSection extends StatelessWidget {
+  const _ActionStatesSection();
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +257,7 @@ class _ItemStatesSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: spacing.md,
       children: const [
-        _SectionLabel(label: 'ITEM STATES'),
+        _SectionLabel(label: 'ACTION STATES'),
         _NormalStatesCard(),
         _DestructiveStatesCard(),
       ],
@@ -179,7 +280,7 @@ class _NormalStatesCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: spacing.xxs,
         children: [
-          StreamContextMenuItem(
+          StreamContextMenuAction<void>(
             label: const Text(
               'With Leading & Trailing',
               maxLines: 1,
@@ -187,21 +288,19 @@ class _NormalStatesCard extends StatelessWidget {
             ),
             leading: Icon(icons.plusLarge),
             trailing: Icon(icons.chevronRight),
-            onPressed: () {},
           ),
-          StreamContextMenuItem(
+          StreamContextMenuAction<void>(
             label: const Text('With Leading Only'),
             leading: Icon(icons.plusLarge),
-            onPressed: () {},
           ),
-          StreamContextMenuItem(
+          StreamContextMenuAction<void>(
             label: const Text('Label Only'),
-            onPressed: () {},
           ),
-          StreamContextMenuItem(
+          StreamContextMenuAction<void>(
             label: const Text('Disabled'),
             leading: Icon(icons.plusLarge),
             trailing: Icon(icons.chevronRight),
+            enabled: false,
           ),
         ],
       ),
@@ -224,7 +323,7 @@ class _DestructiveStatesCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: spacing.xxs,
         children: [
-          StreamContextMenuItem.destructive(
+          StreamContextMenuAction<void>.destructive(
             label: const Text(
               'With Leading & Trailing',
               maxLines: 1,
@@ -232,21 +331,19 @@ class _DestructiveStatesCard extends StatelessWidget {
             ),
             leading: Icon(icons.trashBin),
             trailing: Icon(icons.chevronRight),
-            onPressed: () {},
           ),
-          StreamContextMenuItem.destructive(
+          StreamContextMenuAction<void>.destructive(
             label: const Text('With Leading Only'),
             leading: Icon(icons.trashBin),
-            onPressed: () {},
           ),
-          StreamContextMenuItem.destructive(
+          StreamContextMenuAction<void>.destructive(
             label: const Text('Label Only'),
-            onPressed: () {},
           ),
-          StreamContextMenuItem.destructive(
+          StreamContextMenuAction<void>.destructive(
             label: const Text('Disabled'),
             leading: Icon(icons.trashBin),
             trailing: Icon(icons.chevronRight),
+            enabled: false,
           ),
         ],
       ),
@@ -273,21 +370,18 @@ class _MenuCompositionsSection extends StatelessWidget {
         const _SectionLabel(label: 'MENU COMPOSITIONS'),
         _ExampleCard(
           title: 'Simple Menu',
-          description: 'Basic items without icons',
+          description: 'Basic actions without icons',
           child: Center(
             child: StreamContextMenu(
               children: [
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Cut'),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Copy'),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Paste'),
-                  onPressed: () {},
                 ),
               ],
             ),
@@ -295,24 +389,21 @@ class _MenuCompositionsSection extends StatelessWidget {
         ),
         _ExampleCard(
           title: 'With Icons',
-          description: 'Items with leading icons',
+          description: 'Actions with leading icons',
           child: Center(
             child: StreamContextMenu(
               children: [
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Reply'),
                   leading: Icon(icons.arrowShareLeft),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
                   leading: Icon(icons.squareBehindSquare2Copy),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Flag Message'),
                   leading: Icon(icons.flag2),
-                  onPressed: () {},
                 ),
               ],
             ),
@@ -324,21 +415,18 @@ class _MenuCompositionsSection extends StatelessWidget {
           child: Center(
             child: StreamContextMenu(
               children: [
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Reply'),
                   leading: Icon(icons.arrowShareLeft),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
                   leading: Icon(icons.squareBehindSquare2Copy),
-                  onPressed: () {},
                 ),
                 const StreamContextMenuSeparator(),
-                StreamContextMenuItem.destructive(
+                StreamContextMenuAction<void>.destructive(
                   label: const Text('Delete'),
                   leading: Icon(icons.trashBin),
-                  onPressed: () {},
                 ),
               ],
             ),
@@ -346,61 +434,336 @@ class _MenuCompositionsSection extends StatelessWidget {
         ),
         _ExampleCard(
           title: 'Auto-Separated',
-          description: 'Using StreamContextMenu.separated',
+          description: 'Using StreamContextMenuAction.separated',
           child: Center(
-            child: StreamContextMenu.separated(
-              children: [
-                StreamContextMenuItem(
-                  label: const Text('Reply'),
-                  leading: Icon(icons.arrowShareLeft),
-                  onPressed: () {},
+            child: StreamContextMenu(
+              children: StreamContextMenuAction.separated(
+                items: [
+                  StreamContextMenuAction<void>(
+                    label: const Text('Reply'),
+                    leading: Icon(icons.arrowShareLeft),
+                  ),
+                  StreamContextMenuAction<void>(
+                    label: const Text('Copy Message'),
+                    leading: Icon(icons.squareBehindSquare2Copy),
+                  ),
+                  StreamContextMenuAction<void>(
+                    label: const Text('Flag Message'),
+                    leading: Icon(icons.flag2),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          title: 'Auto-Sectioned',
+          description: 'Using StreamContextMenuAction.sectioned',
+          child: Center(
+            child: StreamContextMenu(
+              children: StreamContextMenuAction.sectioned(
+                sections: [
+                  [
+                    StreamContextMenuAction<void>(
+                      label: const Text('Reply'),
+                      leading: Icon(icons.arrowShareLeft),
+                    ),
+                    StreamContextMenuAction<void>(
+                      label: const Text('Copy Message'),
+                      leading: Icon(icons.squareBehindSquare2Copy),
+                    ),
+                    StreamContextMenuAction<void>(
+                      label: const Text('Flag Message'),
+                      leading: Icon(icons.flag2),
+                    ),
+                  ],
+                  [
+                    StreamContextMenuAction<void>.destructive(
+                      label: const Text('Delete Message'),
+                      leading: Icon(icons.trashBin),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          title: 'Auto-Partitioned',
+          description: 'Using StreamContextMenuAction.partitioned',
+          child: Center(
+            child: StreamContextMenu(
+              children: StreamContextMenuAction.partitioned(
+                items: [
+                  StreamContextMenuAction<void>(
+                    label: const Text('Reply'),
+                    leading: Icon(icons.arrowShareLeft),
+                  ),
+                  StreamContextMenuAction<void>(
+                    label: const Text('Copy Message'),
+                    leading: Icon(icons.squareBehindSquare2Copy),
+                  ),
+                  StreamContextMenuAction<void>(
+                    label: const Text('Flag Message'),
+                    leading: Icon(icons.flag2),
+                  ),
+                  StreamContextMenuAction<void>.destructive(
+                    label: const Text('Delete Message'),
+                    leading: Icon(icons.trashBin),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Dialog Integration Section
+// =============================================================================
+
+enum _SampleAction { reply, copy, flag, delete }
+
+class _DialogIntegrationSection extends StatelessWidget {
+  const _DialogIntegrationSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: const [
+        _SectionLabel(label: 'DIALOG INTEGRATION'),
+        _TypedValueReturnCard(),
+        _EnumValueReturnCard(),
+      ],
+    );
+  }
+}
+
+class _TypedValueReturnCard extends StatefulWidget {
+  const _TypedValueReturnCard();
+
+  @override
+  State<_TypedValueReturnCard> createState() => _TypedValueReturnCardState();
+}
+
+class _TypedValueReturnCardState extends State<_TypedValueReturnCard> {
+  String? _result;
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = context.streamIcons;
+    final spacing = context.streamSpacing;
+
+    return _ExampleCard(
+      title: 'String Value Return',
+      description: 'Actions carry a String value returned via Navigator.pop',
+      child: Center(
+        child: Column(
+          spacing: spacing.sm,
+          children: [
+            StreamButton(
+              label: 'Open Menu',
+              type: StreamButtonType.outline,
+              size: StreamButtonSize.small,
+              onTap: () async {
+                final result = await showDialog<String>(
+                  context: context,
+                  builder: (_) => Dialog(
+                    backgroundColor: StreamColors.transparent,
+                    child: StreamContextMenu(
+                      children: [
+                        StreamContextMenuAction<String>(
+                          value: 'reply',
+                          label: const Text('Reply'),
+                          leading: Icon(icons.arrowShareLeft),
+                        ),
+                        StreamContextMenuAction<String>(
+                          value: 'copy',
+                          label: const Text('Copy Message'),
+                          leading: Icon(icons.squareBehindSquare2Copy),
+                        ),
+                        StreamContextMenuAction<String>(
+                          value: 'flag',
+                          label: const Text('Flag Message'),
+                          leading: Icon(icons.flag2),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+                setState(() => _result = result);
+              },
+            ),
+            _ResultChip(
+              label: _result != null ? '"$_result"' : 'No selection yet',
+              isActive: _result != null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EnumValueReturnCard extends StatefulWidget {
+  const _EnumValueReturnCard();
+
+  @override
+  State<_EnumValueReturnCard> createState() => _EnumValueReturnCardState();
+}
+
+class _EnumValueReturnCardState extends State<_EnumValueReturnCard> {
+  _SampleAction? _result;
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = context.streamIcons;
+    final spacing = context.streamSpacing;
+
+    return _ExampleCard(
+      title: 'Enum Value Return',
+      description: 'Type-safe actions using an enum as the value type',
+      child: Center(
+        child: Column(
+          spacing: spacing.sm,
+          children: [
+            StreamButton(
+              label: 'Open Menu',
+              type: StreamButtonType.outline,
+              size: StreamButtonSize.small,
+              onTap: () async {
+                final result = await showDialog<_SampleAction>(
+                  context: context,
+                  builder: (_) => Dialog(
+                    backgroundColor: StreamColors.transparent,
+                    child: StreamContextMenu(
+                      children: [
+                        StreamContextMenuAction<_SampleAction>(
+                          value: _SampleAction.reply,
+                          label: const Text('Reply'),
+                          leading: Icon(icons.arrowShareLeft),
+                        ),
+                        StreamContextMenuAction<_SampleAction>(
+                          value: _SampleAction.copy,
+                          label: const Text('Copy Message'),
+                          leading: Icon(icons.squareBehindSquare2Copy),
+                        ),
+                        StreamContextMenuAction<_SampleAction>(
+                          value: _SampleAction.flag,
+                          label: const Text('Flag Message'),
+                          leading: Icon(icons.flag2),
+                        ),
+                        const StreamContextMenuSeparator(),
+                        StreamContextMenuAction<_SampleAction>.destructive(
+                          value: _SampleAction.delete,
+                          label: const Text('Delete Message'),
+                          leading: Icon(icons.trashBin),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+                setState(() => _result = result);
+              },
+            ),
+            _ResultChip(
+              label: _result != null ? '_SampleAction.${_result!.name}' : 'No selection yet',
+              isActive: _result != null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// Custom Theming Section
+// =============================================================================
+
+class _CustomThemingSection extends StatelessWidget {
+  const _CustomThemingSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = context.streamIcons;
+    final spacing = context.streamSpacing;
+    final colorScheme = context.streamColorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: [
+        const _SectionLabel(label: 'CUSTOM THEMING'),
+        _ExampleCard(
+          title: 'Compact Style',
+          description: 'Smaller padding and text for dense layouts',
+          child: Center(
+            child: StreamContextMenuActionTheme(
+              data: const StreamContextMenuActionThemeData(
+                style: StreamContextMenuActionStyle(
+                  minimumSize: WidgetStatePropertyAll(Size(200, 32)),
+                  iconSize: WidgetStatePropertyAll(16),
+                  padding: WidgetStatePropertyAll(
+                    EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  ),
                 ),
-                StreamContextMenuItem(
-                  label: const Text('Copy Message'),
-                  leading: Icon(icons.squareBehindSquare2Copy),
-                  onPressed: () {},
-                ),
-                StreamContextMenuItem(
-                  label: const Text('Flag Message'),
-                  leading: Icon(icons.flag2),
-                  onPressed: () {},
-                ),
-              ],
+              ),
+              child: StreamContextMenu(
+                children: [
+                  StreamContextMenuAction<void>(
+                    label: const Text('Reply'),
+                    leading: Icon(icons.arrowShareLeft),
+                  ),
+                  StreamContextMenuAction<void>(
+                    label: const Text('Copy'),
+                    leading: Icon(icons.squareBehindSquare2Copy),
+                  ),
+                  StreamContextMenuAction<void>(
+                    label: const Text('Flag'),
+                    leading: Icon(icons.flag2),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         _ExampleCard(
           title: 'Sub-Menu Navigation',
-          description: 'Back item with nested items',
+          description: 'Back action with tertiary styling via a local theme',
           child: Center(
             child: StreamContextMenu(
               children: [
-                StreamContextMenuItemTheme(
-                  data: StreamContextMenuItemThemeData(
-                    style: StreamContextMenuItemStyle(
+                StreamContextMenuActionTheme(
+                  data: StreamContextMenuActionThemeData(
+                    style: StreamContextMenuActionStyle(
                       foregroundColor: WidgetStatePropertyAll(
-                        context.streamColorScheme.textTertiary,
+                        colorScheme.textTertiary,
                       ),
                       iconColor: WidgetStatePropertyAll(
-                        context.streamColorScheme.textTertiary,
+                        colorScheme.textTertiary,
                       ),
                     ),
                   ),
-                  child: StreamContextMenuItem(
+                  child: StreamContextMenuAction<void>(
                     label: const Text('Reactions'),
                     leading: Icon(icons.chevronLeft),
-                    onPressed: () {},
                   ),
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Love'),
                   leading: Icon(icons.heart2),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Smile'),
                   leading: Icon(icons.emojiSmile),
-                  onPressed: () {},
                 ),
               ],
             ),
@@ -434,56 +797,46 @@ class _RealWorldSection extends StatelessWidget {
           child: Center(
             child: StreamContextMenu(
               children: [
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Reply'),
                   leading: Icon(icons.arrowShareLeft),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Thread Reply'),
                   leading: Icon(icons.bubbleText6ChatMessage),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Pin to Conversation'),
                   leading: Icon(icons.pin),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
                   leading: Icon(icons.squareBehindSquare2Copy),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Mark Unread'),
                   leading: Icon(icons.bubbleWideNotificationChatMessage),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Remind Me'),
                   leading: Icon(icons.bellNotification),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Save For Later'),
                   leading: Icon(icons.fileBend),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Flag Message'),
                   leading: Icon(icons.flag2),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Mute User'),
                   leading: Icon(icons.mute),
-                  onPressed: () {},
                 ),
                 const StreamContextMenuSeparator(),
-                StreamContextMenuItem.destructive(
+                StreamContextMenuAction<void>.destructive(
                   label: const Text('Block User'),
                   leading: Icon(icons.circleBanSign),
-                  onPressed: () {},
                 ),
               ],
             ),
@@ -495,36 +848,30 @@ class _RealWorldSection extends StatelessWidget {
           child: Center(
             child: StreamContextMenu(
               children: [
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Reply'),
                   leading: Icon(icons.arrowShareLeft),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Thread Reply'),
                   leading: Icon(icons.bubbleText6ChatMessage),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Pin to Conversation'),
                   leading: Icon(icons.pin),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
                   leading: Icon(icons.squareBehindSquare2Copy),
-                  onPressed: () {},
                 ),
-                StreamContextMenuItem(
+                StreamContextMenuAction<void>(
                   label: const Text('Edit Message'),
                   leading: Icon(icons.editBig),
-                  onPressed: () {},
                 ),
                 const StreamContextMenuSeparator(),
-                StreamContextMenuItem.destructive(
+                StreamContextMenuAction<void>.destructive(
                   label: const Text('Delete Message'),
                   leading: Icon(icons.trashBin),
-                  onPressed: () {},
                 ),
               ],
             ),
@@ -638,6 +985,41 @@ class _SectionLabel extends StatelessWidget {
           color: colorScheme.textOnAccent,
           letterSpacing: 1,
           fontSize: 9,
+        ),
+      ),
+    );
+  }
+}
+
+class _ResultChip extends StatelessWidget {
+  const _ResultChip({required this.label, required this.isActive});
+
+  final String label;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.sm,
+        vertical: spacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: isActive ? colorScheme.accentPrimary.withValues(alpha: 0.1) : colorScheme.backgroundSurfaceSubtle,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: isActive ? colorScheme.accentPrimary : colorScheme.borderDefault,
+        ),
+      ),
+      child: Text(
+        label,
+        style: textTheme.metadataEmphasis.copyWith(
+          fontFamily: isActive ? 'monospace' : null,
+          color: isActive ? colorScheme.accentPrimary : colorScheme.textTertiary,
         ),
       ),
     );
