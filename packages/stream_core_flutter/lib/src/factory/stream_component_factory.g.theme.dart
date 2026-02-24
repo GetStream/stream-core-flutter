@@ -39,6 +39,7 @@ mixin _$StreamComponentBuilders {
       contextMenuItem: t < 0.5 ? a.contextMenuItem : b.contextMenuItem,
       emoji: t < 0.5 ? a.emoji : b.emoji,
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
+      emojiChip: t < 0.5 ? a.emojiChip : b.emojiChip,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
@@ -55,6 +56,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamContextMenuItemProps)? contextMenuItem,
     Widget Function(BuildContext, StreamEmojiProps)? emoji,
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
+    Widget Function(BuildContext, StreamEmojiChipProps)? emojiChip,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
@@ -71,6 +73,7 @@ mixin _$StreamComponentBuilders {
       contextMenuItem: contextMenuItem ?? _this.contextMenuItem,
       emoji: emoji ?? _this.emoji,
       emojiButton: emojiButton ?? _this.emojiButton,
+      emojiChip: emojiChip ?? _this.emojiChip,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
@@ -98,6 +101,7 @@ mixin _$StreamComponentBuilders {
       contextMenuItem: other.contextMenuItem,
       emoji: other.emoji,
       emojiButton: other.emojiButton,
+      emojiChip: other.emojiChip,
       fileTypeIcon: other.fileTypeIcon,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
@@ -126,6 +130,7 @@ mixin _$StreamComponentBuilders {
         _other.contextMenuItem == _this.contextMenuItem &&
         _other.emoji == _this.emoji &&
         _other.emojiButton == _this.emojiButton &&
+        _other.emojiChip == _this.emojiChip &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar;
@@ -146,6 +151,7 @@ mixin _$StreamComponentBuilders {
       _this.contextMenuItem,
       _this.emoji,
       _this.emojiButton,
+      _this.emojiChip,
       _this.fileTypeIcon,
       _this.onlineIndicator,
       _this.progressBar,

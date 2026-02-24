@@ -11,6 +11,7 @@ import 'components/stream_checkbox_theme.dart';
 import 'components/stream_context_menu_item_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
+import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
@@ -96,6 +97,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
+    StreamEmojiChipThemeData? emojiChipTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
@@ -123,6 +125,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     contextMenuTheme ??= const StreamContextMenuThemeData();
     contextMenuItemTheme ??= const StreamContextMenuItemThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
+    emojiChipTheme ??= const StreamEmojiChipThemeData();
     messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
@@ -144,6 +147,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuTheme: contextMenuTheme,
       contextMenuItemTheme: contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme,
+      emojiChipTheme: emojiChipTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
@@ -179,6 +183,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.contextMenuTheme,
     required this.contextMenuItemTheme,
     required this.emojiButtonTheme,
+    required this.emojiChipTheme,
     required this.messageTheme,
     required this.inputTheme,
     required this.onlineIndicatorTheme,
@@ -264,6 +269,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The emoji button theme for this theme.
   final StreamEmojiButtonThemeData emojiButtonTheme;
 
+  /// The emoji chip theme for this theme.
+  final StreamEmojiChipThemeData emojiChipTheme;
+
   /// The message theme for this theme.
   final StreamMessageThemeData messageTheme;
 
@@ -312,6 +320,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuTheme: contextMenuTheme,
       contextMenuItemTheme: contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme,
+      emojiChipTheme: emojiChipTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,

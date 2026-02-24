@@ -166,6 +166,8 @@ class DefaultStreamEmojiButton extends StatelessWidget {
       iconSize: emojiSize.value,
       icon: StreamEmoji(emoji: props.emoji),
       style: ButtonStyle(
+        tapTargetSize: .shrinkWrap,
+        visualDensity: .standard,
         fixedSize: .all(.square(effectiveSize.value)),
         minimumSize: .all(.square(effectiveSize.value)),
         maximumSize: .all(.square(effectiveSize.value)),

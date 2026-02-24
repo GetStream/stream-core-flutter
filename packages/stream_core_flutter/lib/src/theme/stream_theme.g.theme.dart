@@ -27,6 +27,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
+    StreamEmojiChipThemeData? emojiChipTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
@@ -50,6 +51,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
       contextMenuItemTheme: contextMenuItemTheme ?? _this.contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
+      emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
@@ -113,6 +115,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.emojiButtonTheme,
         t,
       )!,
+      emojiChipTheme: StreamEmojiChipThemeData.lerp(
+        _this.emojiChipTheme,
+        other.emojiChipTheme,
+        t,
+      )!,
       messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
       inputTheme: t < 0.5 ? _this.inputTheme : other.inputTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
@@ -156,6 +163,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuItemTheme == _this.contextMenuItemTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
+        _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
@@ -166,7 +174,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   int get hashCode {
     final _this = (this as StreamTheme);
 
-    return Object.hash(
+    return Object.hashAll([
       runtimeType,
       _this.brightness,
       _this.icons,
@@ -183,10 +191,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.contextMenuTheme,
       _this.contextMenuItemTheme,
       _this.emojiButtonTheme,
+      _this.emojiChipTheme,
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,
       _this.progressBarTheme,
-    );
+    ]);
   }
 }

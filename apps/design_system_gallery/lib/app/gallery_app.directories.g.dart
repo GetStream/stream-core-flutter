@@ -34,6 +34,8 @@ import 'package:design_system_gallery/components/common/stream_progress_bar.dart
     as _design_system_gallery_components_common_stream_progress_bar;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
+import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart'
+    as _design_system_gallery_components_controls_stream_emoji_chip;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
@@ -398,10 +400,32 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'Controls',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamEmojiChip',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_emoji_chip
+                        .buildStreamEmojiChipPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_stream_emoji_chip
+                        .buildStreamEmojiChipShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerAttachmentLinkPreview',
+            name: 'MessageComposerLinkPreviewAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -412,7 +436,7 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerAttachmentMediaFile',
+            name: 'MessageComposerMediaFileAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -423,7 +447,7 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerAttachmentReply',
+            name: 'MessageComposerReplyAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -434,7 +458,7 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'StreamBaseMessageComposer',
+            name: 'StreamCoreMessageComposer',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
