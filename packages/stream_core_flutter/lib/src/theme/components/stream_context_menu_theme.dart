@@ -28,7 +28,7 @@ part 'stream_context_menu_theme.g.theme.dart';
 ///   ),
 ///   child: StreamContextMenu(
 ///     children: [
-///       StreamContextMenuItem(label: Text('Reply'), onPressed: () {}),
+///       StreamContextMenuAction(label: Text('Reply')),
 ///     ],
 ///   ),
 /// )
@@ -40,7 +40,7 @@ part 'stream_context_menu_theme.g.theme.dart';
 ///  * [StreamContextMenuThemeData], which describes the context menu theme.
 ///  * [StreamContextMenuStyle], for container-level styling.
 ///  * [StreamContextMenu], which uses this theme.
-///  * [StreamContextMenuItemTheme], for customizing individual item appearance.
+///  * [StreamContextMenuActionTheme], for customizing individual action appearance.
 class StreamContextMenuTheme extends InheritedTheme {
   /// Creates a context menu theme that controls descendant context menus.
   const StreamContextMenuTheme({

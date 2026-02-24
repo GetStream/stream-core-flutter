@@ -8,7 +8,7 @@ import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
-import 'components/stream_context_menu_item_theme.dart';
+import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_input_theme.dart';
@@ -94,7 +94,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
-    StreamContextMenuItemThemeData? contextMenuItemTheme,
+    StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
@@ -121,7 +121,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     buttonTheme ??= const StreamButtonThemeData();
     checkboxTheme ??= const StreamCheckboxThemeData();
     contextMenuTheme ??= const StreamContextMenuThemeData();
-    contextMenuItemTheme ??= const StreamContextMenuItemThemeData();
+    contextMenuActionTheme ??= const StreamContextMenuActionThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
@@ -142,7 +142,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       contextMenuTheme: contextMenuTheme,
-      contextMenuItemTheme: contextMenuItemTheme,
+      contextMenuActionTheme: contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
@@ -177,7 +177,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.buttonTheme,
     required this.checkboxTheme,
     required this.contextMenuTheme,
-    required this.contextMenuItemTheme,
+    required this.contextMenuActionTheme,
     required this.emojiButtonTheme,
     required this.messageTheme,
     required this.inputTheme,
@@ -258,8 +258,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The context menu theme for this theme.
   final StreamContextMenuThemeData contextMenuTheme;
 
-  /// The context menu item theme for this theme.
-  final StreamContextMenuItemThemeData contextMenuItemTheme;
+  /// The context menu action theme for this theme.
+  final StreamContextMenuActionThemeData contextMenuActionTheme;
 
   /// The emoji button theme for this theme.
   final StreamEmojiButtonThemeData emojiButtonTheme;
@@ -310,7 +310,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       contextMenuTheme: contextMenuTheme,
-      contextMenuItemTheme: contextMenuItemTheme,
+      contextMenuActionTheme: contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
