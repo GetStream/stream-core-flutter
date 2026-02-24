@@ -52,7 +52,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
     Widget Function(BuildContext, StreamButtonProps)? button,
     Widget Function(BuildContext, StreamCheckboxProps)? checkbox,
-    Widget Function(BuildContext, StreamContextMenuActionProps<dynamic>)?
+    Widget Function(BuildContext, StreamContextMenuActionProps<Object?>)?
     contextMenuAction,
     Widget Function(BuildContext, StreamEmojiProps)? emoji,
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
