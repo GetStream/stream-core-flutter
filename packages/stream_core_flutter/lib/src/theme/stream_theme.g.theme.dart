@@ -25,7 +25,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
-    StreamContextMenuItemThemeData? contextMenuItemTheme,
+    StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamListTileThemeData? listTileTheme,
@@ -50,7 +50,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
-      contextMenuItemTheme: contextMenuItemTheme ?? _this.contextMenuItemTheme,
+      contextMenuActionTheme:
+          contextMenuActionTheme ?? _this.contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
@@ -107,9 +108,9 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.contextMenuTheme,
         t,
       )!,
-      contextMenuItemTheme: StreamContextMenuItemThemeData.lerp(
-        _this.contextMenuItemTheme,
-        other.contextMenuItemTheme,
+      contextMenuActionTheme: StreamContextMenuActionThemeData.lerp(
+        _this.contextMenuActionTheme,
+        other.contextMenuActionTheme,
         t,
       )!,
       emojiButtonTheme: StreamEmojiButtonThemeData.lerp(
@@ -168,7 +169,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.buttonTheme == _this.buttonTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
         _other.contextMenuTheme == _this.contextMenuTheme &&
-        _other.contextMenuItemTheme == _this.contextMenuItemTheme &&
+        _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.listTileTheme == _this.listTileTheme &&
@@ -197,7 +198,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.buttonTheme,
       _this.checkboxTheme,
       _this.contextMenuTheme,
-      _this.contextMenuItemTheme,
+      _this.contextMenuActionTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.listTileTheme,

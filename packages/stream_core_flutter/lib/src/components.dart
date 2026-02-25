@@ -11,7 +11,7 @@ export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButt
 export 'components/common/stream_checkbox.dart' hide DefaultStreamCheckbox;
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;
 export 'components/context_menu/stream_context_menu.dart';
-export 'components/context_menu/stream_context_menu_item.dart' hide DefaultStreamContextMenuItem;
+export 'components/context_menu/stream_context_menu_action.dart' hide DefaultStreamContextMenuAction;
 export 'components/controls/stream_emoji_chip.dart' hide DefaultStreamEmojiChip;
 export 'components/controls/stream_remove_control.dart';
 export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;

@@ -13,34 +13,35 @@ import '../../theme/stream_theme_extensions.dart';
 /// decorated container with a shape, border, and drop shadow. The container
 /// is sized intrinsically to the width of its widest child.
 ///
-/// Children are typically [StreamContextMenuItem] and
-/// [StreamContextMenuSeparator] widgets. Use [StreamContextMenu.separated]
-/// to automatically insert separators between each child.
+/// Children are typically [StreamContextMenuAction] and
+/// [StreamContextMenuSeparator] widgets. For automatic separator insertion,
+/// use [StreamContextMenuAction.separated] to divide every item, or
+/// [StreamContextMenuAction.sectioned] to divide logical groups.
 ///
 /// The container's appearance can be customized via [StreamContextMenuTheme].
 ///
 /// {@tool snippet}
 ///
-/// Display a context menu with items:
+/// A basic context menu with a manual separator:
 ///
 /// ```dart
 /// StreamContextMenu(
 ///   children: [
-///     StreamContextMenuItem(
+///     StreamContextMenuAction(
+///       value: 'reply',
 ///       label: Text('Reply'),
 ///       leading: Icon(Icons.reply),
-///       onPressed: () => handleReply(),
 ///     ),
-///     StreamContextMenuItem(
+///     StreamContextMenuAction(
+///       value: 'copy',
 ///       label: Text('Copy Message'),
 ///       leading: Icon(Icons.copy),
-///       onPressed: () => handleCopy(),
 ///     ),
 ///     StreamContextMenuSeparator(),
-///     StreamContextMenuItem.destructive(
+///     StreamContextMenuAction.destructive(
+///       value: 'block',
 ///       label: Text('Block User'),
 ///       leading: Icon(Icons.block),
-///       onPressed: () => handleBlock(),
 ///     ),
 ///   ],
 /// )
@@ -49,10 +50,14 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// See also:
 ///
-///  * [StreamContextMenuItem], for individual menu items.
-///  * [StreamContextMenuSeparator], for visual dividers between groups.
+///  * [StreamContextMenuAction], for individual menu items.
+///  * [StreamContextMenuAction.separated], for auto-inserting separators between
+///    every item.
+///  * [StreamContextMenuAction.sectioned], for auto-inserting separators between
+///    logical groups of items.
+///  * [StreamContextMenuSeparator], for manual visual dividers.
 ///  * [StreamContextMenuTheme], for customizing container appearance.
-///  * [StreamContextMenuItemTheme], for customizing item appearance.
+///  * [StreamContextMenuActionTheme], for customizing item appearance.
 class StreamContextMenu extends StatelessWidget {
   /// Creates a context menu container.
   const StreamContextMenu({
@@ -61,41 +66,9 @@ class StreamContextMenu extends StatelessWidget {
     this.clipBehavior = Clip.hardEdge,
   });
 
-  /// Creates a context menu with [StreamContextMenuSeparator] widgets
-  /// automatically inserted between each child.
-  ///
-  /// {@tool snippet}
-  ///
-  /// ```dart
-  /// StreamContextMenu.separated(
-  ///   children: [
-  ///     StreamContextMenuItem(label: Text('Reply'), onPressed: () {}),
-  ///     StreamContextMenuItem(label: Text('Copy'), onPressed: () {}),
-  ///     StreamContextMenuItem(label: Text('Delete'), onPressed: () {}),
-  ///   ],
-  /// )
-  /// ```
-  /// {@end-tool}
-  factory StreamContextMenu.separated({
-    Key? key,
-    required List<Widget> children,
-    Clip clipBehavior = Clip.hardEdge,
-  }) {
-    return StreamContextMenu(
-      key: key,
-      clipBehavior: clipBehavior,
-      children: [
-        for (final (index, child) in children.indexed) ...[
-          if (index > 0) const StreamContextMenuSeparator(),
-          child,
-        ],
-      ],
-    );
-  }
-
   /// The menu items to display.
   ///
-  /// Typically a list of [StreamContextMenuItem] and
+  /// Typically a list of [StreamContextMenuAction] and
   /// [StreamContextMenuSeparator] widgets.
   final List<Widget> children;
 
@@ -126,10 +99,12 @@ class StreamContextMenu extends StatelessWidget {
           color: effectiveBackgroundColor,
           shadows: effectiveBoxShadow,
         ),
-        child: Column(
-          mainAxisSize: .min,
-          crossAxisAlignment: .stretch,
-          children: children,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: .min,
+            crossAxisAlignment: .stretch,
+            children: children,
+          ),
         ),
       ),
     );
@@ -142,8 +117,9 @@ class StreamContextMenu extends StatelessWidget {
 /// separate groups of related context menu items, for example between regular
 /// actions and destructive actions.
 ///
-/// For automatic separator insertion between every child, use
-/// [StreamContextMenu.separated] instead.
+/// For automatic separator insertion, use [StreamContextMenuAction.separated]
+/// (between every item) or [StreamContextMenuAction.sectioned] (between logical
+/// groups) instead of placing separators manually.
 ///
 /// {@tool snippet}
 ///
@@ -152,12 +128,11 @@ class StreamContextMenu extends StatelessWidget {
 /// ```dart
 /// StreamContextMenu(
 ///   children: [
-///     StreamContextMenuItem(label: Text('Reply'), onPressed: () {}),
-///     StreamContextMenuItem(label: Text('Copy'), onPressed: () {}),
+///     StreamContextMenuAction(label: Text('Reply')),
+///     StreamContextMenuAction(label: Text('Copy')),
 ///     StreamContextMenuSeparator(),
-///     StreamContextMenuItem.destructive(
+///     StreamContextMenuAction.destructive(
 ///       label: Text('Delete'),
-///       onPressed: () {},
 ///     ),
 ///   ],
 /// )
@@ -167,8 +142,11 @@ class StreamContextMenu extends StatelessWidget {
 /// See also:
 ///
 ///  * [StreamContextMenu], which contains this separator.
-///  * [StreamContextMenu.separated], which auto-inserts separators.
-///  * [StreamContextMenuItem], for menu items.
+///  * [StreamContextMenuAction.separated], which auto-inserts separators
+///    between every item.
+///  * [StreamContextMenuAction.sectioned], which auto-inserts separators
+///    between logical groups of items.
+///  * [StreamContextMenuAction], for menu items.
 class StreamContextMenuSeparator extends StatelessWidget {
   /// Creates a context menu separator.
   const StreamContextMenuSeparator({super.key});

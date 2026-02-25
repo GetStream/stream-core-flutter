@@ -156,7 +156,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.badgeCount,
     this.button,
     this.checkbox,
-    this.contextMenuItem,
+    this.contextMenuAction,
     this.emoji,
     this.emojiButton,
     this.emojiChip,
@@ -196,10 +196,10 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamCheckbox] uses [DefaultStreamCheckbox].
   final StreamComponentBuilder<StreamCheckboxProps>? checkbox;
 
-  /// Custom builder for context menu item widgets.
+  /// Custom builder for context menu action widgets.
   ///
-  /// When null, [StreamContextMenuItem] uses [DefaultStreamContextMenuItem].
-  final StreamComponentBuilder<StreamContextMenuItemProps>? contextMenuItem;
+  /// When null, [StreamContextMenuAction] uses [DefaultStreamContextMenuAction].
+  final StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction;
 
   /// Custom builder for emoji widgets.
   ///

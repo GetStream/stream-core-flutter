@@ -59,6 +59,7 @@ class StreamIcons with _$StreamIcons {
   const StreamIcons({
     this.apiAggregate = StreamIconData.iconApiAggregate,
     this.apples = StreamIconData.iconApples,
+    this.archive1 = StreamIconData.iconArchive1,
     this.arrowBoxLeft = StreamIconData.iconArrowBoxLeft,
     this.arrowDown = StreamIconData.iconArrowDown,
     this.arrowLeft = StreamIconData.iconArrowLeft,
@@ -71,6 +72,9 @@ class StreamIcons with _$StreamIcons {
     this.at = StreamIconData.iconAt,
     this.atSolid = StreamIconData.iconAtSolid,
     this.bellNotification = StreamIconData.iconBellNotification,
+    this.bellOff = StreamIconData.iconBellOff,
+    this.bookmark = StreamIconData.iconBookmark,
+    this.bookmarkRemove = StreamIconData.iconBookmarkRemove,
     this.browserAISparkle = StreamIconData.iconBrowserAISparkle,
     this.bubble3ChatMessage = StreamIconData.iconBubble3ChatMessage,
     this.bubble3Solid = StreamIconData.iconBubble3Solid,
@@ -103,6 +107,7 @@ class StreamIcons with _$StreamIcons {
     this.circleX = StreamIconData.iconCircleX,
     this.clock = StreamIconData.iconClock,
     this.clockSolid = StreamIconData.iconClockSolid,
+    this.closeQuote2 = StreamIconData.iconCloseQuote2,
     this.code = StreamIconData.iconCode,
     this.codeBrackets = StreamIconData.iconCodeBrackets,
     this.codeEditorInsert = StreamIconData.iconCodeEditorInsert,
@@ -110,18 +115,21 @@ class StreamIcons with _$StreamIcons {
     this.creditCard2Billing = StreamIconData.iconCreditCard2Billing,
     this.crossMedium = StreamIconData.iconCrossMedium,
     this.crossSmall = StreamIconData.iconCrossSmall,
+    this.dotGrid1x3Horizontal = StreamIconData.iconDotGrid1x3Horizontal,
     this.dotGrid2x3 = StreamIconData.iconDotGrid2x3,
     this.dotsGrid1x3Vertical = StreamIconData.iconDotsGrid1x3Vertical,
     this.doupleCheckmark1Small = StreamIconData.iconDoupleCheckmark1Small,
     this.editBig = StreamIconData.iconEditBig,
     this.editBigSolid = StreamIconData.iconEditBigSolid,
     this.emojiAddReaction = StreamIconData.iconEmojiAddReaction,
+    this.emojiSad = StreamIconData.iconEmojiSad,
     this.emojiSmile = StreamIconData.iconEmojiSmile,
     this.exclamationCircle = StreamIconData.iconExclamationCircle,
     this.exclamationCircle1 = StreamIconData.iconExclamationCircle1,
     this.exclamationTriangle = StreamIconData.iconExclamationTriangle,
     this.exclamationTriangle1 = StreamIconData.iconExclamationTriangle1,
     this.eyeOpen = StreamIconData.iconEyeOpen,
+    this.fileArrowLeftIn = StreamIconData.iconFileArrowLeftIn,
     this.fileBend = StreamIconData.iconFileBend,
     this.filledCircleInfoTooltip = StreamIconData.iconFilledCircleInfoTooltip,
     this.filter1 = StreamIconData.iconFilter1,
@@ -134,7 +142,9 @@ class StreamIcons with _$StreamIcons {
     this.images1Alt = StreamIconData.iconImages1Alt,
     this.invite = StreamIconData.iconInvite,
     this.layersBehind = StreamIconData.iconLayersBehind,
+    this.layoutAlignLeft = StreamIconData.iconLayoutAlignLeft,
     this.layoutGrid1 = StreamIconData.iconLayoutGrid1,
+    this.layoutLeft = StreamIconData.iconLayoutLeft,
     this.lightBulbSimple = StreamIconData.iconLightBulbSimple,
     this.limits = StreamIconData.iconLimits,
     this.lineChart3 = StreamIconData.iconLineChart3,
@@ -173,6 +183,7 @@ class StreamIcons with _$StreamIcons {
     this.settingsSliderVer = StreamIconData.iconSettingsSliderVer,
     this.shapesPlusCloseSquareCircle = StreamIconData.iconShapesPlusCloseSquareCircle,
     this.shapesTriangleSquareCircle = StreamIconData.iconShapesTriangleSquareCircle,
+    this.shareOs = StreamIconData.iconShareOs,
     this.shareRedirectLink = StreamIconData.iconShareRedirectLink,
     this.shield = StreamIconData.iconShield,
     this.squareBehindSquare2Copy = StreamIconData.iconSquareBehindSquare2Copy,
@@ -185,7 +196,9 @@ class StreamIcons with _$StreamIcons {
     this.thunder = StreamIconData.iconThunder,
     this.trashBin = StreamIconData.iconTrashBin,
     this.trending4 = StreamIconData.iconTrending4,
+    this.trophy = StreamIconData.iconTrophy,
     this.unlocked = StreamIconData.iconUnlocked,
+    this.unpin = StreamIconData.iconUnpin,
     this.users = StreamIconData.iconUsers,
     this.video = StreamIconData.iconVideo,
     this.videoSolid = StreamIconData.iconVideoSolid,
@@ -200,6 +213,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The apples icon.
   final IconData apples;
+
+  /// The archive1 icon.
+  final IconData archive1;
 
   /// The arrow box left icon.
   final IconData arrowBoxLeft;
@@ -236,6 +252,15 @@ class StreamIcons with _$StreamIcons {
 
   /// The bell notification icon.
   final IconData bellNotification;
+
+  /// The bell off icon.
+  final IconData bellOff;
+
+  /// The bookmark icon.
+  final IconData bookmark;
+
+  /// The bookmark remove icon.
+  final IconData bookmarkRemove;
 
   /// The browser a i sparkle icon.
   final IconData browserAISparkle;
@@ -333,6 +358,9 @@ class StreamIcons with _$StreamIcons {
   /// The clock solid icon.
   final IconData clockSolid;
 
+  /// The close quote2 icon.
+  final IconData closeQuote2;
+
   /// The code icon.
   final IconData code;
 
@@ -354,6 +382,9 @@ class StreamIcons with _$StreamIcons {
   /// The cross small icon.
   final IconData crossSmall;
 
+  /// The dot grid1x3 horizontal icon.
+  final IconData dotGrid1x3Horizontal;
+
   /// The dot grid2x3 icon.
   final IconData dotGrid2x3;
 
@@ -372,6 +403,9 @@ class StreamIcons with _$StreamIcons {
   /// The emoji add reaction icon.
   final IconData emojiAddReaction;
 
+  /// The emoji sad icon.
+  final IconData emojiSad;
+
   /// The emoji smile icon.
   final IconData emojiSmile;
 
@@ -389,6 +423,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The eye open icon.
   final IconData eyeOpen;
+
+  /// The file arrow left in icon.
+  final IconData fileArrowLeftIn;
 
   /// The file bend icon.
   final IconData fileBend;
@@ -426,8 +463,14 @@ class StreamIcons with _$StreamIcons {
   /// The layers behind icon.
   final IconData layersBehind;
 
+  /// The layout align left icon.
+  final IconData layoutAlignLeft;
+
   /// The layout grid1 icon.
   final IconData layoutGrid1;
+
+  /// The layout left icon.
+  final IconData layoutLeft;
 
   /// The light bulb simple icon.
   final IconData lightBulbSimple;
@@ -543,6 +586,9 @@ class StreamIcons with _$StreamIcons {
   /// The shapes triangle square circle icon.
   final IconData shapesTriangleSquareCircle;
 
+  /// The share os icon.
+  final IconData shareOs;
+
   /// The share redirect link icon.
   final IconData shareRedirectLink;
 
@@ -579,8 +625,14 @@ class StreamIcons with _$StreamIcons {
   /// The trending4 icon.
   final IconData trending4;
 
+  /// The trophy icon.
+  final IconData trophy;
+
   /// The unlocked icon.
   final IconData unlocked;
+
+  /// The unpin icon.
+  final IconData unpin;
 
   /// The users icon.
   final IconData users;
@@ -613,6 +665,7 @@ class StreamIcons with _$StreamIcons {
   Map<String, IconData> get allIcons => {
     'apiAggregate': apiAggregate,
     'apples': apples,
+    'archive1': archive1,
     'arrowBoxLeft': arrowBoxLeft,
     'arrowDown': arrowDown,
     'arrowLeft': arrowLeft,
@@ -625,6 +678,9 @@ class StreamIcons with _$StreamIcons {
     'at': at,
     'atSolid': atSolid,
     'bellNotification': bellNotification,
+    'bellOff': bellOff,
+    'bookmark': bookmark,
+    'bookmarkRemove': bookmarkRemove,
     'browserAISparkle': browserAISparkle,
     'bubble3ChatMessage': bubble3ChatMessage,
     'bubble3Solid': bubble3Solid,
@@ -657,6 +713,7 @@ class StreamIcons with _$StreamIcons {
     'circleX': circleX,
     'clock': clock,
     'clockSolid': clockSolid,
+    'closeQuote2': closeQuote2,
     'code': code,
     'codeBrackets': codeBrackets,
     'codeEditorInsert': codeEditorInsert,
@@ -664,18 +721,21 @@ class StreamIcons with _$StreamIcons {
     'creditCard2Billing': creditCard2Billing,
     'crossMedium': crossMedium,
     'crossSmall': crossSmall,
+    'dotGrid1x3Horizontal': dotGrid1x3Horizontal,
     'dotGrid2x3': dotGrid2x3,
     'dotsGrid1x3Vertical': dotsGrid1x3Vertical,
     'doupleCheckmark1Small': doupleCheckmark1Small,
     'editBig': editBig,
     'editBigSolid': editBigSolid,
     'emojiAddReaction': emojiAddReaction,
+    'emojiSad': emojiSad,
     'emojiSmile': emojiSmile,
     'exclamationCircle': exclamationCircle,
     'exclamationCircle1': exclamationCircle1,
     'exclamationTriangle': exclamationTriangle,
     'exclamationTriangle1': exclamationTriangle1,
     'eyeOpen': eyeOpen,
+    'fileArrowLeftIn': fileArrowLeftIn,
     'fileBend': fileBend,
     'filledCircleInfoTooltip': filledCircleInfoTooltip,
     'filter1': filter1,
@@ -688,7 +748,9 @@ class StreamIcons with _$StreamIcons {
     'images1Alt': images1Alt,
     'invite': invite,
     'layersBehind': layersBehind,
+    'layoutAlignLeft': layoutAlignLeft,
     'layoutGrid1': layoutGrid1,
+    'layoutLeft': layoutLeft,
     'lightBulbSimple': lightBulbSimple,
     'limits': limits,
     'lineChart3': lineChart3,
@@ -727,6 +789,7 @@ class StreamIcons with _$StreamIcons {
     'settingsSliderVer': settingsSliderVer,
     'shapesPlusCloseSquareCircle': shapesPlusCloseSquareCircle,
     'shapesTriangleSquareCircle': shapesTriangleSquareCircle,
+    'shareOs': shareOs,
     'shareRedirectLink': shareRedirectLink,
     'shield': shield,
     'squareBehindSquare2Copy': squareBehindSquare2Copy,
@@ -739,7 +802,9 @@ class StreamIcons with _$StreamIcons {
     'thunder': thunder,
     'trashBin': trashBin,
     'trending4': trending4,
+    'trophy': trophy,
     'unlocked': unlocked,
+    'unpin': unpin,
     'users': users,
     'video': video,
     'videoSolid': videoSolid,

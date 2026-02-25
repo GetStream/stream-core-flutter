@@ -47,7 +47,7 @@ command:
       melos: ^6.2.0
       mocktail: ^1.0.4
       test: ^1.26.2
-      theme_extensions_builder: ^7.1.0
+      theme_extensions_builder: ^7.2.0
 
 scripts:
   postclean:

@@ -28,6 +28,7 @@ mixin _$StreamIcons {
     return StreamIcons(
       apiAggregate: t < 0.5 ? a.apiAggregate : b.apiAggregate,
       apples: t < 0.5 ? a.apples : b.apples,
+      archive1: t < 0.5 ? a.archive1 : b.archive1,
       arrowBoxLeft: t < 0.5 ? a.arrowBoxLeft : b.arrowBoxLeft,
       arrowDown: t < 0.5 ? a.arrowDown : b.arrowDown,
       arrowLeft: t < 0.5 ? a.arrowLeft : b.arrowLeft,
@@ -46,6 +47,9 @@ mixin _$StreamIcons {
       at: t < 0.5 ? a.at : b.at,
       atSolid: t < 0.5 ? a.atSolid : b.atSolid,
       bellNotification: t < 0.5 ? a.bellNotification : b.bellNotification,
+      bellOff: t < 0.5 ? a.bellOff : b.bellOff,
+      bookmark: t < 0.5 ? a.bookmark : b.bookmark,
+      bookmarkRemove: t < 0.5 ? a.bookmarkRemove : b.bookmarkRemove,
       browserAISparkle: t < 0.5 ? a.browserAISparkle : b.browserAISparkle,
       bubble3ChatMessage: t < 0.5 ? a.bubble3ChatMessage : b.bubble3ChatMessage,
       bubble3Solid: t < 0.5 ? a.bubble3Solid : b.bubble3Solid,
@@ -90,6 +94,7 @@ mixin _$StreamIcons {
       circleX: t < 0.5 ? a.circleX : b.circleX,
       clock: t < 0.5 ? a.clock : b.clock,
       clockSolid: t < 0.5 ? a.clockSolid : b.clockSolid,
+      closeQuote2: t < 0.5 ? a.closeQuote2 : b.closeQuote2,
       code: t < 0.5 ? a.code : b.code,
       codeBrackets: t < 0.5 ? a.codeBrackets : b.codeBrackets,
       codeEditorInsert: t < 0.5 ? a.codeEditorInsert : b.codeEditorInsert,
@@ -97,6 +102,9 @@ mixin _$StreamIcons {
       creditCard2Billing: t < 0.5 ? a.creditCard2Billing : b.creditCard2Billing,
       crossMedium: t < 0.5 ? a.crossMedium : b.crossMedium,
       crossSmall: t < 0.5 ? a.crossSmall : b.crossSmall,
+      dotGrid1x3Horizontal: t < 0.5
+          ? a.dotGrid1x3Horizontal
+          : b.dotGrid1x3Horizontal,
       dotGrid2x3: t < 0.5 ? a.dotGrid2x3 : b.dotGrid2x3,
       dotsGrid1x3Vertical: t < 0.5
           ? a.dotsGrid1x3Vertical
@@ -107,6 +115,7 @@ mixin _$StreamIcons {
       editBig: t < 0.5 ? a.editBig : b.editBig,
       editBigSolid: t < 0.5 ? a.editBigSolid : b.editBigSolid,
       emojiAddReaction: t < 0.5 ? a.emojiAddReaction : b.emojiAddReaction,
+      emojiSad: t < 0.5 ? a.emojiSad : b.emojiSad,
       emojiSmile: t < 0.5 ? a.emojiSmile : b.emojiSmile,
       exclamationCircle: t < 0.5 ? a.exclamationCircle : b.exclamationCircle,
       exclamationCircle1: t < 0.5 ? a.exclamationCircle1 : b.exclamationCircle1,
@@ -117,6 +126,7 @@ mixin _$StreamIcons {
           ? a.exclamationTriangle1
           : b.exclamationTriangle1,
       eyeOpen: t < 0.5 ? a.eyeOpen : b.eyeOpen,
+      fileArrowLeftIn: t < 0.5 ? a.fileArrowLeftIn : b.fileArrowLeftIn,
       fileBend: t < 0.5 ? a.fileBend : b.fileBend,
       filledCircleInfoTooltip: t < 0.5
           ? a.filledCircleInfoTooltip
@@ -131,7 +141,9 @@ mixin _$StreamIcons {
       images1Alt: t < 0.5 ? a.images1Alt : b.images1Alt,
       invite: t < 0.5 ? a.invite : b.invite,
       layersBehind: t < 0.5 ? a.layersBehind : b.layersBehind,
+      layoutAlignLeft: t < 0.5 ? a.layoutAlignLeft : b.layoutAlignLeft,
       layoutGrid1: t < 0.5 ? a.layoutGrid1 : b.layoutGrid1,
+      layoutLeft: t < 0.5 ? a.layoutLeft : b.layoutLeft,
       lightBulbSimple: t < 0.5 ? a.lightBulbSimple : b.lightBulbSimple,
       limits: t < 0.5 ? a.limits : b.limits,
       lineChart3: t < 0.5 ? a.lineChart3 : b.lineChart3,
@@ -178,6 +190,7 @@ mixin _$StreamIcons {
       shapesTriangleSquareCircle: t < 0.5
           ? a.shapesTriangleSquareCircle
           : b.shapesTriangleSquareCircle,
+      shareOs: t < 0.5 ? a.shareOs : b.shareOs,
       shareRedirectLink: t < 0.5 ? a.shareRedirectLink : b.shareRedirectLink,
       shield: t < 0.5 ? a.shield : b.shield,
       squareBehindSquare2Copy: t < 0.5
@@ -196,7 +209,9 @@ mixin _$StreamIcons {
       thunder: t < 0.5 ? a.thunder : b.thunder,
       trashBin: t < 0.5 ? a.trashBin : b.trashBin,
       trending4: t < 0.5 ? a.trending4 : b.trending4,
+      trophy: t < 0.5 ? a.trophy : b.trophy,
       unlocked: t < 0.5 ? a.unlocked : b.unlocked,
+      unpin: t < 0.5 ? a.unpin : b.unpin,
       users: t < 0.5 ? a.users : b.users,
       video: t < 0.5 ? a.video : b.video,
       videoSolid: t < 0.5 ? a.videoSolid : b.videoSolid,
@@ -210,6 +225,7 @@ mixin _$StreamIcons {
   StreamIcons copyWith({
     IconData? apiAggregate,
     IconData? apples,
+    IconData? archive1,
     IconData? arrowBoxLeft,
     IconData? arrowDown,
     IconData? arrowLeft,
@@ -222,6 +238,9 @@ mixin _$StreamIcons {
     IconData? at,
     IconData? atSolid,
     IconData? bellNotification,
+    IconData? bellOff,
+    IconData? bookmark,
+    IconData? bookmarkRemove,
     IconData? browserAISparkle,
     IconData? bubble3ChatMessage,
     IconData? bubble3Solid,
@@ -254,6 +273,7 @@ mixin _$StreamIcons {
     IconData? circleX,
     IconData? clock,
     IconData? clockSolid,
+    IconData? closeQuote2,
     IconData? code,
     IconData? codeBrackets,
     IconData? codeEditorInsert,
@@ -261,18 +281,21 @@ mixin _$StreamIcons {
     IconData? creditCard2Billing,
     IconData? crossMedium,
     IconData? crossSmall,
+    IconData? dotGrid1x3Horizontal,
     IconData? dotGrid2x3,
     IconData? dotsGrid1x3Vertical,
     IconData? doupleCheckmark1Small,
     IconData? editBig,
     IconData? editBigSolid,
     IconData? emojiAddReaction,
+    IconData? emojiSad,
     IconData? emojiSmile,
     IconData? exclamationCircle,
     IconData? exclamationCircle1,
     IconData? exclamationTriangle,
     IconData? exclamationTriangle1,
     IconData? eyeOpen,
+    IconData? fileArrowLeftIn,
     IconData? fileBend,
     IconData? filledCircleInfoTooltip,
     IconData? filter1,
@@ -285,7 +308,9 @@ mixin _$StreamIcons {
     IconData? images1Alt,
     IconData? invite,
     IconData? layersBehind,
+    IconData? layoutAlignLeft,
     IconData? layoutGrid1,
+    IconData? layoutLeft,
     IconData? lightBulbSimple,
     IconData? limits,
     IconData? lineChart3,
@@ -324,6 +349,7 @@ mixin _$StreamIcons {
     IconData? settingsSliderVer,
     IconData? shapesPlusCloseSquareCircle,
     IconData? shapesTriangleSquareCircle,
+    IconData? shareOs,
     IconData? shareRedirectLink,
     IconData? shield,
     IconData? squareBehindSquare2Copy,
@@ -336,7 +362,9 @@ mixin _$StreamIcons {
     IconData? thunder,
     IconData? trashBin,
     IconData? trending4,
+    IconData? trophy,
     IconData? unlocked,
+    IconData? unpin,
     IconData? users,
     IconData? video,
     IconData? videoSolid,
@@ -350,6 +378,7 @@ mixin _$StreamIcons {
     return StreamIcons(
       apiAggregate: apiAggregate ?? _this.apiAggregate,
       apples: apples ?? _this.apples,
+      archive1: archive1 ?? _this.archive1,
       arrowBoxLeft: arrowBoxLeft ?? _this.arrowBoxLeft,
       arrowDown: arrowDown ?? _this.arrowDown,
       arrowLeft: arrowLeft ?? _this.arrowLeft,
@@ -365,6 +394,9 @@ mixin _$StreamIcons {
       at: at ?? _this.at,
       atSolid: atSolid ?? _this.atSolid,
       bellNotification: bellNotification ?? _this.bellNotification,
+      bellOff: bellOff ?? _this.bellOff,
+      bookmark: bookmark ?? _this.bookmark,
+      bookmarkRemove: bookmarkRemove ?? _this.bookmarkRemove,
       browserAISparkle: browserAISparkle ?? _this.browserAISparkle,
       bubble3ChatMessage: bubble3ChatMessage ?? _this.bubble3ChatMessage,
       bubble3Solid: bubble3Solid ?? _this.bubble3Solid,
@@ -405,6 +437,7 @@ mixin _$StreamIcons {
       circleX: circleX ?? _this.circleX,
       clock: clock ?? _this.clock,
       clockSolid: clockSolid ?? _this.clockSolid,
+      closeQuote2: closeQuote2 ?? _this.closeQuote2,
       code: code ?? _this.code,
       codeBrackets: codeBrackets ?? _this.codeBrackets,
       codeEditorInsert: codeEditorInsert ?? _this.codeEditorInsert,
@@ -412,6 +445,7 @@ mixin _$StreamIcons {
       creditCard2Billing: creditCard2Billing ?? _this.creditCard2Billing,
       crossMedium: crossMedium ?? _this.crossMedium,
       crossSmall: crossSmall ?? _this.crossSmall,
+      dotGrid1x3Horizontal: dotGrid1x3Horizontal ?? _this.dotGrid1x3Horizontal,
       dotGrid2x3: dotGrid2x3 ?? _this.dotGrid2x3,
       dotsGrid1x3Vertical: dotsGrid1x3Vertical ?? _this.dotsGrid1x3Vertical,
       doupleCheckmark1Small:
@@ -419,12 +453,14 @@ mixin _$StreamIcons {
       editBig: editBig ?? _this.editBig,
       editBigSolid: editBigSolid ?? _this.editBigSolid,
       emojiAddReaction: emojiAddReaction ?? _this.emojiAddReaction,
+      emojiSad: emojiSad ?? _this.emojiSad,
       emojiSmile: emojiSmile ?? _this.emojiSmile,
       exclamationCircle: exclamationCircle ?? _this.exclamationCircle,
       exclamationCircle1: exclamationCircle1 ?? _this.exclamationCircle1,
       exclamationTriangle: exclamationTriangle ?? _this.exclamationTriangle,
       exclamationTriangle1: exclamationTriangle1 ?? _this.exclamationTriangle1,
       eyeOpen: eyeOpen ?? _this.eyeOpen,
+      fileArrowLeftIn: fileArrowLeftIn ?? _this.fileArrowLeftIn,
       fileBend: fileBend ?? _this.fileBend,
       filledCircleInfoTooltip:
           filledCircleInfoTooltip ?? _this.filledCircleInfoTooltip,
@@ -438,7 +474,9 @@ mixin _$StreamIcons {
       images1Alt: images1Alt ?? _this.images1Alt,
       invite: invite ?? _this.invite,
       layersBehind: layersBehind ?? _this.layersBehind,
+      layoutAlignLeft: layoutAlignLeft ?? _this.layoutAlignLeft,
       layoutGrid1: layoutGrid1 ?? _this.layoutGrid1,
+      layoutLeft: layoutLeft ?? _this.layoutLeft,
       lightBulbSimple: lightBulbSimple ?? _this.lightBulbSimple,
       limits: limits ?? _this.limits,
       lineChart3: lineChart3 ?? _this.lineChart3,
@@ -480,6 +518,7 @@ mixin _$StreamIcons {
           shapesPlusCloseSquareCircle ?? _this.shapesPlusCloseSquareCircle,
       shapesTriangleSquareCircle:
           shapesTriangleSquareCircle ?? _this.shapesTriangleSquareCircle,
+      shareOs: shareOs ?? _this.shareOs,
       shareRedirectLink: shareRedirectLink ?? _this.shareRedirectLink,
       shield: shield ?? _this.shield,
       squareBehindSquare2Copy:
@@ -495,7 +534,9 @@ mixin _$StreamIcons {
       thunder: thunder ?? _this.thunder,
       trashBin: trashBin ?? _this.trashBin,
       trending4: trending4 ?? _this.trending4,
+      trophy: trophy ?? _this.trophy,
       unlocked: unlocked ?? _this.unlocked,
+      unpin: unpin ?? _this.unpin,
       users: users ?? _this.users,
       video: video ?? _this.video,
       videoSolid: videoSolid ?? _this.videoSolid,
@@ -520,6 +561,7 @@ mixin _$StreamIcons {
     return copyWith(
       apiAggregate: other.apiAggregate,
       apples: other.apples,
+      archive1: other.archive1,
       arrowBoxLeft: other.arrowBoxLeft,
       arrowDown: other.arrowDown,
       arrowLeft: other.arrowLeft,
@@ -533,6 +575,9 @@ mixin _$StreamIcons {
       at: other.at,
       atSolid: other.atSolid,
       bellNotification: other.bellNotification,
+      bellOff: other.bellOff,
+      bookmark: other.bookmark,
+      bookmarkRemove: other.bookmarkRemove,
       browserAISparkle: other.browserAISparkle,
       bubble3ChatMessage: other.bubble3ChatMessage,
       bubble3Solid: other.bubble3Solid,
@@ -566,6 +611,7 @@ mixin _$StreamIcons {
       circleX: other.circleX,
       clock: other.clock,
       clockSolid: other.clockSolid,
+      closeQuote2: other.closeQuote2,
       code: other.code,
       codeBrackets: other.codeBrackets,
       codeEditorInsert: other.codeEditorInsert,
@@ -573,18 +619,21 @@ mixin _$StreamIcons {
       creditCard2Billing: other.creditCard2Billing,
       crossMedium: other.crossMedium,
       crossSmall: other.crossSmall,
+      dotGrid1x3Horizontal: other.dotGrid1x3Horizontal,
       dotGrid2x3: other.dotGrid2x3,
       dotsGrid1x3Vertical: other.dotsGrid1x3Vertical,
       doupleCheckmark1Small: other.doupleCheckmark1Small,
       editBig: other.editBig,
       editBigSolid: other.editBigSolid,
       emojiAddReaction: other.emojiAddReaction,
+      emojiSad: other.emojiSad,
       emojiSmile: other.emojiSmile,
       exclamationCircle: other.exclamationCircle,
       exclamationCircle1: other.exclamationCircle1,
       exclamationTriangle: other.exclamationTriangle,
       exclamationTriangle1: other.exclamationTriangle1,
       eyeOpen: other.eyeOpen,
+      fileArrowLeftIn: other.fileArrowLeftIn,
       fileBend: other.fileBend,
       filledCircleInfoTooltip: other.filledCircleInfoTooltip,
       filter1: other.filter1,
@@ -597,7 +646,9 @@ mixin _$StreamIcons {
       images1Alt: other.images1Alt,
       invite: other.invite,
       layersBehind: other.layersBehind,
+      layoutAlignLeft: other.layoutAlignLeft,
       layoutGrid1: other.layoutGrid1,
+      layoutLeft: other.layoutLeft,
       lightBulbSimple: other.lightBulbSimple,
       limits: other.limits,
       lineChart3: other.lineChart3,
@@ -636,6 +687,7 @@ mixin _$StreamIcons {
       settingsSliderVer: other.settingsSliderVer,
       shapesPlusCloseSquareCircle: other.shapesPlusCloseSquareCircle,
       shapesTriangleSquareCircle: other.shapesTriangleSquareCircle,
+      shareOs: other.shareOs,
       shareRedirectLink: other.shareRedirectLink,
       shield: other.shield,
       squareBehindSquare2Copy: other.squareBehindSquare2Copy,
@@ -648,7 +700,9 @@ mixin _$StreamIcons {
       thunder: other.thunder,
       trashBin: other.trashBin,
       trending4: other.trending4,
+      trophy: other.trophy,
       unlocked: other.unlocked,
+      unpin: other.unpin,
       users: other.users,
       video: other.video,
       videoSolid: other.videoSolid,
@@ -674,6 +728,7 @@ mixin _$StreamIcons {
 
     return _other.apiAggregate == _this.apiAggregate &&
         _other.apples == _this.apples &&
+        _other.archive1 == _this.archive1 &&
         _other.arrowBoxLeft == _this.arrowBoxLeft &&
         _other.arrowDown == _this.arrowDown &&
         _other.arrowLeft == _this.arrowLeft &&
@@ -687,6 +742,9 @@ mixin _$StreamIcons {
         _other.at == _this.at &&
         _other.atSolid == _this.atSolid &&
         _other.bellNotification == _this.bellNotification &&
+        _other.bellOff == _this.bellOff &&
+        _other.bookmark == _this.bookmark &&
+        _other.bookmarkRemove == _this.bookmarkRemove &&
         _other.browserAISparkle == _this.browserAISparkle &&
         _other.bubble3ChatMessage == _this.bubble3ChatMessage &&
         _other.bubble3Solid == _this.bubble3Solid &&
@@ -723,6 +781,7 @@ mixin _$StreamIcons {
         _other.circleX == _this.circleX &&
         _other.clock == _this.clock &&
         _other.clockSolid == _this.clockSolid &&
+        _other.closeQuote2 == _this.closeQuote2 &&
         _other.code == _this.code &&
         _other.codeBrackets == _this.codeBrackets &&
         _other.codeEditorInsert == _this.codeEditorInsert &&
@@ -730,18 +789,21 @@ mixin _$StreamIcons {
         _other.creditCard2Billing == _this.creditCard2Billing &&
         _other.crossMedium == _this.crossMedium &&
         _other.crossSmall == _this.crossSmall &&
+        _other.dotGrid1x3Horizontal == _this.dotGrid1x3Horizontal &&
         _other.dotGrid2x3 == _this.dotGrid2x3 &&
         _other.dotsGrid1x3Vertical == _this.dotsGrid1x3Vertical &&
         _other.doupleCheckmark1Small == _this.doupleCheckmark1Small &&
         _other.editBig == _this.editBig &&
         _other.editBigSolid == _this.editBigSolid &&
         _other.emojiAddReaction == _this.emojiAddReaction &&
+        _other.emojiSad == _this.emojiSad &&
         _other.emojiSmile == _this.emojiSmile &&
         _other.exclamationCircle == _this.exclamationCircle &&
         _other.exclamationCircle1 == _this.exclamationCircle1 &&
         _other.exclamationTriangle == _this.exclamationTriangle &&
         _other.exclamationTriangle1 == _this.exclamationTriangle1 &&
         _other.eyeOpen == _this.eyeOpen &&
+        _other.fileArrowLeftIn == _this.fileArrowLeftIn &&
         _other.fileBend == _this.fileBend &&
         _other.filledCircleInfoTooltip == _this.filledCircleInfoTooltip &&
         _other.filter1 == _this.filter1 &&
@@ -754,7 +816,9 @@ mixin _$StreamIcons {
         _other.images1Alt == _this.images1Alt &&
         _other.invite == _this.invite &&
         _other.layersBehind == _this.layersBehind &&
+        _other.layoutAlignLeft == _this.layoutAlignLeft &&
         _other.layoutGrid1 == _this.layoutGrid1 &&
+        _other.layoutLeft == _this.layoutLeft &&
         _other.lightBulbSimple == _this.lightBulbSimple &&
         _other.limits == _this.limits &&
         _other.lineChart3 == _this.lineChart3 &&
@@ -794,6 +858,7 @@ mixin _$StreamIcons {
         _other.shapesPlusCloseSquareCircle ==
             _this.shapesPlusCloseSquareCircle &&
         _other.shapesTriangleSquareCircle == _this.shapesTriangleSquareCircle &&
+        _other.shareOs == _this.shareOs &&
         _other.shareRedirectLink == _this.shareRedirectLink &&
         _other.shield == _this.shield &&
         _other.squareBehindSquare2Copy == _this.squareBehindSquare2Copy &&
@@ -806,7 +871,9 @@ mixin _$StreamIcons {
         _other.thunder == _this.thunder &&
         _other.trashBin == _this.trashBin &&
         _other.trending4 == _this.trending4 &&
+        _other.trophy == _this.trophy &&
         _other.unlocked == _this.unlocked &&
+        _other.unpin == _this.unpin &&
         _other.users == _this.users &&
         _other.video == _this.video &&
         _other.videoSolid == _this.videoSolid &&
@@ -824,6 +891,7 @@ mixin _$StreamIcons {
       runtimeType,
       _this.apiAggregate,
       _this.apples,
+      _this.archive1,
       _this.arrowBoxLeft,
       _this.arrowDown,
       _this.arrowLeft,
@@ -836,6 +904,9 @@ mixin _$StreamIcons {
       _this.at,
       _this.atSolid,
       _this.bellNotification,
+      _this.bellOff,
+      _this.bookmark,
+      _this.bookmarkRemove,
       _this.browserAISparkle,
       _this.bubble3ChatMessage,
       _this.bubble3Solid,
@@ -868,6 +939,7 @@ mixin _$StreamIcons {
       _this.circleX,
       _this.clock,
       _this.clockSolid,
+      _this.closeQuote2,
       _this.code,
       _this.codeBrackets,
       _this.codeEditorInsert,
@@ -875,18 +947,21 @@ mixin _$StreamIcons {
       _this.creditCard2Billing,
       _this.crossMedium,
       _this.crossSmall,
+      _this.dotGrid1x3Horizontal,
       _this.dotGrid2x3,
       _this.dotsGrid1x3Vertical,
       _this.doupleCheckmark1Small,
       _this.editBig,
       _this.editBigSolid,
       _this.emojiAddReaction,
+      _this.emojiSad,
       _this.emojiSmile,
       _this.exclamationCircle,
       _this.exclamationCircle1,
       _this.exclamationTriangle,
       _this.exclamationTriangle1,
       _this.eyeOpen,
+      _this.fileArrowLeftIn,
       _this.fileBend,
       _this.filledCircleInfoTooltip,
       _this.filter1,
@@ -899,7 +974,9 @@ mixin _$StreamIcons {
       _this.images1Alt,
       _this.invite,
       _this.layersBehind,
+      _this.layoutAlignLeft,
       _this.layoutGrid1,
+      _this.layoutLeft,
       _this.lightBulbSimple,
       _this.limits,
       _this.lineChart3,
@@ -938,6 +1015,7 @@ mixin _$StreamIcons {
       _this.settingsSliderVer,
       _this.shapesPlusCloseSquareCircle,
       _this.shapesTriangleSquareCircle,
+      _this.shareOs,
       _this.shareRedirectLink,
       _this.shield,
       _this.squareBehindSquare2Copy,
@@ -950,7 +1028,9 @@ mixin _$StreamIcons {
       _this.thunder,
       _this.trashBin,
       _this.trending4,
+      _this.trophy,
       _this.unlocked,
+      _this.unpin,
       _this.users,
       _this.video,
       _this.videoSolid,

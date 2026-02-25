@@ -3,18 +3,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, unused_element
 
-part of 'stream_context_menu_item_theme.dart';
+part of 'stream_context_menu_action_theme.dart';
 
 // **************************************************************************
 // ThemeGenGenerator
 // **************************************************************************
 
-mixin _$StreamContextMenuItemThemeData {
+mixin _$StreamContextMenuActionThemeData {
   bool get canMerge => true;
 
-  static StreamContextMenuItemThemeData? lerp(
-    StreamContextMenuItemThemeData? a,
-    StreamContextMenuItemThemeData? b,
+  static StreamContextMenuActionThemeData? lerp(
+    StreamContextMenuActionThemeData? a,
+    StreamContextMenuActionThemeData? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -29,19 +29,23 @@ mixin _$StreamContextMenuItemThemeData {
       return t == 0.0 ? a : null;
     }
 
-    return StreamContextMenuItemThemeData(
-      style: StreamContextMenuItemStyle.lerp(a.style, b.style, t),
+    return StreamContextMenuActionThemeData(
+      style: StreamContextMenuActionStyle.lerp(a.style, b.style, t),
     );
   }
 
-  StreamContextMenuItemThemeData copyWith({StreamContextMenuItemStyle? style}) {
-    final _this = (this as StreamContextMenuItemThemeData);
+  StreamContextMenuActionThemeData copyWith({
+    StreamContextMenuActionStyle? style,
+  }) {
+    final _this = (this as StreamContextMenuActionThemeData);
 
-    return StreamContextMenuItemThemeData(style: style ?? _this.style);
+    return StreamContextMenuActionThemeData(style: style ?? _this.style);
   }
 
-  StreamContextMenuItemThemeData merge(StreamContextMenuItemThemeData? other) {
-    final _this = (this as StreamContextMenuItemThemeData);
+  StreamContextMenuActionThemeData merge(
+    StreamContextMenuActionThemeData? other,
+  ) {
+    final _this = (this as StreamContextMenuActionThemeData);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -64,26 +68,26 @@ mixin _$StreamContextMenuItemThemeData {
       return false;
     }
 
-    final _this = (this as StreamContextMenuItemThemeData);
-    final _other = (other as StreamContextMenuItemThemeData);
+    final _this = (this as StreamContextMenuActionThemeData);
+    final _other = (other as StreamContextMenuActionThemeData);
 
     return _other.style == _this.style;
   }
 
   @override
   int get hashCode {
-    final _this = (this as StreamContextMenuItemThemeData);
+    final _this = (this as StreamContextMenuActionThemeData);
 
     return Object.hash(runtimeType, _this.style);
   }
 }
 
-mixin _$StreamContextMenuItemStyle {
+mixin _$StreamContextMenuActionStyle {
   bool get canMerge => true;
 
-  static StreamContextMenuItemStyle? lerp(
-    StreamContextMenuItemStyle? a,
-    StreamContextMenuItemStyle? b,
+  static StreamContextMenuActionStyle? lerp(
+    StreamContextMenuActionStyle? a,
+    StreamContextMenuActionStyle? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -98,7 +102,7 @@ mixin _$StreamContextMenuItemStyle {
       return t == 0.0 ? a : null;
     }
 
-    return StreamContextMenuItemStyle(
+    return StreamContextMenuActionStyle(
       backgroundColor: WidgetStateProperty.lerp<Color?>(
         a.backgroundColor,
         b.backgroundColor,
@@ -162,7 +166,7 @@ mixin _$StreamContextMenuItemStyle {
     );
   }
 
-  StreamContextMenuItemStyle copyWith({
+  StreamContextMenuActionStyle copyWith({
     WidgetStateProperty<Color?>? backgroundColor,
     WidgetStateProperty<Color?>? foregroundColor,
     WidgetStateProperty<Color?>? overlayColor,
@@ -174,9 +178,9 @@ mixin _$StreamContextMenuItemStyle {
     WidgetStateProperty<EdgeInsetsGeometry?>? padding,
     WidgetStateProperty<OutlinedBorder?>? shape,
   }) {
-    final _this = (this as StreamContextMenuItemStyle);
+    final _this = (this as StreamContextMenuActionStyle);
 
-    return StreamContextMenuItemStyle(
+    return StreamContextMenuActionStyle(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       foregroundColor: foregroundColor ?? _this.foregroundColor,
       overlayColor: overlayColor ?? _this.overlayColor,
@@ -190,8 +194,8 @@ mixin _$StreamContextMenuItemStyle {
     );
   }
 
-  StreamContextMenuItemStyle merge(StreamContextMenuItemStyle? other) {
-    final _this = (this as StreamContextMenuItemStyle);
+  StreamContextMenuActionStyle merge(StreamContextMenuActionStyle? other) {
+    final _this = (this as StreamContextMenuActionStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -225,8 +229,8 @@ mixin _$StreamContextMenuItemStyle {
       return false;
     }
 
-    final _this = (this as StreamContextMenuItemStyle);
-    final _other = (other as StreamContextMenuItemStyle);
+    final _this = (this as StreamContextMenuActionStyle);
+    final _other = (other as StreamContextMenuActionStyle);
 
     return _other.backgroundColor == _this.backgroundColor &&
         _other.foregroundColor == _this.foregroundColor &&
@@ -242,7 +246,7 @@ mixin _$StreamContextMenuItemStyle {
 
   @override
   int get hashCode {
-    final _this = (this as StreamContextMenuItemStyle);
+    final _this = (this as StreamContextMenuActionStyle);
 
     return Object.hash(
       runtimeType,
