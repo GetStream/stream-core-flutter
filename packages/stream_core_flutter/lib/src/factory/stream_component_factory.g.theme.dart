@@ -29,7 +29,8 @@ mixin _$StreamComponentBuilders {
       return t == 0.0 ? a : null;
     }
 
-    return StreamComponentBuilders(
+    return StreamComponentBuilders.raw(
+      extensions: t < 0.5 ? a.extensions : b.extensions,
       avatar: t < 0.5 ? a.avatar : b.avatar,
       avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
@@ -46,6 +47,7 @@ mixin _$StreamComponentBuilders {
   }
 
   StreamComponentBuilders copyWith({
+    Map<Object, StreamComponentBuilderExtension<dynamic>>? extensions,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
     Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
@@ -62,7 +64,8 @@ mixin _$StreamComponentBuilders {
   }) {
     final _this = (this as StreamComponentBuilders);
 
-    return StreamComponentBuilders(
+    return StreamComponentBuilders.raw(
+      extensions: extensions ?? _this.extensions,
       avatar: avatar ?? _this.avatar,
       avatarGroup: avatarGroup ?? _this.avatarGroup,
       avatarStack: avatarStack ?? _this.avatarStack,
@@ -90,6 +93,7 @@ mixin _$StreamComponentBuilders {
     }
 
     return copyWith(
+      extensions: other.extensions,
       avatar: other.avatar,
       avatarGroup: other.avatarGroup,
       avatarStack: other.avatarStack,
@@ -118,7 +122,8 @@ mixin _$StreamComponentBuilders {
     final _this = (this as StreamComponentBuilders);
     final _other = (other as StreamComponentBuilders);
 
-    return _other.avatar == _this.avatar &&
+    return _other.extensions == _this.extensions &&
+        _other.avatar == _this.avatar &&
         _other.avatarGroup == _this.avatarGroup &&
         _other.avatarStack == _this.avatarStack &&
         _other.badgeCount == _this.badgeCount &&
@@ -138,6 +143,7 @@ mixin _$StreamComponentBuilders {
 
     return Object.hash(
       runtimeType,
+      _this.extensions,
       _this.avatar,
       _this.avatarGroup,
       _this.avatarStack,

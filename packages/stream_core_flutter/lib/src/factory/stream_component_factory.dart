@@ -10,7 +10,8 @@ part 'stream_component_factory.g.theme.dart';
 /// Wrap a subtree with [StreamComponentFactory] to customize how Stream
 /// components are rendered. Access the builders using
 /// [StreamComponentFactory.of], [StreamComponentFactory.maybeOf], or the
-/// [BuildContext] extension [StreamComponentFactoryExtension.streamComponentFactory].
+/// [BuildContext] extension
+/// [StreamComponentFactoryExtension.streamComponentFactory].
 ///
 /// The nearest [StreamComponentFactory] ancestor takes precedence - nested
 /// factories completely override their parents rather than merging.
@@ -125,8 +126,7 @@ typedef StreamComponentBuilder<T> = Widget Function(BuildContext context, T prop
 /// A collection of builders for customizing Stream component rendering.
 ///
 /// All builders are nullable - when null, the component uses its default
-/// implementation. This follows the same pattern as Flutter's theme system
-/// where widgets fall back to their defaults when theme values are null.
+/// implementation.
 ///
 /// {@tool snippet}
 ///
@@ -139,30 +139,111 @@ typedef StreamComponentBuilder<T> = Widget Function(BuildContext context, T prop
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// Register a custom component builder via [extensions]:
+///
+/// ```dart
+/// final builders = StreamComponentBuilders(
+///   extensions: [
+///     StreamComponentBuilderExtension<StreamMessageProps>(
+///       builder: (context, props) => MyCustomMessage(props: props),
+///     ),
+///   ],
+/// );
+/// ```
+///
+/// Then retrieve it with [extension]:
+///
+/// ```dart
+/// final builder = StreamComponentFactory.of(context).extension<StreamMessageProps>();
+/// if (builder != null) return builder(context, props);
+/// ```
+/// {@end-tool}
+///
 /// See also:
 ///
 ///  * [StreamComponentFactory], which provides builders to descendants.
-@themeGen
+///  * [StreamComponentBuilderExtension], which wraps a custom component builder.
 @immutable
+@ThemeGen(constructor: 'raw')
 class StreamComponentBuilders with _$StreamComponentBuilders {
   /// Creates component builders with optional custom implementations.
   ///
   /// Any builder not provided (null) will cause the component to use its
   /// default implementation.
-  const StreamComponentBuilders({
-    this.avatar,
-    this.avatarGroup,
-    this.avatarStack,
-    this.badgeCount,
-    this.button,
-    this.checkbox,
-    this.contextMenuAction,
-    this.emoji,
-    this.emojiButton,
-    this.fileTypeIcon,
-    this.onlineIndicator,
-    this.progressBar,
+  ///
+  /// [extensions] accepts an [Iterable] of [StreamComponentBuilderExtension] instances, which are
+  /// converted to a map keyed by [StreamComponentBuilderExtension.type] internally.
+  factory StreamComponentBuilders({
+    StreamComponentBuilder<StreamAvatarProps>? avatar,
+    StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup,
+    StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
+    StreamComponentBuilder<StreamBadgeCountProps>? badgeCount,
+    StreamComponentBuilder<StreamButtonProps>? button,
+    StreamComponentBuilder<StreamCheckboxProps>? checkbox,
+    StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction,
+    StreamComponentBuilder<StreamEmojiProps>? emoji,
+    StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
+    StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
+    StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
+    StreamComponentBuilder<StreamProgressBarProps>? progressBar,
+    Iterable<StreamComponentBuilderExtension<Object>>? extensions,
+  }) {
+    extensions ??= <StreamComponentBuilderExtension<Object>>[];
+
+    return .raw(
+      avatar: avatar,
+      avatarGroup: avatarGroup,
+      avatarStack: avatarStack,
+      badgeCount: badgeCount,
+      button: button,
+      checkbox: checkbox,
+      contextMenuAction: contextMenuAction,
+      emoji: emoji,
+      emojiButton: emojiButton,
+      fileTypeIcon: fileTypeIcon,
+      onlineIndicator: onlineIndicator,
+      progressBar: progressBar,
+      extensions: _extensionIterableToMap(extensions),
+    );
+  }
+
+  /// Creates component builders from a pre-built extensions map.
+  const StreamComponentBuilders.raw({
+    required this.avatar,
+    required this.avatarGroup,
+    required this.avatarStack,
+    required this.badgeCount,
+    required this.button,
+    required this.checkbox,
+    required this.contextMenuAction,
+    required this.emoji,
+    required this.emojiButton,
+    required this.fileTypeIcon,
+    required this.onlineIndicator,
+    required this.progressBar,
+    required this.extensions,
   });
+
+  /// Arbitrary additions to this builder set.
+  ///
+  /// To define extensions, pass an [Iterable] of [StreamComponentBuilderExtension] instances to
+  /// [StreamComponentBuilders.new].
+  ///
+  /// To obtain an extension, use [extension].
+  ///
+  /// See also:
+  ///
+  ///  * [extension], a convenience function for obtaining a specific extension.
+  final Map<Object, StreamComponentBuilderExtension<Object>> extensions;
+
+  /// Used to obtain a [StreamComponentBuilder] from [extensions].
+  ///
+  /// Obtain with `StreamComponentFactory.of(context).extension<MyProps>()`.
+  ///
+  /// See [extensions].
+  StreamComponentBuilder<T>? extension<T>() => (extensions[T] as StreamComponentBuilderExtension<T>?)?.call;
 
   /// Custom builder for avatar widgets.
   ///
@@ -223,6 +304,69 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
   final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
+
+  // Convert the [extensionsIterable] passed to [StreamComponentBuilders.new]
+  // to the stored [extensions] map, where each entry's key consists of the extension's type.
+  static Map<Object, StreamComponentBuilderExtension<Object>> _extensionIterableToMap(
+    Iterable<StreamComponentBuilderExtension<Object>> extensionsIterable,
+  ) {
+    return <Object, StreamComponentBuilderExtension<Object>>{
+      for (final extension in extensionsIterable) extension.type: extension,
+    };
+  }
+}
+
+/// A typed builder extension for [StreamComponentBuilders].
+///
+/// Wraps a single [StreamComponentBuilder] and uses the Props type [T] as the
+/// lookup key. This allows external packages to register custom component
+/// builders without modifying the core [StreamComponentBuilders] class.
+///
+/// {@tool snippet}
+///
+/// Register a custom message builder:
+///
+/// ```dart
+/// StreamComponentFactory(
+///   builders: StreamComponentBuilders(
+///     extensions: [
+///       StreamComponentBuilderExtension<StreamMessageProps>(
+///         builder: (context, props) => MyCustomMessage(props: props),
+///       ),
+///     ],
+///   ),
+///   child: child,
+/// )
+/// ```
+///
+/// Consume it inside a custom component:
+///
+/// ```dart
+/// final builder = StreamComponentFactory.of(context).extension<StreamMessageProps>();
+/// if (builder != null) return builder(context, props);
+/// return DefaultStreamMessage(props: props);
+/// ```
+/// {@end-tool}
+///
+/// See also:
+///
+///  * [StreamComponentBuilders], which holds extensions.
+///  * [StreamComponentBuilders.extension], for obtaining a specific extension.
+@immutable
+final class StreamComponentBuilderExtension<T> {
+  /// Creates a builder extension for a component with Props type [T].
+  const StreamComponentBuilderExtension({
+    required StreamComponentBuilder<T> builder,
+  }) : _builder = builder;
+
+  // The internal builder function that creates the widget from the context and props.
+  final StreamComponentBuilder<T> _builder;
+
+  /// Invokes the builder with the given [context] and [props].
+  Widget call(BuildContext context, T props) => _builder(context, props);
+
+  /// The extension's type, used as the lookup key.
+  Object get type => T;
 }
 
 /// Extension on [BuildContext] for convenient access to [StreamComponentBuilders].
