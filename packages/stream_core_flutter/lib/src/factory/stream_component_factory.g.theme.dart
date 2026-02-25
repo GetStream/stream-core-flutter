@@ -47,7 +47,7 @@ mixin _$StreamComponentBuilders {
   }
 
   StreamComponentBuilders copyWith({
-    Map<Object, StreamComponentBuilderExtension<dynamic>>? extensions,
+    Map<Object, StreamComponentBuilderExtension<Object>>? extensions,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
     Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
