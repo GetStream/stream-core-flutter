@@ -161,6 +161,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.emojiButton,
     this.emojiChip,
     this.fileTypeIcon,
+    this.listTile,
     this.onlineIndicator,
     this.progressBar,
   });
@@ -219,6 +220,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamFileTypeIcon] uses [DefaultStreamFileTypeIcon].
   final StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon;
+
+  /// Custom builder for list tile widgets.
+  ///
+  /// When null, [StreamListTile] uses [DefaultStreamListTile].
+  final StreamComponentBuilder<StreamListTileProps>? listTile;
 
   /// Custom builder for online indicator widgets.
   ///

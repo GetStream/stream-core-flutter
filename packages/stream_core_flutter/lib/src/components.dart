@@ -14,6 +14,7 @@ export 'components/context_menu/stream_context_menu.dart';
 export 'components/context_menu/stream_context_menu_item.dart' hide DefaultStreamContextMenuItem;
 export 'components/controls/stream_emoji_chip.dart' hide DefaultStreamEmojiChip;
 export 'components/controls/stream_remove_control.dart';
+export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
 export 'components/message_composer.dart';
 export 'components/reaction/picker/stream_reaction_picker_sheet.dart';
 

@@ -28,6 +28,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamContextMenuItemThemeData? contextMenuItemTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
+    StreamListTileThemeData? listTileTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
@@ -52,6 +53,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       contextMenuItemTheme: contextMenuItemTheme ?? _this.contextMenuItemTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
+      listTileTheme: listTileTheme ?? _this.listTileTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
@@ -120,6 +122,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.emojiChipTheme,
         t,
       )!,
+      listTileTheme: StreamListTileThemeData.lerp(
+        _this.listTileTheme,
+        other.listTileTheme,
+        t,
+      )!,
       messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
       inputTheme: t < 0.5 ? _this.inputTheme : other.inputTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
@@ -164,6 +171,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.contextMenuItemTheme == _this.contextMenuItemTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
+        _other.listTileTheme == _this.listTileTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
@@ -192,6 +200,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.contextMenuItemTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
+      _this.listTileTheme,
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,

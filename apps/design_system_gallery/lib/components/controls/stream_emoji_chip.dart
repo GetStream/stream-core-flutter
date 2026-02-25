@@ -294,7 +294,7 @@ class _CountValuesSection extends StatelessWidget {
             spacing: spacing.md,
             children: [
               Text(
-                'Chips respect a minimum width so single-digit counts don\'t produce '
+                "Chips respect a minimum width so single-digit counts don't produce "
                 'a narrow pill. Large counts expand the chip naturally.',
                 style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary),
               ),

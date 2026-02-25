@@ -9,6 +9,7 @@ export 'theme/components/stream_context_menu_theme.dart';
 export 'theme/components/stream_emoji_button_theme.dart';
 export 'theme/components/stream_emoji_chip_theme.dart';
 export 'theme/components/stream_input_theme.dart';
+export 'theme/components/stream_list_tile_theme.dart';
 export 'theme/components/stream_message_theme.dart';
 export 'theme/components/stream_online_indicator_theme.dart';
 export 'theme/components/stream_progress_bar_theme.dart';

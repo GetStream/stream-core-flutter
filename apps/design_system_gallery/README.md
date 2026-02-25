@@ -1,16 +1,39 @@
-# design_system_gallery
+# Stream Design System Gallery
 
-A new Flutter project.
+Production Widgetbook app for documenting and validating `stream_core_flutter`
+components and design tokens.
 
-## Getting Started
+## What This App Provides
 
-This project is a starting point for a Flutter application.
+- Interactive component use cases with knobs (Widgetbook).
+- Foundation token showcases (primitives + semantic tokens).
+- Theme Studio controls for live visual tuning.
+- Device preview wrapper for realistic UI evaluation.
 
-A few resources to get you started if this is your first Flutter project:
+## Run Locally
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+cd apps/design_system_gallery
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+flutter run -d chrome
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Quality Checks
+
+```bash
+cd apps/design_system_gallery
+dart run build_runner build --delete-conflicting-outputs
+dart format lib
+flutter analyze
+```
+
+## Adding A New Component Showcase
+
+1. Create a use-case file in `lib/components/<category>/`.
+2. Add `@widgetbook.UseCase(...)` entries (at minimum: Playground + Showcase).
+3. Regenerate directories with `build_runner`.
+4. Run format and analyze checks.
+
+The generated file `lib/app/gallery_app.directories.g.dart` is owned by
+`widgetbook_generator` and should not be edited manually.

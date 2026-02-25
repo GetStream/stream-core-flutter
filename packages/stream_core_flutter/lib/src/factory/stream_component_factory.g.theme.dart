@@ -41,6 +41,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       emojiChip: t < 0.5 ? a.emojiChip : b.emojiChip,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
+      listTile: t < 0.5 ? a.listTile : b.listTile,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
     );
@@ -58,6 +59,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
     Widget Function(BuildContext, StreamEmojiChipProps)? emojiChip,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
+    Widget Function(BuildContext, StreamListTileProps)? listTile,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
   }) {
@@ -75,6 +77,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: emojiButton ?? _this.emojiButton,
       emojiChip: emojiChip ?? _this.emojiChip,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
+      listTile: listTile ?? _this.listTile,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
     );
@@ -103,6 +106,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: other.emojiButton,
       emojiChip: other.emojiChip,
       fileTypeIcon: other.fileTypeIcon,
+      listTile: other.listTile,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
     );
@@ -132,6 +136,7 @@ mixin _$StreamComponentBuilders {
         _other.emojiButton == _this.emojiButton &&
         _other.emojiChip == _this.emojiChip &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
+        _other.listTile == _this.listTile &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar;
   }
@@ -153,6 +158,7 @@ mixin _$StreamComponentBuilders {
       _this.emojiButton,
       _this.emojiChip,
       _this.fileTypeIcon,
+      _this.listTile,
       _this.onlineIndicator,
       _this.progressBar,
     );
