@@ -10,6 +10,8 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:design_system_gallery/components/accessories/stream_audio_waveform.dart'
+    as _design_system_gallery_components_accessories_stream_audio_waveform;
 import 'package:design_system_gallery/components/accessories/stream_emoji.dart'
     as _design_system_gallery_components_accessories_stream_emoji;
 import 'package:design_system_gallery/components/accessories/stream_file_type_icons.dart'
@@ -170,6 +172,23 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'Accessories',
         children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamAudioWaveformSlider',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_accessories_stream_audio_waveform
+                        .buildStreamAudioWaveformSliderPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_accessories_stream_audio_waveform
+                        .buildStreamAudioWaveformSliderShowcase,
+              ),
+            ],
+          ),
           _widgetbook.WidgetbookComponent(
             name: 'StreamEmoji',
             useCases: [
