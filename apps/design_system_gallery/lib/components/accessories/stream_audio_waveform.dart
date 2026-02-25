@@ -58,7 +58,7 @@ class _SliderPlayground extends StatefulWidget {
 }
 
 class _SliderPlaygroundState extends State<_SliderPlayground> {
-  double _progress = 0.4;
+  var _progress = 0.4;
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +188,6 @@ class _StatesSection extends StatelessWidget {
                   height: 36,
                   child: StreamAudioWaveformSlider(
                     waveform: const [],
-                    progress: 0,
                     onChanged: (_) {},
                   ),
                 ),
@@ -396,7 +395,6 @@ class _WaveformOnlySection extends StatelessWidget {
                 width: double.infinity,
                 child: StreamAudioWaveform(
                   waveform: _sampleWaveform,
-                  progress: 0,
                 ),
               ),
             ],

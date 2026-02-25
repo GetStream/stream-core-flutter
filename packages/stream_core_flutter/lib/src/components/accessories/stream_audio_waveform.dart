@@ -349,7 +349,7 @@ class _WaveformPainter extends CustomPainter {
     final barSpacing = spacingWidth / (limit - 1);
     final progressWidth = progress * canvasWidth;
 
-    void _paintBar(int index, double barValue) {
+    void paintBar(int index, double barValue) {
       var dx = index * (barWidth + barSpacing) + barWidth / 2;
       if (inverse) dx = canvasWidth - dx;
       final dy = canvasHeight / 2;
@@ -378,7 +378,7 @@ class _WaveformPainter extends CustomPainter {
     }
 
     // Paint all the bars
-    waveform.forEachIndexed(_paintBar);
+    waveform.forEachIndexed(paintBar);
   }
 
   @override
@@ -428,7 +428,7 @@ class HorizontalSlider extends StatefulWidget {
 }
 
 class _HorizontalSliderState extends State<HorizontalSlider> {
-  bool _active = false;
+  var _active = false;
 
   /// Returns true if the slider is interactive.
   bool get isInteractive => widget.onChanged != null;

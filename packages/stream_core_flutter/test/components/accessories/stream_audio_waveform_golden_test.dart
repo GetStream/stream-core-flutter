@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'dart:math' as math;
 
 import 'package:alchemist/alchemist.dart';
@@ -54,7 +56,7 @@ void main() {
             child: _buildSliderInTheme(
               StreamAudioWaveformSlider(
                 waveform: _sampleWaveform,
-                progress: 1.0,
+                progress: 1,
                 isActive: true,
                 onChanged: (_) {},
               ),
@@ -119,7 +121,7 @@ void main() {
             child: _buildSliderInTheme(
               StreamAudioWaveformSlider(
                 waveform: _sampleWaveform,
-                progress: 1.0,
+                progress: 1,
                 isActive: true,
                 onChanged: (_) {},
               ),
@@ -208,7 +210,7 @@ void main() {
             child: _buildWaveformInTheme(
               StreamAudioWaveform(
                 waveform: _sampleWaveform,
-                progress: 1.0,
+                progress: 1,
               ),
             ),
           ),
@@ -256,7 +258,7 @@ void main() {
             child: _buildWaveformInTheme(
               StreamAudioWaveform(
                 waveform: _sampleWaveform,
-                progress: 1.0,
+                progress: 1,
               ),
               brightness: Brightness.dark,
             ),
