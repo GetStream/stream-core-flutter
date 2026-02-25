@@ -127,8 +127,8 @@ class StreamEmojiChipThemeStyle with _$StreamEmojiChipThemeStyle {
     this.shape,
     WidgetStateProperty<BorderSide?>? side,
   })
-  // TODO: Fix this or try to find something better
-  : side = side as WidgetStateBorderSide?;
+    // TODO: Fix this or try to find something better
+    : side = side as WidgetStateBorderSide?;
 
   /// The background color for emoji chips.
   ///
