@@ -160,6 +160,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.emoji,
     this.emojiButton,
     this.emojiChip,
+    this.emojiChipBar,
     this.fileTypeIcon,
     this.listTile,
     this.onlineIndicator,
@@ -215,6 +216,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamEmojiChip] uses [DefaultStreamEmojiChip].
   final StreamComponentBuilder<StreamEmojiChipProps>? emojiChip;
+
+  /// Custom builder for emoji chip bar widgets.
+  ///
+  /// When null, [StreamEmojiChipBar] uses [DefaultStreamEmojiChipBar].
+  final StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar;
 
   /// Custom builder for file type icon widgets.
   ///

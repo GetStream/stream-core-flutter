@@ -13,6 +13,7 @@ export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBa
 export 'components/context_menu/stream_context_menu.dart';
 export 'components/context_menu/stream_context_menu_action.dart' hide DefaultStreamContextMenuAction;
 export 'components/controls/stream_emoji_chip.dart' hide DefaultStreamEmojiChip;
+export 'components/controls/stream_emoji_chip_bar.dart' hide DefaultStreamEmojiChipBar;
 export 'components/controls/stream_remove_control.dart';
 export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
 export 'components/message_composer.dart';
