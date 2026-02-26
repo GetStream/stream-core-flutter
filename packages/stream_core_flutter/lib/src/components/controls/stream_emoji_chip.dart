@@ -67,15 +67,23 @@ class StreamEmojiChip extends StatelessWidget {
   /// Creates an add-emoji chip showing the add-reaction icon.
   ///
   /// When [onPressed] is null the chip is disabled.
-  StreamEmojiChip.addEmoji({
-    super.key,
+  static Widget addEmoji({
+    Key? key,
     VoidCallback? onPressed,
     VoidCallback? onLongPress,
-  }) : props = .new(
-         emoji: const _AddEmojiIcon(),
-         onPressed: onPressed,
-         onLongPress: onLongPress,
-       );
+  }) {
+    return StreamEmojiChipTheme(
+      // The add-reaction icon needs to be a bit bigger than the default
+      // emoji size to look visually balanced.
+      data: const .new(style: .new(emojiSize: 20)),
+      child: StreamEmojiChip(
+        key: key,
+        emoji: const _AddEmojiIcon(),
+        onPressed: onPressed,
+        onLongPress: onLongPress,
+      ),
+    );
+  }
 
   /// The props controlling the appearance and behavior of this chip.
   final StreamEmojiChipProps props;
@@ -152,6 +160,7 @@ class DefaultStreamEmojiChip extends StatelessWidget {
     final effectiveForegroundColor = chipThemeStyle?.foregroundColor ?? defaults.foregroundColor;
     final effectiveOverlayColor = chipThemeStyle?.overlayColor ?? defaults.overlayColor;
     final effectiveTextStyle = chipThemeStyle?.textStyle ?? defaults.textStyle;
+    final effectiveEmojiSize = chipThemeStyle?.emojiSize ?? defaults.emojiSize;
     final effectiveMinimumSize = chipThemeStyle?.minimumSize ?? defaults.minimumSize;
     final effectiveMaximumSize = chipThemeStyle?.maximumSize ?? defaults.maximumSize;
     final effectivePadding = chipThemeStyle?.padding ?? defaults.padding;
@@ -162,7 +171,7 @@ class DefaultStreamEmojiChip extends StatelessWidget {
       onPressed: props.onPressed,
       onLongPress: props.onLongPress,
       isSelected: props.isSelected,
-      iconSize: StreamEmojiSize.sm.value,
+      iconSize: effectiveEmojiSize,
       icon: _EmojiChipContent(emoji: props.emoji, count: props.count),
       style: ButtonStyle(
         tapTargetSize: .shrinkWrap,
@@ -212,10 +221,7 @@ class _AddEmojiIcon extends StatelessWidget {
   const _AddEmojiIcon();
 
   @override
-  Widget build(BuildContext context) => IconTheme.merge(
-    data: const IconThemeData(size: 20),
-    child: Icon(context.streamIcons.emojiAddReaction),
-  );
+  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAddReaction);
 }
 
 // Provides default values for [StreamEmojiChipThemeStyle] based on
@@ -229,6 +235,9 @@ class _StreamEmojiChipThemeDefaults extends StreamEmojiChipThemeStyle {
   late final _textTheme = _context.streamTextTheme;
   late final _radius = _context.streamRadius;
   late final _spacing = _context.streamSpacing;
+
+  @override
+  double get emojiSize => StreamEmojiSize.sm.value;
 
   @override
   Size get minimumSize => const Size(64, 32);

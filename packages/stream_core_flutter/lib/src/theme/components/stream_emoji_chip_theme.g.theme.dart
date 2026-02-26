@@ -123,6 +123,7 @@ mixin _$StreamEmojiChipThemeStyle {
         t,
         TextStyle.lerp,
       ),
+      emojiSize: lerpDouble$(a.emojiSize, b.emojiSize, t),
       minimumSize: Size.lerp(a.minimumSize, b.minimumSize, t),
       maximumSize: Size.lerp(a.maximumSize, b.maximumSize, t),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
@@ -136,6 +137,7 @@ mixin _$StreamEmojiChipThemeStyle {
     WidgetStateProperty<Color?>? foregroundColor,
     WidgetStateProperty<Color?>? overlayColor,
     WidgetStateProperty<TextStyle?>? textStyle,
+    double? emojiSize,
     Size? minimumSize,
     Size? maximumSize,
     EdgeInsetsGeometry? padding,
@@ -149,6 +151,7 @@ mixin _$StreamEmojiChipThemeStyle {
       foregroundColor: foregroundColor ?? _this.foregroundColor,
       overlayColor: overlayColor ?? _this.overlayColor,
       textStyle: textStyle ?? _this.textStyle,
+      emojiSize: emojiSize ?? _this.emojiSize,
       minimumSize: minimumSize ?? _this.minimumSize,
       maximumSize: maximumSize ?? _this.maximumSize,
       padding: padding ?? _this.padding,
@@ -173,6 +176,7 @@ mixin _$StreamEmojiChipThemeStyle {
       foregroundColor: other.foregroundColor,
       overlayColor: other.overlayColor,
       textStyle: other.textStyle,
+      emojiSize: other.emojiSize,
       minimumSize: other.minimumSize,
       maximumSize: other.maximumSize,
       padding: other.padding,
@@ -198,6 +202,7 @@ mixin _$StreamEmojiChipThemeStyle {
         _other.foregroundColor == _this.foregroundColor &&
         _other.overlayColor == _this.overlayColor &&
         _other.textStyle == _this.textStyle &&
+        _other.emojiSize == _this.emojiSize &&
         _other.minimumSize == _this.minimumSize &&
         _other.maximumSize == _this.maximumSize &&
         _other.padding == _this.padding &&
@@ -215,6 +220,7 @@ mixin _$StreamEmojiChipThemeStyle {
       _this.foregroundColor,
       _this.overlayColor,
       _this.textStyle,
+      _this.emojiSize,
       _this.minimumSize,
       _this.maximumSize,
       _this.padding,

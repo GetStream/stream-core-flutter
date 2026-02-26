@@ -121,6 +121,7 @@ class StreamEmojiChipThemeStyle with _$StreamEmojiChipThemeStyle {
     this.foregroundColor,
     this.overlayColor,
     this.textStyle,
+    this.emojiSize,
     this.minimumSize,
     this.maximumSize,
     this.padding,
@@ -151,6 +152,11 @@ class StreamEmojiChipThemeStyle with _$StreamEmojiChipThemeStyle {
   /// The color of [textStyle] is typically not used directly — use
   /// [foregroundColor] to control text and icon color instead.
   final WidgetStateProperty<TextStyle?>? textStyle;
+
+  /// The display size of the emoji/icon in logical pixels.
+  ///
+  /// Falls back to [StreamEmojiSize.sm] (16px).
+  final double? emojiSize;
 
   /// The minimum size of the chip.
   ///
