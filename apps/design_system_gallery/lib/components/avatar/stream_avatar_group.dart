@@ -128,7 +128,8 @@ class _SizeCard extends StatelessWidget {
   String _getUsage(StreamAvatarGroupSize size) {
     return switch (size) {
       StreamAvatarGroupSize.lg => 'Channel list items, compact group displays',
-      StreamAvatarGroupSize.xl => 'Channel headers, prominent group displays',
+      StreamAvatarGroupSize.xl => 'Channel list items, standard group displays',
+      StreamAvatarGroupSize.xxl => 'Channel headers, prominent group displays',
     };
   }
 
