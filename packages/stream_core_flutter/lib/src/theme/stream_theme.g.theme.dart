@@ -23,6 +23,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
+    StreamChannelListItemThemeData? channelListItemTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
@@ -46,6 +47,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
+      channelListItemTheme: channelListItemTheme ?? _this.channelListItemTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
       contextMenuActionTheme:
@@ -92,6 +94,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       buttonTheme: StreamButtonThemeData.lerp(
         _this.buttonTheme,
         other.buttonTheme,
+        t,
+      )!,
+      channelListItemTheme: StreamChannelListItemThemeData.lerp(
+        _this.channelListItemTheme,
+        other.channelListItemTheme,
         t,
       )!,
       checkboxTheme: StreamCheckboxThemeData.lerp(
@@ -153,6 +160,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
+        _other.channelListItemTheme == _this.channelListItemTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
@@ -167,7 +175,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   int get hashCode {
     final _this = (this as StreamTheme);
 
-    return Object.hash(
+    return Object.hashAll([
       runtimeType,
       _this.brightness,
       _this.icons,
@@ -180,6 +188,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.buttonTheme,
+      _this.channelListItemTheme,
       _this.checkboxTheme,
       _this.contextMenuTheme,
       _this.contextMenuActionTheme,
@@ -188,6 +197,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.inputTheme,
       _this.onlineIndicatorTheme,
       _this.progressBarTheme,
-    );
+    ]);
   }
 }
