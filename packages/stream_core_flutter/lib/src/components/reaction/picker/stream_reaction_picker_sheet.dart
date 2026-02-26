@@ -65,13 +65,13 @@ extension CategoryIcon on Category {
 ///
 /// {@tool snippet}
 ///
-/// With customization:
+/// With selected reactions and customization:
 ///
 /// ```dart
 /// final emoji = await StreamReactionPickerSheet.show(
 ///   context: context,
 ///   reactionButtonSize: StreamEmojiButtonSize.lg,
-///   showDragHandle: false,
+///   selectedReactions: {'+1', 'heart', 'joy'},
 ///   backgroundColor: Colors.white,
 /// );
 /// ```
@@ -97,6 +97,7 @@ class StreamReactionPickerSheet extends StatefulWidget {
     required this.scrollController,
     this.onReactionSelected,
     this.reactionButtonSize,
+    this.selectedReactions,
   });
 
   /// Called when a reaction is tapped.
@@ -106,6 +107,12 @@ class StreamReactionPickerSheet extends StatefulWidget {
   ///
   /// Defaults to [StreamEmojiButtonSize.xl] (48px buttons).
   final StreamEmojiButtonSize? reactionButtonSize;
+
+  /// The set of emoji short names that are currently selected.
+  ///
+  /// When non-null, emojis whose [Emoji.shortName] (e.g. `"+1"`, `"heart"`, `"joy"`)
+  /// is contained in this set are rendered in the selected state.
+  final Set<String>? selectedReactions;
 
   /// Scroll controller for the emoji grid.
   ///
@@ -121,6 +128,7 @@ class StreamReactionPickerSheet extends StatefulWidget {
   /// Parameters:
   /// - [context]: The build context for showing the modal.
   /// - [reactionButtonSize]: Size of each reaction button. Defaults to [StreamEmojiButtonSize.xl].
+  /// - [selectedReactions]: A set of emoji short names (e.g. `{'+1', 'heart'}`) that should appear selected. When non-null, matching emojis are highlighted.
   /// - [backgroundColor]: Background color of the sheet. Defaults to `backgroundElevation2` from the current color scheme.
   ///
   /// Returns a [Future] that completes with the selected [Emoji] when a
@@ -155,6 +163,7 @@ class StreamReactionPickerSheet extends StatefulWidget {
   static Future<Emoji?> show({
     required BuildContext context,
     StreamEmojiButtonSize? reactionButtonSize,
+    Set<String>? selectedReactions,
     Color? backgroundColor,
   }) {
     final radius = context.streamRadius;
@@ -180,6 +189,7 @@ class StreamReactionPickerSheet extends StatefulWidget {
           scrollController: scrollController,
           onReactionSelected: Navigator.of(context).pop,
           reactionButtonSize: reactionButtonSize,
+          selectedReactions: selectedReactions,
         ),
       ),
     );
@@ -394,6 +404,7 @@ class _StreamReactionPickerSheetState extends State<StreamReactionPickerSheet> w
                               return StreamEmojiButton(
                                 size: effectiveButtonSize,
                                 emoji: Text(emoji.emoji),
+                                isSelected: widget.selectedReactions?.contains(emoji.shortName),
                                 onPressed: () => widget.onReactionSelected?.call(emoji),
                               );
                             },
