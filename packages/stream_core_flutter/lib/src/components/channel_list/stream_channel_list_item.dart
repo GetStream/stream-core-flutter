@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../stream_core_flutter.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_channel_list_item_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
-import '../badge/stream_badge_count.dart';
+import '../badge/stream_badge_notification.dart';
 
 /// A list item for displaying a channel in a channel list.
 ///
@@ -25,7 +26,7 @@ import '../badge/stream_badge_count.dart';
 /// StreamChannelListItem(
 ///   avatar: StreamAvatar(placeholder: (context) => Text('AB')),
 ///   title: 'General',
-///   subtitle: 'Hello, how are you?',
+///   subtitle: Text('Hello, how are you?'),
 ///   timestamp: '9:41',
 ///   unreadCount: 3,
 /// )
@@ -41,7 +42,7 @@ import '../badge/stream_badge_count.dart';
 ///   avatar: StreamAvatar(placeholder: (context) => Text('AB')),
 ///   title: 'Muted Channel',
 ///   titleTrailing: Icon(Icons.volume_off, size: 16),
-///   subtitle: 'Last message...',
+///   subtitle: Text('Last message...'),
 ///   timestamp: 'Yesterday',
 /// )
 /// ```
@@ -57,7 +58,7 @@ import '../badge/stream_badge_count.dart';
 ///
 ///  * [StreamChannelListItemThemeData], for customizing appearance.
 ///  * [StreamChannelListItemTheme], for overriding theme in a widget subtree.
-///  * [StreamBadgeCount], which displays the unread count badge.
+///  * [StreamBadgeNotification], which displays the unread count badge.
 class StreamChannelListItem extends StatelessWidget {
   /// Creates a channel list item.
   StreamChannelListItem({
@@ -65,7 +66,7 @@ class StreamChannelListItem extends StatelessWidget {
     required Widget avatar,
     required String title,
     Widget? titleTrailing,
-    String? subtitle,
+    Widget? subtitle,
     Widget? subtitleTrailing,
     String? timestamp,
     int unreadCount = 0,
@@ -131,8 +132,11 @@ class StreamChannelListItemProps {
   /// Typically used for a mute icon or similar indicator.
   final Widget? titleTrailing;
 
-  /// The message preview text displayed below the title.
-  final String? subtitle;
+  /// The message preview widget displayed below the title.
+  ///
+  /// Typically a [Text] widget with the last message, but can be any widget
+  /// for richer content (e.g., icons, read receipts, sender prefix).
+  final Widget? subtitle;
 
   /// An optional trailing widget in the subtitle row.
   ///
@@ -146,7 +150,7 @@ class StreamChannelListItemProps {
 
   /// The number of unread messages.
   ///
-  /// When greater than zero, a [StreamBadgeCount] is displayed.
+  /// When greater than zero, a [StreamBadgeNotification] is displayed.
   final int unreadCount;
 
   /// Called when the list item is tapped.
@@ -191,7 +195,6 @@ class _DefaultStreamChannelListItemState extends State<DefaultStreamChannelListI
     final effectiveBackgroundColor = channelListItemTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveHoverColor = channelListItemTheme.hoverColor ?? defaults.hoverColor;
     final effectivePressedColor = channelListItemTheme.pressedColor ?? defaults.pressedColor;
-    final effectiveBorderColor = channelListItemTheme.borderColor ?? defaults.borderColor;
     final effectiveTitleStyle = channelListItemTheme.titleStyle ?? defaults.titleStyle;
     final effectiveSubtitleStyle = channelListItemTheme.subtitleStyle ?? defaults.subtitleStyle;
     final effectiveTimestampStyle = channelListItemTheme.timestampStyle ?? defaults.timestampStyle;
@@ -240,9 +243,9 @@ class _DefaultStreamChannelListItemState extends State<DefaultStreamChannelListI
                         timestampStyle: effectiveTimestampStyle,
                         spacing: spacing,
                       ),
-                      if (props.subtitle != null)
+                      if (props.subtitle case final subtitle?)
                         _SubtitleRow(
-                          subtitle: props.subtitle!,
+                          subtitle: subtitle,
                           subtitleTrailing: props.subtitleTrailing,
                           subtitleStyle: effectiveSubtitleStyle,
                         ),
@@ -286,12 +289,15 @@ class _TitleRow extends StatelessWidget {
           child: Row(
             spacing: spacing.xxs,
             children: [
-              Flexible(
-                child: Text(
-                  title,
-                  style: titleStyle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: StreamBadgeNotificationSize.sm.value),
+                  child: Text(
+                    title,
+                    style: titleStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               ?titleTrailing,
@@ -304,7 +310,7 @@ class _TitleRow extends StatelessWidget {
             spacing: spacing.xs,
             children: [
               if (timestamp != null) Text(timestamp!, style: timestampStyle),
-              if (unreadCount > 0) StreamBadgeCount(label: '$unreadCount'),
+              if (unreadCount > 0) StreamBadgeNotification(label: '$unreadCount'),
             ],
           ),
       ],
@@ -319,24 +325,22 @@ class _SubtitleRow extends StatelessWidget {
     required this.subtitleStyle,
   });
 
-  final String subtitle;
+  final Widget subtitle;
   final Widget? subtitleTrailing;
   final TextStyle subtitleStyle;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            subtitle,
-            style: subtitleStyle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        ?subtitleTrailing,
-      ],
+    return DefaultTextStyle(
+      style: subtitleStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      child: Row(
+        children: [
+          Expanded(child: subtitle),
+          ?subtitleTrailing,
+        ],
+      ),
     );
   }
 }

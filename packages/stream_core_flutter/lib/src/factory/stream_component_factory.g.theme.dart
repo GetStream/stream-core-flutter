@@ -34,6 +34,8 @@ mixin _$StreamComponentBuilders {
       avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
+      badgeNotification:
+          t < 0.5 ? a.badgeNotification : b.badgeNotification,
       button: t < 0.5 ? a.button : b.button,
       channelListItem: t < 0.5 ? a.channelListItem : b.channelListItem,
       checkbox: t < 0.5 ? a.checkbox : b.checkbox,
@@ -51,6 +53,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
+    Widget Function(BuildContext, StreamBadgeNotificationProps)?
+    badgeNotification,
     Widget Function(BuildContext, StreamButtonProps)? button,
     Widget Function(BuildContext, StreamChannelListItemProps)? channelListItem,
     Widget Function(BuildContext, StreamCheckboxProps)? checkbox,
@@ -69,6 +73,7 @@ mixin _$StreamComponentBuilders {
       avatarGroup: avatarGroup ?? _this.avatarGroup,
       avatarStack: avatarStack ?? _this.avatarStack,
       badgeCount: badgeCount ?? _this.badgeCount,
+      badgeNotification: badgeNotification ?? _this.badgeNotification,
       button: button ?? _this.button,
       channelListItem: channelListItem ?? _this.channelListItem,
       checkbox: checkbox ?? _this.checkbox,
@@ -97,6 +102,7 @@ mixin _$StreamComponentBuilders {
       avatarGroup: other.avatarGroup,
       avatarStack: other.avatarStack,
       badgeCount: other.badgeCount,
+      badgeNotification: other.badgeNotification,
       button: other.button,
       channelListItem: other.channelListItem,
       checkbox: other.checkbox,
@@ -126,6 +132,7 @@ mixin _$StreamComponentBuilders {
         _other.avatarGroup == _this.avatarGroup &&
         _other.avatarStack == _this.avatarStack &&
         _other.badgeCount == _this.badgeCount &&
+        _other.badgeNotification == _this.badgeNotification &&
         _other.button == _this.button &&
         _other.channelListItem == _this.channelListItem &&
         _other.checkbox == _this.checkbox &&
@@ -147,6 +154,7 @@ mixin _$StreamComponentBuilders {
       _this.avatarGroup,
       _this.avatarStack,
       _this.badgeCount,
+      _this.badgeNotification,
       _this.button,
       _this.channelListItem,
       _this.checkbox,

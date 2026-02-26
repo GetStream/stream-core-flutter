@@ -22,6 +22,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBoxShadow? boxShadow,
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
+    StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamButtonThemeData? buttonTheme,
     StreamChannelListItemThemeData? channelListItemTheme,
     StreamCheckboxThemeData? checkboxTheme,
@@ -46,6 +47,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       boxShadow: boxShadow ?? _this.boxShadow,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
+      badgeNotificationTheme:
+          badgeNotificationTheme ?? _this.badgeNotificationTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       channelListItemTheme: channelListItemTheme ?? _this.channelListItemTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
@@ -89,6 +92,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeCountTheme: StreamBadgeCountThemeData.lerp(
         _this.badgeCountTheme,
         other.badgeCountTheme,
+        t,
+      )!,
+      badgeNotificationTheme: StreamBadgeNotificationThemeData.lerp(
+        _this.badgeNotificationTheme,
+        other.badgeNotificationTheme,
         t,
       )!,
       buttonTheme: StreamButtonThemeData.lerp(
@@ -159,6 +167,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.boxShadow == _this.boxShadow &&
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
+        _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
         _other.buttonTheme == _this.buttonTheme &&
         _other.channelListItemTheme == _this.channelListItemTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
@@ -187,6 +196,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.boxShadow,
       _this.avatarTheme,
       _this.badgeCountTheme,
+      _this.badgeNotificationTheme,
       _this.buttonTheme,
       _this.channelListItemTheme,
       _this.checkboxTheme,

@@ -154,6 +154,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.avatarGroup,
     this.avatarStack,
     this.badgeCount,
+    this.badgeNotification,
     this.button,
     this.channelListItem,
     this.checkbox,
@@ -184,6 +185,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamBadgeCount] uses [DefaultStreamBadgeCount].
   final StreamComponentBuilder<StreamBadgeCountProps>? badgeCount;
+
+  /// Custom builder for badge notification widgets.
+  ///
+  /// When null, [StreamBadgeNotification] uses
+  /// [DefaultStreamBadgeNotification].
+  final StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification;
 
   /// Custom builder for button widgets.
   ///
