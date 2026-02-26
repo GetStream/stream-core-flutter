@@ -25,9 +25,9 @@ import '../badge/stream_badge_notification.dart';
 /// ```dart
 /// StreamChannelListItem(
 ///   avatar: StreamAvatar(placeholder: (context) => Text('AB')),
-///   title: 'General',
+///   title: Text('General'),
 ///   subtitle: Text('Hello, how are you?'),
-///   timestamp: '9:41',
+///   timestamp: Text('9:41'),
 ///   unreadCount: 3,
 /// )
 /// ```
@@ -40,10 +40,10 @@ import '../badge/stream_badge_notification.dart';
 /// ```dart
 /// StreamChannelListItem(
 ///   avatar: StreamAvatar(placeholder: (context) => Text('AB')),
-///   title: 'Muted Channel',
+///   title: Text('Muted Channel'),
 ///   titleTrailing: Icon(Icons.volume_off, size: 16),
 ///   subtitle: Text('Last message...'),
-///   timestamp: 'Yesterday',
+///   timestamp: Text('Yesterday'),
 /// )
 /// ```
 /// {@end-tool}
@@ -64,11 +64,11 @@ class StreamChannelListItem extends StatelessWidget {
   StreamChannelListItem({
     super.key,
     required Widget avatar,
-    required String title,
+    required Widget title,
     Widget? titleTrailing,
     Widget? subtitle,
     Widget? subtitleTrailing,
-    String? timestamp,
+    Widget? timestamp,
     int unreadCount = 0,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
@@ -124,8 +124,11 @@ class StreamChannelListItemProps {
   /// in a [StreamOnlineIndicator].
   final Widget avatar;
 
-  /// The channel title text.
-  final String title;
+  /// The channel title widget.
+  ///
+  /// Typically a [Text] widget with the channel name. The default text style
+  /// is provided by the theme's title style via [DefaultTextStyle].
+  final Widget title;
 
   /// An optional widget displayed after the title text.
   ///
@@ -143,10 +146,11 @@ class StreamChannelListItemProps {
   /// Typically used for a mute icon or similar indicator.
   final Widget? subtitleTrailing;
 
-  /// The formatted timestamp string.
+  /// The timestamp widget displayed in the trailing section of the title row.
   ///
-  /// Displayed in the trailing section of the title row.
-  final String? timestamp;
+  /// Typically a [Text] widget with a formatted date string. The default text
+  /// style is provided by the theme's timestamp style via [DefaultTextStyle].
+  final Widget? timestamp;
 
   /// The number of unread messages.
   ///
@@ -272,9 +276,9 @@ class _TitleRow extends StatelessWidget {
     required this.spacing,
   });
 
-  final String title;
+  final Widget title;
   final Widget? titleTrailing;
-  final String? timestamp;
+  final Widget? timestamp;
   final int unreadCount;
   final TextStyle titleStyle;
   final TextStyle timestampStyle;
@@ -289,14 +293,18 @@ class _TitleRow extends StatelessWidget {
           child: Row(
             spacing: spacing.xxs,
             children: [
-              Expanded(
+              Flexible(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: StreamBadgeNotificationSize.sm.value),
-                  child: Text(
-                    title,
-                    style: titleStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    widthFactor: 1,
+                    child: DefaultTextStyle.merge(
+                      style: titleStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      child: title,
+                    ),
                   ),
                 ),
               ),
@@ -309,7 +317,11 @@ class _TitleRow extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: spacing.xs,
             children: [
-              if (timestamp != null) Text(timestamp!, style: timestampStyle),
+              if (timestamp case final timestamp?)
+                DefaultTextStyle.merge(
+                  style: timestampStyle,
+                  child: timestamp,
+                ),
               if (unreadCount > 0) StreamBadgeNotification(label: '$unreadCount'),
             ],
           ),
