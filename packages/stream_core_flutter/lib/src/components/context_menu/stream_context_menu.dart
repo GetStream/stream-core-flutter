@@ -64,6 +64,7 @@ class StreamContextMenu extends StatelessWidget {
     super.key,
     required this.children,
     this.clipBehavior = Clip.hardEdge,
+    this.elevation = 3,
   });
 
   /// The menu items to display.
@@ -79,27 +80,31 @@ class StreamContextMenu extends StatelessWidget {
   /// Defaults to [Clip.hardEdge].
   final Clip clipBehavior;
 
+  /// The z-coordinate at which to place this menu.
+  ///
+  /// Higher values increase the size and intensity of the menu's drop shadow.
+  ///
+  /// Defaults to `3`.
+  final double elevation;
+
   @override
   Widget build(BuildContext context) {
     final themeStyle = context.streamContextMenuTheme.style;
     final defaults = _ContextMenuStyleDefaults(context);
 
     final effectiveBackgroundColor = themeStyle?.backgroundColor ?? defaults.backgroundColor;
-    final effectiveBoxShadow = themeStyle?.boxShadow ?? defaults.boxShadow;
     final effectivePadding = themeStyle?.padding ?? defaults.padding;
     final effectiveSide = themeStyle?.side ?? defaults.side;
     final effectiveShape = (themeStyle?.shape ?? defaults.shape).copyWith(side: effectiveSide);
 
     return IntrinsicWidth(
-      child: Container(
+      child: Material(
+        elevation: elevation,
+        shape: effectiveShape,
         clipBehavior: clipBehavior,
-        padding: effectivePadding,
-        decoration: ShapeDecoration(
-          shape: effectiveShape,
-          color: effectiveBackgroundColor,
-          shadows: effectiveBoxShadow,
-        ),
+        color: effectiveBackgroundColor,
         child: SingleChildScrollView(
+          padding: effectivePadding,
           child: Column(
             mainAxisSize: .min,
             crossAxisAlignment: .stretch,
@@ -174,7 +179,6 @@ class _ContextMenuStyleDefaults extends StreamContextMenuStyle {
 
   late final StreamRadius _radius = context.streamRadius;
   late final StreamSpacing _spacing = context.streamSpacing;
-  late final StreamBoxShadow _boxShadow = context.streamBoxShadow;
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
 
   @override
@@ -185,9 +189,6 @@ class _ContextMenuStyleDefaults extends StreamContextMenuStyle {
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation2;
-
-  @override
-  List<BoxShadow> get boxShadow => _boxShadow.elevation2;
 
   @override
   EdgeInsetsGeometry get padding => EdgeInsets.all(_spacing.xxs);

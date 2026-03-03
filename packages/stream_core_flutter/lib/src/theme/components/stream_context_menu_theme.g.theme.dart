@@ -106,7 +106,6 @@ mixin _$StreamContextMenuStyle {
           : b.side == null
           ? a.side
           : BorderSide.lerp(a.side!, b.side!, t),
-      boxShadow: t < 0.5 ? a.boxShadow : b.boxShadow,
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
     );
   }
@@ -115,7 +114,6 @@ mixin _$StreamContextMenuStyle {
     Color? backgroundColor,
     OutlinedBorder? shape,
     BorderSide? side,
-    List<BoxShadow>? boxShadow,
     EdgeInsetsGeometry? padding,
   }) {
     final _this = (this as StreamContextMenuStyle);
@@ -124,7 +122,6 @@ mixin _$StreamContextMenuStyle {
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       shape: shape ?? _this.shape,
       side: side ?? _this.side,
-      boxShadow: boxShadow ?? _this.boxShadow,
       padding: padding ?? _this.padding,
     );
   }
@@ -146,7 +143,6 @@ mixin _$StreamContextMenuStyle {
       side: _this.side != null && other.side != null
           ? BorderSide.merge(_this.side!, other.side!)
           : other.side,
-      boxShadow: other.boxShadow,
       padding: other.padding,
     );
   }
@@ -167,7 +163,6 @@ mixin _$StreamContextMenuStyle {
     return _other.backgroundColor == _this.backgroundColor &&
         _other.shape == _this.shape &&
         _other.side == _this.side &&
-        _other.boxShadow == _this.boxShadow &&
         _other.padding == _this.padding;
   }
 
@@ -180,7 +175,6 @@ mixin _$StreamContextMenuStyle {
       _this.backgroundColor,
       _this.shape,
       _this.side,
-      _this.boxShadow,
       _this.padding,
     );
   }

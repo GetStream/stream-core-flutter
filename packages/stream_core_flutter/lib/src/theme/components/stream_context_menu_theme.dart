@@ -118,7 +118,6 @@ class StreamContextMenuStyle with _$StreamContextMenuStyle {
     this.backgroundColor,
     this.shape,
     this.side,
-    this.boxShadow,
     this.padding,
   });
 
@@ -142,11 +141,6 @@ class StreamContextMenuStyle with _$StreamContextMenuStyle {
   ///
   /// If null, defaults to a 1px [StreamColorScheme.borderDefault] border.
   final BorderSide? side;
-
-  /// The box shadow of the context menu container.
-  ///
-  /// If null, defaults to [StreamBoxShadow.elevation2].
-  final List<BoxShadow>? boxShadow;
 
   /// The padding between the menu's boundary and its children.
   ///
