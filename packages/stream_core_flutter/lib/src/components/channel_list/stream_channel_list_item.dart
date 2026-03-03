@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../stream_core_flutter.dart';
-import '../../factory/stream_component_factory.dart';
-import '../../theme/components/stream_channel_list_item_theme.dart';
-import '../../theme/primitives/stream_spacing.dart';
-import '../../theme/semantics/stream_color_scheme.dart';
-import '../../theme/semantics/stream_text_theme.dart';
-import '../../theme/stream_theme_extensions.dart';
-import '../badge/stream_badge_notification.dart';
 
 /// A list item for displaying a channel in a channel list.
 ///
