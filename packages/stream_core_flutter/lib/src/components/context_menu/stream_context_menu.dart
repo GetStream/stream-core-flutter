@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/components/stream_context_menu_theme.dart';
 import '../../theme/primitives/stream_radius.dart';
 import '../../theme/primitives/stream_spacing.dart';
-import '../../theme/semantics/stream_box_shadow.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -64,7 +63,7 @@ class StreamContextMenu extends StatelessWidget {
     super.key,
     required this.children,
     this.clipBehavior = Clip.hardEdge,
-    this.elevation = 3,
+    this.elevation,
   });
 
   /// The menu items to display.
@@ -84,8 +83,9 @@ class StreamContextMenu extends StatelessWidget {
   ///
   /// Higher values increase the size and intensity of the menu's drop shadow.
   ///
-  /// Defaults to `3`.
-  final double elevation;
+  /// If null, resolves from [StreamContextMenuStyle.elevation], then falls
+  /// back to `3`.
+  final double? elevation;
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +93,14 @@ class StreamContextMenu extends StatelessWidget {
     final defaults = _ContextMenuStyleDefaults(context);
 
     final effectiveBackgroundColor = themeStyle?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveElevation = elevation ?? themeStyle?.elevation ?? defaults.elevation;
     final effectivePadding = themeStyle?.padding ?? defaults.padding;
     final effectiveSide = themeStyle?.side ?? defaults.side;
     final effectiveShape = (themeStyle?.shape ?? defaults.shape).copyWith(side: effectiveSide);
 
     return IntrinsicWidth(
       child: Material(
-        elevation: elevation,
+        elevation: effectiveElevation,
         shape: effectiveShape,
         clipBehavior: clipBehavior,
         color: effectiveBackgroundColor,
@@ -171,7 +172,7 @@ class StreamContextMenuSeparator extends StatelessWidget {
 /// Default values for [StreamContextMenuStyle].
 ///
 /// Provides sensible defaults based on the current [StreamColorScheme],
-/// [StreamRadius], [StreamSpacing], and [StreamBoxShadow].
+/// [StreamRadius], and [StreamSpacing].
 class _ContextMenuStyleDefaults extends StreamContextMenuStyle {
   _ContextMenuStyleDefaults(this.context);
 
@@ -180,6 +181,9 @@ class _ContextMenuStyleDefaults extends StreamContextMenuStyle {
   late final StreamRadius _radius = context.streamRadius;
   late final StreamSpacing _spacing = context.streamSpacing;
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
+
+  @override
+  double get elevation => 3;
 
   @override
   OutlinedBorder get shape => RoundedRectangleBorder(borderRadius: .all(_radius.lg));

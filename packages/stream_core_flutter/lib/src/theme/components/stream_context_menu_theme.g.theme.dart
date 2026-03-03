@@ -100,6 +100,7 @@ mixin _$StreamContextMenuStyle {
 
     return StreamContextMenuStyle(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+      elevation: lerpDouble$(a.elevation, b.elevation, t),
       shape: OutlinedBorder.lerp(a.shape, b.shape, t),
       side: a.side == null
           ? b.side
@@ -112,6 +113,7 @@ mixin _$StreamContextMenuStyle {
 
   StreamContextMenuStyle copyWith({
     Color? backgroundColor,
+    double? elevation,
     OutlinedBorder? shape,
     BorderSide? side,
     EdgeInsetsGeometry? padding,
@@ -120,6 +122,7 @@ mixin _$StreamContextMenuStyle {
 
     return StreamContextMenuStyle(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
+      elevation: elevation ?? _this.elevation,
       shape: shape ?? _this.shape,
       side: side ?? _this.side,
       padding: padding ?? _this.padding,
@@ -139,6 +142,7 @@ mixin _$StreamContextMenuStyle {
 
     return copyWith(
       backgroundColor: other.backgroundColor,
+      elevation: other.elevation,
       shape: other.shape,
       side: _this.side != null && other.side != null
           ? BorderSide.merge(_this.side!, other.side!)
@@ -161,6 +165,7 @@ mixin _$StreamContextMenuStyle {
     final _other = (other as StreamContextMenuStyle);
 
     return _other.backgroundColor == _this.backgroundColor &&
+        _other.elevation == _this.elevation &&
         _other.shape == _this.shape &&
         _other.side == _this.side &&
         _other.padding == _this.padding;
@@ -173,6 +178,7 @@ mixin _$StreamContextMenuStyle {
     return Object.hash(
       runtimeType,
       _this.backgroundColor,
+      _this.elevation,
       _this.shape,
       _this.side,
       _this.padding,
