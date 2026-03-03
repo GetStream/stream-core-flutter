@@ -173,21 +173,24 @@ class DefaultStreamEmoji extends StatelessWidget {
     return SizedBox.square(
       dimension: effectiveSize,
       child: MediaQuery.withNoTextScaling(
-        child: DefaultTextStyle.merge(
-          textAlign: .center,
-          style: TextStyle(
-            height: 1,
-            decoration: .none,
-            textBaseline: .alphabetic,
-            fontSize: effectiveSize,
-            // Commonly available fallback fonts for emoji rendering.
-            fontFamilyFallback: const [
-              'Apple Color Emoji', // iOS and macOS.
-              'Noto Color Emoji', // Android, ChromeOS, Ubuntu, Linux.
-              'Segoe UI Emoji', // Windows.
-            ],
+        child: IconTheme(
+          data: iconTheme.copyWith(size: effectiveSize),
+          child: DefaultTextStyle.merge(
+            textAlign: .center,
+            style: TextStyle(
+              height: 1,
+              decoration: .none,
+              textBaseline: .alphabetic,
+              fontSize: effectiveSize,
+              // Commonly available fallback fonts for emoji rendering.
+              fontFamilyFallback: const [
+                'Apple Color Emoji', // iOS and macOS.
+                'Noto Color Emoji', // Android, ChromeOS, Ubuntu, Linux.
+                'Segoe UI Emoji', // Windows.
+              ],
+            ),
+            child: props.emoji,
           ),
-          child: props.emoji,
         ),
       ),
     );
