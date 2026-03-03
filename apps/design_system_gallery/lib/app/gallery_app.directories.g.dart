@@ -38,6 +38,8 @@ import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart
     as _design_system_gallery_components_controls_stream_emoji_chip;
 import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.dart'
     as _design_system_gallery_components_controls_stream_emoji_chip_bar;
+import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
+    as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
@@ -46,8 +48,6 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
-import 'package:design_system_gallery/components/reaction/picker/stream_reaction_picker_sheet.dart'
-    as _design_system_gallery_components_reaction_picker_stream_reaction_picker_sheet;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -443,6 +443,22 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'Emoji',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamEmojiPickerSheet',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_emoji_stream_emoji_picker_sheet
+                        .buildStreamEmojiPickerSheetDefault,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
@@ -492,22 +508,6 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer
                         .buildStreamMessageComposerExample,
-              ),
-            ],
-          ),
-        ],
-      ),
-      _widgetbook.WidgetbookFolder(
-        name: 'Reaction',
-        children: [
-          _widgetbook.WidgetbookComponent(
-            name: 'StreamReactionPickerSheet',
-            useCases: [
-              _widgetbook.WidgetbookUseCase(
-                name: 'Playground',
-                builder:
-                    _design_system_gallery_components_reaction_picker_stream_reaction_picker_sheet
-                        .buildStreamReactionPickerSheetDefault,
               ),
             ],
           ),
