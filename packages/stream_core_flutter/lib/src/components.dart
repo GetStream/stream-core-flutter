@@ -1,3 +1,4 @@
+export 'components/accessories/stream_audio_waveform.dart';
 export 'components/accessories/stream_emoji.dart' hide DefaultStreamEmoji;
 export 'components/accessories/stream_file_type_icon.dart' hide DefaultStreamFileTypeIcon;
 export 'components/avatar/stream_avatar.dart' hide DefaultStreamAvatar;

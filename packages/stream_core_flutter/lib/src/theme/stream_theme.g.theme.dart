@@ -20,6 +20,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamColorScheme? colorScheme,
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
+    StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamButtonThemeData? buttonTheme,
@@ -45,6 +46,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       colorScheme: colorScheme ?? _this.colorScheme,
       textTheme: textTheme ?? _this.textTheme,
       boxShadow: boxShadow ?? _this.boxShadow,
+      audioWaveformTheme: audioWaveformTheme ?? _this.audioWaveformTheme,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
@@ -83,6 +85,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           (_this.colorScheme.lerp(other.colorScheme, t) as StreamColorScheme),
       textTheme: (_this.textTheme.lerp(other.textTheme, t) as StreamTextTheme),
       boxShadow: StreamBoxShadow.lerp(_this.boxShadow, other.boxShadow, t)!,
+      audioWaveformTheme: StreamAudioWaveformThemeData.lerp(
+        _this.audioWaveformTheme,
+        other.audioWaveformTheme,
+        t,
+      )!,
       avatarTheme: StreamAvatarThemeData.lerp(
         _this.avatarTheme,
         other.avatarTheme,
@@ -164,6 +171,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.colorScheme == _this.colorScheme &&
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
+        _other.audioWaveformTheme == _this.audioWaveformTheme &&
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.buttonTheme == _this.buttonTheme &&
@@ -193,6 +201,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.colorScheme,
       _this.textTheme,
       _this.boxShadow,
+      _this.audioWaveformTheme,
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.buttonTheme,
