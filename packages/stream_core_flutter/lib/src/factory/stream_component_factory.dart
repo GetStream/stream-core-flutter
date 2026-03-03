@@ -159,7 +159,10 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.contextMenuAction,
     this.emoji,
     this.emojiButton,
+    this.emojiChip,
+    this.emojiChipBar,
     this.fileTypeIcon,
+    this.listTile,
     this.onlineIndicator,
     this.progressBar,
   });
@@ -209,10 +212,25 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamEmojiButton] uses [DefaultStreamEmojiButton].
   final StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton;
 
+  /// Custom builder for emoji chip widgets.
+  ///
+  /// When null, [StreamEmojiChip] uses [DefaultStreamEmojiChip].
+  final StreamComponentBuilder<StreamEmojiChipProps>? emojiChip;
+
+  /// Custom builder for emoji chip bar widgets.
+  ///
+  /// When null, [StreamEmojiChipBar] uses [DefaultStreamEmojiChipBar].
+  final StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar;
+
   /// Custom builder for file type icon widgets.
   ///
   /// When null, [StreamFileTypeIcon] uses [DefaultStreamFileTypeIcon].
   final StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon;
+
+  /// Custom builder for list tile widgets.
+  ///
+  /// When null, [StreamListTile] uses [DefaultStreamListTile].
+  final StreamComponentBuilder<StreamListTileProps>? listTile;
 
   /// Custom builder for online indicator widgets.
   ///

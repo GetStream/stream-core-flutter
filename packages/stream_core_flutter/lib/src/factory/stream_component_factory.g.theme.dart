@@ -39,7 +39,10 @@ mixin _$StreamComponentBuilders {
       contextMenuAction: t < 0.5 ? a.contextMenuAction : b.contextMenuAction,
       emoji: t < 0.5 ? a.emoji : b.emoji,
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
+      emojiChip: t < 0.5 ? a.emojiChip : b.emojiChip,
+      emojiChipBar: t < 0.5 ? a.emojiChipBar : b.emojiChipBar,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
+      listTile: t < 0.5 ? a.listTile : b.listTile,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
     );
@@ -56,7 +59,11 @@ mixin _$StreamComponentBuilders {
     contextMenuAction,
     Widget Function(BuildContext, StreamEmojiProps)? emoji,
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
+    Widget Function(BuildContext, StreamEmojiChipProps)? emojiChip,
+    Widget Function(BuildContext, StreamEmojiChipBarProps<Object?>)?
+    emojiChipBar,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
+    Widget Function(BuildContext, StreamListTileProps)? listTile,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
   }) {
@@ -72,7 +79,10 @@ mixin _$StreamComponentBuilders {
       contextMenuAction: contextMenuAction ?? _this.contextMenuAction,
       emoji: emoji ?? _this.emoji,
       emojiButton: emojiButton ?? _this.emojiButton,
+      emojiChip: emojiChip ?? _this.emojiChip,
+      emojiChipBar: emojiChipBar ?? _this.emojiChipBar,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
+      listTile: listTile ?? _this.listTile,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
     );
@@ -99,7 +109,10 @@ mixin _$StreamComponentBuilders {
       contextMenuAction: other.contextMenuAction,
       emoji: other.emoji,
       emojiButton: other.emojiButton,
+      emojiChip: other.emojiChip,
+      emojiChipBar: other.emojiChipBar,
       fileTypeIcon: other.fileTypeIcon,
+      listTile: other.listTile,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
     );
@@ -127,7 +140,10 @@ mixin _$StreamComponentBuilders {
         _other.contextMenuAction == _this.contextMenuAction &&
         _other.emoji == _this.emoji &&
         _other.emojiButton == _this.emojiButton &&
+        _other.emojiChip == _this.emojiChip &&
+        _other.emojiChipBar == _this.emojiChipBar &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
+        _other.listTile == _this.listTile &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar;
   }
@@ -147,7 +163,10 @@ mixin _$StreamComponentBuilders {
       _this.contextMenuAction,
       _this.emoji,
       _this.emojiButton,
+      _this.emojiChip,
+      _this.emojiChipBar,
       _this.fileTypeIcon,
+      _this.listTile,
       _this.onlineIndicator,
       _this.progressBar,
     );
