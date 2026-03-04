@@ -25,7 +25,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamButtonThemeData? buttonTheme,
-    StreamChannelListItemThemeData? channelListItemTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
@@ -54,7 +53,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeNotificationTheme:
           badgeNotificationTheme ?? _this.badgeNotificationTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
-      channelListItemTheme: channelListItemTheme ?? _this.channelListItemTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
       contextMenuActionTheme:
@@ -113,11 +111,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       buttonTheme: StreamButtonThemeData.lerp(
         _this.buttonTheme,
         other.buttonTheme,
-        t,
-      )!,
-      channelListItemTheme: StreamChannelListItemThemeData.lerp(
-        _this.channelListItemTheme,
-        other.channelListItemTheme,
         t,
       )!,
       checkboxTheme: StreamCheckboxThemeData.lerp(
@@ -191,7 +184,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
         _other.buttonTheme == _this.buttonTheme &&
-        _other.channelListItemTheme == _this.channelListItemTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
@@ -223,7 +215,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.badgeCountTheme,
       _this.badgeNotificationTheme,
       _this.buttonTheme,
-      _this.channelListItemTheme,
       _this.checkboxTheme,
       _this.contextMenuTheme,
       _this.contextMenuActionTheme,
