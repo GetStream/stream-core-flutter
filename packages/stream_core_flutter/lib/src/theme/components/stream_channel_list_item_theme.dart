@@ -94,6 +94,7 @@ class StreamChannelListItemThemeData with _$StreamChannelListItemThemeData {
     this.hoverColor,
     this.pressedColor,
     this.borderColor,
+    this.muteIconPosition,
   });
 
   /// The text style for the channel title.
@@ -131,10 +132,20 @@ class StreamChannelListItemThemeData with _$StreamChannelListItemThemeData {
   /// Falls back to [StreamColorScheme.borderSubtle].
   final Color? borderColor;
 
+  /// The position of the mute icon.
+  ///
+  /// Falls back to [MuteIconPosition.title].
+  final MuteIconPosition? muteIconPosition;
+
   /// Linearly interpolate between two [StreamChannelListItemThemeData] objects.
   static StreamChannelListItemThemeData? lerp(
     StreamChannelListItemThemeData? a,
     StreamChannelListItemThemeData? b,
     double t,
   ) => _$StreamChannelListItemThemeData.lerp(a, b, t);
+}
+
+enum MuteIconPosition {
+  title,
+  subtitle,
 }

@@ -123,8 +123,7 @@ class _TypeVariantsSection extends StatelessWidget {
                 children: [
                   for (final type in StreamBadgeNotificationType.values) ...[
                     _TypeDemo(type: type),
-                    if (type != StreamBadgeNotificationType.values.last)
-                      SizedBox(width: spacing.xl),
+                    if (type != StreamBadgeNotificationType.values.last) SizedBox(width: spacing.xl),
                   ],
                 ],
               ),
@@ -219,8 +218,7 @@ class _SizeVariantsSection extends StatelessWidget {
                 children: [
                   for (final size in StreamBadgeNotificationSize.values) ...[
                     _SizeDemo(size: size),
-                    if (size != StreamBadgeNotificationSize.values.last)
-                      SizedBox(width: spacing.xl),
+                    if (size != StreamBadgeNotificationSize.values.last) SizedBox(width: spacing.xl),
                   ],
                 ],
               ),

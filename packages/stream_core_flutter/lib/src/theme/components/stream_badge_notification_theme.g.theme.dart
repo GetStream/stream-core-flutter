@@ -65,8 +65,7 @@ mixin _$StreamBadgeNotificationThemeData {
       size: size ?? _this.size,
       primaryBackgroundColor:
           primaryBackgroundColor ?? _this.primaryBackgroundColor,
-      errorBackgroundColor:
-          errorBackgroundColor ?? _this.errorBackgroundColor,
+      errorBackgroundColor: errorBackgroundColor ?? _this.errorBackgroundColor,
       neutralBackgroundColor:
           neutralBackgroundColor ?? _this.neutralBackgroundColor,
       textColor: textColor ?? _this.textColor,

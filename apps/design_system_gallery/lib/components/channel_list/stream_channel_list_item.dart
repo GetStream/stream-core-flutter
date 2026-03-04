@@ -65,6 +65,7 @@ Widget buildStreamChannelListItemPlayground(BuildContext context) {
         subtitle: subtitle != null ? Text(subtitle) : null,
         timestamp: timestamp != null ? Text(timestamp) : null,
         unreadCount: unreadCount,
+        onTap: () => print('onTap'),
       ),
     ),
   );

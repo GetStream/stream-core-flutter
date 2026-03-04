@@ -50,11 +50,7 @@ void main() {
                     placeholder: (context) => const Text('MT'),
                   ),
                   title: const Text('Muted Channel'),
-                  titleTrailing: Icon(
-                    context.streamIcons.mute,
-                    size: 16,
-                    color: context.streamColorScheme.textTertiary,
-                  ),
+                  isMuted: true,
                   subtitle: const Text('Last message...'),
                   timestamp: const Text('10:15'),
                   unreadCount: 1,

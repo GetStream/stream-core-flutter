@@ -21,7 +21,7 @@ export 'components/controls/stream_remove_control.dart';
 export 'components/emoji/data/stream_emoji_data.dart';
 export 'components/emoji/data/stream_supported_emojis.dart';
 export 'components/emoji/stream_emoji_picker_sheet.dart';
-export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
+export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile, ListTileContainer;
 export 'components/message_composer.dart';
 
 export 'factory/stream_component_factory.dart';

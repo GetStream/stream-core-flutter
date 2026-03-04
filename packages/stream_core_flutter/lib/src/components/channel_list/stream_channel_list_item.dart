@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../stream_core_flutter.dart';
+import '../list/stream_list_tile.dart' show ListTileContainer;
 
 /// A list item for displaying a channel in a channel list.
 ///
@@ -58,23 +59,23 @@ class StreamChannelListItem extends StatelessWidget {
     super.key,
     required Widget avatar,
     required Widget title,
-    Widget? titleTrailing,
     Widget? subtitle,
-    Widget? subtitleTrailing,
     Widget? timestamp,
     int unreadCount = 0,
+    bool isMuted = false,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
+    bool selected = false,
   }) : props = StreamChannelListItemProps(
          avatar: avatar,
          title: title,
-         titleTrailing: titleTrailing,
          subtitle: subtitle,
-         subtitleTrailing: subtitleTrailing,
          timestamp: timestamp,
          unreadCount: unreadCount,
+         isMuted: isMuted,
          onTap: onTap,
          onLongPress: onLongPress,
+         selected: selected,
        );
 
   /// The properties that configure this channel list item.
@@ -102,13 +103,13 @@ class StreamChannelListItemProps {
   const StreamChannelListItemProps({
     required this.avatar,
     required this.title,
-    this.titleTrailing,
     this.subtitle,
-    this.subtitleTrailing,
     this.timestamp,
     this.unreadCount = 0,
+    this.isMuted = false,
     this.onTap,
     this.onLongPress,
+    this.selected = false,
   });
 
   /// The avatar widget displayed at the leading edge.
@@ -123,21 +124,11 @@ class StreamChannelListItemProps {
   /// is provided by the theme's title style via [DefaultTextStyle].
   final Widget title;
 
-  /// An optional widget displayed after the title text.
-  ///
-  /// Typically used for a mute icon or similar indicator.
-  final Widget? titleTrailing;
-
   /// The message preview widget displayed below the title.
   ///
   /// Typically a [Text] widget with the last message, but can be any widget
   /// for richer content (e.g., icons, read receipts, sender prefix).
   final Widget? subtitle;
-
-  /// An optional trailing widget in the subtitle row.
-  ///
-  /// Typically used for a mute icon or similar indicator.
-  final Widget? subtitleTrailing;
 
   /// The timestamp widget displayed in the trailing section of the title row.
   ///
@@ -150,11 +141,19 @@ class StreamChannelListItemProps {
   /// When greater than zero, a [StreamBadgeNotification] is displayed.
   final int unreadCount;
 
+  /// Whether the channel is muted.
+  ///
+  /// When true, a mute icon is displayed in the title or subtitle.
+  final bool isMuted;
+
   /// Called when the list item is tapped.
   final VoidCallback? onTap;
 
   /// Called when the list item is long-pressed.
   final VoidCallback? onLongPress;
+
+  /// Whether the list item is in a selected state.
+  final bool selected;
 }
 
 /// The default implementation of [StreamChannelListItem].
@@ -178,9 +177,6 @@ class DefaultStreamChannelListItem extends StatefulWidget {
 }
 
 class _DefaultStreamChannelListItemState extends State<DefaultStreamChannelListItem> {
-  var _isHovered = false;
-  var _isPressed = false;
-
   StreamChannelListItemProps get props => widget.props;
 
   @override
@@ -189,68 +185,65 @@ class _DefaultStreamChannelListItemState extends State<DefaultStreamChannelListI
     final channelListItemTheme = context.streamChannelListItemTheme;
     final defaults = _StreamChannelListItemThemeDefaults(context);
 
-    final effectiveBackgroundColor = channelListItemTheme.backgroundColor ?? defaults.backgroundColor;
-    final effectiveHoverColor = channelListItemTheme.hoverColor ?? defaults.hoverColor;
-    final effectivePressedColor = channelListItemTheme.pressedColor ?? defaults.pressedColor;
     final effectiveTitleStyle = channelListItemTheme.titleStyle ?? defaults.titleStyle;
     final effectiveSubtitleStyle = channelListItemTheme.subtitleStyle ?? defaults.subtitleStyle;
     final effectiveTimestampStyle = channelListItemTheme.timestampStyle ?? defaults.timestampStyle;
+    final effectiveMuteIconPosition = channelListItemTheme.muteIconPosition ?? defaults.muteIconPosition;
 
-    final background = _isPressed
-        ? effectivePressedColor
-        : _isHovered
-        ? effectiveHoverColor
-        : effectiveBackgroundColor;
+    final muteIcon = props.isMuted
+        ? Icon(
+            context.streamIcons.mute,
+            size: 20,
+            color: context.streamColorScheme.textTertiary,
+          )
+        : null;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: GestureDetector(
-        onTap: props.onTap,
-        onLongPress: props.onLongPress,
-        onTapDown: (_) => setState(() => _isPressed = true),
-        onTapUp: (_) => setState(() => _isPressed = false),
-        onTapCancel: () => setState(() => _isPressed = false),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(spacing.lg),
-          ),
-          padding: EdgeInsets.all(spacing.md - 4),
-          margin: const EdgeInsets.all(4),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: spacing.md,
-            children: [
-              props.avatar,
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: spacing.xxxs),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: spacing.xxs,
-                    children: [
-                      _TitleRow(
-                        title: props.title,
-                        titleTrailing: props.titleTrailing,
-                        timestamp: props.timestamp,
-                        unreadCount: props.unreadCount,
-                        titleStyle: effectiveTitleStyle,
-                        timestampStyle: effectiveTimestampStyle,
-                        spacing: spacing,
-                      ),
-                      if (props.subtitle case final subtitle?)
-                        _SubtitleRow(
-                          subtitle: subtitle,
-                          subtitleTrailing: props.subtitleTrailing,
-                          subtitleStyle: effectiveSubtitleStyle,
+    final hasMuteIconInSubtitle = effectiveMuteIconPosition == MuteIconPosition.subtitle && props.isMuted;
+
+    return StreamListTileTheme(
+      data: context.streamListTileTheme.copyWith(contentPadding: EdgeInsets.all(spacing.md - 4)),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Material(
+          type: MaterialType.transparency,
+          child: ListTileContainer(
+            enabled: true,
+            selected: props.selected,
+            onTap: props.onTap,
+            onLongPress: props.onLongPress,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: spacing.md,
+              children: [
+                props.avatar,
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: spacing.xxxs),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: spacing.xxs,
+                      children: [
+                        _TitleRow(
+                          title: props.title,
+                          titleTrailing: effectiveMuteIconPosition == MuteIconPosition.title ? muteIcon : null,
+                          timestamp: props.timestamp,
+                          unreadCount: props.unreadCount,
+                          titleStyle: effectiveTitleStyle,
+                          timestampStyle: effectiveTimestampStyle,
+                          spacing: spacing,
                         ),
-                    ],
+                        if (props.subtitle != null || hasMuteIconInSubtitle)
+                          _SubtitleRow(
+                            subtitle: props.subtitle,
+                            subtitleTrailing: effectiveMuteIconPosition == MuteIconPosition.subtitle ? muteIcon : null,
+                            subtitleStyle: effectiveSubtitleStyle,
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -330,7 +323,7 @@ class _SubtitleRow extends StatelessWidget {
     required this.subtitleStyle,
   });
 
-  final Widget subtitle;
+  final Widget? subtitle;
   final Widget? subtitleTrailing;
   final TextStyle subtitleStyle;
 
@@ -342,7 +335,7 @@ class _SubtitleRow extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       child: Row(
         children: [
-          Expanded(child: subtitle),
+          Expanded(child: subtitle ?? const SizedBox.shrink()),
           ?subtitleTrailing,
         ],
       ),
@@ -378,4 +371,7 @@ class _StreamChannelListItemThemeDefaults extends StreamChannelListItemThemeData
 
   @override
   Color get borderColor => _colorScheme.borderSubtle;
+
+  @override
+  MuteIconPosition get muteIconPosition => MuteIconPosition.title;
 }

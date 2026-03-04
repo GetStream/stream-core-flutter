@@ -18,7 +18,8 @@ enum StreamBadgeNotificationSize {
   xs(16),
 
   /// Small badge (20px height).
-  sm(20);
+  sm(20)
+  ;
 
   /// Constructs a [StreamBadgeNotificationSize] with the given height.
   const StreamBadgeNotificationSize(this.value);
@@ -65,11 +66,8 @@ class StreamBadgeNotificationTheme extends InheritedTheme {
   /// Returns the merged [StreamBadgeNotificationThemeData] from local and
   /// global themes.
   static StreamBadgeNotificationThemeData of(BuildContext context) {
-    final localTheme = context
-        .dependOnInheritedWidgetOfExactType<StreamBadgeNotificationTheme>();
-    return StreamTheme.of(context)
-        .badgeNotificationTheme
-        .merge(localTheme?.data);
+    final localTheme = context.dependOnInheritedWidgetOfExactType<StreamBadgeNotificationTheme>();
+    return StreamTheme.of(context).badgeNotificationTheme.merge(localTheme?.data);
   }
 
   @override
@@ -78,8 +76,7 @@ class StreamBadgeNotificationTheme extends InheritedTheme {
   }
 
   @override
-  bool updateShouldNotify(StreamBadgeNotificationTheme oldWidget) =>
-      data != oldWidget.data;
+  bool updateShouldNotify(StreamBadgeNotificationTheme oldWidget) => data != oldWidget.data;
 }
 
 /// Theme data for customizing [StreamBadgeNotification] widgets.
@@ -90,8 +87,7 @@ class StreamBadgeNotificationTheme extends InheritedTheme {
 ///  * [StreamBadgeNotificationTheme], for overriding theme in a widget subtree.
 @themeGen
 @immutable
-class StreamBadgeNotificationThemeData
-    with _$StreamBadgeNotificationThemeData {
+class StreamBadgeNotificationThemeData with _$StreamBadgeNotificationThemeData {
   /// Creates a badge notification theme with optional style overrides.
   const StreamBadgeNotificationThemeData({
     this.size,

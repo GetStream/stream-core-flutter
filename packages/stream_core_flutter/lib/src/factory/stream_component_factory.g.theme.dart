@@ -34,8 +34,7 @@ mixin _$StreamComponentBuilders {
       avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
-      badgeNotification:
-          t < 0.5 ? a.badgeNotification : b.badgeNotification,
+      badgeNotification: t < 0.5 ? a.badgeNotification : b.badgeNotification,
       button: t < 0.5 ? a.button : b.button,
       channelListItem: t < 0.5 ? a.channelListItem : b.channelListItem,
       checkbox: t < 0.5 ? a.checkbox : b.checkbox,

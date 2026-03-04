@@ -215,8 +215,6 @@ class DefaultStreamListTile extends StatelessWidget {
       if (props.selected) WidgetState.selected,
     };
 
-    final textDirection = Directionality.of(context);
-
     final effectiveTitleColor = (theme.titleColor ?? defaults.titleColor).resolve(states)!;
     final effectiveSubtitleColor = (theme.subtitleColor ?? defaults.subtitleColor).resolve(states)!;
     final effectiveDescriptionColor = (theme.descriptionColor ?? defaults.descriptionColor).resolve(states)!;
@@ -225,19 +223,7 @@ class DefaultStreamListTile extends StatelessWidget {
     final effectiveTitleTextStyle = theme.titleTextStyle ?? defaults.titleTextStyle;
     final effectiveSubtitleTextStyle = theme.subtitleTextStyle ?? defaults.subtitleTextStyle;
     final effectiveDescriptionTextStyle = theme.descriptionTextStyle ?? defaults.descriptionTextStyle;
-    final effectiveBackgroundColor = (theme.backgroundColor ?? defaults.backgroundColor).resolve(states);
-    final effectiveShape = theme.shape ?? defaults.shape;
-    final effectiveContentPadding = (theme.contentPadding ?? defaults.contentPadding).resolve(textDirection);
     final effectiveMinTileHeight = theme.minTileHeight ?? defaults.minTileHeight;
-    final effectiveOverlayColor = theme.overlayColor ?? defaults.overlayColor;
-
-    // Mouse cursor: show a non-interactive cursor when the tile is disabled
-    // OR when no gesture callbacks are wired.
-    final mouseStates = <WidgetState>{
-      if (!props.enabled || (props.onTap == null && props.onLongPress == null)) WidgetState.disabled,
-    };
-
-    final effectiveMouseCursor = WidgetStateMouseCursor.clickable.resolve(mouseStates);
 
     Widget? leadingWidget;
     if (props.leading case final leading?) {
@@ -284,47 +270,29 @@ class DefaultStreamListTile extends StatelessWidget {
       );
     }
 
-    return InkWell(
-      customBorder: effectiveShape,
-      onTap: props.enabled ? props.onTap : null,
-      onLongPress: props.enabled ? props.onLongPress : null,
-      canRequestFocus: props.enabled,
-      mouseCursor: effectiveMouseCursor,
-      overlayColor: effectiveOverlayColor,
-      child: Semantics(
-        button: props.onTap != null || props.onLongPress != null,
-        selected: props.selected,
-        enabled: props.enabled,
-        child: Ink(
-          decoration: ShapeDecoration(
-            shape: effectiveShape,
-            color: effectiveBackgroundColor,
-          ),
-          child: SafeArea(
-            top: false,
-            bottom: false,
-            minimum: effectiveContentPadding,
-            child: IconTheme.merge(
-              data: IconThemeData(color: effectiveIconColor),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: effectiveMinTileHeight),
-                child: Row(
-                  spacing: spacing.xs,
-                  children: [
-                    ?leadingWidget,
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: .min,
-                        crossAxisAlignment: .start,
-                        children: [?titleWidget, ?subtitleWidget],
-                      ),
-                    ),
-                    ?descriptionWidget,
-                    ?trailingWidget,
-                  ],
+    return ListTileContainer(
+      enabled: props.enabled,
+      selected: props.selected,
+      onTap: props.onTap,
+      onLongPress: props.onLongPress,
+      child: IconTheme.merge(
+        data: IconThemeData(color: effectiveIconColor),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: effectiveMinTileHeight),
+          child: Row(
+            spacing: spacing.xs,
+            children: [
+              ?leadingWidget,
+              Expanded(
+                child: Column(
+                  mainAxisSize: .min,
+                  crossAxisAlignment: .start,
+                  children: [?titleWidget, ?subtitleWidget],
                 ),
               ),
-            ),
+              ?descriptionWidget,
+              ?trailingWidget,
+            ],
           ),
         ),
       ),
@@ -403,4 +371,75 @@ class _StreamListTileThemeDefaults extends StreamListTileThemeData {
     if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
     return StreamColors.transparent;
   });
+}
+
+class ListTileContainer extends StatelessWidget {
+  const ListTileContainer({
+    super.key,
+    required this.child,
+    required this.enabled,
+    required this.selected,
+    required this.onTap,
+    required this.onLongPress,
+  });
+
+  final Widget child;
+
+  final bool enabled;
+  final bool selected;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.streamListTileTheme;
+    final defaults = _StreamListTileThemeDefaults(context);
+
+    // Build the WidgetState set once and share it across all color resolvers.
+    final states = <WidgetState>{
+      if (!enabled) WidgetState.disabled,
+      if (selected) WidgetState.selected,
+    };
+
+    final textDirection = Directionality.of(context);
+
+    final effectiveBackgroundColor = (theme.backgroundColor ?? defaults.backgroundColor).resolve(states);
+    final effectiveShape = theme.shape ?? defaults.shape;
+    final effectiveContentPadding = (theme.contentPadding ?? defaults.contentPadding).resolve(textDirection);
+    final effectiveOverlayColor = theme.overlayColor ?? defaults.overlayColor;
+
+    // Mouse cursor: show a non-interactive cursor when the tile is disabled
+    // OR when no gesture callbacks are wired.
+    final mouseStates = <WidgetState>{
+      if (!enabled || (onTap == null && onLongPress == null)) WidgetState.disabled,
+    };
+
+    final effectiveMouseCursor = WidgetStateMouseCursor.clickable.resolve(mouseStates);
+
+    return InkWell(
+      customBorder: effectiveShape,
+      onTap: enabled ? onTap : null,
+      onLongPress: enabled ? onLongPress : null,
+      canRequestFocus: enabled,
+      mouseCursor: effectiveMouseCursor,
+      overlayColor: effectiveOverlayColor,
+      child: Semantics(
+        button: onTap != null || onLongPress != null,
+        selected: selected,
+        enabled: enabled,
+        child: Ink(
+          decoration: ShapeDecoration(
+            shape: effectiveShape,
+            color: effectiveBackgroundColor,
+          ),
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            minimum: effectiveContentPadding,
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
 }
