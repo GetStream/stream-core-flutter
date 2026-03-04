@@ -58,7 +58,7 @@ Generated files have `.g.theme.dart` extension. After modifying `.theme.dart` fi
 
 ### Component Structure (`stream_core_flutter/lib/src/components/`)
 
-Components are organized by category: `avatar/`, `buttons/`, `badge/`, `channel_list/`, `list/`, `message_composer/`, `emoji/`, `context_menu/`, `controls/`, `common/`, `accessories/`.
+Components are organized by category: `avatar/`, `buttons/`, `badge/`, `list/`, `message_composer/`, `emoji/`, `context_menu/`, `controls/`, `common/`, `accessories/`.
 
 Each component typically has:
 - A widget file

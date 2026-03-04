@@ -5,7 +5,6 @@ export 'theme/components/stream_avatar_theme.dart';
 export 'theme/components/stream_badge_count_theme.dart';
 export 'theme/components/stream_badge_notification_theme.dart';
 export 'theme/components/stream_button_theme.dart';
-export 'theme/components/stream_channel_list_item_theme.dart';
 export 'theme/components/stream_checkbox_theme.dart';
 export 'theme/components/stream_context_menu_action_theme.dart';
 export 'theme/components/stream_context_menu_theme.dart';
