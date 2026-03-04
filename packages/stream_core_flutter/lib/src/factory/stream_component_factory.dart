@@ -71,35 +71,8 @@ class StreamComponentFactory extends InheritedWidget {
     final result = maybeOf(context);
     if (result != null) return result;
 
-    throw FlutterError.fromParts(<DiagnosticsNode>[
-      ErrorSummary(
-        'StreamComponentFactory.of() called with a context that does not '
-        'contain a StreamComponentFactory.',
-      ),
-      ErrorDescription(
-        'No StreamComponentFactory ancestor could be found starting from the '
-        'context that was passed to StreamComponentFactory.of(). This usually '
-        'happens when the context used comes from the widget that creates the '
-        'StreamComponentFactory itself.',
-      ),
-      ErrorHint(
-        'To fix this, ensure that you are using a context that is a descendant '
-        'of the StreamComponentFactory. You can use a Builder to get a new '
-        'context that is under the StreamComponentFactory:\n\n'
-        '  Builder(\n'
-        '    builder: (context) {\n'
-        '      final builders = StreamComponentFactory.of(context);\n'
-        '      ...\n'
-        '    },\n'
-        '  )',
-      ),
-      ErrorHint(
-        'Alternatively, split your build method into smaller widgets so that '
-        'you get a new BuildContext that is below the StreamComponentFactory '
-        'in the widget tree.',
-      ),
-      context.describeElement('The context used was'),
-    ]);
+    // If no StreamComponentFactory is found, return an empty StreamComponentBuilders.
+    return const StreamComponentBuilders._empty();
   }
 
   /// Finds the [StreamComponentBuilders] from the closest
@@ -234,6 +207,24 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.progressBar,
     required this.extensions,
   });
+
+  const StreamComponentBuilders._empty()
+    : extensions = const <Object, StreamComponentBuilderExtension<Object>>{},
+      avatar = null,
+      avatarGroup = null,
+      avatarStack = null,
+      badgeCount = null,
+      button = null,
+      checkbox = null,
+      contextMenuAction = null,
+      emoji = null,
+      emojiButton = null,
+      emojiChip = null,
+      emojiChipBar = null,
+      fileTypeIcon = null,
+      listTile = null,
+      onlineIndicator = null,
+      progressBar = null;
 
   /// Arbitrary additions to this builder set.
   ///
