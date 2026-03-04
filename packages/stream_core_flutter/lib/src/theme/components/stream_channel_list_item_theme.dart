@@ -91,8 +91,6 @@ class StreamChannelListItemThemeData with _$StreamChannelListItemThemeData {
     this.subtitleStyle,
     this.timestampStyle,
     this.backgroundColor,
-    this.hoverColor,
-    this.pressedColor,
     this.borderColor,
     this.muteIconPosition,
   });
@@ -112,20 +110,10 @@ class StreamChannelListItemThemeData with _$StreamChannelListItemThemeData {
   /// Falls back to [StreamTextTheme.captionDefault] with [StreamColorScheme.textTertiary].
   final TextStyle? timestampStyle;
 
-  /// The background color of the list item in its default state.
+  /// Defines the default background color of the tile.
   ///
-  /// Falls back to [StreamColorScheme.backgroundApp].
-  final Color? backgroundColor;
-
-  /// The overlay color applied when the list item is hovered.
-  ///
-  /// Falls back to [StreamColorScheme.stateHover].
-  final Color? hoverColor;
-
-  /// The overlay color applied when the list item is pressed.
-  ///
-  /// Falls back to [StreamColorScheme.statePressed].
-  final Color? pressedColor;
+  /// This color is resolved from [WidgetState]s.
+  final WidgetStateProperty<Color?>? backgroundColor;
 
   /// The bottom border color of the list item.
   ///

@@ -201,7 +201,10 @@ class _DefaultStreamChannelListItemState extends State<DefaultStreamChannelListI
     final hasMuteIconInSubtitle = effectiveMuteIconPosition == MuteIconPosition.subtitle && props.isMuted;
 
     return StreamListTileTheme(
-      data: context.streamListTileTheme.copyWith(contentPadding: EdgeInsets.all(spacing.md - 4)),
+      data: context.streamListTileTheme.copyWith(
+        contentPadding: EdgeInsets.all(spacing.md - 4),
+        backgroundColor: channelListItemTheme.backgroundColor,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Material(
@@ -359,15 +362,6 @@ class _StreamChannelListItemThemeDefaults extends StreamChannelListItemThemeData
 
   @override
   TextStyle get timestampStyle => _textTheme.captionDefault.copyWith(color: _colorScheme.textTertiary);
-
-  @override
-  Color get backgroundColor => _colorScheme.backgroundApp;
-
-  @override
-  Color get hoverColor => _colorScheme.stateHover;
-
-  @override
-  Color get pressedColor => _colorScheme.statePressed;
 
   @override
   Color get borderColor => _colorScheme.borderSubtle;

@@ -33,10 +33,14 @@ mixin _$StreamChannelListItemThemeData {
       titleStyle: TextStyle.lerp(a.titleStyle, b.titleStyle, t),
       subtitleStyle: TextStyle.lerp(a.subtitleStyle, b.subtitleStyle, t),
       timestampStyle: TextStyle.lerp(a.timestampStyle, b.timestampStyle, t),
-      backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
-      hoverColor: Color.lerp(a.hoverColor, b.hoverColor, t),
-      pressedColor: Color.lerp(a.pressedColor, b.pressedColor, t),
+      backgroundColor: WidgetStateProperty.lerp<Color?>(
+        a.backgroundColor,
+        b.backgroundColor,
+        t,
+        Color.lerp,
+      ),
       borderColor: Color.lerp(a.borderColor, b.borderColor, t),
+      muteIconPosition: t < 0.5 ? a.muteIconPosition : b.muteIconPosition,
     );
   }
 
@@ -44,10 +48,9 @@ mixin _$StreamChannelListItemThemeData {
     TextStyle? titleStyle,
     TextStyle? subtitleStyle,
     TextStyle? timestampStyle,
-    Color? backgroundColor,
-    Color? hoverColor,
-    Color? pressedColor,
+    WidgetStateProperty<Color?>? backgroundColor,
     Color? borderColor,
+    MuteIconPosition? muteIconPosition,
   }) {
     final _this = (this as StreamChannelListItemThemeData);
 
@@ -56,9 +59,8 @@ mixin _$StreamChannelListItemThemeData {
       subtitleStyle: subtitleStyle ?? _this.subtitleStyle,
       timestampStyle: timestampStyle ?? _this.timestampStyle,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
-      hoverColor: hoverColor ?? _this.hoverColor,
-      pressedColor: pressedColor ?? _this.pressedColor,
       borderColor: borderColor ?? _this.borderColor,
+      muteIconPosition: muteIconPosition ?? _this.muteIconPosition,
     );
   }
 
@@ -82,9 +84,8 @@ mixin _$StreamChannelListItemThemeData {
           _this.timestampStyle?.merge(other.timestampStyle) ??
           other.timestampStyle,
       backgroundColor: other.backgroundColor,
-      hoverColor: other.hoverColor,
-      pressedColor: other.pressedColor,
       borderColor: other.borderColor,
+      muteIconPosition: other.muteIconPosition,
     );
   }
 
@@ -105,9 +106,8 @@ mixin _$StreamChannelListItemThemeData {
         _other.subtitleStyle == _this.subtitleStyle &&
         _other.timestampStyle == _this.timestampStyle &&
         _other.backgroundColor == _this.backgroundColor &&
-        _other.hoverColor == _this.hoverColor &&
-        _other.pressedColor == _this.pressedColor &&
-        _other.borderColor == _this.borderColor;
+        _other.borderColor == _this.borderColor &&
+        _other.muteIconPosition == _this.muteIconPosition;
   }
 
   @override
@@ -120,9 +120,8 @@ mixin _$StreamChannelListItemThemeData {
       _this.subtitleStyle,
       _this.timestampStyle,
       _this.backgroundColor,
-      _this.hoverColor,
-      _this.pressedColor,
       _this.borderColor,
+      _this.muteIconPosition,
     );
   }
 }

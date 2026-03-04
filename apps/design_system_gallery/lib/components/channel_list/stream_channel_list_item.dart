@@ -46,7 +46,6 @@ Widget buildStreamChannelListItemPlayground(BuildContext context) {
   );
 
   final colorScheme = context.streamColorScheme;
-  final icons = context.streamIcons;
 
   return ColoredBox(
     color: colorScheme.backgroundApp,
@@ -185,7 +184,6 @@ class _GroupChannelSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
-    final icons = context.streamIcons;
     final spacing = context.streamSpacing;
 
     return Column(
