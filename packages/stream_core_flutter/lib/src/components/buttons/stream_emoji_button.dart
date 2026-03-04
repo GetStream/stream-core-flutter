@@ -84,7 +84,7 @@ class StreamEmojiButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.emojiButton;
+    final builder = StreamComponentFactory.of(context).emojiButton;
     if (builder != null) return builder(context, props);
     return DefaultStreamEmojiButton(props: props);
   }

@@ -90,7 +90,7 @@ class StreamEmojiChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.emojiChip;
+    final builder = StreamComponentFactory.of(context).emojiChip;
     if (builder != null) return builder(context, props);
     return DefaultStreamEmojiChip(props: props);
   }

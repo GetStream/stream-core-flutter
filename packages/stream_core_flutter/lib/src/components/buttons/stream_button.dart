@@ -98,7 +98,7 @@ class StreamButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.button;
+    final builder = StreamComponentFactory.of(context).button;
     if (builder != null) return builder(context, props);
     return DefaultStreamButton(props: props);
   }

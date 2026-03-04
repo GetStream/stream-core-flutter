@@ -90,7 +90,7 @@ class StreamOnlineIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.onlineIndicator;
+    final builder = StreamComponentFactory.of(context).onlineIndicator;
     if (builder != null) return builder(context, props);
     return DefaultStreamOnlineIndicator(props: props);
   }

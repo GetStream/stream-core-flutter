@@ -53,8 +53,7 @@ class StreamComponentFactory extends InheritedWidget {
   /// Finds the [StreamComponentBuilders] from the closest
   /// [StreamComponentFactory] ancestor that encloses the given context.
   ///
-  /// This will throw a [FlutterError] if no [StreamComponentFactory] is found
-  /// in the widget tree above the given context.
+  /// This will return a default empty [StreamComponentBuilders] if no [StreamComponentFactory] is found
   ///
   /// Typical usage:
   ///
@@ -65,53 +64,9 @@ class StreamComponentFactory extends InheritedWidget {
   /// If you're calling this in the same `build()` method that creates the
   /// `StreamComponentFactory`, consider using a `Builder` or refactoring into
   /// a separate widget to obtain a context below the [StreamComponentFactory].
-  ///
-  /// If you want to return null instead of throwing, use [maybeOf].
   static StreamComponentBuilders of(BuildContext context) {
-    final result = maybeOf(context);
-    if (result != null) return result;
-
-    throw FlutterError.fromParts(<DiagnosticsNode>[
-      ErrorSummary(
-        'StreamComponentFactory.of() called with a context that does not '
-        'contain a StreamComponentFactory.',
-      ),
-      ErrorDescription(
-        'No StreamComponentFactory ancestor could be found starting from the '
-        'context that was passed to StreamComponentFactory.of(). This usually '
-        'happens when the context used comes from the widget that creates the '
-        'StreamComponentFactory itself.',
-      ),
-      ErrorHint(
-        'To fix this, ensure that you are using a context that is a descendant '
-        'of the StreamComponentFactory. You can use a Builder to get a new '
-        'context that is under the StreamComponentFactory:\n\n'
-        '  Builder(\n'
-        '    builder: (context) {\n'
-        '      final builders = StreamComponentFactory.of(context);\n'
-        '      ...\n'
-        '    },\n'
-        '  )',
-      ),
-      ErrorHint(
-        'Alternatively, split your build method into smaller widgets so that '
-        'you get a new BuildContext that is below the StreamComponentFactory '
-        'in the widget tree.',
-      ),
-      context.describeElement('The context used was'),
-    ]);
-  }
-
-  /// Finds the [StreamComponentBuilders] from the closest
-  /// [StreamComponentFactory] ancestor that encloses the given context.
-  ///
-  /// Returns null if no such ancestor exists.
-  ///
-  /// See also:
-  ///  * [of], which throws if no [StreamComponentFactory] is found.
-  static StreamComponentBuilders? maybeOf(BuildContext context) {
     final streamComponentFactory = context.dependOnInheritedWidgetOfExactType<StreamComponentFactory>();
-    return streamComponentFactory?.builders;
+    return streamComponentFactory?.builders ?? StreamComponentBuilders();
   }
 
   @override
@@ -408,6 +363,6 @@ extension StreamComponentFactoryExtension on BuildContext {
   /// Returns the [StreamComponentBuilders] from the nearest
   /// [StreamComponentFactory] ancestor, or null if none exists.
   ///
-  /// This is equivalent to calling [StreamComponentFactory.maybeOf].
-  StreamComponentBuilders? get streamComponentFactory => StreamComponentFactory.maybeOf(this);
+  /// This is equivalent to calling [StreamComponentFactory.of].
+  StreamComponentBuilders get streamComponentFactory => StreamComponentFactory.of(this);
 }

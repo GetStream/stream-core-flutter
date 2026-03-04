@@ -237,7 +237,7 @@ class StreamFileTypeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.fileTypeIcon;
+    final builder = StreamComponentFactory.of(context).fileTypeIcon;
     if (builder != null) return builder(context, props);
     return DefaultStreamFileTypeIcon(props: props);
   }

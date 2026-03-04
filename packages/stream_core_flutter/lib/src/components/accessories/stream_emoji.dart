@@ -111,7 +111,7 @@ class StreamEmoji extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.emoji;
+    final builder = StreamComponentFactory.of(context).emoji;
     if (builder != null) return builder(context, props);
     return DefaultStreamEmoji(props: props);
   }
