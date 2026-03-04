@@ -80,7 +80,7 @@ class StreamProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.progressBar;
+    final builder = StreamComponentFactory.of(context).progressBar;
     if (builder != null) return builder(context, props);
     return DefaultStreamProgressBar(props: props);
   }

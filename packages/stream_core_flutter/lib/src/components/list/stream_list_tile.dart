@@ -104,7 +104,7 @@ class StreamListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.listTile;
+    final builder = StreamComponentFactory.of(context).listTile;
     if (builder != null) return builder(context, props);
     return DefaultStreamListTile(props: props);
   }

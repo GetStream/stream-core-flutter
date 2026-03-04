@@ -64,22 +64,9 @@ class StreamComponentFactory extends InheritedWidget {
   /// If you're calling this in the same `build()` method that creates the
   /// `StreamComponentFactory`, consider using a `Builder` or refactoring into
   /// a separate widget to obtain a context below the [StreamComponentFactory].
-  ///
-  /// If you want to return null instead of a default empty [StreamComponentBuilders], use [maybeOf].
   static StreamComponentBuilders of(BuildContext context) {
-    return maybeOf(context) ?? StreamComponentBuilders();
-  }
-
-  /// Finds the [StreamComponentBuilders] from the closest
-  /// [StreamComponentFactory] ancestor that encloses the given context.
-  ///
-  /// Returns null if no such ancestor exists.
-  ///
-  /// See also:
-  ///  * [of], which returns a default empty [StreamComponentBuilders] if no [StreamComponentFactory] is found.
-  static StreamComponentBuilders? maybeOf(BuildContext context) {
     final streamComponentFactory = context.dependOnInheritedWidgetOfExactType<StreamComponentFactory>();
-    return streamComponentFactory?.builders;
+    return streamComponentFactory?.builders ?? StreamComponentBuilders();
   }
 
   @override
