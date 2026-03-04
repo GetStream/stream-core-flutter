@@ -9,12 +9,12 @@ environment:
 
 dependencies:
   cached_network_image: ^3.4.1
+  collection: ^1.19.0
   flutter:
     sdk: flutter
   flutter_svg: ^2.2.3
   stream_core: ^0.4.0
   theme_extensions_builder_annotation: ^7.1.0
-  unicode_emojis: ^0.5.1
 
 dev_dependencies:
   alchemist: ^0.13.0

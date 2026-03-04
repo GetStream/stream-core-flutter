@@ -7,6 +7,7 @@ import 'package:svg_icon_widget/svg_icon_widget.dart';
 import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';
 import '../../core/stream_icons.dart';
+import 'baselines_toggle.dart';
 import 'debug_paint_toggle.dart';
 import 'device_selector.dart';
 import 'platform_selector.dart';
@@ -101,6 +102,7 @@ class GalleryToolbar extends StatelessWidget {
                   // Debug tools (debug mode only)
                   if (kDebugMode) ...[
                     const DebugPaintToggle(),
+                    const BaselinesToggle(),
                     const WidgetSelectToggle(),
                   ],
                 ],

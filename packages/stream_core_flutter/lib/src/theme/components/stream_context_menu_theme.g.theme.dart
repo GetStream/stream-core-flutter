@@ -100,31 +100,31 @@ mixin _$StreamContextMenuStyle {
 
     return StreamContextMenuStyle(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+      elevation: lerpDouble$(a.elevation, b.elevation, t),
       shape: OutlinedBorder.lerp(a.shape, b.shape, t),
       side: a.side == null
           ? b.side
           : b.side == null
           ? a.side
           : BorderSide.lerp(a.side!, b.side!, t),
-      boxShadow: t < 0.5 ? a.boxShadow : b.boxShadow,
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
     );
   }
 
   StreamContextMenuStyle copyWith({
     Color? backgroundColor,
+    double? elevation,
     OutlinedBorder? shape,
     BorderSide? side,
-    List<BoxShadow>? boxShadow,
     EdgeInsetsGeometry? padding,
   }) {
     final _this = (this as StreamContextMenuStyle);
 
     return StreamContextMenuStyle(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
+      elevation: elevation ?? _this.elevation,
       shape: shape ?? _this.shape,
       side: side ?? _this.side,
-      boxShadow: boxShadow ?? _this.boxShadow,
       padding: padding ?? _this.padding,
     );
   }
@@ -142,11 +142,11 @@ mixin _$StreamContextMenuStyle {
 
     return copyWith(
       backgroundColor: other.backgroundColor,
+      elevation: other.elevation,
       shape: other.shape,
       side: _this.side != null && other.side != null
           ? BorderSide.merge(_this.side!, other.side!)
           : other.side,
-      boxShadow: other.boxShadow,
       padding: other.padding,
     );
   }
@@ -165,9 +165,9 @@ mixin _$StreamContextMenuStyle {
     final _other = (other as StreamContextMenuStyle);
 
     return _other.backgroundColor == _this.backgroundColor &&
+        _other.elevation == _this.elevation &&
         _other.shape == _this.shape &&
         _other.side == _this.side &&
-        _other.boxShadow == _this.boxShadow &&
         _other.padding == _this.padding;
   }
 
@@ -178,9 +178,9 @@ mixin _$StreamContextMenuStyle {
     return Object.hash(
       runtimeType,
       _this.backgroundColor,
+      _this.elevation,
       _this.shape,
       _this.side,
-      _this.boxShadow,
       _this.padding,
     );
   }

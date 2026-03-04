@@ -89,7 +89,7 @@ class StreamContextMenuThemeData with _$StreamContextMenuThemeData {
 
   /// The visual styling for the context menu container.
   ///
-  /// Contains shape, border radius, surface color, and box shadow properties.
+  /// Contains shape, border radius, surface color, and elevation properties.
   final StreamContextMenuStyle? style;
 
   /// Linearly interpolate between two [StreamContextMenuThemeData] values.
@@ -104,7 +104,7 @@ class StreamContextMenuThemeData with _$StreamContextMenuThemeData {
 ///
 /// Inspired by Flutter's [MenuStyle], this defines the appearance of the
 /// menu container including its shape, border radius, surface color, and
-/// shadow.
+/// material elevation.
 ///
 /// See also:
 ///
@@ -116,9 +116,9 @@ class StreamContextMenuStyle with _$StreamContextMenuStyle {
   /// Creates context menu style properties.
   const StreamContextMenuStyle({
     this.backgroundColor,
+    this.elevation,
     this.shape,
     this.side,
-    this.boxShadow,
     this.padding,
   });
 
@@ -126,6 +126,13 @@ class StreamContextMenuStyle with _$StreamContextMenuStyle {
   ///
   /// If null, defaults to [StreamColorScheme.backgroundElevation2].
   final Color? backgroundColor;
+
+  /// The z-coordinate at which to place the menu's [Material].
+  ///
+  /// Higher values increase the size and intensity of the menu's drop shadow.
+  ///
+  /// If null, defaults to `3`.
+  final double? elevation;
 
   /// The shape of the menu's underlying surface.
   ///
@@ -142,11 +149,6 @@ class StreamContextMenuStyle with _$StreamContextMenuStyle {
   ///
   /// If null, defaults to a 1px [StreamColorScheme.borderDefault] border.
   final BorderSide? side;
-
-  /// The box shadow of the context menu container.
-  ///
-  /// If null, defaults to [StreamBoxShadow.elevation2].
-  final List<BoxShadow>? boxShadow;
 
   /// The padding between the menu's boundary and its children.
   ///

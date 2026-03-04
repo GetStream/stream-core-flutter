@@ -10,6 +10,8 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:design_system_gallery/components/accessories/stream_audio_waveform.dart'
+    as _design_system_gallery_components_accessories_stream_audio_waveform;
 import 'package:design_system_gallery/components/accessories/stream_emoji.dart'
     as _design_system_gallery_components_accessories_stream_emoji;
 import 'package:design_system_gallery/components/accessories/stream_file_type_icons.dart'
@@ -38,6 +40,12 @@ import 'package:design_system_gallery/components/common/stream_progress_bar.dart
     as _design_system_gallery_components_common_stream_progress_bar;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
+import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart'
+    as _design_system_gallery_components_controls_stream_emoji_chip;
+import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.dart'
+    as _design_system_gallery_components_controls_stream_emoji_chip_bar;
+import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
+    as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
@@ -46,8 +54,8 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
-import 'package:design_system_gallery/components/reaction/picker/stream_reaction_picker_sheet.dart'
-    as _design_system_gallery_components_reaction_picker_stream_reaction_picker_sheet;
+import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
+    as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/primitives/colors.dart'
     as _design_system_gallery_primitives_colors;
 import 'package:design_system_gallery/primitives/icons.dart'
@@ -174,6 +182,23 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'Accessories',
         children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamAudioWaveformSlider',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_accessories_stream_audio_waveform
+                        .buildStreamAudioWaveformSliderPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_accessories_stream_audio_waveform
+                        .buildStreamAudioWaveformSliderShowcase,
+              ),
+            ],
+          ),
           _widgetbook.WidgetbookComponent(
             name: 'StreamEmoji',
             useCases: [
@@ -441,6 +466,61 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'Controls',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamEmojiChip',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_emoji_chip
+                        .buildStreamEmojiChipPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_stream_emoji_chip
+                        .buildStreamEmojiChipShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamEmojiChipBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_emoji_chip_bar
+                        .buildStreamEmojiChipBarPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_stream_emoji_chip_bar
+                        .buildStreamEmojiChipBarShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Emoji',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamEmojiPickerSheet',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_emoji_stream_emoji_picker_sheet
+                        .buildStreamEmojiPickerSheetDefault,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
@@ -496,16 +576,22 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
-        name: 'Reaction',
+        name: 'Tiles',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'StreamReactionPickerSheet',
+            name: 'StreamListTile',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_reaction_picker_stream_reaction_picker_sheet
-                        .buildStreamReactionPickerSheetDefault,
+                    _design_system_gallery_components_tiles_stream_list_tile
+                        .buildStreamListTilePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_tiles_stream_list_tile
+                        .buildStreamListTileShowcase,
               ),
             ],
           ),

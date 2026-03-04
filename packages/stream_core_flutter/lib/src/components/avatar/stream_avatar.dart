@@ -184,7 +184,6 @@ class DefaultStreamAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final textTheme = context.streamTextTheme;
     final avatarTheme = context.streamAvatarTheme;
     final defaults = _StreamAvatarThemeDefaults(context);
@@ -196,7 +195,7 @@ class DefaultStreamAvatar extends StatelessWidget {
 
     final border = props.showBorder ? effectiveBorder : null;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);
-    final iconTheme = theme.iconTheme.copyWith(
+    final iconTheme = IconTheme.of(context).copyWith(
       color: effectiveForegroundColor,
       size: _iconSizeForSize(effectiveSize),
     );
