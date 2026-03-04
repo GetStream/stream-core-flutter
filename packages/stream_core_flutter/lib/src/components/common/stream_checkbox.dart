@@ -95,7 +95,7 @@ class StreamCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.checkbox;
+    final builder = StreamComponentFactory.of(context).checkbox;
     if (builder != null) return builder(context, props);
     return DefaultStreamCheckbox(props: props);
   }

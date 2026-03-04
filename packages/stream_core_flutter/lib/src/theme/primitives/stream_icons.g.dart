@@ -3,7 +3,7 @@
 // Generated using icon_font_generator.
 // Copyright © 2026 icon_font_generator (https://pub.dev/packages/icon_font_generator).
 
-import 'package:flutter/widgets.dart';
+part of 'stream_icons.dart';
 
 /// Identifiers for the icons.
 ///

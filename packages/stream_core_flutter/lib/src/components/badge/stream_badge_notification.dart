@@ -74,7 +74,7 @@ class StreamBadgeNotification extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.badgeNotification;
+    final builder = StreamComponentFactory.of(context).badgeNotification;
     if (builder != null) return builder(context, props);
     return DefaultStreamBadgeNotification(props: props);
   }

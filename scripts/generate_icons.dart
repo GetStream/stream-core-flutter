@@ -165,12 +165,16 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
 
   // 4. Generate StreamIconData class
   _log('📝 Generating Dart classes...', section: true);
-  final iconDataContent = generateFlutterClass(
+  var iconDataContent = generateFlutterClass(
     glyphList: fontResult.glyphList,
     familyName: fontResult.font.familyName,
     className: config.dataClassName,
     fontFileName: p.basename(config.outputFontFile),
     package: config.package,
+  );
+  iconDataContent = iconDataContent.replaceFirst(
+    "import 'package:flutter/widgets.dart';",
+    "part of '${p.basename(config.outputDataFile).replaceFirst('.g', '')}';",
   );
   File(config.outputDataFile).writeAsStringSync(iconDataContent);
   _log('   ├─ ${p.relative(config.outputDataFile, from: scriptDir)}');
@@ -256,7 +260,7 @@ String _generateClass({
   required String outputFileName,
 }) {
   // Derive part file name (e.g., stream_icons.dart -> stream_icons.g.theme.dart)
-  final partFileName = outputFileName.replaceFirst('.dart', '.g.theme.dart');
+  final partThemeFileName = outputFileName.replaceFirst('.dart', '.g.theme.dart');
 
   final clazz = Class(
     (b) => b
@@ -280,8 +284,8 @@ String _generateClass({
       ..directives.addAll([
         Directive.import('package:flutter/widgets.dart'),
         Directive.import('package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart'),
-        Directive.import(iconDataFileName),
-        Directive.part(partFileName),
+        Directive.part(partThemeFileName),
+        Directive.part(iconDataFileName),
       ])
       ..body.add(clazz),
   );
