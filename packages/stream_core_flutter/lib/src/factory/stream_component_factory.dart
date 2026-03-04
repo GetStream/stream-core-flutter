@@ -53,8 +53,7 @@ class StreamComponentFactory extends InheritedWidget {
   /// Finds the [StreamComponentBuilders] from the closest
   /// [StreamComponentFactory] ancestor that encloses the given context.
   ///
-  /// This will throw a [FlutterError] if no [StreamComponentFactory] is found
-  /// in the widget tree above the given context.
+  /// This will return a default empty [StreamComponentBuilders] if no [StreamComponentFactory] is found
   ///
   /// Typical usage:
   ///
@@ -66,13 +65,9 @@ class StreamComponentFactory extends InheritedWidget {
   /// `StreamComponentFactory`, consider using a `Builder` or refactoring into
   /// a separate widget to obtain a context below the [StreamComponentFactory].
   ///
-  /// If you want to return null instead of throwing, use [maybeOf].
+  /// If you want to return null instead of a default empty [StreamComponentBuilders], use [maybeOf].
   static StreamComponentBuilders of(BuildContext context) {
-    final result = maybeOf(context);
-    if (result != null) return result;
-
-    // If no StreamComponentFactory is found, return an empty StreamComponentBuilders.
-    return const StreamComponentBuilders._empty();
+    return maybeOf(context) ?? StreamComponentBuilders();
   }
 
   /// Finds the [StreamComponentBuilders] from the closest
@@ -81,7 +76,7 @@ class StreamComponentFactory extends InheritedWidget {
   /// Returns null if no such ancestor exists.
   ///
   /// See also:
-  ///  * [of], which throws if no [StreamComponentFactory] is found.
+  ///  * [of], which returns a default empty [StreamComponentBuilders] if no [StreamComponentFactory] is found.
   static StreamComponentBuilders? maybeOf(BuildContext context) {
     final streamComponentFactory = context.dependOnInheritedWidgetOfExactType<StreamComponentFactory>();
     return streamComponentFactory?.builders;
@@ -207,24 +202,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.progressBar,
     required this.extensions,
   });
-
-  const StreamComponentBuilders._empty()
-    : extensions = const <Object, StreamComponentBuilderExtension<Object>>{},
-      avatar = null,
-      avatarGroup = null,
-      avatarStack = null,
-      badgeCount = null,
-      button = null,
-      checkbox = null,
-      contextMenuAction = null,
-      emoji = null,
-      emojiButton = null,
-      emojiChip = null,
-      emojiChipBar = null,
-      fileTypeIcon = null,
-      listTile = null,
-      onlineIndicator = null,
-      progressBar = null;
 
   /// Arbitrary additions to this builder set.
   ///
@@ -399,6 +376,6 @@ extension StreamComponentFactoryExtension on BuildContext {
   /// Returns the [StreamComponentBuilders] from the nearest
   /// [StreamComponentFactory] ancestor, or null if none exists.
   ///
-  /// This is equivalent to calling [StreamComponentFactory.maybeOf].
-  StreamComponentBuilders? get streamComponentFactory => StreamComponentFactory.maybeOf(this);
+  /// This is equivalent to calling [StreamComponentFactory.of].
+  StreamComponentBuilders get streamComponentFactory => StreamComponentFactory.of(this);
 }
