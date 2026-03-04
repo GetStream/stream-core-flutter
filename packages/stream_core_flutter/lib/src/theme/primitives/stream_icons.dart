@@ -5,8 +5,8 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
-import 'stream_icons.g.dart';
 part 'stream_icons.g.theme.dart';
+part 'stream_icons.g.dart';
 
 /// Provides customizable icons for the Stream design system.
 ///

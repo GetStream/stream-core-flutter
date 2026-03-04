@@ -185,7 +185,10 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction,
     StreamComponentBuilder<StreamEmojiProps>? emoji,
     StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
+    StreamComponentBuilder<StreamEmojiButtonProps>? emojiChip,
+    StreamComponentBuilder<StreamEmojiButtonProps>? emojiChipBar,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
+    StreamComponentBuilder<StreamFileTypeIconProps>? listTile,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
@@ -202,7 +205,10 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       contextMenuAction: contextMenuAction,
       emoji: emoji,
       emojiButton: emojiButton,
+      emojiChip: emojiChip,
+      emojiChipBar: emojiChipBar,
       fileTypeIcon: fileTypeIcon,
+      listTile: listTile,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
       extensions: _extensionIterableToMap(extensions),
@@ -220,7 +226,10 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.contextMenuAction,
     required this.emoji,
     required this.emojiButton,
+    required this.emojiChip,
+    required this.emojiChipBar,
     required this.fileTypeIcon,
+    required this.listTile,
     required this.onlineIndicator,
     required this.progressBar,
     required this.extensions,
@@ -290,10 +299,25 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamEmojiButton] uses [DefaultStreamEmojiButton].
   final StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton;
 
+  /// Custom builder for emoji chip widgets.
+  ///
+  /// When null, [StreamEmojiChip] uses [DefaultStreamEmojiChip].
+  final StreamComponentBuilder<StreamEmojiChipProps>? emojiChip;
+
+  /// Custom builder for emoji chip bar widgets.
+  ///
+  /// When null, [StreamEmojiChipBar] uses [DefaultStreamEmojiChipBar].
+  final StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar;
+
   /// Custom builder for file type icon widgets.
   ///
   /// When null, [StreamFileTypeIcon] uses [DefaultStreamFileTypeIcon].
   final StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon;
+
+  /// Custom builder for list tile widgets.
+  ///
+  /// When null, [StreamListTile] uses [DefaultStreamListTile].
+  final StreamComponentBuilder<StreamListTileProps>? listTile;
 
   /// Custom builder for online indicator widgets.
   ///

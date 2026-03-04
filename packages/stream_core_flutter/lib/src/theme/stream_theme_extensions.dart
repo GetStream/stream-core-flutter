@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_button_theme.dart';
@@ -7,7 +8,9 @@ import 'components/stream_checkbox_theme.dart';
 import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
+import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_input_theme.dart';
+import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
@@ -65,6 +68,9 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamBoxShadow] from the current theme.
   StreamBoxShadow get streamBoxShadow => streamTheme.boxShadow;
 
+  /// Returns the [StreamAudioWaveformThemeData] from the nearest ancestor.
+  StreamAudioWaveformThemeData get streamAudioWaveformTheme => StreamAudioWaveformTheme.of(this);
+
   /// Returns the [StreamAvatarThemeData] from the nearest ancestor.
   StreamAvatarThemeData get streamAvatarTheme => StreamAvatarTheme.of(this);
 
@@ -85,6 +91,12 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamEmojiButtonThemeData] from the nearest ancestor.
   StreamEmojiButtonThemeData get streamEmojiButtonTheme => StreamEmojiButtonTheme.of(this);
+
+  /// Returns the [StreamEmojiChipThemeData] from the nearest ancestor.
+  StreamEmojiChipThemeData get streamEmojiChipTheme => StreamEmojiChipTheme.of(this);
+
+  /// Returns the [StreamListTileThemeData] from the nearest ancestor.
+  StreamListTileThemeData get streamListTileTheme => StreamListTileTheme.of(this);
 
   /// Returns the [StreamMessageThemeData] from the nearest ancestor.
   StreamMessageThemeData get streamMessageTheme => StreamMessageTheme.of(this);
