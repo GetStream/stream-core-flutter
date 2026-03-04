@@ -8,16 +8,17 @@ import '../accessories/stream_emoji.dart';
 
 /// A pill-shaped chip for displaying emoji reactions with an optional count.
 ///
-/// [StreamEmojiChip] renders an emoji alongside an optional reaction count.
-/// Use [StreamEmojiChip.addEmoji] for the add-reaction button variant, which
-/// shows the add-reaction icon instead.
+/// [StreamEmojiChip] renders one or more emojis alongside an optional reaction
+/// count. Use the default constructor for a single-emoji chip, [StreamEmojiChip.cluster]
+/// for a multi-emoji chip, and [StreamEmojiChip.addEmoji] for the add-reaction
+/// button variant.
 ///
-/// Both variants share the same theming and support hover, press, selected,
+/// All variants share the same theming and support hover, press, selected,
 /// and disabled interaction states.
 ///
 /// {@tool snippet}
 ///
-/// Display a reaction chip:
+/// Display a single-emoji reaction chip:
 ///
 /// ```dart
 /// StreamEmojiChip(
@@ -25,6 +26,19 @@ import '../accessories/stream_emoji.dart';
 ///   count: 3,
 ///   isSelected: true,
 ///   onPressed: () => toggleReaction('👍'),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Display a clustered chip with multiple emojis and a total count:
+///
+/// ```dart
+/// StreamEmojiChip.cluster(
+///   emojis: [Text('👍'), Text('❤️'), Text('😂')],
+///   count: 12,
+///   onPressed: () => showReactionDetails(),
 /// )
 /// ```
 /// {@end-tool}
@@ -45,7 +59,7 @@ import '../accessories/stream_emoji.dart';
 ///  * [StreamEmojiChipTheme], for customizing chip appearance.
 ///  * [StreamEmojiButton], for a circular emoji-only button.
 class StreamEmojiChip extends StatelessWidget {
-  /// Creates an emoji count chip displaying [emoji] and an optional [count].
+  /// Creates a single-emoji chip displaying [emoji] and an optional [count].
   ///
   /// When [count] is null the count label is hidden.
   /// When [onPressed] is null the chip is disabled.
@@ -57,7 +71,29 @@ class StreamEmojiChip extends StatelessWidget {
     VoidCallback? onLongPress,
     bool isSelected = false,
   }) : props = .new(
-         emoji: emoji,
+         emojis: [emoji],
+         count: count,
+         onPressed: onPressed,
+         onLongPress: onLongPress,
+         isSelected: isSelected,
+       );
+
+  /// Creates a clustered chip displaying multiple [emojis] and an optional [count].
+  ///
+  /// Each emoji in [emojis] is rendered individually at the chip's icon size,
+  /// so the full list is visible without overflow.
+  ///
+  /// When [count] is null the count label is hidden.
+  /// When [onPressed] is null the chip is disabled.
+  StreamEmojiChip.cluster({
+    super.key,
+    required List<Widget> emojis,
+    int? count,
+    VoidCallback? onPressed,
+    VoidCallback? onLongPress,
+    bool isSelected = false,
+  }) : props = .new(
+         emojis: emojis,
          count: count,
          onPressed: onPressed,
          onLongPress: onLongPress,
@@ -108,21 +144,24 @@ class StreamEmojiChip extends StatelessWidget {
 class StreamEmojiChipProps {
   /// Creates properties for an emoji chip.
   const StreamEmojiChipProps({
-    required this.emoji,
+    required this.emojis,
     this.count,
     this.onPressed,
     this.onLongPress,
     this.isSelected = false,
-  });
+  }) : assert(emojis.length > 0, 'emojis must not be empty');
 
-  /// The emoji content to display inside the chip.
+  /// The emoji widgets to display inside the chip.
   ///
-  /// Typically a [Text] widget containing a Unicode emoji character, e.g.
-  /// `Text('👍')`. The chip wraps this in a [StreamEmoji] internally to
-  /// ensure consistent sizing and platform-specific font fallbacks.
-  final Widget emoji;
+  /// For a standard single-emoji chip this is a one-element list, e.g.
+  /// `[Text('👍')]`. For a clustered chip it contains multiple emoji widgets,
+  /// e.g. `[Text('👍'), Text('❤️'), Text('😂')]`.
+  ///
+  /// Each item is individually wrapped in a [StreamEmoji] to ensure consistent
+  /// sizing and platform-specific font fallbacks.
+  final List<Widget> emojis;
 
-  /// The reaction count to display next to [emoji].
+  /// The reaction count to display next to the emojis.
   ///
   /// When null the count label is hidden.
   final int? count;
@@ -172,7 +211,7 @@ class DefaultStreamEmojiChip extends StatelessWidget {
       onLongPress: props.onLongPress,
       isSelected: props.isSelected,
       iconSize: effectiveEmojiSize,
-      icon: _EmojiChipContent(emoji: props.emoji, count: props.count),
+      icon: _EmojiChipContent(emojis: props.emojis, count: props.count),
       style: ButtonStyle(
         tapTargetSize: .shrinkWrap,
         visualDensity: .standard,
@@ -190,11 +229,11 @@ class DefaultStreamEmojiChip extends StatelessWidget {
   }
 }
 
-// Internal widget to layout the emoji and count label inside the chip.
+// Internal widget to layout the emoji icons and count label inside the chip.
 class _EmojiChipContent extends StatelessWidget {
-  const _EmojiChipContent({required this.emoji, this.count});
+  const _EmojiChipContent({required this.emojis, this.count});
 
-  final Widget emoji;
+  final List<Widget> emojis;
   final int? count;
 
   @override
@@ -208,7 +247,7 @@ class _EmojiChipContent extends StatelessWidget {
         crossAxisAlignment: .baseline,
         spacing: context.streamSpacing.xxs,
         children: [
-          StreamEmoji(emoji: emoji),
+          for (final emoji in emojis) StreamEmoji(emoji: emoji),
           if (count case final count?) Text('$count'),
         ],
       ),
