@@ -270,7 +270,7 @@ class DefaultStreamListTile extends StatelessWidget {
       );
     }
 
-    return ListTileContainer(
+    return StreamListTileContainer(
       enabled: props.enabled,
       selected: props.selected,
       onTap: props.onTap,
@@ -373,8 +373,8 @@ class _StreamListTileThemeDefaults extends StreamListTileThemeData {
   });
 }
 
-class ListTileContainer extends StatelessWidget {
-  const ListTileContainer({
+class StreamListTileContainer extends StatelessWidget {
+  const StreamListTileContainer({
     super.key,
     required this.child,
     required this.enabled,

@@ -156,7 +156,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     this.badgeCount,
     this.badgeNotification,
     this.button,
-    this.channelListItem,
     this.checkbox,
     this.contextMenuAction,
     this.emoji,
@@ -199,11 +198,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamButton] uses [DefaultStreamButton].
   final StreamComponentBuilder<StreamButtonProps>? button;
-
-  /// Custom builder for channel list item widgets.
-  ///
-  /// When null, [StreamChannelListItem] uses [DefaultStreamChannelListItem].
-  final StreamComponentBuilder<StreamChannelListItemProps>? channelListItem;
 
   /// Custom builder for checkbox widgets.
   ///

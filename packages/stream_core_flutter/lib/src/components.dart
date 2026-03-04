@@ -10,7 +10,6 @@ export 'components/badge/stream_media_badge.dart';
 export 'components/badge/stream_online_indicator.dart' hide DefaultStreamOnlineIndicator;
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
 export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButton;
-export 'components/channel_list.dart' hide DefaultStreamChannelListItem;
 export 'components/common/stream_checkbox.dart' hide DefaultStreamCheckbox;
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;
 export 'components/context_menu/stream_context_menu.dart';
@@ -21,7 +20,7 @@ export 'components/controls/stream_remove_control.dart';
 export 'components/emoji/data/stream_emoji_data.dart';
 export 'components/emoji/data/stream_supported_emojis.dart';
 export 'components/emoji/stream_emoji_picker_sheet.dart';
-export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile, ListTileContainer;
+export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
 export 'components/message_composer.dart';
 
 export 'factory/stream_component_factory.dart';
