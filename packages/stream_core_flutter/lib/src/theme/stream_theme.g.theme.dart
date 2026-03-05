@@ -23,6 +23,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
+    StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
@@ -49,6 +50,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       audioWaveformTheme: audioWaveformTheme ?? _this.audioWaveformTheme,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
+      badgeNotificationTheme:
+          badgeNotificationTheme ?? _this.badgeNotificationTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
@@ -98,6 +101,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeCountTheme: StreamBadgeCountThemeData.lerp(
         _this.badgeCountTheme,
         other.badgeCountTheme,
+        t,
+      )!,
+      badgeNotificationTheme: StreamBadgeNotificationThemeData.lerp(
+        _this.badgeNotificationTheme,
+        other.badgeNotificationTheme,
         t,
       )!,
       buttonTheme: StreamButtonThemeData.lerp(
@@ -174,6 +182,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.audioWaveformTheme == _this.audioWaveformTheme &&
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
+        _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
         _other.buttonTheme == _this.buttonTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
         _other.contextMenuTheme == _this.contextMenuTheme &&
@@ -204,6 +213,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.audioWaveformTheme,
       _this.avatarTheme,
       _this.badgeCountTheme,
+      _this.badgeNotificationTheme,
       _this.buttonTheme,
       _this.checkboxTheme,
       _this.contextMenuTheme,

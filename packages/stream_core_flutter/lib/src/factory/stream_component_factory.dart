@@ -135,6 +135,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup,
     StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
     StreamComponentBuilder<StreamBadgeCountProps>? badgeCount,
+    StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification,
     StreamComponentBuilder<StreamButtonProps>? button,
     StreamComponentBuilder<StreamCheckboxProps>? checkbox,
     StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction,
@@ -155,6 +156,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       avatarGroup: avatarGroup,
       avatarStack: avatarStack,
       badgeCount: badgeCount,
+      badgeNotification: badgeNotification,
       button: button,
       checkbox: checkbox,
       contextMenuAction: contextMenuAction,
@@ -176,6 +178,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.avatarGroup,
     required this.avatarStack,
     required this.badgeCount,
+    required this.badgeNotification,
     required this.button,
     required this.checkbox,
     required this.contextMenuAction,
@@ -228,6 +231,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamBadgeCount] uses [DefaultStreamBadgeCount].
   final StreamComponentBuilder<StreamBadgeCountProps>? badgeCount;
+
+  /// Custom builder for badge notification widgets.
+  ///
+  /// When null, [StreamBadgeNotification] uses
+  /// [DefaultStreamBadgeNotification].
+  final StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification;
 
   /// Custom builder for button widgets.
   ///
