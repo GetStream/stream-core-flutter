@@ -1,11 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/components/stream_badge_count_theme.dart';
 import '../badge/stream_badge_count.dart';
+import '../common/stream_flex.dart';
 
 /// Predefined avatar stack sizes.
 ///
@@ -186,46 +185,24 @@ class DefaultStreamAvatarStack extends StatelessWidget {
     final extraBadgeSize = _badgeCountSizeForStackSize(effectiveSize);
 
     final diameter = avatarSize.value;
-    final badgeDiameter = extraBadgeSize.value;
 
-    // Split children into visible and overflow
     final visible = props.children.take(props.max).toList();
     final extraCount = props.children.length - visible.length;
 
-    // Build the list of widgets to display
-    final displayChildren = <Widget>[
-      ...visible,
-      if (extraCount > 0) StreamBadgeCount(label: '+$extraCount', size: extraBadgeSize),
-    ];
-
-    // Calculate the offset between each avatar (how much of each avatar is visible)
-    final visiblePortion = diameter * (1 - props.overlap);
-    final badgeVisiblePortion = badgeDiameter * (1 - props.overlap);
-
-    // Total width: first avatar full + remaining avatars visible portion
-    var totalWidth = diameter + (visible.length - 1) * visiblePortion;
-    if (extraCount > 0) totalWidth += badgeVisiblePortion;
-
-    return AnimatedContainer(
-      width: totalWidth,
-      height: math.max(diameter, badgeDiameter),
-      duration: kThemeChangeDuration,
-      // Need to disable text scaling here so that the text doesn't
-      // escape the avatar when the textScaleFactor is large.
-      child: MediaQuery.withNoTextScaling(
-        child: StreamAvatarTheme(
-          data: StreamAvatarThemeData(size: avatarSize),
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              for (var i = 0; i < displayChildren.length; i++)
-                Positioned(
-                  left: i * visiblePortion,
-                  child: displayChildren[i],
-                ),
-            ],
-          ),
+    return MediaQuery.withNoTextScaling(
+      child: StreamAvatarTheme(
+        data: StreamAvatarThemeData(size: avatarSize),
+        child: StreamRow(
+          spacing: -diameter * props.overlap,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ...visible,
+            if (extraCount > 0)
+              StreamBadgeCount(
+                label: '+$extraCount',
+                size: extraBadgeSize,
+              ),
+          ],
         ),
       ),
     );

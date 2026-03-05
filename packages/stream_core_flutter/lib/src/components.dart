@@ -10,6 +10,7 @@ export 'components/badge/stream_online_indicator.dart' hide DefaultStreamOnlineI
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
 export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButton;
 export 'components/common/stream_checkbox.dart' hide DefaultStreamCheckbox;
+export 'components/common/stream_flex.dart';
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;
 export 'components/context_menu/stream_context_menu.dart';
 export 'components/context_menu/stream_context_menu_action.dart' hide DefaultStreamContextMenuAction;
