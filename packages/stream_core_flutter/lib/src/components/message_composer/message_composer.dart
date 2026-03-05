@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -74,12 +72,8 @@ class _StreamCoreMessageComposerState extends State<StreamCoreMessageComposer> {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    final bottomPaddingSafeArea = MediaQuery.of(context).padding.bottom;
-    final minimumBottomPadding = spacing.md;
-    final bottomPadding = math.max(bottomPaddingSafeArea, minimumBottomPadding);
-
     return Container(
-      padding: EdgeInsets.only(top: spacing.md, bottom: bottomPadding),
+      padding: EdgeInsets.only(top: spacing.md),
       decoration: widget.isFloating
           ? null
           : BoxDecoration(
