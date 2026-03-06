@@ -15,7 +15,7 @@ export 'theme/components/stream_list_tile_theme.dart';
 export 'theme/components/stream_message_theme.dart';
 export 'theme/components/stream_online_indicator_theme.dart';
 export 'theme/components/stream_progress_bar_theme.dart';
-export 'theme/components/stream_reaction_theme.dart';
+export 'theme/components/stream_reactions_theme.dart';
 
 export 'theme/primitives/stream_colors.dart';
 export 'theme/primitives/stream_icons.dart';

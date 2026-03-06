@@ -3,7 +3,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, unused_element
 
-part of 'stream_reaction_theme.dart';
+part of 'stream_reactions_theme.dart';
 
 // **************************************************************************
 // ThemeGenGenerator

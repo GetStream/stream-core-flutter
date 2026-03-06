@@ -3,7 +3,7 @@ import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_emoji_chip_theme.dart';
-import '../../theme/components/stream_reaction_theme.dart';
+import '../../theme/components/stream_reactions_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../accessories/stream_emoji.dart';
 import '../common/stream_flex.dart';
