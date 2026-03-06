@@ -784,30 +784,30 @@ class _RealWorldSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: spacing.md,
-        children: const [
-          _SectionLabel(label: 'REAL-WORLD EXAMPLES'),
-          _ExampleCard(
-            title: 'Message Reactions',
-            description:
-                'Interactive reaction bar below a chat message — tap to toggle, '
-                'long-press would open a skin-tone picker.',
-            child: _MessageReactionsExample(),
-          ),
-          _ExampleCard(
-            title: 'Clustered Reactions',
-            description:
-                'All reactions grouped into a single cluster chip — tap the chip '
-                'to see the total count; commonly used in compact message threads.',
-            child: _ClusteredReactionsExample(),
-          ),
-          _ExampleCard(
-            title: 'Busy Reaction Bar',
-            description:
-                'Many reactions with large counts — shows wrap behaviour and '
-                'minimum width enforcement.',
-            child: _BusyReactionsExample(),
-          ),
-        ],
+      children: const [
+        _SectionLabel(label: 'REAL-WORLD EXAMPLES'),
+        _ExampleCard(
+          title: 'Message Reactions',
+          description:
+              'Interactive reaction bar below a chat message — tap to toggle, '
+              'long-press would open a skin-tone picker.',
+          child: _MessageReactionsExample(),
+        ),
+        _ExampleCard(
+          title: 'Clustered Reactions',
+          description:
+              'All reactions grouped into a single cluster chip — tap the chip '
+              'to see the total count; commonly used in compact message threads.',
+          child: _ClusteredReactionsExample(),
+        ),
+        _ExampleCard(
+          title: 'Busy Reaction Bar',
+          description:
+              'Many reactions with large counts — shows wrap behaviour and '
+              'minimum width enforcement.',
+          child: _BusyReactionsExample(),
+        ),
+      ],
     );
   }
 }
@@ -1105,7 +1105,8 @@ enum _ChipType {
   single,
   cluster,
   overflow,
-  addEmoji;
+  addEmoji
+  ;
 
   String get label => switch (this) {
     _ChipType.single => 'Single',

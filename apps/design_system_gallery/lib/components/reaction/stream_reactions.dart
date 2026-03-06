@@ -150,7 +150,6 @@ class _ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
-    final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
     final isOutgoing = direction.isOutgoing;

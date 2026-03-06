@@ -83,8 +83,7 @@ Widget buildStreamFlexPlayground(BuildContext context) {
       mainAxisSize: mainAxisSize,
       clipBehavior: clipBehavior,
       children: [
-        for (var i = 0; i < childCount; i++)
-          _PlaygroundChild(index: i, direction: direction),
+        for (var i = 0; i < childCount; i++) _PlaygroundChild(index: i, direction: direction),
       ],
     ),
   );
@@ -198,8 +197,7 @@ class _SpacingValuesSection extends StatelessWidget {
                   color: colorScheme.textSecondary,
                 ),
               ),
-              for (final (label, value) in _spacingValues)
-                _SpacingDemo(label: label, spacing: value),
+              for (final (label, value) in _spacingValues) _SpacingDemo(label: label, spacing: value),
             ],
           ),
         ),
