@@ -7,6 +7,7 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
+import 'components/stream_badge_notification_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_context_menu_action_theme.dart';
@@ -96,6 +97,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
+    StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamContextMenuThemeData? contextMenuTheme,
@@ -127,6 +129,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
+    badgeNotificationTheme ??= const StreamBadgeNotificationThemeData();
     buttonTheme ??= const StreamButtonThemeData();
     checkboxTheme ??= const StreamCheckboxThemeData();
     contextMenuTheme ??= const StreamContextMenuThemeData();
@@ -152,6 +155,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
+      badgeNotificationTheme: badgeNotificationTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       contextMenuTheme: contextMenuTheme,
@@ -191,6 +195,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.audioWaveformTheme,
     required this.avatarTheme,
     required this.badgeCountTheme,
+    required this.badgeNotificationTheme,
     required this.buttonTheme,
     required this.checkboxTheme,
     required this.contextMenuTheme,
@@ -272,6 +277,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The badge count theme for this theme.
   final StreamBadgeCountThemeData badgeCountTheme;
 
+  /// The badge notification theme for this theme.
+  final StreamBadgeNotificationThemeData badgeNotificationTheme;
+
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
 
@@ -340,6 +348,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
+      badgeNotificationTheme: badgeNotificationTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       contextMenuTheme: contextMenuTheme,

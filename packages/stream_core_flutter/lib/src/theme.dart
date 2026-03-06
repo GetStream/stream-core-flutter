@@ -3,6 +3,7 @@ export 'factory/stream_component_factory.dart';
 export 'theme/components/stream_audio_waveform_theme.dart';
 export 'theme/components/stream_avatar_theme.dart';
 export 'theme/components/stream_badge_count_theme.dart';
+export 'theme/components/stream_badge_notification_theme.dart';
 export 'theme/components/stream_button_theme.dart';
 export 'theme/components/stream_checkbox_theme.dart';
 export 'theme/components/stream_context_menu_action_theme.dart';

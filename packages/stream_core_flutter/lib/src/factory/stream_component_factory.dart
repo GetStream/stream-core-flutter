@@ -53,8 +53,7 @@ class StreamComponentFactory extends InheritedWidget {
   /// Finds the [StreamComponentBuilders] from the closest
   /// [StreamComponentFactory] ancestor that encloses the given context.
   ///
-  /// This will throw a [FlutterError] if no [StreamComponentFactory] is found
-  /// in the widget tree above the given context.
+  /// This will return a default empty [StreamComponentBuilders] if no [StreamComponentFactory] is found
   ///
   /// Typical usage:
   ///
@@ -65,25 +64,9 @@ class StreamComponentFactory extends InheritedWidget {
   /// If you're calling this in the same `build()` method that creates the
   /// `StreamComponentFactory`, consider using a `Builder` or refactoring into
   /// a separate widget to obtain a context below the [StreamComponentFactory].
-  ///
-  /// If you want to return null instead of throwing, use [maybeOf].
   static StreamComponentBuilders of(BuildContext context) {
-    final factory = context.dependOnInheritedWidgetOfExactType<StreamComponentFactory>();
-    if (factory != null) return factory.builders;
-
-    return StreamComponentBuilders();
-  }
-
-  /// Finds the [StreamComponentBuilders] from the closest
-  /// [StreamComponentFactory] ancestor that encloses the given context.
-  ///
-  /// Returns null if no such ancestor exists.
-  ///
-  /// See also:
-  ///  * [of], which throws if no [StreamComponentFactory] is found.
-  static StreamComponentBuilders? maybeOf(BuildContext context) {
     final streamComponentFactory = context.dependOnInheritedWidgetOfExactType<StreamComponentFactory>();
-    return streamComponentFactory?.builders;
+    return streamComponentFactory?.builders ?? StreamComponentBuilders();
   }
 
   @override
@@ -152,6 +135,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup,
     StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
     StreamComponentBuilder<StreamBadgeCountProps>? badgeCount,
+    StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification,
     StreamComponentBuilder<StreamButtonProps>? button,
     StreamComponentBuilder<StreamCheckboxProps>? checkbox,
     StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction,
@@ -173,6 +157,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       avatarGroup: avatarGroup,
       avatarStack: avatarStack,
       badgeCount: badgeCount,
+      badgeNotification: badgeNotification,
       button: button,
       checkbox: checkbox,
       contextMenuAction: contextMenuAction,
@@ -195,6 +180,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.avatarGroup,
     required this.avatarStack,
     required this.badgeCount,
+    required this.badgeNotification,
     required this.button,
     required this.checkbox,
     required this.contextMenuAction,
@@ -248,6 +234,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamBadgeCount] uses [DefaultStreamBadgeCount].
   final StreamComponentBuilder<StreamBadgeCountProps>? badgeCount;
+
+  /// Custom builder for badge notification widgets.
+  ///
+  /// When null, [StreamBadgeNotification] uses
+  /// [DefaultStreamBadgeNotification].
+  final StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification;
 
   /// Custom builder for button widgets.
   ///
@@ -388,6 +380,6 @@ extension StreamComponentFactoryExtension on BuildContext {
   /// Returns the [StreamComponentBuilders] from the nearest
   /// [StreamComponentFactory] ancestor, or null if none exists.
   ///
-  /// This is equivalent to calling [StreamComponentFactory.maybeOf].
-  StreamComponentBuilders? get streamComponentFactory => StreamComponentFactory.maybeOf(this);
+  /// This is equivalent to calling [StreamComponentFactory.of].
+  StreamComponentBuilders get streamComponentFactory => StreamComponentFactory.of(this);
 }

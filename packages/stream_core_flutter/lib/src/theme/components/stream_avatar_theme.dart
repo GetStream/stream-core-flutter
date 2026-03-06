@@ -27,8 +27,11 @@ enum StreamAvatarSize {
   /// Large avatar (40px diameter).
   lg(40),
 
-  /// Extra large avatar (64px diameter).
-  xl(64)
+  /// Extra large avatar (48px diameter).
+  xl(48),
+
+  /// Extra-extra large avatar (80px diameter).
+  xxl(80)
   ;
 
   /// Constructs a [StreamAvatarSize] with the given diameter.

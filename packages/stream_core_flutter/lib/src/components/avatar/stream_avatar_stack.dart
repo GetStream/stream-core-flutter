@@ -110,7 +110,7 @@ class StreamAvatarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.avatarStack;
+    final builder = StreamComponentFactory.of(context).avatarStack;
     if (builder != null) return builder(context, props);
     return DefaultStreamAvatarStack(props: props);
   }

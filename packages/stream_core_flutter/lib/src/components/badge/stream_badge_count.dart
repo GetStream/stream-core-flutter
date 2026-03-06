@@ -81,7 +81,7 @@ class StreamBadgeCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.badgeCount;
+    final builder = StreamComponentFactory.of(context).badgeCount;
     if (builder != null) return builder(context, props);
     return DefaultStreamBadgeCount(props: props);
   }

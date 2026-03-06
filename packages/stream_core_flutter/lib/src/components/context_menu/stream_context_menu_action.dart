@@ -234,7 +234,7 @@ class StreamContextMenuAction<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.contextMenuAction;
+    final builder = StreamComponentFactory.of(context).contextMenuAction;
     if (builder != null) return builder(context, props);
     return DefaultStreamContextMenuAction(props: props);
   }
