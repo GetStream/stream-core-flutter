@@ -96,7 +96,7 @@ class StreamReactions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = StreamComponentFactory.maybeOf(context)?.reactions;
+    final builder = StreamComponentFactory.of(context).reactions;
     if (builder != null) return builder(context, props);
 
     final spacing = context.streamSpacing;
@@ -105,7 +105,6 @@ class StreamReactions extends StatelessWidget {
     return StreamEmojiChipTheme(
       data: StreamEmojiChipThemeData(
         style: StreamEmojiChipThemeStyle(
-          backgroundColor: .all(context.streamColorScheme.backgroundElevation2),
           // Reaction chips must shrink to their content width so that multiple
           // chips fit side-by-side within the bubble bounds. The global default
           // (64px minimum) is designed for stand-alone emoji chip bars and is
@@ -113,6 +112,7 @@ class StreamReactions extends StatelessWidget {
           minimumSize: const Size(32, 24),
           maximumSize: const Size.fromHeight(28),
           emojiSize: StreamEmojiSize.sm.value,
+          backgroundColor: .all(context.streamColorScheme.backgroundElevation2),
           textStyle: .all(textTheme.numericMd.copyWith(fontFeatures: const [.tabularFigures()])),
           padding: EdgeInsetsGeometry.symmetric(vertical: spacing.xxxs, horizontal: spacing.xs),
         ),
