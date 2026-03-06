@@ -5,7 +5,7 @@ import '../stream_theme.dart';
 
 part 'stream_reaction_theme.g.theme.dart';
 
-/// Visual style variants for reactions.
+/// Visual presentation variants for reactions.
 enum StreamReactionsType {
   /// Each reaction type is rendered as an individual pill.
   segmented,
@@ -17,9 +17,6 @@ enum StreamReactionsType {
 /// Vertical position of reactions relative to the child.
 enum StreamReactionsPosition {
   /// Reactions are rendered above the child.
-  ///
-  /// When `overlap` is true, the reaction strip overlaps the child's top
-  /// edge by [StreamReactionsThemeData.overlapExtent].
   header,
 
   /// Reactions are rendered below the child.
@@ -29,21 +26,15 @@ enum StreamReactionsPosition {
 /// Horizontal alignment of reactions relative to the child.
 enum StreamReactionsAlignment {
   /// Align reactions to the leading edge of the child.
-  ///
-  /// When reactions are wider than the child they extend past the trailing
-  /// edge.
   start,
 
   /// Align reactions to the trailing edge of the child.
-  ///
-  /// When reactions are wider than the child they extend past the leading
-  /// edge.
   end,
 }
 
 /// Applies a reaction theme to descendant [StreamReactions] widgets.
 class StreamReactionsTheme extends InheritedTheme {
-  /// Creates a reaction theme that controls descendant reactions.
+  /// Creates a theme that controls descendant reactions.
   const StreamReactionsTheme({
     super.key,
     required this.data,
@@ -70,13 +61,11 @@ class StreamReactionsTheme extends InheritedTheme {
 
 /// Theme data for customizing [StreamReactions] layout.
 ///
-/// Visual styling for the reaction chips themselves (colors, borders, shadows,
-/// padding) is controlled via [StreamEmojiChipTheme] — wrap a subtree with it
-/// to override chip appearance specifically for reactions.
+/// To customize the chip appearance itself, use [StreamEmojiChipTheme].
 @themeGen
 @immutable
 class StreamReactionsThemeData with _$StreamReactionsThemeData {
-  /// Creates a reaction layout theme with optional overrides.
+  /// Creates reaction theme data with optional overrides.
   const StreamReactionsThemeData({
     this.spacing,
     this.gap,
@@ -87,20 +76,13 @@ class StreamReactionsThemeData with _$StreamReactionsThemeData {
   /// Gap between adjacent reaction chips.
   final double? spacing;
 
-  /// Spacing between the reaction strip and the child edge when
-  /// [StreamReactionsProps.overlap] is `false`.
+  /// Gap between the reaction strip and the child when reactions do not overlap.
   final double? gap;
 
-  /// How much the reaction strip overlaps the child when
-  /// [StreamReactionsProps.overlap] is `true`.
-  ///
-  /// Higher values push reactions further into the child.
+  /// How much the reaction strip overlaps the child.
   final double? overlapExtent;
 
-  /// Horizontal distance by which the reaction strip is shifted along the
-  /// x-axis relative to the child.
-  ///
-  /// Defaults to `0` when not set.
+  /// Horizontal offset applied to the reaction strip.
   final double? indent;
 
   /// Linearly interpolate between two [StreamReactionsThemeData] objects.

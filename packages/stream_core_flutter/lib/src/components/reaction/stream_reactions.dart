@@ -9,32 +9,59 @@ import '../accessories/stream_emoji.dart';
 import '../common/stream_flex.dart';
 import '../controls/stream_emoji_chip.dart';
 
-/// Use [StreamReactions.segmented] to render each reaction as its own pill,
-/// and [StreamReactions.clustered] to group all reactions into a single chip.
+/// Displays reactions as either individual chips or a single grouped chip.
 ///
-/// Reactions can be positioned [StreamReactionsPosition.header] or
-/// [StreamReactionsPosition.footer] relative to the [child]. When [child]
-/// is provided, the reaction strip is anchored to the child's bounds and uses
-/// [StreamReactionsAlignment] + [StreamReactionsPosition] to place itself.
+/// Use [StreamReactions.segmented] to render each reaction type as its own
+/// chip, and [StreamReactions.clustered] to group all reaction types into a
+/// single chip.
 ///
-/// When [StreamReactionsProps.overlap] is `true`, the reaction strip visually
-/// overlaps the child edge by [StreamReactionsThemeData.overlapExtent] and
-/// chips are constrained to a single row.
+/// Reactions can be displayed on their own or positioned relative to a
+/// [child], such as a message bubble or container.
 ///
-/// When [StreamReactionsProps.overlap] is `false`, reactions flow across
-/// multiple lines with a fixed gap separating them from the child.
+/// {@tool snippet}
 ///
-/// To customise the chip appearance (colors, borders, shadows) wrap with
-/// [StreamEmojiChipTheme].
+/// Display segmented reactions below a child:
+///
+/// ```dart
+/// StreamReactions.segmented(
+///   items: [
+///     StreamReactionsItem(emoji: Text('👍'), count: 3),
+///     StreamReactionsItem(emoji: Text('❤️'), count: 2),
+///   ],
+///   child: Container(
+///     padding: EdgeInsets.all(12),
+///     child: Text('Looks good to me'),
+///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Display clustered reactions above a child:
+///
+/// ```dart
+/// StreamReactions.clustered(
+///   items: [
+///     StreamReactionsItem(emoji: Text('👍'), count: 4),
+///     StreamReactionsItem(emoji: Text('😂'), count: 2),
+///     StreamReactionsItem(emoji: Text('🔥')),
+///   ],
+///   position: StreamReactionsPosition.header,
+///   child: Container(
+///     padding: EdgeInsets.all(12),
+///     child: Text('Let us ship this'),
+///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// See also:
+///
+///  * [StreamReactionsTheme], for customizing reaction layout.
+///  * [StreamEmojiChipTheme], for customizing chip appearance.
 class StreamReactions extends StatelessWidget {
-  /// Creates a segmented reaction widget where each type gets its own chip.
-  ///
-  /// Counts are shown on all chips when any reaction has `count > 1`.
-  /// When every reaction has a count of 1 (or null), all chips render
-  /// emoji-only without counts.
-  /// Items beyond [max] are collapsed into a `+N` overflow chip whose count
-  /// is the sum of all hidden reactions' counts. The [max] limit only applies
-  /// when [overlap] is `true`; otherwise all items are shown.
+  /// Creates segmented reactions where each type is rendered as its own chip.
   StreamReactions.segmented({
     super.key,
     required List<StreamReactionsItem> items,
@@ -61,10 +88,7 @@ class StreamReactions extends StatelessWidget {
          onPressed: onPressed,
        );
 
-  /// Creates a clustered reaction widget that groups all reactions into one chip.
-  ///
-  /// Shows up to [max] emoji icons side by side. The total reaction count is
-  /// displayed when it exceeds 1.
+  /// Creates clustered reactions that group all reaction types into one chip.
   StreamReactions.clustered({
     super.key,
     required List<StreamReactionsItem> items,
@@ -123,6 +147,14 @@ class StreamReactions extends StatelessWidget {
 }
 
 /// Properties for configuring [StreamReactions].
+///
+/// This class holds the configuration for a reactions widget so it can be
+/// passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamReactions], which uses these properties.
+///  * [DefaultStreamReactions], the default implementation.
 @immutable
 class StreamReactionsProps {
   /// Creates reaction properties.
@@ -140,66 +172,50 @@ class StreamReactionsProps {
     this.onPressed,
   });
 
-  /// The visual type of the reaction row.
+  /// The reaction presentation style.
   final StreamReactionsType type;
 
-  /// The list of reaction items to display.
+  /// The reaction items to display.
   final List<StreamReactionsItem> items;
 
-  /// Optional child widget the reactions should be positioned relative to.
+  /// Optional widget the reactions should be positioned relative to.
   ///
-  /// Typically a message bubble or any container widget. When provided, the
-  /// child is rendered as the base and reactions are overlaid around its top
-  /// or bottom edge. When null, [StreamReactions] renders as a standalone
-  /// reaction strip.
+  /// Typically a message bubble or any container widget.
+  ///
+  /// When null, [StreamReactions] renders as a standalone reaction strip.
   final Widget? child;
 
-  /// Vertical position of reactions relative to the child.
+  /// The vertical position of the reactions relative to the child.
   final StreamReactionsPosition position;
 
-  /// Horizontal alignment of reactions within the available width.
+  /// The horizontal alignment of the reactions relative to the child.
   final StreamReactionsAlignment alignment;
 
   /// Maximum number of visible items.
   ///
-  /// For segmented, items beyond this limit are collapsed into a `+N` overflow
-  /// chip. For clustered, only this many emoji icons are shown.
-  ///
-  /// Defaults to 4. Only applies when [overlap] is `true`; when `false`, all
-  /// items are shown.
+  /// In segmented mode, items beyond this limit are collapsed into an overflow
+  /// chip. In clustered mode, this limits how many emoji widgets are shown in
+  /// the cluster.
   final int? max;
 
-  /// Controls whether reactions overlap the child edge.
+  /// Whether reactions overlap the child edge.
   ///
-  /// When `true`, reactions are laid out with negative spacing so they
-  /// visually overlap the child by [StreamReactionsThemeData.overlapExtent].
-  ///
-  /// When `false`, reactions are detached with a fixed spacing gap instead.
+  /// When `false`, reactions are displayed with a gap from the child.
   final bool overlap;
 
-  /// Horizontal distance by which the reaction strip is shifted along the
-  /// x-axis relative to the child.
-  ///
-  /// When null, falls back to [StreamReactionsThemeData.indent], then to
-  /// the theme default (`0`).
+  /// Horizontal offset applied to the reaction strip.
   final double? indent;
 
-  /// Cross-axis alignment of the column that stacks the child and reactions.
-  ///
-  /// Controls how the child is positioned horizontally
-  /// within the layout. Defaults to [CrossAxisAlignment.start] when null.
+  /// Cross-axis alignment used when laying out the child and reactions.
   final CrossAxisAlignment? crossAxisAlignment;
 
-  /// Clip behavior for the underlying layout column.
-  ///
-  /// Defaults to [Clip.none].
+  /// The clip behavior applied to the layout.
   final Clip clipBehavior;
 
   /// Called when any reaction chip is tapped.
   ///
-  /// For segmented reactions this fires on individual emoji chips as well as
-  /// the `+N` overflow chip. For clustered reactions it fires on the single
-  /// cluster chip.
+  /// In segmented mode, this is used for each visible chip, including the
+  /// overflow chip. In clustered mode, it is used for the grouped chip.
   final VoidCallback? onPressed;
 }
 
@@ -232,11 +248,7 @@ class StreamReactionsItem {
 
 const _kMaxVisibleSegments = 4;
 
-/// The default implementation of [StreamReactions].
-///
-/// Renders reactions as either individual segmented chips or a single clustered
-/// chip. When [StreamReactionsProps.child] is provided, positions the reaction
-/// strip relative to the child with optional overlap.
+/// Default implementation of [StreamReactions].
 ///
 /// See also:
 ///
