@@ -71,7 +71,7 @@ class StreamFlex extends MultiChildRenderObjectWidget {
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.textDirection,
     this.verticalDirection = VerticalDirection.down,
-    this.textBaseline,
+    this.textBaseline, // NO DEFAULT: we don't know what the text's baseline should be
     this.clipBehavior = Clip.none,
     this.spacing = 0.0,
     super.children,
@@ -79,6 +79,7 @@ class StreamFlex extends MultiChildRenderObjectWidget {
          !identical(crossAxisAlignment, CrossAxisAlignment.baseline) || textBaseline != null,
          'textBaseline is required if you specify the crossAxisAlignment with CrossAxisAlignment.baseline',
        );
+  // Cannot use == in the assert above instead of identical because of https://github.com/dart-lang/language/issues/1811.
 
   /// The direction to use as the main axis.
   ///
@@ -191,60 +192,6 @@ class StreamFlex extends MultiChildRenderObjectWidget {
       ..textBaseline = textBaseline
       ..clipBehavior = clipBehavior
       ..spacing = spacing;
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(EnumProperty<Axis>('direction', direction));
-    properties.add(
-      EnumProperty<MainAxisAlignment>(
-        'mainAxisAlignment',
-        mainAxisAlignment,
-      ),
-    );
-    properties.add(
-      EnumProperty<MainAxisSize>(
-        'mainAxisSize',
-        mainAxisSize,
-        defaultValue: MainAxisSize.max,
-      ),
-    );
-    properties.add(
-      EnumProperty<CrossAxisAlignment>(
-        'crossAxisAlignment',
-        crossAxisAlignment,
-      ),
-    );
-    properties.add(
-      EnumProperty<TextDirection>(
-        'textDirection',
-        textDirection,
-        defaultValue: null,
-      ),
-    );
-    properties.add(
-      EnumProperty<VerticalDirection>(
-        'verticalDirection',
-        verticalDirection,
-        defaultValue: VerticalDirection.down,
-      ),
-    );
-    properties.add(
-      EnumProperty<TextBaseline>(
-        'textBaseline',
-        textBaseline,
-        defaultValue: null,
-      ),
-    );
-    properties.add(
-      EnumProperty<Clip>(
-        'clipBehavior',
-        clipBehavior,
-        defaultValue: Clip.none,
-      ),
-    );
-    properties.add(DoubleProperty('spacing', spacing, defaultValue: 0.0));
   }
 }
 
