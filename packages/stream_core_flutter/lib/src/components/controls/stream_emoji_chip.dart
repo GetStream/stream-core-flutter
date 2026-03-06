@@ -100,6 +100,24 @@ class StreamEmojiChip extends StatelessWidget {
          isSelected: isSelected,
        );
 
+  /// Creates an overflow chip displaying a `+N` count label.
+  ///
+  /// Unlike the default constructor, the `+` is rendered as text using the
+  /// chip's text style rather than going through [StreamEmoji].
+  static Widget overflow({
+    Key? key,
+    required int count,
+    VoidCallback? onPressed,
+    VoidCallback? onLongPress,
+  }) {
+    return _OverflowEmojiChip(
+      key: key,
+      count: count,
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+    );
+  }
+
   /// Creates an add-emoji chip showing the add-reaction icon.
   ///
   /// When [onPressed] is null the chip is disabled.
@@ -192,6 +210,75 @@ class DefaultStreamEmojiChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _RawEmojiChip(
+      onPressed: props.onPressed,
+      onLongPress: props.onLongPress,
+      isSelected: props.isSelected,
+      child: Row(
+        mainAxisSize: .min,
+        textBaseline: .alphabetic,
+        crossAxisAlignment: .baseline,
+        spacing: context.streamSpacing.xxs,
+        children: [
+          for (final emoji in props.emojis) StreamEmoji(emoji: emoji),
+          if (props.count case final count?) Text('$count'),
+        ],
+      ),
+    );
+  }
+}
+
+// Renders the add-reaction icon using the current theme's icon set.
+class _AddEmojiIcon extends StatelessWidget {
+  const _AddEmojiIcon();
+
+  @override
+  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAddReaction);
+}
+
+// Overflow chip that renders `+N` as a single text label styled with the
+// chip's text style. Bypasses [StreamEmoji] so the `+` uses the numeric
+// font rather than emoji font sizing.
+class _OverflowEmojiChip extends StatelessWidget {
+  const _OverflowEmojiChip({
+    super.key,
+    required this.count,
+    this.onPressed,
+    this.onLongPress,
+  });
+
+  final int count;
+  final VoidCallback? onPressed;
+  final VoidCallback? onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    return _RawEmojiChip(
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      child: Text('+$count'),
+    );
+  }
+}
+
+// Shared themed button shell used by both [DefaultStreamEmojiChip] and
+// [_OverflowEmojiChip]. Resolves all chip theme properties and renders
+// an [IconButton] with the given [child].
+class _RawEmojiChip extends StatelessWidget {
+  const _RawEmojiChip({
+    required this.child,
+    this.onPressed,
+    this.onLongPress,
+    this.isSelected = false,
+  });
+
+  final Widget child;
+  final VoidCallback? onPressed;
+  final VoidCallback? onLongPress;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
     final chipThemeStyle = context.streamEmojiChipTheme.style;
     final defaults = _StreamEmojiChipThemeDefaults(context);
 
@@ -207,11 +294,13 @@ class DefaultStreamEmojiChip extends StatelessWidget {
     final effectiveSide = chipThemeStyle?.side ?? defaults.side;
 
     return IconButton(
-      onPressed: props.onPressed,
-      onLongPress: props.onLongPress,
-      isSelected: props.isSelected,
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      isSelected: isSelected,
       iconSize: effectiveEmojiSize,
-      icon: _EmojiChipContent(emojis: props.emojis, count: props.count),
+      // Need to disable text scaling here so that the text doesn't
+      // escape the chip when the textScaleFactor is large.
+      icon: MediaQuery.withNoTextScaling(child: child),
       style: ButtonStyle(
         tapTargetSize: .shrinkWrap,
         visualDensity: .standard,
@@ -227,40 +316,6 @@ class DefaultStreamEmojiChip extends StatelessWidget {
       ),
     );
   }
-}
-
-// Internal widget to layout the emoji icons and count label inside the chip.
-class _EmojiChipContent extends StatelessWidget {
-  const _EmojiChipContent({required this.emojis, this.count});
-
-  final List<Widget> emojis;
-  final int? count;
-
-  @override
-  Widget build(BuildContext context) {
-    // Need to disable text scaling here so that the text doesn't
-    // escape the chip when the textScaleFactor is large.
-    return MediaQuery.withNoTextScaling(
-      child: Row(
-        mainAxisSize: .min,
-        textBaseline: .alphabetic,
-        crossAxisAlignment: .baseline,
-        spacing: context.streamSpacing.xxs,
-        children: [
-          for (final emoji in emojis) StreamEmoji(emoji: emoji),
-          if (count case final count?) Text('$count'),
-        ],
-      ),
-    );
-  }
-}
-
-// Renders the add-reaction icon using the current theme's icon set.
-class _AddEmojiIcon extends StatelessWidget {
-  const _AddEmojiIcon();
-
-  @override
-  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAddReaction);
 }
 
 // Provides default values for [StreamEmojiChipThemeStyle] based on

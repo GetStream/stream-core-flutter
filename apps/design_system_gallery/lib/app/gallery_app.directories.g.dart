@@ -52,6 +52,8 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
+import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
+    as _design_system_gallery_components_reaction_stream_reaction;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -544,6 +546,28 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer
                         .buildStreamMessageComposerExample,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Reactions',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamReactions',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_reaction_stream_reaction
+                        .buildStreamReactionsPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_reaction_stream_reaction
+                        .buildStreamReactionsShowcase,
               ),
             ],
           ),

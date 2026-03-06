@@ -46,6 +46,7 @@ mixin _$StreamComponentBuilders {
       listTile: t < 0.5 ? a.listTile : b.listTile,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
+      reactions: t < 0.5 ? a.reactions : b.reactions,
     );
   }
 
@@ -68,6 +69,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamListTileProps)? listTile,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
+    Widget Function(BuildContext, StreamReactionsProps)? reactions,
   }) {
     final _this = (this as StreamComponentBuilders);
 
@@ -88,6 +90,7 @@ mixin _$StreamComponentBuilders {
       listTile: listTile ?? _this.listTile,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
+      reactions: reactions ?? _this.reactions,
     );
   }
 
@@ -119,6 +122,7 @@ mixin _$StreamComponentBuilders {
       listTile: other.listTile,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
+      reactions: other.reactions,
     );
   }
 
@@ -150,7 +154,8 @@ mixin _$StreamComponentBuilders {
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.listTile == _this.listTile &&
         _other.onlineIndicator == _this.onlineIndicator &&
-        _other.progressBar == _this.progressBar;
+        _other.progressBar == _this.progressBar &&
+        _other.reactions == _this.reactions;
   }
 
   @override
@@ -175,6 +180,7 @@ mixin _$StreamComponentBuilders {
       _this.listTile,
       _this.onlineIndicator,
       _this.progressBar,
+      _this.reactions,
     );
   }
 }

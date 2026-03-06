@@ -22,5 +22,6 @@ export 'components/emoji/data/stream_supported_emojis.dart';
 export 'components/emoji/stream_emoji_picker_sheet.dart';
 export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
 export 'components/message_composer.dart';
+export 'components/reaction/stream_reactions.dart' hide DefaultStreamReactions;
 
 export 'factory/stream_component_factory.dart';

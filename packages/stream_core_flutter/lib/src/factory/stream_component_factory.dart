@@ -68,38 +68,10 @@ class StreamComponentFactory extends InheritedWidget {
   ///
   /// If you want to return null instead of throwing, use [maybeOf].
   static StreamComponentBuilders of(BuildContext context) {
-    final result = maybeOf(context);
-    if (result != null) return result;
+    final factory = context.dependOnInheritedWidgetOfExactType<StreamComponentFactory>();
+    if (factory != null) return factory.builders;
 
-    throw FlutterError.fromParts(<DiagnosticsNode>[
-      ErrorSummary(
-        'StreamComponentFactory.of() called with a context that does not '
-        'contain a StreamComponentFactory.',
-      ),
-      ErrorDescription(
-        'No StreamComponentFactory ancestor could be found starting from the '
-        'context that was passed to StreamComponentFactory.of(). This usually '
-        'happens when the context used comes from the widget that creates the '
-        'StreamComponentFactory itself.',
-      ),
-      ErrorHint(
-        'To fix this, ensure that you are using a context that is a descendant '
-        'of the StreamComponentFactory. You can use a Builder to get a new '
-        'context that is under the StreamComponentFactory:\n\n'
-        '  Builder(\n'
-        '    builder: (context) {\n'
-        '      final builders = StreamComponentFactory.of(context);\n'
-        '      ...\n'
-        '    },\n'
-        '  )',
-      ),
-      ErrorHint(
-        'Alternatively, split your build method into smaller widgets so that '
-        'you get a new BuildContext that is below the StreamComponentFactory '
-        'in the widget tree.',
-      ),
-      context.describeElement('The context used was'),
-    ]);
+    return StreamComponentBuilders();
   }
 
   /// Finds the [StreamComponentBuilders] from the closest
@@ -191,6 +163,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamListTileProps>? listTile,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
+    StreamComponentBuilder<StreamReactionsProps>? reactions,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
@@ -211,6 +184,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       listTile: listTile,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
+      reactions: reactions,
       extensions: _extensionIterableToMap(extensions),
     );
   }
@@ -232,6 +206,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.listTile,
     required this.onlineIndicator,
     required this.progressBar,
+    required this.reactions,
     required this.extensions,
   });
 
@@ -328,6 +303,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
   final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
+
+  /// Custom builder for reaction widgets.
+  ///
+  /// When null, [StreamReactions] uses [DefaultStreamReactions].
+  final StreamComponentBuilder<StreamReactionsProps>? reactions;
 
   // Convert the [extensionsIterable] passed to [StreamComponentBuilders.new]
   // to the stored [extensions] map, where each entry's key consists of the extension's type.

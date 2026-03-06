@@ -18,6 +18,7 @@ import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
+import 'components/stream_reaction_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -106,6 +107,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamReactionsThemeData? reactionsTheme,
   }) {
     platform ??= defaultTargetPlatform;
     final isDark = brightness == Brightness.dark;
@@ -136,6 +138,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     progressBarTheme ??= const StreamProgressBarThemeData();
+    reactionsTheme ??= const StreamReactionsThemeData();
 
     return .raw(
       brightness: brightness,
@@ -160,6 +163,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       progressBarTheme: progressBarTheme,
+      reactionsTheme: reactionsTheme,
     );
   }
 
@@ -198,6 +202,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.inputTheme,
     required this.onlineIndicatorTheme,
     required this.progressBarTheme,
+    required this.reactionsTheme,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -300,6 +305,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The progress bar theme for this theme.
   final StreamProgressBarThemeData progressBarTheme;
 
+  /// The reaction theme for this theme.
+  final StreamReactionsThemeData reactionsTheme;
+
   /// Creates a copy of this theme but with platform-dependent primitives
   /// recomputed for the given [platform].
   ///
@@ -343,6 +351,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       progressBarTheme: progressBarTheme,
+      reactionsTheme: reactionsTheme,
     );
   }
 }
