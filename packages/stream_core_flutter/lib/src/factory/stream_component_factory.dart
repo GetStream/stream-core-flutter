@@ -147,6 +147,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamListTileProps>? listTile,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
+    StreamComponentBuilder<StreamReactionsProps>? reactions,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
@@ -168,6 +169,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       listTile: listTile,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
+      reactions: reactions,
       extensions: _extensionIterableToMap(extensions),
     );
   }
@@ -190,6 +192,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.listTile,
     required this.onlineIndicator,
     required this.progressBar,
+    required this.reactions,
     required this.extensions,
   });
 
@@ -292,6 +295,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
   final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
+
+  /// Custom builder for reaction widgets.
+  ///
+  /// When null, [StreamReactions] uses [DefaultStreamReactions].
+  final StreamComponentBuilder<StreamReactionsProps>? reactions;
 
   // Convert the [extensionsIterable] passed to [StreamComponentBuilders.new]
   // to the stored [extensions] map, where each entry's key consists of the extension's type.

@@ -29,33 +29,62 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final isAddEmojiType = context.knobs.boolean(
-      label: 'Add Emoji Type',
-      description: 'Switches to the add-reaction icon variant (no emoji or count).',
+    final chipType = context.knobs.object.dropdown(
+      label: 'Chip Type',
+      options: _ChipType.values,
+      initialOption: _ChipType.single,
+      labelBuilder: (t) => t.label,
+      description: 'Which chip variant to display.',
     );
 
-    final emoji = isAddEmojiType
-        ? null
-        : context.knobs.object.dropdown(
+    final isSingle = chipType == _ChipType.single;
+    final isCluster = chipType == _ChipType.cluster;
+    final isOverflow = chipType == _ChipType.overflow;
+    final isAddEmoji = chipType == _ChipType.addEmoji;
+
+    final emoji = isSingle
+        ? context.knobs.object.dropdown(
             label: 'Emoji',
             options: _sampleEmojis,
             initialOption: _sampleEmojis.first,
             labelBuilder: (e) => '${e.emoji}  ${e.name}',
             description: 'The emoji to display.',
-          );
+          )
+        : null;
+
+    final clusterSize = isCluster
+        ? context.knobs.int.slider(
+            label: 'Cluster Size',
+            initialValue: 3,
+            min: 1,
+            max: _sampleEmojis.length,
+            description: 'Number of emoji icons shown inside the cluster chip.',
+          )
+        : null;
+
+    final overflowCount = isOverflow
+        ? context.knobs.int.slider(
+            label: 'Overflow Count',
+            initialValue: 7,
+            min: 1,
+            max: 99,
+            description: 'The overflow count displayed as +N.',
+          )
+        : null;
 
     final showCount =
-        !isAddEmojiType &&
+        !isAddEmoji &&
+        !isOverflow &&
         context.knobs.boolean(
           label: 'Show Count',
           initialValue: true,
           description: 'Whether to show the reaction count label.',
         );
 
-    final count = (!isAddEmojiType && showCount)
+    final count = (!isAddEmoji && !isOverflow && showCount)
         ? context.knobs.int.slider(
             label: 'Count',
-            initialValue: 1,
+            initialValue: isCluster ? 12 : 1,
             min: 1,
             max: 99,
             description: 'The reaction count to display.',
@@ -96,18 +125,32 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
     }
 
     return Center(
-      child: isAddEmojiType
-          ? StreamEmojiChip.addEmoji(
-              onPressed: isDisabled ? null : onPressed,
-              onLongPress: (showLongPress && !isDisabled) ? onLongPressed : null,
-            )
-          : StreamEmojiChip(
-              emoji: Text(emoji!.emoji),
-              count: count,
-              isSelected: _isSelected,
-              onPressed: isDisabled ? null : onPressed,
-              onLongPress: (showLongPress && !isDisabled) ? onLongPressed : null,
-            ),
+      child: switch (chipType) {
+        _ChipType.addEmoji => StreamEmojiChip.addEmoji(
+          onPressed: isDisabled ? null : onPressed,
+          onLongPress: (showLongPress && !isDisabled) ? onLongPressed : null,
+        ),
+        _ChipType.overflow => StreamEmojiChip.overflow(
+          count: overflowCount!,
+          onPressed: isDisabled ? null : onPressed,
+        ),
+        _ChipType.cluster => StreamEmojiChip.cluster(
+          emojis: [
+            for (final e in _sampleEmojis.take(clusterSize!)) Text(e.emoji),
+          ],
+          count: count,
+          isSelected: _isSelected,
+          onPressed: isDisabled ? null : onPressed,
+          onLongPress: (showLongPress && !isDisabled) ? onLongPressed : null,
+        ),
+        _ChipType.single => StreamEmojiChip(
+          emoji: Text(emoji!.emoji),
+          count: count,
+          isSelected: _isSelected,
+          onPressed: isDisabled ? null : onPressed,
+          onLongPress: (showLongPress && !isDisabled) ? onLongPressed : null,
+        ),
+      },
     );
   }
 }
@@ -135,6 +178,8 @@ Widget buildStreamEmojiChipShowcase(BuildContext context) {
         spacing: spacing.xl,
         children: const [
           _TypeVariantsSection(),
+          _ClusterVariantsSection(),
+          _OverflowVariantsSection(),
           _CountValuesSection(),
           _StateMatrixSection(),
           _RealWorldSection(),
@@ -182,7 +227,8 @@ class _TypeVariantsSection extends StatelessWidget {
             spacing: spacing.md,
             children: [
               Text(
-                'Standard chip (with count, without count, selected) and Add Emoji chip.',
+                'Single-emoji chip (with count, without count, selected), '
+                'cluster chip, overflow chip, and Add Emoji chip.',
                 style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary),
               ),
               Wrap(
@@ -210,6 +256,21 @@ class _TypeVariantsSection extends StatelessWidget {
                       emoji: const Text('👍'),
                       count: 3,
                       isSelected: true,
+                      onPressed: () {},
+                    ),
+                  ),
+                  _TypeDemo(
+                    label: 'Cluster',
+                    child: StreamEmojiChip.cluster(
+                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      count: 12,
+                      onPressed: () {},
+                    ),
+                  ),
+                  _TypeDemo(
+                    label: 'Overflow',
+                    child: StreamEmojiChip.overflow(
+                      count: 7,
                       onPressed: () {},
                     ),
                   ),
@@ -249,6 +310,180 @@ class _TypeDemo extends StatelessWidget {
           style: textTheme.metadataEmphasis.copyWith(
             color: colorScheme.accentPrimary,
             fontFamily: 'monospace',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Cluster Variants Section
+// =============================================================================
+
+class _ClusterVariantsSection extends StatelessWidget {
+  const _ClusterVariantsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: [
+        const _SectionLabel(label: 'CLUSTER VARIANTS'),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurfaceSubtle,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: spacing.md,
+            children: [
+              Text(
+                'Cluster chips render 1–4 emoji icons side-by-side, each '
+                'individually sized. The total reaction count is shown after the icons.',
+                style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary),
+              ),
+              Wrap(
+                spacing: spacing.md,
+                runSpacing: spacing.md,
+                children: [
+                  _TypeDemo(
+                    label: '1 emoji',
+                    child: StreamEmojiChip.cluster(
+                      emojis: const [Text('👍')],
+                      count: 5,
+                      onPressed: () {},
+                    ),
+                  ),
+                  _TypeDemo(
+                    label: '2 emojis',
+                    child: StreamEmojiChip.cluster(
+                      emojis: const [Text('👍'), Text('❤️')],
+                      count: 9,
+                      onPressed: () {},
+                    ),
+                  ),
+                  _TypeDemo(
+                    label: '3 emojis',
+                    child: StreamEmojiChip.cluster(
+                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      count: 17,
+                      onPressed: () {},
+                    ),
+                  ),
+                  _TypeDemo(
+                    label: '4 emojis',
+                    child: StreamEmojiChip.cluster(
+                      emojis: const [Text('👍'), Text('❤️'), Text('😂'), Text('🔥')],
+                      count: 42,
+                      onPressed: () {},
+                    ),
+                  ),
+                  _TypeDemo(
+                    label: 'no count',
+                    child: StreamEmojiChip.cluster(
+                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      onPressed: () {},
+                    ),
+                  ),
+                  _TypeDemo(
+                    label: 'selected',
+                    child: StreamEmojiChip.cluster(
+                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      count: 12,
+                      isSelected: true,
+                      onPressed: () {},
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Overflow Variants Section
+// =============================================================================
+
+class _OverflowVariantsSection extends StatelessWidget {
+  const _OverflowVariantsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: [
+        const _SectionLabel(label: 'OVERFLOW VARIANTS'),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurfaceSubtle,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: spacing.md,
+            children: [
+              Text(
+                'Overflow chips display a +N label for collapsed items. '
+                'The count uses the numeric text style rather than emoji sizing.',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textSecondary,
+                ),
+              ),
+              Wrap(
+                spacing: spacing.md,
+                runSpacing: spacing.md,
+                children: [
+                  for (final count in [1, 3, 7, 15, 42, 99])
+                    _TypeDemo(
+                      label: '+$count',
+                      child: StreamEmojiChip.overflow(
+                        count: count,
+                        onPressed: () {},
+                      ),
+                    ),
+                  _TypeDemo(
+                    label: 'disabled',
+                    child: StreamEmojiChip.overflow(count: 5),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ],
@@ -364,72 +599,112 @@ class _StateMatrixSection extends StatelessWidget {
             children: [
               Text(
                 'Hover and press states are interactive — try them. '
-                'Selected state applies only to the standard chip.',
+                'Selected state applies only to single and cluster chips. '
+                'Overflow chips do not support selection.',
                 style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary),
               ),
-              // Header
-              Row(
-                children: [
-                  const SizedBox(width: 88),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Standard',
-                        style: textTheme.metadataEmphasis.copyWith(
-                          color: colorScheme.textTertiary,
-                          fontSize: 10,
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 520),
+                  child: Column(
+                    spacing: spacing.md,
+                    children: [
+                      _StateRow(
+                        stateLabel: '',
+                        standardChip: Text(
+                          'Single',
+                          style: textTheme.metadataEmphasis.copyWith(
+                            color: colorScheme.textTertiary,
+                            fontSize: 10,
+                          ),
+                        ),
+                        clusterChip: Text(
+                          'Cluster',
+                          style: textTheme.metadataEmphasis.copyWith(
+                            color: colorScheme.textTertiary,
+                            fontSize: 10,
+                          ),
+                        ),
+                        overflowChip: Text(
+                          'Overflow',
+                          style: textTheme.metadataEmphasis.copyWith(
+                            color: colorScheme.textTertiary,
+                            fontSize: 10,
+                          ),
+                        ),
+                        addEmojiChip: Text(
+                          'Add Emoji',
+                          style: textTheme.metadataEmphasis.copyWith(
+                            color: colorScheme.textTertiary,
+                            fontSize: 10,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Add Emoji',
-                        style: textTheme.metadataEmphasis.copyWith(
-                          color: colorScheme.textTertiary,
-                          fontSize: 10,
+                      _StateRow(
+                        stateLabel: 'default',
+                        standardChip: StreamEmojiChip(
+                          emoji: const Text('👍'),
+                          count: 3,
+                          onPressed: () {},
                         ),
+                        clusterChip: StreamEmojiChip.cluster(
+                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          count: 12,
+                          onPressed: () {},
+                        ),
+                        overflowChip: StreamEmojiChip.overflow(
+                          count: 7,
+                          onPressed: () {},
+                        ),
+                        addEmojiChip: StreamEmojiChip.addEmoji(onPressed: () {}),
                       ),
-                    ),
+                      _StateRow(
+                        stateLabel: 'selected',
+                        standardChip: StreamEmojiChip(
+                          emoji: const Text('👍'),
+                          count: 3,
+                          isSelected: true,
+                          onPressed: () {},
+                        ),
+                        clusterChip: StreamEmojiChip.cluster(
+                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          count: 12,
+                          isSelected: true,
+                          onPressed: () {},
+                        ),
+                        addEmojiChip: null,
+                      ),
+                      _StateRow(
+                        stateLabel: 'disabled',
+                        standardChip: StreamEmojiChip(
+                          emoji: const Text('👍'),
+                          count: 3,
+                        ),
+                        clusterChip: StreamEmojiChip.cluster(
+                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          count: 12,
+                        ),
+                        overflowChip: StreamEmojiChip.overflow(count: 7),
+                        addEmojiChip: StreamEmojiChip.addEmoji(),
+                      ),
+                      _StateRow(
+                        stateLabel: 'selected\n+ disabled',
+                        standardChip: StreamEmojiChip(
+                          emoji: const Text('👍'),
+                          count: 3,
+                          isSelected: true,
+                        ),
+                        clusterChip: StreamEmojiChip.cluster(
+                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          count: 12,
+                          isSelected: true,
+                        ),
+                        addEmojiChip: null,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              _StateRow(
-                stateLabel: 'default',
-                standardChip: StreamEmojiChip(
-                  emoji: const Text('👍'),
-                  count: 3,
-                  onPressed: () {},
                 ),
-                addEmojiChip: StreamEmojiChip.addEmoji(onPressed: () {}),
-              ),
-              _StateRow(
-                stateLabel: 'selected',
-                standardChip: StreamEmojiChip(
-                  emoji: const Text('👍'),
-                  count: 3,
-                  isSelected: true,
-                  onPressed: () {},
-                ),
-                addEmojiChip: null, // selection not applicable for addEmoji
-              ),
-              _StateRow(
-                stateLabel: 'disabled',
-                standardChip: StreamEmojiChip(
-                  emoji: const Text('👍'),
-                  count: 3,
-                ),
-                addEmojiChip: StreamEmojiChip.addEmoji(),
-              ),
-              _StateRow(
-                stateLabel: 'selected\n+ disabled',
-                standardChip: StreamEmojiChip(
-                  emoji: const Text('👍'),
-                  count: 3,
-                  isSelected: true,
-                ),
-                addEmojiChip: null,
               ),
             ],
           ),
@@ -443,17 +718,36 @@ class _StateRow extends StatelessWidget {
   const _StateRow({
     required this.stateLabel,
     required this.standardChip,
+    required this.clusterChip,
+    this.overflowChip,
     required this.addEmojiChip,
   });
 
   final String stateLabel;
   final Widget standardChip;
+  final Widget? clusterChip;
+  final Widget? overflowChip;
   final Widget? addEmojiChip;
+
+  static const _cellWidth = 108.0;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
+
+    Widget naText() => Text(
+      'n/a',
+      style: textTheme.metadataDefault.copyWith(
+        color: colorScheme.textDisabled,
+        fontSize: 10,
+      ),
+    );
+
+    Widget cell(Widget? child) => SizedBox(
+      width: _cellWidth,
+      child: Center(child: child ?? naText()),
+    );
 
     return Row(
       children: [
@@ -467,20 +761,10 @@ class _StateRow extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(child: Center(child: standardChip)),
-        Expanded(
-          child: Center(
-            child:
-                addEmojiChip ??
-                Text(
-                  'n/a',
-                  style: textTheme.metadataDefault.copyWith(
-                    color: colorScheme.textDisabled,
-                    fontSize: 10,
-                  ),
-                ),
-          ),
-        ),
+        cell(standardChip),
+        cell(clusterChip),
+        cell(overflowChip),
+        cell(addEmojiChip),
       ],
     );
   }
@@ -508,6 +792,13 @@ class _RealWorldSection extends StatelessWidget {
               'Interactive reaction bar below a chat message — tap to toggle, '
               'long-press would open a skin-tone picker.',
           child: _MessageReactionsExample(),
+        ),
+        _ExampleCard(
+          title: 'Clustered Reactions',
+          description:
+              'All reactions grouped into a single cluster chip — tap the chip '
+              'to see the total count; commonly used in compact message threads.',
+          child: _ClusteredReactionsExample(),
         ),
         _ExampleCard(
           title: 'Busy Reaction Bar',
@@ -604,6 +895,71 @@ class _MessageReactionsExampleState extends State<_MessageReactionsExample> {
               },
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _ClusteredReactionsExample extends StatefulWidget {
+  const _ClusteredReactionsExample();
+
+  @override
+  State<_ClusteredReactionsExample> createState() => _ClusteredReactionsExampleState();
+}
+
+class _ClusteredReactionsExampleState extends State<_ClusteredReactionsExample> {
+  static const _allReactions = [
+    ('👍', 4),
+    ('❤️', 3),
+    ('😂', 2),
+    ('🔥', 1),
+  ];
+
+  var _isSelected = false;
+
+  int get _totalCount => _allReactions.fold(0, (sum, r) => sum + r.$2);
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: spacing.xs,
+      children: [
+        Container(
+          constraints: const BoxConstraints(maxWidth: 280),
+          padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.sm),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurface,
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Text(
+            'Looks great! 🎉 Really happy with how this turned out.',
+            style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),
+          ),
+        ),
+        StreamEmojiChip.cluster(
+          emojis: [for (final (emoji, _) in _allReactions) Text(emoji)],
+          count: _totalCount,
+          isSelected: _isSelected,
+          onPressed: () {
+            setState(() => _isSelected = !_isSelected);
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Cluster tapped — show reaction details'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+          },
         ),
       ],
     );
@@ -744,6 +1100,21 @@ class _SectionLabel extends StatelessWidget {
 // =============================================================================
 // Helpers
 // =============================================================================
+
+enum _ChipType {
+  single,
+  cluster,
+  overflow,
+  addEmoji
+  ;
+
+  String get label => switch (this) {
+    _ChipType.single => 'Single',
+    _ChipType.cluster => 'Cluster',
+    _ChipType.overflow => 'Overflow',
+    _ChipType.addEmoji => 'Add Emoji',
+  };
+}
 
 Emoji _byName(String name) => UnicodeEmojis.allEmojis.firstWhere((e) => e.name == name);
 

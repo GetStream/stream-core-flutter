@@ -8,16 +8,17 @@ import '../accessories/stream_emoji.dart';
 
 /// A pill-shaped chip for displaying emoji reactions with an optional count.
 ///
-/// [StreamEmojiChip] renders an emoji alongside an optional reaction count.
-/// Use [StreamEmojiChip.addEmoji] for the add-reaction button variant, which
-/// shows the add-reaction icon instead.
+/// [StreamEmojiChip] renders one or more emojis alongside an optional reaction
+/// count. Use the default constructor for a single-emoji chip, [StreamEmojiChip.cluster]
+/// for a multi-emoji chip, and [StreamEmojiChip.addEmoji] for the add-reaction
+/// button variant.
 ///
-/// Both variants share the same theming and support hover, press, selected,
+/// All variants share the same theming and support hover, press, selected,
 /// and disabled interaction states.
 ///
 /// {@tool snippet}
 ///
-/// Display a reaction chip:
+/// Display a single-emoji reaction chip:
 ///
 /// ```dart
 /// StreamEmojiChip(
@@ -25,6 +26,19 @@ import '../accessories/stream_emoji.dart';
 ///   count: 3,
 ///   isSelected: true,
 ///   onPressed: () => toggleReaction('👍'),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Display a clustered chip with multiple emojis and a total count:
+///
+/// ```dart
+/// StreamEmojiChip.cluster(
+///   emojis: [Text('👍'), Text('❤️'), Text('😂')],
+///   count: 12,
+///   onPressed: () => showReactionDetails(),
 /// )
 /// ```
 /// {@end-tool}
@@ -45,7 +59,7 @@ import '../accessories/stream_emoji.dart';
 ///  * [StreamEmojiChipTheme], for customizing chip appearance.
 ///  * [StreamEmojiButton], for a circular emoji-only button.
 class StreamEmojiChip extends StatelessWidget {
-  /// Creates an emoji count chip displaying [emoji] and an optional [count].
+  /// Creates a single-emoji chip displaying [emoji] and an optional [count].
   ///
   /// When [count] is null the count label is hidden.
   /// When [onPressed] is null the chip is disabled.
@@ -57,12 +71,52 @@ class StreamEmojiChip extends StatelessWidget {
     VoidCallback? onLongPress,
     bool isSelected = false,
   }) : props = .new(
-         emoji: emoji,
+         emojis: [emoji],
          count: count,
          onPressed: onPressed,
          onLongPress: onLongPress,
          isSelected: isSelected,
        );
+
+  /// Creates a clustered chip displaying multiple [emojis] and an optional [count].
+  ///
+  /// Each emoji in [emojis] is rendered individually at the chip's icon size,
+  /// so the full list is visible without overflow.
+  ///
+  /// When [count] is null the count label is hidden.
+  /// When [onPressed] is null the chip is disabled.
+  StreamEmojiChip.cluster({
+    super.key,
+    required List<Widget> emojis,
+    int? count,
+    VoidCallback? onPressed,
+    VoidCallback? onLongPress,
+    bool isSelected = false,
+  }) : props = .new(
+         emojis: emojis,
+         count: count,
+         onPressed: onPressed,
+         onLongPress: onLongPress,
+         isSelected: isSelected,
+       );
+
+  /// Creates an overflow chip displaying a `+N` count label.
+  ///
+  /// Unlike the default constructor, the `+` is rendered as text using the
+  /// chip's text style rather than going through [StreamEmoji].
+  static Widget overflow({
+    Key? key,
+    required int count,
+    VoidCallback? onPressed,
+    VoidCallback? onLongPress,
+  }) {
+    return _OverflowEmojiChip(
+      key: key,
+      count: count,
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+    );
+  }
 
   /// Creates an add-emoji chip showing the add-reaction icon.
   ///
@@ -108,21 +162,24 @@ class StreamEmojiChip extends StatelessWidget {
 class StreamEmojiChipProps {
   /// Creates properties for an emoji chip.
   const StreamEmojiChipProps({
-    required this.emoji,
+    required this.emojis,
     this.count,
     this.onPressed,
     this.onLongPress,
     this.isSelected = false,
-  });
+  }) : assert(emojis.length > 0, 'emojis must not be empty');
 
-  /// The emoji content to display inside the chip.
+  /// The emoji widgets to display inside the chip.
   ///
-  /// Typically a [Text] widget containing a Unicode emoji character, e.g.
-  /// `Text('👍')`. The chip wraps this in a [StreamEmoji] internally to
-  /// ensure consistent sizing and platform-specific font fallbacks.
-  final Widget emoji;
+  /// For a standard single-emoji chip this is a one-element list, e.g.
+  /// `[Text('👍')]`. For a clustered chip it contains multiple emoji widgets,
+  /// e.g. `[Text('👍'), Text('❤️'), Text('😂')]`.
+  ///
+  /// Each item is individually wrapped in a [StreamEmoji] to ensure consistent
+  /// sizing and platform-specific font fallbacks.
+  final List<Widget> emojis;
 
-  /// The reaction count to display next to [emoji].
+  /// The reaction count to display next to the emojis.
   ///
   /// When null the count label is hidden.
   final int? count;
@@ -153,6 +210,75 @@ class DefaultStreamEmojiChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _RawEmojiChip(
+      onPressed: props.onPressed,
+      onLongPress: props.onLongPress,
+      isSelected: props.isSelected,
+      child: Row(
+        mainAxisSize: .min,
+        textBaseline: .alphabetic,
+        crossAxisAlignment: .baseline,
+        spacing: context.streamSpacing.xxs,
+        children: [
+          for (final emoji in props.emojis) StreamEmoji(emoji: emoji),
+          if (props.count case final count?) Text('$count'),
+        ],
+      ),
+    );
+  }
+}
+
+// Renders the add-reaction icon using the current theme's icon set.
+class _AddEmojiIcon extends StatelessWidget {
+  const _AddEmojiIcon();
+
+  @override
+  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAddReaction);
+}
+
+// Overflow chip that renders `+N` as a single text label styled with the
+// chip's text style. Bypasses [StreamEmoji] so the `+` uses the numeric
+// font rather than emoji font sizing.
+class _OverflowEmojiChip extends StatelessWidget {
+  const _OverflowEmojiChip({
+    super.key,
+    required this.count,
+    this.onPressed,
+    this.onLongPress,
+  });
+
+  final int count;
+  final VoidCallback? onPressed;
+  final VoidCallback? onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    return _RawEmojiChip(
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      child: Text('+$count'),
+    );
+  }
+}
+
+// Shared themed button shell used by both [DefaultStreamEmojiChip] and
+// [_OverflowEmojiChip]. Resolves all chip theme properties and renders
+// an [IconButton] with the given [child].
+class _RawEmojiChip extends StatelessWidget {
+  const _RawEmojiChip({
+    required this.child,
+    this.onPressed,
+    this.onLongPress,
+    this.isSelected = false,
+  });
+
+  final Widget child;
+  final VoidCallback? onPressed;
+  final VoidCallback? onLongPress;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
     final chipThemeStyle = context.streamEmojiChipTheme.style;
     final defaults = _StreamEmojiChipThemeDefaults(context);
 
@@ -168,11 +294,13 @@ class DefaultStreamEmojiChip extends StatelessWidget {
     final effectiveSide = chipThemeStyle?.side ?? defaults.side;
 
     return IconButton(
-      onPressed: props.onPressed,
-      onLongPress: props.onLongPress,
-      isSelected: props.isSelected,
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      isSelected: isSelected,
       iconSize: effectiveEmojiSize,
-      icon: _EmojiChipContent(emoji: props.emoji, count: props.count),
+      // Need to disable text scaling here so that the text doesn't
+      // escape the chip when the textScaleFactor is large.
+      icon: MediaQuery.withNoTextScaling(child: child),
       style: ButtonStyle(
         tapTargetSize: .shrinkWrap,
         visualDensity: .standard,
@@ -188,40 +316,6 @@ class DefaultStreamEmojiChip extends StatelessWidget {
       ),
     );
   }
-}
-
-// Internal widget to layout the emoji and count label inside the chip.
-class _EmojiChipContent extends StatelessWidget {
-  const _EmojiChipContent({required this.emoji, this.count});
-
-  final Widget emoji;
-  final int? count;
-
-  @override
-  Widget build(BuildContext context) {
-    // Need to disable text scaling here so that the text doesn't
-    // escape the chip when the textScaleFactor is large.
-    return MediaQuery.withNoTextScaling(
-      child: Row(
-        mainAxisSize: .min,
-        textBaseline: .alphabetic,
-        crossAxisAlignment: .baseline,
-        spacing: context.streamSpacing.xxs,
-        children: [
-          StreamEmoji(emoji: emoji),
-          if (count case final count?) Text('$count'),
-        ],
-      ),
-    );
-  }
-}
-
-// Renders the add-reaction icon using the current theme's icon set.
-class _AddEmojiIcon extends StatelessWidget {
-  const _AddEmojiIcon();
-
-  @override
-  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAddReaction);
 }
 
 // Provides default values for [StreamEmojiChipThemeStyle] based on

@@ -15,6 +15,7 @@ import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
+import 'components/stream_reactions_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -113,4 +114,7 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamProgressBarThemeData] from the nearest ancestor.
   StreamProgressBarThemeData get streamProgressBarTheme => StreamProgressBarTheme.of(this);
+
+  /// Returns the [StreamReactionsThemeData] from the nearest ancestor.
+  StreamReactionsThemeData get streamReactionsTheme => StreamReactionsTheme.of(this);
 }

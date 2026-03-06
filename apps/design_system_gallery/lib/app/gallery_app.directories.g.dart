@@ -34,6 +34,8 @@ import 'package:design_system_gallery/components/buttons/stream_emoji_button.dar
     as _design_system_gallery_components_buttons_stream_emoji_button;
 import 'package:design_system_gallery/components/common/stream_checkbox.dart'
     as _design_system_gallery_components_common_stream_checkbox;
+import 'package:design_system_gallery/components/common/stream_flex.dart'
+    as _design_system_gallery_components_common_stream_flex;
 import 'package:design_system_gallery/components/common/stream_progress_bar.dart'
     as _design_system_gallery_components_common_stream_progress_bar;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
@@ -52,6 +54,8 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
+import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
+    as _design_system_gallery_components_reaction_stream_reaction;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -401,6 +405,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'StreamFlex',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_common_stream_flex
+                    .buildStreamFlexPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_common_stream_flex
+                    .buildStreamFlexShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StreamProgressBar',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -546,6 +565,28 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer
                         .buildStreamMessageComposerExample,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Reactions',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamReactions',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_reaction_stream_reaction
+                        .buildStreamReactionsPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_reaction_stream_reaction
+                        .buildStreamReactionsShowcase,
               ),
             ],
           ),

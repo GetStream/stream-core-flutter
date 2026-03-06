@@ -35,6 +35,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamReactionsThemeData? reactionsTheme,
   }) {
     final _this = (this as StreamTheme);
 
@@ -64,6 +65,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
+      reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
     );
   }
 
@@ -155,6 +157,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.progressBarTheme,
         t,
       )!,
+      reactionsTheme: StreamReactionsThemeData.lerp(
+        _this.reactionsTheme,
+        other.reactionsTheme,
+        t,
+      )!,
     );
   }
 
@@ -193,7 +200,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
-        _other.progressBarTheme == _this.progressBarTheme;
+        _other.progressBarTheme == _this.progressBarTheme &&
+        _other.reactionsTheme == _this.reactionsTheme;
   }
 
   @override
@@ -225,6 +233,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.inputTheme,
       _this.onlineIndicatorTheme,
       _this.progressBarTheme,
+      _this.reactionsTheme,
     ]);
   }
 }
