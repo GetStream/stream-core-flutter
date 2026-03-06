@@ -140,14 +140,10 @@ class StreamFlex extends MultiChildRenderObjectWidget {
   /// Defaults to 0.0.
   final double spacing;
 
-  bool get _needTextDirection {
-    switch (direction) {
-      case Axis.horizontal:
-        return true;
-      case Axis.vertical:
-        return crossAxisAlignment == CrossAxisAlignment.start || crossAxisAlignment == CrossAxisAlignment.end;
-    }
-  }
+  bool get _needTextDirection => switch (direction) {
+    Axis.horizontal => true,
+    Axis.vertical => crossAxisAlignment == CrossAxisAlignment.start || crossAxisAlignment == CrossAxisAlignment.end,
+  };
 
   /// The resolved text direction for layout.
   ///
