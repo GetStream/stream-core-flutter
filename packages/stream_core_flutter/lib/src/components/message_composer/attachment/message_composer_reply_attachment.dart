@@ -13,8 +13,8 @@ class MessageComposerReplyAttachment extends StatelessWidget {
     this.style = ReplyStyle.incoming,
   });
 
-  final String title;
-  final String subtitle;
+  final Widget title;
+  final Widget subtitle;
   final ImageProvider? image;
   final VoidCallback? onRemovePressed;
   final ReplyStyle style;
@@ -35,55 +35,43 @@ class MessageComposerReplyAttachment extends StatelessWidget {
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
       backgroundColor: backgroundColor,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 2, bottom: 2),
-              color: indicatorColor,
-              child: const SizedBox(
-                width: 2,
-                height: double.infinity,
-              ),
-            ),
-            SizedBox(width: spacing.xs),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: context.streamTextTheme.metadataEmphasis.copyWith(color: textColor)),
-                  Row(
-                    children: [
-                      if (image != null) ...[
-                        Icon(context.streamIcons.camera1, size: 12),
-                        SizedBox(width: spacing.xxs),
-                      ],
-                      Expanded(
-                        child: Text(
-                          subtitle,
-                          style: context.streamTextTheme.metadataDefault.copyWith(color: textColor),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            if (image != null) ...[
-              SizedBox(width: spacing.xs),
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(context.streamRadius.md),
-                  image: DecorationImage(image: image!, fit: BoxFit.cover),
+      child: Row(
+        spacing: spacing.xs,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 2, bottom: 2),
+            color: indicatorColor,
+            child: const SizedBox(width: 2, height: 36),
+          ),
+          Expanded(
+            child: Column(
+              spacing: spacing.xxxs,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DefaultTextStyle.merge(
+                  style: context.streamTextTheme.metadataEmphasis.copyWith(color: textColor),
+                  child: title,
                 ),
+                DefaultTextStyle.merge(
+                  style: context.streamTextTheme.metadataDefault.copyWith(color: textColor),
+                  child: subtitle,
+                ),
+              ],
+            ),
+          ),
+          if (image != null) ...[
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(context.streamRadius.md),
+                image: DecorationImage(image: image!, fit: BoxFit.cover),
               ),
-            ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }

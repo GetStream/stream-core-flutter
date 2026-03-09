@@ -18,8 +18,8 @@ void main() {
               name: '${style.name}_no_remove',
               child: _buildReplyInTheme(
                 MessageComposerReplyAttachment(
-                  title: 'Reply to John Doe',
-                  subtitle: 'We had a great time during our holiday.',
+                  title: const Text('Reply to John Doe'),
+                  subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: null,
                   style: style,
                 ),
@@ -30,8 +30,8 @@ void main() {
               name: '${style.name}_with_remove',
               child: _buildReplyInTheme(
                 MessageComposerReplyAttachment(
-                  title: 'Reply to John Doe',
-                  subtitle: 'We had a great time during our holiday.',
+                  title: const Text('Reply to John Doe'),
+                  subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: () {},
                   style: style,
                 ),
@@ -52,8 +52,8 @@ void main() {
               name: '${style.name}_no_remove',
               child: _buildReplyInTheme(
                 MessageComposerReplyAttachment(
-                  title: 'Reply to John Doe',
-                  subtitle: 'We had a great time during our holiday.',
+                  title: const Text('Reply to John Doe'),
+                  subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: null,
                   style: style,
                 ),
@@ -65,8 +65,8 @@ void main() {
               name: '${style.name}_with_remove',
               child: _buildReplyInTheme(
                 MessageComposerReplyAttachment(
-                  title: 'Reply to John Doe',
-                  subtitle: 'We had a great time during our holiday.',
+                  title: const Text('Reply to John Doe'),
+                  subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: () {},
                   style: style,
                 ),
@@ -101,8 +101,8 @@ void main() {
                     ),
                   ),
                   child: MessageComposerReplyAttachment(
-                    title: 'Reply to John Doe',
-                    subtitle: 'We had a great time during our holiday.',
+                    title: const Text('Reply to John Doe'),
+                    subtitle: const Text('We had a great time during our holiday.'),
                     onRemovePressed: null,
                     style: style,
                   ),
