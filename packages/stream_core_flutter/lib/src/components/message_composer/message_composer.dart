@@ -77,7 +77,6 @@ class _StreamCoreMessageComposerState extends State<StreamCoreMessageComposer> {
       decoration: widget.isFloating
           ? null
           : BoxDecoration(
-              color: context.streamColorScheme.backgroundElevation1,
               border: Border(
                 top: BorderSide(color: context.streamColorScheme.borderDefault),
               ),
