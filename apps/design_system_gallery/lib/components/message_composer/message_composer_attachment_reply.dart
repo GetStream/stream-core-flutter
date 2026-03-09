@@ -25,8 +25,8 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360),
       child: MessageComposerReplyAttachment(
-        title: 'Reply to John Doe',
-        subtitle: 'We had a great time during our holiday.',
+        title: const Text('Reply to John Doe'),
+        subtitle: const Text('We had a great time during our holiday.'),
         image: const AssetImage('assets/attachment_image.png'),
         onRemovePressed: () {},
         style: style,
