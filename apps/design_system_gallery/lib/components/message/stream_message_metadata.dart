@@ -241,14 +241,23 @@ class _RealWorldSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              _MessageBubble(
-                text: 'Has anyone tried the new Flutter update?',
-                color: colorScheme.backgroundSurface,
-                borderRadius: BorderRadius.only(
-                  topLeft: radius.lg,
-                  topRight: radius.lg,
-                  bottomRight: radius.lg,
-                  bottomLeft: radius.xs,
+              StreamMessageBubble(
+                backgroundColor: colorScheme.backgroundSurface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: radius.lg,
+                    topRight: radius.lg,
+                    bottomRight: radius.lg,
+                    bottomLeft: radius.xs,
+                  ),
+                ),
+                side: BorderSide(color: colorScheme.borderSubtle),
+                child: Text(
+                  'Has anyone tried the new Flutter update?',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: colorScheme.textPrimary,
+                  ),
                 ),
               ),
               StreamMessageMetadata(
@@ -264,14 +273,23 @@ class _RealWorldSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              _MessageBubble(
-                text: 'I think the new APIs are much better now',
-                color: colorScheme.backgroundSurface,
-                borderRadius: BorderRadius.only(
-                  topLeft: radius.lg,
-                  topRight: radius.lg,
-                  bottomRight: radius.lg,
-                  bottomLeft: radius.xs,
+              StreamMessageBubble(
+                backgroundColor: colorScheme.backgroundSurface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: radius.lg,
+                    topRight: radius.lg,
+                    bottomRight: radius.lg,
+                    bottomLeft: radius.xs,
+                  ),
+                ),
+                side: BorderSide(color: colorScheme.borderSubtle),
+                child: Text(
+                  'I think the new APIs are much better now',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: colorScheme.textPrimary,
+                  ),
                 ),
               ),
               StreamMessageMetadata(
@@ -290,15 +308,23 @@ class _RealWorldSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               spacing: 4,
               children: [
-                _MessageBubble(
-                  text: 'Let me check that real quick',
-                  color: colorScheme.accentPrimary,
-                  textColor: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomLeft: radius.lg,
-                    bottomRight: radius.xs,
+                StreamMessageBubble(
+                  backgroundColor: colorScheme.accentPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: radius.lg,
+                      topRight: radius.lg,
+                      bottomLeft: radius.lg,
+                      bottomRight: radius.xs,
+                    ),
+                  ),
+                  side: BorderSide.none,
+                  child: const Text(
+                    'Let me check that real quick',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 StreamMessageMetadata(
@@ -317,15 +343,23 @@ class _RealWorldSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               spacing: 4,
               children: [
-                _MessageBubble(
-                  text: 'Sure, I can help with that!',
-                  color: colorScheme.accentPrimary,
-                  textColor: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomLeft: radius.lg,
-                    bottomRight: radius.xs,
+                StreamMessageBubble(
+                  backgroundColor: colorScheme.accentPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: radius.lg,
+                      topRight: radius.lg,
+                      bottomLeft: radius.lg,
+                      bottomRight: radius.xs,
+                    ),
+                  ),
+                  side: BorderSide.none,
+                  child: const Text(
+                    'Sure, I can help with that!',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 StreamMessageMetadataTheme(
@@ -349,15 +383,23 @@ class _RealWorldSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               spacing: 4,
               children: [
-                _MessageBubble(
-                  text: 'Actually, let me rephrase that',
-                  color: colorScheme.accentPrimary,
-                  textColor: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomLeft: radius.lg,
-                    bottomRight: radius.xs,
+                StreamMessageBubble(
+                  backgroundColor: colorScheme.accentPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: radius.lg,
+                      topRight: radius.lg,
+                      bottomLeft: radius.lg,
+                      bottomRight: radius.xs,
+                    ),
+                  ),
+                  side: BorderSide.none,
+                  child: const Text(
+                    'Actually, let me rephrase that',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 StreamMessageMetadataTheme(
@@ -543,39 +585,6 @@ class _ExampleCard extends StatelessWidget {
           ),
           child,
         ],
-      ),
-    );
-  }
-}
-
-class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({
-    required this.text,
-    required this.color,
-    required this.borderRadius,
-    this.textColor,
-  });
-
-  final String text;
-  final Color color;
-  final Color? textColor;
-  final BorderRadius borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: borderRadius,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 15,
-          color: textColor ?? colorScheme.textPrimary,
-        ),
       ),
     );
   }

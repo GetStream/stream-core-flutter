@@ -181,7 +181,6 @@ class _SlotCombinationsSection extends StatelessWidget {
           child: StreamMessageReplies(
             label: const Text('5 replies'),
             avatars: _sampleAvatars(2, palette),
-            showConnector: true,
           ),
         ),
         _ExampleCard(
@@ -192,7 +191,6 @@ class _SlotCombinationsSection extends StatelessWidget {
             label: const Text('8 replies'),
             avatars: _sampleAvatars(5, palette),
             maxAvatars: 2,
-            showConnector: true,
           ),
         ),
       ],
@@ -217,7 +215,6 @@ class _AlignmentSection extends StatelessWidget {
           child: StreamMessageReplies(
             label: const Text('3 replies'),
             avatars: _sampleAvatars(2, palette),
-            showConnector: true,
           ),
         ),
         _ExampleCard(
@@ -227,7 +224,6 @@ class _AlignmentSection extends StatelessWidget {
           child: StreamMessageReplies(
             label: const Text('3 replies'),
             avatars: _sampleAvatars(2, palette),
-            showConnector: true,
             alignment: StreamMessageAlignment.end,
           ),
         ),
@@ -258,7 +254,6 @@ class _ConnectorOverflowSection extends StatelessWidget {
             child: StreamMessageReplies(
               label: const Text('3 replies'),
               avatars: _sampleAvatars(2, palette),
-              showConnector: true,
               onTap: () {},
             ),
           ),
@@ -274,7 +269,6 @@ class _ConnectorOverflowSection extends StatelessWidget {
             child: StreamMessageReplies(
               label: const Text('3 replies'),
               avatars: _sampleAvatars(2, palette),
-              showConnector: true,
               clipBehavior: Clip.hardEdge,
               onTap: () {},
             ),
@@ -301,14 +295,23 @@ class _RealWorldSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _MessageBubble(
-                text: 'Has anyone tried the new Flutter update?',
-                color: colorScheme.backgroundSurface,
-                borderRadius: BorderRadius.only(
-                  topLeft: radius.lg,
-                  topRight: radius.lg,
-                  bottomRight: radius.lg,
-                  bottomLeft: radius.xs,
+              StreamMessageBubble(
+                backgroundColor: colorScheme.backgroundSurface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: radius.lg,
+                    topRight: radius.lg,
+                    bottomRight: radius.lg,
+                    bottomLeft: radius.xs,
+                  ),
+                ),
+                side: BorderSide(color: colorScheme.borderSubtle),
+                child: Text(
+                  'Has anyone tried the new Flutter update?',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: colorScheme.textPrimary,
+                  ),
                 ),
               ),
               StreamMessageRepliesTheme(
@@ -318,7 +321,6 @@ class _RealWorldSection extends StatelessWidget {
                 child: StreamMessageReplies(
                   label: const Text('3 replies'),
                   avatars: _sampleAvatars(2, palette),
-                  showConnector: true,
                   onTap: () {},
                 ),
               ),
@@ -332,15 +334,23 @@ class _RealWorldSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _MessageBubble(
-                  text: 'Sure, I can help with that!',
-                  color: colorScheme.accentPrimary,
-                  textColor: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomLeft: radius.lg,
-                    bottomRight: radius.xs,
+                StreamMessageBubble(
+                  backgroundColor: colorScheme.accentPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: radius.lg,
+                      topRight: radius.lg,
+                      bottomLeft: radius.lg,
+                      bottomRight: radius.xs,
+                    ),
+                  ),
+                  side: BorderSide.none,
+                  child: const Text(
+                    'Sure, I can help with that!',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 StreamMessageRepliesTheme(
@@ -350,7 +360,6 @@ class _RealWorldSection extends StatelessWidget {
                   child: StreamMessageReplies(
                     label: const Text('5 replies'),
                     avatars: _sampleAvatars(3, palette),
-                    showConnector: true,
                     alignment: StreamMessageAlignment.end,
                     onTap: () {},
                   ),
@@ -364,14 +373,23 @@ class _RealWorldSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _MessageBubble(
-                text: 'Let me check that.',
-                color: colorScheme.backgroundSurface,
-                borderRadius: BorderRadius.only(
-                  topLeft: radius.lg,
-                  topRight: radius.lg,
-                  bottomRight: radius.lg,
-                  bottomLeft: radius.xs,
+              StreamMessageBubble(
+                backgroundColor: colorScheme.backgroundSurface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: radius.lg,
+                    topRight: radius.lg,
+                    bottomRight: radius.lg,
+                    bottomLeft: radius.xs,
+                  ),
+                ),
+                side: BorderSide(color: colorScheme.borderSubtle),
+                child: Text(
+                  'Let me check that.',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: colorScheme.textPrimary,
+                  ),
                 ),
               ),
               StreamMessageReplies(
@@ -420,7 +438,6 @@ class _ThemeOverrideSection extends StatelessWidget {
             child: StreamMessageReplies(
               label: const Text('3 replies'),
               avatars: _sampleAvatars(2, palette),
-              showConnector: true,
             ),
           ),
         ),
@@ -431,7 +448,6 @@ class _ThemeOverrideSection extends StatelessWidget {
           child: StreamMessageReplies(
             label: const Text('3 replies'),
             avatars: _sampleAvatars(2, palette),
-            showConnector: true,
             spacing: 16,
           ),
         ),
@@ -455,39 +471,6 @@ class _ThemeOverrideSection extends StatelessWidget {
 // =============================================================================
 
 const _kConnectorOverflowPadding = EdgeInsets.only(top: 24);
-
-class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({
-    required this.text,
-    required this.color,
-    required this.borderRadius,
-    this.textColor,
-  });
-
-  final String text;
-  final Color color;
-  final Color? textColor;
-  final BorderRadius borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: borderRadius,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 15,
-          color: textColor ?? colorScheme.textPrimary,
-        ),
-      ),
-    );
-  }
-}
 
 const _sampleImages = [
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',

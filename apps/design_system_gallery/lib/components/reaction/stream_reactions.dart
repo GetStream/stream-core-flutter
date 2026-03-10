@@ -168,16 +168,15 @@ class _ChatBubble extends StatelessWidget {
             bottomRight: bubbleRadius,
           );
 
-    final bubble = Container(
-      constraints: const BoxConstraints(maxWidth: 280),
+    final bubble = StreamMessageBubble(
+      backgroundColor: bubbleColor,
+      shape: RoundedRectangleBorder(borderRadius: bubbleBorderRadius),
+      side: BorderSide.none,
       padding: EdgeInsets.symmetric(
         horizontal: spacing.sm,
         vertical: spacing.xs,
       ),
-      decoration: BoxDecoration(
-        color: bubbleColor,
-        borderRadius: bubbleBorderRadius,
-      ),
+      constraints: const BoxConstraints(maxWidth: 280),
       child: Text(
         message,
         style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),

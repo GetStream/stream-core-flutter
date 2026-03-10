@@ -45,6 +45,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: t < 0.5 ? a.emojiChipBar : b.emojiChipBar,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       listTile: t < 0.5 ? a.listTile : b.listTile,
+      messageBubble: t < 0.5 ? a.messageBubble : b.messageBubble,
       messageMetadata: t < 0.5 ? a.messageMetadata : b.messageMetadata,
       messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
@@ -72,6 +73,7 @@ mixin _$StreamComponentBuilders {
     emojiChipBar,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamListTileProps)? listTile,
+    Widget Function(BuildContext, StreamMessageBubbleProps)? messageBubble,
     Widget Function(BuildContext, StreamMessageMetadataProps)? messageMetadata,
     Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
@@ -96,6 +98,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar ?? _this.emojiChipBar,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       listTile: listTile ?? _this.listTile,
+      messageBubble: messageBubble ?? _this.messageBubble,
       messageMetadata: messageMetadata ?? _this.messageMetadata,
       messageReplies: messageReplies ?? _this.messageReplies,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
@@ -131,6 +134,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: other.emojiChipBar,
       fileTypeIcon: other.fileTypeIcon,
       listTile: other.listTile,
+      messageBubble: other.messageBubble,
       messageMetadata: other.messageMetadata,
       messageReplies: other.messageReplies,
       onlineIndicator: other.onlineIndicator,
@@ -167,6 +171,7 @@ mixin _$StreamComponentBuilders {
         _other.emojiChipBar == _this.emojiChipBar &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.listTile == _this.listTile &&
+        _other.messageBubble == _this.messageBubble &&
         _other.messageMetadata == _this.messageMetadata &&
         _other.messageReplies == _this.messageReplies &&
         _other.onlineIndicator == _this.onlineIndicator &&
@@ -195,6 +200,7 @@ mixin _$StreamComponentBuilders {
       _this.emojiChipBar,
       _this.fileTypeIcon,
       _this.listTile,
+      _this.messageBubble,
       _this.messageMetadata,
       _this.messageReplies,
       _this.onlineIndicator,
