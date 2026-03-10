@@ -145,6 +145,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
+    StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation,
     StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble,
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
@@ -170,6 +171,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar,
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
+      messageAnnotation: messageAnnotation,
       messageBubble: messageBubble,
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
@@ -196,6 +198,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiChipBar,
     required this.fileTypeIcon,
     required this.listTile,
+    required this.messageAnnotation,
     required this.messageBubble,
     required this.messageMetadata,
     required this.messageReplies,
@@ -294,6 +297,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamListTile] uses [DefaultStreamListTile].
   final StreamComponentBuilder<StreamListTileProps>? listTile;
+
+  /// Custom builder for message annotation widgets.
+  ///
+  /// When null, [StreamMessageAnnotation] uses [DefaultStreamMessageAnnotation].
+  final StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation;
 
   /// Custom builder for message bubble widgets.
   ///

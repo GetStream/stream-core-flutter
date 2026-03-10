@@ -31,6 +31,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageAnnotationThemeData? messageAnnotationTheme,
     StreamMessageMetadataThemeData? messageMetadataTheme,
     StreamMessageRepliesThemeData? messageRepliesTheme,
     StreamMessageThemeData? messageTheme,
@@ -63,6 +64,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
+      messageAnnotationTheme:
+          messageAnnotationTheme ?? _this.messageAnnotationTheme,
       messageMetadataTheme: messageMetadataTheme ?? _this.messageMetadataTheme,
       messageRepliesTheme: messageRepliesTheme ?? _this.messageRepliesTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
@@ -149,6 +152,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.listTileTheme,
         t,
       )!,
+      messageAnnotationTheme: StreamMessageAnnotationThemeData.lerp(
+        _this.messageAnnotationTheme,
+        other.messageAnnotationTheme,
+        t,
+      )!,
       messageMetadataTheme: StreamMessageMetadataThemeData.lerp(
         _this.messageMetadataTheme,
         other.messageMetadataTheme,
@@ -211,6 +219,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.listTileTheme == _this.listTileTheme &&
+        _other.messageAnnotationTheme == _this.messageAnnotationTheme &&
         _other.messageMetadataTheme == _this.messageMetadataTheme &&
         _other.messageRepliesTheme == _this.messageRepliesTheme &&
         _other.messageTheme == _this.messageTheme &&
@@ -245,6 +254,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.listTileTheme,
+      _this.messageAnnotationTheme,
       _this.messageMetadataTheme,
       _this.messageRepliesTheme,
       _this.messageTheme,

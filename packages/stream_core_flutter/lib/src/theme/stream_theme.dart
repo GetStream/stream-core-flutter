@@ -16,6 +16,7 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_list_tile_theme.dart';
+import 'components/stream_message_annotation_theme.dart';
 import 'components/stream_message_metadata_theme.dart';
 import 'components/stream_message_replies_theme.dart';
 import 'components/stream_message_theme.dart';
@@ -107,6 +108,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageAnnotationThemeData? messageAnnotationTheme,
     StreamMessageMetadataThemeData? messageMetadataTheme,
     StreamMessageRepliesThemeData? messageRepliesTheme,
     StreamMessageThemeData? messageTheme,
@@ -141,6 +143,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     emojiChipTheme ??= const StreamEmojiChipThemeData();
     listTileTheme ??= const StreamListTileThemeData();
+    messageAnnotationTheme ??= const StreamMessageAnnotationThemeData();
     messageMetadataTheme ??= const StreamMessageMetadataThemeData();
     messageRepliesTheme ??= const StreamMessageRepliesThemeData();
     messageTheme ??= const StreamMessageThemeData();
@@ -169,6 +172,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       listTileTheme: listTileTheme,
+      messageAnnotationTheme: messageAnnotationTheme,
       messageMetadataTheme: messageMetadataTheme,
       messageRepliesTheme: messageRepliesTheme,
       messageTheme: messageTheme,
@@ -211,6 +215,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.emojiButtonTheme,
     required this.emojiChipTheme,
     required this.listTileTheme,
+    required this.messageAnnotationTheme,
     required this.messageMetadataTheme,
     required this.messageRepliesTheme,
     required this.messageTheme,
@@ -311,6 +316,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The list tile theme for this theme.
   final StreamListTileThemeData listTileTheme;
 
+  /// The message annotation theme for this theme.
+  final StreamMessageAnnotationThemeData messageAnnotationTheme;
+
   /// The message metadata theme for this theme.
   final StreamMessageMetadataThemeData messageMetadataTheme;
 
@@ -372,6 +380,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       listTileTheme: listTileTheme,
+      messageAnnotationTheme: messageAnnotationTheme,
       messageMetadataTheme: messageMetadataTheme,
       messageRepliesTheme: messageRepliesTheme,
       messageTheme: messageTheme,

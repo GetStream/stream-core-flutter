@@ -12,6 +12,7 @@ export 'theme/components/stream_emoji_button_theme.dart';
 export 'theme/components/stream_emoji_chip_theme.dart';
 export 'theme/components/stream_input_theme.dart';
 export 'theme/components/stream_list_tile_theme.dart';
+export 'theme/components/stream_message_annotation_theme.dart';
 export 'theme/components/stream_message_bubble_theme.dart';
 export 'theme/components/stream_message_metadata_theme.dart';
 export 'theme/components/stream_message_replies_theme.dart';
