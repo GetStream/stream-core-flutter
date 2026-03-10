@@ -31,6 +31,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageMetadataThemeData? messageMetadataTheme,
+    StreamMessageRepliesThemeData? messageRepliesTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
@@ -61,6 +63,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
+      messageMetadataTheme: messageMetadataTheme ?? _this.messageMetadataTheme,
+      messageRepliesTheme: messageRepliesTheme ?? _this.messageRepliesTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
@@ -145,6 +149,16 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.listTileTheme,
         t,
       )!,
+      messageMetadataTheme: StreamMessageMetadataThemeData.lerp(
+        _this.messageMetadataTheme,
+        other.messageMetadataTheme,
+        t,
+      )!,
+      messageRepliesTheme: StreamMessageRepliesThemeData.lerp(
+        _this.messageRepliesTheme,
+        other.messageRepliesTheme,
+        t,
+      )!,
       messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
       inputTheme: t < 0.5 ? _this.inputTheme : other.inputTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
@@ -197,6 +211,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.listTileTheme == _this.listTileTheme &&
+        _other.messageMetadataTheme == _this.messageMetadataTheme &&
+        _other.messageRepliesTheme == _this.messageRepliesTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
@@ -229,6 +245,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.listTileTheme,
+      _this.messageMetadataTheme,
+      _this.messageRepliesTheme,
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,

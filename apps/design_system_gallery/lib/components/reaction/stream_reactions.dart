@@ -184,6 +184,21 @@ class _ChatBubble extends StatelessWidget {
       ),
     );
 
+    final metadata = isOutgoing
+        ? StreamMessageMetadataTheme(
+            data: StreamMessageMetadataThemeData(
+              statusColor: colorScheme.accentPrimary,
+            ),
+            child: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+            ),
+          )
+        : StreamMessageMetadata(
+            timestamp: const Text('09:40'),
+            username: const Text('Alice'),
+          );
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: isOutgoing ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -192,12 +207,7 @@ class _ChatBubble extends StatelessWidget {
         SizedBox(height: spacing.xxs),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: spacing.xxs),
-          child: Text(
-            isOutgoing ? '09:41 · Read' : '09:40',
-            style: textTheme.metadataDefault.copyWith(
-              color: colorScheme.textTertiary,
-            ),
-          ),
+          child: metadata,
         ),
       ],
     );

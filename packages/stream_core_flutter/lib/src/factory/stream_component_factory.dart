@@ -145,6 +145,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
+    StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
+    StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
@@ -167,6 +169,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar,
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
+      messageMetadata: messageMetadata,
+      messageReplies: messageReplies,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
       reactions: reactions,
@@ -190,6 +194,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiChipBar,
     required this.fileTypeIcon,
     required this.listTile,
+    required this.messageMetadata,
+    required this.messageReplies,
     required this.onlineIndicator,
     required this.progressBar,
     required this.reactions,
@@ -285,6 +291,16 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamListTile] uses [DefaultStreamListTile].
   final StreamComponentBuilder<StreamListTileProps>? listTile;
+
+  /// Custom builder for message metadata widgets.
+  ///
+  /// When null, [StreamMessageMetadata] uses [DefaultStreamMessageMetadata].
+  final StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata;
+
+  /// Custom builder for message replies widgets.
+  ///
+  /// When null, [StreamMessageReplies] uses [DefaultStreamMessageReplies].
+  final StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies;
 
   /// Custom builder for online indicator widgets.
   ///

@@ -46,6 +46,10 @@ import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.
     as _design_system_gallery_components_controls_stream_emoji_chip_bar;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
+import 'package:design_system_gallery/components/message/stream_message_metadata.dart'
+    as _design_system_gallery_components_message_stream_message_metadata;
+import 'package:design_system_gallery/components/message/stream_message_replies.dart'
+    as _design_system_gallery_components_message_stream_message_replies;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
@@ -55,7 +59,7 @@ import 'package:design_system_gallery/components/message_composer/message_compos
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
 import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
-    as _design_system_gallery_components_reaction_stream_reaction;
+    as _design_system_gallery_components_reaction_stream_reactions;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -516,6 +520,45 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'Message',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamMessageMetadata',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_stream_message_metadata
+                        .buildStreamMessageMetadataPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_stream_message_metadata
+                        .buildStreamMessageMetadataShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamMessageReplies',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_stream_message_replies
+                        .buildStreamMessageRepliesPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_stream_message_replies
+                        .buildStreamMessageRepliesShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
@@ -579,13 +622,13 @@ final directories = <_widgetbook.WidgetbookNode>[
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_reaction_stream_reaction
+                    _design_system_gallery_components_reaction_stream_reactions
                         .buildStreamReactionsPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Showcase',
                 builder:
-                    _design_system_gallery_components_reaction_stream_reaction
+                    _design_system_gallery_components_reaction_stream_reactions
                         .buildStreamReactionsShowcase,
               ),
             ],
