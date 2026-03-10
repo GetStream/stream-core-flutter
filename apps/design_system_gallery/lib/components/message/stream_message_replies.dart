@@ -205,8 +205,7 @@ class _AlignmentSection extends StatelessWidget {
 
     return _Section(
       label: 'ALIGNMENT',
-      description:
-          'Controls element order. Start = [connector, avatars, label]; End = [label, avatars, connector].',
+      description: 'Controls element order. Start = [connector, avatars, label]; End = [label, avatars, connector].',
       children: [
         _ExampleCard(
           label: 'Start alignment (default)',
@@ -240,8 +239,7 @@ class _ConnectorOverflowSection extends StatelessWidget {
 
     return _Section(
       label: 'CONNECTOR OVERFLOW',
-      description:
-          'The connector extends above the row bounds. clipBehavior controls whether it is clipped.',
+      description: 'The connector extends above the row bounds. clipBehavior controls whether it is clipped.',
       children: [
         _ExampleCard(
           label: 'Clip.none (default)',
@@ -298,11 +296,11 @@ class _RealWorldSection extends StatelessWidget {
               StreamMessageBubble(
                 backgroundColor: colorScheme.backgroundSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomRight: radius.lg,
-                    bottomLeft: radius.xs,
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: radius.lg,
+                    topEnd: radius.lg,
+                    bottomEnd: radius.lg,
+                    bottomStart: radius.xs,
                   ),
                 ),
                 side: BorderSide(color: colorScheme.borderSubtle),
@@ -337,11 +335,11 @@ class _RealWorldSection extends StatelessWidget {
                 StreamMessageBubble(
                   backgroundColor: colorScheme.accentPrimary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: radius.lg,
-                      topRight: radius.lg,
-                      bottomLeft: radius.lg,
-                      bottomRight: radius.xs,
+                    borderRadius: BorderRadiusDirectional.only(
+                      topStart: radius.lg,
+                      topEnd: radius.lg,
+                      bottomStart: radius.lg,
+                      bottomEnd: radius.xs,
                     ),
                   ),
                   side: BorderSide.none,
@@ -376,11 +374,11 @@ class _RealWorldSection extends StatelessWidget {
               StreamMessageBubble(
                 backgroundColor: colorScheme.backgroundSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomRight: radius.lg,
-                    bottomLeft: radius.xs,
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: radius.lg,
+                    topEnd: radius.lg,
+                    bottomEnd: radius.lg,
+                    bottomStart: radius.xs,
                   ),
                 ),
                 side: BorderSide(color: colorScheme.borderSubtle),
@@ -609,10 +607,7 @@ class _ExampleCard extends StatelessWidget {
                 ),
             ],
           ),
-          if (childPadding case final padding?)
-            Padding(padding: padding, child: child)
-          else
-            child,
+          if (childPadding case final padding?) Padding(padding: padding, child: child) else child,
         ],
       ),
     );

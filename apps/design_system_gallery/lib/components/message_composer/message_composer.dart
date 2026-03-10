@@ -200,7 +200,7 @@ class _MessageBubble extends StatelessWidget {
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child:       StreamMessageBubble(
+      child: StreamMessageBubble(
         backgroundColor: isMe ? colorScheme.accentPrimary : colorScheme.backgroundApp,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),

@@ -57,26 +57,18 @@ Widget buildStreamMessageBubblePlayground(BuildContext context) {
   final colorScheme = context.streamColorScheme;
   final textTheme = context.streamTextTheme;
 
-  final backgroundColor = useOutgoingColor
-      ? colorScheme.brand.shade100
-      : colorScheme.backgroundSurface;
+  final backgroundColor = useOutgoingColor ? colorScheme.brand.shade100 : colorScheme.backgroundSurface;
 
-  final borderColor = useOutgoingColor
-      ? colorScheme.brand.shade100
-      : colorScheme.borderSubtle;
+  final borderColor = useOutgoingColor ? colorScheme.brand.shade100 : colorScheme.borderSubtle;
 
-  final textColor = useOutgoingColor
-      ? colorScheme.brand.shade900
-      : colorScheme.textPrimary;
+  final textColor = useOutgoingColor ? colorScheme.brand.shade900 : colorScheme.textPrimary;
 
   return Center(
     child: StreamMessageBubble(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-      side: showBorder
-          ? BorderSide(color: borderColor)
-          : BorderSide.none,
+      side: showBorder ? BorderSide(color: borderColor) : BorderSide.none,
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
         vertical: verticalPadding,
@@ -133,7 +125,8 @@ class _IncomingOutgoingSection extends StatelessWidget {
 
     return _Section(
       label: 'INCOMING VS OUTGOING',
-      description: 'Bubbles use different background and border colors based '
+      description:
+          'Bubbles use different background and border colors based '
           'on message direction.',
       children: [
         _ExampleCard(
@@ -182,7 +175,8 @@ class _GroupPositionsSection extends StatelessWidget {
 
     return _Section(
       label: 'GROUP POSITIONS',
-      description: 'Corner radii change based on position within a '
+      description:
+          'Corner radii change based on position within a '
           'consecutive message group.',
       children: [
         _ExampleCard(
@@ -207,11 +201,11 @@ class _GroupPositionsSection extends StatelessWidget {
               StreamMessageBubble(
                 backgroundColor: colorScheme.backgroundSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.xxl,
-                    topRight: radius.xxl,
-                    bottomLeft: tailRadius,
-                    bottomRight: radius.xxl,
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: radius.xxl,
+                    topEnd: radius.xxl,
+                    bottomStart: tailRadius,
+                    bottomEnd: radius.xxl,
                   ),
                 ),
                 side: BorderSide(color: colorScheme.borderSubtle),
@@ -220,11 +214,11 @@ class _GroupPositionsSection extends StatelessWidget {
               StreamMessageBubble(
                 backgroundColor: colorScheme.backgroundSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: tailRadius,
-                    topRight: radius.xxl,
-                    bottomLeft: tailRadius,
-                    bottomRight: radius.xxl,
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: tailRadius,
+                    topEnd: radius.xxl,
+                    bottomStart: tailRadius,
+                    bottomEnd: radius.xxl,
                   ),
                 ),
                 side: BorderSide(color: colorScheme.borderSubtle),
@@ -233,11 +227,11 @@ class _GroupPositionsSection extends StatelessWidget {
               StreamMessageBubble(
                 backgroundColor: colorScheme.backgroundSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: tailRadius,
-                    topRight: radius.xxl,
-                    bottomLeft: radius.xxl,
-                    bottomRight: radius.xxl,
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: tailRadius,
+                    topEnd: radius.xxl,
+                    bottomStart: radius.xxl,
+                    bottomEnd: radius.xxl,
                   ),
                 ),
                 side: BorderSide(color: colorScheme.borderSubtle),
@@ -321,7 +315,8 @@ class _ThemeOverrideSection extends StatelessWidget {
 
     return _Section(
       label: 'STYLE OVERRIDE',
-      description: 'Pass a custom StreamMessageBubbleStyle to override '
+      description:
+          'Pass a custom StreamMessageBubbleStyle to override '
           'individual properties.',
       children: [
         _ExampleCard(

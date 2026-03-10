@@ -244,11 +244,11 @@ class _RealWorldSection extends StatelessWidget {
               StreamMessageBubble(
                 backgroundColor: colorScheme.backgroundSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomRight: radius.lg,
-                    bottomLeft: radius.xs,
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: radius.lg,
+                    topEnd: radius.lg,
+                    bottomEnd: radius.lg,
+                    bottomStart: radius.xs,
                   ),
                 ),
                 side: BorderSide(color: colorScheme.borderSubtle),
@@ -276,11 +276,11 @@ class _RealWorldSection extends StatelessWidget {
               StreamMessageBubble(
                 backgroundColor: colorScheme.backgroundSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: radius.lg,
-                    topRight: radius.lg,
-                    bottomRight: radius.lg,
-                    bottomLeft: radius.xs,
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: radius.lg,
+                    topEnd: radius.lg,
+                    bottomEnd: radius.lg,
+                    bottomStart: radius.xs,
                   ),
                 ),
                 side: BorderSide(color: colorScheme.borderSubtle),
@@ -311,11 +311,11 @@ class _RealWorldSection extends StatelessWidget {
                 StreamMessageBubble(
                   backgroundColor: colorScheme.accentPrimary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: radius.lg,
-                      topRight: radius.lg,
-                      bottomLeft: radius.lg,
-                      bottomRight: radius.xs,
+                    borderRadius: BorderRadiusDirectional.only(
+                      topStart: radius.lg,
+                      topEnd: radius.lg,
+                      bottomStart: radius.lg,
+                      bottomEnd: radius.xs,
                     ),
                   ),
                   side: BorderSide.none,
@@ -346,11 +346,11 @@ class _RealWorldSection extends StatelessWidget {
                 StreamMessageBubble(
                   backgroundColor: colorScheme.accentPrimary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: radius.lg,
-                      topRight: radius.lg,
-                      bottomLeft: radius.lg,
-                      bottomRight: radius.xs,
+                    borderRadius: BorderRadiusDirectional.only(
+                      topStart: radius.lg,
+                      topEnd: radius.lg,
+                      bottomStart: radius.lg,
+                      bottomEnd: radius.xs,
                     ),
                   ),
                   side: BorderSide.none,
@@ -386,11 +386,11 @@ class _RealWorldSection extends StatelessWidget {
                 StreamMessageBubble(
                   backgroundColor: colorScheme.accentPrimary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: radius.lg,
-                      topRight: radius.lg,
-                      bottomLeft: radius.lg,
-                      bottomRight: radius.xs,
+                    borderRadius: BorderRadiusDirectional.only(
+                      topStart: radius.lg,
+                      topEnd: radius.lg,
+                      bottomStart: radius.lg,
+                      bottomEnd: radius.xs,
                     ),
                   ),
                   side: BorderSide.none,
@@ -598,7 +598,8 @@ enum _StatusOption {
   sending('Sending', StreamIconData.iconClock),
   sent('Sent', StreamIconData.iconCheckmark1Small),
   delivered('Delivered', StreamIconData.iconDoupleCheckmark1Small),
-  read('Read', StreamIconData.iconDoupleCheckmark1Small);
+  read('Read', StreamIconData.iconDoupleCheckmark1Small)
+  ;
 
   const _StatusOption(this.label, this.iconData);
 

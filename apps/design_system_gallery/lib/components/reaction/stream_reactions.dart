@@ -157,15 +157,15 @@ class _ChatBubble extends StatelessWidget {
 
     const bubbleRadius = Radius.circular(20);
     final bubbleBorderRadius = isOutgoing
-        ? const BorderRadius.only(
-            topLeft: bubbleRadius,
-            topRight: bubbleRadius,
-            bottomLeft: bubbleRadius,
+        ? const BorderRadiusDirectional.only(
+            topStart: bubbleRadius,
+            topEnd: bubbleRadius,
+            bottomStart: bubbleRadius,
           )
-        : const BorderRadius.only(
-            topLeft: bubbleRadius,
-            topRight: bubbleRadius,
-            bottomRight: bubbleRadius,
+        : const BorderRadiusDirectional.only(
+            topStart: bubbleRadius,
+            topEnd: bubbleRadius,
+            bottomEnd: bubbleRadius,
           );
 
     final bubble = StreamMessageBubble(
