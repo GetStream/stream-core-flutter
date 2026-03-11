@@ -9,6 +9,79 @@ part of 'stream_message_annotation_theme.dart';
 // ThemeGenGenerator
 // **************************************************************************
 
+mixin _$StreamMessageAnnotationThemeData {
+  bool get canMerge => true;
+
+  static StreamMessageAnnotationThemeData? lerp(
+    StreamMessageAnnotationThemeData? a,
+    StreamMessageAnnotationThemeData? b,
+    double t,
+  ) {
+    if (identical(a, b)) {
+      return a;
+    }
+
+    if (a == null) {
+      return t == 1.0 ? b : null;
+    }
+
+    if (b == null) {
+      return t == 0.0 ? a : null;
+    }
+
+    return StreamMessageAnnotationThemeData(
+      style: StreamMessageAnnotationStyle.lerp(a.style, b.style, t),
+    );
+  }
+
+  StreamMessageAnnotationThemeData copyWith({
+    StreamMessageAnnotationStyle? style,
+  }) {
+    final _this = (this as StreamMessageAnnotationThemeData);
+
+    return StreamMessageAnnotationThemeData(style: style ?? _this.style);
+  }
+
+  StreamMessageAnnotationThemeData merge(
+    StreamMessageAnnotationThemeData? other,
+  ) {
+    final _this = (this as StreamMessageAnnotationThemeData);
+
+    if (other == null || identical(_this, other)) {
+      return _this;
+    }
+
+    if (!other.canMerge) {
+      return other;
+    }
+
+    return copyWith(style: _this.style?.merge(other.style) ?? other.style);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final _this = (this as StreamMessageAnnotationThemeData);
+    final _other = (other as StreamMessageAnnotationThemeData);
+
+    return _other.style == _this.style;
+  }
+
+  @override
+  int get hashCode {
+    final _this = (this as StreamMessageAnnotationThemeData);
+
+    return Object.hash(runtimeType, _this.style);
+  }
+}
+
 mixin _$StreamMessageAnnotationStyle {
   bool get canMerge => true;
 
@@ -114,78 +187,5 @@ mixin _$StreamMessageAnnotationStyle {
       _this.spacing,
       _this.padding,
     );
-  }
-}
-
-mixin _$StreamMessageAnnotationThemeData {
-  bool get canMerge => true;
-
-  static StreamMessageAnnotationThemeData? lerp(
-    StreamMessageAnnotationThemeData? a,
-    StreamMessageAnnotationThemeData? b,
-    double t,
-  ) {
-    if (identical(a, b)) {
-      return a;
-    }
-
-    if (a == null) {
-      return t == 1.0 ? b : null;
-    }
-
-    if (b == null) {
-      return t == 0.0 ? a : null;
-    }
-
-    return StreamMessageAnnotationThemeData(
-      style: StreamMessageAnnotationStyle.lerp(a.style, b.style, t),
-    );
-  }
-
-  StreamMessageAnnotationThemeData copyWith({
-    StreamMessageAnnotationStyle? style,
-  }) {
-    final _this = (this as StreamMessageAnnotationThemeData);
-
-    return StreamMessageAnnotationThemeData(style: style ?? _this.style);
-  }
-
-  StreamMessageAnnotationThemeData merge(
-    StreamMessageAnnotationThemeData? other,
-  ) {
-    final _this = (this as StreamMessageAnnotationThemeData);
-
-    if (other == null || identical(_this, other)) {
-      return _this;
-    }
-
-    if (!other.canMerge) {
-      return other;
-    }
-
-    return copyWith(style: _this.style?.merge(other.style) ?? other.style);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final _this = (this as StreamMessageAnnotationThemeData);
-    final _other = (other as StreamMessageAnnotationThemeData);
-
-    return _other.style == _this.style;
-  }
-
-  @override
-  int get hashCode {
-    final _this = (this as StreamMessageAnnotationThemeData);
-
-    return Object.hash(runtimeType, _this.style);
   }
 }

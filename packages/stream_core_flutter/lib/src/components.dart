@@ -25,6 +25,7 @@ export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
 export 'components/message/stream_message_alignment.dart';
 export 'components/message/stream_message_annotation.dart' hide DefaultStreamMessageAnnotation;
 export 'components/message/stream_message_bubble.dart' hide DefaultStreamMessageBubble;
+export 'components/message/stream_message_content.dart' hide DefaultStreamMessageContent;
 export 'components/message/stream_message_group_position.dart';
 export 'components/message/stream_message_metadata.dart' hide DefaultStreamMessageMetadata;
 export 'components/message/stream_message_replies.dart' hide DefaultStreamMessageReplies;

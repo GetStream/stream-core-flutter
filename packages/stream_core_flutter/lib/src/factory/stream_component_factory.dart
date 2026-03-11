@@ -147,6 +147,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamListTileProps>? listTile,
     StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation,
     StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble,
+    StreamComponentBuilder<StreamMessageContentProps>? messageContent,
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
@@ -173,6 +174,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       listTile: listTile,
       messageAnnotation: messageAnnotation,
       messageBubble: messageBubble,
+      messageContent: messageContent,
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
       onlineIndicator: onlineIndicator,
@@ -200,6 +202,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.listTile,
     required this.messageAnnotation,
     required this.messageBubble,
+    required this.messageContent,
     required this.messageMetadata,
     required this.messageReplies,
     required this.onlineIndicator,
@@ -307,6 +310,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamMessageBubble] uses [DefaultStreamMessageBubble].
   final StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble;
+
+  /// Custom builder for message content layout widgets.
+  ///
+  /// When null, [StreamMessageContent] uses [DefaultStreamMessageContent].
+  final StreamComponentBuilder<StreamMessageContentProps>? messageContent;
 
   /// Custom builder for message metadata widgets.
   ///

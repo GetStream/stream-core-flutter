@@ -47,6 +47,7 @@ mixin _$StreamComponentBuilders {
       listTile: t < 0.5 ? a.listTile : b.listTile,
       messageAnnotation: t < 0.5 ? a.messageAnnotation : b.messageAnnotation,
       messageBubble: t < 0.5 ? a.messageBubble : b.messageBubble,
+      messageContent: t < 0.5 ? a.messageContent : b.messageContent,
       messageMetadata: t < 0.5 ? a.messageMetadata : b.messageMetadata,
       messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
@@ -77,6 +78,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamMessageAnnotationProps)?
     messageAnnotation,
     Widget Function(BuildContext, StreamMessageBubbleProps)? messageBubble,
+    Widget Function(BuildContext, StreamMessageContentProps)? messageContent,
     Widget Function(BuildContext, StreamMessageMetadataProps)? messageMetadata,
     Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
@@ -103,6 +105,7 @@ mixin _$StreamComponentBuilders {
       listTile: listTile ?? _this.listTile,
       messageAnnotation: messageAnnotation ?? _this.messageAnnotation,
       messageBubble: messageBubble ?? _this.messageBubble,
+      messageContent: messageContent ?? _this.messageContent,
       messageMetadata: messageMetadata ?? _this.messageMetadata,
       messageReplies: messageReplies ?? _this.messageReplies,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
@@ -140,6 +143,7 @@ mixin _$StreamComponentBuilders {
       listTile: other.listTile,
       messageAnnotation: other.messageAnnotation,
       messageBubble: other.messageBubble,
+      messageContent: other.messageContent,
       messageMetadata: other.messageMetadata,
       messageReplies: other.messageReplies,
       onlineIndicator: other.onlineIndicator,
@@ -178,6 +182,7 @@ mixin _$StreamComponentBuilders {
         _other.listTile == _this.listTile &&
         _other.messageAnnotation == _this.messageAnnotation &&
         _other.messageBubble == _this.messageBubble &&
+        _other.messageContent == _this.messageContent &&
         _other.messageMetadata == _this.messageMetadata &&
         _other.messageReplies == _this.messageReplies &&
         _other.onlineIndicator == _this.onlineIndicator &&
@@ -208,6 +213,7 @@ mixin _$StreamComponentBuilders {
       _this.listTile,
       _this.messageAnnotation,
       _this.messageBubble,
+      _this.messageContent,
       _this.messageMetadata,
       _this.messageReplies,
       _this.onlineIndicator,
