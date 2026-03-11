@@ -154,11 +154,14 @@ class DefaultStreamMessageContent extends StatelessWidget {
     final spacing = context.streamSpacing;
     final effectiveSpacing = props.spacing ?? spacing.xxs;
 
-    return Column(
-      mainAxisSize: .min,
-      spacing: effectiveSpacing,
-      crossAxisAlignment: .stretch,
-      children: [?props.header, props.child, ?props.footer],
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        mainAxisSize: .min,
+        spacing: effectiveSpacing,
+        crossAxisAlignment: .start,
+        children: [?props.header, props.child, ?props.footer],
+      ),
     );
   }
 }
