@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../stream_core_flutter.dart';
 
+/// A widget that represents the message composer input area.
+/// This usually contains the input field and the send or microphone button.
 class StreamMessageComposerInput extends StatelessWidget {
   const StreamMessageComposerInput({
     super.key,
@@ -65,8 +67,10 @@ class StreamMessageComposerInput extends StatelessWidget {
   }
 }
 
+/// A widget that represents the actual text input field for the message composer.
 class StreamMessageComposerInputField extends StatelessWidget {
   const StreamMessageComposerInputField({
+    super.key,
     required this.controller,
     required this.placeholder,
     this.focusNode,
@@ -78,8 +82,6 @@ class StreamMessageComposerInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: fully implement the input field
-
     final composerBorderRadius = context.streamRadius.xxxl;
     final inputTheme = context.streamInputTheme;
     final inputDefaults = InputThemeDefaults(context: context).data;
