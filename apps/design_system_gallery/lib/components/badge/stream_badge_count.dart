@@ -141,6 +141,7 @@ class _SizeDemo extends StatelessWidget {
       StreamBadgeCountSize.xs => '20px',
       StreamBadgeCountSize.sm => '24px',
       StreamBadgeCountSize.md => '32px',
+      StreamBadgeCountSize.lg => '40px',
     };
   }
 

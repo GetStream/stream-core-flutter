@@ -22,8 +22,7 @@ enum StreamAvatarGroupSize {
   xl(48),
 
   /// Extra-extra large avatar group (80px diameter).
-  xxl(80)
-  ;
+  xxl(80);
 
   /// Constructs a [StreamAvatarGroupSize] with the given diameter.
   const StreamAvatarGroupSize(this.value);
@@ -358,20 +357,19 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
   }
 
   // Returns the appropriate avatar size for the given group size.
-  StreamAvatarSize _avatarSizeForGroupSize(
-    StreamAvatarGroupSize size,
-  ) => switch (size) {
-    .lg => StreamAvatarSize.sm,
-    .xl => StreamAvatarSize.md,
-    .xxl => StreamAvatarSize.lg,
-  };
+  StreamAvatarSize _avatarSizeForGroupSize(StreamAvatarGroupSize size) =>
+      switch (size) {
+        .lg => StreamAvatarSize.sm,
+        .xl => StreamAvatarSize.md,
+        .xxl => StreamAvatarSize.xl,
+      };
 
   // Returns the appropriate badge count size for the given group size.
   StreamBadgeCountSize _badgeCountSizeForGroupSize(
     StreamAvatarGroupSize size,
   ) => switch (size) {
-    .lg => StreamBadgeCountSize.sm,
-    .xl => StreamBadgeCountSize.md,
-    .xxl => StreamBadgeCountSize.md,
+    .lg => StreamBadgeCountSize.xs,
+    .xl => StreamBadgeCountSize.sm,
+    .xxl => StreamBadgeCountSize.lg,
   };
 }
