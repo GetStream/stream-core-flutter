@@ -50,7 +50,7 @@ class StreamMessageComposerInput extends StatelessWidget {
               Expanded(
                 child:
                     inputBody ??
-                    _MessageComposerInputField(
+                    StreamMessageComposerInputField(
                       controller: controller,
                       placeholder: placeholder,
                       focusNode: focusNode,
@@ -65,8 +65,8 @@ class StreamMessageComposerInput extends StatelessWidget {
   }
 }
 
-class _MessageComposerInputField extends StatelessWidget {
-  const _MessageComposerInputField({
+class StreamMessageComposerInputField extends StatelessWidget {
+  const StreamMessageComposerInputField({
     required this.controller,
     required this.placeholder,
     this.focusNode,
