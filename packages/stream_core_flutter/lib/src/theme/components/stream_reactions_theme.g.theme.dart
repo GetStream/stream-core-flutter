@@ -33,7 +33,6 @@ mixin _$StreamReactionsThemeData {
       spacing: lerpDouble$(a.spacing, b.spacing, t),
       gap: lerpDouble$(a.gap, b.gap, t),
       overlapExtent: lerpDouble$(a.overlapExtent, b.overlapExtent, t),
-      indent: lerpDouble$(a.indent, b.indent, t),
     );
   }
 
@@ -41,7 +40,6 @@ mixin _$StreamReactionsThemeData {
     double? spacing,
     double? gap,
     double? overlapExtent,
-    double? indent,
   }) {
     final _this = (this as StreamReactionsThemeData);
 
@@ -49,7 +47,6 @@ mixin _$StreamReactionsThemeData {
       spacing: spacing ?? _this.spacing,
       gap: gap ?? _this.gap,
       overlapExtent: overlapExtent ?? _this.overlapExtent,
-      indent: indent ?? _this.indent,
     );
   }
 
@@ -68,7 +65,6 @@ mixin _$StreamReactionsThemeData {
       spacing: other.spacing,
       gap: other.gap,
       overlapExtent: other.overlapExtent,
-      indent: other.indent,
     );
   }
 
@@ -87,8 +83,7 @@ mixin _$StreamReactionsThemeData {
 
     return _other.spacing == _this.spacing &&
         _other.gap == _this.gap &&
-        _other.overlapExtent == _this.overlapExtent &&
-        _other.indent == _this.indent;
+        _other.overlapExtent == _this.overlapExtent;
   }
 
   @override
@@ -100,7 +95,6 @@ mixin _$StreamReactionsThemeData {
       _this.spacing,
       _this.gap,
       _this.overlapExtent,
-      _this.indent,
     );
   }
 }

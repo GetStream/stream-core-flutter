@@ -145,6 +145,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
+    StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation,
+    StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble,
+    StreamComponentBuilder<StreamMessageContentProps>? messageContent,
+    StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
+    StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
+    StreamComponentBuilder<StreamMessageTextProps>? messageText,
+    StreamComponentBuilder<StreamMessageWidgetProps>? messageWidget,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
@@ -167,6 +174,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar,
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
+      messageAnnotation: messageAnnotation,
+      messageBubble: messageBubble,
+      messageContent: messageContent,
+      messageMetadata: messageMetadata,
+      messageReplies: messageReplies,
+      messageText: messageText,
+      messageWidget: messageWidget,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
       reactions: reactions,
@@ -190,6 +204,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiChipBar,
     required this.fileTypeIcon,
     required this.listTile,
+    required this.messageAnnotation,
+    required this.messageBubble,
+    required this.messageContent,
+    required this.messageMetadata,
+    required this.messageReplies,
+    required this.messageText,
+    required this.messageWidget,
     required this.onlineIndicator,
     required this.progressBar,
     required this.reactions,
@@ -285,6 +306,41 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamListTile] uses [DefaultStreamListTile].
   final StreamComponentBuilder<StreamListTileProps>? listTile;
+
+  /// Custom builder for message annotation widgets.
+  ///
+  /// When null, [StreamMessageAnnotation] uses [DefaultStreamMessageAnnotation].
+  final StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation;
+
+  /// Custom builder for message bubble widgets.
+  ///
+  /// When null, [StreamMessageBubble] uses [DefaultStreamMessageBubble].
+  final StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble;
+
+  /// Custom builder for message content layout widgets.
+  ///
+  /// When null, [StreamMessageContent] uses [DefaultStreamMessageContent].
+  final StreamComponentBuilder<StreamMessageContentProps>? messageContent;
+
+  /// Custom builder for message metadata widgets.
+  ///
+  /// When null, [StreamMessageMetadata] uses [DefaultStreamMessageMetadata].
+  final StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata;
+
+  /// Custom builder for message replies widgets.
+  ///
+  /// When null, [StreamMessageReplies] uses [DefaultStreamMessageReplies].
+  final StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies;
+
+  /// Custom builder for message text (markdown) widgets.
+  ///
+  /// When null, [StreamMessageText] uses [DefaultStreamMessageText].
+  final StreamComponentBuilder<StreamMessageTextProps>? messageText;
+
+  /// Custom builder for message widget (top-level message item).
+  ///
+  /// When null, [StreamMessageWidget] uses [DefaultStreamMessageWidget].
+  final StreamComponentBuilder<StreamMessageWidgetProps>? messageWidget;
 
   /// Custom builder for online indicator widgets.
   ///

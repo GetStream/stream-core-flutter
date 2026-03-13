@@ -348,6 +348,11 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             color: config.backgroundDisabled,
             onColorChanged: config.setBackgroundDisabled,
           ),
+          ColorPickerTile(
+            label: 'backgroundHighlight',
+            color: config.backgroundHighlight,
+            onColorChanged: config.setBackgroundHighlight,
+          ),
         ],
       ),
     );

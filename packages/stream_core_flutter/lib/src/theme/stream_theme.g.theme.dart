@@ -31,6 +31,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageItemThemeData? messageItemTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
@@ -61,6 +62,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
+      messageItemTheme: messageItemTheme ?? _this.messageItemTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
@@ -145,6 +147,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.listTileTheme,
         t,
       )!,
+      messageItemTheme: StreamMessageItemThemeData.lerp(
+        _this.messageItemTheme,
+        other.messageItemTheme,
+        t,
+      )!,
       messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
       inputTheme: t < 0.5 ? _this.inputTheme : other.inputTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
@@ -197,6 +204,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.listTileTheme == _this.listTileTheme &&
+        _other.messageItemTheme == _this.messageItemTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
@@ -229,6 +237,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.listTileTheme,
+      _this.messageItemTheme,
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,
