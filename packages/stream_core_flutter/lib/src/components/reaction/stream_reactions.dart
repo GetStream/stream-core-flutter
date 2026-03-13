@@ -8,6 +8,8 @@ import '../../theme/stream_theme_extensions.dart';
 import '../accessories/stream_emoji.dart';
 import '../common/stream_flex.dart';
 import '../controls/stream_emoji_chip.dart';
+import '../message_placement/stream_message_alignment.dart';
+import '../message_placement/stream_message_placement.dart';
 
 /// Displays reactions as either individual chips or a single grouped chip.
 ///
@@ -17,6 +19,10 @@ import '../controls/stream_emoji_chip.dart';
 ///
 /// Reactions can be displayed on their own or positioned relative to a
 /// [child], such as a message bubble or container.
+///
+/// If a [StreamMessagePlacement] is found in the ancestor tree,
+/// [position], [alignment], [crossAxisAlignment], and [indent] are
+/// automatically derived from the message alignment when not explicitly set.
 ///
 /// {@tool snippet}
 ///
@@ -66,8 +72,8 @@ class StreamReactions extends StatelessWidget {
     super.key,
     required List<StreamReactionsItem> items,
     Widget? child,
-    StreamReactionsPosition position = .footer,
-    StreamReactionsAlignment alignment = .start,
+    StreamReactionsPosition? position,
+    StreamReactionsAlignment? alignment,
     int? max,
     bool overlap = true,
     double? indent,
@@ -93,8 +99,8 @@ class StreamReactions extends StatelessWidget {
     super.key,
     required List<StreamReactionsItem> items,
     Widget? child,
-    StreamReactionsPosition position = .header,
-    StreamReactionsAlignment alignment = .end,
+    StreamReactionsPosition? position,
+    StreamReactionsAlignment? alignment,
     int? max,
     bool overlap = true,
     double? indent,
@@ -148,9 +154,6 @@ class StreamReactions extends StatelessWidget {
 
 /// Properties for configuring [StreamReactions].
 ///
-/// This class holds the configuration for a reactions widget so it can be
-/// passed through the [StreamComponentFactory].
-///
 /// See also:
 ///
 ///  * [StreamReactions], which uses these properties.
@@ -162,8 +165,8 @@ class StreamReactionsProps {
     required this.type,
     required this.items,
     this.child,
-    required this.position,
-    required this.alignment,
+    this.position,
+    this.alignment,
     this.max,
     this.overlap = true,
     this.indent,
@@ -186,10 +189,10 @@ class StreamReactionsProps {
   final Widget? child;
 
   /// The vertical position of the reactions relative to the child.
-  final StreamReactionsPosition position;
+  final StreamReactionsPosition? position;
 
   /// The horizontal alignment of the reactions relative to the child.
-  final StreamReactionsAlignment alignment;
+  final StreamReactionsAlignment? alignment;
 
   /// Maximum number of visible items.
   ///
@@ -247,6 +250,7 @@ class StreamReactionsItem {
 }
 
 const _kMaxVisibleSegments = 4;
+const _kDefaultStripIndent = 8.0;
 
 /// Default implementation of [StreamReactions].
 ///
@@ -285,15 +289,41 @@ class DefaultStreamReactions extends StatelessWidget {
     // Negative spacing when overlapping makes reactions overlap the child edge.
     final columnSpacing = props.overlap ? -effectiveOverlapExtent : effectiveGap;
 
-    final effectiveCrossAxisAlignment = props.crossAxisAlignment ?? CrossAxisAlignment.start;
+    // Use the message alignment from the ancestor scope to derive sensible
+    // defaults for position, alignment, cross-axis alignment, and indent.
+    final messageAlignment = StreamMessagePlacement.alignmentOf(context);
 
-    final effectiveIndent = props.indent ?? reactionTheme.indent ?? defaults.indent;
-    final indentedStrip = Transform.translate(offset: .new(effectiveIndent, 0), child: reactionStrip);
+    var effectiveCrossAxisAlignment = props.crossAxisAlignment;
+    effectiveCrossAxisAlignment ??= switch (messageAlignment) {
+      StreamMessageAlignment.start => CrossAxisAlignment.start,
+      StreamMessageAlignment.end => CrossAxisAlignment.end,
+    };
 
-    final alignedStrip = switch (props.alignment) {
+    var effectiveAlignment = props.alignment;
+    effectiveAlignment ??= switch ((messageAlignment, props.overlap)) {
+      (StreamMessageAlignment.start, true) => StreamReactionsAlignment.end,
+      (StreamMessageAlignment.start, false) => StreamReactionsAlignment.start,
+      (StreamMessageAlignment.end, true) => StreamReactionsAlignment.start,
+      (StreamMessageAlignment.end, false) => StreamReactionsAlignment.end,
+    };
+
+    var effectiveIndent = props.indent;
+    effectiveIndent ??= switch ((effectiveAlignment, props.overlap)) {
+      (StreamReactionsAlignment.start, true) => effectiveIndent ?? -_kDefaultStripIndent,
+      (StreamReactionsAlignment.end, true) => effectiveIndent ?? _kDefaultStripIndent,
+      _ => effectiveIndent ?? 0,
+    };
+
+    final effectiveIndentOffset = Offset(effectiveIndent, 0).directional(Directionality.maybeOf(context));
+    final indentedStrip = Transform.translate(offset: effectiveIndentOffset, child: reactionStrip);
+
+    final alignedStrip = switch (effectiveAlignment) {
       .start => Align(alignment: AlignmentDirectional.centerStart, child: indentedStrip),
       .end => Align(alignment: AlignmentDirectional.centerEnd, child: indentedStrip),
     };
+
+    var effectivePosition = props.position;
+    effectivePosition ??= props.overlap ? StreamReactionsPosition.header : StreamReactionsPosition.footer;
 
     // Reactions are always the LAST child so they paint on top of the child
     // when overlapping (later children have higher z-order in Flex layout).
@@ -305,15 +335,14 @@ class DefaultStreamReactions extends StatelessWidget {
       spacing: columnSpacing,
       crossAxisAlignment: effectiveCrossAxisAlignment,
       clipBehavior: props.clipBehavior,
-      verticalDirection: switch (props.position) {
+      verticalDirection: switch (effectivePosition) {
         .header => VerticalDirection.up,
         .footer => VerticalDirection.down,
       },
       children: [props.child!, alignedStrip],
     );
 
-    if (props.overlap) return IntrinsicWidth(child: column);
-    return column;
+    return IntrinsicWidth(child: column);
   }
 
   Widget _buildSegmented(double itemSpacing, int maxVisible) {
@@ -374,7 +403,13 @@ class _StreamReactionsThemeDefaults extends StreamReactionsThemeData {
 
   @override
   double get overlapExtent => _spacing.xs;
+}
 
-  @override
-  double get indent => 0;
+/// Adapts an [Offset] for the current [TextDirection].
+extension on Offset {
+  /// Flips [dx] for RTL so a positive offset always means "toward trailing."
+  Offset directional([TextDirection? textDirection]) {
+    if (textDirection == null || textDirection == .ltr) return this;
+    return Offset(-dx, dy);
+  }
 }

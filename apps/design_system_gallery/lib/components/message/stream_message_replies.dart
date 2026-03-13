@@ -80,12 +80,12 @@ Widget buildStreamMessageRepliesPlayground(BuildContext context) {
     description: 'Vertical padding around the row content.',
   );
 
-  final clipBehavior = context.knobs.object.dropdown<Clip>(
+  final clipOption = context.knobs.object.dropdown<_ClipOption>(
     label: 'Clip Behavior',
-    options: Clip.values,
-    initialOption: Clip.none,
-    labelBuilder: (v) => v.name,
-    description: 'How to clip overflow (e.g. connector).',
+    options: _ClipOption.values,
+    initialOption: _ClipOption.none,
+    labelBuilder: (v) => v.label,
+    description: 'How to clip overflow. Theme default clips for single/bottom, none for top/middle.',
   );
 
   final palette = context.streamColorScheme.avatarPalette;
@@ -98,9 +98,11 @@ Widget buildStreamMessageRepliesPlayground(BuildContext context) {
       maxAvatars: maxAvatars.toInt(),
       showConnector: showConnector,
       alignment: alignment,
-      spacing: spacing,
-      padding: EdgeInsets.symmetric(vertical: verticalPadding),
-      clipBehavior: clipBehavior,
+      clipBehavior: clipOption.clip,
+      style: StreamMessageRepliesStyle.from(
+        spacing: spacing,
+        padding: EdgeInsets.symmetric(vertical: verticalPadding),
+      ),
       onTap: () {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
@@ -140,6 +142,7 @@ Widget buildStreamMessageRepliesShowcase(BuildContext context) {
           _AlignmentSection(),
           _ConnectorOverflowSection(),
           _RealWorldSection(),
+          _EmojiOnlySection(),
           _ThemeOverrideSection(),
         ],
       ),
@@ -177,7 +180,6 @@ class _SlotCombinationsSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'With connector',
-          childPadding: _kConnectorOverflowPadding,
           child: StreamMessageReplies(
             label: const Text('5 replies'),
             avatars: _sampleAvatars(2, palette),
@@ -186,7 +188,6 @@ class _SlotCombinationsSection extends StatelessWidget {
         _ExampleCard(
           label: 'All slots with overflow',
           subtitle: '5 avatars, max 2 — shows +3 badge.',
-          childPadding: _kConnectorOverflowPadding,
           child: StreamMessageReplies(
             label: const Text('8 replies'),
             avatars: _sampleAvatars(5, palette),
@@ -210,7 +211,6 @@ class _AlignmentSection extends StatelessWidget {
         _ExampleCard(
           label: 'Start alignment (default)',
           subtitle: 'Connector → avatars → label.',
-          childPadding: _kConnectorOverflowPadding,
           child: StreamMessageReplies(
             label: const Text('3 replies'),
             avatars: _sampleAvatars(2, palette),
@@ -219,7 +219,6 @@ class _AlignmentSection extends StatelessWidget {
         _ExampleCard(
           label: 'End alignment',
           subtitle: 'Label → avatars → connector.',
-          childPadding: _kConnectorOverflowPadding,
           child: StreamMessageReplies(
             label: const Text('3 replies'),
             avatars: _sampleAvatars(2, palette),
@@ -239,12 +238,12 @@ class _ConnectorOverflowSection extends StatelessWidget {
 
     return _Section(
       label: 'CONNECTOR OVERFLOW',
-      description: 'The connector extends above the row bounds. clipBehavior controls whether it is clipped.',
+      description:
+          'The connector extends above the row bounds. By default, single/bottom positions clip the overflow while top/middle positions do not.',
       children: [
         _ExampleCard(
-          label: 'Clip.none (default)',
-          subtitle: 'Connector paints outside the component bounds.',
-          childPadding: _kConnectorOverflowPadding,
+          label: 'Theme default (single → clipped)',
+          subtitle: 'Connector overflow is clipped at the row boundary.',
           child: DecoratedBox(
             decoration: BoxDecoration(
               border: Border.all(color: colorScheme.borderSubtle, width: 0.5),
@@ -257,9 +256,9 @@ class _ConnectorOverflowSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Clip.hardEdge',
-          subtitle: 'Connector overflow is clipped to the row bounds.',
-          childPadding: _kConnectorOverflowPadding,
+          label: 'Clip.none (explicit)',
+          subtitle: 'Connector paints outside the component bounds.',
+          childPadding: const EdgeInsets.only(top: 24),
           child: DecoratedBox(
             decoration: BoxDecoration(
               border: Border.all(color: colorScheme.borderSubtle, width: 0.5),
@@ -267,8 +266,28 @@ class _ConnectorOverflowSection extends StatelessWidget {
             child: StreamMessageReplies(
               label: const Text('3 replies'),
               avatars: _sampleAvatars(2, palette),
-              clipBehavior: Clip.hardEdge,
+              clipBehavior: Clip.none,
               onTap: () {},
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Theme default (middle → unclipped)',
+          subtitle: 'Middle position leaves connector visible for stacked messages.',
+          childPadding: const EdgeInsets.only(top: 24),
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              stackPosition: StreamMessageStackPosition.middle,
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: colorScheme.borderSubtle, width: 0.5),
+              ),
+              child: StreamMessageReplies(
+                label: const Text('3 replies'),
+                avatars: _sampleAvatars(2, palette),
+                onTap: () {},
+              ),
             ),
           ),
         ),
@@ -281,8 +300,6 @@ class _RealWorldSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.streamColorScheme.avatarPalette;
-    final colorScheme = context.streamColorScheme;
-    final radius = context.streamRadius;
 
     return _Section(
       label: 'REAL-WORLD EXAMPLES',
@@ -294,75 +311,38 @@ class _RealWorldSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'Has anyone tried the new Flutter update?',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('Has anyone tried the new Flutter update?'),
               ),
-              StreamMessageRepliesTheme(
-                data: StreamMessageRepliesThemeData(
-                  connectorColor: colorScheme.backgroundSurface,
-                ),
-                child: StreamMessageReplies(
-                  label: const Text('3 replies'),
-                  avatars: _sampleAvatars(2, palette),
-                  onTap: () {},
-                ),
+              StreamMessageReplies(
+                label: const Text('3 replies'),
+                avatars: _sampleAvatars(2, palette),
+                onTap: () {},
               ),
             ],
           ),
         ),
         _ExampleCard(
           label: 'Outgoing message with replies',
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                StreamMessageBubble(
-                  backgroundColor: colorScheme.accentPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusDirectional.only(
-                      topStart: radius.lg,
-                      topEnd: radius.lg,
-                      bottomStart: radius.lg,
-                      bottomEnd: radius.xs,
-                    ),
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  StreamMessageBubble(
+                    child: StreamMessageText('Sure, I can help with that!'),
                   ),
-                  side: BorderSide.none,
-                  child: const Text(
-                    'Sure, I can help with that!',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                StreamMessageRepliesTheme(
-                  data: StreamMessageRepliesThemeData(
-                    connectorColor: colorScheme.accentPrimary,
-                  ),
-                  child: StreamMessageReplies(
+                  StreamMessageReplies(
                     label: const Text('5 replies'),
                     avatars: _sampleAvatars(3, palette),
                     alignment: StreamMessageAlignment.end,
                     onTap: () {},
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -372,27 +352,79 @@ class _RealWorldSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'Let me check that.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('Let me check that.'),
               ),
               StreamMessageReplies(
                 label: const Text('1 reply'),
                 avatars: _sampleAvatars(1, palette),
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EmojiOnlySection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.streamColorScheme.avatarPalette;
+
+    return _Section(
+      label: 'EMOJI-ONLY MESSAGES',
+      description: 'Replies attached to emoji-only messages that render without a bubble.',
+      children: [
+        _ExampleCard(
+          label: 'Single emoji with replies',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StreamMessageText('👋'),
+              StreamMessageReplies(
+                label: const Text('2 replies'),
+                avatars: _sampleAvatars(2, palette),
+                showConnector: false,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+        _ExampleCard(
+          label: 'Two emojis, outgoing with replies',
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  StreamMessageText('❤️🔥'),
+                  StreamMessageReplies(
+                    label: const Text('4 replies'),
+                    avatars: _sampleAvatars(3, palette),
+                    alignment: StreamMessageAlignment.end,
+                    showConnector: false,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Three emojis with replies',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StreamMessageText('🎉👏🔥'),
+              StreamMessageReplies(
+                label: const Text('1 reply'),
+                avatars: _sampleAvatars(1, palette),
+                showConnector: false,
                 onTap: () {},
               ),
             ],
@@ -410,13 +442,15 @@ class _ThemeOverrideSection extends StatelessWidget {
 
     return _Section(
       label: 'THEME OVERRIDES',
-      description: 'Per-instance overrides via StreamMessageRepliesTheme.',
+      description: 'Per-instance overrides via StreamMessageItemTheme.',
       children: [
         _ExampleCard(
           label: 'Custom label color',
-          child: StreamMessageRepliesTheme(
-            data: const StreamMessageRepliesThemeData(
-              labelColor: Colors.deepPurple,
+          child: StreamMessageItemTheme(
+            data: StreamMessageItemThemeData(
+              replies: StreamMessageRepliesStyle.from(
+                labelColor: Colors.deepPurple,
+              ),
             ),
             child: StreamMessageReplies(
               label: const Text('3 replies'),
@@ -427,11 +461,12 @@ class _ThemeOverrideSection extends StatelessWidget {
         _ExampleCard(
           label: 'Custom connector',
           subtitle: 'Red connector with 3px stroke.',
-          childPadding: _kConnectorOverflowPadding,
-          child: StreamMessageRepliesTheme(
-            data: const StreamMessageRepliesThemeData(
-              connectorColor: Colors.red,
-              connectorStrokeWidth: 3,
+          child: StreamMessageItemTheme(
+            data: StreamMessageItemThemeData(
+              replies: StreamMessageRepliesStyle.from(
+                connectorColor: Colors.red,
+                connectorStrokeWidth: 3,
+              ),
             ),
             child: StreamMessageReplies(
               label: const Text('3 replies'),
@@ -442,11 +477,10 @@ class _ThemeOverrideSection extends StatelessWidget {
         _ExampleCard(
           label: 'Custom spacing',
           subtitle: 'Wider gap (16) between elements.',
-          childPadding: _kConnectorOverflowPadding,
           child: StreamMessageReplies(
             label: const Text('3 replies'),
             avatars: _sampleAvatars(2, palette),
-            spacing: 16,
+            style: StreamMessageRepliesStyle.from(spacing: 16),
           ),
         ),
         _ExampleCard(
@@ -455,8 +489,7 @@ class _ThemeOverrideSection extends StatelessWidget {
           child: StreamMessageReplies(
             label: const Text('3 replies'),
             avatars: _sampleAvatars(2, palette),
-            spacing: 4,
-            padding: EdgeInsets.zero,
+            style: StreamMessageRepliesStyle.from(spacing: 4, padding: EdgeInsets.zero),
           ),
         ),
       ],
@@ -468,7 +501,19 @@ class _ThemeOverrideSection extends StatelessWidget {
 // Helper Widgets & Data
 // =============================================================================
 
-const _kConnectorOverflowPadding = EdgeInsets.only(top: 24);
+enum _ClipOption {
+  themeDefault(null, 'Theme default'),
+  none(Clip.none, 'none'),
+  hardEdge(Clip.hardEdge, 'hardEdge'),
+  antiAlias(Clip.antiAlias, 'antiAlias'),
+  antiAliasWithSaveLayer(Clip.antiAliasWithSaveLayer, 'antiAliasWithSaveLayer')
+  ;
+
+  const _ClipOption(this.clip, this.label);
+
+  final Clip? clip;
+  final String label;
+}
 
 const _sampleImages = [
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',

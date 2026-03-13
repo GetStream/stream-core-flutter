@@ -9,12 +9,12 @@ part of 'stream_message_replies_theme.dart';
 // ThemeGenGenerator
 // **************************************************************************
 
-mixin _$StreamMessageRepliesThemeData {
+mixin _$StreamMessageRepliesStyle {
   bool get canMerge => true;
 
-  static StreamMessageRepliesThemeData? lerp(
-    StreamMessageRepliesThemeData? a,
-    StreamMessageRepliesThemeData? b,
+  static StreamMessageRepliesStyle? lerp(
+    StreamMessageRepliesStyle? a,
+    StreamMessageRepliesStyle? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -29,42 +29,75 @@ mixin _$StreamMessageRepliesThemeData {
       return t == 0.0 ? a : null;
     }
 
-    return StreamMessageRepliesThemeData(
-      labelTextStyle: TextStyle.lerp(a.labelTextStyle, b.labelTextStyle, t),
-      labelColor: Color.lerp(a.labelColor, b.labelColor, t),
-      spacing: lerpDouble$(a.spacing, b.spacing, t),
-      padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
-      connectorColor: Color.lerp(a.connectorColor, b.connectorColor, t),
-      connectorStrokeWidth: lerpDouble$(
+    return StreamMessageRepliesStyle(
+      labelTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+        a.labelTextStyle,
+        b.labelTextStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      labelColor: StreamMessageStyleProperty.lerp<Color?>(
+        a.labelColor,
+        b.labelColor,
+        t,
+        Color.lerp,
+      ),
+      spacing: StreamMessageStyleProperty.lerp<double?>(
+        a.spacing,
+        b.spacing,
+        t,
+        lerpDouble$,
+      ),
+      padding: StreamMessageStyleProperty.lerp<EdgeInsetsGeometry?>(
+        a.padding,
+        b.padding,
+        t,
+        EdgeInsetsGeometry.lerp,
+      ),
+      connectorColor: StreamMessageStyleProperty.lerp<Color?>(
+        a.connectorColor,
+        b.connectorColor,
+        t,
+        Color.lerp,
+      ),
+      connectorStrokeWidth: StreamMessageStyleProperty.lerp<double?>(
         a.connectorStrokeWidth,
         b.connectorStrokeWidth,
+        t,
+        lerpDouble$,
+      ),
+      clipBehavior: StreamMessageStyleClip.lerp(
+        a.clipBehavior,
+        b.clipBehavior,
         t,
       ),
     );
   }
 
-  StreamMessageRepliesThemeData copyWith({
-    TextStyle? labelTextStyle,
-    Color? labelColor,
-    double? spacing,
-    EdgeInsetsGeometry? padding,
-    Color? connectorColor,
-    double? connectorStrokeWidth,
+  StreamMessageRepliesStyle copyWith({
+    StreamMessageStyleProperty<TextStyle?>? labelTextStyle,
+    StreamMessageStyleProperty<Color?>? labelColor,
+    StreamMessageStyleProperty<double?>? spacing,
+    StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding,
+    StreamMessageStyleProperty<Color?>? connectorColor,
+    StreamMessageStyleProperty<double?>? connectorStrokeWidth,
+    StreamMessageStyleClip? clipBehavior,
   }) {
-    final _this = (this as StreamMessageRepliesThemeData);
+    final _this = (this as StreamMessageRepliesStyle);
 
-    return StreamMessageRepliesThemeData(
+    return StreamMessageRepliesStyle(
       labelTextStyle: labelTextStyle ?? _this.labelTextStyle,
       labelColor: labelColor ?? _this.labelColor,
       spacing: spacing ?? _this.spacing,
       padding: padding ?? _this.padding,
       connectorColor: connectorColor ?? _this.connectorColor,
       connectorStrokeWidth: connectorStrokeWidth ?? _this.connectorStrokeWidth,
+      clipBehavior: clipBehavior ?? _this.clipBehavior,
     );
   }
 
-  StreamMessageRepliesThemeData merge(StreamMessageRepliesThemeData? other) {
-    final _this = (this as StreamMessageRepliesThemeData);
+  StreamMessageRepliesStyle merge(StreamMessageRepliesStyle? other) {
+    final _this = (this as StreamMessageRepliesStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -75,14 +108,13 @@ mixin _$StreamMessageRepliesThemeData {
     }
 
     return copyWith(
-      labelTextStyle:
-          _this.labelTextStyle?.merge(other.labelTextStyle) ??
-          other.labelTextStyle,
+      labelTextStyle: other.labelTextStyle,
       labelColor: other.labelColor,
       spacing: other.spacing,
       padding: other.padding,
       connectorColor: other.connectorColor,
       connectorStrokeWidth: other.connectorStrokeWidth,
+      clipBehavior: other.clipBehavior,
     );
   }
 
@@ -96,20 +128,21 @@ mixin _$StreamMessageRepliesThemeData {
       return false;
     }
 
-    final _this = (this as StreamMessageRepliesThemeData);
-    final _other = (other as StreamMessageRepliesThemeData);
+    final _this = (this as StreamMessageRepliesStyle);
+    final _other = (other as StreamMessageRepliesStyle);
 
     return _other.labelTextStyle == _this.labelTextStyle &&
         _other.labelColor == _this.labelColor &&
         _other.spacing == _this.spacing &&
         _other.padding == _this.padding &&
         _other.connectorColor == _this.connectorColor &&
-        _other.connectorStrokeWidth == _this.connectorStrokeWidth;
+        _other.connectorStrokeWidth == _this.connectorStrokeWidth &&
+        _other.clipBehavior == _this.clipBehavior;
   }
 
   @override
   int get hashCode {
-    final _this = (this as StreamMessageRepliesThemeData);
+    final _this = (this as StreamMessageRepliesStyle);
 
     return Object.hash(
       runtimeType,
@@ -119,6 +152,7 @@ mixin _$StreamMessageRepliesThemeData {
       _this.padding,
       _this.connectorColor,
       _this.connectorStrokeWidth,
+      _this.clipBehavior,
     );
   }
 }

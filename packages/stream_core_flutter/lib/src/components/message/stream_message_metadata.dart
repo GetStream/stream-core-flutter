@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
+import '../message_placement/stream_message_placement.dart';
 
 /// The bottom metadata row of a chat message bubble.
 ///
@@ -9,7 +10,7 @@ import '../../theme.dart';
 ///
 /// All content is provided by the caller via widget slots. The provided
 /// widgets are automatically styled according to
-/// [StreamMessageMetadataThemeData].
+/// [StreamMessageMetadataStyle].
 ///
 /// {@tool snippet}
 ///
@@ -38,8 +39,8 @@ import '../../theme.dart';
 ///
 /// See also:
 ///
-///  * [StreamMessageMetadataThemeData], for customizing metadata appearance.
-///  * [StreamMessageMetadataTheme], for overriding theme in a widget subtree.
+///  * [StreamMessageMetadataStyle], for customizing metadata appearance.
+///  * [StreamMessageItemTheme], for theming via the widget tree.
 class StreamMessageMetadata extends StatelessWidget {
   /// Creates a message metadata row.
   ///
@@ -51,15 +52,13 @@ class StreamMessageMetadata extends StatelessWidget {
     Widget? status,
     Widget? username,
     Widget? edited,
-    double? spacing,
-    double? minHeight,
+    StreamMessageMetadataStyle? style,
   }) : props = .new(
          timestamp: timestamp,
          status: status,
          username: username,
          edited: edited,
-         spacing: spacing,
-         minHeight: minHeight,
+         style: style,
        );
 
   /// The properties that configure this metadata row.
@@ -85,14 +84,13 @@ class StreamMessageMetadataProps {
     this.status,
     this.username,
     this.edited,
-    this.spacing,
-    this.minHeight,
+    this.style,
   });
 
   /// The timestamp widget, typically a [Text] displaying the message time.
   ///
-  /// Styled by [StreamMessageMetadataThemeData.timestampTextStyle] and
-  /// [StreamMessageMetadataThemeData.timestampColor].
+  /// Styled by [StreamMessageMetadataStyle.timestampTextStyle] and
+  /// [StreamMessageMetadataStyle.timestampColor].
   final Widget timestamp;
 
   /// An optional status icon widget indicating delivery state.
@@ -100,31 +98,27 @@ class StreamMessageMetadataProps {
   /// Typically an [Icon] such as a clock (sending), single checkmark (sent),
   /// or double checkmark (delivered/read).
   ///
-  /// Styled by [StreamMessageMetadataThemeData.statusColor] and
-  /// [StreamMessageMetadataThemeData.statusIconSize].
+  /// Styled by [StreamMessageMetadataStyle.statusColor] and
+  /// [StreamMessageMetadataStyle.statusIconSize].
   final Widget? status;
 
   /// An optional username widget displaying the sender name.
   ///
-  /// Styled by [StreamMessageMetadataThemeData.usernameTextStyle] and
-  /// [StreamMessageMetadataThemeData.usernameColor].
+  /// Styled by [StreamMessageMetadataStyle.usernameTextStyle] and
+  /// [StreamMessageMetadataStyle.usernameColor].
   final Widget? username;
 
   /// An optional edited indicator widget.
   ///
-  /// Styled by [StreamMessageMetadataThemeData.editedTextStyle] and
-  /// [StreamMessageMetadataThemeData.editedColor].
+  /// Styled by [StreamMessageMetadataStyle.editedTextStyle] and
+  /// [StreamMessageMetadataStyle.editedColor].
   final Widget? edited;
 
-  /// The gap between main elements (username, timestamp group, edited).
+  /// Optional style overrides for placement-aware styling.
   ///
-  /// When null, falls back to [StreamMessageMetadataThemeData.spacing].
-  final double? spacing;
-
-  /// The minimum height of the metadata row.
-  ///
-  /// When null, falls back to [StreamMessageMetadataThemeData.minHeight].
-  final double? minHeight;
+  /// Fields left null fall back to the inherited [StreamMessageItemTheme],
+  /// then to built-in defaults.
+  final StreamMessageMetadataStyle? style;
 }
 
 /// The default implementation of [StreamMessageMetadata].
@@ -142,20 +136,23 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.streamMessageMetadataTheme;
-    final defaults = _StreamMessageMetadataThemeDefaults(context);
+    final placement = StreamMessagePlacement.of(context);
+    final metadataStyle = props.style ?? StreamMessageItemTheme.of(context).metadata;
+    final defaults = _StreamMessageMetadataDefaults(context);
 
-    final effectiveUsernameTextStyle = theme.usernameTextStyle ?? defaults.usernameTextStyle;
-    final effectiveUsernameColor = theme.usernameColor ?? defaults.usernameColor;
-    final effectiveTimestampTextStyle = theme.timestampTextStyle ?? defaults.timestampTextStyle;
-    final effectiveTimestampColor = theme.timestampColor ?? defaults.timestampColor;
-    final effectiveEditedTextStyle = theme.editedTextStyle ?? defaults.editedTextStyle;
-    final effectiveEditedColor = theme.editedColor ?? defaults.editedColor;
-    final effectiveStatusColor = theme.statusColor ?? defaults.statusColor;
-    final effectiveStatusIconSize = theme.statusIconSize ?? defaults.statusIconSize;
-    final effectiveSpacing = props.spacing ?? theme.spacing ?? defaults.spacing;
-    final effectiveStatusSpacing = theme.statusSpacing ?? defaults.statusSpacing;
-    final effectiveMinHeight = props.minHeight ?? theme.minHeight ?? defaults.minHeight;
+    final resolve = StreamMessageStyleResolver(placement, [metadataStyle, defaults]);
+
+    final effectiveUsernameTextStyle = resolve((s) => s?.usernameTextStyle);
+    final effectiveUsernameColor = resolve((s) => s?.usernameColor);
+    final effectiveTimestampTextStyle = resolve((s) => s?.timestampTextStyle);
+    final effectiveTimestampColor = resolve((s) => s?.timestampColor);
+    final effectiveEditedTextStyle = resolve((s) => s?.editedTextStyle);
+    final effectiveEditedColor = resolve((s) => s?.editedColor);
+    final effectiveStatusColor = resolve((s) => s?.statusColor);
+    final effectiveStatusIconSize = resolve((s) => s?.statusIconSize);
+    final effectiveSpacing = resolve((s) => s?.spacing);
+    final effectiveStatusSpacing = resolve((s) => s?.statusSpacing);
+    final effectiveMinHeight = resolve((s) => s?.minHeight);
 
     Widget? usernameWidget;
     if (props.username case final username?) {
@@ -211,8 +208,8 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
   }
 }
 
-class _StreamMessageMetadataThemeDefaults extends StreamMessageMetadataThemeData {
-  _StreamMessageMetadataThemeDefaults(this._context);
+class _StreamMessageMetadataDefaults extends StreamMessageMetadataStyle {
+  _StreamMessageMetadataDefaults(this._context);
 
   final BuildContext _context;
 
@@ -221,35 +218,35 @@ class _StreamMessageMetadataThemeDefaults extends StreamMessageMetadataThemeData
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  TextStyle get usernameTextStyle => _textTheme.metadataEmphasis;
+  StreamMessageStyleProperty<TextStyle> get usernameTextStyle => .all(_textTheme.metadataEmphasis);
 
   @override
-  Color get usernameColor => _colorScheme.textSecondary;
+  StreamMessageStyleProperty<Color> get usernameColor => .all(_colorScheme.textSecondary);
 
   @override
-  TextStyle get timestampTextStyle => _textTheme.metadataDefault;
+  StreamMessageStyleProperty<TextStyle> get timestampTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  Color get timestampColor => _colorScheme.textTertiary;
+  StreamMessageStyleProperty<Color> get timestampColor => .all(_colorScheme.textTertiary);
 
   @override
-  TextStyle get editedTextStyle => _textTheme.metadataDefault;
+  StreamMessageStyleProperty<TextStyle> get editedTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  Color get editedColor => _colorScheme.textTertiary;
+  StreamMessageStyleProperty<Color> get editedColor => .all(_colorScheme.textTertiary);
 
   @override
-  Color get statusColor => _colorScheme.textTertiary;
+  StreamMessageStyleProperty<Color> get statusColor => .all(_colorScheme.textTertiary);
 
   @override
-  double get statusIconSize => 16;
+  StreamMessageStyleProperty<double> get statusIconSize => .all(16);
 
   @override
-  double get spacing => _spacing.xs;
+  StreamMessageStyleProperty<double> get spacing => .all(_spacing.xs);
 
   @override
-  double get statusSpacing => _spacing.xxs;
+  StreamMessageStyleProperty<double> get statusSpacing => .all(_spacing.xxs);
 
   @override
-  double get minHeight => 24;
+  StreamMessageStyleProperty<double> get minHeight => .all(24);
 }

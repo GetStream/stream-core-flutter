@@ -81,13 +81,17 @@ Widget buildStreamMessageMetadataPlayground(BuildContext context) {
     status: showStatus ? Icon(statusOption.iconData) : null,
     username: showUsername ? Text(username) : null,
     edited: showEdited ? Text(editedText) : null,
-    spacing: spacing,
-    minHeight: minHeight,
+    style: StreamMessageMetadataStyle.from(
+      spacing: spacing,
+      minHeight: minHeight,
+    ),
   );
 
   if (showStatus && statusOption == _StatusOption.read) {
-    child = StreamMessageMetadataTheme(
-      data: StreamMessageMetadataThemeData(statusColor: accentPrimary),
+    child = StreamMessageItemTheme(
+      data: StreamMessageItemThemeData(
+        metadata: StreamMessageMetadataStyle.from(statusColor: accentPrimary),
+      ),
       child: child,
     );
   }
@@ -212,8 +216,10 @@ class _DeliveryStatusSection extends StatelessWidget {
         _ExampleCard(
           label: 'Read',
           subtitle: 'Accent-colored double checkmark when read.',
-          child: StreamMessageMetadataTheme(
-            data: StreamMessageMetadataThemeData(statusColor: accentPrimary),
+          child: StreamMessageItemTheme(
+            data: StreamMessageItemThemeData(
+              metadata: StreamMessageMetadataStyle.from(statusColor: accentPrimary),
+            ),
             child: StreamMessageMetadata(
               timestamp: const Text('09:41'),
               status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
@@ -229,7 +235,6 @@ class _RealWorldSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
-    final radius = context.streamRadius;
 
     return _Section(
       label: 'REAL-WORLD EXAMPLES',
@@ -242,23 +247,7 @@ class _RealWorldSection extends StatelessWidget {
             spacing: 4,
             children: [
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'Has anyone tried the new Flutter update?',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('Has anyone tried the new Flutter update?'),
               ),
               StreamMessageMetadata(
                 timestamp: const Text('09:41'),
@@ -274,23 +263,7 @@ class _RealWorldSection extends StatelessWidget {
             spacing: 4,
             children: [
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'I think the new APIs are much better now',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('I think the new APIs are much better now'),
               ),
               StreamMessageMetadata(
                 timestamp: const Text('09:38'),
@@ -302,117 +275,88 @@ class _RealWorldSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'Outgoing message (sending)',
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              spacing: 4,
-              children: [
-                StreamMessageBubble(
-                  backgroundColor: colorScheme.accentPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusDirectional.only(
-                      topStart: radius.lg,
-                      topEnd: radius.lg,
-                      bottomStart: radius.lg,
-                      bottomEnd: radius.xs,
-                    ),
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                spacing: 4,
+                children: [
+                  StreamMessageBubble(
+                    child: StreamMessageText('Let me check that real quick'),
                   ),
-                  side: BorderSide.none,
-                  child: const Text(
-                    'Let me check that real quick',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white,
-                    ),
+                  StreamMessageMetadata(
+                    timestamp: const Text('09:42'),
+                    status: const Icon(StreamIconData.iconClock),
                   ),
-                ),
-                StreamMessageMetadata(
-                  timestamp: const Text('09:42'),
-                  status: const Icon(StreamIconData.iconClock),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
         _ExampleCard(
           label: 'Outgoing message (read)',
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              spacing: 4,
-              children: [
-                StreamMessageBubble(
-                  backgroundColor: colorScheme.accentPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusDirectional.only(
-                      topStart: radius.lg,
-                      topEnd: radius.lg,
-                      bottomStart: radius.lg,
-                      bottomEnd: radius.xs,
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                spacing: 4,
+                children: [
+                  StreamMessageBubble(
+                    child: StreamMessageText('Sure, I can help with that!'),
+                  ),
+                  StreamMessageItemTheme(
+                    data: StreamMessageItemThemeData(
+                      metadata: StreamMessageMetadataStyle.from(
+                        statusColor: colorScheme.accentPrimary,
+                      ),
+                    ),
+                    child: StreamMessageMetadata(
+                      timestamp: const Text('09:40'),
+                      status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
                     ),
                   ),
-                  side: BorderSide.none,
-                  child: const Text(
-                    'Sure, I can help with that!',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                StreamMessageMetadataTheme(
-                  data: StreamMessageMetadataThemeData(
-                    statusColor: colorScheme.accentPrimary,
-                  ),
-                  child: StreamMessageMetadata(
-                    timestamp: const Text('09:40'),
-                    status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
         _ExampleCard(
           label: 'Outgoing message (read + edited)',
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              spacing: 4,
-              children: [
-                StreamMessageBubble(
-                  backgroundColor: colorScheme.accentPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusDirectional.only(
-                      topStart: radius.lg,
-                      topEnd: radius.lg,
-                      bottomStart: radius.lg,
-                      bottomEnd: radius.xs,
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                spacing: 4,
+                children: [
+                  StreamMessageBubble(
+                    child: StreamMessageText('Actually, let me rephrase that'),
+                  ),
+                  StreamMessageItemTheme(
+                    data: StreamMessageItemThemeData(
+                      metadata: StreamMessageMetadataStyle.from(
+                        statusColor: colorScheme.accentPrimary,
+                      ),
+                    ),
+                    child: StreamMessageMetadata(
+                      timestamp: const Text('09:40'),
+                      status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+                      edited: const Text('Edited'),
                     ),
                   ),
-                  side: BorderSide.none,
-                  child: const Text(
-                    'Actually, let me rephrase that',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                StreamMessageMetadataTheme(
-                  data: StreamMessageMetadataThemeData(
-                    statusColor: colorScheme.accentPrimary,
-                  ),
-                  child: StreamMessageMetadata(
-                    timestamp: const Text('09:40'),
-                    status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
-                    edited: const Text('Edited'),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -426,13 +370,15 @@ class _ThemeOverrideSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Section(
       label: 'THEME OVERRIDES',
-      description: 'Per-instance overrides via StreamMessageMetadataTheme.',
+      description: 'Per-instance overrides via StreamMessageItemTheme.',
       children: [
         _ExampleCard(
           label: 'Custom username color',
-          child: StreamMessageMetadataTheme(
-            data: const StreamMessageMetadataThemeData(
-              usernameColor: Colors.deepPurple,
+          child: StreamMessageItemTheme(
+            data: StreamMessageItemThemeData(
+              metadata: StreamMessageMetadataStyle.from(
+                usernameColor: Colors.deepPurple,
+              ),
             ),
             child: StreamMessageMetadata(
               timestamp: const Text('09:41'),
@@ -448,7 +394,7 @@ class _ThemeOverrideSection extends StatelessWidget {
             username: const Text('Alice'),
             status: const Icon(StreamIconData.iconCheckmark1Small),
             edited: const Text('Edited'),
-            spacing: 16,
+            style: StreamMessageMetadataStyle.from(spacing: 16),
           ),
         ),
         _ExampleCard(
@@ -457,8 +403,7 @@ class _ThemeOverrideSection extends StatelessWidget {
           child: StreamMessageMetadata(
             timestamp: const Text('09:41'),
             username: const Text('Alice'),
-            spacing: 4,
-            minHeight: 20,
+            style: StreamMessageMetadataStyle.from(spacing: 4, minHeight: 20),
           ),
         ),
       ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
+import '../message_placement/stream_message_placement.dart';
 
 /// An annotation row for displaying contextual message annotations.
 ///
@@ -42,11 +43,8 @@ import '../../theme.dart';
 ///
 /// See also:
 ///
-///  * [StreamMessageAnnotationStyle], for the visual style properties.
-///  * [StreamMessageAnnotationThemeData], for customizing annotation
-///    appearance.
-///  * [StreamMessageAnnotationTheme], for overriding theme in a widget
-///    subtree.
+///  * [StreamMessageAnnotationStyle], for customizing annotation appearance.
+///  * [StreamMessageItemTheme], for theming via the widget tree.
 class StreamMessageAnnotation extends StatelessWidget {
   /// Creates a message annotation row.
   ///
@@ -58,15 +56,13 @@ class StreamMessageAnnotation extends StatelessWidget {
     required Widget label,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
-    double? spacing,
-    EdgeInsetsGeometry? padding,
+    StreamMessageAnnotationStyle? style,
   }) : props = .new(
          leading: leading,
          label: label,
          onTap: onTap,
          onLongPress: onLongPress,
-         spacing: spacing,
-         padding: padding,
+         style: style,
        );
 
   /// The properties that configure this annotation row.
@@ -92,8 +88,7 @@ class StreamMessageAnnotationProps {
     required this.label,
     this.onTap,
     this.onLongPress,
-    this.spacing,
-    this.padding,
+    this.style,
   });
 
   /// The leading widget, typically an [Icon].
@@ -116,15 +111,11 @@ class StreamMessageAnnotationProps {
   /// Called when the annotation row is long-pressed.
   final VoidCallback? onLongPress;
 
-  /// The gap between the leading widget and label.
+  /// Optional style overrides for placement-aware styling.
   ///
-  /// When null, falls back to [StreamMessageAnnotationStyle.spacing].
-  final double? spacing;
-
-  /// The padding around the annotation row content.
-  ///
-  /// When null, falls back to [StreamMessageAnnotationStyle.padding].
-  final EdgeInsetsGeometry? padding;
+  /// Fields left null fall back to the inherited [StreamMessageItemTheme],
+  /// then to built-in defaults.
+  final StreamMessageAnnotationStyle? style;
 }
 
 /// The default implementation of [StreamMessageAnnotation].
@@ -142,18 +133,21 @@ class DefaultStreamMessageAnnotation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = context.streamMessageAnnotationTheme.style;
+    final placement = StreamMessagePlacement.of(context);
+    final annotationStyle = props.style ?? StreamMessageItemTheme.of(context).annotation;
     final defaults = _StreamMessageAnnotationDefaults(context);
 
-    final effectiveTextStyle = style?.textStyle ?? defaults.textStyle;
-    final effectiveTextColor = style?.textColor ?? defaults.textColor;
-    final effectiveSpacing = props.spacing ?? style?.spacing ?? defaults.spacing;
-    final effectivePadding = props.padding ?? style?.padding ?? defaults.padding;
+    final resolve = StreamMessageStyleResolver(placement, [annotationStyle, defaults]);
+
+    final effectiveTextStyle = resolve((s) => s?.textStyle);
+    final effectiveTextColor = resolve((s) => s?.textColor);
+    final effectiveSpacing = resolve((s) => s?.spacing);
+    final effectivePadding = resolve((s) => s?.padding);
 
     Widget? leadingWidget;
     if (props.leading case final leading?) {
-      final effectiveIconColor = style?.iconColor ?? defaults.iconColor;
-      final effectiveIconSize = style?.iconSize ?? defaults.iconSize;
+      final effectiveIconColor = resolve((s) => s?.iconColor);
+      final effectiveIconSize = resolve((s) => s?.iconSize);
 
       leadingWidget = IconTheme.merge(
         data: IconThemeData(color: effectiveIconColor, size: effectiveIconSize),
@@ -197,20 +191,20 @@ class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  TextStyle get textStyle => _textTheme.metadataEmphasis;
+  StreamMessageStyleProperty<TextStyle> get textStyle => .all(_textTheme.metadataEmphasis);
 
   @override
-  Color get textColor => _colorScheme.textPrimary;
+  StreamMessageStyleProperty<Color> get textColor => .all(_colorScheme.textPrimary);
 
   @override
-  Color get iconColor => _colorScheme.textPrimary;
+  StreamMessageStyleProperty<Color> get iconColor => .all(_colorScheme.textPrimary);
 
   @override
-  double get iconSize => 16;
+  StreamMessageStyleProperty<double> get iconSize => .all(16);
 
   @override
-  double get spacing => _spacing.xxs;
+  StreamMessageStyleProperty<double> get spacing => .all(_spacing.xxs);
 
   @override
-  EdgeInsetsGeometry get padding => .symmetric(vertical: _spacing.xxs);
+  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(vertical: _spacing.xxs));
 }

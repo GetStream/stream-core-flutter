@@ -13,6 +13,7 @@ export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButt
 export 'components/common/stream_checkbox.dart' hide DefaultStreamCheckbox;
 export 'components/common/stream_flex.dart';
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;
+export 'components/common/stream_visibility.dart';
 export 'components/context_menu/stream_context_menu.dart';
 export 'components/context_menu/stream_context_menu_action.dart' hide DefaultStreamContextMenuAction;
 export 'components/controls/stream_emoji_chip.dart' hide DefaultStreamEmojiChip;
@@ -22,14 +23,17 @@ export 'components/emoji/data/stream_emoji_data.dart';
 export 'components/emoji/data/stream_supported_emojis.dart';
 export 'components/emoji/stream_emoji_picker_sheet.dart';
 export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
-export 'components/message/stream_message_alignment.dart';
 export 'components/message/stream_message_annotation.dart' hide DefaultStreamMessageAnnotation;
 export 'components/message/stream_message_bubble.dart' hide DefaultStreamMessageBubble;
 export 'components/message/stream_message_content.dart' hide DefaultStreamMessageContent;
-export 'components/message/stream_message_group_position.dart';
 export 'components/message/stream_message_metadata.dart' hide DefaultStreamMessageMetadata;
 export 'components/message/stream_message_replies.dart' hide DefaultStreamMessageReplies;
+export 'components/message/stream_message_text.dart' hide DefaultStreamMessageText;
+export 'components/message/stream_message_widget.dart' hide DefaultStreamMessageWidget;
 export 'components/message_composer.dart';
+export 'components/message_placement/stream_message_alignment.dart';
+export 'components/message_placement/stream_message_placement.dart';
+export 'components/message_placement/stream_message_stack_position.dart';
 export 'components/reaction/stream_reactions.dart' hide DefaultStreamReactions;
 
 export 'factory/stream_component_factory.dart';

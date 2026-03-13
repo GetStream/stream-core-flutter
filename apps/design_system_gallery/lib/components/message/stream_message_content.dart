@@ -77,19 +77,17 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
   final textTheme = context.streamTextTheme;
   final palette = colorScheme.avatarPalette;
 
-  final bubble = StreamMessageBubble(
-    child: Text(
-      text,
-      style: textTheme.bodyDefault.copyWith(
-        color: colorScheme.textPrimary,
-      ),
-    ),
-  );
+  final emojiCount = StreamMessageText.emojiOnlyCount(text);
+  final isEmojiOnly = emojiCount != null && emojiCount <= 3;
+
+  final messageText = StreamMessageText(text);
+  final Widget messageWidget = isEmojiOnly ? messageText : StreamMessageBubble(child: messageText);
 
   final replies = showReplies
       ? StreamMessageReplies(
           label: const Text('3 replies'),
           avatars: _sampleAvatars(3, palette),
+          showConnector: !isEmojiOnly,
         )
       : null;
 
@@ -119,29 +117,25 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
     };
 
     if (reactionOverlap) {
-      // Top: reactions wrap only the bubble, replies sit below.
       body = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        children: [
-          buildReactions(child: bubble),
-          ?replies,
-        ],
+        children: [buildReactions(child: messageWidget), ?replies],
       );
     } else {
-      // Bottom: reactions wrap bubble + replies together.
-      final inner = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [bubble, ?replies],
+      body = buildReactions(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [messageWidget, ?replies],
+        ),
       );
-      body = buildReactions(child: inner);
     }
   } else {
     body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: [bubble, ?replies],
+      children: [messageWidget, ?replies],
     );
   }
 
@@ -234,6 +228,7 @@ Widget buildStreamMessageContentShowcase(BuildContext context) {
           _SlotCombinationsSection(),
           _ReactionVariantsSection(),
           _FullCompositionSection(),
+          _EmojiOnlySection(),
           _MinimalSection(),
         ],
       ),
@@ -248,9 +243,8 @@ Widget buildStreamMessageContentShowcase(BuildContext context) {
 class _SlotCombinationsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
-    final palette = colorScheme.avatarPalette;
+    final palette = context.streamColorScheme.avatarPalette;
 
     return _Section(
       label: 'SLOT COMBINATIONS',
@@ -281,9 +275,7 @@ class _SlotCombinationsSection extends StatelessWidget {
               status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
             ),
             child: StreamMessageBubble(
-              backgroundColor: colorScheme.backgroundSurface,
-              side: BorderSide(color: colorScheme.borderSubtle),
-              child: const Text('Has anyone tried the new Flutter update?'),
+              child: StreamMessageText('Has anyone tried the new Flutter update?'),
             ),
           ),
         ),
@@ -296,9 +288,7 @@ class _SlotCombinationsSection extends StatelessWidget {
               edited: const Text('Edited'),
             ),
             child: StreamMessageBubble(
-              backgroundColor: colorScheme.backgroundSurface,
-              side: BorderSide(color: colorScheme.borderSubtle),
-              child: const Text('A message with just metadata below.'),
+              child: StreamMessageText('A message with just metadata below.'),
             ),
           ),
         ),
@@ -310,14 +300,12 @@ class _SlotCombinationsSection extends StatelessWidget {
               label: const Text('Saved for later'),
             ),
             child: StreamMessageBubble(
-              backgroundColor: colorScheme.backgroundSurface,
-              side: BorderSide(color: colorScheme.borderSubtle),
-              child: const Text('Saved message, no footer.'),
+              child: StreamMessageText('Saved message, no footer.'),
             ),
           ),
         ),
         _ExampleCard(
-          label: 'Child with replies + footer',
+          label: 'Children with replies + footer',
           child: StreamMessageContent(
             footer: StreamMessageMetadata(
               timestamp: const Text('09:43'),
@@ -328,9 +316,7 @@ class _SlotCombinationsSection extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 StreamMessageBubble(
-                  backgroundColor: colorScheme.backgroundSurface,
-                  side: BorderSide(color: colorScheme.borderSubtle),
-                  child: const Text('Let me know what you think!'),
+                  child: StreamMessageText('Let me know what you think!'),
                 ),
                 StreamMessageReplies(
                   label: const Text('5 replies'),
@@ -348,8 +334,6 @@ class _SlotCombinationsSection extends StatelessWidget {
 class _ReactionVariantsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-
     return _Section(
       label: 'REACTION VARIANTS',
       description:
@@ -372,9 +356,7 @@ class _ReactionVariantsSection extends StatelessWidget {
               alignment: StreamReactionsAlignment.end,
               indent: 8,
               child: StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('Reactions overlap the bubble edge.'),
+                child: StreamMessageText('Reactions overlap the bubble edge.'),
               ),
             ),
           ),
@@ -394,9 +376,7 @@ class _ReactionVariantsSection extends StatelessWidget {
               ],
               overlap: false,
               child: StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('Reactions with a gap below.'),
+                child: StreamMessageText('Reactions with a gap below.'),
               ),
             ),
           ),
@@ -415,9 +395,7 @@ class _ReactionVariantsSection extends StatelessWidget {
               alignment: StreamReactionsAlignment.end,
               indent: 8,
               child: StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('Reaction sits above the bubble.'),
+                child: StreamMessageText('Reaction sits above the bubble.'),
               ),
             ),
           ),
@@ -440,9 +418,7 @@ class _ReactionVariantsSection extends StatelessWidget {
               ],
               overlap: false,
               child: StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('Short text.'),
+                child: StreamMessageText('Short text.'),
               ),
             ),
           ),
@@ -455,9 +431,8 @@ class _ReactionVariantsSection extends StatelessWidget {
 class _FullCompositionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
-    final palette = colorScheme.avatarPalette;
+    final palette = context.streamColorScheme.avatarPalette;
 
     return _Section(
       label: 'FULL COMPOSITION',
@@ -467,59 +442,163 @@ class _FullCompositionSection extends StatelessWidget {
       children: [
         _ExampleCard(
           label: 'Incoming — all slots',
-          child: StreamMessageContent(
-            header: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                StreamMessageAnnotation(
-                  leading: const Icon(StreamIconData.iconPin),
-                  label: const Text('Pinned'),
-                ),
-                StreamMessageAnnotation(
-                  leading: const Icon(StreamIconData.iconBellNotification),
-                  label: Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(text: 'Reminder set'),
-                        TextSpan(
-                          text: ' · In 30 minutes',
-                          style: textTheme.metadataDefault,
-                        ),
-                      ],
+          child: Align(
+            alignment: .centerLeft,
+            child: StreamMessageContent(
+              header: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  StreamMessageAnnotation(
+                    leading: const Icon(StreamIconData.iconPin),
+                    label: const Text('Pinned'),
+                  ),
+                  StreamMessageAnnotation(
+                    leading: const Icon(StreamIconData.iconBellNotification),
+                    label: Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(text: 'Reminder set'),
+                          TextSpan(
+                            text: ' · In 30 minutes',
+                            style: textTheme.metadataDefault,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                ],
+              ),
+              footer: StreamMessageMetadata(
+                timestamp: const Text('09:41'),
+                username: const Text('Alice'),
+                status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+                edited: const Text('Edited'),
+              ),
+              child: StreamReactions.segmented(
+                items: const [
+                  StreamReactionsItem(emoji: Text('👍'), count: 3),
+                  StreamReactionsItem(emoji: Text('😂'), count: 1),
+                  StreamReactionsItem(emoji: Text('❤'), count: 5),
+                ],
+                overlap: false,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    StreamMessageBubble(
+                      child: StreamMessageText(
+                        'This message has multiple annotations, '
+                        'reactions, a reply indicator, and full metadata.',
+                      ),
+                    ),
+                    StreamMessageReplies(
+                      label: const Text('5 replies'),
+                      avatars: _sampleAvatars(3, palette),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Outgoing — reactions + status',
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
+            ),
+            child: StreamMessageContent(
+              footer: StreamMessageMetadata(
+                timestamp: const Text('09:42'),
+                status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+              ),
+              child: StreamReactions.segmented(
+                alignment: .end,
+                overlap: false,
+                items: const [StreamReactionsItem(emoji: Text('👍'), count: 2)],
+                child: StreamMessageBubble(
+                  child: StreamMessageText('Sure, I can help with that!'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EmojiOnlySection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.streamColorScheme.avatarPalette;
+
+    return _Section(
+      label: 'EMOJI-ONLY MESSAGES',
+      description:
+          'Messages with 1–3 emojis render without a bubble. '
+          'Shown with reactions, replies, and metadata.',
+      children: [
+        _ExampleCard(
+          label: 'Single emoji + reactions + footer',
+          child: StreamMessageContent(
             footer: StreamMessageMetadata(
-              timestamp: const Text('09:41'),
+              timestamp: const Text('09:48'),
               username: const Text('Alice'),
-              status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
-              edited: const Text('Edited'),
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('👍'), count: 3),
-                StreamReactionsItem(emoji: Text('😂'), count: 1),
-                StreamReactionsItem(emoji: Text('❤'), count: 5),
+                StreamReactionsItem(emoji: Text('❤'), count: 4),
+                StreamReactionsItem(emoji: Text('😂'), count: 2),
+              ],
+              overlap: false,
+              child: StreamMessageText('👋'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Two emojis + replies (no connector)',
+          child: StreamMessageContent(
+            footer: StreamMessageMetadata(
+              timestamp: const Text('09:49'),
+              username: const Text('Bob'),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                StreamMessageText('❤️🔥'),
+                StreamMessageReplies(
+                  label: const Text('3 replies'),
+                  avatars: _sampleAvatars(2, palette),
+                  showConnector: false,
+                ),
+              ],
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Three emojis + reactions + replies',
+          child: StreamMessageContent(
+            footer: StreamMessageMetadata(
+              timestamp: const Text('09:50'),
+              username: const Text('Charlie'),
+            ),
+            child: StreamReactions.segmented(
+              items: const [
+                StreamReactionsItem(emoji: Text('🔥'), count: 3),
               ],
               overlap: false,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  StreamMessageBubble(
-                    backgroundColor: colorScheme.backgroundSurface,
-                    side: BorderSide(color: colorScheme.borderSubtle),
-                    child: const Text(
-                      'This message has multiple annotations, '
-                      'reactions, a reply indicator, and full metadata.',
-                    ),
-                  ),
+                  StreamMessageText('🎉👏🔥'),
                   StreamMessageReplies(
-                    label: const Text('5 replies'),
-                    avatars: _sampleAvatars(3, palette),
+                    label: const Text('2 replies'),
+                    avatars: _sampleAvatars(2, palette),
+                    showConnector: false,
                   ),
                 ],
               ),
@@ -527,19 +606,23 @@ class _FullCompositionSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Outgoing — reactions + status',
-          child: StreamMessageContent(
-            footer: StreamMessageMetadata(
-              timestamp: const Text('09:42'),
-              status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+          label: 'Outgoing emoji + reactions',
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
             ),
-            child: StreamReactions.segmented(
-              items: const [
-                StreamReactionsItem(emoji: Text('👍'), count: 2),
-              ],
-              overlap: false,
-              child: StreamMessageBubble(
-                child: const Text('Sure, I can help with that!'),
+            child: StreamMessageContent(
+              footer: StreamMessageMetadata(
+                timestamp: const Text('09:51'),
+                status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+              ),
+              child: StreamReactions.segmented(
+                alignment: .end,
+                overlap: false,
+                items: const [
+                  StreamReactionsItem(emoji: Text('👍'), count: 5),
+                ],
+                child: StreamMessageText('😂'),
               ),
             ),
           ),
@@ -552,8 +635,6 @@ class _FullCompositionSection extends StatelessWidget {
 class _MinimalSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-
     return _Section(
       label: 'MINIMAL',
       description: 'Only the required child slot — no header or footer.',
@@ -562,9 +643,7 @@ class _MinimalSection extends StatelessWidget {
           label: 'Bubble only',
           child: StreamMessageContent(
             child: StreamMessageBubble(
-              backgroundColor: colorScheme.backgroundSurface,
-              side: BorderSide(color: colorScheme.borderSubtle),
-              child: const Text('Just a bubble, nothing else.'),
+              child: StreamMessageText('Just a bubble, nothing else.'),
             ),
           ),
         ),
@@ -575,9 +654,7 @@ class _MinimalSection extends StatelessWidget {
               timestamp: const Text('09:50'),
             ),
             child: StreamMessageBubble(
-              backgroundColor: colorScheme.backgroundSurface,
-              side: BorderSide(color: colorScheme.borderSubtle),
-              child: const Text('Hey!'),
+              child: StreamMessageText('Hey!'),
             ),
           ),
         ),

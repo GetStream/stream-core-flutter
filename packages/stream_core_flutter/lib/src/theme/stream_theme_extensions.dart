@@ -12,9 +12,7 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_list_tile_theme.dart';
-import 'components/stream_message_annotation_theme.dart';
-import 'components/stream_message_metadata_theme.dart';
-import 'components/stream_message_replies_theme.dart';
+import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
@@ -106,14 +104,8 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamListTileThemeData] from the nearest ancestor.
   StreamListTileThemeData get streamListTileTheme => StreamListTileTheme.of(this);
 
-  /// Returns the [StreamMessageAnnotationThemeData] from the nearest ancestor.
-  StreamMessageAnnotationThemeData get streamMessageAnnotationTheme => StreamMessageAnnotationTheme.of(this);
-
-  /// Returns the [StreamMessageMetadataThemeData] from the nearest ancestor.
-  StreamMessageMetadataThemeData get streamMessageMetadataTheme => StreamMessageMetadataTheme.of(this);
-
-  /// Returns the [StreamMessageRepliesThemeData] from the nearest ancestor.
-  StreamMessageRepliesThemeData get streamMessageRepliesTheme => StreamMessageRepliesTheme.of(this);
+  /// Returns the [StreamMessageItemThemeData] from the nearest ancestor.
+  StreamMessageItemThemeData get streamMessageItemTheme => StreamMessageItemTheme.of(this);
 
   /// Returns the [StreamMessageThemeData] from the nearest ancestor.
   StreamMessageThemeData get streamMessageTheme => StreamMessageTheme.of(this);

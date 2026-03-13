@@ -1,104 +1,55 @@
 import 'package:flutter/widgets.dart';
+import 'package:stream_core/stream_core.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
-import '../stream_theme.dart';
+import 'stream_message_style_property.dart';
 
 part 'stream_message_metadata_theme.g.theme.dart';
 
-/// Applies a message metadata theme to descendant [StreamMessageMetadata]
-/// widgets.
+/// Visual styling properties for a message metadata row.
 ///
-/// Wrap a subtree with [StreamMessageMetadataTheme] to override metadata row
-/// styling. Access the merged theme using
-/// [BuildContext.streamMessageMetadataTheme].
+/// Defines the appearance of metadata rows including username, timestamp,
+/// edited indicator, status icon, and spacing. All properties use
+/// [StreamMessageStyleProperty] for placement-aware resolution.
+/// Use [StreamMessageMetadataStyle.from] for uniform values across all
+/// placements.
 ///
 /// {@tool snippet}
 ///
-/// Override metadata styling for a specific section:
+/// Uniform style:
 ///
 /// ```dart
-/// StreamMessageMetadataTheme(
-///   data: StreamMessageMetadataThemeData(
-///     usernameColor: Colors.blue,
-///     spacing: 12,
-///   ),
-///   child: StreamMessageMetadata(
-///     timestamp: Text('09:41'),
-///     username: Text('Alice'),
-///   ),
+/// StreamMessageMetadataStyle.from(
+///   usernameColor: Colors.blue,
+///   timestampColor: Colors.grey,
+///   spacing: 12,
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Placement-aware style:
+///
+/// ```dart
+/// StreamMessageMetadataStyle(
+///   usernameColor: StreamMessageStyleProperty.resolveWith((p) {
+///     final isEnd = p.alignment == StreamMessageAlignment.end;
+///     return isEnd ? Colors.blue : Colors.grey;
+///   }),
 /// )
 /// ```
 /// {@end-tool}
 ///
 /// See also:
 ///
-///  * [StreamMessageMetadataThemeData], which describes the metadata theme.
-///  * [StreamMessageMetadata], the widget affected by this theme.
-class StreamMessageMetadataTheme extends InheritedTheme {
-  /// Creates a message metadata theme that controls descendant metadata rows.
-  const StreamMessageMetadataTheme({
-    super.key,
-    required this.data,
-    required super.child,
-  });
-
-  /// The message metadata theme data for descendant widgets.
-  final StreamMessageMetadataThemeData data;
-
-  /// Returns the [StreamMessageMetadataThemeData] merged from local and global
-  /// themes.
-  ///
-  /// Local values from the nearest [StreamMessageMetadataTheme] ancestor take
-  /// precedence over global values from [StreamTheme.of].
-  ///
-  /// This allows partial overrides — for example, overriding only
-  /// [StreamMessageMetadataThemeData.usernameColor] while inheriting other
-  /// properties from the global theme.
-  static StreamMessageMetadataThemeData of(BuildContext context) {
-    final localTheme = context.dependOnInheritedWidgetOfExactType<StreamMessageMetadataTheme>();
-    return StreamTheme.of(context).messageMetadataTheme.merge(localTheme?.data);
-  }
-
-  @override
-  Widget wrap(BuildContext context, Widget child) {
-    return StreamMessageMetadataTheme(data: data, child: child);
-  }
-
-  @override
-  bool updateShouldNotify(StreamMessageMetadataTheme oldWidget) => data != oldWidget.data;
-}
-
-/// Theme data for customizing [StreamMessageMetadata] widgets.
-///
-/// Descendant widgets obtain their values from [StreamMessageMetadataTheme.of].
-/// All properties are null by default, with fallback values applied by
-/// [DefaultStreamMessageMetadata].
-///
-/// {@tool snippet}
-///
-/// Customize metadata appearance globally via [StreamTheme]:
-///
-/// ```dart
-/// StreamTheme(
-///   messageMetadataTheme: StreamMessageMetadataThemeData(
-///     usernameColor: Colors.blue,
-///     timestampColor: Colors.grey,
-///     spacing: 12,
-///   ),
-/// )
-/// ```
-/// {@end-tool}
-///
-/// See also:
-///
-///  * [StreamMessageMetadataTheme], for overriding the theme in a widget
-///    subtree.
-///  * [StreamMessageMetadata], the widget that uses this theme data.
+///  * [StreamMessageItemThemeData], which wraps this style for theming.
+///  * [StreamMessageMetadata], which uses this styling.
 @themeGen
 @immutable
-class StreamMessageMetadataThemeData with _$StreamMessageMetadataThemeData {
-  /// Creates a message metadata theme data with optional property overrides.
-  const StreamMessageMetadataThemeData({
+class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
+  /// Creates a metadata style with optional resolver-based overrides.
+  const StreamMessageMetadataStyle({
     this.usernameTextStyle,
     this.usernameColor,
     this.timestampTextStyle,
@@ -112,53 +63,86 @@ class StreamMessageMetadataThemeData with _$StreamMessageMetadataThemeData {
     this.minHeight,
   });
 
-  /// Defines the default text style for [StreamMessageMetadata.username].
+  /// A convenience constructor that constructs a
+  /// [StreamMessageMetadataStyle] given simple values.
   ///
-  /// This only controls typography. Color comes from [usernameColor].
-  final TextStyle? usernameTextStyle;
-
-  /// Defines the default color for [StreamMessageMetadata.username].
-  final Color? usernameColor;
-
-  /// Defines the default text style for [StreamMessageMetadata.timestamp].
+  /// All parameters default to null. By default this constructor returns
+  /// a [StreamMessageMetadataStyle] that doesn't override anything.
   ///
-  /// This only controls typography. Color comes from [timestampColor].
-  final TextStyle? timestampTextStyle;
-
-  /// Defines the default color for [StreamMessageMetadata.timestamp].
-  final Color? timestampColor;
-
-  /// Defines the default text style for [StreamMessageMetadata.edited].
+  /// For example, to override the default username and timestamp colors,
+  /// one could write:
   ///
-  /// This only controls typography. Color comes from [editedColor].
-  final TextStyle? editedTextStyle;
+  /// ```dart
+  /// StreamMessageMetadataStyle.from(
+  ///   usernameColor: Colors.blue,
+  ///   timestampColor: Colors.grey,
+  /// )
+  /// ```
+  factory StreamMessageMetadataStyle.from({
+    TextStyle? usernameTextStyle,
+    Color? usernameColor,
+    TextStyle? timestampTextStyle,
+    Color? timestampColor,
+    TextStyle? editedTextStyle,
+    Color? editedColor,
+    Color? statusColor,
+    double? statusIconSize,
+    double? spacing,
+    double? statusSpacing,
+    double? minHeight,
+  }) {
+    return StreamMessageMetadataStyle(
+      usernameTextStyle: usernameTextStyle?.let(StreamMessageStyleProperty.all),
+      usernameColor: usernameColor?.let(StreamMessageStyleProperty.all),
+      timestampTextStyle: timestampTextStyle?.let(StreamMessageStyleProperty.all),
+      timestampColor: timestampColor?.let(StreamMessageStyleProperty.all),
+      editedTextStyle: editedTextStyle?.let(StreamMessageStyleProperty.all),
+      editedColor: editedColor?.let(StreamMessageStyleProperty.all),
+      statusColor: statusColor?.let(StreamMessageStyleProperty.all),
+      statusIconSize: statusIconSize?.let(StreamMessageStyleProperty.all),
+      spacing: spacing?.let(StreamMessageStyleProperty.all),
+      statusSpacing: statusSpacing?.let(StreamMessageStyleProperty.all),
+      minHeight: minHeight?.let(StreamMessageStyleProperty.all),
+    );
+  }
 
-  /// Defines the default color for [StreamMessageMetadata.edited].
-  final Color? editedColor;
+  /// The text style for the username.
+  final StreamMessageStyleProperty<TextStyle?>? usernameTextStyle;
 
-  /// Defines the default color for [StreamMessageMetadata.status].
-  ///
-  /// Applied via [IconTheme] to the status icon slot.
-  final Color? statusColor;
+  /// The color for the username text.
+  final StreamMessageStyleProperty<Color?>? usernameColor;
 
-  /// Defines the default size for the status icon.
-  ///
-  /// Applied via [IconTheme] to the status icon slot.
-  final double? statusIconSize;
+  /// The text style for the timestamp.
+  final StreamMessageStyleProperty<TextStyle?>? timestampTextStyle;
+
+  /// The color for the timestamp text.
+  final StreamMessageStyleProperty<Color?>? timestampColor;
+
+  /// The text style for the edited indicator.
+  final StreamMessageStyleProperty<TextStyle?>? editedTextStyle;
+
+  /// The color for the edited indicator text.
+  final StreamMessageStyleProperty<Color?>? editedColor;
+
+  /// The color for the status icon.
+  final StreamMessageStyleProperty<Color?>? statusColor;
+
+  /// The size for the status icon.
+  final StreamMessageStyleProperty<double?>? statusIconSize;
 
   /// The gap between main elements (username, timestamp group, edited).
-  final double? spacing;
+  final StreamMessageStyleProperty<double?>? spacing;
 
   /// The gap between the status icon and the timestamp.
-  final double? statusSpacing;
+  final StreamMessageStyleProperty<double?>? statusSpacing;
 
   /// The minimum height of the metadata row.
-  final double? minHeight;
+  final StreamMessageStyleProperty<double?>? minHeight;
 
-  /// Linearly interpolate between two [StreamMessageMetadataThemeData] objects.
-  static StreamMessageMetadataThemeData? lerp(
-    StreamMessageMetadataThemeData? a,
-    StreamMessageMetadataThemeData? b,
+  /// Linearly interpolate between two [StreamMessageMetadataStyle] objects.
+  static StreamMessageMetadataStyle? lerp(
+    StreamMessageMetadataStyle? a,
+    StreamMessageMetadataStyle? b,
     double t,
-  ) => _$StreamMessageMetadataThemeData.lerp(a, b, t);
+  ) => _$StreamMessageMetadataStyle.lerp(a, b, t);
 }

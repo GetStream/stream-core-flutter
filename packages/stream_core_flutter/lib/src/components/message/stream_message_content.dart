@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../theme.dart';
+import '../message_placement/stream_message_placement.dart';
 
 /// A composite layout container that arranges message primitives into the
 /// full message content structure.
@@ -153,13 +154,14 @@ class DefaultStreamMessageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
     final effectiveSpacing = props.spacing ?? spacing.xxs;
+    final crossAxisAlignment = StreamMessagePlacement.crossAxisAlignmentOf(context);
 
     return SizedBox(
       width: double.infinity,
       child: Column(
         mainAxisSize: .min,
         spacing: effectiveSpacing,
-        crossAxisAlignment: .start,
+        crossAxisAlignment: crossAxisAlignment,
         children: [?props.header, props.child, ?props.footer],
       ),
     );

@@ -195,25 +195,22 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
-
-    return Align(
+    Widget child = Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: StreamMessageBubble(
-        backgroundColor: isMe ? colorScheme.accentPrimary : colorScheme.backgroundApp,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        side: isMe ? BorderSide.none : BorderSide(color: colorScheme.borderSubtle),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Text(
-          message,
-          style: textTheme.bodyDefault.copyWith(
-            color: isMe ? colorScheme.textOnAccent : colorScheme.textPrimary,
-          ),
-        ),
+        child: Text(message),
       ),
     );
+
+    if (isMe) {
+      child = StreamMessagePlacement(
+        placement: const StreamMessagePlacementData(
+          alignment: StreamMessageAlignment.end,
+        ),
+        child: child,
+      );
+    }
+
+    return child;
   }
 }

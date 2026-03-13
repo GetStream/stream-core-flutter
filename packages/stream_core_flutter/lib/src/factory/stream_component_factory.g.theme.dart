@@ -50,6 +50,8 @@ mixin _$StreamComponentBuilders {
       messageContent: t < 0.5 ? a.messageContent : b.messageContent,
       messageMetadata: t < 0.5 ? a.messageMetadata : b.messageMetadata,
       messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
+      messageText: t < 0.5 ? a.messageText : b.messageText,
+      messageWidget: t < 0.5 ? a.messageWidget : b.messageWidget,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
       reactions: t < 0.5 ? a.reactions : b.reactions,
@@ -81,6 +83,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamMessageContentProps)? messageContent,
     Widget Function(BuildContext, StreamMessageMetadataProps)? messageMetadata,
     Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
+    Widget Function(BuildContext, StreamMessageTextProps)? messageText,
+    Widget Function(BuildContext, StreamMessageWidgetProps)? messageWidget,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
@@ -108,6 +112,8 @@ mixin _$StreamComponentBuilders {
       messageContent: messageContent ?? _this.messageContent,
       messageMetadata: messageMetadata ?? _this.messageMetadata,
       messageReplies: messageReplies ?? _this.messageReplies,
+      messageText: messageText ?? _this.messageText,
+      messageWidget: messageWidget ?? _this.messageWidget,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
       reactions: reactions ?? _this.reactions,
@@ -146,6 +152,8 @@ mixin _$StreamComponentBuilders {
       messageContent: other.messageContent,
       messageMetadata: other.messageMetadata,
       messageReplies: other.messageReplies,
+      messageText: other.messageText,
+      messageWidget: other.messageWidget,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
       reactions: other.reactions,
@@ -185,6 +193,8 @@ mixin _$StreamComponentBuilders {
         _other.messageContent == _this.messageContent &&
         _other.messageMetadata == _this.messageMetadata &&
         _other.messageReplies == _this.messageReplies &&
+        _other.messageText == _this.messageText &&
+        _other.messageWidget == _this.messageWidget &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar &&
         _other.reactions == _this.reactions;
@@ -216,6 +226,8 @@ mixin _$StreamComponentBuilders {
       _this.messageContent,
       _this.messageMetadata,
       _this.messageReplies,
+      _this.messageText,
+      _this.messageWidget,
       _this.onlineIndicator,
       _this.progressBar,
       _this.reactions,

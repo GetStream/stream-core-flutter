@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme.dart';
 import '../avatar/stream_avatar_stack.dart';
-import 'stream_message_alignment.dart';
+import '../message_placement/stream_message_alignment.dart';
+import '../message_placement/stream_message_placement.dart';
 
 /// A tappable row showing reply count, participant avatars, and an optional
 /// connector for threaded messages.
@@ -58,8 +59,8 @@ import 'stream_message_alignment.dart';
 ///
 /// See also:
 ///
-///  * [StreamMessageRepliesThemeData], for customizing replies appearance.
-///  * [StreamMessageRepliesTheme], for overriding theme in a widget subtree.
+///  * [StreamMessageRepliesStyle], for customizing replies appearance.
+///  * [StreamMessageItemTheme], for theming via the widget tree.
 ///  * [StreamMessageAlignment], for controlling element order.
 ///  * [StreamAvatarStack], which renders the avatars internally.
 class StreamMessageReplies extends StatelessWidget {
@@ -76,10 +77,9 @@ class StreamMessageReplies extends StatelessWidget {
     bool showConnector = true,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
-    StreamMessageAlignment alignment = .start,
-    double? spacing,
-    EdgeInsetsGeometry? padding,
-    Clip clipBehavior = .none,
+    StreamMessageAlignment? alignment,
+    Clip? clipBehavior,
+    StreamMessageRepliesStyle? style,
   }) : props = .new(
          label: label,
          avatars: avatars,
@@ -89,9 +89,8 @@ class StreamMessageReplies extends StatelessWidget {
          onTap: onTap,
          onLongPress: onLongPress,
          alignment: alignment,
-         spacing: spacing,
-         padding: padding,
          clipBehavior: clipBehavior,
+         style: style,
        );
 
   /// The properties that configure this replies row.
@@ -120,17 +119,16 @@ class StreamMessageRepliesProps {
     this.showConnector = true,
     this.onTap,
     this.onLongPress,
-    this.alignment = .start,
-    this.spacing,
-    this.padding,
-    this.clipBehavior = .none,
+    this.alignment,
+    this.clipBehavior,
+    this.style,
   });
 
   /// An optional label widget, typically a [Text] showing the reply count
   /// (e.g. "3 replies").
   ///
-  /// Styled by [StreamMessageRepliesThemeData.labelTextStyle] and
-  /// [StreamMessageRepliesThemeData.labelColor].
+  /// Styled by [StreamMessageRepliesStyle.labelTextStyle] and
+  /// [StreamMessageRepliesStyle.labelColor].
   final Widget? label;
 
   /// Avatar widgets for thread participants.
@@ -152,8 +150,8 @@ class StreamMessageRepliesProps {
   /// Whether to show the connector linking this row to the message bubble.
   ///
   /// The connector appearance is controlled by
-  /// [StreamMessageRepliesThemeData.connectorColor] and
-  /// [StreamMessageRepliesThemeData.connectorStrokeWidth].
+  /// [StreamMessageRepliesStyle.connectorColor] and
+  /// [StreamMessageRepliesStyle.connectorStrokeWidth].
   ///
   /// The connector adapts to [alignment] and [TextDirection] to always
   /// point toward the message bubble.
@@ -170,25 +168,22 @@ class StreamMessageRepliesProps {
   ///
   /// See [StreamMessageAlignment] for details on how this composes with
   /// [TextDirection].
-  final StreamMessageAlignment alignment;
-
-  /// The gap between elements (connector, avatars, label).
-  ///
-  /// When null, falls back to [StreamMessageRepliesThemeData.spacing].
-  final double? spacing;
-
-  /// The padding around the replies row content.
-  ///
-  /// When null, falls back to [StreamMessageRepliesThemeData.padding].
-  final EdgeInsetsGeometry? padding;
+  final StreamMessageAlignment? alignment;
 
   /// How to clip the widget's content.
   ///
   /// Useful when the connector overflows the row bounds. Set to
   /// [Clip.hardEdge] or similar to constrain the visible area.
   ///
-  /// Defaults to [Clip.none].
-  final Clip clipBehavior;
+  /// When null, falls back to the theme's [StreamMessageRepliesStyle.clipBehavior],
+  /// which defaults based on stack position.
+  final Clip? clipBehavior;
+
+  /// Optional style overrides for placement-aware styling.
+  ///
+  /// Fields left null fall back to the inherited [StreamMessageItemTheme],
+  /// then to built-in defaults.
+  final StreamMessageRepliesStyle? style;
 }
 
 /// The default implementation of [StreamMessageReplies].
@@ -206,13 +201,17 @@ class DefaultStreamMessageReplies extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.streamMessageRepliesTheme;
-    final defaults = _StreamMessageRepliesThemeDefaults(context);
+    final placement = StreamMessagePlacement.of(context);
+    final repliesStyle = props.style ?? StreamMessageItemTheme.of(context).replies;
+    final defaults = _StreamMessageRepliesDefaults(context);
 
-    final effectiveLabelTextStyle = theme.labelTextStyle ?? defaults.labelTextStyle;
-    final effectiveLabelColor = theme.labelColor ?? defaults.labelColor;
-    final effectiveSpacing = props.spacing ?? theme.spacing ?? defaults.spacing;
-    final effectivePadding = props.padding ?? theme.padding ?? defaults.padding;
+    final resolve = StreamMessageStyleResolver(placement, [repliesStyle, defaults]);
+
+    final effectiveLabelTextStyle = resolve((s) => s?.labelTextStyle);
+    final effectiveLabelColor = resolve((s) => s?.labelColor);
+    final effectiveSpacing = resolve((s) => s?.spacing);
+    final effectivePadding = resolve((s) => s?.padding);
+    final effectiveAlignment = props.alignment ?? placement.alignment;
 
     Widget? labelWidget;
     if (props.label case final label?) {
@@ -236,21 +235,21 @@ class DefaultStreamMessageReplies extends StatelessWidget {
 
     Widget? connectorWidget;
     if (props.showConnector) {
-      final effectiveConnectorColor = theme.connectorColor ?? defaults.connectorColor;
-      final effectiveStrokeWidth = theme.connectorStrokeWidth ?? defaults.connectorStrokeWidth;
+      final effectiveConnectorColor = resolve((s) => s?.connectorColor);
+      final effectiveStrokeWidth = resolve((s) => s?.connectorStrokeWidth);
 
       connectorWidget = CustomPaint(
         size: const Size(_kConnectorWidth, _kConnectorHeight),
         painter: _ConnectorPainter(
           color: effectiveConnectorColor,
           strokeWidth: effectiveStrokeWidth,
-          alignment: props.alignment,
+          alignment: effectiveAlignment,
           textDirection: Directionality.of(context),
         ),
       );
     }
 
-    final children = switch (props.alignment) {
+    final children = switch (effectiveAlignment) {
       .start => [?connectorWidget, ?avatarsWidget, ?labelWidget],
       .end => [?labelWidget, ?avatarsWidget, ?connectorWidget],
     };
@@ -260,8 +259,9 @@ class DefaultStreamMessageReplies extends StatelessWidget {
       child: Row(mainAxisSize: .min, spacing: effectiveSpacing, children: children),
     );
 
-    if (props.clipBehavior != Clip.none) {
-      child = ClipRect(clipBehavior: props.clipBehavior, child: child);
+    final effectiveClip = resolve((s) => s?.clipBehavior);
+    if (effectiveClip != Clip.none) {
+      child = ClipRect(clipBehavior: effectiveClip, child: child);
     }
 
     return GestureDetector(
@@ -346,8 +346,8 @@ class _ConnectorPainter extends CustomPainter {
       textDirection != oldDelegate.textDirection;
 }
 
-class _StreamMessageRepliesThemeDefaults extends StreamMessageRepliesThemeData {
-  _StreamMessageRepliesThemeDefaults(this._context);
+class _StreamMessageRepliesDefaults extends StreamMessageRepliesStyle {
+  _StreamMessageRepliesDefaults(this._context);
 
   final BuildContext _context;
 
@@ -356,20 +356,33 @@ class _StreamMessageRepliesThemeDefaults extends StreamMessageRepliesThemeData {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  double get connectorStrokeWidth => 1;
+  StreamMessageStyleProperty<double> get connectorStrokeWidth => .all(1);
 
   @override
-  Color get connectorColor => _colorScheme.borderSubtle;
+  StreamMessageStyleProperty<Color> get connectorColor => .resolveWith(
+    (placement) => switch (placement.alignment) {
+      .start => _colorScheme.borderSubtle,
+      .end => _colorScheme.brand.shade150,
+    },
+  );
 
   @override
-  TextStyle get labelTextStyle => _textTheme.captionEmphasis;
+  StreamMessageStyleProperty<TextStyle> get labelTextStyle => .all(_textTheme.captionEmphasis);
 
   @override
-  Color get labelColor => _colorScheme.textLink;
+  StreamMessageStyleProperty<Color> get labelColor => .all(_colorScheme.textLink);
 
   @override
-  double get spacing => _spacing.xs;
+  StreamMessageStyleProperty<double> get spacing => .all(_spacing.xs);
 
   @override
-  EdgeInsetsGeometry get padding => .only(top: _spacing.xs, bottom: _spacing.xxs);
+  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.only(top: _spacing.xs, bottom: _spacing.xxs));
+
+  @override
+  StreamMessageStyleClip get clipBehavior => .resolveWith(
+    (placement) => switch (placement.stackPosition) {
+      .top || .middle => Clip.none,
+      .bottom || .single => Clip.hardEdge,
+    },
+  );
 }

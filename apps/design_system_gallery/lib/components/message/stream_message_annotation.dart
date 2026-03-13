@@ -62,10 +62,12 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
     child: StreamMessageAnnotation(
       leading: showLeading ? Icon(leadingIcon.resolve(icons)) : null,
       label: Text(label),
-      spacing: spacing,
-      padding: EdgeInsets.symmetric(
-        vertical: verticalPadding,
-        horizontal: horizontalPadding,
+      style: StreamMessageAnnotationStyle.from(
+        spacing: spacing,
+        padding: EdgeInsets.symmetric(
+          vertical: verticalPadding,
+          horizontal: horizontalPadding,
+        ),
       ),
     ),
   );
@@ -119,9 +121,9 @@ class _AnnotationTypesSection extends StatelessWidget {
         _ExampleCard(
           label: 'Saved',
           subtitle: 'Accent color for icon and text.',
-          child: StreamMessageAnnotationTheme(
-            data: StreamMessageAnnotationThemeData(
-              style: StreamMessageAnnotationStyle(
+          child: StreamMessageItemTheme(
+            data: StreamMessageItemThemeData(
+              annotation: StreamMessageAnnotationStyle.from(
                 textColor: colorScheme.accentPrimary,
                 iconColor: colorScheme.accentPrimary,
               ),
@@ -224,14 +226,14 @@ class _ThemeOverrideSection extends StatelessWidget {
 
     return _Section(
       label: 'THEME OVERRIDES',
-      description: 'Per-instance overrides via StreamMessageAnnotationTheme.',
+      description: 'Per-instance overrides via StreamMessageItemTheme.',
       children: [
         _ExampleCard(
           label: 'Custom colors',
           subtitle: 'Purple icon and text color.',
-          child: StreamMessageAnnotationTheme(
-            data: const StreamMessageAnnotationThemeData(
-              style: StreamMessageAnnotationStyle(
+          child: StreamMessageItemTheme(
+            data: StreamMessageItemThemeData(
+              annotation: StreamMessageAnnotationStyle.from(
                 textColor: Colors.purple,
                 iconColor: Colors.purple,
               ),
@@ -245,9 +247,9 @@ class _ThemeOverrideSection extends StatelessWidget {
         _ExampleCard(
           label: 'Custom icon size',
           subtitle: 'Larger icon (20px).',
-          child: StreamMessageAnnotationTheme(
-            data: const StreamMessageAnnotationThemeData(
-              style: StreamMessageAnnotationStyle(
+          child: StreamMessageItemTheme(
+            data: StreamMessageItemThemeData(
+              annotation: StreamMessageAnnotationStyle.from(
                 iconSize: 20,
               ),
             ),
@@ -263,7 +265,7 @@ class _ThemeOverrideSection extends StatelessWidget {
           child: StreamMessageAnnotation(
             leading: Icon(icons.bookmark),
             label: const Text('Saved for later'),
-            spacing: 12,
+            style: StreamMessageAnnotationStyle.from(spacing: 12),
           ),
         ),
         _ExampleCard(
@@ -284,7 +286,6 @@ class _RealWorldSection extends StatelessWidget {
     final icons = context.streamIcons;
     final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
-    final radius = context.streamRadius;
 
     return _Section(
       label: 'REAL-WORLD EXAMPLES',
@@ -296,9 +297,9 @@ class _RealWorldSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              StreamMessageAnnotationTheme(
-                data: StreamMessageAnnotationThemeData(
-                  style: StreamMessageAnnotationStyle(
+              StreamMessageItemTheme(
+                data: StreamMessageItemThemeData(
+                  annotation: StreamMessageAnnotationStyle.from(
                     textColor: colorScheme.accentPrimary,
                     iconColor: colorScheme.accentPrimary,
                   ),
@@ -309,22 +310,7 @@ class _RealWorldSection extends StatelessWidget {
                 ),
               ),
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'Check out this new design system!',
-                  style: textTheme.bodyDefault.copyWith(
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('Check out this new design system!'),
               ),
             ],
           ),
@@ -340,22 +326,7 @@ class _RealWorldSection extends StatelessWidget {
                 label: const Text('Pinned by Alice'),
               ),
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'Meeting at 3 PM today.',
-                  style: textTheme.bodyDefault.copyWith(
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('Meeting at 3 PM today.'),
               ),
             ],
           ),
@@ -381,22 +352,7 @@ class _RealWorldSection extends StatelessWidget {
                 ),
               ),
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'Remember to review the PR.',
-                  style: textTheme.bodyDefault.copyWith(
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('Remember to review the PR.'),
               ),
             ],
           ),
@@ -422,22 +378,7 @@ class _RealWorldSection extends StatelessWidget {
                 ),
               ),
               StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.lg,
-                    topEnd: radius.lg,
-                    bottomEnd: radius.lg,
-                    bottomStart: radius.xs,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: Text(
-                  'This was also sent to the main channel.',
-                  style: textTheme.bodyDefault.copyWith(
-                    color: colorScheme.textPrimary,
-                  ),
-                ),
+                child: StreamMessageText('This was also sent to the main channel.'),
               ),
             ],
           ),

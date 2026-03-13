@@ -53,6 +53,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundSurfaceStrong;
   Color? _backgroundOverlay;
   Color? _backgroundDisabled;
+  Color? _backgroundHighlight;
 
   // =========================================================================
   // Border Colors - Core
@@ -129,6 +130,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundSurfaceStrong => _backgroundSurfaceStrong ?? _themeData.colorScheme.backgroundSurfaceStrong;
   Color get backgroundOverlay => _backgroundOverlay ?? _themeData.colorScheme.backgroundOverlay;
   Color get backgroundDisabled => _backgroundDisabled ?? _themeData.colorScheme.backgroundDisabled;
+  Color get backgroundHighlight => _backgroundHighlight ?? _themeData.colorScheme.backgroundHighlight;
 
   // =========================================================================
   // Getters - Border Core
@@ -210,6 +212,7 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundSurfaceStrong(Color color) => _update(() => _backgroundSurfaceStrong = color);
   void setBackgroundOverlay(Color color) => _update(() => _backgroundOverlay = color);
   void setBackgroundDisabled(Color color) => _update(() => _backgroundDisabled = color);
+  void setBackgroundHighlight(Color color) => _update(() => _backgroundHighlight = color);
 
   // Border Core
   void setBorderDefault(Color color) => _update(() => _borderDefault = color);
@@ -296,6 +299,7 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundSurfaceStrong = null;
     _backgroundOverlay = null;
     _backgroundDisabled = null;
+    _backgroundHighlight = null;
     // Border Core
     _borderDefault = null;
     _borderSubtle = null;
@@ -379,6 +383,7 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundSurfaceStrong: _backgroundSurfaceStrong,
       backgroundOverlay: _backgroundOverlay,
       backgroundDisabled: _backgroundDisabled,
+      backgroundHighlight: _backgroundHighlight,
       // Border Core
       borderDefault: _borderDefault,
       borderSubtle: _borderSubtle,

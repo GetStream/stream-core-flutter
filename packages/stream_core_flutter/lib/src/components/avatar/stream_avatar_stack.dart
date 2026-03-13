@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/components/stream_badge_count_theme.dart';
+import '../../theme/stream_theme_extensions.dart';
 import '../badge/stream_badge_count.dart';
 import '../common/stream_flex.dart';
 
@@ -180,6 +181,8 @@ class DefaultStreamAvatarStack extends StatelessWidget {
   Widget build(BuildContext context) {
     if (props.children.isEmpty) return const SizedBox.shrink();
 
+    final colorScheme = context.streamColorScheme;
+
     final effectiveSize = props.size ?? StreamAvatarStackSize.sm;
     final avatarSize = _avatarSizeForStackSize(effectiveSize);
     final extraBadgeSize = _badgeCountSizeForStackSize(effectiveSize);
@@ -189,9 +192,18 @@ class DefaultStreamAvatarStack extends StatelessWidget {
     final visible = props.children.take(props.max).toList();
     final extraCount = props.children.length - visible.length;
 
+    const avatarBorderWidth = 2.0;
+
     return MediaQuery.withNoTextScaling(
       child: StreamAvatarTheme(
-        data: StreamAvatarThemeData(size: avatarSize),
+        data: StreamAvatarThemeData(
+          size: avatarSize,
+          border: Border.all(
+            width: avatarBorderWidth,
+            color: colorScheme.borderOnDark,
+            strokeAlign: BorderSide.strokeAlignOutside,
+          ),
+        ),
         child: StreamRow(
           spacing: -diameter * props.overlap,
           mainAxisSize: MainAxisSize.min,

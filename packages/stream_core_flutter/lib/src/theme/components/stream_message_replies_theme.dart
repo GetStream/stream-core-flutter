@@ -1,134 +1,124 @@
 import 'package:flutter/widgets.dart';
+import 'package:stream_core/stream_core.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
-import '../stream_theme.dart';
+import 'stream_message_style_property.dart';
 
 part 'stream_message_replies_theme.g.theme.dart';
 
-/// Applies a message replies theme to descendant [StreamMessageReplies]
-/// widgets.
+/// Visual styling properties for a message replies row.
 ///
-/// Wrap a subtree with [StreamMessageRepliesTheme] to override replies row
-/// styling. Access the merged theme using
-/// [BuildContext.streamMessageRepliesTheme].
+/// Defines the appearance of replies rows including label, spacing, padding,
+/// and connector styling. All properties use [StreamMessageStyleProperty]
+/// for placement-aware resolution. Use [StreamMessageRepliesStyle.from]
+/// for uniform values across all placements.
 ///
 /// {@tool snippet}
 ///
-/// Override replies styling for a specific section:
+/// Uniform style:
 ///
 /// ```dart
-/// StreamMessageRepliesTheme(
-///   data: StreamMessageRepliesThemeData(
-///     labelColor: Colors.purple,
-///     spacing: 12,
-///   ),
-///   child: StreamMessageReplies(
-///     label: Text('3 replies'),
-///   ),
+/// StreamMessageRepliesStyle.from(
+///   labelColor: Colors.blue,
+///   spacing: 12,
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Placement-aware style:
+///
+/// ```dart
+/// StreamMessageRepliesStyle(
+///   labelColor: StreamMessageStyleProperty.resolveWith((p) {
+///     final isEnd = p.alignment == StreamMessageAlignment.end;
+///     return isEnd ? Colors.blue : Colors.purple;
+///   }),
 /// )
 /// ```
 /// {@end-tool}
 ///
 /// See also:
 ///
-///  * [StreamMessageRepliesThemeData], which describes the replies theme.
-///  * [StreamMessageReplies], the widget affected by this theme.
-class StreamMessageRepliesTheme extends InheritedTheme {
-  /// Creates a message replies theme that controls descendant replies rows.
-  const StreamMessageRepliesTheme({
-    super.key,
-    required this.data,
-    required super.child,
-  });
-
-  /// The message replies theme data for descendant widgets.
-  final StreamMessageRepliesThemeData data;
-
-  /// Returns the [StreamMessageRepliesThemeData] merged from local and global
-  /// themes.
-  ///
-  /// Local values from the nearest [StreamMessageRepliesTheme] ancestor take
-  /// precedence over global values from [StreamTheme.of].
-  ///
-  /// This allows partial overrides — for example, overriding only
-  /// [StreamMessageRepliesThemeData.labelColor] while inheriting other
-  /// properties from the global theme.
-  static StreamMessageRepliesThemeData of(BuildContext context) {
-    final localTheme = context.dependOnInheritedWidgetOfExactType<StreamMessageRepliesTheme>();
-    return StreamTheme.of(context).messageRepliesTheme.merge(localTheme?.data);
-  }
-
-  @override
-  Widget wrap(BuildContext context, Widget child) {
-    return StreamMessageRepliesTheme(data: data, child: child);
-  }
-
-  @override
-  bool updateShouldNotify(StreamMessageRepliesTheme oldWidget) => data != oldWidget.data;
-}
-
-/// Theme data for customizing [StreamMessageReplies] widgets.
-///
-/// Descendant widgets obtain their values from [StreamMessageRepliesTheme.of].
-/// All properties are null by default, with fallback values applied by
-/// [DefaultStreamMessageReplies].
-///
-/// {@tool snippet}
-///
-/// Customize replies appearance globally via [StreamTheme]:
-///
-/// ```dart
-/// StreamTheme(
-///   messageRepliesTheme: StreamMessageRepliesThemeData(
-///     labelColor: Colors.blue,
-///     spacing: 12,
-///   ),
-/// )
-/// ```
-/// {@end-tool}
-///
-/// See also:
-///
-///  * [StreamMessageRepliesTheme], for overriding the theme in a widget
-///    subtree.
-///  * [StreamMessageReplies], the widget that uses this theme data.
+///  * [StreamMessageItemThemeData], which wraps this style for theming.
+///  * [StreamMessageReplies], which uses this styling.
 @themeGen
 @immutable
-class StreamMessageRepliesThemeData with _$StreamMessageRepliesThemeData {
-  /// Creates a message replies theme data with optional property overrides.
-  const StreamMessageRepliesThemeData({
+class StreamMessageRepliesStyle with _$StreamMessageRepliesStyle {
+  /// Creates a replies style with optional resolver-based overrides.
+  const StreamMessageRepliesStyle({
     this.labelTextStyle,
     this.labelColor,
     this.spacing,
     this.padding,
     this.connectorColor,
     this.connectorStrokeWidth,
+    this.clipBehavior,
   });
 
-  /// Defines the default text style for [StreamMessageReplies.label].
+  /// A convenience constructor that constructs a
+  /// [StreamMessageRepliesStyle] given simple values.
   ///
-  /// This only controls typography. Color comes from [labelColor].
-  final TextStyle? labelTextStyle;
+  /// All parameters default to null. By default this constructor returns
+  /// a [StreamMessageRepliesStyle] that doesn't override anything.
+  ///
+  /// For example, to override the default replies label color and spacing,
+  /// one could write:
+  ///
+  /// ```dart
+  /// StreamMessageRepliesStyle.from(
+  ///   labelColor: Colors.blue,
+  ///   spacing: 12,
+  /// )
+  /// ```
+  factory StreamMessageRepliesStyle.from({
+    TextStyle? labelTextStyle,
+    Color? labelColor,
+    double? spacing,
+    EdgeInsetsGeometry? padding,
+    Color? connectorColor,
+    double? connectorStrokeWidth,
+    Clip? clipBehavior,
+  }) {
+    return StreamMessageRepliesStyle(
+      labelTextStyle: labelTextStyle?.let(StreamMessageStyleProperty.all),
+      labelColor: labelColor?.let(StreamMessageStyleProperty.all),
+      spacing: spacing?.let(StreamMessageStyleProperty.all),
+      padding: padding?.let(StreamMessageStyleProperty.all),
+      connectorColor: connectorColor?.let(StreamMessageStyleProperty.all),
+      connectorStrokeWidth: connectorStrokeWidth?.let(StreamMessageStyleProperty.all),
+      clipBehavior: clipBehavior?.let(StreamMessageStyleClip.all),
+    );
+  }
 
-  /// Defines the default color for [StreamMessageReplies.label].
-  final Color? labelColor;
+  /// The text style for the replies label.
+  final StreamMessageStyleProperty<TextStyle?>? labelTextStyle;
+
+  /// The color for the replies label text.
+  final StreamMessageStyleProperty<Color?>? labelColor;
 
   /// The gap between elements (connector, avatars, label).
-  final double? spacing;
+  final StreamMessageStyleProperty<double?>? spacing;
 
   /// The padding around the replies row content.
-  final EdgeInsetsGeometry? padding;
+  final StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding;
 
   /// The color of the connector path linking the row to the message bubble.
-  final Color? connectorColor;
+  final StreamMessageStyleProperty<Color?>? connectorColor;
 
   /// The stroke width of the connector path.
-  final double? connectorStrokeWidth;
+  final StreamMessageStyleProperty<double?>? connectorStrokeWidth;
 
-  /// Linearly interpolate between two [StreamMessageRepliesThemeData] objects.
-  static StreamMessageRepliesThemeData? lerp(
-    StreamMessageRepliesThemeData? a,
-    StreamMessageRepliesThemeData? b,
+  /// How to clip the widget's content.
+  ///
+  /// Controls whether the connector overflow is clipped at the row boundary.
+  final StreamMessageStyleClip? clipBehavior;
+
+  /// Linearly interpolate between two [StreamMessageRepliesStyle] objects.
+  static StreamMessageRepliesStyle? lerp(
+    StreamMessageRepliesStyle? a,
+    StreamMessageRepliesStyle? b,
     double t,
-  ) => _$StreamMessageRepliesThemeData.lerp(a, b, t);
+  ) => _$StreamMessageRepliesStyle.lerp(a, b, t);
 }

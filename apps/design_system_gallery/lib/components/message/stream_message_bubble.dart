@@ -19,64 +19,30 @@ Widget buildStreamMessageBubblePlayground(BuildContext context) {
     description: 'The text content inside the bubble.',
   );
 
-  final borderRadius = context.knobs.double.slider(
-    label: 'Border Radius',
-    initialValue: 24,
-    max: 32,
-    divisions: 32,
-    description: 'Corner radius of the bubble shape.',
+  final alignment = context.knobs.object.dropdown<StreamMessageAlignment>(
+    label: 'Alignment',
+    options: StreamMessageAlignment.values,
+    labelBuilder: (v) => v.name,
+    description: 'Start (incoming) or end (outgoing).',
   );
 
-  final horizontalPadding = context.knobs.double.slider(
-    label: 'Horizontal Padding',
-    initialValue: 12,
-    max: 32,
-    divisions: 32,
-    description: 'Horizontal content padding inside the bubble.',
+  final stackPosition = context.knobs.object.dropdown<StreamMessageStackPosition>(
+    label: 'Stack Position',
+    options: StreamMessageStackPosition.values,
+    labelBuilder: (v) => v.name,
+    description: 'Position within a consecutive message group.',
   );
 
-  final verticalPadding = context.knobs.double.slider(
-    label: 'Vertical Padding',
-    initialValue: 8,
-    max: 32,
-    divisions: 32,
-    description: 'Vertical content padding inside the bubble.',
+  final placement = StreamMessagePlacementData(
+    alignment: alignment,
+    stackPosition: stackPosition,
   );
-
-  final showBorder = context.knobs.boolean(
-    label: 'Show Border',
-    initialValue: true,
-    description: 'Whether to show a border on the bubble.',
-  );
-
-  final useOutgoingColor = context.knobs.boolean(
-    label: 'Outgoing Style',
-    description: 'Use outgoing (brand) colors instead of incoming.',
-  );
-
-  final colorScheme = context.streamColorScheme;
-  final textTheme = context.streamTextTheme;
-
-  final backgroundColor = useOutgoingColor ? colorScheme.brand.shade100 : colorScheme.backgroundSurface;
-
-  final borderColor = useOutgoingColor ? colorScheme.brand.shade100 : colorScheme.borderSubtle;
-
-  final textColor = useOutgoingColor ? colorScheme.brand.shade900 : colorScheme.textPrimary;
 
   return Center(
-    child: StreamMessageBubble(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      side: showBorder ? BorderSide(color: borderColor) : BorderSide.none,
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: verticalPadding,
-      ),
-      backgroundColor: backgroundColor,
-      child: Text(
-        text,
-        style: textTheme.bodyDefault.copyWith(color: textColor),
+    child: StreamMessagePlacement(
+      placement: placement,
+      child: StreamMessageBubble(
+        child: StreamMessageText(text),
       ),
     ),
   );
@@ -92,23 +58,17 @@ Widget buildStreamMessageBubblePlayground(BuildContext context) {
   path: '[Components]/Message',
 )
 Widget buildStreamMessageBubbleShowcase(BuildContext context) {
-  final colorScheme = context.streamColorScheme;
-  final textTheme = context.streamTextTheme;
-
-  return DefaultTextStyle(
-    style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 32,
-        children: [
-          _IncomingOutgoingSection(),
-          _GroupPositionsSection(),
-          _RealWorldSection(),
-          _ThemeOverrideSection(),
-        ],
-      ),
+  return SingleChildScrollView(
+    padding: const EdgeInsets.all(24),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 32,
+      children: [
+        _AlignmentSection(),
+        _StackPositionsSection(),
+        _ConversationSection(),
+        _StyleOverrideSection(),
+      ],
     ),
   );
 }
@@ -117,47 +77,31 @@ Widget buildStreamMessageBubbleShowcase(BuildContext context) {
 // Showcase Sections
 // =============================================================================
 
-class _IncomingOutgoingSection extends StatelessWidget {
+class _AlignmentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final radius = context.streamRadius;
-
-    return _Section(
-      label: 'INCOMING VS OUTGOING',
+    return const _Section(
+      label: 'ALIGNMENT',
       description:
-          'Bubbles use different background and border colors based '
-          'on message direction.',
+          'Bubbles resolve background, border, and shape from the '
+          'placement alignment (start = incoming, end = outgoing).',
       children: [
         _ExampleCard(
-          label: 'Incoming message',
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: StreamMessageBubble(
-              backgroundColor: colorScheme.backgroundSurface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(radius.xxl),
-              ),
-              side: BorderSide(color: colorScheme.borderSubtle),
-              child: const Text('Has anyone tried the new Flutter update?'),
-            ),
+          label: 'Start (incoming)',
+          child: _PlacedBubble(
+            alignment: StreamMessageAlignment.start,
+            stackPosition: StreamMessageStackPosition.single,
+            crossAlign: CrossAxisAlignment.start,
+            text: 'Has anyone tried the new Flutter update?',
           ),
         ),
         _ExampleCard(
-          label: 'Outgoing message',
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: StreamMessageBubble(
-              backgroundColor: colorScheme.brand.shade100,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(radius.xxl),
-              ),
-              side: BorderSide.none,
-              child: Text(
-                'Sure, I can help with that!',
-                style: TextStyle(color: colorScheme.brand.shade900),
-              ),
-            ),
+          label: 'End (outgoing)',
+          child: _PlacedBubble(
+            alignment: StreamMessageAlignment.end,
+            stackPosition: StreamMessageStackPosition.single,
+            crossAlign: CrossAxisAlignment.end,
+            text: 'Sure, I can help with that!',
           ),
         ),
       ],
@@ -165,77 +109,72 @@ class _IncomingOutgoingSection extends StatelessWidget {
   }
 }
 
-class _GroupPositionsSection extends StatelessWidget {
+class _StackPositionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final radius = context.streamRadius;
-
-    const tailRadius = Radius.circular(4);
-
-    return _Section(
-      label: 'GROUP POSITIONS',
+    return const _Section(
+      label: 'STACK POSITIONS',
       description:
           'Corner radii change based on position within a '
-          'consecutive message group.',
+          'consecutive message stack.',
       children: [
         _ExampleCard(
           label: 'Single (standalone)',
-          subtitle: 'All corners rounded',
-          child: StreamMessageBubble(
-            backgroundColor: colorScheme.backgroundSurface,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(radius.xxl),
-            ),
-            side: BorderSide(color: colorScheme.borderSubtle),
-            child: const Text('A standalone message'),
+          child: _PlacedBubble(
+            alignment: StreamMessageAlignment.start,
+            stackPosition: StreamMessageStackPosition.single,
+            crossAlign: CrossAxisAlignment.start,
+            text: 'A standalone message',
           ),
         ),
         _ExampleCard(
-          label: 'Grouped messages (top → middle → bottom)',
-          subtitle: 'Inner corners tighten on the sender side',
+          label: 'Incoming stack (top → middle → bottom)',
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 2,
             children: [
-              StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: radius.xxl,
-                    topEnd: radius.xxl,
-                    bottomStart: tailRadius,
-                    bottomEnd: radius.xxl,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('First message in group'),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.start,
+                stackPosition: StreamMessageStackPosition.top,
+                crossAlign: CrossAxisAlignment.start,
+                text: 'First message in group',
               ),
-              StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: tailRadius,
-                    topEnd: radius.xxl,
-                    bottomStart: tailRadius,
-                    bottomEnd: radius.xxl,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('Middle message'),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.start,
+                stackPosition: StreamMessageStackPosition.middle,
+                crossAlign: CrossAxisAlignment.start,
+                text: 'Middle message',
               ),
-              StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: tailRadius,
-                    topEnd: radius.xxl,
-                    bottomStart: radius.xxl,
-                    bottomEnd: radius.xxl,
-                  ),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('Last message in group'),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.start,
+                stackPosition: StreamMessageStackPosition.bottom,
+                crossAlign: CrossAxisAlignment.start,
+                text: 'Last message in group',
+              ),
+            ],
+          ),
+        ),
+        _ExampleCard(
+          label: 'Outgoing stack (top → middle → bottom)',
+          child: Column(
+            spacing: 2,
+            children: [
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.end,
+                stackPosition: StreamMessageStackPosition.top,
+                crossAlign: CrossAxisAlignment.end,
+                text: 'First outgoing message',
+              ),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.end,
+                stackPosition: StreamMessageStackPosition.middle,
+                crossAlign: CrossAxisAlignment.end,
+                text: 'Middle outgoing',
+              ),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.end,
+                stackPosition: StreamMessageStackPosition.bottom,
+                crossAlign: CrossAxisAlignment.end,
+                text: 'Last outgoing message',
               ),
             ],
           ),
@@ -245,62 +184,45 @@ class _GroupPositionsSection extends StatelessWidget {
   }
 }
 
-class _RealWorldSection extends StatelessWidget {
+class _ConversationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final radius = context.streamRadius;
-
-    return _Section(
-      label: 'REAL-WORLD EXAMPLES',
-      description: 'Bubbles composed with metadata and reactions.',
+    return const _Section(
+      label: 'CONVERSATION',
+      description: 'A realistic exchange showing how alignment and stack position combine.',
       children: [
         _ExampleCard(
-          label: 'Incoming with metadata',
+          label: 'Mixed thread',
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 4,
+            spacing: 2,
             children: [
-              StreamMessageBubble(
-                backgroundColor: colorScheme.backgroundSurface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(radius.xxl),
-                ),
-                side: BorderSide(color: colorScheme.borderSubtle),
-                child: const Text('Has anyone tried the new Flutter update?'),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.start,
+                stackPosition: StreamMessageStackPosition.top,
+                crossAlign: CrossAxisAlignment.start,
+                text: 'Hey, are you free this weekend?',
               ),
-              StreamMessageMetadata(
-                timestamp: const Text('09:41'),
-                username: const Text('Alice'),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.start,
+                stackPosition: StreamMessageStackPosition.bottom,
+                crossAlign: CrossAxisAlignment.start,
+                text: 'We could go hiking 🏔️',
+              ),
+              SizedBox(height: 8),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.end,
+                stackPosition: StreamMessageStackPosition.single,
+                crossAlign: CrossAxisAlignment.end,
+                text: 'Sounds great! Let me check my schedule.',
+              ),
+              SizedBox(height: 8),
+              _PlacedBubble(
+                alignment: StreamMessageAlignment.start,
+                stackPosition: StreamMessageStackPosition.single,
+                crossAlign: CrossAxisAlignment.start,
+                text: 'Perfect, let me know! 👍',
               ),
             ],
-          ),
-        ),
-        _ExampleCard(
-          label: 'Outgoing with status',
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              spacing: 4,
-              children: [
-                StreamMessageBubble(
-                  backgroundColor: colorScheme.brand.shade100,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(radius.xxl),
-                  ),
-                  side: BorderSide.none,
-                  child: Text(
-                    'Sure, I can help with that!',
-                    style: TextStyle(color: colorScheme.brand.shade900),
-                  ),
-                ),
-                StreamMessageMetadata(
-                  timestamp: const Text('09:42'),
-                  status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
-                ),
-              ],
-            ),
           ),
         ),
       ],
@@ -308,37 +230,43 @@ class _RealWorldSection extends StatelessWidget {
   }
 }
 
-class _ThemeOverrideSection extends StatelessWidget {
+class _StyleOverrideSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-
     return _Section(
       label: 'STYLE OVERRIDE',
       description:
           'Pass a custom StreamMessageBubbleStyle to override '
-          'individual properties.',
+          'individual properties while still using placement scope.',
       children: [
         _ExampleCard(
           label: 'Stadium shape with large padding',
           child: StreamMessageBubble(
-            backgroundColor: colorScheme.backgroundSurface,
-            shape: const StadiumBorder(),
-            side: const BorderSide(color: Colors.deepPurple, width: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: const Text('Custom shape!'),
+            style: StreamMessageBubbleStyle.from(
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 16,
+              ),
+            ),
+            child: StreamMessageText('Custom shape!'),
           ),
         ),
         _ExampleCard(
           label: 'Beveled rectangle',
-          child: StreamMessageBubble(
-            backgroundColor: colorScheme.backgroundSurface,
-            shape: const BeveledRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
+          child: StreamMessagePlacement(
+            placement: const StreamMessagePlacementData(
+              alignment: StreamMessageAlignment.end,
             ),
-            side: const BorderSide(color: Colors.teal),
-            padding: const EdgeInsets.all(16),
-            child: const Text('Beveled corners'),
+            child: StreamMessageBubble(
+              style: StreamMessageBubbleStyle.from(
+                shape: const BeveledRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+                padding: const EdgeInsets.all(16),
+              ),
+              child: StreamMessageText('Beveled corners'),
+            ),
           ),
         ),
       ],
@@ -349,6 +277,44 @@ class _ThemeOverrideSection extends StatelessWidget {
 // =============================================================================
 // Helper Widgets
 // =============================================================================
+
+class _PlacedBubble extends StatelessWidget {
+  const _PlacedBubble({
+    required this.alignment,
+    required this.stackPosition,
+    required this.crossAlign,
+    required this.text,
+  });
+
+  final StreamMessageAlignment alignment;
+  final StreamMessageStackPosition stackPosition;
+  final CrossAxisAlignment crossAlign;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final placement = StreamMessagePlacementData(
+      alignment: alignment,
+      stackPosition: stackPosition,
+    );
+    final isDefault = placement == const StreamMessagePlacementData();
+
+    Widget child = StreamMessageBubble(child: StreamMessageText(text));
+    if (!isDefault) {
+      child = StreamMessagePlacement(
+        placement: placement,
+        child: child,
+      );
+    }
+
+    return Align(
+      alignment: crossAlign == CrossAxisAlignment.end
+          ? AlignmentDirectional.centerEnd
+          : AlignmentDirectional.centerStart,
+      child: child,
+    );
+  }
+}
 
 class _Section extends StatelessWidget {
   const _Section({
@@ -414,11 +380,9 @@ class _ExampleCard extends StatelessWidget {
   const _ExampleCard({
     required this.label,
     required this.child,
-    this.subtitle,
   });
 
   final String label;
-  final String? subtitle;
   final Widget child;
 
   @override
@@ -441,27 +405,13 @@ class _ExampleCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 2,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: colorScheme.textSecondary,
-                ),
-              ),
-              if (subtitle case final sub?)
-                Text(
-                  sub,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.textTertiary,
-                  ),
-                ),
-            ],
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.textSecondary,
+            ),
           ),
           child,
         ],

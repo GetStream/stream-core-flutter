@@ -9,12 +9,12 @@ part of 'stream_message_metadata_theme.dart';
 // ThemeGenGenerator
 // **************************************************************************
 
-mixin _$StreamMessageMetadataThemeData {
+mixin _$StreamMessageMetadataStyle {
   bool get canMerge => true;
 
-  static StreamMessageMetadataThemeData? lerp(
-    StreamMessageMetadataThemeData? a,
-    StreamMessageMetadataThemeData? b,
+  static StreamMessageMetadataStyle? lerp(
+    StreamMessageMetadataStyle? a,
+    StreamMessageMetadataStyle? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -29,45 +29,92 @@ mixin _$StreamMessageMetadataThemeData {
       return t == 0.0 ? a : null;
     }
 
-    return StreamMessageMetadataThemeData(
-      usernameTextStyle: TextStyle.lerp(
+    return StreamMessageMetadataStyle(
+      usernameTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
         a.usernameTextStyle,
         b.usernameTextStyle,
         t,
+        TextStyle.lerp,
       ),
-      usernameColor: Color.lerp(a.usernameColor, b.usernameColor, t),
-      timestampTextStyle: TextStyle.lerp(
+      usernameColor: StreamMessageStyleProperty.lerp<Color?>(
+        a.usernameColor,
+        b.usernameColor,
+        t,
+        Color.lerp,
+      ),
+      timestampTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
         a.timestampTextStyle,
         b.timestampTextStyle,
         t,
+        TextStyle.lerp,
       ),
-      timestampColor: Color.lerp(a.timestampColor, b.timestampColor, t),
-      editedTextStyle: TextStyle.lerp(a.editedTextStyle, b.editedTextStyle, t),
-      editedColor: Color.lerp(a.editedColor, b.editedColor, t),
-      statusColor: Color.lerp(a.statusColor, b.statusColor, t),
-      statusIconSize: lerpDouble$(a.statusIconSize, b.statusIconSize, t),
-      spacing: lerpDouble$(a.spacing, b.spacing, t),
-      statusSpacing: lerpDouble$(a.statusSpacing, b.statusSpacing, t),
-      minHeight: lerpDouble$(a.minHeight, b.minHeight, t),
+      timestampColor: StreamMessageStyleProperty.lerp<Color?>(
+        a.timestampColor,
+        b.timestampColor,
+        t,
+        Color.lerp,
+      ),
+      editedTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+        a.editedTextStyle,
+        b.editedTextStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      editedColor: StreamMessageStyleProperty.lerp<Color?>(
+        a.editedColor,
+        b.editedColor,
+        t,
+        Color.lerp,
+      ),
+      statusColor: StreamMessageStyleProperty.lerp<Color?>(
+        a.statusColor,
+        b.statusColor,
+        t,
+        Color.lerp,
+      ),
+      statusIconSize: StreamMessageStyleProperty.lerp<double?>(
+        a.statusIconSize,
+        b.statusIconSize,
+        t,
+        lerpDouble$,
+      ),
+      spacing: StreamMessageStyleProperty.lerp<double?>(
+        a.spacing,
+        b.spacing,
+        t,
+        lerpDouble$,
+      ),
+      statusSpacing: StreamMessageStyleProperty.lerp<double?>(
+        a.statusSpacing,
+        b.statusSpacing,
+        t,
+        lerpDouble$,
+      ),
+      minHeight: StreamMessageStyleProperty.lerp<double?>(
+        a.minHeight,
+        b.minHeight,
+        t,
+        lerpDouble$,
+      ),
     );
   }
 
-  StreamMessageMetadataThemeData copyWith({
-    TextStyle? usernameTextStyle,
-    Color? usernameColor,
-    TextStyle? timestampTextStyle,
-    Color? timestampColor,
-    TextStyle? editedTextStyle,
-    Color? editedColor,
-    Color? statusColor,
-    double? statusIconSize,
-    double? spacing,
-    double? statusSpacing,
-    double? minHeight,
+  StreamMessageMetadataStyle copyWith({
+    StreamMessageStyleProperty<TextStyle?>? usernameTextStyle,
+    StreamMessageStyleProperty<Color?>? usernameColor,
+    StreamMessageStyleProperty<TextStyle?>? timestampTextStyle,
+    StreamMessageStyleProperty<Color?>? timestampColor,
+    StreamMessageStyleProperty<TextStyle?>? editedTextStyle,
+    StreamMessageStyleProperty<Color?>? editedColor,
+    StreamMessageStyleProperty<Color?>? statusColor,
+    StreamMessageStyleProperty<double?>? statusIconSize,
+    StreamMessageStyleProperty<double?>? spacing,
+    StreamMessageStyleProperty<double?>? statusSpacing,
+    StreamMessageStyleProperty<double?>? minHeight,
   }) {
-    final _this = (this as StreamMessageMetadataThemeData);
+    final _this = (this as StreamMessageMetadataStyle);
 
-    return StreamMessageMetadataThemeData(
+    return StreamMessageMetadataStyle(
       usernameTextStyle: usernameTextStyle ?? _this.usernameTextStyle,
       usernameColor: usernameColor ?? _this.usernameColor,
       timestampTextStyle: timestampTextStyle ?? _this.timestampTextStyle,
@@ -82,8 +129,8 @@ mixin _$StreamMessageMetadataThemeData {
     );
   }
 
-  StreamMessageMetadataThemeData merge(StreamMessageMetadataThemeData? other) {
-    final _this = (this as StreamMessageMetadataThemeData);
+  StreamMessageMetadataStyle merge(StreamMessageMetadataStyle? other) {
+    final _this = (this as StreamMessageMetadataStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -94,17 +141,11 @@ mixin _$StreamMessageMetadataThemeData {
     }
 
     return copyWith(
-      usernameTextStyle:
-          _this.usernameTextStyle?.merge(other.usernameTextStyle) ??
-          other.usernameTextStyle,
+      usernameTextStyle: other.usernameTextStyle,
       usernameColor: other.usernameColor,
-      timestampTextStyle:
-          _this.timestampTextStyle?.merge(other.timestampTextStyle) ??
-          other.timestampTextStyle,
+      timestampTextStyle: other.timestampTextStyle,
       timestampColor: other.timestampColor,
-      editedTextStyle:
-          _this.editedTextStyle?.merge(other.editedTextStyle) ??
-          other.editedTextStyle,
+      editedTextStyle: other.editedTextStyle,
       editedColor: other.editedColor,
       statusColor: other.statusColor,
       statusIconSize: other.statusIconSize,
@@ -124,8 +165,8 @@ mixin _$StreamMessageMetadataThemeData {
       return false;
     }
 
-    final _this = (this as StreamMessageMetadataThemeData);
-    final _other = (other as StreamMessageMetadataThemeData);
+    final _this = (this as StreamMessageMetadataStyle);
+    final _other = (other as StreamMessageMetadataStyle);
 
     return _other.usernameTextStyle == _this.usernameTextStyle &&
         _other.usernameColor == _this.usernameColor &&
@@ -142,7 +183,7 @@ mixin _$StreamMessageMetadataThemeData {
 
   @override
   int get hashCode {
-    final _this = (this as StreamMessageMetadataThemeData);
+    final _this = (this as StreamMessageMetadataStyle);
 
     return Object.hash(
       runtimeType,

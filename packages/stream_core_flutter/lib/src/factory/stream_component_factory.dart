@@ -150,6 +150,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageContentProps>? messageContent,
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
+    StreamComponentBuilder<StreamMessageTextProps>? messageText,
+    StreamComponentBuilder<StreamMessageWidgetProps>? messageWidget,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
@@ -177,6 +179,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageContent: messageContent,
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
+      messageText: messageText,
+      messageWidget: messageWidget,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
       reactions: reactions,
@@ -205,6 +209,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageContent,
     required this.messageMetadata,
     required this.messageReplies,
+    required this.messageText,
+    required this.messageWidget,
     required this.onlineIndicator,
     required this.progressBar,
     required this.reactions,
@@ -325,6 +331,16 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamMessageReplies] uses [DefaultStreamMessageReplies].
   final StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies;
+
+  /// Custom builder for message text (markdown) widgets.
+  ///
+  /// When null, [StreamMessageText] uses [DefaultStreamMessageText].
+  final StreamComponentBuilder<StreamMessageTextProps>? messageText;
+
+  /// Custom builder for message widget (top-level message item).
+  ///
+  /// When null, [StreamMessageWidget] uses [DefaultStreamMessageWidget].
+  final StreamComponentBuilder<StreamMessageWidgetProps>? messageWidget;
 
   /// Custom builder for online indicator widgets.
   ///

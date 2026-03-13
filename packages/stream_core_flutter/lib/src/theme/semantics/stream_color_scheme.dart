@@ -72,6 +72,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
+    Color? backgroundHighlight,
 
     // Background - Elevation
     Color? backgroundElevation0,
@@ -139,6 +140,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundOverlayDark ??= light_tokens.StreamTokens.backgroundCoreOverlayDark;
     backgroundDisabled ??= light_tokens.StreamTokens.backgroundCoreDisabled;
     backgroundInverse ??= light_tokens.StreamTokens.backgroundCoreInverse;
+    backgroundHighlight ??= StreamColors.yellow.shade50;
 
     backgroundElevation0 ??= light_tokens.StreamTokens.backgroundElevationElevation0;
     backgroundElevation1 ??= light_tokens.StreamTokens.backgroundElevationElevation1;
@@ -224,6 +226,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundOverlayDark: backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
+      backgroundHighlight: backgroundHighlight,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
@@ -284,6 +287,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
+    Color? backgroundHighlight,
     // Background - Elevation
     Color? backgroundElevation0,
     Color? backgroundElevation1,
@@ -349,6 +353,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundOverlayDark ??= dark_tokens.StreamTokens.backgroundCoreOverlayDark;
     backgroundDisabled ??= dark_tokens.StreamTokens.backgroundCoreDisabled;
     backgroundInverse ??= dark_tokens.StreamTokens.backgroundCoreInverse;
+    backgroundHighlight ??= StreamColors.yellow.shade800;
 
     backgroundElevation0 ??= dark_tokens.StreamTokens.backgroundElevationElevation0;
     backgroundElevation1 ??= dark_tokens.StreamTokens.backgroundElevationElevation1;
@@ -434,6 +439,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundOverlayDark: backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
+      backgroundHighlight: backgroundHighlight,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
@@ -492,6 +498,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundOverlayDark,
     required this.backgroundDisabled,
     required this.backgroundInverse,
+    required this.backgroundHighlight,
     // Background - Elevation
     required this.backgroundElevation0,
     required this.backgroundElevation1,
@@ -606,6 +613,9 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The inverse background color.
   final Color backgroundInverse;
+
+  /// The highlight background color for pinned or accented items.
+  final Color backgroundHighlight;
 
   // ---- Background - Elevation ----
 
