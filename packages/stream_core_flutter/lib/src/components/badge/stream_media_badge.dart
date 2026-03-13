@@ -12,7 +12,7 @@ class StreamMediaBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: context.streamColorScheme.backgroundInverse,
+        color: context.streamColorScheme.chrome[10000],
         borderRadius: BorderRadius.all(context.streamRadius.max),
       ),
       padding: EdgeInsets.symmetric(
@@ -28,13 +28,13 @@ class StreamMediaBadge extends StatelessWidget {
               MediaBadgeType.audio => context.streamIcons.microphoneSolid,
             },
             size: 12,
-            color: context.streamColorScheme.textOnAccent,
+            color: context.streamColorScheme.textInverse,
           ),
 
           if (duration case final duration?)
             Text(
               duration.toReadableString(),
-              style: context.streamTextTheme.numericMd.copyWith(color: context.streamColorScheme.textOnAccent),
+              style: context.streamTextTheme.numericMd.copyWith(color: context.streamColorScheme.textInverse),
             ),
         ],
       ),
