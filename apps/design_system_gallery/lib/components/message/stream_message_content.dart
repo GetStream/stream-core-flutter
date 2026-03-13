@@ -120,7 +120,10 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
       body = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        children: [buildReactions(child: messageWidget), ?replies],
+        children: [
+          buildReactions(child: messageWidget),
+          ?replies,
+        ],
       );
     } else {
       body = buildReactions(

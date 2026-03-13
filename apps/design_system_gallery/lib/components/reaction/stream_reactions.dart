@@ -565,8 +565,7 @@ class _EmojiOnlyShowcaseSection extends StatelessWidget {
       StreamReactionsPosition position = StreamReactionsPosition.footer,
     }) {
       final isEnd = alignment == StreamMessageAlignment.end;
-      final crossAxis =
-          isEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+      final crossAxis = isEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
 
       final messageText = StreamMessageText(text);
 

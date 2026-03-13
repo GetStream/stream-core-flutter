@@ -551,10 +551,10 @@ class _RealWorldSection extends StatelessWidget {
               ),
               child: StreamMessageBubble(
                 child: StreamMessageText(
-                    'Hey [@Sarah](mention:sarah42), have you tried the '
-                    '**new Flutter update**? The performance '
-                    'improvements are _amazing_!',
-                    onTapMention: (displayText, id) => _showSnack(context, 'Mention: $displayText (id: $id)'),
+                  'Hey [@Sarah](mention:sarah42), have you tried the '
+                  '**new Flutter update**? The performance '
+                  'improvements are _amazing_!',
+                  onTapMention: (displayText, id) => _showSnack(context, 'Mention: $displayText (id: $id)'),
                 ),
               ),
             ),
@@ -569,19 +569,19 @@ class _RealWorldSection extends StatelessWidget {
             ),
             child: StreamMessageBubble(
               child: StreamMessageText(
-                  '## Quick Sort in Dart\n\n'
-                  "Here's an efficient implementation:\n\n"
-                  '```dart\n'
-                  'List<int> quickSort(List<int> list) {\n'
-                  '  if (list.length <= 1) return list;\n'
-                  '  final pivot = list[list.length ~/ 2];\n'
-                  '  final less = list.where((e) => e < pivot).toList();\n'
-                  '  final equal = list.where((e) => e == pivot).toList();\n'
-                  '  final greater = list.where((e) => e > pivot).toList();\n'
-                  '  return [...quickSort(less), ...equal, ...quickSort(greater)];\n'
-                  '}\n'
-                  '```\n\n'
-                  'The time complexity is **O(n log n)** on average.',
+                '## Quick Sort in Dart\n\n'
+                "Here's an efficient implementation:\n\n"
+                '```dart\n'
+                'List<int> quickSort(List<int> list) {\n'
+                '  if (list.length <= 1) return list;\n'
+                '  final pivot = list[list.length ~/ 2];\n'
+                '  final less = list.where((e) => e < pivot).toList();\n'
+                '  final equal = list.where((e) => e == pivot).toList();\n'
+                '  final greater = list.where((e) => e > pivot).toList();\n'
+                '  return [...quickSort(less), ...equal, ...quickSort(greater)];\n'
+                '}\n'
+                '```\n\n'
+                'The time complexity is **O(n log n)** on average.',
               ),
             ),
           ),
@@ -607,11 +607,11 @@ class _RealWorldSection extends StatelessWidget {
             ),
             child: StreamMessageBubble(
               child: StreamMessageText(
-                  'Meeting agenda:\n\n'
-                  '1. **Sprint review** — demo the new features\n'
-                  '2. **Retro** — what went well / what to improve\n'
-                  '3. **Planning** — next sprint priorities\n\n'
-                  '> Please come prepared with your updates.',
+                'Meeting agenda:\n\n'
+                '1. **Sprint review** — demo the new features\n'
+                '2. **Retro** — what went well / what to improve\n'
+                '3. **Planning** — next sprint priorities\n\n'
+                '> Please come prepared with your updates.',
               ),
             ),
           ),
@@ -624,18 +624,18 @@ class _RealWorldSection extends StatelessWidget {
               timestamp: const Text('10:15'),
             ),
             child: StreamReactions.segmented(
-                items: const [
-                  StreamReactionsItem(emoji: Text('\u{1F680}'), count: 5),
-                  StreamReactionsItem(emoji: Text('\u{1F44D}'), count: 3),
-                  StreamReactionsItem(emoji: Text('\u{2764}\u{FE0F}'), count: 2),
-                ],
-                child: StreamMessageBubble(
-                  child: StreamMessageText(
-                    'Just shipped the new **markdown component**!\n\n'
-                    'Features:\n'
-                    '- Full GFM support\n'
-                    '- Placement-aware theming\n'
-                    '- Custom builder extensibility',
+              items: const [
+                StreamReactionsItem(emoji: Text('\u{1F680}'), count: 5),
+                StreamReactionsItem(emoji: Text('\u{1F44D}'), count: 3),
+                StreamReactionsItem(emoji: Text('\u{2764}\u{FE0F}'), count: 2),
+              ],
+              child: StreamMessageBubble(
+                child: StreamMessageText(
+                  'Just shipped the new **markdown component**!\n\n'
+                  'Features:\n'
+                  '- Full GFM support\n'
+                  '- Placement-aware theming\n'
+                  '- Custom builder extensibility',
                 ),
               ),
             ),
