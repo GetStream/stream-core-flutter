@@ -165,7 +165,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderOpacityStrong ??= light_tokens.StreamTokens.borderCoreOpacityStrong;
 
     // Border - Utility
-    borderFocus ??= brand.shade300;
+    borderFocus ??= brand.shade150;
     borderDisabled ??= chrome.shade100;
     borderHover ??= light_tokens.StreamTokens.borderUtilityHover;
     borderPressed ??= light_tokens.StreamTokens.borderUtilityPressed;
@@ -173,7 +173,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderError ??= accentError;
     borderWarning ??= accentWarning;
     borderSuccess ??= accentSuccess;
-    borderSelected ??= accentPrimary;
+    borderSelected ??= light_tokens.StreamTokens.borderUtilitySelected;
 
     // State
     stateHover ??= light_tokens.StreamTokens.backgroundUtilityHover;
@@ -344,7 +344,7 @@ class StreamColorScheme with _$StreamColorScheme {
     chrome ??= StreamChromeColor.dark();
 
     // Accent
-    accentPrimary ??= brand.shade500;
+    accentPrimary ??= brand.shade400;
     accentSuccess ??= dark_tokens.StreamTokens.accentSuccess;
     accentWarning ??= dark_tokens.StreamTokens.accentWarning;
     accentError ??= dark_tokens.StreamTokens.accentError;
@@ -356,7 +356,7 @@ class StreamColorScheme with _$StreamColorScheme {
     textTertiary ??= chrome.shade500;
     textDisabled ??= chrome.shade300;
     textInverse ??= chrome[1000] ?? StreamColors.black;
-    textLink ??= accentPrimary;
+    textLink ??= brand.shade600;
     textOnAccent ??= chrome[0] ?? StreamColors.white;
 
     // Background
@@ -390,7 +390,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderOnSurface ??= chrome.shade200;
 
     // Border - Utility
-    borderFocus ??= brand.shade300;
+    borderFocus ??= brand.shade150;
     borderDisabled ??= chrome.shade100;
     borderHover ??= dark_tokens.StreamTokens.borderUtilityHover;
     borderPressed ??= dark_tokens.StreamTokens.borderUtilityPressed;
@@ -398,7 +398,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderError ??= accentError;
     borderWarning ??= accentWarning;
     borderSuccess ??= accentSuccess;
-    borderSelected ??= accentPrimary;
+    borderSelected ??= dark_tokens.StreamTokens.borderUtilitySelected;
 
     // State
     stateHover ??= dark_tokens.StreamTokens.backgroundUtilityHover;
