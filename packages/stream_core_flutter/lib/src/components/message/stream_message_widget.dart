@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme.dart';
 import '../common/stream_visibility.dart';
+import '../message_placement/stream_channel_kind.dart';
 import '../message_placement/stream_message_alignment.dart';
 import '../message_placement/stream_message_placement.dart';
 import '../message_placement/stream_message_stack_position.dart';
@@ -59,14 +60,15 @@ class StreamMessageWidget extends StatelessWidget {
   /// Creates a message item.
   ///
   /// The [child] is required. An optional [leading] widget is displayed
-  /// alongside the content. The [alignment] and [stackPosition] configure
-  /// the [StreamMessagePlacement] for descendants.
+  /// alongside the content. The [alignment], [stackPosition], and
+  /// [channelKind] configure the [StreamMessagePlacement] for descendants.
   StreamMessageWidget({
     super.key,
     Widget? leading,
     required Widget child,
     StreamMessageAlignment alignment = .start,
     StreamMessageStackPosition stackPosition = .single,
+    StreamChannelKind channelKind = .group,
     StreamVisibility? leadingVisibility,
     EdgeInsetsGeometry? padding,
     double? spacing,
@@ -77,6 +79,7 @@ class StreamMessageWidget extends StatelessWidget {
          child: child,
          alignment: alignment,
          stackPosition: stackPosition,
+         channelKind: channelKind,
          leadingVisibility: leadingVisibility,
          padding: padding,
          spacing: spacing,
@@ -92,6 +95,7 @@ class StreamMessageWidget extends StatelessWidget {
     placement: StreamMessagePlacementData(
       alignment: props.alignment,
       stackPosition: props.stackPosition,
+      channelKind: props.channelKind,
     ),
     child: Builder(
       builder: (context) {
@@ -115,6 +119,7 @@ class StreamMessageWidgetProps {
     required this.child,
     this.alignment = .start,
     this.stackPosition = .single,
+    this.channelKind = .group,
     this.leadingVisibility,
     this.padding,
     this.spacing,
@@ -152,6 +157,15 @@ class StreamMessageWidgetProps {
   ///
   /// Defaults to [StreamMessageStackPosition.single].
   final StreamMessageStackPosition stackPosition;
+
+  /// The kind of channel this message is displayed in.
+  ///
+  /// Establishes the [StreamMessagePlacement] channel kind for
+  /// descendants, which sub-components use to adapt their appearance
+  /// (e.g. hiding avatars in direct channels).
+  ///
+  /// Defaults to [StreamChannelKind.group].
+  final StreamChannelKind channelKind;
 
   /// Overrides the leading widget visibility for this message item.
   ///
@@ -233,21 +247,18 @@ class DefaultStreamMessageWidget extends StatelessWidget {
       StreamMessageAlignment.end => [content, ?leadingWidget],
     };
 
-    return StreamMessagePlacement(
-      placement: placement,
-      child: Material(
-        animateColor: true,
-        color: effectiveBackgroundColor,
-        child: InkWell(
-          onTap: props.onTap,
-          onLongPress: props.onLongPress,
-          child: Padding(
-            padding: effectivePadding,
-            child: Row(
-              spacing: effectiveSpacing,
-              crossAxisAlignment: .end,
-              children: children,
-            ),
+    return Material(
+      animateColor: true,
+      color: effectiveBackgroundColor,
+      child: InkWell(
+        onTap: props.onTap,
+        onLongPress: props.onLongPress,
+        child: Padding(
+          padding: effectivePadding,
+          child: Row(
+            spacing: effectiveSpacing,
+            crossAxisAlignment: .end,
+            children: children,
           ),
         ),
       ),
@@ -273,10 +284,10 @@ class _StreamMessageWidgetDefaults extends StreamMessageItemThemeData {
 
   @override
   StreamMessageStyleVisibility get leadingVisibility => .resolveWith(
-    (placement) => switch ((placement.alignment, placement.stackPosition)) {
-      (.end, _) => .gone,
-      (_, .top || .middle) => .hidden,
-      (_, .single || .bottom) => .visible,
+    (placement) => switch ((placement.channelKind, placement.alignment, placement.stackPosition)) {
+      (.direct, _, _) || (_, .end, _) => .gone,
+      (_, _, .top || .middle) => .hidden,
+      (_, _, .single || .bottom) => .visible,
     },
   );
 }

@@ -31,6 +31,7 @@ export 'components/message/stream_message_replies.dart' hide DefaultStreamMessag
 export 'components/message/stream_message_text.dart' hide DefaultStreamMessageText;
 export 'components/message/stream_message_widget.dart' hide DefaultStreamMessageWidget;
 export 'components/message_composer.dart';
+export 'components/message_placement/stream_channel_kind.dart';
 export 'components/message_placement/stream_message_alignment.dart';
 export 'components/message_placement/stream_message_placement.dart';
 export 'components/message_placement/stream_message_stack_position.dart';

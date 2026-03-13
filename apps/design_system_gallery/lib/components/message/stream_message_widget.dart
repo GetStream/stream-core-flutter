@@ -38,6 +38,14 @@ Widget buildStreamMessageWidgetPlayground(BuildContext context) {
     description: 'Number of messages in the stack. Positions are assigned automatically.',
   );
 
+  final channelKind = context.knobs.object.dropdown<StreamChannelKind>(
+    label: 'Channel Kind',
+    options: StreamChannelKind.values,
+    initialOption: StreamChannelKind.group,
+    labelBuilder: (v) => v.name,
+    description: 'Direct (1-to-1) hides avatars; group shows them.',
+  );
+
   // -- Content slots ----------------------------------------------------------
 
   final showHeader = context.knobs.boolean(
@@ -167,6 +175,7 @@ Widget buildStreamMessageWidgetPlayground(BuildContext context) {
       StreamMessageWidget(
         alignment: alignment,
         stackPosition: stackPositionFor(i, messageCount),
+        channelKind: channelKind,
         onTap: () => _showSnack(context, 'Message tapped'),
         onLongPress: () => _showSnack(context, 'Message long-pressed'),
         leading: avatar,
@@ -237,6 +246,7 @@ Widget buildStreamMessageWidgetShowcase(BuildContext context) {
         children: [
           _AlignmentSection(),
           _StackPositionsSection(),
+          _ChannelKindSection(),
           _VisibilitySection(),
           _FullCompositionSection(),
           _EmojiOnlySection(),
@@ -354,6 +364,67 @@ class _StackPositionsSection extends StatelessWidget {
                 stackPosition: StreamMessageStackPosition.bottom,
                 avatarIndex: 1,
                 text: "Can't wait to try it in our app",
+                timestamp: '09:42',
+                status: Icon(StreamIconData.iconDoupleCheckmark1Small),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChannelKindSection extends StatelessWidget {
+  const _ChannelKindSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _Section(
+      label: 'CHANNEL KIND',
+      description:
+          'In direct (1-to-1) channels, avatars are hidden by default since '
+          'the sender is always known. In group channels, avatars are shown '
+          'for identification.',
+      children: [
+        _ExampleCard(
+          label: 'Group channel — avatars visible',
+          child: Column(
+            spacing: 2,
+            children: [
+              _MessageItem(
+                avatarIndex: 0,
+                text: 'In a group channel, avatars help identify the sender.',
+                timestamp: '09:41',
+                username: 'Alice',
+              ),
+              _MessageItem(
+                alignment: StreamMessageAlignment.end,
+                avatarIndex: 1,
+                text: 'Makes sense for multi-participant chats!',
+                timestamp: '09:42',
+                status: Icon(StreamIconData.iconDoupleCheckmark1Small),
+              ),
+            ],
+          ),
+        ),
+        _ExampleCard(
+          label: 'Direct channel — avatars hidden',
+          child: Column(
+            spacing: 2,
+            children: [
+              _MessageItem(
+                channelKind: StreamChannelKind.direct,
+                avatarIndex: 0,
+                text: 'In a direct channel, you already know who is talking.',
+                timestamp: '09:41',
+                username: 'Alice',
+              ),
+              _MessageItem(
+                channelKind: StreamChannelKind.direct,
+                alignment: StreamMessageAlignment.end,
+                avatarIndex: 1,
+                text: 'So avatars are removed to save space.',
                 timestamp: '09:42',
                 status: Icon(StreamIconData.iconDoupleCheckmark1Small),
               ),
@@ -744,6 +815,7 @@ class _MessageItem extends StatelessWidget {
   const _MessageItem({
     this.alignment = StreamMessageAlignment.start,
     this.stackPosition = StreamMessageStackPosition.single,
+    this.channelKind = StreamChannelKind.group,
     this.avatarIndex,
     required this.text,
     this.timestamp,
@@ -758,6 +830,7 @@ class _MessageItem extends StatelessWidget {
 
   final StreamMessageAlignment alignment;
   final StreamMessageStackPosition stackPosition;
+  final StreamChannelKind channelKind;
   final int? avatarIndex;
   final String text;
   final String? timestamp;
@@ -805,6 +878,7 @@ class _MessageItem extends StatelessWidget {
       padding: .zero,
       alignment: alignment,
       stackPosition: stackPosition,
+      channelKind: channelKind,
       leading: leading,
       child: StreamMessageContent(
         header: annotation,

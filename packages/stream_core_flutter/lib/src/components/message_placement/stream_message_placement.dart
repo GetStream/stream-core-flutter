@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'stream_channel_kind.dart';
 import 'stream_message_alignment.dart';
 import 'stream_message_stack_position.dart';
 
@@ -14,6 +15,9 @@ enum _StreamMessagePlacementAspect {
 
   // The vertical stack position axis (single / top / middle / bottom).
   stackPosition,
+
+  // The channel kind (direct / group).
+  channelKind,
 }
 
 /// Provides [StreamMessagePlacementData] to descendant widgets.
@@ -27,10 +31,12 @@ enum _StreamMessagePlacementAspect {
 ///    the alignment (ignores stack position changes).
 ///  * [stackPositionOf] — returns only the stack position (ignores alignment
 ///    changes).
+///  * [channelKindOf] — returns only the channel kind (ignores alignment and
+///    stack position changes).
 ///
 /// When no [StreamMessagePlacement] is found in the tree, a default placement
-/// of [StreamMessageAlignment.start] + [StreamMessageStackPosition.single] is
-/// returned.
+/// of [StreamMessageAlignment.start] + [StreamMessageStackPosition.single] +
+/// [StreamChannelKind.group] is returned.
 ///
 /// {@tool snippet}
 ///
@@ -137,6 +143,21 @@ class StreamMessagePlacement extends InheritedModel<_StreamMessagePlacementAspec
     return _of(context, _StreamMessagePlacementAspect.stackPosition).stackPosition;
   }
 
+  /// Returns [StreamMessagePlacementData.channelKind] from the nearest
+  /// [StreamMessagePlacement] ancestor.
+  ///
+  /// Use of this method will cause the given [context] to rebuild any time
+  /// that the [StreamMessagePlacementData.channelKind] property of the
+  /// ancestor [StreamMessagePlacement] changes.
+  ///
+  /// Prefer using this function over getting the attribute directly from the
+  /// [StreamMessagePlacementData] returned from [of], because using this
+  /// function will only rebuild the [context] when this specific attribute
+  /// changes, not when _any_ attribute changes.
+  static StreamChannelKind channelKindOf(BuildContext context) {
+    return _of(context, _StreamMessagePlacementAspect.channelKind).channelKind;
+  }
+
   @override
   bool updateShouldNotify(StreamMessagePlacement oldWidget) => placement != oldWidget.placement;
 
@@ -150,6 +171,7 @@ class StreamMessagePlacement extends InheritedModel<_StreamMessagePlacementAspec
       return switch (dependency) {
         .alignment => placement.alignment != oldWidget.placement.alignment,
         .stackPosition => placement.stackPosition != oldWidget.placement.stackPosition,
+        .channelKind => placement.channelKind != oldWidget.placement.channelKind,
       };
     },
   );
@@ -157,23 +179,26 @@ class StreamMessagePlacement extends InheritedModel<_StreamMessagePlacementAspec
 
 /// Describes where a message sits within the message list layout.
 ///
-/// Combines [alignment] (start vs end) and [stackPosition]
-/// (single, top, middle, bottom) into a single value that
-/// [StreamMessageStyleProperty] resolvers use to compute placement-dependent
-/// styling.
+/// Combines [alignment] (start vs end), [stackPosition]
+/// (single, top, middle, bottom), and [channelKind] (direct vs group) into a
+/// single value that [StreamMessageStyleProperty] resolvers use to compute
+/// placement-dependent styling.
 ///
 /// {@tool snippet}
 ///
-/// Create a placement for an end-aligned message at the top of a stack:
+/// Create a placement for an end-aligned message at the top of a stack in a
+/// group channel:
 ///
 /// ```dart
 /// const placement = StreamMessagePlacementData(
 ///   alignment: StreamMessageAlignment.end,
 ///   stackPosition: StreamMessageStackPosition.top,
+///   channelKind: StreamChannelKind.group,
 /// );
 ///
 /// print(placement.alignment);       // StreamMessageAlignment.end
 /// print(placement.stackPosition);   // StreamMessageStackPosition.top
+/// print(placement.channelKind);     // StreamChannelKind.group
 /// ```
 /// {@end-tool}
 ///
@@ -181,16 +206,19 @@ class StreamMessagePlacement extends InheritedModel<_StreamMessagePlacementAspec
 ///
 ///  * [StreamMessageAlignment], the horizontal alignment axis.
 ///  * [StreamMessageStackPosition], the vertical stacking axis.
+///  * [StreamChannelKind], the kind of channel the message is displayed in.
 ///  * [StreamMessageStyleProperty], which resolves values based on placement.
 @immutable
 class StreamMessagePlacementData {
   /// Creates a message placement.
   ///
-  /// Defaults to a start-aligned, standalone message
-  /// ([StreamMessageAlignment.start] + [StreamMessageStackPosition.single]).
+  /// Defaults to a start-aligned, standalone message in a group channel
+  /// ([StreamMessageAlignment.start] + [StreamMessageStackPosition.single] +
+  /// [StreamChannelKind.group]).
   const StreamMessagePlacementData({
     this.alignment = .start,
     this.stackPosition = .single,
+    this.channelKind = .group,
   });
 
   /// The horizontal alignment of the message.
@@ -199,15 +227,22 @@ class StreamMessagePlacementData {
   /// The position of the message within a consecutive stack.
   final StreamMessageStackPosition stackPosition;
 
+  /// The kind of channel this message is displayed in.
+  final StreamChannelKind channelKind;
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is StreamMessagePlacementData && other.alignment == alignment && other.stackPosition == stackPosition;
+    return other is StreamMessagePlacementData &&
+        other.alignment == alignment &&
+        other.stackPosition == stackPosition &&
+        other.channelKind == channelKind;
   }
 
   @override
-  int get hashCode => Object.hash(alignment, stackPosition);
+  int get hashCode => Object.hash(alignment, stackPosition, channelKind);
 
   @override
-  String toString() => 'StreamMessagePlacementData(alignment: $alignment, stackPosition: $stackPosition)';
+  String toString() =>
+      'StreamMessagePlacementData(alignment: $alignment, stackPosition: $stackPosition, channelKind: $channelKind)';
 }
