@@ -442,7 +442,7 @@ class ThemeConfiguration extends ChangeNotifier {
     // Extract subscript lookups to avoid Dart parsing ambiguity with ?[] inside ternaries.
     final chromeShade0 = effectiveChrome?[0];
     final chromeShade1000 = effectiveChrome?[1000];
-    
+
     final effectiveAccentNeutral = _accentNeutral ?? effectiveChrome?.shade500;
     final effectiveTextPrimary = _textPrimary ?? effectiveChrome?.shade900;
     final effectiveTextSecondary = _textSecondary ?? effectiveChrome?.shade700;
@@ -459,14 +459,10 @@ class ThemeConfiguration extends ChangeNotifier {
     final effectiveBackgroundDisabled = _backgroundDisabled ?? effectiveChrome?.shade100;
     final effectiveBackgroundInverse = _backgroundInverse ?? effectiveChrome?.shade900;
     final effectiveBackgroundElevation0 = _backgroundElevation0 ?? (isDark ? chromeShade1000 : chromeShade0);
-    final effectiveBackgroundElevation1 =
-        _backgroundElevation1 ?? (isDark ? effectiveChrome?.shade50 : chromeShade0);
-    final effectiveBackgroundElevation2 =
-        _backgroundElevation2 ?? (isDark ? effectiveChrome?.shade100 : chromeShade0);
-    final effectiveBackgroundElevation3 =
-        _backgroundElevation3 ?? (isDark ? effectiveChrome?.shade200 : chromeShade0);
-    final effectiveBackgroundElevation4 =
-        _backgroundElevation4 ?? (isDark ? effectiveChrome?.shade300 : chromeShade0);
+    final effectiveBackgroundElevation1 = _backgroundElevation1 ?? (isDark ? effectiveChrome?.shade50 : chromeShade0);
+    final effectiveBackgroundElevation2 = _backgroundElevation2 ?? (isDark ? effectiveChrome?.shade100 : chromeShade0);
+    final effectiveBackgroundElevation3 = _backgroundElevation3 ?? (isDark ? effectiveChrome?.shade200 : chromeShade0);
+    final effectiveBackgroundElevation4 = _backgroundElevation4 ?? (isDark ? effectiveChrome?.shade300 : chromeShade0);
     // backgroundApp derives from backgroundElevation0 in both themes
     final effectiveBackgroundApp = _backgroundApp ?? effectiveBackgroundElevation0;
     // In dark, borderInverse uses a fixed token (not chrome); in light it uses chrome[0]
