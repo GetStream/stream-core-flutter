@@ -355,17 +355,16 @@ class StreamColorScheme with _$StreamColorScheme {
     textSecondary ??= chrome.shade700;
     textTertiary ??= chrome.shade500;
     textDisabled ??= chrome.shade300;
-    textInverse ??= chrome[1000] ?? StreamColors.black;
+    textInverse ??= chrome[0] ?? StreamColors.black;
     textLink ??= brand.shade600;
-    textOnAccent ??= chrome[0] ?? StreamColors.white;
+    textOnAccent ??= chrome[1000] ?? StreamColors.white;
 
     // Background
-    backgroundApp ??= chrome[1000] ?? StreamColors.black;
     backgroundSurface ??= chrome.shade100;
     backgroundSurfaceSubtle ??= chrome.shade50;
     backgroundSurfaceStrong ??= chrome.shade150;
     backgroundSurfaceCard ??= chrome.shade100;
-    backgroundOnAccent ??= chrome[0] ?? StreamColors.white;
+    backgroundOnAccent ??= chrome[1000] ?? StreamColors.white;
     backgroundHighlight ??= dark_tokens.StreamTokens.backgroundCoreHighlight;
     backgroundScrim ??= dark_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= dark_tokens.StreamTokens.backgroundCoreOverlayLight;
@@ -373,11 +372,13 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundDisabled ??= chrome.shade100;
     backgroundInverse ??= chrome.shade900;
 
-    backgroundElevation0 ??= chrome[1000] ?? StreamColors.black;
+    backgroundElevation0 ??= chrome[0] ?? StreamColors.black;
     backgroundElevation1 ??= chrome.shade50;
     backgroundElevation2 ??= chrome.shade100;
     backgroundElevation3 ??= chrome.shade200;
     backgroundElevation4 ??= chrome.shade300;
+
+    backgroundApp ??= backgroundElevation0;
 
     // Border - Core
     borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
@@ -386,7 +387,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderInverse ??= dark_tokens.StreamTokens.borderCoreInverse;
     borderOpacitySubtle ??= dark_tokens.StreamTokens.borderCoreOpacitySubtle;
     borderOpacityStrong ??= dark_tokens.StreamTokens.borderCoreOpacityStrong;
-    borderOnAccent ??= chrome[0] ?? StreamColors.white;
+    borderOnAccent ??= chrome[1000] ?? StreamColors.white;
     borderOnSurface ??= chrome.shade200;
 
     // Border - Utility
