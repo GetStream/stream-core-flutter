@@ -51,7 +51,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundSurface;
   Color? _backgroundSurfaceSubtle;
   Color? _backgroundSurfaceStrong;
-  Color? _backgroundOverlay;
+  Color? _backgroundScrim;
   Color? _backgroundDisabled;
 
   // =========================================================================
@@ -60,10 +60,10 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _borderDefault;
   Color? _borderSubtle;
   Color? _borderStrong;
-  Color? _borderOnDark;
+  Color? _borderInverse;
   Color? _borderOnAccent;
-  Color? _borderOpacity10;
-  Color? _borderOpacity25;
+  Color? _borderOpacitySubtle;
+  Color? _borderOpacityStrong;
 
   // =========================================================================
   // Border Colors - Utility
@@ -127,7 +127,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundSurface => _backgroundSurface ?? _themeData.colorScheme.backgroundSurface;
   Color get backgroundSurfaceSubtle => _backgroundSurfaceSubtle ?? _themeData.colorScheme.backgroundSurfaceSubtle;
   Color get backgroundSurfaceStrong => _backgroundSurfaceStrong ?? _themeData.colorScheme.backgroundSurfaceStrong;
-  Color get backgroundOverlay => _backgroundOverlay ?? _themeData.colorScheme.backgroundOverlay;
+  Color get backgroundScrim => _backgroundScrim ?? _themeData.colorScheme.backgroundScrim;
   Color get backgroundDisabled => _backgroundDisabled ?? _themeData.colorScheme.backgroundDisabled;
 
   // =========================================================================
@@ -136,10 +136,10 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get borderDefault => _borderDefault ?? _themeData.colorScheme.borderDefault;
   Color get borderSubtle => _borderSubtle ?? _themeData.colorScheme.borderSubtle;
   Color get borderStrong => _borderStrong ?? _themeData.colorScheme.borderStrong;
-  Color get borderOnDark => _borderOnDark ?? _themeData.colorScheme.borderOnDark;
+  Color get borderInverse => _borderInverse ?? _themeData.colorScheme.borderInverse;
   Color get borderOnAccent => _borderOnAccent ?? _themeData.colorScheme.borderOnAccent;
-  Color get borderOpacity10 => _borderOpacity10 ?? _themeData.colorScheme.borderOpacity10;
-  Color get borderOpacity25 => _borderOpacity25 ?? _themeData.colorScheme.borderOpacity25;
+  Color get borderOpacitySubtle => _borderOpacitySubtle ?? _themeData.colorScheme.borderOpacitySubtle;
+  Color get borderOpacityStrong => _borderOpacityStrong ?? _themeData.colorScheme.borderOpacityStrong;
 
   // =========================================================================
   // Getters - Border Utility
@@ -208,17 +208,17 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundSurface(Color color) => _update(() => _backgroundSurface = color);
   void setBackgroundSurfaceSubtle(Color color) => _update(() => _backgroundSurfaceSubtle = color);
   void setBackgroundSurfaceStrong(Color color) => _update(() => _backgroundSurfaceStrong = color);
-  void setBackgroundOverlay(Color color) => _update(() => _backgroundOverlay = color);
+  void setBackgroundScrim(Color color) => _update(() => _backgroundScrim = color);
   void setBackgroundDisabled(Color color) => _update(() => _backgroundDisabled = color);
 
   // Border Core
   void setBorderDefault(Color color) => _update(() => _borderDefault = color);
   void setBorderSubtle(Color color) => _update(() => _borderSubtle = color);
   void setBorderStrong(Color color) => _update(() => _borderStrong = color);
-  void setBorderOnDark(Color color) => _update(() => _borderOnDark = color);
+  void setBorderInverse(Color color) => _update(() => _borderInverse = color);
   void setBorderOnAccent(Color color) => _update(() => _borderOnAccent = color);
-  void setBorderOpacity10(Color color) => _update(() => _borderOpacity10 = color);
-  void setBorderOpacity25(Color color) => _update(() => _borderOpacity25 = color);
+  void setBorderOpacitySubtle(Color color) => _update(() => _borderOpacitySubtle = color);
+  void setBorderOpacityStrong(Color color) => _update(() => _borderOpacityStrong = color);
 
   // Border Utility
   void setBorderFocus(Color color) => _update(() => _borderFocus = color);
@@ -294,16 +294,16 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundSurface = null;
     _backgroundSurfaceSubtle = null;
     _backgroundSurfaceStrong = null;
-    _backgroundOverlay = null;
+    _backgroundScrim = null;
     _backgroundDisabled = null;
     // Border Core
     _borderDefault = null;
     _borderSubtle = null;
     _borderStrong = null;
-    _borderOnDark = null;
+    _borderInverse = null;
     _borderOnAccent = null;
-    _borderOpacity10 = null;
-    _borderOpacity25 = null;
+    _borderOpacitySubtle = null;
+    _borderOpacityStrong = null;
     // Border Utility
     _borderFocus = null;
     _borderDisabled = null;
@@ -377,16 +377,16 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundSurface: _backgroundSurface,
       backgroundSurfaceSubtle: _backgroundSurfaceSubtle,
       backgroundSurfaceStrong: _backgroundSurfaceStrong,
-      backgroundOverlay: _backgroundOverlay,
+      backgroundScrim: _backgroundScrim,
       backgroundDisabled: _backgroundDisabled,
       // Border Core
       borderDefault: _borderDefault,
       borderSubtle: _borderSubtle,
       borderStrong: _borderStrong,
-      borderOnDark: _borderOnDark,
+      borderInverse: _borderInverse,
       borderOnAccent: _borderOnAccent,
-      borderOpacity10: _borderOpacity10,
-      borderOpacity25: _borderOpacity25,
+      borderOpacitySubtle: _borderOpacitySubtle,
+      borderOpacityStrong: _borderOpacityStrong,
       // Border Utility - derived from brand and accents
       borderFocus: effectiveBorderFocus,
       borderDisabled: _borderDisabled,

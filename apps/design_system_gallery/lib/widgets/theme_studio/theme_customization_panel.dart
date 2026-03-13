@@ -339,9 +339,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBackgroundSurfaceStrong,
           ),
           ColorPickerTile(
-            label: 'backgroundOverlay',
-            color: config.backgroundOverlay,
-            onColorChanged: config.setBackgroundOverlay,
+            label: 'backgroundScrim',
+            color: config.backgroundScrim,
+            onColorChanged: config.setBackgroundScrim,
           ),
           ColorPickerTile(
             label: 'backgroundDisabled',
@@ -377,9 +377,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBorderStrong,
           ),
           ColorPickerTile(
-            label: 'borderOnDark',
-            color: config.borderOnDark,
-            onColorChanged: config.setBorderOnDark,
+            label: 'borderInverse',
+            color: config.borderInverse,
+            onColorChanged: config.setBorderInverse,
           ),
           ColorPickerTile(
             label: 'borderOnAccent',
@@ -387,14 +387,14 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBorderOnAccent,
           ),
           ColorPickerTile(
-            label: 'borderOpacity10',
-            color: config.borderOpacity10,
-            onColorChanged: config.setBorderOpacity10,
+            label: 'borderOpacitySubtle',
+            color: config.borderOpacitySubtle,
+            onColorChanged: config.setBorderOpacitySubtle,
           ),
           ColorPickerTile(
-            label: 'borderOpacity25',
-            color: config.borderOpacity25,
-            onColorChanged: config.setBorderOpacity25,
+            label: 'borderOpacityStrong',
+            color: config.borderOpacityStrong,
+            onColorChanged: config.setBorderOpacityStrong,
           ),
         ],
       ),

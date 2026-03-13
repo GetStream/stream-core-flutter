@@ -55,7 +55,7 @@ import 'package:design_system_gallery/components/message_composer/message_compos
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
 import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
-    as _design_system_gallery_components_reaction_stream_reaction;
+    as _design_system_gallery_components_reaction_stream_reactions;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -579,13 +579,13 @@ final directories = <_widgetbook.WidgetbookNode>[
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_reaction_stream_reaction
+                    _design_system_gallery_components_reaction_stream_reactions
                         .buildStreamReactionsPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Showcase',
                 builder:
-                    _design_system_gallery_components_reaction_stream_reaction
+                    _design_system_gallery_components_reaction_stream_reactions
                         .buildStreamReactionsShowcase,
               ),
             ],

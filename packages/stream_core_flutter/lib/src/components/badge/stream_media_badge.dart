@@ -28,13 +28,13 @@ class StreamMediaBadge extends StatelessWidget {
               MediaBadgeType.audio => context.streamIcons.microphoneSolid,
             },
             size: 12,
-            color: context.streamColorScheme.textOnDark,
+            color: context.streamColorScheme.textOnAccent,
           ),
 
           if (duration case final duration?)
             Text(
               duration.toReadableString(),
-              style: context.streamTextTheme.numericMd.copyWith(color: context.streamColorScheme.textOnDark),
+              style: context.streamTextTheme.numericMd.copyWith(color: context.streamColorScheme.textOnAccent),
             ),
         ],
       ),
