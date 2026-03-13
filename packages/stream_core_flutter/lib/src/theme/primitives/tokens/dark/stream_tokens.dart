@@ -605,7 +605,7 @@ class StreamTokens {
   static const brand900 = Color(0xFFF3F7FF);
   static const skeletonLoadingBase = Color(0x00FFFFFF);
   static const skeletonLoadingHighlight = Color(0x33FFFFFF);
-  static const chrome0 = Color(0xFFFFFFFF);
+  static const chrome0 = Color(0xFF000000);
   static const chrome50 = Color(0xFF1C1C1C);
   static const chrome100 = Color(0xFF323232);
   static const chrome150 = Color(0xFF464646);
@@ -617,5 +617,5 @@ class StreamTokens {
   static const chrome700 = Color(0xFFD8D8D8);
   static const chrome800 = Color(0xFFEFEFEF);
   static const chrome900 = Color(0xFFF8F8F8);
-  static const chrome1000 = Color(0xFF000000);
+  static const chrome1000 = Color(0xFFFFFFFF);
 }

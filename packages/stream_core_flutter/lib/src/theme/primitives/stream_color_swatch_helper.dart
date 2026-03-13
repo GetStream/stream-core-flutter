@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
+import '../../../stream_core_flutter.dart';
+
 class StreamColorSwatchHelper {
   const StreamColorSwatchHelper._();
 
@@ -21,15 +23,16 @@ class StreamColorSwatchHelper {
     final centerLightness = hslBase.lightness;
 
     final shades = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900];
+    final isLight = brightness == Brightness.light;
 
     return {
-      0: const Color(0xFFFFFFFF),
+      0: isLight ? StreamColors.white : StreamColors.black,
       for (final shade in shades)
         shade: _adjustLightness(
           hslBase,
           _calculateLightness(shade, centerLightness, brightness: brightness),
         ),
-      1000: const Color(0xFF000000),
+      1000: isLight ? StreamColors.black : StreamColors.white,
     };
   }
 
