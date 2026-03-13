@@ -18,9 +18,9 @@ class StreamRemoveControl extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         decoration: BoxDecoration(
-          color: colorScheme.accentBlack,
+          color: colorScheme.backgroundInverse,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.borderOnDark, width: 2),
+          border: Border.all(color: colorScheme.borderInverse, width: 2),
         ),
         alignment: Alignment.center,
         height: 20,
