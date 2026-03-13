@@ -23,11 +23,13 @@ class StreamColorSwatchHelper {
     final shades = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900];
 
     return {
+      0: const Color(0xFFFFFFFF),
       for (final shade in shades)
         shade: _adjustLightness(
           hslBase,
           _calculateLightness(shade, centerLightness, brightness: brightness),
         ),
+      1000: const Color(0xFF000000),
     };
   }
 

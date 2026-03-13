@@ -51,8 +51,19 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundSurface;
   Color? _backgroundSurfaceSubtle;
   Color? _backgroundSurfaceStrong;
+  Color? _backgroundSurfaceCard;
+  Color? _backgroundOnAccent;
+  Color? _backgroundHighlight;
   Color? _backgroundScrim;
+  Color? _backgroundOverlayLight;
+  Color? _backgroundOverlayDark;
   Color? _backgroundDisabled;
+  Color? _backgroundInverse;
+  Color? _backgroundElevation0;
+  Color? _backgroundElevation1;
+  Color? _backgroundElevation2;
+  Color? _backgroundElevation3;
+  Color? _backgroundElevation4;
 
   // =========================================================================
   // Border Colors - Core
@@ -62,6 +73,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _borderStrong;
   Color? _borderInverse;
   Color? _borderOnAccent;
+  Color? _borderOnSurface;
   Color? _borderOpacitySubtle;
   Color? _borderOpacityStrong;
 
@@ -70,6 +82,9 @@ class ThemeConfiguration extends ChangeNotifier {
   // =========================================================================
   Color? _borderFocus;
   Color? _borderDisabled;
+  Color? _borderHover;
+  Color? _borderPressed;
+  Color? _borderActive;
   Color? _borderError;
   Color? _borderWarning;
   Color? _borderSuccess;
@@ -101,6 +116,11 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _brandPrimaryColor;
 
   // =========================================================================
+  // Chrome Color
+  // =========================================================================
+  Color? _chromePrimaryColor;
+
+  // =========================================================================
   // Getters - Accent
   // =========================================================================
   Color get accentPrimary => _accentPrimary ?? _themeData.colorScheme.accentPrimary;
@@ -127,8 +147,19 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundSurface => _backgroundSurface ?? _themeData.colorScheme.backgroundSurface;
   Color get backgroundSurfaceSubtle => _backgroundSurfaceSubtle ?? _themeData.colorScheme.backgroundSurfaceSubtle;
   Color get backgroundSurfaceStrong => _backgroundSurfaceStrong ?? _themeData.colorScheme.backgroundSurfaceStrong;
+  Color get backgroundSurfaceCard => _backgroundSurfaceCard ?? _themeData.colorScheme.backgroundSurfaceCard;
+  Color get backgroundOnAccent => _backgroundOnAccent ?? _themeData.colorScheme.backgroundOnAccent;
+  Color get backgroundHighlight => _backgroundHighlight ?? _themeData.colorScheme.backgroundHighlight;
   Color get backgroundScrim => _backgroundScrim ?? _themeData.colorScheme.backgroundScrim;
+  Color get backgroundOverlayLight => _backgroundOverlayLight ?? _themeData.colorScheme.backgroundOverlayLight;
+  Color get backgroundOverlayDark => _backgroundOverlayDark ?? _themeData.colorScheme.backgroundOverlayDark;
   Color get backgroundDisabled => _backgroundDisabled ?? _themeData.colorScheme.backgroundDisabled;
+  Color get backgroundInverse => _backgroundInverse ?? _themeData.colorScheme.backgroundInverse;
+  Color get backgroundElevation0 => _backgroundElevation0 ?? _themeData.colorScheme.backgroundElevation0;
+  Color get backgroundElevation1 => _backgroundElevation1 ?? _themeData.colorScheme.backgroundElevation1;
+  Color get backgroundElevation2 => _backgroundElevation2 ?? _themeData.colorScheme.backgroundElevation2;
+  Color get backgroundElevation3 => _backgroundElevation3 ?? _themeData.colorScheme.backgroundElevation3;
+  Color get backgroundElevation4 => _backgroundElevation4 ?? _themeData.colorScheme.backgroundElevation4;
 
   // =========================================================================
   // Getters - Border Core
@@ -138,6 +169,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get borderStrong => _borderStrong ?? _themeData.colorScheme.borderStrong;
   Color get borderInverse => _borderInverse ?? _themeData.colorScheme.borderInverse;
   Color get borderOnAccent => _borderOnAccent ?? _themeData.colorScheme.borderOnAccent;
+  Color get borderOnSurface => _borderOnSurface ?? _themeData.colorScheme.borderOnSurface;
   Color get borderOpacitySubtle => _borderOpacitySubtle ?? _themeData.colorScheme.borderOpacitySubtle;
   Color get borderOpacityStrong => _borderOpacityStrong ?? _themeData.colorScheme.borderOpacityStrong;
 
@@ -146,6 +178,9 @@ class ThemeConfiguration extends ChangeNotifier {
   // =========================================================================
   Color get borderFocus => _borderFocus ?? _themeData.colorScheme.borderFocus;
   Color get borderDisabled => _borderDisabled ?? _themeData.colorScheme.borderDisabled;
+  Color get borderHover => _borderHover ?? _themeData.colorScheme.borderHover;
+  Color get borderPressed => _borderPressed ?? _themeData.colorScheme.borderPressed;
+  Color get borderActive => _borderActive ?? _themeData.colorScheme.borderActive;
   Color get borderError => _borderError ?? _themeData.colorScheme.borderError;
   Color get borderWarning => _borderWarning ?? _themeData.colorScheme.borderWarning;
   Color get borderSuccess => _borderSuccess ?? _themeData.colorScheme.borderSuccess;
@@ -175,6 +210,11 @@ class ThemeConfiguration extends ChangeNotifier {
   // Getters - Brand
   // =========================================================================
   Color get brandPrimaryColor => _brandPrimaryColor ?? _themeData.colorScheme.brand.shade500;
+
+  // =========================================================================
+  // Getters - Chrome
+  // =========================================================================
+  Color get chromePrimaryColor => _chromePrimaryColor ?? _themeData.colorScheme.chrome.shade500;
 
   // =========================================================================
   // Setters
@@ -208,8 +248,19 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundSurface(Color color) => _update(() => _backgroundSurface = color);
   void setBackgroundSurfaceSubtle(Color color) => _update(() => _backgroundSurfaceSubtle = color);
   void setBackgroundSurfaceStrong(Color color) => _update(() => _backgroundSurfaceStrong = color);
+  void setBackgroundSurfaceCard(Color color) => _update(() => _backgroundSurfaceCard = color);
+  void setBackgroundOnAccent(Color color) => _update(() => _backgroundOnAccent = color);
+  void setBackgroundHighlight(Color color) => _update(() => _backgroundHighlight = color);
   void setBackgroundScrim(Color color) => _update(() => _backgroundScrim = color);
+  void setBackgroundOverlayLight(Color color) => _update(() => _backgroundOverlayLight = color);
+  void setBackgroundOverlayDark(Color color) => _update(() => _backgroundOverlayDark = color);
   void setBackgroundDisabled(Color color) => _update(() => _backgroundDisabled = color);
+  void setBackgroundInverse(Color color) => _update(() => _backgroundInverse = color);
+  void setBackgroundElevation0(Color color) => _update(() => _backgroundElevation0 = color);
+  void setBackgroundElevation1(Color color) => _update(() => _backgroundElevation1 = color);
+  void setBackgroundElevation2(Color color) => _update(() => _backgroundElevation2 = color);
+  void setBackgroundElevation3(Color color) => _update(() => _backgroundElevation3 = color);
+  void setBackgroundElevation4(Color color) => _update(() => _backgroundElevation4 = color);
 
   // Border Core
   void setBorderDefault(Color color) => _update(() => _borderDefault = color);
@@ -217,12 +268,16 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBorderStrong(Color color) => _update(() => _borderStrong = color);
   void setBorderInverse(Color color) => _update(() => _borderInverse = color);
   void setBorderOnAccent(Color color) => _update(() => _borderOnAccent = color);
+  void setBorderOnSurface(Color color) => _update(() => _borderOnSurface = color);
   void setBorderOpacitySubtle(Color color) => _update(() => _borderOpacitySubtle = color);
   void setBorderOpacityStrong(Color color) => _update(() => _borderOpacityStrong = color);
 
   // Border Utility
   void setBorderFocus(Color color) => _update(() => _borderFocus = color);
   void setBorderDisabled(Color color) => _update(() => _borderDisabled = color);
+  void setBorderHover(Color color) => _update(() => _borderHover = color);
+  void setBorderPressed(Color color) => _update(() => _borderPressed = color);
+  void setBorderActive(Color color) => _update(() => _borderActive = color);
   void setBorderError(Color color) => _update(() => _borderError = color);
   void setBorderWarning(Color color) => _update(() => _borderWarning = color);
   void setBorderSuccess(Color color) => _update(() => _borderSuccess = color);
@@ -244,6 +299,9 @@ class ThemeConfiguration extends ChangeNotifier {
 
   // Brand
   void setBrandPrimaryColor(Color color) => _update(() => _brandPrimaryColor = color);
+
+  // Chrome
+  void setChromePrimaryColor(Color color) => _update(() => _chromePrimaryColor = color);
 
   void updateAvatarPaletteAt(int index, StreamAvatarColorPair pair) {
     final current = List<StreamAvatarColorPair>.from(avatarPalette);
@@ -294,19 +352,34 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundSurface = null;
     _backgroundSurfaceSubtle = null;
     _backgroundSurfaceStrong = null;
+    _backgroundSurfaceCard = null;
+    _backgroundOnAccent = null;
+    _backgroundHighlight = null;
     _backgroundScrim = null;
+    _backgroundOverlayLight = null;
+    _backgroundOverlayDark = null;
     _backgroundDisabled = null;
+    _backgroundInverse = null;
+    _backgroundElevation0 = null;
+    _backgroundElevation1 = null;
+    _backgroundElevation2 = null;
+    _backgroundElevation3 = null;
+    _backgroundElevation4 = null;
     // Border Core
     _borderDefault = null;
     _borderSubtle = null;
     _borderStrong = null;
     _borderInverse = null;
     _borderOnAccent = null;
+    _borderOnSurface = null;
     _borderOpacitySubtle = null;
     _borderOpacityStrong = null;
     // Border Utility
     _borderFocus = null;
     _borderDisabled = null;
+    _borderHover = null;
+    _borderPressed = null;
+    _borderActive = null;
     _borderError = null;
     _borderWarning = null;
     _borderSuccess = null;
@@ -324,6 +397,8 @@ class ThemeConfiguration extends ChangeNotifier {
     _avatarPalette = null;
     // Brand
     _brandPrimaryColor = null;
+    // Chrome
+    _chromePrimaryColor = null;
 
     _rebuildTheme();
     notifyListeners();
@@ -331,70 +406,132 @@ class ThemeConfiguration extends ChangeNotifier {
 
   void _rebuildTheme() {
     final baseColorScheme = _brightness == Brightness.dark ? StreamColorScheme.dark() : StreamColorScheme.light();
+    final isDark = _brightness == Brightness.dark;
 
     // Compute effective brand swatch (if brand primary is customized)
     final effectiveBrand = _brandPrimaryColor != null
         ? StreamColorSwatch.fromColor(_brandPrimaryColor!, brightness: _brightness)
         : null;
 
-    // Derived from brand: accentPrimary defaults to brand.shade500
+    // Compute effective chrome swatch (if chrome primary is customized)
+    final effectiveChrome = _chromePrimaryColor != null
+        ? StreamColorSwatch.fromColor(_chromePrimaryColor!, brightness: _brightness)
+        : null;
+
+    // Derived from brand: accentPrimary defaults to brand.shade500 (light) / shade400 (dark)
     final effectiveAccentPrimary = _accentPrimary ?? _brandPrimaryColor;
 
-    // Derived from brand: borderFocus defaults to brand.shade300
-    final effectiveBorderFocus = _borderFocus ?? effectiveBrand?.shade300;
+    // Derived from brand: borderFocus defaults to brand.shade150
+    final effectiveBorderFocus = _borderFocus ?? effectiveBrand?.shade150;
 
     // Derived from brand: stateFocused defaults to brand.shade100
     final effectiveStateFocused = _stateFocused ?? effectiveBrand?.shade100;
 
-    // Derived from accentPrimary: textLink and borderSelected
+    // Derived from accentPrimary: textLink and borderActive
     final effectiveTextLink = _textLink ?? effectiveAccentPrimary;
-    final effectiveBorderSelected = _borderSelected ?? effectiveAccentPrimary;
+    final effectiveBorderActive = _borderActive ?? effectiveAccentPrimary;
 
     // Derived from other accents: border utility colors
     final effectiveBorderError = _borderError ?? _accentError;
     final effectiveBorderWarning = _borderWarning ?? _accentWarning;
     final effectiveBorderSuccess = _borderSuccess ?? _accentSuccess;
 
+    // Derived from chrome: all chrome-dependent semantic colors.
+    // When chrome is customized via copyWith, the base scheme still holds values
+    // derived from the default chrome, so we must re-derive all of them explicitly.
+    // Extract subscript lookups to avoid Dart parsing ambiguity with ?[] inside ternaries.
+    final chromeShade0 = effectiveChrome?[0];
+    final chromeShade1000 = effectiveChrome?[1000];
+    
+    final effectiveAccentNeutral = _accentNeutral ?? effectiveChrome?.shade500;
+    final effectiveTextPrimary = _textPrimary ?? effectiveChrome?.shade900;
+    final effectiveTextSecondary = _textSecondary ?? effectiveChrome?.shade700;
+    final effectiveTextTertiary = _textTertiary ?? effectiveChrome?.shade500;
+    final effectiveTextDisabled = _textDisabled ?? effectiveChrome?.shade300;
+    final effectiveTextInverse = _textInverse ?? (isDark ? chromeShade1000 : chromeShade0);
+    final effectiveTextOnAccent = _textOnAccent ?? chromeShade0;
+    final effectiveBackgroundSurface = _backgroundSurface ?? effectiveChrome?.shade100;
+    final effectiveBackgroundSurfaceSubtle = _backgroundSurfaceSubtle ?? effectiveChrome?.shade50;
+    final effectiveBackgroundSurfaceStrong = _backgroundSurfaceStrong ?? effectiveChrome?.shade150;
+    final effectiveBackgroundSurfaceCard =
+        _backgroundSurfaceCard ?? (isDark ? effectiveChrome?.shade100 : effectiveChrome?.shade50);
+    final effectiveBackgroundOnAccent = _backgroundOnAccent ?? chromeShade0;
+    final effectiveBackgroundDisabled = _backgroundDisabled ?? effectiveChrome?.shade100;
+    final effectiveBackgroundInverse = _backgroundInverse ?? effectiveChrome?.shade900;
+    final effectiveBackgroundElevation0 = _backgroundElevation0 ?? (isDark ? chromeShade1000 : chromeShade0);
+    final effectiveBackgroundElevation1 =
+        _backgroundElevation1 ?? (isDark ? effectiveChrome?.shade50 : chromeShade0);
+    final effectiveBackgroundElevation2 =
+        _backgroundElevation2 ?? (isDark ? effectiveChrome?.shade100 : chromeShade0);
+    final effectiveBackgroundElevation3 =
+        _backgroundElevation3 ?? (isDark ? effectiveChrome?.shade200 : chromeShade0);
+    final effectiveBackgroundElevation4 =
+        _backgroundElevation4 ?? (isDark ? effectiveChrome?.shade300 : chromeShade0);
+    // backgroundApp derives from backgroundElevation0 in both themes
+    final effectiveBackgroundApp = _backgroundApp ?? effectiveBackgroundElevation0;
+    // In dark, borderInverse uses a fixed token (not chrome); in light it uses chrome[0]
+    final effectiveBorderInverse = _borderInverse ?? (isDark ? null : chromeShade0);
+    final effectiveBorderOnAccent = _borderOnAccent ?? chromeShade0;
+    final effectiveBorderOnSurface = _borderOnSurface ?? effectiveChrome?.shade200;
+    final effectiveBorderDisabled = _borderDisabled ?? effectiveChrome?.shade100;
+
     final colorScheme = baseColorScheme.copyWith(
       // Brand
       brand: effectiveBrand,
-      // Accent - brand primary affects accentPrimary
+      // Chrome
+      chrome: effectiveChrome,
+      // Accent
       accentPrimary: effectiveAccentPrimary,
       accentSuccess: _accentSuccess,
       accentWarning: _accentWarning,
       accentError: _accentError,
-      accentNeutral: _accentNeutral,
-      // Text - textLink derived from accentPrimary
-      textPrimary: _textPrimary,
-      textSecondary: _textSecondary,
-      textTertiary: _textTertiary,
-      textDisabled: _textDisabled,
-      textInverse: _textInverse,
+      accentNeutral: effectiveAccentNeutral,
+      // Text
+      textPrimary: effectiveTextPrimary,
+      textSecondary: effectiveTextSecondary,
+      textTertiary: effectiveTextTertiary,
+      textDisabled: effectiveTextDisabled,
+      textInverse: effectiveTextInverse,
       textLink: effectiveTextLink,
-      textOnAccent: _textOnAccent,
+      textOnAccent: effectiveTextOnAccent,
       // Background
-      backgroundApp: _backgroundApp,
-      backgroundSurface: _backgroundSurface,
-      backgroundSurfaceSubtle: _backgroundSurfaceSubtle,
-      backgroundSurfaceStrong: _backgroundSurfaceStrong,
+      backgroundApp: effectiveBackgroundApp,
+      backgroundSurface: effectiveBackgroundSurface,
+      backgroundSurfaceSubtle: effectiveBackgroundSurfaceSubtle,
+      backgroundSurfaceStrong: effectiveBackgroundSurfaceStrong,
+      backgroundSurfaceCard: effectiveBackgroundSurfaceCard,
+      backgroundOnAccent: effectiveBackgroundOnAccent,
+      backgroundHighlight: _backgroundHighlight,
       backgroundScrim: _backgroundScrim,
-      backgroundDisabled: _backgroundDisabled,
+      backgroundOverlayLight: _backgroundOverlayLight,
+      backgroundOverlayDark: _backgroundOverlayDark,
+      backgroundDisabled: effectiveBackgroundDisabled,
+      backgroundInverse: effectiveBackgroundInverse,
+      backgroundElevation0: effectiveBackgroundElevation0,
+      backgroundElevation1: effectiveBackgroundElevation1,
+      backgroundElevation2: effectiveBackgroundElevation2,
+      backgroundElevation3: effectiveBackgroundElevation3,
+      backgroundElevation4: effectiveBackgroundElevation4,
       // Border Core
       borderDefault: _borderDefault,
       borderSubtle: _borderSubtle,
       borderStrong: _borderStrong,
-      borderInverse: _borderInverse,
-      borderOnAccent: _borderOnAccent,
+      borderInverse: effectiveBorderInverse,
+      borderOnAccent: effectiveBorderOnAccent,
+      borderOnSurface: effectiveBorderOnSurface,
       borderOpacitySubtle: _borderOpacitySubtle,
       borderOpacityStrong: _borderOpacityStrong,
-      // Border Utility - derived from brand and accents
+      // Border Utility
       borderFocus: effectiveBorderFocus,
-      borderDisabled: _borderDisabled,
+      borderDisabled: effectiveBorderDisabled,
+      borderHover: _borderHover,
+      borderPressed: _borderPressed,
+      borderActive: effectiveBorderActive,
       borderError: effectiveBorderError,
       borderWarning: effectiveBorderWarning,
       borderSuccess: effectiveBorderSuccess,
-      borderSelected: effectiveBorderSelected,
-      // State - stateFocused derived from brand
+      borderSelected: _borderSelected,
+      // State
       stateHover: _stateHover,
       statePressed: _statePressed,
       stateSelected: _stateSelected,
