@@ -1,5 +1,3 @@
-// ignore_for_file: valid_regexps
-
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
