@@ -38,6 +38,7 @@ mixin _$StreamComponentBuilders {
       badgeNotification: t < 0.5 ? a.badgeNotification : b.badgeNotification,
       button: t < 0.5 ? a.button : b.button,
       checkbox: t < 0.5 ? a.checkbox : b.checkbox,
+      commandChip: t < 0.5 ? a.commandChip : b.commandChip,
       contextMenuAction: t < 0.5 ? a.contextMenuAction : b.contextMenuAction,
       emoji: t < 0.5 ? a.emoji : b.emoji,
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
@@ -61,6 +62,7 @@ mixin _$StreamComponentBuilders {
     badgeNotification,
     Widget Function(BuildContext, StreamButtonProps)? button,
     Widget Function(BuildContext, StreamCheckboxProps)? checkbox,
+    Widget Function(BuildContext, StreamCommandChipProps)? commandChip,
     Widget Function(BuildContext, StreamContextMenuActionProps<Object?>)?
     contextMenuAction,
     Widget Function(BuildContext, StreamEmojiProps)? emoji,
@@ -85,6 +87,7 @@ mixin _$StreamComponentBuilders {
       badgeNotification: badgeNotification ?? _this.badgeNotification,
       button: button ?? _this.button,
       checkbox: checkbox ?? _this.checkbox,
+      commandChip: commandChip ?? _this.commandChip,
       contextMenuAction: contextMenuAction ?? _this.contextMenuAction,
       emoji: emoji ?? _this.emoji,
       emojiButton: emojiButton ?? _this.emojiButton,
@@ -118,6 +121,7 @@ mixin _$StreamComponentBuilders {
       badgeNotification: other.badgeNotification,
       button: other.button,
       checkbox: other.checkbox,
+      commandChip: other.commandChip,
       contextMenuAction: other.contextMenuAction,
       emoji: other.emoji,
       emojiButton: other.emojiButton,
@@ -152,6 +156,7 @@ mixin _$StreamComponentBuilders {
         _other.badgeNotification == _this.badgeNotification &&
         _other.button == _this.button &&
         _other.checkbox == _this.checkbox &&
+        _other.commandChip == _this.commandChip &&
         _other.contextMenuAction == _this.contextMenuAction &&
         _other.emoji == _this.emoji &&
         _other.emojiButton == _this.emojiButton &&
@@ -178,6 +183,7 @@ mixin _$StreamComponentBuilders {
       _this.badgeNotification,
       _this.button,
       _this.checkbox,
+      _this.commandChip,
       _this.contextMenuAction,
       _this.emoji,
       _this.emojiButton,

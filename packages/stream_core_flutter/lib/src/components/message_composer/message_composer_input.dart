@@ -74,11 +74,15 @@ class StreamMessageComposerInputField extends StatelessWidget {
     required this.controller,
     required this.placeholder,
     this.focusNode,
+    this.command,
+    this.onDismissCommand,
   });
 
   final TextEditingController controller;
   final String placeholder;
   final FocusNode? focusNode;
+  final String? command;
+  final VoidCallback? onDismissCommand;
 
   @override
   Widget build(BuildContext context) {
@@ -93,26 +97,40 @@ class StreamMessageComposerInputField extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 124),
-      child: TextField(
-        controller: controller,
-        focusNode: focusNode,
-        style: TextStyle(
-          color: inputTheme.textColor ?? inputDefaults.textColor,
-        ),
-        maxLines: null,
-        decoration: InputDecoration(
-          border: border,
-          focusedBorder: border,
-          enabledBorder: border,
-          errorBorder: border,
-          disabledBorder: border,
-          fillColor: Colors.transparent,
-          contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-          hintText: placeholder,
-          hintStyle: TextStyle(
-            color: inputTheme.placeholderColor ?? inputDefaults.placeholderColor,
+      child: Row(
+        children: [
+          if (command case final command?)
+            Padding(
+              padding: EdgeInsets.only(left: context.streamSpacing.sm),
+              child: StreamCommandChip(
+                label: command,
+                onDismiss: onDismissCommand,
+              ),
+            ),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              style: TextStyle(
+                color: inputTheme.textColor ?? inputDefaults.textColor,
+              ),
+              maxLines: null,
+              decoration: InputDecoration(
+                border: border,
+                focusedBorder: border,
+                enabledBorder: border,
+                errorBorder: border,
+                disabledBorder: border,
+                fillColor: Colors.transparent,
+                contentPadding: EdgeInsets.fromLTRB(command == null ? 12 : 0, 8, 12, 8),
+                hintText: placeholder,
+                hintStyle: TextStyle(
+                  color: inputTheme.placeholderColor ?? inputDefaults.placeholderColor,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
