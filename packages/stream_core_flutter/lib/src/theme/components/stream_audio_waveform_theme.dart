@@ -116,7 +116,7 @@ class StreamAudioWaveformThemeData with _$StreamAudioWaveformThemeData {
 
   /// The color of the waveform bars.
   ///
-  /// Falls back to [StreamColorScheme.borderOpacity25].
+  /// Falls back to [StreamColorScheme.borderOpacityStrong].
   final Color? color;
 
   /// The color of the progressed waveform bars.
