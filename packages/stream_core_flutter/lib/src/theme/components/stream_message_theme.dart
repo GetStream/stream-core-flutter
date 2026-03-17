@@ -59,6 +59,7 @@ class StreamMessageStyle with _$StreamMessageStyle {
     this.textLinkColor,
     this.textReactionColor,
     this.textSystemColor,
+    this.textReadColor,
     this.borderColor,
     this.borderOnChatColor,
     this.threadConnectorColor,
@@ -80,6 +81,7 @@ class StreamMessageStyle with _$StreamMessageStyle {
   final Color? textLinkColor;
   final Color? textReactionColor;
   final Color? textSystemColor;
+  final Color? textReadColor;
 
   final Color? borderColor;
   final Color? borderOnChatColor;
@@ -112,6 +114,7 @@ class _MessageThemeDefaults {
     textLinkColor: _colorScheme.textLink,
     textReactionColor: _colorScheme.textSecondary,
     textSystemColor: _colorScheme.textSecondary,
+    textReadColor: _colorScheme.accentPrimary,
     borderColor: _colorScheme.borderSubtle,
     borderOnChatColor: _colorScheme.borderOnSurface,
     replyIndicatorColor: _colorScheme.borderOnSurface,
@@ -128,6 +131,7 @@ class _MessageThemeDefaults {
     textLinkColor: _colorScheme.textLink,
     textReactionColor: _colorScheme.textSecondary,
     textSystemColor: _colorScheme.textSecondary,
+    textReadColor: _colorScheme.accentPrimary,
     borderColor: _colorScheme.brand.shade100,
     borderOnChatColor: _colorScheme.brand.shade300,
     replyIndicatorColor: _colorScheme.brand.shade400,
