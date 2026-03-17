@@ -106,20 +106,22 @@ class DefaultStreamCommandChip extends StatelessWidget {
               maxLines: 1,
             ),
           ),
-          SizedBox(width: defaults.spacing.xxxs),
-          GestureDetector(
-            onTap: props.onDismiss,
-            behavior: HitTestBehavior.opaque,
-            child: SizedBox(
-              width: 16,
-              height: 16,
-              child: Icon(
-                context.streamIcons.crossMedium,
-                size: 12,
-                color: effectiveIconColor,
+          if (props.onDismiss != null) ...[
+            SizedBox(width: defaults.spacing.xxxs),
+            GestureDetector(
+              onTap: props.onDismiss,
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: Icon(
+                  context.streamIcons.crossMedium,
+                  size: 12,
+                  color: effectiveIconColor,
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

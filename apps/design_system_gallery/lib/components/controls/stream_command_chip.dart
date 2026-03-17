@@ -64,7 +64,7 @@ Widget buildStreamCommandChipShowcase(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: spacing.xl,
       children: [
-        _SectionLabel(label: 'COMMAND CHIP — IMAGE OVERLAY'),
+        const _SectionLabel(label: 'COMMAND CHIP — IMAGE OVERLAY'),
         // Simulated attachment overlay
         Stack(
           alignment: Alignment.topLeft,
@@ -90,7 +90,7 @@ Widget buildStreamCommandChipShowcase(BuildContext context) {
             ),
           ],
         ),
-        _SectionLabel(label: 'LABEL VARIANTS'),
+        const _SectionLabel(label: 'LABEL VARIANTS'),
         Wrap(
           spacing: spacing.xs,
           runSpacing: spacing.xs,
@@ -101,7 +101,7 @@ Widget buildStreamCommandChipShowcase(BuildContext context) {
             StreamCommandChip(label: '/very-long-command-name', onDismiss: () {}),
           ],
         ),
-        _SectionLabel(label: 'WITHOUT DISMISS'),
+        const _SectionLabel(label: 'WITHOUT DISMISS'),
         StreamCommandChip(label: '/giphy'),
       ],
     ),
