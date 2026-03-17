@@ -33,6 +33,7 @@ mixin _$StreamCommandChipThemeData {
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       labelColor: Color.lerp(a.labelColor, b.labelColor, t),
       iconColor: Color.lerp(a.iconColor, b.iconColor, t),
+      minHeight: lerpDouble$(a.minHeight, b.minHeight, t),
     );
   }
 
@@ -40,6 +41,7 @@ mixin _$StreamCommandChipThemeData {
     Color? backgroundColor,
     Color? labelColor,
     Color? iconColor,
+    double? minHeight,
   }) {
     final _this = (this as StreamCommandChipThemeData);
 
@@ -47,6 +49,7 @@ mixin _$StreamCommandChipThemeData {
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       labelColor: labelColor ?? _this.labelColor,
       iconColor: iconColor ?? _this.iconColor,
+      minHeight: minHeight ?? _this.minHeight,
     );
   }
 
@@ -65,6 +68,7 @@ mixin _$StreamCommandChipThemeData {
       backgroundColor: other.backgroundColor,
       labelColor: other.labelColor,
       iconColor: other.iconColor,
+      minHeight: other.minHeight,
     );
   }
 
@@ -83,7 +87,8 @@ mixin _$StreamCommandChipThemeData {
 
     return _other.backgroundColor == _this.backgroundColor &&
         _other.labelColor == _this.labelColor &&
-        _other.iconColor == _this.iconColor;
+        _other.iconColor == _this.iconColor &&
+        _other.minHeight == _this.minHeight;
   }
 
   @override
@@ -95,6 +100,7 @@ mixin _$StreamCommandChipThemeData {
       _this.backgroundColor,
       _this.labelColor,
       _this.iconColor,
+      _this.minHeight,
     );
   }
 }

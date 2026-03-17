@@ -55,6 +55,7 @@ class StreamCommandChipThemeData with _$StreamCommandChipThemeData {
     this.backgroundColor,
     this.labelColor,
     this.iconColor,
+    this.minHeight,
   });
 
   /// The background color of the chip.
@@ -65,6 +66,9 @@ class StreamCommandChipThemeData with _$StreamCommandChipThemeData {
 
   /// The color of the leading and trailing icons.
   final Color? iconColor;
+
+  /// The minimum height of the chip.
+  final double? minHeight;
 
   /// Linearly interpolate between two [StreamCommandChipThemeData] objects.
   static StreamCommandChipThemeData? lerp(

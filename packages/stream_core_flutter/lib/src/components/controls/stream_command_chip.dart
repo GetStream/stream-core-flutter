@@ -81,6 +81,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
     final effectiveBackgroundColor = chipTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveLabelColor = chipTheme.labelColor ?? defaults.labelColor;
     final effectiveIconColor = chipTheme.iconColor ?? defaults.iconColor;
+    final effectiveMinHeight = chipTheme.minHeight ?? defaults.minHeight;
 
     return Container(
       padding: defaults.padding,
@@ -88,16 +89,16 @@ class DefaultStreamCommandChip extends StatelessWidget {
         color: effectiveBackgroundColor,
         borderRadius: defaults.borderRadius,
       ),
-      constraints: const BoxConstraints(minHeight: 24),
+      constraints: BoxConstraints(minHeight: effectiveMinHeight),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        spacing: defaults.spacing.xxxs,
         children: [
           Icon(
             context.streamIcons.thunder,
             size: 12,
             color: effectiveIconColor,
           ),
-          SizedBox(width: defaults.spacing.xxxs),
           MediaQuery.withNoTextScaling(
             child: Text(
               props.label,
@@ -106,8 +107,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
               maxLines: 1,
             ),
           ),
-          if (props.onDismiss != null) ...[
-            SizedBox(width: defaults.spacing.xxxs),
+          if (props.onDismiss != null)
             GestureDetector(
               onTap: props.onDismiss,
               behavior: HitTestBehavior.opaque,
@@ -121,7 +121,6 @@ class DefaultStreamCommandChip extends StatelessWidget {
                 ),
               ),
             ),
-          ],
         ],
       ),
     );
@@ -137,6 +136,7 @@ class _StreamCommandChipDefaults {
   late final _colorScheme = _context.streamColorScheme;
   late final _textTheme = _context.streamTextTheme;
   late final spacing = _context.streamSpacing;
+  late final _radius = _context.streamRadius;
 
   Color get backgroundColor => _colorScheme.backgroundInverse;
 
@@ -146,10 +146,12 @@ class _StreamCommandChipDefaults {
 
   TextStyle get labelStyle => _textTheme.metadataEmphasis;
 
+  double get minHeight => 24;
+
   EdgeInsetsGeometry get padding => EdgeInsets.symmetric(
     horizontal: spacing.xs,
     vertical: spacing.xxxs,
   );
 
-  BorderRadius get borderRadius => const BorderRadius.all(Radius.circular(9999));
+  BorderRadius get borderRadius => BorderRadius.all(_radius.max);
 }
