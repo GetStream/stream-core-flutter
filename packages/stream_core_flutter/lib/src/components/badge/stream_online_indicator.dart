@@ -240,7 +240,7 @@ class _StreamOnlineIndicatorThemeDefaults extends StreamOnlineIndicatorThemeData
   Color get backgroundOffline => _colorScheme.accentNeutral;
 
   @override
-  Color get borderColor => _colorScheme.borderOnDark;
+  Color get borderColor => _colorScheme.borderInverse;
 
   @override
   AlignmentGeometry get alignment => AlignmentDirectional.topEnd;

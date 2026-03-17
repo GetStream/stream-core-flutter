@@ -19,7 +19,7 @@ class StreamTokensTypography {
     fontFamily: 'Geist',
     fontSize: 16,
     fontWeight: FontWeight.w600,
-    height: 1,
+    height: 1.25,
   );
   static const headingXs = TextStyle(
     fontFamily: 'Geist',
@@ -103,24 +103,20 @@ class StreamTokensTypography {
     fontFamily: 'Geist',
     fontSize: 14,
     fontWeight: FontWeight.w700,
-    height: 1,
   );
   static const numericLg = TextStyle(
     fontFamily: 'Geist',
     fontSize: 12,
     fontWeight: FontWeight.w700,
-    height: 1,
   );
   static const numericMd = TextStyle(
     fontFamily: 'Geist',
     fontSize: 10,
     fontWeight: FontWeight.w700,
-    height: 1,
   );
   static const numericSm = TextStyle(
     fontFamily: 'Geist',
     fontSize: 8,
     fontWeight: FontWeight.w700,
-    height: 1,
   );
 }

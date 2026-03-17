@@ -237,7 +237,7 @@ class _StreamCheckboxStyleDefaults extends StreamCheckboxStyle {
   WidgetStateProperty<Color?> get checkColor => WidgetStateProperty.resolveWith((states) {
     if (states.contains(WidgetState.selected)) {
       if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
-      return _colorScheme.textOnDark;
+      return _colorScheme.textOnAccent;
     }
     return StreamColors.transparent;
   });

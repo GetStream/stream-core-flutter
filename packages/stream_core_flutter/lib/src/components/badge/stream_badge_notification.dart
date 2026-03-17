@@ -229,5 +229,5 @@ class _StreamBadgeNotificationThemeDefaults extends StreamBadgeNotificationTheme
   Color get textColor => _colorScheme.textOnAccent;
 
   @override
-  Color get borderColor => _colorScheme.borderOnDark;
+  Color get borderColor => _colorScheme.borderInverse;
 }
