@@ -31,25 +31,35 @@ mixin _$StreamCommandChipThemeData {
 
     return StreamCommandChipThemeData(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
-      labelColor: Color.lerp(a.labelColor, b.labelColor, t),
-      iconColor: Color.lerp(a.iconColor, b.iconColor, t),
+      foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
+      labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
       minHeight: lerpDouble$(a.minHeight, b.minHeight, t),
+      padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
+      borderRadius: BorderRadiusGeometry.lerp(
+        a.borderRadius,
+        b.borderRadius,
+        t,
+      ),
     );
   }
 
   StreamCommandChipThemeData copyWith({
     Color? backgroundColor,
-    Color? labelColor,
-    Color? iconColor,
+    Color? foregroundColor,
+    TextStyle? labelStyle,
     double? minHeight,
+    EdgeInsetsGeometry? padding,
+    BorderRadiusGeometry? borderRadius,
   }) {
     final _this = (this as StreamCommandChipThemeData);
 
     return StreamCommandChipThemeData(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
-      labelColor: labelColor ?? _this.labelColor,
-      iconColor: iconColor ?? _this.iconColor,
+      foregroundColor: foregroundColor ?? _this.foregroundColor,
+      labelStyle: labelStyle ?? _this.labelStyle,
       minHeight: minHeight ?? _this.minHeight,
+      padding: padding ?? _this.padding,
+      borderRadius: borderRadius ?? _this.borderRadius,
     );
   }
 
@@ -66,9 +76,11 @@ mixin _$StreamCommandChipThemeData {
 
     return copyWith(
       backgroundColor: other.backgroundColor,
-      labelColor: other.labelColor,
-      iconColor: other.iconColor,
+      foregroundColor: other.foregroundColor,
+      labelStyle: _this.labelStyle?.merge(other.labelStyle) ?? other.labelStyle,
       minHeight: other.minHeight,
+      padding: other.padding,
+      borderRadius: other.borderRadius,
     );
   }
 
@@ -86,9 +98,11 @@ mixin _$StreamCommandChipThemeData {
     final _other = (other as StreamCommandChipThemeData);
 
     return _other.backgroundColor == _this.backgroundColor &&
-        _other.labelColor == _this.labelColor &&
-        _other.iconColor == _this.iconColor &&
-        _other.minHeight == _this.minHeight;
+        _other.foregroundColor == _this.foregroundColor &&
+        _other.labelStyle == _this.labelStyle &&
+        _other.minHeight == _this.minHeight &&
+        _other.padding == _this.padding &&
+        _other.borderRadius == _this.borderRadius;
   }
 
   @override
@@ -98,9 +112,11 @@ mixin _$StreamCommandChipThemeData {
     return Object.hash(
       runtimeType,
       _this.backgroundColor,
-      _this.labelColor,
-      _this.iconColor,
+      _this.foregroundColor,
+      _this.labelStyle,
       _this.minHeight,
+      _this.padding,
+      _this.borderRadius,
     );
   }
 }

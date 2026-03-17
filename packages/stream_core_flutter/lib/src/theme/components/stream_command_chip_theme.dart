@@ -53,22 +53,30 @@ class StreamCommandChipThemeData with _$StreamCommandChipThemeData {
   /// Creates a command chip theme with optional color overrides.
   const StreamCommandChipThemeData({
     this.backgroundColor,
-    this.labelColor,
-    this.iconColor,
+    this.foregroundColor,
     this.minHeight,
+    this.labelStyle,
+    this.padding,
+    this.borderRadius,
   });
 
   /// The background color of the chip.
   final Color? backgroundColor;
 
-  /// The color of the label text.
-  final Color? labelColor;
+  /// The color of the icon and label text.
+  final Color? foregroundColor;
 
-  /// The color of the leading and trailing icons.
-  final Color? iconColor;
+  /// The style of the label text.
+  final TextStyle? labelStyle;
 
   /// The minimum height of the chip.
   final double? minHeight;
+
+  /// The padding of the chip.
+  final EdgeInsetsGeometry? padding;
+
+  /// The border radius of the chip.
+  final BorderRadiusGeometry? borderRadius;
 
   /// Linearly interpolate between two [StreamCommandChipThemeData] objects.
   static StreamCommandChipThemeData? lerp(

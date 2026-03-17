@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
+import '../../theme/components/stream_command_chip_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// A pill-shaped chip for displaying a slash command selection.
@@ -79,8 +80,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
     final chipTheme = context.streamCommandChipTheme;
 
     final effectiveBackgroundColor = chipTheme.backgroundColor ?? defaults.backgroundColor;
-    final effectiveLabelColor = chipTheme.labelColor ?? defaults.labelColor;
-    final effectiveIconColor = chipTheme.iconColor ?? defaults.iconColor;
+    final effectiveForegroundColor = chipTheme.foregroundColor ?? defaults.foregroundColor;
     final effectiveMinHeight = chipTheme.minHeight ?? defaults.minHeight;
 
     return Container(
@@ -97,12 +97,12 @@ class DefaultStreamCommandChip extends StatelessWidget {
           Icon(
             context.streamIcons.thunder,
             size: 12,
-            color: effectiveIconColor,
+            color: effectiveForegroundColor,
           ),
           MediaQuery.withNoTextScaling(
             child: Text(
               props.label,
-              style: defaults.labelStyle.copyWith(color: effectiveLabelColor),
+              style: defaults.labelStyle.copyWith(color: effectiveForegroundColor),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
@@ -117,7 +117,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
                 child: Icon(
                   context.streamIcons.crossMedium,
                   size: 12,
-                  color: effectiveIconColor,
+                  color: effectiveForegroundColor,
                 ),
               ),
             ),
@@ -128,7 +128,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
 }
 
 // Provides default values for [StreamCommandChip] based on the current theme.
-class _StreamCommandChipDefaults {
+class _StreamCommandChipDefaults extends StreamCommandChipThemeData {
   _StreamCommandChipDefaults(this._context);
 
   final BuildContext _context;
@@ -138,20 +138,24 @@ class _StreamCommandChipDefaults {
   late final spacing = _context.streamSpacing;
   late final _radius = _context.streamRadius;
 
+  @override
   Color get backgroundColor => _colorScheme.backgroundInverse;
 
-  Color get labelColor => _colorScheme.textInverse;
+  @override
+  Color get foregroundColor => _colorScheme.textInverse;
 
-  Color get iconColor => _colorScheme.textInverse;
-
+  @override
   TextStyle get labelStyle => _textTheme.metadataEmphasis;
 
+  @override
   double get minHeight => 24;
 
+  @override
   EdgeInsetsGeometry get padding => EdgeInsets.symmetric(
     horizontal: spacing.xs,
     vertical: spacing.xxxs,
   );
 
+  @override
   BorderRadius get borderRadius => BorderRadius.all(_radius.max);
 }
