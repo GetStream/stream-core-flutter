@@ -15,7 +15,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 Widget buildStreamCommandChipPlayground(BuildContext context) {
   final label = context.knobs.string(
     label: 'Label',
-    initialValue: '/giphy',
+    initialValue: 'GIPHY',
     description: 'The command label displayed inside the chip.',
   );
 
@@ -84,7 +84,7 @@ Widget buildStreamCommandChipShowcase(BuildContext context) {
             Padding(
               padding: EdgeInsets.all(spacing.xs),
               child: StreamCommandChip(
-                label: '/giphy',
+                label: 'GIPHY',
                 onDismiss: () {},
               ),
             ),
@@ -95,14 +95,14 @@ Widget buildStreamCommandChipShowcase(BuildContext context) {
           spacing: spacing.xs,
           runSpacing: spacing.xs,
           children: [
-            StreamCommandChip(label: '/giphy', onDismiss: () {}),
-            StreamCommandChip(label: '/img', onDismiss: () {}),
-            StreamCommandChip(label: '/ban', onDismiss: () {}),
-            StreamCommandChip(label: '/very-long-command-name', onDismiss: () {}),
+            StreamCommandChip(label: 'GIPHY', onDismiss: () {}),
+            StreamCommandChip(label: 'IMG', onDismiss: () {}),
+            StreamCommandChip(label: 'BAN', onDismiss: () {}),
+            StreamCommandChip(label: 'VERY LONG COMMAND NAME', onDismiss: () {}),
           ],
         ),
         const _SectionLabel(label: 'WITHOUT DISMISS'),
-        StreamCommandChip(label: '/giphy'),
+        StreamCommandChip(label: 'GIPHY'),
       ],
     ),
   );
