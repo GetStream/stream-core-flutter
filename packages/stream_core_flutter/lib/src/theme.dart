@@ -6,6 +6,7 @@ export 'theme/components/stream_badge_count_theme.dart';
 export 'theme/components/stream_badge_notification_theme.dart';
 export 'theme/components/stream_button_theme.dart';
 export 'theme/components/stream_checkbox_theme.dart';
+export 'theme/components/stream_command_chip_theme.dart';
 export 'theme/components/stream_context_menu_action_theme.dart';
 export 'theme/components/stream_context_menu_theme.dart';
 export 'theme/components/stream_emoji_button_theme.dart';
