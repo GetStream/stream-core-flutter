@@ -152,7 +152,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
     StreamComponentBuilder<StreamMessageTextProps>? messageText,
-    StreamComponentBuilder<StreamMessageWidgetProps>? messageWidget,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
@@ -183,7 +182,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
       messageText: messageText,
-      messageWidget: messageWidget,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
       reactionPicker: reactionPicker,
@@ -215,7 +213,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageMetadata,
     required this.messageReplies,
     required this.messageText,
-    required this.messageWidget,
     required this.onlineIndicator,
     required this.progressBar,
     required this.reactionPicker,
@@ -347,11 +344,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamMessageText] uses [DefaultStreamMessageText].
   final StreamComponentBuilder<StreamMessageTextProps>? messageText;
-
-  /// Custom builder for message widget (top-level message item).
-  ///
-  /// When null, [StreamMessageWidget] uses [DefaultStreamMessageWidget].
-  final StreamComponentBuilder<StreamMessageWidgetProps>? messageWidget;
 
   /// Custom builder for online indicator widgets.
   ///

@@ -30,7 +30,6 @@ export 'components/message/stream_message_content.dart' hide DefaultStreamMessag
 export 'components/message/stream_message_metadata.dart' hide DefaultStreamMessageMetadata;
 export 'components/message/stream_message_replies.dart' hide DefaultStreamMessageReplies;
 export 'components/message/stream_message_text.dart' hide DefaultStreamMessageText;
-export 'components/message/stream_message_widget.dart' hide DefaultStreamMessageWidget;
 export 'components/message_composer.dart';
 export 'components/message_placement/stream_channel_kind.dart';
 export 'components/message_placement/stream_list_kind.dart';

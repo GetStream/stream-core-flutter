@@ -60,8 +60,6 @@ import 'package:design_system_gallery/components/message/stream_message_replies.
     as _design_system_gallery_components_message_stream_message_replies;
 import 'package:design_system_gallery/components/message/stream_message_text.dart'
     as _design_system_gallery_components_message_stream_message_text;
-import 'package:design_system_gallery/components/message/stream_message_widget.dart'
-    as _design_system_gallery_components_message_stream_message_widget;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
@@ -652,23 +650,6 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_stream_message_text
                         .buildStreamMessageTextShowcase,
-              ),
-            ],
-          ),
-          _widgetbook.WidgetbookComponent(
-            name: 'StreamMessageWidget',
-            useCases: [
-              _widgetbook.WidgetbookUseCase(
-                name: 'Playground',
-                builder:
-                    _design_system_gallery_components_message_stream_message_widget
-                        .buildStreamMessageWidgetPlayground,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Showcase',
-                builder:
-                    _design_system_gallery_components_message_stream_message_widget
-                        .buildStreamMessageWidgetShowcase,
               ),
             ],
           ),
