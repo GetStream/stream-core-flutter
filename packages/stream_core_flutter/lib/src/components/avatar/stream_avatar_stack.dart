@@ -200,7 +200,7 @@ class DefaultStreamAvatarStack extends StatelessWidget {
           size: avatarSize,
           border: Border.all(
             width: avatarBorderWidth,
-            color: colorScheme.borderOnDark,
+            color: colorScheme.borderInverse,
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
         ),
