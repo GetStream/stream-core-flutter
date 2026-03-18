@@ -54,6 +54,7 @@ mixin _$StreamComponentBuilders {
       messageWidget: t < 0.5 ? a.messageWidget : b.messageWidget,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
+      reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
     );
   }
@@ -87,6 +88,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamMessageWidgetProps)? messageWidget,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
+    Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
   }) {
     final _this = (this as StreamComponentBuilders);
@@ -116,6 +118,7 @@ mixin _$StreamComponentBuilders {
       messageWidget: messageWidget ?? _this.messageWidget,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
+      reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
     );
   }
@@ -156,6 +159,7 @@ mixin _$StreamComponentBuilders {
       messageWidget: other.messageWidget,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
+      reactionPicker: other.reactionPicker,
       reactions: other.reactions,
     );
   }
@@ -197,6 +201,7 @@ mixin _$StreamComponentBuilders {
         _other.messageWidget == _this.messageWidget &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar &&
+        _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions;
   }
 
@@ -230,6 +235,7 @@ mixin _$StreamComponentBuilders {
       _this.messageWidget,
       _this.onlineIndicator,
       _this.progressBar,
+      _this.reactionPicker,
       _this.reactions,
     ]);
   }

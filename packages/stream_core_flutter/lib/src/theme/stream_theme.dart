@@ -20,6 +20,7 @@ import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
+import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
@@ -111,6 +112,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
   }) {
     platform ??= defaultTargetPlatform;
@@ -144,6 +146,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     progressBarTheme ??= const StreamProgressBarThemeData();
+    reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
 
     return .raw(
@@ -171,6 +174,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       progressBarTheme: progressBarTheme,
+      reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
     );
   }
@@ -212,6 +216,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.inputTheme,
     required this.onlineIndicatorTheme,
     required this.progressBarTheme,
+    required this.reactionPickerTheme,
     required this.reactionsTheme,
   });
 
@@ -323,6 +328,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The progress bar theme for this theme.
   final StreamProgressBarThemeData progressBarTheme;
 
+  /// The reaction picker theme for this theme.
+  final StreamReactionPickerThemeData reactionPickerTheme;
+
   /// The reaction theme for this theme.
   final StreamReactionsThemeData reactionsTheme;
 
@@ -371,6 +379,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       progressBarTheme: progressBarTheme,
+      reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
     );
   }

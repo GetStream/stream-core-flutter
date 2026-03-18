@@ -36,6 +36,7 @@ export 'components/message_placement/stream_list_kind.dart';
 export 'components/message_placement/stream_message_alignment.dart';
 export 'components/message_placement/stream_message_placement.dart';
 export 'components/message_placement/stream_message_stack_position.dart';
+export 'components/reaction/stream_reaction_picker.dart' hide DefaultStreamReactionPicker;
 export 'components/reaction/stream_reactions.dart' hide DefaultStreamReactions;
 
 export 'factory/stream_component_factory.dart';

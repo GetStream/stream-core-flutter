@@ -154,6 +154,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageWidgetProps>? messageWidget,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
+    StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
@@ -183,6 +184,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageWidget: messageWidget,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
+      reactionPicker: reactionPicker,
       reactions: reactions,
       extensions: _extensionIterableToMap(extensions),
     );
@@ -213,6 +215,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageWidget,
     required this.onlineIndicator,
     required this.progressBar,
+    required this.reactionPicker,
     required this.reactions,
     required this.extensions,
   });
@@ -351,6 +354,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
   final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
+
+  /// Custom builder for reaction picker widgets.
+  ///
+  /// When null, [StreamReactionPicker] uses [DefaultStreamReactionPicker].
+  final StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker;
 
   /// Custom builder for reaction widgets.
   ///
