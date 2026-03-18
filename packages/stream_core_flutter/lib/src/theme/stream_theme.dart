@@ -17,9 +17,11 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_list_tile_theme.dart';
+import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
+import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
@@ -107,10 +109,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageItemThemeData? messageItemTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
   }) {
     platform ??= defaultTargetPlatform;
@@ -140,10 +144,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     emojiChipTheme ??= const StreamEmojiChipThemeData();
     listTileTheme ??= const StreamListTileThemeData();
+    messageItemTheme ??= const StreamMessageItemThemeData();
     messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     progressBarTheme ??= const StreamProgressBarThemeData();
+    reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
 
     return .raw(
@@ -167,10 +173,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       listTileTheme: listTileTheme,
+      messageItemTheme: messageItemTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       progressBarTheme: progressBarTheme,
+      reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
     );
   }
@@ -208,10 +216,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.emojiButtonTheme,
     required this.emojiChipTheme,
     required this.listTileTheme,
+    required this.messageItemTheme,
     required this.messageTheme,
     required this.inputTheme,
     required this.onlineIndicatorTheme,
     required this.progressBarTheme,
+    required this.reactionPickerTheme,
     required this.reactionsTheme,
   });
 
@@ -309,6 +319,11 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The list tile theme for this theme.
   final StreamListTileThemeData listTileTheme;
 
+  /// The message item theme for this theme.
+  ///
+  /// Provides resolver-based styling for message sub-components.
+  final StreamMessageItemThemeData messageItemTheme;
+
   /// The message theme for this theme.
   final StreamMessageThemeData messageTheme;
 
@@ -320,6 +335,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The progress bar theme for this theme.
   final StreamProgressBarThemeData progressBarTheme;
+
+  /// The reaction picker theme for this theme.
+  final StreamReactionPickerThemeData reactionPickerTheme;
 
   /// The reaction theme for this theme.
   final StreamReactionsThemeData reactionsTheme;
@@ -365,10 +383,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       listTileTheme: listTileTheme,
+      messageItemTheme: messageItemTheme,
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       progressBarTheme: progressBarTheme,
+      reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
     );
   }

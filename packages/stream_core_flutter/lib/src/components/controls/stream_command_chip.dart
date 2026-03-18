@@ -31,7 +31,7 @@ class StreamCommandChip extends StatelessWidget {
     super.key,
     required String label,
     VoidCallback? onDismiss,
-  }) : props = StreamCommandChipProps(label: label, onDismiss: onDismiss);
+  }) : props = .new(label: label, onDismiss: onDismiss);
 
   /// The props controlling the appearance and behavior of this chip.
   final StreamCommandChipProps props;
@@ -151,11 +151,8 @@ class _StreamCommandChipDefaults extends StreamCommandChipThemeData {
   double get minHeight => 24;
 
   @override
-  EdgeInsetsGeometry get padding => EdgeInsets.symmetric(
-    horizontal: spacing.xs,
-    vertical: spacing.xxxs,
-  );
+  EdgeInsetsGeometry get padding => .symmetric(horizontal: spacing.xs, vertical: spacing.xxxs);
 
   @override
-  BorderRadius get borderRadius => BorderRadius.all(_radius.max);
+  BorderRadius get borderRadius => .all(_radius.max);
 }

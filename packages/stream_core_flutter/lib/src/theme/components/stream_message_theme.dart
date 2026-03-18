@@ -5,15 +5,31 @@ import '../../../stream_core_flutter.dart';
 
 part 'stream_message_theme.g.theme.dart';
 
+/// Applies a message color theme to descendant widgets.
+///
+/// Wrap a subtree with [StreamMessageTheme] to override message colors.
+/// Provides separate [StreamMessageStyle] values for incoming and outgoing
+/// messages.
+///
+/// See also:
+///
+///  * [StreamMessageThemeData], which describes the theme data.
+///  * [StreamMessageStyle], the color palette for a single message direction.
 class StreamMessageTheme extends InheritedTheme {
+  /// Creates a message theme that controls descendant message widget colors.
   const StreamMessageTheme({
     super.key,
     required this.data,
     required super.child,
   });
 
+  /// The message theme data for descendant widgets.
   final StreamMessageThemeData data;
 
+  /// Returns the [StreamMessageThemeData] from the current theme context.
+  ///
+  /// This merges the local theme (if any) with the global theme from
+  /// [StreamTheme].
   static StreamMessageThemeData of(BuildContext context) {
     final localTheme = context.dependOnInheritedWidgetOfExactType<StreamMessageTheme>();
     return StreamTheme.of(context).messageTheme.merge(localTheme?.data);
@@ -28,15 +44,27 @@ class StreamMessageTheme extends InheritedTheme {
   bool updateShouldNotify(StreamMessageTheme oldWidget) => data != oldWidget.data;
 }
 
+/// Theme data for customizing message colors.
+///
+/// Holds separate color palettes for incoming and outgoing messages.
+///
+/// See also:
+///
+///  * [StreamMessageTheme], for overriding theme in a widget subtree.
+///  * [StreamMessageStyle], the color palette for a single message direction.
 @themeGen
 @immutable
 class StreamMessageThemeData with _$StreamMessageThemeData {
+  /// Creates message theme data with optional incoming/outgoing overrides.
   const StreamMessageThemeData({
     this.incoming,
     this.outgoing,
   });
 
+  /// Color palette for incoming (received) messages.
   final StreamMessageStyle? incoming;
+
+  /// Color palette for outgoing (sent) messages.
   final StreamMessageStyle? outgoing;
 
   StreamMessageThemeData mergeWithDefaults(BuildContext context) {
@@ -45,9 +73,18 @@ class StreamMessageThemeData with _$StreamMessageThemeData {
   }
 }
 
+/// Color palette for a single message direction (incoming or outgoing).
+///
+/// Groups all color tokens used by message-related widgets: backgrounds, text,
+/// borders, progress indicators, and waveform bars.
+///
+/// See also:
+///
+///  * [StreamMessageThemeData], which wraps this style for theming.
 @themeGen
 @immutable
 class StreamMessageStyle with _$StreamMessageStyle {
+  /// Creates a message style with optional color overrides.
   const StreamMessageStyle({
     this.backgroundColor,
     this.backgroundAttachmentColor,

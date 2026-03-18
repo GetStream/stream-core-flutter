@@ -12,7 +12,9 @@ dependencies:
   collection: ^1.19.0
   flutter:
     sdk: flutter
+  flutter_markdown_plus: ^1.0.7
   flutter_svg: ^2.2.3
+  markdown: ^7.3.0
   stream_core: ^0.4.0
   theme_extensions_builder_annotation: ^7.1.0
 

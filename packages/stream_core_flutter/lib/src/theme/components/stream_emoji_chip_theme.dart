@@ -121,6 +121,8 @@ class StreamEmojiChipThemeStyle with _$StreamEmojiChipThemeStyle {
     this.foregroundColor,
     this.overlayColor,
     this.textStyle,
+    this.elevation,
+    this.shadowColor,
     this.emojiSize,
     this.minimumSize,
     this.maximumSize,
@@ -152,6 +154,18 @@ class StreamEmojiChipThemeStyle with _$StreamEmojiChipThemeStyle {
   /// The color of [textStyle] is typically not used directly — use
   /// [foregroundColor] to control text and icon color instead.
   final WidgetStateProperty<TextStyle?>? textStyle;
+
+  /// The elevation of the chip.
+  ///
+  /// Supports state-based elevation for different interaction states
+  /// (default, hover, pressed, disabled, selected).
+  final WidgetStateProperty<double?>? elevation;
+
+  /// The shadow color of the chip.
+  ///
+  /// Must be set to a non-transparent color for [elevation] to produce a
+  /// visible shadow.
+  final WidgetStateProperty<Color?>? shadowColor;
 
   /// The display size of the emoji/icon in logical pixels.
   ///

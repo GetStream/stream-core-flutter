@@ -12,7 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.1.0
+  flutter_markdown_plus: ^1.0.7
   marionette_flutter: ^0.3.0
+  markdown: ^7.3.0
   provider: ^6.1.5+1
   stream_core_flutter:
     path: ../../packages/stream_core_flutter

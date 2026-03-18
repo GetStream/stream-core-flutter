@@ -50,7 +50,6 @@ enum StreamReactionsAlignment {
 ///     spacing: 4,
 ///     gap: 6,
 ///     overlapExtent: 8,
-///     indent: 4,
 ///   ),
 ///   child: StreamReactions.segmented(
 ///     items: [
@@ -111,7 +110,6 @@ class StreamReactionsTheme extends InheritedTheme {
 ///     spacing: 4,
 ///     gap: 6,
 ///     overlapExtent: 8,
-///     indent: 4,
 ///   ),
 /// )
 /// ```
@@ -130,7 +128,6 @@ class StreamReactionsThemeData with _$StreamReactionsThemeData {
     this.spacing,
     this.gap,
     this.overlapExtent,
-    this.indent,
   });
 
   /// The gap between adjacent reaction chips.
@@ -145,12 +142,6 @@ class StreamReactionsThemeData with _$StreamReactionsThemeData {
   ///
   /// Higher values move the reactions further into the child.
   final double? overlapExtent;
-
-  /// The horizontal offset applied to the reaction strip.
-  ///
-  /// Positive values move reactions toward the trailing side, while negative
-  /// values move them toward the leading side.
-  final double? indent;
 
   /// Linearly interpolate between two [StreamReactionsThemeData] objects.
   static StreamReactionsThemeData? lerp(

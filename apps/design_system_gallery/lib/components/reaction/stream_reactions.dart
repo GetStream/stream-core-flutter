@@ -27,26 +27,39 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
     labelBuilder: (option) => option.name,
     description: 'Where reactions sit relative to the bubble.',
   );
-  final alignment = context.knobs.object.dropdown(
+  final alignmentOption = context.knobs.object.dropdown(
     label: 'Alignment',
-    options: StreamReactionsAlignment.values,
-    initialOption: StreamReactionsAlignment.end,
-    labelBuilder: (option) => option.name,
-    description: 'Horizontal alignment of reactions relative to the bubble.',
+    options: _AlignmentOption.values,
+    initialOption: _AlignmentOption.defaultValue,
+    labelBuilder: (option) => option.label,
+    description: 'Horizontal alignment of reactions. Default derives from message alignment.',
+  );
+  final crossAxisOption = context.knobs.object.dropdown(
+    label: 'Cross Axis Alignment',
+    options: _CrossAxisOption.values,
+    initialOption: _CrossAxisOption.defaultValue,
+    labelBuilder: (option) => option.label,
+    description: 'Cross-axis alignment of the column. Default derives from message alignment.',
   );
   final overlap = context.knobs.boolean(
     label: 'Overlap',
     initialValue: true,
     description: 'Reactions overlap the bubble edge with negative spacing.',
   );
-  final indent = context.knobs.double.slider(
-    label: 'Indent',
-    initialValue: 8,
-    min: -8,
-    max: 8,
-    divisions: 8,
-    description: 'Horizontal shift applied to the reaction strip.',
+  final useIndent = context.knobs.boolean(
+    label: 'Override Indent',
+    description: 'Enable to set a custom indent. When off, uses the default (null).',
   );
+  final indent = useIndent
+      ? context.knobs.double.slider(
+          label: 'Indent',
+          initialValue: 8,
+          min: -8,
+          max: 8,
+          divisions: 8,
+          description: 'Horizontal shift applied to the reaction strip.',
+        )
+      : null;
   final max = overlap
       ? context.knobs.int.slider(
           label: 'Max Visible',
@@ -74,15 +87,16 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
 
   final items = _allReactionItems.take(reactionCount).toList();
   final spacing = context.streamSpacing;
-  final isOutgoing = direction.isOutgoing;
-  final crossAxis = isOutgoing ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+
+  final alignment = alignmentOption.value;
+  final crossAxisAlignment = crossAxisOption.value;
 
   Widget buildReaction({required Widget bubble}) => switch (type) {
     StreamReactionsType.segmented => StreamReactions.segmented(
       items: items,
       position: position,
       alignment: alignment,
-      crossAxisAlignment: crossAxis,
+      crossAxisAlignment: crossAxisAlignment,
       max: max,
       overlap: overlap,
       indent: indent,
@@ -93,7 +107,7 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
       items: items,
       position: position,
       alignment: alignment,
-      crossAxisAlignment: crossAxis,
+      crossAxisAlignment: crossAxisAlignment,
       max: max,
       overlap: overlap,
       indent: indent,
@@ -114,17 +128,17 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
           children: [
             _ChatBubble(
               message: _mediumMessage,
-              direction: direction,
+              alignment: direction.alignment,
               reactionBuilder: buildReaction,
             ),
             _ChatBubble(
               message: _shortMessage,
-              direction: direction,
+              alignment: direction.alignment,
               reactionBuilder: buildReaction,
             ),
             _ChatBubble(
               message: _longMessage,
-              direction: direction,
+              alignment: direction.alignment,
               reactionBuilder: buildReaction,
             ),
           ],
@@ -138,68 +152,23 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
 class _ChatBubble extends StatelessWidget {
   const _ChatBubble({
     required this.message,
-    required this.direction,
+    required this.alignment,
     required this.reactionBuilder,
   });
 
   final String message;
-  final _MessageDirection direction;
+  final StreamMessageAlignment alignment;
   final Widget Function({required Widget bubble}) reactionBuilder;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
-    final spacing = context.streamSpacing;
-
-    final isOutgoing = direction.isOutgoing;
-    final bubbleColor = isOutgoing ? colorScheme.brand.shade100 : colorScheme.backgroundSurface;
-
-    const bubbleRadius = Radius.circular(20);
-    final bubbleBorderRadius = isOutgoing
-        ? const BorderRadius.only(
-            topLeft: bubbleRadius,
-            topRight: bubbleRadius,
-            bottomLeft: bubbleRadius,
-          )
-        : const BorderRadius.only(
-            topLeft: bubbleRadius,
-            topRight: bubbleRadius,
-            bottomRight: bubbleRadius,
-          );
-
-    final bubble = Container(
-      constraints: const BoxConstraints(maxWidth: 280),
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.sm,
-        vertical: spacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: bubbleColor,
-        borderRadius: bubbleBorderRadius,
-      ),
-      child: Text(
-        message,
-        style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),
-      ),
-    );
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: isOutgoing ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        reactionBuilder(bubble: bubble),
-        SizedBox(height: spacing.xxs),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: spacing.xxs),
-          child: Text(
-            isOutgoing ? '09:41 · Read' : '09:40',
-            style: textTheme.metadataDefault.copyWith(
-              color: colorScheme.textTertiary,
-            ),
-          ),
+    return StreamMessagePlacement(
+      data: StreamMessagePlacementData(alignment: alignment),
+      child: StreamMessageContent(
+        child: reactionBuilder(
+          bubble: StreamMessageBubble(child: StreamMessageText(message)),
         ),
-      ],
+      ),
     );
   }
 }
@@ -224,8 +193,8 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: spacing.xl,
-          children: const [
-            _ShowcaseSection(
+          children: [
+            const _ShowcaseSection(
               title: 'SEGMENTED — FOOTER',
               description:
                   'Individual pills per reaction, positioned as a footer '
@@ -233,7 +202,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
               threads: [
                 _ThreadMessage(
                   message: _mediumMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: _allReactionItems,
@@ -241,7 +210,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: _shortMessage,
-                  direction: _MessageDirection.outgoing,
+                  alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -251,7 +220,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: _longMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -263,7 +232,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
               ],
             ),
-            _ShowcaseSection(
+            const _ShowcaseSection(
               title: 'SEGMENTED — HEADER',
               description:
                   'Individual pills as a header. Reactions paint on top '
@@ -271,7 +240,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
               threads: [
                 _ThreadMessage(
                   message: _shortMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.header,
                   items: [
@@ -282,7 +251,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: _longMessage,
-                  direction: _MessageDirection.outgoing,
+                  alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.header,
                   items: _allReactionItems,
@@ -290,7 +259,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
               ],
             ),
-            _ShowcaseSection(
+            const _ShowcaseSection(
               title: 'CLUSTERED',
               description:
                   'All reactions grouped into a single chip. Shown in both '
@@ -298,14 +267,14 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
               threads: [
                 _ThreadMessage(
                   message: _longMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.footer,
                   items: _allReactionItems,
                 ),
                 _ThreadMessage(
                   message: _shortMessage,
-                  direction: _MessageDirection.outgoing,
+                  alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.header,
                   items: [
@@ -316,7 +285,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: _mediumMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -326,7 +295,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
               ],
             ),
-            _ShowcaseSection(
+            const _ShowcaseSection(
               title: 'OVERFLOW',
               description:
                   'When reactions exceed the max visible limit, extras are '
@@ -334,7 +303,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
               threads: [
                 _ThreadMessage(
                   message: _mediumMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: _allReactionItems,
@@ -342,7 +311,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: _longMessage,
-                  direction: _MessageDirection.outgoing,
+                  alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: _allReactionItems,
@@ -350,7 +319,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
               ],
             ),
-            _ShowcaseSection(
+            const _ShowcaseSection(
               title: 'COUNT RULES',
               description:
                   'If any reaction has count > 1, all chips show counts. '
@@ -358,21 +327,21 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
               threads: [
                 _ThreadMessage(
                   message: 'Single emoji, count 1 — no count shown.',
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [StreamReactionsItem(emoji: Text('👍'))],
                 ),
                 _ThreadMessage(
                   message: 'Single emoji, count 5 — count shown.',
-                  direction: _MessageDirection.outgoing,
+                  alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [StreamReactionsItem(emoji: Text('❤'), count: 5)],
                 ),
                 _ThreadMessage(
                   message: 'Multiple emojis, all count 1 — no counts.',
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -383,7 +352,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: 'Mixed counts — all show counts.',
-                  direction: _MessageDirection.outgoing,
+                  alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -395,7 +364,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: 'Clustered — total count shown when > 1.',
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -406,7 +375,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
               ],
             ),
-            _ShowcaseSection(
+            const _ShowcaseSection(
               title: 'DETACHED',
               description:
                   'Reactions with overlap disabled — separated from the bubble '
@@ -414,7 +383,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
               threads: [
                 _ThreadMessage(
                   message: _mediumMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -426,7 +395,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: _shortMessage,
-                  direction: _MessageDirection.outgoing,
+                  alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.footer,
                   items: [
@@ -437,7 +406,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
                 _ThreadMessage(
                   message: _longMessage,
-                  direction: _MessageDirection.incoming,
+                  alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: _allReactionItems,
@@ -445,6 +414,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                 ),
               ],
             ),
+            _EmojiOnlyShowcaseSection(),
           ],
         ),
       ),
@@ -460,7 +430,7 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
 class _ThreadMessage {
   const _ThreadMessage({
     required this.message,
-    required this.direction,
+    required this.alignment,
     required this.type,
     required this.position,
     required this.items,
@@ -469,7 +439,7 @@ class _ThreadMessage {
   });
 
   final String message;
-  final _MessageDirection direction;
+  final StreamMessageAlignment alignment;
   final StreamReactionsType type;
   final StreamReactionsPosition position;
   final List<StreamReactionsItem> items;
@@ -538,36 +508,24 @@ class _ShowcaseSection extends StatelessWidget {
                     for (final t in threads)
                       _ChatBubble(
                         message: t.message,
-                        direction: t.direction,
-                        reactionBuilder: ({required bubble}) {
-                          final isOut = t.direction.isOutgoing;
-                          final reactionAlignment = t.overlap
-                              ? (isOut ? StreamReactionsAlignment.start : StreamReactionsAlignment.end)
-                              : (isOut ? StreamReactionsAlignment.end : StreamReactionsAlignment.start);
-                          final crossAxis = isOut ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-
-                          return switch (t.type) {
-                            StreamReactionsType.segmented => StreamReactions.segmented(
-                              items: t.items,
-                              position: t.position,
-                              alignment: reactionAlignment,
-                              crossAxisAlignment: crossAxis,
-                              max: t.max,
-                              overlap: t.overlap,
-                              child: bubble,
-                              onPressed: () {},
-                            ),
-                            StreamReactionsType.clustered => StreamReactions.clustered(
-                              items: t.items,
-                              position: t.position,
-                              alignment: reactionAlignment,
-                              crossAxisAlignment: crossAxis,
-                              max: t.max,
-                              overlap: t.overlap,
-                              child: bubble,
-                              onPressed: () {},
-                            ),
-                          };
+                        alignment: t.alignment,
+                        reactionBuilder: ({required bubble}) => switch (t.type) {
+                          StreamReactionsType.segmented => StreamReactions.segmented(
+                            items: t.items,
+                            position: t.position,
+                            max: t.max,
+                            overlap: t.overlap,
+                            child: bubble,
+                            onPressed: () {},
+                          ),
+                          StreamReactionsType.clustered => StreamReactions.clustered(
+                            items: t.items,
+                            position: t.position,
+                            max: t.max,
+                            overlap: t.overlap,
+                            child: bubble,
+                            onPressed: () {},
+                          ),
                         },
                       ),
                   ],
@@ -579,6 +537,160 @@ class _ShowcaseSection extends StatelessWidget {
       ],
     );
   }
+}
+
+class _EmojiOnlyShowcaseSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+    final palette = colorScheme.avatarPalette;
+
+    const reactions = <StreamReactionsItem>[
+      StreamReactionsItem(emoji: Text('❤'), count: 4),
+      StreamReactionsItem(emoji: Text('😂'), count: 2),
+    ];
+
+    const singleReaction = <StreamReactionsItem>[
+      StreamReactionsItem(emoji: Text('👍'), count: 3),
+    ];
+
+    Widget emojiMessage({
+      required String text,
+      required StreamMessageAlignment alignment,
+      required List<StreamReactionsItem> items,
+      bool showReplies = false,
+      StreamReactionsPosition position = StreamReactionsPosition.footer,
+    }) {
+      final isEnd = alignment == StreamMessageAlignment.end;
+      final crossAxis = isEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+
+      final messageText = StreamMessageText(text);
+
+      Widget body = StreamReactions.segmented(
+        items: items,
+        position: position,
+        overlap: position == StreamReactionsPosition.header,
+        alignment: position == StreamReactionsPosition.header
+            ? StreamReactionsAlignment.end
+            : StreamReactionsAlignment.start,
+        indent: position == StreamReactionsPosition.header ? 8 : null,
+        onPressed: () {},
+        child: messageText,
+      );
+
+      if (showReplies) {
+        body = Column(
+          crossAxisAlignment: crossAxis,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            body,
+            StreamMessageReplies(
+              label: const Text('2 replies'),
+              avatars: _sampleAvatars(2, palette),
+              alignment: alignment,
+              showConnector: false,
+              onTap: () {},
+            ),
+          ],
+        );
+      }
+
+      return StreamMessagePlacement(
+        data: StreamMessagePlacementData(alignment: alignment),
+        child: Align(
+          alignment: isEnd ? Alignment.centerRight : Alignment.centerLeft,
+          child: StreamMessageContent(child: body),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: [
+        const _SectionLabel(label: 'EMOJI-ONLY MESSAGES'),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundApp,
+            borderRadius: BorderRadius.all(radius.lg),
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(spacing.md, spacing.sm, spacing.md, spacing.xs),
+                child: Text(
+                  'Emoji-only messages (1–3 emojis) render without a bubble. '
+                  'Shown with reactions and replies.',
+                  style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary),
+                ),
+              ),
+              Divider(height: 1, color: colorScheme.borderSubtle),
+              Padding(
+                padding: EdgeInsets.all(spacing.md),
+                child: Column(
+                  spacing: spacing.lg,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    emojiMessage(
+                      text: '👋',
+                      alignment: StreamMessageAlignment.start,
+                      items: reactions,
+                    ),
+                    emojiMessage(
+                      text: '❤️🔥',
+                      alignment: StreamMessageAlignment.end,
+                      items: singleReaction,
+                      position: StreamReactionsPosition.header,
+                    ),
+                    emojiMessage(
+                      text: '😂',
+                      alignment: StreamMessageAlignment.start,
+                      items: reactions,
+                      showReplies: true,
+                    ),
+                    emojiMessage(
+                      text: '🎉👏🔥',
+                      alignment: StreamMessageAlignment.end,
+                      items: reactions,
+                      showReplies: true,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+List<Widget> _sampleAvatars(int count, List<StreamAvatarColorPair> palette) {
+  const images = [
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',
+  ];
+  const initials = ['AB', 'CD', 'EF'];
+  return [
+    for (var i = 0; i < count; i++)
+      StreamAvatar(
+        imageUrl: images[i % images.length],
+        backgroundColor: palette[i % palette.length].backgroundColor,
+        foregroundColor: palette[i % palette.length].foregroundColor,
+        placeholder: (context) => Text(initials[i % initials.length]),
+      ),
+  ];
 }
 
 class _SectionLabel extends StatelessWidget {
@@ -630,11 +742,39 @@ void _showSnack(BuildContext context, String message) {
 // =============================================================================
 
 enum _MessageDirection {
-  incoming,
-  outgoing
+  incoming(StreamMessageAlignment.start),
+  outgoing(StreamMessageAlignment.end),
   ;
 
-  bool get isOutgoing => this == outgoing;
+  const _MessageDirection(this.alignment);
+
+  final StreamMessageAlignment alignment;
+}
+
+enum _AlignmentOption {
+  defaultValue('Default', null),
+  start('start', StreamReactionsAlignment.start),
+  end('end', StreamReactionsAlignment.end),
+  ;
+
+  const _AlignmentOption(this.label, this.value);
+
+  final String label;
+  final StreamReactionsAlignment? value;
+}
+
+enum _CrossAxisOption {
+  defaultValue('Default', null),
+  start('start', CrossAxisAlignment.start),
+  center('center', CrossAxisAlignment.center),
+  end('end', CrossAxisAlignment.end),
+  stretch('stretch', CrossAxisAlignment.stretch),
+  ;
+
+  const _CrossAxisOption(this.label, this.value);
+
+  final String label;
+  final CrossAxisAlignment? value;
 }
 
 // =============================================================================
