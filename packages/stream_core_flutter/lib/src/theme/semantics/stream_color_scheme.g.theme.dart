@@ -31,12 +31,12 @@ mixin _$StreamColorScheme {
 
     return StreamColorScheme.raw(
       brand: t < 0.5 ? a.brand : b.brand,
+      chrome: t < 0.5 ? a.chrome : b.chrome,
       accentPrimary: Color.lerp(a.accentPrimary, b.accentPrimary, t)!,
       accentSuccess: Color.lerp(a.accentSuccess, b.accentSuccess, t)!,
       accentWarning: Color.lerp(a.accentWarning, b.accentWarning, t)!,
       accentError: Color.lerp(a.accentError, b.accentError, t)!,
       accentNeutral: Color.lerp(a.accentNeutral, b.accentNeutral, t)!,
-      accentBlack: Color.lerp(a.accentBlack, b.accentBlack, t)!,
       textPrimary: Color.lerp(a.textPrimary, b.textPrimary, t)!,
       textSecondary: Color.lerp(a.textSecondary, b.textSecondary, t)!,
       textTertiary: Color.lerp(a.textTertiary, b.textTertiary, t)!,
@@ -44,7 +44,6 @@ mixin _$StreamColorScheme {
       textInverse: Color.lerp(a.textInverse, b.textInverse, t)!,
       textLink: Color.lerp(a.textLink, b.textLink, t)!,
       textOnAccent: Color.lerp(a.textOnAccent, b.textOnAccent, t)!,
-      textOnDark: Color.lerp(a.textOnDark, b.textOnDark, t)!,
       backgroundApp: Color.lerp(a.backgroundApp, b.backgroundApp, t)!,
       backgroundSurface: Color.lerp(
         a.backgroundSurface,
@@ -61,11 +60,22 @@ mixin _$StreamColorScheme {
         b.backgroundSurfaceStrong,
         t,
       )!,
-      backgroundOverlay: Color.lerp(
-        a.backgroundOverlay,
-        b.backgroundOverlay,
+      backgroundSurfaceCard: Color.lerp(
+        a.backgroundSurfaceCard,
+        b.backgroundSurfaceCard,
         t,
       )!,
+      backgroundOnAccent: Color.lerp(
+        a.backgroundOnAccent,
+        b.backgroundOnAccent,
+        t,
+      )!,
+      backgroundHighlight: Color.lerp(
+        a.backgroundHighlight,
+        b.backgroundHighlight,
+        t,
+      )!,
+      backgroundScrim: Color.lerp(a.backgroundScrim, b.backgroundScrim, t)!,
       backgroundOverlayLight: Color.lerp(
         a.backgroundOverlayLight,
         b.backgroundOverlayLight,
@@ -119,13 +129,24 @@ mixin _$StreamColorScheme {
       borderDefault: Color.lerp(a.borderDefault, b.borderDefault, t)!,
       borderSubtle: Color.lerp(a.borderSubtle, b.borderSubtle, t)!,
       borderStrong: Color.lerp(a.borderStrong, b.borderStrong, t)!,
-      borderOnDark: Color.lerp(a.borderOnDark, b.borderOnDark, t)!,
+      borderInverse: Color.lerp(a.borderInverse, b.borderInverse, t)!,
       borderOnAccent: Color.lerp(a.borderOnAccent, b.borderOnAccent, t)!,
       borderOnSurface: Color.lerp(a.borderOnSurface, b.borderOnSurface, t)!,
-      borderOpacity10: Color.lerp(a.borderOpacity10, b.borderOpacity10, t)!,
-      borderOpacity25: Color.lerp(a.borderOpacity25, b.borderOpacity25, t)!,
+      borderOpacitySubtle: Color.lerp(
+        a.borderOpacitySubtle,
+        b.borderOpacitySubtle,
+        t,
+      )!,
+      borderOpacityStrong: Color.lerp(
+        a.borderOpacityStrong,
+        b.borderOpacityStrong,
+        t,
+      )!,
       borderFocus: Color.lerp(a.borderFocus, b.borderFocus, t)!,
       borderDisabled: Color.lerp(a.borderDisabled, b.borderDisabled, t)!,
+      borderHover: Color.lerp(a.borderHover, b.borderHover, t)!,
+      borderPressed: Color.lerp(a.borderPressed, b.borderPressed, t)!,
+      borderActive: Color.lerp(a.borderActive, b.borderActive, t)!,
       borderError: Color.lerp(a.borderError, b.borderError, t)!,
       borderWarning: Color.lerp(a.borderWarning, b.borderWarning, t)!,
       borderSuccess: Color.lerp(a.borderSuccess, b.borderSuccess, t)!,
@@ -143,12 +164,12 @@ mixin _$StreamColorScheme {
 
   StreamColorScheme copyWith({
     StreamColorSwatch? brand,
+    StreamColorSwatch? chrome,
     Color? accentPrimary,
     Color? accentSuccess,
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
-    Color? accentBlack,
     Color? textPrimary,
     Color? textSecondary,
     Color? textTertiary,
@@ -156,12 +177,14 @@ mixin _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
-    Color? textOnDark,
     Color? backgroundApp,
     Color? backgroundSurface,
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
-    Color? backgroundOverlay,
+    Color? backgroundSurfaceCard,
+    Color? backgroundOnAccent,
+    Color? backgroundHighlight,
+    Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
     Color? backgroundDisabled,
@@ -175,13 +198,16 @@ mixin _$StreamColorScheme {
     Color? borderDefault,
     Color? borderSubtle,
     Color? borderStrong,
-    Color? borderOnDark,
+    Color? borderInverse,
     Color? borderOnAccent,
     Color? borderOnSurface,
-    Color? borderOpacity10,
-    Color? borderOpacity25,
+    Color? borderOpacitySubtle,
+    Color? borderOpacityStrong,
     Color? borderFocus,
     Color? borderDisabled,
+    Color? borderHover,
+    Color? borderPressed,
+    Color? borderActive,
     Color? borderError,
     Color? borderWarning,
     Color? borderSuccess,
@@ -199,12 +225,12 @@ mixin _$StreamColorScheme {
 
     return StreamColorScheme.raw(
       brand: brand ?? _this.brand,
+      chrome: chrome ?? _this.chrome,
       accentPrimary: accentPrimary ?? _this.accentPrimary,
       accentSuccess: accentSuccess ?? _this.accentSuccess,
       accentWarning: accentWarning ?? _this.accentWarning,
       accentError: accentError ?? _this.accentError,
       accentNeutral: accentNeutral ?? _this.accentNeutral,
-      accentBlack: accentBlack ?? _this.accentBlack,
       textPrimary: textPrimary ?? _this.textPrimary,
       textSecondary: textSecondary ?? _this.textSecondary,
       textTertiary: textTertiary ?? _this.textTertiary,
@@ -212,14 +238,17 @@ mixin _$StreamColorScheme {
       textInverse: textInverse ?? _this.textInverse,
       textLink: textLink ?? _this.textLink,
       textOnAccent: textOnAccent ?? _this.textOnAccent,
-      textOnDark: textOnDark ?? _this.textOnDark,
       backgroundApp: backgroundApp ?? _this.backgroundApp,
       backgroundSurface: backgroundSurface ?? _this.backgroundSurface,
       backgroundSurfaceSubtle:
           backgroundSurfaceSubtle ?? _this.backgroundSurfaceSubtle,
       backgroundSurfaceStrong:
           backgroundSurfaceStrong ?? _this.backgroundSurfaceStrong,
-      backgroundOverlay: backgroundOverlay ?? _this.backgroundOverlay,
+      backgroundSurfaceCard:
+          backgroundSurfaceCard ?? _this.backgroundSurfaceCard,
+      backgroundOnAccent: backgroundOnAccent ?? _this.backgroundOnAccent,
+      backgroundHighlight: backgroundHighlight ?? _this.backgroundHighlight,
+      backgroundScrim: backgroundScrim ?? _this.backgroundScrim,
       backgroundOverlayLight:
           backgroundOverlayLight ?? _this.backgroundOverlayLight,
       backgroundOverlayDark:
@@ -235,13 +264,16 @@ mixin _$StreamColorScheme {
       borderDefault: borderDefault ?? _this.borderDefault,
       borderSubtle: borderSubtle ?? _this.borderSubtle,
       borderStrong: borderStrong ?? _this.borderStrong,
-      borderOnDark: borderOnDark ?? _this.borderOnDark,
+      borderInverse: borderInverse ?? _this.borderInverse,
       borderOnAccent: borderOnAccent ?? _this.borderOnAccent,
       borderOnSurface: borderOnSurface ?? _this.borderOnSurface,
-      borderOpacity10: borderOpacity10 ?? _this.borderOpacity10,
-      borderOpacity25: borderOpacity25 ?? _this.borderOpacity25,
+      borderOpacitySubtle: borderOpacitySubtle ?? _this.borderOpacitySubtle,
+      borderOpacityStrong: borderOpacityStrong ?? _this.borderOpacityStrong,
       borderFocus: borderFocus ?? _this.borderFocus,
       borderDisabled: borderDisabled ?? _this.borderDisabled,
+      borderHover: borderHover ?? _this.borderHover,
+      borderPressed: borderPressed ?? _this.borderPressed,
+      borderActive: borderActive ?? _this.borderActive,
       borderError: borderError ?? _this.borderError,
       borderWarning: borderWarning ?? _this.borderWarning,
       borderSuccess: borderSuccess ?? _this.borderSuccess,
@@ -270,12 +302,12 @@ mixin _$StreamColorScheme {
 
     return copyWith(
       brand: other.brand,
+      chrome: other.chrome,
       accentPrimary: other.accentPrimary,
       accentSuccess: other.accentSuccess,
       accentWarning: other.accentWarning,
       accentError: other.accentError,
       accentNeutral: other.accentNeutral,
-      accentBlack: other.accentBlack,
       textPrimary: other.textPrimary,
       textSecondary: other.textSecondary,
       textTertiary: other.textTertiary,
@@ -283,12 +315,14 @@ mixin _$StreamColorScheme {
       textInverse: other.textInverse,
       textLink: other.textLink,
       textOnAccent: other.textOnAccent,
-      textOnDark: other.textOnDark,
       backgroundApp: other.backgroundApp,
       backgroundSurface: other.backgroundSurface,
       backgroundSurfaceSubtle: other.backgroundSurfaceSubtle,
       backgroundSurfaceStrong: other.backgroundSurfaceStrong,
-      backgroundOverlay: other.backgroundOverlay,
+      backgroundSurfaceCard: other.backgroundSurfaceCard,
+      backgroundOnAccent: other.backgroundOnAccent,
+      backgroundHighlight: other.backgroundHighlight,
+      backgroundScrim: other.backgroundScrim,
       backgroundOverlayLight: other.backgroundOverlayLight,
       backgroundOverlayDark: other.backgroundOverlayDark,
       backgroundDisabled: other.backgroundDisabled,
@@ -302,13 +336,16 @@ mixin _$StreamColorScheme {
       borderDefault: other.borderDefault,
       borderSubtle: other.borderSubtle,
       borderStrong: other.borderStrong,
-      borderOnDark: other.borderOnDark,
+      borderInverse: other.borderInverse,
       borderOnAccent: other.borderOnAccent,
       borderOnSurface: other.borderOnSurface,
-      borderOpacity10: other.borderOpacity10,
-      borderOpacity25: other.borderOpacity25,
+      borderOpacitySubtle: other.borderOpacitySubtle,
+      borderOpacityStrong: other.borderOpacityStrong,
       borderFocus: other.borderFocus,
       borderDisabled: other.borderDisabled,
+      borderHover: other.borderHover,
+      borderPressed: other.borderPressed,
+      borderActive: other.borderActive,
       borderError: other.borderError,
       borderWarning: other.borderWarning,
       borderSuccess: other.borderSuccess,
@@ -338,12 +375,12 @@ mixin _$StreamColorScheme {
     final _other = (other as StreamColorScheme);
 
     return _other.brand == _this.brand &&
+        _other.chrome == _this.chrome &&
         _other.accentPrimary == _this.accentPrimary &&
         _other.accentSuccess == _this.accentSuccess &&
         _other.accentWarning == _this.accentWarning &&
         _other.accentError == _this.accentError &&
         _other.accentNeutral == _this.accentNeutral &&
-        _other.accentBlack == _this.accentBlack &&
         _other.textPrimary == _this.textPrimary &&
         _other.textSecondary == _this.textSecondary &&
         _other.textTertiary == _this.textTertiary &&
@@ -351,12 +388,14 @@ mixin _$StreamColorScheme {
         _other.textInverse == _this.textInverse &&
         _other.textLink == _this.textLink &&
         _other.textOnAccent == _this.textOnAccent &&
-        _other.textOnDark == _this.textOnDark &&
         _other.backgroundApp == _this.backgroundApp &&
         _other.backgroundSurface == _this.backgroundSurface &&
         _other.backgroundSurfaceSubtle == _this.backgroundSurfaceSubtle &&
         _other.backgroundSurfaceStrong == _this.backgroundSurfaceStrong &&
-        _other.backgroundOverlay == _this.backgroundOverlay &&
+        _other.backgroundSurfaceCard == _this.backgroundSurfaceCard &&
+        _other.backgroundOnAccent == _this.backgroundOnAccent &&
+        _other.backgroundHighlight == _this.backgroundHighlight &&
+        _other.backgroundScrim == _this.backgroundScrim &&
         _other.backgroundOverlayLight == _this.backgroundOverlayLight &&
         _other.backgroundOverlayDark == _this.backgroundOverlayDark &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
@@ -370,13 +409,16 @@ mixin _$StreamColorScheme {
         _other.borderDefault == _this.borderDefault &&
         _other.borderSubtle == _this.borderSubtle &&
         _other.borderStrong == _this.borderStrong &&
-        _other.borderOnDark == _this.borderOnDark &&
+        _other.borderInverse == _this.borderInverse &&
         _other.borderOnAccent == _this.borderOnAccent &&
         _other.borderOnSurface == _this.borderOnSurface &&
-        _other.borderOpacity10 == _this.borderOpacity10 &&
-        _other.borderOpacity25 == _this.borderOpacity25 &&
+        _other.borderOpacitySubtle == _this.borderOpacitySubtle &&
+        _other.borderOpacityStrong == _this.borderOpacityStrong &&
         _other.borderFocus == _this.borderFocus &&
         _other.borderDisabled == _this.borderDisabled &&
+        _other.borderHover == _this.borderHover &&
+        _other.borderPressed == _this.borderPressed &&
+        _other.borderActive == _this.borderActive &&
         _other.borderError == _this.borderError &&
         _other.borderWarning == _this.borderWarning &&
         _other.borderSuccess == _this.borderSuccess &&
@@ -398,12 +440,12 @@ mixin _$StreamColorScheme {
     return Object.hashAll([
       runtimeType,
       _this.brand,
+      _this.chrome,
       _this.accentPrimary,
       _this.accentSuccess,
       _this.accentWarning,
       _this.accentError,
       _this.accentNeutral,
-      _this.accentBlack,
       _this.textPrimary,
       _this.textSecondary,
       _this.textTertiary,
@@ -411,12 +453,14 @@ mixin _$StreamColorScheme {
       _this.textInverse,
       _this.textLink,
       _this.textOnAccent,
-      _this.textOnDark,
       _this.backgroundApp,
       _this.backgroundSurface,
       _this.backgroundSurfaceSubtle,
       _this.backgroundSurfaceStrong,
-      _this.backgroundOverlay,
+      _this.backgroundSurfaceCard,
+      _this.backgroundOnAccent,
+      _this.backgroundHighlight,
+      _this.backgroundScrim,
       _this.backgroundOverlayLight,
       _this.backgroundOverlayDark,
       _this.backgroundDisabled,
@@ -430,13 +474,16 @@ mixin _$StreamColorScheme {
       _this.borderDefault,
       _this.borderSubtle,
       _this.borderStrong,
-      _this.borderOnDark,
+      _this.borderInverse,
       _this.borderOnAccent,
       _this.borderOnSurface,
-      _this.borderOpacity10,
-      _this.borderOpacity25,
+      _this.borderOpacitySubtle,
+      _this.borderOpacityStrong,
       _this.borderFocus,
       _this.borderDisabled,
+      _this.borderHover,
+      _this.borderPressed,
+      _this.borderActive,
       _this.borderError,
       _this.borderWarning,
       _this.borderSuccess,

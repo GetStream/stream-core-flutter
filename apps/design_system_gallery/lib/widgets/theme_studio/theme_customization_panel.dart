@@ -83,6 +83,8 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
                     SizedBox(height: spacing.md),
                     _buildBrandSection(context),
                     SizedBox(height: spacing.md),
+                    _buildChromeSection(context),
+                    SizedBox(height: spacing.md),
                     _buildAccentColorsSection(context),
                     SizedBox(height: spacing.md),
                     _buildTextColorsSection(context),
@@ -224,6 +226,20 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
+  Widget _buildChromeSection(BuildContext context) {
+    final config = context.read<ThemeConfiguration>();
+    return SectionCard(
+      title: 'Chrome Color',
+      subtitle: 'chrome',
+      icon: Icons.circle_outlined,
+      child: ColorPickerTile(
+        label: 'chromePrimary',
+        color: config.chromePrimaryColor,
+        onColorChanged: config.setChromePrimaryColor,
+      ),
+    );
+  }
+
   Widget _buildAccentColorsSection(BuildContext context) {
     final config = context.read<ThemeConfiguration>();
     return SectionCard(
@@ -312,17 +328,62 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
 
   Widget _buildBackgroundColorsSection(BuildContext context) {
     final config = context.read<ThemeConfiguration>();
+    final spacing = context.streamSpacing;
     return SectionCard(
       title: 'Background Colors',
       subtitle: 'background*',
       icon: Icons.format_paint,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ColorPickerTile(
             label: 'backgroundApp',
             color: config.backgroundApp,
             onColorChanged: config.setBackgroundApp,
           ),
+          ColorPickerTile(
+            label: 'backgroundInverse',
+            color: config.backgroundInverse,
+            onColorChanged: config.setBackgroundInverse,
+          ),
+          ColorPickerTile(
+            label: 'backgroundOnAccent',
+            color: config.backgroundOnAccent,
+            onColorChanged: config.setBackgroundOnAccent,
+          ),
+          ColorPickerTile(
+            label: 'backgroundHighlight',
+            color: config.backgroundHighlight,
+            onColorChanged: config.setBackgroundHighlight,
+          ),
+          ColorPickerTile(
+            label: 'backgroundScrim',
+            color: config.backgroundScrim,
+            onColorChanged: config.setBackgroundScrim,
+          ),
+          ColorPickerTile(
+            label: 'backgroundOverlayLight',
+            color: config.backgroundOverlayLight,
+            onColorChanged: config.setBackgroundOverlayLight,
+          ),
+          ColorPickerTile(
+            label: 'backgroundOverlayDark',
+            color: config.backgroundOverlayDark,
+            onColorChanged: config.setBackgroundOverlayDark,
+          ),
+          ColorPickerTile(
+            label: 'backgroundDisabled',
+            color: config.backgroundDisabled,
+            onColorChanged: config.setBackgroundDisabled,
+          ),
+          SizedBox(height: spacing.xs),
+          Text(
+            'Surface',
+            style: context.streamTextTheme.captionEmphasis.copyWith(
+              color: context.streamColorScheme.textTertiary,
+            ),
+          ),
+          SizedBox(height: spacing.xs),
           ColorPickerTile(
             label: 'backgroundSurface',
             color: config.backgroundSurface,
@@ -339,14 +400,42 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBackgroundSurfaceStrong,
           ),
           ColorPickerTile(
-            label: 'backgroundOverlay',
-            color: config.backgroundOverlay,
-            onColorChanged: config.setBackgroundOverlay,
+            label: 'backgroundSurfaceCard',
+            color: config.backgroundSurfaceCard,
+            onColorChanged: config.setBackgroundSurfaceCard,
+          ),
+          SizedBox(height: spacing.xs),
+          Text(
+            'Elevation',
+            style: context.streamTextTheme.captionEmphasis.copyWith(
+              color: context.streamColorScheme.textTertiary,
+            ),
+          ),
+          SizedBox(height: spacing.xs),
+          ColorPickerTile(
+            label: 'backgroundElevation0',
+            color: config.backgroundElevation0,
+            onColorChanged: config.setBackgroundElevation0,
           ),
           ColorPickerTile(
-            label: 'backgroundDisabled',
-            color: config.backgroundDisabled,
-            onColorChanged: config.setBackgroundDisabled,
+            label: 'backgroundElevation1',
+            color: config.backgroundElevation1,
+            onColorChanged: config.setBackgroundElevation1,
+          ),
+          ColorPickerTile(
+            label: 'backgroundElevation2',
+            color: config.backgroundElevation2,
+            onColorChanged: config.setBackgroundElevation2,
+          ),
+          ColorPickerTile(
+            label: 'backgroundElevation3',
+            color: config.backgroundElevation3,
+            onColorChanged: config.setBackgroundElevation3,
+          ),
+          ColorPickerTile(
+            label: 'backgroundElevation4',
+            color: config.backgroundElevation4,
+            onColorChanged: config.setBackgroundElevation4,
           ),
           ColorPickerTile(
             label: 'backgroundHighlight',
@@ -382,9 +471,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBorderStrong,
           ),
           ColorPickerTile(
-            label: 'borderOnDark',
-            color: config.borderOnDark,
-            onColorChanged: config.setBorderOnDark,
+            label: 'borderInverse',
+            color: config.borderInverse,
+            onColorChanged: config.setBorderInverse,
           ),
           ColorPickerTile(
             label: 'borderOnAccent',
@@ -392,14 +481,19 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBorderOnAccent,
           ),
           ColorPickerTile(
-            label: 'borderOpacity10',
-            color: config.borderOpacity10,
-            onColorChanged: config.setBorderOpacity10,
+            label: 'borderOnSurface',
+            color: config.borderOnSurface,
+            onColorChanged: config.setBorderOnSurface,
           ),
           ColorPickerTile(
-            label: 'borderOpacity25',
-            color: config.borderOpacity25,
-            onColorChanged: config.setBorderOpacity25,
+            label: 'borderOpacitySubtle',
+            color: config.borderOpacitySubtle,
+            onColorChanged: config.setBorderOpacitySubtle,
+          ),
+          ColorPickerTile(
+            label: 'borderOpacityStrong',
+            color: config.borderOpacityStrong,
+            onColorChanged: config.setBorderOpacityStrong,
           ),
         ],
       ),
@@ -418,6 +512,21 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             label: 'borderFocus',
             color: config.borderFocus,
             onColorChanged: config.setBorderFocus,
+          ),
+          ColorPickerTile(
+            label: 'borderActive',
+            color: config.borderActive,
+            onColorChanged: config.setBorderActive,
+          ),
+          ColorPickerTile(
+            label: 'borderHover',
+            color: config.borderHover,
+            onColorChanged: config.setBorderHover,
+          ),
+          ColorPickerTile(
+            label: 'borderPressed',
+            color: config.borderPressed,
+            onColorChanged: config.setBorderPressed,
           ),
           ColorPickerTile(
             label: 'borderDisabled',

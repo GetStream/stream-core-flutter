@@ -172,7 +172,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
             size: avatarSize,
             border: Border.all(
               width: avatarBorderWidth,
-              color: colorScheme.borderOnDark,
+              color: colorScheme.borderInverse,
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
           ),
@@ -358,20 +358,18 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
   }
 
   // Returns the appropriate avatar size for the given group size.
-  StreamAvatarSize _avatarSizeForGroupSize(
-    StreamAvatarGroupSize size,
-  ) => switch (size) {
+  StreamAvatarSize _avatarSizeForGroupSize(StreamAvatarGroupSize size) => switch (size) {
     .lg => StreamAvatarSize.sm,
     .xl => StreamAvatarSize.md,
-    .xxl => StreamAvatarSize.lg,
+    .xxl => StreamAvatarSize.xl,
   };
 
   // Returns the appropriate badge count size for the given group size.
   StreamBadgeCountSize _badgeCountSizeForGroupSize(
     StreamAvatarGroupSize size,
   ) => switch (size) {
-    .lg => StreamBadgeCountSize.sm,
-    .xl => StreamBadgeCountSize.md,
-    .xxl => StreamBadgeCountSize.md,
+    .lg => StreamBadgeCountSize.xs,
+    .xl => StreamBadgeCountSize.sm,
+    .xxl => StreamBadgeCountSize.lg,
   };
 }

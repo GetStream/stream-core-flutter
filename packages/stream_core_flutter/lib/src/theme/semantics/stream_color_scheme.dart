@@ -38,6 +38,7 @@ part 'stream_color_scheme.g.theme.dart';
 /// See also:
 ///
 ///  * [StreamBrandColor], which provides brand color shades.
+///  * [StreamChromeColor], which provides neutral chrome color shades.
 ///  * [StreamColors], which defines the primitive color palette.
 @immutable
 @ThemeGen(constructor: 'raw')
@@ -46,13 +47,13 @@ class StreamColorScheme with _$StreamColorScheme {
   factory StreamColorScheme.light({
     // Brand
     StreamColorSwatch? brand,
+    StreamColorSwatch? chrome,
     // Accent
     Color? accentPrimary,
     Color? accentSuccess,
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
-    Color? accentBlack,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -61,18 +62,19 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
-    Color? textOnDark,
     // Background
     Color? backgroundApp,
     Color? backgroundSurface,
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
-    Color? backgroundOverlay,
+    Color? backgroundSurfaceCard,
+    Color? backgroundOnAccent,
+    Color? backgroundHighlight,
+    Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
-    Color? backgroundHighlight,
 
     // Background - Elevation
     Color? backgroundElevation0,
@@ -84,14 +86,17 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderDefault,
     Color? borderSubtle,
     Color? borderStrong,
-    Color? borderOnDark,
+    Color? borderInverse,
     Color? borderOnAccent,
     Color? borderOnSurface,
-    Color? borderOpacity10,
-    Color? borderOpacity25,
+    Color? borderOpacitySubtle,
+    Color? borderOpacityStrong,
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
+    Color? borderHover,
+    Color? borderPressed,
+    Color? borderActive,
     Color? borderError,
     Color? borderWarning,
     Color? borderSuccess,
@@ -110,68 +115,72 @@ class StreamColorScheme with _$StreamColorScheme {
   }) {
     // Brand
     brand ??= StreamBrandColor.light();
+    chrome ??= StreamChromeColor.light();
 
     // Accent
     accentPrimary ??= brand.shade500;
     accentSuccess ??= light_tokens.StreamTokens.accentSuccess;
     accentWarning ??= light_tokens.StreamTokens.accentWarning;
     accentError ??= light_tokens.StreamTokens.accentError;
-    accentNeutral ??= light_tokens.StreamTokens.accentNeutral;
-    accentBlack ??= light_tokens.StreamTokens.accentBlack;
+    accentNeutral ??= chrome.shade500;
 
     // Text
-    textPrimary ??= light_tokens.StreamTokens.textPrimary;
-    textSecondary ??= light_tokens.StreamTokens.textSecondary;
-    textTertiary ??= light_tokens.StreamTokens.textTertiary;
-    textDisabled ??= light_tokens.StreamTokens.textDisabled;
-    textInverse ??= light_tokens.StreamTokens.textInverse;
+    textPrimary ??= chrome.shade900;
+    textSecondary ??= chrome.shade700;
+    textTertiary ??= chrome.shade500;
+    textDisabled ??= chrome.shade300;
+    textInverse ??= chrome[0] ?? StreamColors.white;
     textLink ??= accentPrimary;
-    textOnAccent ??= light_tokens.StreamTokens.textOnAccent;
-    textOnDark ??= light_tokens.StreamTokens.textOnDark;
+    textOnAccent ??= chrome[0] ?? StreamColors.white;
 
     // Background
-
-    backgroundApp ??= light_tokens.StreamTokens.backgroundCoreApp;
-    backgroundSurface ??= light_tokens.StreamTokens.backgroundCoreSurface;
-    backgroundSurfaceSubtle ??= light_tokens.StreamTokens.backgroundCoreSurfaceSubtle;
-    backgroundSurfaceStrong ??= light_tokens.StreamTokens.backgroundCoreSurfaceStrong;
-    backgroundOverlay ??= light_tokens.StreamTokens.backgroundCoreOverlay;
+    backgroundSurface ??= chrome.shade100;
+    backgroundSurfaceSubtle ??= chrome.shade50;
+    backgroundSurfaceStrong ??= chrome.shade150;
+    backgroundSurfaceCard ??= chrome.shade50;
+    backgroundOnAccent ??= chrome[0] ?? StreamColors.white;
+    backgroundHighlight ??= light_tokens.StreamTokens.backgroundCoreHighlight;
+    backgroundScrim ??= light_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= light_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= light_tokens.StreamTokens.backgroundCoreOverlayDark;
-    backgroundDisabled ??= light_tokens.StreamTokens.backgroundCoreDisabled;
-    backgroundInverse ??= light_tokens.StreamTokens.backgroundCoreInverse;
-    backgroundHighlight ??= StreamColors.yellow.shade50;
+    backgroundDisabled ??= chrome.shade100;
+    backgroundInverse ??= chrome.shade900;
 
-    backgroundElevation0 ??= light_tokens.StreamTokens.backgroundElevationElevation0;
-    backgroundElevation1 ??= light_tokens.StreamTokens.backgroundElevationElevation1;
-    backgroundElevation2 ??= light_tokens.StreamTokens.backgroundElevationElevation2;
-    backgroundElevation3 ??= light_tokens.StreamTokens.backgroundElevationElevation3;
-    backgroundElevation4 ??= light_tokens.StreamTokens.backgroundElevationElevation4;
+    backgroundElevation0 ??= chrome[0] ?? StreamColors.white;
+    backgroundElevation1 ??= chrome[0] ?? StreamColors.white;
+    backgroundElevation2 ??= chrome[0] ?? StreamColors.white;
+    backgroundElevation3 ??= chrome[0] ?? StreamColors.white;
+    backgroundElevation4 ??= chrome[0] ?? StreamColors.white;
+
+    backgroundApp ??= backgroundElevation0;
 
     // Border - Core
     borderDefault ??= light_tokens.StreamTokens.borderCoreDefault;
     borderSubtle ??= light_tokens.StreamTokens.borderCoreSubtle;
     borderStrong ??= light_tokens.StreamTokens.borderCoreStrong;
-    borderOnDark ??= light_tokens.StreamTokens.borderCoreOnDark;
-    borderOnAccent ??= light_tokens.StreamTokens.borderCoreOnAccent;
-    borderOnSurface ??= light_tokens.StreamTokens.borderCoreOnSurface;
-    borderOpacity10 ??= light_tokens.StreamTokens.borderCoreOpacity10;
-    borderOpacity25 ??= light_tokens.StreamTokens.borderCoreOpacity25;
+    borderInverse ??= chrome[0] ?? StreamColors.white;
+    borderOnAccent ??= chrome[0] ?? StreamColors.white;
+    borderOnSurface ??= chrome.shade200;
+    borderOpacitySubtle ??= light_tokens.StreamTokens.borderCoreOpacitySubtle;
+    borderOpacityStrong ??= light_tokens.StreamTokens.borderCoreOpacityStrong;
 
     // Border - Utility
-    borderFocus ??= brand.shade300;
-    borderDisabled ??= light_tokens.StreamTokens.borderUtilityDisabled;
+    borderFocus ??= brand.shade150;
+    borderDisabled ??= chrome.shade100;
+    borderHover ??= light_tokens.StreamTokens.borderUtilityHover;
+    borderPressed ??= light_tokens.StreamTokens.borderUtilityPressed;
+    borderActive ??= accentPrimary;
     borderError ??= accentError;
     borderWarning ??= accentWarning;
     borderSuccess ??= accentSuccess;
-    borderSelected ??= accentPrimary;
+    borderSelected ??= light_tokens.StreamTokens.borderUtilitySelected;
 
     // State
-    stateHover ??= light_tokens.StreamTokens.backgroundCoreHover;
-    statePressed ??= light_tokens.StreamTokens.backgroundCorePressed;
-    stateSelected ??= light_tokens.StreamTokens.backgroundCoreSelected;
+    stateHover ??= light_tokens.StreamTokens.backgroundUtilityHover;
+    statePressed ??= light_tokens.StreamTokens.backgroundUtilityPressed;
+    stateSelected ??= light_tokens.StreamTokens.backgroundUtilitySelected;
     stateFocused ??= brand.shade100;
-    stateDisabled ??= light_tokens.StreamTokens.backgroundCoreDisabled;
+    stateDisabled ??= light_tokens.StreamTokens.backgroundUtilityDisabled;
 
     // System
     systemText ??= light_tokens.StreamTokens.systemText;
@@ -203,12 +212,12 @@ class StreamColorScheme with _$StreamColorScheme {
 
     return .raw(
       brand: brand,
+      chrome: chrome,
       accentPrimary: accentPrimary,
       accentSuccess: accentSuccess,
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
-      accentBlack: accentBlack,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -216,32 +225,36 @@ class StreamColorScheme with _$StreamColorScheme {
       textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
-      textOnDark: textOnDark,
       backgroundApp: backgroundApp,
       backgroundSurface: backgroundSurface,
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
-      backgroundOverlay: backgroundOverlay,
+      backgroundSurfaceCard: backgroundSurfaceCard,
+      backgroundOnAccent: backgroundOnAccent,
+      backgroundHighlight: backgroundHighlight,
+      backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
       backgroundOverlayDark: backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
-      backgroundHighlight: backgroundHighlight,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
       backgroundElevation3: backgroundElevation3,
       backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
-      borderOnDark: borderOnDark,
+      borderInverse: borderInverse,
       borderOnAccent: borderOnAccent,
       borderOnSurface: borderOnSurface,
       borderSubtle: borderSubtle,
       borderStrong: borderStrong,
-      borderOpacity10: borderOpacity10,
-      borderOpacity25: borderOpacity25,
+      borderOpacitySubtle: borderOpacitySubtle,
+      borderOpacityStrong: borderOpacityStrong,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
+      borderHover: borderHover,
+      borderPressed: borderPressed,
+      borderActive: borderActive,
       borderError: borderError,
       borderWarning: borderWarning,
       borderSuccess: borderSuccess,
@@ -261,13 +274,13 @@ class StreamColorScheme with _$StreamColorScheme {
   factory StreamColorScheme.dark({
     // Brand
     StreamColorSwatch? brand,
+    StreamColorSwatch? chrome,
     // Accent
     Color? accentPrimary,
     Color? accentSuccess,
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
-    Color? accentBlack,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -276,18 +289,19 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
-    Color? textOnDark,
     // Background
     Color? backgroundApp,
     Color? backgroundSurface,
     Color? backgroundSurfaceSubtle,
     Color? backgroundSurfaceStrong,
-    Color? backgroundOverlay,
+    Color? backgroundSurfaceCard,
+    Color? backgroundOnAccent,
+    Color? backgroundHighlight,
+    Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
-    Color? backgroundHighlight,
     // Background - Elevation
     Color? backgroundElevation0,
     Color? backgroundElevation1,
@@ -298,14 +312,17 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderDefault,
     Color? borderSubtle,
     Color? borderStrong,
-    Color? borderOpacity10,
-    Color? borderOpacity25,
-    Color? borderOnDark,
+    Color? borderInverse,
+    Color? borderOpacitySubtle,
+    Color? borderOpacityStrong,
     Color? borderOnAccent,
     Color? borderOnSurface,
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
+    Color? borderHover,
+    Color? borderPressed,
+    Color? borderActive,
     Color? borderError,
     Color? borderWarning,
     Color? borderSuccess,
@@ -324,67 +341,72 @@ class StreamColorScheme with _$StreamColorScheme {
   }) {
     // Brand
     brand ??= StreamBrandColor.dark();
+    chrome ??= StreamChromeColor.dark();
 
     // Accent
-    accentPrimary ??= brand.shade500;
+    accentPrimary ??= brand.shade400;
     accentSuccess ??= dark_tokens.StreamTokens.accentSuccess;
     accentWarning ??= dark_tokens.StreamTokens.accentWarning;
     accentError ??= dark_tokens.StreamTokens.accentError;
-    accentNeutral ??= dark_tokens.StreamTokens.accentNeutral;
-    accentBlack ??= dark_tokens.StreamTokens.accentBlack;
+    accentNeutral ??= chrome.shade500;
 
     // Text
-    textPrimary ??= dark_tokens.StreamTokens.textPrimary;
-    textSecondary ??= dark_tokens.StreamTokens.textSecondary;
-    textTertiary ??= dark_tokens.StreamTokens.textTertiary;
-    textDisabled ??= dark_tokens.StreamTokens.textDisabled;
-    textInverse ??= dark_tokens.StreamTokens.textInverse;
-    textLink ??= accentPrimary;
-    textOnAccent ??= dark_tokens.StreamTokens.textOnAccent;
-    textOnDark ??= dark_tokens.StreamTokens.textOnDark;
+    textPrimary ??= chrome.shade900;
+    textSecondary ??= chrome.shade700;
+    textTertiary ??= chrome.shade500;
+    textDisabled ??= chrome.shade300;
+    textInverse ??= chrome[0] ?? StreamColors.black;
+    textLink ??= brand.shade600;
+    textOnAccent ??= chrome[1000] ?? StreamColors.white;
 
     // Background
-    backgroundApp ??= dark_tokens.StreamTokens.backgroundCoreApp;
-    backgroundSurface ??= dark_tokens.StreamTokens.backgroundCoreSurface;
-    backgroundSurfaceSubtle ??= dark_tokens.StreamTokens.backgroundCoreSurfaceSubtle;
-    backgroundSurfaceStrong ??= dark_tokens.StreamTokens.backgroundCoreSurfaceStrong;
-    backgroundOverlay ??= dark_tokens.StreamTokens.backgroundCoreOverlay;
+    backgroundSurface ??= chrome.shade100;
+    backgroundSurfaceSubtle ??= chrome.shade50;
+    backgroundSurfaceStrong ??= chrome.shade150;
+    backgroundSurfaceCard ??= chrome.shade100;
+    backgroundOnAccent ??= chrome[1000] ?? StreamColors.white;
+    backgroundHighlight ??= dark_tokens.StreamTokens.backgroundCoreHighlight;
+    backgroundScrim ??= dark_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= dark_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= dark_tokens.StreamTokens.backgroundCoreOverlayDark;
-    backgroundDisabled ??= dark_tokens.StreamTokens.backgroundCoreDisabled;
-    backgroundInverse ??= dark_tokens.StreamTokens.backgroundCoreInverse;
-    backgroundHighlight ??= StreamColors.yellow.shade800;
+    backgroundDisabled ??= chrome.shade100;
+    backgroundInverse ??= chrome.shade900;
 
-    backgroundElevation0 ??= dark_tokens.StreamTokens.backgroundElevationElevation0;
-    backgroundElevation1 ??= dark_tokens.StreamTokens.backgroundElevationElevation1;
-    backgroundElevation2 ??= dark_tokens.StreamTokens.backgroundElevationElevation2;
-    backgroundElevation3 ??= dark_tokens.StreamTokens.backgroundElevationElevation3;
-    backgroundElevation4 ??= dark_tokens.StreamTokens.backgroundElevationElevation4;
+    backgroundElevation0 ??= chrome[0] ?? StreamColors.black;
+    backgroundElevation1 ??= chrome.shade50;
+    backgroundElevation2 ??= chrome.shade100;
+    backgroundElevation3 ??= chrome.shade200;
+    backgroundElevation4 ??= chrome.shade300;
+
+    backgroundApp ??= backgroundElevation0;
 
     // Border - Core
     borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
     borderSubtle ??= dark_tokens.StreamTokens.borderCoreSubtle;
     borderStrong ??= dark_tokens.StreamTokens.borderCoreStrong;
-    borderOpacity10 ??= dark_tokens.StreamTokens.borderCoreOpacity10;
-    borderOpacity25 ??= dark_tokens.StreamTokens.borderCoreOpacity25;
-    borderOnDark ??= dark_tokens.StreamTokens.borderCoreOnDark;
-    borderOnAccent ??= dark_tokens.StreamTokens.borderCoreOnAccent;
-    borderOnSurface ??= dark_tokens.StreamTokens.borderCoreOnSurface;
+    borderInverse ??= dark_tokens.StreamTokens.borderCoreInverse;
+    borderOpacitySubtle ??= dark_tokens.StreamTokens.borderCoreOpacitySubtle;
+    borderOpacityStrong ??= dark_tokens.StreamTokens.borderCoreOpacityStrong;
+    borderOnAccent ??= chrome[1000] ?? StreamColors.white;
+    borderOnSurface ??= chrome.shade200;
 
     // Border - Utility
-    borderFocus ??= brand.shade300;
-    borderDisabled ??= dark_tokens.StreamTokens.borderUtilityDisabled;
+    borderFocus ??= brand.shade150;
+    borderDisabled ??= chrome.shade100;
+    borderHover ??= dark_tokens.StreamTokens.borderUtilityHover;
+    borderPressed ??= dark_tokens.StreamTokens.borderUtilityPressed;
+    borderActive ??= accentPrimary;
     borderError ??= accentError;
     borderWarning ??= accentWarning;
     borderSuccess ??= accentSuccess;
-    borderSelected ??= accentPrimary;
+    borderSelected ??= dark_tokens.StreamTokens.borderUtilitySelected;
 
     // State
-    stateHover ??= dark_tokens.StreamTokens.backgroundCoreHover;
-    statePressed ??= dark_tokens.StreamTokens.backgroundCorePressed;
-    stateSelected ??= dark_tokens.StreamTokens.backgroundCoreSelected;
+    stateHover ??= dark_tokens.StreamTokens.backgroundUtilityHover;
+    statePressed ??= dark_tokens.StreamTokens.backgroundUtilityPressed;
+    stateSelected ??= dark_tokens.StreamTokens.backgroundUtilitySelected;
     stateFocused ??= brand.shade100;
-    stateDisabled ??= dark_tokens.StreamTokens.backgroundCoreDisabled;
+    stateDisabled ??= dark_tokens.StreamTokens.backgroundUtilityDisabled;
 
     // System
     systemText ??= dark_tokens.StreamTokens.systemText;
@@ -416,12 +438,12 @@ class StreamColorScheme with _$StreamColorScheme {
 
     return .raw(
       brand: brand,
+      chrome: chrome,
       accentPrimary: accentPrimary,
       accentSuccess: accentSuccess,
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
-      accentBlack: accentBlack,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -429,32 +451,36 @@ class StreamColorScheme with _$StreamColorScheme {
       textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
-      textOnDark: textOnDark,
       backgroundApp: backgroundApp,
       backgroundSurface: backgroundSurface,
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
       backgroundSurfaceStrong: backgroundSurfaceStrong,
-      backgroundOverlay: backgroundOverlay,
+      backgroundSurfaceCard: backgroundSurfaceCard,
+      backgroundOnAccent: backgroundOnAccent,
+      backgroundHighlight: backgroundHighlight,
+      backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
       backgroundOverlayDark: backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
-      backgroundHighlight: backgroundHighlight,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
       backgroundElevation3: backgroundElevation3,
       backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
+      borderInverse: borderInverse,
       borderStrong: borderStrong,
-      borderOpacity10: borderOpacity10,
-      borderOpacity25: borderOpacity25,
-      borderOnDark: borderOnDark,
+      borderOpacitySubtle: borderOpacitySubtle,
+      borderOpacityStrong: borderOpacityStrong,
       borderOnAccent: borderOnAccent,
       borderOnSurface: borderOnSurface,
       borderSubtle: borderSubtle,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
+      borderHover: borderHover,
+      borderPressed: borderPressed,
+      borderActive: borderActive,
       borderError: borderError,
       borderWarning: borderWarning,
       borderSuccess: borderSuccess,
@@ -472,13 +498,13 @@ class StreamColorScheme with _$StreamColorScheme {
 
   const StreamColorScheme.raw({
     required this.brand,
+    required this.chrome,
     // Accent
     required this.accentPrimary,
     required this.accentSuccess,
     required this.accentWarning,
     required this.accentError,
     required this.accentNeutral,
-    required this.accentBlack,
     // Text
     required this.textPrimary,
     required this.textSecondary,
@@ -487,18 +513,19 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.textInverse,
     required this.textLink,
     required this.textOnAccent,
-    required this.textOnDark,
     // Background
     required this.backgroundApp,
     required this.backgroundSurface,
     required this.backgroundSurfaceSubtle,
     required this.backgroundSurfaceStrong,
-    required this.backgroundOverlay,
+    required this.backgroundSurfaceCard,
+    required this.backgroundOnAccent,
+    required this.backgroundHighlight,
+    required this.backgroundScrim,
     required this.backgroundOverlayLight,
     required this.backgroundOverlayDark,
     required this.backgroundDisabled,
     required this.backgroundInverse,
-    required this.backgroundHighlight,
     // Background - Elevation
     required this.backgroundElevation0,
     required this.backgroundElevation1,
@@ -509,14 +536,17 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.borderDefault,
     required this.borderSubtle,
     required this.borderStrong,
-    required this.borderOnDark,
+    required this.borderInverse,
     required this.borderOnAccent,
     required this.borderOnSurface,
-    required this.borderOpacity10,
-    required this.borderOpacity25,
+    required this.borderOpacitySubtle,
+    required this.borderOpacityStrong,
     // Border - Utility
     required this.borderFocus,
     required this.borderDisabled,
+    required this.borderHover,
+    required this.borderPressed,
+    required this.borderActive,
     required this.borderError,
     required this.borderWarning,
     required this.borderSuccess,
@@ -539,6 +569,9 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The brand color swatch with shades from 50 to 950.
   final StreamColorSwatch brand;
 
+  /// The chrome (neutral) color swatch with shades from 0 to 1000.
+  final StreamColorSwatch chrome;
+
   // ---- Accent colors ----
 
   /// The primary accent color.
@@ -553,54 +586,57 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The error accent color.
   final Color accentError;
 
-  /// The neutral accent color.
+  /// Neutral accent for low-priority badges.
   final Color accentNeutral;
-
-  /// The black accent color.
-  final Color accentBlack;
 
   // ---- Text colors ----
 
-  /// The primary text color.
+  /// Main text color.
   final Color textPrimary;
 
-  /// The secondary text color.
+  /// Secondary metadata text.
   final Color textSecondary;
 
-  /// The tertiary text color.
+  /// Lowest priority text.
   final Color textTertiary;
 
-  /// The disabled text color.
+  /// Disabled text.
   final Color textDisabled;
 
-  /// The inverse text color.
+  /// Text on dark or accent backgrounds.
   final Color textInverse;
 
   /// The link text color.
   final Color textLink;
 
-  /// The text color on accent backgrounds.
+  /// Text on dark or accent backgrounds.
   final Color textOnAccent;
-
-  /// The text color on dark backgrounds.
-  final Color textOnDark;
 
   // ---- Background colors ----
 
-  /// The main app background color.
+  /// Global application background.
   final Color backgroundApp;
 
-  /// The surface background color.
+  /// Standard section background.
   final Color backgroundSurface;
 
-  /// The subtle surface background color.
+  /// Very light section background.
   final Color backgroundSurfaceSubtle;
 
-  /// The strong surface background color.
+  /// Stronger section background.
   final Color backgroundSurfaceStrong;
 
-  /// The overlay background color.
-  final Color backgroundOverlay;
+  /// Card surface background (slightly elevated above subtle).
+  final Color backgroundSurfaceCard;
+
+  /// Surface that must remain white across themes (e.g., media controls over video).
+  final Color backgroundOnAccent;
+
+  /// Highlight background (e.g., quoted message, search hit).
+  final Color backgroundHighlight;
+
+  /// Dimmed overlay for modals.
+  final Color backgroundScrim;
 
   /// The light overlay background color.
   final Color backgroundOverlayLight;
@@ -608,65 +644,71 @@ class StreamColorScheme with _$StreamColorScheme {
   /// The dark overlay background color.
   final Color backgroundOverlayDark;
 
-  /// Disabled background for inputs, buttons, or chips.
+  /// Disabled backgrounds for inputs, buttons, or chips.
   final Color backgroundDisabled;
 
-  /// The inverse background color.
+  /// Inverse background used for elevated, transient, or high-attention UI surfaces that sit on top of the default app background.
   final Color backgroundInverse;
-
-  /// The highlight background color for pinned or accented items.
-  final Color backgroundHighlight;
 
   // ---- Background - Elevation ----
 
-  /// The elevation 0 background color.
+  /// Flat surfaces.
   final Color backgroundElevation0;
 
-  /// The elevation 1 background color.
+  /// Slightly elevated surfaces.
   final Color backgroundElevation1;
 
-  /// The elevation 2 background color.
+  /// Card-like elements.
   final Color backgroundElevation2;
 
-  /// The elevation 3 background color.
+  /// Popovers.
   final Color backgroundElevation3;
 
-  /// The elevation 4 background color.
+  /// Dialogs, modals.
   final Color backgroundElevation4;
 
   // ---- Border colors - Core ----
 
-  /// Standard surface border
+  /// Standard surface border.
   final Color borderDefault;
 
-  /// The subtle surface border color for separators.
+  /// Very light separators.
   final Color borderSubtle;
 
-  /// The strong surface border color.
+  /// Stronger surface border.
   final Color borderStrong;
 
-  /// The border color on dark backgrounds.
-  final Color borderOnDark;
+  /// Used on dark backgrounds.
+  final Color borderInverse;
 
-  /// The border color on accent backgrounds.
+  /// Borders on accent backgrounds.
   final Color borderOnAccent;
 
   /// The border color on surface backgrounds.
   final Color borderOnSurface;
 
-  /// The 10% opacity border color.
-  final Color borderOpacity10;
+  /// Image frame border treatment (subtle opacity).
+  final Color borderOpacitySubtle;
 
-  /// The 25% opacity border color.
-  final Color borderOpacity25;
+  /// Image frame border treatment (strong opacity).
+  final Color borderOpacityStrong;
 
   // ---- Border colors - Utility ----
 
-  /// The focus ring border color.
+  /// Focus ring or focus border.
   final Color borderFocus;
 
-  /// The disabled state border color.
+  /// Optional disabled border for inputs, buttons, or chips.
   final Color borderDisabled;
+
+  /// Hover feedback border overlay.
+  final Color borderHover;
+
+  /// Pressed feedback border overlay.
+  final Color borderPressed;
+
+  /// Active/selected border (same value as borderSelected).
+  final Color borderActive;
 
   /// The error state border color.
   final Color borderError;
@@ -682,13 +724,13 @@ class StreamColorScheme with _$StreamColorScheme {
 
   // ---- State colors ----
 
-  /// The hover state overlay color.
+  /// Hover feedback overlay.
   final Color stateHover;
 
-  /// The pressed state overlay color.
+  /// Pressed feedback overlay.
   final Color statePressed;
 
-  /// The selected state overlay color.
+  /// Selected overlay.
   final Color stateSelected;
 
   /// The focused state overlay color.
@@ -742,6 +784,7 @@ class StreamColorScheme with _$StreamColorScheme {
 /// See also:
 ///
 ///  * [StreamColorScheme], which contains the brand color.
+///  * [StreamChromeColor], the neutral chrome swatch.
 ///  * [StreamColorSwatch], the base class for color swatches.
 @immutable
 class StreamBrandColor extends StreamColorSwatch {
@@ -794,6 +837,73 @@ class StreamBrandColor extends StreamColorSwatch {
       },
     );
   }
+}
+
+/// The chrome (neutral) color swatch for the Stream design system.
+///
+/// [StreamChromeColor] extends [StreamColorSwatch] and provides the neutral
+/// chrome color palette with shades from 0 (white) to 1000 (black). Chrome
+/// colors are used for backgrounds, text, borders, and other UI elements that
+/// adapt to light/dark themes through the neutral gray scale.
+///
+/// See also:
+///  * [StreamColorScheme], which contains the chrome color.
+///  * [StreamColorSwatch], the base class for color swatches.
+@immutable
+class StreamChromeColor extends StreamColorSwatch {
+  const StreamChromeColor._(super.primary, super._swatch);
+
+  /// Creates a light theme chrome color swatch.
+  factory StreamChromeColor.light() {
+    final primaryColorValue = light_tokens.StreamTokens.chrome500.toARGB32();
+    return ._(
+      primaryColorValue,
+      <int, Color>{
+        0: light_tokens.StreamTokens.chrome0,
+        50: light_tokens.StreamTokens.chrome50,
+        100: light_tokens.StreamTokens.chrome100,
+        150: light_tokens.StreamTokens.chrome150,
+        200: light_tokens.StreamTokens.chrome200,
+        300: light_tokens.StreamTokens.chrome300,
+        400: light_tokens.StreamTokens.chrome400,
+        500: Color(primaryColorValue),
+        600: light_tokens.StreamTokens.chrome600,
+        700: light_tokens.StreamTokens.chrome700,
+        800: light_tokens.StreamTokens.chrome800,
+        900: light_tokens.StreamTokens.chrome900,
+        1000: light_tokens.StreamTokens.chrome1000,
+      },
+    );
+  }
+
+  /// Creates a dark theme chrome color swatch.
+  factory StreamChromeColor.dark() {
+    final primaryColorValue = dark_tokens.StreamTokens.chrome500.toARGB32();
+    return ._(
+      primaryColorValue,
+      <int, Color>{
+        0: dark_tokens.StreamTokens.chrome0,
+        50: dark_tokens.StreamTokens.chrome50,
+        100: dark_tokens.StreamTokens.chrome100,
+        150: dark_tokens.StreamTokens.chrome150,
+        200: dark_tokens.StreamTokens.chrome200,
+        300: dark_tokens.StreamTokens.chrome300,
+        400: dark_tokens.StreamTokens.chrome400,
+        500: Color(primaryColorValue),
+        600: dark_tokens.StreamTokens.chrome600,
+        700: dark_tokens.StreamTokens.chrome700,
+        800: dark_tokens.StreamTokens.chrome800,
+        900: dark_tokens.StreamTokens.chrome900,
+        1000: dark_tokens.StreamTokens.chrome1000,
+      },
+    );
+  }
+
+  /// The shade-0 color (always white – used on dark/accent surfaces).
+  Color get shade0 => this[0]!;
+
+  /// The shade-1000 color (always black – used as the deepest neutral).
+  Color get shade1000 => this[1000]!;
 }
 
 /// A background/foreground color pair for avatars.

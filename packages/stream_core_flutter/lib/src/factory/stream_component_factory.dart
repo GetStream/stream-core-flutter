@@ -138,6 +138,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification,
     StreamComponentBuilder<StreamButtonProps>? button,
     StreamComponentBuilder<StreamCheckboxProps>? checkbox,
+    StreamComponentBuilder<StreamCommandChipProps>? commandChip,
     StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction,
     StreamComponentBuilder<StreamEmojiProps>? emoji,
     StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
@@ -168,6 +169,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       badgeNotification: badgeNotification,
       button: button,
       checkbox: checkbox,
+      commandChip: commandChip,
       contextMenuAction: contextMenuAction,
       emoji: emoji,
       emojiButton: emojiButton,
@@ -199,6 +201,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.badgeNotification,
     required this.button,
     required this.checkbox,
+    required this.commandChip,
     required this.contextMenuAction,
     required this.emoji,
     required this.emojiButton,
@@ -274,6 +277,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamCheckbox] uses [DefaultStreamCheckbox].
   final StreamComponentBuilder<StreamCheckboxProps>? checkbox;
+
+  /// Custom builder for command chip widgets.
+  ///
+  /// When null, [StreamCommandChip] uses [DefaultStreamCommandChip].
+  final StreamComponentBuilder<StreamCommandChipProps>? commandChip;
 
   /// Custom builder for context menu action widgets.
   ///

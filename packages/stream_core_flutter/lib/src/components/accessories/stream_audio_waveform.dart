@@ -127,7 +127,7 @@ class _StreamAudioWaveformSliderState extends State<StreamAudioWaveformSlider> {
     final activeThumbColor = widget.activeThumbColor ?? theme.activeThumbColor ?? colorScheme.accentPrimary;
     final idleThumbColor = widget.idleThumbColor ?? theme.idleThumbColor ?? colorScheme.accentNeutral;
     final thumbColor = widget.isActive ? activeThumbColor : idleThumbColor;
-    final thumbBorderColor = widget.thumbBorderColor ?? theme.thumbBorderColor ?? colorScheme.borderOnAccent;
+    final thumbBorderColor = widget.thumbBorderColor ?? theme.thumbBorderColor ?? colorScheme.borderInverse;
 
     return HorizontalSlider(
       onChangeStart: widget.onChangeStart,
@@ -285,7 +285,7 @@ class StreamAudioWaveform extends StatelessWidget {
     final theme = StreamAudioWaveformTheme.of(context);
     final colorScheme = context.streamColorScheme;
 
-    final color = this.color ?? theme.color ?? colorScheme.borderOpacity25;
+    final color = this.color ?? theme.color ?? colorScheme.borderOpacityStrong;
     final progressColor = this.progressColor ?? theme.progressColor ?? colorScheme.accentPrimary;
     final minBarHeight = this.minBarHeight ?? theme.minBarHeight ?? 2.0;
     final spacingRatio = this.spacingRatio ?? theme.spacingRatio ?? 0.3;

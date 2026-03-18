@@ -26,6 +26,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
+    StreamCommandChipThemeData? commandChipTheme,
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
@@ -57,6 +58,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           badgeNotificationTheme ?? _this.badgeNotificationTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
+      commandChipTheme: commandChipTheme ?? _this.commandChipTheme,
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
       contextMenuActionTheme:
           contextMenuActionTheme ?? _this.contextMenuActionTheme,
@@ -122,6 +124,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       checkboxTheme: StreamCheckboxThemeData.lerp(
         _this.checkboxTheme,
         other.checkboxTheme,
+        t,
+      )!,
+      commandChipTheme: StreamCommandChipThemeData.lerp(
+        _this.commandChipTheme,
+        other.commandChipTheme,
         t,
       )!,
       contextMenuTheme: StreamContextMenuThemeData.lerp(
@@ -206,6 +213,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
         _other.buttonTheme == _this.buttonTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
+        _other.commandChipTheme == _this.commandChipTheme &&
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
@@ -240,6 +248,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.badgeNotificationTheme,
       _this.buttonTheme,
       _this.checkboxTheme,
+      _this.commandChipTheme,
       _this.contextMenuTheme,
       _this.contextMenuActionTheme,
       _this.emojiButtonTheme,

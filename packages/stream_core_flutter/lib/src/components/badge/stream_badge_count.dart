@@ -184,7 +184,7 @@ class DefaultStreamBadgeCount extends StatelessWidget {
     StreamTextTheme textTheme,
   ) => switch (size) {
     .xs => textTheme.numericMd,
-    .sm || .md => textTheme.numericXl,
+    .sm || .md || .lg => textTheme.numericXl,
   };
 
   // Returns the appropriate padding for the given badge size.
@@ -194,6 +194,7 @@ class DefaultStreamBadgeCount extends StatelessWidget {
   ) => switch (size) {
     .xs => .symmetric(horizontal: spacing.xxs),
     .sm || .md => .symmetric(horizontal: spacing.xs),
+    .lg => .symmetric(horizontal: spacing.sm),
   };
 }
 
@@ -215,7 +216,7 @@ class _StreamBadgeCountThemeDefaults extends StreamBadgeCountThemeData {
   StreamBadgeCountSize get size => StreamBadgeCountSize.xs;
 
   @override
-  Color get backgroundColor => _colorScheme.backgroundApp;
+  Color get backgroundColor => _colorScheme.backgroundElevation3;
 
   @override
   Color get borderColor => _colorScheme.borderSubtle;
