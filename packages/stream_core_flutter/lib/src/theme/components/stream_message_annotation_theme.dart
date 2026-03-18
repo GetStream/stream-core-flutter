@@ -52,6 +52,8 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
   const StreamMessageAnnotationStyle({
     this.textStyle,
     this.textColor,
+    this.spanTextStyle,
+    this.spanTextColor,
     this.iconColor,
     this.iconSize,
     this.spacing,
@@ -76,6 +78,8 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
   factory StreamMessageAnnotationStyle.from({
     TextStyle? textStyle,
     Color? textColor,
+    TextStyle? spanTextStyle,
+    Color? spanTextColor,
     Color? iconColor,
     double? iconSize,
     double? spacing,
@@ -84,6 +88,8 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
     return StreamMessageAnnotationStyle(
       textStyle: textStyle?.let(StreamMessageStyleProperty.all),
       textColor: textColor?.let(StreamMessageStyleProperty.all),
+      spanTextStyle: spanTextStyle?.let(StreamMessageStyleProperty.all),
+      spanTextColor: spanTextColor?.let(StreamMessageStyleProperty.all),
       iconColor: iconColor?.let(StreamMessageStyleProperty.all),
       iconSize: iconSize?.let(StreamMessageStyleProperty.all),
       spacing: spacing?.let(StreamMessageStyleProperty.all),
@@ -98,6 +104,17 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
 
   /// The color for the annotation label text.
   final StreamMessageStyleProperty<Color?>? textColor;
+
+  /// The text style for child spans in a [StreamMessageAnnotation.rich] label.
+  ///
+  /// Applied to direct child [TextSpan]s that don't specify an explicit style.
+  /// This only controls typography. Color comes from [spanTextColor].
+  final StreamMessageStyleProperty<TextStyle?>? spanTextStyle;
+
+  /// The color for child spans in a [StreamMessageAnnotation.rich] label.
+  ///
+  /// Applied to direct child [TextSpan]s that don't specify an explicit style.
+  final StreamMessageStyleProperty<Color?>? spanTextColor;
 
   /// The color for the leading icon.
   final StreamMessageStyleProperty<Color?>? iconColor;

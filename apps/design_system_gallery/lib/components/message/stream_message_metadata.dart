@@ -276,7 +276,7 @@ class _RealWorldSection extends StatelessWidget {
         _ExampleCard(
           label: 'Outgoing message (sending)',
           child: StreamMessagePlacement(
-            placement: const StreamMessagePlacementData(
+            data: const StreamMessagePlacementData(
               alignment: StreamMessageAlignment.end,
             ),
             child: Align(
@@ -300,7 +300,7 @@ class _RealWorldSection extends StatelessWidget {
         _ExampleCard(
           label: 'Outgoing message (read)',
           child: StreamMessagePlacement(
-            placement: const StreamMessagePlacementData(
+            data: const StreamMessagePlacementData(
               alignment: StreamMessageAlignment.end,
             ),
             child: Align(
@@ -331,7 +331,7 @@ class _RealWorldSection extends StatelessWidget {
         _ExampleCard(
           label: 'Outgoing message (read + edited)',
           child: StreamMessagePlacement(
-            placement: const StreamMessagePlacementData(
+            data: const StreamMessagePlacementData(
               alignment: StreamMessageAlignment.end,
             ),
             child: Align(

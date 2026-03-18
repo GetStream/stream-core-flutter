@@ -42,6 +42,18 @@ mixin _$StreamMessageAnnotationStyle {
         t,
         Color.lerp,
       ),
+      spanTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+        a.spanTextStyle,
+        b.spanTextStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      spanTextColor: StreamMessageStyleProperty.lerp<Color?>(
+        a.spanTextColor,
+        b.spanTextColor,
+        t,
+        Color.lerp,
+      ),
       iconColor: StreamMessageStyleProperty.lerp<Color?>(
         a.iconColor,
         b.iconColor,
@@ -72,6 +84,8 @@ mixin _$StreamMessageAnnotationStyle {
   StreamMessageAnnotationStyle copyWith({
     StreamMessageStyleProperty<TextStyle?>? textStyle,
     StreamMessageStyleProperty<Color?>? textColor,
+    StreamMessageStyleProperty<TextStyle?>? spanTextStyle,
+    StreamMessageStyleProperty<Color?>? spanTextColor,
     StreamMessageStyleProperty<Color?>? iconColor,
     StreamMessageStyleProperty<double?>? iconSize,
     StreamMessageStyleProperty<double?>? spacing,
@@ -82,6 +96,8 @@ mixin _$StreamMessageAnnotationStyle {
     return StreamMessageAnnotationStyle(
       textStyle: textStyle ?? _this.textStyle,
       textColor: textColor ?? _this.textColor,
+      spanTextStyle: spanTextStyle ?? _this.spanTextStyle,
+      spanTextColor: spanTextColor ?? _this.spanTextColor,
       iconColor: iconColor ?? _this.iconColor,
       iconSize: iconSize ?? _this.iconSize,
       spacing: spacing ?? _this.spacing,
@@ -103,6 +119,8 @@ mixin _$StreamMessageAnnotationStyle {
     return copyWith(
       textStyle: other.textStyle,
       textColor: other.textColor,
+      spanTextStyle: other.spanTextStyle,
+      spanTextColor: other.spanTextColor,
       iconColor: other.iconColor,
       iconSize: other.iconSize,
       spacing: other.spacing,
@@ -125,6 +143,8 @@ mixin _$StreamMessageAnnotationStyle {
 
     return _other.textStyle == _this.textStyle &&
         _other.textColor == _this.textColor &&
+        _other.spanTextStyle == _this.spanTextStyle &&
+        _other.spanTextColor == _this.spanTextColor &&
         _other.iconColor == _this.iconColor &&
         _other.iconSize == _this.iconSize &&
         _other.spacing == _this.spacing &&
@@ -139,6 +159,8 @@ mixin _$StreamMessageAnnotationStyle {
       runtimeType,
       _this.textStyle,
       _this.textColor,
+      _this.spanTextStyle,
+      _this.spanTextColor,
       _this.iconColor,
       _this.iconSize,
       _this.spacing,

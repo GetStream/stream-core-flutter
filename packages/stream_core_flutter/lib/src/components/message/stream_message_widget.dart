@@ -92,7 +92,7 @@ class StreamMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamMessagePlacement(
-    placement: StreamMessagePlacementData(
+    data: StreamMessagePlacementData(
       alignment: props.alignment,
       stackPosition: props.stackPosition,
       channelKind: props.channelKind,
@@ -233,11 +233,7 @@ class DefaultStreamMessageWidget extends StatelessWidget {
         child: leading,
       );
 
-      leadingWidget = switch (effectiveLeadingVisibility) {
-        StreamVisibility.visible => leadingWidget,
-        StreamVisibility.hidden => Visibility.maintain(visible: false, child: leadingWidget),
-        StreamVisibility.gone => null,
-      };
+      leadingWidget = effectiveLeadingVisibility.apply(leadingWidget);
     }
 
     final content = Flexible(child: props.child);

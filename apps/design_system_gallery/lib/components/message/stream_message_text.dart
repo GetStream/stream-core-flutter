@@ -235,7 +235,7 @@ class _ConversationMessage extends StatelessWidget {
             maxWidth: MediaQuery.sizeOf(context).width * 0.75,
           ),
           child: StreamMessagePlacement(
-            placement: placement,
+            data: placement,
             child: Builder(
               builder: (context) {
                 final emojiCount = StreamMessageText.emojiOnlyCount(message.text);
@@ -492,7 +492,7 @@ class _ThemeOverridesSection extends StatelessWidget {
             spacing: 8,
             children: [
               StreamMessagePlacement(
-                placement: const StreamMessagePlacementData(),
+                data: const StreamMessagePlacementData(),
                 child: StreamMessageItemTheme(
                   data: StreamMessageItemThemeData(
                     text: StreamMessageTextStyle(
@@ -509,7 +509,7 @@ class _ThemeOverridesSection extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: StreamMessagePlacement(
-                  placement: const StreamMessagePlacementData(alignment: StreamMessageAlignment.end),
+                  data: const StreamMessagePlacementData(alignment: StreamMessageAlignment.end),
                   child: StreamMessageItemTheme(
                     data: StreamMessageItemThemeData(
                       text: StreamMessageTextStyle(

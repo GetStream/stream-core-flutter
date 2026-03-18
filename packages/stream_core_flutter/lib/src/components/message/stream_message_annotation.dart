@@ -65,6 +65,45 @@ class StreamMessageAnnotation extends StatelessWidget {
          style: style,
        );
 
+  /// Creates a message annotation row with a rich text label.
+  ///
+  /// The [label] string is styled with the annotation's
+  /// [StreamMessageAnnotationStyle.textStyle] (defaults to
+  /// [StreamTextTheme.metadataEmphasis]). The [spans] are wrapped under a
+  /// parent that applies [StreamMessageAnnotationStyle.spanTextStyle]
+  /// (defaults to [StreamTextTheme.metadataDefault]), so spans without an
+  /// explicit style automatically receive the secondary annotation style.
+  ///
+  /// Spans that specify an explicit [TextSpan.style] override the default.
+  ///
+  /// {@tool snippet}
+  ///
+  /// Annotation with secondary styled span:
+  ///
+  /// ```dart
+  /// StreamMessageAnnotation.rich(
+  ///   leading: Icon(StreamIcons.bellNotification),
+  ///   label: 'Reminder set · ',
+  ///   spans: [TextSpan(text: 'In 2 hours')],
+  /// )
+  /// ```
+  /// {@end-tool}
+  StreamMessageAnnotation.rich({
+    super.key,
+    Widget? leading,
+    required String label,
+    required List<InlineSpan> spans,
+    VoidCallback? onTap,
+    VoidCallback? onLongPress,
+    StreamMessageAnnotationStyle? style,
+  }) : props = StreamMessageAnnotationProps(
+         leading: leading,
+         label: _RichAnnotationLabel(label: label, spans: spans),
+         onTap: onTap,
+         onLongPress: onLongPress,
+         style: style,
+       );
+
   /// The properties that configure this annotation row.
   final StreamMessageAnnotationProps props;
 
@@ -181,6 +220,42 @@ class DefaultStreamMessageAnnotation extends StatelessWidget {
   }
 }
 
+// Builds a [Text.rich] where the [label] inherits the annotation's primary
+// text style and the [spans] are wrapped under a parent [TextSpan] that
+// applies the annotation's span style.
+class _RichAnnotationLabel extends StatelessWidget {
+  const _RichAnnotationLabel({required this.label, required this.spans});
+
+  final String label;
+  final List<InlineSpan> spans;
+
+  @override
+  Widget build(BuildContext context) {
+    final placement = StreamMessagePlacement.of(context);
+    final annotationStyle = StreamMessageItemTheme.of(context).annotation;
+    final defaults = _StreamMessageAnnotationDefaults(context);
+
+    final resolve = StreamMessageStyleResolver(placement, [annotationStyle, defaults]);
+
+    final effectiveSpanStyle = resolve((s) => s?.spanTextStyle);
+    final effectiveSpanColor = resolve((s) => s?.spanTextColor);
+
+    return Text.rich(
+      TextSpan(
+        text: label,
+        children: [
+          TextSpan(
+            style: effectiveSpanStyle.copyWith(
+              color: effectiveSpanColor,
+            ),
+            children: spans,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
   _StreamMessageAnnotationDefaults(this._context);
 
@@ -195,6 +270,12 @@ class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
 
   @override
   StreamMessageStyleProperty<Color> get textColor => .all(_colorScheme.textPrimary);
+
+  @override
+  StreamMessageStyleProperty<TextStyle> get spanTextStyle => .all(_textTheme.metadataDefault);
+
+  @override
+  StreamMessageStyleProperty<Color> get spanTextColor => .all(_colorScheme.textPrimary);
 
   @override
   StreamMessageStyleProperty<Color> get iconColor => .all(_colorScheme.textPrimary);

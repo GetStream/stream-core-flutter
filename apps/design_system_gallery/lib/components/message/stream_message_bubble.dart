@@ -40,7 +40,7 @@ Widget buildStreamMessageBubblePlayground(BuildContext context) {
 
   return Center(
     child: StreamMessagePlacement(
-      placement: placement,
+      data: placement,
       child: StreamMessageBubble(
         child: StreamMessageText(text),
       ),
@@ -255,7 +255,7 @@ class _StyleOverrideSection extends StatelessWidget {
         _ExampleCard(
           label: 'Beveled rectangle',
           child: StreamMessagePlacement(
-            placement: const StreamMessagePlacementData(
+            data: const StreamMessagePlacementData(
               alignment: StreamMessageAlignment.end,
             ),
             child: StreamMessageBubble(
@@ -302,7 +302,7 @@ class _PlacedBubble extends StatelessWidget {
     Widget child = StreamMessageBubble(child: StreamMessageText(text));
     if (!isDefault) {
       child = StreamMessagePlacement(
-        placement: placement,
+        data: placement,
         child: child,
       );
     }

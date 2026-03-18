@@ -286,6 +286,8 @@ class _RawEmojiChip extends StatelessWidget {
     final effectiveForegroundColor = chipThemeStyle?.foregroundColor ?? defaults.foregroundColor;
     final effectiveOverlayColor = chipThemeStyle?.overlayColor ?? defaults.overlayColor;
     final effectiveTextStyle = chipThemeStyle?.textStyle ?? defaults.textStyle;
+    final effectiveElevation = chipThemeStyle?.elevation ?? defaults.elevation;
+    final effectiveShadowColor = chipThemeStyle?.shadowColor ?? defaults.shadowColor;
     final effectiveEmojiSize = chipThemeStyle?.emojiSize ?? defaults.emojiSize;
     final effectiveMinimumSize = chipThemeStyle?.minimumSize ?? defaults.minimumSize;
     final effectiveMaximumSize = chipThemeStyle?.maximumSize ?? defaults.maximumSize;
@@ -305,6 +307,8 @@ class _RawEmojiChip extends StatelessWidget {
         tapTargetSize: .shrinkWrap,
         visualDensity: .standard,
         textStyle: effectiveTextStyle,
+        elevation: effectiveElevation,
+        shadowColor: effectiveShadowColor,
         backgroundColor: effectiveBackgroundColor,
         foregroundColor: effectiveForegroundColor,
         overlayColor: effectiveOverlayColor,
@@ -329,9 +333,16 @@ class _StreamEmojiChipThemeDefaults extends StreamEmojiChipThemeStyle {
   late final _textTheme = _context.streamTextTheme;
   late final _radius = _context.streamRadius;
   late final _spacing = _context.streamSpacing;
+  late final _materialColors = Theme.of(_context).colorScheme;
 
   @override
   double get emojiSize => StreamEmojiSize.sm.value;
+
+  @override
+  WidgetStateProperty<double?> get elevation => .all(0);
+
+  @override
+  WidgetStateProperty<Color?> get shadowColor => .all(_materialColors.shadow);
 
   @override
   Size get minimumSize => const Size(64, 32);

@@ -64,6 +64,7 @@ class StreamMessageText extends StatelessWidget {
   StreamMessageText(
     String text, {
     super.key,
+    EdgeInsetsGeometry? padding,
     StreamMessageTextStyle? style,
     bool selectable = false,
     MarkdownTapLinkCallback? onTapLink,
@@ -81,6 +82,7 @@ class StreamMessageText extends StatelessWidget {
     MarkdownStyleSheet? styleSheet,
   }) : props = .new(
          text: text,
+         padding: padding,
          style: style,
          selectable: selectable,
          onTapLink: onTapLink,
@@ -125,9 +127,9 @@ class StreamMessageText extends StatelessWidget {
   /// StreamMessageText.emojiOnlyCount('🇺🇸')       // 1 (flag)
   /// StreamMessageText.emojiOnlyCount('👍🏽')       // 1 (skin tone)
   /// ```
-  static int? emojiOnlyCount(String text) {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return null;
+  static int? emojiOnlyCount(String? text) {
+    final trimmed = text?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
 
     final graphemes = trimmed.characters.where((c) => c.trim().isNotEmpty);
 
@@ -150,6 +152,7 @@ class StreamMessageTextProps {
   /// Creates properties for a markdown message text widget.
   const StreamMessageTextProps({
     required this.text,
+    this.padding,
     this.style,
     this.selectable = false,
     this.onTapLink,
@@ -169,6 +172,11 @@ class StreamMessageTextProps {
 
   /// The markdown text to render.
   final String text;
+
+  /// Optional padding override for the text content.
+  ///
+  /// When non-null, takes precedence over the theme-resolved value.
+  final EdgeInsetsGeometry? padding;
 
   /// Style override for text, links, and mentions.
   final StreamMessageTextStyle? style;
@@ -240,6 +248,7 @@ class DefaultStreamMessageText extends StatelessWidget {
 
     final resolve = StreamMessageStyleResolver(placement, [textStyleFromTheme, defaults]);
 
+    final effectivePadding = props.padding ?? resolve((s) => s?.padding);
     final effectiveTextColor = resolve((s) => s?.textColor);
     var effectiveTextStyle = resolve((s) => s?.textStyle).copyWith(color: effectiveTextColor);
     final effectiveLinkColor = resolve((s) => s?.linkColor);
@@ -294,22 +303,25 @@ class DefaultStreamMessageText extends StatelessWidget {
       ...?props.builders,
     };
 
-    return MarkdownBody(
-      data: props.text,
-      selectable: props.selectable,
-      styleSheet: markdownSheet,
-      styleSheetTheme: .platform,
-      syntaxHighlighter: props.syntaxHighlighter,
-      onTapLink: props.onTapLink,
-      onTapText: props.onTapText,
-      imageBuilder: props.imageBuilder,
-      builders: effectiveBuilders,
-      paddingBuilders: props.paddingBuilders ?? const {},
-      blockSyntaxes: props.blockSyntaxes,
-      inlineSyntaxes: effectiveInlineSyntaxes,
-      extensionSet: props.extensionSet,
-      softLineBreak: props.softLineBreak,
-      fitContent: props.fitContent,
+    return Padding(
+      padding: effectivePadding,
+      child: MarkdownBody(
+        data: props.text,
+        selectable: props.selectable,
+        styleSheet: markdownSheet,
+        styleSheetTheme: .platform,
+        syntaxHighlighter: props.syntaxHighlighter,
+        onTapLink: props.onTapLink,
+        onTapText: props.onTapText,
+        imageBuilder: props.imageBuilder,
+        builders: effectiveBuilders,
+        paddingBuilders: props.paddingBuilders ?? const {},
+        blockSyntaxes: props.blockSyntaxes,
+        inlineSyntaxes: effectiveInlineSyntaxes,
+        extensionSet: props.extensionSet,
+        softLineBreak: props.softLineBreak,
+        fitContent: props.fitContent,
+      ),
     );
   }
 }
@@ -374,6 +386,9 @@ class _StreamMessageTextDefaults extends StreamMessageTextStyle {
 
   late final StreamColorScheme _colorScheme = _context.streamColorScheme;
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
+
+  @override
+  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(horizontal: _context.streamSpacing.sm));
 
   @override
   StreamMessageStyleProperty<TextStyle> get textStyle => .all(_textTheme.bodyDefault);

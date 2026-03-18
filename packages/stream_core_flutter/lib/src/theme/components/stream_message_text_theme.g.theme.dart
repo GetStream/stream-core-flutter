@@ -30,6 +30,12 @@ mixin _$StreamMessageTextStyle {
     }
 
     return StreamMessageTextStyle(
+      padding: StreamMessageStyleProperty.lerp<EdgeInsetsGeometry?>(
+        a.padding,
+        b.padding,
+        t,
+        EdgeInsetsGeometry.lerp,
+      ),
       textStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
         a.textStyle,
         b.textStyle,
@@ -88,6 +94,7 @@ mixin _$StreamMessageTextStyle {
   }
 
   StreamMessageTextStyle copyWith({
+    StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding,
     StreamMessageStyleProperty<TextStyle?>? textStyle,
     StreamMessageStyleProperty<Color?>? textColor,
     StreamMessageStyleProperty<TextStyle?>? linkStyle,
@@ -101,6 +108,7 @@ mixin _$StreamMessageTextStyle {
     final _this = (this as StreamMessageTextStyle);
 
     return StreamMessageTextStyle(
+      padding: padding ?? _this.padding,
       textStyle: textStyle ?? _this.textStyle,
       textColor: textColor ?? _this.textColor,
       linkStyle: linkStyle ?? _this.linkStyle,
@@ -125,6 +133,7 @@ mixin _$StreamMessageTextStyle {
     }
 
     return copyWith(
+      padding: other.padding,
       textStyle: other.textStyle,
       textColor: other.textColor,
       linkStyle: other.linkStyle,
@@ -150,7 +159,8 @@ mixin _$StreamMessageTextStyle {
     final _this = (this as StreamMessageTextStyle);
     final _other = (other as StreamMessageTextStyle);
 
-    return _other.textStyle == _this.textStyle &&
+    return _other.padding == _this.padding &&
+        _other.textStyle == _this.textStyle &&
         _other.textColor == _this.textColor &&
         _other.linkStyle == _this.linkStyle &&
         _other.linkColor == _this.linkColor &&
@@ -167,6 +177,7 @@ mixin _$StreamMessageTextStyle {
 
     return Object.hash(
       runtimeType,
+      _this.padding,
       _this.textStyle,
       _this.textColor,
       _this.linkStyle,

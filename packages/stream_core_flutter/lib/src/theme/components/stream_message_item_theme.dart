@@ -74,7 +74,8 @@ class StreamMessageItemTheme extends InheritedTheme {
 /// Properties are organized in two groups:
 ///
 ///  1. **Item-level** — visual and layout properties for the message item
-///     itself ([backgroundColor], [padding], [spacing], [avatarSize]).
+///     itself ([backgroundColor], [leadingVisibility], [headerVisibility],
+///     [footerVisibility], [padding], [spacing], [avatarSize]).
 ///  2. **Sub-component styles** — grouped style overrides for each child
 ///     component ([text], [bubble], [annotation], [metadata], [replies]).
 ///
@@ -90,6 +91,8 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
   const StreamMessageItemThemeData({
     this.backgroundColor,
     this.leadingVisibility,
+    this.headerVisibility,
+    this.footerVisibility,
     this.padding,
     this.spacing,
     this.avatarSize,
@@ -114,6 +117,24 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
   ///
   /// When null, the leading widget defaults to [StreamVisibility.visible].
   final StreamMessageStyleVisibility? leadingVisibility;
+
+  /// Controls the visibility of the header (annotations) based on placement.
+  ///
+  /// This resolves a [StreamVisibility] value from the current
+  /// [StreamMessagePlacementData], allowing visibility to vary by placement.
+  ///
+  /// When null, the header defaults to [StreamVisibility.visible].
+  final StreamMessageStyleVisibility? headerVisibility;
+
+  /// Controls the visibility of the footer (metadata) based on placement.
+  ///
+  /// This resolves a [StreamVisibility] value from the current
+  /// [StreamMessagePlacementData], allowing visibility to vary by stack
+  /// position (e.g. only show metadata on the bottom message of a stack).
+  ///
+  /// When null, the footer defaults to visible for single/bottom messages
+  /// and gone for top/middle messages.
+  final StreamMessageStyleVisibility? footerVisibility;
 
   /// Outer padding around the entire message item.
   final EdgeInsetsGeometry? padding;

@@ -163,7 +163,7 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamMessagePlacement(
-      placement: StreamMessagePlacementData(alignment: alignment),
+      data: StreamMessagePlacementData(alignment: alignment),
       child: StreamMessageContent(
         child: reactionBuilder(
           bubble: StreamMessageBubble(child: StreamMessageText(message)),
@@ -599,7 +599,7 @@ class _EmojiOnlyShowcaseSection extends StatelessWidget {
       }
 
       return StreamMessagePlacement(
-        placement: StreamMessagePlacementData(alignment: alignment),
+        data: StreamMessagePlacementData(alignment: alignment),
         child: Align(
           alignment: isEnd ? Alignment.centerRight : Alignment.centerLeft,
           child: StreamMessageContent(child: body),

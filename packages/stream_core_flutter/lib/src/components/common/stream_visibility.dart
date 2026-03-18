@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 /// Controls the visibility and layout participation of a widget slot.
 ///
 /// This is typically used for optional slots (such as leading avatars in a
@@ -31,5 +33,19 @@ enum StreamVisibility {
   hidden,
 
   /// The widget is removed from the layout entirely — it takes no space.
-  gone,
+  gone
+  ;
+
+  /// Applies this visibility to the given [child] widget.
+  ///
+  /// Returns the [child] as-is for [visible], wraps it in
+  /// [Visibility.maintain] for [hidden], or returns null for [gone].
+  Widget? apply(Widget? child) {
+    if (child == null) return null;
+    return switch (this) {
+      visible => child,
+      hidden => Visibility.maintain(visible: false, child: child),
+      gone => null,
+    };
+  }
 }

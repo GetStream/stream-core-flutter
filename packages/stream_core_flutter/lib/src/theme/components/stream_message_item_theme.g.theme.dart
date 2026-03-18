@@ -36,6 +36,16 @@ mixin _$StreamMessageItemThemeData {
         b.leadingVisibility,
         t,
       ),
+      headerVisibility: StreamMessageStyleVisibility.lerp(
+        a.headerVisibility,
+        b.headerVisibility,
+        t,
+      ),
+      footerVisibility: StreamMessageStyleVisibility.lerp(
+        a.footerVisibility,
+        b.footerVisibility,
+        t,
+      ),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       spacing: lerpDouble$(a.spacing, b.spacing, t),
       avatarSize: t < 0.5 ? a.avatarSize : b.avatarSize,
@@ -54,6 +64,8 @@ mixin _$StreamMessageItemThemeData {
   StreamMessageItemThemeData copyWith({
     Color? backgroundColor,
     StreamMessageStyleVisibility? leadingVisibility,
+    StreamMessageStyleVisibility? headerVisibility,
+    StreamMessageStyleVisibility? footerVisibility,
     EdgeInsetsGeometry? padding,
     double? spacing,
     StreamAvatarSize? avatarSize,
@@ -68,6 +80,8 @@ mixin _$StreamMessageItemThemeData {
     return StreamMessageItemThemeData(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       leadingVisibility: leadingVisibility ?? _this.leadingVisibility,
+      headerVisibility: headerVisibility ?? _this.headerVisibility,
+      footerVisibility: footerVisibility ?? _this.footerVisibility,
       padding: padding ?? _this.padding,
       spacing: spacing ?? _this.spacing,
       avatarSize: avatarSize ?? _this.avatarSize,
@@ -93,6 +107,8 @@ mixin _$StreamMessageItemThemeData {
     return copyWith(
       backgroundColor: other.backgroundColor,
       leadingVisibility: other.leadingVisibility,
+      headerVisibility: other.headerVisibility,
+      footerVisibility: other.footerVisibility,
       padding: other.padding,
       spacing: other.spacing,
       avatarSize: other.avatarSize,
@@ -119,6 +135,8 @@ mixin _$StreamMessageItemThemeData {
 
     return _other.backgroundColor == _this.backgroundColor &&
         _other.leadingVisibility == _this.leadingVisibility &&
+        _other.headerVisibility == _this.headerVisibility &&
+        _other.footerVisibility == _this.footerVisibility &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
         _other.avatarSize == _this.avatarSize &&
@@ -137,6 +155,8 @@ mixin _$StreamMessageItemThemeData {
       runtimeType,
       _this.backgroundColor,
       _this.leadingVisibility,
+      _this.headerVisibility,
+      _this.footerVisibility,
       _this.padding,
       _this.spacing,
       _this.avatarSize,

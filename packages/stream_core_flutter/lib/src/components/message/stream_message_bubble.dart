@@ -50,8 +50,9 @@ class StreamMessageBubble extends StatelessWidget {
   StreamMessageBubble({
     super.key,
     required Widget child,
+    EdgeInsetsGeometry? padding,
     StreamMessageBubbleStyle? style,
-  }) : props = .new(child: child, style: style);
+  }) : props = .new(child: child, padding: padding, style: style);
 
   /// The properties that configure this bubble.
   final StreamMessageBubbleProps props;
@@ -73,11 +74,17 @@ class StreamMessageBubbleProps {
   /// Creates properties for a message bubble.
   const StreamMessageBubbleProps({
     required this.child,
+    this.padding,
     this.style,
   });
 
   /// The content widget displayed inside the bubble.
   final Widget child;
+
+  /// Optional padding override for the bubble content.
+  ///
+  /// When non-null, takes precedence over the theme-resolved value.
+  final EdgeInsetsGeometry? padding;
 
   /// Optional style overrides for placement-aware styling.
   ///
@@ -109,7 +116,7 @@ class DefaultStreamMessageBubble extends StatelessWidget {
 
     final effectiveSide = resolve((s) => s?.side);
     final effectiveShape = resolve((s) => s?.shape).copyWith(side: effectiveSide);
-    final effectivePadding = resolve((s) => s?.padding);
+    final effectivePadding = props.padding ?? resolve((s) => s?.padding);
     final effectiveConstraints = resolve((s) => s?.constraints);
     final effectiveBackgroundColor = resolve((s) => s?.backgroundColor);
 
@@ -174,9 +181,7 @@ class _StreamMessageBubbleDefaults extends StreamMessageBubbleStyle {
   );
 
   @override
-  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(
-    .symmetric(horizontal: _spacing.sm, vertical: _spacing.xs),
-  );
+  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(vertical: _spacing.xs));
 
   @override
   StreamMessageStyleProperty<BoxConstraints> get constraints => .all(const BoxConstraints(minHeight: 20));

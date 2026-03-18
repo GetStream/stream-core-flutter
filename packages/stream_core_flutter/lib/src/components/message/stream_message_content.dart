@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 
 import '../../theme.dart';
+import '../common/stream_visibility.dart';
 import '../message_placement/stream_message_placement.dart';
+import '../message_placement/stream_message_stack_position.dart';
 
 /// A composite layout container that arranges message primitives into the
 /// full message content structure.
@@ -20,18 +22,13 @@ import '../message_placement/stream_message_placement.dart';
 ///
 /// {@tool snippet}
 ///
-/// Incoming message with annotations, reactions, replies, and metadata:
+/// Incoming message with annotation, reactions, replies, and metadata:
 ///
 /// ```dart
 /// StreamMessageContent(
-///   header: Column(
-///     crossAxisAlignment: CrossAxisAlignment.start,
-///     children: [
-///       StreamMessageAnnotation(
-///         leading: Icon(StreamIcons.pin),
-///         label: Text('Pinned'),
-///       ),
-///     ],
+///   header: StreamMessageAnnotation(
+///     leading: Icon(StreamIcons.pin),
+///     label: Text('Pinned'),
 ///   ),
 ///   footer: StreamMessageMetadata(timestamp: Text('09:41')),
 ///   child: StreamReactions.clustered(
@@ -44,6 +41,29 @@ import '../message_placement/stream_message_placement.dart';
 ///       ],
 ///     ),
 ///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Multiple annotations using [StreamMessageAnnotation.list]:
+///
+/// ```dart
+/// StreamMessageContent(
+///   header: StreamMessageAnnotation.list(
+///     children: [
+///       StreamMessageAnnotation(
+///         leading: Icon(StreamIcons.pin),
+///         label: Text('Pinned'),
+///       ),
+///       StreamMessageAnnotation(
+///         leading: Icon(StreamIcons.bellNotification),
+///         label: Text('Reminder set'),
+///       ),
+///     ],
+///   ),
+///   child: StreamMessageBubble(child: Text('Hello, world!')),
 /// )
 /// ```
 /// {@end-tool}
@@ -76,11 +96,15 @@ class StreamMessageContent extends StatelessWidget {
     Widget? header,
     required Widget child,
     Widget? footer,
+    StreamVisibility? headerVisibility,
+    StreamVisibility? footerVisibility,
     double? spacing,
   }) : props = .new(
          header: header,
          child: child,
          footer: footer,
+         headerVisibility: headerVisibility,
+         footerVisibility: footerVisibility,
          spacing: spacing,
        );
 
@@ -106,16 +130,28 @@ class StreamMessageContentProps {
     this.header,
     required this.child,
     this.footer,
+    this.headerVisibility,
+    this.footerVisibility,
     this.spacing,
   });
 
   /// Content displayed above the body.
   ///
-  /// Typically a column of [StreamMessageAnnotation] widgets showing
-  /// pinned, saved, reminder, or other message annotations.
+  /// Typically a [StreamMessageAnnotation] for a single annotation, or
+  /// [StreamMessageAnnotation.list] for multiple annotations (e.g. pinned
+  /// and reminded, pinned and translated).
   ///
   /// When null, no header is shown.
   final Widget? header;
+
+  /// Overrides the header visibility for this content layout.
+  ///
+  /// When non-null, takes precedence over the theme-resolved value from
+  /// [StreamMessageItemThemeData.headerVisibility].
+  ///
+  /// When null (the default), the visibility is determined by the theme,
+  /// falling back to [StreamVisibility.visible].
+  final StreamVisibility? headerVisibility;
 
   /// The body content of the message.
   ///
@@ -130,6 +166,15 @@ class StreamMessageContentProps {
   ///
   /// When null, no footer is shown.
   final Widget? footer;
+
+  /// Overrides the footer visibility for this content layout.
+  ///
+  /// When non-null, takes precedence over the theme-resolved value from
+  /// [StreamMessageItemThemeData.footerVisibility].
+  ///
+  /// When null (the default), the visibility is determined by the theme,
+  /// falling back to visible for single/bottom and gone for top/middle.
+  final StreamVisibility? footerVisibility;
 
   /// The vertical spacing between the header, child, and footer sections.
   ///
@@ -152,9 +197,33 @@ class DefaultStreamMessageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final placement = StreamMessagePlacement.of(context);
+    final theme = StreamMessageItemTheme.of(context);
     final spacing = context.streamSpacing;
+
     final effectiveSpacing = props.spacing ?? spacing.xxs;
     final crossAxisAlignment = StreamMessagePlacement.crossAxisAlignmentOf(context);
+    final defaults = _StreamMessageContentDefaults(context);
+
+    final resolve = StreamMessageStyleResolver(placement, [defaults]);
+
+    final effectiveHeaderVisibility = props.headerVisibility ?? resolve((s) => s?.headerVisibility);
+
+    Widget? headerWidget;
+    if (props.header case final header?) {
+      headerWidget = header;
+
+      headerWidget = effectiveHeaderVisibility.apply(headerWidget);
+    }
+
+    final effectiveFooterVisibility = props.footerVisibility ?? resolve((s) => s?.footerVisibility);
+
+    Widget? footerWidget;
+    if (props.footer case final footer?) {
+      footerWidget = footer;
+
+      footerWidget = effectiveFooterVisibility.apply(footerWidget);
+    }
 
     return SizedBox(
       width: double.infinity,
@@ -162,8 +231,23 @@ class DefaultStreamMessageContent extends StatelessWidget {
         mainAxisSize: .min,
         spacing: effectiveSpacing,
         crossAxisAlignment: crossAxisAlignment,
-        children: [?props.header, props.child, ?props.footer],
+        children: [?headerWidget, props.child, ?footerWidget],
       ),
     );
   }
+}
+
+class _StreamMessageContentDefaults {
+  _StreamMessageContentDefaults(this._context);
+
+  final BuildContext _context;
+
+  StreamMessageStyleVisibility get headerVisibility => .all(.visible);
+
+  StreamMessageStyleVisibility get footerVisibility => .resolveWith(
+    (placement) => switch (placement.stackPosition) {
+      .single || .bottom => .visible,
+      _ => .gone,
+    },
+  );
 }

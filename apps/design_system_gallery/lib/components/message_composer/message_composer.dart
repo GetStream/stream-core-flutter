@@ -204,7 +204,7 @@ class _MessageBubble extends StatelessWidget {
 
     if (isMe) {
       child = StreamMessagePlacement(
-        placement: const StreamMessagePlacementData(
+        data: const StreamMessagePlacementData(
           alignment: StreamMessageAlignment.end,
         ),
         child: child,

@@ -112,7 +112,6 @@ class _AnnotationTypesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final icons = context.streamIcons;
     final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
 
     return _Section(
       label: 'ANNOTATION TYPES',
@@ -142,76 +141,49 @@ class _AnnotationTypesSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Reminder',
-          subtitle: 'Mixed emphasis: bold label + regular timestamp.',
-          child: StreamMessageAnnotation(
+          label: 'Reminder (.rich)',
+          subtitle: 'Bold label + regular timestamp via .rich constructor.',
+          child: StreamMessageAnnotation.rich(
             leading: Icon(icons.bellNotification),
-            label: Text.rich(
-              TextSpan(
-                children: [
-                  const TextSpan(text: 'Reminder set'),
-                  TextSpan(
-                    text: ' · In 2 hours',
-                    style: textTheme.metadataDefault,
-                  ),
-                ],
-              ),
-            ),
+            label: 'Reminder set · ',
+            spans: const [TextSpan(text: 'In 2 hours')],
           ),
         ),
         _ExampleCard(
-          label: 'Translated',
-          subtitle: 'Regular label + bold action text.',
-          child: StreamMessageAnnotation(
+          label: 'Translated (.rich)',
+          subtitle: 'Bold label + regular action text via .rich constructor.',
+          child: StreamMessageAnnotation.rich(
             leading: const Icon(Icons.translate),
-            label: Text.rich(
-              TextSpan(
-                style: textTheme.metadataDefault,
-                children: [
-                  const TextSpan(text: 'Translated '),
-                  TextSpan(
-                    text: '· Show original',
-                    style: textTheme.metadataEmphasis,
-                  ),
-                ],
-              ),
-            ),
+            label: 'Translated · ',
+            spans: const [TextSpan(text: 'Show original')],
           ),
         ),
         _ExampleCard(
-          label: 'Also sent in channel',
-          subtitle: 'Primary text with inline link.',
-          child: StreamMessageAnnotation(
+          label: 'Also sent in channel (.rich)',
+          subtitle: 'Bold label + link-colored span override.',
+          child: StreamMessageAnnotation.rich(
             leading: Icon(icons.arrowUp),
-            label: Text.rich(
+            label: 'Also sent in channel · ',
+            spans: [
               TextSpan(
-                children: [
-                  const TextSpan(text: 'Also sent in channel · '),
-                  TextSpan(
-                    text: 'View',
-                    style: TextStyle(color: colorScheme.textLink),
-                  ),
-                ],
+                text: 'View',
+                style: TextStyle(color: colorScheme.textLink),
               ),
-            ),
+            ],
           ),
         ),
         _ExampleCard(
-          label: 'Replied to a thread',
-          subtitle: 'Primary text with inline link.',
-          child: StreamMessageAnnotation(
+          label: 'Replied to a thread (.rich)',
+          subtitle: 'Bold label + link-colored span override.',
+          child: StreamMessageAnnotation.rich(
             leading: Icon(icons.arrowUp),
-            label: Text.rich(
+            label: 'Replied to a thread · ',
+            spans: [
               TextSpan(
-                children: [
-                  const TextSpan(text: 'Replied to a thread · '),
-                  TextSpan(
-                    text: 'View',
-                    style: TextStyle(color: colorScheme.textLink),
-                  ),
-                ],
+                text: 'View',
+                style: TextStyle(color: colorScheme.textLink),
               ),
-            ),
+            ],
           ),
         ),
       ],
@@ -285,7 +257,6 @@ class _RealWorldSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final icons = context.streamIcons;
     final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
 
     return _Section(
       label: 'REAL-WORLD EXAMPLES',
@@ -332,24 +303,15 @@ class _RealWorldSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Reminder message',
+          label: 'Reminder message (.rich)',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              StreamMessageAnnotation(
+              StreamMessageAnnotation.rich(
                 leading: Icon(icons.bellNotification),
-                label: Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(text: 'Reminder set'),
-                      TextSpan(
-                        text: ' · In 30 minutes',
-                        style: textTheme.metadataDefault,
-                      ),
-                    ],
-                  ),
-                ),
+                label: 'Reminder set · ',
+                spans: const [TextSpan(text: 'In 30 minutes')],
               ),
               StreamMessageBubble(
                 child: StreamMessageText('Remember to review the PR.'),
@@ -358,24 +320,20 @@ class _RealWorldSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Also sent in channel',
+          label: 'Also sent in channel (.rich)',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              StreamMessageAnnotation(
+              StreamMessageAnnotation.rich(
                 leading: Icon(icons.arrowUp),
-                label: Text.rich(
+                label: 'Also sent in channel · ',
+                spans: [
                   TextSpan(
-                    children: [
-                      const TextSpan(text: 'Also sent in channel · '),
-                      TextSpan(
-                        text: 'View',
-                        style: TextStyle(color: colorScheme.textLink),
-                      ),
-                    ],
+                    text: 'View',
+                    style: TextStyle(color: colorScheme.textLink),
                   ),
-                ),
+                ],
               ),
               StreamMessageBubble(
                 child: StreamMessageText('This was also sent to the main channel.'),

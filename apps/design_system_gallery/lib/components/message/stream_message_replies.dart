@@ -276,7 +276,7 @@ class _ConnectorOverflowSection extends StatelessWidget {
           subtitle: 'Middle position leaves connector visible for stacked messages.',
           childPadding: const EdgeInsets.only(top: 24),
           child: StreamMessagePlacement(
-            placement: const StreamMessagePlacementData(
+            data: const StreamMessagePlacementData(
               stackPosition: StreamMessageStackPosition.middle,
             ),
             child: DecoratedBox(
@@ -324,7 +324,7 @@ class _RealWorldSection extends StatelessWidget {
         _ExampleCard(
           label: 'Outgoing message with replies',
           child: StreamMessagePlacement(
-            placement: const StreamMessagePlacementData(
+            data: const StreamMessagePlacementData(
               alignment: StreamMessageAlignment.end,
             ),
             child: Align(
@@ -394,7 +394,7 @@ class _EmojiOnlySection extends StatelessWidget {
         _ExampleCard(
           label: 'Two emojis, outgoing with replies',
           child: StreamMessagePlacement(
-            placement: const StreamMessagePlacementData(
+            data: const StreamMessagePlacementData(
               alignment: StreamMessageAlignment.end,
             ),
             child: Align(

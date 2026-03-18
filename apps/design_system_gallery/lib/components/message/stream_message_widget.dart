@@ -314,8 +314,9 @@ class _StackPositionsSection extends StatelessWidget {
       label: 'STACK POSITIONS',
       description:
           'In a consecutive group, only the bottom message shows the '
-          'avatar. Middle and top messages hide it while preserving spacing. '
-          'This is driven by the default leadingVisibility in the theme.',
+          'avatar and metadata. Middle and top messages hide the avatar '
+          '(preserving spacing) and remove the footer entirely. '
+          'This is driven by default leadingVisibility and footerVisibility.',
       children: [
         _ExampleCard(
           label: 'Incoming stack (top → middle → bottom)',

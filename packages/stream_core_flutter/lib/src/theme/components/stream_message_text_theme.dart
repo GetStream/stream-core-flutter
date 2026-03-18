@@ -49,6 +49,7 @@ part 'stream_message_text_theme.g.theme.dart';
 class StreamMessageTextStyle with _$StreamMessageTextStyle {
   /// Creates a message text style with optional resolver-based overrides.
   const StreamMessageTextStyle({
+    this.padding,
     this.textStyle,
     this.textColor,
     this.linkStyle,
@@ -76,6 +77,7 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
   /// )
   /// ```
   factory StreamMessageTextStyle.from({
+    EdgeInsetsGeometry? padding,
     TextStyle? textStyle,
     Color? textColor,
     TextStyle? linkStyle,
@@ -87,6 +89,7 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
     TextStyle? tripleEmojiStyle,
   }) {
     return StreamMessageTextStyle(
+      padding: padding?.let(StreamMessageStyleProperty.all),
       textStyle: textStyle?.let(StreamMessageStyleProperty.all),
       textColor: textColor?.let(StreamMessageStyleProperty.all),
       linkStyle: linkStyle?.let(StreamMessageStyleProperty.all),
@@ -98,6 +101,12 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
       tripleEmojiStyle: tripleEmojiStyle?.let(StreamMessageStyleProperty.all),
     );
   }
+
+  /// The padding around the message text content.
+  ///
+  /// Useful for mixed-content bubbles where text needs its own inset
+  /// independent of the bubble's padding.
+  final StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding;
 
   /// The base text style for paragraph content.
   final StreamMessageStyleProperty<TextStyle?>? textStyle;
