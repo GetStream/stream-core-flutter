@@ -140,6 +140,7 @@ mixin _$StreamMessageStyle {
         t,
       ),
       textSystemColor: Color.lerp(a.textSystemColor, b.textSystemColor, t),
+      textReadColor: Color.lerp(a.textReadColor, b.textReadColor, t),
       borderColor: Color.lerp(a.borderColor, b.borderColor, t),
       borderOnChatColor: Color.lerp(
         a.borderOnChatColor,
@@ -186,6 +187,7 @@ mixin _$StreamMessageStyle {
     Color? textLinkColor,
     Color? textReactionColor,
     Color? textSystemColor,
+    Color? textReadColor,
     Color? borderColor,
     Color? borderOnChatColor,
     Color? threadConnectorColor,
@@ -211,6 +213,7 @@ mixin _$StreamMessageStyle {
       textLinkColor: textLinkColor ?? _this.textLinkColor,
       textReactionColor: textReactionColor ?? _this.textReactionColor,
       textSystemColor: textSystemColor ?? _this.textSystemColor,
+      textReadColor: textReadColor ?? _this.textReadColor,
       borderColor: borderColor ?? _this.borderColor,
       borderOnChatColor: borderOnChatColor ?? _this.borderOnChatColor,
       threadConnectorColor: threadConnectorColor ?? _this.threadConnectorColor,
@@ -245,6 +248,7 @@ mixin _$StreamMessageStyle {
       textLinkColor: other.textLinkColor,
       textReactionColor: other.textReactionColor,
       textSystemColor: other.textSystemColor,
+      textReadColor: other.textReadColor,
       borderColor: other.borderColor,
       borderOnChatColor: other.borderOnChatColor,
       threadConnectorColor: other.threadConnectorColor,
@@ -280,6 +284,7 @@ mixin _$StreamMessageStyle {
         _other.textLinkColor == _this.textLinkColor &&
         _other.textReactionColor == _this.textReactionColor &&
         _other.textSystemColor == _this.textSystemColor &&
+        _other.textReadColor == _this.textReadColor &&
         _other.borderColor == _this.borderColor &&
         _other.borderOnChatColor == _this.borderOnChatColor &&
         _other.threadConnectorColor == _this.threadConnectorColor &&
@@ -306,6 +311,7 @@ mixin _$StreamMessageStyle {
       _this.textLinkColor,
       _this.textReactionColor,
       _this.textSystemColor,
+      _this.textReadColor,
       _this.borderColor,
       _this.borderOnChatColor,
       _this.threadConnectorColor,

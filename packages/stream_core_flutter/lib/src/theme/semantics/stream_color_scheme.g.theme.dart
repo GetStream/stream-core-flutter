@@ -96,11 +96,6 @@ mixin _$StreamColorScheme {
         b.backgroundInverse,
         t,
       )!,
-      backgroundHighlight: Color.lerp(
-        a.backgroundHighlight,
-        b.backgroundHighlight,
-        t,
-      )!,
       backgroundElevation0: Color.lerp(
         a.backgroundElevation0,
         b.backgroundElevation0,
@@ -189,7 +184,6 @@ mixin _$StreamColorScheme {
     Color? backgroundOverlayDark,
     Color? backgroundDisabled,
     Color? backgroundInverse,
-    Color? backgroundHighlight,
     Color? backgroundElevation0,
     Color? backgroundElevation1,
     Color? backgroundElevation2,
@@ -255,7 +249,6 @@ mixin _$StreamColorScheme {
           backgroundOverlayDark ?? _this.backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
       backgroundInverse: backgroundInverse ?? _this.backgroundInverse,
-      backgroundHighlight: backgroundHighlight ?? _this.backgroundHighlight,
       backgroundElevation0: backgroundElevation0 ?? _this.backgroundElevation0,
       backgroundElevation1: backgroundElevation1 ?? _this.backgroundElevation1,
       backgroundElevation2: backgroundElevation2 ?? _this.backgroundElevation2,
@@ -327,7 +320,6 @@ mixin _$StreamColorScheme {
       backgroundOverlayDark: other.backgroundOverlayDark,
       backgroundDisabled: other.backgroundDisabled,
       backgroundInverse: other.backgroundInverse,
-      backgroundHighlight: other.backgroundHighlight,
       backgroundElevation0: other.backgroundElevation0,
       backgroundElevation1: other.backgroundElevation1,
       backgroundElevation2: other.backgroundElevation2,
@@ -400,7 +392,6 @@ mixin _$StreamColorScheme {
         _other.backgroundOverlayDark == _this.backgroundOverlayDark &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
         _other.backgroundInverse == _this.backgroundInverse &&
-        _other.backgroundHighlight == _this.backgroundHighlight &&
         _other.backgroundElevation0 == _this.backgroundElevation0 &&
         _other.backgroundElevation1 == _this.backgroundElevation1 &&
         _other.backgroundElevation2 == _this.backgroundElevation2 &&
@@ -465,7 +456,6 @@ mixin _$StreamColorScheme {
       _this.backgroundOverlayDark,
       _this.backgroundDisabled,
       _this.backgroundInverse,
-      _this.backgroundHighlight,
       _this.backgroundElevation0,
       _this.backgroundElevation1,
       _this.backgroundElevation2,
