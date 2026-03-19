@@ -36,6 +36,8 @@ import 'package:design_system_gallery/components/common/stream_checkbox.dart'
     as _design_system_gallery_components_common_stream_checkbox;
 import 'package:design_system_gallery/components/common/stream_flex.dart'
     as _design_system_gallery_components_common_stream_flex;
+import 'package:design_system_gallery/components/common/stream_loading_spinner.dart'
+    as _design_system_gallery_components_common_stream_loading_spinner;
 import 'package:design_system_gallery/components/common/stream_progress_bar.dart'
     as _design_system_gallery_components_common_stream_progress_bar;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
@@ -418,6 +420,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Showcase',
                 builder: _design_system_gallery_components_common_stream_flex
                     .buildStreamFlexShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamLoadingSpinner',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_loading_spinner
+                        .buildStreamLoadingSpinnerPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_loading_spinner
+                        .buildStreamLoadingSpinnerShowcase,
               ),
             ],
           ),

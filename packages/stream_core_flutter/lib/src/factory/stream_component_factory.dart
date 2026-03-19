@@ -146,6 +146,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
+    StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
@@ -169,6 +170,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar,
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
+      loadingSpinner: loadingSpinner,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
       reactions: reactions,
@@ -193,6 +195,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiChipBar,
     required this.fileTypeIcon,
     required this.listTile,
+    required this.loadingSpinner,
     required this.onlineIndicator,
     required this.progressBar,
     required this.reactions,
@@ -293,6 +296,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamListTile] uses [DefaultStreamListTile].
   final StreamComponentBuilder<StreamListTileProps>? listTile;
+
+  /// Custom builder for loading spinner widgets.
+  ///
+  /// When null, [StreamLoadingSpinner] uses [DefaultStreamLoadingSpinner].
+  final StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner;
 
   /// Custom builder for online indicator widgets.
   ///

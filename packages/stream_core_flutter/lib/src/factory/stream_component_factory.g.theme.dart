@@ -46,6 +46,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: t < 0.5 ? a.emojiChipBar : b.emojiChipBar,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       listTile: t < 0.5 ? a.listTile : b.listTile,
+      loadingSpinner: t < 0.5 ? a.loadingSpinner : b.loadingSpinner,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
       reactions: t < 0.5 ? a.reactions : b.reactions,
@@ -72,6 +73,7 @@ mixin _$StreamComponentBuilders {
     emojiChipBar,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamListTileProps)? listTile,
+    Widget Function(BuildContext, StreamLoadingSpinnerProps)? loadingSpinner,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
@@ -95,6 +97,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar ?? _this.emojiChipBar,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       listTile: listTile ?? _this.listTile,
+      loadingSpinner: loadingSpinner ?? _this.loadingSpinner,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
       reactions: reactions ?? _this.reactions,
@@ -129,6 +132,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: other.emojiChipBar,
       fileTypeIcon: other.fileTypeIcon,
       listTile: other.listTile,
+      loadingSpinner: other.loadingSpinner,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
       reactions: other.reactions,
@@ -164,6 +168,7 @@ mixin _$StreamComponentBuilders {
         _other.emojiChipBar == _this.emojiChipBar &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.listTile == _this.listTile &&
+        _other.loadingSpinner == _this.loadingSpinner &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar &&
         _other.reactions == _this.reactions;
@@ -173,7 +178,7 @@ mixin _$StreamComponentBuilders {
   int get hashCode {
     final _this = (this as StreamComponentBuilders);
 
-    return Object.hash(
+    return Object.hashAll([
       runtimeType,
       _this.extensions,
       _this.avatar,
@@ -191,9 +196,10 @@ mixin _$StreamComponentBuilders {
       _this.emojiChipBar,
       _this.fileTypeIcon,
       _this.listTile,
+      _this.loadingSpinner,
       _this.onlineIndicator,
       _this.progressBar,
       _this.reactions,
-    );
+    ]);
   }
 }
