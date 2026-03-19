@@ -147,8 +147,15 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
     StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner,
+    StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation,
+    StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble,
+    StreamComponentBuilder<StreamMessageContentProps>? messageContent,
+    StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
+    StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
+    StreamComponentBuilder<StreamMessageTextProps>? messageText,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
+    StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
@@ -171,8 +178,15 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
       loadingSpinner: loadingSpinner,
+      messageAnnotation: messageAnnotation,
+      messageBubble: messageBubble,
+      messageContent: messageContent,
+      messageMetadata: messageMetadata,
+      messageReplies: messageReplies,
+      messageText: messageText,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
+      reactionPicker: reactionPicker,
       reactions: reactions,
       extensions: _extensionIterableToMap(extensions),
     );
@@ -196,8 +210,15 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.fileTypeIcon,
     required this.listTile,
     required this.loadingSpinner,
+    required this.messageAnnotation,
+    required this.messageBubble,
+    required this.messageContent,
+    required this.messageMetadata,
+    required this.messageReplies,
+    required this.messageText,
     required this.onlineIndicator,
     required this.progressBar,
+    required this.reactionPicker,
     required this.reactions,
     required this.extensions,
   });
@@ -301,6 +322,36 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamLoadingSpinner] uses [DefaultStreamLoadingSpinner].
   final StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner;
+  
+  /// Custom builder for message annotation widgets.
+  ///
+  /// When null, [StreamMessageAnnotation] uses [DefaultStreamMessageAnnotation].
+  final StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation;
+
+  /// Custom builder for message bubble widgets.
+  ///
+  /// When null, [StreamMessageBubble] uses [DefaultStreamMessageBubble].
+  final StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble;
+
+  /// Custom builder for message content layout widgets.
+  ///
+  /// When null, [StreamMessageContent] uses [DefaultStreamMessageContent].
+  final StreamComponentBuilder<StreamMessageContentProps>? messageContent;
+
+  /// Custom builder for message metadata widgets.
+  ///
+  /// When null, [StreamMessageMetadata] uses [DefaultStreamMessageMetadata].
+  final StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata;
+
+  /// Custom builder for message replies widgets.
+  ///
+  /// When null, [StreamMessageReplies] uses [DefaultStreamMessageReplies].
+  final StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies;
+
+  /// Custom builder for message text (markdown) widgets.
+  ///
+  /// When null, [StreamMessageText] uses [DefaultStreamMessageText].
+  final StreamComponentBuilder<StreamMessageTextProps>? messageText;
 
   /// Custom builder for online indicator widgets.
   ///
@@ -311,6 +362,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
   final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
+
+  /// Custom builder for reaction picker widgets.
+  ///
+  /// When null, [StreamReactionPicker] uses [DefaultStreamReactionPicker].
+  final StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker;
 
   /// Custom builder for reaction widgets.
   ///

@@ -123,6 +123,18 @@ mixin _$StreamEmojiChipThemeStyle {
         t,
         TextStyle.lerp,
       ),
+      elevation: WidgetStateProperty.lerp<double?>(
+        a.elevation,
+        b.elevation,
+        t,
+        lerpDouble$,
+      ),
+      shadowColor: WidgetStateProperty.lerp<Color?>(
+        a.shadowColor,
+        b.shadowColor,
+        t,
+        Color.lerp,
+      ),
       emojiSize: lerpDouble$(a.emojiSize, b.emojiSize, t),
       minimumSize: Size.lerp(a.minimumSize, b.minimumSize, t),
       maximumSize: Size.lerp(a.maximumSize, b.maximumSize, t),
@@ -137,6 +149,8 @@ mixin _$StreamEmojiChipThemeStyle {
     WidgetStateProperty<Color?>? foregroundColor,
     WidgetStateProperty<Color?>? overlayColor,
     WidgetStateProperty<TextStyle?>? textStyle,
+    WidgetStateProperty<double?>? elevation,
+    WidgetStateProperty<Color?>? shadowColor,
     double? emojiSize,
     Size? minimumSize,
     Size? maximumSize,
@@ -151,6 +165,8 @@ mixin _$StreamEmojiChipThemeStyle {
       foregroundColor: foregroundColor ?? _this.foregroundColor,
       overlayColor: overlayColor ?? _this.overlayColor,
       textStyle: textStyle ?? _this.textStyle,
+      elevation: elevation ?? _this.elevation,
+      shadowColor: shadowColor ?? _this.shadowColor,
       emojiSize: emojiSize ?? _this.emojiSize,
       minimumSize: minimumSize ?? _this.minimumSize,
       maximumSize: maximumSize ?? _this.maximumSize,
@@ -176,6 +192,8 @@ mixin _$StreamEmojiChipThemeStyle {
       foregroundColor: other.foregroundColor,
       overlayColor: other.overlayColor,
       textStyle: other.textStyle,
+      elevation: other.elevation,
+      shadowColor: other.shadowColor,
       emojiSize: other.emojiSize,
       minimumSize: other.minimumSize,
       maximumSize: other.maximumSize,
@@ -202,6 +220,8 @@ mixin _$StreamEmojiChipThemeStyle {
         _other.foregroundColor == _this.foregroundColor &&
         _other.overlayColor == _this.overlayColor &&
         _other.textStyle == _this.textStyle &&
+        _other.elevation == _this.elevation &&
+        _other.shadowColor == _this.shadowColor &&
         _other.emojiSize == _this.emojiSize &&
         _other.minimumSize == _this.minimumSize &&
         _other.maximumSize == _this.maximumSize &&
@@ -220,6 +240,8 @@ mixin _$StreamEmojiChipThemeStyle {
       _this.foregroundColor,
       _this.overlayColor,
       _this.textStyle,
+      _this.elevation,
+      _this.shadowColor,
       _this.emojiSize,
       _this.minimumSize,
       _this.maximumSize,

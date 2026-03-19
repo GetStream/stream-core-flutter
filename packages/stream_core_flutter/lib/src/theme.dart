@@ -13,9 +13,17 @@ export 'theme/components/stream_emoji_button_theme.dart';
 export 'theme/components/stream_emoji_chip_theme.dart';
 export 'theme/components/stream_input_theme.dart';
 export 'theme/components/stream_list_tile_theme.dart';
+export 'theme/components/stream_message_annotation_theme.dart';
+export 'theme/components/stream_message_bubble_theme.dart';
+export 'theme/components/stream_message_item_theme.dart';
+export 'theme/components/stream_message_metadata_theme.dart';
+export 'theme/components/stream_message_replies_theme.dart';
+export 'theme/components/stream_message_style_property.dart';
+export 'theme/components/stream_message_text_theme.dart';
 export 'theme/components/stream_message_theme.dart';
 export 'theme/components/stream_online_indicator_theme.dart';
 export 'theme/components/stream_progress_bar_theme.dart';
+export 'theme/components/stream_reaction_picker_theme.dart';
 export 'theme/components/stream_reactions_theme.dart';
 
 export 'theme/primitives/stream_colors.dart';

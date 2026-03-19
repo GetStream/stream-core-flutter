@@ -47,8 +47,15 @@ mixin _$StreamComponentBuilders {
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       listTile: t < 0.5 ? a.listTile : b.listTile,
       loadingSpinner: t < 0.5 ? a.loadingSpinner : b.loadingSpinner,
+      messageAnnotation: t < 0.5 ? a.messageAnnotation : b.messageAnnotation,
+      messageBubble: t < 0.5 ? a.messageBubble : b.messageBubble,
+      messageContent: t < 0.5 ? a.messageContent : b.messageContent,
+      messageMetadata: t < 0.5 ? a.messageMetadata : b.messageMetadata,
+      messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
+      messageText: t < 0.5 ? a.messageText : b.messageText,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
+      reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
     );
   }
@@ -74,8 +81,16 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamListTileProps)? listTile,
     Widget Function(BuildContext, StreamLoadingSpinnerProps)? loadingSpinner,
+    Widget Function(BuildContext, StreamMessageAnnotationProps)?
+    messageAnnotation,
+    Widget Function(BuildContext, StreamMessageBubbleProps)? messageBubble,
+    Widget Function(BuildContext, StreamMessageContentProps)? messageContent,
+    Widget Function(BuildContext, StreamMessageMetadataProps)? messageMetadata,
+    Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
+    Widget Function(BuildContext, StreamMessageTextProps)? messageText,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
+    Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
   }) {
     final _this = (this as StreamComponentBuilders);
@@ -98,8 +113,15 @@ mixin _$StreamComponentBuilders {
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       listTile: listTile ?? _this.listTile,
       loadingSpinner: loadingSpinner ?? _this.loadingSpinner,
+      messageAnnotation: messageAnnotation ?? _this.messageAnnotation,
+      messageBubble: messageBubble ?? _this.messageBubble,
+      messageContent: messageContent ?? _this.messageContent,
+      messageMetadata: messageMetadata ?? _this.messageMetadata,
+      messageReplies: messageReplies ?? _this.messageReplies,
+      messageText: messageText ?? _this.messageText,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
+      reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
     );
   }
@@ -133,8 +155,15 @@ mixin _$StreamComponentBuilders {
       fileTypeIcon: other.fileTypeIcon,
       listTile: other.listTile,
       loadingSpinner: other.loadingSpinner,
+      messageAnnotation: other.messageAnnotation,
+      messageBubble: other.messageBubble,
+      messageContent: other.messageContent,
+      messageMetadata: other.messageMetadata,
+      messageReplies: other.messageReplies,
+      messageText: other.messageText,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
+      reactionPicker: other.reactionPicker,
       reactions: other.reactions,
     );
   }
@@ -169,8 +198,15 @@ mixin _$StreamComponentBuilders {
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.listTile == _this.listTile &&
         _other.loadingSpinner == _this.loadingSpinner &&
+        _other.messageAnnotation == _this.messageAnnotation &&
+        _other.messageBubble == _this.messageBubble &&
+        _other.messageContent == _this.messageContent &&
+        _other.messageMetadata == _this.messageMetadata &&
+        _other.messageReplies == _this.messageReplies &&
+        _other.messageText == _this.messageText &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar &&
+        _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions;
   }
 
@@ -197,8 +233,15 @@ mixin _$StreamComponentBuilders {
       _this.fileTypeIcon,
       _this.listTile,
       _this.loadingSpinner,
+      _this.messageAnnotation,
+      _this.messageBubble,
+      _this.messageContent,
+      _this.messageMetadata,
+      _this.messageReplies,
+      _this.messageText,
       _this.onlineIndicator,
       _this.progressBar,
+      _this.reactionPicker,
       _this.reactions,
     ]);
   }

@@ -13,9 +13,11 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_input_theme.dart';
 import 'components/stream_list_tile_theme.dart';
+import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
+import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
@@ -107,6 +109,9 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamListTileThemeData] from the nearest ancestor.
   StreamListTileThemeData get streamListTileTheme => StreamListTileTheme.of(this);
 
+  /// Returns the [StreamMessageItemThemeData] from the nearest ancestor.
+  StreamMessageItemThemeData get streamMessageItemTheme => StreamMessageItemTheme.of(this);
+
   /// Returns the [StreamMessageThemeData] from the nearest ancestor.
   StreamMessageThemeData get streamMessageTheme => StreamMessageTheme.of(this);
 
@@ -118,6 +123,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamProgressBarThemeData] from the nearest ancestor.
   StreamProgressBarThemeData get streamProgressBarTheme => StreamProgressBarTheme.of(this);
+
+  /// Returns the [StreamReactionPickerThemeData] from the nearest ancestor.
+  StreamReactionPickerThemeData get streamReactionPickerTheme => StreamReactionPickerTheme.of(this);
 
   /// Returns the [StreamReactionsThemeData] from the nearest ancestor.
   StreamReactionsThemeData get streamReactionsTheme => StreamReactionsTheme.of(this);

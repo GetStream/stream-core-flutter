@@ -32,10 +32,12 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageItemThemeData? messageItemTheme,
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
   }) {
     final _this = (this as StreamTheme);
@@ -63,10 +65,12 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
+      messageItemTheme: messageItemTheme ?? _this.messageItemTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
+      reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
     );
   }
@@ -152,6 +156,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.listTileTheme,
         t,
       )!,
+      messageItemTheme: StreamMessageItemThemeData.lerp(
+        _this.messageItemTheme,
+        other.messageItemTheme,
+        t,
+      )!,
       messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
       inputTheme: t < 0.5 ? _this.inputTheme : other.inputTheme,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
@@ -162,6 +171,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       progressBarTheme: StreamProgressBarThemeData.lerp(
         _this.progressBarTheme,
         other.progressBarTheme,
+        t,
+      )!,
+      reactionPickerTheme: StreamReactionPickerThemeData.lerp(
+        _this.reactionPickerTheme,
+        other.reactionPickerTheme,
         t,
       )!,
       reactionsTheme: StreamReactionsThemeData.lerp(
@@ -205,10 +219,12 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.listTileTheme == _this.listTileTheme &&
+        _other.messageItemTheme == _this.messageItemTheme &&
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.progressBarTheme == _this.progressBarTheme &&
+        _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme;
   }
 
@@ -238,10 +254,12 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.listTileTheme,
+      _this.messageItemTheme,
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,
       _this.progressBarTheme,
+      _this.reactionPickerTheme,
       _this.reactionsTheme,
     ]);
   }
