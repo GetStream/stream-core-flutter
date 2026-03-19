@@ -8,14 +8,14 @@ class MessageComposerReplyAttachment extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    this.image,
+    this.trailing,
     this.onRemovePressed,
     this.style = ReplyStyle.incoming,
   });
 
   final Widget title;
   final Widget subtitle;
-  final ImageProvider? image;
+  final Widget? trailing;
   final VoidCallback? onRemovePressed;
   final ReplyStyle style;
 
@@ -61,16 +61,7 @@ class MessageComposerReplyAttachment extends StatelessWidget {
               ],
             ),
           ),
-          if (image != null) ...[
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(context.streamRadius.md),
-                image: DecorationImage(image: image!, fit: BoxFit.cover),
-              ),
-            ),
-          ],
+          ?trailing,
         ],
       ),
     );

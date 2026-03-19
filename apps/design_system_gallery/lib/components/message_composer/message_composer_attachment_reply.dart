@@ -27,7 +27,14 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
       child: MessageComposerReplyAttachment(
         title: const Text('Reply to John Doe'),
         subtitle: const Text('We had a great time during our holiday.'),
-        image: const AssetImage('assets/attachment_image.png'),
+        trailing: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(context.streamRadius.md),
+            image: const DecorationImage(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
+          ),
+        ),
         onRemovePressed: () {},
         style: style,
       ),
