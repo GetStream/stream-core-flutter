@@ -384,15 +384,11 @@ class _DefaultErrorWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: onRetry,
-      child: ColoredBox(
+      child: Container(
+        width: props.width,
+        height: props.height,
         color: colorScheme.backgroundOverlayLight,
-        child: SizedBox(
-          width: props.width,
-          height: props.height,
-          child: Center(
-            child: StreamRetryBadge(size: .lg),
-          ),
-        ),
+        child: Center(child: StreamRetryBadge(size: .lg)),
       ),
     );
   }
