@@ -110,6 +110,9 @@ class StreamColorScheme with _$StreamColorScheme {
     // System
     Color? systemText,
     Color? systemScrollbar,
+    // Skeleton Loading
+    Color? skeletonLoadingBase,
+    Color? skeletonLoadingHighlight,
     // Avatar
     List<StreamAvatarColorPair>? avatarPalette,
   }) {
@@ -185,6 +188,10 @@ class StreamColorScheme with _$StreamColorScheme {
     // System
     systemText ??= light_tokens.StreamTokens.systemText;
     systemScrollbar ??= light_tokens.StreamTokens.systemScrollbar;
+
+    // Skeleton Loading
+    skeletonLoadingBase ??= light_tokens.StreamTokens.skeletonLoadingBase;
+    skeletonLoadingHighlight ??= light_tokens.StreamTokens.skeletonLoadingHighlight;
 
     // Avatar
     avatarPalette ??= [
@@ -266,6 +273,8 @@ class StreamColorScheme with _$StreamColorScheme {
       stateDisabled: stateDisabled,
       systemText: systemText,
       systemScrollbar: systemScrollbar,
+      skeletonLoadingBase: skeletonLoadingBase,
+      skeletonLoadingHighlight: skeletonLoadingHighlight,
       avatarPalette: avatarPalette,
     );
   }
@@ -336,6 +345,9 @@ class StreamColorScheme with _$StreamColorScheme {
     // System
     Color? systemText,
     Color? systemScrollbar,
+    // Skeleton Loading
+    Color? skeletonLoadingBase,
+    Color? skeletonLoadingHighlight,
     // Avatar
     List<StreamAvatarColorPair>? avatarPalette,
   }) {
@@ -411,6 +423,10 @@ class StreamColorScheme with _$StreamColorScheme {
     // System
     systemText ??= dark_tokens.StreamTokens.systemText;
     systemScrollbar ??= dark_tokens.StreamTokens.systemScrollbar;
+
+    // Skeleton Loading
+    skeletonLoadingBase ??= dark_tokens.StreamTokens.skeletonLoadingBase;
+    skeletonLoadingHighlight ??= dark_tokens.StreamTokens.skeletonLoadingHighlight;
 
     // Avatar
     avatarPalette ??= [
@@ -492,6 +508,8 @@ class StreamColorScheme with _$StreamColorScheme {
       stateDisabled: stateDisabled,
       systemText: systemText,
       systemScrollbar: systemScrollbar,
+      skeletonLoadingBase: skeletonLoadingBase,
+      skeletonLoadingHighlight: skeletonLoadingHighlight,
       avatarPalette: avatarPalette,
     );
   }
@@ -560,6 +578,9 @@ class StreamColorScheme with _$StreamColorScheme {
     // System
     required this.systemText,
     required this.systemScrollbar,
+    // Skeleton Loading
+    required this.skeletonLoadingBase,
+    required this.skeletonLoadingHighlight,
     // Avatar
     required this.avatarPalette,
   });
@@ -746,6 +767,14 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The system scrollbar color.
   final Color systemScrollbar;
+
+  // ---- Skeleton Loading colors ----
+
+  /// The base color for skeleton loading shimmer.
+  final Color skeletonLoadingBase;
+
+  /// The highlight color for skeleton loading shimmer.
+  final Color skeletonLoadingHighlight;
 
   // ---- Avatar colors ----
 
