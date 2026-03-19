@@ -46,6 +46,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: t < 0.5 ? a.emojiChipBar : b.emojiChipBar,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       listTile: t < 0.5 ? a.listTile : b.listTile,
+      loadingSpinner: t < 0.5 ? a.loadingSpinner : b.loadingSpinner,
       messageAnnotation: t < 0.5 ? a.messageAnnotation : b.messageAnnotation,
       messageBubble: t < 0.5 ? a.messageBubble : b.messageBubble,
       messageContent: t < 0.5 ? a.messageContent : b.messageContent,
@@ -79,6 +80,7 @@ mixin _$StreamComponentBuilders {
     emojiChipBar,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamListTileProps)? listTile,
+    Widget Function(BuildContext, StreamLoadingSpinnerProps)? loadingSpinner,
     Widget Function(BuildContext, StreamMessageAnnotationProps)?
     messageAnnotation,
     Widget Function(BuildContext, StreamMessageBubbleProps)? messageBubble,
@@ -110,6 +112,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar ?? _this.emojiChipBar,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       listTile: listTile ?? _this.listTile,
+      loadingSpinner: loadingSpinner ?? _this.loadingSpinner,
       messageAnnotation: messageAnnotation ?? _this.messageAnnotation,
       messageBubble: messageBubble ?? _this.messageBubble,
       messageContent: messageContent ?? _this.messageContent,
@@ -151,6 +154,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: other.emojiChipBar,
       fileTypeIcon: other.fileTypeIcon,
       listTile: other.listTile,
+      loadingSpinner: other.loadingSpinner,
       messageAnnotation: other.messageAnnotation,
       messageBubble: other.messageBubble,
       messageContent: other.messageContent,
@@ -193,6 +197,7 @@ mixin _$StreamComponentBuilders {
         _other.emojiChipBar == _this.emojiChipBar &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.listTile == _this.listTile &&
+        _other.loadingSpinner == _this.loadingSpinner &&
         _other.messageAnnotation == _this.messageAnnotation &&
         _other.messageBubble == _this.messageBubble &&
         _other.messageContent == _this.messageContent &&
@@ -227,6 +232,7 @@ mixin _$StreamComponentBuilders {
       _this.emojiChipBar,
       _this.fileTypeIcon,
       _this.listTile,
+      _this.loadingSpinner,
       _this.messageAnnotation,
       _this.messageBubble,
       _this.messageContent,

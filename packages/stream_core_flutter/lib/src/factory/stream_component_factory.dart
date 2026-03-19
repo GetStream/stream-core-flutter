@@ -146,6 +146,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
+    StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner,
     StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation,
     StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble,
     StreamComponentBuilder<StreamMessageContentProps>? messageContent,
@@ -176,6 +177,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar,
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
+      loadingSpinner: loadingSpinner,
       messageAnnotation: messageAnnotation,
       messageBubble: messageBubble,
       messageContent: messageContent,
@@ -207,6 +209,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiChipBar,
     required this.fileTypeIcon,
     required this.listTile,
+    required this.loadingSpinner,
     required this.messageAnnotation,
     required this.messageBubble,
     required this.messageContent,
@@ -314,6 +317,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamListTile] uses [DefaultStreamListTile].
   final StreamComponentBuilder<StreamListTileProps>? listTile;
+
+  /// Custom builder for loading spinner widgets.
+  ///
+  /// When null, [StreamLoadingSpinner] uses [DefaultStreamLoadingSpinner].
+  final StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner;
 
   /// Custom builder for message annotation widgets.
   ///
