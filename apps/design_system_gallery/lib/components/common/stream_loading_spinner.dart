@@ -242,7 +242,7 @@ class _ColorVariantsSection extends StatelessWidget {
               SizedBox(height: spacing.md),
               Row(
                 children: [
-                  _ColorDemo(label: 'Default', size: 32),
+                  const _ColorDemo(label: 'Default', size: 32),
                   SizedBox(width: spacing.xl),
                   _ColorDemo(label: 'Success', size: 32, color: colorScheme.accentSuccess),
                   SizedBox(width: spacing.xl),
