@@ -39,6 +39,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
+    StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
   }) {
     final _this = (this as StreamTheme);
 
@@ -72,6 +73,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
+      skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
     );
   }
 
@@ -183,6 +185,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.reactionsTheme,
         t,
       )!,
+      skeletonLoadingTheme: StreamSkeletonLoadingThemeData.lerp(
+        _this.skeletonLoadingTheme,
+        other.skeletonLoadingTheme,
+        t,
+      )!,
     );
   }
 
@@ -225,7 +232,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.progressBarTheme == _this.progressBarTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
-        _other.reactionsTheme == _this.reactionsTheme;
+        _other.reactionsTheme == _this.reactionsTheme &&
+        _other.skeletonLoadingTheme == _this.skeletonLoadingTheme;
   }
 
   @override
@@ -261,6 +269,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.progressBarTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,
+      _this.skeletonLoadingTheme,
     ]);
   }
 }

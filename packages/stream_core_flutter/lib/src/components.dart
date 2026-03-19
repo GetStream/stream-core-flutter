@@ -14,6 +14,7 @@ export 'components/common/stream_checkbox.dart' hide DefaultStreamCheckbox;
 export 'components/common/stream_flex.dart';
 export 'components/common/stream_loading_spinner.dart' hide DefaultStreamLoadingSpinner;
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;
+export 'components/common/stream_skeleton_loading.dart' hide DefaultStreamSkeletonLoading;
 export 'components/common/stream_visibility.dart';
 export 'components/context_menu/stream_context_menu.dart';
 export 'components/context_menu/stream_context_menu_action.dart' hide DefaultStreamContextMenuAction;

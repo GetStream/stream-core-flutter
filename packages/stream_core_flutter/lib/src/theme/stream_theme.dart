@@ -23,6 +23,7 @@ import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
+import 'components/stream_skeleton_loading_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -116,6 +117,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
+    StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
   }) {
     platform ??= defaultTargetPlatform;
     final isDark = brightness == Brightness.dark;
@@ -151,6 +153,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     progressBarTheme ??= const StreamProgressBarThemeData();
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
+    skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
 
     return .raw(
       brightness: brightness,
@@ -180,6 +183,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
+      skeletonLoadingTheme: skeletonLoadingTheme,
     );
   }
 
@@ -223,6 +227,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.progressBarTheme,
     required this.reactionPickerTheme,
     required this.reactionsTheme,
+    required this.skeletonLoadingTheme,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -342,6 +347,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The reaction theme for this theme.
   final StreamReactionsThemeData reactionsTheme;
 
+  /// The skeleton theme for this theme.
+  final StreamSkeletonLoadingThemeData skeletonLoadingTheme;
+
   /// Creates a copy of this theme but with platform-dependent primitives
   /// recomputed for the given [platform].
   ///
@@ -390,6 +398,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
+      skeletonLoadingTheme: skeletonLoadingTheme,
     );
   }
 }
