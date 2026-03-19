@@ -163,12 +163,7 @@ class DefaultStreamBadgeCount extends StatelessWidget {
           shadows: boxShadow.elevation2,
         ),
         foregroundDecoration: ShapeDecoration(
-          shape: StadiumBorder(
-            side: BorderSide(
-              color: effectiveBorderColor,
-              strokeAlign: BorderSide.strokeAlignOutside,
-            ),
-          ),
+          shape: StadiumBorder(side: .new(color: effectiveBorderColor)),
         ),
         child: DefaultTextStyle(
           style: textStyle,

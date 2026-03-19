@@ -144,29 +144,28 @@ class DefaultStreamBadgeNotification extends StatelessWidget {
     final effectiveType = props.type ?? StreamBadgeNotificationType.primary;
     final effectiveTextColor = theme.textColor ?? defaults.textColor;
     final effectiveBorderColor = theme.borderColor ?? defaults.borderColor;
-    final effectiveBackgroundColor = _resolveBackgroundColor(
-      effectiveType,
-      theme,
-      defaults,
-    );
+    final effectiveBackgroundColor = _resolveBackgroundColor(effectiveType, theme, defaults);
 
     final padding = _paddingForSize(effectiveSize, spacing);
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveTextColor);
 
     return IntrinsicWidth(
-      child: Container(
-        constraints: BoxConstraints(
-          minWidth: effectiveSize.value,
-          minHeight: effectiveSize.value,
-        ),
+      child: AnimatedContainer(
+        height: effectiveSize.value,
+        constraints: BoxConstraints(minWidth: effectiveSize.value),
         padding: padding,
         alignment: Alignment.center,
+        clipBehavior: Clip.antiAlias,
+        duration: kThemeChangeDuration,
         decoration: ShapeDecoration(
           color: effectiveBackgroundColor,
+          shape: const StadiumBorder(),
+        ),
+        foregroundDecoration: ShapeDecoration(
           shape: StadiumBorder(
             side: BorderSide(
-              color: effectiveBorderColor,
               width: 2,
+              color: effectiveBorderColor,
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
           ),
@@ -184,9 +183,9 @@ class DefaultStreamBadgeNotification extends StatelessWidget {
     StreamBadgeNotificationThemeData theme,
     _StreamBadgeNotificationThemeDefaults defaults,
   ) => switch (type) {
-    StreamBadgeNotificationType.primary => theme.primaryBackgroundColor ?? defaults.primaryBackgroundColor,
-    StreamBadgeNotificationType.error => theme.errorBackgroundColor ?? defaults.errorBackgroundColor,
-    StreamBadgeNotificationType.neutral => theme.neutralBackgroundColor ?? defaults.neutralBackgroundColor,
+    .primary => theme.primaryBackgroundColor ?? defaults.primaryBackgroundColor,
+    .error => theme.errorBackgroundColor ?? defaults.errorBackgroundColor,
+    .neutral => theme.neutralBackgroundColor ?? defaults.neutralBackgroundColor,
   };
 
   TextStyle _textStyleForSize(
@@ -214,7 +213,7 @@ class _StreamBadgeNotificationThemeDefaults extends StreamBadgeNotificationTheme
   late final _colorScheme = _context.streamColorScheme;
 
   @override
-  StreamBadgeNotificationSize get size => StreamBadgeNotificationSize.sm;
+  StreamBadgeNotificationSize get size => .sm;
 
   @override
   Color get primaryBackgroundColor => _colorScheme.accentPrimary;
