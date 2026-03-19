@@ -322,7 +322,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamLoadingSpinner] uses [DefaultStreamLoadingSpinner].
   final StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner;
-  
+
   /// Custom builder for message annotation widgets.
   ///
   /// When null, [StreamMessageAnnotation] uses [DefaultStreamMessageAnnotation].
