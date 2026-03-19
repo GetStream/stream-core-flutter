@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -7,6 +6,7 @@ import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../common/stream_network_image.dart';
 
 /// A circular avatar component for the Stream design system.
 ///
@@ -217,13 +217,13 @@ class DefaultStreamAvatar extends StatelessWidget {
             child: DefaultTextStyle(
               style: textStyle,
               child: switch (props.imageUrl) {
-                final imageUrl? => CachedNetworkImage(
+                final imageUrl? => StreamNetworkImage(
+                  imageUrl,
                   fit: .cover,
-                  imageUrl: imageUrl,
                   width: effectiveSize.value,
                   height: effectiveSize.value,
-                  placeholder: (context, _) => Center(child: props.placeholder.call(context)),
-                  errorWidget: (context, _, _) => Center(child: props.placeholder.call(context)),
+                  placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
+                  errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
                 ),
                 _ => props.placeholder.call(context),
               },

@@ -153,10 +153,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
     StreamComponentBuilder<StreamMessageTextProps>? messageText,
+    StreamComponentBuilder<StreamNetworkImageProps>? networkImage,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
+    StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
@@ -185,10 +187,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
       messageText: messageText,
+      networkImage: networkImage,
       onlineIndicator: onlineIndicator,
       progressBar: progressBar,
       reactionPicker: reactionPicker,
       reactions: reactions,
+      retryBadge: retryBadge,
       skeletonLoading: skeletonLoading,
       extensions: _extensionIterableToMap(extensions),
     );
@@ -218,10 +222,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageMetadata,
     required this.messageReplies,
     required this.messageText,
+    required this.networkImage,
     required this.onlineIndicator,
     required this.progressBar,
     required this.reactionPicker,
     required this.reactions,
+    required this.retryBadge,
     required this.skeletonLoading,
     required this.extensions,
   });
@@ -356,6 +362,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamMessageText] uses [DefaultStreamMessageText].
   final StreamComponentBuilder<StreamMessageTextProps>? messageText;
 
+  /// Custom builder for network image widgets.
+  ///
+  /// When null, [StreamNetworkImage] uses [DefaultStreamNetworkImage].
+  final StreamComponentBuilder<StreamNetworkImageProps>? networkImage;
+
   /// Custom builder for online indicator widgets.
   ///
   /// When null, [StreamOnlineIndicator] uses [DefaultStreamOnlineIndicator].
@@ -375,6 +386,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamReactions] uses [DefaultStreamReactions].
   final StreamComponentBuilder<StreamReactionsProps>? reactions;
+
+  /// Custom builder for retry badge widgets.
+  ///
+  /// When null, [StreamRetryBadge] uses [DefaultStreamRetryBadge].
+  final StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge;
 
   /// Custom builder for skeleton loading shimmer widgets.
   ///
