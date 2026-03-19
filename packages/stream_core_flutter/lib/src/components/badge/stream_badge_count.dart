@@ -208,7 +208,7 @@ class _StreamBadgeCountThemeDefaults extends StreamBadgeCountThemeData {
   late final _colorScheme = _context.streamColorScheme;
 
   @override
-  StreamBadgeCountSize get size => StreamBadgeCountSize.xs;
+  StreamBadgeCountSize get size => .xs;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation3;
