@@ -108,8 +108,7 @@ class _SizeVariantsSection extends StatelessWidget {
                       label: '${size.name} (${size.value.toInt()}px)',
                       size: size,
                     ),
-                    if (index < StreamLoadingSpinnerSize.values.length - 1)
-                      SizedBox(width: spacing.xl),
+                    if (index < StreamLoadingSpinnerSize.values.length - 1) SizedBox(width: spacing.xl),
                   ],
                 ],
               ),
