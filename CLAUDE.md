@@ -37,6 +37,10 @@ melos run generate:icons    # regenerate icon font from SVGs
 melos run gen-l10n          # regenerate localizations
 ```
 
+### Icons
+
+Source SVGs in `packages/stream_core_flutter/assets_source/icons/` come from the [design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons) repository. When adding or updating icons, pull the latest SVGs from that repo first, then run `melos run generate:icons` to regenerate the icon font and Dart classes.
+
 **Line width:** 120 characters (set in `analysis_options.yaml`).
 
 ## Design

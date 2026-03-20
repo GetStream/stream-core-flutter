@@ -1,6 +1,9 @@
 # Stream Icons Generator Configuration
 #
 # Run: melos run generate:icons
+#
+# Source SVGs come from:
+# https://github.com/GetStream/design-system-tokens/tree/main/assets/icons
 
 # Input
 input_svg_dir: assets_source/icons/
