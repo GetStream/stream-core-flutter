@@ -100,6 +100,8 @@ Widget buildStreamNetworkImageShowcase(BuildContext context) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const _DefaultPlaceholdersSection(),
+          SizedBox(height: spacing.xl),
           const _FitVariantsSection(),
           SizedBox(height: spacing.xl),
           const _CustomBuildersSection(),
@@ -107,6 +109,76 @@ Widget buildStreamNetworkImageShowcase(BuildContext context) {
       ),
     ),
   );
+}
+
+// =============================================================================
+// Default placeholders (standalone)
+// =============================================================================
+
+class _DefaultPlaceholdersSection extends StatelessWidget {
+  const _DefaultPlaceholdersSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return _ShowcaseCard(
+      title: 'DEFAULT PLACEHOLDERS',
+      description:
+          'Reusable loading and error slots — the same widgets '
+          '[StreamNetworkImage] uses when placeholderBuilder and errorBuilder are null.',
+      child: Wrap(
+        spacing: spacing.md,
+        runSpacing: spacing.md,
+        children: [
+          _ImageDemo(
+            label: 'StreamImageLoadingPlaceholder',
+            child: Container(
+              width: 140,
+              height: 100,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(radius.md),
+                border: Border.all(color: colorScheme.borderSubtle),
+                color: colorScheme.backgroundElevation2,
+              ),
+              child: const StreamImageLoadingPlaceholder(
+                width: 140,
+                height: 100,
+              ),
+            ),
+          ),
+          _ImageDemo(
+            label: 'StreamImageErrorPlaceholder',
+            child: Builder(
+              builder: (context) {
+                return Container(
+                  width: 140,
+                  height: 100,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(radius.md),
+                    border: Border.all(color: colorScheme.borderSubtle),
+                  ),
+                  child: StreamImageErrorPlaceholder(
+                    width: 140,
+                    height: 100,
+                    onRetry: () {
+                      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+                        const SnackBar(content: Text('Retry tapped')),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // =============================================================================
@@ -183,8 +255,8 @@ class _CustomBuildersSection extends StatelessWidget {
     return _ShowcaseCard(
       title: 'CUSTOM BUILDERS',
       description:
-          'Custom placeholder and error builders. '
-          'Tap the error widget to retry.',
+          'Override [StreamImageLoadingPlaceholder] / [StreamImageErrorPlaceholder] '
+          'with custom builders. Tap the custom error demo to retry and load the image.',
       child: Wrap(
         spacing: spacing.md,
         runSpacing: spacing.md,

@@ -65,6 +65,8 @@ typedef StreamNetworkImageErrorBuilder = Widget Function(BuildContext context, O
 ///
 ///  * [StreamNetworkImagePlaceholderBuilder], the placeholder builder typedef.
 ///  * [StreamNetworkImageErrorBuilder], the error builder typedef.
+///  * [StreamImageLoadingPlaceholder], the default loading placeholder.
+///  * [StreamImageErrorPlaceholder], the default error surface with retry.
 class StreamNetworkImage extends StatelessWidget {
   /// Creates a network image with automatic caching and error handling.
   ///
@@ -235,14 +237,14 @@ class StreamNetworkImageProps {
 
   /// A builder for the placeholder widget shown while loading.
   ///
-  /// If null, an empty [SizedBox] is shown.
+  /// If null, [StreamImageLoadingPlaceholder] is used.
   final StreamNetworkImagePlaceholderBuilder? placeholderBuilder;
 
   /// A builder for the error widget shown when loading fails.
   ///
   /// The builder receives the error and a [retry] callback that can be
-  /// invoked to retry loading the image. If null, a default error icon
-  /// is shown.
+  /// invoked to retry loading the image. If null, [StreamImageErrorPlaceholder]
+  /// is used.
   final StreamNetworkImageErrorBuilder? errorBuilder;
 
   /// An optional [Listenable] that triggers a retry when notified.
@@ -340,20 +342,42 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       errorListener: (_) => _hasError = true,
       placeholder: (context, _) {
         if (props.placeholderBuilder case final builder?) return builder(context);
-        return _DefaultPlaceholderWidget(props: props);
+        return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
       errorBuilder: (context, error, _) {
         if (props.errorBuilder case final builder?) return builder(context, error, _retry);
-        return _DefaultErrorWidget(props: props, onRetry: _retry);
+        return StreamImageErrorPlaceholder(width: props.width, height: props.height, onRetry: _retry);
       },
     );
   }
 }
 
-class _DefaultPlaceholderWidget extends StatelessWidget {
-  const _DefaultPlaceholderWidget({required this.props});
+/// A loading placeholder for image-sized areas.
+///
+/// [StreamImageLoadingPlaceholder] is used as the default loading state for
+/// image slots to indicate that content is being fetched.
+///
+/// {@tool snippet}
+///
+/// Basic usage:
+///
+/// ```dart
+/// StreamImageLoadingPlaceholder(width: 200, height: 150)
+/// ```
+/// {@end-tool}
+class StreamImageLoadingPlaceholder extends StatelessWidget {
+  /// Creates a [StreamImageLoadingPlaceholder].
+  const StreamImageLoadingPlaceholder({super.key, this.width, this.height});
 
-  final StreamNetworkImageProps props;
+  /// The width of the placeholder area.
+  ///
+  /// If null, the widget sizes itself to the parent's constraints.
+  final double? width;
+
+  /// The height of the placeholder area.
+  ///
+  /// If null, the widget sizes itself to the parent's constraints.
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -362,8 +386,8 @@ class _DefaultPlaceholderWidget extends StatelessWidget {
       children: [
         StreamSkeletonLoading(
           child: StreamSkeletonBox(
-            width: props.width,
-            height: props.height,
+            width: width,
+            height: height,
           ),
         ),
         StreamLoadingSpinner(size: .md),
@@ -372,11 +396,47 @@ class _DefaultPlaceholderWidget extends StatelessWidget {
   }
 }
 
-class _DefaultErrorWidget extends StatelessWidget {
-  const _DefaultErrorWidget({required this.props, required this.onRetry});
+/// An error placeholder for image-sized areas.
+///
+/// [StreamImageErrorPlaceholder] is used as the default error state for image
+/// slots. When [onRetry] is provided, the surface becomes tappable so the
+/// user can retry the failed operation.
+///
+/// {@tool snippet}
+///
+/// Basic usage with retry:
+///
+/// ```dart
+/// StreamImageErrorPlaceholder(
+///   width: 200,
+///   height: 150,
+///   onRetry: () => reloadImage(),
+/// )
+/// ```
+/// {@end-tool}
+class StreamImageErrorPlaceholder extends StatelessWidget {
+  /// Creates a [StreamImageErrorPlaceholder].
+  const StreamImageErrorPlaceholder({
+    super.key,
+    this.width,
+    this.height,
+    this.onRetry,
+  });
 
-  final StreamNetworkImageProps props;
-  final VoidCallback onRetry;
+  /// The width of the placeholder area.
+  ///
+  /// If null, the widget sizes itself to the parent's constraints.
+  final double? width;
+
+  /// The height of the placeholder area.
+  ///
+  /// If null, the widget sizes itself to the parent's constraints.
+  final double? height;
+
+  /// Called when the user taps the error surface to retry.
+  ///
+  /// If null, the surface is not interactive.
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -385,8 +445,8 @@ class _DefaultErrorWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onRetry,
       child: Container(
-        width: props.width,
-        height: props.height,
+        width: width,
+        height: height,
         color: colorScheme.backgroundOverlayLight,
         child: Center(child: StreamRetryBadge(size: .lg)),
       ),
