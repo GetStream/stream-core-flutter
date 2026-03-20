@@ -6,24 +6,44 @@ import '../../factory/stream_component_factory.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
+/// Predefined sizes for [StreamLoadingSpinner].
+///
+/// Each size corresponds to a specific diameter in logical pixels.
+enum StreamLoadingSpinnerSize {
+  /// Large spinner (32px diameter, 3px stroke).
+  lg(32, 3),
+
+  /// Medium spinner (24px diameter, 2.5px stroke).
+  md(24, 2.5),
+
+  /// Small spinner (20px diameter, 2px stroke).
+  sm(20, 2),
+
+  /// Extra small spinner (16px diameter, 2px stroke).
+  xs(16, 2)
+  ;
+
+  const StreamLoadingSpinnerSize(this.value, this.strokeWidth);
+
+  /// The diameter of the spinner in logical pixels.
+  final double value;
+
+  /// The default stroke width for this size.
+  final double strokeWidth;
+}
+
 /// A circular loading spinner component.
 ///
 /// [StreamLoadingSpinner] displays a circular loading spinner that rotates
-/// continuously. It supports customizing the size, stroke width, and colors.
+/// continuously. It supports customizing the [size] and colors.
 class StreamLoadingSpinner extends StatelessWidget {
   /// Creates a [StreamLoadingSpinner].
   StreamLoadingSpinner({
     super.key,
-    double? size,
-    double? strokeWidth,
+    StreamLoadingSpinnerSize? size,
     Color? color,
     Color? trackColor,
-  }) : props = StreamLoadingSpinnerProps(
-         size: size,
-         strokeWidth: strokeWidth,
-         color: color,
-         trackColor: trackColor,
-       );
+  }) : props = .new(size: size, color: color, trackColor: trackColor);
 
   /// The props controlling the appearance of this spinner.
   final StreamLoadingSpinnerProps props;
@@ -49,20 +69,14 @@ class StreamLoadingSpinnerProps {
   /// Creates properties for a loading spinner.
   const StreamLoadingSpinnerProps({
     this.size,
-    this.strokeWidth,
     this.color,
     this.trackColor,
   });
 
-  /// The diameter of the spinner.
+  /// The size of the spinner.
   ///
-  /// If null, defaults to 20.
-  final double? size;
-
-  /// The width of both the track and the animated arc.
-  ///
-  /// If null, defaults to 2.
-  final double? strokeWidth;
+  /// If null, defaults to [StreamLoadingSpinnerSize.sm].
+  final StreamLoadingSpinnerSize? size;
 
   /// The color of the animated arc.
   ///
@@ -116,8 +130,10 @@ class _DefaultStreamLoadingSpinnerState extends State<DefaultStreamLoadingSpinne
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
-    final effectiveSize = widget.props.size ?? 20;
-    final effectiveStrokeWidth = widget.props.strokeWidth ?? 2;
+
+    final resolvedSize = widget.props.size ?? .sm;
+    final effectiveSize = resolvedSize.value;
+    final effectiveStrokeWidth = resolvedSize.strokeWidth;
     final effectiveColor = widget.props.color ?? colorScheme.accentPrimary;
     final effectiveTrackColor = widget.props.trackColor ?? colorScheme.borderDefault;
 
@@ -125,16 +141,15 @@ class _DefaultStreamLoadingSpinnerState extends State<DefaultStreamLoadingSpinne
       dimension: effectiveSize,
       child: AnimatedBuilder(
         animation: _controller,
-        builder: (context, _) {
-          return CustomPaint(
-            painter: _SpinnerPainter(
-              progress: _controller.value,
-              color: effectiveColor,
-              trackColor: effectiveTrackColor,
-              strokeWidth: effectiveStrokeWidth,
-            ),
-          );
-        },
+        builder: (context, _) => CustomPaint(
+          willChange: true,
+          painter: _SpinnerPainter(
+            progress: _controller.value,
+            color: effectiveColor,
+            trackColor: effectiveTrackColor,
+            strokeWidth: effectiveStrokeWidth,
+          ),
+        ),
       ),
     );
   }

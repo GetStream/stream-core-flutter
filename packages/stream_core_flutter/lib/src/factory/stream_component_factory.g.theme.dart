@@ -53,10 +53,12 @@ mixin _$StreamComponentBuilders {
       messageMetadata: t < 0.5 ? a.messageMetadata : b.messageMetadata,
       messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
       messageText: t < 0.5 ? a.messageText : b.messageText,
+      networkImage: t < 0.5 ? a.networkImage : b.networkImage,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
       reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
+      retryBadge: t < 0.5 ? a.retryBadge : b.retryBadge,
       skeletonLoading: t < 0.5 ? a.skeletonLoading : b.skeletonLoading,
     );
   }
@@ -89,10 +91,12 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamMessageMetadataProps)? messageMetadata,
     Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
     Widget Function(BuildContext, StreamMessageTextProps)? messageText,
+    Widget Function(BuildContext, StreamNetworkImageProps)? networkImage,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
     Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
+    Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,
     Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
   }) {
     final _this = (this as StreamComponentBuilders);
@@ -121,10 +125,12 @@ mixin _$StreamComponentBuilders {
       messageMetadata: messageMetadata ?? _this.messageMetadata,
       messageReplies: messageReplies ?? _this.messageReplies,
       messageText: messageText ?? _this.messageText,
+      networkImage: networkImage ?? _this.networkImage,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       progressBar: progressBar ?? _this.progressBar,
       reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
+      retryBadge: retryBadge ?? _this.retryBadge,
       skeletonLoading: skeletonLoading ?? _this.skeletonLoading,
     );
   }
@@ -164,10 +170,12 @@ mixin _$StreamComponentBuilders {
       messageMetadata: other.messageMetadata,
       messageReplies: other.messageReplies,
       messageText: other.messageText,
+      networkImage: other.networkImage,
       onlineIndicator: other.onlineIndicator,
       progressBar: other.progressBar,
       reactionPicker: other.reactionPicker,
       reactions: other.reactions,
+      retryBadge: other.retryBadge,
       skeletonLoading: other.skeletonLoading,
     );
   }
@@ -208,10 +216,12 @@ mixin _$StreamComponentBuilders {
         _other.messageMetadata == _this.messageMetadata &&
         _other.messageReplies == _this.messageReplies &&
         _other.messageText == _this.messageText &&
+        _other.networkImage == _this.networkImage &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar &&
         _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions &&
+        _other.retryBadge == _this.retryBadge &&
         _other.skeletonLoading == _this.skeletonLoading;
   }
 
@@ -244,10 +254,12 @@ mixin _$StreamComponentBuilders {
       _this.messageMetadata,
       _this.messageReplies,
       _this.messageText,
+      _this.networkImage,
       _this.onlineIndicator,
       _this.progressBar,
       _this.reactionPicker,
       _this.reactions,
+      _this.retryBadge,
       _this.skeletonLoading,
     ]);
   }

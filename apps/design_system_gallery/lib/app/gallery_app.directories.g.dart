@@ -28,6 +28,8 @@ import 'package:design_system_gallery/components/badge/stream_badge_notification
     as _design_system_gallery_components_badge_stream_badge_notification;
 import 'package:design_system_gallery/components/badge/stream_online_indicator.dart'
     as _design_system_gallery_components_badge_stream_online_indicator;
+import 'package:design_system_gallery/components/badge/stream_retry_badge.dart'
+    as _design_system_gallery_components_badge_stream_retry_badge;
 import 'package:design_system_gallery/components/buttons/button.dart'
     as _design_system_gallery_components_buttons_button;
 import 'package:design_system_gallery/components/buttons/stream_emoji_button.dart'
@@ -38,6 +40,8 @@ import 'package:design_system_gallery/components/common/stream_flex.dart'
     as _design_system_gallery_components_common_stream_flex;
 import 'package:design_system_gallery/components/common/stream_loading_spinner.dart'
     as _design_system_gallery_components_common_stream_loading_spinner;
+import 'package:design_system_gallery/components/common/stream_network_image.dart'
+    as _design_system_gallery_components_common_stream_network_image;
 import 'package:design_system_gallery/components/common/stream_progress_bar.dart'
     as _design_system_gallery_components_common_stream_progress_bar;
 import 'package:design_system_gallery/components/common/stream_skeleton_loading.dart'
@@ -365,6 +369,23 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamRetryBadge',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_badge_stream_retry_badge
+                        .buildStreamRetryBadgePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_badge_stream_retry_badge
+                        .buildStreamRetryBadgeShowcase,
+              ),
+            ],
+          ),
         ],
       ),
       _widgetbook.WidgetbookFolder(
@@ -453,6 +474,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_common_stream_loading_spinner
                         .buildStreamLoadingSpinnerShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamNetworkImage',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_network_image
+                        .buildStreamNetworkImagePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_network_image
+                        .buildStreamNetworkImageShowcase,
               ),
             ],
           ),

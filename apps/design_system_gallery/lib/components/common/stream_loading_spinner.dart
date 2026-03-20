@@ -13,26 +13,17 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
   path: '[Components]/Common',
 )
 Widget buildStreamLoadingSpinnerPlayground(BuildContext context) {
-  final size = context.knobs.double.slider(
+  final size = context.knobs.object.dropdown<StreamLoadingSpinnerSize>(
     label: 'Size',
-    initialValue: 20,
-    min: 12,
-    max: 64,
+    options: StreamLoadingSpinnerSize.values,
+    initialOption: StreamLoadingSpinnerSize.sm,
+    labelBuilder: (option) => '${option.name} (${option.value.toInt()}px)',
     description: 'The diameter of the spinner.',
-  );
-
-  final strokeWidth = context.knobs.double.slider(
-    label: 'Stroke Width',
-    initialValue: 2,
-    min: 1,
-    max: 8,
-    description: 'The width of the track and arc.',
   );
 
   return Center(
     child: StreamLoadingSpinner(
       size: size,
-      strokeWidth: strokeWidth,
     ),
   );
 }
@@ -59,8 +50,6 @@ Widget buildStreamLoadingSpinnerShowcase(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _SizeVariantsSection(),
-          SizedBox(height: spacing.xl),
-          const _StrokeVariantsSection(),
           SizedBox(height: spacing.xl),
           const _ColorVariantsSection(),
         ],
@@ -114,78 +103,12 @@ class _SizeVariantsSection extends StatelessWidget {
               SizedBox(height: spacing.md),
               Row(
                 children: [
-                  for (final (label, size) in [
-                    ('16px', 16.0),
-                    ('20px', 20.0),
-                    ('32px', 32.0),
-                    ('48px', 48.0),
-                  ]) ...[
-                    _SpinnerDemo(label: label, size: size),
-                    if (size != 48.0) SizedBox(width: spacing.xl),
-                  ],
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// =============================================================================
-// Stroke Width Variants Section
-// =============================================================================
-
-class _StrokeVariantsSection extends StatelessWidget {
-  const _StrokeVariantsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
-    final boxShadow = context.streamBoxShadow;
-    final radius = context.streamRadius;
-    final spacing = context.streamSpacing;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _SectionLabel(label: 'STROKE WIDTH VARIANTS'),
-        SizedBox(height: spacing.md),
-        Container(
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          padding: EdgeInsets.all(spacing.md),
-          decoration: BoxDecoration(
-            color: colorScheme.backgroundSurface,
-            borderRadius: BorderRadius.all(radius.lg),
-            boxShadow: boxShadow.elevation1,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Different stroke widths at 32px size',
-                style: textTheme.captionDefault.copyWith(
-                  color: colorScheme.textSecondary,
-                ),
-              ),
-              SizedBox(height: spacing.md),
-              Row(
-                children: [
-                  for (final (label, strokeWidth) in [
-                    ('1px', 1.0),
-                    ('2px', 2.0),
-                    ('4px', 4.0),
-                    ('6px', 6.0),
-                  ]) ...[
-                    _SpinnerDemo(label: label, size: 32, strokeWidth: strokeWidth),
-                    if (strokeWidth != 6.0) SizedBox(width: spacing.xl),
+                  for (final (index, size) in StreamLoadingSpinnerSize.values.indexed) ...[
+                    _SpinnerDemo(
+                      label: '${size.name} (${size.value.toInt()}px)',
+                      size: size,
+                    ),
+                    if (index < StreamLoadingSpinnerSize.values.length - 1) SizedBox(width: spacing.xl),
                   ],
                 ],
               ),
@@ -242,13 +165,13 @@ class _ColorVariantsSection extends StatelessWidget {
               SizedBox(height: spacing.md),
               Row(
                 children: [
-                  const _ColorDemo(label: 'Default', size: 32),
+                  const _ColorDemo(label: 'Default', size: StreamLoadingSpinnerSize.lg),
                   SizedBox(width: spacing.xl),
-                  _ColorDemo(label: 'Success', size: 32, color: colorScheme.accentSuccess),
+                  _ColorDemo(label: 'Success', size: StreamLoadingSpinnerSize.lg, color: colorScheme.accentSuccess),
                   SizedBox(width: spacing.xl),
-                  _ColorDemo(label: 'Warning', size: 32, color: colorScheme.accentWarning),
+                  _ColorDemo(label: 'Warning', size: StreamLoadingSpinnerSize.lg, color: colorScheme.accentWarning),
                   SizedBox(width: spacing.xl),
-                  _ColorDemo(label: 'Error', size: 32, color: colorScheme.accentError),
+                  _ColorDemo(label: 'Error', size: StreamLoadingSpinnerSize.lg, color: colorScheme.accentError),
                 ],
               ),
             ],
@@ -264,11 +187,10 @@ class _ColorVariantsSection extends StatelessWidget {
 // =============================================================================
 
 class _SpinnerDemo extends StatelessWidget {
-  const _SpinnerDemo({required this.label, required this.size, this.strokeWidth});
+  const _SpinnerDemo({required this.label, required this.size});
 
   final String label;
-  final double size;
-  final double? strokeWidth;
+  final StreamLoadingSpinnerSize size;
 
   @override
   Widget build(BuildContext context) {
@@ -284,7 +206,6 @@ class _SpinnerDemo extends StatelessWidget {
           child: Center(
             child: StreamLoadingSpinner(
               size: size,
-              strokeWidth: strokeWidth,
             ),
           ),
         ),
@@ -305,7 +226,7 @@ class _ColorDemo extends StatelessWidget {
   const _ColorDemo({required this.label, required this.size, this.color});
 
   final String label;
-  final double size;
+  final StreamLoadingSpinnerSize size;
   final Color? color;
 
   @override

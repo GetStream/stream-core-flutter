@@ -186,7 +186,7 @@ class StreamSkeletonBox extends StatelessWidget {
   /// Creates a skeleton placeholder box.
   const StreamSkeletonBox({
     super.key,
-    required this.height,
+    this.height,
     this.width,
     this.borderRadius,
     this.shape = .rectangle,
@@ -206,7 +206,9 @@ class StreamSkeletonBox extends StatelessWidget {
        borderRadius = null;
 
   /// The height of the placeholder.
-  final double height;
+  ///
+  /// If null, the box sizes itself based on incoming constraints.
+  final double? height;
 
   /// The width of the placeholder.
   ///
