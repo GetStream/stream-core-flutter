@@ -40,6 +40,8 @@ import 'package:design_system_gallery/components/common/stream_loading_spinner.d
     as _design_system_gallery_components_common_stream_loading_spinner;
 import 'package:design_system_gallery/components/common/stream_progress_bar.dart'
     as _design_system_gallery_components_common_stream_progress_bar;
+import 'package:design_system_gallery/components/common/stream_skeleton_loading.dart'
+    as _design_system_gallery_components_common_stream_skeleton_loading;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
 import 'package:design_system_gallery/components/controls/stream_command_chip.dart'
@@ -468,6 +470,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_common_stream_progress_bar
                         .buildStreamProgressBarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSkeletonLoading',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_skeleton_loading
+                        .buildStreamSkeletonLoadingPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_skeleton_loading
+                        .buildStreamSkeletonLoadingShowcase,
               ),
             ],
           ),

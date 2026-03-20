@@ -157,6 +157,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
+    StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
@@ -188,6 +189,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       progressBar: progressBar,
       reactionPicker: reactionPicker,
       reactions: reactions,
+      skeletonLoading: skeletonLoading,
       extensions: _extensionIterableToMap(extensions),
     );
   }
@@ -220,6 +222,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.progressBar,
     required this.reactionPicker,
     required this.reactions,
+    required this.skeletonLoading,
     required this.extensions,
   });
 
@@ -372,6 +375,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamReactions] uses [DefaultStreamReactions].
   final StreamComponentBuilder<StreamReactionsProps>? reactions;
+
+  /// Custom builder for skeleton loading shimmer widgets.
+  ///
+  /// When null, [StreamSkeletonLoading] uses [DefaultStreamSkeletonLoading].
+  final StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading;
 
   // Convert the [extensionsIterable] passed to [StreamComponentBuilders.new]
   // to the stored [extensions] map, where each entry's key consists of the extension's type.

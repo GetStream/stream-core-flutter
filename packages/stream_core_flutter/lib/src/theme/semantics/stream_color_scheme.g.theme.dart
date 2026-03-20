@@ -153,16 +153,6 @@ mixin _$StreamColorScheme {
       stateDisabled: Color.lerp(a.stateDisabled, b.stateDisabled, t)!,
       systemText: Color.lerp(a.systemText, b.systemText, t)!,
       systemScrollbar: Color.lerp(a.systemScrollbar, b.systemScrollbar, t)!,
-      skeletonLoadingBase: Color.lerp(
-        a.skeletonLoadingBase,
-        b.skeletonLoadingBase,
-        t,
-      )!,
-      skeletonLoadingHighlight: Color.lerp(
-        a.skeletonLoadingHighlight,
-        b.skeletonLoadingHighlight,
-        t,
-      )!,
       avatarPalette: t < 0.5 ? a.avatarPalette : b.avatarPalette,
     );
   }
@@ -223,8 +213,6 @@ mixin _$StreamColorScheme {
     Color? stateDisabled,
     Color? systemText,
     Color? systemScrollbar,
-    Color? skeletonLoadingBase,
-    Color? skeletonLoadingHighlight,
     List<StreamAvatarColorPair>? avatarPalette,
   }) {
     final _this = (this as StreamColorScheme);
@@ -290,9 +278,6 @@ mixin _$StreamColorScheme {
       stateDisabled: stateDisabled ?? _this.stateDisabled,
       systemText: systemText ?? _this.systemText,
       systemScrollbar: systemScrollbar ?? _this.systemScrollbar,
-      skeletonLoadingBase: skeletonLoadingBase ?? _this.skeletonLoadingBase,
-      skeletonLoadingHighlight:
-          skeletonLoadingHighlight ?? _this.skeletonLoadingHighlight,
       avatarPalette: avatarPalette ?? _this.avatarPalette,
     );
   }
@@ -364,8 +349,6 @@ mixin _$StreamColorScheme {
       stateDisabled: other.stateDisabled,
       systemText: other.systemText,
       systemScrollbar: other.systemScrollbar,
-      skeletonLoadingBase: other.skeletonLoadingBase,
-      skeletonLoadingHighlight: other.skeletonLoadingHighlight,
       avatarPalette: other.avatarPalette,
     );
   }
@@ -438,8 +421,6 @@ mixin _$StreamColorScheme {
         _other.stateDisabled == _this.stateDisabled &&
         _other.systemText == _this.systemText &&
         _other.systemScrollbar == _this.systemScrollbar &&
-        _other.skeletonLoadingBase == _this.skeletonLoadingBase &&
-        _other.skeletonLoadingHighlight == _this.skeletonLoadingHighlight &&
         _other.avatarPalette == _this.avatarPalette;
   }
 
@@ -504,8 +485,6 @@ mixin _$StreamColorScheme {
       _this.stateDisabled,
       _this.systemText,
       _this.systemScrollbar,
-      _this.skeletonLoadingBase,
-      _this.skeletonLoadingHighlight,
       _this.avatarPalette,
     ]);
   }

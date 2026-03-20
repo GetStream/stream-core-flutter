@@ -57,6 +57,7 @@ mixin _$StreamComponentBuilders {
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
       reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
+      skeletonLoading: t < 0.5 ? a.skeletonLoading : b.skeletonLoading,
     );
   }
 
@@ -92,6 +93,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
     Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
+    Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
   }) {
     final _this = (this as StreamComponentBuilders);
 
@@ -123,6 +125,7 @@ mixin _$StreamComponentBuilders {
       progressBar: progressBar ?? _this.progressBar,
       reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
+      skeletonLoading: skeletonLoading ?? _this.skeletonLoading,
     );
   }
 
@@ -165,6 +168,7 @@ mixin _$StreamComponentBuilders {
       progressBar: other.progressBar,
       reactionPicker: other.reactionPicker,
       reactions: other.reactions,
+      skeletonLoading: other.skeletonLoading,
     );
   }
 
@@ -207,7 +211,8 @@ mixin _$StreamComponentBuilders {
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.progressBar == _this.progressBar &&
         _other.reactionPicker == _this.reactionPicker &&
-        _other.reactions == _this.reactions;
+        _other.reactions == _this.reactions &&
+        _other.skeletonLoading == _this.skeletonLoading;
   }
 
   @override
@@ -243,6 +248,7 @@ mixin _$StreamComponentBuilders {
       _this.progressBar,
       _this.reactionPicker,
       _this.reactions,
+      _this.skeletonLoading,
     ]);
   }
 }
