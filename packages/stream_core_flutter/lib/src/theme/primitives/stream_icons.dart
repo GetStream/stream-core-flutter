@@ -83,6 +83,7 @@ class StreamIcons with _$StreamIcons {
     this.bubbleText6Solid = StreamIconData.iconBubbleText6Solid,
     this.bubbleWideNotificationChatMessage = StreamIconData.iconBubbleWideNotificationChatMessage,
     this.bubbleWideSparkleChatMessage = StreamIconData.iconBubbleWideSparkleChatMessage,
+    this.bubbles = StreamIconData.iconBubbles,
     this.calendar1 = StreamIconData.iconCalendar1,
     this.callCancel = StreamIconData.iconCallCancel,
     this.camera1 = StreamIconData.iconCamera1,
@@ -285,6 +286,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The bubble wide sparkle chat message icon.
   final IconData bubbleWideSparkleChatMessage;
+
+  /// The bubbles icon.
+  final IconData bubbles;
 
   /// The calendar1 icon.
   final IconData calendar1;
@@ -689,6 +693,7 @@ class StreamIcons with _$StreamIcons {
     'bubbleText6Solid': bubbleText6Solid,
     'bubbleWideNotificationChatMessage': bubbleWideNotificationChatMessage,
     'bubbleWideSparkleChatMessage': bubbleWideSparkleChatMessage,
+    'bubbles': bubbles,
     'calendar1': calendar1,
     'callCancel': callCancel,
     'camera1': camera1,

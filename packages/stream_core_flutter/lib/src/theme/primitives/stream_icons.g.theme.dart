@@ -66,6 +66,7 @@ mixin _$StreamIcons {
       bubbleWideSparkleChatMessage: t < 0.5
           ? a.bubbleWideSparkleChatMessage
           : b.bubbleWideSparkleChatMessage,
+      bubbles: t < 0.5 ? a.bubbles : b.bubbles,
       calendar1: t < 0.5 ? a.calendar1 : b.calendar1,
       callCancel: t < 0.5 ? a.callCancel : b.callCancel,
       camera1: t < 0.5 ? a.camera1 : b.camera1,
@@ -249,6 +250,7 @@ mixin _$StreamIcons {
     IconData? bubbleText6Solid,
     IconData? bubbleWideNotificationChatMessage,
     IconData? bubbleWideSparkleChatMessage,
+    IconData? bubbles,
     IconData? calendar1,
     IconData? callCancel,
     IconData? camera1,
@@ -410,6 +412,7 @@ mixin _$StreamIcons {
           _this.bubbleWideNotificationChatMessage,
       bubbleWideSparkleChatMessage:
           bubbleWideSparkleChatMessage ?? _this.bubbleWideSparkleChatMessage,
+      bubbles: bubbles ?? _this.bubbles,
       calendar1: calendar1 ?? _this.calendar1,
       callCancel: callCancel ?? _this.callCancel,
       camera1: camera1 ?? _this.camera1,
@@ -587,6 +590,7 @@ mixin _$StreamIcons {
       bubbleWideNotificationChatMessage:
           other.bubbleWideNotificationChatMessage,
       bubbleWideSparkleChatMessage: other.bubbleWideSparkleChatMessage,
+      bubbles: other.bubbles,
       calendar1: other.calendar1,
       callCancel: other.callCancel,
       camera1: other.camera1,
@@ -756,6 +760,7 @@ mixin _$StreamIcons {
             _this.bubbleWideNotificationChatMessage &&
         _other.bubbleWideSparkleChatMessage ==
             _this.bubbleWideSparkleChatMessage &&
+        _other.bubbles == _this.bubbles &&
         _other.calendar1 == _this.calendar1 &&
         _other.callCancel == _this.callCancel &&
         _other.camera1 == _this.camera1 &&
@@ -915,6 +920,7 @@ mixin _$StreamIcons {
       _this.bubbleText6Solid,
       _this.bubbleWideNotificationChatMessage,
       _this.bubbleWideSparkleChatMessage,
+      _this.bubbles,
       _this.calendar1,
       _this.callCancel,
       _this.camera1,
