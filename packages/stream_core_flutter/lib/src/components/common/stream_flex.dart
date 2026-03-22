@@ -314,21 +314,6 @@ class StreamColumn extends StreamFlex {
   }) : super(direction: Axis.vertical);
 }
 
-class ABCD extends NullableStatefulWidget {
-  const ABCD({super.key});
-
-  @override
-  NullableState<ABCD> createState() => _ABCDState();
-}
-
-class _ABCDState extends NullableState<ABCD> {
-  @override
-  Widget? nullableBuild(BuildContext context) {
-    // TODO: implement nullableBuild
-    throw UnimplementedError();
-  }
-}
-
 /// A [StatelessWidget] whose [nullableBuild] may return `null`.
 ///
 /// When [nullableBuild] returns `null`, a collapsed placeholder is used that
