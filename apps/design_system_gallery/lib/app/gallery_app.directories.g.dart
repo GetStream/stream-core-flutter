@@ -58,6 +58,8 @@ import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
     as _design_system_gallery_components_message_stream_message_annotation;
+import 'package:design_system_gallery/components/message/stream_message_attachment_container.dart'
+    as _design_system_gallery_components_message_stream_message_attachment_container;
 import 'package:design_system_gallery/components/message/stream_message_bubble.dart'
     as _design_system_gallery_components_message_stream_message_bubble;
 import 'package:design_system_gallery/components/message/stream_message_content.dart'
@@ -641,6 +643,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_stream_message_annotation
                         .buildStreamMessageAnnotationShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamMessageAttachmentContainer',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_stream_message_attachment_container
+                        .buildStreamMessageAttachmentContainerPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_stream_message_attachment_container
+                        .buildStreamMessageAttachmentContainerShowcase,
               ),
             ],
           ),

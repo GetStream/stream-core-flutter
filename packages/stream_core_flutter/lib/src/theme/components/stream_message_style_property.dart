@@ -313,11 +313,8 @@ class _LerpBorderSide extends StreamMessageStyleProperty<BorderSide?> {
   }
 }
 
-/// Resolves style properties through a cascade of style sources for a given
-/// [StreamMessagePlacementData].
-///
-/// Given an ordered list of style sources, returns the first non-null
-/// resolved value for a requested property.
+/// Resolves style properties from an ordered list of style sources for a
+/// given [StreamMessagePlacementData].
 ///
 /// {@tool snippet}
 ///
@@ -328,7 +325,7 @@ class _LerpBorderSide extends StreamMessageStyleProperty<BorderSide?> {
 /// );
 ///
 /// final color = resolve((s) => s?.backgroundColor);
-/// final padding = resolve((s) => s?.padding);
+/// final side = resolve.maybeResolve((s) => s?.side);
 /// ```
 /// {@end-tool}
 ///
@@ -344,15 +341,30 @@ class StreamMessageStyleResolver<S> {
   final List<S?> _styles;
 
   /// Resolves the first non-null value for [getProperty] across all style
-  /// sources.
+  /// sources, returning `null` if none is found.
   ///
-  /// The last entry in [_styles] should be a defaults object that provides
-  /// every property, ensuring this method always returns a value.
-  T call<T extends Object>(StreamMessageStyleProperty<T?>? Function(S? style) getProperty) {
+  /// Unlike [call], this never throws — use it for optional properties
+  /// that may not have a default.
+  T? maybeResolve<T extends Object>(StreamMessageStyleProperty<T?>? Function(S? style) getProperty) {
     for (final style in _styles) {
       final resolved = getProperty(style)?.resolve(_placement);
       if (resolved != null) return resolved;
     }
+
+    return null; // No style source provided a value for the requested property
+  }
+
+  /// Resolves the first non-null value for [getProperty] across all style
+  /// sources.
+  ///
+  /// Throws a [StateError] if no source provides a value. Use this when a
+  /// defaults object guarantees every property is present.
+  ///
+  /// To return `null` instead of throwing, use [maybeResolve].
+  T call<T extends Object>(StreamMessageStyleProperty<T?>? Function(S? style) getProperty) {
+    final result = maybeResolve(getProperty);
+    if (result != null) return result;
+
     throw StateError('No style source provided a value for the requested property');
   }
 }

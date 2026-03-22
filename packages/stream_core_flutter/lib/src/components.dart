@@ -29,6 +29,7 @@ export 'components/emoji/data/stream_supported_emojis.dart';
 export 'components/emoji/stream_emoji_picker_sheet.dart';
 export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
 export 'components/message/stream_message_annotation.dart' hide DefaultStreamMessageAnnotation;
+export 'components/message/stream_message_attachment_container.dart';
 export 'components/message/stream_message_bubble.dart' hide DefaultStreamMessageBubble;
 export 'components/message/stream_message_content.dart' hide DefaultStreamMessageContent;
 export 'components/message/stream_message_metadata.dart' hide DefaultStreamMessageMetadata;

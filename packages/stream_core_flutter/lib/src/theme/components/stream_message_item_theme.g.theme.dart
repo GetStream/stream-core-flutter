@@ -51,6 +51,11 @@ mixin _$StreamMessageItemThemeData {
       avatarSize: t < 0.5 ? a.avatarSize : b.avatarSize,
       text: StreamMessageTextStyle.lerp(a.text, b.text, t),
       bubble: StreamMessageBubbleStyle.lerp(a.bubble, b.bubble, t),
+      attachment: StreamMessageAttachmentStyle.lerp(
+        a.attachment,
+        b.attachment,
+        t,
+      ),
       annotation: StreamMessageAnnotationStyle.lerp(
         a.annotation,
         b.annotation,
@@ -71,6 +76,7 @@ mixin _$StreamMessageItemThemeData {
     StreamAvatarSize? avatarSize,
     StreamMessageTextStyle? text,
     StreamMessageBubbleStyle? bubble,
+    StreamMessageAttachmentStyle? attachment,
     StreamMessageAnnotationStyle? annotation,
     StreamMessageMetadataStyle? metadata,
     StreamMessageRepliesStyle? replies,
@@ -87,6 +93,7 @@ mixin _$StreamMessageItemThemeData {
       avatarSize: avatarSize ?? _this.avatarSize,
       text: text ?? _this.text,
       bubble: bubble ?? _this.bubble,
+      attachment: attachment ?? _this.attachment,
       annotation: annotation ?? _this.annotation,
       metadata: metadata ?? _this.metadata,
       replies: replies ?? _this.replies,
@@ -114,6 +121,7 @@ mixin _$StreamMessageItemThemeData {
       avatarSize: other.avatarSize,
       text: _this.text?.merge(other.text) ?? other.text,
       bubble: _this.bubble?.merge(other.bubble) ?? other.bubble,
+      attachment: _this.attachment?.merge(other.attachment) ?? other.attachment,
       annotation: _this.annotation?.merge(other.annotation) ?? other.annotation,
       metadata: _this.metadata?.merge(other.metadata) ?? other.metadata,
       replies: _this.replies?.merge(other.replies) ?? other.replies,
@@ -142,6 +150,7 @@ mixin _$StreamMessageItemThemeData {
         _other.avatarSize == _this.avatarSize &&
         _other.text == _this.text &&
         _other.bubble == _this.bubble &&
+        _other.attachment == _this.attachment &&
         _other.annotation == _this.annotation &&
         _other.metadata == _this.metadata &&
         _other.replies == _this.replies;
@@ -162,6 +171,7 @@ mixin _$StreamMessageItemThemeData {
       _this.avatarSize,
       _this.text,
       _this.bubble,
+      _this.attachment,
       _this.annotation,
       _this.metadata,
       _this.replies,

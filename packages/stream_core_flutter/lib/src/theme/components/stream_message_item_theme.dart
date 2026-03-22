@@ -4,6 +4,7 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import '../stream_theme.dart';
 import 'stream_avatar_theme.dart';
 import 'stream_message_annotation_theme.dart';
+import 'stream_message_attachment_theme.dart';
 import 'stream_message_bubble_theme.dart';
 import 'stream_message_metadata_theme.dart';
 import 'stream_message_replies_theme.dart';
@@ -98,6 +99,7 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
     this.avatarSize,
     this.text,
     this.bubble,
+    this.attachment,
     this.annotation,
     this.metadata,
     this.replies,
@@ -154,6 +156,9 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
 
   /// Style overrides for the message bubble.
   final StreamMessageBubbleStyle? bubble;
+
+  /// Style overrides for message attachment containers.
+  final StreamMessageAttachmentStyle? attachment;
 
   /// Style overrides for the message annotation.
   final StreamMessageAnnotationStyle? annotation;
