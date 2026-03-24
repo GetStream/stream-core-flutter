@@ -11,6 +11,7 @@ export 'components/badge/stream_online_indicator.dart' hide DefaultStreamOnlineI
 export 'components/badge/stream_retry_badge.dart' hide DefaultStreamRetryBadge;
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
 export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButton;
+export 'components/common/stream_app_bar.dart' hide DefaultStreamAppBar;
 export 'components/common/stream_checkbox.dart' hide DefaultStreamCheckbox;
 export 'components/common/stream_flex.dart';
 export 'components/common/stream_loading_spinner.dart' hide DefaultStreamLoadingSpinner;
@@ -42,5 +43,4 @@ export 'components/message_placement/stream_message_placement.dart';
 export 'components/message_placement/stream_message_stack_position.dart';
 export 'components/reaction/stream_reaction_picker.dart' hide DefaultStreamReactionPicker;
 export 'components/reaction/stream_reactions.dart' hide DefaultStreamReactions;
-
 export 'factory/stream_component_factory.dart';
