@@ -33,7 +33,8 @@ class StreamCoreMessageComposerInputTrailing extends StatelessWidget {
         voiceRecordingCallback == null) {
       return StreamButton.icon(
         key: _messageComposerInputTrailingSendKey,
-        icon: buttonState == StreamMessageComposerInputTrailingState.edit ||
+        icon:
+            buttonState == StreamMessageComposerInputTrailingState.edit ||
                 buttonState == StreamMessageComposerInputTrailingState.command
             ? context.streamIcons.checkmark2Small
             : context.streamIcons.paperPlane,
