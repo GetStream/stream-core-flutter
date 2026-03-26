@@ -31,17 +31,17 @@ mixin _$StreamMessageItemThemeData {
 
     return StreamMessageItemThemeData(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
-      leadingVisibility: StreamMessageStyleVisibility.lerp(
+      leadingVisibility: StreamMessageLayoutVisibility.lerp(
         a.leadingVisibility,
         b.leadingVisibility,
         t,
       ),
-      headerVisibility: StreamMessageStyleVisibility.lerp(
+      headerVisibility: StreamMessageLayoutVisibility.lerp(
         a.headerVisibility,
         b.headerVisibility,
         t,
       ),
-      footerVisibility: StreamMessageStyleVisibility.lerp(
+      footerVisibility: StreamMessageLayoutVisibility.lerp(
         a.footerVisibility,
         b.footerVisibility,
         t,
@@ -68,9 +68,9 @@ mixin _$StreamMessageItemThemeData {
 
   StreamMessageItemThemeData copyWith({
     Color? backgroundColor,
-    StreamMessageStyleVisibility? leadingVisibility,
-    StreamMessageStyleVisibility? headerVisibility,
-    StreamMessageStyleVisibility? footerVisibility,
+    StreamMessageLayoutVisibility? leadingVisibility,
+    StreamMessageLayoutVisibility? headerVisibility,
+    StreamMessageLayoutVisibility? footerVisibility,
     EdgeInsetsGeometry? padding,
     double? spacing,
     StreamAvatarSize? avatarSize,

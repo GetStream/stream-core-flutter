@@ -1,7 +1,8 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
+import '../widget_state_utils.dart';
 
 part 'stream_button_theme.g.theme.dart';
 
@@ -148,6 +149,10 @@ class StreamButtonTypeStyle with _$StreamButtonTypeStyle {
 @immutable
 class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
   /// Creates button style properties.
+  ///
+  /// All color properties are [WidgetStateProperty]-based for full
+  /// state-level control. For a simpler API that accepts plain values and
+  /// builds state properties internally, use [StreamButtonThemeStyle.from].
   const StreamButtonThemeStyle({
     this.backgroundColor,
     this.foregroundColor,
@@ -155,7 +160,59 @@ class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
     this.overlayColor,
     this.elevation,
     this.iconSize,
+    this.textStyle,
+    this.tapTargetSize,
   });
+
+  /// Creates a [StreamButtonThemeStyle] from simple values.
+  ///
+  /// This is a convenience factory that wraps plain colors into
+  /// [WidgetStateProperty] values, similar to how Flutter's
+  /// `TextButton.styleFrom` works.
+  ///
+  /// State-specific parameters (prefixed with `disabled`, `hovered`, or
+  /// `pressed`) take precedence for their respective states; unprefixed
+  /// parameters are used as the default for all other states.
+  ///
+  /// {@tool snippet}
+  ///
+  /// Create a solid button style with disabled state:
+  ///
+  /// ```dart
+  /// StreamButtonThemeStyle.from(
+  ///   backgroundColor: Colors.blue,
+  ///   disabledBackgroundColor: Colors.grey,
+  ///   foregroundColor: Colors.white,
+  ///   disabledForegroundColor: Colors.white70,
+  /// )
+  /// ```
+  /// {@end-tool}
+  factory StreamButtonThemeStyle.from({
+    Color? backgroundColor,
+    Color? disabledBackgroundColor,
+    Color? foregroundColor,
+    Color? disabledForegroundColor,
+    Color? borderColor,
+    Color? disabledBorderColor,
+    Color? overlayColor,
+    Color? hoveredOverlayColor,
+    Color? pressedOverlayColor,
+    double? elevation,
+    double? iconSize,
+    TextStyle? textStyle,
+    MaterialTapTargetSize? tapTargetSize,
+  }) {
+    return StreamButtonThemeStyle(
+      backgroundColor: WidgetStateUtils.resolveWith(backgroundColor, null, disabledBackgroundColor),
+      foregroundColor: WidgetStateUtils.resolveWith(foregroundColor, null, disabledForegroundColor),
+      borderColor: WidgetStateUtils.resolveWith(borderColor, null, disabledBorderColor),
+      overlayColor: WidgetStateUtils.resolveOverlay(overlayColor, hoveredOverlayColor, pressedOverlayColor),
+      elevation: WidgetStateUtils.allOrNull(elevation),
+      iconSize: WidgetStateUtils.allOrNull(iconSize),
+      textStyle: WidgetStateUtils.allOrNull(textStyle),
+      tapTargetSize: tapTargetSize,
+    );
+  }
 
   /// The background color for the button.
   ///
@@ -187,6 +244,16 @@ class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
   ///
   /// If null, defaults to 20.
   final WidgetStateProperty<double?>? iconSize;
+
+  /// The text style for the button label.
+  ///
+  /// Supports state-based text styles for different interaction states.
+  final WidgetStateProperty<TextStyle?>? textStyle;
+
+  /// The minimum tap target size of the button.
+  ///
+  /// If null, defaults to [MaterialTapTargetSize.padded].
+  final MaterialTapTargetSize? tapTargetSize;
 
   /// Linearly interpolate between two [StreamButtonThemeStyle] objects.
   static StreamButtonThemeStyle? lerp(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
-import '../message_placement/stream_message_placement.dart';
+import '../message_layout/stream_message_layout.dart';
 
 /// An annotation row for displaying contextual message annotations.
 ///
@@ -172,11 +172,11 @@ class DefaultStreamMessageAnnotation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacement.of(context);
-    final annotationStyle = props.style ?? StreamMessageItemTheme.of(context).annotation;
+    final layout = StreamMessageLayout.of(context);
+    final annotationStyle = StreamMessageItemTheme.of(context).annotation;
     final defaults = _StreamMessageAnnotationDefaults(context);
 
-    final resolve = StreamMessageStyleResolver(placement, [annotationStyle, defaults]);
+    final resolve = StreamMessageLayoutResolver(layout, [props.style, annotationStyle, defaults]);
 
     final effectiveTextStyle = resolve((s) => s?.textStyle);
     final effectiveTextColor = resolve((s) => s?.textColor);
@@ -231,11 +231,11 @@ class _RichAnnotationLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacement.of(context);
+    final layout = StreamMessageLayout.of(context);
     final annotationStyle = StreamMessageItemTheme.of(context).annotation;
     final defaults = _StreamMessageAnnotationDefaults(context);
 
-    final resolve = StreamMessageStyleResolver(placement, [annotationStyle, defaults]);
+    final resolve = StreamMessageLayoutResolver(layout, [annotationStyle, defaults]);
 
     final effectiveSpanStyle = resolve((s) => s?.spanTextStyle);
     final effectiveSpanColor = resolve((s) => s?.spanTextColor);
@@ -266,26 +266,26 @@ class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  StreamMessageStyleProperty<TextStyle> get textStyle => .all(_textTheme.metadataEmphasis);
+  StreamMessageLayoutProperty<TextStyle> get textStyle => .all(_textTheme.metadataEmphasis);
 
   @override
-  StreamMessageStyleProperty<Color> get textColor => .all(_colorScheme.textPrimary);
+  StreamMessageLayoutProperty<Color> get textColor => .all(_colorScheme.textPrimary);
 
   @override
-  StreamMessageStyleProperty<TextStyle> get spanTextStyle => .all(_textTheme.metadataDefault);
+  StreamMessageLayoutProperty<TextStyle> get spanTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  StreamMessageStyleProperty<Color> get spanTextColor => .all(_colorScheme.textPrimary);
+  StreamMessageLayoutProperty<Color> get spanTextColor => .all(_colorScheme.textPrimary);
 
   @override
-  StreamMessageStyleProperty<Color> get iconColor => .all(_colorScheme.textPrimary);
+  StreamMessageLayoutProperty<Color> get iconColor => .all(_colorScheme.textPrimary);
 
   @override
-  StreamMessageStyleProperty<double> get iconSize => .all(16);
+  StreamMessageLayoutProperty<double> get iconSize => .all(16);
 
   @override
-  StreamMessageStyleProperty<double> get spacing => .all(_spacing.xxs);
+  StreamMessageLayoutProperty<double> get spacing => .all(_spacing.xxs);
 
   @override
-  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(vertical: _spacing.xxs));
+  StreamMessageLayoutProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(vertical: _spacing.xxs));
 }

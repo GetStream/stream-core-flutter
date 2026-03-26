@@ -33,14 +33,22 @@ Widget buildStreamMessageBubblePlayground(BuildContext context) {
     description: 'Position within a consecutive message group.',
   );
 
-  final placement = StreamMessagePlacementData(
+  final contentKind = context.knobs.object.dropdown<StreamMessageContentKind>(
+    label: 'Content Kind',
+    options: StreamMessageContentKind.values,
+    labelBuilder: (v) => v.name,
+    description: 'The kind of content the message carries.',
+  );
+
+  final layout = StreamMessageLayoutData(
     alignment: alignment,
     stackPosition: stackPosition,
+    contentKind: contentKind,
   );
 
   return Center(
-    child: StreamMessagePlacement(
-      data: placement,
+    child: StreamMessageLayout(
+      data: layout,
       child: StreamMessageBubble(
         child: StreamMessageText(text),
       ),
@@ -254,8 +262,8 @@ class _StyleOverrideSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'Beveled rectangle',
-          child: StreamMessagePlacement(
-            data: const StreamMessagePlacementData(
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(
               alignment: StreamMessageAlignment.end,
             ),
             child: StreamMessageBubble(
@@ -293,16 +301,16 @@ class _PlacedBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacementData(
+    final layout = StreamMessageLayoutData(
       alignment: alignment,
       stackPosition: stackPosition,
     );
-    final isDefault = placement == const StreamMessagePlacementData();
+    final isDefault = layout == const StreamMessageLayoutData();
 
     Widget child = StreamMessageBubble(child: StreamMessageText(text));
     if (!isDefault) {
-      child = StreamMessagePlacement(
-        data: placement,
+      child = StreamMessageLayout(
+        data: layout,
         child: child,
       );
     }

@@ -30,61 +30,61 @@ mixin _$StreamMessageTextStyle {
     }
 
     return StreamMessageTextStyle(
-      padding: StreamMessageStyleProperty.lerp<EdgeInsetsGeometry?>(
+      padding: StreamMessageLayoutProperty.lerp<EdgeInsetsGeometry?>(
         a.padding,
         b.padding,
         t,
         EdgeInsetsGeometry.lerp,
       ),
-      textStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      textStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.textStyle,
         b.textStyle,
         t,
         TextStyle.lerp,
       ),
-      textColor: StreamMessageStyleProperty.lerp<Color?>(
+      textColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.textColor,
         b.textColor,
         t,
         Color.lerp,
       ),
-      linkStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      linkStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.linkStyle,
         b.linkStyle,
         t,
         TextStyle.lerp,
       ),
-      linkColor: StreamMessageStyleProperty.lerp<Color?>(
+      linkColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.linkColor,
         b.linkColor,
         t,
         Color.lerp,
       ),
-      mentionStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      mentionStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.mentionStyle,
         b.mentionStyle,
         t,
         TextStyle.lerp,
       ),
-      mentionColor: StreamMessageStyleProperty.lerp<Color?>(
+      mentionColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.mentionColor,
         b.mentionColor,
         t,
         Color.lerp,
       ),
-      singleEmojiStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      singleEmojiStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.singleEmojiStyle,
         b.singleEmojiStyle,
         t,
         TextStyle.lerp,
       ),
-      doubleEmojiStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      doubleEmojiStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.doubleEmojiStyle,
         b.doubleEmojiStyle,
         t,
         TextStyle.lerp,
       ),
-      tripleEmojiStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      tripleEmojiStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.tripleEmojiStyle,
         b.tripleEmojiStyle,
         t,
@@ -94,16 +94,16 @@ mixin _$StreamMessageTextStyle {
   }
 
   StreamMessageTextStyle copyWith({
-    StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding,
-    StreamMessageStyleProperty<TextStyle?>? textStyle,
-    StreamMessageStyleProperty<Color?>? textColor,
-    StreamMessageStyleProperty<TextStyle?>? linkStyle,
-    StreamMessageStyleProperty<Color?>? linkColor,
-    StreamMessageStyleProperty<TextStyle?>? mentionStyle,
-    StreamMessageStyleProperty<Color?>? mentionColor,
-    StreamMessageStyleProperty<TextStyle?>? singleEmojiStyle,
-    StreamMessageStyleProperty<TextStyle?>? doubleEmojiStyle,
-    StreamMessageStyleProperty<TextStyle?>? tripleEmojiStyle,
+    StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding,
+    StreamMessageLayoutProperty<TextStyle?>? textStyle,
+    StreamMessageLayoutProperty<Color?>? textColor,
+    StreamMessageLayoutProperty<TextStyle?>? linkStyle,
+    StreamMessageLayoutProperty<Color?>? linkColor,
+    StreamMessageLayoutProperty<TextStyle?>? mentionStyle,
+    StreamMessageLayoutProperty<Color?>? mentionColor,
+    StreamMessageLayoutProperty<TextStyle?>? singleEmojiStyle,
+    StreamMessageLayoutProperty<TextStyle?>? doubleEmojiStyle,
+    StreamMessageLayoutProperty<TextStyle?>? tripleEmojiStyle,
   }) {
     final _this = (this as StreamMessageTextStyle);
 

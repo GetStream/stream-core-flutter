@@ -242,6 +242,13 @@ mixin _$StreamButtonThemeStyle {
         t,
         lerpDouble$,
       ),
+      textStyle: WidgetStateProperty.lerp<TextStyle?>(
+        a.textStyle,
+        b.textStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      tapTargetSize: t < 0.5 ? a.tapTargetSize : b.tapTargetSize,
     );
   }
 
@@ -252,6 +259,8 @@ mixin _$StreamButtonThemeStyle {
     WidgetStateProperty<Color?>? overlayColor,
     WidgetStateProperty<double?>? elevation,
     WidgetStateProperty<double?>? iconSize,
+    WidgetStateProperty<TextStyle?>? textStyle,
+    MaterialTapTargetSize? tapTargetSize,
   }) {
     final _this = (this as StreamButtonThemeStyle);
 
@@ -262,6 +271,8 @@ mixin _$StreamButtonThemeStyle {
       overlayColor: overlayColor ?? _this.overlayColor,
       elevation: elevation ?? _this.elevation,
       iconSize: iconSize ?? _this.iconSize,
+      textStyle: textStyle ?? _this.textStyle,
+      tapTargetSize: tapTargetSize ?? _this.tapTargetSize,
     );
   }
 
@@ -283,6 +294,8 @@ mixin _$StreamButtonThemeStyle {
       overlayColor: other.overlayColor,
       elevation: other.elevation,
       iconSize: other.iconSize,
+      textStyle: other.textStyle,
+      tapTargetSize: other.tapTargetSize,
     );
   }
 
@@ -304,7 +317,9 @@ mixin _$StreamButtonThemeStyle {
         _other.borderColor == _this.borderColor &&
         _other.overlayColor == _this.overlayColor &&
         _other.elevation == _this.elevation &&
-        _other.iconSize == _this.iconSize;
+        _other.iconSize == _this.iconSize &&
+        _other.textStyle == _this.textStyle &&
+        _other.tapTargetSize == _this.tapTargetSize;
   }
 
   @override
@@ -319,6 +334,8 @@ mixin _$StreamButtonThemeStyle {
       _this.overlayColor,
       _this.elevation,
       _this.iconSize,
+      _this.textStyle,
+      _this.tapTargetSize,
     );
   }
 }

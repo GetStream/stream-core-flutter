@@ -5,6 +5,9 @@
 # Input
 input_svg_dir: assets_source/icons/
 
+# Optional: colored SVG icons that cannot be converted to a font
+input_svg_icon_dir: assets/icons/
+
 # Output paths (relative to this config file)
 output_font_file: lib/fonts/stream_icons_font.otf
 output_file: lib/src/theme/primitives/stream_icons.dart
@@ -13,6 +16,7 @@ output_data_file: lib/src/theme/primitives/stream_icons.g.dart
 # Class names
 class_name: StreamIcons
 data_class_name: StreamIconData
+svg_icon_data_class_name: StreamSvgIconData
 package: stream_core_flutter
 
 # Font options

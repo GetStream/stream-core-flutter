@@ -4,6 +4,7 @@
 // To regenerate: melos run generate:icons
 
 import 'package:flutter/widgets.dart';
+import 'package:svg_icon_widget/svg_icon_widget.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 part 'stream_icons.g.theme.dart';
 part 'stream_icons.g.dart';
@@ -206,6 +207,8 @@ class StreamIcons with _$StreamIcons {
     this.voiceHigh = StreamIconData.iconVoiceHigh,
     this.volumeFull = StreamIconData.iconVolumeFull,
     this.webhook = StreamIconData.iconWebhook,
+    this.giphy = StreamSvgIconData.giphy,
+    this.imgur = StreamSvgIconData.imgur,
   });
 
   /// The api aggregate icon.
@@ -655,6 +658,16 @@ class StreamIcons with _$StreamIcons {
   /// The webhook icon.
   final IconData webhook;
 
+  /// The giphy colored SVG icon.
+  ///
+  /// This is an [SvgIconData] — use with [SvgIcon], not [Icon].
+  final SvgIconData giphy;
+
+  /// The imgur colored SVG icon.
+  ///
+  /// This is an [SvgIconData] — use with [SvgIcon], not [Icon].
+  final SvgIconData imgur;
+
   /// A map of all available icons keyed by their field name.
   ///
   /// Useful for dynamic icon lookup by string name.
@@ -813,6 +826,16 @@ class StreamIcons with _$StreamIcons {
     'volumeFull': volumeFull,
     'webhook': webhook,
   };
+
+  /// A map of all colored SVG icons keyed by their field name.
+  ///
+  /// These icons preserve their original colors and should be used with
+  /// [SvgIcon] widget, not the standard [Icon] widget.
+  ///
+  /// ```dart
+  /// final icon = context.streamIcons.allSvgIcons['giphy'];
+  /// ```
+  Map<String, SvgIconData> get allSvgIcons => {'giphy': giphy, 'imgur': imgur};
 
   /// Linearly interpolate between two [StreamIcons] objects.
   static StreamIcons? lerp(

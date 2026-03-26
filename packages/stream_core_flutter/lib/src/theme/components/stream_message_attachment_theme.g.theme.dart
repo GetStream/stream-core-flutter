@@ -30,26 +30,33 @@ mixin _$StreamMessageAttachmentStyle {
     }
 
     return StreamMessageAttachmentStyle(
-      backgroundColor: StreamMessageStyleProperty.lerp<Color?>(
+      backgroundColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.backgroundColor,
         b.backgroundColor,
         t,
         Color.lerp,
       ),
-      shape: StreamMessageStyleProperty.lerp<OutlinedBorder?>(
+      shape: StreamMessageLayoutProperty.lerp<OutlinedBorder?>(
         a.shape,
         b.shape,
         t,
         OutlinedBorder.lerp,
       ),
-      side: StreamMessageStyleBorderSide.lerp(a.side, b.side, t),
+      side: StreamMessageLayoutBorderSide.lerp(a.side, b.side, t),
+      padding: StreamMessageLayoutProperty.lerp<EdgeInsetsGeometry?>(
+        a.padding,
+        b.padding,
+        t,
+        EdgeInsetsGeometry.lerp,
+      ),
     );
   }
 
   StreamMessageAttachmentStyle copyWith({
-    StreamMessageStyleProperty<Color?>? backgroundColor,
-    StreamMessageStyleProperty<OutlinedBorder?>? shape,
-    StreamMessageStyleBorderSide? side,
+    StreamMessageLayoutProperty<Color?>? backgroundColor,
+    StreamMessageLayoutProperty<OutlinedBorder?>? shape,
+    StreamMessageLayoutBorderSide? side,
+    StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding,
   }) {
     final _this = (this as StreamMessageAttachmentStyle);
 
@@ -57,6 +64,7 @@ mixin _$StreamMessageAttachmentStyle {
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       shape: shape ?? _this.shape,
       side: side ?? _this.side,
+      padding: padding ?? _this.padding,
     );
   }
 
@@ -75,6 +83,7 @@ mixin _$StreamMessageAttachmentStyle {
       backgroundColor: other.backgroundColor,
       shape: other.shape,
       side: other.side,
+      padding: other.padding,
     );
   }
 
@@ -93,7 +102,8 @@ mixin _$StreamMessageAttachmentStyle {
 
     return _other.backgroundColor == _this.backgroundColor &&
         _other.shape == _this.shape &&
-        _other.side == _this.side;
+        _other.side == _this.side &&
+        _other.padding == _this.padding;
   }
 
   @override
@@ -105,6 +115,7 @@ mixin _$StreamMessageAttachmentStyle {
       _this.backgroundColor,
       _this.shape,
       _this.side,
+      _this.padding,
     );
   }
 }

@@ -219,6 +219,8 @@ mixin _$StreamIcons {
       voiceHigh: t < 0.5 ? a.voiceHigh : b.voiceHigh,
       volumeFull: t < 0.5 ? a.volumeFull : b.volumeFull,
       webhook: t < 0.5 ? a.webhook : b.webhook,
+      giphy: t < 0.5 ? a.giphy : b.giphy,
+      imgur: t < 0.5 ? a.imgur : b.imgur,
     );
   }
 
@@ -372,6 +374,8 @@ mixin _$StreamIcons {
     IconData? voiceHigh,
     IconData? volumeFull,
     IconData? webhook,
+    SvgIconData? giphy,
+    SvgIconData? imgur,
   }) {
     final _this = (this as StreamIcons);
 
@@ -544,6 +548,8 @@ mixin _$StreamIcons {
       voiceHigh: voiceHigh ?? _this.voiceHigh,
       volumeFull: volumeFull ?? _this.volumeFull,
       webhook: webhook ?? _this.webhook,
+      giphy: giphy ?? _this.giphy,
+      imgur: imgur ?? _this.imgur,
     );
   }
 
@@ -710,6 +716,8 @@ mixin _$StreamIcons {
       voiceHigh: other.voiceHigh,
       volumeFull: other.volumeFull,
       webhook: other.webhook,
+      giphy: other.giphy,
+      imgur: other.imgur,
     );
   }
 
@@ -880,7 +888,9 @@ mixin _$StreamIcons {
         _other.voiceAndVideo == _this.voiceAndVideo &&
         _other.voiceHigh == _this.voiceHigh &&
         _other.volumeFull == _this.volumeFull &&
-        _other.webhook == _this.webhook;
+        _other.webhook == _this.webhook &&
+        _other.giphy == _this.giphy &&
+        _other.imgur == _this.imgur;
   }
 
   @override
@@ -1038,6 +1048,8 @@ mixin _$StreamIcons {
       _this.voiceHigh,
       _this.volumeFull,
       _this.webhook,
+      _this.giphy,
+      _this.imgur,
     ]);
   }
 }

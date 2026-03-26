@@ -39,3 +39,4 @@ export 'theme/semantics/stream_text_theme.dart';
 
 export 'theme/stream_theme.dart';
 export 'theme/stream_theme_extensions.dart';
+export 'theme/widget_state_utils.dart';

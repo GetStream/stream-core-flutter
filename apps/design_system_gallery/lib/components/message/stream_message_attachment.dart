@@ -3,16 +3,35 @@ import 'package:stream_core_flutter/stream_core_flutter.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
+/// Gallery-only attachment style so Widgetbook shows bubble vs attachment
+/// contrast. Product code can set [StreamMessageItemThemeData.attachment] or
+/// pass [StreamMessageAttachment.style] to override the built-in defaults.
+StreamMessageAttachmentStyle _galleryAttachmentStyle(BuildContext context) {
+  final colorScheme = context.streamColorScheme;
+  final radius = context.streamRadius;
+  return StreamMessageAttachmentStyle(
+    backgroundColor: StreamMessageLayoutProperty.resolveWith(
+      (layout) => switch (layout.alignment) {
+        StreamMessageAlignment.start => colorScheme.backgroundSurfaceStrong,
+        StreamMessageAlignment.end => colorScheme.brand.shade150,
+      },
+    ),
+    shape: StreamMessageLayoutProperty.resolveWith(
+      (_) => RoundedSuperellipseBorder(borderRadius: BorderRadius.all(radius.lg)),
+    ),
+  );
+}
+
 // =============================================================================
 // Playground
 // =============================================================================
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: StreamMessageAttachmentContainer,
+  type: StreamMessageAttachment,
   path: '[Components]/Message',
 )
-Widget buildStreamMessageAttachmentContainerPlayground(BuildContext context) {
+Widget buildStreamMessageAttachmentPlayground(BuildContext context) {
   final text = context.knobs.string(
     label: 'Text',
     initialValue: 'Check out this photo!',
@@ -33,25 +52,38 @@ Widget buildStreamMessageAttachmentContainerPlayground(BuildContext context) {
     description: 'Position within a consecutive message group.',
   );
 
+  final contentKind = context.knobs.object.dropdown<StreamMessageContentKind>(
+    label: 'Content Kind',
+    options: StreamMessageContentKind.values,
+    labelBuilder: (v) => v.name,
+    description: 'The kind of content the message carries.',
+  );
+
   final showBubble = context.knobs.boolean(
     label: 'Wrap in bubble',
     initialValue: true,
-    description: 'Toggle the surrounding bubble to see the container in isolation.',
+    description: 'Toggle the surrounding bubble to see the attachment in isolation.',
   );
 
-  final placement = StreamMessagePlacementData(
+  final layout = StreamMessageLayoutData(
     alignment: alignment,
     stackPosition: stackPosition,
+    contentKind: contentKind,
   );
 
-  return Center(
-    child: StreamMessagePlacement(
-      data: placement,
-      child: showBubble
-          ? _MessageWithAttachment(text: text)
-          : const StreamMessageAttachmentContainer(
-              child: _PlaceholderAttachment(),
-            ),
+  return StreamMessageItemTheme(
+    data: StreamMessageItemTheme.of(context).copyWith(
+      attachment: _galleryAttachmentStyle(context),
+    ),
+    child: Center(
+      child: StreamMessageLayout(
+        data: layout,
+        child: showBubble
+            ? _MessageWithAttachment(text: text)
+            : const StreamMessageAttachment(
+                child: _PlaceholderAttachment(),
+              ),
+      ),
     ),
   );
 }
@@ -62,20 +94,25 @@ Widget buildStreamMessageAttachmentContainerPlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: StreamMessageAttachmentContainer,
+  type: StreamMessageAttachment,
   path: '[Components]/Message',
 )
-Widget buildStreamMessageAttachmentContainerShowcase(BuildContext context) {
-  return SingleChildScrollView(
-    padding: const EdgeInsets.all(24),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 32,
-      children: [
-        _BubbleContrastSection(),
-        _ConversationSection(),
-        _StyleOverrideSection(),
-      ],
+Widget buildStreamMessageAttachmentShowcase(BuildContext context) {
+  return StreamMessageItemTheme(
+    data: StreamMessageItemTheme.of(context).copyWith(
+      attachment: _galleryAttachmentStyle(context),
+    ),
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 32,
+        children: [
+          _BubbleContrastSection(),
+          _ConversationSection(),
+          _StyleOverrideSection(),
+        ],
+      ),
     ),
   );
 }
@@ -90,7 +127,7 @@ class _BubbleContrastSection extends StatelessWidget {
     return const _Section(
       label: 'BUBBLE VS ATTACHMENT',
       description:
-          'The attachment container uses a distinct background from the '
+          'The attachment uses a distinct background from the '
           'surrounding bubble, making embedded content stand out.',
       children: [
         _ExampleCard(
@@ -120,7 +157,7 @@ class _ConversationSection extends StatelessWidget {
     return const _Section(
       label: 'CONVERSATION',
       description:
-          'A realistic exchange showing how attachment containers '
+          'A realistic exchange showing how attachments '
           'look across different placements in a message thread.',
       children: [
         _ExampleCard(
@@ -214,7 +251,7 @@ class _MessageWithAttachment extends StatelessWidget {
         children: [
           const Padding(
             padding: .symmetric(horizontal: 8),
-            child: StreamMessageAttachmentContainer(
+            child: StreamMessageAttachment(
               child: _PlaceholderAttachment(),
             ),
           ),
@@ -264,8 +301,8 @@ class _StyledMessage extends StatelessWidget {
 
     return Align(
       alignment: isEnd ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
-      child: StreamMessagePlacement(
-        data: StreamMessagePlacementData(alignment: alignment),
+      child: StreamMessageLayout(
+        data: StreamMessageLayoutData(alignment: alignment),
         child: StreamMessageBubble(
           child: Column(
             crossAxisAlignment: .start,
@@ -273,7 +310,7 @@ class _StyledMessage extends StatelessWidget {
             children: [
               Padding(
                 padding: const .symmetric(horizontal: 8),
-                child: StreamMessageAttachmentContainer(
+                child: StreamMessageAttachment(
                   style: style,
                   child: const _PlaceholderAttachment(),
                 ),
@@ -303,15 +340,15 @@ class _PlacedMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacementData(
+    final layout = StreamMessageLayoutData(
       alignment: alignment,
       stackPosition: stackPosition,
     );
-    final isDefault = placement == const StreamMessagePlacementData();
+    final isDefault = layout == const StreamMessageLayoutData();
 
     Widget child = _MessageWithAttachment(text: text);
     if (!isDefault) {
-      child = StreamMessagePlacement(data: placement, child: child);
+      child = StreamMessageLayout(data: layout, child: child);
     }
 
     return Align(

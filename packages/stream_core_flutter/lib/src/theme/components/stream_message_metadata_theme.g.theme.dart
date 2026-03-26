@@ -30,67 +30,67 @@ mixin _$StreamMessageMetadataStyle {
     }
 
     return StreamMessageMetadataStyle(
-      usernameTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      usernameTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.usernameTextStyle,
         b.usernameTextStyle,
         t,
         TextStyle.lerp,
       ),
-      usernameColor: StreamMessageStyleProperty.lerp<Color?>(
+      usernameColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.usernameColor,
         b.usernameColor,
         t,
         Color.lerp,
       ),
-      timestampTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      timestampTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.timestampTextStyle,
         b.timestampTextStyle,
         t,
         TextStyle.lerp,
       ),
-      timestampColor: StreamMessageStyleProperty.lerp<Color?>(
+      timestampColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.timestampColor,
         b.timestampColor,
         t,
         Color.lerp,
       ),
-      editedTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      editedTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.editedTextStyle,
         b.editedTextStyle,
         t,
         TextStyle.lerp,
       ),
-      editedColor: StreamMessageStyleProperty.lerp<Color?>(
+      editedColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.editedColor,
         b.editedColor,
         t,
         Color.lerp,
       ),
-      statusColor: StreamMessageStyleProperty.lerp<Color?>(
+      statusColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.statusColor,
         b.statusColor,
         t,
         Color.lerp,
       ),
-      statusIconSize: StreamMessageStyleProperty.lerp<double?>(
+      statusIconSize: StreamMessageLayoutProperty.lerp<double?>(
         a.statusIconSize,
         b.statusIconSize,
         t,
         lerpDouble$,
       ),
-      spacing: StreamMessageStyleProperty.lerp<double?>(
+      spacing: StreamMessageLayoutProperty.lerp<double?>(
         a.spacing,
         b.spacing,
         t,
         lerpDouble$,
       ),
-      statusSpacing: StreamMessageStyleProperty.lerp<double?>(
+      statusSpacing: StreamMessageLayoutProperty.lerp<double?>(
         a.statusSpacing,
         b.statusSpacing,
         t,
         lerpDouble$,
       ),
-      minHeight: StreamMessageStyleProperty.lerp<double?>(
+      minHeight: StreamMessageLayoutProperty.lerp<double?>(
         a.minHeight,
         b.minHeight,
         t,
@@ -100,17 +100,17 @@ mixin _$StreamMessageMetadataStyle {
   }
 
   StreamMessageMetadataStyle copyWith({
-    StreamMessageStyleProperty<TextStyle?>? usernameTextStyle,
-    StreamMessageStyleProperty<Color?>? usernameColor,
-    StreamMessageStyleProperty<TextStyle?>? timestampTextStyle,
-    StreamMessageStyleProperty<Color?>? timestampColor,
-    StreamMessageStyleProperty<TextStyle?>? editedTextStyle,
-    StreamMessageStyleProperty<Color?>? editedColor,
-    StreamMessageStyleProperty<Color?>? statusColor,
-    StreamMessageStyleProperty<double?>? statusIconSize,
-    StreamMessageStyleProperty<double?>? spacing,
-    StreamMessageStyleProperty<double?>? statusSpacing,
-    StreamMessageStyleProperty<double?>? minHeight,
+    StreamMessageLayoutProperty<TextStyle?>? usernameTextStyle,
+    StreamMessageLayoutProperty<Color?>? usernameColor,
+    StreamMessageLayoutProperty<TextStyle?>? timestampTextStyle,
+    StreamMessageLayoutProperty<Color?>? timestampColor,
+    StreamMessageLayoutProperty<TextStyle?>? editedTextStyle,
+    StreamMessageLayoutProperty<Color?>? editedColor,
+    StreamMessageLayoutProperty<Color?>? statusColor,
+    StreamMessageLayoutProperty<double?>? statusIconSize,
+    StreamMessageLayoutProperty<double?>? spacing,
+    StreamMessageLayoutProperty<double?>? statusSpacing,
+    StreamMessageLayoutProperty<double?>? minHeight,
   }) {
     final _this = (this as StreamMessageMetadataStyle);
 

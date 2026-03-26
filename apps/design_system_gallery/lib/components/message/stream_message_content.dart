@@ -507,8 +507,8 @@ class _FullCompositionSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'Outgoing — reactions + status',
-          child: StreamMessagePlacement(
-            data: const StreamMessagePlacementData(
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(
               alignment: StreamMessageAlignment.end,
             ),
             child: StreamMessageContent(
@@ -610,8 +610,8 @@ class _EmojiOnlySection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'Outgoing emoji + reactions',
-          child: StreamMessagePlacement(
-            data: const StreamMessagePlacementData(
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(
               alignment: StreamMessageAlignment.end,
             ),
             child: StreamMessageContent(

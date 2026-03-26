@@ -9,7 +9,7 @@ part 'stream_message_annotation_theme.g.theme.dart';
 /// Visual styling properties for a message annotation row.
 ///
 /// Defines the appearance of annotation rows including text, icons, spacing,
-/// and padding. All properties use [StreamMessageStyleProperty] for
+/// and padding. All properties use [StreamMessageLayoutProperty] for
 /// placement-aware resolution. Use [StreamMessageAnnotationStyle.from]
 /// for uniform values across all placements.
 ///
@@ -33,7 +33,7 @@ part 'stream_message_annotation_theme.g.theme.dart';
 ///
 /// ```dart
 /// StreamMessageAnnotationStyle(
-///   textColor: StreamMessageStyleProperty.resolveWith((p) {
+///   textColor: StreamMessageLayoutProperty.resolveWith((p) {
 ///     final isEnd = p.alignment == StreamMessageAlignment.end;
 ///     return isEnd ? Colors.blue : Colors.grey;
 ///   }),
@@ -86,47 +86,47 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
     EdgeInsetsGeometry? padding,
   }) {
     return StreamMessageAnnotationStyle(
-      textStyle: textStyle?.let(StreamMessageStyleProperty.all),
-      textColor: textColor?.let(StreamMessageStyleProperty.all),
-      spanTextStyle: spanTextStyle?.let(StreamMessageStyleProperty.all),
-      spanTextColor: spanTextColor?.let(StreamMessageStyleProperty.all),
-      iconColor: iconColor?.let(StreamMessageStyleProperty.all),
-      iconSize: iconSize?.let(StreamMessageStyleProperty.all),
-      spacing: spacing?.let(StreamMessageStyleProperty.all),
-      padding: padding?.let(StreamMessageStyleProperty.all),
+      textStyle: textStyle?.let(StreamMessageLayoutProperty.all),
+      textColor: textColor?.let(StreamMessageLayoutProperty.all),
+      spanTextStyle: spanTextStyle?.let(StreamMessageLayoutProperty.all),
+      spanTextColor: spanTextColor?.let(StreamMessageLayoutProperty.all),
+      iconColor: iconColor?.let(StreamMessageLayoutProperty.all),
+      iconSize: iconSize?.let(StreamMessageLayoutProperty.all),
+      spacing: spacing?.let(StreamMessageLayoutProperty.all),
+      padding: padding?.let(StreamMessageLayoutProperty.all),
     );
   }
 
   /// The text style for the annotation label.
   ///
   /// This only controls typography. Color comes from [textColor].
-  final StreamMessageStyleProperty<TextStyle?>? textStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? textStyle;
 
   /// The color for the annotation label text.
-  final StreamMessageStyleProperty<Color?>? textColor;
+  final StreamMessageLayoutProperty<Color?>? textColor;
 
   /// The text style for child spans in a [StreamMessageAnnotation.rich] label.
   ///
   /// Applied to direct child [TextSpan]s that don't specify an explicit style.
   /// This only controls typography. Color comes from [spanTextColor].
-  final StreamMessageStyleProperty<TextStyle?>? spanTextStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? spanTextStyle;
 
   /// The color for child spans in a [StreamMessageAnnotation.rich] label.
   ///
   /// Applied to direct child [TextSpan]s that don't specify an explicit style.
-  final StreamMessageStyleProperty<Color?>? spanTextColor;
+  final StreamMessageLayoutProperty<Color?>? spanTextColor;
 
   /// The color for the leading icon.
-  final StreamMessageStyleProperty<Color?>? iconColor;
+  final StreamMessageLayoutProperty<Color?>? iconColor;
 
   /// The size for the leading icon.
-  final StreamMessageStyleProperty<double?>? iconSize;
+  final StreamMessageLayoutProperty<double?>? iconSize;
 
   /// The gap between the leading widget and label.
-  final StreamMessageStyleProperty<double?>? spacing;
+  final StreamMessageLayoutProperty<double?>? spacing;
 
   /// The padding around the annotation row content.
-  final StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding;
+  final StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding;
 
   /// Linearly interpolate between two [StreamMessageAnnotationStyle] objects.
   static StreamMessageAnnotationStyle? lerp(

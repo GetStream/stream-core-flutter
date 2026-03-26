@@ -942,3 +942,19 @@ class StreamIconData {
   /// <image width='32px' src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOS4yMzM0IDQuMzMzMDFDOS4yMzMyMiAzLjY1MjAxIDguNjgxMDQgMy4wOTk2MSA4IDMuMDk5NjFDNy4zMTg5NiAzLjA5OTYxIDYuNzY2NzggMy42NTIwMSA2Ljc2NjYgNC4zMzMwMUM2Ljc2NjYgNS4wMTQxNiA3LjMxODg1IDUuNTY2NDEgOCA1LjU2NjQxQzguNjgxMTUgNS41NjY0MSA5LjIzMzQgNS4wMTQxNiA5LjIzMzQgNC4zMzMwMVpNMTAuNDMzNiA0LjMzMzAxQzEwLjQzMzYgNS40Njk2NiA5LjY1MzA5IDYuNDIxMDggOC41OTk2MSA2LjY4ODQ4VjEwLjc1QzguNTk5NjEgMTEuOTM3NCA5LjU2MjU3IDEyLjkwMDQgMTAuNzUgMTIuOTAwNEMxMS45Mzc0IDEyLjkwMDQgMTIuOTAwNCAxMS45Mzc0IDEyLjkwMDQgMTAuNzVWMTAuMDAyTDExLjk1MDIgMTAuODQ2N0wxMS4xNTMzIDkuOTUwMkwxNC4wOTk2IDcuMzMwMDhWMTAuNzVDMTQuMDk5NiAxMi42MDAyIDEyLjYwMDIgMTQuMDk5NiAxMC43NSAxNC4wOTk2QzkuNjEwODUgMTQuMDk5NiA4LjYwNTI0IDEzLjUzMDkgOCAxMi42NjIxQzcuMzk0NzYgMTMuNTMwOSA2LjM4OTE1IDE0LjA5OTYgNS4yNSAxNC4wOTk2QzMuMzk5ODUgMTQuMDk5NiAxLjkwMDM5IDEyLjYwMDIgMS45MDAzOSAxMC43NVY3LjMzMDA4TDQuODQ2NjggOS45NTAyTDQuMDQ5OCAxMC44NDY3TDMuMDk5NjEgMTAuMDAyVjEwLjc1QzMuMDk5NjEgMTEuOTM3NCA0LjA2MjU5IDEyLjkwMDQgNS4yNSAxMi45MDA0QzYuNDM3NDMgMTIuOTAwNCA3LjQwMDM5IDExLjkzNzQgNy40MDAzOSAxMC43NVY2LjY4ODQ4QzYuMzQ2OTEgNi40MjEwOCA1LjU2NjQxIDUuNDY5NjYgNS41NjY0MSA0LjMzMzAxQzUuNTY2NTggMi45ODkyNiA2LjY1NjIyIDEuOTAwMzkgOCAxLjkwMDM5QzkuMzQzNzggMS45MDAzOSAxMC40MzM0IDIuOTg5MjYgMTAuNDMzNiA0LjMzMzAxWiIgZmlsbD0iYmxhY2siLz48L3N2Zz4='>
   static const IconData iconWebhook = IconData(0xe094, fontFamily: iconFontFamily, fontPackage: iconFontPackage);
 }
+
+/// Colored SVG icon data constants.
+///
+/// These icons preserve their original colors and should be used with
+/// [SvgIcon] widget, not the standard [Icon] widget.
+class StreamSvgIconData {
+  const StreamSvgIconData._();
+
+  static const String _package = 'stream_core_flutter';
+
+  /// The giphy colored SVG icon.
+  static const SvgIconData giphy = SvgIconData('assets/icons/icon_giphy.svg', package: _package, preserveColors: true);
+
+  /// The imgur colored SVG icon.
+  static const SvgIconData imgur = SvgIconData('assets/icons/icon_imgur.svg', package: _package, preserveColors: true);
+}

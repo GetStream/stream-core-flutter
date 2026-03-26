@@ -42,11 +42,21 @@ class _IconsPageState extends State<_IconsPage> {
     final spacing = context.streamSpacing;
 
     final streamIcons = context.streamIcons;
+
     final allIcons = streamIcons.allIcons.entries.toList();
     final filteredIcons = allIcons.where((MapEntry<String, IconData> entry) {
       if (_searchQuery.isEmpty) return true;
       return entry.key.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
+
+    final allSvgIcons = streamIcons.allSvgIcons.entries.toList();
+    final filteredSvgIcons = allSvgIcons.where((MapEntry<String, SvgIconData> entry) {
+      if (_searchQuery.isEmpty) return true;
+      return entry.key.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
+
+    final totalCount = allIcons.length + allSvgIcons.length;
+    final filteredCount = filteredIcons.length + filteredSvgIcons.length;
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(spacing.lg),
@@ -60,7 +70,7 @@ class _IconsPageState extends State<_IconsPage> {
           // Search bar
           _SearchBar(
             controller: _searchController,
-            iconCount: allIcons.length,
+            iconCount: totalCount,
             hasQuery: _searchQuery.isNotEmpty,
             onChanged: (value) => setState(() => _searchQuery = value),
             onClear: () {
@@ -73,7 +83,7 @@ class _IconsPageState extends State<_IconsPage> {
 
           // Results count
           Text(
-            '${filteredIcons.length} icons${_searchQuery.isNotEmpty ? ' matching "$_searchQuery"' : ''}',
+            '$filteredCount icons${_searchQuery.isNotEmpty ? ' matching "$_searchQuery"' : ''}',
             style: textTheme.captionDefault.copyWith(
               color: colorScheme.textTertiary,
             ),
@@ -81,8 +91,27 @@ class _IconsPageState extends State<_IconsPage> {
 
           SizedBox(height: spacing.md),
 
-          // Icons grid
-          _IconsGrid(icons: filteredIcons),
+          if (filteredCount == 0)
+            _EmptyState()
+          else ...[
+            // Font icons grid
+            if (filteredIcons.isNotEmpty) _IconsGrid(icons: filteredIcons),
+
+            // SVG icons section
+            if (filteredSvgIcons.isNotEmpty) ...[
+              if (filteredIcons.isNotEmpty) SizedBox(height: spacing.xl),
+              const _SectionLabel(label: 'COLORED SVG ICONS'),
+              SizedBox(height: spacing.sm),
+              Text(
+                'These icons preserve their original colors. Use with SvgIcon widget.',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textTertiary,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              _SvgIconsGrid(icons: filteredSvgIcons),
+            ],
+          ],
 
           SizedBox(height: spacing.xl),
 
@@ -167,13 +196,8 @@ class _IconsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    if (icons.isEmpty) {
-      return _EmptyState();
-    }
-
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calculate columns based on available width
         const minCardWidth = 140.0;
         final gapSize = spacing.sm;
         final columns = (constraints.maxWidth / minCardWidth).floor().clamp(2, 6);
@@ -254,6 +278,122 @@ class _IconCard extends StatelessWidget {
             ),
             SizedBox(height: spacing.sm),
             // Icon name
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    name,
+                    style: textTheme.metadataEmphasis.copyWith(
+                      color: colorScheme.accentPrimary,
+                      fontFamily: 'monospace',
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: spacing.xxs),
+                Icon(
+                  Icons.copy,
+                  size: 10,
+                  color: colorScheme.textTertiary,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SvgIconsGrid extends StatelessWidget {
+  const _SvgIconsGrid({required this.icons});
+
+  final List<MapEntry<String, SvgIconData>> icons;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const minCardWidth = 140.0;
+        final gapSize = spacing.sm;
+        final columns = (constraints.maxWidth / minCardWidth).floor().clamp(2, 6);
+        final cardWidth = (constraints.maxWidth - (gapSize * (columns - 1))) / columns;
+
+        return Wrap(
+          spacing: gapSize,
+          runSpacing: gapSize,
+          children: icons.map((entry) {
+            return SizedBox(
+              width: cardWidth,
+              child: _SvgIconCard(name: entry.key, icon: entry.value),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}
+
+class _SvgIconCard extends StatelessWidget {
+  const _SvgIconCard({
+    required this.name,
+    required this.icon,
+  });
+
+  final String name;
+  final SvgIconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return InkWell(
+      onTap: () {
+        Clipboard.setData(ClipboardData(text: 'context.streamIcons.$name'));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Copied: context.streamIcons.$name'),
+            duration: const Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+      borderRadius: BorderRadius.all(radius.lg),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        padding: EdgeInsets.all(spacing.md),
+        decoration: BoxDecoration(
+          color: colorScheme.backgroundSurface,
+          borderRadius: BorderRadius.all(radius.lg),
+          boxShadow: boxShadow.elevation1,
+        ),
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.all(radius.lg),
+          border: Border.all(color: colorScheme.borderSubtle),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: colorScheme.backgroundSurfaceSubtle,
+                borderRadius: BorderRadius.all(radius.md),
+              ),
+              child: Center(child: SvgIcon(icon, size: 24)),
+            ),
+            SizedBox(height: spacing.sm),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -416,6 +556,38 @@ class _QuickReference extends StatelessWidget {
               SizedBox(height: spacing.md),
               Text(
                 'Use themed icons when you want to allow icon customization via StreamTheme.',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textTertiary,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Divider(color: colorScheme.borderSubtle),
+              SizedBox(height: spacing.md),
+              Text(
+                'Colored SVG Icons',
+                style: textTheme.captionEmphasis.copyWith(
+                  color: colorScheme.textPrimary,
+                ),
+              ),
+              SizedBox(height: spacing.sm),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(spacing.sm),
+                decoration: BoxDecoration(
+                  color: colorScheme.backgroundSurfaceSubtle,
+                  borderRadius: BorderRadius.all(radius.md),
+                ),
+                child: Text(
+                  'SvgIcon(context.streamIcons.giphy)',
+                  style: textTheme.captionDefault.copyWith(
+                    color: colorScheme.accentPrimary,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Text(
+                'Use SvgIcon for colored SVG icons that preserve their original colors.',
                 style: textTheme.captionDefault.copyWith(
                   color: colorScheme.textTertiary,
                 ),

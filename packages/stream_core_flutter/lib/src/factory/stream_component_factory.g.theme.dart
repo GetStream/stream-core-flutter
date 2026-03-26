@@ -60,6 +60,7 @@ mixin _$StreamComponentBuilders {
       reactions: t < 0.5 ? a.reactions : b.reactions,
       retryBadge: t < 0.5 ? a.retryBadge : b.retryBadge,
       skeletonLoading: t < 0.5 ? a.skeletonLoading : b.skeletonLoading,
+      imageSourceBadge: t < 0.5 ? a.imageSourceBadge : b.imageSourceBadge,
     );
   }
 
@@ -98,6 +99,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
     Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,
     Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
+    Widget Function(BuildContext, StreamImageSourceBadgeProps)?
+    imageSourceBadge,
   }) {
     final _this = (this as StreamComponentBuilders);
 
@@ -132,6 +135,7 @@ mixin _$StreamComponentBuilders {
       reactions: reactions ?? _this.reactions,
       retryBadge: retryBadge ?? _this.retryBadge,
       skeletonLoading: skeletonLoading ?? _this.skeletonLoading,
+      imageSourceBadge: imageSourceBadge ?? _this.imageSourceBadge,
     );
   }
 
@@ -177,6 +181,7 @@ mixin _$StreamComponentBuilders {
       reactions: other.reactions,
       retryBadge: other.retryBadge,
       skeletonLoading: other.skeletonLoading,
+      imageSourceBadge: other.imageSourceBadge,
     );
   }
 
@@ -222,7 +227,8 @@ mixin _$StreamComponentBuilders {
         _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions &&
         _other.retryBadge == _this.retryBadge &&
-        _other.skeletonLoading == _this.skeletonLoading;
+        _other.skeletonLoading == _this.skeletonLoading &&
+        _other.imageSourceBadge == _this.imageSourceBadge;
   }
 
   @override
@@ -261,6 +267,7 @@ mixin _$StreamComponentBuilders {
       _this.reactions,
       _this.retryBadge,
       _this.skeletonLoading,
+      _this.imageSourceBadge,
     ]);
   }
 }

@@ -30,6 +30,75 @@ mixin _$StreamProgressBarThemeData {
     }
 
     return StreamProgressBarThemeData(
+      style: StreamProgressBarStyle.lerp(a.style, b.style, t),
+    );
+  }
+
+  StreamProgressBarThemeData copyWith({StreamProgressBarStyle? style}) {
+    final _this = (this as StreamProgressBarThemeData);
+
+    return StreamProgressBarThemeData(style: style ?? _this.style);
+  }
+
+  StreamProgressBarThemeData merge(StreamProgressBarThemeData? other) {
+    final _this = (this as StreamProgressBarThemeData);
+
+    if (other == null || identical(_this, other)) {
+      return _this;
+    }
+
+    if (!other.canMerge) {
+      return other;
+    }
+
+    return copyWith(style: _this.style?.merge(other.style) ?? other.style);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final _this = (this as StreamProgressBarThemeData);
+    final _other = (other as StreamProgressBarThemeData);
+
+    return _other.style == _this.style;
+  }
+
+  @override
+  int get hashCode {
+    final _this = (this as StreamProgressBarThemeData);
+
+    return Object.hash(runtimeType, _this.style);
+  }
+}
+
+mixin _$StreamProgressBarStyle {
+  bool get canMerge => true;
+
+  static StreamProgressBarStyle? lerp(
+    StreamProgressBarStyle? a,
+    StreamProgressBarStyle? b,
+    double t,
+  ) {
+    if (identical(a, b)) {
+      return a;
+    }
+
+    if (a == null) {
+      return t == 1.0 ? b : null;
+    }
+
+    if (b == null) {
+      return t == 0.0 ? a : null;
+    }
+
+    return StreamProgressBarStyle(
       trackColor: Color.lerp(a.trackColor, b.trackColor, t),
       fillColor: Color.lerp(a.fillColor, b.fillColor, t),
       minHeight: lerpDouble$(a.minHeight, b.minHeight, t),
@@ -41,15 +110,15 @@ mixin _$StreamProgressBarThemeData {
     );
   }
 
-  StreamProgressBarThemeData copyWith({
+  StreamProgressBarStyle copyWith({
     Color? trackColor,
     Color? fillColor,
     double? minHeight,
     BorderRadiusGeometry? borderRadius,
   }) {
-    final _this = (this as StreamProgressBarThemeData);
+    final _this = (this as StreamProgressBarStyle);
 
-    return StreamProgressBarThemeData(
+    return StreamProgressBarStyle(
       trackColor: trackColor ?? _this.trackColor,
       fillColor: fillColor ?? _this.fillColor,
       minHeight: minHeight ?? _this.minHeight,
@@ -57,8 +126,8 @@ mixin _$StreamProgressBarThemeData {
     );
   }
 
-  StreamProgressBarThemeData merge(StreamProgressBarThemeData? other) {
-    final _this = (this as StreamProgressBarThemeData);
+  StreamProgressBarStyle merge(StreamProgressBarStyle? other) {
+    final _this = (this as StreamProgressBarStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -86,8 +155,8 @@ mixin _$StreamProgressBarThemeData {
       return false;
     }
 
-    final _this = (this as StreamProgressBarThemeData);
-    final _other = (other as StreamProgressBarThemeData);
+    final _this = (this as StreamProgressBarStyle);
+    final _other = (other as StreamProgressBarStyle);
 
     return _other.trackColor == _this.trackColor &&
         _other.fillColor == _this.fillColor &&
@@ -97,7 +166,7 @@ mixin _$StreamProgressBarThemeData {
 
   @override
   int get hashCode {
-    final _this = (this as StreamProgressBarThemeData);
+    final _this = (this as StreamProgressBarStyle);
 
     return Object.hash(
       runtimeType,

@@ -11,7 +11,7 @@ part 'stream_message_bubble_theme.g.theme.dart';
 ///
 /// Defines the appearance of message bubbles including shape, border, padding,
 /// constraints, and background color. All properties use
-/// [StreamMessageStyleProperty] for placement-aware resolution.
+/// [StreamMessageLayoutProperty] for placement-aware resolution.
 /// Use [StreamMessageBubbleStyle.from] for uniform values across all
 /// placements.
 ///
@@ -33,7 +33,7 @@ part 'stream_message_bubble_theme.g.theme.dart';
 ///
 /// ```dart
 /// StreamMessageBubbleStyle(
-///   backgroundColor: StreamMessageStyleProperty.resolveWith((p) {
+///   backgroundColor: StreamMessageLayoutProperty.resolveWith((p) {
 ///     final isEnd = p.alignment == StreamMessageAlignment.end;
 ///     return isEnd ? Colors.blue.shade100 : Colors.grey.shade100;
 ///   }),
@@ -80,32 +80,32 @@ class StreamMessageBubbleStyle with _$StreamMessageBubbleStyle {
     Color? backgroundColor,
   }) {
     return StreamMessageBubbleStyle(
-      shape: shape?.let(StreamMessageStyleProperty.all),
-      side: side?.let(StreamMessageStyleBorderSide.all),
-      padding: padding?.let(StreamMessageStyleProperty.all),
-      constraints: constraints?.let(StreamMessageStyleProperty.all),
-      backgroundColor: backgroundColor?.let(StreamMessageStyleProperty.all),
+      shape: shape?.let(StreamMessageLayoutProperty.all),
+      side: side?.let(StreamMessageLayoutBorderSide.all),
+      padding: padding?.let(StreamMessageLayoutProperty.all),
+      constraints: constraints?.let(StreamMessageLayoutProperty.all),
+      backgroundColor: backgroundColor?.let(StreamMessageLayoutProperty.all),
     );
   }
 
   /// The shape of the bubble.
   ///
   /// Typically varies by stack position and alignment (tail corner side).
-  final StreamMessageStyleProperty<OutlinedBorder?>? shape;
+  final StreamMessageLayoutProperty<OutlinedBorder?>? shape;
 
   /// The border outline of the bubble.
-  final StreamMessageStyleBorderSide? side;
+  final StreamMessageLayoutBorderSide? side;
 
   /// Content padding inside the bubble.
-  final StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding;
+  final StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding;
 
   /// Size constraints for the bubble.
-  final StreamMessageStyleProperty<BoxConstraints?>? constraints;
+  final StreamMessageLayoutProperty<BoxConstraints?>? constraints;
 
   /// The background fill color of the bubble.
   ///
   /// Typically differs between start-aligned and end-aligned messages.
-  final StreamMessageStyleProperty<Color?>? backgroundColor;
+  final StreamMessageLayoutProperty<Color?>? backgroundColor;
 
   /// Linearly interpolate between two [StreamMessageBubbleStyle] objects.
   static StreamMessageBubbleStyle? lerp(

@@ -153,13 +153,13 @@ class DefaultStreamProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.streamProgressBarTheme;
+    final style = context.streamProgressBarTheme.style;
     final defaults = _StreamProgressBarStyleDefaults(context);
 
-    final effectiveTrackColor = props.trackColor ?? theme.trackColor ?? defaults.trackColor;
-    final effectiveFillColor = props.fillColor ?? theme.fillColor ?? defaults.fillColor;
-    final effectiveMinHeight = props.minHeight ?? theme.minHeight ?? defaults.minHeight;
-    final effectiveBorderRadius = props.borderRadius ?? theme.borderRadius ?? defaults.borderRadius;
+    final effectiveTrackColor = props.trackColor ?? style?.trackColor ?? defaults.trackColor;
+    final effectiveFillColor = props.fillColor ?? style?.fillColor ?? defaults.fillColor;
+    final effectiveMinHeight = props.minHeight ?? style?.minHeight ?? defaults.minHeight;
+    final effectiveBorderRadius = props.borderRadius ?? style?.borderRadius ?? defaults.borderRadius;
 
     return LinearProgressIndicator(
       trackGap: 0,
@@ -173,9 +173,9 @@ class DefaultStreamProgressBar extends StatelessWidget {
   }
 }
 
-// Provides default values for [StreamProgressBarThemeData] based on the
+// Provides default values for [StreamProgressBarStyle] based on the
 // current [StreamColorScheme].
-class _StreamProgressBarStyleDefaults extends StreamProgressBarThemeData {
+class _StreamProgressBarStyleDefaults extends StreamProgressBarStyle {
   _StreamProgressBarStyleDefaults(this.context);
 
   final BuildContext context;

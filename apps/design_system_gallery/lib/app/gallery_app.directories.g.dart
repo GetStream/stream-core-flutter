@@ -26,6 +26,8 @@ import 'package:design_system_gallery/components/badge/stream_badge_count.dart'
     as _design_system_gallery_components_badge_stream_badge_count;
 import 'package:design_system_gallery/components/badge/stream_badge_notification.dart'
     as _design_system_gallery_components_badge_stream_badge_notification;
+import 'package:design_system_gallery/components/badge/stream_image_source_badge.dart'
+    as _design_system_gallery_components_badge_stream_image_source_badge;
 import 'package:design_system_gallery/components/badge/stream_online_indicator.dart'
     as _design_system_gallery_components_badge_stream_online_indicator;
 import 'package:design_system_gallery/components/badge/stream_retry_badge.dart'
@@ -58,8 +60,8 @@ import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
     as _design_system_gallery_components_message_stream_message_annotation;
-import 'package:design_system_gallery/components/message/stream_message_attachment_container.dart'
-    as _design_system_gallery_components_message_stream_message_attachment_container;
+import 'package:design_system_gallery/components/message/stream_message_attachment.dart'
+    as _design_system_gallery_components_message_stream_message_attachment;
 import 'package:design_system_gallery/components/message/stream_message_bubble.dart'
     as _design_system_gallery_components_message_stream_message_bubble;
 import 'package:design_system_gallery/components/message/stream_message_content.dart'
@@ -351,6 +353,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_badge_stream_badge_notification
                         .buildStreamBadgeNotificationShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamImageSourceBadge',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_badge_stream_image_source_badge
+                        .buildStreamImageSourceBadgePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_badge_stream_image_source_badge
+                        .buildStreamImageSourceBadgeShowcase,
               ),
             ],
           ),
@@ -647,19 +666,19 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'StreamMessageAttachmentContainer',
+            name: 'StreamMessageAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_message_stream_message_attachment_container
-                        .buildStreamMessageAttachmentContainerPlayground,
+                    _design_system_gallery_components_message_stream_message_attachment
+                        .buildStreamMessageAttachmentPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Showcase',
                 builder:
-                    _design_system_gallery_components_message_stream_message_attachment_container
-                        .buildStreamMessageAttachmentContainerShowcase,
+                    _design_system_gallery_components_message_stream_message_attachment
+                        .buildStreamMessageAttachmentShowcase,
               ),
             ],
           ),

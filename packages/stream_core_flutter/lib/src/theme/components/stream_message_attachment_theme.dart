@@ -9,7 +9,7 @@ part 'stream_message_attachment_theme.g.theme.dart';
 /// Visual styling properties for message attachment containers.
 ///
 /// Defines the appearance of attachment containers including shape, border,
-/// and background color. All properties use [StreamMessageStyleProperty] for
+/// and background color. All properties use [StreamMessageLayoutProperty] for
 /// placement-aware resolution. Use [StreamMessageAttachmentStyle.from] for
 /// uniform values across all placements.
 ///
@@ -32,7 +32,7 @@ part 'stream_message_attachment_theme.g.theme.dart';
 ///
 /// ```dart
 /// StreamMessageAttachmentStyle(
-///   backgroundColor: StreamMessageStyleProperty.resolveWith((p) {
+///   backgroundColor: StreamMessageLayoutProperty.resolveWith((p) {
 ///     final isEnd = p.alignment == StreamMessageAlignment.end;
 ///     return isEnd ? Colors.blue.shade50 : Colors.grey.shade50;
 ///   }),
@@ -51,6 +51,7 @@ class StreamMessageAttachmentStyle with _$StreamMessageAttachmentStyle {
     this.backgroundColor,
     this.shape,
     this.side,
+    this.padding,
   });
 
   /// A convenience constructor that constructs a
@@ -72,26 +73,34 @@ class StreamMessageAttachmentStyle with _$StreamMessageAttachmentStyle {
     Color? backgroundColor,
     OutlinedBorder? shape,
     BorderSide? side,
+    EdgeInsetsGeometry? padding,
   }) {
     return StreamMessageAttachmentStyle(
-      backgroundColor: backgroundColor?.let(StreamMessageStyleProperty.all),
-      shape: shape?.let(StreamMessageStyleProperty.all),
-      side: side?.let(StreamMessageStyleBorderSide.all),
+      backgroundColor: backgroundColor?.let(StreamMessageLayoutProperty.all),
+      shape: shape?.let(StreamMessageLayoutProperty.all),
+      side: side?.let(StreamMessageLayoutBorderSide.all),
+      padding: padding?.let(StreamMessageLayoutProperty.all),
     );
   }
 
   /// The background fill color of the attachment container.
   ///
   /// Typically differs between start-aligned and end-aligned messages.
-  final StreamMessageStyleProperty<Color?>? backgroundColor;
+  final StreamMessageLayoutProperty<Color?>? backgroundColor;
 
   /// The shape of the attachment container.
   ///
   /// Typically varies by alignment or stack position.
-  final StreamMessageStyleProperty<OutlinedBorder?>? shape;
+  final StreamMessageLayoutProperty<OutlinedBorder?>? shape;
 
   /// The border outline of the attachment container.
-  final StreamMessageStyleBorderSide? side;
+  final StreamMessageLayoutBorderSide? side;
+
+  /// Padding around the attachment content.
+  ///
+  /// When non-null, a [Padding] widget is inserted between the attachment
+  /// container decoration and the child content.
+  final StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding;
 
   /// Linearly interpolate between two [StreamMessageAttachmentStyle] objects.
   static StreamMessageAttachmentStyle? lerp(

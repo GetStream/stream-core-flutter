@@ -5,7 +5,7 @@ import 'package:stream_core/stream_core.dart';
 
 import '../../theme.dart';
 import '../accessories/stream_emoji.dart';
-import '../message_placement/stream_message_placement.dart';
+import '../message_layout/stream_message_layout.dart';
 
 /// The default protocol prefix used to identify mention links.
 ///
@@ -178,7 +178,10 @@ class StreamMessageTextProps {
   /// When non-null, takes precedence over the theme-resolved value.
   final EdgeInsetsGeometry? padding;
 
-  /// Style override for text, links, and mentions.
+  /// Optional style overrides for placement-aware styling.
+  ///
+  /// Fields left null fall back to the inherited [StreamMessageItemTheme],
+  /// then to built-in defaults.
   final StreamMessageTextStyle? style;
 
   /// Whether text is selectable.
@@ -242,11 +245,11 @@ class DefaultStreamMessageText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacement.of(context);
-    final textStyleFromTheme = props.style ?? StreamMessageItemTheme.of(context).text;
+    final layout = StreamMessageLayout.of(context);
+    final themeStyle = StreamMessageItemTheme.of(context).text;
     final defaults = _StreamMessageTextDefaults(context);
 
-    final resolve = StreamMessageStyleResolver(placement, [textStyleFromTheme, defaults]);
+    final resolve = StreamMessageLayoutResolver(layout, [props.style, themeStyle, defaults]);
 
     final effectivePadding = props.padding ?? resolve((s) => s?.padding);
     final effectiveTextColor = resolve((s) => s?.textColor);
@@ -256,8 +259,9 @@ class DefaultStreamMessageText extends StatelessWidget {
     final effectiveMentionColor = resolve((s) => s?.mentionColor);
     final effectiveMentionStyle = resolve((s) => s?.mentionStyle).copyWith(color: effectiveMentionColor);
 
+    final contentType = layout.contentKind;
     final emojiCount = StreamMessageText.emojiOnlyCount(props.text);
-    if (emojiCount case final count?) {
+    if (emojiCount case final count? when contentType == .emojiOnly) {
       final emojiStyle = switch (count) {
         1 => resolve((s) => s?.singleEmojiStyle),
         2 => resolve((s) => s?.doubleEmojiStyle),
@@ -388,43 +392,48 @@ class _StreamMessageTextDefaults extends StreamMessageTextStyle {
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
 
   @override
-  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(horizontal: _context.streamSpacing.sm));
+  StreamMessageLayoutProperty<EdgeInsetsGeometry> get padding => .resolveWith(
+    (layout) => switch (layout.contentKind) {
+      .emojiOnly => EdgeInsets.zero,
+      _ => .symmetric(horizontal: _context.streamSpacing.sm),
+    },
+  );
 
   @override
-  StreamMessageStyleProperty<TextStyle> get textStyle => .all(_textTheme.bodyDefault);
+  StreamMessageLayoutProperty<TextStyle> get textStyle => .all(_textTheme.bodyDefault);
 
   @override
-  StreamMessageStyleProperty<Color> get textColor => .resolveWith(
-    (placement) => switch (placement.alignment) {
+  StreamMessageLayoutProperty<Color> get textColor => .resolveWith(
+    (layout) => switch (layout.alignment) {
       .start => _colorScheme.textPrimary,
       .end => _colorScheme.brand.shade900,
     },
   );
 
   @override
-  StreamMessageStyleProperty<TextStyle> get linkStyle => .all(_textTheme.bodyLink);
+  StreamMessageLayoutProperty<TextStyle> get linkStyle => .all(_textTheme.bodyLink);
 
   @override
-  StreamMessageStyleProperty<Color> get linkColor => .all(_colorScheme.textLink);
+  StreamMessageLayoutProperty<Color> get linkColor => .all(_colorScheme.textLink);
 
   @override
-  StreamMessageStyleProperty<TextStyle> get mentionStyle => .all(_textTheme.bodyLink);
+  StreamMessageLayoutProperty<TextStyle> get mentionStyle => .all(_textTheme.bodyLink);
 
   @override
-  StreamMessageStyleProperty<Color> get mentionColor => .all(_colorScheme.textLink);
+  StreamMessageLayoutProperty<Color> get mentionColor => .all(_colorScheme.textLink);
 
   @override
-  StreamMessageStyleProperty<TextStyle> get singleEmojiStyle {
+  StreamMessageLayoutProperty<TextStyle> get singleEmojiStyle {
     return .all(.new(fontSize: StreamEmojiSize.xxl.value, height: 1));
   }
 
   @override
-  StreamMessageStyleProperty<TextStyle> get doubleEmojiStyle {
+  StreamMessageLayoutProperty<TextStyle> get doubleEmojiStyle {
     return .all(.new(fontSize: StreamEmojiSize.xl.value, height: 1));
   }
 
   @override
-  StreamMessageStyleProperty<TextStyle> get tripleEmojiStyle {
+  StreamMessageLayoutProperty<TextStyle> get tripleEmojiStyle {
     return .all(.new(fontSize: StreamEmojiSize.lg.value, height: 1));
   }
 }

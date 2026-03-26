@@ -77,14 +77,15 @@ Widget buildStreamFlexPlayground(BuildContext context) {
   final variedSizes = context.knobs.boolean(
     label: 'Varied sizes',
     initialValue: true,
-    description: 'Give children different cross-axis sizes to '
+    description:
+        'Give children different cross-axis sizes to '
         'demonstrate alignment behavior.',
   );
 
   final collapseOdd = context.knobs.boolean(
     label: 'Collapse odd children',
-    initialValue: false,
-    description: 'Odd-indexed children return null via NullableBuilder — '
+    description:
+        'Odd-indexed children return null via NullableBuilder — '
         'StreamFlex skips their spacing slots entirely.',
   );
 
@@ -486,12 +487,12 @@ class _ComparisonDemo extends StatelessWidget {
     final radius = context.streamRadius;
 
     Widget label(String text) => Text(
-          text,
-          style: textTheme.metadataEmphasis.copyWith(
-            color: colorScheme.accentPrimary,
-            fontFamily: 'monospace',
-          ),
-        );
+      text,
+      style: textTheme.metadataEmphasis.copyWith(
+        color: colorScheme.accentPrimary,
+        fontFamily: 'monospace',
+      ),
+    );
 
     Widget chip(int index) => _DemoChip(index: index);
 
@@ -758,7 +759,7 @@ class _CombinedDemoState extends State<_CombinedDemo> {
                     NullableBuilder(
                       builder: (_) {
                         if (!_visible[i]) return null;
-                        return Container(
+                        return DecoratedBox(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -1032,7 +1033,7 @@ class _ReadReceiptsDemo extends StatelessWidget {
                     builder: (_) {
                       if (!online) return null;
                       final idx = _readers.indexWhere((r) => r.$1 == initial);
-                      return Container(
+                      return DecoratedBox(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -1086,7 +1087,6 @@ class _ProgressStepsDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
-    final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
     const completedCount = 2;
@@ -1103,9 +1103,7 @@ class _ProgressStepsDemo extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: i <= completedCount
-                      ? colorScheme.accentPrimary
-                      : colorScheme.backgroundSurfaceStrong,
+                  color: i <= completedCount ? colorScheme.accentPrimary : colorScheme.backgroundSurfaceStrong,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: colorScheme.backgroundSurfaceSubtle,
@@ -1122,9 +1120,7 @@ class _ProgressStepsDemo extends StatelessWidget {
                     : Text(
                         '${i + 1}',
                         style: textTheme.metadataEmphasis.copyWith(
-                          color: i == completedCount
-                              ? colorScheme.textOnAccent
-                              : colorScheme.textTertiary,
+                          color: i == completedCount ? colorScheme.textOnAccent : colorScheme.textTertiary,
                           fontSize: 11,
                         ),
                       ),
@@ -1133,9 +1129,7 @@ class _ProgressStepsDemo extends StatelessWidget {
                 Container(
                   width: 40,
                   height: 2,
-                  color: i < completedCount
-                      ? colorScheme.accentPrimary
-                      : colorScheme.borderSubtle,
+                  color: i < completedCount ? colorScheme.accentPrimary : colorScheme.borderSubtle,
                 ),
             ],
           ],
@@ -1150,9 +1144,7 @@ class _ProgressStepsDemo extends StatelessWidget {
                   _steps[i],
                   textAlign: TextAlign.center,
                   style: textTheme.metadataDefault.copyWith(
-                    color: i <= completedCount
-                        ? colorScheme.accentPrimary
-                        : colorScheme.textTertiary,
+                    color: i <= completedCount ? colorScheme.accentPrimary : colorScheme.textTertiary,
                     fontSize: 9,
                   ),
                 ),

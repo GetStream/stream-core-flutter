@@ -160,6 +160,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
+    StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
@@ -194,6 +195,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       reactions: reactions,
       retryBadge: retryBadge,
       skeletonLoading: skeletonLoading,
+      imageSourceBadge: imageSourceBadge,
       extensions: _extensionIterableToMap(extensions),
     );
   }
@@ -229,6 +231,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.reactions,
     required this.retryBadge,
     required this.skeletonLoading,
+    required this.imageSourceBadge,
     required this.extensions,
   });
 
@@ -396,6 +399,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamSkeletonLoading] uses [DefaultStreamSkeletonLoading].
   final StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading;
+
+  /// Custom builder for source badge widgets.
+  ///
+  /// When null, [StreamImageSourceBadge] uses [DefaultStreamImageSourceBadge].
+  final StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge;
 
   // Convert the [extensionsIterable] passed to [StreamComponentBuilders.new]
   // to the stored [extensions] map, where each entry's key consists of the extension's type.

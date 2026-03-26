@@ -30,49 +30,49 @@ mixin _$StreamMessageAnnotationStyle {
     }
 
     return StreamMessageAnnotationStyle(
-      textStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      textStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.textStyle,
         b.textStyle,
         t,
         TextStyle.lerp,
       ),
-      textColor: StreamMessageStyleProperty.lerp<Color?>(
+      textColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.textColor,
         b.textColor,
         t,
         Color.lerp,
       ),
-      spanTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      spanTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.spanTextStyle,
         b.spanTextStyle,
         t,
         TextStyle.lerp,
       ),
-      spanTextColor: StreamMessageStyleProperty.lerp<Color?>(
+      spanTextColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.spanTextColor,
         b.spanTextColor,
         t,
         Color.lerp,
       ),
-      iconColor: StreamMessageStyleProperty.lerp<Color?>(
+      iconColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.iconColor,
         b.iconColor,
         t,
         Color.lerp,
       ),
-      iconSize: StreamMessageStyleProperty.lerp<double?>(
+      iconSize: StreamMessageLayoutProperty.lerp<double?>(
         a.iconSize,
         b.iconSize,
         t,
         lerpDouble$,
       ),
-      spacing: StreamMessageStyleProperty.lerp<double?>(
+      spacing: StreamMessageLayoutProperty.lerp<double?>(
         a.spacing,
         b.spacing,
         t,
         lerpDouble$,
       ),
-      padding: StreamMessageStyleProperty.lerp<EdgeInsetsGeometry?>(
+      padding: StreamMessageLayoutProperty.lerp<EdgeInsetsGeometry?>(
         a.padding,
         b.padding,
         t,
@@ -82,14 +82,14 @@ mixin _$StreamMessageAnnotationStyle {
   }
 
   StreamMessageAnnotationStyle copyWith({
-    StreamMessageStyleProperty<TextStyle?>? textStyle,
-    StreamMessageStyleProperty<Color?>? textColor,
-    StreamMessageStyleProperty<TextStyle?>? spanTextStyle,
-    StreamMessageStyleProperty<Color?>? spanTextColor,
-    StreamMessageStyleProperty<Color?>? iconColor,
-    StreamMessageStyleProperty<double?>? iconSize,
-    StreamMessageStyleProperty<double?>? spacing,
-    StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding,
+    StreamMessageLayoutProperty<TextStyle?>? textStyle,
+    StreamMessageLayoutProperty<Color?>? textColor,
+    StreamMessageLayoutProperty<TextStyle?>? spanTextStyle,
+    StreamMessageLayoutProperty<Color?>? spanTextColor,
+    StreamMessageLayoutProperty<Color?>? iconColor,
+    StreamMessageLayoutProperty<double?>? iconSize,
+    StreamMessageLayoutProperty<double?>? spacing,
+    StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding,
   }) {
     final _this = (this as StreamMessageAnnotationStyle);
 

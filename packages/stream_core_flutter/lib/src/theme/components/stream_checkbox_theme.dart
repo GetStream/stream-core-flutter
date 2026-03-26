@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
+import '../widget_state_utils.dart';
 
 part 'stream_checkbox_theme.g.theme.dart';
 
@@ -135,12 +136,8 @@ class StreamCheckboxThemeData with _$StreamCheckboxThemeData {
 /// Visual styling properties for checkboxes.
 ///
 /// Defines the appearance of checkboxes including size, colors, border, and
-/// shape. All color properties support state-based styling via
-/// [WidgetStateProperty] for interactive feedback (default, hover, pressed,
-/// disabled, selected).
-///
-/// This follows the same pattern as Flutter's [CheckboxThemeData] where
-/// `fillColor`, `checkColor`, and `overlayColor` are state-dependent.
+/// shape. Color and border properties are [WidgetStateProperty]-based for
+/// state-dependent styling (default, hover, pressed, disabled, selected).
 ///
 /// See also:
 ///
@@ -150,6 +147,10 @@ class StreamCheckboxThemeData with _$StreamCheckboxThemeData {
 @immutable
 class StreamCheckboxStyle with _$StreamCheckboxStyle {
   /// Creates checkbox style properties.
+  ///
+  /// Color and border properties are [WidgetStateProperty]-based for full
+  /// state-level control. For a simpler API that accepts plain values and
+  /// builds state properties internally, use [StreamCheckboxStyle.from].
   const StreamCheckboxStyle({
     this.size,
     this.checkSize,
@@ -159,6 +160,58 @@ class StreamCheckboxStyle with _$StreamCheckboxStyle {
     this.shape,
     WidgetStateProperty<BorderSide?>? side,
   }) : side = side as WidgetStateBorderSide?;
+
+  /// Creates a [StreamCheckboxStyle] from simple values.
+  ///
+  /// Wraps plain colors and border sides into [WidgetStateProperty] values.
+  ///
+  /// State-specific parameters (prefixed with `selected` or `disabled`) take
+  /// precedence for their respective states; unprefixed parameters are used
+  /// as the default for all other states.
+  ///
+  /// {@tool snippet}
+  ///
+  /// Create a style with accent fill when selected and a border when not:
+  ///
+  /// ```dart
+  /// StreamCheckboxStyle.from(
+  ///   fillColor: Colors.transparent,
+  ///   selectedFillColor: Colors.blue,
+  ///   checkColor: Colors.white,
+  ///   hoveredOverlayColor: Colors.blue.withOpacity(0.08),
+  ///   pressedOverlayColor: Colors.blue.withOpacity(0.1),
+  ///   side: BorderSide(color: Colors.grey),
+  ///   selectedSide: BorderSide.none,
+  /// )
+  /// ```
+  /// {@end-tool}
+  factory StreamCheckboxStyle.from({
+    StreamCheckboxSize? size,
+    double? checkSize,
+    Color? fillColor,
+    Color? selectedFillColor,
+    Color? disabledFillColor,
+    Color? checkColor,
+    Color? selectedCheckColor,
+    Color? disabledCheckColor,
+    Color? overlayColor,
+    Color? hoveredOverlayColor,
+    Color? pressedOverlayColor,
+    OutlinedBorder? shape,
+    BorderSide? side,
+    BorderSide? selectedSide,
+    BorderSide? disabledSide,
+  }) {
+    return StreamCheckboxStyle(
+      size: size,
+      checkSize: checkSize,
+      fillColor: WidgetStateUtils.resolveWith(fillColor, selectedFillColor, disabledFillColor),
+      checkColor: WidgetStateUtils.resolveWith(checkColor, selectedCheckColor, disabledCheckColor),
+      overlayColor: WidgetStateUtils.resolveOverlay(overlayColor, hoveredOverlayColor, pressedOverlayColor),
+      shape: shape,
+      side: WidgetStateUtils.resolveSide(side, selectedSide, disabledSide),
+    );
+  }
 
   /// The size of checkboxes.
   ///
