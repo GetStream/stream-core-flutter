@@ -44,6 +44,7 @@ mixin _$StreamColorScheme {
       textInverse: Color.lerp(a.textInverse, b.textInverse, t)!,
       textLink: Color.lerp(a.textLink, b.textLink, t)!,
       textOnAccent: Color.lerp(a.textOnAccent, b.textOnAccent, t)!,
+      textOnInverse: Color.lerp(a.textOnInverse, b.textOnInverse, t)!,
       backgroundApp: Color.lerp(a.backgroundApp, b.backgroundApp, t)!,
       backgroundSurface: Color.lerp(
         a.backgroundSurface,
@@ -126,6 +127,7 @@ mixin _$StreamColorScheme {
       borderStrong: Color.lerp(a.borderStrong, b.borderStrong, t)!,
       borderInverse: Color.lerp(a.borderInverse, b.borderInverse, t)!,
       borderOnAccent: Color.lerp(a.borderOnAccent, b.borderOnAccent, t)!,
+      borderOnInverse: Color.lerp(a.borderOnInverse, b.borderOnInverse, t)!,
       borderOnSurface: Color.lerp(a.borderOnSurface, b.borderOnSurface, t)!,
       borderOpacitySubtle: Color.lerp(
         a.borderOpacitySubtle,
@@ -172,6 +174,7 @@ mixin _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
+    Color? textOnInverse,
     Color? backgroundApp,
     Color? backgroundSurface,
     Color? backgroundSurfaceSubtle,
@@ -194,6 +197,7 @@ mixin _$StreamColorScheme {
     Color? borderStrong,
     Color? borderInverse,
     Color? borderOnAccent,
+    Color? borderOnInverse,
     Color? borderOnSurface,
     Color? borderOpacitySubtle,
     Color? borderOpacityStrong,
@@ -232,6 +236,7 @@ mixin _$StreamColorScheme {
       textInverse: textInverse ?? _this.textInverse,
       textLink: textLink ?? _this.textLink,
       textOnAccent: textOnAccent ?? _this.textOnAccent,
+      textOnInverse: textOnInverse ?? _this.textOnInverse,
       backgroundApp: backgroundApp ?? _this.backgroundApp,
       backgroundSurface: backgroundSurface ?? _this.backgroundSurface,
       backgroundSurfaceSubtle:
@@ -259,6 +264,7 @@ mixin _$StreamColorScheme {
       borderStrong: borderStrong ?? _this.borderStrong,
       borderInverse: borderInverse ?? _this.borderInverse,
       borderOnAccent: borderOnAccent ?? _this.borderOnAccent,
+      borderOnInverse: borderOnInverse ?? _this.borderOnInverse,
       borderOnSurface: borderOnSurface ?? _this.borderOnSurface,
       borderOpacitySubtle: borderOpacitySubtle ?? _this.borderOpacitySubtle,
       borderOpacityStrong: borderOpacityStrong ?? _this.borderOpacityStrong,
@@ -308,6 +314,7 @@ mixin _$StreamColorScheme {
       textInverse: other.textInverse,
       textLink: other.textLink,
       textOnAccent: other.textOnAccent,
+      textOnInverse: other.textOnInverse,
       backgroundApp: other.backgroundApp,
       backgroundSurface: other.backgroundSurface,
       backgroundSurfaceSubtle: other.backgroundSurfaceSubtle,
@@ -330,6 +337,7 @@ mixin _$StreamColorScheme {
       borderStrong: other.borderStrong,
       borderInverse: other.borderInverse,
       borderOnAccent: other.borderOnAccent,
+      borderOnInverse: other.borderOnInverse,
       borderOnSurface: other.borderOnSurface,
       borderOpacitySubtle: other.borderOpacitySubtle,
       borderOpacityStrong: other.borderOpacityStrong,
@@ -380,6 +388,7 @@ mixin _$StreamColorScheme {
         _other.textInverse == _this.textInverse &&
         _other.textLink == _this.textLink &&
         _other.textOnAccent == _this.textOnAccent &&
+        _other.textOnInverse == _this.textOnInverse &&
         _other.backgroundApp == _this.backgroundApp &&
         _other.backgroundSurface == _this.backgroundSurface &&
         _other.backgroundSurfaceSubtle == _this.backgroundSurfaceSubtle &&
@@ -402,6 +411,7 @@ mixin _$StreamColorScheme {
         _other.borderStrong == _this.borderStrong &&
         _other.borderInverse == _this.borderInverse &&
         _other.borderOnAccent == _this.borderOnAccent &&
+        _other.borderOnInverse == _this.borderOnInverse &&
         _other.borderOnSurface == _this.borderOnSurface &&
         _other.borderOpacitySubtle == _this.borderOpacitySubtle &&
         _other.borderOpacityStrong == _this.borderOpacityStrong &&
@@ -444,6 +454,7 @@ mixin _$StreamColorScheme {
       _this.textInverse,
       _this.textLink,
       _this.textOnAccent,
+      _this.textOnInverse,
       _this.backgroundApp,
       _this.backgroundSurface,
       _this.backgroundSurfaceSubtle,
@@ -466,6 +477,7 @@ mixin _$StreamColorScheme {
       _this.borderStrong,
       _this.borderInverse,
       _this.borderOnAccent,
+      _this.borderOnInverse,
       _this.borderOnSurface,
       _this.borderOpacitySubtle,
       _this.borderOpacityStrong,
