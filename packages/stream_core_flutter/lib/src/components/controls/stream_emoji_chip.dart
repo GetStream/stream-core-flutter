@@ -215,13 +215,27 @@ class DefaultStreamEmojiChip extends StatelessWidget {
       onLongPress: props.onLongPress,
       isSelected: props.isSelected,
       child: Row(
-        mainAxisSize: .min,
-        textBaseline: .alphabetic,
-        crossAxisAlignment: .baseline,
         spacing: context.streamSpacing.xxs,
+        mainAxisSize: .min,
+        mainAxisAlignment: .center,
         children: [
-          for (final emoji in props.emojis) StreamEmoji(emoji: emoji),
-          if (props.count case final count?) Text('$count'),
+          Row(
+            mainAxisSize: .min,
+            textBaseline: .ideographic,
+            crossAxisAlignment: .baseline,
+            spacing: context.streamSpacing.xxs,
+            children: [
+              for (final emoji in props.emojis) StreamEmoji(emoji: emoji),
+            ],
+          ),
+          if (props.count case final count?)
+            DefaultTextStyle.merge(
+              style: const TextStyle(
+                height: 1,
+                leadingDistribution: TextLeadingDistribution.even,
+              ),
+              child: Text('$count'),
+            ),
         ],
       ),
     );
