@@ -44,6 +44,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
     Color? backgroundColor,
     Color? surfaceTintColor,
     ShapeBorder? shape,
+    double? preferredHeight,
   }) : props = StreamAppBarProps(
          leading: leading,
          leadingWidth: leadingWidth,
@@ -61,6 +62,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
          backgroundColor: backgroundColor,
          surfaceTintColor: surfaceTintColor,
          shape: shape,
+         preferredHeight: preferredHeight,
        );
 
   /// The props controlling the appearance and behavior of this app bar.
@@ -69,7 +71,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize {
     final bottomHeight = props.bottom?.preferredSize.height ?? 0;
-    return Size.fromHeight(kToolbarHeight + bottomHeight);
+    return Size.fromHeight((props.preferredHeight ?? kToolbarHeight) + bottomHeight);
   }
 
   @override
@@ -108,6 +110,7 @@ class StreamAppBarProps {
     this.backgroundColor,
     this.surfaceTintColor,
     this.shape,
+    this.preferredHeight,
   });
 
   /// A widget to display before the toolbar's [title].
@@ -166,6 +169,11 @@ class StreamAppBarProps {
   /// Defaults to a [LinearBorder] with a bottom edge using
   /// `borderSubtle` color from the Stream color scheme.
   final ShapeBorder? shape;
+
+  /// Override the default toolbar height ([kToolbarHeight]).
+  ///
+  /// When null, defaults to [kToolbarHeight].
+  final double? preferredHeight;
 }
 
 /// Default implementation of [StreamAppBar].
