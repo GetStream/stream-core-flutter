@@ -63,12 +63,15 @@ class StreamIcons with _$StreamIcons {
     this.archive1 = StreamIconData.iconArchive1,
     this.arrowBoxLeft = StreamIconData.iconArrowBoxLeft,
     this.arrowDown = StreamIconData.iconArrowDown,
+    this.arrowDownCircle = StreamIconData.iconArrowDownCircle,
     this.arrowLeft = StreamIconData.iconArrowLeft,
     this.arrowRight = StreamIconData.iconArrowRight,
     this.arrowRotateClockwise = StreamIconData.iconArrowRotateClockwise,
     this.arrowRotateRightLeftRepeatRefresh = StreamIconData.iconArrowRotateRightLeftRepeatRefresh,
     this.arrowShareLeft = StreamIconData.iconArrowShareLeft,
+    this.arrowShareRight = StreamIconData.iconArrowShareRight,
     this.arrowUp = StreamIconData.iconArrowUp,
+    this.arrowUpRight = StreamIconData.iconArrowUpRight,
     this.arrowsRepeatLeftRight = StreamIconData.iconArrowsRepeatLeftRight,
     this.at = StreamIconData.iconAt,
     this.atSolid = StreamIconData.iconAtSolid,
@@ -84,6 +87,7 @@ class StreamIcons with _$StreamIcons {
     this.bubbleText6Solid = StreamIconData.iconBubbleText6Solid,
     this.bubbleWideNotificationChatMessage = StreamIconData.iconBubbleWideNotificationChatMessage,
     this.bubbleWideSparkleChatMessage = StreamIconData.iconBubbleWideSparkleChatMessage,
+    this.bubbles = StreamIconData.iconBubbles,
     this.calendar1 = StreamIconData.iconCalendar1,
     this.callCancel = StreamIconData.iconCallCancel,
     this.camera1 = StreamIconData.iconCamera1,
@@ -109,10 +113,12 @@ class StreamIcons with _$StreamIcons {
     this.clock = StreamIconData.iconClock,
     this.clockSolid = StreamIconData.iconClockSolid,
     this.closeQuote2 = StreamIconData.iconCloseQuote2,
+    this.cloudSimpleUpload = StreamIconData.iconCloudSimpleUpload,
     this.code = StreamIconData.iconCode,
     this.codeBrackets = StreamIconData.iconCodeBrackets,
     this.codeEditorInsert = StreamIconData.iconCodeEditorInsert,
     this.compass = StreamIconData.iconCompass,
+    this.components = StreamIconData.iconComponents,
     this.creditCard2Billing = StreamIconData.iconCreditCard2Billing,
     this.crossMedium = StreamIconData.iconCrossMedium,
     this.crossSmall = StreamIconData.iconCrossSmall,
@@ -135,6 +141,7 @@ class StreamIcons with _$StreamIcons {
     this.filledCircleInfoTooltip = StreamIconData.iconFilledCircleInfoTooltip,
     this.filter1 = StreamIconData.iconFilter1,
     this.flag2 = StreamIconData.iconFlag2,
+    this.folder1 = StreamIconData.iconFolder1,
     this.gauge = StreamIconData.iconGauge,
     this.google = StreamIconData.iconGoogle,
     this.hashtagChannel = StreamIconData.iconHashtagChannel,
@@ -145,6 +152,7 @@ class StreamIcons with _$StreamIcons {
     this.layersBehind = StreamIconData.iconLayersBehind,
     this.layoutAlignLeft = StreamIconData.iconLayoutAlignLeft,
     this.layoutGrid1 = StreamIconData.iconLayoutGrid1,
+    this.layoutGrid2 = StreamIconData.iconLayoutGrid2,
     this.layoutLeft = StreamIconData.iconLayoutLeft,
     this.lightBulbSimple = StreamIconData.iconLightBulbSimple,
     this.limits = StreamIconData.iconLimits,
@@ -195,6 +203,7 @@ class StreamIcons with _$StreamIcons {
     this.tennis = StreamIconData.iconTennis,
     this.textToImageURLEnrichment = StreamIconData.iconTextToImageURLEnrichment,
     this.thunder = StreamIconData.iconThunder,
+    this.translate = StreamIconData.iconTranslate,
     this.trashBin = StreamIconData.iconTrashBin,
     this.trending4 = StreamIconData.iconTrending4,
     this.trophy = StreamIconData.iconTrophy,
@@ -226,6 +235,9 @@ class StreamIcons with _$StreamIcons {
   /// The arrow down icon.
   final IconData arrowDown;
 
+  /// The arrow down circle icon.
+  final IconData arrowDownCircle;
+
   /// The arrow left icon.
   final IconData arrowLeft;
 
@@ -241,8 +253,14 @@ class StreamIcons with _$StreamIcons {
   /// The arrow share left icon.
   final IconData arrowShareLeft;
 
+  /// The arrow share right icon.
+  final IconData arrowShareRight;
+
   /// The arrow up icon.
   final IconData arrowUp;
+
+  /// The arrow up right icon.
+  final IconData arrowUpRight;
 
   /// The arrows repeat left right icon.
   final IconData arrowsRepeatLeftRight;
@@ -288,6 +306,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The bubble wide sparkle chat message icon.
   final IconData bubbleWideSparkleChatMessage;
+
+  /// The bubbles icon.
+  final IconData bubbles;
 
   /// The calendar1 icon.
   final IconData calendar1;
@@ -364,6 +385,9 @@ class StreamIcons with _$StreamIcons {
   /// The close quote2 icon.
   final IconData closeQuote2;
 
+  /// The cloud simple upload icon.
+  final IconData cloudSimpleUpload;
+
   /// The code icon.
   final IconData code;
 
@@ -375,6 +399,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The compass icon.
   final IconData compass;
+
+  /// The components icon.
+  final IconData components;
 
   /// The credit card2 billing icon.
   final IconData creditCard2Billing;
@@ -442,6 +469,9 @@ class StreamIcons with _$StreamIcons {
   /// The flag2 icon.
   final IconData flag2;
 
+  /// The folder1 icon.
+  final IconData folder1;
+
   /// The gauge icon.
   final IconData gauge;
 
@@ -471,6 +501,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The layout grid1 icon.
   final IconData layoutGrid1;
+
+  /// The layout grid2 icon.
+  final IconData layoutGrid2;
 
   /// The layout left icon.
   final IconData layoutLeft;
@@ -622,6 +655,9 @@ class StreamIcons with _$StreamIcons {
   /// The thunder icon.
   final IconData thunder;
 
+  /// The translate icon.
+  final IconData translate;
+
   /// The trash bin icon.
   final IconData trashBin;
 
@@ -681,12 +717,15 @@ class StreamIcons with _$StreamIcons {
     'archive1': archive1,
     'arrowBoxLeft': arrowBoxLeft,
     'arrowDown': arrowDown,
+    'arrowDownCircle': arrowDownCircle,
     'arrowLeft': arrowLeft,
     'arrowRight': arrowRight,
     'arrowRotateClockwise': arrowRotateClockwise,
     'arrowRotateRightLeftRepeatRefresh': arrowRotateRightLeftRepeatRefresh,
     'arrowShareLeft': arrowShareLeft,
+    'arrowShareRight': arrowShareRight,
     'arrowUp': arrowUp,
+    'arrowUpRight': arrowUpRight,
     'arrowsRepeatLeftRight': arrowsRepeatLeftRight,
     'at': at,
     'atSolid': atSolid,
@@ -702,6 +741,7 @@ class StreamIcons with _$StreamIcons {
     'bubbleText6Solid': bubbleText6Solid,
     'bubbleWideNotificationChatMessage': bubbleWideNotificationChatMessage,
     'bubbleWideSparkleChatMessage': bubbleWideSparkleChatMessage,
+    'bubbles': bubbles,
     'calendar1': calendar1,
     'callCancel': callCancel,
     'camera1': camera1,
@@ -727,10 +767,12 @@ class StreamIcons with _$StreamIcons {
     'clock': clock,
     'clockSolid': clockSolid,
     'closeQuote2': closeQuote2,
+    'cloudSimpleUpload': cloudSimpleUpload,
     'code': code,
     'codeBrackets': codeBrackets,
     'codeEditorInsert': codeEditorInsert,
     'compass': compass,
+    'components': components,
     'creditCard2Billing': creditCard2Billing,
     'crossMedium': crossMedium,
     'crossSmall': crossSmall,
@@ -753,6 +795,7 @@ class StreamIcons with _$StreamIcons {
     'filledCircleInfoTooltip': filledCircleInfoTooltip,
     'filter1': filter1,
     'flag2': flag2,
+    'folder1': folder1,
     'gauge': gauge,
     'google': google,
     'hashtagChannel': hashtagChannel,
@@ -763,6 +806,7 @@ class StreamIcons with _$StreamIcons {
     'layersBehind': layersBehind,
     'layoutAlignLeft': layoutAlignLeft,
     'layoutGrid1': layoutGrid1,
+    'layoutGrid2': layoutGrid2,
     'layoutLeft': layoutLeft,
     'lightBulbSimple': lightBulbSimple,
     'limits': limits,
@@ -813,6 +857,7 @@ class StreamIcons with _$StreamIcons {
     'tennis': tennis,
     'textToImageURLEnrichment': textToImageURLEnrichment,
     'thunder': thunder,
+    'translate': translate,
     'trashBin': trashBin,
     'trending4': trending4,
     'trophy': trophy,

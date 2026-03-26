@@ -3,6 +3,9 @@
 /// Generates an icon font and Dart classes from SVG files using configuration
 /// from a YAML config file.
 ///
+/// Source SVGs come from the design-system-tokens repository:
+/// https://github.com/GetStream/design-system-tokens/tree/main/assets/icons
+///
 /// Usage:
 ///   dart run scripts/generate_icons.dart
 ///

@@ -31,6 +31,7 @@ mixin _$StreamIcons {
       archive1: t < 0.5 ? a.archive1 : b.archive1,
       arrowBoxLeft: t < 0.5 ? a.arrowBoxLeft : b.arrowBoxLeft,
       arrowDown: t < 0.5 ? a.arrowDown : b.arrowDown,
+      arrowDownCircle: t < 0.5 ? a.arrowDownCircle : b.arrowDownCircle,
       arrowLeft: t < 0.5 ? a.arrowLeft : b.arrowLeft,
       arrowRight: t < 0.5 ? a.arrowRight : b.arrowRight,
       arrowRotateClockwise: t < 0.5
@@ -40,7 +41,9 @@ mixin _$StreamIcons {
           ? a.arrowRotateRightLeftRepeatRefresh
           : b.arrowRotateRightLeftRepeatRefresh,
       arrowShareLeft: t < 0.5 ? a.arrowShareLeft : b.arrowShareLeft,
+      arrowShareRight: t < 0.5 ? a.arrowShareRight : b.arrowShareRight,
       arrowUp: t < 0.5 ? a.arrowUp : b.arrowUp,
+      arrowUpRight: t < 0.5 ? a.arrowUpRight : b.arrowUpRight,
       arrowsRepeatLeftRight: t < 0.5
           ? a.arrowsRepeatLeftRight
           : b.arrowsRepeatLeftRight,
@@ -66,6 +69,7 @@ mixin _$StreamIcons {
       bubbleWideSparkleChatMessage: t < 0.5
           ? a.bubbleWideSparkleChatMessage
           : b.bubbleWideSparkleChatMessage,
+      bubbles: t < 0.5 ? a.bubbles : b.bubbles,
       calendar1: t < 0.5 ? a.calendar1 : b.calendar1,
       callCancel: t < 0.5 ? a.callCancel : b.callCancel,
       camera1: t < 0.5 ? a.camera1 : b.camera1,
@@ -95,10 +99,12 @@ mixin _$StreamIcons {
       clock: t < 0.5 ? a.clock : b.clock,
       clockSolid: t < 0.5 ? a.clockSolid : b.clockSolid,
       closeQuote2: t < 0.5 ? a.closeQuote2 : b.closeQuote2,
+      cloudSimpleUpload: t < 0.5 ? a.cloudSimpleUpload : b.cloudSimpleUpload,
       code: t < 0.5 ? a.code : b.code,
       codeBrackets: t < 0.5 ? a.codeBrackets : b.codeBrackets,
       codeEditorInsert: t < 0.5 ? a.codeEditorInsert : b.codeEditorInsert,
       compass: t < 0.5 ? a.compass : b.compass,
+      components: t < 0.5 ? a.components : b.components,
       creditCard2Billing: t < 0.5 ? a.creditCard2Billing : b.creditCard2Billing,
       crossMedium: t < 0.5 ? a.crossMedium : b.crossMedium,
       crossSmall: t < 0.5 ? a.crossSmall : b.crossSmall,
@@ -133,6 +139,7 @@ mixin _$StreamIcons {
           : b.filledCircleInfoTooltip,
       filter1: t < 0.5 ? a.filter1 : b.filter1,
       flag2: t < 0.5 ? a.flag2 : b.flag2,
+      folder1: t < 0.5 ? a.folder1 : b.folder1,
       gauge: t < 0.5 ? a.gauge : b.gauge,
       google: t < 0.5 ? a.google : b.google,
       hashtagChannel: t < 0.5 ? a.hashtagChannel : b.hashtagChannel,
@@ -143,6 +150,7 @@ mixin _$StreamIcons {
       layersBehind: t < 0.5 ? a.layersBehind : b.layersBehind,
       layoutAlignLeft: t < 0.5 ? a.layoutAlignLeft : b.layoutAlignLeft,
       layoutGrid1: t < 0.5 ? a.layoutGrid1 : b.layoutGrid1,
+      layoutGrid2: t < 0.5 ? a.layoutGrid2 : b.layoutGrid2,
       layoutLeft: t < 0.5 ? a.layoutLeft : b.layoutLeft,
       lightBulbSimple: t < 0.5 ? a.lightBulbSimple : b.lightBulbSimple,
       limits: t < 0.5 ? a.limits : b.limits,
@@ -207,6 +215,7 @@ mixin _$StreamIcons {
           ? a.textToImageURLEnrichment
           : b.textToImageURLEnrichment,
       thunder: t < 0.5 ? a.thunder : b.thunder,
+      translate: t < 0.5 ? a.translate : b.translate,
       trashBin: t < 0.5 ? a.trashBin : b.trashBin,
       trending4: t < 0.5 ? a.trending4 : b.trending4,
       trophy: t < 0.5 ? a.trophy : b.trophy,
@@ -230,12 +239,15 @@ mixin _$StreamIcons {
     IconData? archive1,
     IconData? arrowBoxLeft,
     IconData? arrowDown,
+    IconData? arrowDownCircle,
     IconData? arrowLeft,
     IconData? arrowRight,
     IconData? arrowRotateClockwise,
     IconData? arrowRotateRightLeftRepeatRefresh,
     IconData? arrowShareLeft,
+    IconData? arrowShareRight,
     IconData? arrowUp,
+    IconData? arrowUpRight,
     IconData? arrowsRepeatLeftRight,
     IconData? at,
     IconData? atSolid,
@@ -251,6 +263,7 @@ mixin _$StreamIcons {
     IconData? bubbleText6Solid,
     IconData? bubbleWideNotificationChatMessage,
     IconData? bubbleWideSparkleChatMessage,
+    IconData? bubbles,
     IconData? calendar1,
     IconData? callCancel,
     IconData? camera1,
@@ -276,10 +289,12 @@ mixin _$StreamIcons {
     IconData? clock,
     IconData? clockSolid,
     IconData? closeQuote2,
+    IconData? cloudSimpleUpload,
     IconData? code,
     IconData? codeBrackets,
     IconData? codeEditorInsert,
     IconData? compass,
+    IconData? components,
     IconData? creditCard2Billing,
     IconData? crossMedium,
     IconData? crossSmall,
@@ -302,6 +317,7 @@ mixin _$StreamIcons {
     IconData? filledCircleInfoTooltip,
     IconData? filter1,
     IconData? flag2,
+    IconData? folder1,
     IconData? gauge,
     IconData? google,
     IconData? hashtagChannel,
@@ -312,6 +328,7 @@ mixin _$StreamIcons {
     IconData? layersBehind,
     IconData? layoutAlignLeft,
     IconData? layoutGrid1,
+    IconData? layoutGrid2,
     IconData? layoutLeft,
     IconData? lightBulbSimple,
     IconData? limits,
@@ -362,6 +379,7 @@ mixin _$StreamIcons {
     IconData? tennis,
     IconData? textToImageURLEnrichment,
     IconData? thunder,
+    IconData? translate,
     IconData? trashBin,
     IconData? trending4,
     IconData? trophy,
@@ -385,6 +403,7 @@ mixin _$StreamIcons {
       archive1: archive1 ?? _this.archive1,
       arrowBoxLeft: arrowBoxLeft ?? _this.arrowBoxLeft,
       arrowDown: arrowDown ?? _this.arrowDown,
+      arrowDownCircle: arrowDownCircle ?? _this.arrowDownCircle,
       arrowLeft: arrowLeft ?? _this.arrowLeft,
       arrowRight: arrowRight ?? _this.arrowRight,
       arrowRotateClockwise: arrowRotateClockwise ?? _this.arrowRotateClockwise,
@@ -392,7 +411,9 @@ mixin _$StreamIcons {
           arrowRotateRightLeftRepeatRefresh ??
           _this.arrowRotateRightLeftRepeatRefresh,
       arrowShareLeft: arrowShareLeft ?? _this.arrowShareLeft,
+      arrowShareRight: arrowShareRight ?? _this.arrowShareRight,
       arrowUp: arrowUp ?? _this.arrowUp,
+      arrowUpRight: arrowUpRight ?? _this.arrowUpRight,
       arrowsRepeatLeftRight:
           arrowsRepeatLeftRight ?? _this.arrowsRepeatLeftRight,
       at: at ?? _this.at,
@@ -414,6 +435,7 @@ mixin _$StreamIcons {
           _this.bubbleWideNotificationChatMessage,
       bubbleWideSparkleChatMessage:
           bubbleWideSparkleChatMessage ?? _this.bubbleWideSparkleChatMessage,
+      bubbles: bubbles ?? _this.bubbles,
       calendar1: calendar1 ?? _this.calendar1,
       callCancel: callCancel ?? _this.callCancel,
       camera1: camera1 ?? _this.camera1,
@@ -442,10 +464,12 @@ mixin _$StreamIcons {
       clock: clock ?? _this.clock,
       clockSolid: clockSolid ?? _this.clockSolid,
       closeQuote2: closeQuote2 ?? _this.closeQuote2,
+      cloudSimpleUpload: cloudSimpleUpload ?? _this.cloudSimpleUpload,
       code: code ?? _this.code,
       codeBrackets: codeBrackets ?? _this.codeBrackets,
       codeEditorInsert: codeEditorInsert ?? _this.codeEditorInsert,
       compass: compass ?? _this.compass,
+      components: components ?? _this.components,
       creditCard2Billing: creditCard2Billing ?? _this.creditCard2Billing,
       crossMedium: crossMedium ?? _this.crossMedium,
       crossSmall: crossSmall ?? _this.crossSmall,
@@ -470,6 +494,7 @@ mixin _$StreamIcons {
           filledCircleInfoTooltip ?? _this.filledCircleInfoTooltip,
       filter1: filter1 ?? _this.filter1,
       flag2: flag2 ?? _this.flag2,
+      folder1: folder1 ?? _this.folder1,
       gauge: gauge ?? _this.gauge,
       google: google ?? _this.google,
       hashtagChannel: hashtagChannel ?? _this.hashtagChannel,
@@ -480,6 +505,7 @@ mixin _$StreamIcons {
       layersBehind: layersBehind ?? _this.layersBehind,
       layoutAlignLeft: layoutAlignLeft ?? _this.layoutAlignLeft,
       layoutGrid1: layoutGrid1 ?? _this.layoutGrid1,
+      layoutGrid2: layoutGrid2 ?? _this.layoutGrid2,
       layoutLeft: layoutLeft ?? _this.layoutLeft,
       lightBulbSimple: lightBulbSimple ?? _this.lightBulbSimple,
       limits: limits ?? _this.limits,
@@ -536,6 +562,7 @@ mixin _$StreamIcons {
       textToImageURLEnrichment:
           textToImageURLEnrichment ?? _this.textToImageURLEnrichment,
       thunder: thunder ?? _this.thunder,
+      translate: translate ?? _this.translate,
       trashBin: trashBin ?? _this.trashBin,
       trending4: trending4 ?? _this.trending4,
       trophy: trophy ?? _this.trophy,
@@ -570,13 +597,16 @@ mixin _$StreamIcons {
       archive1: other.archive1,
       arrowBoxLeft: other.arrowBoxLeft,
       arrowDown: other.arrowDown,
+      arrowDownCircle: other.arrowDownCircle,
       arrowLeft: other.arrowLeft,
       arrowRight: other.arrowRight,
       arrowRotateClockwise: other.arrowRotateClockwise,
       arrowRotateRightLeftRepeatRefresh:
           other.arrowRotateRightLeftRepeatRefresh,
       arrowShareLeft: other.arrowShareLeft,
+      arrowShareRight: other.arrowShareRight,
       arrowUp: other.arrowUp,
+      arrowUpRight: other.arrowUpRight,
       arrowsRepeatLeftRight: other.arrowsRepeatLeftRight,
       at: other.at,
       atSolid: other.atSolid,
@@ -593,6 +623,7 @@ mixin _$StreamIcons {
       bubbleWideNotificationChatMessage:
           other.bubbleWideNotificationChatMessage,
       bubbleWideSparkleChatMessage: other.bubbleWideSparkleChatMessage,
+      bubbles: other.bubbles,
       calendar1: other.calendar1,
       callCancel: other.callCancel,
       camera1: other.camera1,
@@ -618,10 +649,12 @@ mixin _$StreamIcons {
       clock: other.clock,
       clockSolid: other.clockSolid,
       closeQuote2: other.closeQuote2,
+      cloudSimpleUpload: other.cloudSimpleUpload,
       code: other.code,
       codeBrackets: other.codeBrackets,
       codeEditorInsert: other.codeEditorInsert,
       compass: other.compass,
+      components: other.components,
       creditCard2Billing: other.creditCard2Billing,
       crossMedium: other.crossMedium,
       crossSmall: other.crossSmall,
@@ -644,6 +677,7 @@ mixin _$StreamIcons {
       filledCircleInfoTooltip: other.filledCircleInfoTooltip,
       filter1: other.filter1,
       flag2: other.flag2,
+      folder1: other.folder1,
       gauge: other.gauge,
       google: other.google,
       hashtagChannel: other.hashtagChannel,
@@ -654,6 +688,7 @@ mixin _$StreamIcons {
       layersBehind: other.layersBehind,
       layoutAlignLeft: other.layoutAlignLeft,
       layoutGrid1: other.layoutGrid1,
+      layoutGrid2: other.layoutGrid2,
       layoutLeft: other.layoutLeft,
       lightBulbSimple: other.lightBulbSimple,
       limits: other.limits,
@@ -704,6 +739,7 @@ mixin _$StreamIcons {
       tennis: other.tennis,
       textToImageURLEnrichment: other.textToImageURLEnrichment,
       thunder: other.thunder,
+      translate: other.translate,
       trashBin: other.trashBin,
       trending4: other.trending4,
       trophy: other.trophy,
@@ -739,13 +775,16 @@ mixin _$StreamIcons {
         _other.archive1 == _this.archive1 &&
         _other.arrowBoxLeft == _this.arrowBoxLeft &&
         _other.arrowDown == _this.arrowDown &&
+        _other.arrowDownCircle == _this.arrowDownCircle &&
         _other.arrowLeft == _this.arrowLeft &&
         _other.arrowRight == _this.arrowRight &&
         _other.arrowRotateClockwise == _this.arrowRotateClockwise &&
         _other.arrowRotateRightLeftRepeatRefresh ==
             _this.arrowRotateRightLeftRepeatRefresh &&
         _other.arrowShareLeft == _this.arrowShareLeft &&
+        _other.arrowShareRight == _this.arrowShareRight &&
         _other.arrowUp == _this.arrowUp &&
+        _other.arrowUpRight == _this.arrowUpRight &&
         _other.arrowsRepeatLeftRight == _this.arrowsRepeatLeftRight &&
         _other.at == _this.at &&
         _other.atSolid == _this.atSolid &&
@@ -764,6 +803,7 @@ mixin _$StreamIcons {
             _this.bubbleWideNotificationChatMessage &&
         _other.bubbleWideSparkleChatMessage ==
             _this.bubbleWideSparkleChatMessage &&
+        _other.bubbles == _this.bubbles &&
         _other.calendar1 == _this.calendar1 &&
         _other.callCancel == _this.callCancel &&
         _other.camera1 == _this.camera1 &&
@@ -790,10 +830,12 @@ mixin _$StreamIcons {
         _other.clock == _this.clock &&
         _other.clockSolid == _this.clockSolid &&
         _other.closeQuote2 == _this.closeQuote2 &&
+        _other.cloudSimpleUpload == _this.cloudSimpleUpload &&
         _other.code == _this.code &&
         _other.codeBrackets == _this.codeBrackets &&
         _other.codeEditorInsert == _this.codeEditorInsert &&
         _other.compass == _this.compass &&
+        _other.components == _this.components &&
         _other.creditCard2Billing == _this.creditCard2Billing &&
         _other.crossMedium == _this.crossMedium &&
         _other.crossSmall == _this.crossSmall &&
@@ -816,6 +858,7 @@ mixin _$StreamIcons {
         _other.filledCircleInfoTooltip == _this.filledCircleInfoTooltip &&
         _other.filter1 == _this.filter1 &&
         _other.flag2 == _this.flag2 &&
+        _other.folder1 == _this.folder1 &&
         _other.gauge == _this.gauge &&
         _other.google == _this.google &&
         _other.hashtagChannel == _this.hashtagChannel &&
@@ -826,6 +869,7 @@ mixin _$StreamIcons {
         _other.layersBehind == _this.layersBehind &&
         _other.layoutAlignLeft == _this.layoutAlignLeft &&
         _other.layoutGrid1 == _this.layoutGrid1 &&
+        _other.layoutGrid2 == _this.layoutGrid2 &&
         _other.layoutLeft == _this.layoutLeft &&
         _other.lightBulbSimple == _this.lightBulbSimple &&
         _other.limits == _this.limits &&
@@ -877,6 +921,7 @@ mixin _$StreamIcons {
         _other.tennis == _this.tennis &&
         _other.textToImageURLEnrichment == _this.textToImageURLEnrichment &&
         _other.thunder == _this.thunder &&
+        _other.translate == _this.translate &&
         _other.trashBin == _this.trashBin &&
         _other.trending4 == _this.trending4 &&
         _other.trophy == _this.trophy &&
@@ -904,12 +949,15 @@ mixin _$StreamIcons {
       _this.archive1,
       _this.arrowBoxLeft,
       _this.arrowDown,
+      _this.arrowDownCircle,
       _this.arrowLeft,
       _this.arrowRight,
       _this.arrowRotateClockwise,
       _this.arrowRotateRightLeftRepeatRefresh,
       _this.arrowShareLeft,
+      _this.arrowShareRight,
       _this.arrowUp,
+      _this.arrowUpRight,
       _this.arrowsRepeatLeftRight,
       _this.at,
       _this.atSolid,
@@ -925,6 +973,7 @@ mixin _$StreamIcons {
       _this.bubbleText6Solid,
       _this.bubbleWideNotificationChatMessage,
       _this.bubbleWideSparkleChatMessage,
+      _this.bubbles,
       _this.calendar1,
       _this.callCancel,
       _this.camera1,
@@ -950,10 +999,12 @@ mixin _$StreamIcons {
       _this.clock,
       _this.clockSolid,
       _this.closeQuote2,
+      _this.cloudSimpleUpload,
       _this.code,
       _this.codeBrackets,
       _this.codeEditorInsert,
       _this.compass,
+      _this.components,
       _this.creditCard2Billing,
       _this.crossMedium,
       _this.crossSmall,
@@ -976,6 +1027,7 @@ mixin _$StreamIcons {
       _this.filledCircleInfoTooltip,
       _this.filter1,
       _this.flag2,
+      _this.folder1,
       _this.gauge,
       _this.google,
       _this.hashtagChannel,
@@ -986,6 +1038,7 @@ mixin _$StreamIcons {
       _this.layersBehind,
       _this.layoutAlignLeft,
       _this.layoutGrid1,
+      _this.layoutGrid2,
       _this.layoutLeft,
       _this.lightBulbSimple,
       _this.limits,
@@ -1036,6 +1089,7 @@ mixin _$StreamIcons {
       _this.tennis,
       _this.textToImageURLEnrichment,
       _this.thunder,
+      _this.translate,
       _this.trashBin,
       _this.trending4,
       _this.trophy,
