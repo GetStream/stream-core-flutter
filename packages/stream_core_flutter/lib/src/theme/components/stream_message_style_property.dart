@@ -4,22 +4,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart' show BorderSide;
 
 import '../../components/common/stream_visibility.dart';
-import '../../components/message_placement/stream_message_placement.dart';
+import '../../components/message_layout/stream_message_layout.dart';
 
-/// Resolves a value of type [T] based on a message's [StreamMessagePlacementData].
+/// Resolves a value of type [T] based on a message's [StreamMessageLayoutData].
 ///
 /// Each field in a message style class (e.g. `StreamMessageBubbleStyle.shape`)
-/// is a [StreamMessageStyleProperty] so that its value can vary by alignment
+/// is a [StreamMessageLayoutProperty] so that its value can vary by alignment
 /// (start / end) and stack position (single / top / middle / bottom).
 ///
 /// Use the factory constructors for common patterns:
 ///
 /// {@tool snippet}
 ///
-/// Uniform value for all placements:
+/// Uniform value for all layouts:
 ///
 /// ```dart
-/// StreamMessageStyleProperty.all(EdgeInsets.all(12))
+/// StreamMessageLayoutProperty.all(EdgeInsets.all(12))
 /// ```
 /// {@end-tool}
 ///
@@ -28,8 +28,8 @@ import '../../components/message_placement/stream_message_placement.dart';
 /// Alignment-aware color:
 ///
 /// ```dart
-/// StreamMessageStyleProperty.resolveWith((placement) {
-///   final isEnd = placement.alignment == StreamMessageAlignment.end;
+/// StreamMessageLayoutProperty.resolveWith((layout) {
+///   final isEnd = layout.alignment == StreamMessageAlignment.end;
 ///   return isEnd ? brandColor : surfaceColor;
 /// })
 /// ```
@@ -40,9 +40,9 @@ import '../../components/message_placement/stream_message_placement.dart';
 /// Position + alignment aware shape:
 ///
 /// ```dart
-/// StreamMessageStyleProperty.resolveWith((placement) {
-///   final isEnd = placement.alignment == StreamMessageAlignment.end;
-///   return switch (placement.stackPosition) {
+/// StreamMessageLayoutProperty.resolveWith((layout) {
+///   final isEnd = layout.alignment == StreamMessageAlignment.end;
+///   return switch (layout.stackPosition) {
 ///     StreamMessageStackPosition.single =>
 ///       RoundedRectangleBorder(borderRadius: BorderRadius.all(r.xxl)),
 ///     StreamMessageStackPosition.top =>
@@ -60,26 +60,26 @@ import '../../components/message_placement/stream_message_placement.dart';
 ///
 /// See also:
 ///
-///  * [StreamMessagePlacementData], the context passed to [resolve].
-abstract class StreamMessageStyleProperty<T> {
+///  * [StreamMessageLayoutData], the context passed to [resolve].
+abstract class StreamMessageLayoutProperty<T> {
   /// Const constructor for subclasses.
-  const StreamMessageStyleProperty();
+  const StreamMessageLayoutProperty();
 
-  /// Resolves this property for the given [placement].
-  T resolve(StreamMessagePlacementData placement);
+  /// Resolves this property for the given [layout].
+  T resolve(StreamMessageLayoutData layout);
 
-  /// Creates a property that returns [value] for every placement.
-  static StreamMessageStyleProperty<T> all<T>(T value) => _AllProperty<T>(value);
+  /// Creates a property that returns [value] for every layout.
+  static StreamMessageLayoutProperty<T> all<T>(T value) => _AllProperty<T>(value);
 
   /// Creates a property that delegates to [callback] for resolution.
-  static StreamMessageStyleProperty<T> resolveWith<T>(
-    T Function(StreamMessagePlacementData placement) callback,
+  static StreamMessageLayoutProperty<T> resolveWith<T>(
+    T Function(StreamMessageLayoutData layout) callback,
   ) => _ResolveWithProperty<T>(callback);
 
-  /// Linearly interpolates between two [StreamMessageStyleProperty] values.
-  static StreamMessageStyleProperty<T?>? lerp<T>(
-    StreamMessageStyleProperty<T?>? a,
-    StreamMessageStyleProperty<T?>? b,
+  /// Linearly interpolates between two [StreamMessageLayoutProperty] values.
+  static StreamMessageLayoutProperty<T?>? lerp<T>(
+    StreamMessageLayoutProperty<T?>? a,
+    StreamMessageLayoutProperty<T?>? b,
     double t,
     T? Function(T?, T?, double) lerpFunction,
   ) {
@@ -89,13 +89,13 @@ abstract class StreamMessageStyleProperty<T> {
 }
 
 @immutable
-class _AllProperty<T> extends StreamMessageStyleProperty<T> {
+class _AllProperty<T> extends StreamMessageLayoutProperty<T> {
   const _AllProperty(this._value);
 
   final T _value;
 
   @override
-  T resolve(StreamMessagePlacementData placement) => _value;
+  T resolve(StreamMessageLayoutData layout) => _value;
 
   @override
   bool operator ==(Object other) {
@@ -107,37 +107,37 @@ class _AllProperty<T> extends StreamMessageStyleProperty<T> {
   int get hashCode => _value.hashCode;
 }
 
-class _ResolveWithProperty<T> extends StreamMessageStyleProperty<T> {
+class _ResolveWithProperty<T> extends StreamMessageLayoutProperty<T> {
   const _ResolveWithProperty(this._callback);
 
-  final T Function(StreamMessagePlacementData placement) _callback;
+  final T Function(StreamMessageLayoutData layout) _callback;
 
   @override
-  T resolve(StreamMessagePlacementData placement) => _callback(placement);
+  T resolve(StreamMessageLayoutData layout) => _callback(layout);
 }
 
-class _LerpProperty<T> extends StreamMessageStyleProperty<T?> {
+class _LerpProperty<T> extends StreamMessageLayoutProperty<T?> {
   const _LerpProperty(this._a, this._b, this._t, this._lerpFunction);
 
-  final StreamMessageStyleProperty<T?>? _a;
-  final StreamMessageStyleProperty<T?>? _b;
+  final StreamMessageLayoutProperty<T?>? _a;
+  final StreamMessageLayoutProperty<T?>? _b;
   final double _t;
   final T? Function(T?, T?, double) _lerpFunction;
 
   @override
-  T? resolve(StreamMessagePlacementData placement) {
-    return _lerpFunction(_a?.resolve(placement), _b?.resolve(placement), _t);
+  T? resolve(StreamMessageLayoutData layout) {
+    return _lerpFunction(_a?.resolve(layout), _b?.resolve(layout), _t);
   }
 }
 
-/// A [Clip] value that can depend on [StreamMessagePlacementData].
+/// A [Clip] value that can depend on [StreamMessageLayoutData].
 ///
 /// {@tool snippet}
 ///
-/// Same clip for all placements:
+/// Same clip for all layouts:
 ///
 /// ```dart
-/// StreamMessageStyleClip.all(Clip.hardEdge)
+/// StreamMessageLayoutClip.all(Clip.hardEdge)
 /// ```
 /// {@end-tool}
 ///
@@ -146,8 +146,8 @@ class _LerpProperty<T> extends StreamMessageStyleProperty<T?> {
 /// Placement-aware clip:
 ///
 /// ```dart
-/// StreamMessageStyleClip.resolveWith((placement) {
-///   return switch (placement.stackPosition) {
+/// StreamMessageLayoutClip.resolveWith((layout) {
+///   return switch (layout.stackPosition) {
 ///     .top || .middle => Clip.none,
 ///     .bottom || .single => Clip.hardEdge,
 ///   };
@@ -157,22 +157,22 @@ class _LerpProperty<T> extends StreamMessageStyleProperty<T?> {
 ///
 /// See also:
 ///
-///  * [StreamMessageStyleProperty], the generic placement-aware resolver.
-///  * [StreamMessagePlacementData], the context passed to [resolve].
-extension type const StreamMessageStyleClip._(StreamMessageStyleProperty<Clip?> _property)
-    implements StreamMessageStyleProperty<Clip?> {
-  /// Creates a clip that returns [clip] for every placement.
-  static StreamMessageStyleClip all(Clip clip) => ._(.all(clip));
+///  * [StreamMessageLayoutProperty], the generic layout-aware resolver.
+///  * [StreamMessageLayoutData], the context passed to [resolve].
+extension type const StreamMessageLayoutClip._(StreamMessageLayoutProperty<Clip?> _property)
+    implements StreamMessageLayoutProperty<Clip?> {
+  /// Creates a clip that returns [clip] for every layout.
+  static StreamMessageLayoutClip all(Clip clip) => ._(.all(clip));
 
   /// Creates a clip that delegates to [callback] for resolution.
-  static StreamMessageStyleClip resolveWith(
-    Clip? Function(StreamMessagePlacementData placement) callback,
+  static StreamMessageLayoutClip resolveWith(
+    Clip? Function(StreamMessageLayoutData layout) callback,
   ) => ._(.resolveWith(callback));
 
-  /// Linearly interpolate between two [StreamMessageStyleClip] values.
-  static StreamMessageStyleClip? lerp(
-    StreamMessageStyleClip? a,
-    StreamMessageStyleClip? b,
+  /// Linearly interpolate between two [StreamMessageLayoutClip] values.
+  static StreamMessageLayoutClip? lerp(
+    StreamMessageLayoutClip? a,
+    StreamMessageLayoutClip? b,
     double t,
   ) {
     if (a == null && b == null) return null;
@@ -181,14 +181,14 @@ extension type const StreamMessageStyleClip._(StreamMessageStyleProperty<Clip?> 
   }
 }
 
-/// A [StreamVisibility] value that can depend on [StreamMessagePlacementData].
+/// A [StreamVisibility] value that can depend on [StreamMessageLayoutData].
 ///
 /// {@tool snippet}
 ///
-/// Same visibility for all placements:
+/// Same visibility for all layouts:
 ///
 /// ```dart
-/// StreamMessageStyleVisibility.all(StreamVisibility.hidden)
+/// StreamMessageLayoutVisibility.all(StreamVisibility.hidden)
 /// ```
 /// {@end-tool}
 ///
@@ -197,8 +197,8 @@ extension type const StreamMessageStyleClip._(StreamMessageStyleProperty<Clip?> 
 /// Placement-aware visibility:
 ///
 /// ```dart
-/// StreamMessageStyleVisibility.resolveWith((placement) {
-///   return switch (placement.stackPosition) {
+/// StreamMessageLayoutVisibility.resolveWith((layout) {
+///   return switch (layout.stackPosition) {
 ///     .top || .middle => StreamVisibility.hidden,
 ///     .bottom || .single => StreamVisibility.visible,
 ///   };
@@ -208,22 +208,22 @@ extension type const StreamMessageStyleClip._(StreamMessageStyleProperty<Clip?> 
 ///
 /// See also:
 ///
-///  * [StreamMessageStyleProperty], the generic placement-aware resolver.
-///  * [StreamMessagePlacementData], the context passed to [resolve].
-extension type const StreamMessageStyleVisibility._(StreamMessageStyleProperty<StreamVisibility?> _property)
-    implements StreamMessageStyleProperty<StreamVisibility?> {
-  /// Creates a visibility that returns [visibility] for every placement.
-  static StreamMessageStyleVisibility all(StreamVisibility visibility) => ._(.all(visibility));
+///  * [StreamMessageLayoutProperty], the generic layout-aware resolver.
+///  * [StreamMessageLayoutData], the context passed to [resolve].
+extension type const StreamMessageLayoutVisibility._(StreamMessageLayoutProperty<StreamVisibility?> _property)
+    implements StreamMessageLayoutProperty<StreamVisibility?> {
+  /// Creates a visibility that returns [visibility] for every layout.
+  static StreamMessageLayoutVisibility all(StreamVisibility visibility) => ._(.all(visibility));
 
   /// Creates a visibility that delegates to [callback] for resolution.
-  static StreamMessageStyleVisibility resolveWith(
-    StreamVisibility? Function(StreamMessagePlacementData placement) callback,
+  static StreamMessageLayoutVisibility resolveWith(
+    StreamVisibility? Function(StreamMessageLayoutData layout) callback,
   ) => ._(.resolveWith(callback));
 
-  /// Linearly interpolate between two [StreamMessageStyleVisibility] values.
-  static StreamMessageStyleVisibility? lerp(
-    StreamMessageStyleVisibility? a,
-    StreamMessageStyleVisibility? b,
+  /// Linearly interpolate between two [StreamMessageLayoutVisibility] values.
+  static StreamMessageLayoutVisibility? lerp(
+    StreamMessageLayoutVisibility? a,
+    StreamMessageLayoutVisibility? b,
     double t,
   ) {
     if (a == null && b == null) return null;
@@ -232,14 +232,14 @@ extension type const StreamMessageStyleVisibility._(StreamMessageStyleProperty<S
   }
 }
 
-/// A [BorderSide] value that can depend on [StreamMessagePlacementData].
+/// A [BorderSide] value that can depend on [StreamMessageLayoutData].
 ///
 /// {@tool snippet}
 ///
-/// Same border for all placements:
+/// Same border for all layouts:
 ///
 /// ```dart
-/// StreamMessageStyleBorderSide.all(BorderSide(color: Colors.grey))
+/// StreamMessageLayoutBorderSide.all(BorderSide(color: Colors.grey))
 /// ```
 /// {@end-tool}
 ///
@@ -248,8 +248,8 @@ extension type const StreamMessageStyleVisibility._(StreamMessageStyleProperty<S
 /// Placement-aware border:
 ///
 /// ```dart
-/// StreamMessageStyleBorderSide.resolveWith((placement) {
-///   return switch (placement.alignment) {
+/// StreamMessageLayoutBorderSide.resolveWith((layout) {
+///   return switch (layout.alignment) {
 ///     .start => BorderSide(color: Colors.grey),
 ///     .end => BorderSide(color: Colors.blue),
 ///   };
@@ -259,22 +259,22 @@ extension type const StreamMessageStyleVisibility._(StreamMessageStyleProperty<S
 ///
 /// See also:
 ///
-///  * [StreamMessageStyleProperty], the generic placement-aware resolver.
-///  * [StreamMessagePlacementData], the context passed to [resolve].
-extension type const StreamMessageStyleBorderSide._(StreamMessageStyleProperty<BorderSide?> _property)
-    implements StreamMessageStyleProperty<BorderSide?> {
-  /// Creates a border side that returns [side] for every placement.
-  static StreamMessageStyleBorderSide all(BorderSide side) => ._(.all(side));
+///  * [StreamMessageLayoutProperty], the generic layout-aware resolver.
+///  * [StreamMessageLayoutData], the context passed to [resolve].
+extension type const StreamMessageLayoutBorderSide._(StreamMessageLayoutProperty<BorderSide?> _property)
+    implements StreamMessageLayoutProperty<BorderSide?> {
+  /// Creates a border side that returns [side] for every layout.
+  static StreamMessageLayoutBorderSide all(BorderSide side) => ._(.all(side));
 
   /// Creates a border side that delegates to [callback] for resolution.
-  static StreamMessageStyleBorderSide resolveWith(
-    BorderSide? Function(StreamMessagePlacementData placement) callback,
+  static StreamMessageLayoutBorderSide resolveWith(
+    BorderSide? Function(StreamMessageLayoutData layout) callback,
   ) => ._(.resolveWith(callback));
 
-  /// Linearly interpolate between two [StreamMessageStyleBorderSide] values.
-  static StreamMessageStyleBorderSide? lerp(
-    StreamMessageStyleBorderSide? a,
-    StreamMessageStyleBorderSide? b,
+  /// Linearly interpolate between two [StreamMessageLayoutBorderSide] values.
+  static StreamMessageLayoutBorderSide? lerp(
+    StreamMessageLayoutBorderSide? a,
+    StreamMessageLayoutBorderSide? b,
     double t,
   ) {
     if (a == null && b == null) return null;
@@ -283,17 +283,17 @@ extension type const StreamMessageStyleBorderSide._(StreamMessageStyleProperty<B
   }
 }
 
-class _LerpBorderSide extends StreamMessageStyleProperty<BorderSide?> {
+class _LerpBorderSide extends StreamMessageLayoutProperty<BorderSide?> {
   const _LerpBorderSide(this._a, this._b, this._t);
 
-  final StreamMessageStyleBorderSide? _a;
-  final StreamMessageStyleBorderSide? _b;
+  final StreamMessageLayoutBorderSide? _a;
+  final StreamMessageLayoutBorderSide? _b;
   final double _t;
 
   @override
-  BorderSide? resolve(StreamMessagePlacementData placement) {
-    final resolvedA = _a?.resolve(placement);
-    final resolvedB = _b?.resolve(placement);
+  BorderSide? resolve(StreamMessageLayoutData layout) {
+    final resolvedA = _a?.resolve(layout);
+    final resolvedB = _b?.resolve(layout);
     if (resolvedA == null && resolvedB == null) return null;
     if (resolvedA == null) {
       return BorderSide.lerp(
@@ -313,46 +313,58 @@ class _LerpBorderSide extends StreamMessageStyleProperty<BorderSide?> {
   }
 }
 
-/// Resolves style properties through a cascade of style sources for a given
-/// [StreamMessagePlacementData].
-///
-/// Given an ordered list of style sources, returns the first non-null
-/// resolved value for a requested property.
+/// Resolves style properties from an ordered list of style sources for a
+/// given [StreamMessageLayoutData].
 ///
 /// {@tool snippet}
 ///
 /// ```dart
-/// final resolve = StreamMessageStyleResolver<StreamMessageBubbleStyle>(
-///   placement,
+/// final resolve = StreamMessageLayoutResolver<StreamMessageBubbleStyle>(
+///   layout,
 ///   [widgetStyle, themeStyle, defaults],
 /// );
 ///
 /// final color = resolve((s) => s?.backgroundColor);
-/// final padding = resolve((s) => s?.padding);
+/// final side = resolve.maybeResolve((s) => s?.side);
 /// ```
 /// {@end-tool}
 ///
 /// See also:
 ///
-///  * [StreamMessageStyleProperty], the resolver type for each field.
-///  * [StreamMessagePlacementData], the context passed to each resolver.
-class StreamMessageStyleResolver<S> {
+///  * [StreamMessageLayoutProperty], the resolver type for each field.
+///  * [StreamMessageLayoutData], the context passed to each resolver.
+class StreamMessageLayoutResolver<S> {
   /// Creates a resolver that cascades through [styles] in order.
-  const StreamMessageStyleResolver(this._placement, this._styles);
+  const StreamMessageLayoutResolver(this._layout, this._styles);
 
-  final StreamMessagePlacementData _placement;
+  final StreamMessageLayoutData _layout;
   final List<S?> _styles;
+
+  /// Resolves the first non-null value for [getProperty] across all style
+  /// sources, returning `null` if none is found.
+  ///
+  /// Unlike [call], this never throws — use it for optional properties
+  /// that may not have a default.
+  T? maybeResolve<T extends Object>(StreamMessageLayoutProperty<T?>? Function(S? style) getProperty) {
+    for (final style in _styles) {
+      final resolved = getProperty(style)?.resolve(_layout);
+      if (resolved != null) return resolved;
+    }
+
+    return null; // No style source provided a value for the requested property
+  }
 
   /// Resolves the first non-null value for [getProperty] across all style
   /// sources.
   ///
-  /// The last entry in [_styles] should be a defaults object that provides
-  /// every property, ensuring this method always returns a value.
-  T call<T extends Object>(StreamMessageStyleProperty<T?>? Function(S? style) getProperty) {
-    for (final style in _styles) {
-      final resolved = getProperty(style)?.resolve(_placement);
-      if (resolved != null) return resolved;
-    }
+  /// Throws a [StateError] if no source provides a value. Use this when a
+  /// defaults object guarantees every property is present.
+  ///
+  /// To return `null` instead of throwing, use [maybeResolve].
+  T call<T extends Object>(StreamMessageLayoutProperty<T?>? Function(S? style) getProperty) {
+    final result = maybeResolve(getProperty);
+    if (result != null) return result;
+
     throw StateError('No style source provided a value for the requested property');
   }
 }

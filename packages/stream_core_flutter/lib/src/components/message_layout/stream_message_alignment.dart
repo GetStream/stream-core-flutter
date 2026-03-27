@@ -17,6 +17,13 @@
 ///
 /// Each widget that accepts this enum defines its own element order for
 /// [start] and [end]. See the individual widget documentation for specifics.
+///
+/// See also:
+///
+///  * [StreamMessageLayoutData], which carries this value.
+///  * [StreamMessageLayout], the [InheritedModel] that provides it.
+///  * [StreamMessageStackPosition], which controls the vertical stacking of
+///    consecutive messages from the same sender.
 enum StreamMessageAlignment {
   /// Elements ordered toward the start of the message bubble.
   start,

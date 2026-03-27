@@ -217,7 +217,7 @@ class _ConversationMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnd = message.alignment == StreamMessageAlignment.end;
-    final placement = StreamMessagePlacementData(
+    final layout = StreamMessageLayoutData(
       alignment: message.alignment,
       stackPosition: message.stackPosition,
     );
@@ -234,8 +234,8 @@ class _ConversationMessage extends StatelessWidget {
           constraints: BoxConstraints(
             maxWidth: MediaQuery.sizeOf(context).width * 0.75,
           ),
-          child: StreamMessagePlacement(
-            data: placement,
+          child: StreamMessageLayout(
+            data: layout,
             child: Builder(
               builder: (context) {
                 final emojiCount = StreamMessageText.emojiOnlyCount(message.text);
@@ -491,12 +491,12 @@ class _ThemeOverridesSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 8,
             children: [
-              StreamMessagePlacement(
-                data: const StreamMessagePlacementData(),
+              StreamMessageLayout(
+                data: const StreamMessageLayoutData(),
                 child: StreamMessageItemTheme(
                   data: StreamMessageItemThemeData(
                     text: StreamMessageTextStyle(
-                      textColor: StreamMessageStyleProperty.resolveWith((p) {
+                      textColor: StreamMessageLayoutProperty.resolveWith((p) {
                         return p.alignment == StreamMessageAlignment.end ? Colors.white : Colors.black87;
                       }),
                     ),
@@ -508,12 +508,12 @@ class _ThemeOverridesSection extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.centerRight,
-                child: StreamMessagePlacement(
-                  data: const StreamMessagePlacementData(alignment: StreamMessageAlignment.end),
+                child: StreamMessageLayout(
+                  data: const StreamMessageLayoutData(alignment: StreamMessageAlignment.end),
                   child: StreamMessageItemTheme(
                     data: StreamMessageItemThemeData(
                       text: StreamMessageTextStyle(
-                        textColor: StreamMessageStyleProperty.resolveWith((p) {
+                        textColor: StreamMessageLayoutProperty.resolveWith((p) {
                           return p.alignment == StreamMessageAlignment.end ? Colors.white : Colors.black87;
                         }),
                       ),

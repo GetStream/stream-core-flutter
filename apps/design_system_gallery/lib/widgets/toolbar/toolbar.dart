@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
-import 'package:svg_icon_widget/svg_icon_widget.dart';
 
 import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';

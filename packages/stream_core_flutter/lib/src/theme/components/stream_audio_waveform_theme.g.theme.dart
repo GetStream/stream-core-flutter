@@ -36,8 +36,17 @@ mixin _$StreamAudioWaveformThemeData {
       spacingRatio: lerpDouble$(a.spacingRatio, b.spacingRatio, t),
       heightScale: lerpDouble$(a.heightScale, b.heightScale, t),
       activeThumbColor: Color.lerp(a.activeThumbColor, b.activeThumbColor, t),
+      activeThumbBorderColor: Color.lerp(
+        a.activeThumbBorderColor,
+        b.activeThumbBorderColor,
+        t,
+      ),
       idleThumbColor: Color.lerp(a.idleThumbColor, b.idleThumbColor, t),
-      thumbBorderColor: Color.lerp(a.thumbBorderColor, b.thumbBorderColor, t),
+      idleThumbBorderColor: Color.lerp(
+        a.idleThumbBorderColor,
+        b.idleThumbBorderColor,
+        t,
+      ),
     );
   }
 
@@ -48,8 +57,9 @@ mixin _$StreamAudioWaveformThemeData {
     double? spacingRatio,
     double? heightScale,
     Color? activeThumbColor,
+    Color? activeThumbBorderColor,
     Color? idleThumbColor,
-    Color? thumbBorderColor,
+    Color? idleThumbBorderColor,
   }) {
     final _this = (this as StreamAudioWaveformThemeData);
 
@@ -60,8 +70,10 @@ mixin _$StreamAudioWaveformThemeData {
       spacingRatio: spacingRatio ?? _this.spacingRatio,
       heightScale: heightScale ?? _this.heightScale,
       activeThumbColor: activeThumbColor ?? _this.activeThumbColor,
+      activeThumbBorderColor:
+          activeThumbBorderColor ?? _this.activeThumbBorderColor,
       idleThumbColor: idleThumbColor ?? _this.idleThumbColor,
-      thumbBorderColor: thumbBorderColor ?? _this.thumbBorderColor,
+      idleThumbBorderColor: idleThumbBorderColor ?? _this.idleThumbBorderColor,
     );
   }
 
@@ -83,8 +95,9 @@ mixin _$StreamAudioWaveformThemeData {
       spacingRatio: other.spacingRatio,
       heightScale: other.heightScale,
       activeThumbColor: other.activeThumbColor,
+      activeThumbBorderColor: other.activeThumbBorderColor,
       idleThumbColor: other.idleThumbColor,
-      thumbBorderColor: other.thumbBorderColor,
+      idleThumbBorderColor: other.idleThumbBorderColor,
     );
   }
 
@@ -107,8 +120,9 @@ mixin _$StreamAudioWaveformThemeData {
         _other.spacingRatio == _this.spacingRatio &&
         _other.heightScale == _this.heightScale &&
         _other.activeThumbColor == _this.activeThumbColor &&
+        _other.activeThumbBorderColor == _this.activeThumbBorderColor &&
         _other.idleThumbColor == _this.idleThumbColor &&
-        _other.thumbBorderColor == _this.thumbBorderColor;
+        _other.idleThumbBorderColor == _this.idleThumbBorderColor;
   }
 
   @override
@@ -123,8 +137,9 @@ mixin _$StreamAudioWaveformThemeData {
       _this.spacingRatio,
       _this.heightScale,
       _this.activeThumbColor,
+      _this.activeThumbBorderColor,
       _this.idleThumbColor,
-      _this.thumbBorderColor,
+      _this.idleThumbBorderColor,
     );
   }
 }

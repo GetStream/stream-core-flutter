@@ -10,7 +10,7 @@ part 'stream_message_metadata_theme.g.theme.dart';
 ///
 /// Defines the appearance of metadata rows including username, timestamp,
 /// edited indicator, status icon, and spacing. All properties use
-/// [StreamMessageStyleProperty] for placement-aware resolution.
+/// [StreamMessageLayoutProperty] for placement-aware resolution.
 /// Use [StreamMessageMetadataStyle.from] for uniform values across all
 /// placements.
 ///
@@ -33,7 +33,7 @@ part 'stream_message_metadata_theme.g.theme.dart';
 ///
 /// ```dart
 /// StreamMessageMetadataStyle(
-///   usernameColor: StreamMessageStyleProperty.resolveWith((p) {
+///   usernameColor: StreamMessageLayoutProperty.resolveWith((p) {
 ///     final isEnd = p.alignment == StreamMessageAlignment.end;
 ///     return isEnd ? Colors.blue : Colors.grey;
 ///   }),
@@ -92,52 +92,52 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
     double? minHeight,
   }) {
     return StreamMessageMetadataStyle(
-      usernameTextStyle: usernameTextStyle?.let(StreamMessageStyleProperty.all),
-      usernameColor: usernameColor?.let(StreamMessageStyleProperty.all),
-      timestampTextStyle: timestampTextStyle?.let(StreamMessageStyleProperty.all),
-      timestampColor: timestampColor?.let(StreamMessageStyleProperty.all),
-      editedTextStyle: editedTextStyle?.let(StreamMessageStyleProperty.all),
-      editedColor: editedColor?.let(StreamMessageStyleProperty.all),
-      statusColor: statusColor?.let(StreamMessageStyleProperty.all),
-      statusIconSize: statusIconSize?.let(StreamMessageStyleProperty.all),
-      spacing: spacing?.let(StreamMessageStyleProperty.all),
-      statusSpacing: statusSpacing?.let(StreamMessageStyleProperty.all),
-      minHeight: minHeight?.let(StreamMessageStyleProperty.all),
+      usernameTextStyle: usernameTextStyle?.let(StreamMessageLayoutProperty.all),
+      usernameColor: usernameColor?.let(StreamMessageLayoutProperty.all),
+      timestampTextStyle: timestampTextStyle?.let(StreamMessageLayoutProperty.all),
+      timestampColor: timestampColor?.let(StreamMessageLayoutProperty.all),
+      editedTextStyle: editedTextStyle?.let(StreamMessageLayoutProperty.all),
+      editedColor: editedColor?.let(StreamMessageLayoutProperty.all),
+      statusColor: statusColor?.let(StreamMessageLayoutProperty.all),
+      statusIconSize: statusIconSize?.let(StreamMessageLayoutProperty.all),
+      spacing: spacing?.let(StreamMessageLayoutProperty.all),
+      statusSpacing: statusSpacing?.let(StreamMessageLayoutProperty.all),
+      minHeight: minHeight?.let(StreamMessageLayoutProperty.all),
     );
   }
 
   /// The text style for the username.
-  final StreamMessageStyleProperty<TextStyle?>? usernameTextStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? usernameTextStyle;
 
   /// The color for the username text.
-  final StreamMessageStyleProperty<Color?>? usernameColor;
+  final StreamMessageLayoutProperty<Color?>? usernameColor;
 
   /// The text style for the timestamp.
-  final StreamMessageStyleProperty<TextStyle?>? timestampTextStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? timestampTextStyle;
 
   /// The color for the timestamp text.
-  final StreamMessageStyleProperty<Color?>? timestampColor;
+  final StreamMessageLayoutProperty<Color?>? timestampColor;
 
   /// The text style for the edited indicator.
-  final StreamMessageStyleProperty<TextStyle?>? editedTextStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? editedTextStyle;
 
   /// The color for the edited indicator text.
-  final StreamMessageStyleProperty<Color?>? editedColor;
+  final StreamMessageLayoutProperty<Color?>? editedColor;
 
   /// The color for the status icon.
-  final StreamMessageStyleProperty<Color?>? statusColor;
+  final StreamMessageLayoutProperty<Color?>? statusColor;
 
   /// The size for the status icon.
-  final StreamMessageStyleProperty<double?>? statusIconSize;
+  final StreamMessageLayoutProperty<double?>? statusIconSize;
 
   /// The gap between main elements (username, timestamp group, edited).
-  final StreamMessageStyleProperty<double?>? spacing;
+  final StreamMessageLayoutProperty<double?>? spacing;
 
   /// The gap between the status icon and the timestamp.
-  final StreamMessageStyleProperty<double?>? statusSpacing;
+  final StreamMessageLayoutProperty<double?>? statusSpacing;
 
   /// The minimum height of the metadata row.
-  final StreamMessageStyleProperty<double?>? minHeight;
+  final StreamMessageLayoutProperty<double?>? minHeight;
 
   /// Linearly interpolate between two [StreamMessageMetadataStyle] objects.
   static StreamMessageMetadataStyle? lerp(

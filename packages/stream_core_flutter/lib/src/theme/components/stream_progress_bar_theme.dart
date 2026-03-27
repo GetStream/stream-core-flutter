@@ -18,8 +18,10 @@ part 'stream_progress_bar_theme.g.theme.dart';
 /// ```dart
 /// StreamProgressBarTheme(
 ///   data: StreamProgressBarThemeData(
-///     trackColor: Colors.grey.shade200,
-///     fillColor: Colors.green,
+///     style: StreamProgressBarStyle(
+///       trackColor: Colors.grey.shade200,
+///       fillColor: Colors.green,
+///     ),
 ///   ),
 ///   child: Column(
 ///     children: [
@@ -53,7 +55,7 @@ class StreamProgressBarTheme extends InheritedTheme {
   /// precedence over global values from [StreamTheme.of].
   ///
   /// This allows partial overrides - for example, overriding only
-  /// [StreamProgressBarThemeData.fillColor] while inheriting other properties
+  /// [StreamProgressBarStyle.fillColor] while inheriting other properties
   /// from the global theme.
   static StreamProgressBarThemeData of(BuildContext context) {
     final localTheme = context.dependOnInheritedWidgetOfExactType<StreamProgressBarTheme>();
@@ -73,15 +75,20 @@ class StreamProgressBarTheme extends InheritedTheme {
 ///
 /// {@tool snippet}
 ///
-/// Customize progress bar appearance globally:
+/// Customize progress bar appearance globally via [StreamTheme]:
 ///
 /// ```dart
 /// StreamTheme(
-///   progressBarTheme: StreamProgressBarThemeData(
-///     trackColor: Colors.grey.shade200,
-///     fillColor: Colors.blue,
-///     minHeight: 6,
+///   data: StreamThemeData(
+///     progressBarTheme: StreamProgressBarThemeData(
+///       style: StreamProgressBarStyle(
+///         trackColor: Colors.grey.shade200,
+///         fillColor: Colors.blue,
+///         minHeight: 6,
+///       ),
+///     ),
 ///   ),
+///   child: MyApp(),
 /// )
 /// ```
 /// {@end-tool}
@@ -94,7 +101,35 @@ class StreamProgressBarTheme extends InheritedTheme {
 @immutable
 class StreamProgressBarThemeData with _$StreamProgressBarThemeData {
   /// Creates progress bar theme data with optional style overrides.
-  const StreamProgressBarThemeData({
+  const StreamProgressBarThemeData({this.style});
+
+  /// The visual styling for progress bars.
+  ///
+  /// Contains track color, fill color, height, and border radius.
+  final StreamProgressBarStyle? style;
+
+  /// Linearly interpolate between two [StreamProgressBarThemeData] objects.
+  static StreamProgressBarThemeData? lerp(
+    StreamProgressBarThemeData? a,
+    StreamProgressBarThemeData? b,
+    double t,
+  ) => _$StreamProgressBarThemeData.lerp(a, b, t);
+}
+
+/// Visual styling properties for progress bars.
+///
+/// Defines the appearance of progress bars including track color, fill color,
+/// height, and border radius.
+///
+/// See also:
+///
+///  * [StreamProgressBarThemeData], which wraps this style for theming.
+///  * [StreamProgressBar], which uses this styling.
+@themeGen
+@immutable
+class StreamProgressBarStyle with _$StreamProgressBarStyle {
+  /// Creates progress bar style properties.
+  const StreamProgressBarStyle({
     this.trackColor,
     this.fillColor,
     this.minHeight,
@@ -121,10 +156,10 @@ class StreamProgressBarThemeData with _$StreamProgressBarThemeData {
   /// Falls back to the design system's max radius.
   final BorderRadiusGeometry? borderRadius;
 
-  /// Linearly interpolate between two [StreamProgressBarThemeData] objects.
-  static StreamProgressBarThemeData? lerp(
-    StreamProgressBarThemeData? a,
-    StreamProgressBarThemeData? b,
+  /// Linearly interpolate between two [StreamProgressBarStyle] objects.
+  static StreamProgressBarStyle? lerp(
+    StreamProgressBarStyle? a,
+    StreamProgressBarStyle? b,
     double t,
-  ) => _$StreamProgressBarThemeData.lerp(a, b, t);
+  ) => _$StreamProgressBarStyle.lerp(a, b, t);
 }

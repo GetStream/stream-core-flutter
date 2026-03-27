@@ -26,6 +26,8 @@ import 'package:design_system_gallery/components/badge/stream_badge_count.dart'
     as _design_system_gallery_components_badge_stream_badge_count;
 import 'package:design_system_gallery/components/badge/stream_badge_notification.dart'
     as _design_system_gallery_components_badge_stream_badge_notification;
+import 'package:design_system_gallery/components/badge/stream_image_source_badge.dart'
+    as _design_system_gallery_components_badge_stream_image_source_badge;
 import 'package:design_system_gallery/components/badge/stream_online_indicator.dart'
     as _design_system_gallery_components_badge_stream_online_indicator;
 import 'package:design_system_gallery/components/badge/stream_retry_badge.dart'
@@ -48,6 +50,8 @@ import 'package:design_system_gallery/components/common/stream_skeleton_loading.
     as _design_system_gallery_components_common_stream_skeleton_loading;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
+import 'package:design_system_gallery/components/controls/playback_speed_toggle.dart'
+    as _design_system_gallery_components_controls_playback_speed_toggle;
 import 'package:design_system_gallery/components/controls/stream_command_chip.dart'
     as _design_system_gallery_components_controls_stream_command_chip;
 import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart'
@@ -58,6 +62,8 @@ import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
     as _design_system_gallery_components_message_stream_message_annotation;
+import 'package:design_system_gallery/components/message/stream_message_attachment.dart'
+    as _design_system_gallery_components_message_stream_message_attachment;
 import 'package:design_system_gallery/components/message/stream_message_bubble.dart'
     as _design_system_gallery_components_message_stream_message_bubble;
 import 'package:design_system_gallery/components/message/stream_message_content.dart'
@@ -76,6 +82,8 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
+import 'package:design_system_gallery/components/message_composer/message_composer_file_attachment.dart'
+    as _design_system_gallery_components_message_composer_message_composer_file_attachment;
 import 'package:design_system_gallery/components/reaction/stream_reaction_picker.dart'
     as _design_system_gallery_components_reaction_stream_reaction_picker;
 import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
@@ -353,6 +361,23 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'StreamImageSourceBadge',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_badge_stream_image_source_badge
+                        .buildStreamImageSourceBadgePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_badge_stream_image_source_badge
+                        .buildStreamImageSourceBadgeShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StreamOnlineIndicator',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -606,6 +631,23 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamPlaybackSpeedToggle',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_playback_speed_toggle
+                        .buildStreamPlaybackSpeedTogglePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_playback_speed_toggle
+                        .buildStreamPlaybackSpeedToggleShowcase,
+              ),
+            ],
+          ),
         ],
       ),
       _widgetbook.WidgetbookFolder(
@@ -641,6 +683,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_stream_message_annotation
                         .buildStreamMessageAnnotationShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamMessageAttachment',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_stream_message_attachment
+                        .buildStreamMessageAttachmentPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_stream_message_attachment
+                        .buildStreamMessageAttachmentShowcase,
               ),
             ],
           ),
@@ -735,6 +794,23 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
+            name: 'MessageComposerFileAttachment',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_file_attachment
+                        .buildMessageComposerFileAttachmentPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_file_attachment
+                        .buildMessageComposerFileAttachmentShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'MessageComposerLinkPreviewAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -742,6 +818,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer_attachment_link_preview
                         .buildMessageComposerAttachmentLinkPreviewPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_link_preview
+                        .buildMessageComposerAttachmentLinkPreviewShowcase,
               ),
             ],
           ),
@@ -754,6 +836,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                     _design_system_gallery_components_message_composer_message_composer_attachment_media_file
                         .buildMessageComposerAttachmentMediaFilePlayground,
               ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_media_file
+                        .buildMessageComposerAttachmentMediaFileShowcase,
+              ),
             ],
           ),
           _widgetbook.WidgetbookComponent(
@@ -764,6 +852,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer_attachment_reply
                         .buildMessageComposerAttachmentReplyPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_reply
+                        .buildMessageComposerAttachmentReplyShowcase,
               ),
             ],
           ),

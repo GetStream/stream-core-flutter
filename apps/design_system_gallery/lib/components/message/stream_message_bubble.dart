@@ -33,14 +33,14 @@ Widget buildStreamMessageBubblePlayground(BuildContext context) {
     description: 'Position within a consecutive message group.',
   );
 
-  final placement = StreamMessagePlacementData(
+  final layout = StreamMessageLayoutData(
     alignment: alignment,
     stackPosition: stackPosition,
   );
 
   return Center(
-    child: StreamMessagePlacement(
-      data: placement,
+    child: StreamMessageLayout(
+      data: layout,
       child: StreamMessageBubble(
         child: StreamMessageText(text),
       ),
@@ -90,7 +90,6 @@ class _AlignmentSection extends StatelessWidget {
           label: 'Start (incoming)',
           child: _PlacedBubble(
             alignment: StreamMessageAlignment.start,
-            stackPosition: StreamMessageStackPosition.single,
             crossAlign: CrossAxisAlignment.start,
             text: 'Has anyone tried the new Flutter update?',
           ),
@@ -99,7 +98,6 @@ class _AlignmentSection extends StatelessWidget {
           label: 'End (outgoing)',
           child: _PlacedBubble(
             alignment: StreamMessageAlignment.end,
-            stackPosition: StreamMessageStackPosition.single,
             crossAlign: CrossAxisAlignment.end,
             text: 'Sure, I can help with that!',
           ),
@@ -122,7 +120,6 @@ class _StackPositionsSection extends StatelessWidget {
           label: 'Single (standalone)',
           child: _PlacedBubble(
             alignment: StreamMessageAlignment.start,
-            stackPosition: StreamMessageStackPosition.single,
             crossAlign: CrossAxisAlignment.start,
             text: 'A standalone message',
           ),
@@ -211,14 +208,12 @@ class _ConversationSection extends StatelessWidget {
               SizedBox(height: 8),
               _PlacedBubble(
                 alignment: StreamMessageAlignment.end,
-                stackPosition: StreamMessageStackPosition.single,
                 crossAlign: CrossAxisAlignment.end,
                 text: 'Sounds great! Let me check my schedule.',
               ),
               SizedBox(height: 8),
               _PlacedBubble(
                 alignment: StreamMessageAlignment.start,
-                stackPosition: StreamMessageStackPosition.single,
                 crossAlign: CrossAxisAlignment.start,
                 text: 'Perfect, let me know! 👍',
               ),
@@ -254,8 +249,8 @@ class _StyleOverrideSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'Beveled rectangle',
-          child: StreamMessagePlacement(
-            data: const StreamMessagePlacementData(
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(
               alignment: StreamMessageAlignment.end,
             ),
             child: StreamMessageBubble(
@@ -281,7 +276,7 @@ class _StyleOverrideSection extends StatelessWidget {
 class _PlacedBubble extends StatelessWidget {
   const _PlacedBubble({
     required this.alignment,
-    required this.stackPosition,
+    this.stackPosition = StreamMessageStackPosition.single,
     required this.crossAlign,
     required this.text,
   });
@@ -293,18 +288,15 @@ class _PlacedBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacementData(
+    final layout = StreamMessageLayoutData(
       alignment: alignment,
       stackPosition: stackPosition,
     );
-    final isDefault = placement == const StreamMessagePlacementData();
+    final isDefault = layout == const StreamMessageLayoutData();
 
     Widget child = StreamMessageBubble(child: StreamMessageText(text));
     if (!isDefault) {
-      child = StreamMessagePlacement(
-        data: placement,
-        child: child,
-      );
+      child = StreamMessageLayout(data: layout, child: child);
     }
 
     return Align(

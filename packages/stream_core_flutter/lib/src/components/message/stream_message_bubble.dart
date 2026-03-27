@@ -1,7 +1,7 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../../theme.dart';
-import '../message_placement/stream_message_placement.dart';
+import '../message_layout/stream_message_layout.dart';
 
 /// A styled container that wraps message content with a themed background,
 /// shape, and padding.
@@ -9,8 +9,8 @@ import '../message_placement/stream_message_placement.dart';
 /// [StreamMessageBubble] is the visual shell of a chat message. Metadata,
 /// reactions, and reply indicators compose around it at a higher level.
 ///
-/// If a [StreamMessagePlacement] is found in the ancestor tree, style
-/// properties automatically adapt to the current message placement.
+/// If a [StreamMessageLayout] is found in the ancestor tree, style
+/// properties automatically adapt to the current message layout.
 ///
 /// {@tool snippet}
 ///
@@ -40,7 +40,7 @@ import '../message_placement/stream_message_placement.dart';
 ///
 ///  * [StreamMessageBubbleStyle], for resolver-based styling.
 ///  * [StreamMessageItemTheme], for theming via the widget tree.
-///  * [StreamMessagePlacement], which provides the placement context
+///  * [StreamMessageLayout], which provides the layout context
 ///    used to resolve styles.
 class StreamMessageBubble extends StatelessWidget {
   /// Creates a message bubble.
@@ -86,7 +86,7 @@ class StreamMessageBubbleProps {
   /// When non-null, takes precedence over the theme-resolved value.
   final EdgeInsetsGeometry? padding;
 
-  /// Optional style overrides for placement-aware styling.
+  /// Optional style overrides for layout-aware styling.
   ///
   /// Fields left null fall back to the inherited [StreamMessageItemTheme],
   /// then to built-in defaults.
@@ -108,11 +108,11 @@ class DefaultStreamMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacement.of(context);
-    final bubbleStyle = props.style ?? StreamMessageItemTheme.of(context).bubble;
+    final layout = StreamMessageLayout.of(context);
+    final themeStyle = StreamMessageItemTheme.of(context).bubble;
     final defaults = _StreamMessageBubbleDefaults(context);
 
-    final resolve = StreamMessageStyleResolver(placement, [bubbleStyle, defaults]);
+    final resolve = StreamMessageLayoutResolver(layout, [props.style, themeStyle, defaults]);
 
     final effectiveSide = resolve((s) => s?.side);
     final effectiveShape = resolve((s) => s?.shape).copyWith(side: effectiveSide);
@@ -122,11 +122,10 @@ class DefaultStreamMessageBubble extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: effectiveConstraints,
-      child: DecoratedBox(
-        decoration: ShapeDecoration(
-          shape: effectiveShape,
-          color: effectiveBackgroundColor,
-        ),
+      child: Material(
+        clipBehavior: .hardEdge,
+        shape: effectiveShape,
+        color: effectiveBackgroundColor,
         child: Padding(
           padding: effectivePadding,
           child: props.child,
@@ -146,17 +145,18 @@ class _StreamMessageBubbleDefaults extends StreamMessageBubbleStyle {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  StreamMessageStyleProperty<Color> get backgroundColor => .resolveWith(
-    (placement) => switch (placement.alignment) {
-      .start => _colorScheme.backgroundSurface,
-      .end => _colorScheme.brand.shade100,
+  StreamMessageLayoutProperty<Color> get backgroundColor => .resolveWith(
+    (layout) => switch ((layout.alignment, layout.contentKind)) {
+      (_, .emojiOnly) => StreamColors.transparent,
+      (.start, _) => _colorScheme.backgroundSurface,
+      (.end, _) => _colorScheme.brand.shade100,
     },
   );
 
   @override
-  StreamMessageStyleProperty<OutlinedBorder> get shape => .resolveWith(
-    (placement) => RoundedSuperellipseBorder(
-      borderRadius: switch ((placement.alignment, placement.stackPosition)) {
+  StreamMessageLayoutProperty<OutlinedBorder> get shape => .resolveWith(
+    (layout) => RoundedSuperellipseBorder(
+      borderRadius: switch ((layout.alignment, layout.stackPosition)) {
         (.start, .single || .bottom) => BorderRadiusDirectional.only(
           topStart: _radius.xxl,
           topEnd: _radius.xxl,
@@ -173,16 +173,22 @@ class _StreamMessageBubbleDefaults extends StreamMessageBubbleStyle {
   );
 
   @override
-  StreamMessageStyleBorderSide get side => .resolveWith(
-    (placement) => switch (placement.alignment) {
-      .start => BorderSide(color: _colorScheme.borderSubtle),
-      .end => BorderSide(color: _colorScheme.brand.shade100),
+  StreamMessageLayoutBorderSide get side => .resolveWith(
+    (layout) => switch ((layout.alignment, layout.contentKind)) {
+      (_, .emojiOnly) => BorderSide.none,
+      (.start, _) => BorderSide(color: _colorScheme.borderSubtle),
+      (.end, _) => BorderSide(color: _colorScheme.brand.shade100),
     },
   );
 
   @override
-  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(vertical: _spacing.xs));
+  StreamMessageLayoutProperty<EdgeInsetsGeometry> get padding => .resolveWith(
+    (layout) => switch (layout.contentKind) {
+      .singleAttachment => EdgeInsets.zero,
+      _ => .symmetric(vertical: _spacing.xs),
+    },
+  );
 
   @override
-  StreamMessageStyleProperty<BoxConstraints> get constraints => .all(const BoxConstraints(minHeight: 20));
+  StreamMessageLayoutProperty<BoxConstraints> get constraints => .all(const .new(minHeight: 20));
 }

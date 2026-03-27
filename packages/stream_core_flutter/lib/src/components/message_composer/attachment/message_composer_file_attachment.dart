@@ -23,30 +23,37 @@ class MessageComposerFileAttachment extends StatelessWidget {
     final spacing = context.streamSpacing;
 
     return StreamMessageComposerAttachmentContainer(
-      padding: EdgeInsets.fromLTRB(spacing.md, spacing.md, spacing.sm, spacing.md),
       onRemovePressed: onRemovePressed,
-      borderColor: context.streamColorScheme.borderDefault,
-      child: Row(
-        children: [
-          ?fileTypeIcon,
-          SizedBox(width: spacing.xs),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (title case final title?)
-                  Text(
-                    title,
-                    style: titleStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ?subtitle,
-              ],
+      child: Padding(
+        padding: .directional(
+          start: spacing.md,
+          end: spacing.sm,
+          top: spacing.md,
+          bottom: spacing.md,
+        ),
+        child: Row(
+          spacing: spacing.sm,
+          children: [
+            ?fileTypeIcon,
+            Expanded(
+              child: Column(
+                spacing: spacing.xxs,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (title case final title?)
+                    Text(
+                      title,
+                      style: titleStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ?subtitle,
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

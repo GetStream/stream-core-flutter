@@ -11,8 +11,8 @@ import '../../theme/stream_theme_extensions.dart';
 import '../accessories/stream_emoji.dart';
 import '../controls/stream_emoji_chip.dart';
 
-import '../message_placement/stream_message_alignment.dart';
-import '../message_placement/stream_message_placement.dart';
+import '../message_layout/stream_message_alignment.dart';
+import '../message_layout/stream_message_layout.dart';
 
 /// Displays reactions as either individual chips or a single grouped chip.
 ///
@@ -23,7 +23,7 @@ import '../message_placement/stream_message_placement.dart';
 /// Reactions can be displayed on their own or positioned relative to a
 /// [child], such as a message bubble or container.
 ///
-/// If a [StreamMessagePlacement] is found in the ancestor tree,
+/// If a [StreamMessageLayout] is found in the ancestor tree,
 /// [position], [alignment], [crossAxisAlignment], and [indent] are
 /// automatically derived from the message alignment when not explicitly set.
 ///
@@ -312,7 +312,7 @@ class DefaultStreamReactions extends StatelessWidget {
 
     // Use the message alignment from the ancestor scope to derive sensible
     // defaults for position, alignment, cross-axis alignment, and indent.
-    final messageAlignment = StreamMessagePlacement.messageAlignmentOf(context);
+    final messageAlignment = StreamMessageLayout.messageAlignmentOf(context);
 
     var effectiveCrossAxisAlignment = props.crossAxisAlignment;
     effectiveCrossAxisAlignment ??= switch (messageAlignment) {

@@ -156,11 +156,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageTextProps>? messageText,
     StreamComponentBuilder<StreamNetworkImageProps>? networkImage,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
+    StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
+    StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
@@ -191,11 +193,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageText: messageText,
       networkImage: networkImage,
       onlineIndicator: onlineIndicator,
+      playbackSpeedToggle: playbackSpeedToggle,
       progressBar: progressBar,
       reactionPicker: reactionPicker,
       reactions: reactions,
       retryBadge: retryBadge,
       skeletonLoading: skeletonLoading,
+      imageSourceBadge: imageSourceBadge,
       extensions: _extensionIterableToMap(extensions),
     );
   }
@@ -227,11 +231,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageText,
     required this.networkImage,
     required this.onlineIndicator,
+    required this.playbackSpeedToggle,
     required this.progressBar,
     required this.reactionPicker,
     required this.reactions,
     required this.retryBadge,
     required this.skeletonLoading,
+    required this.imageSourceBadge,
     required this.extensions,
   });
 
@@ -380,6 +386,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamOnlineIndicator] uses [DefaultStreamOnlineIndicator].
   final StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator;
 
+  /// Custom builder for playback speed toggle widgets.
+  ///
+  /// When null, [StreamPlaybackSpeedToggle] uses
+  /// [DefaultStreamPlaybackSpeedToggle].
+  final StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle;
+
   /// Custom builder for progress bar widgets.
   ///
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
@@ -404,6 +416,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamSkeletonLoading] uses [DefaultStreamSkeletonLoading].
   final StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading;
+
+  /// Custom builder for source badge widgets.
+  ///
+  /// When null, [StreamImageSourceBadge] uses [DefaultStreamImageSourceBadge].
+  final StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge;
 
   // Convert the [extensionsIterable] passed to [StreamComponentBuilders.new]
   // to the stored [extensions] map, where each entry's key consists of the extension's type.

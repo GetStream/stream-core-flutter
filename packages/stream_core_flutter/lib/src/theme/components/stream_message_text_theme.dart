@@ -32,7 +32,7 @@ part 'stream_message_text_theme.g.theme.dart';
 ///
 /// ```dart
 /// StreamMessageTextStyle(
-///   textColor: StreamMessageStyleProperty.resolveWith((p) {
+///   textColor: StreamMessageLayoutProperty.resolveWith((p) {
 ///     final isEnd = p.alignment == StreamMessageAlignment.end;
 ///     return isEnd ? Colors.white : Colors.black;
 ///   }),
@@ -89,16 +89,16 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
     TextStyle? tripleEmojiStyle,
   }) {
     return StreamMessageTextStyle(
-      padding: padding?.let(StreamMessageStyleProperty.all),
-      textStyle: textStyle?.let(StreamMessageStyleProperty.all),
-      textColor: textColor?.let(StreamMessageStyleProperty.all),
-      linkStyle: linkStyle?.let(StreamMessageStyleProperty.all),
-      linkColor: linkColor?.let(StreamMessageStyleProperty.all),
-      mentionStyle: mentionStyle?.let(StreamMessageStyleProperty.all),
-      mentionColor: mentionColor?.let(StreamMessageStyleProperty.all),
-      singleEmojiStyle: singleEmojiStyle?.let(StreamMessageStyleProperty.all),
-      doubleEmojiStyle: doubleEmojiStyle?.let(StreamMessageStyleProperty.all),
-      tripleEmojiStyle: tripleEmojiStyle?.let(StreamMessageStyleProperty.all),
+      padding: padding?.let(StreamMessageLayoutProperty.all),
+      textStyle: textStyle?.let(StreamMessageLayoutProperty.all),
+      textColor: textColor?.let(StreamMessageLayoutProperty.all),
+      linkStyle: linkStyle?.let(StreamMessageLayoutProperty.all),
+      linkColor: linkColor?.let(StreamMessageLayoutProperty.all),
+      mentionStyle: mentionStyle?.let(StreamMessageLayoutProperty.all),
+      mentionColor: mentionColor?.let(StreamMessageLayoutProperty.all),
+      singleEmojiStyle: singleEmojiStyle?.let(StreamMessageLayoutProperty.all),
+      doubleEmojiStyle: doubleEmojiStyle?.let(StreamMessageLayoutProperty.all),
+      tripleEmojiStyle: tripleEmojiStyle?.let(StreamMessageLayoutProperty.all),
     );
   }
 
@@ -106,34 +106,34 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
   ///
   /// Useful for mixed-content bubbles where text needs its own inset
   /// independent of the bubble's padding.
-  final StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding;
+  final StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding;
 
   /// The base text style for paragraph content.
-  final StreamMessageStyleProperty<TextStyle?>? textStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? textStyle;
 
   /// The color for paragraph text.
-  final StreamMessageStyleProperty<Color?>? textColor;
+  final StreamMessageLayoutProperty<Color?>? textColor;
 
   /// The text style for links.
-  final StreamMessageStyleProperty<TextStyle?>? linkStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? linkStyle;
 
   /// The color for link text.
-  final StreamMessageStyleProperty<Color?>? linkColor;
+  final StreamMessageLayoutProperty<Color?>? linkColor;
 
   /// The text style for @mention text.
-  final StreamMessageStyleProperty<TextStyle?>? mentionStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? mentionStyle;
 
   /// The color for @mention text.
-  final StreamMessageStyleProperty<Color?>? mentionColor;
+  final StreamMessageLayoutProperty<Color?>? mentionColor;
 
   /// The text style for emoji-only messages containing exactly one emoji.
-  final StreamMessageStyleProperty<TextStyle?>? singleEmojiStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? singleEmojiStyle;
 
   /// The text style for emoji-only messages containing exactly two emojis.
-  final StreamMessageStyleProperty<TextStyle?>? doubleEmojiStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? doubleEmojiStyle;
 
   /// The text style for emoji-only messages containing exactly three emojis.
-  final StreamMessageStyleProperty<TextStyle?>? tripleEmojiStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? tripleEmojiStyle;
 
   /// Linearly interpolate between two [StreamMessageTextStyle] objects.
   static StreamMessageTextStyle? lerp(

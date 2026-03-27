@@ -30,43 +30,43 @@ mixin _$StreamMessageRepliesStyle {
     }
 
     return StreamMessageRepliesStyle(
-      labelTextStyle: StreamMessageStyleProperty.lerp<TextStyle?>(
+      labelTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.labelTextStyle,
         b.labelTextStyle,
         t,
         TextStyle.lerp,
       ),
-      labelColor: StreamMessageStyleProperty.lerp<Color?>(
+      labelColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.labelColor,
         b.labelColor,
         t,
         Color.lerp,
       ),
-      spacing: StreamMessageStyleProperty.lerp<double?>(
+      spacing: StreamMessageLayoutProperty.lerp<double?>(
         a.spacing,
         b.spacing,
         t,
         lerpDouble$,
       ),
-      padding: StreamMessageStyleProperty.lerp<EdgeInsetsGeometry?>(
+      padding: StreamMessageLayoutProperty.lerp<EdgeInsetsGeometry?>(
         a.padding,
         b.padding,
         t,
         EdgeInsetsGeometry.lerp,
       ),
-      connectorColor: StreamMessageStyleProperty.lerp<Color?>(
+      connectorColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.connectorColor,
         b.connectorColor,
         t,
         Color.lerp,
       ),
-      connectorStrokeWidth: StreamMessageStyleProperty.lerp<double?>(
+      connectorStrokeWidth: StreamMessageLayoutProperty.lerp<double?>(
         a.connectorStrokeWidth,
         b.connectorStrokeWidth,
         t,
         lerpDouble$,
       ),
-      clipBehavior: StreamMessageStyleClip.lerp(
+      clipBehavior: StreamMessageLayoutClip.lerp(
         a.clipBehavior,
         b.clipBehavior,
         t,
@@ -75,13 +75,13 @@ mixin _$StreamMessageRepliesStyle {
   }
 
   StreamMessageRepliesStyle copyWith({
-    StreamMessageStyleProperty<TextStyle?>? labelTextStyle,
-    StreamMessageStyleProperty<Color?>? labelColor,
-    StreamMessageStyleProperty<double?>? spacing,
-    StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding,
-    StreamMessageStyleProperty<Color?>? connectorColor,
-    StreamMessageStyleProperty<double?>? connectorStrokeWidth,
-    StreamMessageStyleClip? clipBehavior,
+    StreamMessageLayoutProperty<TextStyle?>? labelTextStyle,
+    StreamMessageLayoutProperty<Color?>? labelColor,
+    StreamMessageLayoutProperty<double?>? spacing,
+    StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding,
+    StreamMessageLayoutProperty<Color?>? connectorColor,
+    StreamMessageLayoutProperty<double?>? connectorStrokeWidth,
+    StreamMessageLayoutClip? clipBehavior,
   }) {
     final _this = (this as StreamMessageRepliesStyle);
 

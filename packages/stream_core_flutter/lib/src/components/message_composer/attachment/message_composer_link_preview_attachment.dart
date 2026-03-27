@@ -31,58 +31,66 @@ class MessageComposerLinkPreviewAttachment extends StatelessWidget {
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
       backgroundColor: backgroundColor,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (image != null) ...[
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(context.streamRadius.md),
-                image: DecorationImage(image: image!, fit: BoxFit.cover),
+      child: Padding(
+        padding: .directional(
+          start: spacing.xs,
+          end: spacing.sm,
+          top: spacing.xs,
+          bottom: spacing.xs,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (image != null) ...[
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(context.streamRadius.md),
+                  image: DecorationImage(image: image!, fit: BoxFit.cover),
+                ),
+              ),
+              SizedBox(width: spacing.xs),
+            ],
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (title case final title?)
+                    Text(
+                      title,
+                      style: titleStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (subtitle case final subtitle?)
+                    Text(
+                      subtitle,
+                      style: bodyStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (url case final url?)
+                    Row(
+                      children: [
+                        Icon(context.streamIcons.chainLink3, size: 12),
+                        SizedBox(width: spacing.xxs),
+                        Expanded(
+                          child: Text(
+                            url,
+                            style: bodyStyle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
               ),
             ),
-            SizedBox(width: spacing.xs),
           ],
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (title case final title?)
-                  Text(
-                    title,
-                    style: titleStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                if (subtitle case final subtitle?)
-                  Text(
-                    subtitle,
-                    style: bodyStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                if (url case final url?)
-                  Row(
-                    children: [
-                      Icon(context.streamIcons.chainLink3, size: 12),
-                      SizedBox(width: spacing.xxs),
-                      Expanded(
-                        child: Text(
-                          url,
-                          style: bodyStyle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

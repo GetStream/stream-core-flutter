@@ -16,8 +16,9 @@
 ///   2. Reads SVG files from the configured source directory
 ///   3. Generates an OTF font file
 ///   4. Generates icon data class with icon constants
-///   5. Generates icon class for theme customization
-///   6. Runs build_runner to generate the theme extension mixin
+///   5. Optionally generates SVG icon data class for colored SVG icons
+///   6. Generates icon class for theme customization
+///   7. Runs build_runner to generate the theme extension mixin
 library;
 
 import 'dart:io';
@@ -36,12 +37,14 @@ import 'package:yaml/yaml.dart';
 class IconGeneratorConfig {
   const IconGeneratorConfig({
     required this.inputSvgDir,
+    this.inputSvgIconDir,
     required this.outputFontFile,
     required this.outputFile,
     required this.outputDataFile,
     required this.fontName,
     required this.className,
     required this.dataClassName,
+    required this.svgIconDataClassName,
     required this.package,
     required this.normalize,
     required this.ignoreShapes,
@@ -59,23 +62,30 @@ class IconGeneratorConfig {
     final config = loadYaml(file.readAsStringSync()) as YamlMap;
     final configDir = p.dirname(yamlPath);
 
-    // Helper to resolve paths relative to the config file directory
-    String resolvePath(String key) {
+    String? resolveOptionalPath(String key) {
       final value = config[key] as String?;
-      if (value == null || value.isEmpty) {
+      if (value == null || value.isEmpty) return null;
+      return p.normalize(p.join(configDir, value));
+    }
+
+    String resolvePath(String key) {
+      final path = resolveOptionalPath(key);
+      if (path == null || path.isEmpty) {
         throw IconGeneratorException('Missing required config: $key', exitCode: 2);
       }
-      return p.normalize(p.join(configDir, value));
+      return path;
     }
 
     return IconGeneratorConfig(
       inputSvgDir: resolvePath('input_svg_dir'),
+      inputSvgIconDir: resolveOptionalPath('input_svg_icon_dir'),
       outputFontFile: resolvePath('output_font_file'),
       outputFile: resolvePath('output_file'),
       outputDataFile: resolvePath('output_data_file'),
       fontName: config['font_name'] as String? ?? 'Stream Icons',
       className: config['class_name'] as String? ?? 'StreamIcons',
       dataClassName: config['data_class_name'] as String? ?? 'StreamIconData',
+      svgIconDataClassName: config['svg_icon_data_class_name'] as String? ?? 'StreamSvgIconData',
       package: config['package'] as String? ?? 'stream_core_flutter',
       normalize: config['normalize'] as bool? ?? true,
       ignoreShapes: config['ignore_shapes'] as bool? ?? true,
@@ -85,12 +95,14 @@ class IconGeneratorConfig {
   }
 
   final String inputSvgDir;
+  final String? inputSvgIconDir;
   final String outputFontFile;
   final String outputFile;
   final String outputDataFile;
   final String fontName;
   final String className;
   final String dataClassName;
+  final String svgIconDataClassName;
   final String package;
   final bool normalize;
   final bool ignoreShapes;
@@ -179,22 +191,41 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
     "import 'package:flutter/widgets.dart';",
     "part of '${p.basename(config.outputDataFile).replaceFirst('.g', '')}';",
   );
+
+  // 5. Generate StreamSvgIconData class (if configured)
+  final svgIconEntries = <SvgIconEntry>[];
+
+  if (config.inputSvgIconDir != null) {
+    svgIconEntries.addAll(_extractSvgIconEntries(config.inputSvgIconDir!, scriptDir));
+
+    if (svgIconEntries.isNotEmpty) {
+      final svgDataContent = _generateSvgIconDataClass(
+        entries: svgIconEntries,
+        className: config.svgIconDataClassName,
+        package: config.package,
+      );
+      iconDataContent += '\n$svgDataContent';
+    }
+  }
+
   File(config.outputDataFile).writeAsStringSync(iconDataContent);
   _log('   ├─ ${p.relative(config.outputDataFile, from: scriptDir)}');
 
-  // 5. Generate StreamIcons class
+  // 6. Generate StreamIcons class
   final iconEntries = _extractIconEntries(fontResult.glyphList);
   final classContent = _generateClass(
     iconEntries: iconEntries,
+    svgIconEntries: svgIconEntries,
     className: config.className,
     dataClassName: config.dataClassName,
+    svgIconDataClassName: config.svgIconDataClassName,
     iconDataFileName: p.basename(config.outputDataFile),
     outputFileName: p.basename(config.outputFile),
   );
   File(config.outputFile).writeAsStringSync(classContent);
   _log('   └─ ${p.relative(config.outputFile, from: scriptDir)}');
 
-  // 6. Run build_runner to generate theme mixin
+  // 7. Run build_runner to generate theme mixin
   _log('🔧 Running build_runner...', section: true);
   final packageDir = config.outputFile.substring(0, config.outputFile.indexOf('/lib/'));
   final buildResult = await Process.run(
@@ -209,7 +240,7 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
   }
   _log('   └─ ${p.basename(config.outputFile).replaceFirst('.dart', '.g.theme.dart')}');
 
-  // 7. Format generated files
+  // 8. Format generated files
   if (config.format) {
     _log('✨ Formatting...', section: true);
     final generatedThemeFile = config.outputFile.replaceFirst('.dart', '.g.theme.dart');
@@ -251,6 +282,74 @@ List<IconEntry> _extractIconEntries(List<GenericGlyph> glyphList) {
     ..sort((a, b) => a.fieldName.compareTo(b.fieldName));
 }
 
+/// Reads SVG icon filenames from a directory and creates entries.
+///
+/// Returns an empty list if the directory does not exist.
+List<SvgIconEntry> _extractSvgIconEntries(String directory, String configDir) {
+  final dir = Directory(directory);
+  if (!dir.existsSync()) return [];
+
+  final svgFiles = dir.listSync().whereType<File>().where((f) => p.extension(f.path).toLowerCase() == '.svg').toList()
+    ..sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
+
+  return svgFiles.map((f) => SvgIconEntry.fromFile(f.path, configDir)).toList()
+    ..sort((a, b) => a.fieldName.compareTo(b.fieldName));
+}
+
+// =============================================================================
+// StreamSvgIconData Class Generation
+// =============================================================================
+
+/// Generates the [StreamSvgIconData] holder class with colored SVG icon
+/// constants.
+String _generateSvgIconDataClass({
+  required List<SvgIconEntry> entries,
+  required String className,
+  required String package,
+}) {
+  final clazz = Class(
+    (b) => b
+      ..docs.add(
+        '/// Colored SVG icon data constants.\n'
+        '///\n'
+        '/// These icons preserve their original colors and should be used with\n'
+        '/// [SvgIcon] widget, not the standard [Icon] widget.',
+      )
+      ..name = className
+      ..constructors.add(
+        Constructor(
+          (c) => c
+            ..constant = true
+            ..name = '_',
+        ),
+      )
+      ..fields.addAll([
+        Field(
+          (f) => f
+            ..static = true
+            ..modifier = FieldModifier.constant
+            ..type = refer('String')
+            ..name = '_package'
+            ..assignment = Code("'$package'"),
+        ),
+        ...entries.map(
+          (e) => Field(
+            (f) => f
+              ..docs.add('/// The ${e.humanReadable} colored SVG icon.')
+              ..static = true
+              ..modifier = FieldModifier.constant
+              ..type = refer('SvgIconData')
+              ..name = e.fieldName
+              ..assignment = Code("SvgIconData('${e.assetPath}', package: _package, preserveColors: true)"),
+          ),
+        ),
+      ]),
+  );
+
+  final emitter = DartEmitter(useNullSafetySyntax: true);
+  return clazz.accept(emitter).toString();
+}
+
 // =============================================================================
 // StreamIcons Class Generation
 // =============================================================================
@@ -259,11 +358,13 @@ String _generateClass({
   required List<IconEntry> iconEntries,
   required String className,
   required String dataClassName,
+  required String svgIconDataClassName,
   required String iconDataFileName,
   required String outputFileName,
+  List<SvgIconEntry> svgIconEntries = const [],
 }) {
-  // Derive part file name (e.g., stream_icons.dart -> stream_icons.g.theme.dart)
   final partThemeFileName = outputFileName.replaceFirst('.dart', '.g.theme.dart');
+  final hasSvgIcons = svgIconEntries.isNotEmpty;
 
   final clazz = Class(
     (b) => b
@@ -271,9 +372,11 @@ String _generateClass({
       ..annotations.addAll([refer('themeGen'), refer('immutable')])
       ..name = className
       ..mixins.add(refer('_\$$className'))
-      ..constructors.add(_buildConstructor(iconEntries, dataClassName))
-      ..fields.addAll(_buildFields(iconEntries))
-      ..methods.addAll(_buildMethods(iconEntries, className)),
+      ..constructors.add(
+        _buildConstructor(iconEntries, dataClassName, svgIconEntries, svgIconDataClassName),
+      )
+      ..fields.addAll([..._buildFields(iconEntries), ..._buildSvgIconFields(svgIconEntries)])
+      ..methods.addAll(_buildMethods(iconEntries, className, svgIconEntries)),
   );
 
   final library = Library(
@@ -286,6 +389,7 @@ String _generateClass({
       ])
       ..directives.addAll([
         Directive.import('package:flutter/widgets.dart'),
+        if (hasSvgIcons) Directive.import('package:svg_icon_widget/svg_icon_widget.dart'),
         Directive.import('package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart'),
         Directive.part(partThemeFileName),
         Directive.part(iconDataFileName),
@@ -297,13 +401,18 @@ String _generateClass({
   return library.accept(emitter).toString();
 }
 
-Constructor _buildConstructor(List<IconEntry> entries, String iconsClassName) {
+Constructor _buildConstructor(
+  List<IconEntry> entries,
+  String iconsClassName, [
+  List<SvgIconEntry> svgEntries = const [],
+  String svgIconDataClassName = '',
+]) {
   return Constructor(
     (c) => c
       ..constant = true
       ..docs.add('/// Creates an icon set with optional overrides.')
-      ..optionalParameters.addAll(
-        entries.map(
+      ..optionalParameters.addAll([
+        ...entries.map(
           (e) => Parameter(
             (p) => p
               ..name = e.fieldName
@@ -312,7 +421,16 @@ Constructor _buildConstructor(List<IconEntry> entries, String iconsClassName) {
               ..defaultTo = Code('$iconsClassName.${e.constantName}'),
           ),
         ),
-      ),
+        ...svgEntries.map(
+          (e) => Parameter(
+            (p) => p
+              ..name = e.fieldName
+              ..named = true
+              ..toThis = true
+              ..defaultTo = Code('$svgIconDataClassName.${e.fieldName}'),
+          ),
+        ),
+      ]),
   );
 }
 
@@ -328,7 +446,25 @@ Iterable<Field> _buildFields(List<IconEntry> entries) {
   );
 }
 
-Iterable<Method> _buildMethods(List<IconEntry> entries, String className) {
+Iterable<Field> _buildSvgIconFields(List<SvgIconEntry> entries) {
+  return entries.map(
+    (e) => Field(
+      (f) => f
+        ..docs.add(
+          '/// The ${e.humanReadable} colored SVG icon.\n///\n/// This is an [SvgIconData] — use with [SvgIcon], not [Icon].',
+        )
+        ..modifier = FieldModifier.final$
+        ..type = refer('SvgIconData')
+        ..name = e.fieldName,
+    ),
+  );
+}
+
+Iterable<Method> _buildMethods(
+  List<IconEntry> entries,
+  String className, [
+  List<SvgIconEntry> svgEntries = const [],
+]) {
   return [
     // allIcons getter
     Method(
@@ -340,6 +476,17 @@ Iterable<Method> _buildMethods(List<IconEntry> entries, String className) {
         ..lambda = true
         ..body = Code('{${entries.map((e) => "'${e.fieldName}': ${e.fieldName}").join(', ')}}'),
     ),
+    // allSvgIcons getter (only when SVG icons exist)
+    if (svgEntries.isNotEmpty)
+      Method(
+        (m) => m
+          ..docs.add(_allSvgIconsDoc)
+          ..type = MethodType.getter
+          ..returns = refer('Map<String, SvgIconData>')
+          ..name = 'allSvgIcons'
+          ..lambda = true
+          ..body = Code('{${svgEntries.map((e) => "'${e.fieldName}': ${e.fieldName}").join(', ')}}'),
+      ),
     // lerp static method
     Method(
       (m) => m
@@ -430,6 +577,16 @@ const _allIconsDoc = '''
 /// final icon = context.streamIcons.allIcons['settingsGear2'];
 /// ```''';
 
+const _allSvgIconsDoc = '''
+/// A map of all colored SVG icons keyed by their field name.
+///
+/// These icons preserve their original colors and should be used with
+/// [SvgIcon] widget, not the standard [Icon] widget.
+///
+/// ```dart
+/// final icon = context.streamIcons.allSvgIcons['giphy'];
+/// ```''';
+
 // =============================================================================
 // Icon Entry Model
 // =============================================================================
@@ -465,6 +622,34 @@ class IconEntry {
         .replaceAllMapped(RegExp(r'[-_](\d)'), (m) => m.group(1)!) // Remove separators before digits
         .replaceAllMapped(RegExp('[-_]([a-zA-Z])'), (m) => m.group(1)!.toUpperCase()); // camelCase
   }
+}
+
+/// Represents a single colored SVG icon with its naming variants and asset path.
+class SvgIconEntry {
+  const SvgIconEntry({
+    required this.fieldName,
+    required this.assetPath,
+    required this.humanReadable,
+  });
+
+  /// Creates an entry from an SVG file path.
+  ///
+  /// Strips the `icon_` prefix from the filename and converts to camelCase.
+  /// The [assetPath] is computed relative to [configDir].
+  factory SvgIconEntry.fromFile(String filePath, String configDir) {
+    final baseName = p.basenameWithoutExtension(filePath);
+    final withoutPrefix = baseName.startsWith('icon_') ? baseName.substring(5) : baseName;
+
+    return SvgIconEntry(
+      fieldName: ReCase(withoutPrefix).camelCase,
+      assetPath: p.relative(filePath, from: configDir),
+      humanReadable: ReCase(withoutPrefix).sentenceCase.toLowerCase(),
+    );
+  }
+
+  final String fieldName;
+  final String assetPath;
+  final String humanReadable;
 }
 
 // =============================================================================

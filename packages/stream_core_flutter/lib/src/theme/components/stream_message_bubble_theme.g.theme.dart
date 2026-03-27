@@ -30,26 +30,26 @@ mixin _$StreamMessageBubbleStyle {
     }
 
     return StreamMessageBubbleStyle(
-      shape: StreamMessageStyleProperty.lerp<OutlinedBorder?>(
+      shape: StreamMessageLayoutProperty.lerp<OutlinedBorder?>(
         a.shape,
         b.shape,
         t,
         OutlinedBorder.lerp,
       ),
-      side: StreamMessageStyleBorderSide.lerp(a.side, b.side, t),
-      padding: StreamMessageStyleProperty.lerp<EdgeInsetsGeometry?>(
+      side: StreamMessageLayoutBorderSide.lerp(a.side, b.side, t),
+      padding: StreamMessageLayoutProperty.lerp<EdgeInsetsGeometry?>(
         a.padding,
         b.padding,
         t,
         EdgeInsetsGeometry.lerp,
       ),
-      constraints: StreamMessageStyleProperty.lerp<BoxConstraints?>(
+      constraints: StreamMessageLayoutProperty.lerp<BoxConstraints?>(
         a.constraints,
         b.constraints,
         t,
         BoxConstraints.lerp,
       ),
-      backgroundColor: StreamMessageStyleProperty.lerp<Color?>(
+      backgroundColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.backgroundColor,
         b.backgroundColor,
         t,
@@ -59,11 +59,11 @@ mixin _$StreamMessageBubbleStyle {
   }
 
   StreamMessageBubbleStyle copyWith({
-    StreamMessageStyleProperty<OutlinedBorder?>? shape,
-    StreamMessageStyleBorderSide? side,
-    StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding,
-    StreamMessageStyleProperty<BoxConstraints?>? constraints,
-    StreamMessageStyleProperty<Color?>? backgroundColor,
+    StreamMessageLayoutProperty<OutlinedBorder?>? shape,
+    StreamMessageLayoutBorderSide? side,
+    StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding,
+    StreamMessageLayoutProperty<BoxConstraints?>? constraints,
+    StreamMessageLayoutProperty<Color?>? backgroundColor,
   }) {
     final _this = (this as StreamMessageBubbleStyle);
 

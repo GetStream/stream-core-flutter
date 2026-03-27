@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
-import '../message_placement/stream_message_placement.dart';
+import '../message_layout/stream_message_layout.dart';
 
 /// The bottom metadata row of a chat message bubble.
 ///
@@ -136,11 +136,11 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacement.of(context);
-    final metadataStyle = props.style ?? StreamMessageItemTheme.of(context).metadata;
+    final layout = StreamMessageLayout.of(context);
+    final themeStyle = StreamMessageItemTheme.of(context).metadata;
     final defaults = _StreamMessageMetadataDefaults(context);
 
-    final resolve = StreamMessageStyleResolver(placement, [metadataStyle, defaults]);
+    final resolve = StreamMessageLayoutResolver(layout, [props.style, themeStyle, defaults]);
 
     final effectiveUsernameTextStyle = resolve((s) => s?.usernameTextStyle);
     final effectiveUsernameColor = resolve((s) => s?.usernameColor);
@@ -218,35 +218,35 @@ class _StreamMessageMetadataDefaults extends StreamMessageMetadataStyle {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  StreamMessageStyleProperty<TextStyle> get usernameTextStyle => .all(_textTheme.metadataEmphasis);
+  StreamMessageLayoutProperty<TextStyle> get usernameTextStyle => .all(_textTheme.metadataEmphasis);
 
   @override
-  StreamMessageStyleProperty<Color> get usernameColor => .all(_colorScheme.textSecondary);
+  StreamMessageLayoutProperty<Color> get usernameColor => .all(_colorScheme.textSecondary);
 
   @override
-  StreamMessageStyleProperty<TextStyle> get timestampTextStyle => .all(_textTheme.metadataDefault);
+  StreamMessageLayoutProperty<TextStyle> get timestampTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  StreamMessageStyleProperty<Color> get timestampColor => .all(_colorScheme.textTertiary);
+  StreamMessageLayoutProperty<Color> get timestampColor => .all(_colorScheme.textTertiary);
 
   @override
-  StreamMessageStyleProperty<TextStyle> get editedTextStyle => .all(_textTheme.metadataDefault);
+  StreamMessageLayoutProperty<TextStyle> get editedTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  StreamMessageStyleProperty<Color> get editedColor => .all(_colorScheme.textTertiary);
+  StreamMessageLayoutProperty<Color> get editedColor => .all(_colorScheme.textTertiary);
 
   @override
-  StreamMessageStyleProperty<Color> get statusColor => .all(_colorScheme.textTertiary);
+  StreamMessageLayoutProperty<Color> get statusColor => .all(_colorScheme.textTertiary);
 
   @override
-  StreamMessageStyleProperty<double> get statusIconSize => .all(16);
+  StreamMessageLayoutProperty<double> get statusIconSize => .all(16);
 
   @override
-  StreamMessageStyleProperty<double> get spacing => .all(_spacing.xs);
+  StreamMessageLayoutProperty<double> get spacing => .all(_spacing.xs);
 
   @override
-  StreamMessageStyleProperty<double> get statusSpacing => .all(_spacing.xxs);
+  StreamMessageLayoutProperty<double> get statusSpacing => .all(_spacing.xxs);
 
   @override
-  StreamMessageStyleProperty<double> get minHeight => .all(24);
+  StreamMessageLayoutProperty<double> get minHeight => .all(24);
 }

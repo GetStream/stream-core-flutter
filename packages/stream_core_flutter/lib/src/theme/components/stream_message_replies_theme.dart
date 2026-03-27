@@ -9,7 +9,7 @@ part 'stream_message_replies_theme.g.theme.dart';
 /// Visual styling properties for a message replies row.
 ///
 /// Defines the appearance of replies rows including label, spacing, padding,
-/// and connector styling. All properties use [StreamMessageStyleProperty]
+/// and connector styling. All properties use [StreamMessageLayoutProperty]
 /// for placement-aware resolution. Use [StreamMessageRepliesStyle.from]
 /// for uniform values across all placements.
 ///
@@ -31,7 +31,7 @@ part 'stream_message_replies_theme.g.theme.dart';
 ///
 /// ```dart
 /// StreamMessageRepliesStyle(
-///   labelColor: StreamMessageStyleProperty.resolveWith((p) {
+///   labelColor: StreamMessageLayoutProperty.resolveWith((p) {
 ///     final isEnd = p.alignment == StreamMessageAlignment.end;
 ///     return isEnd ? Colors.blue : Colors.purple;
 ///   }),
@@ -82,38 +82,38 @@ class StreamMessageRepliesStyle with _$StreamMessageRepliesStyle {
     Clip? clipBehavior,
   }) {
     return StreamMessageRepliesStyle(
-      labelTextStyle: labelTextStyle?.let(StreamMessageStyleProperty.all),
-      labelColor: labelColor?.let(StreamMessageStyleProperty.all),
-      spacing: spacing?.let(StreamMessageStyleProperty.all),
-      padding: padding?.let(StreamMessageStyleProperty.all),
-      connectorColor: connectorColor?.let(StreamMessageStyleProperty.all),
-      connectorStrokeWidth: connectorStrokeWidth?.let(StreamMessageStyleProperty.all),
-      clipBehavior: clipBehavior?.let(StreamMessageStyleClip.all),
+      labelTextStyle: labelTextStyle?.let(StreamMessageLayoutProperty.all),
+      labelColor: labelColor?.let(StreamMessageLayoutProperty.all),
+      spacing: spacing?.let(StreamMessageLayoutProperty.all),
+      padding: padding?.let(StreamMessageLayoutProperty.all),
+      connectorColor: connectorColor?.let(StreamMessageLayoutProperty.all),
+      connectorStrokeWidth: connectorStrokeWidth?.let(StreamMessageLayoutProperty.all),
+      clipBehavior: clipBehavior?.let(StreamMessageLayoutClip.all),
     );
   }
 
   /// The text style for the replies label.
-  final StreamMessageStyleProperty<TextStyle?>? labelTextStyle;
+  final StreamMessageLayoutProperty<TextStyle?>? labelTextStyle;
 
   /// The color for the replies label text.
-  final StreamMessageStyleProperty<Color?>? labelColor;
+  final StreamMessageLayoutProperty<Color?>? labelColor;
 
   /// The gap between elements (connector, avatars, label).
-  final StreamMessageStyleProperty<double?>? spacing;
+  final StreamMessageLayoutProperty<double?>? spacing;
 
   /// The padding around the replies row content.
-  final StreamMessageStyleProperty<EdgeInsetsGeometry?>? padding;
+  final StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding;
 
   /// The color of the connector path linking the row to the message bubble.
-  final StreamMessageStyleProperty<Color?>? connectorColor;
+  final StreamMessageLayoutProperty<Color?>? connectorColor;
 
   /// The stroke width of the connector path.
-  final StreamMessageStyleProperty<double?>? connectorStrokeWidth;
+  final StreamMessageLayoutProperty<double?>? connectorStrokeWidth;
 
   /// How to clip the widget's content.
   ///
   /// Controls whether the connector overflow is clipped at the row boundary.
-  final StreamMessageStyleClip? clipBehavior;
+  final StreamMessageLayoutClip? clipBehavior;
 
   /// Linearly interpolate between two [StreamMessageRepliesStyle] objects.
   static StreamMessageRepliesStyle? lerp(

@@ -35,34 +35,37 @@ class MessageComposerReplyAttachment extends StatelessWidget {
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
       backgroundColor: backgroundColor,
-      child: Row(
-        spacing: spacing.xs,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(top: 2, bottom: 2),
-            color: indicatorColor,
-            child: const SizedBox(width: 2, height: 36),
-          ),
-          Expanded(
-            child: Column(
-              spacing: spacing.xxxs,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                DefaultTextStyle.merge(
-                  style: context.streamTextTheme.metadataEmphasis.copyWith(color: textColor),
-                  child: title,
-                ),
-                DefaultTextStyle.merge(
-                  style: context.streamTextTheme.metadataDefault.copyWith(color: textColor),
-                  child: subtitle,
-                ),
-              ],
+      child: Padding(
+        padding: .all(spacing.xs),
+        child: Row(
+          spacing: spacing.xs,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 2, bottom: 2),
+              color: indicatorColor,
+              child: const SizedBox(width: 2, height: 36),
             ),
-          ),
-          ?trailing,
-        ],
+            Expanded(
+              child: Column(
+                spacing: spacing.xxxs,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  DefaultTextStyle.merge(
+                    style: context.streamTextTheme.metadataEmphasis.copyWith(color: textColor),
+                    child: title,
+                  ),
+                  DefaultTextStyle.merge(
+                    style: context.streamTextTheme.metadataDefault.copyWith(color: textColor),
+                    child: subtitle,
+                  ),
+                ],
+              ),
+            ),
+            ?trailing,
+          ],
+        ),
       ),
     );
   }

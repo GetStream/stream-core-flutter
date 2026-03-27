@@ -11,8 +11,9 @@ typedef StreamNetworkImagePlaceholderBuilder = WidgetBuilder;
 /// Signature for a function that builds an error widget when a
 /// [StreamNetworkImage] fails to load.
 ///
-/// The [retry] callback can be invoked to retry loading the image.
-typedef StreamNetworkImageErrorBuilder = Widget Function(BuildContext context, Object error, VoidCallback retry);
+/// When [retry] is non-null, it can be invoked to retry loading the image
+/// (e.g. to show a tap-to-reload button).
+typedef StreamNetworkImageErrorBuilder = Widget Function(BuildContext context, Object error, VoidCallback? retry);
 
 /// A network image component with automatic caching, error handling,
 /// and tap-to-reload support.
@@ -42,7 +43,7 @@ typedef StreamNetworkImageErrorBuilder = Widget Function(BuildContext context, O
 ///   fit: BoxFit.cover,
 ///   placeholderBuilder: (context) => const CircularProgressIndicator(),
 ///   errorBuilder: (context, error, retry) => TextButton(
-///     onPressed: retry,
+///     onPressed: retry, // nullable -- null when retry is not available
 ///     child: const Text('Retry'),
 ///   ),
 /// )
@@ -242,9 +243,9 @@ class StreamNetworkImageProps {
 
   /// A builder for the error widget shown when loading fails.
   ///
-  /// The builder receives the error and a [retry] callback that can be
-  /// invoked to retry loading the image. If null, [StreamImageErrorPlaceholder]
-  /// is used.
+  /// The builder receives the error and an optional [retry] callback that
+  /// can be invoked to retry loading the image. If null,
+  /// [StreamImageErrorPlaceholder] is used.
   final StreamNetworkImageErrorBuilder? errorBuilder;
 
   /// An optional [Listenable] that triggers a retry when notified.
@@ -440,15 +441,31 @@ class StreamImageErrorPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icons = context.streamIcons;
     final colorScheme = context.streamColorScheme;
 
-    return GestureDetector(
-      onTap: onRetry,
-      child: Container(
-        width: width,
-        height: height,
-        color: colorScheme.backgroundOverlayLight,
-        child: Center(child: StreamRetryBadge(size: .lg)),
+    if (onRetry case final onRetry?) {
+      return GestureDetector(
+        onTap: onRetry,
+        child: Container(
+          width: width,
+          height: height,
+          color: colorScheme.backgroundOverlayLight,
+          child: Center(child: StreamRetryBadge(size: .lg)),
+        ),
+      );
+    }
+
+    return Container(
+      width: width,
+      height: height,
+      color: colorScheme.backgroundOverlayLight,
+      child: Center(
+        child: Icon(
+          size: 32,
+          icons.images1Alt,
+          color: colorScheme.accentNeutral,
+        ),
       ),
     );
   }

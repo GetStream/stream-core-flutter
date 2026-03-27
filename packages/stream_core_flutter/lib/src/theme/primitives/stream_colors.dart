@@ -66,6 +66,9 @@ abstract final class StreamColors {
   /// The black color with 50% opacity.
   static const black50 = Color(0x80000000);
 
+  /// The black color with 75% opacity.
+  static const black75 = Color(0xBF000000);
+
   /// The slate color swatch.
   static final slate = StreamColorSwatch(
     _slatePrimaryValue.toARGB32(),

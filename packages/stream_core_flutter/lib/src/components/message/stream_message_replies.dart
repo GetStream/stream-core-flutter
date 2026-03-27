@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme.dart';
 import '../avatar/stream_avatar_stack.dart';
-import '../message_placement/stream_message_alignment.dart';
-import '../message_placement/stream_message_placement.dart';
+import '../message_layout/stream_message_alignment.dart';
+import '../message_layout/stream_message_layout.dart';
 
 /// A tappable row showing reply count, participant avatars, and an optional
 /// connector for threaded messages.
@@ -201,17 +201,17 @@ class DefaultStreamMessageReplies extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placement = StreamMessagePlacement.of(context);
-    final repliesStyle = props.style ?? StreamMessageItemTheme.of(context).replies;
+    final layout = StreamMessageLayout.of(context);
+    final themeStyle = StreamMessageItemTheme.of(context).replies;
     final defaults = _StreamMessageRepliesDefaults(context);
 
-    final resolve = StreamMessageStyleResolver(placement, [repliesStyle, defaults]);
+    final resolve = StreamMessageLayoutResolver(layout, [props.style, themeStyle, defaults]);
 
     final effectiveLabelTextStyle = resolve((s) => s?.labelTextStyle);
     final effectiveLabelColor = resolve((s) => s?.labelColor);
     final effectiveSpacing = resolve((s) => s?.spacing);
     final effectivePadding = resolve((s) => s?.padding);
-    final effectiveAlignment = props.alignment ?? placement.alignment;
+    final effectiveAlignment = props.alignment ?? layout.alignment;
 
     Widget? labelWidget;
     if (props.label case final label?) {
@@ -356,31 +356,31 @@ class _StreamMessageRepliesDefaults extends StreamMessageRepliesStyle {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  StreamMessageStyleProperty<double> get connectorStrokeWidth => .all(1);
+  StreamMessageLayoutProperty<double> get connectorStrokeWidth => .all(1);
 
   @override
-  StreamMessageStyleProperty<Color> get connectorColor => .resolveWith(
-    (placement) => switch (placement.alignment) {
+  StreamMessageLayoutProperty<Color> get connectorColor => .resolveWith(
+    (layout) => switch (layout.alignment) {
       .start => _colorScheme.borderSubtle,
       .end => _colorScheme.brand.shade150,
     },
   );
 
   @override
-  StreamMessageStyleProperty<TextStyle> get labelTextStyle => .all(_textTheme.captionEmphasis);
+  StreamMessageLayoutProperty<TextStyle> get labelTextStyle => .all(_textTheme.captionEmphasis);
 
   @override
-  StreamMessageStyleProperty<Color> get labelColor => .all(_colorScheme.textLink);
+  StreamMessageLayoutProperty<Color> get labelColor => .all(_colorScheme.textLink);
 
   @override
-  StreamMessageStyleProperty<double> get spacing => .all(_spacing.xs);
+  StreamMessageLayoutProperty<double> get spacing => .all(_spacing.xs);
 
   @override
-  StreamMessageStyleProperty<EdgeInsetsGeometry> get padding => .all(.only(top: _spacing.xs, bottom: _spacing.xxs));
+  StreamMessageLayoutProperty<EdgeInsetsGeometry> get padding => .all(.only(top: _spacing.xs, bottom: _spacing.xxs));
 
   @override
-  StreamMessageStyleClip get clipBehavior => .resolveWith(
-    (placement) => switch (placement.stackPosition) {
+  StreamMessageLayoutClip get clipBehavior => .resolveWith(
+    (layout) => switch (layout.stackPosition) {
       .top || .middle => Clip.none,
       .bottom || .single => Clip.hardEdge,
     },

@@ -20,6 +20,8 @@
 ///
 /// See also:
 ///
+///  * [StreamMessageLayoutData], which carries this value.
+///  * [StreamMessageLayout], the [InheritedModel] that provides it.
 ///  * [StreamMessageAlignment], which controls the horizontal placement of
 ///    message elements.
 enum StreamMessageStackPosition {

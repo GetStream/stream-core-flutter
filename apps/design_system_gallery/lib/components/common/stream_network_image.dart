@@ -366,9 +366,9 @@ class _TapToReloadDemoState extends State<_TapToReloadDemo> {
 
   String get _url => _useValidUrl ? 'https://picsum.photos/seed/retry-success/300/200' : _kInvalidUrl;
 
-  void _onRetry(VoidCallback retry) {
+  void _onRetry(VoidCallback? retry) {
     setState(() => _useValidUrl = true);
-    retry();
+    retry?.call();
   }
 
   @override
@@ -383,7 +383,8 @@ class _TapToReloadDemoState extends State<_TapToReloadDemo> {
         height: widget.height,
         fit: BoxFit.cover,
         errorBuilder: widget.errorBuilder != null
-            ? (context, error, retry) => widget.errorBuilder!(context, error, () => _onRetry(retry))
+            ? (context, error, retry) =>
+                  widget.errorBuilder!(context, error, retry != null ? () => _onRetry(retry) : null)
             : null,
       ),
     );

@@ -4,6 +4,7 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import '../stream_theme.dart';
 import 'stream_avatar_theme.dart';
 import 'stream_message_annotation_theme.dart';
+import 'stream_message_attachment_theme.dart';
 import 'stream_message_bubble_theme.dart';
 import 'stream_message_metadata_theme.dart';
 import 'stream_message_replies_theme.dart';
@@ -26,7 +27,7 @@ part 'stream_message_item_theme.g.theme.dart';
 ///   data: StreamMessageItemThemeData(
 ///     backgroundColor: Colors.blue.shade50,
 ///     bubble: StreamMessageBubbleStyle(
-///       backgroundColor: StreamMessageStyleProperty.resolveWith((p) {
+///       backgroundColor: StreamMessageLayoutProperty.resolveWith((p) {
 ///         final isEnd = p.alignment == StreamMessageAlignment.end;
 ///         return isEnd ? Colors.blue.shade100 : Colors.grey.shade100;
 ///       }),
@@ -98,6 +99,7 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
     this.avatarSize,
     this.text,
     this.bubble,
+    this.attachment,
     this.annotation,
     this.metadata,
     this.replies,
@@ -112,29 +114,29 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
   /// Controls the visibility of the leading widget based on placement.
   ///
   /// This resolves a [StreamVisibility] value from the current
-  /// [StreamMessagePlacementData], allowing visibility to vary by stack
+  /// [StreamMessageLayoutData], allowing visibility to vary by stack
   /// position (e.g. only show the avatar on the bottom message of a stack).
   ///
   /// When null, the leading widget defaults to [StreamVisibility.visible].
-  final StreamMessageStyleVisibility? leadingVisibility;
+  final StreamMessageLayoutVisibility? leadingVisibility;
 
   /// Controls the visibility of the header (annotations) based on placement.
   ///
   /// This resolves a [StreamVisibility] value from the current
-  /// [StreamMessagePlacementData], allowing visibility to vary by placement.
+  /// [StreamMessageLayoutData], allowing visibility to vary by placement.
   ///
   /// When null, the header defaults to [StreamVisibility.visible].
-  final StreamMessageStyleVisibility? headerVisibility;
+  final StreamMessageLayoutVisibility? headerVisibility;
 
   /// Controls the visibility of the footer (metadata) based on placement.
   ///
   /// This resolves a [StreamVisibility] value from the current
-  /// [StreamMessagePlacementData], allowing visibility to vary by stack
+  /// [StreamMessageLayoutData], allowing visibility to vary by stack
   /// position (e.g. only show metadata on the bottom message of a stack).
   ///
   /// When null, the footer defaults to visible for single/bottom messages
   /// and gone for top/middle messages.
-  final StreamMessageStyleVisibility? footerVisibility;
+  final StreamMessageLayoutVisibility? footerVisibility;
 
   /// Outer padding around the entire message item.
   final EdgeInsetsGeometry? padding;
@@ -154,6 +156,9 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
 
   /// Style overrides for the message bubble.
   final StreamMessageBubbleStyle? bubble;
+
+  /// Style overrides for message attachment containers.
+  final StreamMessageAttachmentStyle? attachment;
 
   /// Style overrides for the message annotation.
   final StreamMessageAnnotationStyle? annotation;

@@ -22,7 +22,9 @@ part 'stream_audio_waveform_theme.g.theme.dart';
 ///     color: Colors.grey,
 ///     progressColor: Colors.blue,
 ///     activeThumbColor: Colors.blue,
+///     activeThumbBorderColor: Colors.blue,
 ///     idleThumbColor: Colors.grey,
+///     idleThumbBorderColor: Colors.grey,
 ///   ),
 ///   child: StreamAudioWaveformSlider(
 ///     waveform: waveformData,
@@ -87,8 +89,9 @@ class StreamAudioWaveformTheme extends InheritedTheme {
 ///     spacingRatio: 0.3,
 ///     heightScale: 1,
 ///     activeThumbColor: Colors.blue,
+///     activeThumbBorderColor: Colors.blue,
 ///     idleThumbColor: Colors.grey,
-///     thumbBorderColor: Colors.grey,
+///     idleThumbBorderColor: Colors.grey,
 ///   ),
 /// )
 /// ```
@@ -110,8 +113,9 @@ class StreamAudioWaveformThemeData with _$StreamAudioWaveformThemeData {
     this.spacingRatio,
     this.heightScale,
     this.activeThumbColor,
+    this.activeThumbBorderColor,
     this.idleThumbColor,
-    this.thumbBorderColor,
+    this.idleThumbBorderColor,
   });
 
   /// The color of the waveform bars.
@@ -131,7 +135,7 @@ class StreamAudioWaveformThemeData with _$StreamAudioWaveformThemeData {
 
   /// The ratio of the spacing between the waveform bars.
   ///
-  /// Falls back to 0.3.
+  /// Falls back to 0.5.
   final double? spacingRatio;
 
   /// The scale of the height of the waveform bars.
@@ -144,15 +148,22 @@ class StreamAudioWaveformThemeData with _$StreamAudioWaveformThemeData {
   /// Falls back to [StreamColorScheme.accentPrimary].
   final Color? activeThumbColor;
 
+  /// The border color of the slider thumb when the waveform is active
+  /// (playing).
+  ///
+  /// Falls back to [StreamColorScheme.borderOnAccent].
+  final Color? activeThumbBorderColor;
+
   /// The color of the slider thumb when the waveform is idle (not playing).
   ///
   /// Falls back to [StreamColorScheme.accentNeutral].
   final Color? idleThumbColor;
 
-  /// The border color of the slider thumb.
+  /// The border color of the slider thumb when the waveform is idle
+  /// (not playing).
   ///
-  /// Falls back to [StreamColorScheme.borderOnAccent].
-  final Color? thumbBorderColor;
+  /// Falls back to [StreamColorScheme.borderDefault].
+  final Color? idleThumbBorderColor;
 
   /// Linearly interpolate between two [StreamAudioWaveformThemeData] objects.
   static StreamAudioWaveformThemeData? lerp(
