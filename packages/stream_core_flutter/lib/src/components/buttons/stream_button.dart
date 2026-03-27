@@ -466,7 +466,7 @@ class _PrimaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButtonD
   @override
   WidgetStateProperty<Color> get foregroundColor => WidgetStateProperty.resolveWith((states) {
     if (states.contains(WidgetState.disabled)) return colorScheme.textDisabled;
-    return colorScheme.accentPrimary;
+    return colorScheme.textLink;
   });
 }
 
@@ -497,7 +497,7 @@ class _PrimaryGhostDefaults extends StreamButtonThemeStyle with _SharedButtonDef
   @override
   WidgetStateProperty<Color> get foregroundColor => WidgetStateProperty.resolveWith((states) {
     if (states.contains(WidgetState.disabled)) return colorScheme.textDisabled;
-    return colorScheme.accentPrimary;
+    return colorScheme.textLink;
   });
 }
 

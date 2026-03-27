@@ -153,8 +153,13 @@ class _MessageThemeDefaults {
     textSystemColor: _colorScheme.textSecondary,
     textReadColor: _colorScheme.accentPrimary,
     borderColor: _colorScheme.borderSubtle,
-    borderOnChatColor: _colorScheme.borderOnSurface,
-    replyIndicatorColor: _colorScheme.borderOnSurface,
+    borderOnChatColor: _colorScheme.borderStrong,
+    threadConnectorColor: _colorScheme.borderDefault,
+    replyIndicatorColor: _colorScheme.chrome.shade400,
+    progressTrackColor: _colorScheme.backgroundSurfaceStrong,
+    progressFillColor: _colorScheme.accentNeutral,
+    waveFormBarColor: _colorScheme.borderOpacityStrong,
+    waveFormBarPlayingColor: _colorScheme.accentPrimary,
   );
 
   StreamMessageStyle get outgoing => StreamMessageStyle(
@@ -171,6 +176,11 @@ class _MessageThemeDefaults {
     textReadColor: _colorScheme.accentPrimary,
     borderColor: _colorScheme.brand.shade100,
     borderOnChatColor: _colorScheme.brand.shade300,
+    threadConnectorColor: _colorScheme.brand.shade150,
     replyIndicatorColor: _colorScheme.brand.shade400,
+    progressTrackColor: _colorScheme.brand.shade200,
+    progressFillColor: _colorScheme.accentPrimary,
+    waveFormBarColor: _colorScheme.borderOpacityStrong,
+    waveFormBarPlayingColor: _colorScheme.accentPrimary,
   );
 }

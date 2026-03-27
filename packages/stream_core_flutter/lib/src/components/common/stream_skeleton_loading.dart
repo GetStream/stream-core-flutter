@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_skeleton_loading_theme.dart';
-import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -271,10 +270,7 @@ class _StreamSkeletonLoadingThemeDefaults extends StreamSkeletonLoadingThemeData
   Color get baseColor => _colorScheme.backgroundSurfaceStrong;
 
   @override
-  Color get highlightColor {
-    final brightness = Theme.brightnessOf(context);
-    return brightness == .light ? StreamColors.white20 : _colorScheme.chrome[0]!;
-  }
+  Color get highlightColor => _colorScheme.backgroundOverlayLight;
 
   @override
   Duration get period => const Duration(milliseconds: 1500);

@@ -214,7 +214,7 @@ class _StreamBadgeCountThemeDefaults extends StreamBadgeCountThemeData {
   Color get backgroundColor => _colorScheme.backgroundElevation3;
 
   @override
-  Color get borderColor => _colorScheme.borderSubtle;
+  Color get borderColor => _colorScheme.borderOnInverse;
 
   @override
   Color get textColor => _colorScheme.textPrimary;
