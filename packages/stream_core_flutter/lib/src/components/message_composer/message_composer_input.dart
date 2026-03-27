@@ -76,13 +76,42 @@ class StreamMessageComposerInputField extends StatelessWidget {
     this.focusNode,
     this.command,
     this.onDismissCommand,
+    this.textInputAction,
+    this.keyboardType,
+    this.textCapitalization = TextCapitalization.sentences,
+    this.autofocus = false,
+    this.autocorrect = true,
   });
 
+  /// The controller for the text field.
   final TextEditingController controller;
+
+  /// The placeholder text shown when the field is empty.
   final String placeholder;
+
+  /// The focus node for the text field.
   final FocusNode? focusNode;
+
+  /// The active command label displayed as a chip.
   final String? command;
+
+  /// Called when the user dismisses the command chip.
   final VoidCallback? onDismissCommand;
+
+  /// The type of action button to use for the keyboard.
+  final TextInputAction? textInputAction;
+
+  /// The type of keyboard to use for editing the text.
+  final TextInputType? keyboardType;
+
+  /// {@macro flutter.widgets.editableText.textCapitalization}
+  final TextCapitalization textCapitalization;
+
+  /// Whether the text field should be focused initially.
+  final bool autofocus;
+
+  /// Whether to enable autocorrect.
+  final bool autocorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +140,12 @@ class StreamMessageComposerInputField extends StatelessWidget {
             child: TextField(
               controller: controller,
               focusNode: focusNode,
+              textInputAction: textInputAction,
+              keyboardType: keyboardType,
+              textCapitalization: textCapitalization,
+              autofocus: autofocus,
+              autocorrect: autocorrect,
+              keyboardAppearance: Theme.of(context).brightness,
               style: TextStyle(
                 color: inputTheme.textColor ?? inputDefaults.textColor,
               ),

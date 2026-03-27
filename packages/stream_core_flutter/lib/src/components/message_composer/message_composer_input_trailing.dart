@@ -6,6 +6,7 @@ import '../../../stream_core_flutter.dart';
 enum StreamMessageComposerInputTrailingState {
   send,
   edit,
+  command,
   microphone,
   voiceRecordingActive,
 }
@@ -28,10 +29,13 @@ class StreamCoreMessageComposerInputTrailing extends StatelessWidget {
   Widget build(BuildContext context) {
     if (buttonState == StreamMessageComposerInputTrailingState.send ||
         buttonState == StreamMessageComposerInputTrailingState.edit ||
+        buttonState == StreamMessageComposerInputTrailingState.command ||
         voiceRecordingCallback == null) {
       return StreamButton.icon(
         key: _messageComposerInputTrailingSendKey,
-        icon: buttonState == StreamMessageComposerInputTrailingState.edit
+        icon:
+            buttonState == StreamMessageComposerInputTrailingState.edit ||
+                buttonState == StreamMessageComposerInputTrailingState.command
             ? context.streamIcons.checkmark2Small
             : context.streamIcons.paperPlane,
         size: StreamButtonSize.small,
