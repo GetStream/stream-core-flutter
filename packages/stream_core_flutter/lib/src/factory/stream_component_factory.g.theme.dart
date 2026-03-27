@@ -31,6 +31,7 @@ mixin _$StreamComponentBuilders {
 
     return StreamComponentBuilders.raw(
       extensions: t < 0.5 ? a.extensions : b.extensions,
+      appBar: t < 0.5 ? a.appBar : b.appBar,
       avatar: t < 0.5 ? a.avatar : b.avatar,
       avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
@@ -65,6 +66,7 @@ mixin _$StreamComponentBuilders {
 
   StreamComponentBuilders copyWith({
     Map<Object, StreamComponentBuilderExtension<Object>>? extensions,
+    Widget Function(BuildContext, StreamAppBarProps)? appBar,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
     Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
@@ -103,6 +105,7 @@ mixin _$StreamComponentBuilders {
 
     return StreamComponentBuilders.raw(
       extensions: extensions ?? _this.extensions,
+      appBar: appBar ?? _this.appBar,
       avatar: avatar ?? _this.avatar,
       avatarGroup: avatarGroup ?? _this.avatarGroup,
       avatarStack: avatarStack ?? _this.avatarStack,
@@ -148,6 +151,7 @@ mixin _$StreamComponentBuilders {
 
     return copyWith(
       extensions: other.extensions,
+      appBar: other.appBar,
       avatar: other.avatar,
       avatarGroup: other.avatarGroup,
       avatarStack: other.avatarStack,
@@ -194,6 +198,7 @@ mixin _$StreamComponentBuilders {
     final _other = (other as StreamComponentBuilders);
 
     return _other.extensions == _this.extensions &&
+        _other.appBar == _this.appBar &&
         _other.avatar == _this.avatar &&
         _other.avatarGroup == _this.avatarGroup &&
         _other.avatarStack == _this.avatarStack &&
@@ -232,6 +237,7 @@ mixin _$StreamComponentBuilders {
     return Object.hashAll([
       runtimeType,
       _this.extensions,
+      _this.appBar,
       _this.avatar,
       _this.avatarGroup,
       _this.avatarStack,

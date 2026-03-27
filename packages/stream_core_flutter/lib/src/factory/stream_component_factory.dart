@@ -131,6 +131,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// [extensions] accepts an [Iterable] of [StreamComponentBuilderExtension] instances, which are
   /// converted to a map keyed by [StreamComponentBuilderExtension.type] internally.
   factory StreamComponentBuilders({
+    StreamComponentBuilder<StreamAppBarProps>? appBar,
     StreamComponentBuilder<StreamAvatarProps>? avatar,
     StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup,
     StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
@@ -165,6 +166,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
 
     return .raw(
+      appBar: appBar,
       avatar: avatar,
       avatarGroup: avatarGroup,
       avatarStack: avatarStack,
@@ -200,6 +202,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
 
   /// Creates component builders from a pre-built extensions map.
   const StreamComponentBuilders.raw({
+    required this.appBar,
     required this.avatar,
     required this.avatarGroup,
     required this.avatarStack,
@@ -250,6 +253,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// See [extensions].
   StreamComponentBuilder<T>? extension<T>() => (extensions[T] as StreamComponentBuilderExtension<T>?)?.call;
+
+  /// Custom builder for app bar widgets.
+  ///
+  /// When null, [StreamAppBar] uses [DefaultStreamAppBar].
+  final StreamComponentBuilder<StreamAppBarProps>? appBar;
 
   /// Custom builder for avatar widgets.
   ///
