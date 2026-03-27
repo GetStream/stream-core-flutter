@@ -163,7 +163,9 @@ class DefaultStreamBadgeCount extends StatelessWidget {
           shadows: boxShadow.elevation2,
         ),
         foregroundDecoration: ShapeDecoration(
-          shape: StadiumBorder(side: .new(color: effectiveBorderColor)),
+          shape: StadiumBorder(
+            side: effectiveBorderColor != null ? .new(color: effectiveBorderColor) : .none,
+          ),
         ),
         child: DefaultTextStyle(
           style: textStyle,
@@ -214,8 +216,7 @@ class _StreamBadgeCountThemeDefaults extends StreamBadgeCountThemeData {
   Color get backgroundColor => _colorScheme.backgroundElevation3;
 
   @override
-  Color get borderColor =>
-      Theme.brightnessOf(_context) == Brightness.dark ? _colorScheme.borderStrong : _colorScheme.borderSubtle;
+  Color? get borderColor => null;
 
   @override
   Color get textColor => _colorScheme.textPrimary;
