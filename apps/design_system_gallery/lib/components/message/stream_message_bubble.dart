@@ -33,17 +33,9 @@ Widget buildStreamMessageBubblePlayground(BuildContext context) {
     description: 'Position within a consecutive message group.',
   );
 
-  final contentKind = context.knobs.object.dropdown<StreamMessageContentKind>(
-    label: 'Content Kind',
-    options: StreamMessageContentKind.values,
-    labelBuilder: (v) => v.name,
-    description: 'The kind of content the message carries.',
-  );
-
   final layout = StreamMessageLayoutData(
     alignment: alignment,
     stackPosition: stackPosition,
-    contentKind: contentKind,
   );
 
   return Center(
@@ -98,7 +90,6 @@ class _AlignmentSection extends StatelessWidget {
           label: 'Start (incoming)',
           child: _PlacedBubble(
             alignment: StreamMessageAlignment.start,
-            stackPosition: StreamMessageStackPosition.single,
             crossAlign: CrossAxisAlignment.start,
             text: 'Has anyone tried the new Flutter update?',
           ),
@@ -107,7 +98,6 @@ class _AlignmentSection extends StatelessWidget {
           label: 'End (outgoing)',
           child: _PlacedBubble(
             alignment: StreamMessageAlignment.end,
-            stackPosition: StreamMessageStackPosition.single,
             crossAlign: CrossAxisAlignment.end,
             text: 'Sure, I can help with that!',
           ),
@@ -130,7 +120,6 @@ class _StackPositionsSection extends StatelessWidget {
           label: 'Single (standalone)',
           child: _PlacedBubble(
             alignment: StreamMessageAlignment.start,
-            stackPosition: StreamMessageStackPosition.single,
             crossAlign: CrossAxisAlignment.start,
             text: 'A standalone message',
           ),
@@ -219,14 +208,12 @@ class _ConversationSection extends StatelessWidget {
               SizedBox(height: 8),
               _PlacedBubble(
                 alignment: StreamMessageAlignment.end,
-                stackPosition: StreamMessageStackPosition.single,
                 crossAlign: CrossAxisAlignment.end,
                 text: 'Sounds great! Let me check my schedule.',
               ),
               SizedBox(height: 8),
               _PlacedBubble(
                 alignment: StreamMessageAlignment.start,
-                stackPosition: StreamMessageStackPosition.single,
                 crossAlign: CrossAxisAlignment.start,
                 text: 'Perfect, let me know! 👍',
               ),
@@ -289,7 +276,7 @@ class _StyleOverrideSection extends StatelessWidget {
 class _PlacedBubble extends StatelessWidget {
   const _PlacedBubble({
     required this.alignment,
-    required this.stackPosition,
+    this.stackPosition = StreamMessageStackPosition.single,
     required this.crossAlign,
     required this.text,
   });
@@ -309,10 +296,7 @@ class _PlacedBubble extends StatelessWidget {
 
     Widget child = StreamMessageBubble(child: StreamMessageText(text));
     if (!isDefault) {
-      child = StreamMessageLayout(
-        data: layout,
-        child: child,
-      );
+      child = StreamMessageLayout(data: layout, child: child);
     }
 
     return Align(

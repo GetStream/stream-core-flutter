@@ -52,13 +52,6 @@ Widget buildStreamMessageAttachmentPlayground(BuildContext context) {
     description: 'Position within a consecutive message group.',
   );
 
-  final contentKind = context.knobs.object.dropdown<StreamMessageContentKind>(
-    label: 'Content Kind',
-    options: StreamMessageContentKind.values,
-    labelBuilder: (v) => v.name,
-    description: 'The kind of content the message carries.',
-  );
-
   final showBubble = context.knobs.boolean(
     label: 'Wrap in bubble',
     initialValue: true,
@@ -68,7 +61,6 @@ Widget buildStreamMessageAttachmentPlayground(BuildContext context) {
   final layout = StreamMessageLayoutData(
     alignment: alignment,
     stackPosition: stackPosition,
-    contentKind: contentKind,
   );
 
   return StreamMessageItemTheme(
