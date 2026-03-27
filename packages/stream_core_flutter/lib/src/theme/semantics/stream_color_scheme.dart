@@ -102,9 +102,9 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderSuccess,
     Color? borderSelected,
     // State
-    Color? stateHover,
-    Color? statePressed,
-    Color? stateSelected,
+    Color? backgroundHover,
+    Color? backgroundPressed,
+    Color? backgroundSelected,
     // System
     Color? systemText,
     Color? systemScrollbar,
@@ -174,9 +174,9 @@ class StreamColorScheme with _$StreamColorScheme {
     borderSelected ??= light_tokens.StreamTokens.borderUtilitySelected;
 
     // State
-    stateHover ??= light_tokens.StreamTokens.backgroundUtilityHover;
-    statePressed ??= light_tokens.StreamTokens.backgroundUtilityPressed;
-    stateSelected ??= light_tokens.StreamTokens.backgroundUtilitySelected;
+    backgroundHover ??= light_tokens.StreamTokens.backgroundUtilityHover;
+    backgroundPressed ??= light_tokens.StreamTokens.backgroundUtilityPressed;
+    backgroundSelected ??= light_tokens.StreamTokens.backgroundUtilitySelected;
 
     // System
     systemText ??= light_tokens.StreamTokens.systemText;
@@ -255,9 +255,9 @@ class StreamColorScheme with _$StreamColorScheme {
       borderWarning: borderWarning,
       borderSuccess: borderSuccess,
       borderSelected: borderSelected,
-      stateHover: stateHover,
-      statePressed: statePressed,
-      stateSelected: stateSelected,
+      backgroundHover: backgroundHover,
+      backgroundPressed: backgroundPressed,
+      backgroundSelected: backgroundSelected,
       systemText: systemText,
       systemScrollbar: systemScrollbar,
       avatarPalette: avatarPalette,
@@ -322,9 +322,9 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderSuccess,
     Color? borderSelected,
     // State
-    Color? stateHover,
-    Color? statePressed,
-    Color? stateSelected,
+    Color? backgroundHover,
+    Color? backgroundPressed,
+    Color? backgroundSelected,
     // System
     Color? systemText,
     Color? systemScrollbar,
@@ -394,9 +394,9 @@ class StreamColorScheme with _$StreamColorScheme {
     borderSelected ??= dark_tokens.StreamTokens.borderUtilitySelected;
 
     // State
-    stateHover ??= dark_tokens.StreamTokens.backgroundUtilityHover;
-    statePressed ??= dark_tokens.StreamTokens.backgroundUtilityPressed;
-    stateSelected ??= dark_tokens.StreamTokens.backgroundUtilitySelected;
+    backgroundHover ??= dark_tokens.StreamTokens.backgroundUtilityHover;
+    backgroundPressed ??= dark_tokens.StreamTokens.backgroundUtilityPressed;
+    backgroundSelected ??= dark_tokens.StreamTokens.backgroundUtilitySelected;
 
     // System
     systemText ??= dark_tokens.StreamTokens.systemText;
@@ -475,9 +475,9 @@ class StreamColorScheme with _$StreamColorScheme {
       borderWarning: borderWarning,
       borderSuccess: borderSuccess,
       borderSelected: borderSelected,
-      stateHover: stateHover,
-      statePressed: statePressed,
-      stateSelected: stateSelected,
+      backgroundHover: backgroundHover,
+      backgroundPressed: backgroundPressed,
+      backgroundSelected: backgroundSelected,
       systemText: systemText,
       systemScrollbar: systemScrollbar,
       avatarPalette: avatarPalette,
@@ -540,9 +540,9 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.borderSuccess,
     required this.borderSelected,
     // State
-    required this.stateHover,
-    required this.statePressed,
-    required this.stateSelected,
+    required this.backgroundHover,
+    required this.backgroundPressed,
+    required this.backgroundSelected,
     // System
     required this.systemText,
     required this.systemScrollbar,
@@ -634,6 +634,15 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Disabled backgrounds for inputs, buttons, or chips.
   final Color backgroundDisabled;
 
+  /// Hover feedback overlay.
+  final Color backgroundHover;
+
+  /// Pressed feedback overlay.
+  final Color backgroundPressed;
+
+  /// Selected overlay.
+  final Color backgroundSelected;
+
   /// Inverse background used for elevated, transient, or high-attention UI surfaces that sit on top of the default app background.
   final Color backgroundInverse;
 
@@ -709,17 +718,6 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The selected state border color.
   final Color borderSelected;
-
-  // ---- State colors ----
-
-  /// Hover feedback overlay.
-  final Color stateHover;
-
-  /// Pressed feedback overlay.
-  final Color statePressed;
-
-  /// Selected overlay.
-  final Color stateSelected;
 
   // ---- System colors ----
 

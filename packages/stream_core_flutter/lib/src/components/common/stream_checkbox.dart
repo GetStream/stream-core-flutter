@@ -244,8 +244,8 @@ class _StreamCheckboxStyleDefaults extends StreamCheckboxStyle {
 
   @override
   WidgetStateProperty<Color?> get overlayColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
-    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    if (states.contains(WidgetState.pressed)) return _colorScheme.backgroundPressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.backgroundHover;
     return StreamColors.transparent;
   });
 

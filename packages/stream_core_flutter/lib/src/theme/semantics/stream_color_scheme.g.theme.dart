@@ -91,6 +91,17 @@ mixin _$StreamColorScheme {
         b.backgroundDisabled,
         t,
       )!,
+      backgroundHover: Color.lerp(a.backgroundHover, b.backgroundHover, t)!,
+      backgroundPressed: Color.lerp(
+        a.backgroundPressed,
+        b.backgroundPressed,
+        t,
+      )!,
+      backgroundSelected: Color.lerp(
+        a.backgroundSelected,
+        b.backgroundSelected,
+        t,
+      )!,
       backgroundInverse: Color.lerp(
         a.backgroundInverse,
         b.backgroundInverse,
@@ -146,9 +157,6 @@ mixin _$StreamColorScheme {
       borderWarning: Color.lerp(a.borderWarning, b.borderWarning, t)!,
       borderSuccess: Color.lerp(a.borderSuccess, b.borderSuccess, t)!,
       borderSelected: Color.lerp(a.borderSelected, b.borderSelected, t)!,
-      stateHover: Color.lerp(a.stateHover, b.stateHover, t)!,
-      statePressed: Color.lerp(a.statePressed, b.statePressed, t)!,
-      stateSelected: Color.lerp(a.stateSelected, b.stateSelected, t)!,
       systemText: Color.lerp(a.systemText, b.systemText, t)!,
       systemScrollbar: Color.lerp(a.systemScrollbar, b.systemScrollbar, t)!,
       avatarPalette: t < 0.5 ? a.avatarPalette : b.avatarPalette,
@@ -181,6 +189,9 @@ mixin _$StreamColorScheme {
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
     Color? backgroundDisabled,
+    Color? backgroundHover,
+    Color? backgroundPressed,
+    Color? backgroundSelected,
     Color? backgroundInverse,
     Color? backgroundElevation0,
     Color? backgroundElevation1,
@@ -204,9 +215,6 @@ mixin _$StreamColorScheme {
     Color? borderWarning,
     Color? borderSuccess,
     Color? borderSelected,
-    Color? stateHover,
-    Color? statePressed,
-    Color? stateSelected,
     Color? systemText,
     Color? systemScrollbar,
     List<StreamAvatarColorPair>? avatarPalette,
@@ -244,6 +252,9 @@ mixin _$StreamColorScheme {
       backgroundOverlayDark:
           backgroundOverlayDark ?? _this.backgroundOverlayDark,
       backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
+      backgroundHover: backgroundHover ?? _this.backgroundHover,
+      backgroundPressed: backgroundPressed ?? _this.backgroundPressed,
+      backgroundSelected: backgroundSelected ?? _this.backgroundSelected,
       backgroundInverse: backgroundInverse ?? _this.backgroundInverse,
       backgroundElevation0: backgroundElevation0 ?? _this.backgroundElevation0,
       backgroundElevation1: backgroundElevation1 ?? _this.backgroundElevation1,
@@ -268,9 +279,6 @@ mixin _$StreamColorScheme {
       borderWarning: borderWarning ?? _this.borderWarning,
       borderSuccess: borderSuccess ?? _this.borderSuccess,
       borderSelected: borderSelected ?? _this.borderSelected,
-      stateHover: stateHover ?? _this.stateHover,
-      statePressed: statePressed ?? _this.statePressed,
-      stateSelected: stateSelected ?? _this.stateSelected,
       systemText: systemText ?? _this.systemText,
       systemScrollbar: systemScrollbar ?? _this.systemScrollbar,
       avatarPalette: avatarPalette ?? _this.avatarPalette,
@@ -314,6 +322,9 @@ mixin _$StreamColorScheme {
       backgroundOverlayLight: other.backgroundOverlayLight,
       backgroundOverlayDark: other.backgroundOverlayDark,
       backgroundDisabled: other.backgroundDisabled,
+      backgroundHover: other.backgroundHover,
+      backgroundPressed: other.backgroundPressed,
+      backgroundSelected: other.backgroundSelected,
       backgroundInverse: other.backgroundInverse,
       backgroundElevation0: other.backgroundElevation0,
       backgroundElevation1: other.backgroundElevation1,
@@ -337,9 +348,6 @@ mixin _$StreamColorScheme {
       borderWarning: other.borderWarning,
       borderSuccess: other.borderSuccess,
       borderSelected: other.borderSelected,
-      stateHover: other.stateHover,
-      statePressed: other.statePressed,
-      stateSelected: other.stateSelected,
       systemText: other.systemText,
       systemScrollbar: other.systemScrollbar,
       avatarPalette: other.avatarPalette,
@@ -384,6 +392,9 @@ mixin _$StreamColorScheme {
         _other.backgroundOverlayLight == _this.backgroundOverlayLight &&
         _other.backgroundOverlayDark == _this.backgroundOverlayDark &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
+        _other.backgroundHover == _this.backgroundHover &&
+        _other.backgroundPressed == _this.backgroundPressed &&
+        _other.backgroundSelected == _this.backgroundSelected &&
         _other.backgroundInverse == _this.backgroundInverse &&
         _other.backgroundElevation0 == _this.backgroundElevation0 &&
         _other.backgroundElevation1 == _this.backgroundElevation1 &&
@@ -407,9 +418,6 @@ mixin _$StreamColorScheme {
         _other.borderWarning == _this.borderWarning &&
         _other.borderSuccess == _this.borderSuccess &&
         _other.borderSelected == _this.borderSelected &&
-        _other.stateHover == _this.stateHover &&
-        _other.statePressed == _this.statePressed &&
-        _other.stateSelected == _this.stateSelected &&
         _other.systemText == _this.systemText &&
         _other.systemScrollbar == _this.systemScrollbar &&
         _other.avatarPalette == _this.avatarPalette;
@@ -446,6 +454,9 @@ mixin _$StreamColorScheme {
       _this.backgroundOverlayLight,
       _this.backgroundOverlayDark,
       _this.backgroundDisabled,
+      _this.backgroundHover,
+      _this.backgroundPressed,
+      _this.backgroundSelected,
       _this.backgroundInverse,
       _this.backgroundElevation0,
       _this.backgroundElevation1,
@@ -469,9 +480,6 @@ mixin _$StreamColorScheme {
       _this.borderWarning,
       _this.borderSuccess,
       _this.borderSelected,
-      _this.stateHover,
-      _this.statePressed,
-      _this.stateSelected,
       _this.systemText,
       _this.systemScrollbar,
       _this.avatarPalette,

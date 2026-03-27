@@ -95,8 +95,6 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
                     SizedBox(height: spacing.md),
                     _buildBorderUtilitySection(context),
                     SizedBox(height: spacing.md),
-                    _buildStateColorsSection(context),
-                    SizedBox(height: spacing.md),
                     _buildSystemColorsSection(context),
                     SizedBox(height: spacing.md),
                     _buildAvatarPaletteSection(context),
@@ -371,6 +369,21 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             color: config.backgroundDisabled,
             onColorChanged: config.setBackgroundDisabled,
           ),
+          ColorPickerTile(
+            label: 'backgroundHover',
+            color: config.backgroundHover,
+            onColorChanged: config.setBackgroundHover,
+          ),
+          ColorPickerTile(
+            label: 'backgroundPressed',
+            color: config.backgroundPressed,
+            onColorChanged: config.setBackgroundPressed,
+          ),
+          ColorPickerTile(
+            label: 'backgroundSelected',
+            color: config.backgroundSelected,
+            onColorChanged: config.setBackgroundSelected,
+          ),
           SizedBox(height: spacing.xs),
           Text(
             'Surface',
@@ -537,34 +550,6 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             label: 'borderSelected',
             color: config.borderSelected,
             onColorChanged: config.setBorderSelected,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStateColorsSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
-    return SectionCard(
-      title: 'State Colors',
-      subtitle: 'state*',
-      icon: Icons.touch_app,
-      child: Column(
-        children: [
-          ColorPickerTile(
-            label: 'stateHover',
-            color: config.stateHover,
-            onColorChanged: config.setStateHover,
-          ),
-          ColorPickerTile(
-            label: 'statePressed',
-            color: config.statePressed,
-            onColorChanged: config.setStatePressed,
-          ),
-          ColorPickerTile(
-            label: 'stateSelected',
-            color: config.stateSelected,
-            onColorChanged: config.setStateSelected,
           ),
         ],
       ),

@@ -361,14 +361,14 @@ class _StreamListTileThemeDefaults extends StreamListTileThemeData {
   @override
   WidgetStateProperty<Color> get backgroundColor => .resolveWith((states) {
     const base = StreamColors.transparent;
-    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.stateSelected, base);
+    if (states.contains(WidgetState.selected)) return .alphaBlend(_colorScheme.backgroundSelected, base);
     return base;
   });
 
   @override
   WidgetStateProperty<Color> get overlayColor => .resolveWith((states) {
-    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
-    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    if (states.contains(WidgetState.pressed)) return _colorScheme.backgroundPressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.backgroundHover;
     return StreamColors.transparent;
   });
 }

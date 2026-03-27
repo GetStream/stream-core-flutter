@@ -354,7 +354,7 @@ class _StreamEmojiChipThemeDefaults extends StreamEmojiChipThemeStyle {
   WidgetStateProperty<Color?> get backgroundColor => .resolveWith((states) {
     if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     if (states.contains(WidgetState.selected)) {
-      return Color.alphaBlend(_colorScheme.stateSelected, StreamColors.transparent);
+      return Color.alphaBlend(_colorScheme.backgroundSelected, StreamColors.transparent);
     }
     return StreamColors.transparent;
   });
@@ -368,8 +368,8 @@ class _StreamEmojiChipThemeDefaults extends StreamEmojiChipThemeStyle {
   @override
   WidgetStateProperty<Color?> get overlayColor => .resolveWith((states) {
     if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
-    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
-    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    if (states.contains(WidgetState.pressed)) return _colorScheme.backgroundPressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.backgroundHover;
     return StreamColors.transparent;
   });
 

@@ -57,6 +57,9 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundOverlayLight;
   Color? _backgroundOverlayDark;
   Color? _backgroundDisabled;
+  Color? _backgroundHover;
+  Color? _backgroundPressed;
+  Color? _backgroundSelected;
   Color? _backgroundInverse;
   Color? _backgroundElevation0;
   Color? _backgroundElevation1;
@@ -86,13 +89,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _borderWarning;
   Color? _borderSuccess;
   Color? _borderSelected;
-
-  // =========================================================================
-  // State Colors
-  // =========================================================================
-  Color? _stateHover;
-  Color? _statePressed;
-  Color? _stateSelected;
 
   // =========================================================================
   // System Colors
@@ -148,6 +144,9 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundOverlayLight => _backgroundOverlayLight ?? _themeData.colorScheme.backgroundOverlayLight;
   Color get backgroundOverlayDark => _backgroundOverlayDark ?? _themeData.colorScheme.backgroundOverlayDark;
   Color get backgroundDisabled => _backgroundDisabled ?? _themeData.colorScheme.backgroundDisabled;
+  Color get backgroundHover => _backgroundHover ?? _themeData.colorScheme.backgroundHover;
+  Color get backgroundPressed => _backgroundPressed ?? _themeData.colorScheme.backgroundPressed;
+  Color get backgroundSelected => _backgroundSelected ?? _themeData.colorScheme.backgroundSelected;
   Color get backgroundInverse => _backgroundInverse ?? _themeData.colorScheme.backgroundInverse;
   Color get backgroundElevation0 => _backgroundElevation0 ?? _themeData.colorScheme.backgroundElevation0;
   Color get backgroundElevation1 => _backgroundElevation1 ?? _themeData.colorScheme.backgroundElevation1;
@@ -177,13 +176,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get borderWarning => _borderWarning ?? _themeData.colorScheme.borderWarning;
   Color get borderSuccess => _borderSuccess ?? _themeData.colorScheme.borderSuccess;
   Color get borderSelected => _borderSelected ?? _themeData.colorScheme.borderSelected;
-
-  // =========================================================================
-  // Getters - State
-  // =========================================================================
-  Color get stateHover => _stateHover ?? _themeData.colorScheme.stateHover;
-  Color get statePressed => _statePressed ?? _themeData.colorScheme.statePressed;
-  Color get stateSelected => _stateSelected ?? _themeData.colorScheme.stateSelected;
 
   // =========================================================================
   // Getters - System
@@ -244,6 +236,9 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundOverlayLight(Color color) => _update(() => _backgroundOverlayLight = color);
   void setBackgroundOverlayDark(Color color) => _update(() => _backgroundOverlayDark = color);
   void setBackgroundDisabled(Color color) => _update(() => _backgroundDisabled = color);
+  void setBackgroundHover(Color color) => _update(() => _backgroundHover = color);
+  void setBackgroundPressed(Color color) => _update(() => _backgroundPressed = color);
+  void setBackgroundSelected(Color color) => _update(() => _backgroundSelected = color);
   void setBackgroundInverse(Color color) => _update(() => _backgroundInverse = color);
   void setBackgroundElevation0(Color color) => _update(() => _backgroundElevation0 = color);
   void setBackgroundElevation1(Color color) => _update(() => _backgroundElevation1 = color);
@@ -269,11 +264,6 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBorderWarning(Color color) => _update(() => _borderWarning = color);
   void setBorderSuccess(Color color) => _update(() => _borderSuccess = color);
   void setBorderSelected(Color color) => _update(() => _borderSelected = color);
-
-  // State
-  void setStateHover(Color color) => _update(() => _stateHover = color);
-  void setStatePressed(Color color) => _update(() => _statePressed = color);
-  void setStateSelected(Color color) => _update(() => _stateSelected = color);
 
   // System
   void setSystemText(Color color) => _update(() => _systemText = color);
@@ -343,6 +333,9 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundOverlayLight = null;
     _backgroundOverlayDark = null;
     _backgroundDisabled = null;
+    _backgroundHover = null;
+    _backgroundPressed = null;
+    _backgroundSelected = null;
     _backgroundInverse = null;
     _backgroundElevation0 = null;
     _backgroundElevation1 = null;
@@ -366,10 +359,6 @@ class ThemeConfiguration extends ChangeNotifier {
     _borderWarning = null;
     _borderSuccess = null;
     _borderSelected = null;
-    // State
-    _stateHover = null;
-    _statePressed = null;
-    _stateSelected = null;
     // System
     _systemText = null;
     _systemScrollbar = null;
@@ -474,6 +463,9 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundOverlayLight: _backgroundOverlayLight,
       backgroundOverlayDark: _backgroundOverlayDark,
       backgroundDisabled: effectiveBackgroundDisabled,
+      backgroundHover: _backgroundHover,
+      backgroundPressed: _backgroundPressed,
+      backgroundSelected: _backgroundSelected,
       backgroundInverse: effectiveBackgroundInverse,
       backgroundElevation0: effectiveBackgroundElevation0,
       backgroundElevation1: effectiveBackgroundElevation1,
@@ -497,10 +489,6 @@ class ThemeConfiguration extends ChangeNotifier {
       borderWarning: effectiveBorderWarning,
       borderSuccess: effectiveBorderSuccess,
       borderSelected: _borderSelected,
-      // State
-      stateHover: _stateHover,
-      statePressed: _statePressed,
-      stateSelected: _stateSelected,
       // System
       systemText: _systemText,
       systemScrollbar: _systemScrollbar,
