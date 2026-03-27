@@ -12,6 +12,8 @@ final List<double> _sampleWaveform = List.generate(
   (i) => (math.sin(i * 0.15) * 0.3 + 0.5 + math.sin(i * 0.4) * 0.2).clamp(0.0, 1.0),
 );
 
+final List<double> _maxWaveform = List.filled(100, 1);
+
 void main() {
   group('StreamAudioWaveformSlider Golden Tests', () {
     goldenTest(
@@ -146,7 +148,7 @@ void main() {
                   color: Colors.purple,
                   progressColor: Colors.orange,
                   idleThumbColor: Colors.grey,
-                  thumbBorderColor: Colors.black,
+                  idleThumbBorderColor: Colors.black,
                 ),
                 child: StreamAudioWaveformSlider(
                   waveform: _sampleWaveform,
@@ -164,7 +166,7 @@ void main() {
                   color: Colors.purple,
                   progressColor: Colors.orange,
                   activeThumbColor: Colors.red,
-                  thumbBorderColor: Colors.black,
+                  activeThumbBorderColor: Colors.black,
                 ),
                 child: StreamAudioWaveformSlider(
                   waveform: _sampleWaveform,
@@ -211,6 +213,15 @@ void main() {
               StreamAudioWaveform(
                 waveform: _sampleWaveform,
                 progress: 1,
+              ),
+            ),
+          ),
+          GoldenTestScenario(
+            name: 'max_waveform',
+            child: _buildWaveformInTheme(
+              StreamAudioWaveform(
+                waveform: _maxWaveform,
+                progress: 0.5,
               ),
             ),
           ),

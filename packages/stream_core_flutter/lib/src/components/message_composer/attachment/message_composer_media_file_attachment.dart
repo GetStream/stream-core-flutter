@@ -30,41 +30,23 @@ class MessageComposerMediaFileAttachment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      width: 80,
-      child: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(context.streamSpacing.xxs),
-            child: Container(
-              clipBehavior: Clip.antiAlias,
-              foregroundDecoration: BoxDecoration(
-                borderRadius: BorderRadius.all(context.streamRadius.lg),
-                border: Border.all(
-                  color: context.streamColorScheme.borderDefault.withAlpha(25),
-                ),
+    final spacing = context.streamSpacing;
+
+    return StreamMessageComposerAttachmentContainer(
+      onRemovePressed: onRemovePressed,
+      child: SizedBox.square(
+        dimension: 72,
+        child: Stack(
+          children: [
+            child,
+            if (mediaBadge case final badge?)
+              PositionedDirectional(
+                start: spacing.xs,
+                bottom: spacing.xs,
+                child: badge,
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(context.streamRadius.lg),
-              ),
-              child: child,
-            ),
-          ),
-          if (onRemovePressed case final VoidCallback onRemovePressed?)
-            Align(
-              alignment: Alignment.topRight,
-              child: StreamRemoveControl(onPressed: onRemovePressed),
-            ),
-          if (mediaBadge case final Widget mediaBadge?)
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Padding(
-                padding: EdgeInsets.all(context.streamSpacing.xs),
-                child: mediaBadge,
-              ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

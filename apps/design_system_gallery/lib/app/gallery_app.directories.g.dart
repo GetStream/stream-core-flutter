@@ -50,6 +50,8 @@ import 'package:design_system_gallery/components/common/stream_skeleton_loading.
     as _design_system_gallery_components_common_stream_skeleton_loading;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
+import 'package:design_system_gallery/components/controls/playback_speed_toggle.dart'
+    as _design_system_gallery_components_controls_playback_speed_toggle;
 import 'package:design_system_gallery/components/controls/stream_command_chip.dart'
     as _design_system_gallery_components_controls_stream_command_chip;
 import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart'
@@ -624,6 +626,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_controls_stream_emoji_chip_bar
                         .buildStreamEmojiChipBarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamPlaybackSpeedToggle',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_playback_speed_toggle
+                        .buildStreamPlaybackSpeedTogglePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_playback_speed_toggle
+                        .buildStreamPlaybackSpeedToggleShowcase,
               ),
             ],
           ),

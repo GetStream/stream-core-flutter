@@ -155,6 +155,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageTextProps>? messageText,
     StreamComponentBuilder<StreamNetworkImageProps>? networkImage,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
+    StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
@@ -190,6 +191,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageText: messageText,
       networkImage: networkImage,
       onlineIndicator: onlineIndicator,
+      playbackSpeedToggle: playbackSpeedToggle,
       progressBar: progressBar,
       reactionPicker: reactionPicker,
       reactions: reactions,
@@ -226,6 +228,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageText,
     required this.networkImage,
     required this.onlineIndicator,
+    required this.playbackSpeedToggle,
     required this.progressBar,
     required this.reactionPicker,
     required this.reactions,
@@ -374,6 +377,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamOnlineIndicator] uses [DefaultStreamOnlineIndicator].
   final StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator;
+
+  /// Custom builder for playback speed toggle widgets.
+  ///
+  /// When null, [StreamPlaybackSpeedToggle] uses
+  /// [DefaultStreamPlaybackSpeedToggle].
+  final StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle;
 
   /// Custom builder for progress bar widgets.
   ///

@@ -20,6 +20,7 @@ import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
@@ -114,6 +115,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
@@ -150,6 +152,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     messageTheme ??= const StreamMessageThemeData();
     inputTheme ??= const StreamInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
+    playbackSpeedToggleTheme ??= const StreamPlaybackSpeedToggleThemeData();
     progressBarTheme ??= const StreamProgressBarThemeData();
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
@@ -180,6 +183,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
+      playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
@@ -224,6 +228,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.messageTheme,
     required this.inputTheme,
     required this.onlineIndicatorTheme,
+    required this.playbackSpeedToggleTheme,
     required this.progressBarTheme,
     required this.reactionPickerTheme,
     required this.reactionsTheme,
@@ -338,6 +343,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
 
+  /// The playback speed toggle theme for this theme.
+  final StreamPlaybackSpeedToggleThemeData playbackSpeedToggleTheme;
+
   /// The progress bar theme for this theme.
   final StreamProgressBarThemeData progressBarTheme;
 
@@ -395,6 +403,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       messageTheme: messageTheme,
       inputTheme: inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
+      playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,

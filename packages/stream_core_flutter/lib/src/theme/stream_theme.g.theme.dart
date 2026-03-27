@@ -36,6 +36,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamMessageThemeData? messageTheme,
     StreamInputThemeData? inputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
+    StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
@@ -70,6 +71,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       messageTheme: messageTheme ?? _this.messageTheme,
       inputTheme: inputTheme ?? _this.inputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
+      playbackSpeedToggleTheme:
+          playbackSpeedToggleTheme ?? _this.playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
@@ -170,6 +173,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.onlineIndicatorTheme,
         t,
       )!,
+      playbackSpeedToggleTheme: StreamPlaybackSpeedToggleThemeData.lerp(
+        _this.playbackSpeedToggleTheme,
+        other.playbackSpeedToggleTheme,
+        t,
+      )!,
       progressBarTheme: StreamProgressBarThemeData.lerp(
         _this.progressBarTheme,
         other.progressBarTheme,
@@ -230,6 +238,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.messageTheme == _this.messageTheme &&
         _other.inputTheme == _this.inputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
+        _other.playbackSpeedToggleTheme == _this.playbackSpeedToggleTheme &&
         _other.progressBarTheme == _this.progressBarTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
@@ -266,6 +275,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.messageTheme,
       _this.inputTheme,
       _this.onlineIndicatorTheme,
+      _this.playbackSpeedToggleTheme,
       _this.progressBarTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,

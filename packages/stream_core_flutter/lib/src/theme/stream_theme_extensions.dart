@@ -16,6 +16,7 @@ import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
+import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
@@ -121,6 +122,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamOnlineIndicatorThemeData] from the nearest ancestor.
   StreamOnlineIndicatorThemeData get streamOnlineIndicatorTheme => StreamOnlineIndicatorTheme.of(this);
+
+  /// Returns the [StreamPlaybackSpeedToggleThemeData] from the nearest ancestor.
+  StreamPlaybackSpeedToggleThemeData get streamPlaybackSpeedToggleTheme => StreamPlaybackSpeedToggleTheme.of(this);
 
   /// Returns the [StreamProgressBarThemeData] from the nearest ancestor.
   StreamProgressBarThemeData get streamProgressBarTheme => StreamProgressBarTheme.of(this);

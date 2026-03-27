@@ -23,6 +23,7 @@ export 'theme/components/stream_message_style_property.dart';
 export 'theme/components/stream_message_text_theme.dart';
 export 'theme/components/stream_message_theme.dart';
 export 'theme/components/stream_online_indicator_theme.dart';
+export 'theme/components/stream_playback_speed_toggle_theme.dart';
 export 'theme/components/stream_progress_bar_theme.dart';
 export 'theme/components/stream_reaction_picker_theme.dart';
 export 'theme/components/stream_reactions_theme.dart';

@@ -31,8 +31,9 @@ class StreamAudioWaveformSlider extends StatefulWidget {
     this.inverse = true,
     this.isActive = false,
     this.activeThumbColor,
+    this.activeThumbBorderColor,
     this.idleThumbColor,
-    this.thumbBorderColor,
+    this.idleThumbBorderColor,
   });
 
   /// The waveform data to be drawn.
@@ -104,15 +105,20 @@ class StreamAudioWaveformSlider extends StatefulWidget {
   /// Defaults to [StreamAudioWaveformThemeData.activeThumbColor].
   final Color? activeThumbColor;
 
+  /// The border color of the slider thumb when [isActive] is true.
+  ///
+  /// Defaults to [StreamAudioWaveformThemeData.activeThumbBorderColor].
+  final Color? activeThumbBorderColor;
+
   /// The color of the slider thumb when [isActive] is false.
   ///
   /// Defaults to [StreamAudioWaveformThemeData.idleThumbColor].
   final Color? idleThumbColor;
 
-  /// The color of the slider thumb border.
+  /// The border color of the slider thumb when [isActive] is false.
   ///
-  /// Defaults to [StreamAudioWaveformThemeData.thumbBorderColor].
-  final Color? thumbBorderColor;
+  /// Defaults to [StreamAudioWaveformThemeData.idleThumbBorderColor].
+  final Color? idleThumbBorderColor;
 
   @override
   State<StreamAudioWaveformSlider> createState() => _StreamAudioWaveformSliderState();
@@ -125,9 +131,14 @@ class _StreamAudioWaveformSliderState extends State<StreamAudioWaveformSlider> {
     final colorScheme = context.streamColorScheme;
 
     final activeThumbColor = widget.activeThumbColor ?? theme.activeThumbColor ?? colorScheme.accentPrimary;
-    final idleThumbColor = widget.idleThumbColor ?? theme.idleThumbColor ?? colorScheme.accentNeutral;
+    final activeThumbBorderColor =
+        widget.activeThumbBorderColor ?? theme.activeThumbBorderColor ?? colorScheme.borderOnAccent;
+    final idleThumbColor = widget.idleThumbColor ?? theme.idleThumbColor ?? colorScheme.backgroundOnAccent;
+    final idleThumbBorderColor =
+        widget.idleThumbBorderColor ?? theme.idleThumbBorderColor ?? colorScheme.borderOpacityStrong;
+
     final thumbColor = widget.isActive ? activeThumbColor : idleThumbColor;
-    final thumbBorderColor = widget.thumbBorderColor ?? theme.thumbBorderColor ?? colorScheme.borderInverse;
+    final thumbBorderColor = widget.isActive ? activeThumbBorderColor : idleThumbBorderColor;
 
     return HorizontalSlider(
       onChangeStart: widget.onChangeStart,
@@ -182,6 +193,7 @@ class StreamAudioWaveformSliderThumb extends StatelessWidget {
     this.size = _kAudioWaveformSliderThumbWidth,
     this.color = Colors.white,
     this.borderColor = const Color(0xffecebeb),
+    this.elevation = 2,
   });
 
   /// The width of the thumb.
@@ -193,19 +205,25 @@ class StreamAudioWaveformSliderThumb extends StatelessWidget {
   /// The border color of the thumb.
   final Color borderColor;
 
+  /// The elevation of the thumb shadow.
+  ///
+  /// Defaults to 2.
+  final double elevation;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      foregroundDecoration: BoxDecoration(
-        color: color,
-        border: Border.all(
-          color: borderColor,
-          strokeAlign: BorderSide.strokeAlignCenter,
-          width: 2,
+    return PhysicalModel(
+      color: color,
+      shape: .circle,
+      elevation: elevation,
+      child: SizedBox.square(
+        dimension: size,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: .all(color: borderColor),
+            shape: BoxShape.circle,
+          ),
         ),
-        shape: BoxShape.circle,
       ),
     );
   }
@@ -288,7 +306,7 @@ class StreamAudioWaveform extends StatelessWidget {
     final color = this.color ?? theme.color ?? colorScheme.borderOpacityStrong;
     final progressColor = this.progressColor ?? theme.progressColor ?? colorScheme.accentPrimary;
     final minBarHeight = this.minBarHeight ?? theme.minBarHeight ?? 2.0;
-    final spacingRatio = this.spacingRatio ?? theme.spacingRatio ?? 0.3;
+    final spacingRatio = this.spacingRatio ?? theme.spacingRatio ?? 0.5;
     final heightScale = this.heightScale ?? theme.heightScale ?? 1.0;
 
     return CustomPaint(
@@ -316,7 +334,7 @@ class _WaveformPainter extends CustomPainter {
     this.progress = 0,
     this.progressColor = const Color(0xff005FFF),
     this.minBarHeight = 2,
-    double spacingRatio = 0.3,
+    double spacingRatio = 0.5,
     this.heightScale = 1,
     this.inverse = true,
   }) : waveform = [
@@ -354,7 +372,7 @@ class _WaveformPainter extends CustomPainter {
       if (inverse) dx = canvasWidth - dx;
       final dy = canvasHeight / 2;
 
-      final barHeight = math.max(barValue * canvasHeight, minBarHeight);
+      final barHeight = math.max(barValue * canvasHeight * heightScale, minBarHeight);
 
       final rect = RRect.fromRectAndRadius(
         Rect.fromCenter(
@@ -362,7 +380,7 @@ class _WaveformPainter extends CustomPainter {
           width: barWidth,
           height: barHeight,
         ),
-        const Radius.circular(2),
+        Radius.circular(barWidth / 2),
       );
 
       final waveColor = switch (dx <= progressWidth) {
@@ -370,11 +388,7 @@ class _WaveformPainter extends CustomPainter {
         false => color,
       };
 
-      final wavePaint = Paint()
-        ..color = waveColor
-        ..strokeCap = StrokeCap.round;
-
-      canvas.drawRRect(rect, wavePaint);
+      canvas.drawRRect(rect, Paint()..color = waveColor);
     }
 
     // Paint all the bars

@@ -55,6 +55,9 @@ mixin _$StreamComponentBuilders {
       messageText: t < 0.5 ? a.messageText : b.messageText,
       networkImage: t < 0.5 ? a.networkImage : b.networkImage,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
+      playbackSpeedToggle: t < 0.5
+          ? a.playbackSpeedToggle
+          : b.playbackSpeedToggle,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
       reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
@@ -94,6 +97,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamMessageTextProps)? messageText,
     Widget Function(BuildContext, StreamNetworkImageProps)? networkImage,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
+    Widget Function(BuildContext, StreamPlaybackSpeedToggleProps)?
+    playbackSpeedToggle,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
     Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
@@ -130,6 +135,7 @@ mixin _$StreamComponentBuilders {
       messageText: messageText ?? _this.messageText,
       networkImage: networkImage ?? _this.networkImage,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
+      playbackSpeedToggle: playbackSpeedToggle ?? _this.playbackSpeedToggle,
       progressBar: progressBar ?? _this.progressBar,
       reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
@@ -176,6 +182,7 @@ mixin _$StreamComponentBuilders {
       messageText: other.messageText,
       networkImage: other.networkImage,
       onlineIndicator: other.onlineIndicator,
+      playbackSpeedToggle: other.playbackSpeedToggle,
       progressBar: other.progressBar,
       reactionPicker: other.reactionPicker,
       reactions: other.reactions,
@@ -223,6 +230,7 @@ mixin _$StreamComponentBuilders {
         _other.messageText == _this.messageText &&
         _other.networkImage == _this.networkImage &&
         _other.onlineIndicator == _this.onlineIndicator &&
+        _other.playbackSpeedToggle == _this.playbackSpeedToggle &&
         _other.progressBar == _this.progressBar &&
         _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions &&
@@ -262,6 +270,7 @@ mixin _$StreamComponentBuilders {
       _this.messageText,
       _this.networkImage,
       _this.onlineIndicator,
+      _this.playbackSpeedToggle,
       _this.progressBar,
       _this.reactionPicker,
       _this.reactions,

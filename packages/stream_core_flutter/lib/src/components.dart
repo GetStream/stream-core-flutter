@@ -24,6 +24,7 @@ export 'components/context_menu/stream_context_menu_action.dart' hide DefaultStr
 export 'components/controls/stream_command_chip.dart' hide DefaultStreamCommandChip;
 export 'components/controls/stream_emoji_chip.dart' hide DefaultStreamEmojiChip;
 export 'components/controls/stream_emoji_chip_bar.dart' hide DefaultStreamEmojiChipBar;
+export 'components/controls/stream_playback_speed_toggle.dart' hide DefaultStreamPlaybackSpeedToggle;
 export 'components/controls/stream_remove_control.dart';
 export 'components/emoji/data/stream_emoji_data.dart';
 export 'components/emoji/data/stream_supported_emojis.dart';
