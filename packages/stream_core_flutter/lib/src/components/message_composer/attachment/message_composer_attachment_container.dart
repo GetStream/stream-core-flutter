@@ -6,12 +6,10 @@ import '../../controls/stream_remove_control.dart';
 /// A styled container that wraps message composer attachment content with a
 /// themed background, shape, and border.
 ///
-/// Built-in defaults provide a rounded shape, background color, border, and
-/// padding matching the design system tokens. Override specific properties
-/// as needed.
+/// Built-in defaults provide a rounded shape, background color, and border
+/// matching the design system tokens.
 ///
-/// An optional [onRemovePressed] callback adds a [StreamRemoveControl] overlay
-/// at the top-right corner.
+/// An optional [onRemovePressed] callback adds a [StreamRemoveControl] overlay.
 ///
 /// {@tool snippet}
 ///
@@ -27,12 +25,12 @@ import '../../controls/stream_remove_control.dart';
 ///
 /// {@tool snippet}
 ///
-/// With custom background and padding:
+/// With custom colors:
 ///
 /// ```dart
 /// StreamMessageComposerAttachmentContainer(
 ///   backgroundColor: Colors.blue.shade50,
-///   padding: EdgeInsets.all(16),
+///   borderColor: Colors.blue.shade200,
 ///   child: MyAttachmentContent(),
 /// )
 /// ```
@@ -83,30 +81,37 @@ class StreamMessageComposerAttachmentContainer extends StatelessWidget {
     final effectiveBorderColor = borderColor ?? colorScheme.borderDefault;
     final effectiveBackgroundColor = backgroundColor ?? colorScheme.backgroundElevation1;
 
-    return Stack(
-      children: [
-        Container(
-          clipBehavior: .hardEdge,
-          margin: .all(spacing.xxs),
-          decoration: BoxDecoration(
-            borderRadius: .all(radius.lg),
-            color: effectiveBackgroundColor,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: .all(radius.lg),
-            border: .all(
-              color: effectiveBorderColor,
-              strokeAlign: BorderSide.strokeAlignInside,
-            ),
-          ),
-          child: child,
+    final container = Container(
+      clipBehavior: .hardEdge,
+      margin: .all(spacing.xxs),
+      decoration: BoxDecoration(
+        borderRadius: .all(radius.lg),
+        color: effectiveBackgroundColor,
+      ),
+      foregroundDecoration: BoxDecoration(
+        borderRadius: .all(radius.lg),
+        border: .all(
+          color: effectiveBorderColor,
+          strokeAlign: BorderSide.strokeAlignInside,
         ),
-        if (onRemovePressed case final onPressed?)
-          Align(
-            alignment: AlignmentDirectional.topEnd,
+      ),
+      child: child,
+    );
+
+    if (onRemovePressed case final onPressed?) {
+      return Stack(
+        clipBehavior: .none,
+        children: [
+          container,
+          PositionedDirectional(
+            top: 0,
+            end: 0,
             child: StreamRemoveControl(onPressed: onPressed),
           ),
-      ],
-    );
+        ],
+      );
+    }
+
+    return container;
   }
 }

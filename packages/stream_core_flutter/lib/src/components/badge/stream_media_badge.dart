@@ -34,25 +34,33 @@ class StreamMediaBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icons = context.streamIcons;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    final textTheme = context.streamTextTheme;
+    final colorScheme = context.streamColorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: context.streamColorScheme.chrome[1000],
-        borderRadius: BorderRadius.all(context.streamRadius.max),
+        color: colorScheme.backgroundInverse,
+        borderRadius: .all(radius.max),
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: context.streamSpacing.xs,
-        vertical: context.streamSpacing.xxs,
+        horizontal: spacing.xs,
+        vertical: spacing.xxs,
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
+        spacing: spacing.xxs,
         children: [
           Icon(
             switch (type) {
-              MediaBadgeType.video => context.streamIcons.videoSolid,
-              MediaBadgeType.audio => context.streamIcons.microphoneSolid,
+              MediaBadgeType.video => icons.videoSolid,
+              MediaBadgeType.audio => icons.microphoneSolid,
             },
             size: 12,
-            color: context.streamColorScheme.textInverse,
+            color: colorScheme.textOnInverse,
           ),
 
           if (duration case final duration?)
@@ -61,7 +69,7 @@ class StreamMediaBadge extends StatelessWidget {
                 MediaBadgeDurationFormat.compact => duration.toCompactString(),
                 MediaBadgeDurationFormat.exact => duration.toExactString(),
               },
-              style: context.streamTextTheme.numericMd.copyWith(color: context.streamColorScheme.textInverse),
+              style: textTheme.numericMd.copyWith(color: colorScheme.textOnInverse),
             ),
         ],
       ),

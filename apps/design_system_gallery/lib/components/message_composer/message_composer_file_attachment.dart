@@ -9,33 +9,28 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: MessageComposerReplyAttachment,
+  type: MessageComposerFileAttachment,
   path: '[Components]/Message Composer',
 )
-Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
+Widget buildMessageComposerFileAttachmentPlayground(BuildContext context) {
   final title = context.knobs.string(
     label: 'Title',
-    initialValue: 'Reply to John Doe',
-    description: 'The title line, typically the author name.',
+    initialValue: 'quarterly_report.pdf',
+    description: 'The file name displayed in the attachment.',
   );
 
-  final subtitle = context.knobs.string(
-    label: 'Subtitle',
-    initialValue: 'We had a great time during our holiday.',
-    description: 'The subtitle line, typically the message preview.',
+  final fileType = context.knobs.object.dropdown<StreamFileType>(
+    label: 'File Type',
+    options: StreamFileType.values,
+    initialOption: StreamFileType.pdf,
+    labelBuilder: (v) => v.name,
+    description: 'Determines which icon is shown.',
   );
 
-  final style = context.knobs.object.dropdown<ReplyStyle>(
-    label: 'Style',
-    options: ReplyStyle.values,
-    initialOption: ReplyStyle.incoming,
-    labelBuilder: (option) => option.name,
-    description: 'Incoming uses left-hand bar and incoming colors; outgoing uses right-hand bar and outgoing colors.',
-  );
-
-  final showThumbnail = context.knobs.boolean(
-    label: 'Show Thumbnail',
-    description: 'Toggle a trailing image thumbnail.',
+  final showSubtitle = context.knobs.boolean(
+    label: 'Show Subtitle',
+    initialValue: true,
+    description: 'Toggle a subtitle (e.g. file size).',
   );
 
   final showRemoveButton = context.knobs.boolean(
@@ -47,12 +42,16 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
   return Center(
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360),
-      child: MessageComposerReplyAttachment(
-        title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: showThumbnail ? _Thumbnail() : null,
+      child: MessageComposerFileAttachment(
+        fileTypeIcon: StreamFileTypeIcon(type: fileType),
+        title: title,
+        subtitle: showSubtitle
+            ? Text(
+                '2.4 MB',
+                style: TextStyle(fontSize: 12, color: context.streamColorScheme.textTertiary),
+              )
+            : null,
         onRemovePressed: showRemoveButton ? () {} : null,
-        style: style,
       ),
     ),
   );
@@ -64,18 +63,18 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: MessageComposerReplyAttachment,
+  type: MessageComposerFileAttachment,
   path: '[Components]/Message Composer',
 )
-Widget buildMessageComposerAttachmentReplyShowcase(BuildContext context) {
+Widget buildMessageComposerFileAttachmentShowcase(BuildContext context) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(24),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 32,
       children: [
-        _ReplyStyleSection(),
-        _ThumbnailSection(),
+        _FileTypesSection(),
+        _WithSubtitleSection(),
       ],
     ),
   );
@@ -85,28 +84,43 @@ Widget buildMessageComposerAttachmentReplyShowcase(BuildContext context) {
 // Showcase Sections
 // =============================================================================
 
-class _ReplyStyleSection extends StatelessWidget {
+class _FileTypesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Section(
-      label: 'REPLY STYLE',
-      description: 'Incoming vs outgoing reply styling with different indicator colors and backgrounds.',
+      label: 'FILE TYPES',
+      description: 'Different file type icons based on the attachment type.',
       children: [
         _ExampleCard(
-          label: 'Incoming',
-          child: MessageComposerReplyAttachment(
-            title: const Text('Reply to Alice'),
-            subtitle: const Text('Did you see the sunset yesterday?'),
+          label: 'PDF',
+          child: MessageComposerFileAttachment(
+            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.pdf),
+            title: 'annual_report.pdf',
             onRemovePressed: () {},
           ),
         ),
         _ExampleCard(
-          label: 'Outgoing',
-          child: MessageComposerReplyAttachment(
-            title: const Text('Reply to You'),
-            subtitle: const Text('Sure, I can help with that!'),
+          label: 'Document',
+          child: MessageComposerFileAttachment(
+            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.text),
+            title: 'meeting_notes.docx',
             onRemovePressed: () {},
-            style: ReplyStyle.outgoing,
+          ),
+        ),
+        _ExampleCard(
+          label: 'Spreadsheet',
+          child: MessageComposerFileAttachment(
+            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
+            title: 'project_budget.xlsx',
+            onRemovePressed: () {},
+          ),
+        ),
+        _ExampleCard(
+          label: 'Audio',
+          child: MessageComposerFileAttachment(
+            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.audio),
+            title: 'podcast_episode.mp3',
+            onRemovePressed: () {},
           ),
         ),
       ],
@@ -114,30 +128,31 @@ class _ReplyStyleSection extends StatelessWidget {
   }
 }
 
-class _ThumbnailSection extends StatelessWidget {
+class _WithSubtitleSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final subtitleStyle = TextStyle(fontSize: 12, color: colorScheme.textTertiary);
+
     return _Section(
-      label: 'WITH THUMBNAIL',
-      description: 'A trailing thumbnail for replies to media messages.',
+      label: 'WITH SUBTITLE',
+      description: 'An optional subtitle for additional info like file size or upload status.',
       children: [
         _ExampleCard(
-          label: 'Incoming with image',
-          child: MessageComposerReplyAttachment(
-            title: const Text('Reply to Bob'),
-            subtitle: const Text('Check out this photo from our trip!'),
-            trailing: _Thumbnail(),
+          label: 'With file size',
+          child: MessageComposerFileAttachment(
+            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.pdf),
+            title: 'design_specs.pdf',
+            subtitle: Text('4.2 MB', style: subtitleStyle),
             onRemovePressed: () {},
           ),
         ),
         _ExampleCard(
-          label: 'Outgoing with image',
-          child: MessageComposerReplyAttachment(
-            title: const Text('Reply to You'),
-            subtitle: const Text('Here is the document you requested.'),
-            trailing: _Thumbnail(),
-            onRemovePressed: () {},
-            style: ReplyStyle.outgoing,
+          label: 'Without remove button',
+          child: MessageComposerFileAttachment(
+            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
+            title: 'budget_2025.xlsx',
+            subtitle: Text('1.8 MB', style: subtitleStyle),
           ),
         ),
       ],
@@ -148,23 +163,6 @@ class _ThumbnailSection extends StatelessWidget {
 // =============================================================================
 // Helper Widgets
 // =============================================================================
-
-class _Thumbnail extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(context.streamRadius.md),
-        image: const DecorationImage(
-          image: AssetImage('assets/attachment_image.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-}
 
 class _Section extends StatelessWidget {
   const _Section({

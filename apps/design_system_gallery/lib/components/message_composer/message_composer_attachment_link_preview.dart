@@ -29,14 +29,14 @@ Widget buildMessageComposerAttachmentLinkPreviewPlayground(BuildContext context)
     description: 'The link URL displayed in the preview.',
   );
   final showImage = context.knobs.boolean(
-    label: 'Show image',
+    label: 'Show Image',
     initialValue: true,
-    description: 'Whether to show the link preview thumbnail image.',
+    description: 'Toggle the link preview thumbnail image.',
   );
   final showRemoveButton = context.knobs.boolean(
-    label: 'Show remove button',
+    label: 'Show Remove Button',
     initialValue: true,
-    description: 'Whether to show the remove attachment control.',
+    description: 'Toggle the remove attachment control.',
   );
 
   return Center(
@@ -51,4 +51,168 @@ Widget buildMessageComposerAttachmentLinkPreviewPlayground(BuildContext context)
       ),
     ),
   );
+}
+
+// =============================================================================
+// Showcase
+// =============================================================================
+
+@widgetbook.UseCase(
+  name: 'Showcase',
+  type: MessageComposerLinkPreviewAttachment,
+  path: '[Components]/Message Composer',
+)
+Widget buildMessageComposerAttachmentLinkPreviewShowcase(BuildContext context) {
+  return SingleChildScrollView(
+    padding: const EdgeInsets.all(24),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 32,
+      children: [
+        _FullPreviewSection(),
+        _PartialPreviewSection(),
+      ],
+    ),
+  );
+}
+
+// =============================================================================
+// Showcase Sections
+// =============================================================================
+
+class _FullPreviewSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const _Section(
+      label: 'FULL PREVIEW',
+      description: 'All fields populated: image, title, subtitle, and URL.',
+      children: [
+        _ExampleCard(
+          label: 'Complete link preview',
+          child: MessageComposerLinkPreviewAttachment(
+            title: 'Stream Chat Flutter SDK',
+            subtitle: 'Build real-time chat with our powerful Flutter SDK.',
+            url: 'https://getstream.io/chat/sdk/flutter/',
+            image: AssetImage('assets/attachment_image.png'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PartialPreviewSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const _Section(
+      label: 'PARTIAL PREVIEWS',
+      description: 'Each field is optional. The layout adapts to available content.',
+      children: [
+        _ExampleCard(
+          label: 'Title + URL only',
+          child: MessageComposerLinkPreviewAttachment(
+            title: 'Flutter Documentation',
+            url: 'https://docs.flutter.dev',
+          ),
+        ),
+        _ExampleCard(
+          label: 'URL only',
+          child: MessageComposerLinkPreviewAttachment(
+            url: 'https://getstream.io',
+          ),
+        ),
+        _ExampleCard(
+          label: 'Image + title + subtitle (no URL)',
+          child: MessageComposerLinkPreviewAttachment(
+            title: 'Beautiful Landscapes',
+            subtitle: 'A collection of stunning nature photography.',
+            image: AssetImage('assets/attachment_image.png'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Helper Widgets
+// =============================================================================
+
+class _Section extends StatelessWidget {
+  const _Section({
+    required this.label,
+    required this.children,
+    this.description,
+  });
+
+  final String label;
+  final String? description;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 16,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 4,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+                color: colorScheme.accentPrimary,
+              ),
+            ),
+            if (description case final desc?)
+              Text(desc, style: TextStyle(fontSize: 13, color: colorScheme.textTertiary)),
+          ],
+        ),
+        ...children,
+      ],
+    );
+  }
+}
+
+class _ExampleCard extends StatelessWidget {
+  const _ExampleCard({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final radius = context.streamRadius;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundApp,
+        borderRadius: BorderRadius.all(radius.md),
+      ),
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.all(radius.md),
+        border: Border.all(color: colorScheme.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 8,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: colorScheme.textSecondary),
+          ),
+          child,
+        ],
+      ),
+    );
+  }
 }

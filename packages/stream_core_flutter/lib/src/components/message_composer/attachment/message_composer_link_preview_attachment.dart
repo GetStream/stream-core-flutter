@@ -32,7 +32,12 @@ class MessageComposerLinkPreviewAttachment extends StatelessWidget {
       onRemovePressed: onRemovePressed,
       backgroundColor: backgroundColor,
       child: Padding(
-        padding: .all(spacing.xs),
+        padding: .directional(
+          start: spacing.xs,
+          end: spacing.sm,
+          top: spacing.xs,
+          bottom: spacing.xs,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

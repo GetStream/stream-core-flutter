@@ -41,8 +41,8 @@ class MessageComposerMediaFileAttachment extends StatelessWidget {
             child,
             if (mediaBadge case final badge?)
               PositionedDirectional(
-                start: spacing.xs,
-                bottom: spacing.xs,
+                start: spacing.xxs,
+                bottom: spacing.xxs,
                 child: badge,
               ),
           ],

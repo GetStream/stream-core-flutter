@@ -25,13 +25,19 @@ class MessageComposerFileAttachment extends StatelessWidget {
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
       child: Padding(
-        padding: .all(spacing.md),
+        padding: .directional(
+          start: spacing.md,
+          end: spacing.sm,
+          top: spacing.md,
+          bottom: spacing.md,
+        ),
         child: Row(
+          spacing: spacing.sm,
           children: [
             ?fileTypeIcon,
-            SizedBox(width: spacing.xs),
             Expanded(
               child: Column(
+                spacing: spacing.xxs,
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

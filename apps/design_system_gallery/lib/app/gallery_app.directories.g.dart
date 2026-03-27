@@ -82,6 +82,8 @@ import 'package:design_system_gallery/components/message_composer/message_compos
     as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
+import 'package:design_system_gallery/components/message_composer/message_composer_file_attachment.dart'
+    as _design_system_gallery_components_message_composer_message_composer_file_attachment;
 import 'package:design_system_gallery/components/reaction/stream_reaction_picker.dart'
     as _design_system_gallery_components_reaction_stream_reaction_picker;
 import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
@@ -792,6 +794,23 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
+            name: 'MessageComposerFileAttachment',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_file_attachment
+                        .buildMessageComposerFileAttachmentPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_file_attachment
+                        .buildMessageComposerFileAttachmentShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'MessageComposerLinkPreviewAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -799,6 +818,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer_attachment_link_preview
                         .buildMessageComposerAttachmentLinkPreviewPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_link_preview
+                        .buildMessageComposerAttachmentLinkPreviewShowcase,
               ),
             ],
           ),
@@ -811,6 +836,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                     _design_system_gallery_components_message_composer_message_composer_attachment_media_file
                         .buildMessageComposerAttachmentMediaFilePlayground,
               ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_media_file
+                        .buildMessageComposerAttachmentMediaFileShowcase,
+              ),
             ],
           ),
           _widgetbook.WidgetbookComponent(
@@ -821,6 +852,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_composer_message_composer_attachment_reply
                         .buildMessageComposerAttachmentReplyPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_reply
+                        .buildMessageComposerAttachmentReplyShowcase,
               ),
             ],
           ),
