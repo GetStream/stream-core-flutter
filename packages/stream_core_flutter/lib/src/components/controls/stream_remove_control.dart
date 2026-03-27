@@ -20,14 +20,14 @@ class StreamRemoveControl extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.backgroundInverse,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.borderInverse, width: 2),
+          border: Border.all(color: colorScheme.borderOnInverse, width: 2),
         ),
         alignment: Alignment.center,
         height: 20,
         width: 20,
         child: Icon(
           context.streamIcons.crossSmall,
-          color: colorScheme.textOnAccent,
+          color: colorScheme.textOnInverse,
           size: 10,
         ),
       ),

@@ -62,6 +62,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
+    Color? textOnInverse,
     // Background
     Color? backgroundApp,
     Color? backgroundSurface,
@@ -88,6 +89,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderStrong,
     Color? borderInverse,
     Color? borderOnAccent,
+    Color? borderOnInverse,
     Color? borderOnSurface,
     Color? borderOpacitySubtle,
     Color? borderOpacityStrong,
@@ -132,6 +134,7 @@ class StreamColorScheme with _$StreamColorScheme {
     textInverse ??= chrome[0] ?? StreamColors.white;
     textLink ??= accentPrimary;
     textOnAccent ??= chrome[0] ?? StreamColors.white;
+    textOnInverse ??= chrome[0] ?? StreamColors.white;
 
     // Background
     backgroundSurface ??= chrome.shade100;
@@ -144,7 +147,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundOverlayLight ??= light_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= light_tokens.StreamTokens.backgroundCoreOverlayDark;
     backgroundDisabled ??= chrome.shade100;
-    backgroundInverse ??= chrome.shade900;
+    backgroundInverse ??= chrome[1000] ?? StreamColors.black;
 
     backgroundElevation0 ??= chrome[0] ?? StreamColors.white;
     backgroundElevation1 ??= chrome[0] ?? StreamColors.white;
@@ -160,6 +163,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderStrong ??= light_tokens.StreamTokens.borderCoreStrong;
     borderInverse ??= chrome[0] ?? StreamColors.white;
     borderOnAccent ??= chrome[0] ?? StreamColors.white;
+    borderOnInverse ??= chrome[0] ?? StreamColors.white;
     borderOnSurface ??= chrome.shade200;
     borderOpacitySubtle ??= light_tokens.StreamTokens.borderCoreOpacitySubtle;
     borderOpacityStrong ??= light_tokens.StreamTokens.borderCoreOpacityStrong;
@@ -225,6 +229,7 @@ class StreamColorScheme with _$StreamColorScheme {
       textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
+      textOnInverse: textOnInverse,
       backgroundApp: backgroundApp,
       backgroundSurface: backgroundSurface,
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
@@ -245,6 +250,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderDefault: borderDefault,
       borderInverse: borderInverse,
       borderOnAccent: borderOnAccent,
+      borderOnInverse: borderOnInverse,
       borderOnSurface: borderOnSurface,
       borderSubtle: borderSubtle,
       borderStrong: borderStrong,
@@ -289,6 +295,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
+    Color? textOnInverse,
     // Background
     Color? backgroundApp,
     Color? backgroundSurface,
@@ -316,6 +323,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderOpacitySubtle,
     Color? borderOpacityStrong,
     Color? borderOnAccent,
+    Color? borderOnInverse,
     Color? borderOnSurface,
     // Border - Utility
     Color? borderFocus,
@@ -358,6 +366,7 @@ class StreamColorScheme with _$StreamColorScheme {
     textInverse ??= chrome[0] ?? StreamColors.black;
     textLink ??= brand.shade600;
     textOnAccent ??= chrome[1000] ?? StreamColors.white;
+    textOnInverse ??= chrome[0] ?? StreamColors.black;
 
     // Background
     backgroundSurface ??= chrome.shade100;
@@ -370,7 +379,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundOverlayLight ??= dark_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= dark_tokens.StreamTokens.backgroundCoreOverlayDark;
     backgroundDisabled ??= chrome.shade100;
-    backgroundInverse ??= chrome.shade900;
+    backgroundInverse ??= chrome[1000] ?? StreamColors.white;
 
     backgroundElevation0 ??= chrome[0] ?? StreamColors.black;
     backgroundElevation1 ??= chrome.shade50;
@@ -388,6 +397,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderOpacitySubtle ??= dark_tokens.StreamTokens.borderCoreOpacitySubtle;
     borderOpacityStrong ??= dark_tokens.StreamTokens.borderCoreOpacityStrong;
     borderOnAccent ??= chrome[1000] ?? StreamColors.white;
+    borderOnInverse ??= chrome[0] ?? StreamColors.black;
     borderOnSurface ??= chrome.shade200;
 
     // Border - Utility
@@ -451,6 +461,7 @@ class StreamColorScheme with _$StreamColorScheme {
       textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
+      textOnInverse: textOnInverse,
       backgroundApp: backgroundApp,
       backgroundSurface: backgroundSurface,
       backgroundSurfaceSubtle: backgroundSurfaceSubtle,
@@ -474,6 +485,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderOpacitySubtle: borderOpacitySubtle,
       borderOpacityStrong: borderOpacityStrong,
       borderOnAccent: borderOnAccent,
+      borderOnInverse: borderOnInverse,
       borderOnSurface: borderOnSurface,
       borderSubtle: borderSubtle,
       borderFocus: borderFocus,
@@ -513,6 +525,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.textInverse,
     required this.textLink,
     required this.textOnAccent,
+    required this.textOnInverse,
     // Background
     required this.backgroundApp,
     required this.backgroundSurface,
@@ -538,6 +551,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.borderStrong,
     required this.borderInverse,
     required this.borderOnAccent,
+    required this.borderOnInverse,
     required this.borderOnSurface,
     required this.borderOpacitySubtle,
     required this.borderOpacityStrong,
@@ -612,6 +626,10 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Text on dark or accent backgrounds.
   final Color textOnAccent;
 
+  /// Text on inverse-colored surfaces. Flips between light and dark to
+  /// maintain legibility when the background inverts.
+  final Color textOnInverse;
+
   // ---- Background colors ----
 
   /// Global application background.
@@ -683,6 +701,10 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Borders on accent backgrounds.
   final Color borderOnAccent;
+
+  /// Border on inverse-colored surfaces. Stays legible when the background
+  /// flips between light and dark mode.
+  final Color borderOnInverse;
 
   /// The border color on surface backgrounds.
   final Color borderOnSurface;
