@@ -31,6 +31,7 @@ class MessageComposerLinkPreviewAttachment extends StatelessWidget {
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
       backgroundColor: backgroundColor,
+      borderColor: StreamColors.transparent,
       child: Padding(
         padding: .directional(
           start: spacing.xs,

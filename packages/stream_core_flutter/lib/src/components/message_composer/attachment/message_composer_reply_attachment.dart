@@ -35,6 +35,7 @@ class MessageComposerReplyAttachment extends StatelessWidget {
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
       backgroundColor: backgroundColor,
+      borderColor: StreamColors.transparent,
       child: Padding(
         padding: .all(spacing.xs),
         child: Row(
