@@ -156,13 +156,13 @@ class StreamAudioWaveformThemeData with _$StreamAudioWaveformThemeData {
 
   /// The color of the slider thumb when the waveform is idle (not playing).
   ///
-  /// Falls back to [StreamColorScheme.accentNeutral].
+  /// Falls back to [StreamColorScheme.backgroundOnAccent].
   final Color? idleThumbColor;
 
   /// The border color of the slider thumb when the waveform is idle
   /// (not playing).
   ///
-  /// Falls back to [StreamColorScheme.borderDefault].
+  /// Falls back to [StreamColorScheme.borderOpacityStrong].
   final Color? idleThumbBorderColor;
 
   /// Linearly interpolate between two [StreamAudioWaveformThemeData] objects.

@@ -74,7 +74,7 @@ class StreamVoiceRecordingButton extends StatelessWidget {
             ghost: StreamButtonThemeStyle(
               backgroundColor: isRecording
                   ? WidgetStateProperty.all(
-                      context.streamColorScheme.statePressed,
+                      context.streamColorScheme.backgroundPressed,
                     )
                   : null,
             ),

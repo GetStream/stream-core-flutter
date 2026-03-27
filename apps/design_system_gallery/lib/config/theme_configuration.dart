@@ -40,7 +40,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _textSecondary;
   Color? _textTertiary;
   Color? _textDisabled;
-  Color? _textInverse;
   Color? _textLink;
   Color? _textOnAccent;
 
@@ -58,12 +57,14 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundOverlayLight;
   Color? _backgroundOverlayDark;
   Color? _backgroundDisabled;
+  Color? _backgroundHover;
+  Color? _backgroundPressed;
+  Color? _backgroundSelected;
   Color? _backgroundInverse;
   Color? _backgroundElevation0;
   Color? _backgroundElevation1;
   Color? _backgroundElevation2;
   Color? _backgroundElevation3;
-  Color? _backgroundElevation4;
 
   // =========================================================================
   // Border Colors - Core
@@ -71,7 +72,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _borderDefault;
   Color? _borderSubtle;
   Color? _borderStrong;
-  Color? _borderInverse;
   Color? _borderOnAccent;
   Color? _borderOnSurface;
   Color? _borderOpacitySubtle;
@@ -89,15 +89,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _borderWarning;
   Color? _borderSuccess;
   Color? _borderSelected;
-
-  // =========================================================================
-  // State Colors
-  // =========================================================================
-  Color? _stateHover;
-  Color? _statePressed;
-  Color? _stateSelected;
-  Color? _stateFocused;
-  Color? _stateDisabled;
 
   // =========================================================================
   // System Colors
@@ -136,7 +127,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get textSecondary => _textSecondary ?? _themeData.colorScheme.textSecondary;
   Color get textTertiary => _textTertiary ?? _themeData.colorScheme.textTertiary;
   Color get textDisabled => _textDisabled ?? _themeData.colorScheme.textDisabled;
-  Color get textInverse => _textInverse ?? _themeData.colorScheme.textInverse;
   Color get textLink => _textLink ?? _themeData.colorScheme.textLink;
   Color get textOnAccent => _textOnAccent ?? _themeData.colorScheme.textOnAccent;
 
@@ -154,12 +144,14 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundOverlayLight => _backgroundOverlayLight ?? _themeData.colorScheme.backgroundOverlayLight;
   Color get backgroundOverlayDark => _backgroundOverlayDark ?? _themeData.colorScheme.backgroundOverlayDark;
   Color get backgroundDisabled => _backgroundDisabled ?? _themeData.colorScheme.backgroundDisabled;
+  Color get backgroundHover => _backgroundHover ?? _themeData.colorScheme.backgroundHover;
+  Color get backgroundPressed => _backgroundPressed ?? _themeData.colorScheme.backgroundPressed;
+  Color get backgroundSelected => _backgroundSelected ?? _themeData.colorScheme.backgroundSelected;
   Color get backgroundInverse => _backgroundInverse ?? _themeData.colorScheme.backgroundInverse;
   Color get backgroundElevation0 => _backgroundElevation0 ?? _themeData.colorScheme.backgroundElevation0;
   Color get backgroundElevation1 => _backgroundElevation1 ?? _themeData.colorScheme.backgroundElevation1;
   Color get backgroundElevation2 => _backgroundElevation2 ?? _themeData.colorScheme.backgroundElevation2;
   Color get backgroundElevation3 => _backgroundElevation3 ?? _themeData.colorScheme.backgroundElevation3;
-  Color get backgroundElevation4 => _backgroundElevation4 ?? _themeData.colorScheme.backgroundElevation4;
 
   // =========================================================================
   // Getters - Border Core
@@ -167,7 +159,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get borderDefault => _borderDefault ?? _themeData.colorScheme.borderDefault;
   Color get borderSubtle => _borderSubtle ?? _themeData.colorScheme.borderSubtle;
   Color get borderStrong => _borderStrong ?? _themeData.colorScheme.borderStrong;
-  Color get borderInverse => _borderInverse ?? _themeData.colorScheme.borderInverse;
   Color get borderOnAccent => _borderOnAccent ?? _themeData.colorScheme.borderOnAccent;
   Color get borderOnSurface => _borderOnSurface ?? _themeData.colorScheme.borderOnSurface;
   Color get borderOpacitySubtle => _borderOpacitySubtle ?? _themeData.colorScheme.borderOpacitySubtle;
@@ -185,15 +176,6 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get borderWarning => _borderWarning ?? _themeData.colorScheme.borderWarning;
   Color get borderSuccess => _borderSuccess ?? _themeData.colorScheme.borderSuccess;
   Color get borderSelected => _borderSelected ?? _themeData.colorScheme.borderSelected;
-
-  // =========================================================================
-  // Getters - State
-  // =========================================================================
-  Color get stateHover => _stateHover ?? _themeData.colorScheme.stateHover;
-  Color get statePressed => _statePressed ?? _themeData.colorScheme.statePressed;
-  Color get stateSelected => _stateSelected ?? _themeData.colorScheme.stateSelected;
-  Color get stateFocused => _stateFocused ?? _themeData.colorScheme.stateFocused;
-  Color get stateDisabled => _stateDisabled ?? _themeData.colorScheme.stateDisabled;
 
   // =========================================================================
   // Getters - System
@@ -239,7 +221,6 @@ class ThemeConfiguration extends ChangeNotifier {
   void setTextSecondary(Color color) => _update(() => _textSecondary = color);
   void setTextTertiary(Color color) => _update(() => _textTertiary = color);
   void setTextDisabled(Color color) => _update(() => _textDisabled = color);
-  void setTextInverse(Color color) => _update(() => _textInverse = color);
   void setTextLink(Color color) => _update(() => _textLink = color);
   void setTextOnAccent(Color color) => _update(() => _textOnAccent = color);
 
@@ -255,18 +236,19 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundOverlayLight(Color color) => _update(() => _backgroundOverlayLight = color);
   void setBackgroundOverlayDark(Color color) => _update(() => _backgroundOverlayDark = color);
   void setBackgroundDisabled(Color color) => _update(() => _backgroundDisabled = color);
+  void setBackgroundHover(Color color) => _update(() => _backgroundHover = color);
+  void setBackgroundPressed(Color color) => _update(() => _backgroundPressed = color);
+  void setBackgroundSelected(Color color) => _update(() => _backgroundSelected = color);
   void setBackgroundInverse(Color color) => _update(() => _backgroundInverse = color);
   void setBackgroundElevation0(Color color) => _update(() => _backgroundElevation0 = color);
   void setBackgroundElevation1(Color color) => _update(() => _backgroundElevation1 = color);
   void setBackgroundElevation2(Color color) => _update(() => _backgroundElevation2 = color);
   void setBackgroundElevation3(Color color) => _update(() => _backgroundElevation3 = color);
-  void setBackgroundElevation4(Color color) => _update(() => _backgroundElevation4 = color);
 
   // Border Core
   void setBorderDefault(Color color) => _update(() => _borderDefault = color);
   void setBorderSubtle(Color color) => _update(() => _borderSubtle = color);
   void setBorderStrong(Color color) => _update(() => _borderStrong = color);
-  void setBorderInverse(Color color) => _update(() => _borderInverse = color);
   void setBorderOnAccent(Color color) => _update(() => _borderOnAccent = color);
   void setBorderOnSurface(Color color) => _update(() => _borderOnSurface = color);
   void setBorderOpacitySubtle(Color color) => _update(() => _borderOpacitySubtle = color);
@@ -282,13 +264,6 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBorderWarning(Color color) => _update(() => _borderWarning = color);
   void setBorderSuccess(Color color) => _update(() => _borderSuccess = color);
   void setBorderSelected(Color color) => _update(() => _borderSelected = color);
-
-  // State
-  void setStateHover(Color color) => _update(() => _stateHover = color);
-  void setStatePressed(Color color) => _update(() => _statePressed = color);
-  void setStateSelected(Color color) => _update(() => _stateSelected = color);
-  void setStateFocused(Color color) => _update(() => _stateFocused = color);
-  void setStateDisabled(Color color) => _update(() => _stateDisabled = color);
 
   // System
   void setSystemText(Color color) => _update(() => _systemText = color);
@@ -344,7 +319,6 @@ class ThemeConfiguration extends ChangeNotifier {
     _textSecondary = null;
     _textTertiary = null;
     _textDisabled = null;
-    _textInverse = null;
     _textLink = null;
     _textOnAccent = null;
     // Background
@@ -359,17 +333,18 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundOverlayLight = null;
     _backgroundOverlayDark = null;
     _backgroundDisabled = null;
+    _backgroundHover = null;
+    _backgroundPressed = null;
+    _backgroundSelected = null;
     _backgroundInverse = null;
     _backgroundElevation0 = null;
     _backgroundElevation1 = null;
     _backgroundElevation2 = null;
     _backgroundElevation3 = null;
-    _backgroundElevation4 = null;
     // Border Core
     _borderDefault = null;
     _borderSubtle = null;
     _borderStrong = null;
-    _borderInverse = null;
     _borderOnAccent = null;
     _borderOnSurface = null;
     _borderOpacitySubtle = null;
@@ -384,12 +359,6 @@ class ThemeConfiguration extends ChangeNotifier {
     _borderWarning = null;
     _borderSuccess = null;
     _borderSelected = null;
-    // State
-    _stateHover = null;
-    _statePressed = null;
-    _stateSelected = null;
-    _stateFocused = null;
-    _stateDisabled = null;
     // System
     _systemText = null;
     _systemScrollbar = null;
@@ -424,9 +393,6 @@ class ThemeConfiguration extends ChangeNotifier {
     // Derived from brand: borderFocus defaults to brand.shade150
     final effectiveBorderFocus = _borderFocus ?? effectiveBrand?.shade150;
 
-    // Derived from brand: stateFocused defaults to brand.shade100
-    final effectiveStateFocused = _stateFocused ?? effectiveBrand?.shade100;
-
     // Derived from accentPrimary: textLink and borderActive
     final effectiveTextLink = _textLink ?? effectiveAccentPrimary;
     final effectiveBorderActive = _borderActive ?? effectiveAccentPrimary;
@@ -448,7 +414,6 @@ class ThemeConfiguration extends ChangeNotifier {
     final effectiveTextSecondary = _textSecondary ?? effectiveChrome?.shade700;
     final effectiveTextTertiary = _textTertiary ?? effectiveChrome?.shade500;
     final effectiveTextDisabled = _textDisabled ?? effectiveChrome?.shade300;
-    final effectiveTextInverse = _textInverse ?? (isDark ? chromeShade1000 : chromeShade0);
     final effectiveTextOnAccent = _textOnAccent ?? chromeShade0;
     final effectiveBackgroundSurface = _backgroundSurface ?? effectiveChrome?.shade100;
     final effectiveBackgroundSurfaceSubtle = _backgroundSurfaceSubtle ?? effectiveChrome?.shade50;
@@ -462,13 +427,10 @@ class ThemeConfiguration extends ChangeNotifier {
     final effectiveBackgroundElevation1 = _backgroundElevation1 ?? (isDark ? effectiveChrome?.shade50 : chromeShade0);
     final effectiveBackgroundElevation2 = _backgroundElevation2 ?? (isDark ? effectiveChrome?.shade100 : chromeShade0);
     final effectiveBackgroundElevation3 = _backgroundElevation3 ?? (isDark ? effectiveChrome?.shade200 : chromeShade0);
-    final effectiveBackgroundElevation4 = _backgroundElevation4 ?? (isDark ? effectiveChrome?.shade300 : chromeShade0);
     // backgroundApp derives from backgroundElevation0 in both themes
     final effectiveBackgroundApp = _backgroundApp ?? effectiveBackgroundElevation0;
-    // In dark, borderInverse uses a fixed token (not chrome); in light it uses chrome[0]
-    final effectiveBorderInverse = _borderInverse ?? (isDark ? null : chromeShade0);
     final effectiveBorderOnAccent = _borderOnAccent ?? chromeShade0;
-    final effectiveBorderOnSurface = _borderOnSurface ?? effectiveChrome?.shade200;
+    final effectiveBorderOnSurface = _borderOnSurface ?? effectiveChrome?.shade300;
     final effectiveBorderDisabled = _borderDisabled ?? effectiveChrome?.shade100;
 
     final colorScheme = baseColorScheme.copyWith(
@@ -487,7 +449,6 @@ class ThemeConfiguration extends ChangeNotifier {
       textSecondary: effectiveTextSecondary,
       textTertiary: effectiveTextTertiary,
       textDisabled: effectiveTextDisabled,
-      textInverse: effectiveTextInverse,
       textLink: effectiveTextLink,
       textOnAccent: effectiveTextOnAccent,
       // Background
@@ -502,17 +463,18 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundOverlayLight: _backgroundOverlayLight,
       backgroundOverlayDark: _backgroundOverlayDark,
       backgroundDisabled: effectiveBackgroundDisabled,
+      backgroundHover: _backgroundHover,
+      backgroundPressed: _backgroundPressed,
+      backgroundSelected: _backgroundSelected,
       backgroundInverse: effectiveBackgroundInverse,
       backgroundElevation0: effectiveBackgroundElevation0,
       backgroundElevation1: effectiveBackgroundElevation1,
       backgroundElevation2: effectiveBackgroundElevation2,
       backgroundElevation3: effectiveBackgroundElevation3,
-      backgroundElevation4: effectiveBackgroundElevation4,
       // Border Core
       borderDefault: _borderDefault,
       borderSubtle: _borderSubtle,
       borderStrong: _borderStrong,
-      borderInverse: effectiveBorderInverse,
       borderOnAccent: effectiveBorderOnAccent,
       borderOnSurface: effectiveBorderOnSurface,
       borderOpacitySubtle: _borderOpacitySubtle,
@@ -527,12 +489,6 @@ class ThemeConfiguration extends ChangeNotifier {
       borderWarning: effectiveBorderWarning,
       borderSuccess: effectiveBorderSuccess,
       borderSelected: _borderSelected,
-      // State
-      stateHover: _stateHover,
-      statePressed: _statePressed,
-      stateSelected: _stateSelected,
-      stateFocused: effectiveStateFocused,
-      stateDisabled: _stateDisabled,
       // System
       systemText: _systemText,
       systemScrollbar: _systemScrollbar,
@@ -611,7 +567,7 @@ class ThemeConfiguration extends ChangeNotifier {
         style: FilledButton.styleFrom(
           backgroundColor: accentPrimary,
           foregroundColor: textOnAccent,
-          disabledBackgroundColor: stateDisabled,
+          disabledBackgroundColor: backgroundDisabled,
           disabledForegroundColor: textDisabled,
           shape: RoundedRectangleBorder(borderRadius: componentRadius),
         ),

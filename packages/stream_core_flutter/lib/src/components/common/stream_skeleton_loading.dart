@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_skeleton_loading_theme.dart';
-import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -256,25 +255,11 @@ class _StreamSkeletonLoadingThemeDefaults extends StreamSkeletonLoadingThemeData
 
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
 
-  // The shimmer package uses BlendMode.srcATop which replaces child pixels
-  // with the gradient. The highlight color is brightness-aware: light mode
-  // uses a semi-transparent white overlay, dark mode uses the deepest chrome
-  // shade to create a subtle darkening sweep.
-  //
-  // NOTE: Component theme defaults should generally avoid depending on
-  // [Theme.brightnessOf] and instead rely solely on [StreamColorScheme]
-  // semantics. This is an exception because the chrome surface hierarchy
-  // inverts between light and dark modes, so no single semantic color pair
-  // produces the correct base→highlight contrast in both brightnesses.
-
   @override
   Color get baseColor => _colorScheme.backgroundSurfaceStrong;
 
   @override
-  Color get highlightColor {
-    final brightness = Theme.brightnessOf(context);
-    return brightness == .light ? StreamColors.white20 : _colorScheme.chrome[0]!;
-  }
+  Color get highlightColor => _colorScheme.backgroundOverlayLight;
 
   @override
   Duration get period => const Duration(milliseconds: 1500);

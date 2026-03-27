@@ -142,7 +142,7 @@ class _StreamCommandChipDefaults extends StreamCommandChipThemeData {
   Color get backgroundColor => _colorScheme.backgroundInverse;
 
   @override
-  Color get foregroundColor => _colorScheme.textInverse;
+  Color get foregroundColor => _colorScheme.textOnInverse;
 
   @override
   TextStyle get labelStyle => _textTheme.metadataEmphasis;

@@ -207,20 +207,20 @@ class _StreamEmojiButtonThemeDefaults extends StreamEmojiButtonThemeStyle {
   @override
   WidgetStateProperty<Color?> get backgroundColor => WidgetStateProperty.resolveWith((states) {
     if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
-    if (states.contains(WidgetState.selected)) return _colorScheme.stateSelected;
+    if (states.contains(WidgetState.selected)) return _colorScheme.backgroundSelected;
     return StreamColors.transparent;
   });
 
   @override
   WidgetStateProperty<Color?> get foregroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return _colorScheme.stateDisabled;
+    if (states.contains(WidgetState.disabled)) return _colorScheme.backgroundDisabled;
     return null; // Let emoji/icon use its natural color
   });
 
   @override
   WidgetStateProperty<Color?> get overlayColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.pressed)) return _colorScheme.statePressed;
-    if (states.contains(WidgetState.hovered)) return _colorScheme.stateHover;
+    if (states.contains(WidgetState.pressed)) return _colorScheme.backgroundPressed;
+    if (states.contains(WidgetState.hovered)) return _colorScheme.backgroundHover;
     return StreamColors.transparent;
   });
 

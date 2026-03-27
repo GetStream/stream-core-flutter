@@ -125,7 +125,7 @@ class DefaultStreamRetryBadge extends StatelessWidget {
         shape: CircleBorder(
           side: BorderSide(
             width: 2,
-            color: colorScheme.borderInverse,
+            color: colorScheme.borderOnInverse,
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
         ),
