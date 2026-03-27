@@ -307,11 +307,6 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setTextDisabled,
           ),
           ColorPickerTile(
-            label: 'textInverse',
-            color: config.textInverse,
-            onColorChanged: config.setTextInverse,
-          ),
-          ColorPickerTile(
             label: 'textLink',
             color: config.textLink,
             onColorChanged: config.setTextLink,
@@ -433,11 +428,6 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onColorChanged: config.setBackgroundElevation3,
           ),
           ColorPickerTile(
-            label: 'backgroundElevation4',
-            color: config.backgroundElevation4,
-            onColorChanged: config.setBackgroundElevation4,
-          ),
-          ColorPickerTile(
             label: 'backgroundHighlight',
             color: config.backgroundHighlight,
             onColorChanged: config.setBackgroundHighlight,
@@ -469,11 +459,6 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             label: 'borderStrong',
             color: config.borderStrong,
             onColorChanged: config.setBorderStrong,
-          ),
-          ColorPickerTile(
-            label: 'borderInverse',
-            color: config.borderInverse,
-            onColorChanged: config.setBorderInverse,
           ),
           ColorPickerTile(
             label: 'borderOnAccent',
@@ -580,16 +565,6 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             label: 'stateSelected',
             color: config.stateSelected,
             onColorChanged: config.setStateSelected,
-          ),
-          ColorPickerTile(
-            label: 'stateFocused',
-            color: config.stateFocused,
-            onColorChanged: config.setStateFocused,
-          ),
-          ColorPickerTile(
-            label: 'stateDisabled',
-            color: config.stateDisabled,
-            onColorChanged: config.setStateDisabled,
           ),
         ],
       ),

@@ -59,7 +59,6 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textSecondary,
     Color? textTertiary,
     Color? textDisabled,
-    Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
     Color? textOnInverse,
@@ -82,12 +81,10 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundElevation1,
     Color? backgroundElevation2,
     Color? backgroundElevation3,
-    Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
     Color? borderSubtle,
     Color? borderStrong,
-    Color? borderInverse,
     Color? borderOnAccent,
     Color? borderOnInverse,
     Color? borderOnSurface,
@@ -96,6 +93,7 @@ class StreamColorScheme with _$StreamColorScheme {
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
+    Color? borderDisabledOnSurface,
     Color? borderHover,
     Color? borderPressed,
     Color? borderActive,
@@ -107,8 +105,6 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? stateHover,
     Color? statePressed,
     Color? stateSelected,
-    Color? stateFocused,
-    Color? stateDisabled,
     // System
     Color? systemText,
     Color? systemScrollbar,
@@ -131,7 +127,6 @@ class StreamColorScheme with _$StreamColorScheme {
     textSecondary ??= chrome.shade700;
     textTertiary ??= chrome.shade500;
     textDisabled ??= chrome.shade300;
-    textInverse ??= chrome[0] ?? StreamColors.white;
     textLink ??= accentPrimary;
     textOnAccent ??= chrome[0] ?? StreamColors.white;
     textOnInverse ??= chrome[0] ?? StreamColors.white;
@@ -153,7 +148,6 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundElevation1 ??= chrome[0] ?? StreamColors.white;
     backgroundElevation2 ??= chrome[0] ?? StreamColors.white;
     backgroundElevation3 ??= chrome[0] ?? StreamColors.white;
-    backgroundElevation4 ??= chrome[0] ?? StreamColors.white;
 
     backgroundApp ??= backgroundElevation0;
 
@@ -161,16 +155,16 @@ class StreamColorScheme with _$StreamColorScheme {
     borderDefault ??= light_tokens.StreamTokens.borderCoreDefault;
     borderSubtle ??= light_tokens.StreamTokens.borderCoreSubtle;
     borderStrong ??= light_tokens.StreamTokens.borderCoreStrong;
-    borderInverse ??= chrome[0] ?? StreamColors.white;
     borderOnAccent ??= chrome[0] ?? StreamColors.white;
     borderOnInverse ??= chrome[0] ?? StreamColors.white;
-    borderOnSurface ??= chrome.shade200;
+    borderOnSurface ??= chrome.shade300;
     borderOpacitySubtle ??= light_tokens.StreamTokens.borderCoreOpacitySubtle;
     borderOpacityStrong ??= light_tokens.StreamTokens.borderCoreOpacityStrong;
 
     // Border - Utility
     borderFocus ??= brand.shade150;
     borderDisabled ??= chrome.shade100;
+    borderDisabledOnSurface ??= chrome.shade150;
     borderHover ??= light_tokens.StreamTokens.borderUtilityHover;
     borderPressed ??= light_tokens.StreamTokens.borderUtilityPressed;
     borderActive ??= accentPrimary;
@@ -183,8 +177,6 @@ class StreamColorScheme with _$StreamColorScheme {
     stateHover ??= light_tokens.StreamTokens.backgroundUtilityHover;
     statePressed ??= light_tokens.StreamTokens.backgroundUtilityPressed;
     stateSelected ??= light_tokens.StreamTokens.backgroundUtilitySelected;
-    stateFocused ??= brand.shade100;
-    stateDisabled ??= light_tokens.StreamTokens.backgroundUtilityDisabled;
 
     // System
     systemText ??= light_tokens.StreamTokens.systemText;
@@ -226,7 +218,6 @@ class StreamColorScheme with _$StreamColorScheme {
       textSecondary: textSecondary,
       textTertiary: textTertiary,
       textDisabled: textDisabled,
-      textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
       textOnInverse: textOnInverse,
@@ -246,9 +237,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
       backgroundElevation3: backgroundElevation3,
-      backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
-      borderInverse: borderInverse,
       borderOnAccent: borderOnAccent,
       borderOnInverse: borderOnInverse,
       borderOnSurface: borderOnSurface,
@@ -258,6 +247,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderOpacityStrong: borderOpacityStrong,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
+      borderDisabledOnSurface: borderDisabledOnSurface,
       borderHover: borderHover,
       borderPressed: borderPressed,
       borderActive: borderActive,
@@ -268,8 +258,6 @@ class StreamColorScheme with _$StreamColorScheme {
       stateHover: stateHover,
       statePressed: statePressed,
       stateSelected: stateSelected,
-      stateFocused: stateFocused,
-      stateDisabled: stateDisabled,
       systemText: systemText,
       systemScrollbar: systemScrollbar,
       avatarPalette: avatarPalette,
@@ -292,7 +280,6 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? textSecondary,
     Color? textTertiary,
     Color? textDisabled,
-    Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
     Color? textOnInverse,
@@ -314,12 +301,10 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundElevation1,
     Color? backgroundElevation2,
     Color? backgroundElevation3,
-    Color? backgroundElevation4,
     // Border - Core
     Color? borderDefault,
     Color? borderSubtle,
     Color? borderStrong,
-    Color? borderInverse,
     Color? borderOpacitySubtle,
     Color? borderOpacityStrong,
     Color? borderOnAccent,
@@ -328,6 +313,7 @@ class StreamColorScheme with _$StreamColorScheme {
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
+    Color? borderDisabledOnSurface,
     Color? borderHover,
     Color? borderPressed,
     Color? borderActive,
@@ -339,8 +325,6 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? stateHover,
     Color? statePressed,
     Color? stateSelected,
-    Color? stateFocused,
-    Color? stateDisabled,
     // System
     Color? systemText,
     Color? systemScrollbar,
@@ -363,7 +347,6 @@ class StreamColorScheme with _$StreamColorScheme {
     textSecondary ??= chrome.shade700;
     textTertiary ??= chrome.shade500;
     textDisabled ??= chrome.shade300;
-    textInverse ??= chrome[0] ?? StreamColors.black;
     textLink ??= brand.shade600;
     textOnAccent ??= chrome[1000] ?? StreamColors.white;
     textOnInverse ??= chrome[0] ?? StreamColors.black;
@@ -385,7 +368,6 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundElevation1 ??= chrome.shade50;
     backgroundElevation2 ??= chrome.shade100;
     backgroundElevation3 ??= chrome.shade200;
-    backgroundElevation4 ??= chrome.shade300;
 
     backgroundApp ??= backgroundElevation0;
 
@@ -393,16 +375,16 @@ class StreamColorScheme with _$StreamColorScheme {
     borderDefault ??= dark_tokens.StreamTokens.borderCoreDefault;
     borderSubtle ??= dark_tokens.StreamTokens.borderCoreSubtle;
     borderStrong ??= dark_tokens.StreamTokens.borderCoreStrong;
-    borderInverse ??= dark_tokens.StreamTokens.borderCoreInverse;
     borderOpacitySubtle ??= dark_tokens.StreamTokens.borderCoreOpacitySubtle;
     borderOpacityStrong ??= dark_tokens.StreamTokens.borderCoreOpacityStrong;
     borderOnAccent ??= chrome[1000] ?? StreamColors.white;
     borderOnInverse ??= chrome[0] ?? StreamColors.black;
-    borderOnSurface ??= chrome.shade200;
+    borderOnSurface ??= chrome.shade300;
 
     // Border - Utility
     borderFocus ??= brand.shade150;
     borderDisabled ??= chrome.shade100;
+    borderDisabledOnSurface ??= chrome.shade150;
     borderHover ??= dark_tokens.StreamTokens.borderUtilityHover;
     borderPressed ??= dark_tokens.StreamTokens.borderUtilityPressed;
     borderActive ??= accentPrimary;
@@ -415,8 +397,6 @@ class StreamColorScheme with _$StreamColorScheme {
     stateHover ??= dark_tokens.StreamTokens.backgroundUtilityHover;
     statePressed ??= dark_tokens.StreamTokens.backgroundUtilityPressed;
     stateSelected ??= dark_tokens.StreamTokens.backgroundUtilitySelected;
-    stateFocused ??= brand.shade100;
-    stateDisabled ??= dark_tokens.StreamTokens.backgroundUtilityDisabled;
 
     // System
     systemText ??= dark_tokens.StreamTokens.systemText;
@@ -458,7 +438,6 @@ class StreamColorScheme with _$StreamColorScheme {
       textSecondary: textSecondary,
       textTertiary: textTertiary,
       textDisabled: textDisabled,
-      textInverse: textInverse,
       textLink: textLink,
       textOnAccent: textOnAccent,
       textOnInverse: textOnInverse,
@@ -478,9 +457,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
       backgroundElevation3: backgroundElevation3,
-      backgroundElevation4: backgroundElevation4,
       borderDefault: borderDefault,
-      borderInverse: borderInverse,
       borderStrong: borderStrong,
       borderOpacitySubtle: borderOpacitySubtle,
       borderOpacityStrong: borderOpacityStrong,
@@ -490,6 +467,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderSubtle: borderSubtle,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
+      borderDisabledOnSurface: borderDisabledOnSurface,
       borderHover: borderHover,
       borderPressed: borderPressed,
       borderActive: borderActive,
@@ -500,8 +478,6 @@ class StreamColorScheme with _$StreamColorScheme {
       stateHover: stateHover,
       statePressed: statePressed,
       stateSelected: stateSelected,
-      stateFocused: stateFocused,
-      stateDisabled: stateDisabled,
       systemText: systemText,
       systemScrollbar: systemScrollbar,
       avatarPalette: avatarPalette,
@@ -522,7 +498,6 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.textSecondary,
     required this.textTertiary,
     required this.textDisabled,
-    required this.textInverse,
     required this.textLink,
     required this.textOnAccent,
     required this.textOnInverse,
@@ -544,12 +519,10 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundElevation1,
     required this.backgroundElevation2,
     required this.backgroundElevation3,
-    required this.backgroundElevation4,
     // Border - Core
     required this.borderDefault,
     required this.borderSubtle,
     required this.borderStrong,
-    required this.borderInverse,
     required this.borderOnAccent,
     required this.borderOnInverse,
     required this.borderOnSurface,
@@ -558,6 +531,7 @@ class StreamColorScheme with _$StreamColorScheme {
     // Border - Utility
     required this.borderFocus,
     required this.borderDisabled,
+    required this.borderDisabledOnSurface,
     required this.borderHover,
     required this.borderPressed,
     required this.borderActive,
@@ -569,8 +543,6 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.stateHover,
     required this.statePressed,
     required this.stateSelected,
-    required this.stateFocused,
-    required this.stateDisabled,
     // System
     required this.systemText,
     required this.systemScrollbar,
@@ -616,9 +588,6 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Disabled text.
   final Color textDisabled;
-
-  /// Text on dark or accent backgrounds.
-  final Color textInverse;
 
   /// The link text color.
   final Color textLink;
@@ -682,9 +651,6 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Popovers.
   final Color backgroundElevation3;
 
-  /// Dialogs, modals.
-  final Color backgroundElevation4;
-
   // ---- Border colors - Core ----
 
   /// Standard surface border.
@@ -695,9 +661,6 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Stronger surface border.
   final Color borderStrong;
-
-  /// Used on dark backgrounds.
-  final Color borderInverse;
 
   /// Borders on accent backgrounds.
   final Color borderOnAccent;
@@ -722,6 +685,9 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Optional disabled border for inputs, buttons, or chips.
   final Color borderDisabled;
+
+  /// Disabled border for surface backgrounds.
+  final Color borderDisabledOnSurface;
 
   /// Hover feedback border overlay.
   final Color borderHover;
@@ -754,12 +720,6 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Selected overlay.
   final Color stateSelected;
-
-  /// The focused state overlay color.
-  final Color stateFocused;
-
-  /// The disabled state color.
-  final Color stateDisabled;
 
   // ---- System colors ----
 

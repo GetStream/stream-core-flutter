@@ -41,7 +41,6 @@ mixin _$StreamColorScheme {
       textSecondary: Color.lerp(a.textSecondary, b.textSecondary, t)!,
       textTertiary: Color.lerp(a.textTertiary, b.textTertiary, t)!,
       textDisabled: Color.lerp(a.textDisabled, b.textDisabled, t)!,
-      textInverse: Color.lerp(a.textInverse, b.textInverse, t)!,
       textLink: Color.lerp(a.textLink, b.textLink, t)!,
       textOnAccent: Color.lerp(a.textOnAccent, b.textOnAccent, t)!,
       textOnInverse: Color.lerp(a.textOnInverse, b.textOnInverse, t)!,
@@ -117,15 +116,9 @@ mixin _$StreamColorScheme {
         b.backgroundElevation3,
         t,
       )!,
-      backgroundElevation4: Color.lerp(
-        a.backgroundElevation4,
-        b.backgroundElevation4,
-        t,
-      )!,
       borderDefault: Color.lerp(a.borderDefault, b.borderDefault, t)!,
       borderSubtle: Color.lerp(a.borderSubtle, b.borderSubtle, t)!,
       borderStrong: Color.lerp(a.borderStrong, b.borderStrong, t)!,
-      borderInverse: Color.lerp(a.borderInverse, b.borderInverse, t)!,
       borderOnAccent: Color.lerp(a.borderOnAccent, b.borderOnAccent, t)!,
       borderOnInverse: Color.lerp(a.borderOnInverse, b.borderOnInverse, t)!,
       borderOnSurface: Color.lerp(a.borderOnSurface, b.borderOnSurface, t)!,
@@ -141,6 +134,11 @@ mixin _$StreamColorScheme {
       )!,
       borderFocus: Color.lerp(a.borderFocus, b.borderFocus, t)!,
       borderDisabled: Color.lerp(a.borderDisabled, b.borderDisabled, t)!,
+      borderDisabledOnSurface: Color.lerp(
+        a.borderDisabledOnSurface,
+        b.borderDisabledOnSurface,
+        t,
+      )!,
       borderHover: Color.lerp(a.borderHover, b.borderHover, t)!,
       borderPressed: Color.lerp(a.borderPressed, b.borderPressed, t)!,
       borderActive: Color.lerp(a.borderActive, b.borderActive, t)!,
@@ -151,8 +149,6 @@ mixin _$StreamColorScheme {
       stateHover: Color.lerp(a.stateHover, b.stateHover, t)!,
       statePressed: Color.lerp(a.statePressed, b.statePressed, t)!,
       stateSelected: Color.lerp(a.stateSelected, b.stateSelected, t)!,
-      stateFocused: Color.lerp(a.stateFocused, b.stateFocused, t)!,
-      stateDisabled: Color.lerp(a.stateDisabled, b.stateDisabled, t)!,
       systemText: Color.lerp(a.systemText, b.systemText, t)!,
       systemScrollbar: Color.lerp(a.systemScrollbar, b.systemScrollbar, t)!,
       avatarPalette: t < 0.5 ? a.avatarPalette : b.avatarPalette,
@@ -171,7 +167,6 @@ mixin _$StreamColorScheme {
     Color? textSecondary,
     Color? textTertiary,
     Color? textDisabled,
-    Color? textInverse,
     Color? textLink,
     Color? textOnAccent,
     Color? textOnInverse,
@@ -191,11 +186,9 @@ mixin _$StreamColorScheme {
     Color? backgroundElevation1,
     Color? backgroundElevation2,
     Color? backgroundElevation3,
-    Color? backgroundElevation4,
     Color? borderDefault,
     Color? borderSubtle,
     Color? borderStrong,
-    Color? borderInverse,
     Color? borderOnAccent,
     Color? borderOnInverse,
     Color? borderOnSurface,
@@ -203,6 +196,7 @@ mixin _$StreamColorScheme {
     Color? borderOpacityStrong,
     Color? borderFocus,
     Color? borderDisabled,
+    Color? borderDisabledOnSurface,
     Color? borderHover,
     Color? borderPressed,
     Color? borderActive,
@@ -213,8 +207,6 @@ mixin _$StreamColorScheme {
     Color? stateHover,
     Color? statePressed,
     Color? stateSelected,
-    Color? stateFocused,
-    Color? stateDisabled,
     Color? systemText,
     Color? systemScrollbar,
     List<StreamAvatarColorPair>? avatarPalette,
@@ -233,7 +225,6 @@ mixin _$StreamColorScheme {
       textSecondary: textSecondary ?? _this.textSecondary,
       textTertiary: textTertiary ?? _this.textTertiary,
       textDisabled: textDisabled ?? _this.textDisabled,
-      textInverse: textInverse ?? _this.textInverse,
       textLink: textLink ?? _this.textLink,
       textOnAccent: textOnAccent ?? _this.textOnAccent,
       textOnInverse: textOnInverse ?? _this.textOnInverse,
@@ -258,11 +249,9 @@ mixin _$StreamColorScheme {
       backgroundElevation1: backgroundElevation1 ?? _this.backgroundElevation1,
       backgroundElevation2: backgroundElevation2 ?? _this.backgroundElevation2,
       backgroundElevation3: backgroundElevation3 ?? _this.backgroundElevation3,
-      backgroundElevation4: backgroundElevation4 ?? _this.backgroundElevation4,
       borderDefault: borderDefault ?? _this.borderDefault,
       borderSubtle: borderSubtle ?? _this.borderSubtle,
       borderStrong: borderStrong ?? _this.borderStrong,
-      borderInverse: borderInverse ?? _this.borderInverse,
       borderOnAccent: borderOnAccent ?? _this.borderOnAccent,
       borderOnInverse: borderOnInverse ?? _this.borderOnInverse,
       borderOnSurface: borderOnSurface ?? _this.borderOnSurface,
@@ -270,6 +259,8 @@ mixin _$StreamColorScheme {
       borderOpacityStrong: borderOpacityStrong ?? _this.borderOpacityStrong,
       borderFocus: borderFocus ?? _this.borderFocus,
       borderDisabled: borderDisabled ?? _this.borderDisabled,
+      borderDisabledOnSurface:
+          borderDisabledOnSurface ?? _this.borderDisabledOnSurface,
       borderHover: borderHover ?? _this.borderHover,
       borderPressed: borderPressed ?? _this.borderPressed,
       borderActive: borderActive ?? _this.borderActive,
@@ -280,8 +271,6 @@ mixin _$StreamColorScheme {
       stateHover: stateHover ?? _this.stateHover,
       statePressed: statePressed ?? _this.statePressed,
       stateSelected: stateSelected ?? _this.stateSelected,
-      stateFocused: stateFocused ?? _this.stateFocused,
-      stateDisabled: stateDisabled ?? _this.stateDisabled,
       systemText: systemText ?? _this.systemText,
       systemScrollbar: systemScrollbar ?? _this.systemScrollbar,
       avatarPalette: avatarPalette ?? _this.avatarPalette,
@@ -311,7 +300,6 @@ mixin _$StreamColorScheme {
       textSecondary: other.textSecondary,
       textTertiary: other.textTertiary,
       textDisabled: other.textDisabled,
-      textInverse: other.textInverse,
       textLink: other.textLink,
       textOnAccent: other.textOnAccent,
       textOnInverse: other.textOnInverse,
@@ -331,11 +319,9 @@ mixin _$StreamColorScheme {
       backgroundElevation1: other.backgroundElevation1,
       backgroundElevation2: other.backgroundElevation2,
       backgroundElevation3: other.backgroundElevation3,
-      backgroundElevation4: other.backgroundElevation4,
       borderDefault: other.borderDefault,
       borderSubtle: other.borderSubtle,
       borderStrong: other.borderStrong,
-      borderInverse: other.borderInverse,
       borderOnAccent: other.borderOnAccent,
       borderOnInverse: other.borderOnInverse,
       borderOnSurface: other.borderOnSurface,
@@ -343,6 +329,7 @@ mixin _$StreamColorScheme {
       borderOpacityStrong: other.borderOpacityStrong,
       borderFocus: other.borderFocus,
       borderDisabled: other.borderDisabled,
+      borderDisabledOnSurface: other.borderDisabledOnSurface,
       borderHover: other.borderHover,
       borderPressed: other.borderPressed,
       borderActive: other.borderActive,
@@ -353,8 +340,6 @@ mixin _$StreamColorScheme {
       stateHover: other.stateHover,
       statePressed: other.statePressed,
       stateSelected: other.stateSelected,
-      stateFocused: other.stateFocused,
-      stateDisabled: other.stateDisabled,
       systemText: other.systemText,
       systemScrollbar: other.systemScrollbar,
       avatarPalette: other.avatarPalette,
@@ -385,7 +370,6 @@ mixin _$StreamColorScheme {
         _other.textSecondary == _this.textSecondary &&
         _other.textTertiary == _this.textTertiary &&
         _other.textDisabled == _this.textDisabled &&
-        _other.textInverse == _this.textInverse &&
         _other.textLink == _this.textLink &&
         _other.textOnAccent == _this.textOnAccent &&
         _other.textOnInverse == _this.textOnInverse &&
@@ -405,11 +389,9 @@ mixin _$StreamColorScheme {
         _other.backgroundElevation1 == _this.backgroundElevation1 &&
         _other.backgroundElevation2 == _this.backgroundElevation2 &&
         _other.backgroundElevation3 == _this.backgroundElevation3 &&
-        _other.backgroundElevation4 == _this.backgroundElevation4 &&
         _other.borderDefault == _this.borderDefault &&
         _other.borderSubtle == _this.borderSubtle &&
         _other.borderStrong == _this.borderStrong &&
-        _other.borderInverse == _this.borderInverse &&
         _other.borderOnAccent == _this.borderOnAccent &&
         _other.borderOnInverse == _this.borderOnInverse &&
         _other.borderOnSurface == _this.borderOnSurface &&
@@ -417,6 +399,7 @@ mixin _$StreamColorScheme {
         _other.borderOpacityStrong == _this.borderOpacityStrong &&
         _other.borderFocus == _this.borderFocus &&
         _other.borderDisabled == _this.borderDisabled &&
+        _other.borderDisabledOnSurface == _this.borderDisabledOnSurface &&
         _other.borderHover == _this.borderHover &&
         _other.borderPressed == _this.borderPressed &&
         _other.borderActive == _this.borderActive &&
@@ -427,8 +410,6 @@ mixin _$StreamColorScheme {
         _other.stateHover == _this.stateHover &&
         _other.statePressed == _this.statePressed &&
         _other.stateSelected == _this.stateSelected &&
-        _other.stateFocused == _this.stateFocused &&
-        _other.stateDisabled == _this.stateDisabled &&
         _other.systemText == _this.systemText &&
         _other.systemScrollbar == _this.systemScrollbar &&
         _other.avatarPalette == _this.avatarPalette;
@@ -451,7 +432,6 @@ mixin _$StreamColorScheme {
       _this.textSecondary,
       _this.textTertiary,
       _this.textDisabled,
-      _this.textInverse,
       _this.textLink,
       _this.textOnAccent,
       _this.textOnInverse,
@@ -471,11 +451,9 @@ mixin _$StreamColorScheme {
       _this.backgroundElevation1,
       _this.backgroundElevation2,
       _this.backgroundElevation3,
-      _this.backgroundElevation4,
       _this.borderDefault,
       _this.borderSubtle,
       _this.borderStrong,
-      _this.borderInverse,
       _this.borderOnAccent,
       _this.borderOnInverse,
       _this.borderOnSurface,
@@ -483,6 +461,7 @@ mixin _$StreamColorScheme {
       _this.borderOpacityStrong,
       _this.borderFocus,
       _this.borderDisabled,
+      _this.borderDisabledOnSurface,
       _this.borderHover,
       _this.borderPressed,
       _this.borderActive,
@@ -493,8 +472,6 @@ mixin _$StreamColorScheme {
       _this.stateHover,
       _this.statePressed,
       _this.stateSelected,
-      _this.stateFocused,
-      _this.stateDisabled,
       _this.systemText,
       _this.systemScrollbar,
       _this.avatarPalette,
