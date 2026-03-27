@@ -39,11 +39,11 @@ import '../../theme/stream_theme_extensions.dart';
 ///  * [StreamRetryBadge], a badge for retry actions.
 ///  * [StreamBadgeCount], a badge for displaying counts.
 class StreamImageSourceBadge extends StatelessWidget {
-  /// Creates a source badge with the given [leading] icon and/or [label].
+  /// Creates a source badge with the given [leading] icon and [label].
   StreamImageSourceBadge({
     super.key,
-    Widget? leading,
-    Widget? label,
+    required Widget leading,
+    required Widget label,
     Color? backgroundColor,
     Color? foregroundColor,
   }) : props = .new(
@@ -88,8 +88,8 @@ class StreamImageSourceBadge extends StatelessWidget {
 class StreamImageSourceBadgeProps {
   /// Creates properties for a source badge.
   const StreamImageSourceBadgeProps({
-    this.leading,
-    this.label,
+    required this.leading,
+    required this.label,
     this.backgroundColor,
     this.foregroundColor,
   });
@@ -97,13 +97,13 @@ class StreamImageSourceBadgeProps {
   /// The leading icon widget.
   ///
   /// Typically a brand logo or icon identifying the content source.
-  final Widget? leading;
+  final Widget leading;
 
   /// The label widget.
   ///
   /// Typically a [Text] widget displaying the source name
   /// (e.g., "GIPHY", "IMGUR").
-  final Widget? label;
+  final Widget label;
 
   /// The background color of the badge.
   ///
@@ -146,7 +146,12 @@ class DefaultStreamImageSourceBadge extends StatelessWidget {
     return AnimatedContainer(
       height: 24,
       duration: kThemeChangeDuration,
-      padding: .symmetric(horizontal: spacing.xs, vertical: spacing.xxxs),
+      padding: .directional(
+        start: spacing.xxs,
+        top: spacing.xxxs,
+        bottom: spacing.xxxs,
+        end: spacing.xs,
+      ),
       decoration: ShapeDecoration(
         color: backgroundColor,
         shape: RoundedSuperellipseBorder(borderRadius: .all(radius.lg)),
@@ -158,7 +163,7 @@ class DefaultStreamImageSourceBadge extends StatelessWidget {
           child: Row(
             mainAxisSize: .min,
             spacing: spacing.xxs,
-            children: [?props.leading, ?props.label],
+            children: [props.leading, props.label],
           ),
         ),
       ),

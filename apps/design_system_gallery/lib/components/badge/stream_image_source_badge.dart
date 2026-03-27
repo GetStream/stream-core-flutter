@@ -64,18 +64,6 @@ Widget buildStreamImageSourceBadgePlayground(BuildContext context) {
     description: 'The source name displayed in the badge.',
   );
 
-  final showLeading = context.knobs.boolean(
-    label: 'Show Leading',
-    initialValue: true,
-    description: 'Whether to show the leading icon.',
-  );
-
-  final showLabel = context.knobs.boolean(
-    label: 'Show Label',
-    initialValue: true,
-    description: 'Whether to show the label.',
-  );
-
   final backgroundColor = context.knobs.object.dropdown<_ColorOption>(
     label: 'Background Color',
     options: _ColorOption.values,
@@ -99,8 +87,8 @@ Widget buildStreamImageSourceBadgePlayground(BuildContext context) {
   };
 
   final badge = StreamImageSourceBadge(
-    leading: showLeading ? leading : null,
-    label: showLabel ? Text(labelText) : null,
+    leading: leading,
+    label: Text(labelText),
     backgroundColor: backgroundColor.color,
     foregroundColor: foregroundColor.color,
   );
@@ -317,7 +305,7 @@ class _CompositionSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Badge supports icon + label, icon only, or label only',
+                'Badge displays a leading icon alongside a label',
                 style: textTheme.captionDefault.copyWith(
                   color: colorScheme.textSecondary,
                 ),
@@ -330,20 +318,6 @@ class _CompositionSection extends StatelessWidget {
                     badge: StreamImageSourceBadge(
                       leading: SvgIcon(icons.giphy),
                       label: const Text('GIPHY'),
-                    ),
-                  ),
-                  SizedBox(width: spacing.xl),
-                  _CompositionDemo(
-                    label: 'Icon only',
-                    badge: StreamImageSourceBadge(
-                      leading: SvgIcon(icons.giphy),
-                    ),
-                  ),
-                  SizedBox(width: spacing.xl),
-                  _CompositionDemo(
-                    label: 'Label only',
-                    badge: StreamImageSourceBadge(
-                      label: const Text('SOURCE'),
                     ),
                   ),
                 ],
