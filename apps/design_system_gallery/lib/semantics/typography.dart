@@ -417,7 +417,12 @@ class _CompleteReference extends StatelessWidget {
                 children: [
                   _SizeTag(
                     label: 'heading',
-                    sizes: _sizesOf([textTheme.headingLg, textTheme.headingMd, textTheme.headingSm, textTheme.headingXs]),
+                    sizes: _sizesOf([
+                      textTheme.headingLg,
+                      textTheme.headingMd,
+                      textTheme.headingSm,
+                      textTheme.headingXs,
+                    ]),
                   ),
                   _SizeTag(
                     label: 'body',
@@ -433,7 +438,12 @@ class _CompleteReference extends StatelessWidget {
                   ),
                   _SizeTag(
                     label: 'numeric',
-                    sizes: _sizesOf([textTheme.numericXl, textTheme.numericLg, textTheme.numericMd, textTheme.numericSm]),
+                    sizes: _sizesOf([
+                      textTheme.numericXl,
+                      textTheme.numericLg,
+                      textTheme.numericMd,
+                      textTheme.numericSm,
+                    ]),
                   ),
                 ],
               ),
