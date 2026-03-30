@@ -191,15 +191,13 @@ class _Section extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+              style: context.streamTextTheme.metadataEmphasis.copyWith(
                 letterSpacing: 1.2,
                 color: colorScheme.accentPrimary,
               ),
             ),
             if (description case final desc?)
-              Text(desc, style: TextStyle(fontSize: 13, color: colorScheme.textTertiary)),
+              Text(desc, style: context.streamTextTheme.metadataDefault.copyWith(color: colorScheme.textTertiary)),
           ],
         ),
         ...children,
@@ -236,7 +234,7 @@ class _ExampleCard extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: colorScheme.textSecondary),
+            style: context.streamTextTheme.metadataEmphasis.copyWith(color: colorScheme.textSecondary),
           ),
           child,
         ],

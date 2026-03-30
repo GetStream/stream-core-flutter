@@ -266,12 +266,12 @@ class _TypeStyleCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: spacing.xs + spacing.xxs,
+                    runSpacing: spacing.xs,
                     children: [
                       _SpecChip(label: '${size}px'),
-                      SizedBox(width: spacing.xs + spacing.xxs),
                       _SpecChip(label: weight),
-                      SizedBox(width: spacing.xs + spacing.xxs),
                       _SpecChip(label: '${lineHeight.toStringAsFixed(1)}×'),
                     ],
                   ),

@@ -154,14 +154,14 @@ class _StreamBranding extends StatelessWidget {
           children: [
             Text(
               'Stream',
-              style: textTheme.headingSm.copyWith(
+              style: textTheme.headingXs.copyWith(
                 color: colorScheme.textPrimary,
                 letterSpacing: -0.5,
               ),
             ),
             Text(
               'Design System',
-              style: textTheme.captionDefault.copyWith(
+              style: textTheme.metadataDefault.copyWith(
                 color: colorScheme.textTertiary,
               ),
             ),
