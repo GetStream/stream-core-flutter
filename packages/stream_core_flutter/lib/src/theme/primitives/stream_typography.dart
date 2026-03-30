@@ -16,7 +16,7 @@ part 'stream_typography.g.theme.dart';
 ///
 /// ```dart
 /// final typography = StreamTypography();
-/// final fontSize = typography.fontSize.md; // 15.0 on iOS, 16.0 on Android
+/// final fontSize = typography.fontSize.md; // 17.0 on iOS, 16.0 on Android
 /// ```
 /// {@end-tool}
 ///
@@ -118,7 +118,7 @@ class StreamLineHeight with _$StreamLineHeight {
 ///
 /// ```dart
 /// final fontSize = StreamFontSize();
-/// Text('Hello', style: TextStyle(fontSize: fontSize.md)); // 15.0 on iOS, 16.0 on Android
+/// Text('Hello', style: TextStyle(fontSize: fontSize.md)); // 17.0 on iOS, 16.0 on Android
 /// ```
 /// {@end-tool}
 @immutable
@@ -173,12 +173,12 @@ class StreamFontSize with _$StreamFontSize {
   /// Uses San Francisco font sizing conventions.
   static const StreamFontSize ios = .raw(
     micro: 8,
-    xxs: 10,
-    xs: 12,
-    sm: 13,
-    md: 15,
-    lg: 17,
-    xl: 20,
+    xxs: 12,
+    xs: 13,
+    sm: 15,
+    md: 17,
+    lg: 20,
+    xl: 22,
     xxl: 24,
   );
 

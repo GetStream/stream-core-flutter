@@ -552,7 +552,7 @@ class ThemeConfiguration extends ChangeNotifier {
           borderRadius: dialogRadius,
           side: BorderSide(color: borderSubtle),
         ),
-        titleTextStyle: ts.bodyEmphasis.copyWith(color: textPrimary),
+        titleTextStyle: ts.headingSm.copyWith(color: textPrimary),
         contentTextStyle: ts.bodyDefault.copyWith(color: textSecondary),
       ),
       // AppBar
@@ -652,7 +652,7 @@ class ThemeConfiguration extends ChangeNotifier {
           color: backgroundSurfaceStrong,
           borderRadius: smallRadius,
         ),
-        textStyle: ts.captionDefault.copyWith(color: textPrimary),
+        textStyle: ts.metadataDefault.copyWith(color: textPrimary),
       ),
       // Divider
       dividerTheme: DividerThemeData(
@@ -661,18 +661,18 @@ class ThemeConfiguration extends ChangeNotifier {
       ),
       // Icon
       iconTheme: IconThemeData(color: textSecondary),
-      // Text - mapped to closest Stream styles by size/weight
+      // Text - mapped to Material 3 roles per Figma design system spec
       textTheme: TextTheme(
-        // Titles - for app bar, dialogs, navigation
+        // Titles - heading hierarchy
         titleLarge: ts.headingLg.copyWith(color: textPrimary),
-        titleMedium: ts.bodyEmphasis.copyWith(color: textPrimary),
-        titleSmall: ts.captionEmphasis.copyWith(color: textPrimary),
-        // Body - main content text
-        bodyLarge: ts.bodyEmphasis.copyWith(color: textPrimary),
-        bodyMedium: ts.bodyDefault.copyWith(color: textPrimary),
-        bodySmall: ts.captionDefault.copyWith(color: textSecondary),
+        titleMedium: ts.headingMd.copyWith(color: textPrimary),
+        titleSmall: ts.headingSm.copyWith(color: textPrimary),
+        // Body - content text
+        bodyLarge: ts.bodyDefault.copyWith(color: textPrimary),
+        bodyMedium: ts.captionDefault.copyWith(color: textPrimary),
+        bodySmall: ts.metadataDefault.copyWith(color: textSecondary),
         // Labels - buttons, chips, navigation items
-        labelLarge: ts.captionEmphasis.copyWith(color: textPrimary),
+        labelLarge: ts.headingXs.copyWith(color: textPrimary),
         labelMedium: ts.metadataEmphasis.copyWith(color: textSecondary),
         labelSmall: ts.metadataDefault.copyWith(color: textTertiary),
       ),

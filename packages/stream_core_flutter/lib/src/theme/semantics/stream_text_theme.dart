@@ -74,21 +74,21 @@ class StreamTextTheme with _$StreamTextTheme {
     headingMd ??= TextStyle(
       fontSize: fontSize.lg,
       fontWeight: fontWeight.semibold,
-      height: lineHeight.normal / fontSize.lg,
+      height: lineHeight.relaxed / fontSize.lg,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     headingSm ??= TextStyle(
       fontSize: fontSize.md,
       fontWeight: fontWeight.semibold,
-      height: lineHeight.tight / fontSize.md,
+      height: lineHeight.normal / fontSize.md,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     headingXs ??= TextStyle(
-      fontSize: fontSize.xs,
+      fontSize: fontSize.sm,
       fontWeight: fontWeight.semibold,
-      height: lineHeight.tight / fontSize.xs,
+      height: lineHeight.normal / fontSize.sm,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
@@ -127,28 +127,28 @@ class StreamTextTheme with _$StreamTextTheme {
     captionDefault ??= TextStyle(
       fontSize: fontSize.sm,
       fontWeight: fontWeight.regular,
-      height: lineHeight.tight / fontSize.sm,
+      height: lineHeight.normal / fontSize.sm,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     captionEmphasis ??= TextStyle(
       fontSize: fontSize.sm,
       fontWeight: fontWeight.semibold,
-      height: lineHeight.tight / fontSize.sm,
+      height: lineHeight.normal / fontSize.sm,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     captionLink ??= TextStyle(
       fontSize: fontSize.sm,
       fontWeight: fontWeight.regular,
-      height: lineHeight.tight / fontSize.sm,
+      height: lineHeight.normal / fontSize.sm,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     captionLinkEmphasis ??= TextStyle(
       fontSize: fontSize.sm,
       fontWeight: fontWeight.semibold,
-      height: lineHeight.tight / fontSize.sm,
+      height: lineHeight.normal / fontSize.sm,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
@@ -187,28 +187,28 @@ class StreamTextTheme with _$StreamTextTheme {
     numericXl ??= TextStyle(
       fontSize: fontSize.sm,
       fontWeight: fontWeight.bold,
-      height: 14 / fontSize.sm,
+      height: 1,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     numericLg ??= TextStyle(
       fontSize: fontSize.xs,
       fontWeight: fontWeight.bold,
-      height: 12 / fontSize.xs,
+      height: 1,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     numericMd ??= TextStyle(
       fontSize: fontSize.xxs,
       fontWeight: fontWeight.bold,
-      height: 10 / fontSize.xxs,
+      height: 1,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
     numericSm ??= TextStyle(
       fontSize: fontSize.micro,
       fontWeight: fontWeight.bold,
-      height: 8 / fontSize.micro,
+      height: 1,
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     );
@@ -260,104 +260,109 @@ class StreamTextTheme with _$StreamTextTheme {
     required this.numericSm,
   });
 
-  /// Large heading text style.
+  /// Large heading text style for screen titles and channel titles.
   ///
   /// Uses semibold weight, xl font size, and relaxed line height.
   final TextStyle headingLg;
 
-  /// Medium heading text style.
+  /// Medium heading text style for section headers inside screens.
   ///
-  /// Uses semibold weight, lg font size, and normal line height.
+  /// Uses semibold weight, lg font size, and relaxed line height.
   final TextStyle headingMd;
 
-  /// Small heading text style.
+  /// Small heading text style for sub-section headers.
   ///
-  /// Uses semibold weight, md font size, and tight line height.
+  /// Uses semibold weight, md font size, and normal line height.
   final TextStyle headingSm;
 
-  /// Extra small heading text style.
+  /// Extra small heading text style for minor labels and grouped sections.
   ///
-  /// Uses semibold weight, xs font size, and tight line height.
+  /// Uses medium weight (iOS) or semibold weight (Android), sm font size,
+  /// and normal line height.
   final TextStyle headingXs;
 
-  /// Default body text style.
+  /// Default body text style for message text and primary content.
   ///
   /// Uses regular weight, md font size, and normal line height.
   final TextStyle bodyDefault;
 
-  /// Emphasized body text style.
+  /// Emphasized body text style for strong inline emphasis.
   ///
   /// Uses semibold weight, md font size, and normal line height.
   final TextStyle bodyEmphasis;
 
-  /// Body link text style.
+  /// Body link text style for inline links.
   ///
   /// Uses regular weight, md font size, and normal line height.
   final TextStyle bodyLink;
 
-  /// Emphasized body link text style.
+  /// Emphasized body link text style for prominent inline links.
   ///
   /// Uses semibold weight, md font size, and normal line height.
   final TextStyle bodyLinkEmphasis;
 
-  /// Default caption text style.
+  /// Default caption text style for secondary supporting text.
   ///
-  /// Uses regular weight, sm font size, and tight line height.
+  /// Uses regular weight, sm font size, and normal (iOS) or tight (Android)
+  /// line height.
   final TextStyle captionDefault;
 
-  /// Emphasized caption text style.
+  /// Emphasized caption text style for strong supporting text.
   ///
-  /// Uses semibold weight, sm font size, and tight line height.
+  /// Uses semibold weight, sm font size, and normal (iOS) or tight (Android)
+  /// line height.
   final TextStyle captionEmphasis;
 
-  /// Caption link text style.
+  /// Caption link text style for links in caption.
   ///
-  /// Uses regular weight, sm font size, and tight line height.
+  /// Uses regular weight, sm font size, and normal (iOS) or tight (Android)
+  /// line height.
   final TextStyle captionLink;
 
-  /// Emphasized caption link text style.
+  /// Emphasized caption link text style for prominent links in caption.
   ///
-  /// Uses semibold weight, sm font size, and tight line height.
+  /// Uses semibold weight, sm font size, and normal (iOS) or tight (Android)
+  /// line height.
   final TextStyle captionLinkEmphasis;
 
-  /// Default metadata text style.
+  /// Default metadata text style for timestamps and delivery status.
   ///
   /// Uses regular weight, xs font size, and tight line height.
   final TextStyle metadataDefault;
 
-  /// Emphasized metadata text style.
+  /// Emphasized metadata text style for highlighted metadata.
   ///
   /// Uses semibold weight, xs font size, and tight line height.
   final TextStyle metadataEmphasis;
 
-  /// Metadata link text style.
+  /// Metadata link text style for metadata links.
   ///
   /// Uses regular weight, xs font size, and tight line height.
   final TextStyle metadataLink;
 
-  /// Emphasized metadata link text style.
+  /// Emphasized metadata link text style for prominent metadata links.
   ///
   /// Uses semibold weight, xs font size, and tight line height.
   final TextStyle metadataLinkEmphasis;
 
-  /// Extra large numeric text style.
+  /// Extra large numeric text style for timestamps and delivery status.
   ///
-  /// Uses bold weight and sm font size. Optimized for displaying numbers.
+  /// Uses bold weight, sm font size, and 100% line height.
   final TextStyle numericXl;
 
-  /// Large numeric text style.
+  /// Large numeric text style for badges and avatar initials.
   ///
-  /// Uses bold weight and xs font size. Optimized for displaying numbers.
+  /// Uses bold weight, xs font size, and 100% line height.
   final TextStyle numericLg;
 
-  /// Medium numeric text style.
+  /// Medium numeric text style for small badge counts.
   ///
-  /// Uses bold weight and xxs font size. Optimized for displaying numbers.
+  /// Uses bold weight, xxs font size, and 100% line height.
   final TextStyle numericMd;
 
-  /// Small numeric text style.
+  /// Small numeric text style for micro indicators only.
   ///
-  /// Uses bold weight and micro font size. Optimized for displaying numbers.
+  /// Uses bold weight, micro font size, and 100% line height.
   final TextStyle numericSm;
 
   /// Linearly interpolates between this and another [StreamTextTheme].
