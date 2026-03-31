@@ -41,6 +41,7 @@ class IconGeneratorConfig {
     required this.outputFontFile,
     required this.outputFile,
     required this.outputDataFile,
+    required this.outputLogFile,
     required this.fontName,
     required this.className,
     required this.dataClassName,
@@ -82,6 +83,7 @@ class IconGeneratorConfig {
       outputFontFile: resolvePath('output_font_file'),
       outputFile: resolvePath('output_file'),
       outputDataFile: resolvePath('output_data_file'),
+      outputLogFile: resolvePath('output_log_file'),
       fontName: config['font_name'] as String? ?? 'Stream Icons',
       className: config['class_name'] as String? ?? 'StreamIcons',
       dataClassName: config['data_class_name'] as String? ?? 'StreamIconData',
@@ -99,6 +101,7 @@ class IconGeneratorConfig {
   final String outputFontFile;
   final String outputFile;
   final String outputDataFile;
+  final String outputLogFile;
   final String fontName;
   final String className;
   final String dataClassName;
@@ -159,7 +162,12 @@ String _resolveConfigPath() {
 
 Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async {
   // 1. Read SVG files
-  final svgMap = _readSvgFiles(config.inputSvgDir, config.recursive, scriptDir);
+  final svgMap = _readSvgFiles(
+    config.inputSvgDir,
+    config.recursive,
+    scriptDir: scriptDir,
+    logFilePath: config.outputLogFile,
+  );
   if (svgMap.isEmpty) {
     throw const IconGeneratorException('No SVG files found', exitCode: 2);
   }
@@ -249,7 +257,12 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
 }
 
 /// Reads all SVG files from a directory.
-Map<String, String> _readSvgFiles(String directory, bool recursive, String scriptDir) {
+Map<String, String> _readSvgFiles(
+  String directory,
+  bool recursive, {
+  required String scriptDir,
+  required String logFilePath,
+}) {
   _log('🔍 Reading SVGs: ${p.relative(directory, from: scriptDir)}');
 
   final dir = Directory(directory);
@@ -260,16 +273,62 @@ Map<String, String> _readSvgFiles(String directory, bool recursive, String scrip
     );
   }
 
+  _log('🔍 Reading log file: ${p.relative(logFilePath, from: scriptDir)}');
+  final logFile = File(logFilePath);
+  if (!logFile.existsSync()) {
+    throw IconGeneratorException(
+      'Log file not found: $logFile',
+      exitCode: 2,
+    );
+  }
+  final logContent = logFile.readAsStringSync();
+  final logEntries = <String, String>{};
+  for (final line in logContent.split('\n')) {
+    final parts = line.split(';');
+    if (parts.length == 2) {
+      logEntries[parts[0]] = parts[1];
+    }
+  }
+
+  final newAdditions = <String, String>{};
+
+  String getAdditionDate(String fileName) {
+    if (logEntries.containsKey(fileName)) {
+      return logEntries[fileName]!;
+    }
+    final now = DateTime.now();
+    newAdditions[fileName] = '${now.year}${now.month}${now.day}';
+    return newAdditions[fileName]!;
+  }
+
   final svgFiles =
       dir
           .listSync(recursive: recursive)
           .whereType<File>()
           .where((f) => p.extension(f.path).toLowerCase() == '.svg')
+          .where((f) => !_excludedSvgIcons.contains(p.basenameWithoutExtension(f.path)))
           .toList()
-        ..sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
+        ..sort(
+          (a, b) {
+            final dateDiff =
+                getAdditionDate(
+                  p.basenameWithoutExtension(a.path),
+                ).compareTo(
+                  getAdditionDate(p.basenameWithoutExtension(b.path)),
+                );
+            if (dateDiff != 0) {
+              return dateDiff;
+            }
+            return p.basenameWithoutExtension(a.path).compareTo(p.basenameWithoutExtension(b.path));
+          },
+        );
+
+  for (final entries in newAdditions.entries) {
+    logFile.writeAsStringSync('${entries.key};${entries.value}\n', mode: FileMode.append);
+  }
 
   return {
-    for (final file in svgFiles) p.basenameWithoutExtension(file.path): file.readAsStringSync(),
+    for (final file in svgFiles) p.basenameWithoutExtension(file.path).camelCase: file.readAsStringSync(),
   };
 }
 
@@ -606,7 +665,7 @@ class IconEntry {
 
     return IconEntry(
       fieldName: ReCase(withoutPrefix).camelCase,
-      constantName: 'icon${sanitized.startsWith('Icon') ? sanitized.substring(4) : ReCase(sanitized).pascalCase}',
+      constantName: ReCase(sanitized).camelCase,
       humanReadable: ReCase(withoutPrefix).sentenceCase.toLowerCase(),
     );
   }
@@ -685,3 +744,20 @@ class IconGeneratorException implements Exception {
   @override
   String toString() => message;
 }
+
+const _excludedSvgIcons = [
+  // Multi color icons are added separately
+  'giphy-12',
+  'giphy-16',
+  'giphy-20',
+  'giphy-32',
+  'imgur-12',
+  'imgur-16',
+  'imgur-20',
+  'imgur-32',
+  // Loading icons are a Flutter widget
+  'loading-12',
+  'loading-16',
+  'loading-20',
+  'loading-32',
+];
