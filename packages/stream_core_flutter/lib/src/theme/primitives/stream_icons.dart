@@ -137,6 +137,7 @@ class StreamIcons with _$StreamIcons {
     this.clock12 = StreamIconData.clock12,
     this.clock16 = StreamIconData.clock16,
     this.clock20 = StreamIconData.clock20,
+    this.clock32 = StreamIconData.clock32,
     this.command12 = StreamIconData.command12,
     this.command16 = StreamIconData.command16,
     this.command20 = StreamIconData.command20,
@@ -204,7 +205,6 @@ class StreamIcons with _$StreamIcons {
     this.gallery16 = StreamIconData.gallery16,
     this.gallery20 = StreamIconData.gallery20,
     this.gallery32 = StreamIconData.gallery32,
-    this.icon32 = StreamIconData.icon32,
     this.image12 = StreamIconData.image12,
     this.image16 = StreamIconData.image16,
     this.image20 = StreamIconData.image20,
@@ -644,6 +644,9 @@ class StreamIcons with _$StreamIcons {
   /// The clock20 icon.
   final IconData clock20;
 
+  /// The clock32 icon.
+  final IconData clock32;
+
   /// The command12 icon.
   final IconData command12;
 
@@ -844,9 +847,6 @@ class StreamIcons with _$StreamIcons {
 
   /// The gallery32 icon.
   final IconData gallery32;
-
-  /// The icon32 icon.
-  final IconData icon32;
 
   /// The image12 icon.
   final IconData image12;
@@ -1539,6 +1539,7 @@ class StreamIcons with _$StreamIcons {
     'clock12': clock12,
     'clock16': clock16,
     'clock20': clock20,
+    'clock32': clock32,
     'command12': command12,
     'command16': command16,
     'command20': command20,
@@ -1606,7 +1607,6 @@ class StreamIcons with _$StreamIcons {
     'gallery16': gallery16,
     'gallery20': gallery20,
     'gallery32': gallery32,
-    'icon32': icon32,
     'image12': image12,
     'image16': image16,
     'image20': image20,

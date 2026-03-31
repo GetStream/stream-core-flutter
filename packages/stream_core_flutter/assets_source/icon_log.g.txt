@@ -42,6 +42,7 @@ mention-12;2026331
 play-fill-32;2026331
 thread-32;2026331
 image-12;2026331
+clock-32;2026331
 message-bubble-fill-32;2026331
 xmark-32;2026331
 audio-12;2026331
@@ -77,7 +78,6 @@ refresh-12;2026331
 arrow-up-32;2026331
 x-circle-32;2026331
 chevron-right-12;2026331
-icon-32;2026331
 checks-32;2026331
 pause-fill-32;2026331
 message-bubbles-32;2026331

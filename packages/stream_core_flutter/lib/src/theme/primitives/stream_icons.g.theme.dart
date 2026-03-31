@@ -105,6 +105,7 @@ mixin _$StreamIcons {
       clock12: t < 0.5 ? a.clock12 : b.clock12,
       clock16: t < 0.5 ? a.clock16 : b.clock16,
       clock20: t < 0.5 ? a.clock20 : b.clock20,
+      clock32: t < 0.5 ? a.clock32 : b.clock32,
       command12: t < 0.5 ? a.command12 : b.command12,
       command16: t < 0.5 ? a.command16 : b.command16,
       command20: t < 0.5 ? a.command20 : b.command20,
@@ -196,7 +197,6 @@ mixin _$StreamIcons {
       gallery16: t < 0.5 ? a.gallery16 : b.gallery16,
       gallery20: t < 0.5 ? a.gallery20 : b.gallery20,
       gallery32: t < 0.5 ? a.gallery32 : b.gallery32,
-      icon32: t < 0.5 ? a.icon32 : b.icon32,
       image12: t < 0.5 ? a.image12 : b.image12,
       image16: t < 0.5 ? a.image16 : b.image16,
       image20: t < 0.5 ? a.image20 : b.image20,
@@ -488,6 +488,7 @@ mixin _$StreamIcons {
     IconData? clock12,
     IconData? clock16,
     IconData? clock20,
+    IconData? clock32,
     IconData? command12,
     IconData? command16,
     IconData? command20,
@@ -555,7 +556,6 @@ mixin _$StreamIcons {
     IconData? gallery16,
     IconData? gallery20,
     IconData? gallery32,
-    IconData? icon32,
     IconData? image12,
     IconData? image16,
     IconData? image20,
@@ -839,6 +839,7 @@ mixin _$StreamIcons {
       clock12: clock12 ?? _this.clock12,
       clock16: clock16 ?? _this.clock16,
       clock20: clock20 ?? _this.clock20,
+      clock32: clock32 ?? _this.clock32,
       command12: command12 ?? _this.command12,
       command16: command16 ?? _this.command16,
       command20: command20 ?? _this.command20,
@@ -918,7 +919,6 @@ mixin _$StreamIcons {
       gallery16: gallery16 ?? _this.gallery16,
       gallery20: gallery20 ?? _this.gallery20,
       gallery32: gallery32 ?? _this.gallery32,
-      icon32: icon32 ?? _this.icon32,
       image12: image12 ?? _this.image12,
       image16: image16 ?? _this.image16,
       image20: image20 ?? _this.image20,
@@ -1213,6 +1213,7 @@ mixin _$StreamIcons {
       clock12: other.clock12,
       clock16: other.clock16,
       clock20: other.clock20,
+      clock32: other.clock32,
       command12: other.command12,
       command16: other.command16,
       command20: other.command20,
@@ -1280,7 +1281,6 @@ mixin _$StreamIcons {
       gallery16: other.gallery16,
       gallery20: other.gallery20,
       gallery32: other.gallery32,
-      icon32: other.icon32,
       image12: other.image12,
       image16: other.image16,
       image20: other.image20,
@@ -1576,6 +1576,7 @@ mixin _$StreamIcons {
         _other.clock12 == _this.clock12 &&
         _other.clock16 == _this.clock16 &&
         _other.clock20 == _this.clock20 &&
+        _other.clock32 == _this.clock32 &&
         _other.command12 == _this.command12 &&
         _other.command16 == _this.command16 &&
         _other.command20 == _this.command20 &&
@@ -1643,7 +1644,6 @@ mixin _$StreamIcons {
         _other.gallery16 == _this.gallery16 &&
         _other.gallery20 == _this.gallery20 &&
         _other.gallery32 == _this.gallery32 &&
-        _other.icon32 == _this.icon32 &&
         _other.image12 == _this.image12 &&
         _other.image16 == _this.image16 &&
         _other.image20 == _this.image20 &&
@@ -1931,6 +1931,7 @@ mixin _$StreamIcons {
       _this.clock12,
       _this.clock16,
       _this.clock20,
+      _this.clock32,
       _this.command12,
       _this.command16,
       _this.command20,
@@ -1998,7 +1999,6 @@ mixin _$StreamIcons {
       _this.gallery16,
       _this.gallery20,
       _this.gallery32,
-      _this.icon32,
       _this.image12,
       _this.image16,
       _this.image20,
