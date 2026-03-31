@@ -78,6 +78,10 @@ class StreamIcons with _$StreamIcons {
     this.arrowLeft16 = StreamIconData.arrowLeft16,
     this.arrowLeft20 = StreamIconData.arrowLeft20,
     this.arrowLeft32 = StreamIconData.arrowLeft32,
+    this.arrowRight12 = StreamIconData.arrowRight12,
+    this.arrowRight16 = StreamIconData.arrowRight16,
+    this.arrowRight20 = StreamIconData.arrowRight20,
+    this.arrowRight32 = StreamIconData.arrowRight32,
     this.arrowUp12 = StreamIconData.arrowUp12,
     this.arrowUp16 = StreamIconData.arrowUp16,
     this.arrowUp20 = StreamIconData.arrowUp20,
@@ -141,14 +145,15 @@ class StreamIcons with _$StreamIcons {
     this.command12 = StreamIconData.command12,
     this.command16 = StreamIconData.command16,
     this.command20 = StreamIconData.command20,
+    this.command32 = StreamIconData.command32,
     this.copy12 = StreamIconData.copy12,
     this.copy16 = StreamIconData.copy16,
     this.copy20 = StreamIconData.copy20,
     this.copy32 = StreamIconData.copy32,
-    this.delete = StreamIconData.delete,
     this.delete12 = StreamIconData.delete12,
     this.delete16 = StreamIconData.delete16,
     this.delete20 = StreamIconData.delete20,
+    this.delete32 = StreamIconData.delete32,
     this.download12 = StreamIconData.download12,
     this.download16 = StreamIconData.download16,
     this.download20 = StreamIconData.download20,
@@ -157,22 +162,22 @@ class StreamIcons with _$StreamIcons {
     this.edit16 = StreamIconData.edit16,
     this.edit20 = StreamIconData.edit20,
     this.edit32 = StreamIconData.edit32,
-    this.emoji = StreamIconData.emoji,
     this.emoji12 = StreamIconData.emoji12,
     this.emoji16 = StreamIconData.emoji16,
     this.emoji20 = StreamIconData.emoji20,
+    this.emoji32 = StreamIconData.emoji32,
     this.emojiAdd12 = StreamIconData.emojiAdd12,
     this.emojiAdd16 = StreamIconData.emojiAdd16,
     this.emojiAdd20 = StreamIconData.emojiAdd20,
     this.emojiAdd32 = StreamIconData.emojiAdd32,
+    this.exclamationCircle12 = StreamIconData.exclamationCircle12,
+    this.exclamationCircle16 = StreamIconData.exclamationCircle16,
+    this.exclamationCircle20 = StreamIconData.exclamationCircle20,
+    this.exclamationCircle32 = StreamIconData.exclamationCircle32,
     this.exclamationCircleFill12 = StreamIconData.exclamationCircleFill12,
     this.exclamationCircleFill16 = StreamIconData.exclamationCircleFill16,
     this.exclamationCircleFill20 = StreamIconData.exclamationCircleFill20,
     this.exclamationCircleFill32 = StreamIconData.exclamationCircleFill32,
-    this.exclamationMark12 = StreamIconData.exclamationMark12,
-    this.exclamationMark16 = StreamIconData.exclamationMark16,
-    this.exclamationMark20 = StreamIconData.exclamationMark20,
-    this.exclamationMark32 = StreamIconData.exclamationMark32,
     this.exclamationMarkFill12 = StreamIconData.exclamationMarkFill12,
     this.exclamationMarkFill16 = StreamIconData.exclamationMarkFill16,
     this.exclamationMarkFill20 = StreamIconData.exclamationMarkFill20,
@@ -211,9 +216,11 @@ class StreamIcons with _$StreamIcons {
     this.image32 = StreamIconData.image32,
     this.info12 = StreamIconData.info12,
     this.info16 = StreamIconData.info16,
+    this.info20 = StreamIconData.info20,
     this.info32 = StreamIconData.info32,
     this.leave12 = StreamIconData.leave12,
     this.leave16 = StreamIconData.leave16,
+    this.leave20 = StreamIconData.leave20,
     this.leave32 = StreamIconData.leave32,
     this.link12 = StreamIconData.link12,
     this.link16 = StreamIconData.link16,
@@ -249,6 +256,7 @@ class StreamIcons with _$StreamIcons {
     this.minus32 = StreamIconData.minus32,
     this.minusCircle12 = StreamIconData.minusCircle12,
     this.minusCircle16 = StreamIconData.minusCircle16,
+    this.minusCircle20 = StreamIconData.minusCircle20,
     this.minusCircle32 = StreamIconData.minusCircle32,
     this.more12 = StreamIconData.more12,
     this.more16 = StreamIconData.more16,
@@ -286,10 +294,10 @@ class StreamIcons with _$StreamIcons {
     this.poll16 = StreamIconData.poll16,
     this.poll20 = StreamIconData.poll20,
     this.poll32 = StreamIconData.poll32,
-    this.quote = StreamIconData.quote,
     this.quote12 = StreamIconData.quote12,
     this.quote16 = StreamIconData.quote16,
     this.quote20 = StreamIconData.quote20,
+    this.quote32 = StreamIconData.quote32,
     this.refresh12 = StreamIconData.refresh12,
     this.refresh16 = StreamIconData.refresh16,
     this.refresh20 = StreamIconData.refresh20,
@@ -324,6 +332,7 @@ class StreamIcons with _$StreamIcons {
     this.share32 = StreamIconData.share32,
     this.sidebar12 = StreamIconData.sidebar12,
     this.sidebar16 = StreamIconData.sidebar16,
+    this.sidebar20 = StreamIconData.sidebar20,
     this.sidebar32 = StreamIconData.sidebar32,
     this.stopFill12 = StreamIconData.stopFill12,
     this.stopFill16 = StreamIconData.stopFill16,
@@ -347,6 +356,7 @@ class StreamIcons with _$StreamIcons {
     this.trophy32 = StreamIconData.trophy32,
     this.unlock12 = StreamIconData.unlock12,
     this.unlock16 = StreamIconData.unlock16,
+    this.unlock20 = StreamIconData.unlock20,
     this.unlock32 = StreamIconData.unlock32,
     this.unpin12 = StreamIconData.unpin12,
     this.unpin16 = StreamIconData.unpin16,
@@ -398,6 +408,7 @@ class StreamIcons with _$StreamIcons {
     this.voiceFill32 = StreamIconData.voiceFill32,
     this.xCircle12 = StreamIconData.xCircle12,
     this.xCircle16 = StreamIconData.xCircle16,
+    this.xCircle20 = StreamIconData.xCircle20,
     this.xCircle32 = StreamIconData.xCircle32,
     this.xmark12 = StreamIconData.xmark12,
     this.xmark16 = StreamIconData.xmark16,
@@ -466,6 +477,18 @@ class StreamIcons with _$StreamIcons {
 
   /// The arrow left32 icon.
   final IconData arrowLeft32;
+
+  /// The arrow right12 icon.
+  final IconData arrowRight12;
+
+  /// The arrow right16 icon.
+  final IconData arrowRight16;
+
+  /// The arrow right20 icon.
+  final IconData arrowRight20;
+
+  /// The arrow right32 icon.
+  final IconData arrowRight32;
 
   /// The arrow up12 icon.
   final IconData arrowUp12;
@@ -656,6 +679,9 @@ class StreamIcons with _$StreamIcons {
   /// The command20 icon.
   final IconData command20;
 
+  /// The command32 icon.
+  final IconData command32;
+
   /// The copy12 icon.
   final IconData copy12;
 
@@ -668,9 +694,6 @@ class StreamIcons with _$StreamIcons {
   /// The copy32 icon.
   final IconData copy32;
 
-  /// The delete icon.
-  final IconData delete;
-
   /// The delete12 icon.
   final IconData delete12;
 
@@ -679,6 +702,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The delete20 icon.
   final IconData delete20;
+
+  /// The delete32 icon.
+  final IconData delete32;
 
   /// The download12 icon.
   final IconData download12;
@@ -704,9 +730,6 @@ class StreamIcons with _$StreamIcons {
   /// The edit32 icon.
   final IconData edit32;
 
-  /// The emoji icon.
-  final IconData emoji;
-
   /// The emoji12 icon.
   final IconData emoji12;
 
@@ -715,6 +738,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The emoji20 icon.
   final IconData emoji20;
+
+  /// The emoji32 icon.
+  final IconData emoji32;
 
   /// The emoji add12 icon.
   final IconData emojiAdd12;
@@ -728,6 +754,18 @@ class StreamIcons with _$StreamIcons {
   /// The emoji add32 icon.
   final IconData emojiAdd32;
 
+  /// The exclamation circle12 icon.
+  final IconData exclamationCircle12;
+
+  /// The exclamation circle16 icon.
+  final IconData exclamationCircle16;
+
+  /// The exclamation circle20 icon.
+  final IconData exclamationCircle20;
+
+  /// The exclamation circle32 icon.
+  final IconData exclamationCircle32;
+
   /// The exclamation circle fill12 icon.
   final IconData exclamationCircleFill12;
 
@@ -739,18 +777,6 @@ class StreamIcons with _$StreamIcons {
 
   /// The exclamation circle fill32 icon.
   final IconData exclamationCircleFill32;
-
-  /// The exclamation mark12 icon.
-  final IconData exclamationMark12;
-
-  /// The exclamation mark16 icon.
-  final IconData exclamationMark16;
-
-  /// The exclamation mark20 icon.
-  final IconData exclamationMark20;
-
-  /// The exclamation mark32 icon.
-  final IconData exclamationMark32;
 
   /// The exclamation mark fill12 icon.
   final IconData exclamationMarkFill12;
@@ -866,6 +892,9 @@ class StreamIcons with _$StreamIcons {
   /// The info16 icon.
   final IconData info16;
 
+  /// The info20 icon.
+  final IconData info20;
+
   /// The info32 icon.
   final IconData info32;
 
@@ -874,6 +903,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The leave16 icon.
   final IconData leave16;
+
+  /// The leave20 icon.
+  final IconData leave20;
 
   /// The leave32 icon.
   final IconData leave32;
@@ -979,6 +1011,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The minus circle16 icon.
   final IconData minusCircle16;
+
+  /// The minus circle20 icon.
+  final IconData minusCircle20;
 
   /// The minus circle32 icon.
   final IconData minusCircle32;
@@ -1091,9 +1126,6 @@ class StreamIcons with _$StreamIcons {
   /// The poll32 icon.
   final IconData poll32;
 
-  /// The quote icon.
-  final IconData quote;
-
   /// The quote12 icon.
   final IconData quote12;
 
@@ -1102,6 +1134,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The quote20 icon.
   final IconData quote20;
+
+  /// The quote32 icon.
+  final IconData quote32;
 
   /// The refresh12 icon.
   final IconData refresh12;
@@ -1205,6 +1240,9 @@ class StreamIcons with _$StreamIcons {
   /// The sidebar16 icon.
   final IconData sidebar16;
 
+  /// The sidebar20 icon.
+  final IconData sidebar20;
+
   /// The sidebar32 icon.
   final IconData sidebar32;
 
@@ -1273,6 +1311,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The unlock16 icon.
   final IconData unlock16;
+
+  /// The unlock20 icon.
+  final IconData unlock20;
 
   /// The unlock32 icon.
   final IconData unlock32;
@@ -1427,6 +1468,9 @@ class StreamIcons with _$StreamIcons {
   /// The x circle16 icon.
   final IconData xCircle16;
 
+  /// The x circle20 icon.
+  final IconData xCircle20;
+
   /// The x circle32 icon.
   final IconData xCircle32;
 
@@ -1480,6 +1524,10 @@ class StreamIcons with _$StreamIcons {
     'arrowLeft16': arrowLeft16,
     'arrowLeft20': arrowLeft20,
     'arrowLeft32': arrowLeft32,
+    'arrowRight12': arrowRight12,
+    'arrowRight16': arrowRight16,
+    'arrowRight20': arrowRight20,
+    'arrowRight32': arrowRight32,
     'arrowUp12': arrowUp12,
     'arrowUp16': arrowUp16,
     'arrowUp20': arrowUp20,
@@ -1543,14 +1591,15 @@ class StreamIcons with _$StreamIcons {
     'command12': command12,
     'command16': command16,
     'command20': command20,
+    'command32': command32,
     'copy12': copy12,
     'copy16': copy16,
     'copy20': copy20,
     'copy32': copy32,
-    'delete': delete,
     'delete12': delete12,
     'delete16': delete16,
     'delete20': delete20,
+    'delete32': delete32,
     'download12': download12,
     'download16': download16,
     'download20': download20,
@@ -1559,22 +1608,22 @@ class StreamIcons with _$StreamIcons {
     'edit16': edit16,
     'edit20': edit20,
     'edit32': edit32,
-    'emoji': emoji,
     'emoji12': emoji12,
     'emoji16': emoji16,
     'emoji20': emoji20,
+    'emoji32': emoji32,
     'emojiAdd12': emojiAdd12,
     'emojiAdd16': emojiAdd16,
     'emojiAdd20': emojiAdd20,
     'emojiAdd32': emojiAdd32,
+    'exclamationCircle12': exclamationCircle12,
+    'exclamationCircle16': exclamationCircle16,
+    'exclamationCircle20': exclamationCircle20,
+    'exclamationCircle32': exclamationCircle32,
     'exclamationCircleFill12': exclamationCircleFill12,
     'exclamationCircleFill16': exclamationCircleFill16,
     'exclamationCircleFill20': exclamationCircleFill20,
     'exclamationCircleFill32': exclamationCircleFill32,
-    'exclamationMark12': exclamationMark12,
-    'exclamationMark16': exclamationMark16,
-    'exclamationMark20': exclamationMark20,
-    'exclamationMark32': exclamationMark32,
     'exclamationMarkFill12': exclamationMarkFill12,
     'exclamationMarkFill16': exclamationMarkFill16,
     'exclamationMarkFill20': exclamationMarkFill20,
@@ -1613,9 +1662,11 @@ class StreamIcons with _$StreamIcons {
     'image32': image32,
     'info12': info12,
     'info16': info16,
+    'info20': info20,
     'info32': info32,
     'leave12': leave12,
     'leave16': leave16,
+    'leave20': leave20,
     'leave32': leave32,
     'link12': link12,
     'link16': link16,
@@ -1651,6 +1702,7 @@ class StreamIcons with _$StreamIcons {
     'minus32': minus32,
     'minusCircle12': minusCircle12,
     'minusCircle16': minusCircle16,
+    'minusCircle20': minusCircle20,
     'minusCircle32': minusCircle32,
     'more12': more12,
     'more16': more16,
@@ -1688,10 +1740,10 @@ class StreamIcons with _$StreamIcons {
     'poll16': poll16,
     'poll20': poll20,
     'poll32': poll32,
-    'quote': quote,
     'quote12': quote12,
     'quote16': quote16,
     'quote20': quote20,
+    'quote32': quote32,
     'refresh12': refresh12,
     'refresh16': refresh16,
     'refresh20': refresh20,
@@ -1726,6 +1778,7 @@ class StreamIcons with _$StreamIcons {
     'share32': share32,
     'sidebar12': sidebar12,
     'sidebar16': sidebar16,
+    'sidebar20': sidebar20,
     'sidebar32': sidebar32,
     'stopFill12': stopFill12,
     'stopFill16': stopFill16,
@@ -1749,6 +1802,7 @@ class StreamIcons with _$StreamIcons {
     'trophy32': trophy32,
     'unlock12': unlock12,
     'unlock16': unlock16,
+    'unlock20': unlock20,
     'unlock32': unlock32,
     'unpin12': unpin12,
     'unpin16': unpin16,
@@ -1800,6 +1854,7 @@ class StreamIcons with _$StreamIcons {
     'voiceFill32': voiceFill32,
     'xCircle12': xCircle12,
     'xCircle16': xCircle16,
+    'xCircle20': xCircle20,
     'xCircle32': xCircle32,
     'xmark12': xmark12,
     'xmark16': xmark16,

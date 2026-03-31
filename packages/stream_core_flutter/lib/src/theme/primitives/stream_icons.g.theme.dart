@@ -46,6 +46,10 @@ mixin _$StreamIcons {
       arrowLeft16: t < 0.5 ? a.arrowLeft16 : b.arrowLeft16,
       arrowLeft20: t < 0.5 ? a.arrowLeft20 : b.arrowLeft20,
       arrowLeft32: t < 0.5 ? a.arrowLeft32 : b.arrowLeft32,
+      arrowRight12: t < 0.5 ? a.arrowRight12 : b.arrowRight12,
+      arrowRight16: t < 0.5 ? a.arrowRight16 : b.arrowRight16,
+      arrowRight20: t < 0.5 ? a.arrowRight20 : b.arrowRight20,
+      arrowRight32: t < 0.5 ? a.arrowRight32 : b.arrowRight32,
       arrowUp12: t < 0.5 ? a.arrowUp12 : b.arrowUp12,
       arrowUp16: t < 0.5 ? a.arrowUp16 : b.arrowUp16,
       arrowUp20: t < 0.5 ? a.arrowUp20 : b.arrowUp20,
@@ -109,14 +113,15 @@ mixin _$StreamIcons {
       command12: t < 0.5 ? a.command12 : b.command12,
       command16: t < 0.5 ? a.command16 : b.command16,
       command20: t < 0.5 ? a.command20 : b.command20,
+      command32: t < 0.5 ? a.command32 : b.command32,
       copy12: t < 0.5 ? a.copy12 : b.copy12,
       copy16: t < 0.5 ? a.copy16 : b.copy16,
       copy20: t < 0.5 ? a.copy20 : b.copy20,
       copy32: t < 0.5 ? a.copy32 : b.copy32,
-      delete: t < 0.5 ? a.delete : b.delete,
       delete12: t < 0.5 ? a.delete12 : b.delete12,
       delete16: t < 0.5 ? a.delete16 : b.delete16,
       delete20: t < 0.5 ? a.delete20 : b.delete20,
+      delete32: t < 0.5 ? a.delete32 : b.delete32,
       download12: t < 0.5 ? a.download12 : b.download12,
       download16: t < 0.5 ? a.download16 : b.download16,
       download20: t < 0.5 ? a.download20 : b.download20,
@@ -125,14 +130,26 @@ mixin _$StreamIcons {
       edit16: t < 0.5 ? a.edit16 : b.edit16,
       edit20: t < 0.5 ? a.edit20 : b.edit20,
       edit32: t < 0.5 ? a.edit32 : b.edit32,
-      emoji: t < 0.5 ? a.emoji : b.emoji,
       emoji12: t < 0.5 ? a.emoji12 : b.emoji12,
       emoji16: t < 0.5 ? a.emoji16 : b.emoji16,
       emoji20: t < 0.5 ? a.emoji20 : b.emoji20,
+      emoji32: t < 0.5 ? a.emoji32 : b.emoji32,
       emojiAdd12: t < 0.5 ? a.emojiAdd12 : b.emojiAdd12,
       emojiAdd16: t < 0.5 ? a.emojiAdd16 : b.emojiAdd16,
       emojiAdd20: t < 0.5 ? a.emojiAdd20 : b.emojiAdd20,
       emojiAdd32: t < 0.5 ? a.emojiAdd32 : b.emojiAdd32,
+      exclamationCircle12: t < 0.5
+          ? a.exclamationCircle12
+          : b.exclamationCircle12,
+      exclamationCircle16: t < 0.5
+          ? a.exclamationCircle16
+          : b.exclamationCircle16,
+      exclamationCircle20: t < 0.5
+          ? a.exclamationCircle20
+          : b.exclamationCircle20,
+      exclamationCircle32: t < 0.5
+          ? a.exclamationCircle32
+          : b.exclamationCircle32,
       exclamationCircleFill12: t < 0.5
           ? a.exclamationCircleFill12
           : b.exclamationCircleFill12,
@@ -145,10 +162,6 @@ mixin _$StreamIcons {
       exclamationCircleFill32: t < 0.5
           ? a.exclamationCircleFill32
           : b.exclamationCircleFill32,
-      exclamationMark12: t < 0.5 ? a.exclamationMark12 : b.exclamationMark12,
-      exclamationMark16: t < 0.5 ? a.exclamationMark16 : b.exclamationMark16,
-      exclamationMark20: t < 0.5 ? a.exclamationMark20 : b.exclamationMark20,
-      exclamationMark32: t < 0.5 ? a.exclamationMark32 : b.exclamationMark32,
       exclamationMarkFill12: t < 0.5
           ? a.exclamationMarkFill12
           : b.exclamationMarkFill12,
@@ -203,9 +216,11 @@ mixin _$StreamIcons {
       image32: t < 0.5 ? a.image32 : b.image32,
       info12: t < 0.5 ? a.info12 : b.info12,
       info16: t < 0.5 ? a.info16 : b.info16,
+      info20: t < 0.5 ? a.info20 : b.info20,
       info32: t < 0.5 ? a.info32 : b.info32,
       leave12: t < 0.5 ? a.leave12 : b.leave12,
       leave16: t < 0.5 ? a.leave16 : b.leave16,
+      leave20: t < 0.5 ? a.leave20 : b.leave20,
       leave32: t < 0.5 ? a.leave32 : b.leave32,
       link12: t < 0.5 ? a.link12 : b.link12,
       link16: t < 0.5 ? a.link16 : b.link16,
@@ -249,6 +264,7 @@ mixin _$StreamIcons {
       minus32: t < 0.5 ? a.minus32 : b.minus32,
       minusCircle12: t < 0.5 ? a.minusCircle12 : b.minusCircle12,
       minusCircle16: t < 0.5 ? a.minusCircle16 : b.minusCircle16,
+      minusCircle20: t < 0.5 ? a.minusCircle20 : b.minusCircle20,
       minusCircle32: t < 0.5 ? a.minusCircle32 : b.minusCircle32,
       more12: t < 0.5 ? a.more12 : b.more12,
       more16: t < 0.5 ? a.more16 : b.more16,
@@ -286,10 +302,10 @@ mixin _$StreamIcons {
       poll16: t < 0.5 ? a.poll16 : b.poll16,
       poll20: t < 0.5 ? a.poll20 : b.poll20,
       poll32: t < 0.5 ? a.poll32 : b.poll32,
-      quote: t < 0.5 ? a.quote : b.quote,
       quote12: t < 0.5 ? a.quote12 : b.quote12,
       quote16: t < 0.5 ? a.quote16 : b.quote16,
       quote20: t < 0.5 ? a.quote20 : b.quote20,
+      quote32: t < 0.5 ? a.quote32 : b.quote32,
       refresh12: t < 0.5 ? a.refresh12 : b.refresh12,
       refresh16: t < 0.5 ? a.refresh16 : b.refresh16,
       refresh20: t < 0.5 ? a.refresh20 : b.refresh20,
@@ -324,6 +340,7 @@ mixin _$StreamIcons {
       share32: t < 0.5 ? a.share32 : b.share32,
       sidebar12: t < 0.5 ? a.sidebar12 : b.sidebar12,
       sidebar16: t < 0.5 ? a.sidebar16 : b.sidebar16,
+      sidebar20: t < 0.5 ? a.sidebar20 : b.sidebar20,
       sidebar32: t < 0.5 ? a.sidebar32 : b.sidebar32,
       stopFill12: t < 0.5 ? a.stopFill12 : b.stopFill12,
       stopFill16: t < 0.5 ? a.stopFill16 : b.stopFill16,
@@ -347,6 +364,7 @@ mixin _$StreamIcons {
       trophy32: t < 0.5 ? a.trophy32 : b.trophy32,
       unlock12: t < 0.5 ? a.unlock12 : b.unlock12,
       unlock16: t < 0.5 ? a.unlock16 : b.unlock16,
+      unlock20: t < 0.5 ? a.unlock20 : b.unlock20,
       unlock32: t < 0.5 ? a.unlock32 : b.unlock32,
       unpin12: t < 0.5 ? a.unpin12 : b.unpin12,
       unpin16: t < 0.5 ? a.unpin16 : b.unpin16,
@@ -398,6 +416,7 @@ mixin _$StreamIcons {
       voiceFill32: t < 0.5 ? a.voiceFill32 : b.voiceFill32,
       xCircle12: t < 0.5 ? a.xCircle12 : b.xCircle12,
       xCircle16: t < 0.5 ? a.xCircle16 : b.xCircle16,
+      xCircle20: t < 0.5 ? a.xCircle20 : b.xCircle20,
       xCircle32: t < 0.5 ? a.xCircle32 : b.xCircle32,
       xmark12: t < 0.5 ? a.xmark12 : b.xmark12,
       xmark16: t < 0.5 ? a.xmark16 : b.xmark16,
@@ -429,6 +448,10 @@ mixin _$StreamIcons {
     IconData? arrowLeft16,
     IconData? arrowLeft20,
     IconData? arrowLeft32,
+    IconData? arrowRight12,
+    IconData? arrowRight16,
+    IconData? arrowRight20,
+    IconData? arrowRight32,
     IconData? arrowUp12,
     IconData? arrowUp16,
     IconData? arrowUp20,
@@ -492,14 +515,15 @@ mixin _$StreamIcons {
     IconData? command12,
     IconData? command16,
     IconData? command20,
+    IconData? command32,
     IconData? copy12,
     IconData? copy16,
     IconData? copy20,
     IconData? copy32,
-    IconData? delete,
     IconData? delete12,
     IconData? delete16,
     IconData? delete20,
+    IconData? delete32,
     IconData? download12,
     IconData? download16,
     IconData? download20,
@@ -508,22 +532,22 @@ mixin _$StreamIcons {
     IconData? edit16,
     IconData? edit20,
     IconData? edit32,
-    IconData? emoji,
     IconData? emoji12,
     IconData? emoji16,
     IconData? emoji20,
+    IconData? emoji32,
     IconData? emojiAdd12,
     IconData? emojiAdd16,
     IconData? emojiAdd20,
     IconData? emojiAdd32,
+    IconData? exclamationCircle12,
+    IconData? exclamationCircle16,
+    IconData? exclamationCircle20,
+    IconData? exclamationCircle32,
     IconData? exclamationCircleFill12,
     IconData? exclamationCircleFill16,
     IconData? exclamationCircleFill20,
     IconData? exclamationCircleFill32,
-    IconData? exclamationMark12,
-    IconData? exclamationMark16,
-    IconData? exclamationMark20,
-    IconData? exclamationMark32,
     IconData? exclamationMarkFill12,
     IconData? exclamationMarkFill16,
     IconData? exclamationMarkFill20,
@@ -562,9 +586,11 @@ mixin _$StreamIcons {
     IconData? image32,
     IconData? info12,
     IconData? info16,
+    IconData? info20,
     IconData? info32,
     IconData? leave12,
     IconData? leave16,
+    IconData? leave20,
     IconData? leave32,
     IconData? link12,
     IconData? link16,
@@ -600,6 +626,7 @@ mixin _$StreamIcons {
     IconData? minus32,
     IconData? minusCircle12,
     IconData? minusCircle16,
+    IconData? minusCircle20,
     IconData? minusCircle32,
     IconData? more12,
     IconData? more16,
@@ -637,10 +664,10 @@ mixin _$StreamIcons {
     IconData? poll16,
     IconData? poll20,
     IconData? poll32,
-    IconData? quote,
     IconData? quote12,
     IconData? quote16,
     IconData? quote20,
+    IconData? quote32,
     IconData? refresh12,
     IconData? refresh16,
     IconData? refresh20,
@@ -675,6 +702,7 @@ mixin _$StreamIcons {
     IconData? share32,
     IconData? sidebar12,
     IconData? sidebar16,
+    IconData? sidebar20,
     IconData? sidebar32,
     IconData? stopFill12,
     IconData? stopFill16,
@@ -698,6 +726,7 @@ mixin _$StreamIcons {
     IconData? trophy32,
     IconData? unlock12,
     IconData? unlock16,
+    IconData? unlock20,
     IconData? unlock32,
     IconData? unpin12,
     IconData? unpin16,
@@ -749,6 +778,7 @@ mixin _$StreamIcons {
     IconData? voiceFill32,
     IconData? xCircle12,
     IconData? xCircle16,
+    IconData? xCircle20,
     IconData? xCircle32,
     IconData? xmark12,
     IconData? xmark16,
@@ -780,6 +810,10 @@ mixin _$StreamIcons {
       arrowLeft16: arrowLeft16 ?? _this.arrowLeft16,
       arrowLeft20: arrowLeft20 ?? _this.arrowLeft20,
       arrowLeft32: arrowLeft32 ?? _this.arrowLeft32,
+      arrowRight12: arrowRight12 ?? _this.arrowRight12,
+      arrowRight16: arrowRight16 ?? _this.arrowRight16,
+      arrowRight20: arrowRight20 ?? _this.arrowRight20,
+      arrowRight32: arrowRight32 ?? _this.arrowRight32,
       arrowUp12: arrowUp12 ?? _this.arrowUp12,
       arrowUp16: arrowUp16 ?? _this.arrowUp16,
       arrowUp20: arrowUp20 ?? _this.arrowUp20,
@@ -843,14 +877,15 @@ mixin _$StreamIcons {
       command12: command12 ?? _this.command12,
       command16: command16 ?? _this.command16,
       command20: command20 ?? _this.command20,
+      command32: command32 ?? _this.command32,
       copy12: copy12 ?? _this.copy12,
       copy16: copy16 ?? _this.copy16,
       copy20: copy20 ?? _this.copy20,
       copy32: copy32 ?? _this.copy32,
-      delete: delete ?? _this.delete,
       delete12: delete12 ?? _this.delete12,
       delete16: delete16 ?? _this.delete16,
       delete20: delete20 ?? _this.delete20,
+      delete32: delete32 ?? _this.delete32,
       download12: download12 ?? _this.download12,
       download16: download16 ?? _this.download16,
       download20: download20 ?? _this.download20,
@@ -859,14 +894,18 @@ mixin _$StreamIcons {
       edit16: edit16 ?? _this.edit16,
       edit20: edit20 ?? _this.edit20,
       edit32: edit32 ?? _this.edit32,
-      emoji: emoji ?? _this.emoji,
       emoji12: emoji12 ?? _this.emoji12,
       emoji16: emoji16 ?? _this.emoji16,
       emoji20: emoji20 ?? _this.emoji20,
+      emoji32: emoji32 ?? _this.emoji32,
       emojiAdd12: emojiAdd12 ?? _this.emojiAdd12,
       emojiAdd16: emojiAdd16 ?? _this.emojiAdd16,
       emojiAdd20: emojiAdd20 ?? _this.emojiAdd20,
       emojiAdd32: emojiAdd32 ?? _this.emojiAdd32,
+      exclamationCircle12: exclamationCircle12 ?? _this.exclamationCircle12,
+      exclamationCircle16: exclamationCircle16 ?? _this.exclamationCircle16,
+      exclamationCircle20: exclamationCircle20 ?? _this.exclamationCircle20,
+      exclamationCircle32: exclamationCircle32 ?? _this.exclamationCircle32,
       exclamationCircleFill12:
           exclamationCircleFill12 ?? _this.exclamationCircleFill12,
       exclamationCircleFill16:
@@ -875,10 +914,6 @@ mixin _$StreamIcons {
           exclamationCircleFill20 ?? _this.exclamationCircleFill20,
       exclamationCircleFill32:
           exclamationCircleFill32 ?? _this.exclamationCircleFill32,
-      exclamationMark12: exclamationMark12 ?? _this.exclamationMark12,
-      exclamationMark16: exclamationMark16 ?? _this.exclamationMark16,
-      exclamationMark20: exclamationMark20 ?? _this.exclamationMark20,
-      exclamationMark32: exclamationMark32 ?? _this.exclamationMark32,
       exclamationMarkFill12:
           exclamationMarkFill12 ?? _this.exclamationMarkFill12,
       exclamationMarkFill16:
@@ -925,9 +960,11 @@ mixin _$StreamIcons {
       image32: image32 ?? _this.image32,
       info12: info12 ?? _this.info12,
       info16: info16 ?? _this.info16,
+      info20: info20 ?? _this.info20,
       info32: info32 ?? _this.info32,
       leave12: leave12 ?? _this.leave12,
       leave16: leave16 ?? _this.leave16,
+      leave20: leave20 ?? _this.leave20,
       leave32: leave32 ?? _this.leave32,
       link12: link12 ?? _this.link12,
       link16: link16 ?? _this.link16,
@@ -963,6 +1000,7 @@ mixin _$StreamIcons {
       minus32: minus32 ?? _this.minus32,
       minusCircle12: minusCircle12 ?? _this.minusCircle12,
       minusCircle16: minusCircle16 ?? _this.minusCircle16,
+      minusCircle20: minusCircle20 ?? _this.minusCircle20,
       minusCircle32: minusCircle32 ?? _this.minusCircle32,
       more12: more12 ?? _this.more12,
       more16: more16 ?? _this.more16,
@@ -1000,10 +1038,10 @@ mixin _$StreamIcons {
       poll16: poll16 ?? _this.poll16,
       poll20: poll20 ?? _this.poll20,
       poll32: poll32 ?? _this.poll32,
-      quote: quote ?? _this.quote,
       quote12: quote12 ?? _this.quote12,
       quote16: quote16 ?? _this.quote16,
       quote20: quote20 ?? _this.quote20,
+      quote32: quote32 ?? _this.quote32,
       refresh12: refresh12 ?? _this.refresh12,
       refresh16: refresh16 ?? _this.refresh16,
       refresh20: refresh20 ?? _this.refresh20,
@@ -1038,6 +1076,7 @@ mixin _$StreamIcons {
       share32: share32 ?? _this.share32,
       sidebar12: sidebar12 ?? _this.sidebar12,
       sidebar16: sidebar16 ?? _this.sidebar16,
+      sidebar20: sidebar20 ?? _this.sidebar20,
       sidebar32: sidebar32 ?? _this.sidebar32,
       stopFill12: stopFill12 ?? _this.stopFill12,
       stopFill16: stopFill16 ?? _this.stopFill16,
@@ -1061,6 +1100,7 @@ mixin _$StreamIcons {
       trophy32: trophy32 ?? _this.trophy32,
       unlock12: unlock12 ?? _this.unlock12,
       unlock16: unlock16 ?? _this.unlock16,
+      unlock20: unlock20 ?? _this.unlock20,
       unlock32: unlock32 ?? _this.unlock32,
       unpin12: unpin12 ?? _this.unpin12,
       unpin16: unpin16 ?? _this.unpin16,
@@ -1112,6 +1152,7 @@ mixin _$StreamIcons {
       voiceFill32: voiceFill32 ?? _this.voiceFill32,
       xCircle12: xCircle12 ?? _this.xCircle12,
       xCircle16: xCircle16 ?? _this.xCircle16,
+      xCircle20: xCircle20 ?? _this.xCircle20,
       xCircle32: xCircle32 ?? _this.xCircle32,
       xmark12: xmark12 ?? _this.xmark12,
       xmark16: xmark16 ?? _this.xmark16,
@@ -1154,6 +1195,10 @@ mixin _$StreamIcons {
       arrowLeft16: other.arrowLeft16,
       arrowLeft20: other.arrowLeft20,
       arrowLeft32: other.arrowLeft32,
+      arrowRight12: other.arrowRight12,
+      arrowRight16: other.arrowRight16,
+      arrowRight20: other.arrowRight20,
+      arrowRight32: other.arrowRight32,
       arrowUp12: other.arrowUp12,
       arrowUp16: other.arrowUp16,
       arrowUp20: other.arrowUp20,
@@ -1217,14 +1262,15 @@ mixin _$StreamIcons {
       command12: other.command12,
       command16: other.command16,
       command20: other.command20,
+      command32: other.command32,
       copy12: other.copy12,
       copy16: other.copy16,
       copy20: other.copy20,
       copy32: other.copy32,
-      delete: other.delete,
       delete12: other.delete12,
       delete16: other.delete16,
       delete20: other.delete20,
+      delete32: other.delete32,
       download12: other.download12,
       download16: other.download16,
       download20: other.download20,
@@ -1233,22 +1279,22 @@ mixin _$StreamIcons {
       edit16: other.edit16,
       edit20: other.edit20,
       edit32: other.edit32,
-      emoji: other.emoji,
       emoji12: other.emoji12,
       emoji16: other.emoji16,
       emoji20: other.emoji20,
+      emoji32: other.emoji32,
       emojiAdd12: other.emojiAdd12,
       emojiAdd16: other.emojiAdd16,
       emojiAdd20: other.emojiAdd20,
       emojiAdd32: other.emojiAdd32,
+      exclamationCircle12: other.exclamationCircle12,
+      exclamationCircle16: other.exclamationCircle16,
+      exclamationCircle20: other.exclamationCircle20,
+      exclamationCircle32: other.exclamationCircle32,
       exclamationCircleFill12: other.exclamationCircleFill12,
       exclamationCircleFill16: other.exclamationCircleFill16,
       exclamationCircleFill20: other.exclamationCircleFill20,
       exclamationCircleFill32: other.exclamationCircleFill32,
-      exclamationMark12: other.exclamationMark12,
-      exclamationMark16: other.exclamationMark16,
-      exclamationMark20: other.exclamationMark20,
-      exclamationMark32: other.exclamationMark32,
       exclamationMarkFill12: other.exclamationMarkFill12,
       exclamationMarkFill16: other.exclamationMarkFill16,
       exclamationMarkFill20: other.exclamationMarkFill20,
@@ -1287,9 +1333,11 @@ mixin _$StreamIcons {
       image32: other.image32,
       info12: other.info12,
       info16: other.info16,
+      info20: other.info20,
       info32: other.info32,
       leave12: other.leave12,
       leave16: other.leave16,
+      leave20: other.leave20,
       leave32: other.leave32,
       link12: other.link12,
       link16: other.link16,
@@ -1325,6 +1373,7 @@ mixin _$StreamIcons {
       minus32: other.minus32,
       minusCircle12: other.minusCircle12,
       minusCircle16: other.minusCircle16,
+      minusCircle20: other.minusCircle20,
       minusCircle32: other.minusCircle32,
       more12: other.more12,
       more16: other.more16,
@@ -1362,10 +1411,10 @@ mixin _$StreamIcons {
       poll16: other.poll16,
       poll20: other.poll20,
       poll32: other.poll32,
-      quote: other.quote,
       quote12: other.quote12,
       quote16: other.quote16,
       quote20: other.quote20,
+      quote32: other.quote32,
       refresh12: other.refresh12,
       refresh16: other.refresh16,
       refresh20: other.refresh20,
@@ -1400,6 +1449,7 @@ mixin _$StreamIcons {
       share32: other.share32,
       sidebar12: other.sidebar12,
       sidebar16: other.sidebar16,
+      sidebar20: other.sidebar20,
       sidebar32: other.sidebar32,
       stopFill12: other.stopFill12,
       stopFill16: other.stopFill16,
@@ -1423,6 +1473,7 @@ mixin _$StreamIcons {
       trophy32: other.trophy32,
       unlock12: other.unlock12,
       unlock16: other.unlock16,
+      unlock20: other.unlock20,
       unlock32: other.unlock32,
       unpin12: other.unpin12,
       unpin16: other.unpin16,
@@ -1474,6 +1525,7 @@ mixin _$StreamIcons {
       voiceFill32: other.voiceFill32,
       xCircle12: other.xCircle12,
       xCircle16: other.xCircle16,
+      xCircle20: other.xCircle20,
       xCircle32: other.xCircle32,
       xmark12: other.xmark12,
       xmark16: other.xmark16,
@@ -1517,6 +1569,10 @@ mixin _$StreamIcons {
         _other.arrowLeft16 == _this.arrowLeft16 &&
         _other.arrowLeft20 == _this.arrowLeft20 &&
         _other.arrowLeft32 == _this.arrowLeft32 &&
+        _other.arrowRight12 == _this.arrowRight12 &&
+        _other.arrowRight16 == _this.arrowRight16 &&
+        _other.arrowRight20 == _this.arrowRight20 &&
+        _other.arrowRight32 == _this.arrowRight32 &&
         _other.arrowUp12 == _this.arrowUp12 &&
         _other.arrowUp16 == _this.arrowUp16 &&
         _other.arrowUp20 == _this.arrowUp20 &&
@@ -1580,14 +1636,15 @@ mixin _$StreamIcons {
         _other.command12 == _this.command12 &&
         _other.command16 == _this.command16 &&
         _other.command20 == _this.command20 &&
+        _other.command32 == _this.command32 &&
         _other.copy12 == _this.copy12 &&
         _other.copy16 == _this.copy16 &&
         _other.copy20 == _this.copy20 &&
         _other.copy32 == _this.copy32 &&
-        _other.delete == _this.delete &&
         _other.delete12 == _this.delete12 &&
         _other.delete16 == _this.delete16 &&
         _other.delete20 == _this.delete20 &&
+        _other.delete32 == _this.delete32 &&
         _other.download12 == _this.download12 &&
         _other.download16 == _this.download16 &&
         _other.download20 == _this.download20 &&
@@ -1596,22 +1653,22 @@ mixin _$StreamIcons {
         _other.edit16 == _this.edit16 &&
         _other.edit20 == _this.edit20 &&
         _other.edit32 == _this.edit32 &&
-        _other.emoji == _this.emoji &&
         _other.emoji12 == _this.emoji12 &&
         _other.emoji16 == _this.emoji16 &&
         _other.emoji20 == _this.emoji20 &&
+        _other.emoji32 == _this.emoji32 &&
         _other.emojiAdd12 == _this.emojiAdd12 &&
         _other.emojiAdd16 == _this.emojiAdd16 &&
         _other.emojiAdd20 == _this.emojiAdd20 &&
         _other.emojiAdd32 == _this.emojiAdd32 &&
+        _other.exclamationCircle12 == _this.exclamationCircle12 &&
+        _other.exclamationCircle16 == _this.exclamationCircle16 &&
+        _other.exclamationCircle20 == _this.exclamationCircle20 &&
+        _other.exclamationCircle32 == _this.exclamationCircle32 &&
         _other.exclamationCircleFill12 == _this.exclamationCircleFill12 &&
         _other.exclamationCircleFill16 == _this.exclamationCircleFill16 &&
         _other.exclamationCircleFill20 == _this.exclamationCircleFill20 &&
         _other.exclamationCircleFill32 == _this.exclamationCircleFill32 &&
-        _other.exclamationMark12 == _this.exclamationMark12 &&
-        _other.exclamationMark16 == _this.exclamationMark16 &&
-        _other.exclamationMark20 == _this.exclamationMark20 &&
-        _other.exclamationMark32 == _this.exclamationMark32 &&
         _other.exclamationMarkFill12 == _this.exclamationMarkFill12 &&
         _other.exclamationMarkFill16 == _this.exclamationMarkFill16 &&
         _other.exclamationMarkFill20 == _this.exclamationMarkFill20 &&
@@ -1650,9 +1707,11 @@ mixin _$StreamIcons {
         _other.image32 == _this.image32 &&
         _other.info12 == _this.info12 &&
         _other.info16 == _this.info16 &&
+        _other.info20 == _this.info20 &&
         _other.info32 == _this.info32 &&
         _other.leave12 == _this.leave12 &&
         _other.leave16 == _this.leave16 &&
+        _other.leave20 == _this.leave20 &&
         _other.leave32 == _this.leave32 &&
         _other.link12 == _this.link12 &&
         _other.link16 == _this.link16 &&
@@ -1688,6 +1747,7 @@ mixin _$StreamIcons {
         _other.minus32 == _this.minus32 &&
         _other.minusCircle12 == _this.minusCircle12 &&
         _other.minusCircle16 == _this.minusCircle16 &&
+        _other.minusCircle20 == _this.minusCircle20 &&
         _other.minusCircle32 == _this.minusCircle32 &&
         _other.more12 == _this.more12 &&
         _other.more16 == _this.more16 &&
@@ -1725,10 +1785,10 @@ mixin _$StreamIcons {
         _other.poll16 == _this.poll16 &&
         _other.poll20 == _this.poll20 &&
         _other.poll32 == _this.poll32 &&
-        _other.quote == _this.quote &&
         _other.quote12 == _this.quote12 &&
         _other.quote16 == _this.quote16 &&
         _other.quote20 == _this.quote20 &&
+        _other.quote32 == _this.quote32 &&
         _other.refresh12 == _this.refresh12 &&
         _other.refresh16 == _this.refresh16 &&
         _other.refresh20 == _this.refresh20 &&
@@ -1763,6 +1823,7 @@ mixin _$StreamIcons {
         _other.share32 == _this.share32 &&
         _other.sidebar12 == _this.sidebar12 &&
         _other.sidebar16 == _this.sidebar16 &&
+        _other.sidebar20 == _this.sidebar20 &&
         _other.sidebar32 == _this.sidebar32 &&
         _other.stopFill12 == _this.stopFill12 &&
         _other.stopFill16 == _this.stopFill16 &&
@@ -1786,6 +1847,7 @@ mixin _$StreamIcons {
         _other.trophy32 == _this.trophy32 &&
         _other.unlock12 == _this.unlock12 &&
         _other.unlock16 == _this.unlock16 &&
+        _other.unlock20 == _this.unlock20 &&
         _other.unlock32 == _this.unlock32 &&
         _other.unpin12 == _this.unpin12 &&
         _other.unpin16 == _this.unpin16 &&
@@ -1837,6 +1899,7 @@ mixin _$StreamIcons {
         _other.voiceFill32 == _this.voiceFill32 &&
         _other.xCircle12 == _this.xCircle12 &&
         _other.xCircle16 == _this.xCircle16 &&
+        _other.xCircle20 == _this.xCircle20 &&
         _other.xCircle32 == _this.xCircle32 &&
         _other.xmark12 == _this.xmark12 &&
         _other.xmark16 == _this.xmark16 &&
@@ -1872,6 +1935,10 @@ mixin _$StreamIcons {
       _this.arrowLeft16,
       _this.arrowLeft20,
       _this.arrowLeft32,
+      _this.arrowRight12,
+      _this.arrowRight16,
+      _this.arrowRight20,
+      _this.arrowRight32,
       _this.arrowUp12,
       _this.arrowUp16,
       _this.arrowUp20,
@@ -1935,14 +2002,15 @@ mixin _$StreamIcons {
       _this.command12,
       _this.command16,
       _this.command20,
+      _this.command32,
       _this.copy12,
       _this.copy16,
       _this.copy20,
       _this.copy32,
-      _this.delete,
       _this.delete12,
       _this.delete16,
       _this.delete20,
+      _this.delete32,
       _this.download12,
       _this.download16,
       _this.download20,
@@ -1951,22 +2019,22 @@ mixin _$StreamIcons {
       _this.edit16,
       _this.edit20,
       _this.edit32,
-      _this.emoji,
       _this.emoji12,
       _this.emoji16,
       _this.emoji20,
+      _this.emoji32,
       _this.emojiAdd12,
       _this.emojiAdd16,
       _this.emojiAdd20,
       _this.emojiAdd32,
+      _this.exclamationCircle12,
+      _this.exclamationCircle16,
+      _this.exclamationCircle20,
+      _this.exclamationCircle32,
       _this.exclamationCircleFill12,
       _this.exclamationCircleFill16,
       _this.exclamationCircleFill20,
       _this.exclamationCircleFill32,
-      _this.exclamationMark12,
-      _this.exclamationMark16,
-      _this.exclamationMark20,
-      _this.exclamationMark32,
       _this.exclamationMarkFill12,
       _this.exclamationMarkFill16,
       _this.exclamationMarkFill20,
@@ -2005,9 +2073,11 @@ mixin _$StreamIcons {
       _this.image32,
       _this.info12,
       _this.info16,
+      _this.info20,
       _this.info32,
       _this.leave12,
       _this.leave16,
+      _this.leave20,
       _this.leave32,
       _this.link12,
       _this.link16,
@@ -2043,6 +2113,7 @@ mixin _$StreamIcons {
       _this.minus32,
       _this.minusCircle12,
       _this.minusCircle16,
+      _this.minusCircle20,
       _this.minusCircle32,
       _this.more12,
       _this.more16,
@@ -2080,10 +2151,10 @@ mixin _$StreamIcons {
       _this.poll16,
       _this.poll20,
       _this.poll32,
-      _this.quote,
       _this.quote12,
       _this.quote16,
       _this.quote20,
+      _this.quote32,
       _this.refresh12,
       _this.refresh16,
       _this.refresh20,
@@ -2118,6 +2189,7 @@ mixin _$StreamIcons {
       _this.share32,
       _this.sidebar12,
       _this.sidebar16,
+      _this.sidebar20,
       _this.sidebar32,
       _this.stopFill12,
       _this.stopFill16,
@@ -2141,6 +2213,7 @@ mixin _$StreamIcons {
       _this.trophy32,
       _this.unlock12,
       _this.unlock16,
+      _this.unlock20,
       _this.unlock32,
       _this.unpin12,
       _this.unpin16,
@@ -2192,6 +2265,7 @@ mixin _$StreamIcons {
       _this.voiceFill32,
       _this.xCircle12,
       _this.xCircle16,
+      _this.xCircle20,
       _this.xCircle32,
       _this.xmark12,
       _this.xmark16,
