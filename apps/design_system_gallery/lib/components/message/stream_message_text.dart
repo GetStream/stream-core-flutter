@@ -591,7 +591,7 @@ class _RealWorldSection extends StatelessWidget {
           subtitle: 'Annotation, bubble, metadata, and reply indicator.',
           child: StreamMessageContent(
             header: StreamMessageAnnotation(
-              leading: Icon(context.streamIcons.pin),
+              leading: Icon(context.streamIcons.pin20),
               label: const Text('Pinned by Alice'),
             ),
             footer: Column(

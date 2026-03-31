@@ -233,7 +233,7 @@ class _AddEmojiIcon extends StatelessWidget {
   const _AddEmojiIcon();
 
   @override
-  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAddReaction);
+  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAdd20);
 }
 
 // Overflow chip that renders `+N` as a single text label styled with the

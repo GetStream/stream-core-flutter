@@ -69,14 +69,14 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
     );
 
     final actionData = <({String label, IconData icon})>[
-      (label: 'Reply', icon: icons.arrowShareLeft),
-      (label: 'Thread Reply', icon: icons.bubbleText6ChatMessage),
-      (label: 'Pin to Conversation', icon: icons.pin),
-      (label: 'Copy Message', icon: icons.squareBehindSquare2Copy),
-      (label: 'Mark Unread', icon: icons.bubbleWideNotificationChatMessage),
-      (label: 'Remind Me', icon: icons.bellNotification),
-      (label: 'Save For Later', icon: icons.fileBend),
-      (label: 'Flag Message', icon: icons.flag2),
+      (label: 'Reply', icon: icons.reply20),
+      (label: 'Thread Reply', icon: icons.thread20),
+      (label: 'Pin to Conversation', icon: icons.pin20),
+      (label: 'Copy Message', icon: icons.copy20),
+      (label: 'Mark Unread', icon: icons.notification20),
+      (label: 'Remind Me', icon: icons.bell20),
+      (label: 'Save For Later', icon: icons.file20),
+      (label: 'Flag Message', icon: icons.flag20),
     ];
 
     List<Widget> buildInlineActions() {
@@ -86,7 +86,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
             value: actionData[i].label,
             label: Text(actionData[i].label),
             leading: showLeadingIcon ? Icon(actionData[i].icon) : null,
-            trailing: showTrailingIcon ? Icon(icons.chevronRight) : null,
+            trailing: showTrailingIcon ? Icon(icons.chevronRight20) : null,
             enabled: !(hasDisabledAction && i == 1),
             onTap: () => setState(() => _inlineTapped = actionData[i].label),
           ),
@@ -95,7 +95,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
           StreamContextMenuAction<String>.destructive(
             value: 'Delete Message',
             label: const Text('Delete Message'),
-            leading: showLeadingIcon ? Icon(icons.trashBin) : null,
+            leading: showLeadingIcon ? Icon(icons.delete20) : null,
             onTap: () => setState(() => _inlineTapped = 'Delete Message'),
           ),
       ];
@@ -108,7 +108,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
             value: actionData[i].label,
             label: Text(actionData[i].label),
             leading: showLeadingIcon ? Icon(actionData[i].icon) : null,
-            trailing: showTrailingIcon ? Icon(icons.chevronRight) : null,
+            trailing: showTrailingIcon ? Icon(icons.chevronRight20) : null,
             enabled: !(hasDisabledAction && i == 1),
           ),
         if (showSeparator && showDestructiveAction) const StreamContextMenuSeparator(),
@@ -116,7 +116,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
           StreamContextMenuAction<String>.destructive(
             value: 'Delete Message',
             label: const Text('Delete Message'),
-            leading: showLeadingIcon ? Icon(icons.trashBin) : null,
+            leading: showLeadingIcon ? Icon(icons.delete20) : null,
           ),
       ];
     }
@@ -286,20 +286,20 @@ class _NormalStatesCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            leading: Icon(icons.plusLarge),
-            trailing: Icon(icons.chevronRight),
+            leading: Icon(icons.plus20),
+            trailing: Icon(icons.chevronRight20),
           ),
           StreamContextMenuAction<void>(
             label: const Text('With Leading Only'),
-            leading: Icon(icons.plusLarge),
+            leading: Icon(icons.plus20),
           ),
           StreamContextMenuAction<void>(
             label: const Text('Label Only'),
           ),
           StreamContextMenuAction<void>(
             label: const Text('Disabled'),
-            leading: Icon(icons.plusLarge),
-            trailing: Icon(icons.chevronRight),
+            leading: Icon(icons.plus20),
+            trailing: Icon(icons.chevronRight20),
             enabled: false,
           ),
         ],
@@ -329,20 +329,20 @@ class _DestructiveStatesCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            leading: Icon(icons.trashBin),
-            trailing: Icon(icons.chevronRight),
+            leading: Icon(icons.delete20),
+            trailing: Icon(icons.chevronRight20),
           ),
           StreamContextMenuAction<void>.destructive(
             label: const Text('With Leading Only'),
-            leading: Icon(icons.trashBin),
+            leading: Icon(icons.delete20),
           ),
           StreamContextMenuAction<void>.destructive(
             label: const Text('Label Only'),
           ),
           StreamContextMenuAction<void>.destructive(
             label: const Text('Disabled'),
-            leading: Icon(icons.trashBin),
-            trailing: Icon(icons.chevronRight),
+            leading: Icon(icons.delete20),
+            trailing: Icon(icons.chevronRight20),
             enabled: false,
           ),
         ],
@@ -395,15 +395,15 @@ class _MenuCompositionsSection extends StatelessWidget {
               children: [
                 StreamContextMenuAction<void>(
                   label: const Text('Reply'),
-                  leading: Icon(icons.arrowShareLeft),
+                  leading: Icon(icons.reply20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
-                  leading: Icon(icons.squareBehindSquare2Copy),
+                  leading: Icon(icons.copy20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Flag Message'),
-                  leading: Icon(icons.flag2),
+                  leading: Icon(icons.flag20),
                 ),
               ],
             ),
@@ -417,16 +417,16 @@ class _MenuCompositionsSection extends StatelessWidget {
               children: [
                 StreamContextMenuAction<void>(
                   label: const Text('Reply'),
-                  leading: Icon(icons.arrowShareLeft),
+                  leading: Icon(icons.reply20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
-                  leading: Icon(icons.squareBehindSquare2Copy),
+                  leading: Icon(icons.copy20),
                 ),
                 const StreamContextMenuSeparator(),
                 StreamContextMenuAction<void>.destructive(
                   label: const Text('Delete'),
-                  leading: Icon(icons.trashBin),
+                  leading: Icon(icons.delete20),
                 ),
               ],
             ),
@@ -441,15 +441,15 @@ class _MenuCompositionsSection extends StatelessWidget {
                 items: [
                   StreamContextMenuAction<void>(
                     label: const Text('Reply'),
-                    leading: Icon(icons.arrowShareLeft),
+                    leading: Icon(icons.reply20),
                   ),
                   StreamContextMenuAction<void>(
                     label: const Text('Copy Message'),
-                    leading: Icon(icons.squareBehindSquare2Copy),
+                    leading: Icon(icons.copy20),
                   ),
                   StreamContextMenuAction<void>(
                     label: const Text('Flag Message'),
-                    leading: Icon(icons.flag2),
+                    leading: Icon(icons.flag20),
                   ),
                 ],
               ),
@@ -466,21 +466,21 @@ class _MenuCompositionsSection extends StatelessWidget {
                   [
                     StreamContextMenuAction<void>(
                       label: const Text('Reply'),
-                      leading: Icon(icons.arrowShareLeft),
+                      leading: Icon(icons.reply20),
                     ),
                     StreamContextMenuAction<void>(
                       label: const Text('Copy Message'),
-                      leading: Icon(icons.squareBehindSquare2Copy),
+                      leading: Icon(icons.copy20),
                     ),
                     StreamContextMenuAction<void>(
                       label: const Text('Flag Message'),
-                      leading: Icon(icons.flag2),
+                      leading: Icon(icons.flag20),
                     ),
                   ],
                   [
                     StreamContextMenuAction<void>.destructive(
                       label: const Text('Delete Message'),
-                      leading: Icon(icons.trashBin),
+                      leading: Icon(icons.delete20),
                     ),
                   ],
                 ],
@@ -497,19 +497,19 @@ class _MenuCompositionsSection extends StatelessWidget {
                 items: [
                   StreamContextMenuAction<void>(
                     label: const Text('Reply'),
-                    leading: Icon(icons.arrowShareLeft),
+                    leading: Icon(icons.reply20),
                   ),
                   StreamContextMenuAction<void>(
                     label: const Text('Copy Message'),
-                    leading: Icon(icons.squareBehindSquare2Copy),
+                    leading: Icon(icons.copy20),
                   ),
                   StreamContextMenuAction<void>(
                     label: const Text('Flag Message'),
-                    leading: Icon(icons.flag2),
+                    leading: Icon(icons.flag20),
                   ),
                   StreamContextMenuAction<void>.destructive(
                     label: const Text('Delete Message'),
-                    leading: Icon(icons.trashBin),
+                    leading: Icon(icons.delete20),
                   ),
                 ],
               ),
@@ -582,17 +582,17 @@ class _TypedValueReturnCardState extends State<_TypedValueReturnCard> {
                         StreamContextMenuAction<String>(
                           value: 'reply',
                           label: const Text('Reply'),
-                          leading: Icon(icons.arrowShareLeft),
+                          leading: Icon(icons.reply20),
                         ),
                         StreamContextMenuAction<String>(
                           value: 'copy',
                           label: const Text('Copy Message'),
-                          leading: Icon(icons.squareBehindSquare2Copy),
+                          leading: Icon(icons.copy20),
                         ),
                         StreamContextMenuAction<String>(
                           value: 'flag',
                           label: const Text('Flag Message'),
-                          leading: Icon(icons.flag2),
+                          leading: Icon(icons.flag20),
                         ),
                       ],
                     ),
@@ -648,23 +648,23 @@ class _EnumValueReturnCardState extends State<_EnumValueReturnCard> {
                         StreamContextMenuAction<_SampleAction>(
                           value: _SampleAction.reply,
                           label: const Text('Reply'),
-                          leading: Icon(icons.arrowShareLeft),
+                          leading: Icon(icons.reply20),
                         ),
                         StreamContextMenuAction<_SampleAction>(
                           value: _SampleAction.copy,
                           label: const Text('Copy Message'),
-                          leading: Icon(icons.squareBehindSquare2Copy),
+                          leading: Icon(icons.copy20),
                         ),
                         StreamContextMenuAction<_SampleAction>(
                           value: _SampleAction.flag,
                           label: const Text('Flag Message'),
-                          leading: Icon(icons.flag2),
+                          leading: Icon(icons.flag20),
                         ),
                         const StreamContextMenuSeparator(),
                         StreamContextMenuAction<_SampleAction>.destructive(
                           value: _SampleAction.delete,
                           label: const Text('Delete Message'),
-                          leading: Icon(icons.trashBin),
+                          leading: Icon(icons.delete20),
                         ),
                       ],
                     ),
@@ -720,15 +720,15 @@ class _CustomThemingSection extends StatelessWidget {
                 children: [
                   StreamContextMenuAction<void>(
                     label: const Text('Reply'),
-                    leading: Icon(icons.arrowShareLeft),
+                    leading: Icon(icons.reply20),
                   ),
                   StreamContextMenuAction<void>(
                     label: const Text('Copy'),
-                    leading: Icon(icons.squareBehindSquare2Copy),
+                    leading: Icon(icons.copy20),
                   ),
                   StreamContextMenuAction<void>(
                     label: const Text('Flag'),
-                    leading: Icon(icons.flag2),
+                    leading: Icon(icons.flag20),
                   ),
                 ],
               ),
@@ -754,16 +754,16 @@ class _CustomThemingSection extends StatelessWidget {
                   ),
                   child: StreamContextMenuAction<void>(
                     label: const Text('Reactions'),
-                    leading: Icon(icons.chevronLeft),
+                    leading: Icon(icons.chevronLeft20),
                   ),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Love'),
-                  leading: Icon(icons.heart2),
+                  leading: Icon(icons.emoji20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Smile'),
-                  leading: Icon(icons.emojiSmile),
+                  leading: Icon(icons.emoji20),
                 ),
               ],
             ),
@@ -799,44 +799,44 @@ class _RealWorldSection extends StatelessWidget {
               children: [
                 StreamContextMenuAction<void>(
                   label: const Text('Reply'),
-                  leading: Icon(icons.arrowShareLeft),
+                  leading: Icon(icons.reply20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Thread Reply'),
-                  leading: Icon(icons.bubbleText6ChatMessage),
+                  leading: Icon(icons.thread20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Pin to Conversation'),
-                  leading: Icon(icons.pin),
+                  leading: Icon(icons.pin20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
-                  leading: Icon(icons.squareBehindSquare2Copy),
+                  leading: Icon(icons.copy20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Mark Unread'),
-                  leading: Icon(icons.bubbleWideNotificationChatMessage),
+                  leading: Icon(icons.notification20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Remind Me'),
-                  leading: Icon(icons.bellNotification),
+                  leading: Icon(icons.bell20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Save For Later'),
-                  leading: Icon(icons.fileBend),
+                  leading: Icon(icons.file20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Flag Message'),
-                  leading: Icon(icons.flag2),
+                  leading: Icon(icons.flag20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Mute User'),
-                  leading: Icon(icons.mute),
+                  leading: Icon(icons.mute20),
                 ),
                 const StreamContextMenuSeparator(),
                 StreamContextMenuAction<void>.destructive(
                   label: const Text('Block User'),
-                  leading: Icon(icons.circleBanSign),
+                  leading: Icon(icons.noSign20),
                 ),
               ],
             ),
@@ -850,28 +850,28 @@ class _RealWorldSection extends StatelessWidget {
               children: [
                 StreamContextMenuAction<void>(
                   label: const Text('Reply'),
-                  leading: Icon(icons.arrowShareLeft),
+                  leading: Icon(icons.reply20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Thread Reply'),
-                  leading: Icon(icons.bubbleText6ChatMessage),
+                  leading: Icon(icons.thread20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Pin to Conversation'),
-                  leading: Icon(icons.pin),
+                  leading: Icon(icons.pin20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Copy Message'),
-                  leading: Icon(icons.squareBehindSquare2Copy),
+                  leading: Icon(icons.copy20),
                 ),
                 StreamContextMenuAction<void>(
                   label: const Text('Edit Message'),
-                  leading: Icon(icons.editBig),
+                  leading: Icon(icons.edit20),
                 ),
                 const StreamContextMenuSeparator(),
                 StreamContextMenuAction<void>.destructive(
                   label: const Text('Delete Message'),
-                  leading: Icon(icons.trashBin),
+                  leading: Icon(icons.delete20),
                 ),
               ],
             ),

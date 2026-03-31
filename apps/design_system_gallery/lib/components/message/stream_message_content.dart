@@ -148,7 +148,7 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
       child: StreamMessageContent(
         header: showHeader
             ? StreamMessageAnnotation(
-                leading: const Icon(StreamIconData.iconBellNotification),
+                leading: const Icon(StreamIconData.bell20),
                 label: Text.rich(
                   TextSpan(
                     children: [
@@ -166,7 +166,7 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
             ? StreamMessageMetadata(
                 timestamp: const Text('09:41'),
                 username: const Text('Alice'),
-                status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+                status: const Icon(StreamIconData.checks12),
                 edited: const Text('Edited'),
               )
             : null,
@@ -259,7 +259,7 @@ class _SlotCombinationsSection extends StatelessWidget {
           label: 'Header + child + footer',
           child: StreamMessageContent(
             header: StreamMessageAnnotation(
-              leading: const Icon(StreamIconData.iconBellNotification),
+              leading: const Icon(StreamIconData.bell20),
               label: Text.rich(
                 TextSpan(
                   children: [
@@ -275,7 +275,7 @@ class _SlotCombinationsSection extends StatelessWidget {
             footer: StreamMessageMetadata(
               timestamp: const Text('09:41'),
               username: const Text('Alice'),
-              status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+              status: const Icon(StreamIconData.checks12),
             ),
             child: StreamMessageBubble(
               child: StreamMessageText('Has anyone tried the new Flutter update?'),
@@ -287,7 +287,7 @@ class _SlotCombinationsSection extends StatelessWidget {
           child: StreamMessageContent(
             footer: StreamMessageMetadata(
               timestamp: const Text('09:42'),
-              status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+              status: const Icon(StreamIconData.checks12),
               edited: const Text('Edited'),
             ),
             child: StreamMessageBubble(
@@ -299,7 +299,7 @@ class _SlotCombinationsSection extends StatelessWidget {
           label: 'Header + child (no footer)',
           child: StreamMessageContent(
             header: StreamMessageAnnotation(
-              leading: const Icon(StreamIconData.iconBookmark),
+              leading: const Icon(StreamIconData.save20),
               label: const Text('Saved for later'),
             ),
             child: StreamMessageBubble(
@@ -453,11 +453,11 @@ class _FullCompositionSection extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   StreamMessageAnnotation(
-                    leading: const Icon(StreamIconData.iconPin),
+                    leading: const Icon(StreamIconData.pin20),
                     label: const Text('Pinned'),
                   ),
                   StreamMessageAnnotation(
-                    leading: const Icon(StreamIconData.iconBellNotification),
+                    leading: const Icon(StreamIconData.bell20),
                     label: Text.rich(
                       TextSpan(
                         children: [
@@ -475,7 +475,7 @@ class _FullCompositionSection extends StatelessWidget {
               footer: StreamMessageMetadata(
                 timestamp: const Text('09:41'),
                 username: const Text('Alice'),
-                status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+                status: const Icon(StreamIconData.checks12),
                 edited: const Text('Edited'),
               ),
               child: StreamReactions.segmented(
@@ -514,7 +514,7 @@ class _FullCompositionSection extends StatelessWidget {
             child: StreamMessageContent(
               footer: StreamMessageMetadata(
                 timestamp: const Text('09:42'),
-                status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+                status: const Icon(StreamIconData.checks12),
               ),
               child: StreamReactions.segmented(
                 alignment: .end,
@@ -617,7 +617,7 @@ class _EmojiOnlySection extends StatelessWidget {
             child: StreamMessageContent(
               footer: StreamMessageMetadata(
                 timestamp: const Text('09:51'),
-                status: const Icon(StreamIconData.iconDoupleCheckmark1Small),
+                status: const Icon(StreamIconData.checks12),
               ),
               child: StreamReactions.segmented(
                 alignment: .end,

@@ -132,7 +132,7 @@ class DefaultStreamRetryBadge extends StatelessWidget {
       ),
       child: Center(
         child: Icon(
-          icons.arrowRotateClockwise,
+          icons.retry16,
           size: effectiveSize.iconSize,
           color: colorScheme.textOnAccent,
         ),

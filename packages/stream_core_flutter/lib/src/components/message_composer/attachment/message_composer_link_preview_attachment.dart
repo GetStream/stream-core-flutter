@@ -75,7 +75,7 @@ class MessageComposerLinkPreviewAttachment extends StatelessWidget {
                   if (url case final url?)
                     Row(
                       children: [
-                        Icon(context.streamIcons.chainLink3, size: 12),
+                        Icon(context.streamIcons.link12, size: 12),
                         SizedBox(width: spacing.xxs),
                         Expanded(
                           child: Text(

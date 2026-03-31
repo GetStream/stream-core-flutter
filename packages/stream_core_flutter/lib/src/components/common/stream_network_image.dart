@@ -463,7 +463,7 @@ class StreamImageErrorPlaceholder extends StatelessWidget {
       child: Center(
         child: Icon(
           size: 32,
-          icons.images1Alt,
+          icons.image32,
           color: colorScheme.accentNeutral,
         ),
       ),
