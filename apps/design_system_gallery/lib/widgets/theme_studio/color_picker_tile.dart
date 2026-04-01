@@ -32,7 +32,7 @@ class ColorPickerTile extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: spacing.sm + spacing.xxs, vertical: spacing.sm),
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: colorScheme.backgroundApp,
+            color: colorScheme.backgroundSurfaceSubtle,
             borderRadius: BorderRadius.all(radius.sm),
           ),
           foregroundDecoration: BoxDecoration(
@@ -61,7 +61,7 @@ class ColorPickerTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: textTheme.captionDefault.copyWith(
+                  style: textTheme.metadataDefault.copyWith(
                     color: colorScheme.textPrimary,
                     fontFamily: 'monospace',
                   ),
@@ -75,7 +75,7 @@ class ColorPickerTile extends StatelessWidget {
                 ),
               ),
               SizedBox(width: spacing.xs + spacing.xxs),
-              Icon(Icons.edit, color: colorScheme.textTertiary, size: 12),
+              Icon(Icons.edit, color: colorScheme.textSecondary, size: 12),
             ],
           ),
         ),
@@ -97,7 +97,7 @@ class ColorPickerTile extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Text(
           label,
-          style: textTheme.bodyEmphasis.copyWith(
+          style: textTheme.headingSm.copyWith(
             fontFamily: 'monospace',
           ),
         ),

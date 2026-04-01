@@ -32,7 +32,7 @@ class AvatarColorPairTile extends StatelessWidget {
         padding: EdgeInsets.all(spacing.sm + spacing.xxs),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: colorScheme.backgroundApp,
+          color: colorScheme.backgroundSurfaceSubtle,
           borderRadius: BorderRadius.all(radius.md),
         ),
         foregroundDecoration: BoxDecoration(
@@ -55,7 +55,7 @@ class AvatarColorPairTile extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'AB',
-                      style: textTheme.captionEmphasis.copyWith(
+                      style: textTheme.metadataEmphasis.copyWith(
                         color: pair.foregroundColor,
                       ),
                     ),
@@ -134,7 +134,7 @@ class AvatarColorPairTile extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Text(
           label,
-          style: textTheme.bodyEmphasis.copyWith(
+          style: textTheme.headingSm.copyWith(
             fontFamily: 'monospace',
           ),
         ),

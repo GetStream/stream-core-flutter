@@ -40,7 +40,7 @@ class TextScaleSelector extends StatelessWidget {
             color: colorScheme.textTertiary,
             size: 16,
           ),
-          style: textTheme.captionDefault.copyWith(
+          style: textTheme.metadataDefault.copyWith(
             color: colorScheme.textPrimary,
           ),
           dropdownColor: colorScheme.backgroundSurface,
@@ -58,7 +58,7 @@ class TextScaleSelector extends StatelessWidget {
                   SizedBox(width: spacing.sm),
                   Text(
                     '${(scale * 100).toInt()}%',
-                    style: textTheme.captionDefault,
+                    style: textTheme.metadataDefault,
                   ),
                 ],
               ),

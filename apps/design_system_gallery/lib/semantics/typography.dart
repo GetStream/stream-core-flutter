@@ -49,50 +49,50 @@ class _TypeScale extends StatelessWidget {
         'HEADINGS',
         'Page and section titles',
         [
-          ('headingLg', textTheme.headingLg, 'Page titles, hero text'),
-          ('headingMd', textTheme.headingMd, 'Section headers'),
-          ('headingSm', textTheme.headingSm, 'Card titles, dialogs'),
-          ('headingXs', textTheme.headingXs, 'Small labels, overlines'),
+          ('headingLg', textTheme.headingLg, 'Screen titles, channel titles'),
+          ('headingMd', textTheme.headingMd, 'Section headers inside screens'),
+          ('headingSm', textTheme.headingSm, 'Sub-section headers'),
+          ('headingXs', textTheme.headingXs, 'Minor labels, grouped sections'),
         ],
       ),
       (
         'BODY',
         'Main content text',
         [
-          ('bodyDefault', textTheme.bodyDefault, 'Paragraphs, descriptions'),
-          ('bodyEmphasis', textTheme.bodyEmphasis, 'Important inline text'),
-          ('bodyLink', textTheme.bodyLink, 'Clickable links'),
-          ('bodyLinkEmphasis', textTheme.bodyLinkEmphasis, 'Bold links'),
+          ('bodyDefault', textTheme.bodyDefault, 'Message text, primary content'),
+          ('bodyEmphasis', textTheme.bodyEmphasis, 'Strong inline emphasis'),
+          ('bodyLink', textTheme.bodyLink, 'Inline links'),
+          ('bodyLinkEmphasis', textTheme.bodyLinkEmphasis, 'Prominent inline links'),
         ],
       ),
       (
         'CAPTION',
-        'Secondary and supporting text',
+        'Secondary supporting text',
         [
-          ('captionDefault', textTheme.captionDefault, 'Labels, hints'),
-          ('captionEmphasis', textTheme.captionEmphasis, 'Bold labels'),
-          ('captionLink', textTheme.captionLink, 'Small links'),
-          ('captionLinkEmphasis', textTheme.captionLinkEmphasis, 'Bold small links'),
+          ('captionDefault', textTheme.captionDefault, 'Secondary supporting text'),
+          ('captionEmphasis', textTheme.captionEmphasis, 'Strong supporting text'),
+          ('captionLink', textTheme.captionLink, 'Links in caption'),
+          ('captionLinkEmphasis', textTheme.captionLinkEmphasis, 'Prominent links in caption'),
         ],
       ),
       (
         'METADATA',
         'Smallest text for auxiliary info',
         [
-          ('metadataDefault', textTheme.metadataDefault, 'Timestamps, counts'),
-          ('metadataEmphasis', textTheme.metadataEmphasis, 'Bold metadata'),
-          ('metadataLink', textTheme.metadataLink, 'Tiny links'),
-          ('metadataLinkEmphasis', textTheme.metadataLinkEmphasis, 'Bold tiny links'),
+          ('metadataDefault', textTheme.metadataDefault, 'Timestamps, delivery status'),
+          ('metadataEmphasis', textTheme.metadataEmphasis, 'Highlighted metadata'),
+          ('metadataLink', textTheme.metadataLink, 'Metadata links'),
+          ('metadataLinkEmphasis', textTheme.metadataLinkEmphasis, 'Prominent metadata links'),
         ],
       ),
       (
         'NUMERIC',
         'Numbers and counters',
         [
-          ('numericXl', textTheme.numericXl, 'Extra large counters'),
-          ('numericLg', textTheme.numericLg, 'Large counters, stats'),
-          ('numericMd', textTheme.numericMd, 'Badges, indicators'),
-          ('numericSm', textTheme.numericSm, 'Small counts'),
+          ('numericXl', textTheme.numericXl, 'Timestamps, delivery status'),
+          ('numericLg', textTheme.numericLg, 'Badges, avatar initials'),
+          ('numericMd', textTheme.numericMd, 'Small badge counts'),
+          ('numericSm', textTheme.numericSm, 'Micro indicators only'),
         ],
       ),
     ];
@@ -266,12 +266,12 @@ class _TypeStyleCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: spacing.xs + spacing.xxs,
+                    runSpacing: spacing.xs,
                     children: [
                       _SpecChip(label: '${size}px'),
-                      SizedBox(width: spacing.xs + spacing.xxs),
                       _SpecChip(label: weight),
-                      SizedBox(width: spacing.xs + spacing.xxs),
                       _SpecChip(label: '${lineHeight.toStringAsFixed(1)}×'),
                     ],
                   ),
@@ -414,26 +414,36 @@ class _CompleteReference extends StatelessWidget {
               Wrap(
                 spacing: spacing.sm,
                 runSpacing: spacing.sm,
-                children: const [
+                children: [
                   _SizeTag(
                     label: 'heading',
-                    sizes: '20 / 18 / 16 / 12',
+                    sizes: _sizesOf([
+                      textTheme.headingLg,
+                      textTheme.headingMd,
+                      textTheme.headingSm,
+                      textTheme.headingXs,
+                    ]),
                   ),
                   _SizeTag(
                     label: 'body',
-                    sizes: '16',
+                    sizes: _sizesOf([textTheme.bodyDefault]),
                   ),
                   _SizeTag(
                     label: 'caption',
-                    sizes: '14',
+                    sizes: _sizesOf([textTheme.captionDefault]),
                   ),
                   _SizeTag(
                     label: 'metadata',
-                    sizes: '12',
+                    sizes: _sizesOf([textTheme.metadataDefault]),
                   ),
                   _SizeTag(
                     label: 'numeric',
-                    sizes: '14 / 12 / 10 / 8',
+                    sizes: _sizesOf([
+                      textTheme.numericXl,
+                      textTheme.numericLg,
+                      textTheme.numericMd,
+                      textTheme.numericSm,
+                    ]),
                   ),
                 ],
               ),
@@ -548,6 +558,10 @@ class _SizeTag extends StatelessWidget {
       ),
     );
   }
+}
+
+String _sizesOf(List<TextStyle> styles) {
+  return styles.map((s) => s.fontSize?.toInt().toString() ?? '?').join(' / ');
 }
 
 class _SectionLabel extends StatelessWidget {

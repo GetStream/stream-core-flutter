@@ -59,7 +59,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
 
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.backgroundApp,
+        color: colorScheme.backgroundSurfaceSubtle,
       ),
       foregroundDecoration: BoxDecoration(
         border: .symmetric(
@@ -139,7 +139,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
               children: [
                 Text(
                   'Theme Studio',
-                  style: textTheme.bodyEmphasis.copyWith(
+                  style: textTheme.headingXs.copyWith(
                     color: colorScheme.textPrimary,
                   ),
                 ),
@@ -387,8 +387,8 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           SizedBox(height: spacing.xs),
           Text(
             'Surface',
-            style: context.streamTextTheme.captionEmphasis.copyWith(
-              color: context.streamColorScheme.textTertiary,
+            style: context.streamTextTheme.metadataEmphasis.copyWith(
+              color: context.streamColorScheme.textSecondary,
             ),
           ),
           SizedBox(height: spacing.xs),
@@ -415,8 +415,8 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           SizedBox(height: spacing.xs),
           Text(
             'Elevation',
-            style: context.streamTextTheme.captionEmphasis.copyWith(
-              color: context.streamColorScheme.textTertiary,
+            style: context.streamTextTheme.metadataEmphasis.copyWith(
+              color: context.streamColorScheme.textSecondary,
             ),
           ),
           SizedBox(height: spacing.xs),

@@ -429,6 +429,7 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,8 +443,7 @@ class _Section extends StatelessWidget {
             if (description case final desc?)
               Text(
                 desc,
-                style: TextStyle(
-                  fontSize: 13,
+                style: textTheme.metadataDefault.copyWith(
                   color: colorScheme.textTertiary,
                 ),
               ),
@@ -463,11 +463,10 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
     return Text(
       label,
-      style: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
+      style: textTheme.metadataEmphasis.copyWith(
         letterSpacing: 1.2,
         color: colorScheme.accentPrimary,
       ),
@@ -490,6 +489,7 @@ class _ExampleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
     final radius = context.streamRadius;
+    final textTheme = context.streamTextTheme;
 
     return Container(
       width: double.infinity,
@@ -512,17 +512,14 @@ class _ExampleCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+                style: textTheme.metadataEmphasis.copyWith(
                   color: colorScheme.textSecondary,
                 ),
               ),
               if (subtitle case final sub?)
                 Text(
                   sub,
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: textTheme.metadataDefault.copyWith(
                     color: colorScheme.textTertiary,
                   ),
                 ),

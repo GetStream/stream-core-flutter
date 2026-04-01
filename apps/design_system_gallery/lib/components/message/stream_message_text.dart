@@ -908,6 +908,7 @@ class _CopyableCodeBlockState extends State<_CopyableCodeBlock> {
   @override
   Widget build(BuildContext context) {
     final cs = widget.colorScheme;
+    final ts = context.streamTextTheme;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -929,9 +930,7 @@ class _CopyableCodeBlockState extends State<_CopyableCodeBlock> {
                 if (widget.language.isNotEmpty)
                   Text(
                     widget.language,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                    style: ts.metadataEmphasis.copyWith(
                       color: cs.textSecondary,
                     ),
                   ),
@@ -944,13 +943,12 @@ class _CopyableCodeBlockState extends State<_CopyableCodeBlock> {
                       Icon(
                         _copied ? Icons.check : Icons.copy,
                         size: 14,
-                        color: _copied ? Colors.green : cs.textTertiary,
+                        color: _copied ? cs.accentSuccess : cs.textTertiary,
                       ),
                       Text(
                         _copied ? 'Copied!' : 'Copy',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: _copied ? Colors.green : cs.textTertiary,
+                        style: ts.metadataDefault.copyWith(
+                          color: _copied ? cs.accentSuccess : cs.textTertiary,
                         ),
                       ),
                     ],
@@ -963,9 +961,8 @@ class _CopyableCodeBlockState extends State<_CopyableCodeBlock> {
             padding: const EdgeInsets.all(12),
             child: SelectableText(
               widget.code,
-              style: TextStyle(
+              style: ts.metadataDefault.copyWith(
                 fontFamily: 'monospace',
-                fontSize: 13,
                 color: cs.textPrimary,
               ),
             ),
@@ -1019,7 +1016,7 @@ class _Section extends StatelessWidget {
             if (description case final desc?)
               Text(
                 desc,
-                style: TextStyle(fontSize: 13, color: colorScheme.textTertiary),
+                style: context.streamTextTheme.metadataDefault.copyWith(color: colorScheme.textTertiary),
               ),
           ],
         ),
@@ -1037,11 +1034,10 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
     return Text(
       label,
-      style: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
+      style: textTheme.metadataEmphasis.copyWith(
         letterSpacing: 1.2,
         color: colorScheme.accentPrimary,
       ),
@@ -1064,6 +1060,7 @@ class _ExampleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
     final radius = context.streamRadius;
+    final textTheme = context.streamTextTheme;
 
     return Container(
       width: double.infinity,
@@ -1086,16 +1083,14 @@ class _ExampleCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+                style: textTheme.metadataEmphasis.copyWith(
                   color: colorScheme.textSecondary,
                 ),
               ),
               if (subtitle case final sub?)
                 Text(
                   sub,
-                  style: TextStyle(fontSize: 12, color: colorScheme.textTertiary),
+                  style: textTheme.metadataDefault.copyWith(color: colorScheme.textTertiary),
                 ),
             ],
           ),

@@ -43,7 +43,7 @@ class PlatformSelector extends StatelessWidget {
             color: colorScheme.textTertiary,
             size: 16,
           ),
-          style: textTheme.captionDefault.copyWith(
+          style: textTheme.metadataDefault.copyWith(
             color: colorScheme.textPrimary,
           ),
           dropdownColor: colorScheme.backgroundSurface,
@@ -61,7 +61,7 @@ class PlatformSelector extends StatelessWidget {
                   SizedBox(width: spacing.sm),
                   Text(
                     _labelFor(platform),
-                    style: textTheme.captionDefault,
+                    style: textTheme.metadataDefault,
                   ),
                 ],
               ),

@@ -52,9 +52,8 @@ class ThemeStudioModeButton extends StatelessWidget {
               SizedBox(height: spacing.xs),
               Text(
                 label,
-                style: textTheme.captionEmphasis.copyWith(
+                style: textTheme.metadataDefault.copyWith(
                   color: isSelected ? colorScheme.accentPrimary : colorScheme.textTertiary,
-                  fontSize: 11,
                 ),
               ),
             ],
