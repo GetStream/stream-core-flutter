@@ -177,14 +177,14 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
 }
 
 const _allReactions = <StreamReactionsItem>[
-  StreamReactionsItem(emoji: Text('👍'), count: 8),
-  StreamReactionsItem(emoji: Text('❤'), count: 14),
-  StreamReactionsItem(emoji: Text('😂'), count: 5),
-  StreamReactionsItem(emoji: Text('🔥'), count: 3),
-  StreamReactionsItem(emoji: Text('🎉'), count: 2),
-  StreamReactionsItem(emoji: Text('👏'), count: 7),
-  StreamReactionsItem(emoji: Text('😮')),
-  StreamReactionsItem(emoji: Text('🙏'), count: 4),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 8),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('❤'), count: 14),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('😂'), count: 5),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('🔥'), count: 3),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('🎉'), count: 2),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('👏'), count: 7),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('😮')),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('🙏'), count: 4),
 ];
 
 const _sampleImages = [
@@ -352,8 +352,8 @@ class _ReactionVariantsSection extends StatelessWidget {
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('👍'), count: 3),
-                StreamReactionsItem(emoji: Text('❤'), count: 2),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('❤'), count: 2),
               ],
               position: StreamReactionsPosition.header,
               alignment: StreamReactionsAlignment.end,
@@ -373,9 +373,9 @@ class _ReactionVariantsSection extends StatelessWidget {
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('😂'), count: 5),
-                StreamReactionsItem(emoji: Text('🔥'), count: 3),
-                StreamReactionsItem(emoji: Text('🎉'), count: 2),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('😂'), count: 5),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('🔥'), count: 3),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('🎉'), count: 2),
               ],
               overlap: false,
               child: StreamMessageBubble(
@@ -392,7 +392,7 @@ class _ReactionVariantsSection extends StatelessWidget {
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('👏'), count: 7),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('👏'), count: 7),
               ],
               position: StreamReactionsPosition.header,
               alignment: StreamReactionsAlignment.end,
@@ -412,12 +412,12 @@ class _ReactionVariantsSection extends StatelessWidget {
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('👍'), count: 8),
-                StreamReactionsItem(emoji: Text('❤'), count: 14),
-                StreamReactionsItem(emoji: Text('😂'), count: 5),
-                StreamReactionsItem(emoji: Text('🔥'), count: 3),
-                StreamReactionsItem(emoji: Text('🎉'), count: 2),
-                StreamReactionsItem(emoji: Text('👏'), count: 7),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 8),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('❤'), count: 14),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('😂'), count: 5),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('🔥'), count: 3),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('🎉'), count: 2),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('👏'), count: 7),
               ],
               overlap: false,
               child: StreamMessageBubble(
@@ -480,9 +480,9 @@ class _FullCompositionSection extends StatelessWidget {
               ),
               child: StreamReactions.segmented(
                 items: const [
-                  StreamReactionsItem(emoji: Text('👍'), count: 3),
-                  StreamReactionsItem(emoji: Text('😂'), count: 1),
-                  StreamReactionsItem(emoji: Text('❤'), count: 5),
+                  StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3),
+                  StreamReactionsItem(emoji: StreamUnicodeEmoji('😂'), count: 1),
+                  StreamReactionsItem(emoji: StreamUnicodeEmoji('❤'), count: 5),
                 ],
                 overlap: false,
                 child: Column(
@@ -519,7 +519,7 @@ class _FullCompositionSection extends StatelessWidget {
               child: StreamReactions.segmented(
                 alignment: .end,
                 overlap: false,
-                items: const [StreamReactionsItem(emoji: Text('👍'), count: 2)],
+                items: const [StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 2)],
                 child: StreamMessageBubble(
                   child: StreamMessageText('Sure, I can help with that!'),
                 ),
@@ -552,8 +552,8 @@ class _EmojiOnlySection extends StatelessWidget {
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('❤'), count: 4),
-                StreamReactionsItem(emoji: Text('😂'), count: 2),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('❤'), count: 4),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('😂'), count: 2),
               ],
               overlap: false,
               child: StreamMessageText('👋'),
@@ -590,7 +590,7 @@ class _EmojiOnlySection extends StatelessWidget {
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('🔥'), count: 3),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('🔥'), count: 3),
               ],
               overlap: false,
               child: Column(
@@ -623,7 +623,7 @@ class _EmojiOnlySection extends StatelessWidget {
                 alignment: .end,
                 overlap: false,
                 items: const [
-                  StreamReactionsItem(emoji: Text('👍'), count: 5),
+                  StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 5),
                 ],
                 child: StreamMessageText('😂'),
               ),

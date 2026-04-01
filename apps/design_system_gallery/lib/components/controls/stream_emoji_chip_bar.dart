@@ -38,7 +38,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       for (var i = 0; i < count && i < _reactions.length; i++)
         StreamEmojiChipItem(
           value: _reactions[i].$1,
-          emoji: Text(_reactions[i].$1),
+          emoji: StreamUnicodeEmoji(_reactions[i].$1),
           count: _reactions[i].$2,
         ),
     ];
@@ -459,7 +459,7 @@ class _ReactionDetailExampleState extends State<_ReactionDetailExample> {
     for (final (emoji, users) in _reactionUsers)
       StreamEmojiChipItem(
         value: emoji,
-        emoji: Text(emoji),
+        emoji: StreamUnicodeEmoji(emoji),
         count: users.length,
       ),
   ];
@@ -542,7 +542,7 @@ class _ReactionUserTile extends StatelessWidget {
           ),
           StreamEmoji(
             size: StreamEmojiSize.sm,
-            emoji: Text(emoji),
+            emoji: StreamUnicodeEmoji(emoji),
           ),
         ],
       ),
@@ -673,9 +673,19 @@ const _reactions = [
 ];
 
 final _sampleItems = [
-  for (final (emoji, count) in _reactions.take(5)) StreamEmojiChipItem(value: emoji, emoji: Text(emoji), count: count),
+  for (final (emoji, count) in _reactions.take(5))
+    StreamEmojiChipItem(
+      value: emoji,
+      emoji: StreamUnicodeEmoji(emoji),
+      count: count,
+    ),
 ];
 
 final _manyItems = [
-  for (final (emoji, count) in _reactions) StreamEmojiChipItem(value: emoji, emoji: Text(emoji), count: count),
+  for (final (emoji, count) in _reactions)
+    StreamEmojiChipItem(
+      value: emoji,
+      emoji: StreamUnicodeEmoji(emoji),
+      count: count,
+    ),
 ];

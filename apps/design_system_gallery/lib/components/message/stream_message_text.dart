@@ -625,9 +625,9 @@ class _RealWorldSection extends StatelessWidget {
             ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(emoji: Text('\u{1F680}'), count: 5),
-                StreamReactionsItem(emoji: Text('\u{1F44D}'), count: 3),
-                StreamReactionsItem(emoji: Text('\u{2764}\u{FE0F}'), count: 2),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('\u{1F680}'), count: 5),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('\u{1F44D}'), count: 3),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('\u{2764}\u{FE0F}'), count: 2),
               ],
               child: StreamMessageBubble(
                 child: StreamMessageText(

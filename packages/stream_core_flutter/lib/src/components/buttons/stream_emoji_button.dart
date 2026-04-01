@@ -25,7 +25,7 @@ import '../accessories/stream_emoji.dart';
 ///
 /// ```dart
 /// StreamEmojiButton(
-///   emoji: Text('👍'),
+///   emoji: StreamUnicodeEmoji('👍'),
 ///   onPressed: () => print('thumbs up selected'),
 /// )
 /// ```
@@ -37,7 +37,7 @@ import '../accessories/stream_emoji.dart';
 ///
 /// ```dart
 /// StreamEmojiButton(
-///   emoji: Text('❤️'),
+///   emoji: StreamUnicodeEmoji('❤️'),
 ///   isSelected: true,
 ///   onPressed: () => print('heart selected'),
 /// )
@@ -50,7 +50,7 @@ import '../accessories/stream_emoji.dart';
 ///
 /// ```dart
 /// StreamEmojiButton(
-///   emoji: Text('👍'),
+///   emoji: StreamUnicodeEmoji('👍'),
 ///   onPressed: () => addReaction('👍'),
 ///   onLongPress: () => showSkinTonePicker('👍'),
 /// )
@@ -67,7 +67,7 @@ class StreamEmojiButton extends StatelessWidget {
   StreamEmojiButton({
     super.key,
     StreamEmojiButtonSize? size,
-    required Widget emoji,
+    required StreamEmojiContent emoji,
     VoidCallback? onPressed,
     VoidCallback? onLongPress,
     bool? isSelected,
@@ -115,8 +115,11 @@ class StreamEmojiButtonProps {
   /// [StreamEmojiButtonSize.xl].
   final StreamEmojiButtonSize? size;
 
-  /// The emoji or icon widget to display.
-  final Widget emoji;
+  /// The content model describing what to render.
+  ///
+  /// Typically a [StreamUnicodeEmoji] for Unicode reactions or a
+  /// [StreamImageEmoji] for custom server emoji.
+  final StreamEmojiContent emoji;
 
   /// Called when the emoji button is pressed.
   ///

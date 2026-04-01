@@ -22,6 +22,14 @@ Widget buildStreamEmojiPlayground(BuildContext context) {
     description: 'Emoji size preset.',
   );
 
+  final contentType = context.knobs.object.dropdown(
+    label: 'Content Type',
+    options: _ContentType.values,
+    initialOption: _ContentType.unicode,
+    labelBuilder: (option) => option.label,
+    description: 'The type of emoji content to display.',
+  );
+
   final emoji = context.knobs.object.dropdown(
     label: 'Emoji',
     options: _sampleEmojis,
@@ -35,10 +43,12 @@ Widget buildStreamEmojiPlayground(BuildContext context) {
     description: 'Show a border around the emoji bounding box.',
   );
 
-  final emojiWidget = StreamEmoji(
-    size: size,
-    emoji: Text(emoji.emoji),
-  );
+  final content = switch (contentType) {
+    _ContentType.unicode => StreamUnicodeEmoji(emoji.emoji),
+    _ContentType.image => StreamImageEmoji(url: _twemojiUrl(emoji.emoji)),
+  };
+
+  final emojiWidget = StreamEmoji(size: size, emoji: content);
 
   return Center(
     child: switch (showBounds) {
@@ -77,9 +87,9 @@ Widget buildStreamEmojiShowcase(BuildContext context) {
         children: [
           const _SizeVariantsSection(),
           SizedBox(height: spacing.xl),
-          const _EmojiSamplerSection(),
+          const _ContentVariantsSection(),
           SizedBox(height: spacing.xl),
-          const _IconUsageSection(),
+          const _EmojiSamplerSection(),
         ],
       ),
     ),
@@ -95,47 +105,21 @@ class _SizeVariantsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
-    final boxShadow = context.streamBoxShadow;
-    final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
       children: [
         const _SectionLabel(label: 'SIZE VARIANTS'),
-        SizedBox(height: spacing.md),
-        Container(
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          padding: EdgeInsets.all(spacing.md),
-          decoration: BoxDecoration(
-            color: colorScheme.backgroundSurface,
-            borderRadius: BorderRadius.all(radius.lg),
-            boxShadow: boxShadow.elevation1,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        _Card(
+          title: 'Predefined Sizes',
+          subtitle: 'Emoji scales across predefined size presets',
+          child: Wrap(
+            spacing: spacing.xl,
+            runSpacing: spacing.xl,
             children: [
-              Text(
-                'Emoji scales across predefined sizes',
-                style: textTheme.captionDefault.copyWith(
-                  color: colorScheme.textSecondary,
-                ),
-              ),
-              SizedBox(height: spacing.md),
-              Wrap(
-                spacing: spacing.xl,
-                runSpacing: spacing.xl,
-                children: [
-                  for (final size in StreamEmojiSize.values) _SizeDemo(size: size),
-                ],
-              ),
+              for (final size in StreamEmojiSize.values) _SizeDemo(size: size),
             ],
           ),
         ),
@@ -163,7 +147,7 @@ class _SizeDemo extends StatelessWidget {
           child: Center(
             child: StreamEmoji(
               size: size,
-              emoji: const Text('🔥'),
+              emoji: const StreamUnicodeEmoji('🔥'),
             ),
           ),
         ),
@@ -189,59 +173,82 @@ class _SizeDemo extends StatelessWidget {
 }
 
 // =============================================================================
-// Emoji Sampler Section
+// Content Variants Section
 // =============================================================================
 
-class _EmojiSamplerSection extends StatelessWidget {
-  const _EmojiSamplerSection();
+class _ContentVariantsSection extends StatelessWidget {
+  const _ContentVariantsSection();
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
-    final boxShadow = context.streamBoxShadow;
-    final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
       children: [
-        const _SectionLabel(label: 'EMOJI SAMPLER'),
-        SizedBox(height: spacing.md),
-        Container(
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          padding: EdgeInsets.all(spacing.md),
-          decoration: BoxDecoration(
-            color: colorScheme.backgroundSurface,
-            borderRadius: BorderRadius.all(radius.lg),
-            boxShadow: boxShadow.elevation1,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        const _SectionLabel(label: 'CONTENT VARIANTS'),
+
+        // Unicode vs Image comparison
+        _Card(
+          title: 'Unicode vs Image',
+          subtitle: 'Same emoji rendered via native Unicode and Twemoji image',
+          child: Wrap(
+            spacing: spacing.xl,
+            runSpacing: spacing.lg,
             children: [
-              Text(
-                'Various emojis rendered at consistent sizing',
-                style: textTheme.captionDefault.copyWith(
-                  color: colorScheme.textSecondary,
+              const _ContentDemo(
+                label: 'Unicode (native)',
+                emoji: StreamUnicodeEmoji('🎉'),
+              ),
+              _ContentDemo(
+                label: 'Image (Twemoji)',
+                emoji: StreamImageEmoji(url: _twemojiUrl('🎉')),
+              ),
+              _ContentDemo(
+                label: 'Error fallback',
+                emoji: StreamImageEmoji(
+                  url: Uri.parse('https://invalid.example/404.png'),
                 ),
               ),
-              SizedBox(height: spacing.md),
-              Wrap(
-                spacing: spacing.sm,
-                runSpacing: spacing.sm,
-                children: [
-                  for (final emoji in _sampleEmojis)
-                    StreamEmoji(
-                      size: StreamEmojiSize.lg,
-                      emoji: Text(emoji.emoji),
-                    ),
-                ],
+            ],
+          ),
+        ),
+
+        // Animated emoji with still fallback
+        _Card(
+          title: 'Animated Emoji',
+          subtitle: 'Animated GIF with a still fallback when "Reduce Motion" is enabled',
+          child: Wrap(
+            spacing: spacing.xl,
+            runSpacing: spacing.lg,
+            children: [
+              _ContentDemo(
+                label: 'Animated (GIF)',
+                emoji: StreamImageEmoji(
+                  url: Uri.parse(
+                    'https://cultofthepartyparrot.com/parrots/hd/parrot.gif',
+                  ),
+                  stillUrl: _twemojiUrl('🦜'),
+                ),
               ),
+              _ContentDemo(
+                label: 'Still fallback',
+                emoji: StreamImageEmoji(url: _twemojiUrl('🦜')),
+              ),
+            ],
+          ),
+        ),
+
+        // Custom emoji showcase from various platforms
+        _Card(
+          title: 'Custom Image Emoji',
+          subtitle: 'Examples of platform-specific custom emoji',
+          child: Wrap(
+            spacing: spacing.xl,
+            runSpacing: spacing.lg,
+            children: [
+              for (final item in _customEmojiSamples) _ContentDemo(label: item.label, emoji: item.emoji),
             ],
           ),
         ),
@@ -250,60 +257,61 @@ class _EmojiSamplerSection extends StatelessWidget {
   }
 }
 
-// =============================================================================
-// Icon Usage Section
-// =============================================================================
+class _ContentDemo extends StatelessWidget {
+  const _ContentDemo({required this.label, required this.emoji});
 
-class _IconUsageSection extends StatelessWidget {
-  const _IconUsageSection();
+  final String label;
+  final StreamEmojiContent emoji;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
-    final boxShadow = context.streamBoxShadow;
-    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      children: [
+        StreamEmoji(size: StreamEmojiSize.xl, emoji: emoji),
+        SizedBox(height: spacing.xs),
+        Text(
+          label,
+          style: textTheme.metadataDefault.copyWith(
+            color: colorScheme.textTertiary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Emoji Sampler Section
+// =============================================================================
+
+class _EmojiSamplerSection extends StatelessWidget {
+  const _EmojiSamplerSection();
+
+  @override
+  Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
       children: [
-        const _SectionLabel(label: 'WITH ICONS'),
-        SizedBox(height: spacing.md),
-        Container(
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          padding: EdgeInsets.all(spacing.md),
-          decoration: BoxDecoration(
-            color: colorScheme.backgroundSurface,
-            borderRadius: BorderRadius.all(radius.lg),
-            boxShadow: boxShadow.elevation1,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        const _SectionLabel(label: 'EMOJI SAMPLER'),
+        _Card(
+          title: 'Unicode Emoji Gallery',
+          subtitle: 'Various emojis rendered at consistent sizing',
+          child: Wrap(
+            spacing: spacing.sm,
+            runSpacing: spacing.sm,
             children: [
-              Text(
-                'StreamEmoji can display any widget, not just emoji',
-                style: textTheme.captionDefault.copyWith(
-                  color: colorScheme.textSecondary,
+              for (final emoji in _sampleEmojis)
+                StreamEmoji(
+                  size: StreamEmojiSize.lg,
+                  emoji: StreamUnicodeEmoji(emoji.emoji),
                 ),
-              ),
-              SizedBox(height: spacing.md),
-              Wrap(
-                spacing: spacing.sm,
-                runSpacing: spacing.sm,
-                children: [
-                  for (final iconData in _sampleIcons)
-                    StreamEmoji(
-                      size: StreamEmojiSize.lg,
-                      emoji: Icon(iconData, color: colorScheme.textPrimary),
-                    ),
-                ],
-              ),
             ],
           ),
         ),
@@ -349,9 +357,78 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
+class _Card extends StatelessWidget {
+  const _Card({required this.title, this.subtitle, required this.child});
+
+  final String title;
+  final String? subtitle;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundSurface,
+        borderRadius: BorderRadius.all(radius.lg),
+        boxShadow: boxShadow.elevation1,
+      ),
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.all(radius.lg),
+        border: Border.all(color: colorScheme.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: spacing.sm,
+        children: [
+          Text(
+            title,
+            style: textTheme.bodyEmphasis.copyWith(
+              color: colorScheme.textPrimary,
+            ),
+          ),
+          if (subtitle case final subtitle?)
+            Text(
+              subtitle,
+              style: textTheme.captionDefault.copyWith(
+                color: colorScheme.textSecondary,
+              ),
+            ),
+          SizedBox(height: spacing.xxs),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
 // =============================================================================
 // Helpers
 // =============================================================================
+
+enum _ContentType {
+  unicode('Unicode'),
+  image('Image (Twemoji)')
+  ;
+
+  const _ContentType(this.label);
+  final String label;
+}
+
+Uri _twemojiUrl(String emoji) {
+  final codePoints = emoji.runes.map((r) => r.toRadixString(16)).join('-');
+  return Uri.parse(
+    'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/$codePoints.png',
+  );
+}
 
 Emoji _byName(String name) => UnicodeEmojis.allEmojis.firstWhere((e) => e.name == name);
 
@@ -370,17 +447,32 @@ final _sampleEmojis = [
   _byName('white heavy check mark'),
 ];
 
-const _sampleIcons = [
-  Icons.thumb_up,
-  Icons.favorite,
-  Icons.sentiment_very_satisfied,
-  Icons.local_fire_department,
-  Icons.celebration,
-  Icons.lightbulb,
-  Icons.visibility,
-  Icons.rocket_launch,
-  Icons.star,
-  Icons.check_circle,
-  Icons.emoji_emotions,
-  Icons.cake,
+// Custom emoji samples from various platforms.
+// All samples use the same emoji (🔥 U+1F525) for a direct visual comparison.
+final _customEmojiSamples = [
+  (label: 'Twemoji', emoji: StreamImageEmoji(url: _twemojiUrl('🔥'))),
+  (
+    label: 'Noto Emoji',
+    emoji: StreamImageEmoji(
+      url: Uri.parse(
+        'https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.png',
+      ),
+    ),
+  ),
+  (
+    label: 'OpenMoji',
+    emoji: StreamImageEmoji(
+      url: Uri.parse(
+        'https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji/color/72x72/1F525.png',
+      ),
+    ),
+  ),
+  (
+    label: 'Fluent Emoji',
+    emoji: StreamImageEmoji(
+      url: Uri.parse(
+        'https://cdn.jsdelivr.net/gh/shuding/fluentui-emoji-unicode/assets/1f525_3d.png',
+      ),
+    ),
+  ),
 ];

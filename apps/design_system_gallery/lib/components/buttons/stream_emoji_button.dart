@@ -53,7 +53,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
     return Center(
       child: StreamEmojiButton(
         size: size,
-        emoji: Text(emoji.emoji),
+        emoji: StreamUnicodeEmoji(emoji.emoji),
         isSelected: _isSelected,
         onPressed: isDisabled
             ? null
@@ -99,8 +99,6 @@ Widget buildStreamEmojiButtonShowcase(BuildContext context) {
           const _StateVariantsSection(),
           SizedBox(height: spacing.xl),
           const _EmojiGridSection(),
-          SizedBox(height: spacing.xl),
-          const _WithIconsSection(),
         ],
       ),
     ),
@@ -181,7 +179,7 @@ class _SizeDemo extends StatelessWidget {
       children: [
         StreamEmojiButton(
           size: size,
-          emoji: const Text('👍'),
+          emoji: const StreamUnicodeEmoji('👍'),
           onPressed: () {},
         ),
         SizedBox(height: spacing.sm),
@@ -318,7 +316,7 @@ class _StateDemoState extends State<_StateDemo> {
       children: [
         StreamEmojiButton(
           size: StreamEmojiButtonSize.lg,
-          emoji: const Text('👍'),
+          emoji: const StreamUnicodeEmoji('👍'),
           isSelected: _isSelected,
           onPressed: widget.enabled
               ? () {
@@ -391,7 +389,7 @@ class _EmojiGridSection extends StatelessWidget {
                   for (final emoji in _sampleEmojis)
                     StreamEmojiButton(
                       size: StreamEmojiButtonSize.lg,
-                      emoji: Text(emoji.emoji),
+                      emoji: StreamUnicodeEmoji(emoji.emoji),
                       onPressed: () {
                         ScaffoldMessenger.of(context)
                           ..hideCurrentSnackBar()
@@ -402,69 +400,6 @@ class _EmojiGridSection extends StatelessWidget {
                             ),
                           );
                       },
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// =============================================================================
-// With Icons Section
-// =============================================================================
-
-class _WithIconsSection extends StatelessWidget {
-  const _WithIconsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
-    final boxShadow = context.streamBoxShadow;
-    final radius = context.streamRadius;
-    final spacing = context.streamSpacing;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _SectionLabel(label: 'WITH ICONS'),
-        SizedBox(height: spacing.md),
-        Container(
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          padding: EdgeInsets.all(spacing.md),
-          decoration: BoxDecoration(
-            color: colorScheme.backgroundSurface,
-            borderRadius: BorderRadius.all(radius.lg),
-            boxShadow: boxShadow.elevation1,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.all(radius.lg),
-            border: Border.all(color: colorScheme.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Using Material Icons instead of emoji',
-                style: textTheme.captionDefault.copyWith(
-                  color: colorScheme.textSecondary,
-                ),
-              ),
-              SizedBox(height: spacing.md),
-              Wrap(
-                spacing: spacing.xs,
-                runSpacing: spacing.xs,
-                children: [
-                  for (final iconData in _sampleIcons)
-                    StreamEmojiButton(
-                      size: StreamEmojiButtonSize.lg,
-                      emoji: Icon(iconData, color: colorScheme.textPrimary),
-                      onPressed: () {},
                     ),
                 ],
               ),
@@ -532,19 +467,4 @@ final _sampleEmojis = [
   _byName('waving hand sign'),
   _byName('white medium star'),
   _byName('white heavy check mark'),
-];
-
-const _sampleIcons = [
-  Icons.thumb_up,
-  Icons.favorite,
-  Icons.sentiment_very_satisfied,
-  Icons.local_fire_department,
-  Icons.celebration,
-  Icons.lightbulb,
-  Icons.visibility,
-  Icons.rocket_launch,
-  Icons.star,
-  Icons.check_circle,
-  Icons.emoji_emotions,
-  Icons.cake,
 ];

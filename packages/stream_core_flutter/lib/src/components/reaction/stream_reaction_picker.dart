@@ -6,6 +6,7 @@ import '../../theme/primitives/stream_radius.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../accessories/stream_emoji.dart';
 import '../buttons/stream_button.dart';
 import '../buttons/stream_emoji_button.dart';
 
@@ -20,7 +21,7 @@ import '../buttons/stream_emoji_button.dart';
 /// ```dart
 /// StreamReactionPickerItem(
 ///   key: 'like',
-///   emoji: Text('👍'),
+///   emoji: StreamUnicodeEmoji('👍'),
 ///   isSelected: true,
 /// )
 /// ```
@@ -37,8 +38,11 @@ class StreamReactionPickerItem {
   /// A unique identifier for this reaction (e.g. 'like', 'love').
   final String key;
 
-  /// The emoji widget to display (e.g. `Text('👍')`).
-  final Widget emoji;
+  /// The content model describing what to render.
+  ///
+  /// Typically a [StreamUnicodeEmoji] (e.g. `StreamUnicodeEmoji('👍')`)
+  /// or a [StreamImageEmoji] for custom server emoji.
+  final StreamEmojiContent emoji;
 
   /// Whether the user has already selected this reaction.
   final bool isSelected;
@@ -67,8 +71,8 @@ typedef OnReactionItemPicked = ValueSetter<StreamReactionPickerItem>;
 /// ```dart
 /// StreamReactionPicker(
 ///   items: [
-///     StreamReactionPickerItem(key: 'like', emoji: Text('👍')),
-///     StreamReactionPickerItem(key: 'love', emoji: Text('❤️'), isSelected: true),
+///     StreamReactionPickerItem(key: 'like', emoji: StreamUnicodeEmoji('👍')),
+///     StreamReactionPickerItem(key: 'love', emoji: StreamUnicodeEmoji('❤️'), isSelected: true),
 ///   ],
 ///   onReactionPicked: (item) => print('Picked: ${item.key}'),
 ///   onAddReactionTap: () => print('Open emoji picker'),
