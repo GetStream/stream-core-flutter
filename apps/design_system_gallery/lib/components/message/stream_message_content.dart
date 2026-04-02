@@ -77,17 +77,17 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
   final textTheme = context.streamTextTheme;
   final palette = colorScheme.avatarPalette;
 
-  final emojiCount = StreamMessageText.emojiOnlyCount(text);
-  final isEmojiOnly = emojiCount != null && emojiCount <= 3;
+  final emojiCount = StreamMessageText.emojiCount(text);
+  final isJumbomoji = emojiCount != null && emojiCount <= 3;
 
   final messageText = StreamMessageText(text);
-  final Widget messageWidget = isEmojiOnly ? messageText : StreamMessageBubble(child: messageText);
+  final Widget messageWidget = isJumbomoji ? messageText : StreamMessageBubble(child: messageText);
 
   final replies = showReplies
       ? StreamMessageReplies(
           label: const Text('3 replies'),
           avatars: _sampleAvatars(3, palette),
-          showConnector: !isEmojiOnly,
+          showConnector: !isJumbomoji,
         )
       : null;
 

@@ -13,7 +13,7 @@ import 'package:flutter/widgets.dart';
 /// ```dart
 /// StreamMessageItemTheme(
 ///   data: StreamMessageItemThemeData(
-///     leadingVisibility: StreamMessageLayoutProperty.resolveWith(
+///     avatarVisibility: StreamMessageLayoutProperty.resolveWith(
 ///       (p) => switch (p.stackPosition) {
 ///         StreamMessageStackPosition.bottom ||
 ///         StreamMessageStackPosition.single => StreamVisibility.visible,

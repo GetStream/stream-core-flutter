@@ -157,7 +157,7 @@ class StreamEmojiChipItem<T> {
   /// For reaction filtering, this is typically a reaction type identifier.
   final T value;
 
-  /// The emoji display model to render inside the chip.
+  /// The content model describing what to render inside the chip.
   ///
   /// Typically a [StreamUnicodeEmoji] for Unicode reactions or a
   /// [StreamImageEmoji] for custom server emoji.

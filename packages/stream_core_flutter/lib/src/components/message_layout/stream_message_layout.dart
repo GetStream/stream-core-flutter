@@ -24,7 +24,7 @@ enum _StreamMessageLayoutAspect {
   // The list kind (channel / thread).
   listKind,
 
-  // The content kind (standard / singleAttachment / emojiOnly).
+  // The content kind (standard / singleAttachment / jumbomoji).
   contentKind,
 }
 
@@ -254,7 +254,7 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
 /// [stackPosition] (single, top, middle, bottom) — with environmental
 /// context — [channelKind] (direct vs group), [listKind] (channel vs
 /// thread) — and content classification — [contentKind] (standard,
-/// singleAttachment, emojiOnly) — into a single value that
+/// singleAttachment, jumbomoji) — into a single value that
 /// [StreamMessageLayoutProperty] resolvers use to compute
 /// layout-dependent styling.
 ///

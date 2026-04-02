@@ -269,7 +269,7 @@ class StreamReactionsItem {
     this.count,
   });
 
-  /// The display model representing this reaction's emoji.
+  /// The content model describing what to render.
   ///
   /// Typically a [StreamUnicodeEmoji] (e.g. `StreamUnicodeEmoji('👍')`)
   /// or a [StreamImageEmoji] for custom server emoji.

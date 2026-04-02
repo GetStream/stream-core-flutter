@@ -114,20 +114,20 @@ class StreamMessageText extends StatelessWidget {
   /// emojis (ignoring whitespace), or `null` if the text is empty or contains
   /// any non-emoji characters.
   ///
-  /// Useful for determining emoji-specific rendering such as larger font sizes
+  /// Useful for determining jumbomoji rendering such as larger font sizes
   /// or hiding the message bubble.
   ///
   /// ```dart
-  /// StreamMessageText.emojiOnlyCount('🚀')        // 1
-  /// StreamMessageText.emojiOnlyCount('👍🔥')      // 2
-  /// StreamMessageText.emojiOnlyCount('❤️🎉😍')    // 3
-  /// StreamMessageText.emojiOnlyCount('🎉🎉🎉🎉')  // 4
-  /// StreamMessageText.emojiOnlyCount('Hello 👋')   // null (mixed)
-  /// StreamMessageText.emojiOnlyCount('👨‍👩‍👧')       // 1 (ZWJ family)
-  /// StreamMessageText.emojiOnlyCount('🇺🇸')       // 1 (flag)
-  /// StreamMessageText.emojiOnlyCount('👍🏽')       // 1 (skin tone)
+  /// StreamMessageText.emojiCount('🚀')        // 1
+  /// StreamMessageText.emojiCount('👍🔥')      // 2
+  /// StreamMessageText.emojiCount('❤️🎉😍')    // 3
+  /// StreamMessageText.emojiCount('🎉🎉🎉🎉')  // 4
+  /// StreamMessageText.emojiCount('Hello 👋')   // null (mixed)
+  /// StreamMessageText.emojiCount('👨‍👩‍👧')       // 1 (ZWJ family)
+  /// StreamMessageText.emojiCount('🇺🇸')       // 1 (flag)
+  /// StreamMessageText.emojiCount('👍🏽')       // 1 (skin tone)
   /// ```
-  static int? emojiOnlyCount(String? text) {
+  static int? emojiCount(String? text) {
     final trimmed = text?.trim();
     if (trimmed == null || trimmed.isEmpty) return null;
 
@@ -260,8 +260,8 @@ class DefaultStreamMessageText extends StatelessWidget {
     final effectiveMentionStyle = resolve((s) => s?.mentionStyle).copyWith(color: effectiveMentionColor);
 
     final contentType = layout.contentKind;
-    final emojiCount = StreamMessageText.emojiOnlyCount(props.text);
-    if (emojiCount case final count? when contentType == .emojiOnly) {
+    final emojiCount = StreamMessageText.emojiCount(props.text);
+    if (emojiCount case final count? when contentType == .jumbomoji) {
       final emojiStyle = switch (count) {
         1 => resolve((s) => s?.singleEmojiStyle),
         2 => resolve((s) => s?.doubleEmojiStyle),
@@ -394,7 +394,7 @@ class _StreamMessageTextDefaults extends StreamMessageTextStyle {
   @override
   StreamMessageLayoutProperty<EdgeInsetsGeometry> get padding => .resolveWith(
     (layout) => switch (layout.contentKind) {
-      .emojiOnly => EdgeInsets.zero,
+      .jumbomoji => EdgeInsets.zero,
       _ => .symmetric(horizontal: _context.streamSpacing.sm),
     },
   );

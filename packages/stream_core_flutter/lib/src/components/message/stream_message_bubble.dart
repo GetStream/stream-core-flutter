@@ -147,7 +147,7 @@ class _StreamMessageBubbleDefaults extends StreamMessageBubbleStyle {
   @override
   StreamMessageLayoutProperty<Color> get backgroundColor => .resolveWith(
     (layout) => switch ((layout.alignment, layout.contentKind)) {
-      (_, .emojiOnly) => StreamColors.transparent,
+      (_, .jumbomoji) => StreamColors.transparent,
       (.start, _) => _colorScheme.backgroundSurface,
       (.end, _) => _colorScheme.brand.shade100,
     },
@@ -175,7 +175,7 @@ class _StreamMessageBubbleDefaults extends StreamMessageBubbleStyle {
   @override
   StreamMessageLayoutBorderSide get side => .resolveWith(
     (layout) => switch ((layout.alignment, layout.contentKind)) {
-      (_, .emojiOnly) => BorderSide.none,
+      (_, .jumbomoji) => BorderSide.none,
       (.start, _) => BorderSide(color: _colorScheme.borderSubtle),
       (.end, _) => BorderSide(color: _colorScheme.brand.shade100),
     },
