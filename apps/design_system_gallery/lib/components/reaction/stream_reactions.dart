@@ -214,8 +214,14 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('👍'), count: 2),
-                    StreamReactionsItem(emoji: Text('❤'), count: 1),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('👍'),
+                      count: 2,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('❤'),
+                      count: 1,
+                    ),
                   ],
                 ),
                 _ThreadMessage(
@@ -224,10 +230,22 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('😂'), count: 5),
-                    StreamReactionsItem(emoji: Text('🔥'), count: 3),
-                    StreamReactionsItem(emoji: Text('👏'), count: 7),
-                    StreamReactionsItem(emoji: Text('🎉'), count: 2),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('😂'),
+                      count: 5,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('🔥'),
+                      count: 3,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('👏'),
+                      count: 7,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('🎉'),
+                      count: 2,
+                    ),
                   ],
                 ),
               ],
@@ -244,9 +262,18 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.header,
                   items: [
-                    StreamReactionsItem(emoji: Text('👍'), count: 3),
-                    StreamReactionsItem(emoji: Text('❤'), count: 8),
-                    StreamReactionsItem(emoji: Text('😂'), count: 2),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('👍'),
+                      count: 3,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('❤'),
+                      count: 8,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('😂'),
+                      count: 2,
+                    ),
                   ],
                 ),
                 _ThreadMessage(
@@ -278,9 +305,18 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.header,
                   items: [
-                    StreamReactionsItem(emoji: Text('👍'), count: 4),
-                    StreamReactionsItem(emoji: Text('❤'), count: 3),
-                    StreamReactionsItem(emoji: Text('😂'), count: 2),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('👍'),
+                      count: 4,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('❤'),
+                      count: 3,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('😂'),
+                      count: 2,
+                    ),
                   ],
                 ),
                 _ThreadMessage(
@@ -289,8 +325,14 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('🔥'), count: 6),
-                    StreamReactionsItem(emoji: Text('🙏'), count: 1),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('🔥'),
+                      count: 6,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('🙏'),
+                      count: 1,
+                    ),
                   ],
                 ),
               ],
@@ -330,14 +372,19 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   alignment: StreamMessageAlignment.start,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
-                  items: [StreamReactionsItem(emoji: Text('👍'))],
+                  items: [StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'))],
                 ),
                 _ThreadMessage(
                   message: 'Single emoji, count 5 — count shown.',
                   alignment: StreamMessageAlignment.end,
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
-                  items: [StreamReactionsItem(emoji: Text('❤'), count: 5)],
+                  items: [
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('❤'),
+                      count: 5,
+                    ),
+                  ],
                 ),
                 _ThreadMessage(
                   message: 'Multiple emojis, all count 1 — no counts.',
@@ -345,9 +392,9 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('👍')),
-                    StreamReactionsItem(emoji: Text('❤')),
-                    StreamReactionsItem(emoji: Text('😂')),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('👍')),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('❤')),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('😂')),
                   ],
                 ),
                 _ThreadMessage(
@@ -356,10 +403,16 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('👍'), count: 8),
-                    StreamReactionsItem(emoji: Text('❤')),
-                    StreamReactionsItem(emoji: Text('😂'), count: 3),
-                    StreamReactionsItem(emoji: Text('🔥')),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('👍'),
+                      count: 8,
+                    ),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('❤')),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('😂'),
+                      count: 3,
+                    ),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('🔥')),
                   ],
                 ),
                 _ThreadMessage(
@@ -368,9 +421,9 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('👍')),
-                    StreamReactionsItem(emoji: Text('❤')),
-                    StreamReactionsItem(emoji: Text('😂')),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('👍')),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('❤')),
+                    StreamReactionsItem(emoji: StreamUnicodeEmoji('😂')),
                   ],
                 ),
               ],
@@ -387,9 +440,18 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.segmented,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('😂'), count: 5),
-                    StreamReactionsItem(emoji: Text('👍'), count: 2),
-                    StreamReactionsItem(emoji: Text('❤'), count: 8),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('😂'),
+                      count: 5,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('👍'),
+                      count: 2,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('❤'),
+                      count: 8,
+                    ),
                   ],
                   overlap: false,
                 ),
@@ -399,8 +461,14 @@ Widget buildStreamReactionsShowcase(BuildContext context) {
                   type: StreamReactionsType.clustered,
                   position: StreamReactionsPosition.footer,
                   items: [
-                    StreamReactionsItem(emoji: Text('🔥'), count: 3),
-                    StreamReactionsItem(emoji: Text('🎉'), count: 1),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('🔥'),
+                      count: 3,
+                    ),
+                    StreamReactionsItem(
+                      emoji: StreamUnicodeEmoji('🎉'),
+                      count: 1,
+                    ),
                   ],
                   overlap: false,
                 ),
@@ -549,12 +617,12 @@ class _EmojiOnlyShowcaseSection extends StatelessWidget {
     final palette = colorScheme.avatarPalette;
 
     const reactions = <StreamReactionsItem>[
-      StreamReactionsItem(emoji: Text('❤'), count: 4),
-      StreamReactionsItem(emoji: Text('😂'), count: 2),
+      StreamReactionsItem(emoji: StreamUnicodeEmoji('❤'), count: 4),
+      StreamReactionsItem(emoji: StreamUnicodeEmoji('😂'), count: 2),
     ];
 
     const singleReaction = <StreamReactionsItem>[
-      StreamReactionsItem(emoji: Text('👍'), count: 3),
+      StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3),
     ];
 
     Widget emojiMessage({
@@ -730,10 +798,7 @@ void _showSnack(BuildContext context, String message) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 1),
-      ),
+      SnackBar(content: Text(message), duration: const Duration(seconds: 1)),
     );
 }
 
@@ -782,16 +847,16 @@ enum _CrossAxisOption {
 // =============================================================================
 
 const _allReactionItems = <StreamReactionsItem>[
-  StreamReactionsItem(emoji: Text('👍'), count: 8),
-  StreamReactionsItem(emoji: Text('❤'), count: 14),
-  StreamReactionsItem(emoji: Text('😂'), count: 5),
-  StreamReactionsItem(emoji: Text('🔥'), count: 3),
-  StreamReactionsItem(emoji: Text('🎉'), count: 2),
-  StreamReactionsItem(emoji: Text('👏'), count: 7),
-  StreamReactionsItem(emoji: Text('😮')),
-  StreamReactionsItem(emoji: Text('🙏'), count: 4),
-  StreamReactionsItem(emoji: Text('🚀'), count: 6),
-  StreamReactionsItem(emoji: Text('😢'), count: 2),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 8),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('❤'), count: 14),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('😂'), count: 5),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('🔥'), count: 3),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('🎉'), count: 2),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('👏'), count: 7),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('😮')),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('🙏'), count: 4),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('🚀'), count: 6),
+  StreamReactionsItem(emoji: StreamUnicodeEmoji('😢'), count: 2),
 ];
 
 const _shortMessage = 'Sure 👍';

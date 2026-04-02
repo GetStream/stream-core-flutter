@@ -79,7 +79,7 @@ class _EmojiPickerPlaygroundState extends State<_EmojiPickerPlayground> {
               spacing: spacing.xs,
               runSpacing: spacing.xs,
               children: [
-                for (final entry in _selectedEmojis.entries) StreamEmoji(emoji: Text(entry.value.emoji)),
+                for (final entry in _selectedEmojis.entries) StreamEmoji(emoji: StreamUnicodeEmoji(entry.value.emoji)),
               ],
             ),
           ],

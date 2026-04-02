@@ -73,7 +73,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
         .map(
           (e) => StreamReactionPickerItem(
             key: e.key,
-            emoji: Text(e.emoji),
+            emoji: StreamUnicodeEmoji(e.emoji),
             isSelected: _selectedKeys.contains(e.key),
           ),
         )
@@ -245,10 +245,7 @@ class _FewReactionsSection extends StatelessWidget {
           _ShowcaseRow(
             label: '3 reactions',
             child: StreamReactionPicker(
-              items: _buildItems(
-                _allEmojis.take(3),
-                selectedKeys: {'love'},
-              ),
+              items: _buildItems(_allEmojis.take(3), selectedKeys: {'love'}),
               onReactionPicked: (_) {},
               onAddReactionTap: () {},
             ),
@@ -320,10 +317,7 @@ class _BackgroundColorSection extends StatelessWidget {
     final spacing = context.streamSpacing;
     final colorScheme = context.streamColorScheme;
 
-    final items = _buildItems(
-      _allEmojis.take(5),
-      selectedKeys: {'like'},
-    );
+    final items = _buildItems(_allEmojis.take(5), selectedKeys: {'like'});
 
     return _ShowcaseCard(
       label: 'BACKGROUND COLOR',
@@ -386,10 +380,7 @@ class _ShapeSection extends StatelessWidget {
     final spacing = context.streamSpacing;
     final radius = context.streamRadius;
 
-    final items = _buildItems(
-      _allEmojis.take(5),
-      selectedKeys: {'love'},
-    );
+    final items = _buildItems(_allEmojis.take(5), selectedKeys: {'love'});
 
     return _ShowcaseCard(
       label: 'SHAPE',
@@ -426,9 +417,7 @@ class _ShapeSection extends StatelessWidget {
           _ShowcaseRow(
             label: 'stadium',
             child: StreamReactionPickerTheme(
-              data: const StreamReactionPickerThemeData(
-                shape: StadiumBorder(),
-              ),
+              data: const StreamReactionPickerThemeData(shape: StadiumBorder()),
               child: StreamReactionPicker(
                 items: items,
                 onReactionPicked: (_) {},
@@ -469,10 +458,7 @@ class _BorderSection extends StatelessWidget {
     final spacing = context.streamSpacing;
     final colorScheme = context.streamColorScheme;
 
-    final items = _buildItems(
-      _allEmojis.take(5),
-      selectedKeys: {'fire'},
-    );
+    final items = _buildItems(_allEmojis.take(5), selectedKeys: {'fire'});
 
     return _ShowcaseCard(
       label: 'SIDE (BORDER)',
@@ -495,10 +481,7 @@ class _BorderSection extends StatelessWidget {
             label: 'accentPrimary border',
             child: StreamReactionPickerTheme(
               data: StreamReactionPickerThemeData(
-                side: BorderSide(
-                  color: colorScheme.accentPrimary,
-                  width: 1.5,
-                ),
+                side: BorderSide(color: colorScheme.accentPrimary, width: 1.5),
               ),
               child: StreamReactionPicker(
                 items: items,
@@ -511,10 +494,7 @@ class _BorderSection extends StatelessWidget {
             label: 'thick border',
             child: StreamReactionPickerTheme(
               data: StreamReactionPickerThemeData(
-                side: BorderSide(
-                  color: colorScheme.borderDefault,
-                  width: 2,
-                ),
+                side: BorderSide(color: colorScheme.borderDefault, width: 2),
               ),
               child: StreamReactionPicker(
                 items: items,
@@ -526,9 +506,7 @@ class _BorderSection extends StatelessWidget {
           _ShowcaseRow(
             label: 'no border',
             child: StreamReactionPickerTheme(
-              data: const StreamReactionPickerThemeData(
-                side: BorderSide.none,
-              ),
+              data: const StreamReactionPickerThemeData(side: BorderSide.none),
               child: StreamReactionPicker(
                 items: items,
                 onReactionPicked: (_) {},
@@ -553,10 +531,7 @@ class _ElevationSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    final items = _buildItems(
-      _allEmojis.take(5),
-      selectedKeys: {'laugh'},
-    );
+    final items = _buildItems(_allEmojis.take(5), selectedKeys: {'laugh'});
 
     return _ShowcaseCard(
       label: 'ELEVATION',
@@ -638,10 +613,7 @@ class _DisabledSection extends StatelessWidget {
           _ShowcaseRow(
             label: 'Add button disabled',
             child: StreamReactionPicker(
-              items: _buildItems(
-                _allEmojis.take(5),
-                selectedKeys: {'like'},
-              ),
+              items: _buildItems(_allEmojis.take(5), selectedKeys: {'like'}),
               onReactionPicked: (_) {},
             ),
           ),
@@ -716,10 +688,7 @@ class _ShowcaseCard extends StatelessWidget {
                 ),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
-              Padding(
-                padding: EdgeInsets.all(spacing.md),
-                child: child,
-              ),
+              Padding(padding: EdgeInsets.all(spacing.md), child: child),
             ],
           ),
         ),
@@ -729,10 +698,7 @@ class _ShowcaseCard extends StatelessWidget {
 }
 
 class _ShowcaseRow extends StatelessWidget {
-  const _ShowcaseRow({
-    required this.label,
-    required this.child,
-  });
+  const _ShowcaseRow({required this.label, required this.child});
 
   final String label;
   final Widget child;
@@ -802,10 +768,7 @@ void _showSnack(BuildContext context, String message) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 1),
-      ),
+      SnackBar(content: Text(message), duration: const Duration(seconds: 1)),
     );
 }
 
@@ -817,7 +780,7 @@ List<StreamReactionPickerItem> _buildItems(
     for (final e in entries)
       StreamReactionPickerItem(
         key: e.key,
-        emoji: Text(e.emoji),
+        emoji: StreamUnicodeEmoji(e.emoji),
         isSelected: selectedKeys.contains(e.key),
       ),
   ];

@@ -121,7 +121,7 @@ class StreamEmojiPickerSheet extends StatelessWidget {
               final emoji = emojis.elementAt(index);
               return StreamEmojiButton(
                 size: effectiveButtonSize,
-                emoji: Text(emoji.emoji),
+                emoji: StreamUnicodeEmoji(emoji.emoji),
                 isSelected: selectedReactions?.contains(emoji.shortName),
                 onPressed: () => Navigator.of(context).pop(emoji),
               );

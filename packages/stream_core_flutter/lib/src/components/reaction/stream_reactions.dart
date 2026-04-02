@@ -34,8 +34,8 @@ import '../message_layout/stream_message_layout.dart';
 /// ```dart
 /// StreamReactions.segmented(
 ///   items: [
-///     StreamReactionsItem(emoji: Text('👍'), count: 3),
-///     StreamReactionsItem(emoji: Text('❤️'), count: 2),
+///     StreamReactionsItem(emoji: StreamEmoji(emoji: StreamUnicodeEmoji('👍')), count: 3),
+///     StreamReactionsItem(emoji: StreamEmoji(emoji: StreamUnicodeEmoji('❤️')), count: 2),
 ///   ],
 ///   child: Container(
 ///     padding: EdgeInsets.all(12),
@@ -52,9 +52,9 @@ import '../message_layout/stream_message_layout.dart';
 /// ```dart
 /// StreamReactions.clustered(
 ///   items: [
-///     StreamReactionsItem(emoji: Text('👍'), count: 4),
-///     StreamReactionsItem(emoji: Text('😂'), count: 2),
-///     StreamReactionsItem(emoji: Text('🔥')),
+///     StreamReactionsItem(emoji: StreamEmoji(emoji: StreamUnicodeEmoji('👍')), count: 4),
+///     StreamReactionsItem(emoji: StreamEmoji(emoji: StreamUnicodeEmoji('😂')), count: 2),
+///     StreamReactionsItem(emoji: StreamEmoji(emoji: StreamUnicodeEmoji('🔥'))),
 ///   ],
 ///   position: StreamReactionsPosition.header,
 ///   child: Container(
@@ -170,10 +170,10 @@ class StreamReactions extends StatelessWidget {
           // chips fit side-by-side within the bubble bounds. The global default
           // (64px minimum) is designed for stand-alone emoji chip bars and is
           // too wide for a segmented reaction row.
-          elevation: .all(3),
           minimumSize: const Size(32, 24),
-          maximumSize: const Size.fromHeight(28),
+          maximumSize: const Size.fromHeight(24),
           emojiSize: StreamEmojiSize.sm.value,
+          elevation: .all(props.overlap ? 3 : 0),
           backgroundColor: .all(context.streamColorScheme.backgroundElevation2),
           textStyle: .all(textTheme.numericMd.copyWith(fontFeatures: const [.tabularFigures()])),
           padding: EdgeInsetsGeometry.symmetric(vertical: spacing.xxxs, horizontal: spacing.xs),
@@ -269,11 +269,11 @@ class StreamReactionsItem {
     this.count,
   });
 
-  /// The widget representing this reaction's emoji.
+  /// The display model representing this reaction's emoji.
   ///
-  /// Typically a [Text] widget containing an emoji character
-  /// (e.g. `Text('👍')`).
-  final Widget emoji;
+  /// Typically a [StreamUnicodeEmoji] (e.g. `StreamUnicodeEmoji('👍')`)
+  /// or a [StreamImageEmoji] for custom server emoji.
+  final StreamEmojiContent emoji;
 
   /// The number of times this reaction was used.
   ///

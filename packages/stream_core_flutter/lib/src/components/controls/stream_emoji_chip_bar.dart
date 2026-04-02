@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../accessories/stream_emoji.dart';
 import 'stream_emoji_chip.dart';
 
 /// A horizontally scrollable bar of [StreamEmojiChip]s for filtering by
@@ -32,8 +33,8 @@ import 'stream_emoji_chip.dart';
 ///     onPressed: () => showReactionPicker(),
 ///   ),
 ///   items: [
-///     StreamEmojiChipItem(value: '👍', emoji: Text('👍'), count: 7),
-///     StreamEmojiChipItem(value: '❤️', emoji: Text('❤️'), count: 5),
+///     StreamEmojiChipItem(value: '👍', emoji: StreamUnicodeEmoji('👍'), count: 7),
+///     StreamEmojiChipItem(value: '❤️', emoji: StreamUnicodeEmoji('❤️'), count: 5),
 ///   ],
 ///   selected: _selectedReaction,
 ///   onSelected: (value) => setState(() => _selectedReaction = value),
@@ -156,11 +157,11 @@ class StreamEmojiChipItem<T> {
   /// For reaction filtering, this is typically a reaction type identifier.
   final T value;
 
-  /// The emoji content to display inside the chip.
+  /// The emoji display model to render inside the chip.
   ///
-  /// Typically a reaction icon builder result or a [Text] widget containing
-  /// a Unicode emoji character.
-  final Widget emoji;
+  /// Typically a [StreamUnicodeEmoji] for Unicode reactions or a
+  /// [StreamImageEmoji] for custom server emoji.
+  final StreamEmojiContent emoji;
 
   /// The reaction count to display next to [emoji].
   ///

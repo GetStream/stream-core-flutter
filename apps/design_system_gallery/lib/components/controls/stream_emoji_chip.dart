@@ -135,16 +135,14 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
           onPressed: isDisabled ? null : onPressed,
         ),
         _ChipType.cluster => StreamEmojiChip.cluster(
-          emojis: [
-            for (final e in _sampleEmojis.take(clusterSize!)) Text(e.emoji),
-          ],
+          emojis: [for (final e in _sampleEmojis.take(clusterSize!)) StreamUnicodeEmoji(e.emoji)],
           count: count,
           isSelected: _isSelected,
           onPressed: isDisabled ? null : onPressed,
           onLongPress: (showLongPress && !isDisabled) ? onLongPressed : null,
         ),
         _ChipType.single => StreamEmojiChip(
-          emoji: Text(emoji!.emoji),
+          emoji: StreamUnicodeEmoji(emoji!.emoji),
           count: count,
           isSelected: _isSelected,
           onPressed: isDisabled ? null : onPressed,
@@ -238,7 +236,7 @@ class _TypeVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: 'With count',
                     child: StreamEmojiChip(
-                      emoji: const Text('👍'),
+                      emoji: const StreamUnicodeEmoji('👍'),
                       count: 3,
                       onPressed: () {},
                     ),
@@ -246,14 +244,14 @@ class _TypeVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: 'Without count',
                     child: StreamEmojiChip(
-                      emoji: const Text('👍'),
+                      emoji: const StreamUnicodeEmoji('👍'),
                       onPressed: () {},
                     ),
                   ),
                   _TypeDemo(
                     label: 'Selected',
                     child: StreamEmojiChip(
-                      emoji: const Text('👍'),
+                      emoji: const StreamUnicodeEmoji('👍'),
                       count: 3,
                       isSelected: true,
                       onPressed: () {},
@@ -262,17 +260,18 @@ class _TypeVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: 'Cluster',
                     child: StreamEmojiChip.cluster(
-                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      emojis: const [
+                        StreamUnicodeEmoji('👍'),
+                        StreamUnicodeEmoji('❤️'),
+                        StreamUnicodeEmoji('😂'),
+                      ],
                       count: 12,
                       onPressed: () {},
                     ),
                   ),
                   _TypeDemo(
                     label: 'Overflow',
-                    child: StreamEmojiChip.overflow(
-                      count: 7,
-                      onPressed: () {},
-                    ),
+                    child: StreamEmojiChip.overflow(count: 7, onPressed: () {}),
                   ),
                   _TypeDemo(
                     label: 'Add Emoji',
@@ -366,7 +365,7 @@ class _ClusterVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: '1 emoji',
                     child: StreamEmojiChip.cluster(
-                      emojis: const [Text('👍')],
+                      emojis: const [StreamUnicodeEmoji('👍')],
                       count: 5,
                       onPressed: () {},
                     ),
@@ -374,7 +373,10 @@ class _ClusterVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: '2 emojis',
                     child: StreamEmojiChip.cluster(
-                      emojis: const [Text('👍'), Text('❤️')],
+                      emojis: const [
+                        StreamUnicodeEmoji('👍'),
+                        StreamUnicodeEmoji('❤️'),
+                      ],
                       count: 9,
                       onPressed: () {},
                     ),
@@ -382,7 +384,11 @@ class _ClusterVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: '3 emojis',
                     child: StreamEmojiChip.cluster(
-                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      emojis: const [
+                        StreamUnicodeEmoji('👍'),
+                        StreamUnicodeEmoji('❤️'),
+                        StreamUnicodeEmoji('😂'),
+                      ],
                       count: 17,
                       onPressed: () {},
                     ),
@@ -390,7 +396,12 @@ class _ClusterVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: '4 emojis',
                     child: StreamEmojiChip.cluster(
-                      emojis: const [Text('👍'), Text('❤️'), Text('😂'), Text('🔥')],
+                      emojis: const [
+                        StreamUnicodeEmoji('👍'),
+                        StreamUnicodeEmoji('❤️'),
+                        StreamUnicodeEmoji('😂'),
+                        StreamUnicodeEmoji('🔥'),
+                      ],
                       count: 42,
                       onPressed: () {},
                     ),
@@ -398,14 +409,22 @@ class _ClusterVariantsSection extends StatelessWidget {
                   _TypeDemo(
                     label: 'no count',
                     child: StreamEmojiChip.cluster(
-                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      emojis: const [
+                        StreamUnicodeEmoji('👍'),
+                        StreamUnicodeEmoji('❤️'),
+                        StreamUnicodeEmoji('😂'),
+                      ],
                       onPressed: () {},
                     ),
                   ),
                   _TypeDemo(
                     label: 'selected',
                     child: StreamEmojiChip.cluster(
-                      emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                      emojis: const [
+                        StreamUnicodeEmoji('👍'),
+                        StreamUnicodeEmoji('❤️'),
+                        StreamUnicodeEmoji('😂'),
+                      ],
                       count: 12,
                       isSelected: true,
                       onPressed: () {},
@@ -541,14 +560,16 @@ class _CountValuesSection extends StatelessWidget {
                     _TypeDemo(
                       label: 'count: $count',
                       child: StreamEmojiChip(
-                        emoji: const Text('👍'),
+                        emoji: const StreamUnicodeEmoji('👍'),
                         count: count,
                         onPressed: () {},
                       ),
                     ),
                   _TypeDemo(
                     label: 'no count',
-                    child: StreamEmojiChip(emoji: const Text('👍')),
+                    child: StreamEmojiChip(
+                      emoji: const StreamUnicodeEmoji('👍'),
+                    ),
                   ),
                 ],
               ),
@@ -606,7 +627,7 @@ class _StateMatrixSection extends StatelessWidget {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(minWidth: 520),
+                  constraints: const BoxConstraints(minWidth: 580),
                   child: Column(
                     spacing: spacing.md,
                     children: [
@@ -644,12 +665,16 @@ class _StateMatrixSection extends StatelessWidget {
                       _StateRow(
                         stateLabel: 'default',
                         standardChip: StreamEmojiChip(
-                          emoji: const Text('👍'),
+                          emoji: const StreamUnicodeEmoji('👍'),
                           count: 3,
                           onPressed: () {},
                         ),
                         clusterChip: StreamEmojiChip.cluster(
-                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          emojis: const [
+                            StreamUnicodeEmoji('👍'),
+                            StreamUnicodeEmoji('❤️'),
+                            StreamUnicodeEmoji('😂'),
+                          ],
                           count: 12,
                           onPressed: () {},
                         ),
@@ -657,18 +682,24 @@ class _StateMatrixSection extends StatelessWidget {
                           count: 7,
                           onPressed: () {},
                         ),
-                        addEmojiChip: StreamEmojiChip.addEmoji(onPressed: () {}),
+                        addEmojiChip: StreamEmojiChip.addEmoji(
+                          onPressed: () {},
+                        ),
                       ),
                       _StateRow(
                         stateLabel: 'selected',
                         standardChip: StreamEmojiChip(
-                          emoji: const Text('👍'),
+                          emoji: const StreamUnicodeEmoji('👍'),
                           count: 3,
                           isSelected: true,
                           onPressed: () {},
                         ),
                         clusterChip: StreamEmojiChip.cluster(
-                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          emojis: const [
+                            StreamUnicodeEmoji('👍'),
+                            StreamUnicodeEmoji('❤️'),
+                            StreamUnicodeEmoji('😂'),
+                          ],
                           count: 12,
                           isSelected: true,
                           onPressed: () {},
@@ -678,11 +709,15 @@ class _StateMatrixSection extends StatelessWidget {
                       _StateRow(
                         stateLabel: 'disabled',
                         standardChip: StreamEmojiChip(
-                          emoji: const Text('👍'),
+                          emoji: const StreamUnicodeEmoji('👍'),
                           count: 3,
                         ),
                         clusterChip: StreamEmojiChip.cluster(
-                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          emojis: const [
+                            StreamUnicodeEmoji('👍'),
+                            StreamUnicodeEmoji('❤️'),
+                            StreamUnicodeEmoji('😂'),
+                          ],
                           count: 12,
                         ),
                         overflowChip: StreamEmojiChip.overflow(count: 7),
@@ -691,12 +726,16 @@ class _StateMatrixSection extends StatelessWidget {
                       _StateRow(
                         stateLabel: 'selected\n+ disabled',
                         standardChip: StreamEmojiChip(
-                          emoji: const Text('👍'),
+                          emoji: const StreamUnicodeEmoji('👍'),
                           count: 3,
                           isSelected: true,
                         ),
                         clusterChip: StreamEmojiChip.cluster(
-                          emojis: const [Text('👍'), Text('❤️'), Text('😂')],
+                          emojis: const [
+                            StreamUnicodeEmoji('👍'),
+                            StreamUnicodeEmoji('❤️'),
+                            StreamUnicodeEmoji('😂'),
+                          ],
                           count: 12,
                           isSelected: true,
                         ),
@@ -729,7 +768,7 @@ class _StateRow extends StatelessWidget {
   final Widget? overflowChip;
   final Widget? addEmojiChip;
 
-  static const _cellWidth = 108.0;
+  static const _cellWidth = 120.0;
 
   @override
   Widget build(BuildContext context) {
@@ -867,7 +906,7 @@ class _MessageReactionsExampleState extends State<_MessageReactionsExample> {
           children: [
             for (final entry in _counts.entries)
               StreamEmojiChip(
-                emoji: Text(entry.key),
+                emoji: StreamUnicodeEmoji(entry.key),
                 count: entry.value,
                 isSelected: _mine.contains(entry.key),
                 onPressed: () => _toggle(entry.key),
@@ -946,7 +985,7 @@ class _ClusteredReactionsExampleState extends State<_ClusteredReactionsExample> 
           ),
         ),
         StreamEmojiChip.cluster(
-          emojis: [for (final (emoji, _) in _allReactions) Text(emoji)],
+          emojis: [for (final (emoji, _) in _allReactions) StreamUnicodeEmoji(emoji)],
           count: _totalCount,
           isSelected: _isSelected,
           onPressed: () {
@@ -990,7 +1029,7 @@ class _BusyReactionsExample extends StatelessWidget {
       children: [
         for (final (emoji, count) in _reactions)
           StreamEmojiChip(
-            emoji: Text(emoji),
+            emoji: StreamUnicodeEmoji(emoji),
             count: count,
             onPressed: () {},
           ),
