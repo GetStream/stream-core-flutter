@@ -238,7 +238,7 @@ class _ConversationMessage extends StatelessWidget {
             data: layout,
             child: Builder(
               builder: (context) {
-                final emojiCount = StreamMessageText.emojiOnlyCount(message.text);
+                final emojiCount = StreamMessageText.emojiCount(message.text);
                 final hideBubble = emojiCount != null && emojiCount <= 3;
 
                 Widget text = StreamMessageText(

@@ -11,6 +11,6 @@ enum StreamMessageContentKind {
   /// A single attachment without text or a quoted reply.
   singleAttachment,
 
-  /// An emoji-only message (typically 1-3 emojis) without other content.
-  emojiOnly,
+  /// A jumbomoji message (typically 1-3 emojis) without other content.
+  jumbomoji,
 }

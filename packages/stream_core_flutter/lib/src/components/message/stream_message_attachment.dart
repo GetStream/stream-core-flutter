@@ -105,7 +105,7 @@ class _StreamMessageAttachmentDefaults extends StreamMessageAttachmentStyle {
   @override
   StreamMessageLayoutProperty<EdgeInsetsGeometry> get padding => .resolveWith(
     (layout) => switch (layout.contentKind) {
-      .standard || .emojiOnly => .symmetric(horizontal: _spacing.xs),
+      .standard || .jumbomoji => .symmetric(horizontal: _spacing.xs),
       .singleAttachment => .zero,
     },
   );
@@ -113,7 +113,7 @@ class _StreamMessageAttachmentDefaults extends StreamMessageAttachmentStyle {
   @override
   StreamMessageLayoutProperty<OutlinedBorder> get shape => .resolveWith(
     (layout) => switch (layout.contentKind) {
-      .standard || .emojiOnly => RoundedSuperellipseBorder(borderRadius: .all(_radius.lg)),
+      .standard || .jumbomoji => RoundedSuperellipseBorder(borderRadius: .all(_radius.lg)),
       .singleAttachment => LinearBorder.none,
     },
   );

@@ -31,19 +31,24 @@ mixin _$StreamMessageItemThemeData {
 
     return StreamMessageItemThemeData(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
-      leadingVisibility: StreamMessageLayoutVisibility.lerp(
-        a.leadingVisibility,
-        b.leadingVisibility,
+      avatarVisibility: StreamMessageLayoutVisibility.lerp(
+        a.avatarVisibility,
+        b.avatarVisibility,
         t,
       ),
-      headerVisibility: StreamMessageLayoutVisibility.lerp(
-        a.headerVisibility,
-        b.headerVisibility,
+      annotationVisibility: StreamMessageLayoutVisibility.lerp(
+        a.annotationVisibility,
+        b.annotationVisibility,
         t,
       ),
-      footerVisibility: StreamMessageLayoutVisibility.lerp(
-        a.footerVisibility,
-        b.footerVisibility,
+      metadataVisibility: StreamMessageLayoutVisibility.lerp(
+        a.metadataVisibility,
+        b.metadataVisibility,
+        t,
+      ),
+      repliesVisibility: StreamMessageLayoutVisibility.lerp(
+        a.repliesVisibility,
+        b.repliesVisibility,
         t,
       ),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
@@ -68,9 +73,10 @@ mixin _$StreamMessageItemThemeData {
 
   StreamMessageItemThemeData copyWith({
     Color? backgroundColor,
-    StreamMessageLayoutVisibility? leadingVisibility,
-    StreamMessageLayoutVisibility? headerVisibility,
-    StreamMessageLayoutVisibility? footerVisibility,
+    StreamMessageLayoutVisibility? avatarVisibility,
+    StreamMessageLayoutVisibility? annotationVisibility,
+    StreamMessageLayoutVisibility? metadataVisibility,
+    StreamMessageLayoutVisibility? repliesVisibility,
     EdgeInsetsGeometry? padding,
     double? spacing,
     StreamAvatarSize? avatarSize,
@@ -85,9 +91,10 @@ mixin _$StreamMessageItemThemeData {
 
     return StreamMessageItemThemeData(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
-      leadingVisibility: leadingVisibility ?? _this.leadingVisibility,
-      headerVisibility: headerVisibility ?? _this.headerVisibility,
-      footerVisibility: footerVisibility ?? _this.footerVisibility,
+      avatarVisibility: avatarVisibility ?? _this.avatarVisibility,
+      annotationVisibility: annotationVisibility ?? _this.annotationVisibility,
+      metadataVisibility: metadataVisibility ?? _this.metadataVisibility,
+      repliesVisibility: repliesVisibility ?? _this.repliesVisibility,
       padding: padding ?? _this.padding,
       spacing: spacing ?? _this.spacing,
       avatarSize: avatarSize ?? _this.avatarSize,
@@ -113,9 +120,10 @@ mixin _$StreamMessageItemThemeData {
 
     return copyWith(
       backgroundColor: other.backgroundColor,
-      leadingVisibility: other.leadingVisibility,
-      headerVisibility: other.headerVisibility,
-      footerVisibility: other.footerVisibility,
+      avatarVisibility: other.avatarVisibility,
+      annotationVisibility: other.annotationVisibility,
+      metadataVisibility: other.metadataVisibility,
+      repliesVisibility: other.repliesVisibility,
       padding: other.padding,
       spacing: other.spacing,
       avatarSize: other.avatarSize,
@@ -142,9 +150,10 @@ mixin _$StreamMessageItemThemeData {
     final _other = (other as StreamMessageItemThemeData);
 
     return _other.backgroundColor == _this.backgroundColor &&
-        _other.leadingVisibility == _this.leadingVisibility &&
-        _other.headerVisibility == _this.headerVisibility &&
-        _other.footerVisibility == _this.footerVisibility &&
+        _other.avatarVisibility == _this.avatarVisibility &&
+        _other.annotationVisibility == _this.annotationVisibility &&
+        _other.metadataVisibility == _this.metadataVisibility &&
+        _other.repliesVisibility == _this.repliesVisibility &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
         _other.avatarSize == _this.avatarSize &&
@@ -163,9 +172,10 @@ mixin _$StreamMessageItemThemeData {
     return Object.hash(
       runtimeType,
       _this.backgroundColor,
-      _this.leadingVisibility,
-      _this.headerVisibility,
-      _this.footerVisibility,
+      _this.avatarVisibility,
+      _this.annotationVisibility,
+      _this.metadataVisibility,
+      _this.repliesVisibility,
       _this.padding,
       _this.spacing,
       _this.avatarSize,
