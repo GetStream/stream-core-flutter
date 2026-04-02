@@ -199,6 +199,17 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
     "import 'package:flutter/widgets.dart';",
     "part of '${p.basename(config.outputDataFile).replaceFirst('.g', '')}';",
   );
+  // Update the icon data to include matchTextDirection: true for RTL icons.
+  // Each entry in _rtlIcons is a base name (e.g. 'arrow-left'). The regex
+  // matches only the valid sizes (12/16/20/32) directly appended, so a
+  // hypothetical 'arrow-left-box-12' (camelCase: arrowLeftBox12) is unaffected.
+  for (final baseName in _rtlIcons) {
+    final camelBase = ReCase(baseName).camelCase;
+    iconDataContent = iconDataContent.replaceAllMapped(
+      RegExp('(static const IconData $camelBase(?:12|16|20|32) = IconData\\([^)]+)\\)'),
+      (match) => '${match.group(1)}, matchTextDirection: true)',
+    );
+  }
 
   // 5. Generate StreamSvgIconData class (if configured)
   final svgIconEntries = <SvgIconEntry>[];
@@ -760,4 +771,21 @@ const _excludedSvgIcons = [
   'loading-16',
   'loading-20',
   'loading-32',
+];
+
+const _rtlIcons = [
+  'arrow-left',
+  'arrow-right',
+  'arrow-up-right',
+  'audio',
+  'chevron-left',
+  'chevron-right',
+  'leave',
+  'mute',
+  'reply',
+  'search',
+  'send',
+  'sidebar',
+  'video',
+  'video-fill',
 ];
