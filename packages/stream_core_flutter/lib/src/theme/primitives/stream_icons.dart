@@ -58,641 +58,1433 @@ part 'stream_icons.g.dart';
 class StreamIcons with _$StreamIcons {
   /// Creates an icon set with optional overrides.
   const StreamIcons({
-    this.apiAggregate = StreamIconData.iconApiAggregate,
-    this.apples = StreamIconData.iconApples,
-    this.archive1 = StreamIconData.iconArchive1,
-    this.arrowBoxLeft = StreamIconData.iconArrowBoxLeft,
-    this.arrowDown = StreamIconData.iconArrowDown,
-    this.arrowDownCircle = StreamIconData.iconArrowDownCircle,
-    this.arrowLeft = StreamIconData.iconArrowLeft,
-    this.arrowRight = StreamIconData.iconArrowRight,
-    this.arrowRotateClockwise = StreamIconData.iconArrowRotateClockwise,
-    this.arrowRotateRightLeftRepeatRefresh = StreamIconData.iconArrowRotateRightLeftRepeatRefresh,
-    this.arrowShareLeft = StreamIconData.iconArrowShareLeft,
-    this.arrowShareRight = StreamIconData.iconArrowShareRight,
-    this.arrowUp = StreamIconData.iconArrowUp,
-    this.arrowUpRight = StreamIconData.iconArrowUpRight,
-    this.arrowsRepeatLeftRight = StreamIconData.iconArrowsRepeatLeftRight,
-    this.at = StreamIconData.iconAt,
-    this.atSolid = StreamIconData.iconAtSolid,
-    this.bellNotification = StreamIconData.iconBellNotification,
-    this.bellOff = StreamIconData.iconBellOff,
-    this.bookmark = StreamIconData.iconBookmark,
-    this.bookmarkRemove = StreamIconData.iconBookmarkRemove,
-    this.browserAISparkle = StreamIconData.iconBrowserAISparkle,
-    this.bubble3ChatMessage = StreamIconData.iconBubble3ChatMessage,
-    this.bubble3Solid = StreamIconData.iconBubble3Solid,
-    this.bubbleAnnotation2ChatMessage = StreamIconData.iconBubbleAnnotation2ChatMessage,
-    this.bubbleText6ChatMessage = StreamIconData.iconBubbleText6ChatMessage,
-    this.bubbleText6Solid = StreamIconData.iconBubbleText6Solid,
-    this.bubbleWideNotificationChatMessage = StreamIconData.iconBubbleWideNotificationChatMessage,
-    this.bubbleWideSparkleChatMessage = StreamIconData.iconBubbleWideSparkleChatMessage,
-    this.bubbles = StreamIconData.iconBubbles,
-    this.calendar1 = StreamIconData.iconCalendar1,
-    this.callCancel = StreamIconData.iconCallCancel,
-    this.camera1 = StreamIconData.iconCamera1,
-    this.car1 = StreamIconData.iconCar1,
-    this.cat = StreamIconData.iconCat,
-    this.chainLink3 = StreamIconData.iconChainLink3,
-    this.chart5 = StreamIconData.iconChart5,
-    this.checkmark1Small = StreamIconData.iconCheckmark1Small,
-    this.checkmark2 = StreamIconData.iconCheckmark2,
-    this.checkmark2Small = StreamIconData.iconCheckmark2Small,
-    this.chevronDown = StreamIconData.iconChevronDown,
-    this.chevronGrabberVerticalSelector = StreamIconData.iconChevronGrabberVerticalSelector,
-    this.chevronLeft = StreamIconData.iconChevronLeft,
-    this.chevronRight = StreamIconData.iconChevronRight,
-    this.chevronTop = StreamIconData.iconChevronTop,
-    this.circleBanSign = StreamIconData.iconCircleBanSign,
-    this.circleCheck = StreamIconData.iconCircleCheck,
-    this.circleInfoTooltip = StreamIconData.iconCircleInfoTooltip,
-    this.circleMinus = StreamIconData.iconCircleMinus,
-    this.circleQuestionmark = StreamIconData.iconCircleQuestionmark,
-    this.circleQuestionmarkFilled = StreamIconData.iconCircleQuestionmarkFilled,
-    this.circleX = StreamIconData.iconCircleX,
-    this.clock = StreamIconData.iconClock,
-    this.clockSolid = StreamIconData.iconClockSolid,
-    this.closeQuote2 = StreamIconData.iconCloseQuote2,
-    this.cloudSimpleUpload = StreamIconData.iconCloudSimpleUpload,
-    this.code = StreamIconData.iconCode,
-    this.codeBrackets = StreamIconData.iconCodeBrackets,
-    this.codeEditorInsert = StreamIconData.iconCodeEditorInsert,
-    this.compass = StreamIconData.iconCompass,
-    this.components = StreamIconData.iconComponents,
-    this.creditCard2Billing = StreamIconData.iconCreditCard2Billing,
-    this.crossMedium = StreamIconData.iconCrossMedium,
-    this.crossSmall = StreamIconData.iconCrossSmall,
-    this.dotGrid1x3Horizontal = StreamIconData.iconDotGrid1x3Horizontal,
-    this.dotGrid2x3 = StreamIconData.iconDotGrid2x3,
-    this.dotsGrid1x3Vertical = StreamIconData.iconDotsGrid1x3Vertical,
-    this.doupleCheckmark1Small = StreamIconData.iconDoupleCheckmark1Small,
-    this.editBig = StreamIconData.iconEditBig,
-    this.editBigSolid = StreamIconData.iconEditBigSolid,
-    this.emojiAddReaction = StreamIconData.iconEmojiAddReaction,
-    this.emojiSad = StreamIconData.iconEmojiSad,
-    this.emojiSmile = StreamIconData.iconEmojiSmile,
-    this.exclamationCircle = StreamIconData.iconExclamationCircle,
-    this.exclamationCircle1 = StreamIconData.iconExclamationCircle1,
-    this.exclamationTriangle = StreamIconData.iconExclamationTriangle,
-    this.exclamationTriangle1 = StreamIconData.iconExclamationTriangle1,
-    this.eyeOpen = StreamIconData.iconEyeOpen,
-    this.fileArrowLeftIn = StreamIconData.iconFileArrowLeftIn,
-    this.fileBend = StreamIconData.iconFileBend,
-    this.filledCircleInfoTooltip = StreamIconData.iconFilledCircleInfoTooltip,
-    this.filter1 = StreamIconData.iconFilter1,
-    this.flag2 = StreamIconData.iconFlag2,
-    this.folder1 = StreamIconData.iconFolder1,
-    this.gauge = StreamIconData.iconGauge,
-    this.google = StreamIconData.iconGoogle,
-    this.hashtagChannel = StreamIconData.iconHashtagChannel,
-    this.heart2 = StreamIconData.iconHeart2,
-    this.history = StreamIconData.iconHistory,
-    this.images1Alt = StreamIconData.iconImages1Alt,
-    this.invite = StreamIconData.iconInvite,
-    this.layersBehind = StreamIconData.iconLayersBehind,
-    this.layoutAlignLeft = StreamIconData.iconLayoutAlignLeft,
-    this.layoutGrid1 = StreamIconData.iconLayoutGrid1,
-    this.layoutGrid2 = StreamIconData.iconLayoutGrid2,
-    this.layoutLeft = StreamIconData.iconLayoutLeft,
-    this.lightBulbSimple = StreamIconData.iconLightBulbSimple,
-    this.limits = StreamIconData.iconLimits,
-    this.lineChart3 = StreamIconData.iconLineChart3,
-    this.lock = StreamIconData.iconLock,
-    this.magnifyingGlassSearch = StreamIconData.iconMagnifyingGlassSearch,
-    this.mapPin = StreamIconData.iconMapPin,
-    this.microphone = StreamIconData.iconMicrophone,
-    this.microphoneSolid = StreamIconData.iconMicrophoneSolid,
-    this.minusLarge = StreamIconData.iconMinusLarge,
-    this.minusSmall = StreamIconData.iconMinusSmall,
-    this.mute = StreamIconData.iconMute,
-    this.newspaper2 = StreamIconData.iconNewspaper2,
-    this.organization = StreamIconData.iconOrganization,
-    this.paperPlane = StreamIconData.iconPaperPlane,
-    this.paperPlaneTopRight = StreamIconData.iconPaperPlaneTopRight,
-    this.paperclip1 = StreamIconData.iconPaperclip1,
-    this.paragraphsText = StreamIconData.iconParagraphsText,
-    this.pause = StreamIconData.iconPause,
-    this.pencil = StreamIconData.iconPencil,
-    this.people = StreamIconData.iconPeople,
-    this.people2 = StreamIconData.iconPeople2,
-    this.peopleAdd = StreamIconData.iconPeopleAdd,
-    this.peopleAdded = StreamIconData.iconPeopleAdded,
-    this.peopleCircle = StreamIconData.iconPeopleCircle,
-    this.peopleCopy = StreamIconData.iconPeopleCopy,
-    this.peopleEditUserRights = StreamIconData.iconPeopleEditUserRights,
-    this.peopleRemove = StreamIconData.iconPeopleRemove,
-    this.persona = StreamIconData.iconPersona,
-    this.pin = StreamIconData.iconPin,
-    this.playSolid = StreamIconData.iconPlaySolid,
-    this.plusLarge = StreamIconData.iconPlusLarge,
-    this.plusSmall = StreamIconData.iconPlusSmall,
-    this.runShortcut = StreamIconData.iconRunShortcut,
-    this.searchText = StreamIconData.iconSearchText,
-    this.settingsGear2 = StreamIconData.iconSettingsGear2,
-    this.settingsSliderVer = StreamIconData.iconSettingsSliderVer,
-    this.shapesPlusCloseSquareCircle = StreamIconData.iconShapesPlusCloseSquareCircle,
-    this.shapesTriangleSquareCircle = StreamIconData.iconShapesTriangleSquareCircle,
-    this.shareOs = StreamIconData.iconShareOs,
-    this.shareRedirectLink = StreamIconData.iconShareRedirectLink,
-    this.shield = StreamIconData.iconShield,
-    this.squareBehindSquare2Copy = StreamIconData.iconSquareBehindSquare2Copy,
-    this.squareCircleTopRightFeeds = StreamIconData.iconSquareCircleTopRightFeeds,
-    this.stop = StreamIconData.iconStop,
-    this.table = StreamIconData.iconTable,
-    this.team = StreamIconData.iconTeam,
-    this.tennis = StreamIconData.iconTennis,
-    this.textToImageURLEnrichment = StreamIconData.iconTextToImageURLEnrichment,
-    this.thunder = StreamIconData.iconThunder,
-    this.translate = StreamIconData.iconTranslate,
-    this.trashBin = StreamIconData.iconTrashBin,
-    this.trending4 = StreamIconData.iconTrending4,
-    this.trophy = StreamIconData.iconTrophy,
-    this.unlocked = StreamIconData.iconUnlocked,
-    this.unpin = StreamIconData.iconUnpin,
-    this.users = StreamIconData.iconUsers,
-    this.video = StreamIconData.iconVideo,
-    this.videoSolid = StreamIconData.iconVideoSolid,
-    this.voiceAndVideo = StreamIconData.iconVoiceAndVideo,
-    this.voiceHigh = StreamIconData.iconVoiceHigh,
-    this.volumeFull = StreamIconData.iconVolumeFull,
-    this.webhook = StreamIconData.iconWebhook,
+    this.account12 = StreamIconData.account12,
+    this.account16 = StreamIconData.account16,
+    this.account20 = StreamIconData.account20,
+    this.account32 = StreamIconData.account32,
+    this.archive12 = StreamIconData.archive12,
+    this.archive16 = StreamIconData.archive16,
+    this.archive20 = StreamIconData.archive20,
+    this.archive32 = StreamIconData.archive32,
+    this.arrowDown12 = StreamIconData.arrowDown12,
+    this.arrowDown16 = StreamIconData.arrowDown16,
+    this.arrowDown20 = StreamIconData.arrowDown20,
+    this.arrowDown32 = StreamIconData.arrowDown32,
+    this.arrowDownCircle12 = StreamIconData.arrowDownCircle12,
+    this.arrowDownCircle16 = StreamIconData.arrowDownCircle16,
+    this.arrowDownCircle20 = StreamIconData.arrowDownCircle20,
+    this.arrowDownCircle32 = StreamIconData.arrowDownCircle32,
+    this.arrowLeft12 = StreamIconData.arrowLeft12,
+    this.arrowLeft16 = StreamIconData.arrowLeft16,
+    this.arrowLeft20 = StreamIconData.arrowLeft20,
+    this.arrowLeft32 = StreamIconData.arrowLeft32,
+    this.arrowRight12 = StreamIconData.arrowRight12,
+    this.arrowRight16 = StreamIconData.arrowRight16,
+    this.arrowRight20 = StreamIconData.arrowRight20,
+    this.arrowRight32 = StreamIconData.arrowRight32,
+    this.arrowUp12 = StreamIconData.arrowUp12,
+    this.arrowUp16 = StreamIconData.arrowUp16,
+    this.arrowUp20 = StreamIconData.arrowUp20,
+    this.arrowUp32 = StreamIconData.arrowUp32,
+    this.arrowUpRight12 = StreamIconData.arrowUpRight12,
+    this.arrowUpRight16 = StreamIconData.arrowUpRight16,
+    this.arrowUpRight20 = StreamIconData.arrowUpRight20,
+    this.arrowUpRight32 = StreamIconData.arrowUpRight32,
+    this.attachment12 = StreamIconData.attachment12,
+    this.attachment16 = StreamIconData.attachment16,
+    this.attachment20 = StreamIconData.attachment20,
+    this.attachment32 = StreamIconData.attachment32,
+    this.audio12 = StreamIconData.audio12,
+    this.audio16 = StreamIconData.audio16,
+    this.audio20 = StreamIconData.audio20,
+    this.audio32 = StreamIconData.audio32,
+    this.bell12 = StreamIconData.bell12,
+    this.bell16 = StreamIconData.bell16,
+    this.bell20 = StreamIconData.bell20,
+    this.bell32 = StreamIconData.bell32,
+    this.bellOff12 = StreamIconData.bellOff12,
+    this.bellOff16 = StreamIconData.bellOff16,
+    this.bellOff20 = StreamIconData.bellOff20,
+    this.bellOff32 = StreamIconData.bellOff32,
+    this.bolt12 = StreamIconData.bolt12,
+    this.bolt16 = StreamIconData.bolt16,
+    this.bolt20 = StreamIconData.bolt20,
+    this.bolt32 = StreamIconData.bolt32,
+    this.camera12 = StreamIconData.camera12,
+    this.camera16 = StreamIconData.camera16,
+    this.camera20 = StreamIconData.camera20,
+    this.camera32 = StreamIconData.camera32,
+    this.checkmark12 = StreamIconData.checkmark12,
+    this.checkmark16 = StreamIconData.checkmark16,
+    this.checkmark20 = StreamIconData.checkmark20,
+    this.checkmark32 = StreamIconData.checkmark32,
+    this.checks12 = StreamIconData.checks12,
+    this.checks16 = StreamIconData.checks16,
+    this.checks20 = StreamIconData.checks20,
+    this.checks32 = StreamIconData.checks32,
+    this.chevronDown12 = StreamIconData.chevronDown12,
+    this.chevronDown16 = StreamIconData.chevronDown16,
+    this.chevronDown20 = StreamIconData.chevronDown20,
+    this.chevronDown32 = StreamIconData.chevronDown32,
+    this.chevronLeft12 = StreamIconData.chevronLeft12,
+    this.chevronLeft16 = StreamIconData.chevronLeft16,
+    this.chevronLeft20 = StreamIconData.chevronLeft20,
+    this.chevronLeft32 = StreamIconData.chevronLeft32,
+    this.chevronRight12 = StreamIconData.chevronRight12,
+    this.chevronRight16 = StreamIconData.chevronRight16,
+    this.chevronRight20 = StreamIconData.chevronRight20,
+    this.chevronRight32 = StreamIconData.chevronRight32,
+    this.chevronUp12 = StreamIconData.chevronUp12,
+    this.chevronUp16 = StreamIconData.chevronUp16,
+    this.chevronUp20 = StreamIconData.chevronUp20,
+    this.chevronUp32 = StreamIconData.chevronUp32,
+    this.clock12 = StreamIconData.clock12,
+    this.clock16 = StreamIconData.clock16,
+    this.clock20 = StreamIconData.clock20,
+    this.clock32 = StreamIconData.clock32,
+    this.command12 = StreamIconData.command12,
+    this.command16 = StreamIconData.command16,
+    this.command20 = StreamIconData.command20,
+    this.command32 = StreamIconData.command32,
+    this.copy12 = StreamIconData.copy12,
+    this.copy16 = StreamIconData.copy16,
+    this.copy20 = StreamIconData.copy20,
+    this.copy32 = StreamIconData.copy32,
+    this.delete12 = StreamIconData.delete12,
+    this.delete16 = StreamIconData.delete16,
+    this.delete20 = StreamIconData.delete20,
+    this.delete32 = StreamIconData.delete32,
+    this.download12 = StreamIconData.download12,
+    this.download16 = StreamIconData.download16,
+    this.download20 = StreamIconData.download20,
+    this.download32 = StreamIconData.download32,
+    this.edit12 = StreamIconData.edit12,
+    this.edit16 = StreamIconData.edit16,
+    this.edit20 = StreamIconData.edit20,
+    this.edit32 = StreamIconData.edit32,
+    this.emoji12 = StreamIconData.emoji12,
+    this.emoji16 = StreamIconData.emoji16,
+    this.emoji20 = StreamIconData.emoji20,
+    this.emoji32 = StreamIconData.emoji32,
+    this.emojiAdd12 = StreamIconData.emojiAdd12,
+    this.emojiAdd16 = StreamIconData.emojiAdd16,
+    this.emojiAdd20 = StreamIconData.emojiAdd20,
+    this.emojiAdd32 = StreamIconData.emojiAdd32,
+    this.exclamationCircle12 = StreamIconData.exclamationCircle12,
+    this.exclamationCircle16 = StreamIconData.exclamationCircle16,
+    this.exclamationCircle20 = StreamIconData.exclamationCircle20,
+    this.exclamationCircle32 = StreamIconData.exclamationCircle32,
+    this.exclamationCircleFill12 = StreamIconData.exclamationCircleFill12,
+    this.exclamationCircleFill16 = StreamIconData.exclamationCircleFill16,
+    this.exclamationCircleFill20 = StreamIconData.exclamationCircleFill20,
+    this.exclamationCircleFill32 = StreamIconData.exclamationCircleFill32,
+    this.exclamationMarkFill12 = StreamIconData.exclamationMarkFill12,
+    this.exclamationMarkFill16 = StreamIconData.exclamationMarkFill16,
+    this.exclamationMarkFill20 = StreamIconData.exclamationMarkFill20,
+    this.exclamationMarkFill32 = StreamIconData.exclamationMarkFill32,
+    this.exclamationTriangleFill12 = StreamIconData.exclamationTriangleFill12,
+    this.exclamationTriangleFill16 = StreamIconData.exclamationTriangleFill16,
+    this.exclamationTriangleFill20 = StreamIconData.exclamationTriangleFill20,
+    this.exclamationTriangleFill32 = StreamIconData.exclamationTriangleFill32,
+    this.export12 = StreamIconData.export12,
+    this.export16 = StreamIconData.export16,
+    this.export20 = StreamIconData.export20,
+    this.export32 = StreamIconData.export32,
+    this.eyeFill12 = StreamIconData.eyeFill12,
+    this.eyeFill16 = StreamIconData.eyeFill16,
+    this.eyeFill20 = StreamIconData.eyeFill20,
+    this.eyeFill32 = StreamIconData.eyeFill32,
+    this.file12 = StreamIconData.file12,
+    this.file16 = StreamIconData.file16,
+    this.file20 = StreamIconData.file20,
+    this.file32 = StreamIconData.file32,
+    this.flag12 = StreamIconData.flag12,
+    this.flag16 = StreamIconData.flag16,
+    this.flag20 = StreamIconData.flag20,
+    this.flag32 = StreamIconData.flag32,
+    this.folder12 = StreamIconData.folder12,
+    this.folder16 = StreamIconData.folder16,
+    this.folder20 = StreamIconData.folder20,
+    this.folder32 = StreamIconData.folder32,
+    this.gallery12 = StreamIconData.gallery12,
+    this.gallery16 = StreamIconData.gallery16,
+    this.gallery20 = StreamIconData.gallery20,
+    this.gallery32 = StreamIconData.gallery32,
+    this.image12 = StreamIconData.image12,
+    this.image16 = StreamIconData.image16,
+    this.image20 = StreamIconData.image20,
+    this.image32 = StreamIconData.image32,
+    this.info12 = StreamIconData.info12,
+    this.info16 = StreamIconData.info16,
+    this.info20 = StreamIconData.info20,
+    this.info32 = StreamIconData.info32,
+    this.leave12 = StreamIconData.leave12,
+    this.leave16 = StreamIconData.leave16,
+    this.leave20 = StreamIconData.leave20,
+    this.leave32 = StreamIconData.leave32,
+    this.link12 = StreamIconData.link12,
+    this.link16 = StreamIconData.link16,
+    this.link20 = StreamIconData.link20,
+    this.link32 = StreamIconData.link32,
+    this.location12 = StreamIconData.location12,
+    this.location16 = StreamIconData.location16,
+    this.location20 = StreamIconData.location20,
+    this.location32 = StreamIconData.location32,
+    this.lock12 = StreamIconData.lock12,
+    this.lock16 = StreamIconData.lock16,
+    this.lock20 = StreamIconData.lock20,
+    this.lock32 = StreamIconData.lock32,
+    this.mention12 = StreamIconData.mention12,
+    this.mention16 = StreamIconData.mention16,
+    this.mention20 = StreamIconData.mention20,
+    this.mention32 = StreamIconData.mention32,
+    this.messageBubble12 = StreamIconData.messageBubble12,
+    this.messageBubble16 = StreamIconData.messageBubble16,
+    this.messageBubble20 = StreamIconData.messageBubble20,
+    this.messageBubble32 = StreamIconData.messageBubble32,
+    this.messageBubbleFill12 = StreamIconData.messageBubbleFill12,
+    this.messageBubbleFill16 = StreamIconData.messageBubbleFill16,
+    this.messageBubbleFill20 = StreamIconData.messageBubbleFill20,
+    this.messageBubbleFill32 = StreamIconData.messageBubbleFill32,
+    this.messageBubbles12 = StreamIconData.messageBubbles12,
+    this.messageBubbles16 = StreamIconData.messageBubbles16,
+    this.messageBubbles20 = StreamIconData.messageBubbles20,
+    this.messageBubbles32 = StreamIconData.messageBubbles32,
+    this.minus12 = StreamIconData.minus12,
+    this.minus16 = StreamIconData.minus16,
+    this.minus20 = StreamIconData.minus20,
+    this.minus32 = StreamIconData.minus32,
+    this.minusCircle12 = StreamIconData.minusCircle12,
+    this.minusCircle16 = StreamIconData.minusCircle16,
+    this.minusCircle20 = StreamIconData.minusCircle20,
+    this.minusCircle32 = StreamIconData.minusCircle32,
+    this.more12 = StreamIconData.more12,
+    this.more16 = StreamIconData.more16,
+    this.more20 = StreamIconData.more20,
+    this.more32 = StreamIconData.more32,
+    this.mute12 = StreamIconData.mute12,
+    this.mute16 = StreamIconData.mute16,
+    this.mute20 = StreamIconData.mute20,
+    this.mute32 = StreamIconData.mute32,
+    this.noSign12 = StreamIconData.noSign12,
+    this.noSign16 = StreamIconData.noSign16,
+    this.noSign20 = StreamIconData.noSign20,
+    this.noSign32 = StreamIconData.noSign32,
+    this.notification12 = StreamIconData.notification12,
+    this.notification16 = StreamIconData.notification16,
+    this.notification20 = StreamIconData.notification20,
+    this.notification32 = StreamIconData.notification32,
+    this.pauseFill12 = StreamIconData.pauseFill12,
+    this.pauseFill16 = StreamIconData.pauseFill16,
+    this.pauseFill20 = StreamIconData.pauseFill20,
+    this.pauseFill32 = StreamIconData.pauseFill32,
+    this.pin12 = StreamIconData.pin12,
+    this.pin16 = StreamIconData.pin16,
+    this.pin20 = StreamIconData.pin20,
+    this.pin32 = StreamIconData.pin32,
+    this.playFill12 = StreamIconData.playFill12,
+    this.playFill16 = StreamIconData.playFill16,
+    this.playFill20 = StreamIconData.playFill20,
+    this.playFill32 = StreamIconData.playFill32,
+    this.plus12 = StreamIconData.plus12,
+    this.plus16 = StreamIconData.plus16,
+    this.plus20 = StreamIconData.plus20,
+    this.plus32 = StreamIconData.plus32,
+    this.poll12 = StreamIconData.poll12,
+    this.poll16 = StreamIconData.poll16,
+    this.poll20 = StreamIconData.poll20,
+    this.poll32 = StreamIconData.poll32,
+    this.quote12 = StreamIconData.quote12,
+    this.quote16 = StreamIconData.quote16,
+    this.quote20 = StreamIconData.quote20,
+    this.quote32 = StreamIconData.quote32,
+    this.refresh12 = StreamIconData.refresh12,
+    this.refresh16 = StreamIconData.refresh16,
+    this.refresh20 = StreamIconData.refresh20,
+    this.refresh32 = StreamIconData.refresh32,
+    this.reorder12 = StreamIconData.reorder12,
+    this.reorder16 = StreamIconData.reorder16,
+    this.reorder20 = StreamIconData.reorder20,
+    this.reorder32 = StreamIconData.reorder32,
+    this.reply12 = StreamIconData.reply12,
+    this.reply16 = StreamIconData.reply16,
+    this.reply20 = StreamIconData.reply20,
+    this.reply32 = StreamIconData.reply32,
+    this.retry12 = StreamIconData.retry12,
+    this.retry16 = StreamIconData.retry16,
+    this.retry20 = StreamIconData.retry20,
+    this.retry32 = StreamIconData.retry32,
+    this.save12 = StreamIconData.save12,
+    this.save16 = StreamIconData.save16,
+    this.save20 = StreamIconData.save20,
+    this.save32 = StreamIconData.save32,
+    this.search12 = StreamIconData.search12,
+    this.search16 = StreamIconData.search16,
+    this.search20 = StreamIconData.search20,
+    this.search32 = StreamIconData.search32,
+    this.send12 = StreamIconData.send12,
+    this.send16 = StreamIconData.send16,
+    this.send20 = StreamIconData.send20,
+    this.send32 = StreamIconData.send32,
+    this.share12 = StreamIconData.share12,
+    this.share16 = StreamIconData.share16,
+    this.share20 = StreamIconData.share20,
+    this.share32 = StreamIconData.share32,
+    this.sidebar12 = StreamIconData.sidebar12,
+    this.sidebar16 = StreamIconData.sidebar16,
+    this.sidebar20 = StreamIconData.sidebar20,
+    this.sidebar32 = StreamIconData.sidebar32,
+    this.stopFill12 = StreamIconData.stopFill12,
+    this.stopFill16 = StreamIconData.stopFill16,
+    this.stopFill20 = StreamIconData.stopFill20,
+    this.stopFill32 = StreamIconData.stopFill32,
+    this.thread12 = StreamIconData.thread12,
+    this.thread16 = StreamIconData.thread16,
+    this.thread20 = StreamIconData.thread20,
+    this.thread32 = StreamIconData.thread32,
+    this.threadFill12 = StreamIconData.threadFill12,
+    this.threadFill16 = StreamIconData.threadFill16,
+    this.threadFill20 = StreamIconData.threadFill20,
+    this.threadFill32 = StreamIconData.threadFill32,
+    this.translate12 = StreamIconData.translate12,
+    this.translate16 = StreamIconData.translate16,
+    this.translate20 = StreamIconData.translate20,
+    this.translate32 = StreamIconData.translate32,
+    this.trophy12 = StreamIconData.trophy12,
+    this.trophy16 = StreamIconData.trophy16,
+    this.trophy20 = StreamIconData.trophy20,
+    this.trophy32 = StreamIconData.trophy32,
+    this.unlock12 = StreamIconData.unlock12,
+    this.unlock16 = StreamIconData.unlock16,
+    this.unlock20 = StreamIconData.unlock20,
+    this.unlock32 = StreamIconData.unlock32,
+    this.unpin12 = StreamIconData.unpin12,
+    this.unpin16 = StreamIconData.unpin16,
+    this.unpin20 = StreamIconData.unpin20,
+    this.unpin32 = StreamIconData.unpin32,
+    this.unsave12 = StreamIconData.unsave12,
+    this.unsave16 = StreamIconData.unsave16,
+    this.unsave20 = StreamIconData.unsave20,
+    this.unsave32 = StreamIconData.unsave32,
+    this.upload12 = StreamIconData.upload12,
+    this.upload16 = StreamIconData.upload16,
+    this.upload20 = StreamIconData.upload20,
+    this.upload32 = StreamIconData.upload32,
+    this.user12 = StreamIconData.user12,
+    this.user16 = StreamIconData.user16,
+    this.user20 = StreamIconData.user20,
+    this.user32 = StreamIconData.user32,
+    this.userAdd12 = StreamIconData.userAdd12,
+    this.userAdd16 = StreamIconData.userAdd16,
+    this.userAdd20 = StreamIconData.userAdd20,
+    this.userAdd32 = StreamIconData.userAdd32,
+    this.userCheck12 = StreamIconData.userCheck12,
+    this.userCheck16 = StreamIconData.userCheck16,
+    this.userCheck20 = StreamIconData.userCheck20,
+    this.userCheck32 = StreamIconData.userCheck32,
+    this.userRemove12 = StreamIconData.userRemove12,
+    this.userRemove16 = StreamIconData.userRemove16,
+    this.userRemove20 = StreamIconData.userRemove20,
+    this.userRemove32 = StreamIconData.userRemove32,
+    this.users12 = StreamIconData.users12,
+    this.users16 = StreamIconData.users16,
+    this.users20 = StreamIconData.users20,
+    this.users32 = StreamIconData.users32,
+    this.video12 = StreamIconData.video12,
+    this.video16 = StreamIconData.video16,
+    this.video20 = StreamIconData.video20,
+    this.video32 = StreamIconData.video32,
+    this.videoFill12 = StreamIconData.videoFill12,
+    this.videoFill16 = StreamIconData.videoFill16,
+    this.videoFill20 = StreamIconData.videoFill20,
+    this.videoFill32 = StreamIconData.videoFill32,
+    this.voice12 = StreamIconData.voice12,
+    this.voice16 = StreamIconData.voice16,
+    this.voice20 = StreamIconData.voice20,
+    this.voice32 = StreamIconData.voice32,
+    this.voiceFill12 = StreamIconData.voiceFill12,
+    this.voiceFill16 = StreamIconData.voiceFill16,
+    this.voiceFill20 = StreamIconData.voiceFill20,
+    this.voiceFill32 = StreamIconData.voiceFill32,
+    this.xCircle12 = StreamIconData.xCircle12,
+    this.xCircle16 = StreamIconData.xCircle16,
+    this.xCircle20 = StreamIconData.xCircle20,
+    this.xCircle32 = StreamIconData.xCircle32,
+    this.xmark12 = StreamIconData.xmark12,
+    this.xmark16 = StreamIconData.xmark16,
+    this.xmark20 = StreamIconData.xmark20,
+    this.xmark32 = StreamIconData.xmark32,
     this.giphy = StreamSvgIconData.giphy,
     this.imgur = StreamSvgIconData.imgur,
   });
 
-  /// The api aggregate icon.
-  final IconData apiAggregate;
+  /// The account12 icon.
+  final IconData account12;
 
-  /// The apples icon.
-  final IconData apples;
+  /// The account16 icon.
+  final IconData account16;
 
-  /// The archive1 icon.
-  final IconData archive1;
+  /// The account20 icon.
+  final IconData account20;
 
-  /// The arrow box left icon.
-  final IconData arrowBoxLeft;
+  /// The account32 icon.
+  final IconData account32;
 
-  /// The arrow down icon.
-  final IconData arrowDown;
+  /// The archive12 icon.
+  final IconData archive12;
 
-  /// The arrow down circle icon.
-  final IconData arrowDownCircle;
+  /// The archive16 icon.
+  final IconData archive16;
 
-  /// The arrow left icon.
-  final IconData arrowLeft;
+  /// The archive20 icon.
+  final IconData archive20;
 
-  /// The arrow right icon.
-  final IconData arrowRight;
+  /// The archive32 icon.
+  final IconData archive32;
 
-  /// The arrow rotate clockwise icon.
-  final IconData arrowRotateClockwise;
+  /// The arrow down12 icon.
+  final IconData arrowDown12;
 
-  /// The arrow rotate right left repeat refresh icon.
-  final IconData arrowRotateRightLeftRepeatRefresh;
+  /// The arrow down16 icon.
+  final IconData arrowDown16;
 
-  /// The arrow share left icon.
-  final IconData arrowShareLeft;
+  /// The arrow down20 icon.
+  final IconData arrowDown20;
 
-  /// The arrow share right icon.
-  final IconData arrowShareRight;
+  /// The arrow down32 icon.
+  final IconData arrowDown32;
 
-  /// The arrow up icon.
-  final IconData arrowUp;
+  /// The arrow down circle12 icon.
+  final IconData arrowDownCircle12;
 
-  /// The arrow up right icon.
-  final IconData arrowUpRight;
+  /// The arrow down circle16 icon.
+  final IconData arrowDownCircle16;
 
-  /// The arrows repeat left right icon.
-  final IconData arrowsRepeatLeftRight;
+  /// The arrow down circle20 icon.
+  final IconData arrowDownCircle20;
 
-  /// The at icon.
-  final IconData at;
+  /// The arrow down circle32 icon.
+  final IconData arrowDownCircle32;
 
-  /// The at solid icon.
-  final IconData atSolid;
+  /// The arrow left12 icon.
+  final IconData arrowLeft12;
 
-  /// The bell notification icon.
-  final IconData bellNotification;
+  /// The arrow left16 icon.
+  final IconData arrowLeft16;
 
-  /// The bell off icon.
-  final IconData bellOff;
+  /// The arrow left20 icon.
+  final IconData arrowLeft20;
 
-  /// The bookmark icon.
-  final IconData bookmark;
+  /// The arrow left32 icon.
+  final IconData arrowLeft32;
 
-  /// The bookmark remove icon.
-  final IconData bookmarkRemove;
+  /// The arrow right12 icon.
+  final IconData arrowRight12;
 
-  /// The browser a i sparkle icon.
-  final IconData browserAISparkle;
+  /// The arrow right16 icon.
+  final IconData arrowRight16;
 
-  /// The bubble3 chat message icon.
-  final IconData bubble3ChatMessage;
+  /// The arrow right20 icon.
+  final IconData arrowRight20;
 
-  /// The bubble3 solid icon.
-  final IconData bubble3Solid;
+  /// The arrow right32 icon.
+  final IconData arrowRight32;
 
-  /// The bubble annotation2 chat message icon.
-  final IconData bubbleAnnotation2ChatMessage;
+  /// The arrow up12 icon.
+  final IconData arrowUp12;
 
-  /// The bubble text6 chat message icon.
-  final IconData bubbleText6ChatMessage;
+  /// The arrow up16 icon.
+  final IconData arrowUp16;
 
-  /// The bubble text6 solid icon.
-  final IconData bubbleText6Solid;
+  /// The arrow up20 icon.
+  final IconData arrowUp20;
 
-  /// The bubble wide notification chat message icon.
-  final IconData bubbleWideNotificationChatMessage;
+  /// The arrow up32 icon.
+  final IconData arrowUp32;
 
-  /// The bubble wide sparkle chat message icon.
-  final IconData bubbleWideSparkleChatMessage;
+  /// The arrow up right12 icon.
+  final IconData arrowUpRight12;
 
-  /// The bubbles icon.
-  final IconData bubbles;
+  /// The arrow up right16 icon.
+  final IconData arrowUpRight16;
 
-  /// The calendar1 icon.
-  final IconData calendar1;
+  /// The arrow up right20 icon.
+  final IconData arrowUpRight20;
 
-  /// The call cancel icon.
-  final IconData callCancel;
+  /// The arrow up right32 icon.
+  final IconData arrowUpRight32;
 
-  /// The camera1 icon.
-  final IconData camera1;
+  /// The attachment12 icon.
+  final IconData attachment12;
 
-  /// The car1 icon.
-  final IconData car1;
+  /// The attachment16 icon.
+  final IconData attachment16;
 
-  /// The cat icon.
-  final IconData cat;
+  /// The attachment20 icon.
+  final IconData attachment20;
 
-  /// The chain link3 icon.
-  final IconData chainLink3;
+  /// The attachment32 icon.
+  final IconData attachment32;
 
-  /// The chart5 icon.
-  final IconData chart5;
+  /// The audio12 icon.
+  final IconData audio12;
 
-  /// The checkmark1 small icon.
-  final IconData checkmark1Small;
+  /// The audio16 icon.
+  final IconData audio16;
 
-  /// The checkmark2 icon.
-  final IconData checkmark2;
+  /// The audio20 icon.
+  final IconData audio20;
 
-  /// The checkmark2 small icon.
-  final IconData checkmark2Small;
+  /// The audio32 icon.
+  final IconData audio32;
 
-  /// The chevron down icon.
-  final IconData chevronDown;
+  /// The bell12 icon.
+  final IconData bell12;
 
-  /// The chevron grabber vertical selector icon.
-  final IconData chevronGrabberVerticalSelector;
+  /// The bell16 icon.
+  final IconData bell16;
 
-  /// The chevron left icon.
-  final IconData chevronLeft;
+  /// The bell20 icon.
+  final IconData bell20;
 
-  /// The chevron right icon.
-  final IconData chevronRight;
+  /// The bell32 icon.
+  final IconData bell32;
 
-  /// The chevron top icon.
-  final IconData chevronTop;
+  /// The bell off12 icon.
+  final IconData bellOff12;
 
-  /// The circle ban sign icon.
-  final IconData circleBanSign;
+  /// The bell off16 icon.
+  final IconData bellOff16;
 
-  /// The circle check icon.
-  final IconData circleCheck;
+  /// The bell off20 icon.
+  final IconData bellOff20;
 
-  /// The circle info tooltip icon.
-  final IconData circleInfoTooltip;
+  /// The bell off32 icon.
+  final IconData bellOff32;
 
-  /// The circle minus icon.
-  final IconData circleMinus;
+  /// The bolt12 icon.
+  final IconData bolt12;
 
-  /// The circle questionmark icon.
-  final IconData circleQuestionmark;
+  /// The bolt16 icon.
+  final IconData bolt16;
 
-  /// The circle questionmark filled icon.
-  final IconData circleQuestionmarkFilled;
+  /// The bolt20 icon.
+  final IconData bolt20;
 
-  /// The circle x icon.
-  final IconData circleX;
+  /// The bolt32 icon.
+  final IconData bolt32;
 
-  /// The clock icon.
-  final IconData clock;
+  /// The camera12 icon.
+  final IconData camera12;
 
-  /// The clock solid icon.
-  final IconData clockSolid;
+  /// The camera16 icon.
+  final IconData camera16;
 
-  /// The close quote2 icon.
-  final IconData closeQuote2;
+  /// The camera20 icon.
+  final IconData camera20;
 
-  /// The cloud simple upload icon.
-  final IconData cloudSimpleUpload;
+  /// The camera32 icon.
+  final IconData camera32;
 
-  /// The code icon.
-  final IconData code;
+  /// The checkmark12 icon.
+  final IconData checkmark12;
 
-  /// The code brackets icon.
-  final IconData codeBrackets;
+  /// The checkmark16 icon.
+  final IconData checkmark16;
 
-  /// The code editor insert icon.
-  final IconData codeEditorInsert;
+  /// The checkmark20 icon.
+  final IconData checkmark20;
 
-  /// The compass icon.
-  final IconData compass;
+  /// The checkmark32 icon.
+  final IconData checkmark32;
 
-  /// The components icon.
-  final IconData components;
+  /// The checks12 icon.
+  final IconData checks12;
 
-  /// The credit card2 billing icon.
-  final IconData creditCard2Billing;
+  /// The checks16 icon.
+  final IconData checks16;
 
-  /// The cross medium icon.
-  final IconData crossMedium;
+  /// The checks20 icon.
+  final IconData checks20;
 
-  /// The cross small icon.
-  final IconData crossSmall;
+  /// The checks32 icon.
+  final IconData checks32;
 
-  /// The dot grid1x3 horizontal icon.
-  final IconData dotGrid1x3Horizontal;
+  /// The chevron down12 icon.
+  final IconData chevronDown12;
 
-  /// The dot grid2x3 icon.
-  final IconData dotGrid2x3;
+  /// The chevron down16 icon.
+  final IconData chevronDown16;
 
-  /// The dots grid1x3 vertical icon.
-  final IconData dotsGrid1x3Vertical;
+  /// The chevron down20 icon.
+  final IconData chevronDown20;
 
-  /// The douple checkmark1 small icon.
-  final IconData doupleCheckmark1Small;
+  /// The chevron down32 icon.
+  final IconData chevronDown32;
 
-  /// The edit big icon.
-  final IconData editBig;
+  /// The chevron left12 icon.
+  final IconData chevronLeft12;
 
-  /// The edit big solid icon.
-  final IconData editBigSolid;
+  /// The chevron left16 icon.
+  final IconData chevronLeft16;
 
-  /// The emoji add reaction icon.
-  final IconData emojiAddReaction;
+  /// The chevron left20 icon.
+  final IconData chevronLeft20;
 
-  /// The emoji sad icon.
-  final IconData emojiSad;
+  /// The chevron left32 icon.
+  final IconData chevronLeft32;
 
-  /// The emoji smile icon.
-  final IconData emojiSmile;
+  /// The chevron right12 icon.
+  final IconData chevronRight12;
 
-  /// The exclamation circle icon.
-  final IconData exclamationCircle;
+  /// The chevron right16 icon.
+  final IconData chevronRight16;
 
-  /// The exclamation circle1 icon.
-  final IconData exclamationCircle1;
+  /// The chevron right20 icon.
+  final IconData chevronRight20;
 
-  /// The exclamation triangle icon.
-  final IconData exclamationTriangle;
+  /// The chevron right32 icon.
+  final IconData chevronRight32;
 
-  /// The exclamation triangle1 icon.
-  final IconData exclamationTriangle1;
+  /// The chevron up12 icon.
+  final IconData chevronUp12;
 
-  /// The eye open icon.
-  final IconData eyeOpen;
+  /// The chevron up16 icon.
+  final IconData chevronUp16;
 
-  /// The file arrow left in icon.
-  final IconData fileArrowLeftIn;
+  /// The chevron up20 icon.
+  final IconData chevronUp20;
 
-  /// The file bend icon.
-  final IconData fileBend;
+  /// The chevron up32 icon.
+  final IconData chevronUp32;
 
-  /// The filled circle info tooltip icon.
-  final IconData filledCircleInfoTooltip;
+  /// The clock12 icon.
+  final IconData clock12;
 
-  /// The filter1 icon.
-  final IconData filter1;
+  /// The clock16 icon.
+  final IconData clock16;
 
-  /// The flag2 icon.
-  final IconData flag2;
+  /// The clock20 icon.
+  final IconData clock20;
 
-  /// The folder1 icon.
-  final IconData folder1;
+  /// The clock32 icon.
+  final IconData clock32;
 
-  /// The gauge icon.
-  final IconData gauge;
+  /// The command12 icon.
+  final IconData command12;
 
-  /// The google icon.
-  final IconData google;
+  /// The command16 icon.
+  final IconData command16;
 
-  /// The hashtag channel icon.
-  final IconData hashtagChannel;
+  /// The command20 icon.
+  final IconData command20;
 
-  /// The heart2 icon.
-  final IconData heart2;
+  /// The command32 icon.
+  final IconData command32;
 
-  /// The history icon.
-  final IconData history;
+  /// The copy12 icon.
+  final IconData copy12;
 
-  /// The images1 alt icon.
-  final IconData images1Alt;
+  /// The copy16 icon.
+  final IconData copy16;
 
-  /// The invite icon.
-  final IconData invite;
+  /// The copy20 icon.
+  final IconData copy20;
 
-  /// The layers behind icon.
-  final IconData layersBehind;
+  /// The copy32 icon.
+  final IconData copy32;
 
-  /// The layout align left icon.
-  final IconData layoutAlignLeft;
+  /// The delete12 icon.
+  final IconData delete12;
 
-  /// The layout grid1 icon.
-  final IconData layoutGrid1;
+  /// The delete16 icon.
+  final IconData delete16;
 
-  /// The layout grid2 icon.
-  final IconData layoutGrid2;
+  /// The delete20 icon.
+  final IconData delete20;
 
-  /// The layout left icon.
-  final IconData layoutLeft;
+  /// The delete32 icon.
+  final IconData delete32;
 
-  /// The light bulb simple icon.
-  final IconData lightBulbSimple;
+  /// The download12 icon.
+  final IconData download12;
 
-  /// The limits icon.
-  final IconData limits;
+  /// The download16 icon.
+  final IconData download16;
 
-  /// The line chart3 icon.
-  final IconData lineChart3;
+  /// The download20 icon.
+  final IconData download20;
 
-  /// The lock icon.
-  final IconData lock;
+  /// The download32 icon.
+  final IconData download32;
 
-  /// The magnifying glass search icon.
-  final IconData magnifyingGlassSearch;
+  /// The edit12 icon.
+  final IconData edit12;
 
-  /// The map pin icon.
-  final IconData mapPin;
+  /// The edit16 icon.
+  final IconData edit16;
 
-  /// The microphone icon.
-  final IconData microphone;
+  /// The edit20 icon.
+  final IconData edit20;
 
-  /// The microphone solid icon.
-  final IconData microphoneSolid;
+  /// The edit32 icon.
+  final IconData edit32;
 
-  /// The minus large icon.
-  final IconData minusLarge;
+  /// The emoji12 icon.
+  final IconData emoji12;
 
-  /// The minus small icon.
-  final IconData minusSmall;
+  /// The emoji16 icon.
+  final IconData emoji16;
 
-  /// The mute icon.
-  final IconData mute;
+  /// The emoji20 icon.
+  final IconData emoji20;
 
-  /// The newspaper2 icon.
-  final IconData newspaper2;
+  /// The emoji32 icon.
+  final IconData emoji32;
 
-  /// The organization icon.
-  final IconData organization;
+  /// The emoji add12 icon.
+  final IconData emojiAdd12;
 
-  /// The paper plane icon.
-  final IconData paperPlane;
+  /// The emoji add16 icon.
+  final IconData emojiAdd16;
 
-  /// The paper plane top right icon.
-  final IconData paperPlaneTopRight;
+  /// The emoji add20 icon.
+  final IconData emojiAdd20;
 
-  /// The paperclip1 icon.
-  final IconData paperclip1;
+  /// The emoji add32 icon.
+  final IconData emojiAdd32;
 
-  /// The paragraphs text icon.
-  final IconData paragraphsText;
+  /// The exclamation circle12 icon.
+  final IconData exclamationCircle12;
 
-  /// The pause icon.
-  final IconData pause;
+  /// The exclamation circle16 icon.
+  final IconData exclamationCircle16;
 
-  /// The pencil icon.
-  final IconData pencil;
+  /// The exclamation circle20 icon.
+  final IconData exclamationCircle20;
 
-  /// The people icon.
-  final IconData people;
+  /// The exclamation circle32 icon.
+  final IconData exclamationCircle32;
 
-  /// The people2 icon.
-  final IconData people2;
+  /// The exclamation circle fill12 icon.
+  final IconData exclamationCircleFill12;
 
-  /// The people add icon.
-  final IconData peopleAdd;
+  /// The exclamation circle fill16 icon.
+  final IconData exclamationCircleFill16;
 
-  /// The people added icon.
-  final IconData peopleAdded;
+  /// The exclamation circle fill20 icon.
+  final IconData exclamationCircleFill20;
 
-  /// The people circle icon.
-  final IconData peopleCircle;
+  /// The exclamation circle fill32 icon.
+  final IconData exclamationCircleFill32;
 
-  /// The people copy icon.
-  final IconData peopleCopy;
+  /// The exclamation mark fill12 icon.
+  final IconData exclamationMarkFill12;
 
-  /// The people edit user rights icon.
-  final IconData peopleEditUserRights;
+  /// The exclamation mark fill16 icon.
+  final IconData exclamationMarkFill16;
 
-  /// The people remove icon.
-  final IconData peopleRemove;
+  /// The exclamation mark fill20 icon.
+  final IconData exclamationMarkFill20;
 
-  /// The persona icon.
-  final IconData persona;
+  /// The exclamation mark fill32 icon.
+  final IconData exclamationMarkFill32;
 
-  /// The pin icon.
-  final IconData pin;
+  /// The exclamation triangle fill12 icon.
+  final IconData exclamationTriangleFill12;
 
-  /// The play solid icon.
-  final IconData playSolid;
+  /// The exclamation triangle fill16 icon.
+  final IconData exclamationTriangleFill16;
 
-  /// The plus large icon.
-  final IconData plusLarge;
+  /// The exclamation triangle fill20 icon.
+  final IconData exclamationTriangleFill20;
 
-  /// The plus small icon.
-  final IconData plusSmall;
+  /// The exclamation triangle fill32 icon.
+  final IconData exclamationTriangleFill32;
 
-  /// The run shortcut icon.
-  final IconData runShortcut;
+  /// The export12 icon.
+  final IconData export12;
 
-  /// The search text icon.
-  final IconData searchText;
+  /// The export16 icon.
+  final IconData export16;
 
-  /// The settings gear2 icon.
-  final IconData settingsGear2;
+  /// The export20 icon.
+  final IconData export20;
 
-  /// The settings slider ver icon.
-  final IconData settingsSliderVer;
+  /// The export32 icon.
+  final IconData export32;
 
-  /// The shapes plus close square circle icon.
-  final IconData shapesPlusCloseSquareCircle;
+  /// The eye fill12 icon.
+  final IconData eyeFill12;
 
-  /// The shapes triangle square circle icon.
-  final IconData shapesTriangleSquareCircle;
+  /// The eye fill16 icon.
+  final IconData eyeFill16;
 
-  /// The share os icon.
-  final IconData shareOs;
+  /// The eye fill20 icon.
+  final IconData eyeFill20;
 
-  /// The share redirect link icon.
-  final IconData shareRedirectLink;
+  /// The eye fill32 icon.
+  final IconData eyeFill32;
 
-  /// The shield icon.
-  final IconData shield;
+  /// The file12 icon.
+  final IconData file12;
 
-  /// The square behind square2 copy icon.
-  final IconData squareBehindSquare2Copy;
+  /// The file16 icon.
+  final IconData file16;
 
-  /// The square circle top right feeds icon.
-  final IconData squareCircleTopRightFeeds;
+  /// The file20 icon.
+  final IconData file20;
 
-  /// The stop icon.
-  final IconData stop;
+  /// The file32 icon.
+  final IconData file32;
 
-  /// The table icon.
-  final IconData table;
+  /// The flag12 icon.
+  final IconData flag12;
 
-  /// The team icon.
-  final IconData team;
+  /// The flag16 icon.
+  final IconData flag16;
 
-  /// The tennis icon.
-  final IconData tennis;
+  /// The flag20 icon.
+  final IconData flag20;
 
-  /// The text to image u r l enrichment icon.
-  final IconData textToImageURLEnrichment;
+  /// The flag32 icon.
+  final IconData flag32;
 
-  /// The thunder icon.
-  final IconData thunder;
+  /// The folder12 icon.
+  final IconData folder12;
 
-  /// The translate icon.
-  final IconData translate;
+  /// The folder16 icon.
+  final IconData folder16;
 
-  /// The trash bin icon.
-  final IconData trashBin;
+  /// The folder20 icon.
+  final IconData folder20;
 
-  /// The trending4 icon.
-  final IconData trending4;
+  /// The folder32 icon.
+  final IconData folder32;
 
-  /// The trophy icon.
-  final IconData trophy;
+  /// The gallery12 icon.
+  final IconData gallery12;
 
-  /// The unlocked icon.
-  final IconData unlocked;
+  /// The gallery16 icon.
+  final IconData gallery16;
 
-  /// The unpin icon.
-  final IconData unpin;
+  /// The gallery20 icon.
+  final IconData gallery20;
 
-  /// The users icon.
-  final IconData users;
+  /// The gallery32 icon.
+  final IconData gallery32;
 
-  /// The video icon.
-  final IconData video;
+  /// The image12 icon.
+  final IconData image12;
 
-  /// The video solid icon.
-  final IconData videoSolid;
+  /// The image16 icon.
+  final IconData image16;
 
-  /// The voice and video icon.
-  final IconData voiceAndVideo;
+  /// The image20 icon.
+  final IconData image20;
 
-  /// The voice high icon.
-  final IconData voiceHigh;
+  /// The image32 icon.
+  final IconData image32;
 
-  /// The volume full icon.
-  final IconData volumeFull;
+  /// The info12 icon.
+  final IconData info12;
 
-  /// The webhook icon.
-  final IconData webhook;
+  /// The info16 icon.
+  final IconData info16;
+
+  /// The info20 icon.
+  final IconData info20;
+
+  /// The info32 icon.
+  final IconData info32;
+
+  /// The leave12 icon.
+  final IconData leave12;
+
+  /// The leave16 icon.
+  final IconData leave16;
+
+  /// The leave20 icon.
+  final IconData leave20;
+
+  /// The leave32 icon.
+  final IconData leave32;
+
+  /// The link12 icon.
+  final IconData link12;
+
+  /// The link16 icon.
+  final IconData link16;
+
+  /// The link20 icon.
+  final IconData link20;
+
+  /// The link32 icon.
+  final IconData link32;
+
+  /// The location12 icon.
+  final IconData location12;
+
+  /// The location16 icon.
+  final IconData location16;
+
+  /// The location20 icon.
+  final IconData location20;
+
+  /// The location32 icon.
+  final IconData location32;
+
+  /// The lock12 icon.
+  final IconData lock12;
+
+  /// The lock16 icon.
+  final IconData lock16;
+
+  /// The lock20 icon.
+  final IconData lock20;
+
+  /// The lock32 icon.
+  final IconData lock32;
+
+  /// The mention12 icon.
+  final IconData mention12;
+
+  /// The mention16 icon.
+  final IconData mention16;
+
+  /// The mention20 icon.
+  final IconData mention20;
+
+  /// The mention32 icon.
+  final IconData mention32;
+
+  /// The message bubble12 icon.
+  final IconData messageBubble12;
+
+  /// The message bubble16 icon.
+  final IconData messageBubble16;
+
+  /// The message bubble20 icon.
+  final IconData messageBubble20;
+
+  /// The message bubble32 icon.
+  final IconData messageBubble32;
+
+  /// The message bubble fill12 icon.
+  final IconData messageBubbleFill12;
+
+  /// The message bubble fill16 icon.
+  final IconData messageBubbleFill16;
+
+  /// The message bubble fill20 icon.
+  final IconData messageBubbleFill20;
+
+  /// The message bubble fill32 icon.
+  final IconData messageBubbleFill32;
+
+  /// The message bubbles12 icon.
+  final IconData messageBubbles12;
+
+  /// The message bubbles16 icon.
+  final IconData messageBubbles16;
+
+  /// The message bubbles20 icon.
+  final IconData messageBubbles20;
+
+  /// The message bubbles32 icon.
+  final IconData messageBubbles32;
+
+  /// The minus12 icon.
+  final IconData minus12;
+
+  /// The minus16 icon.
+  final IconData minus16;
+
+  /// The minus20 icon.
+  final IconData minus20;
+
+  /// The minus32 icon.
+  final IconData minus32;
+
+  /// The minus circle12 icon.
+  final IconData minusCircle12;
+
+  /// The minus circle16 icon.
+  final IconData minusCircle16;
+
+  /// The minus circle20 icon.
+  final IconData minusCircle20;
+
+  /// The minus circle32 icon.
+  final IconData minusCircle32;
+
+  /// The more12 icon.
+  final IconData more12;
+
+  /// The more16 icon.
+  final IconData more16;
+
+  /// The more20 icon.
+  final IconData more20;
+
+  /// The more32 icon.
+  final IconData more32;
+
+  /// The mute12 icon.
+  final IconData mute12;
+
+  /// The mute16 icon.
+  final IconData mute16;
+
+  /// The mute20 icon.
+  final IconData mute20;
+
+  /// The mute32 icon.
+  final IconData mute32;
+
+  /// The no sign12 icon.
+  final IconData noSign12;
+
+  /// The no sign16 icon.
+  final IconData noSign16;
+
+  /// The no sign20 icon.
+  final IconData noSign20;
+
+  /// The no sign32 icon.
+  final IconData noSign32;
+
+  /// The notification12 icon.
+  final IconData notification12;
+
+  /// The notification16 icon.
+  final IconData notification16;
+
+  /// The notification20 icon.
+  final IconData notification20;
+
+  /// The notification32 icon.
+  final IconData notification32;
+
+  /// The pause fill12 icon.
+  final IconData pauseFill12;
+
+  /// The pause fill16 icon.
+  final IconData pauseFill16;
+
+  /// The pause fill20 icon.
+  final IconData pauseFill20;
+
+  /// The pause fill32 icon.
+  final IconData pauseFill32;
+
+  /// The pin12 icon.
+  final IconData pin12;
+
+  /// The pin16 icon.
+  final IconData pin16;
+
+  /// The pin20 icon.
+  final IconData pin20;
+
+  /// The pin32 icon.
+  final IconData pin32;
+
+  /// The play fill12 icon.
+  final IconData playFill12;
+
+  /// The play fill16 icon.
+  final IconData playFill16;
+
+  /// The play fill20 icon.
+  final IconData playFill20;
+
+  /// The play fill32 icon.
+  final IconData playFill32;
+
+  /// The plus12 icon.
+  final IconData plus12;
+
+  /// The plus16 icon.
+  final IconData plus16;
+
+  /// The plus20 icon.
+  final IconData plus20;
+
+  /// The plus32 icon.
+  final IconData plus32;
+
+  /// The poll12 icon.
+  final IconData poll12;
+
+  /// The poll16 icon.
+  final IconData poll16;
+
+  /// The poll20 icon.
+  final IconData poll20;
+
+  /// The poll32 icon.
+  final IconData poll32;
+
+  /// The quote12 icon.
+  final IconData quote12;
+
+  /// The quote16 icon.
+  final IconData quote16;
+
+  /// The quote20 icon.
+  final IconData quote20;
+
+  /// The quote32 icon.
+  final IconData quote32;
+
+  /// The refresh12 icon.
+  final IconData refresh12;
+
+  /// The refresh16 icon.
+  final IconData refresh16;
+
+  /// The refresh20 icon.
+  final IconData refresh20;
+
+  /// The refresh32 icon.
+  final IconData refresh32;
+
+  /// The reorder12 icon.
+  final IconData reorder12;
+
+  /// The reorder16 icon.
+  final IconData reorder16;
+
+  /// The reorder20 icon.
+  final IconData reorder20;
+
+  /// The reorder32 icon.
+  final IconData reorder32;
+
+  /// The reply12 icon.
+  final IconData reply12;
+
+  /// The reply16 icon.
+  final IconData reply16;
+
+  /// The reply20 icon.
+  final IconData reply20;
+
+  /// The reply32 icon.
+  final IconData reply32;
+
+  /// The retry12 icon.
+  final IconData retry12;
+
+  /// The retry16 icon.
+  final IconData retry16;
+
+  /// The retry20 icon.
+  final IconData retry20;
+
+  /// The retry32 icon.
+  final IconData retry32;
+
+  /// The save12 icon.
+  final IconData save12;
+
+  /// The save16 icon.
+  final IconData save16;
+
+  /// The save20 icon.
+  final IconData save20;
+
+  /// The save32 icon.
+  final IconData save32;
+
+  /// The search12 icon.
+  final IconData search12;
+
+  /// The search16 icon.
+  final IconData search16;
+
+  /// The search20 icon.
+  final IconData search20;
+
+  /// The search32 icon.
+  final IconData search32;
+
+  /// The send12 icon.
+  final IconData send12;
+
+  /// The send16 icon.
+  final IconData send16;
+
+  /// The send20 icon.
+  final IconData send20;
+
+  /// The send32 icon.
+  final IconData send32;
+
+  /// The share12 icon.
+  final IconData share12;
+
+  /// The share16 icon.
+  final IconData share16;
+
+  /// The share20 icon.
+  final IconData share20;
+
+  /// The share32 icon.
+  final IconData share32;
+
+  /// The sidebar12 icon.
+  final IconData sidebar12;
+
+  /// The sidebar16 icon.
+  final IconData sidebar16;
+
+  /// The sidebar20 icon.
+  final IconData sidebar20;
+
+  /// The sidebar32 icon.
+  final IconData sidebar32;
+
+  /// The stop fill12 icon.
+  final IconData stopFill12;
+
+  /// The stop fill16 icon.
+  final IconData stopFill16;
+
+  /// The stop fill20 icon.
+  final IconData stopFill20;
+
+  /// The stop fill32 icon.
+  final IconData stopFill32;
+
+  /// The thread12 icon.
+  final IconData thread12;
+
+  /// The thread16 icon.
+  final IconData thread16;
+
+  /// The thread20 icon.
+  final IconData thread20;
+
+  /// The thread32 icon.
+  final IconData thread32;
+
+  /// The thread fill12 icon.
+  final IconData threadFill12;
+
+  /// The thread fill16 icon.
+  final IconData threadFill16;
+
+  /// The thread fill20 icon.
+  final IconData threadFill20;
+
+  /// The thread fill32 icon.
+  final IconData threadFill32;
+
+  /// The translate12 icon.
+  final IconData translate12;
+
+  /// The translate16 icon.
+  final IconData translate16;
+
+  /// The translate20 icon.
+  final IconData translate20;
+
+  /// The translate32 icon.
+  final IconData translate32;
+
+  /// The trophy12 icon.
+  final IconData trophy12;
+
+  /// The trophy16 icon.
+  final IconData trophy16;
+
+  /// The trophy20 icon.
+  final IconData trophy20;
+
+  /// The trophy32 icon.
+  final IconData trophy32;
+
+  /// The unlock12 icon.
+  final IconData unlock12;
+
+  /// The unlock16 icon.
+  final IconData unlock16;
+
+  /// The unlock20 icon.
+  final IconData unlock20;
+
+  /// The unlock32 icon.
+  final IconData unlock32;
+
+  /// The unpin12 icon.
+  final IconData unpin12;
+
+  /// The unpin16 icon.
+  final IconData unpin16;
+
+  /// The unpin20 icon.
+  final IconData unpin20;
+
+  /// The unpin32 icon.
+  final IconData unpin32;
+
+  /// The unsave12 icon.
+  final IconData unsave12;
+
+  /// The unsave16 icon.
+  final IconData unsave16;
+
+  /// The unsave20 icon.
+  final IconData unsave20;
+
+  /// The unsave32 icon.
+  final IconData unsave32;
+
+  /// The upload12 icon.
+  final IconData upload12;
+
+  /// The upload16 icon.
+  final IconData upload16;
+
+  /// The upload20 icon.
+  final IconData upload20;
+
+  /// The upload32 icon.
+  final IconData upload32;
+
+  /// The user12 icon.
+  final IconData user12;
+
+  /// The user16 icon.
+  final IconData user16;
+
+  /// The user20 icon.
+  final IconData user20;
+
+  /// The user32 icon.
+  final IconData user32;
+
+  /// The user add12 icon.
+  final IconData userAdd12;
+
+  /// The user add16 icon.
+  final IconData userAdd16;
+
+  /// The user add20 icon.
+  final IconData userAdd20;
+
+  /// The user add32 icon.
+  final IconData userAdd32;
+
+  /// The user check12 icon.
+  final IconData userCheck12;
+
+  /// The user check16 icon.
+  final IconData userCheck16;
+
+  /// The user check20 icon.
+  final IconData userCheck20;
+
+  /// The user check32 icon.
+  final IconData userCheck32;
+
+  /// The user remove12 icon.
+  final IconData userRemove12;
+
+  /// The user remove16 icon.
+  final IconData userRemove16;
+
+  /// The user remove20 icon.
+  final IconData userRemove20;
+
+  /// The user remove32 icon.
+  final IconData userRemove32;
+
+  /// The users12 icon.
+  final IconData users12;
+
+  /// The users16 icon.
+  final IconData users16;
+
+  /// The users20 icon.
+  final IconData users20;
+
+  /// The users32 icon.
+  final IconData users32;
+
+  /// The video12 icon.
+  final IconData video12;
+
+  /// The video16 icon.
+  final IconData video16;
+
+  /// The video20 icon.
+  final IconData video20;
+
+  /// The video32 icon.
+  final IconData video32;
+
+  /// The video fill12 icon.
+  final IconData videoFill12;
+
+  /// The video fill16 icon.
+  final IconData videoFill16;
+
+  /// The video fill20 icon.
+  final IconData videoFill20;
+
+  /// The video fill32 icon.
+  final IconData videoFill32;
+
+  /// The voice12 icon.
+  final IconData voice12;
+
+  /// The voice16 icon.
+  final IconData voice16;
+
+  /// The voice20 icon.
+  final IconData voice20;
+
+  /// The voice32 icon.
+  final IconData voice32;
+
+  /// The voice fill12 icon.
+  final IconData voiceFill12;
+
+  /// The voice fill16 icon.
+  final IconData voiceFill16;
+
+  /// The voice fill20 icon.
+  final IconData voiceFill20;
+
+  /// The voice fill32 icon.
+  final IconData voiceFill32;
+
+  /// The x circle12 icon.
+  final IconData xCircle12;
+
+  /// The x circle16 icon.
+  final IconData xCircle16;
+
+  /// The x circle20 icon.
+  final IconData xCircle20;
+
+  /// The x circle32 icon.
+  final IconData xCircle32;
+
+  /// The xmark12 icon.
+  final IconData xmark12;
+
+  /// The xmark16 icon.
+  final IconData xmark16;
+
+  /// The xmark20 icon.
+  final IconData xmark20;
+
+  /// The xmark32 icon.
+  final IconData xmark32;
 
   /// The giphy colored SVG icon.
   ///
@@ -712,164 +1504,362 @@ class StreamIcons with _$StreamIcons {
   /// final icon = context.streamIcons.allIcons['settingsGear2'];
   /// ```
   Map<String, IconData> get allIcons => {
-    'apiAggregate': apiAggregate,
-    'apples': apples,
-    'archive1': archive1,
-    'arrowBoxLeft': arrowBoxLeft,
-    'arrowDown': arrowDown,
-    'arrowDownCircle': arrowDownCircle,
-    'arrowLeft': arrowLeft,
-    'arrowRight': arrowRight,
-    'arrowRotateClockwise': arrowRotateClockwise,
-    'arrowRotateRightLeftRepeatRefresh': arrowRotateRightLeftRepeatRefresh,
-    'arrowShareLeft': arrowShareLeft,
-    'arrowShareRight': arrowShareRight,
-    'arrowUp': arrowUp,
-    'arrowUpRight': arrowUpRight,
-    'arrowsRepeatLeftRight': arrowsRepeatLeftRight,
-    'at': at,
-    'atSolid': atSolid,
-    'bellNotification': bellNotification,
-    'bellOff': bellOff,
-    'bookmark': bookmark,
-    'bookmarkRemove': bookmarkRemove,
-    'browserAISparkle': browserAISparkle,
-    'bubble3ChatMessage': bubble3ChatMessage,
-    'bubble3Solid': bubble3Solid,
-    'bubbleAnnotation2ChatMessage': bubbleAnnotation2ChatMessage,
-    'bubbleText6ChatMessage': bubbleText6ChatMessage,
-    'bubbleText6Solid': bubbleText6Solid,
-    'bubbleWideNotificationChatMessage': bubbleWideNotificationChatMessage,
-    'bubbleWideSparkleChatMessage': bubbleWideSparkleChatMessage,
-    'bubbles': bubbles,
-    'calendar1': calendar1,
-    'callCancel': callCancel,
-    'camera1': camera1,
-    'car1': car1,
-    'cat': cat,
-    'chainLink3': chainLink3,
-    'chart5': chart5,
-    'checkmark1Small': checkmark1Small,
-    'checkmark2': checkmark2,
-    'checkmark2Small': checkmark2Small,
-    'chevronDown': chevronDown,
-    'chevronGrabberVerticalSelector': chevronGrabberVerticalSelector,
-    'chevronLeft': chevronLeft,
-    'chevronRight': chevronRight,
-    'chevronTop': chevronTop,
-    'circleBanSign': circleBanSign,
-    'circleCheck': circleCheck,
-    'circleInfoTooltip': circleInfoTooltip,
-    'circleMinus': circleMinus,
-    'circleQuestionmark': circleQuestionmark,
-    'circleQuestionmarkFilled': circleQuestionmarkFilled,
-    'circleX': circleX,
-    'clock': clock,
-    'clockSolid': clockSolid,
-    'closeQuote2': closeQuote2,
-    'cloudSimpleUpload': cloudSimpleUpload,
-    'code': code,
-    'codeBrackets': codeBrackets,
-    'codeEditorInsert': codeEditorInsert,
-    'compass': compass,
-    'components': components,
-    'creditCard2Billing': creditCard2Billing,
-    'crossMedium': crossMedium,
-    'crossSmall': crossSmall,
-    'dotGrid1x3Horizontal': dotGrid1x3Horizontal,
-    'dotGrid2x3': dotGrid2x3,
-    'dotsGrid1x3Vertical': dotsGrid1x3Vertical,
-    'doupleCheckmark1Small': doupleCheckmark1Small,
-    'editBig': editBig,
-    'editBigSolid': editBigSolid,
-    'emojiAddReaction': emojiAddReaction,
-    'emojiSad': emojiSad,
-    'emojiSmile': emojiSmile,
-    'exclamationCircle': exclamationCircle,
-    'exclamationCircle1': exclamationCircle1,
-    'exclamationTriangle': exclamationTriangle,
-    'exclamationTriangle1': exclamationTriangle1,
-    'eyeOpen': eyeOpen,
-    'fileArrowLeftIn': fileArrowLeftIn,
-    'fileBend': fileBend,
-    'filledCircleInfoTooltip': filledCircleInfoTooltip,
-    'filter1': filter1,
-    'flag2': flag2,
-    'folder1': folder1,
-    'gauge': gauge,
-    'google': google,
-    'hashtagChannel': hashtagChannel,
-    'heart2': heart2,
-    'history': history,
-    'images1Alt': images1Alt,
-    'invite': invite,
-    'layersBehind': layersBehind,
-    'layoutAlignLeft': layoutAlignLeft,
-    'layoutGrid1': layoutGrid1,
-    'layoutGrid2': layoutGrid2,
-    'layoutLeft': layoutLeft,
-    'lightBulbSimple': lightBulbSimple,
-    'limits': limits,
-    'lineChart3': lineChart3,
-    'lock': lock,
-    'magnifyingGlassSearch': magnifyingGlassSearch,
-    'mapPin': mapPin,
-    'microphone': microphone,
-    'microphoneSolid': microphoneSolid,
-    'minusLarge': minusLarge,
-    'minusSmall': minusSmall,
-    'mute': mute,
-    'newspaper2': newspaper2,
-    'organization': organization,
-    'paperPlane': paperPlane,
-    'paperPlaneTopRight': paperPlaneTopRight,
-    'paperclip1': paperclip1,
-    'paragraphsText': paragraphsText,
-    'pause': pause,
-    'pencil': pencil,
-    'people': people,
-    'people2': people2,
-    'peopleAdd': peopleAdd,
-    'peopleAdded': peopleAdded,
-    'peopleCircle': peopleCircle,
-    'peopleCopy': peopleCopy,
-    'peopleEditUserRights': peopleEditUserRights,
-    'peopleRemove': peopleRemove,
-    'persona': persona,
-    'pin': pin,
-    'playSolid': playSolid,
-    'plusLarge': plusLarge,
-    'plusSmall': plusSmall,
-    'runShortcut': runShortcut,
-    'searchText': searchText,
-    'settingsGear2': settingsGear2,
-    'settingsSliderVer': settingsSliderVer,
-    'shapesPlusCloseSquareCircle': shapesPlusCloseSquareCircle,
-    'shapesTriangleSquareCircle': shapesTriangleSquareCircle,
-    'shareOs': shareOs,
-    'shareRedirectLink': shareRedirectLink,
-    'shield': shield,
-    'squareBehindSquare2Copy': squareBehindSquare2Copy,
-    'squareCircleTopRightFeeds': squareCircleTopRightFeeds,
-    'stop': stop,
-    'table': table,
-    'team': team,
-    'tennis': tennis,
-    'textToImageURLEnrichment': textToImageURLEnrichment,
-    'thunder': thunder,
-    'translate': translate,
-    'trashBin': trashBin,
-    'trending4': trending4,
-    'trophy': trophy,
-    'unlocked': unlocked,
-    'unpin': unpin,
-    'users': users,
-    'video': video,
-    'videoSolid': videoSolid,
-    'voiceAndVideo': voiceAndVideo,
-    'voiceHigh': voiceHigh,
-    'volumeFull': volumeFull,
-    'webhook': webhook,
+    'account12': account12,
+    'account16': account16,
+    'account20': account20,
+    'account32': account32,
+    'archive12': archive12,
+    'archive16': archive16,
+    'archive20': archive20,
+    'archive32': archive32,
+    'arrowDown12': arrowDown12,
+    'arrowDown16': arrowDown16,
+    'arrowDown20': arrowDown20,
+    'arrowDown32': arrowDown32,
+    'arrowDownCircle12': arrowDownCircle12,
+    'arrowDownCircle16': arrowDownCircle16,
+    'arrowDownCircle20': arrowDownCircle20,
+    'arrowDownCircle32': arrowDownCircle32,
+    'arrowLeft12': arrowLeft12,
+    'arrowLeft16': arrowLeft16,
+    'arrowLeft20': arrowLeft20,
+    'arrowLeft32': arrowLeft32,
+    'arrowRight12': arrowRight12,
+    'arrowRight16': arrowRight16,
+    'arrowRight20': arrowRight20,
+    'arrowRight32': arrowRight32,
+    'arrowUp12': arrowUp12,
+    'arrowUp16': arrowUp16,
+    'arrowUp20': arrowUp20,
+    'arrowUp32': arrowUp32,
+    'arrowUpRight12': arrowUpRight12,
+    'arrowUpRight16': arrowUpRight16,
+    'arrowUpRight20': arrowUpRight20,
+    'arrowUpRight32': arrowUpRight32,
+    'attachment12': attachment12,
+    'attachment16': attachment16,
+    'attachment20': attachment20,
+    'attachment32': attachment32,
+    'audio12': audio12,
+    'audio16': audio16,
+    'audio20': audio20,
+    'audio32': audio32,
+    'bell12': bell12,
+    'bell16': bell16,
+    'bell20': bell20,
+    'bell32': bell32,
+    'bellOff12': bellOff12,
+    'bellOff16': bellOff16,
+    'bellOff20': bellOff20,
+    'bellOff32': bellOff32,
+    'bolt12': bolt12,
+    'bolt16': bolt16,
+    'bolt20': bolt20,
+    'bolt32': bolt32,
+    'camera12': camera12,
+    'camera16': camera16,
+    'camera20': camera20,
+    'camera32': camera32,
+    'checkmark12': checkmark12,
+    'checkmark16': checkmark16,
+    'checkmark20': checkmark20,
+    'checkmark32': checkmark32,
+    'checks12': checks12,
+    'checks16': checks16,
+    'checks20': checks20,
+    'checks32': checks32,
+    'chevronDown12': chevronDown12,
+    'chevronDown16': chevronDown16,
+    'chevronDown20': chevronDown20,
+    'chevronDown32': chevronDown32,
+    'chevronLeft12': chevronLeft12,
+    'chevronLeft16': chevronLeft16,
+    'chevronLeft20': chevronLeft20,
+    'chevronLeft32': chevronLeft32,
+    'chevronRight12': chevronRight12,
+    'chevronRight16': chevronRight16,
+    'chevronRight20': chevronRight20,
+    'chevronRight32': chevronRight32,
+    'chevronUp12': chevronUp12,
+    'chevronUp16': chevronUp16,
+    'chevronUp20': chevronUp20,
+    'chevronUp32': chevronUp32,
+    'clock12': clock12,
+    'clock16': clock16,
+    'clock20': clock20,
+    'clock32': clock32,
+    'command12': command12,
+    'command16': command16,
+    'command20': command20,
+    'command32': command32,
+    'copy12': copy12,
+    'copy16': copy16,
+    'copy20': copy20,
+    'copy32': copy32,
+    'delete12': delete12,
+    'delete16': delete16,
+    'delete20': delete20,
+    'delete32': delete32,
+    'download12': download12,
+    'download16': download16,
+    'download20': download20,
+    'download32': download32,
+    'edit12': edit12,
+    'edit16': edit16,
+    'edit20': edit20,
+    'edit32': edit32,
+    'emoji12': emoji12,
+    'emoji16': emoji16,
+    'emoji20': emoji20,
+    'emoji32': emoji32,
+    'emojiAdd12': emojiAdd12,
+    'emojiAdd16': emojiAdd16,
+    'emojiAdd20': emojiAdd20,
+    'emojiAdd32': emojiAdd32,
+    'exclamationCircle12': exclamationCircle12,
+    'exclamationCircle16': exclamationCircle16,
+    'exclamationCircle20': exclamationCircle20,
+    'exclamationCircle32': exclamationCircle32,
+    'exclamationCircleFill12': exclamationCircleFill12,
+    'exclamationCircleFill16': exclamationCircleFill16,
+    'exclamationCircleFill20': exclamationCircleFill20,
+    'exclamationCircleFill32': exclamationCircleFill32,
+    'exclamationMarkFill12': exclamationMarkFill12,
+    'exclamationMarkFill16': exclamationMarkFill16,
+    'exclamationMarkFill20': exclamationMarkFill20,
+    'exclamationMarkFill32': exclamationMarkFill32,
+    'exclamationTriangleFill12': exclamationTriangleFill12,
+    'exclamationTriangleFill16': exclamationTriangleFill16,
+    'exclamationTriangleFill20': exclamationTriangleFill20,
+    'exclamationTriangleFill32': exclamationTriangleFill32,
+    'export12': export12,
+    'export16': export16,
+    'export20': export20,
+    'export32': export32,
+    'eyeFill12': eyeFill12,
+    'eyeFill16': eyeFill16,
+    'eyeFill20': eyeFill20,
+    'eyeFill32': eyeFill32,
+    'file12': file12,
+    'file16': file16,
+    'file20': file20,
+    'file32': file32,
+    'flag12': flag12,
+    'flag16': flag16,
+    'flag20': flag20,
+    'flag32': flag32,
+    'folder12': folder12,
+    'folder16': folder16,
+    'folder20': folder20,
+    'folder32': folder32,
+    'gallery12': gallery12,
+    'gallery16': gallery16,
+    'gallery20': gallery20,
+    'gallery32': gallery32,
+    'image12': image12,
+    'image16': image16,
+    'image20': image20,
+    'image32': image32,
+    'info12': info12,
+    'info16': info16,
+    'info20': info20,
+    'info32': info32,
+    'leave12': leave12,
+    'leave16': leave16,
+    'leave20': leave20,
+    'leave32': leave32,
+    'link12': link12,
+    'link16': link16,
+    'link20': link20,
+    'link32': link32,
+    'location12': location12,
+    'location16': location16,
+    'location20': location20,
+    'location32': location32,
+    'lock12': lock12,
+    'lock16': lock16,
+    'lock20': lock20,
+    'lock32': lock32,
+    'mention12': mention12,
+    'mention16': mention16,
+    'mention20': mention20,
+    'mention32': mention32,
+    'messageBubble12': messageBubble12,
+    'messageBubble16': messageBubble16,
+    'messageBubble20': messageBubble20,
+    'messageBubble32': messageBubble32,
+    'messageBubbleFill12': messageBubbleFill12,
+    'messageBubbleFill16': messageBubbleFill16,
+    'messageBubbleFill20': messageBubbleFill20,
+    'messageBubbleFill32': messageBubbleFill32,
+    'messageBubbles12': messageBubbles12,
+    'messageBubbles16': messageBubbles16,
+    'messageBubbles20': messageBubbles20,
+    'messageBubbles32': messageBubbles32,
+    'minus12': minus12,
+    'minus16': minus16,
+    'minus20': minus20,
+    'minus32': minus32,
+    'minusCircle12': minusCircle12,
+    'minusCircle16': minusCircle16,
+    'minusCircle20': minusCircle20,
+    'minusCircle32': minusCircle32,
+    'more12': more12,
+    'more16': more16,
+    'more20': more20,
+    'more32': more32,
+    'mute12': mute12,
+    'mute16': mute16,
+    'mute20': mute20,
+    'mute32': mute32,
+    'noSign12': noSign12,
+    'noSign16': noSign16,
+    'noSign20': noSign20,
+    'noSign32': noSign32,
+    'notification12': notification12,
+    'notification16': notification16,
+    'notification20': notification20,
+    'notification32': notification32,
+    'pauseFill12': pauseFill12,
+    'pauseFill16': pauseFill16,
+    'pauseFill20': pauseFill20,
+    'pauseFill32': pauseFill32,
+    'pin12': pin12,
+    'pin16': pin16,
+    'pin20': pin20,
+    'pin32': pin32,
+    'playFill12': playFill12,
+    'playFill16': playFill16,
+    'playFill20': playFill20,
+    'playFill32': playFill32,
+    'plus12': plus12,
+    'plus16': plus16,
+    'plus20': plus20,
+    'plus32': plus32,
+    'poll12': poll12,
+    'poll16': poll16,
+    'poll20': poll20,
+    'poll32': poll32,
+    'quote12': quote12,
+    'quote16': quote16,
+    'quote20': quote20,
+    'quote32': quote32,
+    'refresh12': refresh12,
+    'refresh16': refresh16,
+    'refresh20': refresh20,
+    'refresh32': refresh32,
+    'reorder12': reorder12,
+    'reorder16': reorder16,
+    'reorder20': reorder20,
+    'reorder32': reorder32,
+    'reply12': reply12,
+    'reply16': reply16,
+    'reply20': reply20,
+    'reply32': reply32,
+    'retry12': retry12,
+    'retry16': retry16,
+    'retry20': retry20,
+    'retry32': retry32,
+    'save12': save12,
+    'save16': save16,
+    'save20': save20,
+    'save32': save32,
+    'search12': search12,
+    'search16': search16,
+    'search20': search20,
+    'search32': search32,
+    'send12': send12,
+    'send16': send16,
+    'send20': send20,
+    'send32': send32,
+    'share12': share12,
+    'share16': share16,
+    'share20': share20,
+    'share32': share32,
+    'sidebar12': sidebar12,
+    'sidebar16': sidebar16,
+    'sidebar20': sidebar20,
+    'sidebar32': sidebar32,
+    'stopFill12': stopFill12,
+    'stopFill16': stopFill16,
+    'stopFill20': stopFill20,
+    'stopFill32': stopFill32,
+    'thread12': thread12,
+    'thread16': thread16,
+    'thread20': thread20,
+    'thread32': thread32,
+    'threadFill12': threadFill12,
+    'threadFill16': threadFill16,
+    'threadFill20': threadFill20,
+    'threadFill32': threadFill32,
+    'translate12': translate12,
+    'translate16': translate16,
+    'translate20': translate20,
+    'translate32': translate32,
+    'trophy12': trophy12,
+    'trophy16': trophy16,
+    'trophy20': trophy20,
+    'trophy32': trophy32,
+    'unlock12': unlock12,
+    'unlock16': unlock16,
+    'unlock20': unlock20,
+    'unlock32': unlock32,
+    'unpin12': unpin12,
+    'unpin16': unpin16,
+    'unpin20': unpin20,
+    'unpin32': unpin32,
+    'unsave12': unsave12,
+    'unsave16': unsave16,
+    'unsave20': unsave20,
+    'unsave32': unsave32,
+    'upload12': upload12,
+    'upload16': upload16,
+    'upload20': upload20,
+    'upload32': upload32,
+    'user12': user12,
+    'user16': user16,
+    'user20': user20,
+    'user32': user32,
+    'userAdd12': userAdd12,
+    'userAdd16': userAdd16,
+    'userAdd20': userAdd20,
+    'userAdd32': userAdd32,
+    'userCheck12': userCheck12,
+    'userCheck16': userCheck16,
+    'userCheck20': userCheck20,
+    'userCheck32': userCheck32,
+    'userRemove12': userRemove12,
+    'userRemove16': userRemove16,
+    'userRemove20': userRemove20,
+    'userRemove32': userRemove32,
+    'users12': users12,
+    'users16': users16,
+    'users20': users20,
+    'users32': users32,
+    'video12': video12,
+    'video16': video16,
+    'video20': video20,
+    'video32': video32,
+    'videoFill12': videoFill12,
+    'videoFill16': videoFill16,
+    'videoFill20': videoFill20,
+    'videoFill32': videoFill32,
+    'voice12': voice12,
+    'voice16': voice16,
+    'voice20': voice20,
+    'voice32': voice32,
+    'voiceFill12': voiceFill12,
+    'voiceFill16': voiceFill16,
+    'voiceFill20': voiceFill20,
+    'voiceFill32': voiceFill32,
+    'xCircle12': xCircle12,
+    'xCircle16': xCircle16,
+    'xCircle20': xCircle20,
+    'xCircle32': xCircle32,
+    'xmark12': xmark12,
+    'xmark16': xmark16,
+    'xmark20': xmark20,
+    'xmark32': xmark32,
   };
 
   /// A map of all colored SVG icons keyed by their field name.

@@ -15,6 +15,7 @@ input_svg_icon_dir: assets/icons/
 output_font_file: lib/fonts/stream_icons_font.otf
 output_file: lib/src/theme/primitives/stream_icons.dart
 output_data_file: lib/src/theme/primitives/stream_icons.g.dart
+output_log_file: assets_source/icon_log.g.txt
 
 # Class names
 class_name: StreamIcons
@@ -24,3 +25,4 @@ package: stream_core_flutter
 
 # Font options
 font_name: Stream Icons
+

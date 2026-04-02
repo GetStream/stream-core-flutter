@@ -162,7 +162,7 @@ class _SearchBar extends StatelessWidget {
           prefixIcon: Padding(
             padding: EdgeInsets.only(left: spacing.md, right: spacing.sm),
             child: Icon(
-              icons.magnifyingGlassSearch,
+              icons.search20,
               size: 20,
               color: colorScheme.textTertiary,
             ),
@@ -172,8 +172,8 @@ class _SearchBar extends StatelessWidget {
               ? IconButton(
                   onPressed: onClear,
                   icon: Icon(
-                    icons.crossSmall,
-                    size: 18,
+                    icons.xmark16,
+                    size: 16,
                     color: colorScheme.textTertiary,
                   ),
                 )
@@ -272,7 +272,7 @@ class _IconCard extends StatelessWidget {
               ),
               child: Icon(
                 icon,
-                size: 24,
+                size: 20,
                 color: colorScheme.textPrimary,
               ),
             ),

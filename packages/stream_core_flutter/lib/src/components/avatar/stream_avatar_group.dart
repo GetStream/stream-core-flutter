@@ -207,7 +207,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.topStart,
             child: StreamAvatar(
-              placeholder: (context) => Icon(context.streamIcons.people),
+              placeholder: (context) => Icon(context.streamIcons.user20),
             ),
           ),
         ),
