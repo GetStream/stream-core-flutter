@@ -45,6 +45,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       emojiChip: t < 0.5 ? a.emojiChip : b.emojiChip,
       emojiChipBar: t < 0.5 ? a.emojiChipBar : b.emojiChipBar,
+      errorBadge: t < 0.5 ? a.errorBadge : b.errorBadge,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       listTile: t < 0.5 ? a.listTile : b.listTile,
       loadingSpinner: t < 0.5 ? a.loadingSpinner : b.loadingSpinner,
@@ -87,6 +88,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamEmojiChipProps)? emojiChip,
     Widget Function(BuildContext, StreamEmojiChipBarProps<Object?>)?
     emojiChipBar,
+    Widget Function(BuildContext, StreamErrorBadgeProps)? errorBadge,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamListTileProps)? listTile,
     Widget Function(BuildContext, StreamLoadingSpinnerProps)? loadingSpinner,
@@ -127,6 +129,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: emojiButton ?? _this.emojiButton,
       emojiChip: emojiChip ?? _this.emojiChip,
       emojiChipBar: emojiChipBar ?? _this.emojiChipBar,
+      errorBadge: errorBadge ?? _this.errorBadge,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       listTile: listTile ?? _this.listTile,
       loadingSpinner: loadingSpinner ?? _this.loadingSpinner,
@@ -175,6 +178,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: other.emojiButton,
       emojiChip: other.emojiChip,
       emojiChipBar: other.emojiChipBar,
+      errorBadge: other.errorBadge,
       fileTypeIcon: other.fileTypeIcon,
       listTile: other.listTile,
       loadingSpinner: other.loadingSpinner,
@@ -224,6 +228,7 @@ mixin _$StreamComponentBuilders {
         _other.emojiButton == _this.emojiButton &&
         _other.emojiChip == _this.emojiChip &&
         _other.emojiChipBar == _this.emojiChipBar &&
+        _other.errorBadge == _this.errorBadge &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.listTile == _this.listTile &&
         _other.loadingSpinner == _this.loadingSpinner &&
@@ -265,6 +270,7 @@ mixin _$StreamComponentBuilders {
       _this.emojiButton,
       _this.emojiChip,
       _this.emojiChipBar,
+      _this.errorBadge,
       _this.fileTypeIcon,
       _this.listTile,
       _this.loadingSpinner,

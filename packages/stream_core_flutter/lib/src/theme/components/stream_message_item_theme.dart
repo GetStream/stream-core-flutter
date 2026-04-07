@@ -94,6 +94,7 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
     this.backgroundColor,
     this.avatarVisibility,
     this.annotationVisibility,
+    this.errorBadgeVisibility,
     this.metadataVisibility,
     this.repliesVisibility,
     this.padding,
@@ -139,6 +140,15 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
   /// When null, the metadata defaults to visible for single/bottom messages
   /// and gone for top/middle messages.
   final StreamMessageLayoutVisibility? metadataVisibility;
+
+  /// Controls the visibility of the error badge based on placement.
+  ///
+  /// This resolves a [StreamVisibility] value from the current
+  /// [StreamMessageLayoutData], allowing visibility to vary by message
+  /// state (e.g. only show the badge when the message failed to send).
+  ///
+  /// When null, the error badge defaults to [StreamVisibility.gone].
+  final StreamMessageLayoutVisibility? errorBadgeVisibility;
 
   /// Controls the visibility of the replies indicator based on placement.
   ///

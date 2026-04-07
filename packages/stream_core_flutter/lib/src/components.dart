@@ -6,6 +6,7 @@ export 'components/avatar/stream_avatar_group.dart' hide DefaultStreamAvatarGrou
 export 'components/avatar/stream_avatar_stack.dart' hide DefaultStreamAvatarStack;
 export 'components/badge/stream_badge_count.dart' hide DefaultStreamBadgeCount;
 export 'components/badge/stream_badge_notification.dart' hide DefaultStreamBadgeNotification;
+export 'components/badge/stream_error_badge.dart' hide DefaultStreamErrorBadge;
 export 'components/badge/stream_image_source_badge.dart' hide DefaultStreamImageSourceBadge;
 export 'components/badge/stream_media_badge.dart';
 export 'components/badge/stream_online_indicator.dart' hide DefaultStreamOnlineIndicator;

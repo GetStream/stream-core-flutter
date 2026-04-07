@@ -113,29 +113,21 @@ class DefaultStreamRetryBadge extends StatelessWidget {
 
     final effectiveSize = props.size ?? StreamRetryBadgeSize.md;
 
+    final border = Border.all(
+      width: 2,
+      color: colorScheme.borderOnInverse,
+      strokeAlign: BorderSide.strokeAlignOutside,
+    );
+
     return AnimatedContainer(
       width: effectiveSize.value,
       height: effectiveSize.value,
       duration: kThemeChangeDuration,
-      decoration: ShapeDecoration(
-        color: colorScheme.accentError,
-        shape: const CircleBorder(),
-      ),
-      foregroundDecoration: ShapeDecoration(
-        shape: CircleBorder(
-          side: BorderSide(
-            width: 2,
-            color: colorScheme.borderOnInverse,
-            strokeAlign: BorderSide.strokeAlignOutside,
-          ),
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          icons.retry16,
-          size: effectiveSize.iconSize,
-          color: colorScheme.textOnAccent,
-        ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: colorScheme.accentError),
+      foregroundDecoration: BoxDecoration(shape: BoxShape.circle, border: border),
+      child: IconTheme(
+        data: .new(size: effectiveSize.iconSize, color: colorScheme.textOnAccent),
+        child: Center(child: Icon(icons.retry16)),
       ),
     );
   }

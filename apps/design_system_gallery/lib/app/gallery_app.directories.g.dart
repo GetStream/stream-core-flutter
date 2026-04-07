@@ -26,6 +26,8 @@ import 'package:design_system_gallery/components/badge/stream_badge_count.dart'
     as _design_system_gallery_components_badge_stream_badge_count;
 import 'package:design_system_gallery/components/badge/stream_badge_notification.dart'
     as _design_system_gallery_components_badge_stream_badge_notification;
+import 'package:design_system_gallery/components/badge/stream_error_badge.dart'
+    as _design_system_gallery_components_badge_stream_error_badge;
 import 'package:design_system_gallery/components/badge/stream_image_source_badge.dart'
     as _design_system_gallery_components_badge_stream_image_source_badge;
 import 'package:design_system_gallery/components/badge/stream_online_indicator.dart'
@@ -357,6 +359,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_badge_stream_badge_notification
                         .buildStreamBadgeNotificationShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamErrorBadge',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_badge_stream_error_badge
+                        .buildStreamErrorBadgePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_badge_stream_error_badge
+                        .buildStreamErrorBadgeShowcase,
               ),
             ],
           ),
