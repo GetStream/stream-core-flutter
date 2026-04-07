@@ -46,6 +46,11 @@ mixin _$StreamMessageItemThemeData {
         b.metadataVisibility,
         t,
       ),
+      errorBadgeVisibility: StreamMessageLayoutVisibility.lerp(
+        a.errorBadgeVisibility,
+        b.errorBadgeVisibility,
+        t,
+      ),
       repliesVisibility: StreamMessageLayoutVisibility.lerp(
         a.repliesVisibility,
         b.repliesVisibility,
@@ -76,6 +81,7 @@ mixin _$StreamMessageItemThemeData {
     StreamMessageLayoutVisibility? avatarVisibility,
     StreamMessageLayoutVisibility? annotationVisibility,
     StreamMessageLayoutVisibility? metadataVisibility,
+    StreamMessageLayoutVisibility? errorBadgeVisibility,
     StreamMessageLayoutVisibility? repliesVisibility,
     EdgeInsetsGeometry? padding,
     double? spacing,
@@ -94,6 +100,7 @@ mixin _$StreamMessageItemThemeData {
       avatarVisibility: avatarVisibility ?? _this.avatarVisibility,
       annotationVisibility: annotationVisibility ?? _this.annotationVisibility,
       metadataVisibility: metadataVisibility ?? _this.metadataVisibility,
+      errorBadgeVisibility: errorBadgeVisibility ?? _this.errorBadgeVisibility,
       repliesVisibility: repliesVisibility ?? _this.repliesVisibility,
       padding: padding ?? _this.padding,
       spacing: spacing ?? _this.spacing,
@@ -123,6 +130,7 @@ mixin _$StreamMessageItemThemeData {
       avatarVisibility: other.avatarVisibility,
       annotationVisibility: other.annotationVisibility,
       metadataVisibility: other.metadataVisibility,
+      errorBadgeVisibility: other.errorBadgeVisibility,
       repliesVisibility: other.repliesVisibility,
       padding: other.padding,
       spacing: other.spacing,
@@ -153,6 +161,7 @@ mixin _$StreamMessageItemThemeData {
         _other.avatarVisibility == _this.avatarVisibility &&
         _other.annotationVisibility == _this.annotationVisibility &&
         _other.metadataVisibility == _this.metadataVisibility &&
+        _other.errorBadgeVisibility == _this.errorBadgeVisibility &&
         _other.repliesVisibility == _this.repliesVisibility &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
@@ -175,6 +184,7 @@ mixin _$StreamMessageItemThemeData {
       _this.avatarVisibility,
       _this.annotationVisibility,
       _this.metadataVisibility,
+      _this.errorBadgeVisibility,
       _this.repliesVisibility,
       _this.padding,
       _this.spacing,

@@ -145,6 +145,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
     StreamComponentBuilder<StreamEmojiChipProps>? emojiChip,
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
+    StreamComponentBuilder<StreamErrorBadgeProps>? errorBadge,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
     StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner,
@@ -182,6 +183,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiButton: emojiButton,
       emojiChip: emojiChip,
       emojiChipBar: emojiChipBar,
+      errorBadge: errorBadge,
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
       loadingSpinner: loadingSpinner,
@@ -220,6 +222,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiButton,
     required this.emojiChip,
     required this.emojiChipBar,
+    required this.errorBadge,
     required this.fileTypeIcon,
     required this.listTile,
     required this.loadingSpinner,
@@ -330,6 +333,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamEmojiChipBar] uses [DefaultStreamEmojiChipBar].
   final StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar;
+
+  /// Custom builder for error badge widgets.
+  ///
+  /// When null, [StreamErrorBadge] uses [DefaultStreamErrorBadge].
+  final StreamComponentBuilder<StreamErrorBadgeProps>? errorBadge;
 
   /// Custom builder for file type icon widgets.
   ///
