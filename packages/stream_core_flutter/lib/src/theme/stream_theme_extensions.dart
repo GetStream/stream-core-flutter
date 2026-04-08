@@ -21,6 +21,7 @@ import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
+import 'components/stream_toggle_switch_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -137,4 +138,7 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamSkeletonLoadingThemeData] from the nearest ancestor.
   StreamSkeletonLoadingThemeData get streamSkeletonLoadingTheme => StreamSkeletonLoadingTheme.of(this);
+
+  /// Returns the [StreamToggleSwitchThemeData] from the nearest ancestor.
+  StreamToggleSwitchThemeData get streamToggleSwitchTheme => StreamToggleSwitchTheme.of(this);
 }

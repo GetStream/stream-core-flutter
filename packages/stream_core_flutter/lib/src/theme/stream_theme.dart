@@ -25,6 +25,7 @@ import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
+import 'components/stream_toggle_switch_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -120,6 +121,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
+    StreamToggleSwitchThemeData? toggleSwitchTheme,
   }) {
     platform ??= defaultTargetPlatform;
     final isDark = brightness == Brightness.dark;
@@ -157,6 +159,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
     skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
+    toggleSwitchTheme ??= const StreamToggleSwitchThemeData();
 
     return .raw(
       brightness: brightness,
@@ -188,6 +191,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
+      toggleSwitchTheme: toggleSwitchTheme,
     );
   }
 
@@ -233,6 +237,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.reactionPickerTheme,
     required this.reactionsTheme,
     required this.skeletonLoadingTheme,
+    required this.toggleSwitchTheme,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -358,6 +363,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The skeleton theme for this theme.
   final StreamSkeletonLoadingThemeData skeletonLoadingTheme;
 
+  /// The toggle switch theme for this theme.
+  final StreamToggleSwitchThemeData toggleSwitchTheme;
+
   /// Creates a copy of this theme but with platform-dependent primitives
   /// recomputed for the given [platform].
   ///
@@ -408,6 +416,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
+      toggleSwitchTheme: toggleSwitchTheme,
     );
   }
 }

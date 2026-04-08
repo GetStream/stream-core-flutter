@@ -163,6 +163,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
+    StreamComponentBuilder<StreamToggleSwitchProps>? toggleSwitch,
     StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
@@ -201,6 +202,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       reactions: reactions,
       retryBadge: retryBadge,
       skeletonLoading: skeletonLoading,
+      toggleSwitch: toggleSwitch,
       imageSourceBadge: imageSourceBadge,
       extensions: _extensionIterableToMap(extensions),
     );
@@ -240,6 +242,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.reactions,
     required this.retryBadge,
     required this.skeletonLoading,
+    required this.toggleSwitch,
     required this.imageSourceBadge,
     required this.extensions,
   });
@@ -424,6 +427,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamSkeletonLoading] uses [DefaultStreamSkeletonLoading].
   final StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading;
+
+  /// Custom builder for toggle switch widgets.
+  ///
+  /// When null, [StreamToggleSwitch] uses [DefaultStreamToggleSwitch].
+  final StreamComponentBuilder<StreamToggleSwitchProps>? toggleSwitch;
 
   /// Custom builder for source badge widgets.
   ///
