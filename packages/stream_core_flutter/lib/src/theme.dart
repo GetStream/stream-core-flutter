@@ -27,6 +27,7 @@ export 'theme/components/stream_playback_speed_toggle_theme.dart';
 export 'theme/components/stream_progress_bar_theme.dart';
 export 'theme/components/stream_reaction_picker_theme.dart';
 export 'theme/components/stream_reactions_theme.dart';
+export 'theme/components/stream_toggle_switch_theme.dart';
 
 export 'theme/primitives/stream_colors.dart';
 export 'theme/primitives/stream_icons.dart';
