@@ -1,7 +1,7 @@
 name: stream_core_flutter
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: "Stream Design System for Flutter and cross-SDK utilities that depend on Flutter."
+version: 0.1.0
+homepage: https://github.com/GetStream/stream-core-flutter
 
 environment:
   sdk: ^3.10.0
