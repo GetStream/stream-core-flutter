@@ -1,39 +1,17 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Stream Core Flutter
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+**⚠️ Internal SDK — Not for public use**
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+This is the internal Flutter SDK that powers several of Stream’s products (`stream_chat` and `stream_video`). 
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+It provides the Stream Design System for Flutter and cross-SDK utilities that depend on Flutter.
 
-## Features
+## 🔒 Intended Usage
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+This package is **not designed for direct use by customers**. It acts as the foundation layer for other Stream SDKs and contains internal logic that is subject to change.
 
-## Getting started
+> If you're building an app with Stream, use [stream-chat-flutter](https://github.com/GetStream/stream-chat-flutter), [stream-video-flutter](https://github.com/GetStream/stream-video-flutter) or [stream-feeds-flutter](https://github.com/GetStream/stream-feeds-flutter) instead.
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+## ⚠️ Versioning Notice
 
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
-```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+This library does follow semantic versioning. Breaking changes may be introduced at any time without warning. We reserve the right to refactor or remove functionality without deprecation periods. However, as all our products need to depend on the same version of the core packages we want to limit breaking changes as much as possible.

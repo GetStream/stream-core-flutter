@@ -35,6 +35,7 @@ command:
       rxdart: ^0.28.0
       shimmer: ^3.0.0
       stream_core: ^0.4.0
+      stream_core_flutter: ^0.1.0
       svg_icon_widget: ^0.0.1+1
       synchronized: ^3.3.0
       theme_extensions_builder_annotation: ^7.1.0
