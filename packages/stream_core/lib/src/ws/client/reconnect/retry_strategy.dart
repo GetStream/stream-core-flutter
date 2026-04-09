@@ -65,13 +65,14 @@ class DefaultRetryStrategy implements RetryStrategy {
   static const maximumReconnectionDelayInSeconds = 25;
 
   @override
-  int consecutiveFailuresCount = 0;
+  int get consecutiveFailuresCount => _consecutiveFailuresCount;
+  var _consecutiveFailuresCount = 0;
 
   @override
-  void incrementConsecutiveFailures() => consecutiveFailuresCount++;
+  void incrementConsecutiveFailures() => _consecutiveFailuresCount++;
 
   @override
-  void resetConsecutiveFailures() => consecutiveFailuresCount = 0;
+  void resetConsecutiveFailures() => _consecutiveFailuresCount = 0;
 
   @override
   Duration getNextRetryDelay() {

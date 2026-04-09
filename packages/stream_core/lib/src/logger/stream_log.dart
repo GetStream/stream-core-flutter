@@ -1,3 +1,5 @@
+// ignore_for_file: omit_obvious_property_types
+
 import 'stream_logger.dart';
 
 StreamLog get streamLog => StreamLog();
@@ -9,7 +11,7 @@ class StreamLog {
 
   StreamLog._();
 
-  static final StreamLog _instance = StreamLog._();
+  static final _instance = StreamLog._();
 
   StreamLogger _logger = const SilentStreamLogger();
   IsLoggableValidator _validator = (Priority priority, Tag tag) => false;

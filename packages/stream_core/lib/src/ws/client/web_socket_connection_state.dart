@@ -16,8 +16,7 @@ typedef ConnectionStateEmitter = StateEmitter<WebSocketConnectionState>;
 ///
 /// Extends [ConnectionStateEmitter] with the ability to update the current state.
 /// Used internally by WebSocket client implementations to manage state transitions.
-typedef MutableConnectionStateEmitter
-    = MutableStateEmitter<WebSocketConnectionState>;
+typedef MutableConnectionStateEmitter = MutableStateEmitter<WebSocketConnectionState>;
 
 /// Represents the current state of a WebSocket connection.
 ///
@@ -107,16 +106,16 @@ sealed class WebSocketConnectionState extends Equatable {
   bool get isAutomaticReconnectionEnabled {
     return switch (this) {
       Disconnected(:final source) => switch (source) {
-          ServerInitiated() => switch (source.error?.apiError) {
-              final error? when error.code == 1000 => false,
-              final error? when error.isTokenExpiredError => false,
-              final error? when error.isClientError => false,
-              _ => true, // Reconnect on other server initiated disconnections
-            },
-          UnHealthyConnection() => true,
-          SystemInitiated() => true,
-          UserInitiated() => false,
+        ServerInitiated() => switch (source.error?.apiError) {
+          final error? when error.code == 1000 => false,
+          final error? when error.isTokenExpiredError => false,
+          final error? when error.isClientError => false,
+          _ => true, // Reconnect on other server initiated disconnections
         },
+        UnHealthyConnection() => true,
+        SystemInitiated() => true,
+        UserInitiated() => false,
+      },
       _ => false, // No automatic reconnection for other states
     };
   }

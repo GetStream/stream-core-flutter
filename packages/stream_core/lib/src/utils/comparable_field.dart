@@ -41,8 +41,7 @@ import 'package:meta/meta.dart';
 /// print(intField?.compareTo(doubleField!));  // 0 (equal)
 /// ```
 @immutable
-class ComparableField<T extends Object>
-    implements Comparable<ComparableField<T>> {
+class ComparableField<T extends Object> implements Comparable<ComparableField<T>> {
   const ComparableField._(this.value);
 
   /// Creates a [ComparableField] from [value].
@@ -84,8 +83,8 @@ class ComparableField<T extends Object>
       (final bool a, final bool b) when a == b => 0,
       (final bool a, final bool b) => a && !b ? 1 : -1,
       _ => throw ArgumentError(
-          'Incompatible types: ${value.runtimeType} vs ${other.value.runtimeType}',
-        ),
+        'Incompatible types: ${value.runtimeType} vs ${other.value.runtimeType}',
+      ),
     };
   }
 }

@@ -20,13 +20,13 @@ jobs:
         with: 
           scopes: |
             llc
+            ui
             repo
           requireScope: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   semantic_changelog_update:
-    if: ${{ false }} # TODO: Enable after the first release
     needs: conventional_pr_title # Trigger after the [conventional_pr_title] completes
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +34,8 @@ jobs:
         with:
           scopes: |
             {
-              "llc": "packages/stream_core"
+              "llc": "packages/stream_core",
+              "ui": "packages/stream_core_flutter"
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

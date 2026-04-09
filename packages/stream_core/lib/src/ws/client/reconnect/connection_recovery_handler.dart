@@ -42,23 +42,23 @@ class ConnectionRecoveryHandler extends Disposable {
     bool keepConnectionAliveInBackground = false,
     List<AutomaticReconnectionPolicy>? policies,
     RetryStrategy? retryStrategy,
-  })  : _client = client,
-        _reconnectStrategy = retryStrategy ?? RetryStrategy(),
-        _keepConnectionAliveInBackground = keepConnectionAliveInBackground,
-        _policies = <AutomaticReconnectionPolicy>[
-          if (policies != null) ...policies,
-          WebSocketAutomaticReconnectionPolicy(
-            connectionState: client.connectionState,
-          ),
-          if (networkStateProvider case final provider?)
-            InternetAvailabilityReconnectionPolicy(
-              networkState: provider.state,
-            ),
-          if (lifecycleStateProvider case final provider?)
-            BackgroundStateReconnectionPolicy(
-              appLifecycleState: provider.state,
-            ),
-        ] {
+  }) : _client = client,
+       _reconnectStrategy = retryStrategy ?? RetryStrategy(),
+       _keepConnectionAliveInBackground = keepConnectionAliveInBackground,
+       _policies = <AutomaticReconnectionPolicy>[
+         if (policies != null) ...policies,
+         WebSocketAutomaticReconnectionPolicy(
+           connectionState: client.connectionState,
+         ),
+         if (networkStateProvider case final provider?)
+           InternetAvailabilityReconnectionPolicy(
+             networkState: provider.state,
+           ),
+         if (lifecycleStateProvider case final provider?)
+           BackgroundStateReconnectionPolicy(
+             appLifecycleState: provider.state,
+           ),
+       ] {
     // Listen to connection state changes.
     _client.connectionState.on(_onConnectionStateChanged).addTo(_subscriptions);
 

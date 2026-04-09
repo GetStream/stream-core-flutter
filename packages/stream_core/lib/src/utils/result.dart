@@ -94,8 +94,10 @@ extension PatternMatching<T> on Result<T> {
   T getOrThrow() {
     return switch (this) {
       Success<T>(:final data) => data,
-      Failure(:final error, :final stackTrace) =>
-        Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current),
+      Failure(:final error, :final stackTrace) => Error.throwWithStackTrace(
+        error,
+        stackTrace ?? StackTrace.current,
+      ),
     };
   }
 
@@ -184,8 +186,8 @@ extension PatternMatching<T> on Result<T> {
     return switch (this) {
       Success<T>(:final data) => Result.success(data as R),
       Failure(:final error, :final stackTrace) => Result.success(
-          transform(error, stackTrace),
-        ),
+        transform(error, stackTrace),
+      ),
     };
   }
 
@@ -200,8 +202,8 @@ extension PatternMatching<T> on Result<T> {
     return switch (this) {
       Success<T>(:final data) => Result.success(data as R),
       Failure(:final error, :final stackTrace) => runSafelySync(
-          () => transform(error, stackTrace),
-        ),
+        () => transform(error, stackTrace),
+      ),
     };
   }
 

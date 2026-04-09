@@ -1,0 +1,172 @@
+import 'package:flutter/material.dart';
+
+import '../../../stream_core_flutter.dart';
+
+/// A widget that represents the message composer input area.
+/// This usually contains the input field and the send or microphone button.
+class StreamMessageComposerInput extends StatelessWidget {
+  const StreamMessageComposerInput({
+    super.key,
+    required this.controller,
+    this.placeholder = '',
+    this.isFloating = false,
+    this.inputLeading,
+    this.inputTrailing,
+    this.inputBody,
+    this.inputHeader,
+    this.focusNode,
+  });
+
+  final TextEditingController controller;
+  final String placeholder;
+  final bool isFloating;
+  final Widget? inputLeading;
+  final Widget? inputTrailing;
+  final Widget? inputBody;
+  final Widget? inputHeader;
+  final FocusNode? focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.all(context.streamRadius.xxxl),
+        border: Border.all(
+          color: context.streamColorScheme.borderDefault,
+        ),
+      ),
+      decoration: BoxDecoration(
+        color: context.streamColorScheme.backgroundElevation1,
+        borderRadius: BorderRadius.all(context.streamRadius.xxxl),
+        boxShadow: isFloating ? context.streamBoxShadow.elevation3 : null,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ?inputHeader,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              ?inputLeading,
+              Expanded(
+                child:
+                    inputBody ??
+                    StreamMessageComposerInputField(
+                      controller: controller,
+                      placeholder: placeholder,
+                      focusNode: focusNode,
+                    ),
+              ),
+              ?inputTrailing,
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A widget that represents the actual text input field for the message composer.
+class StreamMessageComposerInputField extends StatelessWidget {
+  const StreamMessageComposerInputField({
+    super.key,
+    required this.controller,
+    required this.placeholder,
+    this.focusNode,
+    this.command,
+    this.onDismissCommand,
+    this.textInputAction,
+    this.keyboardType,
+    this.textCapitalization = TextCapitalization.sentences,
+    this.autofocus = false,
+    this.autocorrect = true,
+  });
+
+  /// The controller for the text field.
+  final TextEditingController controller;
+
+  /// The placeholder text shown when the field is empty.
+  final String placeholder;
+
+  /// The focus node for the text field.
+  final FocusNode? focusNode;
+
+  /// The active command label displayed as a chip.
+  final String? command;
+
+  /// Called when the user dismisses the command chip.
+  final VoidCallback? onDismissCommand;
+
+  /// The type of action button to use for the keyboard.
+  final TextInputAction? textInputAction;
+
+  /// The type of keyboard to use for editing the text.
+  final TextInputType? keyboardType;
+
+  /// {@macro flutter.widgets.editableText.textCapitalization}
+  final TextCapitalization textCapitalization;
+
+  /// Whether the text field should be focused initially.
+  final bool autofocus;
+
+  /// Whether to enable autocorrect.
+  final bool autocorrect;
+
+  @override
+  Widget build(BuildContext context) {
+    final composerBorderRadius = context.streamRadius.xxxl;
+    final inputTheme = context.streamInputTheme;
+    final inputDefaults = InputThemeDefaults(context: context).data;
+
+    final border = OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.all(composerBorderRadius),
+    );
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 124),
+      child: Row(
+        children: [
+          if (command case final command?)
+            Padding(
+              padding: EdgeInsets.only(left: context.streamSpacing.sm),
+              child: StreamCommandChip(
+                label: command,
+                onDismiss: onDismissCommand,
+              ),
+            ),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              textInputAction: textInputAction,
+              keyboardType: keyboardType,
+              textCapitalization: textCapitalization,
+              autofocus: autofocus,
+              autocorrect: autocorrect,
+              keyboardAppearance: Theme.of(context).brightness,
+              style: TextStyle(
+                color: inputTheme.textColor ?? inputDefaults.textColor,
+              ),
+              maxLines: null,
+              decoration: InputDecoration(
+                border: border,
+                focusedBorder: border,
+                enabledBorder: border,
+                errorBorder: border,
+                disabledBorder: border,
+                fillColor: Colors.transparent,
+                contentPadding: EdgeInsets.fromLTRB(command == null ? 12 : 0, 8, 12, 8),
+                hintText: placeholder,
+                hintStyle: TextStyle(
+                  color: inputTheme.placeholderColor ?? inputDefaults.placeholderColor,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

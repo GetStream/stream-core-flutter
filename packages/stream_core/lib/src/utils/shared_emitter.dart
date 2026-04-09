@@ -98,8 +98,7 @@ abstract interface class MutableSharedEmitter<T> extends SharedEmitter<T> {
 ///
 /// See also:
 /// - [MutableSharedEmitter] for the interface.
-class SharedEmitterImpl<T> extends StreamView<T>
-    implements MutableSharedEmitter<T> {
+class SharedEmitterImpl<T> extends StreamView<T> implements MutableSharedEmitter<T> {
   /// Creates a [SharedEmitterImpl].
   ///
   /// Supports synchronous or asynchronous event emission via [sync], and

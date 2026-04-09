@@ -265,8 +265,7 @@ void main() {
 
         final result = users.updateWhere(
           (user) => user.id == '2',
-          update: (user) =>
-              _TestUser(id: user.id, name: '${user.name} Updated'),
+          update: (user) => _TestUser(id: user.id, name: '${user.name} Updated'),
         );
 
         expect(result.length, 3);
@@ -287,8 +286,7 @@ void main() {
 
         final result = scores.updateWhere(
           (score) => score.points < 100,
-          update: (score) =>
-              _TestScore(userId: score.userId, points: score.points * 2),
+          update: (score) => _TestScore(userId: score.userId, points: score.points * 2),
         );
 
         expect(result.length, 4);
@@ -322,8 +320,7 @@ void main() {
 
         final result = users.updateWhere(
           (user) => true,
-          update: (user) =>
-              _TestUser(id: user.id, name: '${user.name} Updated'),
+          update: (user) => _TestUser(id: user.id, name: '${user.name} Updated'),
         );
 
         expect(result.length, 2);
@@ -374,8 +371,7 @@ void main() {
 
         final result = scores.updateWhere(
           (score) => score.points >= 150 && score.points <= 200,
-          update: (score) =>
-              _TestScore(userId: score.userId, points: score.points + 50),
+          update: (score) => _TestScore(userId: score.userId, points: score.points + 50),
         );
 
         expect(result[0].points, 100); // Unchanged
@@ -403,8 +399,7 @@ void main() {
         expect(result[2].points, 150);
       });
 
-      test('should sort multiple updated elements when compare is provided',
-          () {
+      test('should sort multiple updated elements when compare is provided', () {
         final users = [
           const _TestUser(id: '1', name: 'Alice'),
           const _TestUser(id: '2', name: 'Bob'),
@@ -414,8 +409,7 @@ void main() {
 
         final result = users.updateWhere(
           (user) => user.id == '2' || user.id == '4',
-          update: (user) =>
-              _TestUser(id: user.id, name: 'Z${user.name}'), // Prefix with Z
+          update: (user) => _TestUser(id: user.id, name: 'Z${user.name}'), // Prefix with Z
           compare: (a, b) => a.name.compareTo(b.name), // Ascending by name
         );
 
@@ -701,8 +695,7 @@ void main() {
       test('should insert element at correct position in sorted list', () {
         final numbers = [1, 3, 5, 7];
 
-        final result =
-            numbers.sortedInsert(4, compare: (a, b) => a.compareTo(b));
+        final result = numbers.sortedInsert(4, compare: (a, b) => a.compareTo(b));
 
         expect(result, [1, 3, 4, 5, 7]);
         // Original list should be unchanged
@@ -712,8 +705,7 @@ void main() {
       test('should insert at beginning when element is smallest', () {
         final numbers = [3, 5, 7];
 
-        final result =
-            numbers.sortedInsert(1, compare: (a, b) => a.compareTo(b));
+        final result = numbers.sortedInsert(1, compare: (a, b) => a.compareTo(b));
 
         expect(result, [1, 3, 5, 7]);
       });
@@ -721,8 +713,7 @@ void main() {
       test('should insert at end when element is largest', () {
         final numbers = [1, 3, 5];
 
-        final result =
-            numbers.sortedInsert(7, compare: (a, b) => a.compareTo(b));
+        final result = numbers.sortedInsert(7, compare: (a, b) => a.compareTo(b));
 
         expect(result, [1, 3, 5, 7]);
       });
@@ -730,10 +721,8 @@ void main() {
       test('should work with single element list', () {
         final numbers = [5];
 
-        final smaller =
-            numbers.sortedInsert(3, compare: (a, b) => a.compareTo(b));
-        final larger =
-            numbers.sortedInsert(7, compare: (a, b) => a.compareTo(b));
+        final smaller = numbers.sortedInsert(3, compare: (a, b) => a.compareTo(b));
+        final larger = numbers.sortedInsert(7, compare: (a, b) => a.compareTo(b));
 
         expect(smaller, [3, 5]);
         expect(larger, [5, 7]);
@@ -742,8 +731,7 @@ void main() {
       test('should work with empty list', () {
         final numbers = <int>[];
 
-        final result =
-            numbers.sortedInsert(5, compare: (a, b) => a.compareTo(b));
+        final result = numbers.sortedInsert(5, compare: (a, b) => a.compareTo(b));
 
         expect(result, [5]);
       });
@@ -751,8 +739,7 @@ void main() {
       test('should work with reverse order comparator', () {
         final numbers = [7, 5, 3, 1]; // Descending order
 
-        final result =
-            numbers.sortedInsert(4, compare: (a, b) => b.compareTo(a));
+        final result = numbers.sortedInsert(4, compare: (a, b) => b.compareTo(a));
 
         expect(result, [7, 5, 4, 3, 1]);
       });
@@ -760,8 +747,7 @@ void main() {
       test('should work with string sorting', () {
         final names = ['Alice', 'Charlie', 'David'];
 
-        final result =
-            names.sortedInsert('Bob', compare: (a, b) => a.compareTo(b));
+        final result = names.sortedInsert('Bob', compare: (a, b) => a.compareTo(b));
 
         expect(result, ['Alice', 'Bob', 'Charlie', 'David']);
       });
@@ -785,8 +771,7 @@ void main() {
       test('should handle duplicate values', () {
         final numbers = [1, 3, 5, 7];
 
-        final result =
-            numbers.sortedInsert(3, compare: (a, b) => a.compareTo(b));
+        final result = numbers.sortedInsert(3, compare: (a, b) => a.compareTo(b));
 
         expect(result, [1, 3, 3, 5, 7]);
       });
@@ -838,8 +823,7 @@ void main() {
         final result = scores.insertUnique(
           const _TestScore(userId: 4, points: 175),
           key: (score) => score.userId,
-          compare: (a, b) =>
-              b.points.compareTo(a.points), // Descending by points
+          compare: (a, b) => b.points.compareTo(a.points), // Descending by points
         );
 
         expect(result.length, 4);
@@ -847,8 +831,7 @@ void main() {
         expect(result.map((s) => s.userId), [2, 4, 3, 1]);
       });
 
-      test('should replace and sort when key exists and compare is provided',
-          () {
+      test('should replace and sort when key exists and compare is provided', () {
         final scores = [
           const _TestScore(userId: 1, points: 100),
           const _TestScore(userId: 2, points: 200),
@@ -858,8 +841,7 @@ void main() {
         final result = scores.insertUnique(
           const _TestScore(userId: 2, points: 250), // Update existing
           key: (score) => score.userId,
-          compare: (a, b) =>
-              b.points.compareTo(a.points), // Descending by points
+          compare: (a, b) => b.points.compareTo(a.points), // Descending by points
         );
 
         expect(result.length, 3);
@@ -967,8 +949,7 @@ void main() {
         final result = users.sortedUpsert(
           const _TestScore(userId: 1, points: 150),
           key: (score) => score.userId,
-          compare: (a, b) =>
-              b.points.compareTo(a.points), // Descending by points
+          compare: (a, b) => b.points.compareTo(a.points), // Descending by points
         );
 
         expect(result.length, 3);
@@ -985,8 +966,7 @@ void main() {
         final result = users.sortedUpsert(
           const _TestScore(userId: 2, points: 80),
           key: (score) => score.userId,
-          compare: (a, b) =>
-              b.points.compareTo(a.points), // Descending by points
+          compare: (a, b) => b.points.compareTo(a.points), // Descending by points
         );
 
         expect(result.length, 3);
@@ -1063,8 +1043,7 @@ void main() {
         final result = scores.sortedUpsert(
           const _TestScore(userId: 2, points: 50),
           key: (score) => score.userId,
-          compare: (a, b) =>
-              b.points.compareTo(a.points), // Descending by points
+          compare: (a, b) => b.points.compareTo(a.points), // Descending by points
           update: (original, updated) => _TestScore(
             userId: original.userId,
             points: original.points + updated.points, // Add points together
@@ -1077,9 +1056,7 @@ void main() {
         expect(result.map((s) => s.userId), [2, 3, 1]);
       });
 
-      test(
-          'should use default update behavior when update function is not provided',
-          () {
+      test('should use default update behavior when update function is not provided', () {
         final scores = [
           const _TestScore(userId: 1, points: 100),
           const _TestScore(userId: 2, points: 200),
@@ -1413,8 +1390,7 @@ void main() {
         ); // Should return same instance
       });
 
-      test('should handle multiple matching elements (removes first found)',
-          () {
+      test('should handle multiple matching elements (removes first found)', () {
         final comments = [
           const _TestComment(id: '1', text: 'duplicate', replies: []),
           const _TestComment(id: '2', text: 'duplicate', replies: []),
@@ -1471,8 +1447,9 @@ void main() {
         final mainComment = result.first;
         expect(mainComment.replies.length, 2);
 
-        final controversialComment = mainComment.replies
-            .firstWhere((c) => c.text == 'Controversial opinion');
+        final controversialComment = mainComment.replies.firstWhere(
+          (c) => c.text == 'Controversial opinion',
+        );
         expect(controversialComment.replies.length, 1);
         expect(controversialComment.replies.first.text, 'Valid response');
         expect(mainComment.modifiedAt, isNotNull); // Root was updated
@@ -1506,10 +1483,8 @@ void main() {
         final result = comments.updateNested(
           (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) =>
-              updatedComment.copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
         );
 
         expect(result.length, 2);
@@ -1552,10 +1527,8 @@ void main() {
         final result = comments.updateNested(
           (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) =>
-              updatedComment.copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
         );
 
         expect(result.length, 1);
@@ -1593,12 +1566,9 @@ void main() {
         final result = comments.updateNested(
           (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) =>
-              updatedComment.copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
-          compare: (a, b) =>
-              b.upvotes.compareTo(a.upvotes), // Sort by upvotes desc
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
+          compare: (a, b) => b.upvotes.compareTo(a.upvotes), // Sort by upvotes desc
         );
 
         expect(result.length, 1);
@@ -1649,15 +1619,12 @@ void main() {
         final result = comments.updateNested(
           (comment) => comment.id == updatedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) =>
-              updatedComment.copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
+          update: (comment) => updatedComment.copyWith(modifiedAt: DateTime.now()),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
         );
 
         expect(result.length, 1);
-        final deepComment =
-            result.first.replies.first.replies.first.replies.first;
+        final deepComment = result.first.replies.first.replies.first.replies.first;
         expect(deepComment.text, 'Updated Level 3');
         expect(deepComment.upvotes, 10);
         expect(deepComment.modifiedAt, isNotNull);
@@ -1670,8 +1637,7 @@ void main() {
           (comment) => comment.id == '1',
           children: (comment) => comment.replies,
           update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
         );
 
         expect(result, isEmpty);
@@ -1686,8 +1652,7 @@ void main() {
           (comment) => comment.id == 'nonexistent',
           children: (comment) => comment.replies,
           update: (comment) => comment.copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
         );
 
         expect(
@@ -1737,10 +1702,8 @@ void main() {
         final result = forumThread.updateNested(
           (comment) => comment.id == upvotedComment.id,
           children: (comment) => comment.replies,
-          update: (comment) =>
-              upvotedComment.copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
+          update: (comment) => upvotedComment.copyWith(modifiedAt: DateTime.now()),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
           compare: (a, b) => b.upvotes.compareTo(a.upvotes), // Sort by upvotes
         );
 
@@ -1860,11 +1823,11 @@ void main() {
         final result = deepComments.updateNested(
           (comment) => comment.id == 'thread1_0',
           children: (comment) => comment.replies,
-          update: (comment) =>
-              const _TestComment(id: 'thread1_0', text: 'Updated leaf')
-                  .copyWith(modifiedAt: DateTime.now()),
-          updateChildren: (parent, newReplies) =>
-              parent.copyWith(replies: newReplies),
+          update: (comment) => const _TestComment(
+            id: 'thread1_0',
+            text: 'Updated leaf',
+          ).copyWith(modifiedAt: DateTime.now()),
+          updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
         );
         stopwatch.stop();
 
@@ -1945,8 +1908,7 @@ void main() {
     });
 
     group('Concurrent Usage Simulation', () {
-      test('should maintain immutability under simulated concurrent access',
-          () {
+      test('should maintain immutability under simulated concurrent access', () {
         final baseList = [
           const _TestUser(id: '1', name: 'Alice'),
           const _TestUser(id: '2', name: 'Bob'),
@@ -1989,11 +1951,12 @@ void main() {
           currentState = currentState.updateNested(
             (comment) => comment.id == '2',
             children: (comment) => comment.replies,
-            update: (comment) =>
-                _TestComment(id: '2', text: 'Reply 1', upvotes: 5 + i)
-                    .copyWith(modifiedAt: DateTime.now()),
-            updateChildren: (parent, newReplies) =>
-                parent.copyWith(replies: newReplies),
+            update: (comment) => _TestComment(
+              id: '2',
+              text: 'Reply 1',
+              upvotes: 5 + i,
+            ).copyWith(modifiedAt: DateTime.now()),
+            updateChildren: (parent, newReplies) => parent.copyWith(replies: newReplies),
           );
         }
 
@@ -2031,8 +1994,7 @@ void main() {
             authorId: 'user1',
             content: 'Hello Updated',
           ),
-          key: (activity) =>
-              '${activity.authorId}_${activity.content.split(' ').first}',
+          key: (activity) => '${activity.authorId}_${activity.content.split(' ').first}',
         );
 
         expect(result.length, 2); // Should replace 'Hello' activity

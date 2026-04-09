@@ -743,8 +743,7 @@ void main() {
         final model = TestModel(metadata: {'a': 1, 'b': 2});
 
         expect(
-          Filter.equal(TestFilterField.metadata, {'b': 2, 'a': 1})
-              .matches(model),
+          Filter.equal(TestFilterField.metadata, {'b': 2, 'a': 1}).matches(model),
           isTrue,
         );
       });
@@ -796,23 +795,19 @@ void main() {
         final modelWithoutDiacritic = TestModel(name: 'Jose');
 
         expect(
-          Filter.equal(TestFilterField.name, 'José')
-              .matches(modelWithDiacritic),
+          Filter.equal(TestFilterField.name, 'José').matches(modelWithDiacritic),
           isTrue,
         );
         expect(
-          Filter.equal(TestFilterField.name, 'José')
-              .matches(modelWithoutDiacritic),
+          Filter.equal(TestFilterField.name, 'José').matches(modelWithoutDiacritic),
           isFalse,
         );
         expect(
-          Filter.equal(TestFilterField.name, 'Jose')
-              .matches(modelWithDiacritic),
+          Filter.equal(TestFilterField.name, 'Jose').matches(modelWithDiacritic),
           isFalse,
         );
         expect(
-          Filter.equal(TestFilterField.name, 'jose')
-              .matches(modelWithDiacritic),
+          Filter.equal(TestFilterField.name, 'jose').matches(modelWithDiacritic),
           isFalse,
         );
       });
@@ -873,18 +868,15 @@ void main() {
         final model = TestModel(name: 'John');
 
         expect(
-          Filter.in_(TestFilterField.name, ['John', 'Jane', 'Bob'])
-              .matches(model),
+          Filter.in_(TestFilterField.name, ['John', 'Jane', 'Bob']).matches(model),
           isTrue,
         );
         expect(
-          Filter.in_(TestFilterField.name, ['john', 'Jane', 'Bob'])
-              .matches(model),
+          Filter.in_(TestFilterField.name, ['john', 'Jane', 'Bob']).matches(model),
           isFalse,
         );
         expect(
-          Filter.in_(TestFilterField.name, ['JOHN', 'Jane', 'Bob'])
-              .matches(model),
+          Filter.in_(TestFilterField.name, ['JOHN', 'Jane', 'Bob']).matches(model),
           isFalse,
         );
       });
@@ -894,23 +886,27 @@ void main() {
         final modelWithoutDiacritic = TestModel(name: 'Jose');
 
         expect(
-          Filter.in_(TestFilterField.name, ['José', 'François', 'Müller'])
-              .matches(modelWithDiacritic),
+          Filter.in_(TestFilterField.name, [
+            'José',
+            'François',
+            'Müller',
+          ]).matches(modelWithDiacritic),
           isTrue,
         );
         expect(
-          Filter.in_(TestFilterField.name, ['José', 'François', 'Müller'])
-              .matches(modelWithoutDiacritic),
+          Filter.in_(TestFilterField.name, [
+            'José',
+            'François',
+            'Müller',
+          ]).matches(modelWithoutDiacritic),
           isFalse,
         );
         expect(
-          Filter.in_(TestFilterField.name, ['Jose', 'Francois'])
-              .matches(modelWithDiacritic),
+          Filter.in_(TestFilterField.name, ['Jose', 'Francois']).matches(modelWithDiacritic),
           isFalse,
         );
         expect(
-          Filter.in_(TestFilterField.name, ['jose', 'françois'])
-              .matches(modelWithDiacritic),
+          Filter.in_(TestFilterField.name, ['jose', 'françois']).matches(modelWithDiacritic),
           isFalse,
         );
       });
@@ -921,8 +917,7 @@ void main() {
         final model = TestModel(metadata: {'a': 1, 'b': 2, 'c': 3});
 
         expect(
-          Filter.contains(TestFilterField.metadata, {'a': 1, 'b': 2})
-              .matches(model),
+          Filter.contains(TestFilterField.metadata, {'a': 1, 'b': 2}).matches(model),
           isTrue,
         );
         expect(
@@ -935,8 +930,7 @@ void main() {
         final modelWithNull = TestModel(metadata: {'status': null});
         final modelWithoutKey = TestModel(metadata: {'name': 'John'});
 
-        final filter =
-            Filter.contains(TestFilterField.metadata, {'status': null});
+        final filter = Filter.contains(TestFilterField.metadata, {'status': null});
 
         expect(filter.matches(modelWithNull), isTrue);
         expect(filter.matches(modelWithoutKey), isFalse);
@@ -1008,14 +1002,12 @@ void main() {
 
           // Filter with duplicates should match (duplicates ignored)
           expect(
-            Filter.contains(TestFilterField.tags, ['a', 'a', 'a'])
-                .matches(model),
+            Filter.contains(TestFilterField.tags, ['a', 'a', 'a']).matches(model),
             isTrue, // Should be TRUE, not FALSE
           );
 
           expect(
-            Filter.contains(TestFilterField.tags, ['a', 'b', 'a'])
-                .matches(model),
+            Filter.contains(TestFilterField.tags, ['a', 'b', 'a']).matches(model),
             isTrue,
           );
         },
@@ -1067,18 +1059,15 @@ void main() {
         final model = TestModel(createdAt: DateTime(2023, 6, 15));
 
         expect(
-          Filter.greater(TestFilterField.createdAt, DateTime(2023, 1, 1))
-              .matches(model),
+          Filter.greater(TestFilterField.createdAt, DateTime(2023, 1, 1)).matches(model),
           isTrue,
         );
         expect(
-          Filter.greater(TestFilterField.createdAt, DateTime(2023, 6, 15))
-              .matches(model),
+          Filter.greater(TestFilterField.createdAt, DateTime(2023, 6, 15)).matches(model),
           isFalse,
         );
         expect(
-          Filter.greater(TestFilterField.createdAt, DateTime(2024, 1, 1))
-              .matches(model),
+          Filter.greater(TestFilterField.createdAt, DateTime(2024, 1, 1)).matches(model),
           isFalse,
         );
       });
@@ -1086,67 +1075,55 @@ void main() {
       test('Greater should use lexicographic comparison for strings', () {
         // Lexicographic: uppercase < lowercase
         expect(
-          Filter.greater(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Johnny')),
+          Filter.greater(TestFilterField.name, 'John').matches(TestModel(name: 'Johnny')),
           isTrue,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Mike')),
+          Filter.greater(TestFilterField.name, 'John').matches(TestModel(name: 'Mike')),
           isTrue,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'john')),
+          Filter.greater(TestFilterField.name, 'John').matches(TestModel(name: 'john')),
           isTrue,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'John')),
+          Filter.greater(TestFilterField.name, 'John').matches(TestModel(name: 'John')),
           isFalse,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'JOHN')),
+          Filter.greater(TestFilterField.name, 'John').matches(TestModel(name: 'JOHN')),
           isFalse,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Alice')),
+          Filter.greater(TestFilterField.name, 'John').matches(TestModel(name: 'Alice')),
           isFalse,
         );
       });
 
       test('Greater should handle diacritics lexicographically', () {
         expect(
-          Filter.greater(TestFilterField.name, 'José')
-              .matches(TestModel(name: 'Joséa')),
+          Filter.greater(TestFilterField.name, 'José').matches(TestModel(name: 'Joséa')),
           isTrue,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'José')
-              .matches(TestModel(name: 'joséa')),
+          Filter.greater(TestFilterField.name, 'José').matches(TestModel(name: 'joséa')),
           isTrue,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'José')
-              .matches(TestModel(name: 'José')),
+          Filter.greater(TestFilterField.name, 'José').matches(TestModel(name: 'José')),
           isFalse,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'José')
-              .matches(TestModel(name: 'Jose')),
+          Filter.greater(TestFilterField.name, 'José').matches(TestModel(name: 'Jose')),
           isFalse,
         );
         expect(
-          Filter.greater(TestFilterField.name, 'José')
-              .matches(TestModel(name: 'jose')),
+          Filter.greater(TestFilterField.name, 'José').matches(TestModel(name: 'jose')),
           isTrue,
         );
       });
 
-      test('GreaterOrEqual should match when field value is greater or equal',
-          () {
+      test('GreaterOrEqual should match when field value is greater or equal', () {
         final model = TestModel(id: '50');
 
         expect(
@@ -1163,36 +1140,29 @@ void main() {
         );
       });
 
-      test('GreaterOrEqual should use lexicographic comparison for strings',
-          () {
+      test('GreaterOrEqual should use lexicographic comparison for strings', () {
         expect(
-          Filter.greaterOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Johnny')),
+          Filter.greaterOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'Johnny')),
           isTrue,
         );
         expect(
-          Filter.greaterOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Mike')),
+          Filter.greaterOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'Mike')),
           isTrue,
         );
         expect(
-          Filter.greaterOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'john')),
+          Filter.greaterOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'john')),
           isTrue,
         );
         expect(
-          Filter.greaterOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'John')),
+          Filter.greaterOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'John')),
           isTrue,
         );
         expect(
-          Filter.greaterOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'JOHN')),
+          Filter.greaterOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'JOHN')),
           isFalse,
         );
         expect(
-          Filter.greaterOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Alice')),
+          Filter.greaterOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'Alice')),
           isFalse,
         );
       });
@@ -1201,51 +1171,42 @@ void main() {
         final model = TestModel(createdAt: DateTime(2023, 6, 15));
 
         expect(
-          Filter.less(TestFilterField.createdAt, DateTime(2024, 1, 1))
-              .matches(model),
+          Filter.less(TestFilterField.createdAt, DateTime(2024, 1, 1)).matches(model),
           isTrue,
         );
         expect(
-          Filter.less(TestFilterField.createdAt, DateTime(2023, 6, 15))
-              .matches(model),
+          Filter.less(TestFilterField.createdAt, DateTime(2023, 6, 15)).matches(model),
           isFalse,
         );
         expect(
-          Filter.less(TestFilterField.createdAt, DateTime(2023, 1, 1))
-              .matches(model),
+          Filter.less(TestFilterField.createdAt, DateTime(2023, 1, 1)).matches(model),
           isFalse,
         );
       });
 
       test('Less should use lexicographic comparison for strings', () {
         expect(
-          Filter.less(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Johnny')),
+          Filter.less(TestFilterField.name, 'John').matches(TestModel(name: 'Johnny')),
           isFalse,
         );
         expect(
-          Filter.less(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Mike')),
+          Filter.less(TestFilterField.name, 'John').matches(TestModel(name: 'Mike')),
           isFalse,
         );
         expect(
-          Filter.less(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'john')),
+          Filter.less(TestFilterField.name, 'John').matches(TestModel(name: 'john')),
           isFalse,
         );
         expect(
-          Filter.less(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'John')),
+          Filter.less(TestFilterField.name, 'John').matches(TestModel(name: 'John')),
           isFalse,
         );
         expect(
-          Filter.less(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'JOHN')),
+          Filter.less(TestFilterField.name, 'John').matches(TestModel(name: 'JOHN')),
           isTrue,
         );
         expect(
-          Filter.less(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Alice')),
+          Filter.less(TestFilterField.name, 'John').matches(TestModel(name: 'Alice')),
           isTrue,
         );
       });
@@ -1269,33 +1230,27 @@ void main() {
 
       test('LessOrEqual should use lexicographic comparison for strings', () {
         expect(
-          Filter.lessOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Johnny')),
+          Filter.lessOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'Johnny')),
           isFalse,
         );
         expect(
-          Filter.lessOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Mike')),
+          Filter.lessOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'Mike')),
           isFalse,
         );
         expect(
-          Filter.lessOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'john')),
+          Filter.lessOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'john')),
           isFalse,
         );
         expect(
-          Filter.lessOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'John')),
+          Filter.lessOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'John')),
           isTrue,
         );
         expect(
-          Filter.lessOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'JOHN')),
+          Filter.lessOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'JOHN')),
           isTrue,
         );
         expect(
-          Filter.lessOrEqual(TestFilterField.name, 'John')
-              .matches(TestModel(name: 'Alice')),
+          Filter.lessOrEqual(TestFilterField.name, 'John').matches(TestModel(name: 'Alice')),
           isTrue,
         );
       });
@@ -1321,8 +1276,7 @@ void main() {
         );
       });
 
-      test('should return false for NULL comparisons (PostgreSQL semantics)',
-          () {
+      test('should return false for NULL comparisons (PostgreSQL semantics)', () {
         final modelWithNull = TestModel(id: null);
         final modelWithValue = TestModel(id: '50');
 
@@ -1344,20 +1298,17 @@ void main() {
 
         // GreaterOrEqual: NULL >= value → false
         expect(
-          Filter.greaterOrEqual(TestFilterField.id, '30')
-              .matches(modelWithNull),
+          Filter.greaterOrEqual(TestFilterField.id, '30').matches(modelWithNull),
           isFalse,
         );
         // GreaterOrEqual: value >= NULL → false
         expect(
-          Filter.greaterOrEqual(TestFilterField.id, null)
-              .matches(modelWithValue),
+          Filter.greaterOrEqual(TestFilterField.id, null).matches(modelWithValue),
           isFalse,
         );
         // GreaterOrEqual: NULL >= NULL → false
         expect(
-          Filter.greaterOrEqual(TestFilterField.id, null)
-              .matches(modelWithNull),
+          Filter.greaterOrEqual(TestFilterField.id, null).matches(modelWithNull),
           isFalse,
         );
 
@@ -1473,8 +1424,7 @@ void main() {
         final filter = Filter.query(TestFilterField.name, 'PROD');
 
         final itemWithLowercase = TestModel(name: 'production server');
-        final itemWithMixedCase =
-            TestModel(name: 'Development Production Environment');
+        final itemWithMixedCase = TestModel(name: 'Development Production Environment');
         final itemWithPartialMatch = TestModel(name: 'reproduced issue');
         final itemWithoutMatch = TestModel(name: 'staging server');
 
@@ -1495,46 +1445,38 @@ void main() {
 
       test('should handle diacritics case-insensitively', () {
         expect(
-          Filter.query(TestFilterField.name, 'josé')
-              .matches(TestModel(name: 'José')),
+          Filter.query(TestFilterField.name, 'josé').matches(TestModel(name: 'José')),
           isTrue,
         );
         expect(
-          Filter.query(TestFilterField.name, 'josé')
-              .matches(TestModel(name: 'JOSÉ')),
+          Filter.query(TestFilterField.name, 'josé').matches(TestModel(name: 'JOSÉ')),
           isTrue,
         );
         expect(
-          Filter.query(TestFilterField.name, 'josé')
-              .matches(TestModel(name: 'josé')),
+          Filter.query(TestFilterField.name, 'josé').matches(TestModel(name: 'josé')),
           isTrue,
         );
         expect(
-          Filter.query(TestFilterField.name, 'josé')
-              .matches(TestModel(name: 'Jose')),
+          Filter.query(TestFilterField.name, 'josé').matches(TestModel(name: 'Jose')),
           isFalse,
         );
         expect(
-          Filter.query(TestFilterField.name, 'josé')
-              .matches(TestModel(name: 'jose')),
+          Filter.query(TestFilterField.name, 'josé').matches(TestModel(name: 'jose')),
           isFalse,
         );
       });
 
       test('should match middle and end substrings', () {
         expect(
-          Filter.query(TestFilterField.name, 'hn')
-              .matches(TestModel(name: 'John')),
+          Filter.query(TestFilterField.name, 'hn').matches(TestModel(name: 'John')),
           isTrue,
         );
         expect(
-          Filter.query(TestFilterField.name, 'hn')
-              .matches(TestModel(name: 'JOHN')),
+          Filter.query(TestFilterField.name, 'hn').matches(TestModel(name: 'JOHN')),
           isTrue,
         );
         expect(
-          Filter.query(TestFilterField.name, 'hn')
-              .matches(TestModel(name: 'Jane')),
+          Filter.query(TestFilterField.name, 'hn').matches(TestModel(name: 'Jane')),
           isFalse,
         );
       });
@@ -1563,13 +1505,11 @@ void main() {
         final modelWithEmptyName = TestModel(name: '');
 
         expect(
-          Filter.autoComplete(TestFilterField.name, '')
-              .matches(modelWithContent),
+          Filter.autoComplete(TestFilterField.name, '').matches(modelWithContent),
           isFalse,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, '')
-              .matches(modelWithEmptyName),
+          Filter.autoComplete(TestFilterField.name, '').matches(modelWithEmptyName),
           isFalse,
         );
       });
@@ -1578,10 +1518,8 @@ void main() {
         final filter = Filter.autoComplete(TestFilterField.name, 'con');
 
         final itemWithDotSeparation = TestModel(name: 'app.config.json');
-        final itemWithDashSeparation =
-            TestModel(name: 'user-configuration-file');
-        final itemWithMixedPunctuation =
-            TestModel(name: 'system/container,settings.xml');
+        final itemWithDashSeparation = TestModel(name: 'user-configuration-file');
+        final itemWithMixedPunctuation = TestModel(name: 'system/container,settings.xml');
         final itemWithoutWordPrefix = TestModel(name: 'application');
         final itemWithInWordMatch = TestModel(name: 'reconstruction');
 
@@ -1603,88 +1541,77 @@ void main() {
 
       test('should handle diacritics case-insensitively', () {
         expect(
-          Filter.autoComplete(TestFilterField.name, 'jos')
-              .matches(TestModel(name: 'José')),
+          Filter.autoComplete(TestFilterField.name, 'jos').matches(TestModel(name: 'José')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'jos')
-              .matches(TestModel(name: 'JOSÉ')),
+          Filter.autoComplete(TestFilterField.name, 'jos').matches(TestModel(name: 'JOSÉ')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'jos')
-              .matches(TestModel(name: 'josé')),
+          Filter.autoComplete(TestFilterField.name, 'jos').matches(TestModel(name: 'josé')),
           isTrue,
         );
       });
 
       test('should match word boundaries in multi-word text', () {
         expect(
-          Filter.autoComplete(TestFilterField.name, 'john')
-              .matches(TestModel(name: 'John Smith')),
+          Filter.autoComplete(TestFilterField.name, 'john').matches(TestModel(name: 'John Smith')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'john')
-              .matches(TestModel(name: 'JOHN DOE')),
+          Filter.autoComplete(TestFilterField.name, 'john').matches(TestModel(name: 'JOHN DOE')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'john')
-              .matches(TestModel(name: 'Smith John')),
+          Filter.autoComplete(TestFilterField.name, 'john').matches(TestModel(name: 'Smith John')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'smi')
-              .matches(TestModel(name: 'John Smith')),
+          Filter.autoComplete(TestFilterField.name, 'smi').matches(TestModel(name: 'John Smith')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'smi')
-              .matches(TestModel(name: 'Johnson')),
+          Filter.autoComplete(TestFilterField.name, 'smi').matches(TestModel(name: 'Johnson')),
           isFalse,
         );
       });
 
       test('should handle punctuation as word boundaries', () {
         expect(
-          Filter.autoComplete(TestFilterField.name, 'john')
-              .matches(TestModel(name: 'john-doe')),
+          Filter.autoComplete(TestFilterField.name, 'john').matches(TestModel(name: 'john-doe')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'john')
-              .matches(TestModel(name: 'john.doe')),
+          Filter.autoComplete(TestFilterField.name, 'john').matches(TestModel(name: 'john.doe')),
           isTrue,
         );
         expect(
-          Filter.autoComplete(TestFilterField.name, 'john')
-              .matches(TestModel(name: 'Johnson')),
+          Filter.autoComplete(TestFilterField.name, 'john').matches(TestModel(name: 'Johnson')),
           isTrue,
         );
       });
 
       test('should not match when query is longer than word', () {
         expect(
-          Filter.autoComplete(TestFilterField.name, 'johnathan')
-              .matches(TestModel(name: 'John')),
+          Filter.autoComplete(TestFilterField.name, 'johnathan').matches(TestModel(name: 'John')),
           isFalse,
         );
       });
 
       test('should return false for non-string fields', () {
         expect(
-          Filter.autoComplete(TestFilterField.metadata, 'test')
-              .matches(TestModel(metadata: {'key': 'value'})),
+          Filter.autoComplete(
+            TestFilterField.metadata,
+            'test',
+          ).matches(TestModel(metadata: {'key': 'value'})),
           isFalse,
         );
       });
 
       test('should return false for fields with only punctuation', () {
         expect(
-          Filter.autoComplete(TestFilterField.name, 'test')
-              .matches(TestModel(name: '...')),
+          Filter.autoComplete(TestFilterField.name, 'test').matches(TestModel(name: '...')),
           isFalse,
         );
       });
@@ -1701,13 +1628,11 @@ void main() {
         );
 
         expect(
-          Filter.pathExists(TestFilterField.metadata, 'user.profile.name')
-              .matches(model),
+          Filter.pathExists(TestFilterField.metadata, 'user.profile.name').matches(model),
           isTrue,
         );
         expect(
-          Filter.pathExists(TestFilterField.metadata, 'user.profile.age')
-              .matches(model),
+          Filter.pathExists(TestFilterField.metadata, 'user.profile.age').matches(model),
           isFalse,
         );
       });
@@ -1738,8 +1663,7 @@ void main() {
         final model = TestModel(metadata: null);
 
         expect(
-          Filter.pathExists(TestFilterField.metadata, 'user.name')
-              .matches(model),
+          Filter.pathExists(TestFilterField.metadata, 'user.name').matches(model),
           isFalse,
         );
       });
@@ -1761,8 +1685,7 @@ void main() {
         );
 
         expect(
-          Filter.pathExists(TestFilterField.metadata, 'user.name')
-              .matches(model),
+          Filter.pathExists(TestFilterField.metadata, 'user.name').matches(model),
           isFalse,
         );
       });
@@ -1773,15 +1696,13 @@ void main() {
 
         // Path exists but value is null - should match (key exists)
         expect(
-          Filter.pathExists(TestFilterField.metadata, 'user')
-              .matches(modelWithNull),
+          Filter.pathExists(TestFilterField.metadata, 'user').matches(modelWithNull),
           isTrue,
         );
 
         // Path doesn't exist - should not match
         expect(
-          Filter.pathExists(TestFilterField.metadata, 'user')
-              .matches(modelWithoutKey),
+          Filter.pathExists(TestFilterField.metadata, 'user').matches(modelWithoutKey),
           isFalse,
         );
       });
@@ -1876,9 +1797,7 @@ void main() {
         );
       });
 
-      test(
-          'should handle null values in optional fields (PostgreSQL semantics)',
-          () {
+      test('should handle null values in optional fields (PostgreSQL semantics)', () {
         final modelWithNull = TestModel(name: null);
         final modelWithValue = TestModel(name: 'John');
 
@@ -1935,8 +1854,7 @@ void main() {
           isTrue,
         );
         expect(
-          Filter.contains(TestFilterField.metadata, {})
-              .matches(modelWithValues),
+          Filter.contains(TestFilterField.metadata, {}).matches(modelWithValues),
           isTrue,
         );
       });

@@ -18,7 +18,7 @@ final class HealthCheckPingEvent extends WsRequest {
   Map<String, Object?> toJson() {
     return {
       'type': 'health.check',
-      if (connectionId case final id?) 'client_id': id,
+      'client_id': ?connectionId,
     };
   }
 }

@@ -112,7 +112,8 @@ enum AuthType {
   ///
   /// Allows unauthenticated access with limited permissions.
   /// Used for public content access or guest user scenarios.
-  anonymous('anonymous');
+  anonymous('anonymous')
+  ;
 
   /// Constructs an [AuthType] with the associated header value.
   const AuthType(this.headerValue);
