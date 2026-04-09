@@ -3,7 +3,7 @@ name: Publish Design System Gallery
 on:
   push:
     branches:
-      - main-design-system
+      - main
   workflow_dispatch:
 
 env:
