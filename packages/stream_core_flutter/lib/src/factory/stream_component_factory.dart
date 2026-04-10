@@ -165,7 +165,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     StreamComponentBuilder<StreamStepperProps>? stepper,
     StreamComponentBuilder<StreamTextInputProps>? textInput,
-    StreamComponentBuilder<StreamToggleSwitchProps>? toggleSwitch,
+    StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
     StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
@@ -446,8 +446,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
 
   /// Custom builder for toggle switch widgets.
   ///
-  /// When null, [StreamToggleSwitch] uses [DefaultStreamToggleSwitch].
-  final StreamComponentBuilder<StreamToggleSwitchProps>? toggleSwitch;
+  /// When null, [StreamSwitch] uses [DefaultStreamSwitch].
+  final StreamComponentBuilder<StreamSwitchProps>? toggleSwitch;
 
   /// Custom builder for source badge widgets.
   ///

@@ -30,7 +30,7 @@ export 'components/controls/stream_emoji_chip_bar.dart' hide DefaultStreamEmojiC
 export 'components/controls/stream_playback_speed_toggle.dart' hide DefaultStreamPlaybackSpeedToggle;
 export 'components/controls/stream_remove_control.dart';
 export 'components/controls/stream_stepper.dart' hide DefaultStreamStepper;
-export 'components/controls/stream_toggle_switch.dart' hide DefaultStreamToggleSwitch;
+export 'components/controls/stream_switch.dart' hide DefaultStreamSwitch;
 export 'components/emoji/data/stream_emoji_data.dart';
 export 'components/emoji/data/stream_supported_emojis.dart';
 export 'components/emoji/stream_emoji_picker_sheet.dart';

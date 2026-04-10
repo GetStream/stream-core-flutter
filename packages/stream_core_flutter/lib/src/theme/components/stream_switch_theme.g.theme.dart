@@ -3,18 +3,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, unused_element
 
-part of 'stream_toggle_switch_theme.dart';
+part of 'stream_switch_theme.dart';
 
 // **************************************************************************
 // ThemeGenGenerator
 // **************************************************************************
 
-mixin _$StreamToggleSwitchThemeData {
+mixin _$StreamSwitchThemeData {
   bool get canMerge => true;
 
-  static StreamToggleSwitchThemeData? lerp(
-    StreamToggleSwitchThemeData? a,
-    StreamToggleSwitchThemeData? b,
+  static StreamSwitchThemeData? lerp(
+    StreamSwitchThemeData? a,
+    StreamSwitchThemeData? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -29,19 +29,19 @@ mixin _$StreamToggleSwitchThemeData {
       return t == 0.0 ? a : null;
     }
 
-    return StreamToggleSwitchThemeData(
-      style: StreamToggleSwitchStyle.lerp(a.style, b.style, t),
+    return StreamSwitchThemeData(
+      style: StreamSwitchStyle.lerp(a.style, b.style, t),
     );
   }
 
-  StreamToggleSwitchThemeData copyWith({StreamToggleSwitchStyle? style}) {
-    final _this = (this as StreamToggleSwitchThemeData);
+  StreamSwitchThemeData copyWith({StreamSwitchStyle? style}) {
+    final _this = (this as StreamSwitchThemeData);
 
-    return StreamToggleSwitchThemeData(style: style ?? _this.style);
+    return StreamSwitchThemeData(style: style ?? _this.style);
   }
 
-  StreamToggleSwitchThemeData merge(StreamToggleSwitchThemeData? other) {
-    final _this = (this as StreamToggleSwitchThemeData);
+  StreamSwitchThemeData merge(StreamSwitchThemeData? other) {
+    final _this = (this as StreamSwitchThemeData);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -64,26 +64,26 @@ mixin _$StreamToggleSwitchThemeData {
       return false;
     }
 
-    final _this = (this as StreamToggleSwitchThemeData);
-    final _other = (other as StreamToggleSwitchThemeData);
+    final _this = (this as StreamSwitchThemeData);
+    final _other = (other as StreamSwitchThemeData);
 
     return _other.style == _this.style;
   }
 
   @override
   int get hashCode {
-    final _this = (this as StreamToggleSwitchThemeData);
+    final _this = (this as StreamSwitchThemeData);
 
     return Object.hash(runtimeType, _this.style);
   }
 }
 
-mixin _$StreamToggleSwitchStyle {
+mixin _$StreamSwitchStyle {
   bool get canMerge => true;
 
-  static StreamToggleSwitchStyle? lerp(
-    StreamToggleSwitchStyle? a,
-    StreamToggleSwitchStyle? b,
+  static StreamSwitchStyle? lerp(
+    StreamSwitchStyle? a,
+    StreamSwitchStyle? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -98,7 +98,7 @@ mixin _$StreamToggleSwitchStyle {
       return t == 0.0 ? a : null;
     }
 
-    return StreamToggleSwitchStyle(
+    return StreamSwitchStyle(
       trackColor: WidgetStateProperty.lerp<Color?>(
         a.trackColor,
         b.trackColor,
@@ -132,16 +132,16 @@ mixin _$StreamToggleSwitchStyle {
     );
   }
 
-  StreamToggleSwitchStyle copyWith({
+  StreamSwitchStyle copyWith({
     WidgetStateProperty<Color?>? trackColor,
     WidgetStateProperty<Color?>? thumbColor,
     WidgetStateProperty<Color?>? trackOutlineColor,
     WidgetStateProperty<double?>? trackOutlineWidth,
     WidgetStateProperty<Color?>? overlayColor,
   }) {
-    final _this = (this as StreamToggleSwitchStyle);
+    final _this = (this as StreamSwitchStyle);
 
-    return StreamToggleSwitchStyle(
+    return StreamSwitchStyle(
       trackColor: trackColor ?? _this.trackColor,
       thumbColor: thumbColor ?? _this.thumbColor,
       trackOutlineColor: trackOutlineColor ?? _this.trackOutlineColor,
@@ -150,8 +150,8 @@ mixin _$StreamToggleSwitchStyle {
     );
   }
 
-  StreamToggleSwitchStyle merge(StreamToggleSwitchStyle? other) {
-    final _this = (this as StreamToggleSwitchStyle);
+  StreamSwitchStyle merge(StreamSwitchStyle? other) {
+    final _this = (this as StreamSwitchStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -180,8 +180,8 @@ mixin _$StreamToggleSwitchStyle {
       return false;
     }
 
-    final _this = (this as StreamToggleSwitchStyle);
-    final _other = (other as StreamToggleSwitchStyle);
+    final _this = (this as StreamSwitchStyle);
+    final _other = (other as StreamSwitchStyle);
 
     return _other.trackColor == _this.trackColor &&
         _other.thumbColor == _this.thumbColor &&
@@ -192,7 +192,7 @@ mixin _$StreamToggleSwitchStyle {
 
   @override
   int get hashCode {
-    final _this = (this as StreamToggleSwitchStyle);
+    final _this = (this as StreamSwitchStyle);
 
     return Object.hash(
       runtimeType,

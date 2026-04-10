@@ -113,7 +113,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
     Widget Function(BuildContext, StreamStepperProps)? stepper,
     Widget Function(BuildContext, StreamTextInputProps)? textInput,
-    Widget Function(BuildContext, StreamToggleSwitchProps)? toggleSwitch,
+    Widget Function(BuildContext, StreamSwitchProps)? toggleSwitch,
     Widget Function(BuildContext, StreamImageSourceBadgeProps)?
     imageSourceBadge,
   }) {

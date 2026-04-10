@@ -42,7 +42,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamReactionsThemeData? reactionsTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamStepperThemeData? stepperTheme,
-    StreamToggleSwitchThemeData? toggleSwitchTheme,
+    StreamSwitchThemeData? switchTheme,
   }) {
     final _this = (this as StreamTheme);
 
@@ -80,7 +80,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
       stepperTheme: stepperTheme ?? _this.stepperTheme,
-      toggleSwitchTheme: toggleSwitchTheme ?? _this.toggleSwitchTheme,
+      switchTheme: switchTheme ?? _this.switchTheme,
     );
   }
 
@@ -211,9 +211,9 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.stepperTheme,
         t,
       )!,
-      toggleSwitchTheme: StreamToggleSwitchThemeData.lerp(
-        _this.toggleSwitchTheme,
-        other.toggleSwitchTheme,
+      switchTheme: StreamSwitchThemeData.lerp(
+        _this.switchTheme,
+        other.switchTheme,
         t,
       )!,
     );
@@ -262,7 +262,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.reactionsTheme == _this.reactionsTheme &&
         _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
         _other.stepperTheme == _this.stepperTheme &&
-        _other.toggleSwitchTheme == _this.toggleSwitchTheme;
+        _other.switchTheme == _this.switchTheme;
   }
 
   @override
@@ -301,7 +301,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.reactionsTheme,
       _this.skeletonLoadingTheme,
       _this.stepperTheme,
-      _this.toggleSwitchTheme,
+      _this.switchTheme,
     ]);
   }
 }

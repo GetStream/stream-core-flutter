@@ -1,8 +1,13 @@
 ## 0.2.0
 
+### 💥 Breaking Changes
+
+- Renamed `StreamInputTheme`/`StreamInputThemeData` to `StreamTextInputTheme`/`StreamTextInputThemeData` with a redesigned API
+- Renamed `StreamTheme.inputTheme` to `StreamTheme.textInputTheme`
+
 ### ✨ Features
 
-- Added `StreamToggleSwitch` component with platform-aware styling and `style` prop
+- Added `StreamSwitch` component with platform-aware styling and `style` prop
 - Added `StreamTextInput` component with configurable helper text, icons, and validation states
 - Added `StreamStepper` component for numeric value adjustment with customizable bounds and `style` prop
 - Extended `StreamButtonThemeStyle` with sizing, alignment, padding, and shape options

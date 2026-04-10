@@ -9,10 +9,10 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: StreamToggleSwitch,
+  type: StreamSwitch,
   path: '[Components]/Controls',
 )
-Widget buildStreamToggleSwitchPlayground(BuildContext context) {
+Widget buildStreamSwitchPlayground(BuildContext context) {
   return const _PlaygroundDemo();
 }
 
@@ -34,7 +34,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
     );
 
     return Center(
-      child: StreamToggleSwitch(
+      child: StreamSwitch(
         value: _value,
         onChanged: isDisabled
             ? null
@@ -52,10 +52,10 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: StreamToggleSwitch,
+  type: StreamSwitch,
   path: '[Components]/Controls',
 )
-Widget buildStreamToggleSwitchShowcase(BuildContext context) {
+Widget buildStreamSwitchShowcase(BuildContext context) {
   final colorScheme = context.streamColorScheme;
   final textTheme = context.streamTextTheme;
   final spacing = context.streamSpacing;
@@ -117,25 +117,25 @@ class _StatesSection extends StatelessWidget {
               _StateDemo(
                 label: 'Off',
                 description: 'Default unselected state',
-                child: StreamToggleSwitch(value: false, onChanged: (_) {}),
+                child: StreamSwitch(value: false, onChanged: (_) {}),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
               _StateDemo(
                 label: 'On',
                 description: 'Selected (active) state',
-                child: StreamToggleSwitch(value: true, onChanged: (_) {}),
+                child: StreamSwitch(value: true, onChanged: (_) {}),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
               _StateDemo(
                 label: 'Disabled Off',
                 description: 'Non-interactive unselected state',
-                child: StreamToggleSwitch(value: false, onChanged: null),
+                child: StreamSwitch(value: false, onChanged: null),
               ),
               Divider(height: 1, color: colorScheme.borderSubtle),
               _StateDemo(
                 label: 'Disabled On',
                 description: 'Non-interactive selected state',
-                child: StreamToggleSwitch(value: true, onChanged: null),
+                child: StreamSwitch(value: true, onChanged: null),
               ),
             ],
           ),
@@ -240,7 +240,7 @@ class _ToggleDemoState extends State<_ToggleDemo> {
         Row(
           spacing: spacing.md,
           children: [
-            StreamToggleSwitch(
+            StreamSwitch(
               value: _value1,
               onChanged: (v) => setState(() => _value1 = v),
             ),
@@ -255,7 +255,7 @@ class _ToggleDemoState extends State<_ToggleDemo> {
         Row(
           spacing: spacing.md,
           children: [
-            StreamToggleSwitch(
+            StreamSwitch(
               value: _value2,
               onChanged: (v) => setState(() => _value2 = v),
             ),
@@ -290,7 +290,7 @@ class _ThemeCustomizationSection extends StatelessWidget {
         _SectionLabel(label: 'THEME CUSTOMIZATION'),
         _ExampleCard(
           title: 'Custom Track Colors',
-          description: 'Overriding track colors via StreamToggleSwitchTheme',
+          description: 'Overriding track colors via StreamSwitchTheme',
           child: _CustomColorsDemo(),
         ),
       ],
@@ -341,16 +341,16 @@ class _CustomColorsDemoState extends State<_CustomColorsDemo> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return StreamToggleSwitchTheme(
-      data: StreamToggleSwitchThemeData(
-        style: StreamToggleSwitchStyle(
+    return StreamSwitchTheme(
+      data: StreamSwitchThemeData(
+        style: StreamSwitchStyle(
           trackColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) return color;
             return null;
           }),
         ),
       ),
-      child: StreamToggleSwitch(
+      child: StreamSwitch(
         value: value,
         onChanged: onChanged,
       ),
@@ -475,7 +475,7 @@ class _SettingsRow extends StatelessWidget {
               ),
             ),
           ),
-          StreamToggleSwitch(
+          StreamSwitch(
             value: value,
             onChanged: onChanged,
           ),

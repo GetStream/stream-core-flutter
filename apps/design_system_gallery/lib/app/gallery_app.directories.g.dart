@@ -64,8 +64,8 @@ import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.
     as _design_system_gallery_components_controls_stream_emoji_chip_bar;
 import 'package:design_system_gallery/components/controls/stream_stepper.dart'
     as _design_system_gallery_components_controls_stream_stepper;
-import 'package:design_system_gallery/components/controls/stream_toggle_switch.dart'
-    as _design_system_gallery_components_controls_stream_toggle_switch;
+import 'package:design_system_gallery/components/controls/stream_switch.dart'
+    as _design_system_gallery_components_controls_stream_switch;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
@@ -708,19 +708,19 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'StreamToggleSwitch',
+            name: 'StreamSwitch',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_controls_stream_toggle_switch
-                        .buildStreamToggleSwitchPlayground,
+                    _design_system_gallery_components_controls_stream_switch
+                        .buildStreamSwitchPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Showcase',
                 builder:
-                    _design_system_gallery_components_controls_stream_toggle_switch
-                        .buildStreamToggleSwitchShowcase,
+                    _design_system_gallery_components_controls_stream_switch
+                        .buildStreamSwitchShowcase,
               ),
             ],
           ),

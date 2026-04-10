@@ -4,11 +4,11 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 import '../stream_theme.dart';
 import '../widget_state_utils.dart';
 
-part 'stream_toggle_switch_theme.g.theme.dart';
+part 'stream_switch_theme.g.theme.dart';
 
-/// Applies a toggle switch theme to descendant [StreamToggleSwitch] widgets.
+/// Applies a toggle switch theme to descendant [StreamSwitch] widgets.
 ///
-/// Wrap a subtree with [StreamToggleSwitchTheme] to override toggle switch
+/// Wrap a subtree with [StreamSwitchTheme] to override toggle switch
 /// styling. Access the merged theme using
 /// [BuildContext.streamToggleSwitchTheme].
 ///
@@ -17,9 +17,9 @@ part 'stream_toggle_switch_theme.g.theme.dart';
 /// Override toggle switch styling for a specific section:
 ///
 /// ```dart
-/// StreamToggleSwitchTheme(
-///   data: StreamToggleSwitchThemeData(
-///     style: StreamToggleSwitchStyle(
+/// StreamSwitchTheme(
+///   data: StreamSwitchThemeData(
+///     style: StreamSwitchStyle(
 ///       trackColor: WidgetStateProperty.resolveWith((states) {
 ///         if (states.contains(WidgetState.selected)) {
 ///           return Colors.green;
@@ -28,7 +28,7 @@ part 'stream_toggle_switch_theme.g.theme.dart';
 ///       }),
 ///     ),
 ///   ),
-///   child: StreamToggleSwitch(
+///   child: StreamSwitch(
 ///     value: true,
 ///     onChanged: (value) {},
 ///   ),
@@ -38,39 +38,39 @@ part 'stream_toggle_switch_theme.g.theme.dart';
 ///
 /// See also:
 ///
-///  * [StreamToggleSwitchThemeData], which describes the toggle switch theme.
-///  * [StreamToggleSwitch], the widget affected by this theme.
-class StreamToggleSwitchTheme extends InheritedTheme {
+///  * [StreamSwitchThemeData], which describes the toggle switch theme.
+///  * [StreamSwitch], the widget affected by this theme.
+class StreamSwitchTheme extends InheritedTheme {
   /// Creates a toggle switch theme that controls descendant toggle switches.
-  const StreamToggleSwitchTheme({
+  const StreamSwitchTheme({
     super.key,
     required this.data,
     required super.child,
   });
 
   /// The toggle switch theme data for descendant widgets.
-  final StreamToggleSwitchThemeData data;
+  final StreamSwitchThemeData data;
 
-  /// Returns the [StreamToggleSwitchThemeData] merged from local and global
+  /// Returns the [StreamSwitchThemeData] merged from local and global
   /// themes.
   ///
-  /// Local values from the nearest [StreamToggleSwitchTheme] ancestor take
+  /// Local values from the nearest [StreamSwitchTheme] ancestor take
   /// precedence over global values from [StreamTheme.of].
-  static StreamToggleSwitchThemeData of(BuildContext context) {
-    final localTheme = context.dependOnInheritedWidgetOfExactType<StreamToggleSwitchTheme>();
-    return StreamTheme.of(context).toggleSwitchTheme.merge(localTheme?.data);
+  static StreamSwitchThemeData of(BuildContext context) {
+    final localTheme = context.dependOnInheritedWidgetOfExactType<StreamSwitchTheme>();
+    return StreamTheme.of(context).switchTheme.merge(localTheme?.data);
   }
 
   @override
   Widget wrap(BuildContext context, Widget child) {
-    return StreamToggleSwitchTheme(data: data, child: child);
+    return StreamSwitchTheme(data: data, child: child);
   }
 
   @override
-  bool updateShouldNotify(StreamToggleSwitchTheme oldWidget) => data != oldWidget.data;
+  bool updateShouldNotify(StreamSwitchTheme oldWidget) => data != oldWidget.data;
 }
 
-/// Theme data for customizing [StreamToggleSwitch] widgets.
+/// Theme data for customizing [StreamSwitch] widgets.
 ///
 /// {@tool snippet}
 ///
@@ -78,8 +78,8 @@ class StreamToggleSwitchTheme extends InheritedTheme {
 ///
 /// ```dart
 /// StreamTheme(
-///   toggleSwitchTheme: StreamToggleSwitchThemeData(
-///     style: StreamToggleSwitchStyle.from(
+///   toggleSwitchTheme: StreamSwitchThemeData(
+///     style: StreamSwitchStyle.from(
 ///       trackColor: Colors.grey,
 ///       selectedTrackColor: Colors.green,
 ///       thumbColor: Colors.white,
@@ -91,24 +91,24 @@ class StreamToggleSwitchTheme extends InheritedTheme {
 ///
 /// See also:
 ///
-///  * [StreamToggleSwitchTheme], for overriding theme in a widget subtree.
+///  * [StreamSwitchTheme], for overriding theme in a widget subtree.
 @themeGen
 @immutable
-class StreamToggleSwitchThemeData with _$StreamToggleSwitchThemeData {
+class StreamSwitchThemeData with _$StreamSwitchThemeData {
   /// Creates toggle switch theme data with optional style overrides.
-  const StreamToggleSwitchThemeData({this.style});
+  const StreamSwitchThemeData({this.style});
 
   /// The visual styling for toggle switches.
   ///
   /// Contains track color, thumb color, overlay color, and track outline color.
-  final StreamToggleSwitchStyle? style;
+  final StreamSwitchStyle? style;
 
-  /// Linearly interpolate between two [StreamToggleSwitchThemeData] objects.
-  static StreamToggleSwitchThemeData? lerp(
-    StreamToggleSwitchThemeData? a,
-    StreamToggleSwitchThemeData? b,
+  /// Linearly interpolate between two [StreamSwitchThemeData] objects.
+  static StreamSwitchThemeData? lerp(
+    StreamSwitchThemeData? a,
+    StreamSwitchThemeData? b,
     double t,
-  ) => _$StreamToggleSwitchThemeData.lerp(a, b, t);
+  ) => _$StreamSwitchThemeData.lerp(a, b, t);
 }
 
 /// Visual styling properties for toggle switches.
@@ -119,17 +119,17 @@ class StreamToggleSwitchThemeData with _$StreamToggleSwitchThemeData {
 ///
 /// See also:
 ///
-///  * [StreamToggleSwitchThemeData], which wraps this style for theming.
-///  * [StreamToggleSwitch], which uses this styling.
+///  * [StreamSwitchThemeData], which wraps this style for theming.
+///  * [StreamSwitch], which uses this styling.
 @themeGen
 @immutable
-class StreamToggleSwitchStyle with _$StreamToggleSwitchStyle {
+class StreamSwitchStyle with _$StreamSwitchStyle {
   /// Creates toggle switch style properties.
   ///
   /// Color properties are [WidgetStateProperty]-based for full state-level
   /// control. For a simpler API that accepts plain values and builds state
-  /// properties internally, use [StreamToggleSwitchStyle.from].
-  const StreamToggleSwitchStyle({
+  /// properties internally, use [StreamSwitchStyle.from].
+  const StreamSwitchStyle({
     this.trackColor,
     this.thumbColor,
     this.trackOutlineColor,
@@ -137,7 +137,7 @@ class StreamToggleSwitchStyle with _$StreamToggleSwitchStyle {
     this.overlayColor,
   });
 
-  /// Creates a [StreamToggleSwitchStyle] from simple values.
+  /// Creates a [StreamSwitchStyle] from simple values.
   ///
   /// Wraps plain colors into [WidgetStateProperty] values.
   ///
@@ -150,7 +150,7 @@ class StreamToggleSwitchStyle with _$StreamToggleSwitchStyle {
   /// Create a style with a green track when selected:
   ///
   /// ```dart
-  /// StreamToggleSwitchStyle.from(
+  /// StreamSwitchStyle.from(
   ///   trackColor: Colors.grey,
   ///   selectedTrackColor: Colors.green,
   ///   disabledTrackColor: Colors.grey.shade200,
@@ -160,7 +160,7 @@ class StreamToggleSwitchStyle with _$StreamToggleSwitchStyle {
   /// )
   /// ```
   /// {@end-tool}
-  factory StreamToggleSwitchStyle.from({
+  factory StreamSwitchStyle.from({
     Color? trackColor,
     Color? selectedTrackColor,
     Color? disabledTrackColor,
@@ -177,7 +177,7 @@ class StreamToggleSwitchStyle with _$StreamToggleSwitchStyle {
     Color? hoveredOverlayColor,
     Color? pressedOverlayColor,
   }) {
-    return StreamToggleSwitchStyle(
+    return StreamSwitchStyle(
       trackColor: WidgetStateUtils.resolveWith(trackColor, selectedTrackColor, disabledTrackColor),
       thumbColor: WidgetStateUtils.resolveWith(thumbColor, selectedThumbColor, disabledThumbColor),
       trackOutlineColor: WidgetStateUtils.resolveWith(
@@ -228,10 +228,10 @@ class StreamToggleSwitchStyle with _$StreamToggleSwitchStyle {
   ///  * [WidgetState.pressed] -- pressed overlay.
   final WidgetStateProperty<Color?>? overlayColor;
 
-  /// Linearly interpolate between two [StreamToggleSwitchStyle] objects.
-  static StreamToggleSwitchStyle? lerp(
-    StreamToggleSwitchStyle? a,
-    StreamToggleSwitchStyle? b,
+  /// Linearly interpolate between two [StreamSwitchStyle] objects.
+  static StreamSwitchStyle? lerp(
+    StreamSwitchStyle? a,
+    StreamSwitchStyle? b,
     double t,
-  ) => _$StreamToggleSwitchStyle.lerp(a, b, t);
+  ) => _$StreamSwitchStyle.lerp(a, b, t);
 }

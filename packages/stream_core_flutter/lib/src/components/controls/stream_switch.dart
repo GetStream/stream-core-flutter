@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
-import '../../theme/components/stream_toggle_switch_theme.dart';
+import '../../theme/components/stream_switch_theme.dart';
 import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// A toggle switch styled for the Stream design system.
 ///
-/// [StreamToggleSwitch] displays a platform-adaptive toggle switch that
+/// [StreamSwitch] displays a platform-adaptive toggle switch that
 /// renders as a [CupertinoSwitch] on iOS/macOS and a Material [Switch] on
 /// other platforms. Visual properties can be customized via
-/// [StreamToggleSwitchTheme] and [StreamToggleSwitchStyle].
+/// [StreamSwitchTheme] and [StreamSwitchStyle].
 ///
 /// The toggle switch itself does not maintain any state. Instead, when the
 /// state of the switch changes, the widget calls the [onChanged] callback.
@@ -24,7 +24,7 @@ import '../../theme/stream_theme_extensions.dart';
 /// Basic toggle switch:
 ///
 /// ```dart
-/// StreamToggleSwitch(
+/// StreamSwitch(
 ///   value: isEnabled,
 ///   onChanged: (value) => setState(() => isEnabled = value),
 /// )
@@ -36,7 +36,7 @@ import '../../theme/stream_theme_extensions.dart';
 /// Disabled toggle switch:
 ///
 /// ```dart
-/// StreamToggleSwitch(
+/// StreamSwitch(
 ///   value: true,
 ///   onChanged: null,
 /// )
@@ -45,15 +45,15 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// See also:
 ///
-///  * [StreamToggleSwitchTheme], for customizing toggle switch appearance.
-///  * [StreamToggleSwitchStyle], for the visual style properties.
-class StreamToggleSwitch extends StatelessWidget {
+///  * [StreamSwitchTheme], for customizing toggle switch appearance.
+///  * [StreamSwitchStyle], for the visual style properties.
+class StreamSwitch extends StatelessWidget {
   /// Creates a Stream toggle switch.
-  StreamToggleSwitch({
+  StreamSwitch({
     super.key,
     required bool value,
     required ValueChanged<bool>? onChanged,
-    StreamToggleSwitchStyle? style,
+    StreamSwitchStyle? style,
     String? semanticLabel,
   }) : props = .new(
          value: value,
@@ -63,28 +63,28 @@ class StreamToggleSwitch extends StatelessWidget {
        );
 
   /// The props controlling the appearance and behavior of this toggle switch.
-  final StreamToggleSwitchProps props;
+  final StreamSwitchProps props;
 
   @override
   Widget build(BuildContext context) {
     final builder = StreamComponentFactory.of(context).toggleSwitch;
     if (builder != null) return builder(context, props);
-    return DefaultStreamToggleSwitch(props: props);
+    return DefaultStreamSwitch(props: props);
   }
 }
 
-/// Properties for configuring a [StreamToggleSwitch].
+/// Properties for configuring a [StreamSwitch].
 ///
 /// This class holds all the configuration options for a toggle switch,
 /// allowing them to be passed through the [StreamComponentFactory].
 ///
 /// See also:
 ///
-///  * [StreamToggleSwitch], which uses these properties.
-///  * [DefaultStreamToggleSwitch], the default implementation.
-class StreamToggleSwitchProps {
+///  * [StreamSwitch], which uses these properties.
+///  * [DefaultStreamSwitch], the default implementation.
+class StreamSwitchProps {
   /// Creates properties for a toggle switch.
-  const StreamToggleSwitchProps({
+  const StreamSwitchProps({
     required this.value,
     required this.onChanged,
     this.style,
@@ -105,8 +105,8 @@ class StreamToggleSwitchProps {
 
   /// Per-instance style overrides.
   ///
-  /// Values here take precedence over [StreamToggleSwitchTheme].
-  final StreamToggleSwitchStyle? style;
+  /// Values here take precedence over [StreamSwitchTheme].
+  final StreamSwitchStyle? style;
 
   /// The semantic label for the toggle switch that will be announced by
   /// screen readers.
@@ -115,7 +115,7 @@ class StreamToggleSwitchProps {
   final String? semanticLabel;
 }
 
-/// Default implementation of [StreamToggleSwitch].
+/// Default implementation of [StreamSwitch].
 ///
 /// Renders a platform-adaptive switch using [Switch.adaptive]. Styling is
 /// resolved from widget props, theme, and built-in defaults in that order.
@@ -124,21 +124,21 @@ class StreamToggleSwitchProps {
 ///  * iOS/macOS — Cupertino defaults (filled track, white thumb).
 ///  * Android and others — Material defaults (outlined track when unselected,
 ///    colored thumb).
-class DefaultStreamToggleSwitch extends StatelessWidget {
+class DefaultStreamSwitch extends StatelessWidget {
   /// Creates a default toggle switch.
-  const DefaultStreamToggleSwitch({super.key, required this.props});
+  const DefaultStreamSwitch({super.key, required this.props});
 
   /// The props controlling the appearance and behavior of this toggle switch.
-  final StreamToggleSwitchProps props;
+  final StreamSwitchProps props;
 
   @override
   Widget build(BuildContext context) {
     final style = props.style;
-    final themeStyle = context.streamToggleSwitchTheme.style;
+    final themeStyle = context.streamSwitchTheme.style;
 
     final defaults = switch (Theme.of(context).platform) {
-      .iOS || .macOS => _CupertinoToggleSwitchDefaults(context),
-      _ => _MaterialToggleSwitchDefaults(context),
+      .iOS || .macOS => _CupertinoSwitchDefaults(context),
+      _ => _MaterialSwitchDefaults(context),
     };
 
     final effectiveTrackColor = style?.trackColor ?? themeStyle?.trackColor ?? defaults.trackColor;
@@ -167,8 +167,8 @@ class DefaultStreamToggleSwitch extends StatelessWidget {
 }
 
 // Cupertino (iOS/macOS) defaults — filled track, always-white thumb.
-class _CupertinoToggleSwitchDefaults extends StreamToggleSwitchStyle {
-  _CupertinoToggleSwitchDefaults(this.context);
+class _CupertinoSwitchDefaults extends StreamSwitchStyle {
+  _CupertinoSwitchDefaults(this.context);
 
   final BuildContext context;
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
@@ -203,8 +203,8 @@ class _CupertinoToggleSwitchDefaults extends StreamToggleSwitchStyle {
 
 // Material (Android/others) defaults — transparent track with outline when
 // unselected, colored thumb that changes between selected/unselected states.
-class _MaterialToggleSwitchDefaults extends StreamToggleSwitchStyle {
-  _MaterialToggleSwitchDefaults(this.context);
+class _MaterialSwitchDefaults extends StreamSwitchStyle {
+  _MaterialSwitchDefaults(this.context);
 
   final BuildContext context;
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
