@@ -65,6 +65,8 @@ mixin _$StreamComponentBuilders {
       reactions: t < 0.5 ? a.reactions : b.reactions,
       retryBadge: t < 0.5 ? a.retryBadge : b.retryBadge,
       skeletonLoading: t < 0.5 ? a.skeletonLoading : b.skeletonLoading,
+      stepper: t < 0.5 ? a.stepper : b.stepper,
+      textInput: t < 0.5 ? a.textInput : b.textInput,
       toggleSwitch: t < 0.5 ? a.toggleSwitch : b.toggleSwitch,
       imageSourceBadge: t < 0.5 ? a.imageSourceBadge : b.imageSourceBadge,
     );
@@ -109,6 +111,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
     Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,
     Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
+    Widget Function(BuildContext, StreamStepperProps)? stepper,
+    Widget Function(BuildContext, StreamTextInputProps)? textInput,
     Widget Function(BuildContext, StreamToggleSwitchProps)? toggleSwitch,
     Widget Function(BuildContext, StreamImageSourceBadgeProps)?
     imageSourceBadge,
@@ -149,6 +153,8 @@ mixin _$StreamComponentBuilders {
       reactions: reactions ?? _this.reactions,
       retryBadge: retryBadge ?? _this.retryBadge,
       skeletonLoading: skeletonLoading ?? _this.skeletonLoading,
+      stepper: stepper ?? _this.stepper,
+      textInput: textInput ?? _this.textInput,
       toggleSwitch: toggleSwitch ?? _this.toggleSwitch,
       imageSourceBadge: imageSourceBadge ?? _this.imageSourceBadge,
     );
@@ -199,6 +205,8 @@ mixin _$StreamComponentBuilders {
       reactions: other.reactions,
       retryBadge: other.retryBadge,
       skeletonLoading: other.skeletonLoading,
+      stepper: other.stepper,
+      textInput: other.textInput,
       toggleSwitch: other.toggleSwitch,
       imageSourceBadge: other.imageSourceBadge,
     );
@@ -250,6 +258,8 @@ mixin _$StreamComponentBuilders {
         _other.reactions == _this.reactions &&
         _other.retryBadge == _this.retryBadge &&
         _other.skeletonLoading == _this.skeletonLoading &&
+        _other.stepper == _this.stepper &&
+        _other.textInput == _this.textInput &&
         _other.toggleSwitch == _this.toggleSwitch &&
         _other.imageSourceBadge == _this.imageSourceBadge;
   }
@@ -293,6 +303,8 @@ mixin _$StreamComponentBuilders {
       _this.reactions,
       _this.retryBadge,
       _this.skeletonLoading,
+      _this.stepper,
+      _this.textInput,
       _this.toggleSwitch,
       _this.imageSourceBadge,
     ]);

@@ -159,6 +159,8 @@ Widget buildStreamButtonShowcase(BuildContext context) {
         children: const [
           _StyleTypeMatrixSection(),
           _SizeScaleSection(),
+          _ThemeOverrideSection(),
+          _SelectedStateSection(),
           _RealWorldSection(),
         ],
       ),
@@ -484,6 +486,358 @@ class _SizeDemo extends StatelessWidget {
             fontFamily: 'monospace',
             fontSize: 10,
           ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Theme Override Section
+// =============================================================================
+
+class _ThemeOverrideSection extends StatelessWidget {
+  const _ThemeOverrideSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: [
+        const _SectionLabel(label: 'THEME OVERRIDES'),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurfaceSubtle,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Column(
+            spacing: spacing.lg,
+            children: const [
+              _ThemeOverrideExample(
+                label: 'fixedSize override',
+                description: 'Full-width button via fixedSize: Size(∞, 48)',
+                child: _FullWidthOverrideExample(),
+              ),
+              _ThemeOverrideExample(
+                label: 'alignment override',
+                description: 'Left-aligned content within a fixed-width button',
+                child: _AlignmentOverrideExample(),
+              ),
+              _ThemeOverrideExample(
+                label: 'minimumSize / maximumSize',
+                description: 'Constrain button width with min 200 / max 250',
+                child: _MinMaxOverrideExample(),
+              ),
+              _ThemeOverrideExample(
+                label: 'Custom padding & shape',
+                description: 'Asymmetric padding with stadium border',
+                child: _PaddingShapeOverrideExample(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ThemeOverrideExample extends StatelessWidget {
+  const _ThemeOverrideExample({
+    required this.label,
+    required this.description,
+    required this.child,
+  });
+
+  final String label;
+  final String description;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.sm,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: textTheme.captionEmphasis.copyWith(
+                color: colorScheme.textPrimary,
+                fontFamily: 'monospace',
+              ),
+            ),
+            Text(
+              description,
+              style: textTheme.metadataDefault.copyWith(
+                color: colorScheme.textTertiary,
+              ),
+            ),
+          ],
+        ),
+        child,
+      ],
+    );
+  }
+}
+
+class _FullWidthOverrideExample extends StatelessWidget {
+  const _FullWidthOverrideExample();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: StreamButton(
+        label: 'Full Width Button',
+        size: StreamButtonSize.large,
+        themeStyle: StreamButtonThemeStyle.from(
+          fixedSize: const Size(double.infinity, 48),
+        ),
+        onTap: () {},
+      ),
+    );
+  }
+}
+
+class _AlignmentOverrideExample extends StatelessWidget {
+  const _AlignmentOverrideExample();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: StreamButton(
+        label: 'Start-aligned label',
+        size: StreamButtonSize.large,
+        style: StreamButtonStyle.secondary,
+        type: StreamButtonType.outline,
+        themeStyle: const StreamButtonThemeStyle(
+          fixedSize: WidgetStatePropertyAll(Size(double.infinity, 48)),
+          alignment: AlignmentDirectional.centerStart,
+        ),
+        onTap: () {},
+      ),
+    );
+  }
+}
+
+class _MinMaxOverrideExample extends StatelessWidget {
+  const _MinMaxOverrideExample();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return Row(
+      spacing: spacing.md,
+      children: [
+        StreamButton(
+          label: 'Hi',
+          themeStyle: StreamButtonThemeStyle.from(
+            minimumSize: const Size(200, 0),
+          ),
+          onTap: () {},
+        ),
+        StreamButton(
+          label: 'This label is intentionally long',
+          themeStyle: StreamButtonThemeStyle.from(
+            maximumSize: const Size(250, double.infinity),
+          ),
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+}
+
+class _PaddingShapeOverrideExample extends StatelessWidget {
+  const _PaddingShapeOverrideExample();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return Row(
+      spacing: spacing.md,
+      children: [
+        StreamButton(
+          label: 'Custom Padding',
+          size: StreamButtonSize.large,
+          themeStyle: StreamButtonThemeStyle.from(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+            shape: const StadiumBorder(),
+          ),
+          onTap: () {},
+        ),
+        StreamButton(
+          label: 'Pill Button',
+          style: StreamButtonStyle.destructive,
+          size: StreamButtonSize.small,
+          themeStyle: StreamButtonThemeStyle.from(
+            shape: const StadiumBorder(),
+          ),
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Selected State Section
+// =============================================================================
+
+class _SelectedStateSection extends StatelessWidget {
+  const _SelectedStateSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: [
+        const _SectionLabel(label: 'SELECTED STATE'),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurfaceSubtle,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: const Column(
+            spacing: 16,
+            children: [
+              _ToggleButtonRow(),
+              _ToggleIconRow(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ToggleButtonRow extends StatefulWidget {
+  const _ToggleButtonRow();
+
+  @override
+  State<_ToggleButtonRow> createState() => _ToggleButtonRowState();
+}
+
+class _ToggleButtonRowState extends State<_ToggleButtonRow> {
+  var _selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    final labels = ['All', 'Unread', 'Mentions'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.sm,
+      children: [
+        Text(
+          'Segmented toggle (label)',
+          style: textTheme.captionEmphasis.copyWith(
+            color: colorScheme.textPrimary,
+            fontFamily: 'monospace',
+          ),
+        ),
+        Row(
+          spacing: spacing.xs,
+          children: [
+            for (var i = 0; i < labels.length; i++)
+              StreamButton(
+                label: labels[i],
+                style: StreamButtonStyle.secondary,
+                type: _selected == i ? StreamButtonType.solid : StreamButtonType.outline,
+                size: StreamButtonSize.small,
+                isSelected: _selected == i,
+                onTap: () => setState(() => _selected = i),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _ToggleIconRow extends StatefulWidget {
+  const _ToggleIconRow();
+
+  @override
+  State<_ToggleIconRow> createState() => _ToggleIconRowState();
+}
+
+class _ToggleIconRowState extends State<_ToggleIconRow> {
+  var _selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    final icons = [Icons.list, Icons.grid_view, Icons.view_agenda];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.sm,
+      children: [
+        Text(
+          'Segmented toggle (icon)',
+          style: textTheme.captionEmphasis.copyWith(
+            color: colorScheme.textPrimary,
+            fontFamily: 'monospace',
+          ),
+        ),
+        Row(
+          spacing: spacing.xs,
+          children: [
+            for (var i = 0; i < icons.length; i++)
+              StreamButton.icon(
+                icon: icons[i],
+                style: StreamButtonStyle.secondary,
+                type: _selected == i ? StreamButtonType.solid : StreamButtonType.outline,
+                size: StreamButtonSize.small,
+                isSelected: _selected == i,
+                onTap: () => setState(() => _selected = i),
+              ),
+          ],
         ),
       ],
     );

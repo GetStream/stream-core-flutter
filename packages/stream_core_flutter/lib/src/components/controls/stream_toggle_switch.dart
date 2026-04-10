@@ -53,10 +53,12 @@ class StreamToggleSwitch extends StatelessWidget {
     super.key,
     required bool value,
     required ValueChanged<bool>? onChanged,
+    StreamToggleSwitchStyle? style,
     String? semanticLabel,
-  }) : props = StreamToggleSwitchProps(
+  }) : props = .new(
          value: value,
          onChanged: onChanged,
+         style: style,
          semanticLabel: semanticLabel,
        );
 
@@ -85,6 +87,7 @@ class StreamToggleSwitchProps {
   const StreamToggleSwitchProps({
     required this.value,
     required this.onChanged,
+    this.style,
     this.semanticLabel,
   });
 
@@ -99,6 +102,11 @@ class StreamToggleSwitchProps {
   ///
   /// If null, the toggle switch will be displayed as disabled.
   final ValueChanged<bool>? onChanged;
+
+  /// Per-instance style overrides.
+  ///
+  /// Values here take precedence over [StreamToggleSwitchTheme].
+  final StreamToggleSwitchStyle? style;
 
   /// The semantic label for the toggle switch that will be announced by
   /// screen readers.
@@ -125,18 +133,21 @@ class DefaultStreamToggleSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final switchStyle = context.streamToggleSwitchTheme.style;
+    final style = props.style;
+    final themeStyle = context.streamToggleSwitchTheme.style;
 
     final defaults = switch (Theme.of(context).platform) {
       .iOS || .macOS => _CupertinoToggleSwitchDefaults(context),
       _ => _MaterialToggleSwitchDefaults(context),
     };
 
-    final effectiveTrackColor = switchStyle?.trackColor ?? defaults.trackColor;
-    final effectiveThumbColor = switchStyle?.thumbColor ?? defaults.thumbColor;
-    final effectiveTrackOutlineColor = switchStyle?.trackOutlineColor ?? defaults.trackOutlineColor;
-    final effectiveTrackOutlineWidth = switchStyle?.trackOutlineWidth ?? defaults.trackOutlineWidth;
-    final effectiveOverlayColor = switchStyle?.overlayColor ?? defaults.overlayColor;
+    final effectiveTrackColor = style?.trackColor ?? themeStyle?.trackColor ?? defaults.trackColor;
+    final effectiveThumbColor = style?.thumbColor ?? themeStyle?.thumbColor ?? defaults.thumbColor;
+    final effectiveTrackOutlineColor =
+        style?.trackOutlineColor ?? themeStyle?.trackOutlineColor ?? defaults.trackOutlineColor;
+    final effectiveTrackOutlineWidth =
+        style?.trackOutlineWidth ?? themeStyle?.trackOutlineWidth ?? defaults.trackOutlineWidth;
+    final effectiveOverlayColor = style?.overlayColor ?? themeStyle?.overlayColor ?? defaults.overlayColor;
 
     return Semantics(
       label: props.semanticLabel,

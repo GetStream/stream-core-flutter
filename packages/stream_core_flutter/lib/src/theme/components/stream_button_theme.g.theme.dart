@@ -248,6 +248,37 @@ mixin _$StreamButtonThemeStyle {
         t,
         TextStyle.lerp,
       ),
+      shape: WidgetStateProperty.lerp<OutlinedBorder?>(
+        a.shape,
+        b.shape,
+        t,
+        OutlinedBorder.lerp,
+      ),
+      padding: WidgetStateProperty.lerp<EdgeInsetsGeometry?>(
+        a.padding,
+        b.padding,
+        t,
+        EdgeInsetsGeometry.lerp,
+      ),
+      fixedSize: WidgetStateProperty.lerp<Size?>(
+        a.fixedSize,
+        b.fixedSize,
+        t,
+        Size.lerp,
+      ),
+      minimumSize: WidgetStateProperty.lerp<Size?>(
+        a.minimumSize,
+        b.minimumSize,
+        t,
+        Size.lerp,
+      ),
+      maximumSize: WidgetStateProperty.lerp<Size?>(
+        a.maximumSize,
+        b.maximumSize,
+        t,
+        Size.lerp,
+      ),
+      alignment: AlignmentGeometry.lerp(a.alignment, b.alignment, t),
       tapTargetSize: t < 0.5 ? a.tapTargetSize : b.tapTargetSize,
     );
   }
@@ -260,6 +291,12 @@ mixin _$StreamButtonThemeStyle {
     WidgetStateProperty<double?>? elevation,
     WidgetStateProperty<double?>? iconSize,
     WidgetStateProperty<TextStyle?>? textStyle,
+    WidgetStateProperty<OutlinedBorder?>? shape,
+    WidgetStateProperty<EdgeInsetsGeometry?>? padding,
+    WidgetStateProperty<Size?>? fixedSize,
+    WidgetStateProperty<Size?>? minimumSize,
+    WidgetStateProperty<Size?>? maximumSize,
+    AlignmentGeometry? alignment,
     MaterialTapTargetSize? tapTargetSize,
   }) {
     final _this = (this as StreamButtonThemeStyle);
@@ -272,6 +309,12 @@ mixin _$StreamButtonThemeStyle {
       elevation: elevation ?? _this.elevation,
       iconSize: iconSize ?? _this.iconSize,
       textStyle: textStyle ?? _this.textStyle,
+      shape: shape ?? _this.shape,
+      padding: padding ?? _this.padding,
+      fixedSize: fixedSize ?? _this.fixedSize,
+      minimumSize: minimumSize ?? _this.minimumSize,
+      maximumSize: maximumSize ?? _this.maximumSize,
+      alignment: alignment ?? _this.alignment,
       tapTargetSize: tapTargetSize ?? _this.tapTargetSize,
     );
   }
@@ -295,6 +338,12 @@ mixin _$StreamButtonThemeStyle {
       elevation: other.elevation,
       iconSize: other.iconSize,
       textStyle: other.textStyle,
+      shape: other.shape,
+      padding: other.padding,
+      fixedSize: other.fixedSize,
+      minimumSize: other.minimumSize,
+      maximumSize: other.maximumSize,
+      alignment: other.alignment,
       tapTargetSize: other.tapTargetSize,
     );
   }
@@ -319,6 +368,12 @@ mixin _$StreamButtonThemeStyle {
         _other.elevation == _this.elevation &&
         _other.iconSize == _this.iconSize &&
         _other.textStyle == _this.textStyle &&
+        _other.shape == _this.shape &&
+        _other.padding == _this.padding &&
+        _other.fixedSize == _this.fixedSize &&
+        _other.minimumSize == _this.minimumSize &&
+        _other.maximumSize == _this.maximumSize &&
+        _other.alignment == _this.alignment &&
         _other.tapTargetSize == _this.tapTargetSize;
   }
 
@@ -335,6 +390,12 @@ mixin _$StreamButtonThemeStyle {
       _this.elevation,
       _this.iconSize,
       _this.textStyle,
+      _this.shape,
+      _this.padding,
+      _this.fixedSize,
+      _this.minimumSize,
+      _this.maximumSize,
+      _this.alignment,
       _this.tapTargetSize,
     );
   }
