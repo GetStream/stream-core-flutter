@@ -149,20 +149,24 @@ class DefaultStreamSwitch extends StatelessWidget {
         style?.trackOutlineWidth ?? themeStyle?.trackOutlineWidth ?? defaults.trackOutlineWidth;
     final effectiveOverlayColor = style?.overlayColor ?? themeStyle?.overlayColor ?? defaults.overlayColor;
 
-    return Semantics(
-      label: props.semanticLabel,
-      toggled: props.value,
-      child: Switch.adaptive(
-        value: props.value,
-        onChanged: props.onChanged,
-        trackColor: effectiveTrackColor,
-        thumbColor: effectiveThumbColor,
-        trackOutlineColor: effectiveTrackOutlineColor,
-        trackOutlineWidth: effectiveTrackOutlineWidth,
-        overlayColor: effectiveOverlayColor,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
+    Widget result = Switch.adaptive(
+      value: props.value,
+      onChanged: props.onChanged,
+      trackColor: effectiveTrackColor,
+      thumbColor: effectiveThumbColor,
+      trackOutlineColor: effectiveTrackOutlineColor,
+      trackOutlineWidth: effectiveTrackOutlineWidth,
+      overlayColor: effectiveOverlayColor,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
+
+    if (props.semanticLabel case final label?) {
+      result = MergeSemantics(
+        child: Semantics(label: label, child: result),
+      );
+    }
+
+    return result;
   }
 }
 
