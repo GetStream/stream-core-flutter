@@ -161,6 +161,12 @@ class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
     this.elevation,
     this.iconSize,
     this.textStyle,
+    this.shape,
+    this.padding,
+    this.fixedSize,
+    this.minimumSize,
+    this.maximumSize,
+    this.alignment,
     this.tapTargetSize,
   });
 
@@ -200,6 +206,12 @@ class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
     double? elevation,
     double? iconSize,
     TextStyle? textStyle,
+    OutlinedBorder? shape,
+    EdgeInsetsGeometry? padding,
+    Size? fixedSize,
+    Size? minimumSize,
+    Size? maximumSize,
+    AlignmentGeometry? alignment,
     MaterialTapTargetSize? tapTargetSize,
   }) {
     return StreamButtonThemeStyle(
@@ -210,6 +222,12 @@ class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
       elevation: WidgetStateUtils.allOrNull(elevation),
       iconSize: WidgetStateUtils.allOrNull(iconSize),
       textStyle: WidgetStateUtils.allOrNull(textStyle),
+      shape: WidgetStateUtils.allOrNull(shape),
+      padding: WidgetStateUtils.allOrNull(padding),
+      fixedSize: WidgetStateUtils.allOrNull(fixedSize),
+      minimumSize: WidgetStateUtils.allOrNull(minimumSize),
+      maximumSize: WidgetStateUtils.allOrNull(maximumSize),
+      alignment: alignment,
       tapTargetSize: tapTargetSize,
     );
   }
@@ -249,6 +267,48 @@ class StreamButtonThemeStyle with _$StreamButtonThemeStyle {
   ///
   /// Supports state-based text styles for different interaction states.
   final WidgetStateProperty<TextStyle?>? textStyle;
+
+  /// The shape of the button.
+  ///
+  /// If null, icon buttons default to [CircleBorder] and label buttons
+  /// default to [RoundedSuperellipseBorder].
+  final WidgetStateProperty<OutlinedBorder?>? shape;
+
+  /// The padding inside the button.
+  ///
+  /// If null, icon buttons default to [EdgeInsets.zero] and label buttons
+  /// default to horizontal padding based on [StreamSpacing.md].
+  final WidgetStateProperty<EdgeInsetsGeometry?>? padding;
+
+  /// The button's size.
+  ///
+  /// This size is still constrained by [minimumSize] and [maximumSize].
+  /// Fixed size dimensions whose value is [double.infinity] are ignored.
+  ///
+  /// If null, defaults to the value derived from [StreamButtonProps.size].
+  final WidgetStateProperty<Size?>? fixedSize;
+
+  /// The minimum size of the button itself.
+  ///
+  /// The [StreamButtonProps.size] is constrained to be at least as large
+  /// as this value. Defaults to [Size.zero].
+  final WidgetStateProperty<Size?>? minimumSize;
+
+  /// The maximum size of the button itself.
+  ///
+  /// The [StreamButtonProps.size] is constrained to be no larger
+  /// than this value. Defaults to [Size.infinite].
+  final WidgetStateProperty<Size?>? maximumSize;
+
+  /// The alignment of the button's child.
+  ///
+  /// Typically buttons are sized to be just big enough to contain the child
+  /// and its padding. If the button's size is constrained to a fixed size,
+  /// this property defines how the child is aligned within the available
+  /// space.
+  ///
+  /// If null, defaults to [Alignment.center].
+  final AlignmentGeometry? alignment;
 
   /// The minimum tap target size of the button.
   ///

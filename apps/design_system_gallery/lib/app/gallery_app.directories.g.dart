@@ -50,6 +50,8 @@ import 'package:design_system_gallery/components/common/stream_progress_bar.dart
     as _design_system_gallery_components_common_stream_progress_bar;
 import 'package:design_system_gallery/components/common/stream_skeleton_loading.dart'
     as _design_system_gallery_components_common_stream_skeleton_loading;
+import 'package:design_system_gallery/components/common/stream_text_input.dart'
+    as _design_system_gallery_components_common_stream_text_input;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
 import 'package:design_system_gallery/components/controls/playback_speed_toggle.dart'
@@ -60,6 +62,8 @@ import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart
     as _design_system_gallery_components_controls_stream_emoji_chip;
 import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.dart'
     as _design_system_gallery_components_controls_stream_emoji_chip_bar;
+import 'package:design_system_gallery/components/controls/stream_stepper.dart'
+    as _design_system_gallery_components_controls_stream_stepper;
 import 'package:design_system_gallery/components/controls/stream_toggle_switch.dart'
     as _design_system_gallery_components_controls_stream_toggle_switch;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
@@ -574,6 +578,23 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamTextInput',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_text_input
+                        .buildStreamTextInputPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_text_input
+                        .buildStreamTextInputShowcase,
+              ),
+            ],
+          ),
         ],
       ),
       _widgetbook.WidgetbookFolder(
@@ -666,6 +687,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_controls_playback_speed_toggle
                         .buildStreamPlaybackSpeedToggleShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamStepper',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_stepper
+                        .buildStreamStepperPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_stream_stepper
+                        .buildStreamStepperShowcase,
               ),
             ],
           ),

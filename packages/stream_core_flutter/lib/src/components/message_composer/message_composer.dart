@@ -114,11 +114,9 @@ class InputThemeDefaults {
   final BuildContext context;
   final StreamColorScheme _colorScheme;
 
-  StreamInputThemeData get data => StreamInputThemeData(
-    textColor: _colorScheme.textPrimary,
-    placeholderColor: _colorScheme.textTertiary,
-    disabledColor: _colorScheme.textDisabled,
-    iconColor: _colorScheme.textTertiary,
-    borderColor: _colorScheme.borderDefault,
+  StreamTextInputStyle get style => StreamTextInputStyle(
+    textStyle: TextStyle(color: _colorScheme.textPrimary),
+    hintStyle: TextStyle(color: _colorScheme.textTertiary),
+    border: BorderSide(color: _colorScheme.borderDefault),
   );
 }

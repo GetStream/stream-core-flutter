@@ -20,6 +20,7 @@ export 'components/common/stream_loading_spinner.dart' hide DefaultStreamLoading
 export 'components/common/stream_network_image.dart' hide DefaultStreamNetworkImage;
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;
 export 'components/common/stream_skeleton_loading.dart' hide DefaultStreamSkeletonLoading;
+export 'components/common/stream_text_input.dart' hide DefaultStreamTextInput;
 export 'components/common/stream_visibility.dart';
 export 'components/context_menu/stream_context_menu.dart';
 export 'components/context_menu/stream_context_menu_action.dart' hide DefaultStreamContextMenuAction;
@@ -28,6 +29,7 @@ export 'components/controls/stream_emoji_chip.dart' hide DefaultStreamEmojiChip;
 export 'components/controls/stream_emoji_chip_bar.dart' hide DefaultStreamEmojiChipBar;
 export 'components/controls/stream_playback_speed_toggle.dart' hide DefaultStreamPlaybackSpeedToggle;
 export 'components/controls/stream_remove_control.dart';
+export 'components/controls/stream_stepper.dart' hide DefaultStreamStepper;
 export 'components/controls/stream_toggle_switch.dart' hide DefaultStreamToggleSwitch;
 export 'components/emoji/data/stream_emoji_data.dart';
 export 'components/emoji/data/stream_supported_emojis.dart';

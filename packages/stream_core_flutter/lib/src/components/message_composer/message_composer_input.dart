@@ -116,8 +116,11 @@ class StreamMessageComposerInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final composerBorderRadius = context.streamRadius.xxxl;
-    final inputTheme = context.streamInputTheme;
-    final inputDefaults = InputThemeDefaults(context: context).data;
+    final inputStyle = context.streamTextInputTheme.style;
+    final inputDefaults = InputThemeDefaults(context: context).style;
+
+    final effectiveStyle = inputStyle?.textStyle ?? inputDefaults.textStyle;
+    final effectiveHintStyle = inputStyle?.hintStyle ?? inputDefaults.hintStyle;
 
     final border = OutlineInputBorder(
       borderSide: BorderSide.none,
@@ -146,9 +149,7 @@ class StreamMessageComposerInputField extends StatelessWidget {
               autofocus: autofocus,
               autocorrect: autocorrect,
               keyboardAppearance: Theme.of(context).brightness,
-              style: TextStyle(
-                color: inputTheme.textColor ?? inputDefaults.textColor,
-              ),
+              style: effectiveStyle,
               maxLines: null,
               decoration: InputDecoration(
                 border: border,
@@ -159,9 +160,7 @@ class StreamMessageComposerInputField extends StatelessWidget {
                 fillColor: Colors.transparent,
                 contentPadding: EdgeInsets.fromLTRB(command == null ? 12 : 0, 8, 12, 8),
                 hintText: placeholder,
-                hintStyle: TextStyle(
-                  color: inputTheme.placeholderColor ?? inputDefaults.placeholderColor,
-                ),
+                hintStyle: effectiveHintStyle,
               ),
             ),
           ),
