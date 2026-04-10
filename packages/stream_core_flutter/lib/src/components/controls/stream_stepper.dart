@@ -108,7 +108,8 @@ class StreamStepperProps {
     this.min = 0,
     this.max = 99,
     this.style,
-  });
+  }) : assert(min <= max, 'min must be <= max'),
+       assert(value >= min && value <= max, 'value must be between min and max');
 
   /// The current integer value displayed in the stepper.
   final int value;
@@ -139,7 +140,7 @@ class StreamStepperProps {
 /// Default implementation of [StreamStepper].
 ///
 /// Renders a horizontal row containing two [StreamButton.icon] instances
-/// (decrement and increment) with an editable [StreamTextInput] between them.
+/// (decrement and increment) with a read-only [StreamTextInput] between them.
 ///
 /// Button styling is fully delegated to [StreamButtonTheme]; only the text
 /// input area is styled by [StreamStepperTheme].

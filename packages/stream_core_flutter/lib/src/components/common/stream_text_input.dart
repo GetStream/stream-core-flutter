@@ -88,6 +88,7 @@ class StreamTextInput extends StatelessWidget {
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
     List<TextInputFormatter>? inputFormatters,
+    bool autocorrect = false,
     bool autofocus = false,
     bool readOnly = false,
     TextAlign textAlign = .start,
@@ -113,6 +114,7 @@ class StreamTextInput extends StatelessWidget {
          keyboardType: keyboardType,
          textInputAction: textInputAction,
          inputFormatters: inputFormatters,
+         autocorrect: autocorrect,
          autofocus: autofocus,
          readOnly: readOnly,
          textAlign: textAlign,
@@ -165,6 +167,7 @@ class StreamTextInputProps {
     this.keyboardType,
     this.textInputAction,
     this.inputFormatters,
+    this.autocorrect = false,
     this.autofocus = false,
     this.readOnly = false,
     this.textAlign = TextAlign.start,
@@ -238,6 +241,11 @@ class StreamTextInputProps {
   /// When null, a default formatter that prevents leading whitespace is used.
   /// Pass an explicit empty list to disable all formatters.
   final List<TextInputFormatter>? inputFormatters;
+
+  /// Whether to enable autocorrect.
+  ///
+  /// Defaults to false.
+  final bool autocorrect;
 
   /// Whether the text input should focus itself on mount.
   ///
@@ -398,7 +406,7 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
     };
 
     return GestureDetector(
-      onTap: _effectiveFocusNode.requestFocus,
+      onTap: props.enabled ? _effectiveFocusNode.requestFocus : null,
       child: Container(
         alignment: .center,
         clipBehavior: .hardEdge,
@@ -426,7 +434,7 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
                     ?props.leading,
                     Expanded(
                       child: TextField(
-                        autocorrect: false,
+                        autocorrect: props.autocorrect,
                         controller: _effectiveController,
                         focusNode: _effectiveFocusNode,
                         onChanged: props.onChanged,
