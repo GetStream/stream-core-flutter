@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_button_theme.dart';
 import '../../theme/primitives/stream_colors.dart';
+import '../../theme/primitives/stream_radius.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -79,11 +80,11 @@ class StreamButton extends StatelessWidget {
   /// Set [isFloating] to true for an floating button with a shadow.
   StreamButton.icon({
     super.key,
+    required IconData icon,
     VoidCallback? onTap,
     StreamButtonStyle style = .primary,
     StreamButtonType type = .solid,
     StreamButtonSize size = .medium,
-    IconData? icon,
     bool? isFloating,
     bool? isSelected,
     StreamButtonThemeStyle? themeStyle,
@@ -154,6 +155,12 @@ class StreamButtonProps {
   final StreamButtonType type;
 
   /// The size of the button.
+  ///
+  /// For regular buttons, only the height is fixed and the width sizes to fit
+  /// the content. For icon buttons, both dimensions are fixed.
+  ///
+  /// This size is still constrained by [StreamButtonThemeStyle.minimumSize]
+  /// and [StreamButtonThemeStyle.maximumSize].
   final StreamButtonSize size;
 
   /// The icon displayed on the left side of the label.
@@ -277,7 +284,6 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
 
   @override
   Widget build(BuildContext context) {
-    final radius = context.streamRadius;
     final spacing = context.streamSpacing;
     final buttonTheme = context.streamButtonTheme;
 
@@ -315,10 +321,24 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
     final effectiveElevation = themeStyle?.elevation ?? defaults.elevation;
     final effectiveIconSize = themeStyle?.iconSize ?? defaults.iconSize;
     final effectiveTextStyle = themeStyle?.textStyle ?? defaults.textStyle;
+    final effectiveShape = themeStyle?.shape ?? defaults.shape;
     final effectiveTapTargetSize = themeStyle?.tapTargetSize ?? defaults.tapTargetSize;
 
     final buttonSize = props.size.value;
     final isIconButton = props.label == null;
+
+    final effectiveFixedSize =
+        themeStyle?.fixedSize ??
+        WidgetStatePropertyAll(isIconButton ? Size.square(buttonSize) : Size.fromHeight(buttonSize));
+    final effectiveMinimumSize = themeStyle?.minimumSize ?? defaults.minimumSize;
+    final effectiveMaximumSize = themeStyle?.maximumSize ?? defaults.maximumSize;
+    final effectiveAlignment = themeStyle?.alignment ?? defaults.alignment;
+    final effectivePadding =
+        themeStyle?.padding ??
+        switch (isIconButton) {
+          true => const WidgetStatePropertyAll(EdgeInsets.zero),
+          false => WidgetStatePropertyAll(.symmetric(horizontal: spacing.md)),
+        };
 
     return ElevatedButton(
       onPressed: props.onTap,
@@ -332,9 +352,12 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
         backgroundColor: effectiveBackgroundColor,
         foregroundColor: effectiveForegroundColor,
         overlayColor: effectiveOverlayColor,
-        minimumSize: .all(.square(buttonSize)),
-        maximumSize: .all(isIconButton ? .square(buttonSize) : .fromHeight(buttonSize)),
-        padding: .all(isIconButton ? .zero : .symmetric(horizontal: spacing.md)),
+        fixedSize: effectiveFixedSize,
+        minimumSize: effectiveMinimumSize,
+        maximumSize: effectiveMaximumSize,
+        padding: effectivePadding,
+        alignment: effectiveAlignment,
+        shape: effectiveShape,
         side: switch (effectiveBorderColor) {
           final color? => .resolveWith(
             (states) {
@@ -344,10 +367,6 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
             },
           ),
           _ => null,
-        },
-        shape: switch (props.label) {
-          null => .all(const CircleBorder()),
-          _ => .all(RoundedSuperellipseBorder(borderRadius: .all(radius.max))),
         },
       ),
       child: switch (isIconButton) {
@@ -371,8 +390,12 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
 
 mixin _SharedButtonDefaults on StreamButtonThemeStyle {
   bool get isFloating;
+  StreamRadius get radius;
   StreamTextTheme get textTheme;
   StreamColorScheme get colorScheme;
+
+  @override
+  AlignmentGeometry get alignment => Alignment.center;
 
   @override
   MaterialTapTargetSize get tapTargetSize => MaterialTapTargetSize.padded;
@@ -384,11 +407,20 @@ mixin _SharedButtonDefaults on StreamButtonThemeStyle {
   WidgetStateProperty<TextStyle> get textStyle => WidgetStatePropertyAll(textTheme.bodyEmphasis);
 
   @override
+  WidgetStateProperty<OutlinedBorder> get shape => .all(RoundedSuperellipseBorder(borderRadius: .all(radius.max)));
+
+  @override
   WidgetStateProperty<Color> get overlayColor => WidgetStateProperty.resolveWith((states) {
     if (states.contains(WidgetState.pressed)) return colorScheme.backgroundPressed;
     if (states.contains(WidgetState.hovered)) return colorScheme.backgroundHover;
     return StreamColors.transparent;
   });
+
+  @override
+  WidgetStateProperty<Size> get minimumSize => const WidgetStatePropertyAll(Size.zero);
+
+  @override
+  WidgetStateProperty<Size> get maximumSize => const WidgetStatePropertyAll(Size.infinite);
 
   @override
   WidgetStateProperty<double> get elevation => WidgetStateProperty.resolveWith((states) {
@@ -407,10 +439,13 @@ class _PrimarySolidDefaults extends StreamButtonThemeStyle with _SharedButtonDef
   _PrimarySolidDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -438,10 +473,13 @@ class _PrimaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButtonD
   _PrimaryOutlineDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -475,10 +513,13 @@ class _PrimaryGhostDefaults extends StreamButtonThemeStyle with _SharedButtonDef
   _PrimaryGhostDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -508,10 +549,13 @@ class _SecondarySolidDefaults extends StreamButtonThemeStyle with _SharedButtonD
   _SecondarySolidDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -539,10 +583,13 @@ class _SecondaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButto
   _SecondaryOutlineDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -576,10 +623,13 @@ class _SecondaryGhostDefaults extends StreamButtonThemeStyle with _SharedButtonD
   _SecondaryGhostDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -609,10 +659,13 @@ class _DestructiveSolidDefaults extends StreamButtonThemeStyle with _SharedButto
   _DestructiveSolidDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -640,10 +693,13 @@ class _DestructiveOutlineDefaults extends StreamButtonThemeStyle with _SharedBut
   _DestructiveOutlineDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override
@@ -677,10 +733,13 @@ class _DestructiveGhostDefaults extends StreamButtonThemeStyle with _SharedButto
   _DestructiveGhostDefaults(
     this.context, {
     required this.isFloating,
-  }) : textTheme = context.streamTextTheme,
+  }) : radius = context.streamRadius,
+       textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
   final BuildContext context;
+  @override
+  final StreamRadius radius;
   @override
   final StreamTextTheme textTheme;
   @override

@@ -34,13 +34,15 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamListTileThemeData? listTileTheme,
     StreamMessageItemThemeData? messageItemTheme,
     StreamMessageThemeData? messageTheme,
-    StreamInputThemeData? inputTheme,
+    StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
+    StreamStepperThemeData? stepperTheme,
+    StreamSwitchThemeData? switchTheme,
   }) {
     final _this = (this as StreamTheme);
 
@@ -69,7 +71,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       listTileTheme: listTileTheme ?? _this.listTileTheme,
       messageItemTheme: messageItemTheme ?? _this.messageItemTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
-      inputTheme: inputTheme ?? _this.inputTheme,
+      textInputTheme: textInputTheme ?? _this.textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
       playbackSpeedToggleTheme:
           playbackSpeedToggleTheme ?? _this.playbackSpeedToggleTheme,
@@ -77,6 +79,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
+      stepperTheme: stepperTheme ?? _this.stepperTheme,
+      switchTheme: switchTheme ?? _this.switchTheme,
     );
   }
 
@@ -167,7 +171,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         t,
       )!,
       messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
-      inputTheme: t < 0.5 ? _this.inputTheme : other.inputTheme,
+      textInputTheme: StreamTextInputThemeData.lerp(
+        _this.textInputTheme,
+        other.textInputTheme,
+        t,
+      )!,
       onlineIndicatorTheme: StreamOnlineIndicatorThemeData.lerp(
         _this.onlineIndicatorTheme,
         other.onlineIndicatorTheme,
@@ -196,6 +204,16 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       skeletonLoadingTheme: StreamSkeletonLoadingThemeData.lerp(
         _this.skeletonLoadingTheme,
         other.skeletonLoadingTheme,
+        t,
+      )!,
+      stepperTheme: StreamStepperThemeData.lerp(
+        _this.stepperTheme,
+        other.stepperTheme,
+        t,
+      )!,
+      switchTheme: StreamSwitchThemeData.lerp(
+        _this.switchTheme,
+        other.switchTheme,
         t,
       )!,
     );
@@ -236,13 +254,15 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.listTileTheme == _this.listTileTheme &&
         _other.messageItemTheme == _this.messageItemTheme &&
         _other.messageTheme == _this.messageTheme &&
-        _other.inputTheme == _this.inputTheme &&
+        _other.textInputTheme == _this.textInputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.playbackSpeedToggleTheme == _this.playbackSpeedToggleTheme &&
         _other.progressBarTheme == _this.progressBarTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
-        _other.skeletonLoadingTheme == _this.skeletonLoadingTheme;
+        _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
+        _other.stepperTheme == _this.stepperTheme &&
+        _other.switchTheme == _this.switchTheme;
   }
 
   @override
@@ -273,13 +293,15 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.listTileTheme,
       _this.messageItemTheme,
       _this.messageTheme,
-      _this.inputTheme,
+      _this.textInputTheme,
       _this.onlineIndicatorTheme,
       _this.playbackSpeedToggleTheme,
       _this.progressBarTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,
       _this.skeletonLoadingTheme,
+      _this.stepperTheme,
+      _this.switchTheme,
     ]);
   }
 }

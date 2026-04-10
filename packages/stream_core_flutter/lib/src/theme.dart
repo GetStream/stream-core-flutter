@@ -11,7 +11,6 @@ export 'theme/components/stream_context_menu_action_theme.dart';
 export 'theme/components/stream_context_menu_theme.dart';
 export 'theme/components/stream_emoji_button_theme.dart';
 export 'theme/components/stream_emoji_chip_theme.dart';
-export 'theme/components/stream_input_theme.dart';
 export 'theme/components/stream_list_tile_theme.dart';
 export 'theme/components/stream_message_annotation_theme.dart';
 export 'theme/components/stream_message_attachment_theme.dart';
@@ -27,6 +26,9 @@ export 'theme/components/stream_playback_speed_toggle_theme.dart';
 export 'theme/components/stream_progress_bar_theme.dart';
 export 'theme/components/stream_reaction_picker_theme.dart';
 export 'theme/components/stream_reactions_theme.dart';
+export 'theme/components/stream_stepper_theme.dart';
+export 'theme/components/stream_switch_theme.dart';
+export 'theme/components/stream_text_input_theme.dart';
 
 export 'theme/primitives/stream_colors.dart';
 export 'theme/primitives/stream_icons.dart';

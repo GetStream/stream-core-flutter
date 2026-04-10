@@ -11,7 +11,6 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
-import 'components/stream_input_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
@@ -21,6 +20,9 @@ import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
+import 'components/stream_stepper_theme.dart';
+import 'components/stream_switch_theme.dart';
+import 'components/stream_text_input_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -117,8 +119,8 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamMessageThemeData] from the nearest ancestor.
   StreamMessageThemeData get streamMessageTheme => StreamMessageTheme.of(this);
 
-  /// Returns the [StreamInputThemeData] from the nearest ancestor.
-  StreamInputThemeData get streamInputTheme => StreamInputTheme.of(this);
+  /// Returns the [StreamTextInputThemeData] from the nearest ancestor.
+  StreamTextInputThemeData get streamTextInputTheme => StreamTextInputTheme.of(this);
 
   /// Returns the [StreamOnlineIndicatorThemeData] from the nearest ancestor.
   StreamOnlineIndicatorThemeData get streamOnlineIndicatorTheme => StreamOnlineIndicatorTheme.of(this);
@@ -137,4 +139,10 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamSkeletonLoadingThemeData] from the nearest ancestor.
   StreamSkeletonLoadingThemeData get streamSkeletonLoadingTheme => StreamSkeletonLoadingTheme.of(this);
+
+  /// Returns the [StreamStepperThemeData] from the nearest ancestor.
+  StreamStepperThemeData get streamStepperTheme => StreamStepperTheme.of(this);
+
+  /// Returns the [StreamSwitchThemeData] from the nearest ancestor.
+  StreamSwitchThemeData get streamSwitchTheme => StreamSwitchTheme.of(this);
 }

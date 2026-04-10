@@ -87,6 +87,9 @@ class StreamListTile extends StatelessWidget {
     VoidCallback? onLongPress,
     bool enabled = true,
     bool selected = false,
+    EdgeInsetsGeometry? contentPadding,
+    TextStyle? titleTextStyle,
+    TextStyle? subtitleTextStyle,
   }) : props = .new(
          leading: leading,
          title: title,
@@ -97,6 +100,9 @@ class StreamListTile extends StatelessWidget {
          onLongPress: onLongPress,
          enabled: enabled,
          selected: selected,
+         contentPadding: contentPadding,
+         titleTextStyle: titleTextStyle,
+         subtitleTextStyle: subtitleTextStyle,
        );
 
   /// The props controlling the appearance and behavior of this tile.
@@ -131,6 +137,9 @@ class StreamListTileProps {
     this.onLongPress,
     this.enabled = true,
     this.selected = false,
+    this.contentPadding,
+    this.titleTextStyle,
+    this.subtitleTextStyle,
   });
 
   /// A widget displayed before the title.
@@ -183,6 +192,21 @@ class StreamListTileProps {
   /// [StreamListTileThemeData] (background color, text colors, and icon
   /// colors). This is independent of tap handling.
   final bool selected;
+
+  /// The tile's internal padding.
+  ///
+  /// Overrides [StreamListTileThemeData.contentPadding] for this tile.
+  final EdgeInsetsGeometry? contentPadding;
+
+  /// The text style for the [title].
+  ///
+  /// Overrides [StreamListTileThemeData.titleTextStyle] for this tile.
+  final TextStyle? titleTextStyle;
+
+  /// The text style for the [subtitle].
+  ///
+  /// Overrides [StreamListTileThemeData.subtitleTextStyle] for this tile.
+  final TextStyle? subtitleTextStyle;
 }
 
 /// The default implementation of [StreamListTile].
@@ -220,8 +244,8 @@ class DefaultStreamListTile extends StatelessWidget {
     final effectiveDescriptionColor = (theme.descriptionColor ?? defaults.descriptionColor).resolve(states)!;
     final effectiveIconColor = (theme.iconColor ?? defaults.iconColor).resolve(states)!;
 
-    final effectiveTitleTextStyle = theme.titleTextStyle ?? defaults.titleTextStyle;
-    final effectiveSubtitleTextStyle = theme.subtitleTextStyle ?? defaults.subtitleTextStyle;
+    final effectiveTitleTextStyle = props.titleTextStyle ?? theme.titleTextStyle ?? defaults.titleTextStyle;
+    final effectiveSubtitleTextStyle = props.subtitleTextStyle ?? theme.subtitleTextStyle ?? defaults.subtitleTextStyle;
     final effectiveDescriptionTextStyle = theme.descriptionTextStyle ?? defaults.descriptionTextStyle;
     final effectiveMinTileHeight = theme.minTileHeight ?? defaults.minTileHeight;
 
@@ -275,6 +299,7 @@ class DefaultStreamListTile extends StatelessWidget {
       selected: props.selected,
       onTap: props.onTap,
       onLongPress: props.onLongPress,
+      contentPadding: props.contentPadding,
       child: IconTheme.merge(
         data: IconThemeData(color: effectiveIconColor),
         child: ConstrainedBox(
@@ -286,6 +311,7 @@ class DefaultStreamListTile extends StatelessWidget {
               Expanded(
                 child: Column(
                   mainAxisSize: .min,
+                  spacing: spacing.xxs,
                   crossAxisAlignment: .start,
                   children: [?titleWidget, ?subtitleWidget],
                 ),
@@ -373,22 +399,66 @@ class _StreamListTileThemeDefaults extends StreamListTileThemeData {
   });
 }
 
+/// The container for a [StreamListTile] that provides background, shape, ink
+/// effects, semantics, and content padding.
+///
+/// This widget is used internally by [DefaultStreamListTile], but is also
+/// available for custom tile implementations (e.g. `StreamChannelListItem`)
+/// that need the same visual treatment without the standard list tile layout.
+///
+/// It resolves theming from [StreamListTileTheme] for background color, shape,
+/// overlay color, and content padding. The [contentPadding] prop takes
+/// precedence over the theme value.
+///
+/// Requires a [Material] ancestor for ink effects to render.
+///
+/// See also:
+///
+///  * [StreamListTile], the standard tile widget built on this container.
+///  * [StreamListTileTheme], for customizing the container appearance globally.
 class StreamListTileContainer extends StatelessWidget {
+  /// Creates a list tile container.
   const StreamListTileContainer({
     super.key,
     required this.child,
-    required this.enabled,
-    required this.selected,
-    required this.onTap,
-    required this.onLongPress,
+    this.enabled = true,
+    this.selected = false,
+    this.onTap,
+    this.onLongPress,
+    this.contentPadding,
   });
 
+  /// The content to display inside the container.
   final Widget child;
 
+  /// Whether this tile is interactive.
+  ///
+  /// When false, [onTap] and [onLongPress] are inoperative.
   final bool enabled;
+
+  /// Whether this tile is in a selected state.
+  ///
+  /// When true, the tile applies the selected background color from
+  /// [StreamListTileThemeData].
   final bool selected;
+
+  /// Called when the user taps this tile.
+  ///
+  /// Inoperative if [enabled] is false.
   final VoidCallback? onTap;
+
+  /// Called when the user long-presses this tile.
+  ///
+  /// Inoperative if [enabled] is false.
   final VoidCallback? onLongPress;
+
+  /// The tile's internal padding.
+  ///
+  /// Applied via [SafeArea] so it acts as a minimum — on devices with
+  /// horizontal safe area insets, the system insets take over if larger.
+  ///
+  /// Overrides [StreamListTileThemeData.contentPadding] for this tile.
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -405,8 +475,10 @@ class StreamListTileContainer extends StatelessWidget {
 
     final effectiveBackgroundColor = (theme.backgroundColor ?? defaults.backgroundColor).resolve(states);
     final effectiveShape = theme.shape ?? defaults.shape;
-    final effectiveContentPadding = (theme.contentPadding ?? defaults.contentPadding).resolve(textDirection);
     final effectiveOverlayColor = theme.overlayColor ?? defaults.overlayColor;
+    final effectiveContentPadding = (contentPadding ?? theme.contentPadding ?? defaults.contentPadding).resolve(
+      textDirection,
+    );
 
     // Mouse cursor: show a non-interactive cursor when the tile is disabled
     // OR when no gesture callbacks are wired.

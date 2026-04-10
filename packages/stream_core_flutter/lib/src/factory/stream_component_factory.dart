@@ -163,6 +163,9 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
+    StreamComponentBuilder<StreamStepperProps>? stepper,
+    StreamComponentBuilder<StreamTextInputProps>? textInput,
+    StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
     StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
@@ -201,6 +204,9 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       reactions: reactions,
       retryBadge: retryBadge,
       skeletonLoading: skeletonLoading,
+      stepper: stepper,
+      textInput: textInput,
+      toggleSwitch: toggleSwitch,
       imageSourceBadge: imageSourceBadge,
       extensions: _extensionIterableToMap(extensions),
     );
@@ -240,6 +246,9 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.reactions,
     required this.retryBadge,
     required this.skeletonLoading,
+    required this.stepper,
+    required this.textInput,
+    required this.toggleSwitch,
     required this.imageSourceBadge,
     required this.extensions,
   });
@@ -424,6 +433,21 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamSkeletonLoading] uses [DefaultStreamSkeletonLoading].
   final StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading;
+
+  /// Custom builder for stepper widgets.
+  ///
+  /// When null, [StreamStepper] uses [DefaultStreamStepper].
+  final StreamComponentBuilder<StreamStepperProps>? stepper;
+
+  /// Custom builder for text input widgets.
+  ///
+  /// When null, [StreamTextInput] uses [DefaultStreamTextInput].
+  final StreamComponentBuilder<StreamTextInputProps>? textInput;
+
+  /// Custom builder for switch widgets.
+  ///
+  /// When null, [StreamSwitch] uses [DefaultStreamSwitch].
+  final StreamComponentBuilder<StreamSwitchProps>? toggleSwitch;
 
   /// Custom builder for source badge widgets.
   ///

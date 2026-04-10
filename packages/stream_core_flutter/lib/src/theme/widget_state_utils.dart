@@ -35,8 +35,8 @@ mixin WidgetStateUtils {
   static WidgetStateProperty<T?>? resolveWith<T>(T? defaultValue, T? selected, T? disabled) {
     if ((defaultValue ?? selected ?? disabled) == null) return null;
     return WidgetStateProperty<T?>.fromMap({
-      WidgetState.disabled: disabled,
-      WidgetState.selected: selected,
+      WidgetState.disabled: ?disabled,
+      WidgetState.selected: ?selected,
       WidgetState.any: defaultValue,
     });
   }
@@ -62,8 +62,8 @@ mixin WidgetStateUtils {
   static WidgetStateProperty<Color?>? resolveOverlay(Color? defaultValue, Color? hovered, Color? pressed) {
     if ((defaultValue ?? hovered ?? pressed) == null) return null;
     return WidgetStateProperty<Color?>.fromMap({
-      WidgetState.pressed: pressed,
-      WidgetState.hovered: hovered,
+      WidgetState.pressed: ?pressed,
+      WidgetState.hovered: ?hovered,
       WidgetState.any: defaultValue,
     });
   }

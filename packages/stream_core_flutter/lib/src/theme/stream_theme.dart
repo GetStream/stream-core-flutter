@@ -15,7 +15,6 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
-import 'components/stream_input_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
@@ -25,6 +24,9 @@ import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
+import 'components/stream_stepper_theme.dart';
+import 'components/stream_switch_theme.dart';
+import 'components/stream_text_input_theme.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -113,13 +115,15 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamListTileThemeData? listTileTheme,
     StreamMessageItemThemeData? messageItemTheme,
     StreamMessageThemeData? messageTheme,
-    StreamInputThemeData? inputTheme,
+    StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
+    StreamStepperThemeData? stepperTheme,
+    StreamSwitchThemeData? switchTheme,
   }) {
     platform ??= defaultTargetPlatform;
     final isDark = brightness == Brightness.dark;
@@ -150,13 +154,15 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     listTileTheme ??= const StreamListTileThemeData();
     messageItemTheme ??= const StreamMessageItemThemeData();
     messageTheme ??= const StreamMessageThemeData();
-    inputTheme ??= const StreamInputThemeData();
+    textInputTheme ??= const StreamTextInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     playbackSpeedToggleTheme ??= const StreamPlaybackSpeedToggleThemeData();
     progressBarTheme ??= const StreamProgressBarThemeData();
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
     skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
+    stepperTheme ??= const StreamStepperThemeData();
+    switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
       brightness: brightness,
@@ -181,13 +187,15 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       listTileTheme: listTileTheme,
       messageItemTheme: messageItemTheme,
       messageTheme: messageTheme,
-      inputTheme: inputTheme,
+      textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
+      stepperTheme: stepperTheme,
+      switchTheme: switchTheme,
     );
   }
 
@@ -226,13 +234,15 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.listTileTheme,
     required this.messageItemTheme,
     required this.messageTheme,
-    required this.inputTheme,
+    required this.textInputTheme,
     required this.onlineIndicatorTheme,
     required this.playbackSpeedToggleTheme,
     required this.progressBarTheme,
     required this.reactionPickerTheme,
     required this.reactionsTheme,
     required this.skeletonLoadingTheme,
+    required this.stepperTheme,
+    required this.switchTheme,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -337,8 +347,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The message theme for this theme.
   final StreamMessageThemeData messageTheme;
 
-  /// The input theme for this theme.
-  final StreamInputThemeData inputTheme;
+  /// The text input theme for this theme.
+  final StreamTextInputThemeData textInputTheme;
 
   /// The online indicator theme for this theme.
   final StreamOnlineIndicatorThemeData onlineIndicatorTheme;
@@ -357,6 +367,12 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The skeleton theme for this theme.
   final StreamSkeletonLoadingThemeData skeletonLoadingTheme;
+
+  /// The stepper theme for this theme.
+  final StreamStepperThemeData stepperTheme;
+
+  /// The switch theme for this theme.
+  final StreamSwitchThemeData switchTheme;
 
   /// Creates a copy of this theme but with platform-dependent primitives
   /// recomputed for the given [platform].
@@ -401,13 +417,15 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       listTileTheme: listTileTheme,
       messageItemTheme: messageItemTheme,
       messageTheme: messageTheme,
-      inputTheme: inputTheme,
+      textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
+      stepperTheme: stepperTheme,
+      switchTheme: switchTheme,
     );
   }
 }
