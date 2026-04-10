@@ -35,7 +35,8 @@ jobs:
         with:
           scopes: |
             {
-              "llc": "packages/stream_core"
+              "llc": "packages/stream_core",
+              "ui": "packages/stream_core_flutter"
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

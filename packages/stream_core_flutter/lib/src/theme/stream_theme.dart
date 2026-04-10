@@ -15,6 +15,7 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
+import 'components/stream_input_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';

@@ -475,6 +475,7 @@ class StreamListTileContainer extends StatelessWidget {
 
     final effectiveBackgroundColor = (theme.backgroundColor ?? defaults.backgroundColor).resolve(states);
     final effectiveShape = theme.shape ?? defaults.shape;
+    final effectiveContentPadding = (theme.contentPadding ?? defaults.contentPadding).resolve(textDirection);
     final effectiveOverlayColor = theme.overlayColor ?? defaults.overlayColor;
     final effectiveContentPadding = (contentPadding ?? theme.contentPadding ?? defaults.contentPadding).resolve(
       textDirection,
