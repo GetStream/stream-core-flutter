@@ -6,22 +6,22 @@ import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
-/// A toggle switch styled for the Stream design system.
+/// A switch styled for the Stream design system.
 ///
-/// [StreamSwitch] displays a platform-adaptive toggle switch that
+/// [StreamSwitch] displays a platform-adaptive switch that
 /// renders as a [CupertinoSwitch] on iOS/macOS and a Material [Switch] on
 /// other platforms. Visual properties can be customized via
 /// [StreamSwitchTheme] and [StreamSwitchStyle].
 ///
-/// The toggle switch itself does not maintain any state. Instead, when the
+/// The switch itself does not maintain any state. Instead, when the
 /// state of the switch changes, the widget calls the [onChanged] callback.
-/// Most widgets that use a toggle switch will listen for the [onChanged]
+/// Most widgets that use a switch will listen for the [onChanged]
 /// callback and rebuild the switch with a new [value] to update the visual
 /// appearance.
 ///
 /// {@tool snippet}
 ///
-/// Basic toggle switch:
+/// Basic switch:
 ///
 /// ```dart
 /// StreamSwitch(
@@ -33,7 +33,7 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// {@tool snippet}
 ///
-/// Disabled toggle switch:
+/// Disabled switch:
 ///
 /// ```dart
 /// StreamSwitch(
@@ -45,10 +45,10 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// See also:
 ///
-///  * [StreamSwitchTheme], for customizing toggle switch appearance.
+///  * [StreamSwitchTheme], for customizing switch appearance.
 ///  * [StreamSwitchStyle], for the visual style properties.
 class StreamSwitch extends StatelessWidget {
-  /// Creates a Stream toggle switch.
+  /// Creates a Stream switch.
   StreamSwitch({
     super.key,
     required bool value,
@@ -62,7 +62,7 @@ class StreamSwitch extends StatelessWidget {
          semanticLabel: semanticLabel,
        );
 
-  /// The props controlling the appearance and behavior of this toggle switch.
+  /// The props controlling the appearance and behavior of this switch.
   final StreamSwitchProps props;
 
   @override
@@ -75,7 +75,7 @@ class StreamSwitch extends StatelessWidget {
 
 /// Properties for configuring a [StreamSwitch].
 ///
-/// This class holds all the configuration options for a toggle switch,
+/// This class holds all the configuration options for a switch,
 /// allowing them to be passed through the [StreamComponentFactory].
 ///
 /// See also:
@@ -83,7 +83,7 @@ class StreamSwitch extends StatelessWidget {
 ///  * [StreamSwitch], which uses these properties.
 ///  * [DefaultStreamSwitch], the default implementation.
 class StreamSwitchProps {
-  /// Creates properties for a toggle switch.
+  /// Creates properties for a switch.
   const StreamSwitchProps({
     required this.value,
     required this.onChanged,
@@ -91,16 +91,16 @@ class StreamSwitchProps {
     this.semanticLabel,
   });
 
-  /// Whether this toggle switch is on.
+  /// Whether this switch is on.
   final bool value;
 
-  /// Called when the value of the toggle switch should change.
+  /// Called when the value of the switch should change.
   ///
-  /// The toggle switch passes the new value to the callback but does not
+  /// The switch passes the new value to the callback but does not
   /// actually change state until the parent widget rebuilds the switch with
   /// the new value.
   ///
-  /// If null, the toggle switch will be displayed as disabled.
+  /// If null, the switch will be displayed as disabled.
   final ValueChanged<bool>? onChanged;
 
   /// Per-instance style overrides.
@@ -108,7 +108,7 @@ class StreamSwitchProps {
   /// Values here take precedence over [StreamSwitchTheme].
   final StreamSwitchStyle? style;
 
-  /// The semantic label for the toggle switch that will be announced by
+  /// The semantic label for the switch that will be announced by
   /// screen readers.
   ///
   /// This label does not show in the UI.
@@ -125,10 +125,10 @@ class StreamSwitchProps {
 ///  * Android and others — Material defaults (outlined track when unselected,
 ///    colored thumb).
 class DefaultStreamSwitch extends StatelessWidget {
-  /// Creates a default toggle switch.
+  /// Creates a default switch.
   const DefaultStreamSwitch({super.key, required this.props});
 
-  /// The props controlling the appearance and behavior of this toggle switch.
+  /// The props controlling the appearance and behavior of this switch.
   final StreamSwitchProps props;
 
   @override

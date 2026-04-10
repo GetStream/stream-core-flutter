@@ -371,7 +371,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The stepper theme for this theme.
   final StreamStepperThemeData stepperTheme;
 
-  /// The toggle switch theme for this theme.
+  /// The switch theme for this theme.
   final StreamSwitchThemeData switchTheme;
 
   /// Creates a copy of this theme but with platform-dependent primitives

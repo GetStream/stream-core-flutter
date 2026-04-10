@@ -6,15 +6,14 @@ import '../widget_state_utils.dart';
 
 part 'stream_switch_theme.g.theme.dart';
 
-/// Applies a toggle switch theme to descendant [StreamSwitch] widgets.
+/// Applies a switch theme to descendant [StreamSwitch] widgets.
 ///
-/// Wrap a subtree with [StreamSwitchTheme] to override toggle switch
-/// styling. Access the merged theme using
-/// [BuildContext.streamToggleSwitchTheme].
+/// Wrap a subtree with [StreamSwitchTheme] to override switch styling.
+/// Access the merged theme using [BuildContext.streamSwitchTheme].
 ///
 /// {@tool snippet}
 ///
-/// Override toggle switch styling for a specific section:
+/// Override switch styling for a specific section:
 ///
 /// ```dart
 /// StreamSwitchTheme(
@@ -38,17 +37,17 @@ part 'stream_switch_theme.g.theme.dart';
 ///
 /// See also:
 ///
-///  * [StreamSwitchThemeData], which describes the toggle switch theme.
+///  * [StreamSwitchThemeData], which describes the switch theme.
 ///  * [StreamSwitch], the widget affected by this theme.
 class StreamSwitchTheme extends InheritedTheme {
-  /// Creates a toggle switch theme that controls descendant toggle switches.
+  /// Creates a switch theme that controls descendant switches.
   const StreamSwitchTheme({
     super.key,
     required this.data,
     required super.child,
   });
 
-  /// The toggle switch theme data for descendant widgets.
+  /// The switch theme data for descendant widgets.
   final StreamSwitchThemeData data;
 
   /// Returns the [StreamSwitchThemeData] merged from local and global
@@ -74,11 +73,11 @@ class StreamSwitchTheme extends InheritedTheme {
 ///
 /// {@tool snippet}
 ///
-/// Customize toggle switch appearance globally via [StreamTheme]:
+/// Customize switch appearance globally via [StreamTheme]:
 ///
 /// ```dart
 /// StreamTheme(
-///   toggleSwitchTheme: StreamSwitchThemeData(
+///   switchTheme: StreamSwitchThemeData(
 ///     style: StreamSwitchStyle.from(
 ///       trackColor: Colors.grey,
 ///       selectedTrackColor: Colors.green,
@@ -95,10 +94,10 @@ class StreamSwitchTheme extends InheritedTheme {
 @themeGen
 @immutable
 class StreamSwitchThemeData with _$StreamSwitchThemeData {
-  /// Creates toggle switch theme data with optional style overrides.
+  /// Creates switch theme data with optional style overrides.
   const StreamSwitchThemeData({this.style});
 
-  /// The visual styling for toggle switches.
+  /// The visual styling for switches.
   ///
   /// Contains track color, thumb color, overlay color, and track outline color.
   final StreamSwitchStyle? style;
@@ -111,9 +110,9 @@ class StreamSwitchThemeData with _$StreamSwitchThemeData {
   ) => _$StreamSwitchThemeData.lerp(a, b, t);
 }
 
-/// Visual styling properties for toggle switches.
+/// Visual styling properties for switches.
 ///
-/// Defines the appearance of toggle switches including track, thumb, overlay,
+/// Defines the appearance of switches including track, thumb, overlay,
 /// and outline colors. Color properties are [WidgetStateProperty]-based for
 /// state-dependent styling (default, hover, pressed, disabled, selected).
 ///
@@ -124,7 +123,7 @@ class StreamSwitchThemeData with _$StreamSwitchThemeData {
 @themeGen
 @immutable
 class StreamSwitchStyle with _$StreamSwitchStyle {
-  /// Creates toggle switch style properties.
+  /// Creates switch style properties.
   ///
   /// Color properties are [WidgetStateProperty]-based for full state-level
   /// control. For a simpler API that accepts plain values and builds state

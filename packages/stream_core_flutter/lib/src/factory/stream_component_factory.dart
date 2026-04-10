@@ -444,7 +444,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamTextInput] uses [DefaultStreamTextInput].
   final StreamComponentBuilder<StreamTextInputProps>? textInput;
 
-  /// Custom builder for toggle switch widgets.
+  /// Custom builder for switch widgets.
   ///
   /// When null, [StreamSwitch] uses [DefaultStreamSwitch].
   final StreamComponentBuilder<StreamSwitchProps>? toggleSwitch;
