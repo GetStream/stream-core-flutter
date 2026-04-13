@@ -4,9 +4,12 @@
 
 - Renamed `StreamInputTheme`/`StreamInputThemeData` to `StreamTextInputTheme`/`StreamTextInputThemeData` with a redesigned API
 - Renamed `StreamTheme.inputTheme` to `StreamTheme.textInputTheme`
+- Removed `alignment` and `offset` from `StreamOnlineIndicatorThemeData` (these are layout concerns, not theme)
 
 ### ✨ Features
 
+- Added `child`, `alignment`, and `offset` parameters to `StreamBadgeNotification` for badge-over-child positioning
+- Added `child`, `alignment`, and `offset` parameters to `StreamBadgeCount` for badge-over-child positioning
 - Added `StreamSwitch` component with platform-aware styling and `style` prop
 - Added `StreamTextInput` component with configurable helper text, icons, and validation states
 - Added `StreamStepper` component for numeric value adjustment with customizable bounds and `style` prop

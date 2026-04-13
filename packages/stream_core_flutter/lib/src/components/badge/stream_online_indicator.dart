@@ -191,8 +191,8 @@ class DefaultStreamOnlineIndicator extends StatelessWidget {
     if (props.child == null) return indicator;
 
     // Otherwise, wrap in Stack like Badge.
-    final effectiveAlignment = props.alignment ?? onlineIndicatorTheme.alignment ?? defaults.alignment;
-    final effectiveOffset = props.offset ?? onlineIndicatorTheme.offset ?? defaults.offset;
+    final effectiveAlignment = props.alignment ?? AlignmentDirectional.topEnd;
+    final effectiveOffset = props.offset ?? Offset.zero;
 
     return Stack(
       clipBehavior: Clip.none,
@@ -241,10 +241,4 @@ class _StreamOnlineIndicatorThemeDefaults extends StreamOnlineIndicatorThemeData
 
   @override
   Color get borderColor => _colorScheme.borderOnInverse;
-
-  @override
-  AlignmentGeometry get alignment => AlignmentDirectional.topEnd;
-
-  @override
-  Offset get offset => Offset.zero;
 }
