@@ -127,8 +127,6 @@ class StreamOnlineIndicatorThemeData with _$StreamOnlineIndicatorThemeData {
     this.backgroundOnline,
     this.backgroundOffline,
     this.borderColor,
-    this.alignment,
-    this.offset,
   });
 
   /// The default size for online indicators.
@@ -151,18 +149,6 @@ class StreamOnlineIndicatorThemeData with _$StreamOnlineIndicatorThemeData {
   /// A thin outline around the presence dot that matches the surface behind
   /// the avatar.
   final Color? borderColor;
-
-  /// The alignment of the indicator relative to the child widget.
-  ///
-  /// Only used when [StreamOnlineIndicator.child] is provided.
-  /// Falls back to [AlignmentDirectional.topEnd].
-  final AlignmentGeometry? alignment;
-
-  /// The offset for fine-tuning indicator position.
-  ///
-  /// Applied after alignment to adjust the indicator's final position.
-  /// Falls back to [Offset.zero].
-  final Offset? offset;
 
   /// Linearly interpolate between two [StreamOnlineIndicatorThemeData] objects.
   static StreamOnlineIndicatorThemeData? lerp(

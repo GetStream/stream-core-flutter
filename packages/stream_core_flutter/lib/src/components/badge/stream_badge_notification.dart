@@ -16,6 +16,9 @@ import '../../theme/stream_theme_extensions.dart';
 /// Unlike [StreamBadgeCount], which uses neutral colors, this badge uses
 /// prominent colored backgrounds (primary, error, neutral) to draw attention.
 ///
+/// When [child] is provided, the badge is automatically positioned relative
+/// to the child using a [Stack], similar to Flutter's [Badge] widget.
+///
 /// The badge has three visual types controlled by
 /// [StreamBadgeNotificationType]:
 ///
@@ -25,10 +28,36 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// {@tool snippet}
 ///
-/// Basic usage with unread count:
+/// Basic usage (standalone badge):
 ///
 /// ```dart
 /// StreamBadgeNotification(label: '3')
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// With a child widget (automatically positioned):
+///
+/// ```dart
+/// StreamBadgeNotification(
+///   label: '5',
+///   child: Icon(Icons.chat_bubble_outline),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Custom positioning:
+///
+/// ```dart
+/// StreamBadgeNotification(
+///   label: '3',
+///   alignment: Alignment.topRight,
+///   offset: Offset(2, -2),
+///   child: StreamAvatar(placeholder: (context) => Text('AB')),
+/// )
 /// ```
 /// {@end-tool}
 ///
@@ -58,15 +87,25 @@ import '../../theme/stream_theme_extensions.dart';
 ///  * [StreamBadgeCount], a neutral count badge without colored backgrounds.
 class StreamBadgeNotification extends StatelessWidget {
   /// Creates a badge notification indicator.
+  ///
+  /// If [child] is provided, the badge is automatically positioned relative
+  /// to the child using a [Stack], similar to Flutter's [Badge] widget.
+  /// Use [alignment] and [offset] to fine-tune placement.
   StreamBadgeNotification({
     super.key,
     StreamBadgeNotificationType? type,
     StreamBadgeNotificationSize? size,
     required String label,
+    Widget? child,
+    AlignmentGeometry? alignment,
+    Offset? offset,
   }) : props = StreamBadgeNotificationProps(
          type: type,
          size: size,
          label: label,
+         child: child,
+         alignment: alignment,
+         offset: offset,
        );
 
   /// The properties that configure this badge notification.
@@ -95,6 +134,9 @@ class StreamBadgeNotificationProps {
     this.type,
     this.size,
     required this.label,
+    this.child,
+    this.alignment,
+    this.offset,
   });
 
   /// The visual type determining the badge background color.
@@ -113,6 +155,24 @@ class StreamBadgeNotificationProps {
   /// Typically a numeric count (e.g., "5") or an overflow indicator
   /// (e.g., "99+").
   final String label;
+
+  /// The widget below this widget in the tree.
+  ///
+  /// When provided, the badge is positioned relative to this child
+  /// using a [Stack]. When null, only the badge is displayed.
+  final Widget? child;
+
+  /// The alignment of the badge relative to [child].
+  ///
+  /// Only used when [child] is provided.
+  /// Defaults to [AlignmentDirectional.topEnd].
+  final AlignmentGeometry? alignment;
+
+  /// The offset for fine-tuning badge position.
+  ///
+  /// Applied after [alignment] to adjust the badge's final position.
+  /// Defaults to [Offset.zero].
+  final Offset? offset;
 }
 
 /// The default implementation of [StreamBadgeNotification].
@@ -149,7 +209,7 @@ class DefaultStreamBadgeNotification extends StatelessWidget {
     final padding = _paddingForSize(effectiveSize, spacing);
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveTextColor);
 
-    return IntrinsicWidth(
+    final badge = IntrinsicWidth(
       child: AnimatedContainer(
         height: effectiveSize.value,
         constraints: BoxConstraints(minWidth: effectiveSize.value),
@@ -175,6 +235,29 @@ class DefaultStreamBadgeNotification extends StatelessWidget {
           child: Text(props.label),
         ),
       ),
+    );
+
+    // If no child, just return the badge.
+    if (props.child == null) return badge;
+
+    // Otherwise, wrap in Stack like Badge.
+    final effectiveAlignment = props.alignment ?? AlignmentDirectional.topEnd;
+    final effectiveOffset = props.offset ?? Offset.zero;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        props.child!,
+        Positioned.fill(
+          child: Align(
+            alignment: effectiveAlignment,
+            child: Transform.translate(
+              offset: effectiveOffset,
+              child: badge,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

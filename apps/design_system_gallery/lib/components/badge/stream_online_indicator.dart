@@ -32,50 +32,50 @@ Widget buildStreamOnlineIndicatorPlayground(BuildContext context) {
     description: 'Wrap an avatar as child (Badge-like behavior).',
   );
 
-  final alignment = context.knobs.object.dropdown<AlignmentDirectional>(
-    label: 'Alignment',
-    options: const [
-      AlignmentDirectional.topStart,
-      AlignmentDirectional.topCenter,
-      AlignmentDirectional.topEnd,
-      AlignmentDirectional.centerStart,
-      AlignmentDirectional.center,
-      AlignmentDirectional.centerEnd,
-      AlignmentDirectional.bottomStart,
-      AlignmentDirectional.bottomCenter,
-      AlignmentDirectional.bottomEnd,
-    ],
-    initialOption: AlignmentDirectional.topEnd,
-    labelBuilder: (option) => switch (option) {
-      AlignmentDirectional.topStart => 'Top Start',
-      AlignmentDirectional.topCenter => 'Top Center',
-      AlignmentDirectional.topEnd => 'Top End',
-      AlignmentDirectional.centerStart => 'Center Start',
-      AlignmentDirectional.center => 'Center',
-      AlignmentDirectional.centerEnd => 'Center End',
-      AlignmentDirectional.bottomStart => 'Bottom Start',
-      AlignmentDirectional.bottomCenter => 'Bottom Center',
-      AlignmentDirectional.bottomEnd => 'Bottom End',
-      _ => option.toString(),
-    },
-    description: 'Alignment of indicator relative to child (directional for RTL support).',
-  );
-
-  final offsetX = context.knobs.double.slider(
-    label: 'Offset X',
-    min: -10,
-    max: 10,
-    description: 'Horizontal offset for fine-tuning position.',
-  );
-
-  final offsetY = context.knobs.double.slider(
-    label: 'Offset Y',
-    min: -10,
-    max: 10,
-    description: 'Vertical offset for fine-tuning position.',
-  );
-
   if (withChild) {
+    final alignment = context.knobs.object.dropdown<AlignmentDirectional>(
+      label: 'Alignment',
+      options: const [
+        AlignmentDirectional.topStart,
+        AlignmentDirectional.topCenter,
+        AlignmentDirectional.topEnd,
+        AlignmentDirectional.centerStart,
+        AlignmentDirectional.center,
+        AlignmentDirectional.centerEnd,
+        AlignmentDirectional.bottomStart,
+        AlignmentDirectional.bottomCenter,
+        AlignmentDirectional.bottomEnd,
+      ],
+      initialOption: AlignmentDirectional.topEnd,
+      labelBuilder: (option) => switch (option) {
+        AlignmentDirectional.topStart => 'Top Start',
+        AlignmentDirectional.topCenter => 'Top Center',
+        AlignmentDirectional.topEnd => 'Top End',
+        AlignmentDirectional.centerStart => 'Center Start',
+        AlignmentDirectional.center => 'Center',
+        AlignmentDirectional.centerEnd => 'Center End',
+        AlignmentDirectional.bottomStart => 'Bottom Start',
+        AlignmentDirectional.bottomCenter => 'Bottom Center',
+        AlignmentDirectional.bottomEnd => 'Bottom End',
+        _ => option.toString(),
+      },
+      description: 'Alignment of indicator relative to child (directional for RTL support).',
+    );
+
+    final offsetX = context.knobs.double.slider(
+      label: 'Offset X',
+      min: -10,
+      max: 10,
+      description: 'Horizontal offset for fine-tuning position.',
+    );
+
+    final offsetY = context.knobs.double.slider(
+      label: 'Offset Y',
+      min: -10,
+      max: 10,
+      description: 'Vertical offset for fine-tuning position.',
+    );
+
     return Center(
       child: StreamOnlineIndicator(
         isOnline: isOnline,

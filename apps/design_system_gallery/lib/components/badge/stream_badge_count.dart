@@ -27,6 +27,66 @@ Widget buildStreamBadgeCountPlayground(BuildContext context) {
     description: 'The size of the badge.',
   );
 
+  final withChild = context.knobs.boolean(
+    label: 'With Child',
+    description: 'Wrap an icon as child (Badge-like behavior).',
+  );
+
+  if (withChild) {
+    final alignment = context.knobs.object.dropdown<AlignmentDirectional>(
+      label: 'Alignment',
+      options: const [
+        AlignmentDirectional.topStart,
+        AlignmentDirectional.topCenter,
+        AlignmentDirectional.topEnd,
+        AlignmentDirectional.centerStart,
+        AlignmentDirectional.center,
+        AlignmentDirectional.centerEnd,
+        AlignmentDirectional.bottomStart,
+        AlignmentDirectional.bottomCenter,
+        AlignmentDirectional.bottomEnd,
+      ],
+      initialOption: AlignmentDirectional.topEnd,
+      labelBuilder: (option) => switch (option) {
+        AlignmentDirectional.topStart => 'Top Start',
+        AlignmentDirectional.topCenter => 'Top Center',
+        AlignmentDirectional.topEnd => 'Top End',
+        AlignmentDirectional.centerStart => 'Center Start',
+        AlignmentDirectional.center => 'Center',
+        AlignmentDirectional.centerEnd => 'Center End',
+        AlignmentDirectional.bottomStart => 'Bottom Start',
+        AlignmentDirectional.bottomCenter => 'Bottom Center',
+        AlignmentDirectional.bottomEnd => 'Bottom End',
+        _ => option.toString(),
+      },
+      description: 'Alignment of badge relative to child (directional for RTL support).',
+    );
+
+    final offsetX = context.knobs.double.slider(
+      label: 'Offset X',
+      min: -10,
+      max: 10,
+      description: 'Horizontal offset for fine-tuning position.',
+    );
+
+    final offsetY = context.knobs.double.slider(
+      label: 'Offset Y',
+      min: -10,
+      max: 10,
+      description: 'Vertical offset for fine-tuning position.',
+    );
+
+    return Center(
+      child: StreamBadgeCount(
+        label: label,
+        size: size,
+        alignment: alignment,
+        offset: Offset(offsetX, offsetY),
+        child: const Icon(Icons.chat_bubble_outline, size: 36),
+      ),
+    );
+  }
+
   return Center(
     child: StreamBadgeCount(
       label: label,
@@ -62,6 +122,10 @@ Widget buildStreamBadgeCountShowcase(BuildContext context) {
 
           // Count variants
           const _CountVariantsSection(),
+          SizedBox(height: spacing.xl),
+
+          // Alignment variants
+          const _AlignmentVariantsSection(),
           SizedBox(height: spacing.xl),
 
           // Usage patterns
@@ -276,6 +340,116 @@ class _CountDemo extends StatelessWidget {
 }
 
 // =============================================================================
+// Alignment Variants Section
+// =============================================================================
+
+class _AlignmentVariantsSection extends StatelessWidget {
+  const _AlignmentVariantsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionLabel(label: 'ALIGNMENT VARIANTS'),
+        SizedBox(height: spacing.md),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurface,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Badge-like positioning with child',
+                style: textTheme.captionEmphasis.copyWith(
+                  color: colorScheme.textPrimary,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Wrap(
+                spacing: spacing.xl,
+                runSpacing: spacing.lg,
+                children: const [
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.topStart,
+                    label: 'topStart',
+                  ),
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.topEnd,
+                    label: 'topEnd',
+                  ),
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.bottomStart,
+                    label: 'bottomStart',
+                  ),
+                  _AlignmentDemo(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    label: 'bottomEnd',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AlignmentDemo extends StatelessWidget {
+  const _AlignmentDemo({required this.alignment, required this.label});
+
+  final AlignmentGeometry alignment;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      children: [
+        StreamBadgeCount(
+          label: '3',
+          size: StreamBadgeCountSize.xs,
+          alignment: alignment,
+          child: Icon(
+            Icons.chat_bubble_outline,
+            size: 36,
+            color: colorScheme.textSecondary,
+          ),
+        ),
+        SizedBox(height: spacing.sm),
+        Text(
+          label,
+          style: textTheme.metadataEmphasis.copyWith(
+            color: colorScheme.accentPrimary,
+            fontFamily: 'monospace',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
 // Usage Patterns Section
 // =============================================================================
 
@@ -349,22 +523,13 @@ class _AvatarWithBadge extends StatelessWidget {
 
     return Column(
       children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            StreamAvatar(
-              size: StreamAvatarSize.lg,
-              placeholder: (context) => Text(name[0]),
-            ),
-            Positioned(
-              right: -4,
-              top: -4,
-              child: StreamBadgeCount(
-                label: count > 99 ? '99+' : '$count',
-                size: StreamBadgeCountSize.xs,
-              ),
-            ),
-          ],
+        StreamBadgeCount(
+          label: count > 99 ? '99+' : '$count',
+          size: StreamBadgeCountSize.xs,
+          child: StreamAvatar(
+            size: StreamAvatarSize.lg,
+            placeholder: (context) => Text(name[0]),
+          ),
         ),
         SizedBox(height: spacing.sm),
         Text(
