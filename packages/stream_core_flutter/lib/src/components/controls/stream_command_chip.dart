@@ -115,7 +115,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
                 width: 16,
                 height: 16,
                 child: Icon(
-                  context.streamIcons.xmark,
+                  context.streamIcons.xmarkSmall,
                   size: 12,
                   color: effectiveForegroundColor,
                 ),

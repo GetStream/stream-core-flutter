@@ -130,6 +130,7 @@ mixin _$StreamIcons {
       voiceFill: t < 0.5 ? a.voiceFill : b.voiceFill,
       xCircle: t < 0.5 ? a.xCircle : b.xCircle,
       xmark: t < 0.5 ? a.xmark : b.xmark,
+      xmarkSmall: t < 0.5 ? a.xmarkSmall : b.xmarkSmall,
       giphy: t < 0.5 ? a.giphy : b.giphy,
       imgur: t < 0.5 ? a.imgur : b.imgur,
     );
@@ -232,6 +233,7 @@ mixin _$StreamIcons {
     IconData? voiceFill,
     IconData? xCircle,
     IconData? xmark,
+    IconData? xmarkSmall,
     SvgIconData? giphy,
     SvgIconData? imgur,
   }) {
@@ -336,6 +338,7 @@ mixin _$StreamIcons {
       voiceFill: voiceFill ?? _this.voiceFill,
       xCircle: xCircle ?? _this.xCircle,
       xmark: xmark ?? _this.xmark,
+      xmarkSmall: xmarkSmall ?? _this.xmarkSmall,
       giphy: giphy ?? _this.giphy,
       imgur: imgur ?? _this.imgur,
     );
@@ -449,6 +452,7 @@ mixin _$StreamIcons {
       voiceFill: other.voiceFill,
       xCircle: other.xCircle,
       xmark: other.xmark,
+      xmarkSmall: other.xmarkSmall,
       giphy: other.giphy,
       imgur: other.imgur,
     );
@@ -563,6 +567,7 @@ mixin _$StreamIcons {
         _other.voiceFill == _this.voiceFill &&
         _other.xCircle == _this.xCircle &&
         _other.xmark == _this.xmark &&
+        _other.xmarkSmall == _this.xmarkSmall &&
         _other.giphy == _this.giphy &&
         _other.imgur == _this.imgur;
   }
@@ -669,6 +674,7 @@ mixin _$StreamIcons {
       _this.voiceFill,
       _this.xCircle,
       _this.xmark,
+      _this.xmarkSmall,
       _this.giphy,
       _this.imgur,
     ]);

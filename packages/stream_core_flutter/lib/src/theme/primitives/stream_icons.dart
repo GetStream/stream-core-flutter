@@ -154,6 +154,7 @@ class StreamIcons with _$StreamIcons {
     this.voiceFill = StreamIconData.voiceFill,
     this.xCircle = StreamIconData.xCircle,
     this.xmark = StreamIconData.xmark,
+    this.xmarkSmall = StreamIconData.xmarkSmall,
     this.giphy = StreamSvgIconData.giphy,
     this.imgur = StreamSvgIconData.imgur,
   });
@@ -446,6 +447,9 @@ class StreamIcons with _$StreamIcons {
   /// The xmark icon.
   final IconData xmark;
 
+  /// The xmark small icon.
+  final IconData xmarkSmall;
+
   /// The giphy colored SVG icon.
   ///
   /// This is an [SvgIconData] — use with [SvgIcon], not [Icon].
@@ -560,6 +564,7 @@ class StreamIcons with _$StreamIcons {
     'voiceFill': voiceFill,
     'xCircle': xCircle,
     'xmark': xmark,
+    'xmarkSmall': xmarkSmall,
   };
 
   /// A map of all colored SVG icons keyed by their field name.
