@@ -133,7 +133,7 @@ class StreamMessageComposerInputField extends StatelessWidget {
         children: [
           if (command case final command?)
             Padding(
-              padding: EdgeInsets.only(left: context.streamSpacing.sm),
+              padding: EdgeInsetsDirectional.only(start: context.streamSpacing.sm),
               child: StreamCommandChip(
                 label: command,
                 onDismiss: onDismissCommand,
@@ -158,7 +158,7 @@ class StreamMessageComposerInputField extends StatelessWidget {
                 errorBorder: border,
                 disabledBorder: border,
                 fillColor: Colors.transparent,
-                contentPadding: EdgeInsets.fromLTRB(command == null ? 12 : 0, 8, 12, 8),
+                contentPadding: EdgeInsetsDirectional.fromSTEB(command == null ? 12 : 0, 8, 12, 8),
                 hintText: placeholder,
                 hintStyle: effectiveHintStyle,
               ),
