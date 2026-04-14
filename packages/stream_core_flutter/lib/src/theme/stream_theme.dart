@@ -130,7 +130,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     // Primitives
     icons ??= const StreamIcons();
-    radius ??= StreamRadius(platform: platform);
+    radius ??= const StreamRadius();
     spacing ??= const StreamSpacing();
     typography ??= StreamTypography(platform: platform);
 
@@ -390,14 +390,13 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// ```
   /// {@end-tool}
   StreamTheme applyPlatform(TargetPlatform platform) {
-    final newRadius = StreamRadius(platform: platform);
     final newTypography = StreamTypography(platform: platform);
     final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
 
     return StreamTheme.raw(
       brightness: brightness,
       icons: icons,
-      radius: newRadius,
+      radius: radius,
       spacing: spacing,
       typography: newTypography,
       colorScheme: colorScheme,
