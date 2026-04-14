@@ -1,3 +1,14 @@
+## Upcoming
+
+### 🐞 Fixed
+
+- Fixed RTL layout for composer input field.
+- Fixed RTL layout for audio waveform and waveform slider.
+
+### 🔄 Changed
+
+- Unified `StreamRadius` values across all platforms.
+
 ## 0.2.0
 
 ### 💥 Breaking Changes
