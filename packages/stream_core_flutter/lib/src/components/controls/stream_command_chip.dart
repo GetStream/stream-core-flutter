@@ -95,7 +95,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
         spacing: defaults.spacing.xxxs,
         children: [
           Icon(
-            context.streamIcons.bolt12,
+            context.streamIcons.bolt,
             size: 12,
             color: effectiveForegroundColor,
           ),
@@ -115,7 +115,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
                 width: 16,
                 height: 16,
                 child: Icon(
-                  context.streamIcons.xmark12,
+                  context.streamIcons.xmark,
                   size: 12,
                   color: effectiveForegroundColor,
                 ),

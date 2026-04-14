@@ -132,7 +132,7 @@ class DefaultStreamErrorBadge extends StatelessWidget {
       foregroundDecoration: BoxDecoration(shape: BoxShape.circle, border: border),
       child: IconTheme(
         data: .new(size: effectiveSize.iconSize, color: colorScheme.textOnAccent),
-        child: Center(child: Icon(icons.exclamationMarkFill20)),
+        child: Center(child: Icon(icons.exclamationMarkFill)),
       ),
     );
   }

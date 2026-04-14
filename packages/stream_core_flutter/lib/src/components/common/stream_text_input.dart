@@ -624,15 +624,15 @@ class _StreamHelperTextState extends State<StreamHelperText> with SingleTickerPr
 
     final (effectiveIcon, effectiveStyle) = switch (effectiveState) {
       .info => (
-        widget.icon ?? Icon(icons.info20),
+        widget.icon ?? Icon(icons.info),
         widget.style ?? inputStyle?.helperInfoStyle ?? defaults.helperInfoStyle,
       ),
       .error => (
-        widget.icon ?? Icon(icons.exclamationCircle20),
+        widget.icon ?? Icon(icons.exclamationCircle),
         widget.style ?? inputStyle?.helperErrorStyle ?? defaults.helperErrorStyle,
       ),
       .success => (
-        widget.icon ?? Icon(icons.checkmark20),
+        widget.icon ?? Icon(icons.checkmark),
         widget.style ?? inputStyle?.helperSuccessStyle ?? defaults.helperSuccessStyle,
       ),
     };
