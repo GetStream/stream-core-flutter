@@ -73,10 +73,10 @@ class StreamJumpToUnreadButtonTheme extends InheritedTheme {
 
 /// Theme data for customizing [StreamJumpToUnreadButton] widgets.
 ///
-/// The outer pill container is styled with [backgroundColor], [borderColor],
+/// The outer pill container is styled with [backgroundColor], [side],
 /// [elevation], and [shadowColor]. The inner leading and trailing sub-buttons
 /// (which use [StreamButton]) are independently styled via
-/// [leadingButtonStyle] and [trailingButtonStyle].
+/// [leadingStyle] and [trailingStyle].
 ///
 /// {@tool snippet}
 ///
@@ -86,7 +86,7 @@ class StreamJumpToUnreadButtonTheme extends InheritedTheme {
 /// StreamTheme(
 ///   jumpToUnreadButtonTheme: StreamJumpToUnreadButtonThemeData(
 ///     backgroundColor: Colors.white,
-///     borderColor: Colors.grey,
+///     side: BorderSide(color: Colors.grey),
 ///     leadingStyle: StreamButtonThemeStyle(
 ///       foregroundColor: WidgetStatePropertyAll(Colors.black),
 ///       textStyle: WidgetStatePropertyAll(myTextStyle),
