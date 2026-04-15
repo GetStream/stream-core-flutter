@@ -9,9 +9,9 @@
 - Fixed RTL layout for composer input field.
 - Fixed RTL layout for audio waveform and waveform slider.
 
-### 🔄 Changed
+### 💥 Breaking Changes
 
-- Unified `StreamRadius` values across all platforms.
+- Unified `StreamRadius` across platforms; removed platform factory, `.raw()`, `.ios`, and `.android`.
 
 ## 0.2.0
 
