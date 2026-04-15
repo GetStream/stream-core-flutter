@@ -1,5 +1,9 @@
 ## Upcoming
 
+### ✨ Features
+
+- Added `StreamJumpToUnreadButton` component and `StreamJumpToUnreadButtonTheme`.
+
 ### 🐞 Fixed
 
 - Fixed RTL layout for composer input field.
