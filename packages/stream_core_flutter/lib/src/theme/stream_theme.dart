@@ -15,6 +15,7 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
+import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
@@ -112,6 +113,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
+    StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
     StreamMessageItemThemeData? messageItemTheme,
     StreamMessageThemeData? messageTheme,
@@ -151,6 +153,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     contextMenuActionTheme ??= const StreamContextMenuActionThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     emojiChipTheme ??= const StreamEmojiChipThemeData();
+    jumpToUnreadButtonTheme ??= const StreamJumpToUnreadButtonThemeData();
     listTileTheme ??= const StreamListTileThemeData();
     messageItemTheme ??= const StreamMessageItemThemeData();
     messageTheme ??= const StreamMessageThemeData();
@@ -184,6 +187,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuActionTheme: contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
+      jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
       messageItemTheme: messageItemTheme,
       messageTheme: messageTheme,
@@ -231,6 +235,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.contextMenuActionTheme,
     required this.emojiButtonTheme,
     required this.emojiChipTheme,
+    required this.jumpToUnreadButtonTheme,
     required this.listTileTheme,
     required this.messageItemTheme,
     required this.messageTheme,
@@ -336,6 +341,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The emoji chip theme for this theme.
   final StreamEmojiChipThemeData emojiChipTheme;
 
+  /// The jump-to-unread button theme for this theme.
+  final StreamJumpToUnreadButtonThemeData jumpToUnreadButtonTheme;
+
   /// The list tile theme for this theme.
   final StreamListTileThemeData listTileTheme;
 
@@ -413,6 +421,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuActionTheme: contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
+      jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
       messageItemTheme: messageItemTheme,
       messageTheme: messageTheme,
