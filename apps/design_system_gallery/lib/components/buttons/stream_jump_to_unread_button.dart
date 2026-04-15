@@ -45,7 +45,6 @@ class _PlaygroundDemo extends StatelessWidget {
     final elevation = context.knobs.double.slider(
       label: 'Elevation',
       initialValue: 3,
-      min: 0,
       max: 12,
       description: 'Material elevation of the pill container.',
     );
@@ -441,7 +440,7 @@ class _MessageListMockup extends StatelessWidget {
                       borderRadius: BorderRadius.all(radius.md),
                     ),
                     child: Text(
-                      i.isEven ? 'Hey, how are you?' : 'I\'m good, thanks!',
+                      i.isEven ? 'Hey, how are you?' : "I'm good, thanks!",
                       style: textTheme.bodyDefault.copyWith(
                         color: i.isEven ? colorScheme.textPrimary : colorScheme.textOnAccent,
                       ),
