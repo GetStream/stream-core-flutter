@@ -1,3 +1,8 @@
+## NEXT
+
+### 💥 Breaking Changes
+- Renamed Stream Icons by removing the size suffix from the icon names.
+
 ## 0.2.0
 
 ### 💥 Breaking Changes
