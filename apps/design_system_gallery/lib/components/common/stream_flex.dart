@@ -355,7 +355,6 @@ class _CrossAxisRow extends StatelessWidget {
       ),
       child: StreamRow(
         spacing: 6,
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: alignment,
         children: [
           for (var i = 0; i < 5; i++)
@@ -462,7 +461,6 @@ class _CollapsedDemoState extends State<_CollapsedDemo> {
           ),
           child: StreamRow(
             spacing: 8,
-            mainAxisSize: MainAxisSize.min,
             children: [
               for (var i = 0; i < 5; i++)
                 NullableBuilder(
@@ -514,7 +512,6 @@ class _ComparisonDemo extends StatelessWidget {
                 ),
                 child: StreamRow(
                   spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     chip(0),
                     NullableBuilder(builder: (_) => null),
@@ -603,7 +600,6 @@ class _ZOrderDemo extends StatelessWidget {
 
     return StreamRow(
       spacing: -16,
-      mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < 5; i++)
           Container(
@@ -643,7 +639,6 @@ class _VerticalOverlapDemo extends StatelessWidget {
 
     return StreamColumn(
       spacing: -12,
-      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var i = 0; i < 4; i++)
@@ -753,7 +748,6 @@ class _CombinedDemoState extends State<_CombinedDemo> {
             children: [
               StreamRow(
                 spacing: -10,
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   for (var i = 0; i < _names.length; i++)
                     NullableBuilder(
@@ -870,7 +864,6 @@ class _AvatarStackDemo extends StatelessWidget {
             label: 'spacing: ${overlap.toInt()}',
             child: StreamRow(
               spacing: overlap,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 for (var i = 0; i < _initials.length; i++)
                   StreamAvatar(
@@ -916,7 +909,6 @@ class _NotificationBadgesDemo extends StatelessWidget {
 
     return StreamRow(
       spacing: -6,
-      mainAxisSize: MainAxisSize.min,
       children: [
         for (final (bg, fg, label) in badges)
           Container(
@@ -962,7 +954,6 @@ class _ReactionBarDemo extends StatelessWidget {
 
     return StreamRow(
       spacing: -4,
-      mainAxisSize: MainAxisSize.min,
       children: [
         for (final (emoji, count) in _reactions)
           Container(
@@ -1026,7 +1017,6 @@ class _ReadReceiptsDemo extends StatelessWidget {
             ),
             StreamRow(
               spacing: -6,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 for (final (initial, online) in _readers)
                   NullableBuilder(

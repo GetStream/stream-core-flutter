@@ -206,7 +206,6 @@ class DefaultStreamAvatarStack extends StatelessWidget {
         ),
         child: StreamRow(
           spacing: -diameter * props.overlap,
-          mainAxisSize: MainAxisSize.min,
           children: [
             ...visible,
             if (extraCount > 0)

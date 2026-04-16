@@ -104,7 +104,7 @@ class StreamFlex extends MultiChildRenderObjectWidget {
     super.key,
     required this.direction,
     this.mainAxisAlignment = MainAxisAlignment.start,
-    this.mainAxisSize = MainAxisSize.max,
+    this.mainAxisSize = MainAxisSize.min,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.textDirection,
     this.verticalDirection = VerticalDirection.down,
@@ -464,6 +464,7 @@ abstract class NullableState<T extends NullableStatefulWidget> extends State<T> 
   /// Return `null` to indicate this widget should be collapsed — it will
   /// occupy zero space and [StreamRow]/[StreamColumn] will not apply
   /// spacing for it.
+  @protected
   Widget? nullableBuild(BuildContext context);
 
   @override
@@ -488,7 +489,7 @@ class _CollapsedWidget extends LeafRenderObjectWidget {
 // object when calculating spacing.
 class _RenderCollapsed extends RenderBox {
   @override
-  void performLayout() => size = constraints.smallest;
+  bool get sizedByParent => true;
 
   @override
   double computeMinIntrinsicWidth(double height) => 0;
@@ -503,7 +504,7 @@ class _RenderCollapsed extends RenderBox {
   double computeMaxIntrinsicHeight(double width) => 0;
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) => constraints.smallest;
+  Size computeDryLayout(covariant BoxConstraints constraints) => constraints.smallest;
 }
 
 // Render object for [StreamFlex] that supports negative [spacing] and
