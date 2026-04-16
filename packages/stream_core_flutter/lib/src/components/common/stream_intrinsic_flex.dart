@@ -191,7 +191,7 @@ class StreamIntrinsicFlex extends MultiChildRenderObjectWidget {
   /// [Directionality]. Returns null when text direction is not needed for
   /// the current layout configuration.
   ///
-  /// This method exists so that subclasses of [StreamFlex] that create their
+  /// This method exists so that subclasses of [StreamIntrinsicFlex] that create their
   /// own render objects can reuse the text direction resolution logic.
   @protected
   TextDirection? getEffectiveTextDirection(BuildContext context) {
