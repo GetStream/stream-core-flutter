@@ -118,6 +118,9 @@ mixin _$StreamIcons {
       unlock: t < 0.5 ? a.unlock : b.unlock,
       unpin: t < 0.5 ? a.unpin : b.unpin,
       unsave: t < 0.5 ? a.unsave : b.unsave,
+      unsupportedAttachment: t < 0.5
+          ? a.unsupportedAttachment
+          : b.unsupportedAttachment,
       upload: t < 0.5 ? a.upload : b.upload,
       user: t < 0.5 ? a.user : b.user,
       userAdd: t < 0.5 ? a.userAdd : b.userAdd,
@@ -221,6 +224,7 @@ mixin _$StreamIcons {
     IconData? unlock,
     IconData? unpin,
     IconData? unsave,
+    IconData? unsupportedAttachment,
     IconData? upload,
     IconData? user,
     IconData? userAdd,
@@ -326,6 +330,8 @@ mixin _$StreamIcons {
       unlock: unlock ?? _this.unlock,
       unpin: unpin ?? _this.unpin,
       unsave: unsave ?? _this.unsave,
+      unsupportedAttachment:
+          unsupportedAttachment ?? _this.unsupportedAttachment,
       upload: upload ?? _this.upload,
       user: user ?? _this.user,
       userAdd: userAdd ?? _this.userAdd,
@@ -440,6 +446,7 @@ mixin _$StreamIcons {
       unlock: other.unlock,
       unpin: other.unpin,
       unsave: other.unsave,
+      unsupportedAttachment: other.unsupportedAttachment,
       upload: other.upload,
       user: other.user,
       userAdd: other.userAdd,
@@ -555,6 +562,7 @@ mixin _$StreamIcons {
         _other.unlock == _this.unlock &&
         _other.unpin == _this.unpin &&
         _other.unsave == _this.unsave &&
+        _other.unsupportedAttachment == _this.unsupportedAttachment &&
         _other.upload == _this.upload &&
         _other.user == _this.user &&
         _other.userAdd == _this.userAdd &&
@@ -662,6 +670,7 @@ mixin _$StreamIcons {
       _this.unlock,
       _this.unpin,
       _this.unsave,
+      _this.unsupportedAttachment,
       _this.upload,
       _this.user,
       _this.userAdd,

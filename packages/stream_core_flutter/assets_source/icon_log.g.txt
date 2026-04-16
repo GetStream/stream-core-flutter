@@ -96,3 +96,4 @@ camera;2026414
 exclamation-mark-fill;2026414
 send;2026414
 xmark-small;2026414
+unsupported-attachment;2026416

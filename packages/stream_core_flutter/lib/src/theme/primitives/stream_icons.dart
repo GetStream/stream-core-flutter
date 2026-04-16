@@ -142,6 +142,7 @@ class StreamIcons with _$StreamIcons {
     this.unlock = StreamIconData.unlock,
     this.unpin = StreamIconData.unpin,
     this.unsave = StreamIconData.unsave,
+    this.unsupportedAttachment = StreamIconData.unsupportedAttachment,
     this.upload = StreamIconData.upload,
     this.user = StreamIconData.user,
     this.userAdd = StreamIconData.userAdd,
@@ -411,6 +412,9 @@ class StreamIcons with _$StreamIcons {
   /// The unsave icon.
   final IconData unsave;
 
+  /// The unsupported attachment icon.
+  final IconData unsupportedAttachment;
+
   /// The upload icon.
   final IconData upload;
 
@@ -552,6 +556,7 @@ class StreamIcons with _$StreamIcons {
     'unlock': unlock,
     'unpin': unpin,
     'unsave': unsave,
+    'unsupportedAttachment': unsupportedAttachment,
     'upload': upload,
     'user': user,
     'userAdd': userAdd,
