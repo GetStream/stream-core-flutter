@@ -81,9 +81,9 @@ Widget buildStreamImageSourceBadgePlayground(BuildContext context) {
   final leading = switch (leadingIcon) {
     _LeadingOption.giphy => SvgIcon(icons.giphy),
     _LeadingOption.imgur => SvgIcon(icons.imgur),
-    _LeadingOption.file20 => Icon(icons.file20),
-    _LeadingOption.playFill20 => Icon(icons.playFill20),
-    _LeadingOption.video20 => Icon(icons.video20),
+    _LeadingOption.file => Icon(icons.file),
+    _LeadingOption.playFill => Icon(icons.playFill),
+    _LeadingOption.video => Icon(icons.video),
   };
 
   final badge = StreamImageSourceBadge(
@@ -126,9 +126,9 @@ enum _BadgeVariant {
 enum _LeadingOption {
   giphy('Giphy (SVG)'),
   imgur('Imgur (SVG)'),
-  file20('File Icon'),
-  playFill20('Play Icon'),
-  video20('Video Icon')
+  file('File Icon'),
+  playFill('Play Icon'),
+  video('Video Icon')
   ;
 
   const _LeadingOption(this.label);

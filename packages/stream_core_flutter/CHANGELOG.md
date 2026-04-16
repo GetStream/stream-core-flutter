@@ -12,6 +12,7 @@
 ### 💥 Breaking Changes
 
 - Unified `StreamRadius` across platforms; removed platform factory, `.raw()`, `.ios`, and `.android`.
+- Renamed Stream Icons by removing the size suffix from the icon names.
 
 ## 0.2.0
 

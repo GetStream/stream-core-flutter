@@ -36,8 +36,8 @@ class StreamCoreMessageComposerInputTrailing extends StatelessWidget {
         icon:
             buttonState == StreamMessageComposerInputTrailingState.edit ||
                 buttonState == StreamMessageComposerInputTrailingState.command
-            ? context.streamIcons.checkmark20
-            : context.streamIcons.send20,
+            ? context.streamIcons.checkmark
+            : context.streamIcons.send,
         size: StreamButtonSize.small,
         onTap: onSendPressed,
       );
@@ -81,7 +81,7 @@ class StreamVoiceRecordingButton extends StatelessWidget {
           ),
         ),
         child: StreamButton.icon(
-          icon: context.streamIcons.voice20,
+          icon: context.streamIcons.voice,
           type: StreamButtonType.ghost,
           style: StreamButtonStyle.secondary,
           size: StreamButtonSize.small,

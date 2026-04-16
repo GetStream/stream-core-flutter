@@ -200,13 +200,11 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
     "part of '${p.basename(config.outputDataFile).replaceFirst('.g', '')}';",
   );
   // Update the icon data to include matchTextDirection: true for RTL icons.
-  // Each entry in _rtlIcons is a base name (e.g. 'arrow-left'). The regex
-  // matches only the valid sizes (12/16/20/32) directly appended, so a
-  // hypothetical 'arrow-left-box-12' (camelCase: arrowLeftBox12) is unaffected.
+  // Each entry in _rtlIcons is a base name (e.g. 'arrow-left').
   for (final baseName in _rtlIcons) {
     final camelBase = ReCase(baseName).camelCase;
     iconDataContent = iconDataContent.replaceAllMapped(
-      RegExp('(static const IconData $camelBase(?:12|16|20|32) = IconData\\([^)]+)\\)'),
+      RegExp('(static const IconData $camelBase = IconData\\([^)]+)\\)'),
       (match) => '${match.group(1)}, matchTextDirection: true)',
     );
   }
@@ -758,19 +756,10 @@ class IconGeneratorException implements Exception {
 
 const _excludedSvgIcons = [
   // Multi color icons are added separately
-  'giphy-12',
-  'giphy-16',
-  'giphy-20',
-  'giphy-32',
-  'imgur-12',
-  'imgur-16',
-  'imgur-20',
-  'imgur-32',
+  'giphy',
+  'imgur',
   // Loading icons are a Flutter widget
-  'loading-12',
-  'loading-16',
-  'loading-20',
-  'loading-32',
+  'loading',
 ];
 
 const _rtlIcons = [
