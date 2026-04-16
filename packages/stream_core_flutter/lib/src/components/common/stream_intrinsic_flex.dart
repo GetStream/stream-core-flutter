@@ -121,16 +121,16 @@ class StreamIntrinsicFlex extends MultiChildRenderObjectWidget {
 
   /// The direction to use as the main axis.
   ///
-  /// If you know the axis in advance, then consider using a [StreamRow]
-  /// (if it's horizontal) or [StreamColumn] (if it's vertical) instead,
+  /// If you know the axis in advance, then consider using a [StreamIntrinsicRow]
+  /// (if it's horizontal) or [StreamIntrinsicColumn] (if it's vertical) instead,
   /// since that will be less verbose.
   final Axis direction;
 
   /// How the children should be placed along the main axis.
   ///
   /// For example, [MainAxisAlignment.start], the default, places the children
-  /// at the start (i.e., the left for a [StreamRow] or the top for a
-  /// [StreamColumn]) of the main axis.
+  /// at the start (i.e., the left for a [StreamIntrinsicRow] or the top for a
+  /// [StreamIntrinsicColumn]) of the main axis.
   final MainAxisAlignment mainAxisAlignment;
 
   /// How much space should be occupied in the main axis.
@@ -223,12 +223,12 @@ class StreamIntrinsicFlex extends MultiChildRenderObjectWidget {
       ..direction = direction
       ..mainAxisAlignment = mainAxisAlignment
       ..mainAxisSize = mainAxisSize
-      ..spacing = spacing
       ..crossAxisAlignment = crossAxisAlignment
-      ..textBaseline = textBaseline
-      ..textDirection = textDirection ?? Directionality.maybeOf(context)
+      ..textDirection = getEffectiveTextDirection(context)
       ..verticalDirection = verticalDirection
-      ..clipBehavior = clipBehavior;
+      ..textBaseline = textBaseline
+      ..clipBehavior = clipBehavior
+      ..spacing = spacing;
   }
 }
 
