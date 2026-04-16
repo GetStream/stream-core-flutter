@@ -38,10 +38,14 @@ import 'package:design_system_gallery/components/buttons/button.dart'
     as _design_system_gallery_components_buttons_button;
 import 'package:design_system_gallery/components/buttons/stream_emoji_button.dart'
     as _design_system_gallery_components_buttons_stream_emoji_button;
+import 'package:design_system_gallery/components/buttons/stream_jump_to_unread_button.dart'
+    as _design_system_gallery_components_buttons_stream_jump_to_unread_button;
 import 'package:design_system_gallery/components/common/stream_checkbox.dart'
     as _design_system_gallery_components_common_stream_checkbox;
 import 'package:design_system_gallery/components/common/stream_flex.dart'
     as _design_system_gallery_components_common_stream_flex;
+import 'package:design_system_gallery/components/common/stream_intrinsic_flex.dart'
+    as _design_system_gallery_components_common_stream_intrinsic_flex;
 import 'package:design_system_gallery/components/common/stream_loading_spinner.dart'
     as _design_system_gallery_components_common_stream_loading_spinner;
 import 'package:design_system_gallery/components/common/stream_network_image.dart'
@@ -473,6 +477,23 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamJumpToUnreadButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_buttons_stream_jump_to_unread_button
+                        .buildStreamJumpToUnreadButtonPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_buttons_stream_jump_to_unread_button
+                        .buildStreamJumpToUnreadButtonShowcase,
+              ),
+            ],
+          ),
         ],
       ),
       _widgetbook.WidgetbookFolder(
@@ -507,6 +528,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Showcase',
                 builder: _design_system_gallery_components_common_stream_flex
                     .buildStreamFlexShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamIntrinsicFlex',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_intrinsic_flex
+                        .buildStreamIntrinsicFlexPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_intrinsic_flex
+                        .buildStreamIntrinsicFlexShowcase,
               ),
             ],
           ),

@@ -69,6 +69,7 @@ mixin _$StreamComponentBuilders {
       textInput: t < 0.5 ? a.textInput : b.textInput,
       toggleSwitch: t < 0.5 ? a.toggleSwitch : b.toggleSwitch,
       imageSourceBadge: t < 0.5 ? a.imageSourceBadge : b.imageSourceBadge,
+      jumpToUnreadButton: t < 0.5 ? a.jumpToUnreadButton : b.jumpToUnreadButton,
     );
   }
 
@@ -116,6 +117,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamSwitchProps)? toggleSwitch,
     Widget Function(BuildContext, StreamImageSourceBadgeProps)?
     imageSourceBadge,
+    Widget Function(BuildContext, StreamJumpToUnreadButtonProps)?
+    jumpToUnreadButton,
   }) {
     final _this = (this as StreamComponentBuilders);
 
@@ -157,6 +160,7 @@ mixin _$StreamComponentBuilders {
       textInput: textInput ?? _this.textInput,
       toggleSwitch: toggleSwitch ?? _this.toggleSwitch,
       imageSourceBadge: imageSourceBadge ?? _this.imageSourceBadge,
+      jumpToUnreadButton: jumpToUnreadButton ?? _this.jumpToUnreadButton,
     );
   }
 
@@ -209,6 +213,7 @@ mixin _$StreamComponentBuilders {
       textInput: other.textInput,
       toggleSwitch: other.toggleSwitch,
       imageSourceBadge: other.imageSourceBadge,
+      jumpToUnreadButton: other.jumpToUnreadButton,
     );
   }
 
@@ -261,7 +266,8 @@ mixin _$StreamComponentBuilders {
         _other.stepper == _this.stepper &&
         _other.textInput == _this.textInput &&
         _other.toggleSwitch == _this.toggleSwitch &&
-        _other.imageSourceBadge == _this.imageSourceBadge;
+        _other.imageSourceBadge == _this.imageSourceBadge &&
+        _other.jumpToUnreadButton == _this.jumpToUnreadButton;
   }
 
   @override
@@ -307,6 +313,7 @@ mixin _$StreamComponentBuilders {
       _this.textInput,
       _this.toggleSwitch,
       _this.imageSourceBadge,
+      _this.jumpToUnreadButton,
     ]);
   }
 }

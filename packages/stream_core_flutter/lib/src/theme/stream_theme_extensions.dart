@@ -11,6 +11,7 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
+import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_message_theme.dart';
@@ -109,6 +110,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamEmojiChipThemeData] from the nearest ancestor.
   StreamEmojiChipThemeData get streamEmojiChipTheme => StreamEmojiChipTheme.of(this);
+
+  /// Returns the [StreamJumpToUnreadButtonThemeData] from the nearest ancestor.
+  StreamJumpToUnreadButtonThemeData get streamJumpToUnreadButtonTheme => StreamJumpToUnreadButtonTheme.of(this);
 
   /// Returns the [StreamListTileThemeData] from the nearest ancestor.
   StreamListTileThemeData get streamListTileTheme => StreamListTileTheme.of(this);

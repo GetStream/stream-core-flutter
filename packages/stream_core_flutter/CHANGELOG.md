@@ -1,6 +1,17 @@
-## NEXT
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamJumpToUnreadButton` component and `StreamJumpToUnreadButtonTheme`.
+
+### 🐞 Fixed
+
+- Fixed RTL layout for composer input field.
+- Fixed RTL layout for audio waveform and waveform slider.
 
 ### 💥 Breaking Changes
+
+- Unified `StreamRadius` across platforms; removed platform factory, `.raw()`, `.ios`, and `.android`.
 - Renamed Stream Icons by removing the size suffix from the icon names.
 
 ## 0.2.0

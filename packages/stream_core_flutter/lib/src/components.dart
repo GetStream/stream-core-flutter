@@ -13,9 +13,11 @@ export 'components/badge/stream_online_indicator.dart' hide DefaultStreamOnlineI
 export 'components/badge/stream_retry_badge.dart' hide DefaultStreamRetryBadge;
 export 'components/buttons/stream_button.dart' hide DefaultStreamButton;
 export 'components/buttons/stream_emoji_button.dart' hide DefaultStreamEmojiButton;
+export 'components/buttons/stream_jump_to_unread_button.dart' hide DefaultStreamJumpToUnreadButton;
 export 'components/common/stream_app_bar.dart' hide DefaultStreamAppBar;
 export 'components/common/stream_checkbox.dart' hide DefaultStreamCheckbox;
 export 'components/common/stream_flex.dart';
+export 'components/common/stream_intrinsic_flex.dart';
 export 'components/common/stream_loading_spinner.dart' hide DefaultStreamLoadingSpinner;
 export 'components/common/stream_network_image.dart' hide DefaultStreamNetworkImage;
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;

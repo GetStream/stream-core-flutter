@@ -31,9 +31,11 @@ class MessageComposerMediaFileAttachment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
+    final colorScheme = context.streamColorScheme;
 
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
+      borderColor: colorScheme.borderOpacitySubtle,
       child: SizedBox.square(
         dimension: 72,
         child: Stack(

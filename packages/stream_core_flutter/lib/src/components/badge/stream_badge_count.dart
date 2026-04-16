@@ -231,7 +231,8 @@ class DefaultStreamBadgeCount extends StatelessWidget {
       children: [
         props.child!,
         Positioned.fill(
-          child: Align(
+          child: FittedBox(
+            fit: BoxFit.none,
             alignment: effectiveAlignment,
             child: Transform.translate(
               offset: effectiveOffset,

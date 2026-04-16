@@ -167,6 +167,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamTextInputProps>? textInput,
     StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
     StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge,
+    StreamComponentBuilder<StreamJumpToUnreadButtonProps>? jumpToUnreadButton,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
   }) {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
@@ -208,6 +209,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       textInput: textInput,
       toggleSwitch: toggleSwitch,
       imageSourceBadge: imageSourceBadge,
+      jumpToUnreadButton: jumpToUnreadButton,
       extensions: _extensionIterableToMap(extensions),
     );
   }
@@ -250,6 +252,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.textInput,
     required this.toggleSwitch,
     required this.imageSourceBadge,
+    required this.jumpToUnreadButton,
     required this.extensions,
   });
 
@@ -453,6 +456,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamImageSourceBadge] uses [DefaultStreamImageSourceBadge].
   final StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge;
+
+  /// Custom builder for jump-to-unread button widgets.
+  ///
+  /// When null, [StreamJumpToUnreadButton] uses
+  /// [DefaultStreamJumpToUnreadButton].
+  final StreamComponentBuilder<StreamJumpToUnreadButtonProps>? jumpToUnreadButton;
 
   // Convert the [extensionsIterable] passed to [StreamComponentBuilders.new]
   // to the stored [extensions] map, where each entry's key consists of the extension's type.

@@ -31,6 +31,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
+    StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
     StreamMessageItemThemeData? messageItemTheme,
     StreamMessageThemeData? messageTheme,
@@ -68,6 +69,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           contextMenuActionTheme ?? _this.contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
+      jumpToUnreadButtonTheme:
+          jumpToUnreadButtonTheme ?? _this.jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
       messageItemTheme: messageItemTheme ?? _this.messageItemTheme,
       messageTheme: messageTheme ?? _this.messageTheme,
@@ -158,6 +161,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       emojiChipTheme: StreamEmojiChipThemeData.lerp(
         _this.emojiChipTheme,
         other.emojiChipTheme,
+        t,
+      )!,
+      jumpToUnreadButtonTheme: StreamJumpToUnreadButtonThemeData.lerp(
+        _this.jumpToUnreadButtonTheme,
+        other.jumpToUnreadButtonTheme,
         t,
       )!,
       listTileTheme: StreamListTileThemeData.lerp(
@@ -251,6 +259,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
+        _other.jumpToUnreadButtonTheme == _this.jumpToUnreadButtonTheme &&
         _other.listTileTheme == _this.listTileTheme &&
         _other.messageItemTheme == _this.messageItemTheme &&
         _other.messageTheme == _this.messageTheme &&
@@ -290,6 +299,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.contextMenuActionTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
+      _this.jumpToUnreadButtonTheme,
       _this.listTileTheme,
       _this.messageItemTheme,
       _this.messageTheme,

@@ -180,7 +180,6 @@ class DefaultStreamMessageContent extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: StreamColumn(
-        mainAxisSize: .min,
         spacing: effectiveSpacing,
         crossAxisAlignment: crossAxisAlignment,
         children: [?props.header, props.child, ?props.footer],

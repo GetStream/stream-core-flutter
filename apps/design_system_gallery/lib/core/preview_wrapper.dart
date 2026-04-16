@@ -54,7 +54,7 @@ class PreviewWrapper extends StatelessWidget {
     );
 
     // Apply platform override to both Material theme and Stream theme so
-    // that platform-aware primitives (e.g. StreamRadius, StreamTypography)
+    // that platform-aware primitives (e.g. StreamTypography)
     // resolve correctly for the selected platform.
     if (previewConfig.targetPlatform case final targetPlatform?) {
       content = _PlatformOverride(platform: targetPlatform, child: content);

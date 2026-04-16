@@ -11,6 +11,7 @@ export 'theme/components/stream_context_menu_action_theme.dart';
 export 'theme/components/stream_context_menu_theme.dart';
 export 'theme/components/stream_emoji_button_theme.dart';
 export 'theme/components/stream_emoji_chip_theme.dart';
+export 'theme/components/stream_jump_to_unread_button_theme.dart';
 export 'theme/components/stream_list_tile_theme.dart';
 export 'theme/components/stream_message_annotation_theme.dart';
 export 'theme/components/stream_message_attachment_theme.dart';

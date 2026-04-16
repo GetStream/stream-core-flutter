@@ -424,7 +424,6 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
               color: effectiveIconColor,
             ),
             child: StreamColumn(
-              mainAxisSize: .min,
               spacing: spacing.sm,
               crossAxisAlignment: .start,
               children: [

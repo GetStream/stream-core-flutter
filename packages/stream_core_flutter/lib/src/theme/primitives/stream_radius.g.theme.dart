@@ -25,7 +25,7 @@ mixin _$StreamRadius {
       return t == 0.0 ? a : null;
     }
 
-    return StreamRadius.raw(
+    return StreamRadius(
       none: Radius.lerp(a.none, b.none, t)!,
       xxs: Radius.lerp(a.xxs, b.xxs, t)!,
       xs: Radius.lerp(a.xs, b.xs, t)!,
@@ -55,7 +55,7 @@ mixin _$StreamRadius {
   }) {
     final _this = (this as StreamRadius);
 
-    return StreamRadius.raw(
+    return StreamRadius(
       none: none ?? _this.none,
       xxs: xxs ?? _this.xxs,
       xs: xs ?? _this.xs,

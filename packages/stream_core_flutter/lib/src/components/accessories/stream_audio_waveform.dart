@@ -165,10 +165,10 @@ class _StreamAudioWaveformSliderState extends State<StreamAudioWaveformSlider> {
               // Just using it for the calculation of the thumb position.
               builder: (context) {
                 final progressWidth = constraints.maxWidth * widget.progress;
-                return AnimatedPositioned(
+                return AnimatedPositionedDirectional(
                   curve: const ElasticOutCurve(1.05),
                   duration: const Duration(milliseconds: 300),
-                  left: progressWidth - _kAudioWaveformSliderThumbWidth / 2,
+                  start: progressWidth - _kAudioWaveformSliderThumbWidth / 2,
                   child: StreamAudioWaveformSliderThumb(
                     color: thumbColor,
                     borderColor: thumbBorderColor,
@@ -303,24 +303,29 @@ class StreamAudioWaveform extends StatelessWidget {
     final theme = StreamAudioWaveformTheme.of(context);
     final colorScheme = context.streamColorScheme;
 
+    final isRtl = Directionality.maybeOf(context) == TextDirection.rtl;
+
     final color = this.color ?? theme.color ?? colorScheme.borderOpacityStrong;
     final progressColor = this.progressColor ?? theme.progressColor ?? colorScheme.accentPrimary;
     final minBarHeight = this.minBarHeight ?? theme.minBarHeight ?? 2.0;
     final spacingRatio = this.spacingRatio ?? theme.spacingRatio ?? 0.5;
     final heightScale = this.heightScale ?? theme.heightScale ?? 1.0;
 
-    return CustomPaint(
-      willChange: true,
-      painter: _WaveformPainter(
-        waveform: waveform.reversed,
-        limit: limit,
-        color: color,
-        progress: progress,
-        progressColor: progressColor,
-        minBarHeight: minBarHeight,
-        spacingRatio: spacingRatio,
-        heightScale: heightScale,
-        inverse: inverse,
+    return Transform.flip(
+      flipX: isRtl,
+      child: CustomPaint(
+        willChange: true,
+        painter: _WaveformPainter(
+          waveform: waveform.reversed,
+          limit: limit,
+          color: color,
+          progress: progress,
+          progressColor: progressColor,
+          minBarHeight: minBarHeight,
+          spacingRatio: spacingRatio,
+          heightScale: heightScale,
+          inverse: inverse,
+        ),
       ),
     );
   }
