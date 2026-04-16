@@ -99,7 +99,7 @@ class StreamBadgeNotification extends StatelessWidget {
     Widget? child,
     AlignmentGeometry? alignment,
     Offset? offset,
-  }) : props = StreamBadgeNotificationProps(
+  }) : props = .new(
          type: type,
          size: size,
          label: label,
@@ -249,7 +249,8 @@ class DefaultStreamBadgeNotification extends StatelessWidget {
       children: [
         props.child!,
         Positioned.fill(
-          child: Align(
+          child: FittedBox(
+            fit: BoxFit.none,
             alignment: effectiveAlignment,
             child: Transform.translate(
               offset: effectiveOffset,
