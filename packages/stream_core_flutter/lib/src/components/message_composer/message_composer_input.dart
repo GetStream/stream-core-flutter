@@ -148,7 +148,6 @@ class StreamMessageComposerInputField extends StatelessWidget {
               textCapitalization: textCapitalization,
               autofocus: autofocus,
               autocorrect: autocorrect,
-              keyboardAppearance: Theme.of(context).brightness,
               style: effectiveStyle,
               maxLines: null,
               decoration: InputDecoration(
