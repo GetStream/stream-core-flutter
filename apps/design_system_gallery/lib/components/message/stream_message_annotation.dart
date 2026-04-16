@@ -128,7 +128,7 @@ class _AnnotationTypesSection extends StatelessWidget {
               ),
             ),
             child: StreamMessageAnnotation(
-              leading: Icon(icons.save20),
+              leading: Icon(icons.save),
               label: const Text('Saved for later'),
             ),
           ),
@@ -136,7 +136,7 @@ class _AnnotationTypesSection extends StatelessWidget {
         _ExampleCard(
           label: 'Pinned',
           child: StreamMessageAnnotation(
-            leading: Icon(icons.pin20),
+            leading: Icon(icons.pin),
             label: const Text('Pinned by Alice'),
           ),
         ),
@@ -144,7 +144,7 @@ class _AnnotationTypesSection extends StatelessWidget {
           label: 'Reminder (.rich)',
           subtitle: 'Bold label + regular timestamp via .rich constructor.',
           child: StreamMessageAnnotation.rich(
-            leading: Icon(icons.bell20),
+            leading: Icon(icons.bell),
             label: 'Reminder set · ',
             spans: const [TextSpan(text: 'In 2 hours')],
           ),
@@ -162,7 +162,7 @@ class _AnnotationTypesSection extends StatelessWidget {
           label: 'Also sent in channel (.rich)',
           subtitle: 'Bold label + link-colored span override.',
           child: StreamMessageAnnotation.rich(
-            leading: Icon(icons.arrowUp20),
+            leading: Icon(icons.arrowUp),
             label: 'Also sent in channel · ',
             spans: [
               TextSpan(
@@ -176,7 +176,7 @@ class _AnnotationTypesSection extends StatelessWidget {
           label: 'Replied to a thread (.rich)',
           subtitle: 'Bold label + link-colored span override.',
           child: StreamMessageAnnotation.rich(
-            leading: Icon(icons.arrowUp20),
+            leading: Icon(icons.arrowUp),
             label: 'Replied to a thread · ',
             spans: [
               TextSpan(
@@ -211,7 +211,7 @@ class _ThemeOverrideSection extends StatelessWidget {
               ),
             ),
             child: StreamMessageAnnotation(
-              leading: Icon(icons.save20),
+              leading: Icon(icons.save),
               label: const Text('Saved for later'),
             ),
           ),
@@ -226,7 +226,7 @@ class _ThemeOverrideSection extends StatelessWidget {
               ),
             ),
             child: StreamMessageAnnotation(
-              leading: Icon(icons.pin20),
+              leading: Icon(icons.pin),
               label: const Text('Pinned by Alice'),
             ),
           ),
@@ -235,7 +235,7 @@ class _ThemeOverrideSection extends StatelessWidget {
           label: 'Custom spacing',
           subtitle: 'Wider gap (12px) between icon and label.',
           child: StreamMessageAnnotation(
-            leading: Icon(icons.save20),
+            leading: Icon(icons.save),
             label: const Text('Saved for later'),
             style: StreamMessageAnnotationStyle.from(spacing: 12),
           ),
@@ -276,7 +276,7 @@ class _RealWorldSection extends StatelessWidget {
                   ),
                 ),
                 child: StreamMessageAnnotation(
-                  leading: Icon(icons.save20),
+                  leading: Icon(icons.save),
                   label: const Text('Saved for later'),
                 ),
               ),
@@ -293,7 +293,7 @@ class _RealWorldSection extends StatelessWidget {
             spacing: 4,
             children: [
               StreamMessageAnnotation(
-                leading: Icon(icons.pin20),
+                leading: Icon(icons.pin),
                 label: const Text('Pinned by Alice'),
               ),
               StreamMessageBubble(
@@ -309,7 +309,7 @@ class _RealWorldSection extends StatelessWidget {
             spacing: 4,
             children: [
               StreamMessageAnnotation.rich(
-                leading: Icon(icons.bell20),
+                leading: Icon(icons.bell),
                 label: 'Reminder set · ',
                 spans: const [TextSpan(text: 'In 30 minutes')],
               ),
@@ -326,7 +326,7 @@ class _RealWorldSection extends StatelessWidget {
             spacing: 4,
             children: [
               StreamMessageAnnotation.rich(
-                leading: Icon(icons.arrowUp20),
+                leading: Icon(icons.arrowUp),
                 label: 'Also sent in channel · ',
                 spans: [
                   TextSpan(
@@ -363,10 +363,10 @@ enum _IconOption {
   final String label;
 
   IconData resolve(StreamIcons icons) => switch (this) {
-    bookmark => icons.save20,
-    pin => icons.pin20,
-    bellNotification => icons.bell20,
-    arrowUp => icons.arrowUp20,
+    bookmark => icons.save,
+    pin => icons.pin,
+    bellNotification => icons.bell,
+    arrowUp => icons.arrowUp,
     translate => Icons.translate,
   };
 }

@@ -156,7 +156,7 @@ class _SlotCombinationsSection extends StatelessWidget {
           label: 'Timestamp + status',
           child: StreamMessageMetadata(
             timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.checks12),
+            status: const Icon(StreamIconData.checks),
           ),
         ),
         _ExampleCard(
@@ -170,7 +170,7 @@ class _SlotCombinationsSection extends StatelessWidget {
           label: 'All slots',
           child: StreamMessageMetadata(
             timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.checks12),
+            status: const Icon(StreamIconData.checks),
             username: const Text('Alice'),
             edited: const Text('Edited'),
           ),
@@ -194,7 +194,7 @@ class _DeliveryStatusSection extends StatelessWidget {
           subtitle: 'Clock icon while message is in transit.',
           child: StreamMessageMetadata(
             timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.clock12),
+            status: const Icon(StreamIconData.clock),
           ),
         ),
         _ExampleCard(
@@ -202,7 +202,7 @@ class _DeliveryStatusSection extends StatelessWidget {
           subtitle: 'Single checkmark after server acknowledgement.',
           child: StreamMessageMetadata(
             timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.checkmark12),
+            status: const Icon(StreamIconData.checkmark),
           ),
         ),
         _ExampleCard(
@@ -210,7 +210,7 @@ class _DeliveryStatusSection extends StatelessWidget {
           subtitle: 'Double checkmark when received by recipient.',
           child: StreamMessageMetadata(
             timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.checks12),
+            status: const Icon(StreamIconData.checks),
           ),
         ),
         _ExampleCard(
@@ -222,7 +222,7 @@ class _DeliveryStatusSection extends StatelessWidget {
             ),
             child: StreamMessageMetadata(
               timestamp: const Text('09:41'),
-              status: const Icon(StreamIconData.checks12),
+              status: const Icon(StreamIconData.checks),
             ),
           ),
         ),
@@ -290,7 +290,7 @@ class _RealWorldSection extends StatelessWidget {
                   ),
                   StreamMessageMetadata(
                     timestamp: const Text('09:42'),
-                    status: const Icon(StreamIconData.clock12),
+                    status: const Icon(StreamIconData.clock),
                   ),
                 ],
               ),
@@ -320,7 +320,7 @@ class _RealWorldSection extends StatelessWidget {
                     ),
                     child: StreamMessageMetadata(
                       timestamp: const Text('09:40'),
-                      status: const Icon(StreamIconData.checks12),
+                      status: const Icon(StreamIconData.checks),
                     ),
                   ),
                 ],
@@ -351,7 +351,7 @@ class _RealWorldSection extends StatelessWidget {
                     ),
                     child: StreamMessageMetadata(
                       timestamp: const Text('09:40'),
-                      status: const Icon(StreamIconData.checks12),
+                      status: const Icon(StreamIconData.checks),
                       edited: const Text('Edited'),
                     ),
                   ),
@@ -392,7 +392,7 @@ class _ThemeOverrideSection extends StatelessWidget {
           child: StreamMessageMetadata(
             timestamp: const Text('09:41'),
             username: const Text('Alice'),
-            status: const Icon(StreamIconData.checkmark12),
+            status: const Icon(StreamIconData.checkmark),
             edited: const Text('Edited'),
             style: StreamMessageMetadataStyle.from(spacing: 16),
           ),
@@ -537,10 +537,10 @@ class _ExampleCard extends StatelessWidget {
 // =============================================================================
 
 enum _StatusOption {
-  sending('Sending', StreamIconData.clock12),
-  sent('Sent', StreamIconData.checkmark12),
-  delivered('Delivered', StreamIconData.checks12),
-  read('Read', StreamIconData.checks12)
+  sending('Sending', StreamIconData.clock),
+  sent('Sent', StreamIconData.checkmark),
+  delivered('Delivered', StreamIconData.checks),
+  read('Read', StreamIconData.checks)
   ;
 
   const _StatusOption(this.label, this.iconData);

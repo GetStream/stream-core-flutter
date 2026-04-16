@@ -215,7 +215,7 @@ class _DefaultStreamStepperState extends State<DefaultStreamStepper> {
       spacing: effectiveSpacing,
       children: [
         StreamButton.icon(
-          icon: icons.minus20,
+          icon: icons.minus,
           style: .secondary,
           type: .outline,
           themeStyle: effectiveButtonStyle,
@@ -229,7 +229,7 @@ class _DefaultStreamStepperState extends State<DefaultStreamStepper> {
           style: effectiveInputStyle,
         ),
         StreamButton.icon(
-          icon: icons.plus20,
+          icon: icons.plus,
           style: .secondary,
           type: .outline,
           themeStyle: effectiveButtonStyle,

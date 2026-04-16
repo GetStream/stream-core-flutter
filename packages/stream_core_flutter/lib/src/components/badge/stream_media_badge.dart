@@ -56,8 +56,8 @@ class StreamMediaBadge extends StatelessWidget {
         children: [
           Icon(
             switch (type) {
-              MediaBadgeType.video => icons.videoFill12,
-              MediaBadgeType.audio => icons.voiceFill12,
+              MediaBadgeType.video => icons.videoFill,
+              MediaBadgeType.audio => icons.voiceFill,
             },
             size: 12,
             color: colorScheme.textOnInverse,

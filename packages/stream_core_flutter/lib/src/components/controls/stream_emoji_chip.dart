@@ -230,7 +230,7 @@ class _AddEmojiIcon extends StatelessWidget {
   const _AddEmojiIcon();
 
   @override
-  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAdd20);
+  Widget build(BuildContext context) => Icon(context.streamIcons.emojiAdd);
 }
 
 // Shared themed button shell used by both [DefaultStreamEmojiChip] and

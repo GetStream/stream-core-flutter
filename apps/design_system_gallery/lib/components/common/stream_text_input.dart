@@ -131,8 +131,8 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
                       enabled: !isDisabled,
                       readOnly: isReadOnly,
                       maxLines: maxLines,
-                      leading: showLeading ? Icon(context.streamIcons.search20) : null,
-                      trailing: showTrailing ? Icon(context.streamIcons.xmark20) : null,
+                      leading: showLeading ? Icon(context.streamIcons.search) : null,
+                      trailing: showTrailing ? Icon(context.streamIcons.xmark) : null,
                       onChanged: (v) => setState(() => _value = v),
                     ),
                     if (_value.isNotEmpty)
@@ -416,7 +416,7 @@ class _LeadingIconDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamTextInput(
       hintText: 'Search messages...',
-      leading: Icon(context.streamIcons.search20),
+      leading: Icon(context.streamIcons.search),
       onChanged: (_) {},
     );
   }
@@ -444,7 +444,7 @@ class _TrailingIconDemoState extends State<_TrailingIconDemo> {
       controller: _controller,
       trailing: GestureDetector(
         onTap: _controller.clear,
-        child: Icon(context.streamIcons.xmark20),
+        child: Icon(context.streamIcons.xmark),
       ),
     );
   }
@@ -457,8 +457,8 @@ class _BothIconsDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamTextInput(
       hintText: 'Enter a name...',
-      leading: Icon(context.streamIcons.user20),
-      trailing: Icon(context.streamIcons.checkmark20),
+      leading: Icon(context.streamIcons.user),
+      trailing: Icon(context.streamIcons.checkmark),
       onChanged: (_) {},
     );
   }
@@ -533,7 +533,7 @@ class _LiveValidationDemoState extends State<_LiveValidationDemo> {
       children: [
         StreamTextInput(
           hintText: 'Choose a username',
-          leading: Icon(context.streamIcons.user20),
+          leading: Icon(context.streamIcons.user),
           helperText: helperText,
           helperState: helperState,
           inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
@@ -636,7 +636,7 @@ class _LoginFormExampleState extends State<_LoginFormExample> {
         StreamTextInput(
           hintText: 'Password',
           initialValue: _password,
-          leading: Icon(context.streamIcons.lock20),
+          leading: Icon(context.streamIcons.lock),
           helperText: _successText(_passwordError),
           helperState: _stateFor(_passwordError),
           onChanged: (v) => setState(() => _password = v),
@@ -689,11 +689,11 @@ class _SearchBarExampleState extends State<_SearchBarExample> {
     return StreamTextInput(
       controller: _controller,
       hintText: 'Search conversations...',
-      leading: Icon(context.streamIcons.search20),
+      leading: Icon(context.streamIcons.search),
       trailing: _hasText
           ? GestureDetector(
               onTap: _controller.clear,
-              child: Icon(context.streamIcons.xmark20),
+              child: Icon(context.streamIcons.xmark),
             )
           : null,
     );

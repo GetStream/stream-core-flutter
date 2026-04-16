@@ -210,7 +210,7 @@ class DefaultStreamReactionPicker extends StatelessWidget {
             size: .small,
             type: .outline,
             style: .secondary,
-            icon: icons.plus20,
+            icon: icons.plus,
             onTap: props.onAddReactionTap,
           ),
         ],

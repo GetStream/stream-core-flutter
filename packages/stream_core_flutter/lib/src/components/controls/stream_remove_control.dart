@@ -26,9 +26,9 @@ class StreamRemoveControl extends StatelessWidget {
         height: 20,
         width: 20,
         child: Icon(
-          context.streamIcons.xmark12,
+          context.streamIcons.xmarkSmall,
           color: colorScheme.textOnInverse,
-          size: 10,
+          size: 12,
         ),
       ),
     );

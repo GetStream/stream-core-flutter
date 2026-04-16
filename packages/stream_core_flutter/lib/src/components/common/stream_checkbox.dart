@@ -189,7 +189,7 @@ class DefaultStreamCheckbox extends StatelessWidget {
         },
         isSelected: props.value,
         iconSize: effectiveCheckSize,
-        icon: Icon(icons.checkmark16),
+        icon: Icon(icons.checkmark),
         style: ButtonStyle(
           tapTargetSize: .shrinkWrap,
           visualDensity: .standard,
