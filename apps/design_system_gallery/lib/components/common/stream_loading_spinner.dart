@@ -21,9 +21,24 @@ Widget buildStreamLoadingSpinnerPlayground(BuildContext context) {
     description: 'The diameter of the spinner.',
   );
 
+  final determinate = context.knobs.boolean(
+    label: 'Determinate',
+    description: 'When enabled, shows a fixed progress arc instead of a rotating spinner.',
+  );
+
+  final value = determinate
+      ? context.knobs.double.slider(
+          label: 'Value',
+          initialValue: 0.6,
+          max: 1,
+          description: 'The progress value from 0.0 to 1.0.',
+        )
+      : null;
+
   return Center(
     child: StreamLoadingSpinner(
       size: size,
+      value: value,
     ),
   );
 }
@@ -50,6 +65,8 @@ Widget buildStreamLoadingSpinnerShowcase(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _SizeVariantsSection(),
+          SizedBox(height: spacing.xl),
+          const _ProgressVariantsSection(),
           SizedBox(height: spacing.xl),
           const _ColorVariantsSection(),
         ],
@@ -110,6 +127,97 @@ class _SizeVariantsSection extends StatelessWidget {
                     ),
                     if (index < StreamLoadingSpinnerSize.values.length - 1) SizedBox(width: spacing.xl),
                   ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Progress Variants Section
+// =============================================================================
+
+class _ProgressVariantsSection extends StatelessWidget {
+  const _ProgressVariantsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionLabel(label: 'PROGRESS VARIANTS'),
+        SizedBox(height: spacing.md),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurface,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Determinate progress at different values',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textSecondary,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Row(
+                children: [
+                  for (final (index, entry) in [
+                    ('0%', 0.0),
+                    ('25%', 0.25),
+                    ('50%', 0.5),
+                    ('75%', 0.75),
+                    ('100%', 1.0),
+                  ].indexed) ...[
+                    _ProgressDemo(
+                      label: entry.$1,
+                      value: entry.$2,
+                      size: StreamLoadingSpinnerSize.lg,
+                    ),
+                    if (index < 4) SizedBox(width: spacing.xl),
+                  ],
+                ],
+              ),
+              SizedBox(height: spacing.lg),
+              Text(
+                'Indeterminate vs determinate comparison',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textSecondary,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Row(
+                children: [
+                  const _SpinnerDemo(
+                    label: 'Indeterminate',
+                    size: StreamLoadingSpinnerSize.lg,
+                  ),
+                  SizedBox(width: spacing.xl),
+                  const _ProgressDemo(
+                    label: 'Determinate',
+                    value: 0.6,
+                    size: StreamLoadingSpinnerSize.lg,
+                  ),
                 ],
               ),
             ],
@@ -206,6 +314,44 @@ class _SpinnerDemo extends StatelessWidget {
           child: Center(
             child: StreamLoadingSpinner(
               size: size,
+            ),
+          ),
+        ),
+        SizedBox(height: spacing.sm),
+        Text(
+          label,
+          style: textTheme.metadataEmphasis.copyWith(
+            color: colorScheme.accentPrimary,
+            fontFamily: 'monospace',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProgressDemo extends StatelessWidget {
+  const _ProgressDemo({required this.label, required this.value, required this.size});
+
+  final String label;
+  final double value;
+  final StreamLoadingSpinnerSize size;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      children: [
+        SizedBox(
+          width: 56,
+          height: 56,
+          child: Center(
+            child: StreamLoadingSpinner(
+              size: size,
+              value: value,
             ),
           ),
         ),
