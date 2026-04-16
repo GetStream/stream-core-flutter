@@ -134,7 +134,7 @@ class _DefaultSection extends StatelessWidget {
       child: StreamJumpToUnreadButton(
         label: '3 unread',
         onJumpPressed: () {},
-        trailingIcon: context.streamIcons.xmark16,
+        trailingIcon: context.streamIcons.xmark,
         onDismissPressed: () {},
       ),
     );
@@ -155,7 +155,7 @@ class _DisabledSection extends StatelessWidget {
       description: 'Non-interactive state with both callbacks null',
       child: StreamJumpToUnreadButton(
         label: '3 unread',
-        trailingIcon: context.streamIcons.xmark16,
+        trailingIcon: context.streamIcons.xmark,
       ),
     );
   }
@@ -176,7 +176,7 @@ class _LongLabelSection extends StatelessWidget {
       child: StreamJumpToUnreadButton(
         label: '128 unread messages',
         onJumpPressed: () {},
-        trailingIcon: context.streamIcons.xmark16,
+        trailingIcon: context.streamIcons.xmark,
         onDismissPressed: () {},
       ),
     );
@@ -270,7 +270,7 @@ class _CustomColorsOverride extends StatelessWidget {
             child: StreamJumpToUnreadButton(
               label: '3 unread',
               onJumpPressed: () {},
-              trailingIcon: context.streamIcons.xmark16,
+              trailingIcon: context.streamIcons.xmark,
               onDismissPressed: () {},
             ),
           ),
@@ -318,7 +318,7 @@ class _CustomShapeOverride extends StatelessWidget {
             child: StreamJumpToUnreadButton(
               label: '7 unread',
               onJumpPressed: () {},
-              trailingIcon: context.streamIcons.xmark16,
+              trailingIcon: context.streamIcons.xmark,
               onDismissPressed: () {},
             ),
           ),
@@ -360,7 +360,7 @@ class _NoElevationOverride extends StatelessWidget {
             child: StreamJumpToUnreadButton(
               label: '12 unread',
               onJumpPressed: () {},
-              trailingIcon: context.streamIcons.xmark16,
+              trailingIcon: context.streamIcons.xmark,
               onDismissPressed: () {},
             ),
           ),
@@ -458,7 +458,7 @@ class _MessageListMockup extends StatelessWidget {
             child: StreamJumpToUnreadButton(
               label: '3 unread',
               onJumpPressed: () {},
-              trailingIcon: context.streamIcons.xmark16,
+              trailingIcon: context.streamIcons.xmark,
               onDismissPressed: () {},
             ),
           ),

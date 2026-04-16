@@ -96,12 +96,12 @@ class StreamJumpToUnreadButtonProps {
 
   /// The icon displayed at the start of the leading section.
   ///
-  /// Falls back to the theme's `arrowUp16` icon.
+  /// Falls back to the theme's `arrowUp` icon.
   final IconData? leadingIcon;
 
   /// The icon displayed in the trailing section after the separator.
   ///
-  /// Falls back to the theme's `xmark16` icon.
+  /// Falls back to the theme's `xmark` icon.
   final IconData? trailingIcon;
 
   /// Called when the trailing dismiss section is pressed.
@@ -144,8 +144,8 @@ class DefaultStreamJumpToUnreadButton extends StatelessWidget {
     final effectivePadding = theme.padding ?? defaults.padding;
     final effectiveBackgroundColor = theme.backgroundColor ?? defaults.backgroundColor;
 
-    final effectiveLeadingIcon = props.leadingIcon ?? icons.arrowUp16;
-    final effectiveTrailingIcon = props.trailingIcon ?? icons.xmark16;
+    final effectiveLeadingIcon = props.leadingIcon ?? icons.arrowUp;
+    final effectiveTrailingIcon = props.trailingIcon ?? icons.xmark;
     final effectiveLeadingStyle = defaults.leadingStyle.merge(theme.leadingStyle);
     final effectiveTrailingStyle = defaults.trailingStyle.merge(theme.trailingStyle);
 
