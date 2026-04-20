@@ -3,6 +3,7 @@
 ### ✨ Features
 
 - Added `StreamJumpToUnreadButton` component and `StreamJumpToUnreadButtonTheme`.
+- Added `StreamFileTypeIconSize.md` and `StreamFileTypeIconSize.sm` variants.
 
 ### 🐞 Fixed
 
@@ -13,6 +14,7 @@
 
 - Unified `StreamRadius` across platforms; removed platform factory, `.raw()`, `.ios`, and `.android`.
 - Renamed Stream Icons by removing the size suffix from the icon names.
+- Renamed `StreamFileTypeIconSize` variants: `s48` → `xl`, `s40` → `lg`.
 
 ## 0.2.0
 

@@ -39,7 +39,7 @@ Widget buildFileTypeIconPlayground(BuildContext context) {
   final size = context.knobs.object.dropdown(
     label: 'Size',
     options: StreamFileTypeIconSize.values,
-    initialOption: StreamFileTypeIconSize.s40,
+    initialOption: StreamFileTypeIconSize.lg,
     labelBuilder: (option) => option.name,
     description: 'Icon size preset.',
   );
@@ -172,7 +172,7 @@ class _FileTypeCard extends StatelessWidget {
               child: Center(
                 child: StreamFileTypeIcon(
                   type: fileType,
-                  size: StreamFileTypeIconSize.s48,
+                  size: StreamFileTypeIconSize.xl,
                   extension: _getExtension(fileType),
                 ),
               ),
@@ -223,8 +223,65 @@ class _SizeVariantsSection extends StatelessWidget {
       children: [
         const _SectionLabel(label: 'SIZE SCALE'),
         SizedBox(height: spacing.md),
+        const _SizeScaleComparison(),
+        SizedBox(height: spacing.sm),
         ...StreamFileTypeIconSize.values.map((size) => _SizeCard(size: size)),
       ],
+    );
+  }
+}
+
+/// Compact side-by-side comparison of all sizes at a single file type, so the
+/// progressive scaling (and the label/no-label behaviour) reads at a glance.
+class _SizeScaleComparison extends StatelessWidget {
+  const _SizeScaleComparison();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundSurface,
+        borderRadius: BorderRadius.all(radius.lg),
+        boxShadow: boxShadow.elevation1,
+      ),
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.all(radius.lg),
+        border: Border.all(color: colorScheme.borderSubtle),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          for (final size in StreamFileTypeIconSize.values)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                StreamFileTypeIcon(
+                  type: StreamFileType.pdf,
+                  size: size,
+                  extension: 'pdf',
+                ),
+                SizedBox(height: spacing.xs),
+                Text(
+                  size.name,
+                  style: textTheme.metadataEmphasis.copyWith(
+                    color: colorScheme.textPrimary,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }
@@ -236,17 +293,26 @@ class _SizeCard extends StatelessWidget {
 
   String _getDimensions(StreamFileTypeIconSize size) {
     return switch (size) {
-      StreamFileTypeIconSize.s48 => '40×48',
-      StreamFileTypeIconSize.s40 => '32×40',
+      StreamFileTypeIconSize.xl => '40×48',
+      StreamFileTypeIconSize.lg => '32×40',
+      StreamFileTypeIconSize.md => '26×32',
+      StreamFileTypeIconSize.sm => '19×24',
     };
   }
 
   String _getUsage(StreamFileTypeIconSize size) {
     return switch (size) {
-      StreamFileTypeIconSize.s48 => 'File previews, galleries, detail views',
-      StreamFileTypeIconSize.s40 => 'List items, compact views, messages',
+      StreamFileTypeIconSize.xl => 'File previews, galleries, detail views. Renders the extension label.',
+      StreamFileTypeIconSize.lg => 'List items, compact views, messages. Renders the extension label.',
+      StreamFileTypeIconSize.md => 'Inline attachments and condensed rows. Glyph-only — no label.',
+      StreamFileTypeIconSize.sm => 'Chips, tight metadata, inline references. Glyph-only — no label.',
     };
   }
+
+  bool _rendersLabel(StreamFileTypeIconSize size) => switch (size) {
+    StreamFileTypeIconSize.xl || StreamFileTypeIconSize.lg => true,
+    StreamFileTypeIconSize.md || StreamFileTypeIconSize.sm => false,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +356,10 @@ class _SizeCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: spacing.sm,
+                    runSpacing: spacing.xxs,
                     children: [
                       Text(
                         'StreamFileTypeIconSize.${size.name}',
@@ -299,24 +368,10 @@ class _SizeCard extends StatelessWidget {
                           fontFamily: 'monospace',
                         ),
                       ),
-                      SizedBox(width: spacing.sm),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: spacing.xs + spacing.xxs,
-                          vertical: spacing.xxs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.backgroundSurfaceSubtle,
-                          borderRadius: BorderRadius.all(radius.xs),
-                        ),
-                        child: Text(
-                          _getDimensions(size),
-                          style: textTheme.metadataEmphasis.copyWith(
-                            color: colorScheme.textSecondary,
-                            fontFamily: 'monospace',
-                            fontSize: 10,
-                          ),
-                        ),
+                      _SizeMetaChip(label: _getDimensions(size)),
+                      _SizeMetaChip(
+                        label: _rendersLabel(size) ? 'with label' : 'glyph only',
+                        emphasized: _rendersLabel(size),
                       ),
                     ],
                   ),
@@ -331,6 +386,40 @@ class _SizeCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SizeMetaChip extends StatelessWidget {
+  const _SizeMetaChip({required this.label, this.emphasized = false});
+
+  final String label;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.xs + spacing.xxs,
+        vertical: spacing.xxs,
+      ),
+      decoration: BoxDecoration(
+        color: emphasized ? colorScheme.accentPrimary.withValues(alpha: .12) : colorScheme.backgroundSurfaceSubtle,
+        borderRadius: BorderRadius.all(radius.xs),
+      ),
+      child: Text(
+        label,
+        style: textTheme.metadataEmphasis.copyWith(
+          color: emphasized ? colorScheme.accentPrimary : colorScheme.textSecondary,
+          fontFamily: 'monospace',
+          fontSize: 10,
         ),
       ),
     );
@@ -557,7 +646,7 @@ class _MessageAttachmentExample extends StatelessWidget {
         children: [
           StreamFileTypeIcon(
             type: StreamFileType.presentation,
-            size: StreamFileTypeIconSize.s48,
+            size: StreamFileTypeIconSize.xl,
             extension: 'pptx',
           ),
           SizedBox(width: spacing.sm),
@@ -677,7 +766,7 @@ class _FileGridItem extends StatelessWidget {
         children: [
           StreamFileTypeIcon(
             type: fileType,
-            size: StreamFileTypeIconSize.s48,
+            size: StreamFileTypeIconSize.xl,
             extension: _getExtension(fileType),
           ),
           SizedBox(height: spacing.xs),

@@ -148,6 +148,7 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
     final effectiveTimestampColor = resolve((s) => s?.timestampColor);
     final effectiveEditedTextStyle = resolve((s) => s?.editedTextStyle);
     final effectiveEditedColor = resolve((s) => s?.editedColor);
+    final effectiveStatusTextStyle = resolve((s) => s?.statusTextStyle);
     final effectiveStatusColor = resolve((s) => s?.statusColor);
     final effectiveStatusIconSize = resolve((s) => s?.statusIconSize);
     final effectiveSpacing = resolve((s) => s?.spacing);
@@ -178,7 +179,11 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
           color: effectiveStatusColor,
           size: effectiveStatusIconSize,
         ),
-        child: status,
+        child: AnimatedDefaultTextStyle(
+          style: effectiveStatusTextStyle.copyWith(color: effectiveStatusColor),
+          duration: kThemeChangeDuration,
+          child: status,
+        ),
       );
     }
 
@@ -234,6 +239,9 @@ class _StreamMessageMetadataDefaults extends StreamMessageMetadataStyle {
 
   @override
   StreamMessageLayoutProperty<Color> get editedColor => .all(_colorScheme.textTertiary);
+
+  @override
+  StreamMessageLayoutProperty<TextStyle> get statusTextStyle => .all(_textTheme.metadataDefault);
 
   @override
   StreamMessageLayoutProperty<Color> get statusColor => .all(_colorScheme.textTertiary);

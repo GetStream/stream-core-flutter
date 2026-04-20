@@ -66,6 +66,12 @@ mixin _$StreamMessageMetadataStyle {
         t,
         Color.lerp,
       ),
+      statusTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.statusTextStyle,
+        b.statusTextStyle,
+        t,
+        TextStyle.lerp,
+      ),
       statusColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.statusColor,
         b.statusColor,
@@ -106,6 +112,7 @@ mixin _$StreamMessageMetadataStyle {
     StreamMessageLayoutProperty<Color?>? timestampColor,
     StreamMessageLayoutProperty<TextStyle?>? editedTextStyle,
     StreamMessageLayoutProperty<Color?>? editedColor,
+    StreamMessageLayoutProperty<TextStyle?>? statusTextStyle,
     StreamMessageLayoutProperty<Color?>? statusColor,
     StreamMessageLayoutProperty<double?>? statusIconSize,
     StreamMessageLayoutProperty<double?>? spacing,
@@ -121,6 +128,7 @@ mixin _$StreamMessageMetadataStyle {
       timestampColor: timestampColor ?? _this.timestampColor,
       editedTextStyle: editedTextStyle ?? _this.editedTextStyle,
       editedColor: editedColor ?? _this.editedColor,
+      statusTextStyle: statusTextStyle ?? _this.statusTextStyle,
       statusColor: statusColor ?? _this.statusColor,
       statusIconSize: statusIconSize ?? _this.statusIconSize,
       spacing: spacing ?? _this.spacing,
@@ -147,6 +155,7 @@ mixin _$StreamMessageMetadataStyle {
       timestampColor: other.timestampColor,
       editedTextStyle: other.editedTextStyle,
       editedColor: other.editedColor,
+      statusTextStyle: other.statusTextStyle,
       statusColor: other.statusColor,
       statusIconSize: other.statusIconSize,
       spacing: other.spacing,
@@ -174,6 +183,7 @@ mixin _$StreamMessageMetadataStyle {
         _other.timestampColor == _this.timestampColor &&
         _other.editedTextStyle == _this.editedTextStyle &&
         _other.editedColor == _this.editedColor &&
+        _other.statusTextStyle == _this.statusTextStyle &&
         _other.statusColor == _this.statusColor &&
         _other.statusIconSize == _this.statusIconSize &&
         _other.spacing == _this.spacing &&
@@ -193,6 +203,7 @@ mixin _$StreamMessageMetadataStyle {
       _this.timestampColor,
       _this.editedTextStyle,
       _this.editedColor,
+      _this.statusTextStyle,
       _this.statusColor,
       _this.statusIconSize,
       _this.spacing,
