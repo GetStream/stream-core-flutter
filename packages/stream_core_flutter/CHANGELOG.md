@@ -4,6 +4,7 @@
 
 - Added `StreamJumpToUnreadButton` component and `StreamJumpToUnreadButtonTheme`.
 - Added `StreamFileTypeIconSize.md` and `StreamFileTypeIconSize.sm` variants.
+- Added `trailing` slot to `StreamMessageAnnotation`, with matching `trailingTextStyle`/`trailingTextColor` on `StreamMessageAnnotationStyle`.
 
 ### 🐞 Fixed
 
@@ -15,6 +16,7 @@
 - Unified `StreamRadius` across platforms; removed platform factory, `.raw()`, `.ios`, and `.android`.
 - Renamed Stream Icons by removing the size suffix from the icon names.
 - Renamed `StreamFileTypeIconSize` variants: `s48` → `xl`, `s40` → `lg`.
+- Removed `StreamMessageAnnotation.rich` and `spanTextStyle`/`spanTextColor`; use the new `trailing` slot instead.
 
 ## 0.2.0
 
