@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../factory/stream_component_factory.dart';
-import '../../theme/primitives/stream_colors.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// Predefined sizes for the file type icon.
@@ -14,11 +13,17 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 ///  * [StreamFileTypeIcon], which uses these size variants.
 enum StreamFileTypeIconSize {
-  /// Large icon (40×48 pixels).
-  s48(width: 40, height: 48),
+  /// Extra-large icon (40×48 pixels).
+  xl(width: 40, height: 48),
 
-  /// Small icon (32×40 pixels).
-  s40(width: 32, height: 40)
+  /// Large icon (32×40 pixels).
+  lg(width: 32, height: 40),
+
+  /// Medium icon (26×32 pixels).
+  md(width: 26, height: 32),
+
+  /// Small icon (19×24 pixels).
+  sm(width: 19, height: 24)
   ;
 
   /// Constructs a [StreamFileTypeIconSize] with the given dimensions.
@@ -112,7 +117,7 @@ enum StreamFileType {
 /// ```dart
 /// StreamFileTypeIcon(
 ///   type: StreamFileType.audio,
-///   size: StreamFileTypeIconSize.s48,
+///   size: StreamFileTypeIconSize.xl,
 ///   extension: 'mp3',
 /// )
 /// ```
@@ -132,7 +137,7 @@ class StreamFileTypeIcon extends StatelessWidget {
   StreamFileTypeIcon({
     super.key,
     required StreamFileType type,
-    StreamFileTypeIconSize size = .s40,
+    StreamFileTypeIconSize size = .lg,
     String? extension,
   }) : props = .new(type: type, size: size, extension: extension);
 
@@ -149,8 +154,8 @@ class StreamFileTypeIcon extends StatelessWidget {
   /// extension.
   factory StreamFileTypeIcon.fromMimeType({
     Key? key,
-    required String mimeType,
-    StreamFileTypeIconSize size = .s40,
+    String? mimeType,
+    StreamFileTypeIconSize size = .lg,
   }) {
     final (type, extension) = _getFileTypeFromMimeType(mimeType);
     return .new(key: key, type: type, size: size, extension: extension);
@@ -267,7 +272,7 @@ class StreamFileTypeIconProps {
 
   /// The size of the icon.
   ///
-  /// Defaults to [StreamFileTypeIconSize.s40].
+  /// Defaults to [StreamFileTypeIconSize.lg].
   final StreamFileTypeIconSize size;
 
   /// The file extension to display on the icon.
@@ -297,6 +302,7 @@ class DefaultStreamFileTypeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = context.streamTextTheme;
+    final colorScheme = context.streamColorScheme;
 
     return Stack(
       clipBehavior: .none,
@@ -308,7 +314,7 @@ class DefaultStreamFileTypeIcon extends StatelessWidget {
           height: props.size.height,
           clipBehavior: .none,
         ),
-        if (props.extension case final extension?) ...[
+        if (props.extension case final extension? when _showsExtensionLabelForSize(props.size))
           Positioned(
             left: 4,
             right: 4,
@@ -321,24 +327,36 @@ class DefaultStreamFileTypeIcon extends StatelessWidget {
                 maxLines: 1,
                 textAlign: .center,
                 overflow: .ellipsis,
-                style: textTheme.numericSm.copyWith(color: StreamColors.white),
+                style: textTheme.numericSm.copyWith(color: colorScheme.textOnAccent),
               ),
             ),
           ),
-        ],
       ],
     );
   }
 
+  // Returns whether the given size renders an extension label overlay.
+  //
+  // The smaller variants ([md], [sm]) are glyph-only — the SVG itself
+  // communicates the file type without needing a label on top.
+  bool _showsExtensionLabelForSize(
+    StreamFileTypeIconSize size,
+  ) => switch (size) {
+    .xl || .lg => true,
+    .md || .sm => false,
+  };
+
   // Returns the appropriate bottom position for the given icon size.
   //
   // The position determines where the extension label is placed vertically
-  // on the icon. Larger icons require slightly more offset.
+  // on the icon. Only reachable for sizes where [_showsExtensionLabelForSize]
+  // is true — the glyph-only variants short-circuit before this is called.
   double _bottomPositionForSize(
     StreamFileTypeIconSize size,
   ) => switch (size) {
-    .s48 => 5,
-    .s40 => 4,
+    .xl => 8,
+    .lg => 7,
+    .md || .sm => 0,
   };
 
   // Returns the appropriate icon asset path for the given file type and size.

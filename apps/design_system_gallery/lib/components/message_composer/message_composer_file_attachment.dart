@@ -44,7 +44,7 @@ Widget buildMessageComposerFileAttachmentPlayground(BuildContext context) {
       constraints: const BoxConstraints(maxWidth: 360),
       child: MessageComposerFileAttachment(
         fileTypeIcon: StreamFileTypeIcon(type: fileType),
-        title: title,
+        title: Text(title),
         subtitle: showSubtitle
             ? Text(
                 '2.4 MB',
@@ -95,7 +95,7 @@ class _FileTypesSection extends StatelessWidget {
           label: 'PDF',
           child: MessageComposerFileAttachment(
             fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.pdf),
-            title: 'annual_report.pdf',
+            title: const Text('annual_report.pdf'),
             onRemovePressed: () {},
           ),
         ),
@@ -103,7 +103,7 @@ class _FileTypesSection extends StatelessWidget {
           label: 'Document',
           child: MessageComposerFileAttachment(
             fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.text),
-            title: 'meeting_notes.docx',
+            title: const Text('meeting_notes.docx'),
             onRemovePressed: () {},
           ),
         ),
@@ -111,7 +111,7 @@ class _FileTypesSection extends StatelessWidget {
           label: 'Spreadsheet',
           child: MessageComposerFileAttachment(
             fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
-            title: 'project_budget.xlsx',
+            title: const Text('project_budget.xlsx'),
             onRemovePressed: () {},
           ),
         ),
@@ -119,7 +119,7 @@ class _FileTypesSection extends StatelessWidget {
           label: 'Audio',
           child: MessageComposerFileAttachment(
             fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.audio),
-            title: 'podcast_episode.mp3',
+            title: const Text('podcast_episode.mp3'),
             onRemovePressed: () {},
           ),
         ),
@@ -142,7 +142,7 @@ class _WithSubtitleSection extends StatelessWidget {
           label: 'With file size',
           child: MessageComposerFileAttachment(
             fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.pdf),
-            title: 'design_specs.pdf',
+            title: const Text('design_specs.pdf'),
             subtitle: Text('4.2 MB', style: subtitleStyle),
             onRemovePressed: () {},
           ),
@@ -151,7 +151,7 @@ class _WithSubtitleSection extends StatelessWidget {
           label: 'Without remove button',
           child: MessageComposerFileAttachment(
             fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
-            title: 'budget_2025.xlsx',
+            title: const Text('budget_2025.xlsx'),
             subtitle: Text('1.8 MB', style: subtitleStyle),
           ),
         ),

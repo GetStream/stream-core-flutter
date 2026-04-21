@@ -115,55 +115,56 @@ class StreamMessageComposerInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final composerBorderRadius = context.streamRadius.xxxl;
+    final spacing = context.streamSpacing;
+
     final inputStyle = context.streamTextInputTheme.style;
     final inputDefaults = InputThemeDefaults(context: context).style;
 
     final effectiveStyle = inputStyle?.textStyle ?? inputDefaults.textStyle;
     final effectiveHintStyle = inputStyle?.hintStyle ?? inputDefaults.hintStyle;
 
-    final border = OutlineInputBorder(
-      borderSide: BorderSide.none,
-      borderRadius: BorderRadius.all(composerBorderRadius),
-    );
-
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 124),
-      child: Row(
-        children: [
-          if (command case final command?)
-            Padding(
-              padding: EdgeInsetsDirectional.only(start: context.streamSpacing.sm),
-              child: StreamCommandChip(
+      child: Padding(
+        padding: .all(spacing.sm),
+        child: Row(
+          mainAxisSize: .min,
+          spacing: spacing.xxs,
+          crossAxisAlignment: .end,
+          children: [
+            if (command case final command?)
+              StreamCommandChip(
                 label: command,
                 onDismiss: onDismissCommand,
               ),
-            ),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              textInputAction: textInputAction,
-              keyboardType: keyboardType,
-              textCapitalization: textCapitalization,
-              autofocus: autofocus,
-              autocorrect: autocorrect,
-              style: effectiveStyle,
-              maxLines: null,
-              decoration: InputDecoration(
-                border: border,
-                focusedBorder: border,
-                enabledBorder: border,
-                errorBorder: border,
-                disabledBorder: border,
-                fillColor: Colors.transparent,
-                contentPadding: EdgeInsetsDirectional.fromSTEB(command == null ? 12 : 0, 8, 12, 8),
-                hintText: placeholder,
-                hintStyle: effectiveHintStyle,
+            Expanded(
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                textInputAction: textInputAction,
+                keyboardType: keyboardType,
+                textCapitalization: textCapitalization,
+                autofocus: autofocus,
+                autocorrect: autocorrect,
+                style: effectiveStyle,
+                maxLines: null,
+                decoration: InputDecoration(
+                  isCollapsed: true,
+                  filled: false,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  hintText: placeholder,
+                  hintStyle: effectiveHintStyle,
+                  contentPadding: .symmetric(horizontal: spacing.xxs, vertical: spacing.xxxs),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

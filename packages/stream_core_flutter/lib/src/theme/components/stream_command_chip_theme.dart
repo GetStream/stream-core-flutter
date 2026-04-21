@@ -50,12 +50,12 @@ class StreamCommandChipTheme extends InheritedTheme {
 @themeGen
 @immutable
 class StreamCommandChipThemeData with _$StreamCommandChipThemeData {
-  /// Creates a command chip theme with optional color overrides.
+  /// Creates a command chip theme with optional overrides.
   const StreamCommandChipThemeData({
     this.backgroundColor,
     this.foregroundColor,
-    this.minHeight,
     this.labelStyle,
+    this.minHeight,
     this.padding,
     this.borderRadius,
   });
@@ -63,16 +63,18 @@ class StreamCommandChipThemeData with _$StreamCommandChipThemeData {
   /// The background color of the chip.
   final Color? backgroundColor;
 
-  /// The color of the icon and label text.
+  /// The color of the icons and label text.
   final Color? foregroundColor;
 
   /// The style of the label text.
   final TextStyle? labelStyle;
 
   /// The minimum height of the chip.
+  ///
+  /// The chip will grow taller if its content exceeds this height.
   final double? minHeight;
 
-  /// The padding of the chip.
+  /// The padding around the chip's contents.
   final EdgeInsetsGeometry? padding;
 
   /// The border radius of the chip.

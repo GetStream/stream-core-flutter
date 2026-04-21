@@ -5,16 +5,28 @@ import '../message_layout/stream_message_layout.dart';
 
 /// An annotation row for displaying contextual message annotations.
 ///
-/// Displays an optional [leading] widget (typically an icon) and a [label]
-/// widget in a horizontal row with themed styling. Can be used for various
-/// annotation types such as "Saved", "Pinned", "Reminder", etc.
+/// Displays an optional [leading] widget (typically an icon), a [label]
+/// widget, and an optional [trailing] widget in a horizontal row. Can be
+/// used for various annotation types such as "Saved", "Pinned", "Reminder",
+/// etc.
 ///
 /// All content is provided by the caller via widget slots. The provided
 /// widgets are automatically styled according to
 /// [StreamMessageAnnotationStyle].
 ///
-/// The visual order is always `[leading, label]` with configurable spacing
-/// between them. When [leading] is null, only the label is shown.
+/// The visual order is always `[leading, label, trailing]` with configurable
+/// spacing between them. Any slot that is null is omitted from the row.
+///
+/// When [onTap] or [onLongPress] is provided, the entire row — including
+/// its padding — becomes tappable. This gives a forgiving hit target for
+/// annotations like "Also sent in channel · View" where the trailing link
+/// and the label both lead to the same destination.
+///
+/// When neither is provided, the row is hit-transparent and will not
+/// steal taps from widgets beneath it (e.g., in a [Stack] or overlay).
+/// For more targeted behavior (e.g., a tappable trailing link while the
+/// rest of the row does nothing), leave [onTap]/[onLongPress] null and
+/// wrap the [trailing] widget with its own [GestureDetector].
 ///
 /// {@tool snippet}
 ///
@@ -30,13 +42,17 @@ import '../message_layout/stream_message_layout.dart';
 ///
 /// {@tool snippet}
 ///
-/// Tappable annotation:
+/// Annotation with a row-level tap and a link-colored trailing label:
 ///
 /// ```dart
 /// StreamMessageAnnotation(
-///   leading: Icon(StreamIcons.pin),
-///   label: Text('Pinned'),
-///   onTap: () => print('Annotation tapped'),
+///   onTap: () => openChannel(),
+///   leading: Icon(StreamIcons.arrowUpRight),
+///   label: Text('Also sent in channel · '),
+///   trailing: Text('View'),
+///   style: StreamMessageAnnotationStyle.from(
+///     trailingTextColor: Theme.of(context).colorScheme.primary,
+///   ),
 /// )
 /// ```
 /// {@end-tool}
@@ -48,57 +64,21 @@ import '../message_layout/stream_message_layout.dart';
 class StreamMessageAnnotation extends StatelessWidget {
   /// Creates a message annotation row.
   ///
-  /// The [label] is required; [leading] is optional and omitted from the row
-  /// when null.
+  /// The [label] is required; [leading] and [trailing] are optional and
+  /// omitted from the row when null. When [onTap] or [onLongPress] is
+  /// provided, the entire row becomes tappable.
   StreamMessageAnnotation({
     super.key,
     Widget? leading,
     required Widget label,
+    Widget? trailing,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
     StreamMessageAnnotationStyle? style,
   }) : props = .new(
          leading: leading,
          label: label,
-         onTap: onTap,
-         onLongPress: onLongPress,
-         style: style,
-       );
-
-  /// Creates a message annotation row with a rich text label.
-  ///
-  /// The [label] string is styled with the annotation's
-  /// [StreamMessageAnnotationStyle.textStyle] (defaults to
-  /// [StreamTextTheme.metadataEmphasis]). The [spans] are wrapped under a
-  /// parent that applies [StreamMessageAnnotationStyle.spanTextStyle]
-  /// (defaults to [StreamTextTheme.metadataDefault]), so spans without an
-  /// explicit style automatically receive the secondary annotation style.
-  ///
-  /// Spans that specify an explicit [TextSpan.style] override the default.
-  ///
-  /// {@tool snippet}
-  ///
-  /// Annotation with secondary styled span:
-  ///
-  /// ```dart
-  /// StreamMessageAnnotation.rich(
-  ///   leading: Icon(StreamIcons.bellNotification),
-  ///   label: 'Reminder set · ',
-  ///   spans: [TextSpan(text: 'In 2 hours')],
-  /// )
-  /// ```
-  /// {@end-tool}
-  StreamMessageAnnotation.rich({
-    super.key,
-    Widget? leading,
-    required String label,
-    required List<InlineSpan> spans,
-    VoidCallback? onTap,
-    VoidCallback? onLongPress,
-    StreamMessageAnnotationStyle? style,
-  }) : props = StreamMessageAnnotationProps(
-         leading: leading,
-         label: _RichAnnotationLabel(label: label, spans: spans),
+         trailing: trailing,
          onTap: onTap,
          onLongPress: onLongPress,
          style: style,
@@ -125,6 +105,7 @@ class StreamMessageAnnotationProps {
   const StreamMessageAnnotationProps({
     this.leading,
     required this.label,
+    this.trailing,
     this.onTap,
     this.onLongPress,
     this.style,
@@ -132,7 +113,7 @@ class StreamMessageAnnotationProps {
 
   /// The leading widget, typically an [Icon].
   ///
-  /// When null, the row displays only the [label].
+  /// When null, the row displays only the [label] (and [trailing] if set).
   ///
   /// Styled by [StreamMessageAnnotationStyle.iconColor] and
   /// [StreamMessageAnnotationStyle.iconSize].
@@ -143,6 +124,13 @@ class StreamMessageAnnotationProps {
   /// Styled by [StreamMessageAnnotationStyle.textStyle] and
   /// [StreamMessageAnnotationStyle.textColor].
   final Widget label;
+
+  /// The trailing widget, typically a tappable link or a secondary label
+  /// (e.g., a timestamp).
+  ///
+  /// Styled by [StreamMessageAnnotationStyle.trailingTextStyle] and
+  /// [StreamMessageAnnotationStyle.trailingTextColor].
+  final Widget? trailing;
 
   /// Called when the annotation row is tapped.
   final VoidCallback? onTap;
@@ -202,57 +190,37 @@ class DefaultStreamMessageAnnotation extends StatelessWidget {
       ),
     );
 
+    Widget? trailingWidget;
+    if (props.trailing case final trailing?) {
+      final effectiveTrailingTextStyle = resolve((s) => s?.trailingTextStyle);
+      final effectiveTrailingTextColor = resolve((s) => s?.trailingTextColor);
+
+      trailingWidget = AnimatedDefaultTextStyle(
+        style: effectiveTrailingTextStyle.copyWith(color: effectiveTrailingTextColor),
+        duration: kThemeChangeDuration,
+        child: trailing,
+      );
+    }
+
     final child = Padding(
       padding: effectivePadding,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: effectiveSpacing,
-        children: [?leadingWidget, labelWidget],
+        children: [?leadingWidget, labelWidget, ?trailingWidget],
       ),
     );
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: props.onTap,
-      onLongPress: props.onLongPress,
-      child: child,
-    );
-  }
-}
+    if (props.onTap != null || props.onLongPress != null) {
+      return GestureDetector(
+        behavior: .opaque,
+        onTap: props.onTap,
+        onLongPress: props.onLongPress,
+        child: child,
+      );
+    }
 
-// Builds a [Text.rich] where the [label] inherits the annotation's primary
-// text style and the [spans] are wrapped under a parent [TextSpan] that
-// applies the annotation's span style.
-class _RichAnnotationLabel extends StatelessWidget {
-  const _RichAnnotationLabel({required this.label, required this.spans});
-
-  final String label;
-  final List<InlineSpan> spans;
-
-  @override
-  Widget build(BuildContext context) {
-    final layout = StreamMessageLayout.of(context);
-    final annotationStyle = StreamMessageItemTheme.of(context).annotation;
-    final defaults = _StreamMessageAnnotationDefaults(context);
-
-    final resolve = StreamMessageLayoutResolver(layout, [annotationStyle, defaults]);
-
-    final effectiveSpanStyle = resolve((s) => s?.spanTextStyle);
-    final effectiveSpanColor = resolve((s) => s?.spanTextColor);
-
-    return Text.rich(
-      TextSpan(
-        text: label,
-        children: [
-          TextSpan(
-            style: effectiveSpanStyle.copyWith(
-              color: effectiveSpanColor,
-            ),
-            children: spans,
-          ),
-        ],
-      ),
-    );
+    return child;
   }
 }
 
@@ -272,12 +240,6 @@ class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
   StreamMessageLayoutProperty<Color> get textColor => .all(_colorScheme.textPrimary);
 
   @override
-  StreamMessageLayoutProperty<TextStyle> get spanTextStyle => .all(_textTheme.metadataDefault);
-
-  @override
-  StreamMessageLayoutProperty<Color> get spanTextColor => .all(_colorScheme.textPrimary);
-
-  @override
   StreamMessageLayoutProperty<Color> get iconColor => .all(_colorScheme.textPrimary);
 
   @override
@@ -288,4 +250,10 @@ class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
 
   @override
   StreamMessageLayoutProperty<EdgeInsetsGeometry> get padding => .all(.symmetric(vertical: _spacing.xxs));
+
+  @override
+  StreamMessageLayoutProperty<TextStyle> get trailingTextStyle => .all(_textTheme.metadataDefault);
+
+  @override
+  StreamMessageLayoutProperty<Color> get trailingTextColor => .all(_colorScheme.textPrimary);
 }

@@ -109,14 +109,16 @@ class _StreamCoreMessageComposerState extends State<StreamCoreMessageComposer> {
 class MessageData {}
 
 class InputThemeDefaults {
-  InputThemeDefaults({required this.context}) : _colorScheme = context.streamColorScheme;
+  InputThemeDefaults({required this.context})
+    : _colorScheme = context.streamColorScheme,
+      _textTheme = context.streamTextTheme;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;
+  final StreamTextTheme _textTheme;
 
   StreamTextInputStyle get style => StreamTextInputStyle(
-    textStyle: TextStyle(color: _colorScheme.textPrimary),
-    hintStyle: TextStyle(color: _colorScheme.textTertiary),
-    border: BorderSide(color: _colorScheme.borderDefault),
+    textStyle: _textTheme.bodyDefault.copyWith(color: _colorScheme.textPrimary),
+    hintStyle: _textTheme.bodyDefault.copyWith(color: _colorScheme.textTertiary),
   );
 }

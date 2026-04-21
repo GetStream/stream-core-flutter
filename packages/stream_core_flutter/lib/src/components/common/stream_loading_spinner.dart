@@ -44,7 +44,8 @@ enum StreamLoadingSpinnerSize {
 ///
 /// [StreamLoadingSpinner] displays a circular arc that fills to indicate
 /// progress. It supports both determinate (fixed value) and indeterminate
-/// (loading animation) states.
+/// (loading animation) states. When [value] reaches `1.0`, the spinner
+/// transitions to a checkmark indicating completion.
 ///
 /// {@tool snippet}
 ///
@@ -133,7 +134,8 @@ class StreamLoadingSpinnerProps {
   /// The progress value from 0.0 to 1.0.
   ///
   /// If null, the spinner is indeterminate, displaying a looping
-  /// animation rather than a fixed fill.
+  /// animation rather than a fixed fill. When the value reaches `1.0`,
+  /// the spinner transitions to a checkmark indicating completion.
   final double? value;
 
   /// The size of the spinner.
@@ -159,8 +161,9 @@ class StreamLoadingSpinnerProps {
 
 /// Default implementation of [StreamLoadingSpinner].
 ///
-/// Renders a spinner using [CircularProgressIndicator]. Styling is resolved
-/// from widget props and built-in defaults in that order.
+/// Renders a spinner using [CircularProgressIndicator], transitioning to a
+/// checkmark when the progress reaches `1.0`. Styling is resolved from widget
+/// props and built-in defaults in that order.
 ///
 /// See also:
 ///
@@ -181,6 +184,28 @@ class DefaultStreamLoadingSpinner extends StatelessWidget {
     final effectiveTrackColor = props.trackColor ?? colorScheme.borderDefault;
     final effectiveBackgroundColor = props.backgroundColor ?? colorScheme.backgroundElevation0;
 
+    final effectiveValue = props.value?.clamp(0.0, 1.0);
+    final indicator = switch (effectiveValue) {
+      1.0 => Container(
+        key: const ValueKey('completed'),
+        decoration: BoxDecoration(shape: .circle, color: effectiveColor),
+        constraints: .tight(.square(resolvedSize.visualValue + resolvedSize.strokeWidth)),
+        child: Center(child: Icon(context.streamIcons.checkmark)),
+      ),
+      _ => CircularProgressIndicator(
+        key: const ValueKey('progress'),
+        trackGap: 0,
+        padding: EdgeInsets.zero,
+        color: effectiveColor,
+        strokeCap: StrokeCap.round,
+        value: effectiveValue,
+        strokeWidth: resolvedSize.strokeWidth,
+        strokeAlign: BorderSide.strokeAlignCenter,
+        backgroundColor: effectiveTrackColor,
+        constraints: .tight(.square(resolvedSize.visualValue)),
+      ),
+    };
+
     return SizedBox.square(
       dimension: resolvedSize.value,
       child: DecoratedBox(
@@ -189,19 +214,28 @@ class DefaultStreamLoadingSpinner extends StatelessWidget {
           color: effectiveBackgroundColor,
         ),
         child: Center(
-          child: CircularProgressIndicator(
-            trackGap: 0,
-            padding: .zero,
-            color: effectiveColor,
-            strokeCap: StrokeCap.round,
-            value: props.value?.clamp(0.0, 1.0),
-            strokeWidth: resolvedSize.strokeWidth,
-            strokeAlign: BorderSide.strokeAlignCenter,
-            backgroundColor: effectiveTrackColor,
-            constraints: .tight(.square(resolvedSize.visualValue)),
+          child: IconTheme(
+            data: IconThemeData(
+              size: _iconSizeForSize(resolvedSize),
+              color: colorScheme.textOnAccent,
+            ),
+            child: AnimatedSwitcher(
+              duration: kThemeChangeDuration,
+              child: indicator,
+            ),
           ),
         ),
       ),
     );
   }
+
+  // Returns the appropriate icon size for the given spinner size.
+  double _iconSizeForSize(
+    StreamLoadingSpinnerSize size,
+  ) => switch (size) {
+    .xs => 8,
+    .sm => 10,
+    .md => 12,
+    .lg => 16,
+  };
 }

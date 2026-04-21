@@ -56,6 +56,7 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
     this.timestampColor,
     this.editedTextStyle,
     this.editedColor,
+    this.statusTextStyle,
     this.statusColor,
     this.statusIconSize,
     this.spacing,
@@ -85,6 +86,7 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
     Color? timestampColor,
     TextStyle? editedTextStyle,
     Color? editedColor,
+    TextStyle? statusTextStyle,
     Color? statusColor,
     double? statusIconSize,
     double? spacing,
@@ -98,6 +100,7 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
       timestampColor: timestampColor?.let(StreamMessageLayoutProperty.all),
       editedTextStyle: editedTextStyle?.let(StreamMessageLayoutProperty.all),
       editedColor: editedColor?.let(StreamMessageLayoutProperty.all),
+      statusTextStyle: statusTextStyle?.let(StreamMessageLayoutProperty.all),
       statusColor: statusColor?.let(StreamMessageLayoutProperty.all),
       statusIconSize: statusIconSize?.let(StreamMessageLayoutProperty.all),
       spacing: spacing?.let(StreamMessageLayoutProperty.all),
@@ -124,7 +127,10 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
   /// The color for the edited indicator text.
   final StreamMessageLayoutProperty<Color?>? editedColor;
 
-  /// The color for the status icon.
+  /// The text style for the status text.
+  final StreamMessageLayoutProperty<TextStyle?>? statusTextStyle;
+
+  /// The color for the status icon or text.
   final StreamMessageLayoutProperty<Color?>? statusColor;
 
   /// The size for the status icon.

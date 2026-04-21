@@ -7,8 +7,6 @@
 
 # Input
 input_svg_dir: assets_source/icons/
-
-# Optional: colored SVG icons that cannot be converted to a font
 input_svg_icon_dir: assets/icons/
 
 # Output paths (relative to this config file)
@@ -26,3 +24,11 @@ package: stream_core_flutter
 # Font options
 font_name: Stream Icons
 
+# Preserve each glyph's position as authored in its SVG. The default
+# (`normalize: true`) re-centers every glyph by its bounding box, which silently
+# undoes deliberate optical offsets — e.g. the `play-fill` triangle is nudged
+# right inside its viewBox so it reads as centered to the eye.
+#
+# Note: The generator warns about mixed viewBox sizes (from the `16/` and `32/`
+# folders). Those are intentional size-specific variants and safe to ignore.
+normalize: false

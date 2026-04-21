@@ -26,7 +26,16 @@ Widget buildStreamLoadingSpinnerPlayground(BuildContext context) {
     description: 'When enabled, shows a fixed progress arc instead of a rotating spinner.',
   );
 
-  final value = determinate
+  final animate =
+      determinate &&
+      context.knobs.boolean(
+        label: 'Animate',
+        description:
+            'Continuously animate the value from 0.0 to 1.0 to preview the '
+            'progress -> checkmark transition.',
+      );
+
+  final value = determinate && !animate
       ? context.knobs.double.slider(
           label: 'Value',
           initialValue: 0.6,
@@ -36,11 +45,63 @@ Widget buildStreamLoadingSpinnerPlayground(BuildContext context) {
       : null;
 
   return Center(
-    child: StreamLoadingSpinner(
-      size: size,
-      value: value,
-    ),
+    child: switch (animate) {
+      true => _AnimatedSpinner(size: size),
+      false => StreamLoadingSpinner(size: size, value: value),
+    },
   );
+}
+
+/// Cycles the spinner value from 0.0 to 1.0, holds at 1.0, then restarts.
+class _AnimatedSpinner extends StatefulWidget {
+  const _AnimatedSpinner({required this.size});
+
+  final StreamLoadingSpinnerSize size;
+
+  @override
+  State<_AnimatedSpinner> createState() => _AnimatedSpinnerState();
+}
+
+class _AnimatedSpinnerState extends State<_AnimatedSpinner> with SingleTickerProviderStateMixin {
+  static const _fillDuration = Duration(seconds: 3);
+  static const _holdDuration = Duration(milliseconds: 800);
+
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: _fillDuration,
+  )..addStatusListener(_handleStatusChange);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.forward();
+  }
+
+  Future<void> _handleStatusChange(AnimationStatus status) async {
+    if (status != AnimationStatus.completed) return;
+    await Future<void>.delayed(_holdDuration);
+    if (!mounted) return;
+
+    _controller.reset();
+    return _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) => StreamLoadingSpinner(
+        size: widget.size,
+        value: _controller.value,
+      ),
+    );
+  }
 }
 
 // =============================================================================
@@ -174,7 +235,7 @@ class _ProgressVariantsSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Determinate progress at different values',
+                'Determinate progress at different values (100% shows a checkmark)',
                 style: textTheme.captionDefault.copyWith(
                   color: colorScheme.textSecondary,
                 ),

@@ -70,6 +70,8 @@ import 'package:design_system_gallery/components/controls/stream_stepper.dart'
     as _design_system_gallery_components_controls_stream_stepper;
 import 'package:design_system_gallery/components/controls/stream_switch.dart'
     as _design_system_gallery_components_controls_stream_switch;
+import 'package:design_system_gallery/components/controls/stream_video_play_indicator.dart'
+    as _design_system_gallery_components_controls_stream_video_play_indicator;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
@@ -759,6 +761,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_controls_stream_switch
                         .buildStreamSwitchShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamVideoPlayIndicator',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_video_play_indicator
+                        .buildStreamVideoPlayIndicatorPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_stream_video_play_indicator
+                        .buildStreamVideoPlayIndicatorShowcase,
               ),
             ],
           ),

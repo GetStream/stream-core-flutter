@@ -5,22 +5,33 @@ import '../../../../stream_core_flutter.dart';
 class MessageComposerFileAttachment extends StatelessWidget {
   const MessageComposerFileAttachment({
     super.key,
-    this.title,
-    this.fileTypeIcon,
+    required this.title,
     this.subtitle,
+    this.fileTypeIcon,
     this.onRemovePressed,
   });
 
-  final StreamFileTypeIcon? fileTypeIcon;
-  final String? title;
+  final Widget title;
   final Widget? subtitle;
+  final StreamFileTypeIcon? fileTypeIcon;
   final VoidCallback? onRemovePressed;
 
   @override
   Widget build(BuildContext context) {
-    final textColor = context.streamColorScheme.textPrimary;
-    final titleStyle = context.streamTextTheme.captionEmphasis.copyWith(color: textColor);
     final spacing = context.streamSpacing;
+
+    final textTheme = context.streamTextTheme;
+    final colorScheme = context.streamColorScheme;
+
+    final titleStyle = textTheme.metadataEmphasis.copyWith(color: colorScheme.textPrimary);
+    final subtitleStyle = textTheme.metadataDefault.copyWith(color: colorScheme.textSecondary);
+
+    final effectiveTitle = DefaultTextStyle.merge(style: titleStyle, maxLines: 1, overflow: .ellipsis, child: title);
+
+    Widget? effectiveSubtitle;
+    if (subtitle case final title?) {
+      effectiveSubtitle = DefaultTextStyle.merge(style: subtitleStyle, maxLines: 1, overflow: .ellipsis, child: title);
+    }
 
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
@@ -41,14 +52,8 @@ class MessageComposerFileAttachment extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (title case final title?)
-                    Text(
-                      title,
-                      style: titleStyle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ?subtitle,
+                  effectiveTitle,
+                  ?effectiveSubtitle,
                 ],
               ),
             ),
