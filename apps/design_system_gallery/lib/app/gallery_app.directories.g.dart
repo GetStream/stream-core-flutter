@@ -54,6 +54,8 @@ import 'package:design_system_gallery/components/common/stream_progress_bar.dart
     as _design_system_gallery_components_common_stream_progress_bar;
 import 'package:design_system_gallery/components/common/stream_skeleton_loading.dart'
     as _design_system_gallery_components_common_stream_skeleton_loading;
+import 'package:design_system_gallery/components/common/stream_tap_target_padding.dart'
+    as _design_system_gallery_components_common_stream_tap_target_padding;
 import 'package:design_system_gallery/components/common/stream_text_input.dart'
     as _design_system_gallery_components_common_stream_text_input;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
@@ -66,6 +68,8 @@ import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart
     as _design_system_gallery_components_controls_stream_emoji_chip;
 import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.dart'
     as _design_system_gallery_components_controls_stream_emoji_chip_bar;
+import 'package:design_system_gallery/components/controls/stream_remove_control.dart'
+    as _design_system_gallery_components_controls_stream_remove_control;
 import 'package:design_system_gallery/components/controls/stream_stepper.dart'
     as _design_system_gallery_components_controls_stream_stepper;
 import 'package:design_system_gallery/components/controls/stream_switch.dart'
@@ -619,6 +623,17 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'StreamTapTargetPadding',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_tap_target_padding
+                        .buildStreamTapTargetPaddingPlayground,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StreamTextInput',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -727,6 +742,17 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_controls_playback_speed_toggle
                         .buildStreamPlaybackSpeedToggleShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamRemoveControl',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_remove_control
+                        .buildStreamRemoveControlPlayground,
               ),
             ],
           ),
