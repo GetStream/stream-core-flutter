@@ -17,13 +17,16 @@ import '../message_layout/stream_message_layout.dart';
 /// The visual order is always `[leading, label, trailing]` with configurable
 /// spacing between them. Any slot that is null is omitted from the row.
 ///
-/// When [onTap] or [onLongPress] is provided, the entire row — including its
-/// padding — becomes tappable. This gives a forgiving hit target for
-/// annotations like "Also sent in channel · View" where the "View" trailing
-/// link and the label both take the user to the same destination. For more
-/// targeted hit areas (e.g., a tappable trailing link while the rest of the
-/// row is inert), leave [onTap]/[onLongPress] null and wrap the [trailing]
-/// widget with its own [GestureDetector].
+/// When [onTap] or [onLongPress] is provided, the entire row — including
+/// its padding — becomes tappable. This gives a forgiving hit target for
+/// annotations like "Also sent in channel · View" where the trailing link
+/// and the label both lead to the same destination.
+///
+/// When neither is provided, the row is hit-transparent and will not
+/// steal taps from widgets beneath it (e.g., in a [Stack] or overlay).
+/// For more targeted behavior (e.g., a tappable trailing link while the
+/// rest of the row does nothing), leave [onTap]/[onLongPress] null and
+/// wrap the [trailing] widget with its own [GestureDetector].
 ///
 /// Text/icon styling for [trailing] comes from
 /// [StreamMessageAnnotationStyle.trailingTextStyle] and
@@ -215,12 +218,16 @@ class DefaultStreamMessageAnnotation extends StatelessWidget {
       ),
     );
 
-    return GestureDetector(
-      behavior: .opaque,
-      onTap: props.onTap,
-      onLongPress: props.onLongPress,
-      child: child,
-    );
+    if (props.onTap != null || props.onLongPress != null) {
+      return GestureDetector(
+        behavior: .opaque,
+        onTap: props.onTap,
+        onLongPress: props.onLongPress,
+        child: child,
+      );
+    }
+
+    return child;
   }
 }
 
