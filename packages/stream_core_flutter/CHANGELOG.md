@@ -7,6 +7,7 @@
 - Added `StreamFileTypeIconSize.md` and `StreamFileTypeIconSize.sm` variants.
 - Added `trailing` slot to `StreamMessageAnnotation`, with matching `trailingTextStyle`/`trailingTextColor` on `StreamMessageAnnotationStyle`.
 - `StreamLoadingSpinner` now renders a completion checkmark when progress reaches 100%.
+- `StreamCommandChip` is now tappable across its whole surface, not just the × icon.
 
 ### 🐞 Fixed
 

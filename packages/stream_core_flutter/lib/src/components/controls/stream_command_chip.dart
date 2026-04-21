@@ -7,8 +7,12 @@ import '../../theme/stream_theme_extensions.dart';
 /// A pill-shaped chip for displaying a slash command selection.
 ///
 /// [StreamCommandChip] renders a thunder icon, a command label, and a dismiss
-/// button. It is typically used as an overlay on a message attachment when a
+/// (×) icon. It is typically used as an overlay on a message attachment when a
 /// slash command is active in the message composer.
+///
+/// Tapping anywhere on the chip invokes [onDismiss]; the trailing × icon is a
+/// visual affordance. When [onDismiss] is null the chip is inert and the
+/// dismiss icon is hidden.
 ///
 /// {@tool snippet}
 ///
@@ -60,9 +64,10 @@ class StreamCommandChipProps {
   /// The command label to display inside the chip.
   final String label;
 
-  /// Called when the dismiss (×) button is tapped.
+  /// Called when the chip is tapped.
   ///
-  /// When null the dismiss button is still shown but does nothing.
+  /// Tapping anywhere on the chip — not just the × icon — invokes this
+  /// callback. When null the chip is inert and the dismiss icon is hidden.
   final VoidCallback? onDismiss;
 }
 
@@ -76,52 +81,50 @@ class DefaultStreamCommandChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
     final defaults = _StreamCommandChipDefaults(context);
     final chipTheme = context.streamCommandChipTheme;
 
+    final effectiveMinHeight = chipTheme.minHeight ?? defaults.minHeight;
+    final effectivePadding = chipTheme.padding ?? defaults.padding;
+    final effectiveBorderRadius = chipTheme.borderRadius ?? defaults.borderRadius;
     final effectiveBackgroundColor = chipTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = chipTheme.foregroundColor ?? defaults.foregroundColor;
-    final effectiveMinHeight = chipTheme.minHeight ?? defaults.minHeight;
+    final effectiveLabelStyle = (chipTheme.labelStyle ?? defaults.labelStyle).copyWith(color: effectiveForegroundColor);
 
-    return Container(
-      padding: defaults.padding,
-      decoration: BoxDecoration(
-        color: effectiveBackgroundColor,
-        borderRadius: defaults.borderRadius,
-      ),
-      constraints: BoxConstraints(minHeight: effectiveMinHeight),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: defaults.spacing.xxxs,
-        children: [
-          Icon(
-            context.streamIcons.bolt,
-            size: 12,
-            color: effectiveForegroundColor,
-          ),
-          MediaQuery.withNoTextScaling(
-            child: Text(
-              props.label,
-              style: defaults.labelStyle.copyWith(color: effectiveForegroundColor),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          if (props.onDismiss != null)
-            GestureDetector(
-              onTap: props.onDismiss,
-              behavior: HitTestBehavior.opaque,
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: Icon(
-                  context.streamIcons.xmarkSmall,
-                  size: 12,
-                  color: effectiveForegroundColor,
-                ),
+    return GestureDetector(
+      behavior: .opaque,
+      onTap: props.onDismiss,
+      child: Container(
+        constraints: .new(minHeight: effectiveMinHeight),
+        padding: effectivePadding,
+        decoration: BoxDecoration(
+          color: effectiveBackgroundColor,
+          borderRadius: effectiveBorderRadius,
+        ),
+        child: IconTheme(
+          data: .new(color: effectiveForegroundColor),
+          child: DefaultTextStyle.merge(
+            maxLines: 1,
+            overflow: .ellipsis,
+            style: effectiveLabelStyle,
+            child: MediaQuery.withNoTextScaling(
+              child: Row(
+                mainAxisSize: .min,
+                children: [
+                  Icon(size: 12, context.streamIcons.bolt),
+                  SizedBox(width: spacing.xxs),
+                  Flexible(child: Text(props.label)),
+                  if (props.onDismiss != null) ...[
+                    SizedBox(width: spacing.xxxs),
+                    Icon(size: 16, context.streamIcons.xmarkSmall),
+                  ],
+                ],
               ),
             ),
-        ],
+          ),
+        ),
       ),
     );
   }
@@ -135,8 +138,11 @@ class _StreamCommandChipDefaults extends StreamCommandChipThemeData {
 
   late final _colorScheme = _context.streamColorScheme;
   late final _textTheme = _context.streamTextTheme;
-  late final spacing = _context.streamSpacing;
   late final _radius = _context.streamRadius;
+  late final _spacing = _context.streamSpacing;
+
+  @override
+  double get minHeight => 24;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundInverse;
@@ -148,11 +154,8 @@ class _StreamCommandChipDefaults extends StreamCommandChipThemeData {
   TextStyle get labelStyle => _textTheme.metadataEmphasis;
 
   @override
-  double get minHeight => 24;
+  EdgeInsetsGeometry get padding => .symmetric(horizontal: _spacing.xs, vertical: _spacing.xxxs);
 
   @override
-  EdgeInsetsGeometry get padding => .symmetric(horizontal: spacing.xs, vertical: spacing.xxxs);
-
-  @override
-  BorderRadius get borderRadius => .all(_radius.max);
+  BorderRadiusGeometry get borderRadius => .all(_radius.max);
 }
