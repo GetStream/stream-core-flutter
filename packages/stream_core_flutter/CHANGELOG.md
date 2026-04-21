@@ -8,6 +8,8 @@
 - Added `trailing` slot to `StreamMessageAnnotation`, with matching `trailingTextStyle`/`trailingTextColor` on `StreamMessageAnnotationStyle`.
 - `StreamLoadingSpinner` now renders a completion checkmark when progress reaches 100%.
 - `StreamCommandChip` is now tappable across its whole surface, not just the × icon.
+- Added `StreamMessageAnnotationStyle.tinted(color)`, `StreamMessageMetadataStyle.tinted(color)`, and
+  `StreamMessageRepliesStyle.tinted(color)` factories that tint every text and icon color with a single value.
 
 ### 🐞 Fixed
 

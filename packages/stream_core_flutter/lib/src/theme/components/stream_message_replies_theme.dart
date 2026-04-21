@@ -92,6 +92,26 @@ class StreamMessageRepliesStyle with _$StreamMessageRepliesStyle {
     );
   }
 
+  /// A convenience constructor that tints the label and connector colors with
+  /// the given [color].
+  ///
+  /// Equivalent to calling [StreamMessageRepliesStyle.from] with [labelColor]
+  /// and [connectorColor] both set to [color]. Useful when rendering replies
+  /// over an accent or dimmed backdrop (e.g. inside a message action modal)
+  /// where both elements should adopt a single on-accent color.
+  ///
+  /// ```dart
+  /// StreamMessageRepliesStyle.tinted(colorScheme.textOnAccent)
+  /// ```
+  factory StreamMessageRepliesStyle.tinted(
+    Color color,
+  ) {
+    return .from(
+      labelColor: color,
+      connectorColor: color,
+    );
+  }
+
   /// The text style for the replies label.
   final StreamMessageLayoutProperty<TextStyle?>? labelTextStyle;
 

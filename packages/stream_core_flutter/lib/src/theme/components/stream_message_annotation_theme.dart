@@ -97,6 +97,28 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
     );
   }
 
+  /// A convenience constructor that tints every text and icon color with the
+  /// given [color].
+  ///
+  /// Equivalent to calling [StreamMessageAnnotationStyle.from] with
+  /// [textColor], [iconColor], and [trailingTextColor] all set to [color].
+  /// Useful when rendering annotations over an accent or dimmed backdrop
+  /// (e.g. inside a message action modal) where every glyph should adopt a
+  /// single on-accent color.
+  ///
+  /// ```dart
+  /// StreamMessageAnnotationStyle.tinted(colorScheme.textOnAccent)
+  /// ```
+  factory StreamMessageAnnotationStyle.tinted(
+    Color color,
+  ) {
+    return .from(
+      textColor: color,
+      iconColor: color,
+      trailingTextColor: color,
+    );
+  }
+
   /// The text style for the annotation label.
   ///
   /// This only controls typography. Color comes from [textColor].

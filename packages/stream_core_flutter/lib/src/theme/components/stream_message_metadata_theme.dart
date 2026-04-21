@@ -109,6 +109,29 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
     );
   }
 
+  /// A convenience constructor that tints every text and icon color with the
+  /// given [color].
+  ///
+  /// Equivalent to calling [StreamMessageMetadataStyle.from] with
+  /// [usernameColor], [timestampColor], [editedColor], and [statusColor] all
+  /// set to [color]. Useful when rendering metadata over an accent or dimmed
+  /// backdrop (e.g. inside a message action modal) where every glyph should
+  /// adopt a single on-accent color.
+  ///
+  /// ```dart
+  /// StreamMessageMetadataStyle.tinted(colorScheme.textOnAccent)
+  /// ```
+  factory StreamMessageMetadataStyle.tinted(
+    Color color,
+  ) {
+    return .from(
+      usernameColor: color,
+      timestampColor: color,
+      editedColor: color,
+      statusColor: color,
+    );
+  }
+
   /// The text style for the username.
   final StreamMessageLayoutProperty<TextStyle?>? usernameTextStyle;
 
