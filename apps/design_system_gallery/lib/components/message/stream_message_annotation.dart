@@ -14,10 +14,11 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 )
 Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
   final icons = context.streamIcons;
+  final colorScheme = context.streamColorScheme;
 
   final label = context.knobs.string(
     label: 'Label',
-    initialValue: 'Saved for later',
+    initialValue: 'Also sent in channel ·',
     description: 'The annotation label text.',
   );
 
@@ -30,9 +31,29 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
   final leadingIcon = context.knobs.object.dropdown<_IconOption>(
     label: 'Leading Icon',
     options: _IconOption.values,
-    initialOption: _IconOption.bookmark,
+    initialOption: _IconOption.arrowUp,
     labelBuilder: (v) => v.label,
     description: 'The leading icon to display.',
+  );
+
+  final showTrailing = context.knobs.boolean(
+    label: 'Show Trailing',
+    initialValue: true,
+    description: 'Whether to show the trailing widget (e.g., a link or timestamp).',
+  );
+
+  final trailingText = context.knobs.string(
+    label: 'Trailing Text',
+    initialValue: 'View',
+    description: 'The text shown inside the trailing slot.',
+  );
+
+  final trailingAsLink = context.knobs.boolean(
+    label: 'Trailing as Link',
+    initialValue: true,
+    description:
+        'Color the trailing text with the theme link color '
+        '(instead of the default primary text color).',
   );
 
   final spacing = context.knobs.double.slider(
@@ -40,7 +61,7 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
     initialValue: 4,
     max: 16,
     divisions: 16,
-    description: 'Gap between icon and label. Overrides theme when set.',
+    description: 'Gap between icon, label and trailing. Overrides theme when set.',
   );
 
   final verticalPadding = context.knobs.double.slider(
@@ -58,16 +79,32 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
     description: 'Horizontal padding around the row content.',
   );
 
+  final isActionable = showTrailing && trailingAsLink;
+
   return Center(
     child: StreamMessageAnnotation(
+      onTap: isActionable
+          ? () {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  const SnackBar(
+                    content: Text('Tapped'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+            }
+          : null,
       leading: showLeading ? Icon(leadingIcon.resolve(icons)) : null,
       label: Text(label),
+      trailing: showTrailing ? Text(trailingText) : null,
       style: StreamMessageAnnotationStyle.from(
         spacing: spacing,
         padding: EdgeInsets.symmetric(
           vertical: verticalPadding,
           horizontal: horizontalPadding,
         ),
+        trailingTextColor: trailingAsLink ? colorScheme.textLink : null,
       ),
     ),
   );
@@ -141,49 +178,69 @@ class _AnnotationTypesSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Reminder (.rich)',
-          subtitle: 'Bold label + regular timestamp via .rich constructor.',
-          child: StreamMessageAnnotation.rich(
+          label: 'Reminder',
+          subtitle: 'Bold label + regular-weight informational trailing timestamp.',
+          child: StreamMessageAnnotation(
             leading: Icon(icons.bell),
-            label: 'Reminder set · ',
-            spans: const [TextSpan(text: 'In 2 hours')],
+            label: const Text('Reminder set ·'),
+            trailing: const Text('In 2 hours'),
           ),
         ),
         _ExampleCard(
-          label: 'Translated (.rich)',
-          subtitle: 'Bold label + regular action text via .rich constructor.',
-          child: StreamMessageAnnotation.rich(
+          label: 'Translated (row-level tap)',
+          subtitle: 'Entire row is tappable via onTap; trailing uses link color.',
+          child: StreamMessageAnnotation(
+            onTap: () {},
             leading: const Icon(Icons.translate),
-            label: 'Translated · ',
-            spans: const [TextSpan(text: 'Show original')],
+            label: const Text('Translated ·'),
+            trailing: const Text('Show original'),
+            style: StreamMessageAnnotationStyle.from(
+              trailingTextColor: colorScheme.textLink,
+            ),
           ),
         ),
         _ExampleCard(
-          label: 'Also sent in channel (.rich)',
-          subtitle: 'Bold label + link-colored span override.',
-          child: StreamMessageAnnotation.rich(
+          label: 'Also sent in channel (row-level tap)',
+          subtitle: 'onTap wraps the whole row; trailing styled as a link.',
+          child: StreamMessageAnnotation(
+            onTap: () {},
             leading: Icon(icons.arrowUp),
-            label: 'Also sent in channel · ',
-            spans: [
-              TextSpan(
-                text: 'View',
-                style: TextStyle(color: colorScheme.textLink),
-              ),
-            ],
+            label: const Text('Also sent in channel ·'),
+            trailing: const Text('View'),
+            style: StreamMessageAnnotationStyle.from(
+              trailingTextColor: colorScheme.textLink,
+            ),
           ),
         ),
         _ExampleCard(
-          label: 'Replied to a thread (.rich)',
-          subtitle: 'Bold label + link-colored span override.',
-          child: StreamMessageAnnotation.rich(
+          label: 'Replied to a thread (row-level tap)',
+          subtitle: 'onTap wraps the whole row; trailing styled as a link.',
+          child: StreamMessageAnnotation(
+            onTap: () {},
             leading: Icon(icons.arrowUp),
-            label: 'Replied to a thread · ',
-            spans: [
-              TextSpan(
-                text: 'View',
-                style: TextStyle(color: colorScheme.textLink),
-              ),
-            ],
+            label: const Text('Replied to a thread ·'),
+            trailing: const Text('View'),
+            style: StreamMessageAnnotationStyle.from(
+              trailingTextColor: colorScheme.textLink,
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Trailing-only gesture',
+          subtitle:
+              'For a narrower tap target, wrap the trailing widget in its '
+              'own GestureDetector and leave onTap null.',
+          child: StreamMessageAnnotation(
+            leading: const Icon(Icons.translate),
+            label: const Text('Translated ·'),
+            trailing: GestureDetector(
+              onTap: () {},
+              behavior: HitTestBehavior.opaque,
+              child: const Text('Show original'),
+            ),
+            style: StreamMessageAnnotationStyle.from(
+              trailingTextColor: colorScheme.textLink,
+            ),
           ),
         ),
       ],
@@ -303,15 +360,15 @@ class _RealWorldSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Reminder message (.rich)',
+          label: 'Reminder message',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              StreamMessageAnnotation.rich(
+              StreamMessageAnnotation(
                 leading: Icon(icons.bell),
-                label: 'Reminder set · ',
-                spans: const [TextSpan(text: 'In 30 minutes')],
+                label: const Text('Reminder set ·'),
+                trailing: const Text('In 30 minutes'),
               ),
               StreamMessageBubble(
                 child: StreamMessageText('Remember to review the PR.'),
@@ -320,20 +377,19 @@ class _RealWorldSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
-          label: 'Also sent in channel (.rich)',
+          label: 'Also sent in channel (row-level tap)',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              StreamMessageAnnotation.rich(
+              StreamMessageAnnotation(
+                onTap: () {},
                 leading: Icon(icons.arrowUp),
-                label: 'Also sent in channel · ',
-                spans: [
-                  TextSpan(
-                    text: 'View',
-                    style: TextStyle(color: colorScheme.textLink),
-                  ),
-                ],
+                label: const Text('Also sent in channel ·'),
+                trailing: const Text('View'),
+                style: StreamMessageAnnotationStyle.from(
+                  trailingTextColor: colorScheme.textLink,
+                ),
               ),
               StreamMessageBubble(
                 child: StreamMessageText('This was also sent to the main channel.'),

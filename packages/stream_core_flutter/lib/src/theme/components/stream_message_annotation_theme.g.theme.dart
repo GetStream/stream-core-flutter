@@ -42,18 +42,6 @@ mixin _$StreamMessageAnnotationStyle {
         t,
         Color.lerp,
       ),
-      spanTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
-        a.spanTextStyle,
-        b.spanTextStyle,
-        t,
-        TextStyle.lerp,
-      ),
-      spanTextColor: StreamMessageLayoutProperty.lerp<Color?>(
-        a.spanTextColor,
-        b.spanTextColor,
-        t,
-        Color.lerp,
-      ),
       iconColor: StreamMessageLayoutProperty.lerp<Color?>(
         a.iconColor,
         b.iconColor,
@@ -78,30 +66,42 @@ mixin _$StreamMessageAnnotationStyle {
         t,
         EdgeInsetsGeometry.lerp,
       ),
+      trailingTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.trailingTextStyle,
+        b.trailingTextStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      trailingTextColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.trailingTextColor,
+        b.trailingTextColor,
+        t,
+        Color.lerp,
+      ),
     );
   }
 
   StreamMessageAnnotationStyle copyWith({
     StreamMessageLayoutProperty<TextStyle?>? textStyle,
     StreamMessageLayoutProperty<Color?>? textColor,
-    StreamMessageLayoutProperty<TextStyle?>? spanTextStyle,
-    StreamMessageLayoutProperty<Color?>? spanTextColor,
     StreamMessageLayoutProperty<Color?>? iconColor,
     StreamMessageLayoutProperty<double?>? iconSize,
     StreamMessageLayoutProperty<double?>? spacing,
     StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding,
+    StreamMessageLayoutProperty<TextStyle?>? trailingTextStyle,
+    StreamMessageLayoutProperty<Color?>? trailingTextColor,
   }) {
     final _this = (this as StreamMessageAnnotationStyle);
 
     return StreamMessageAnnotationStyle(
       textStyle: textStyle ?? _this.textStyle,
       textColor: textColor ?? _this.textColor,
-      spanTextStyle: spanTextStyle ?? _this.spanTextStyle,
-      spanTextColor: spanTextColor ?? _this.spanTextColor,
       iconColor: iconColor ?? _this.iconColor,
       iconSize: iconSize ?? _this.iconSize,
       spacing: spacing ?? _this.spacing,
       padding: padding ?? _this.padding,
+      trailingTextStyle: trailingTextStyle ?? _this.trailingTextStyle,
+      trailingTextColor: trailingTextColor ?? _this.trailingTextColor,
     );
   }
 
@@ -119,12 +119,12 @@ mixin _$StreamMessageAnnotationStyle {
     return copyWith(
       textStyle: other.textStyle,
       textColor: other.textColor,
-      spanTextStyle: other.spanTextStyle,
-      spanTextColor: other.spanTextColor,
       iconColor: other.iconColor,
       iconSize: other.iconSize,
       spacing: other.spacing,
       padding: other.padding,
+      trailingTextStyle: other.trailingTextStyle,
+      trailingTextColor: other.trailingTextColor,
     );
   }
 
@@ -143,12 +143,12 @@ mixin _$StreamMessageAnnotationStyle {
 
     return _other.textStyle == _this.textStyle &&
         _other.textColor == _this.textColor &&
-        _other.spanTextStyle == _this.spanTextStyle &&
-        _other.spanTextColor == _this.spanTextColor &&
         _other.iconColor == _this.iconColor &&
         _other.iconSize == _this.iconSize &&
         _other.spacing == _this.spacing &&
-        _other.padding == _this.padding;
+        _other.padding == _this.padding &&
+        _other.trailingTextStyle == _this.trailingTextStyle &&
+        _other.trailingTextColor == _this.trailingTextColor;
   }
 
   @override
@@ -159,12 +159,12 @@ mixin _$StreamMessageAnnotationStyle {
       runtimeType,
       _this.textStyle,
       _this.textColor,
-      _this.spanTextStyle,
-      _this.spanTextColor,
       _this.iconColor,
       _this.iconSize,
       _this.spacing,
       _this.padding,
+      _this.trailingTextStyle,
+      _this.trailingTextColor,
     );
   }
 }

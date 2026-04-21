@@ -52,12 +52,12 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
   const StreamMessageAnnotationStyle({
     this.textStyle,
     this.textColor,
-    this.spanTextStyle,
-    this.spanTextColor,
     this.iconColor,
     this.iconSize,
     this.spacing,
     this.padding,
+    this.trailingTextStyle,
+    this.trailingTextColor,
   });
 
   /// A convenience constructor that constructs a
@@ -78,22 +78,22 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
   factory StreamMessageAnnotationStyle.from({
     TextStyle? textStyle,
     Color? textColor,
-    TextStyle? spanTextStyle,
-    Color? spanTextColor,
     Color? iconColor,
     double? iconSize,
     double? spacing,
     EdgeInsetsGeometry? padding,
+    TextStyle? trailingTextStyle,
+    Color? trailingTextColor,
   }) {
     return StreamMessageAnnotationStyle(
       textStyle: textStyle?.let(StreamMessageLayoutProperty.all),
       textColor: textColor?.let(StreamMessageLayoutProperty.all),
-      spanTextStyle: spanTextStyle?.let(StreamMessageLayoutProperty.all),
-      spanTextColor: spanTextColor?.let(StreamMessageLayoutProperty.all),
       iconColor: iconColor?.let(StreamMessageLayoutProperty.all),
       iconSize: iconSize?.let(StreamMessageLayoutProperty.all),
       spacing: spacing?.let(StreamMessageLayoutProperty.all),
       padding: padding?.let(StreamMessageLayoutProperty.all),
+      trailingTextStyle: trailingTextStyle?.let(StreamMessageLayoutProperty.all),
+      trailingTextColor: trailingTextColor?.let(StreamMessageLayoutProperty.all),
     );
   }
 
@@ -104,17 +104,6 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
 
   /// The color for the annotation label text.
   final StreamMessageLayoutProperty<Color?>? textColor;
-
-  /// The text style for child spans in a [StreamMessageAnnotation.rich] label.
-  ///
-  /// Applied to direct child [TextSpan]s that don't specify an explicit style.
-  /// This only controls typography. Color comes from [spanTextColor].
-  final StreamMessageLayoutProperty<TextStyle?>? spanTextStyle;
-
-  /// The color for child spans in a [StreamMessageAnnotation.rich] label.
-  ///
-  /// Applied to direct child [TextSpan]s that don't specify an explicit style.
-  final StreamMessageLayoutProperty<Color?>? spanTextColor;
 
   /// The color for the leading icon.
   final StreamMessageLayoutProperty<Color?>? iconColor;
@@ -127,6 +116,20 @@ class StreamMessageAnnotationStyle with _$StreamMessageAnnotationStyle {
 
   /// The padding around the annotation row content.
   final StreamMessageLayoutProperty<EdgeInsetsGeometry?>? padding;
+
+  /// The text style for the trailing widget.
+  ///
+  /// Applied to the trailing widget via an inherited [DefaultTextStyle].
+  /// The trailing widget (typically a tappable [Text]) picks up this style
+  /// automatically. This only controls typography. Color comes from
+  /// [trailingTextColor].
+  final StreamMessageLayoutProperty<TextStyle?>? trailingTextStyle;
+
+  /// The color for the trailing widget.
+  ///
+  /// Applied to the trailing widget's text via the inherited
+  /// [DefaultTextStyle].
+  final StreamMessageLayoutProperty<Color?>? trailingTextColor;
 
   /// Linearly interpolate between two [StreamMessageAnnotationStyle] objects.
   static StreamMessageAnnotationStyle? lerp(

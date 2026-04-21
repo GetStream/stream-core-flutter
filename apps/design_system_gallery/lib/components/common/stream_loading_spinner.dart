@@ -26,14 +26,14 @@ Widget buildStreamLoadingSpinnerPlayground(BuildContext context) {
     description: 'When enabled, shows a fixed progress arc instead of a rotating spinner.',
   );
 
-  final animate = determinate
-      ? context.knobs.boolean(
-          label: 'Animate',
-          description:
-              'Continuously animate the value from 0.0 to 1.0 to preview the '
-              'progress -> checkmark transition.',
-        )
-      : false;
+  final animate =
+      determinate &&
+      context.knobs.boolean(
+        label: 'Animate',
+        description:
+            'Continuously animate the value from 0.0 to 1.0 to preview the '
+            'progress -> checkmark transition.',
+      );
 
   final value = determinate && !animate
       ? context.knobs.double.slider(
@@ -62,12 +62,11 @@ class _AnimatedSpinner extends StatefulWidget {
   State<_AnimatedSpinner> createState() => _AnimatedSpinnerState();
 }
 
-class _AnimatedSpinnerState extends State<_AnimatedSpinner>
-    with SingleTickerProviderStateMixin {
+class _AnimatedSpinnerState extends State<_AnimatedSpinner> with SingleTickerProviderStateMixin {
   static const _fillDuration = Duration(seconds: 3);
   static const _holdDuration = Duration(milliseconds: 800);
 
-  late final AnimationController _controller = AnimationController(
+  late final _controller = AnimationController(
     vsync: this,
     duration: _fillDuration,
   )..addStatusListener(_handleStatusChange);
@@ -82,9 +81,9 @@ class _AnimatedSpinnerState extends State<_AnimatedSpinner>
     if (status != AnimationStatus.completed) return;
     await Future<void>.delayed(_holdDuration);
     if (!mounted) return;
-    _controller
-      ..reset()
-      ..forward();
+
+    _controller.reset();
+    return _controller.forward();
   }
 
   @override
