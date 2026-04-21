@@ -28,13 +28,6 @@ import '../message_layout/stream_message_layout.dart';
 /// rest of the row does nothing), leave [onTap]/[onLongPress] null and
 /// wrap the [trailing] widget with its own [GestureDetector].
 ///
-/// Text/icon styling for [trailing] comes from
-/// [StreamMessageAnnotationStyle.trailingTextStyle] and
-/// [StreamMessageAnnotationStyle.trailingTextColor]. By default the trailing
-/// text uses the primary text color; to render it as a tappable-looking link
-/// (e.g., for a "View" action) pass a style with `trailingTextColor` set to
-/// the theme's link color.
-///
 /// {@tool snippet}
 ///
 /// Basic annotation with icon and label:
