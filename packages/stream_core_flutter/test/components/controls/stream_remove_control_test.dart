@@ -107,7 +107,8 @@ void main() {
         expect(
           (badgeRect.center - parent.topRight).distance < 15,
           isTrue,
-          reason: 'Icon center ${badgeRect.center} should be near '
+          reason:
+              'Icon center ${badgeRect.center} should be near '
               'the top-right corner ${parent.topRight}.',
         );
       },
@@ -128,7 +129,8 @@ void main() {
         expect(
           (badgeRect.center - parent.topLeft).distance < 15,
           isTrue,
-          reason: 'Icon center ${badgeRect.center} should be near '
+          reason:
+              'Icon center ${badgeRect.center} should be near '
               'the top-left corner ${parent.topLeft} in RTL.',
         );
       },

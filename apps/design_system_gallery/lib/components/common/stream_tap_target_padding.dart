@@ -82,8 +82,7 @@ class _InteractiveDemoState extends State<_InteractiveDemo> {
     final textTheme = context.streamTextTheme;
     final spacing = context.streamSpacing;
 
-    final hitRegionColor =
-        colorScheme.accentPrimary.withValues(alpha: 0.15);
+    final hitRegionColor = colorScheme.accentPrimary.withValues(alpha: 0.15);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -94,9 +93,7 @@ class _InteractiveDemoState extends State<_InteractiveDemo> {
             color: widget.showHitRegion ? hitRegionColor : null,
             border: Border.all(
               color: colorScheme.borderSubtle,
-              style: widget.showHitRegion
-                  ? BorderStyle.solid
-                  : BorderStyle.none,
+              style: widget.showHitRegion ? BorderStyle.solid : BorderStyle.none,
             ),
           ),
           child: StreamTapTargetPadding(

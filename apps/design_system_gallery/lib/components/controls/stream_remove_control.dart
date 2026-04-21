@@ -60,8 +60,7 @@ class _RemoveControlDemoState extends State<_RemoveControlDemo> {
     final spacing = context.streamSpacing;
     final radius = context.streamRadius;
 
-    final hitRegionColor =
-        colorScheme.accentPrimary.withValues(alpha: 0.15);
+    final hitRegionColor = colorScheme.accentPrimary.withValues(alpha: 0.15);
 
     return Column(
       mainAxisSize: MainAxisSize.min,

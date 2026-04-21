@@ -199,12 +199,10 @@ void main() {
       );
 
       await tester.pumpWidget(build(Alignment.center));
-      final centerOffset =
-          tester.getTopLeft(find.byKey(const ValueKey('child')));
+      final centerOffset = tester.getTopLeft(find.byKey(const ValueKey('child')));
 
       await tester.pumpWidget(build(AlignmentDirectional.topEnd));
-      final topEndOffset =
-          tester.getTopLeft(find.byKey(const ValueKey('child')));
+      final topEndOffset = tester.getTopLeft(find.byKey(const ValueKey('child')));
 
       expect(topEndOffset, isNot(equals(centerOffset)));
     });
