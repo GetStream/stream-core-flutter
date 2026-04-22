@@ -70,6 +70,7 @@ class StreamRemoveControl extends StatelessWidget {
     return Semantics(
       button: true,
       label: semanticLabel,
+      onTap: onPressed,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: onPressed,

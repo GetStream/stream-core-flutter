@@ -138,20 +138,31 @@ void main() {
   });
 
   group('accessibility', () {
-    testWidgets('exposes a button with the given semantic label', (
-      tester,
-    ) async {
-      final handle = tester.ensureSemantics();
-      await tester.pumpWidget(buildSubject(onPressed: () {}));
+    testWidgets(
+      'exposes a button with the given semantic label and a tap action',
+      (tester) async {
+        final handle = tester.ensureSemantics();
+        var taps = 0;
+        await tester.pumpWidget(buildSubject(onPressed: () => taps++));
 
-      expect(
-        tester.getSemantics(find.byType(StreamRemoveControl)),
-        matchesSemantics(
-          isButton: true,
-          label: 'Remove',
-        ),
-      );
-      handle.dispose();
-    });
+        expect(
+          tester.getSemantics(find.byType(StreamRemoveControl)),
+          matchesSemantics(
+            isButton: true,
+            label: 'Remove',
+            hasTapAction: true,
+          ),
+        );
+
+        // Invoking the semantic tap action should fire onPressed so that
+        // assistive tech (e.g. TalkBack / VoiceOver) can activate the
+        // control even though the child GestureDetector's semantics are
+        // excluded.
+        await tester.tap(find.byType(StreamRemoveControl));
+        expect(taps, 1);
+
+        handle.dispose();
+      },
+    );
   });
 }
