@@ -56,8 +56,10 @@ Widget buildStreamSheetHeaderPlayground(BuildContext context) {
   return Align(
     alignment: Alignment.topCenter,
     child: StreamSheetHeader(
-      padding: EdgeInsets.all(padding),
-      spacing: spacing,
+      style: StreamSheetHeaderStyle(
+        padding: EdgeInsets.all(padding),
+        spacing: spacing,
+      ),
       leading: showLeading
           ? StreamButton.icon(
               icon: context.streamIcons.xmark,
@@ -176,15 +178,17 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
           ),
           SizedBox(height: spacing.md),
           _HeaderExample(
-            label: 'Theme-level leadingStyle/trailingStyle propagates to plain StreamButtons',
+            label: 'Style leadingStyle/trailingStyle propagates to plain StreamButtons',
             header: StreamSheetHeader(
-              leadingStyle: StreamButtonThemeStyle.from(
-                backgroundColor: colorScheme.backgroundSurfaceSubtle,
-                foregroundColor: colorScheme.textPrimary,
-              ),
-              trailingStyle: StreamButtonThemeStyle.from(
-                backgroundColor: colorScheme.accentError,
-                foregroundColor: colorScheme.textOnAccent,
+              style: StreamSheetHeaderStyle(
+                leadingStyle: StreamButtonThemeStyle.from(
+                  backgroundColor: colorScheme.backgroundSurfaceSubtle,
+                  foregroundColor: colorScheme.textPrimary,
+                ),
+                trailingStyle: StreamButtonThemeStyle.from(
+                  backgroundColor: colorScheme.accentError,
+                  foregroundColor: colorScheme.textOnAccent,
+                ),
               ),
               leading: StreamButton.icon(
                 icon: context.streamIcons.xmark,

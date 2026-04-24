@@ -81,24 +81,14 @@ class StreamSheetHeader extends StatelessWidget {
     Widget? title,
     Widget? subtitle,
     Widget? trailing,
-    EdgeInsetsGeometry? padding,
-    double? spacing,
-    TextStyle? titleTextStyle,
-    TextStyle? subtitleTextStyle,
-    StreamButtonThemeStyle? leadingStyle,
-    StreamButtonThemeStyle? trailingStyle,
+    StreamSheetHeaderStyle? style,
   }) : props = .new(
          leading: leading,
          automaticallyImplyLeading: automaticallyImplyLeading,
          title: title,
          subtitle: subtitle,
          trailing: trailing,
-         padding: padding,
-         spacing: spacing,
-         titleTextStyle: titleTextStyle,
-         subtitleTextStyle: subtitleTextStyle,
-         leadingStyle: leadingStyle,
-         trailingStyle: trailingStyle,
+         style: style,
        );
 
   /// The properties that configure this header.
@@ -129,12 +119,7 @@ class StreamSheetHeaderProps {
     this.title,
     this.subtitle,
     this.trailing,
-    this.padding,
-    this.spacing,
-    this.titleTextStyle,
-    this.subtitleTextStyle,
-    this.leadingStyle,
-    this.trailingStyle,
+    this.style,
   });
 
   /// A widget to display before the [title].
@@ -178,35 +163,11 @@ class StreamSheetHeaderProps {
   /// symmetry.
   final Widget? trailing;
 
-  /// The padding around the header's content row.
+  /// The visual style applied to this header.
   ///
-  /// Overrides [StreamSheetHeaderThemeData.padding] for this header.
-  final EdgeInsetsGeometry? padding;
-
-  /// The horizontal space between [leading], the heading, and [trailing].
-  ///
-  /// Overrides [StreamSheetHeaderThemeData.spacing] for this header.
-  final double? spacing;
-
-  /// The text style applied to [title].
-  ///
-  /// Overrides [StreamSheetHeaderThemeData.titleTextStyle] for this header.
-  final TextStyle? titleTextStyle;
-
-  /// The text style applied to [subtitle].
-  ///
-  /// Overrides [StreamSheetHeaderThemeData.subtitleTextStyle] for this header.
-  final TextStyle? subtitleTextStyle;
-
-  /// The button style propagated to any [StreamButton] in [leading].
-  ///
-  /// Overrides [StreamSheetHeaderThemeData.leadingStyle] for this header.
-  final StreamButtonThemeStyle? leadingStyle;
-
-  /// The button style propagated to any [StreamButton] in [trailing].
-  ///
-  /// Overrides [StreamSheetHeaderThemeData.trailingStyle] for this header.
-  final StreamButtonThemeStyle? trailingStyle;
+  /// Resolution order per field: this [style] → ambient
+  /// [StreamSheetHeaderTheme] → token-backed defaults.
+  final StreamSheetHeaderStyle? style;
 }
 
 /// The default implementation of [StreamSheetHeader].
@@ -236,16 +197,15 @@ class DefaultStreamSheetHeader extends StatelessWidget {
     final icons = context.streamIcons;
     final spacing = context.streamSpacing;
 
-    final style = context.streamSheetHeaderTheme.style;
+    final style = context.streamSheetHeaderTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamSheetHeaderStyleDefaults(context);
 
-    final effectivePadding = props.padding ?? style?.padding ?? defaults.padding;
-    final effectiveSpacing = props.spacing ?? style?.spacing ?? defaults.spacing;
-    final effectiveTitleTextStyle = props.titleTextStyle ?? style?.titleTextStyle ?? defaults.titleTextStyle;
-    final effectiveSubtitleTextStyle =
-        props.subtitleTextStyle ?? style?.subtitleTextStyle ?? defaults.subtitleTextStyle;
-    final effectiveLeadingStyle = props.leadingStyle ?? style?.leadingStyle;
-    final effectiveTrailingStyle = props.trailingStyle ?? style?.trailingStyle;
+    final effectivePadding = style?.padding ?? defaults.padding;
+    final effectiveSpacing = style?.spacing ?? defaults.spacing;
+    final effectiveTitleTextStyle = style?.titleTextStyle ?? defaults.titleTextStyle;
+    final effectiveSubtitleTextStyle = style?.subtitleTextStyle ?? defaults.subtitleTextStyle;
+    final effectiveLeadingStyle = style?.leadingStyle ?? defaults.leadingStyle;
+    final effectiveTrailingStyle = style?.trailingStyle ?? defaults.trailingStyle;
 
     // Leading: caller-provided, or an auto-implied dismissal button when
     // the enclosing route implies one. A regular pushed page gets a back
