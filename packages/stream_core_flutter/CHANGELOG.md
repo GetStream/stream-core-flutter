@@ -17,6 +17,10 @@
 - Fixed RTL layout for composer input field.
 - Fixed RTL layout for audio waveform and waveform slider.
 - Fixed `StreamTextInput` stretching vertically when placed inside a parent with bounded `maxHeight` (e.g. `AlertDialog.content`, `Flexible`). The input now always hugs its intrinsic height.
+- Fixed `StreamTextInput` content alignment so text and prefix/suffix slots are centered vertically.
+- Changed `StreamTextInput` default `textCapitalization` to `TextCapitalization.sentences`.
+- Updated `StreamReactionPicker` spacing to match the Figma specification.
+- Updated `StreamStepper` button style to match the Figma specification.
 
 ### 💥 Breaking Changes
 
