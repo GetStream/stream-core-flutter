@@ -236,15 +236,16 @@ class DefaultStreamSheetHeader extends StatelessWidget {
     final icons = context.streamIcons;
     final spacing = context.streamSpacing;
 
-    final theme = context.streamSheetHeaderTheme;
-    final defaults = _StreamSheetHeaderThemeDefaults(context);
+    final style = context.streamSheetHeaderTheme.style;
+    final defaults = _StreamSheetHeaderStyleDefaults(context);
 
-    final effectivePadding = props.padding ?? theme.padding ?? defaults.padding;
-    final effectiveSpacing = props.spacing ?? theme.spacing ?? defaults.spacing;
-    final effectiveTitleTextStyle = props.titleTextStyle ?? theme.titleTextStyle ?? defaults.titleTextStyle;
-    final effectiveSubtitleTextStyle = props.subtitleTextStyle ?? theme.subtitleTextStyle ?? defaults.subtitleTextStyle;
-    final effectiveLeadingStyle = props.leadingStyle ?? theme.leadingStyle;
-    final effectiveTrailingStyle = props.trailingStyle ?? theme.trailingStyle;
+    final effectivePadding = props.padding ?? style?.padding ?? defaults.padding;
+    final effectiveSpacing = props.spacing ?? style?.spacing ?? defaults.spacing;
+    final effectiveTitleTextStyle = props.titleTextStyle ?? style?.titleTextStyle ?? defaults.titleTextStyle;
+    final effectiveSubtitleTextStyle =
+        props.subtitleTextStyle ?? style?.subtitleTextStyle ?? defaults.subtitleTextStyle;
+    final effectiveLeadingStyle = props.leadingStyle ?? style?.leadingStyle;
+    final effectiveTrailingStyle = props.trailingStyle ?? style?.trailingStyle;
 
     // Leading: caller-provided, or an auto-implied dismissal button when
     // the enclosing route implies one. A regular pushed page gets a back
@@ -331,14 +332,14 @@ class DefaultStreamSheetHeader extends StatelessWidget {
   }
 }
 
-// Default theme values for [StreamSheetHeader].
+// Default style values for [StreamSheetHeader].
 //
 // These defaults are used when no explicit value is provided via
-// constructor parameters or [StreamSheetHeaderThemeData]. The defaults
-// are context-aware and use values from [StreamColorScheme],
+// constructor parameters or [StreamSheetHeaderStyle]. The defaults are
+// context-aware and use values from [StreamColorScheme],
 // [StreamTextTheme], and [StreamSpacing].
-class _StreamSheetHeaderThemeDefaults extends StreamSheetHeaderThemeData {
-  _StreamSheetHeaderThemeDefaults(this._context);
+class _StreamSheetHeaderStyleDefaults extends StreamSheetHeaderStyle {
+  _StreamSheetHeaderStyleDefaults(this._context);
 
   final BuildContext _context;
 

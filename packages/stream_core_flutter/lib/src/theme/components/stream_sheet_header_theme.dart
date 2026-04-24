@@ -18,7 +18,7 @@ part 'stream_sheet_header_theme.g.theme.dart';
 /// ```dart
 /// StreamSheetHeaderTheme(
 ///   data: StreamSheetHeaderThemeData(
-///     padding: EdgeInsets.all(16),
+///     style: StreamSheetHeaderStyle(padding: EdgeInsets.all(16)),
 ///   ),
 ///   child: StreamSheetHeader(title: Text('Details')),
 /// )
@@ -28,6 +28,8 @@ part 'stream_sheet_header_theme.g.theme.dart';
 /// See also:
 ///
 ///  * [StreamSheetHeaderThemeData], which describes the sheet header theme.
+///  * [StreamSheetHeaderStyle], the reusable visual style embedded by the
+///    theme.
 ///  * [StreamSheetHeader], the widget affected by this theme.
 class StreamSheetHeaderTheme extends InheritedTheme {
   /// Creates a sheet header theme that controls descendant sheet headers.
@@ -61,9 +63,9 @@ class StreamSheetHeaderTheme extends InheritedTheme {
 
 /// Theme data for customizing [StreamSheetHeader] widgets.
 ///
-/// Descendant widgets obtain their values from [StreamSheetHeaderTheme.of].
-/// All properties are null by default, with fallback values applied by
-/// [DefaultStreamSheetHeader].
+/// Wraps a [StreamSheetHeaderStyle] so it can be served by
+/// [StreamSheetHeaderTheme] and slotted into [StreamTheme] alongside other
+/// component theme data classes.
 ///
 /// {@tool snippet}
 ///
@@ -72,8 +74,10 @@ class StreamSheetHeaderTheme extends InheritedTheme {
 /// ```dart
 /// StreamTheme(
 ///   sheetHeaderTheme: StreamSheetHeaderThemeData(
-///     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-///     spacing: 8,
+///     style: StreamSheetHeaderStyle(
+///       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+///       spacing: 8,
+///     ),
 ///   ),
 /// )
 /// ```
@@ -81,13 +85,59 @@ class StreamSheetHeaderTheme extends InheritedTheme {
 ///
 /// See also:
 ///
+///  * [StreamSheetHeaderStyle], the reusable visual style embedded here.
 ///  * [StreamSheetHeaderTheme], for overriding the theme in a widget subtree.
 ///  * [StreamSheetHeader], the widget that uses this theme data.
 @themeGen
 @immutable
 class StreamSheetHeaderThemeData with _$StreamSheetHeaderThemeData {
-  /// Creates a sheet header theme data with optional property overrides.
-  const StreamSheetHeaderThemeData({
+  /// Creates sheet header theme data.
+  const StreamSheetHeaderThemeData({this.style});
+
+  /// Visual styling for the sheet header.
+  final StreamSheetHeaderStyle? style;
+
+  /// Linearly interpolate between two [StreamSheetHeaderThemeData] objects.
+  static StreamSheetHeaderThemeData? lerp(
+    StreamSheetHeaderThemeData? a,
+    StreamSheetHeaderThemeData? b,
+    double t,
+  ) => _$StreamSheetHeaderThemeData.lerp(a, b, t);
+}
+
+/// Visual styling properties for a [StreamSheetHeader].
+///
+/// Defines the appearance of the header including padding, spacing, title
+/// and subtitle text styles, and the default button style for the leading
+/// and trailing slots.
+///
+/// Exposed separately from [StreamSheetHeaderThemeData] so other theme data
+/// classes can embed a sheet-header style via a typed field.
+///
+/// {@tool snippet}
+///
+/// Compose a style and hand it to a sheet header theme:
+///
+/// ```dart
+/// StreamSheetHeaderStyle(
+///   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+///   spacing: 8,
+///   leadingStyle: StreamButtonThemeStyle.from(
+///     backgroundColor: colors.backgroundSurfaceSubtle,
+///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// See also:
+///
+///  * [StreamSheetHeaderThemeData], which wraps this style for theming.
+///  * [StreamSheetHeader], which uses this styling.
+@themeGen
+@immutable
+class StreamSheetHeaderStyle with _$StreamSheetHeaderStyle {
+  /// Creates a sheet header style with optional property overrides.
+  const StreamSheetHeaderStyle({
     this.padding,
     this.spacing,
     this.titleTextStyle,
@@ -96,39 +146,38 @@ class StreamSheetHeaderThemeData with _$StreamSheetHeaderThemeData {
     this.trailingStyle,
   });
 
-  /// The default padding around the header's content row.
+  /// The padding around the header's content row.
   final EdgeInsetsGeometry? padding;
 
-  /// The default horizontal space between the leading, heading, and trailing
-  /// slots.
+  /// The horizontal space between the leading, heading, and trailing slots.
   final double? spacing;
 
-  /// The default text style for [StreamSheetHeader.title].
+  /// The text style for [StreamSheetHeader.title].
   final TextStyle? titleTextStyle;
 
-  /// The default text style for [StreamSheetHeader.subtitle].
+  /// The text style for [StreamSheetHeader.subtitle].
   final TextStyle? subtitleTextStyle;
 
-  /// The default button style for any [StreamButton] rendered in
+  /// The button style for any [StreamButton] rendered in
   /// [StreamSheetHeader.leading].
   ///
-  /// Scoped to the slot so any [StreamButton] dropped into it picks up this
-  /// style regardless of the button's configured `style` or `type`.
-  /// Per-instance `themeStyle` overrides still win via merge.
+  /// Applied via a scoped [StreamButtonTheme] so any [StreamButton] dropped
+  /// into the slot picks it up regardless of the button's configured `style`
+  /// or `type`. Per-instance `themeStyle` overrides still win via merge.
   final StreamButtonThemeStyle? leadingStyle;
 
-  /// The default button style for any [StreamButton] rendered in
+  /// The button style for any [StreamButton] rendered in
   /// [StreamSheetHeader.trailing].
   ///
-  /// Scoped to the slot so any [StreamButton] dropped into it picks up this
-  /// style regardless of the button's configured `style` or `type`.
-  /// Per-instance `themeStyle` overrides still win via merge.
+  /// Applied via a scoped [StreamButtonTheme] so any [StreamButton] dropped
+  /// into the slot picks it up regardless of the button's configured `style`
+  /// or `type`. Per-instance `themeStyle` overrides still win via merge.
   final StreamButtonThemeStyle? trailingStyle;
 
-  /// Linearly interpolate between two [StreamSheetHeaderThemeData] objects.
-  static StreamSheetHeaderThemeData? lerp(
-    StreamSheetHeaderThemeData? a,
-    StreamSheetHeaderThemeData? b,
+  /// Linearly interpolate between two [StreamSheetHeaderStyle] objects.
+  static StreamSheetHeaderStyle? lerp(
+    StreamSheetHeaderStyle? a,
+    StreamSheetHeaderStyle? b,
     double t,
-  ) => _$StreamSheetHeaderThemeData.lerp(a, b, t);
+  ) => _$StreamSheetHeaderStyle.lerp(a, b, t);
 }
