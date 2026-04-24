@@ -15,6 +15,7 @@
 
 - Fixed RTL layout for composer input field.
 - Fixed RTL layout for audio waveform and waveform slider.
+- Fixed `StreamTextInput` stretching vertically when placed inside a parent with bounded `maxHeight` (e.g. `AlertDialog.content`, `Flexible`). The input now always hugs its intrinsic height.
 
 ### 💥 Breaking Changes
 
