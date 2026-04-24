@@ -99,7 +99,7 @@ class StreamTextInput extends StatelessWidget {
     VoidCallback? onEditingComplete,
     ValueChanged<String>? onSubmitted,
     GestureTapCallback? onTap,
-    TextCapitalization textCapitalization = .none,
+    TextCapitalization textCapitalization = .sentences,
   }) : props = .new(
          controller: controller,
          initialValue: initialValue,
@@ -178,7 +178,7 @@ class StreamTextInputProps {
     this.onEditingComplete,
     this.onSubmitted,
     this.onTap,
-    this.textCapitalization = .none,
+    this.textCapitalization = .sentences,
   }) : assert(
          controller == null || initialValue == null,
          'Cannot provide both controller and initialValue.',
