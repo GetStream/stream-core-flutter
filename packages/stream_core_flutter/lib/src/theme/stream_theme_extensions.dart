@@ -20,6 +20,7 @@ import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
+import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
@@ -140,6 +141,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamReactionsThemeData] from the nearest ancestor.
   StreamReactionsThemeData get streamReactionsTheme => StreamReactionsTheme.of(this);
+
+  /// Returns the [StreamSheetHeaderThemeData] from the nearest ancestor.
+  StreamSheetHeaderThemeData get streamSheetHeaderTheme => StreamSheetHeaderTheme.of(this);
 
   /// Returns the [StreamSkeletonLoadingThemeData] from the nearest ancestor.
   StreamSkeletonLoadingThemeData get streamSkeletonLoadingTheme => StreamSkeletonLoadingTheme.of(this);

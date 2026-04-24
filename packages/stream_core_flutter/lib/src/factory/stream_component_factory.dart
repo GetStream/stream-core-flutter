@@ -162,6 +162,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
+    StreamComponentBuilder<StreamSheetHeaderProps>? sheetHeader,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     StreamComponentBuilder<StreamStepperProps>? stepper,
     StreamComponentBuilder<StreamTextInputProps>? textInput,
@@ -204,6 +205,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       reactionPicker: reactionPicker,
       reactions: reactions,
       retryBadge: retryBadge,
+      sheetHeader: sheetHeader,
       skeletonLoading: skeletonLoading,
       stepper: stepper,
       textInput: textInput,
@@ -247,6 +249,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.reactionPicker,
     required this.reactions,
     required this.retryBadge,
+    required this.sheetHeader,
     required this.skeletonLoading,
     required this.stepper,
     required this.textInput,
@@ -431,6 +434,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamRetryBadge] uses [DefaultStreamRetryBadge].
   final StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge;
+
+  /// Custom builder for sheet header widgets.
+  ///
+  /// When null, [StreamSheetHeader] uses [DefaultStreamSheetHeader].
+  final StreamComponentBuilder<StreamSheetHeaderProps>? sheetHeader;
 
   /// Custom builder for skeleton loading shimmer widgets.
   ///

@@ -37,6 +37,7 @@ export 'components/controls/stream_video_play_indicator.dart';
 export 'components/emoji/data/stream_emoji_data.dart';
 export 'components/emoji/data/stream_supported_emojis.dart';
 export 'components/emoji/stream_emoji_picker_sheet.dart';
+export 'components/header/stream_sheet_header.dart' hide DefaultStreamSheetHeader;
 export 'components/list/stream_list_tile.dart' hide DefaultStreamListTile;
 export 'components/message/stream_message_annotation.dart' hide DefaultStreamMessageAnnotation;
 export 'components/message/stream_message_attachment.dart';

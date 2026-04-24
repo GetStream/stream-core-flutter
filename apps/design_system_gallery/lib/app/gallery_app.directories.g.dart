@@ -74,6 +74,8 @@ import 'package:design_system_gallery/components/controls/stream_video_play_indi
     as _design_system_gallery_components_controls_stream_video_play_indicator;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
+import 'package:design_system_gallery/components/header/stream_sheet_header.dart'
+    as _design_system_gallery_components_header_stream_sheet_header;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
     as _design_system_gallery_components_message_stream_message_annotation;
 import 'package:design_system_gallery/components/message/stream_message_attachment.dart'
@@ -794,6 +796,28 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_emoji_stream_emoji_picker_sheet
                         .buildStreamEmojiPickerSheetDefault,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Header',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSheetHeader',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_header_stream_sheet_header
+                        .buildStreamSheetHeaderPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_header_stream_sheet_header
+                        .buildStreamSheetHeaderShowcase,
               ),
             ],
           ),

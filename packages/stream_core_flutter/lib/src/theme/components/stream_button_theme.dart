@@ -85,6 +85,15 @@ class StreamButtonThemeData with _$StreamButtonThemeData {
     this.destructive,
   });
 
+  /// Applies [style] to every button style variant (primary, secondary,
+  /// destructive). Useful when the same type-style should override all
+  /// variants — e.g. when scoping a [StreamButtonTheme] to a slot that
+  /// accepts a button regardless of its configured style.
+  const StreamButtonThemeData.all(StreamButtonTypeStyle style)
+    : primary = style,
+      secondary = style,
+      destructive = style;
+
   /// Styles for primary (brand/accent) buttons.
   final StreamButtonTypeStyle? primary;
 
@@ -117,6 +126,12 @@ class StreamButtonTypeStyle with _$StreamButtonTypeStyle {
     this.outline,
     this.ghost,
   });
+
+  /// Applies [style] to every button type (solid, outline, ghost). Useful
+  /// when the same style should override all types — e.g. when scoping a
+  /// [StreamButtonTheme] to a slot that accepts a button regardless of
+  /// its configured type.
+  const StreamButtonTypeStyle.all(StreamButtonThemeStyle style) : solid = style, outline = style, ghost = style;
 
   /// Style for solid (filled) buttons.
   final StreamButtonThemeStyle? solid;

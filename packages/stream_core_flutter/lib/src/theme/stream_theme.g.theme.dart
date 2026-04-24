@@ -41,6 +41,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
+    StreamSheetHeaderThemeData? sheetHeaderTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
@@ -81,6 +82,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
+      sheetHeaderTheme: sheetHeaderTheme ?? _this.sheetHeaderTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
       stepperTheme: stepperTheme ?? _this.stepperTheme,
       switchTheme: switchTheme ?? _this.switchTheme,
@@ -209,6 +211,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.reactionsTheme,
         t,
       )!,
+      sheetHeaderTheme: StreamSheetHeaderThemeData.lerp(
+        _this.sheetHeaderTheme,
+        other.sheetHeaderTheme,
+        t,
+      )!,
       skeletonLoadingTheme: StreamSkeletonLoadingThemeData.lerp(
         _this.skeletonLoadingTheme,
         other.skeletonLoadingTheme,
@@ -269,6 +276,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.progressBarTheme == _this.progressBarTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
+        _other.sheetHeaderTheme == _this.sheetHeaderTheme &&
         _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
         _other.stepperTheme == _this.stepperTheme &&
         _other.switchTheme == _this.switchTheme;
@@ -309,6 +317,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.progressBarTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,
+      _this.sheetHeaderTheme,
       _this.skeletonLoadingTheme,
       _this.stepperTheme,
       _this.switchTheme,
