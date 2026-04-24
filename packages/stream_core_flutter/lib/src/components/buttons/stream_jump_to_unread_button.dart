@@ -162,13 +162,13 @@ class DefaultStreamJumpToUnreadButton extends StatelessWidget {
             spacing: spacing.xxs,
             children: [
               StreamButton(
-                label: props.label,
-                iconLeft: effectiveLeadingIcon,
+                iconLeft: Icon(effectiveLeadingIcon),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.ghost,
                 size: StreamButtonSize.small,
-                onTap: props.onJumpPressed,
+                onPressed: props.onJumpPressed,
                 themeStyle: effectiveLeadingStyle,
+                child: Text(props.label),
               ),
               VerticalDivider(
                 color: effectiveSide.color,
@@ -176,11 +176,11 @@ class DefaultStreamJumpToUnreadButton extends StatelessWidget {
                 thickness: effectiveSide.width,
               ),
               StreamButton.icon(
-                icon: effectiveTrailingIcon,
+                icon: Icon(effectiveTrailingIcon),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.ghost,
                 size: StreamButtonSize.small,
-                onTap: props.onDismissPressed,
+                onPressed: props.onDismissPressed,
                 themeStyle: effectiveTrailingStyle,
               ),
             ],

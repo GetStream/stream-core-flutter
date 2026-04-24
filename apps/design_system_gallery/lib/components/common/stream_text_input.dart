@@ -644,8 +644,8 @@ class _LoginFormExampleState extends State<_LoginFormExample> {
         Align(
           alignment: Alignment.centerLeft,
           child: StreamButton(
-            label: _submitted ? 'Submitted' : 'Sign In',
-            onTap: () => setState(() => _submitted = true),
+            onPressed: () => setState(() => _submitted = true),
+            child: Text(_submitted ? 'Submitted' : 'Sign In'),
           ),
         ),
         if (_submitted && _emailError == null && _passwordError == null)

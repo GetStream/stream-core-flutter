@@ -58,8 +58,7 @@ class _EmojiPickerPlaygroundState extends State<_EmojiPickerPlayground> {
         spacing: spacing.md,
         children: [
           StreamButton(
-            label: 'Show Emoji Picker',
-            onTap: () async {
+            onPressed: () async {
               final emoji = await StreamEmojiPickerSheet.show(
                 context: context,
                 emojiButtonSize: widget.emojiButtonSize,
@@ -67,6 +66,7 @@ class _EmojiPickerPlaygroundState extends State<_EmojiPickerPlayground> {
               );
               if (emoji != null && context.mounted) _toggle(emoji);
             },
+            child: const Text('Show Emoji Picker'),
           ),
           if (_selectedEmojis.isNotEmpty) ...[
             Text(

@@ -62,18 +62,18 @@ Widget buildStreamSheetHeaderPlayground(BuildContext context) {
       ),
       leading: showLeading
           ? StreamButton.icon(
-              icon: context.streamIcons.xmark,
+              icon: Icon(context.streamIcons.xmark),
               style: StreamButtonStyle.secondary,
               type: StreamButtonType.outline,
-              onTap: () {},
+              onPressed: () {},
             )
           : null,
       title: (title != null && title.isNotEmpty) ? Text(title) : null,
       subtitle: (subtitle != null && subtitle.isNotEmpty) ? Text(subtitle) : null,
       trailing: showTrailing
           ? StreamButton.icon(
-              icon: context.streamIcons.checkmark,
-              onTap: () {},
+              icon: Icon(context.streamIcons.checkmark),
+              onPressed: () {},
             )
           : null,
     ),
@@ -118,10 +118,10 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
             label: 'Leading only — trailing reserves a spacer',
             header: StreamSheetHeader(
               leading: StreamButton.icon(
-                icon: context.streamIcons.xmark,
+                icon: Icon(context.streamIcons.xmark),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.outline,
-                onTap: () {},
+                onPressed: () {},
               ),
               title: const Text('Details'),
             ),
@@ -132,8 +132,8 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
             header: StreamSheetHeader(
               title: const Text('Details'),
               trailing: StreamButton.icon(
-                icon: context.streamIcons.checkmark,
-                onTap: () {},
+                icon: Icon(context.streamIcons.checkmark),
+                onPressed: () {},
               ),
             ),
           ),
@@ -142,16 +142,16 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
             label: 'Full layout with subtitle',
             header: StreamSheetHeader(
               leading: StreamButton.icon(
-                icon: context.streamIcons.xmark,
+                icon: Icon(context.streamIcons.xmark),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.outline,
-                onTap: () {},
+                onPressed: () {},
               ),
               title: const Text('Edit profile'),
               subtitle: const Text('Tap save to apply changes'),
               trailing: StreamButton.icon(
-                icon: context.streamIcons.checkmark,
-                onTap: () {},
+                icon: Icon(context.streamIcons.checkmark),
+                onPressed: () {},
               ),
             ),
           ),
@@ -160,10 +160,10 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
             label: 'Long title truncates gracefully',
             header: StreamSheetHeader(
               leading: StreamButton.icon(
-                icon: context.streamIcons.xmark,
+                icon: Icon(context.streamIcons.xmark),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.outline,
-                onTap: () {},
+                onPressed: () {},
               ),
               title: const Text(
                 'A rather long title that should ellipsize gracefully',
@@ -171,8 +171,8 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
                 overflow: TextOverflow.ellipsis,
               ),
               trailing: StreamButton.icon(
-                icon: context.streamIcons.checkmark,
-                onTap: () {},
+                icon: Icon(context.streamIcons.checkmark),
+                onPressed: () {},
               ),
             ),
           ),
@@ -191,13 +191,13 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
                 ),
               ),
               leading: StreamButton.icon(
-                icon: context.streamIcons.xmark,
-                onTap: () {},
+                icon: Icon(context.streamIcons.xmark),
+                onPressed: () {},
               ),
               title: const Text('Discard changes?'),
               trailing: StreamButton.icon(
-                icon: context.streamIcons.delete,
-                onTap: () {},
+                icon: Icon(context.streamIcons.delete),
+                onPressed: () {},
               ),
             ),
           ),
@@ -242,8 +242,8 @@ class _BottomSheetDemo extends StatelessWidget {
           ),
           padding: EdgeInsets.all(spacing.sm),
           child: StreamButton(
-            label: 'Open bottom sheet',
-            onTap: () => _open(context),
+            onPressed: () => _open(context),
+            child: const Text('Open bottom sheet'),
           ),
         ),
       ],
@@ -268,8 +268,8 @@ class _BottomSheetDemo extends StatelessWidget {
                 title: const Text('Edit profile'),
                 subtitle: const Text('Changes are saved automatically'),
                 trailing: StreamButton.icon(
-                  icon: context.streamIcons.checkmark,
-                  onTap: () => Navigator.pop(context),
+                  icon: Icon(context.streamIcons.checkmark),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
               Expanded(
@@ -328,16 +328,16 @@ class _AutoImplyLeadingDemo extends StatelessWidget {
             children: [
               Expanded(
                 child: StreamButton(
-                  label: 'Push page',
                   style: StreamButtonStyle.secondary,
                   type: StreamButtonType.outline,
-                  onTap: () => _push(context, fullscreenDialog: false),
+                  onPressed: () => _push(context, fullscreenDialog: false),
+                  child: const Text('Push page'),
                 ),
               ),
               Expanded(
                 child: StreamButton(
-                  label: 'Push fullscreen dialog',
-                  onTap: () => _push(context, fullscreenDialog: true),
+                  onPressed: () => _push(context, fullscreenDialog: true),
+                  child: const Text('Push fullscreen dialog'),
                 ),
               ),
             ],

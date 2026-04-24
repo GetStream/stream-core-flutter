@@ -20,11 +20,11 @@ void main() {
                   name: '${style.name}_${type.name}_${size.name}',
                   child: _buildButtonInTheme(
                     StreamButton(
-                      label: 'Button',
-                      onTap: () {},
+                      onPressed: () {},
                       style: style,
                       type: type,
                       size: size,
+                      child: const Text('Button'),
                     ),
                   ),
                 ),
@@ -45,11 +45,11 @@ void main() {
                   name: '${style.name}_${type.name}_${size.name}',
                   child: _buildButtonInTheme(
                     StreamButton(
-                      label: 'Button',
-                      onTap: () {},
+                      onPressed: () {},
                       style: style,
                       type: type,
                       size: size,
+                      child: const Text('Button'),
                     ),
                     brightness: Brightness.dark,
                   ),
@@ -68,9 +68,9 @@ void main() {
             name: 'icon left',
             child: _buildButtonInTheme(
               StreamButton(
-                label: 'Button',
-                onTap: () {},
-                iconLeft: Icons.add,
+                onPressed: () {},
+                iconLeft: const Icon(Icons.add),
+                child: const Text('Button'),
               ),
             ),
           ),
@@ -78,9 +78,9 @@ void main() {
             name: 'icon right',
             child: _buildButtonInTheme(
               StreamButton(
-                label: 'Button',
-                onTap: () {},
-                iconRight: Icons.arrow_forward,
+                onPressed: () {},
+                iconRight: const Icon(Icons.arrow_forward),
+                child: const Text('Button'),
               ),
             ),
           ),
@@ -88,10 +88,10 @@ void main() {
             name: 'both icons',
             child: _buildButtonInTheme(
               StreamButton(
-                label: 'Button',
-                onTap: () {},
-                iconLeft: Icons.add,
-                iconRight: Icons.arrow_forward,
+                onPressed: () {},
+                iconLeft: const Icon(Icons.add),
+                iconRight: const Icon(Icons.arrow_forward),
+                child: const Text('Button'),
               ),
             ),
           ),
@@ -111,10 +111,10 @@ void main() {
                 name: '${style.name}_${type.name}',
                 child: _buildButtonInTheme(
                   StreamButton.icon(
-                    onTap: () {},
+                    onPressed: () {},
                     style: style,
                     type: type,
-                    icon: Icons.add,
+                    icon: const Icon(Icons.add),
                   ),
                 ),
               ),
@@ -134,10 +134,10 @@ void main() {
                 name: '${style.name}_${type.name}',
                 child: _buildButtonInTheme(
                   StreamButton(
-                    label: 'Disabled',
-                    onTap: null,
+                    onPressed: null,
                     style: style,
                     type: type,
+                    child: const Text('Disabled'),
                   ),
                 ),
               ),

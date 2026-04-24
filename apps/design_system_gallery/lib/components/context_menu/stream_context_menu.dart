@@ -175,10 +175,9 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
             SizedBox(height: spacing.sm),
 
             StreamButton(
-              label: 'Open as Dialog',
               type: StreamButtonType.outline,
               size: StreamButtonSize.small,
-              onTap: () async {
+              onPressed: () async {
                 final result = await showDialog<String>(
                   context: context,
                   useRootNavigator: false,
@@ -193,6 +192,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
                   setState(() => _dialogReturned = result);
                 }
               },
+              child: const Text('Open as Dialog'),
             ),
             SizedBox(height: spacing.xs),
             _ResultChip(
@@ -569,10 +569,9 @@ class _TypedValueReturnCardState extends State<_TypedValueReturnCard> {
           spacing: spacing.sm,
           children: [
             StreamButton(
-              label: 'Open Menu',
               type: StreamButtonType.outline,
               size: StreamButtonSize.small,
-              onTap: () async {
+              onPressed: () async {
                 final result = await showDialog<String>(
                   context: context,
                   builder: (_) => Dialog(
@@ -600,6 +599,7 @@ class _TypedValueReturnCardState extends State<_TypedValueReturnCard> {
                 );
                 setState(() => _result = result);
               },
+              child: const Text('Open Menu'),
             ),
             _ResultChip(
               label: _result != null ? '"$_result"' : 'No selection yet',
@@ -635,10 +635,9 @@ class _EnumValueReturnCardState extends State<_EnumValueReturnCard> {
           spacing: spacing.sm,
           children: [
             StreamButton(
-              label: 'Open Menu',
               type: StreamButtonType.outline,
               size: StreamButtonSize.small,
-              onTap: () async {
+              onPressed: () async {
                 final result = await showDialog<_SampleAction>(
                   context: context,
                   builder: (_) => Dialog(
@@ -672,6 +671,7 @@ class _EnumValueReturnCardState extends State<_EnumValueReturnCard> {
                 );
                 setState(() => _result = result);
               },
+              child: const Text('Open Menu'),
             ),
             _ResultChip(
               label: _result != null ? '_SampleAction.${_result!.name}' : 'No selection yet',

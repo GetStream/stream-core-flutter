@@ -216,11 +216,11 @@ class _DefaultStreamStepperState extends State<DefaultStreamStepper> {
       spacing: effectiveSpacing,
       children: [
         StreamButton.icon(
-          icon: icons.minus,
+          icon: Icon(icons.minus),
           style: .secondary,
           type: .outline,
           themeStyle: effectiveButtonStyle,
-          onTap: canDecrement ? _decrement : null,
+          onPressed: canDecrement ? _decrement : null,
         ),
         StreamTextInput(
           controller: _controller,
@@ -230,11 +230,11 @@ class _DefaultStreamStepperState extends State<DefaultStreamStepper> {
           style: effectiveInputStyle,
         ),
         StreamButton.icon(
-          icon: icons.plus,
+          icon: Icon(icons.plus),
           style: .secondary,
           type: .outline,
           themeStyle: effectiveButtonStyle,
-          onTap: canIncrement ? _increment : null,
+          onPressed: canIncrement ? _increment : null,
         ),
       ],
     );

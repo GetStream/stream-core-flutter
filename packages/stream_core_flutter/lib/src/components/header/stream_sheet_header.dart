@@ -48,8 +48,8 @@ import '../common/stream_visibility.dart';
 ///       StreamSheetHeader(
 ///         title: Text('Edit profile'),
 ///         trailing: StreamButton.icon(
-///           icon: context.streamIcons.checkmark,
-///           onTap: () => Navigator.pop(context, result),
+///           icon: Icon(context.streamIcons.checkmark),
+///           onPressed: () => Navigator.pop(context, result),
 ///         ),
 ///       ),
 ///       // ... sheet contents
@@ -219,8 +219,8 @@ class DefaultStreamSheetHeader extends StatelessWidget {
         leading = StreamButton.icon(
           type: .outline,
           style: .secondary,
-          icon: isRegularPage ? icons.chevronLeft : icons.xmark,
-          onTap: Navigator.of(context).maybePop,
+          icon: Icon(isRegularPage ? icons.chevronLeft : icons.xmark),
+          onPressed: Navigator.of(context).maybePop,
         );
       }
     }
