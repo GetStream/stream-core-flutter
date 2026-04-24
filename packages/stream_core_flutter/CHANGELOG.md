@@ -6,8 +6,10 @@
 - Added `StreamVideoPlayIndicator` component with `StreamVideoPlayIndicatorSize` variants.
 - Added `StreamFileTypeIconSize.md` and `StreamFileTypeIconSize.sm` variants.
 - Added `trailing` slot to `StreamMessageAnnotation`, with matching `trailingTextStyle`/`trailingTextColor` on `StreamMessageAnnotationStyle`.
+- Added `StreamTapTargetPadding`, a reusable primitive that grows a child's layout and hit-test area to a configurable `minSize` without changing its visual size, with a directional `alignment` that controls which direction the extra tap area extends into.
 - `StreamLoadingSpinner` now renders a completion checkmark when progress reaches 100%.
 - `StreamCommandChip` is now tappable across its whole surface, not just the × icon.
+- `StreamRemoveControl` now meets the 48 dp minimum tap target by default while keeping its 20 dp visible badge anchored to the top-end corner. Exposes `tapTargetSize`, `visualDensity`, and `semanticLabel`, and announces itself as a button to screen readers.
 
 ### 🐞 Fixed
 

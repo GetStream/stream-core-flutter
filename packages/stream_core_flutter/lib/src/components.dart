@@ -22,6 +22,7 @@ export 'components/common/stream_loading_spinner.dart' hide DefaultStreamLoading
 export 'components/common/stream_network_image.dart' hide DefaultStreamNetworkImage;
 export 'components/common/stream_progress_bar.dart' hide DefaultStreamProgressBar;
 export 'components/common/stream_skeleton_loading.dart' hide DefaultStreamSkeletonLoading;
+export 'components/common/stream_tap_target_padding.dart';
 export 'components/common/stream_text_input.dart' hide DefaultStreamTextInput;
 export 'components/common/stream_visibility.dart';
 export 'components/context_menu/stream_context_menu.dart';
