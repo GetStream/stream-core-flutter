@@ -408,7 +408,6 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
     return GestureDetector(
       onTap: props.enabled ? _effectiveFocusNode.requestFocus : null,
       child: Container(
-        alignment: .center,
         clipBehavior: .hardEdge,
         constraints: effectiveConstraints,
         decoration: BoxDecoration(
