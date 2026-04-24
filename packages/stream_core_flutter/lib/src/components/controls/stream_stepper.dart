@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../stream_core_flutter.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_button_theme.dart';
 import '../../theme/components/stream_stepper_theme.dart';
@@ -250,12 +251,17 @@ class _StreamStepperDefaults extends StreamStepperStyle {
   final BuildContext context;
 
   late final StreamSpacing _spacing = context.streamSpacing;
+  late final StreamColorScheme _colorScheme = context.streamColorScheme;
 
   @override
   double get spacing => _spacing.xxs;
 
   @override
-  StreamButtonThemeStyle? get buttonStyle => .from(tapTargetSize: .shrinkWrap);
+  StreamButtonThemeStyle? get buttonStyle => .from(
+    tapTargetSize: .shrinkWrap,
+    borderColor: _colorScheme.borderOnSurface,
+    disabledBorderColor: _colorScheme.borderDisabledOnSurface,
+  );
 
   @override
   StreamTextInputStyle get inputStyle => const .collapsed(constraints: .tightFor(width: 40, height: 40));
