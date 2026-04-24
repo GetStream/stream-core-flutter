@@ -10,6 +10,7 @@
 - Added `StreamSheetHeader` component and `StreamSheetHeaderTheme` for bottom-sheet and modal headers, with auto-implied dismissal based on the enclosing route.
 - `StreamLoadingSpinner` now renders a completion checkmark when progress reaches 100%.
 - `StreamCommandChip` is now tappable across its whole surface, not just the × icon.
+- `StreamRemoveControl` now meets the 48 dp minimum tap target by default while keeping its 20 dp visible badge anchored to the top-end corner. Exposes `tapTargetSize`, `visualDensity`, and `semanticLabel`, and announces itself as a button to screen readers.
 
 ### 🐞 Fixed
 
