@@ -234,7 +234,7 @@ class _StreamReactionPickerThemeDefaults extends StreamReactionPickerThemeData {
   double get elevation => 3;
 
   @override
-  double get spacing => _spacing.none;
+  double get spacing => _spacing.xxxs;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation2;
