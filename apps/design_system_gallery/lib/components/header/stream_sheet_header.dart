@@ -199,10 +199,95 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
           ),
           SizedBox(height: spacing.md),
           const _AutoImplyLeadingDemo(),
+          SizedBox(height: spacing.md),
+          const _BottomSheetDemo(),
         ],
       ),
     ),
   );
+}
+
+// Opens a modal bottom sheet that fills the screen by default, with no snap
+// points — matching how the sheet header is presented in Figma. Drag the
+// handle or swipe down to dismiss; there's no intermediate resting height.
+// The sheet owns the drag handle via `showDragHandle: true`, so the header
+// keeps focus on title and actions.
+class _BottomSheetDemo extends StatelessWidget {
+  const _BottomSheetDemo();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Inside a full-height bottom sheet with a drag handle',
+          style: textTheme.captionEmphasis.copyWith(color: colorScheme.textSecondary),
+        ),
+        SizedBox(height: spacing.xs),
+        Container(
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurface,
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          padding: EdgeInsets.all(spacing.sm),
+          child: StreamButton(
+            label: 'Open bottom sheet',
+            onTap: () => _open(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _open(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      useSafeArea: true,
+      builder: (context) {
+        final colorScheme = context.streamColorScheme;
+        final textTheme = context.streamTextTheme;
+        final spacing = context.streamSpacing;
+
+        return SizedBox.expand(
+          child: Column(
+            children: [
+              StreamSheetHeader(
+                title: const Text('Edit profile'),
+                subtitle: const Text('Changes are saved automatically'),
+                trailing: StreamButton.icon(
+                  icon: context.streamIcons.checkmark,
+                  onTap: () => Navigator.pop(context),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(spacing.lg, 0, spacing.lg, spacing.lg),
+                  child: Center(
+                    child: Text(
+                      'The sheet opens full height with no snap points. '
+                      'Drag the handle down or swipe to dismiss — there is '
+                      'no intermediate resting height.',
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 // Demonstrates the auto-implied leading button. Tapping each launcher pushes
