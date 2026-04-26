@@ -8,7 +8,7 @@ class StreamCoreMessageComposer extends StatefulWidget {
     super.key,
     required this.controller,
     required this.isFloating,
-    this.placeholder = '',
+    this.placeholder,
     this.focusNode,
     this.composerLeading,
     this.composerTrailing,
@@ -20,7 +20,7 @@ class StreamCoreMessageComposer extends StatefulWidget {
 
   final TextEditingController? controller;
   final bool isFloating;
-  final String placeholder;
+  final String? placeholder;
   final FocusNode? focusNode;
 
   final Widget? composerLeading;

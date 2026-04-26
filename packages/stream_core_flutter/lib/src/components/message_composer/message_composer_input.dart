@@ -8,7 +8,7 @@ class StreamMessageComposerInput extends StatelessWidget {
   const StreamMessageComposerInput({
     super.key,
     required this.controller,
-    this.placeholder = '',
+    this.placeholder,
     this.isFloating = false,
     this.inputLeading,
     this.inputTrailing,
@@ -18,7 +18,7 @@ class StreamMessageComposerInput extends StatelessWidget {
   });
 
   final TextEditingController controller;
-  final String placeholder;
+  final String? placeholder;
   final bool isFloating;
   final Widget? inputLeading;
   final Widget? inputTrailing;
@@ -72,7 +72,7 @@ class StreamMessageComposerInputField extends StatelessWidget {
   const StreamMessageComposerInputField({
     super.key,
     required this.controller,
-    required this.placeholder,
+    this.placeholder,
     this.focusNode,
     this.command,
     this.onDismissCommand,
@@ -87,7 +87,7 @@ class StreamMessageComposerInputField extends StatelessWidget {
   final TextEditingController controller;
 
   /// The placeholder text shown when the field is empty.
-  final String placeholder;
+  final String? placeholder;
 
   /// The focus node for the text field.
   final FocusNode? focusNode;
