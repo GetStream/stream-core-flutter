@@ -92,6 +92,7 @@ class StreamTextInput extends StatelessWidget {
     bool autofocus = false,
     bool readOnly = false,
     TextAlign textAlign = .start,
+    TextAlignVertical? textAlignVertical,
     int? maxLines = 1,
     int? minLines,
     int? maxLength,
@@ -118,6 +119,7 @@ class StreamTextInput extends StatelessWidget {
          autofocus: autofocus,
          readOnly: readOnly,
          textAlign: textAlign,
+         textAlignVertical: textAlignVertical,
          maxLines: maxLines,
          minLines: minLines,
          maxLength: maxLength,
@@ -171,6 +173,7 @@ class StreamTextInputProps {
     this.autofocus = false,
     this.readOnly = false,
     this.textAlign = TextAlign.start,
+    this.textAlignVertical,
     this.maxLines = 1,
     this.minLines,
     this.maxLength,
@@ -261,6 +264,9 @@ class StreamTextInputProps {
   ///
   /// Defaults to [TextAlign.start].
   final TextAlign textAlign;
+
+  /// How the text should be aligned vertically.
+  final TextAlignVertical? textAlignVertical;
 
   /// The maximum number of lines for the text input.
   ///
@@ -410,10 +416,12 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
       child: Container(
         clipBehavior: .hardEdge,
         constraints: effectiveConstraints,
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: effectiveFillColor,
-          borderRadius: effectiveBorderRadius,
-          border: Border.fromBorderSide(effectiveBorder),
+          shape: RoundedSuperellipseBorder(
+            side: effectiveBorder,
+            borderRadius: effectiveBorderRadius,
+          ),
         ),
         child: Padding(
           padding: effectiveContentPadding,
@@ -447,6 +455,7 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
                         autofocus: props.autofocus,
                         readOnly: props.readOnly,
                         textAlign: props.textAlign,
+                        textAlignVertical: props.textAlignVertical,
                         textCapitalization: props.textCapitalization,
                         maxLines: props.maxLines,
                         minLines: props.minLines,
