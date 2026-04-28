@@ -122,6 +122,10 @@ class StreamMessageComposerInputField extends StatelessWidget {
 
     final effectiveStyle = inputStyle?.textStyle ?? inputDefaults.textStyle;
     final effectiveHintStyle = inputStyle?.hintStyle ?? inputDefaults.hintStyle;
+    final effectiveCursorColor = inputStyle?.cursorColor ?? inputDefaults.cursorColor;
+    final effectiveCursorWidth = inputStyle?.cursorWidth ?? inputDefaults.cursorWidth ?? 2.0;
+    final effectiveCursorHeight = inputStyle?.cursorHeight ?? inputDefaults.cursorHeight;
+    final effectiveCursorRadius = inputStyle?.cursorRadius ?? inputDefaults.cursorRadius;
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 124),
@@ -147,6 +151,10 @@ class StreamMessageComposerInputField extends StatelessWidget {
                 autofocus: autofocus,
                 autocorrect: autocorrect,
                 style: effectiveStyle,
+                cursorColor: effectiveCursorColor,
+                cursorWidth: effectiveCursorWidth,
+                cursorHeight: effectiveCursorHeight,
+                cursorRadius: effectiveCursorRadius,
                 maxLines: null,
                 decoration: InputDecoration(
                   isCollapsed: true,

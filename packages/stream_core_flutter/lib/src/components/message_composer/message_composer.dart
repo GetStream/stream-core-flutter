@@ -118,6 +118,9 @@ class InputThemeDefaults {
   final StreamTextTheme _textTheme;
 
   StreamTextInputStyle get style => StreamTextInputStyle(
+    cursorWidth: 2,
+    cursorColor: _colorScheme.accentPrimary,
+    cursorErrorColor: _colorScheme.accentError,
     textStyle: _textTheme.bodyDefault.copyWith(color: _colorScheme.textPrimary),
     hintStyle: _textTheme.bodyDefault.copyWith(color: _colorScheme.textTertiary),
   );
