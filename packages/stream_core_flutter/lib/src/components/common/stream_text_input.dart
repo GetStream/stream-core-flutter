@@ -401,10 +401,17 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
       states,
     );
     final effectiveIconSize = style?.iconSize ?? inputStyle?.iconSize ?? defaults.iconSize;
-    final effectiveConstraints = style?.constraints ?? inputStyle?.constraints;
+    final effectiveCursorWidth = style?.cursorWidth ?? inputStyle?.cursorWidth ?? defaults.cursorWidth;
+    final effectiveCursorHeight = style?.cursorHeight ?? inputStyle?.cursorHeight ?? defaults.cursorHeight;
+    final effectiveCursorRadius = style?.cursorRadius ?? inputStyle?.cursorRadius ?? defaults.cursorRadius;
+    final effectiveConstraints = style?.constraints ?? inputStyle?.constraints ?? defaults.constraints;
     final effectiveInputFormatters = props.inputFormatters ?? [FilteringTextInputFormatter.deny(RegExp(r'^\s'))];
 
     final hasError = props.helperState == StreamHelperState.error;
+    final effectiveCursorColor = switch (hasError) {
+      true => style?.cursorErrorColor ?? inputStyle?.cursorErrorColor ?? defaults.cursorErrorColor,
+      false => style?.cursorColor ?? inputStyle?.cursorColor ?? defaults.cursorColor,
+    };
     final effectiveBorder = switch ((hasError, _effectiveFocusNode.hasFocus)) {
       (true, _) => style?.errorBorder ?? inputStyle?.errorBorder ?? defaults.errorBorder,
       (_, true) => style?.focusBorder ?? inputStyle?.focusBorder ?? defaults.focusBorder,
@@ -449,6 +456,10 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
                         onSubmitted: props.onSubmitted,
                         onTap: props.onTap,
                         style: effectiveTextStyle,
+                        cursorColor: effectiveCursorColor,
+                        cursorWidth: effectiveCursorWidth,
+                        cursorHeight: effectiveCursorHeight,
+                        cursorRadius: effectiveCursorRadius,
                         keyboardType: props.keyboardType,
                         textInputAction: props.textInputAction,
                         inputFormatters: effectiveInputFormatters,
@@ -702,6 +713,15 @@ class _StreamTextInputDefaults extends StreamTextInputStyle {
     if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
     return _colorScheme.textTertiary;
   });
+
+  @override
+  double get cursorWidth => 2;
+
+  @override
+  Color get cursorColor => _colorScheme.accentPrimary;
+
+  @override
+  Color get cursorErrorColor => _colorScheme.accentError;
 
   @override
   BorderSide get border => BorderSide(color: _colorScheme.borderDefault);

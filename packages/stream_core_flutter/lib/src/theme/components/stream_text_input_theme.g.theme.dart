@@ -103,6 +103,11 @@ mixin _$StreamTextInputStyle {
       hintStyle: TextStyle.lerp(a.hintStyle, b.hintStyle, t),
       iconColor: Color.lerp(a.iconColor, b.iconColor, t),
       iconSize: lerpDouble$(a.iconSize, b.iconSize, t),
+      cursorColor: Color.lerp(a.cursorColor, b.cursorColor, t),
+      cursorErrorColor: Color.lerp(a.cursorErrorColor, b.cursorErrorColor, t),
+      cursorWidth: lerpDouble$(a.cursorWidth, b.cursorWidth, t),
+      cursorHeight: lerpDouble$(a.cursorHeight, b.cursorHeight, t),
+      cursorRadius: Radius.lerp(a.cursorRadius, b.cursorRadius, t),
       helperInfoStyle: TextStyle.lerp(a.helperInfoStyle, b.helperInfoStyle, t),
       helperErrorStyle: TextStyle.lerp(
         a.helperErrorStyle,
@@ -151,6 +156,11 @@ mixin _$StreamTextInputStyle {
     TextStyle? hintStyle,
     Color? iconColor,
     double? iconSize,
+    Color? cursorColor,
+    Color? cursorErrorColor,
+    double? cursorWidth,
+    double? cursorHeight,
+    Radius? cursorRadius,
     TextStyle? helperInfoStyle,
     TextStyle? helperErrorStyle,
     TextStyle? helperSuccessStyle,
@@ -171,6 +181,11 @@ mixin _$StreamTextInputStyle {
       hintStyle: hintStyle ?? _this.hintStyle,
       iconColor: iconColor ?? _this.iconColor,
       iconSize: iconSize ?? _this.iconSize,
+      cursorColor: cursorColor ?? _this.cursorColor,
+      cursorErrorColor: cursorErrorColor ?? _this.cursorErrorColor,
+      cursorWidth: cursorWidth ?? _this.cursorWidth,
+      cursorHeight: cursorHeight ?? _this.cursorHeight,
+      cursorRadius: cursorRadius ?? _this.cursorRadius,
       helperInfoStyle: helperInfoStyle ?? _this.helperInfoStyle,
       helperErrorStyle: helperErrorStyle ?? _this.helperErrorStyle,
       helperSuccessStyle: helperSuccessStyle ?? _this.helperSuccessStyle,
@@ -202,6 +217,11 @@ mixin _$StreamTextInputStyle {
       hintStyle: _this.hintStyle?.merge(other.hintStyle) ?? other.hintStyle,
       iconColor: other.iconColor,
       iconSize: other.iconSize,
+      cursorColor: other.cursorColor,
+      cursorErrorColor: other.cursorErrorColor,
+      cursorWidth: other.cursorWidth,
+      cursorHeight: other.cursorHeight,
+      cursorRadius: other.cursorRadius,
       helperInfoStyle:
           _this.helperInfoStyle?.merge(other.helperInfoStyle) ??
           other.helperInfoStyle,
@@ -246,6 +266,11 @@ mixin _$StreamTextInputStyle {
         _other.hintStyle == _this.hintStyle &&
         _other.iconColor == _this.iconColor &&
         _other.iconSize == _this.iconSize &&
+        _other.cursorColor == _this.cursorColor &&
+        _other.cursorErrorColor == _this.cursorErrorColor &&
+        _other.cursorWidth == _this.cursorWidth &&
+        _other.cursorHeight == _this.cursorHeight &&
+        _other.cursorRadius == _this.cursorRadius &&
         _other.helperInfoStyle == _this.helperInfoStyle &&
         _other.helperErrorStyle == _this.helperErrorStyle &&
         _other.helperSuccessStyle == _this.helperSuccessStyle &&
@@ -264,12 +289,17 @@ mixin _$StreamTextInputStyle {
   int get hashCode {
     final _this = (this as StreamTextInputStyle);
 
-    return Object.hash(
+    return Object.hashAll([
       runtimeType,
       _this.textStyle,
       _this.hintStyle,
       _this.iconColor,
       _this.iconSize,
+      _this.cursorColor,
+      _this.cursorErrorColor,
+      _this.cursorWidth,
+      _this.cursorHeight,
+      _this.cursorRadius,
       _this.helperInfoStyle,
       _this.helperErrorStyle,
       _this.helperSuccessStyle,
@@ -282,6 +312,6 @@ mixin _$StreamTextInputStyle {
       _this.constraints,
       _this.helperIconSize,
       _this.helperMaxLines,
-    );
+    ]);
   }
 }
