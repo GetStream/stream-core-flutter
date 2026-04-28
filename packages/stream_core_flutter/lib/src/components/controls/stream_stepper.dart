@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../stream_core_flutter.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_button_theme.dart';
 import '../../theme/components/stream_stepper_theme.dart';
 import '../../theme/components/stream_text_input_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
+import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import '../common/stream_text_input.dart';
