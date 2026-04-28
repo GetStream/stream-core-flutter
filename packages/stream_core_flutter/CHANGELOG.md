@@ -11,12 +11,18 @@
 - `StreamLoadingSpinner` now renders a completion checkmark when progress reaches 100%.
 - `StreamCommandChip` is now tappable across its whole surface, not just the × icon.
 - `StreamRemoveControl` now meets the 48 dp minimum tap target by default while keeping its 20 dp visible badge anchored to the top-end corner. Exposes `tapTargetSize`, `visualDensity`, and `semanticLabel`, and announces itself as a button to screen readers.
+- Added `textAlignVertical` to `StreamTextInput` (and `StreamTextInputProps`) for controlling the vertical alignment of the text within the input.
+- Added `cursorColor`, `cursorErrorColor`, `cursorWidth`, `cursorHeight`, and `cursorRadius` to `StreamTextInputStyle` for customizing the text input cursor. `cursorErrorColor` is applied automatically when `helperState` is `StreamHelperState.error`. `StreamMessageComposerInputField` also honors these cursor properties from the theme.
 
 ### 🐞 Fixed
 
 - Fixed RTL layout for composer input field.
 - Fixed RTL layout for audio waveform and waveform slider.
 - Fixed `StreamTextInput` stretching vertically when placed inside a parent with bounded `maxHeight` (e.g. `AlertDialog.content`, `Flexible`). The input now always hugs its intrinsic height.
+- Fixed `StreamTextInput` content alignment so text and prefix/suffix slots are centered vertically.
+- Changed `StreamTextInput` default `textCapitalization` to `TextCapitalization.sentences`.
+- Updated `StreamReactionPicker` spacing to match the Figma specification.
+- Updated `StreamStepper` button style to match the Figma specification.
 
 ### 💥 Breaking Changes
 
@@ -24,6 +30,8 @@
 - Renamed Stream Icons by removing the size suffix from the icon names.
 - Renamed `StreamFileTypeIconSize` variants: `s48` → `xl`, `s40` → `lg`.
 - Removed `StreamMessageAnnotation.rich` and `spanTextStyle`/`spanTextColor`; use the new `trailing` slot instead.
+- Aligned `StreamButton` API with Flutter's built-in buttons: renamed `label` (`String?`) to required `child` (`Widget`), changed `icon`/`iconLeft`/`iconRight` from `IconData` to `Widget`, and renamed `onTap` to `onPressed`. `StreamButtonProps` mirrors the same renames.
+- `placeholder` on `StreamCoreMessageComposer`, `StreamMessageComposerInput`, and `StreamMessageComposerInputField` is now an optional `String?` (was `String` defaulting to `''`, and `required` on `StreamMessageComposerInputField`).
 
 ## 0.2.0
 

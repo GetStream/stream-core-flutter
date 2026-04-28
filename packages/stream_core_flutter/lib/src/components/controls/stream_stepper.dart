@@ -7,6 +7,7 @@ import '../../theme/components/stream_button_theme.dart';
 import '../../theme/components/stream_stepper_theme.dart';
 import '../../theme/components/stream_text_input_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
+import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import '../common/stream_text_input.dart';
@@ -215,11 +216,11 @@ class _DefaultStreamStepperState extends State<DefaultStreamStepper> {
       spacing: effectiveSpacing,
       children: [
         StreamButton.icon(
-          icon: icons.minus,
+          icon: Icon(icons.minus),
           style: .secondary,
           type: .outline,
           themeStyle: effectiveButtonStyle,
-          onTap: canDecrement ? _decrement : null,
+          onPressed: canDecrement ? _decrement : null,
         ),
         StreamTextInput(
           controller: _controller,
@@ -229,11 +230,11 @@ class _DefaultStreamStepperState extends State<DefaultStreamStepper> {
           style: effectiveInputStyle,
         ),
         StreamButton.icon(
-          icon: icons.plus,
+          icon: Icon(icons.plus),
           style: .secondary,
           type: .outline,
           themeStyle: effectiveButtonStyle,
-          onTap: canIncrement ? _increment : null,
+          onPressed: canIncrement ? _increment : null,
         ),
       ],
     );
@@ -250,12 +251,17 @@ class _StreamStepperDefaults extends StreamStepperStyle {
   final BuildContext context;
 
   late final StreamSpacing _spacing = context.streamSpacing;
+  late final StreamColorScheme _colorScheme = context.streamColorScheme;
 
   @override
   double get spacing => _spacing.xxs;
 
   @override
-  StreamButtonThemeStyle? get buttonStyle => .from(tapTargetSize: .shrinkWrap);
+  StreamButtonThemeStyle? get buttonStyle => .from(
+    tapTargetSize: .shrinkWrap,
+    borderColor: _colorScheme.borderOnSurface,
+    disabledBorderColor: _colorScheme.borderDisabledOnSurface,
+  );
 
   @override
   StreamTextInputStyle get inputStyle => const .collapsed(constraints: .tightFor(width: 40, height: 40));

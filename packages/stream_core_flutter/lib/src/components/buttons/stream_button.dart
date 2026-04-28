@@ -10,12 +10,14 @@ import '../../theme/stream_theme_extensions.dart';
 
 /// A versatile button with support for multiple styles, types, and sizes.
 ///
-/// [StreamButton] renders a label-based button or an icon-only button via the
-/// [StreamButton.icon] constructor. The button adapts its appearance based on
-/// the combination of [StreamButtonStyle], [StreamButtonType], and interaction
-/// state (hover, pressed, disabled, selected).
+/// [StreamButton] renders an arbitrary [Widget] as its [child], optionally
+/// flanked by leading and/or trailing icons via [iconLeft] and [iconRight].
+/// For a circular icon-only button, use the [StreamButton.icon] constructor.
 ///
-/// All visual states can be customized via [StreamButtonTheme].
+/// The button adapts its appearance based on the combination of
+/// [StreamButtonStyle], [StreamButtonType], and interaction state (hover,
+/// pressed, disabled, selected). All visual states can be customized via
+/// [StreamButtonTheme].
 ///
 /// {@tool snippet}
 ///
@@ -23,8 +25,21 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// ```dart
 /// StreamButton(
-///   label: 'Submit',
-///   onTap: () => print('submitted'),
+///   onPressed: () => print('submitted'),
+///   child: const Text('Submit'),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Display a button with a leading icon:
+///
+/// ```dart
+/// StreamButton(
+///   iconLeft: const Icon(Icons.add),
+///   onPressed: () => print('added'),
+///   child: const Text('Add'),
 /// )
 /// ```
 /// {@end-tool}
@@ -35,37 +50,39 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// ```dart
 /// StreamButton(
-///   label: 'Filter',
 ///   style: StreamButtonStyle.secondary,
 ///   type: StreamButtonType.ghost,
 ///   isSelected: isActive,
-///   onTap: () => toggleFilter(),
+///   onPressed: () => toggleFilter(),
+///   child: const Text('Filter'),
 /// )
 /// ```
 /// {@end-tool}
 ///
 /// See also:
 ///
+///  * [StreamButton.icon], for a circular icon-only button.
 ///  * [StreamButtonTheme], for customizing button appearance.
 ///  * [StreamButtonStyle], for available style variants.
 ///  * [StreamButtonType], for available type variants.
 ///  * [StreamButtonSize], for available size variants.
 class StreamButton extends StatelessWidget {
-  /// Creates a label button with optional leading and trailing icons.
+  /// Creates a button that displays [child], optionally flanked by leading
+  /// and/or trailing icons ([iconLeft] and [iconRight]).
   StreamButton({
     super.key,
-    required String label,
-    VoidCallback? onTap,
+    required Widget child,
+    VoidCallback? onPressed,
     StreamButtonStyle style = .primary,
     StreamButtonType type = .solid,
     StreamButtonSize size = .medium,
-    IconData? iconLeft,
-    IconData? iconRight,
+    Widget? iconLeft,
+    Widget? iconRight,
     bool? isSelected,
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
-         label: label,
-         onTap: onTap,
+         child: child,
+         onPressed: onPressed,
          style: style,
          type: type,
          size: size,
@@ -75,13 +92,23 @@ class StreamButton extends StatelessWidget {
          themeStyle: themeStyle,
        );
 
-  /// Creates a circular icon-only button.
+  /// Creates a circular icon-only button that displays [icon].
   ///
-  /// Set [isFloating] to true for an floating button with a shadow.
+  /// Set [isFloating] to true for a floating button with a shadow.
+  ///
+  /// {@tool snippet}
+  ///
+  /// ```dart
+  /// StreamButton.icon(
+  ///   icon: const Icon(Icons.add),
+  ///   onPressed: () => print('added'),
+  /// )
+  /// ```
+  /// {@end-tool}
   StreamButton.icon({
     super.key,
-    required IconData icon,
-    VoidCallback? onTap,
+    required Widget icon,
+    VoidCallback? onPressed,
     StreamButtonStyle style = .primary,
     StreamButtonType type = .solid,
     StreamButtonSize size = .medium,
@@ -89,7 +116,7 @@ class StreamButton extends StatelessWidget {
     bool? isSelected,
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
-         onTap: onTap,
+         onPressed: onPressed,
          style: style,
          type: type,
          size: size,
@@ -115,6 +142,13 @@ class StreamButton extends StatelessWidget {
 /// This class holds all the configuration options for a button,
 /// allowing them to be passed through the [StreamComponentFactory].
 ///
+/// The presence of [child] determines the button's shape:
+///
+///  * When [child] is non-null, the button renders [child] flanked by
+///    optional [iconLeft] and/or [iconRight] icons.
+///  * When [child] is null, the button renders as a circular icon-only
+///    button using [iconLeft] as its sole icon (see [StreamButton.icon]).
+///
 /// See also:
 ///
 ///  * [StreamButton], which uses these properties.
@@ -122,8 +156,8 @@ class StreamButton extends StatelessWidget {
 class StreamButtonProps {
   /// Creates properties for a button.
   const StreamButtonProps({
-    this.label,
-    this.onTap,
+    this.child,
+    this.onPressed,
     this.style = .primary,
     this.type = .solid,
     this.size = .medium,
@@ -134,15 +168,16 @@ class StreamButtonProps {
     this.themeStyle,
   });
 
-  /// The label text displayed on the button.
+  /// The main content widget displayed inside the button.
   ///
-  /// If null, the button is rendered as a circular icon-only button.
-  final String? label;
+  /// When null, the button renders as a circular icon-only button using
+  /// [iconLeft] as its sole icon (see [StreamButton.icon]).
+  final Widget? child;
 
   /// Called when the button is pressed.
   ///
   /// If null, the button will be disabled.
-  final VoidCallback? onTap;
+  final VoidCallback? onPressed;
 
   /// The visual style variant of the button.
   ///
@@ -163,11 +198,14 @@ class StreamButtonProps {
   /// and [StreamButtonThemeStyle.maximumSize].
   final StreamButtonSize size;
 
-  /// The icon displayed on the left side of the label.
-  final IconData? iconLeft;
+  /// The icon displayed at the leading edge of the button, before [child].
+  ///
+  /// When [child] is null, this is the sole icon rendered by a circular
+  /// icon-only button (see [StreamButton.icon]).
+  final Widget? iconLeft;
 
-  /// The icon displayed on the right side of the label.
-  final IconData? iconRight;
+  /// The icon displayed at the trailing edge of the button, after [child].
+  final Widget? iconRight;
 
   /// Whether the button has a floating (elevated) appearance.
   ///
@@ -325,7 +363,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
     final effectiveTapTargetSize = themeStyle?.tapTargetSize ?? defaults.tapTargetSize;
 
     final buttonSize = props.size.value;
-    final isIconButton = props.label == null;
+    final isIconButton = props.child == null;
 
     final effectiveFixedSize =
         themeStyle?.fixedSize ??
@@ -341,7 +379,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
         };
 
     return ElevatedButton(
-      onPressed: props.onTap,
+      onPressed: props.onPressed,
       statesController: _statesController,
       style: ButtonStyle(
         tapTargetSize: effectiveTapTargetSize,
@@ -370,15 +408,15 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
         },
       ),
       child: switch (isIconButton) {
-        true => Icon(props.iconLeft),
+        true => props.iconLeft,
         false => Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: spacing.xs,
           children: [
-            if (props.iconLeft case final iconLeft?) Icon(iconLeft),
-            if (props.label case final label?) Flexible(child: Text(label)),
-            if (props.iconRight case final iconRight?) Icon(iconRight),
+            ?props.iconLeft,
+            if (props.child case final child?) Flexible(child: child),
+            ?props.iconRight,
           ],
         ),
       },

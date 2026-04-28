@@ -92,6 +92,7 @@ class StreamTextInput extends StatelessWidget {
     bool autofocus = false,
     bool readOnly = false,
     TextAlign textAlign = .start,
+    TextAlignVertical? textAlignVertical,
     int? maxLines = 1,
     int? minLines,
     int? maxLength,
@@ -99,7 +100,7 @@ class StreamTextInput extends StatelessWidget {
     VoidCallback? onEditingComplete,
     ValueChanged<String>? onSubmitted,
     GestureTapCallback? onTap,
-    TextCapitalization textCapitalization = .none,
+    TextCapitalization textCapitalization = .sentences,
   }) : props = .new(
          controller: controller,
          initialValue: initialValue,
@@ -118,6 +119,7 @@ class StreamTextInput extends StatelessWidget {
          autofocus: autofocus,
          readOnly: readOnly,
          textAlign: textAlign,
+         textAlignVertical: textAlignVertical,
          maxLines: maxLines,
          minLines: minLines,
          maxLength: maxLength,
@@ -171,6 +173,7 @@ class StreamTextInputProps {
     this.autofocus = false,
     this.readOnly = false,
     this.textAlign = TextAlign.start,
+    this.textAlignVertical,
     this.maxLines = 1,
     this.minLines,
     this.maxLength,
@@ -178,7 +181,7 @@ class StreamTextInputProps {
     this.onEditingComplete,
     this.onSubmitted,
     this.onTap,
-    this.textCapitalization = .none,
+    this.textCapitalization = .sentences,
   }) : assert(
          controller == null || initialValue == null,
          'Cannot provide both controller and initialValue.',
@@ -262,6 +265,9 @@ class StreamTextInputProps {
   /// Defaults to [TextAlign.start].
   final TextAlign textAlign;
 
+  /// How the text should be aligned vertically.
+  final TextAlignVertical? textAlignVertical;
+
   /// The maximum number of lines for the text input.
   ///
   /// Defaults to 1 (single line). Set to null for unlimited lines.
@@ -287,7 +293,7 @@ class StreamTextInputProps {
 
   /// Configures how the platform keyboard capitalizes text.
   ///
-  /// Defaults to [TextCapitalization.none].
+  /// Defaults to [TextCapitalization.sentences].
   final TextCapitalization textCapitalization;
 }
 
@@ -395,10 +401,17 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
       states,
     );
     final effectiveIconSize = style?.iconSize ?? inputStyle?.iconSize ?? defaults.iconSize;
-    final effectiveConstraints = style?.constraints ?? inputStyle?.constraints;
+    final effectiveCursorWidth = style?.cursorWidth ?? inputStyle?.cursorWidth ?? defaults.cursorWidth;
+    final effectiveCursorHeight = style?.cursorHeight ?? inputStyle?.cursorHeight ?? defaults.cursorHeight;
+    final effectiveCursorRadius = style?.cursorRadius ?? inputStyle?.cursorRadius ?? defaults.cursorRadius;
+    final effectiveConstraints = style?.constraints ?? inputStyle?.constraints ?? defaults.constraints;
     final effectiveInputFormatters = props.inputFormatters ?? [FilteringTextInputFormatter.deny(RegExp(r'^\s'))];
 
     final hasError = props.helperState == StreamHelperState.error;
+    final effectiveCursorColor = switch (hasError) {
+      true => style?.cursorErrorColor ?? inputStyle?.cursorErrorColor ?? defaults.cursorErrorColor,
+      false => style?.cursorColor ?? inputStyle?.cursorColor ?? defaults.cursorColor,
+    };
     final effectiveBorder = switch ((hasError, _effectiveFocusNode.hasFocus)) {
       (true, _) => style?.errorBorder ?? inputStyle?.errorBorder ?? defaults.errorBorder,
       (_, true) => style?.focusBorder ?? inputStyle?.focusBorder ?? defaults.focusBorder,
@@ -410,10 +423,12 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
       child: Container(
         clipBehavior: .hardEdge,
         constraints: effectiveConstraints,
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: effectiveFillColor,
-          borderRadius: effectiveBorderRadius,
-          border: Border.fromBorderSide(effectiveBorder),
+          shape: RoundedSuperellipseBorder(
+            side: effectiveBorder,
+            borderRadius: effectiveBorderRadius,
+          ),
         ),
         child: Padding(
           padding: effectiveContentPadding,
@@ -424,6 +439,7 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
             ),
             child: StreamColumn(
               spacing: spacing.sm,
+              mainAxisAlignment: .center,
               crossAxisAlignment: .start,
               children: [
                 StreamRow(
@@ -440,12 +456,17 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
                         onSubmitted: props.onSubmitted,
                         onTap: props.onTap,
                         style: effectiveTextStyle,
+                        cursorColor: effectiveCursorColor,
+                        cursorWidth: effectiveCursorWidth,
+                        cursorHeight: effectiveCursorHeight,
+                        cursorRadius: effectiveCursorRadius,
                         keyboardType: props.keyboardType,
                         textInputAction: props.textInputAction,
                         inputFormatters: effectiveInputFormatters,
                         autofocus: props.autofocus,
                         readOnly: props.readOnly,
                         textAlign: props.textAlign,
+                        textAlignVertical: props.textAlignVertical,
                         textCapitalization: props.textCapitalization,
                         maxLines: props.maxLines,
                         minLines: props.minLines,
@@ -692,6 +713,15 @@ class _StreamTextInputDefaults extends StreamTextInputStyle {
     if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
     return _colorScheme.textTertiary;
   });
+
+  @override
+  double get cursorWidth => 2;
+
+  @override
+  Color get cursorColor => _colorScheme.accentPrimary;
+
+  @override
+  Color get cursorErrorColor => _colorScheme.accentError;
 
   @override
   BorderSide get border => BorderSide(color: _colorScheme.borderDefault);

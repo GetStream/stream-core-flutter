@@ -25,8 +25,8 @@ part 'stream_button_theme.g.theme.dart';
 ///     ),
 ///   ),
 ///   child: StreamButton(
-///     label: 'Submit',
-///     onTap: () {},
+///     onPressed: () {},
+///     child: Text('Submit'),
 ///   ),
 /// )
 /// ```

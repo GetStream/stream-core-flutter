@@ -127,6 +127,11 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
     this.hintStyle,
     this.iconColor,
     this.iconSize,
+    this.cursorColor,
+    this.cursorErrorColor,
+    this.cursorWidth,
+    this.cursorHeight,
+    this.cursorRadius,
     this.helperInfoStyle,
     this.helperErrorStyle,
     this.helperSuccessStyle,
@@ -154,6 +159,11 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
     this.hintStyle,
     this.iconColor,
     this.iconSize,
+    this.cursorColor,
+    this.cursorErrorColor,
+    this.cursorWidth,
+    this.cursorHeight,
+    this.cursorRadius,
     this.helperInfoStyle,
     this.helperErrorStyle,
     this.helperSuccessStyle,
@@ -200,6 +210,32 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
   ///
   /// Defaults to `20`.
   final double? iconSize;
+
+  /// The color of the text input cursor.
+  ///
+  /// Defaults to [StreamColorScheme.accentPrimary].
+  final Color? cursorColor;
+
+  /// The color of the text input cursor when [StreamHelperState.error] is
+  /// active.
+  ///
+  /// Defaults to [StreamColorScheme.accentError].
+  final Color? cursorErrorColor;
+
+  /// The width of the text input cursor.
+  ///
+  /// Defaults to `2`.
+  final double? cursorWidth;
+
+  /// The height of the text input cursor.
+  ///
+  /// If null, defaults to the preferred line height of the input text style.
+  final double? cursorHeight;
+
+  /// The radius of the text input cursor.
+  ///
+  /// If null, the cursor is rendered without rounded corners.
+  final Radius? cursorRadius;
 
   /// The text style for helper text in [StreamHelperState.info] state.
   ///

@@ -33,13 +33,14 @@ class StreamCoreMessageComposerInputTrailing extends StatelessWidget {
         voiceRecordingCallback == null) {
       return StreamButton.icon(
         key: _messageComposerInputTrailingSendKey,
-        icon:
-            buttonState == StreamMessageComposerInputTrailingState.edit ||
-                buttonState == StreamMessageComposerInputTrailingState.command
-            ? context.streamIcons.checkmark
-            : context.streamIcons.send,
+        icon: Icon(
+          buttonState == StreamMessageComposerInputTrailingState.edit ||
+                  buttonState == StreamMessageComposerInputTrailingState.command
+              ? context.streamIcons.checkmark
+              : context.streamIcons.send,
+        ),
         size: StreamButtonSize.small,
-        onTap: onSendPressed,
+        onPressed: onSendPressed,
       );
     }
     return StreamVoiceRecordingButton(
@@ -81,11 +82,11 @@ class StreamVoiceRecordingButton extends StatelessWidget {
           ),
         ),
         child: StreamButton.icon(
-          icon: context.streamIcons.voice,
+          icon: Icon(context.streamIcons.voice),
           type: StreamButtonType.ghost,
           style: StreamButtonStyle.secondary,
           size: StreamButtonSize.small,
-          onTap: () {},
+          onPressed: () {},
         ),
       ),
     );

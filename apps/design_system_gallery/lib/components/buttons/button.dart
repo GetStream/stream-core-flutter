@@ -113,23 +113,23 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
     return Center(
       child: isIconOnly
           ? StreamButton.icon(
-              icon: Icons.add,
+              icon: const Icon(Icons.add),
               style: style,
               type: type,
               size: size,
               isFloating: isFloating ? true : null,
               isSelected: isSelectable ? _isSelected : null,
-              onTap: isDisabled ? null : onTap,
+              onPressed: isDisabled ? null : onTap,
             )
           : StreamButton(
-              label: label,
               style: style,
               type: type,
               size: size,
               isSelected: isSelectable ? _isSelected : null,
-              onTap: isDisabled ? null : onTap,
-              iconLeft: showLeadingIcon ? Icons.add : null,
-              iconRight: showTrailingIcon ? Icons.arrow_forward : null,
+              onPressed: isDisabled ? null : onTap,
+              iconLeft: showLeadingIcon ? const Icon(Icons.add) : null,
+              iconRight: showTrailingIcon ? const Icon(Icons.arrow_forward) : null,
+              child: Text(label),
             ),
     );
   }
@@ -344,11 +344,11 @@ class _MatrixTypeRow extends StatelessWidget {
         Expanded(
           child: Center(
             child: StreamButton(
-              label: 'Label',
               style: style,
               type: type,
               size: StreamButtonSize.small,
-              onTap: () {},
+              onPressed: () {},
+              child: const Text('Label'),
             ),
           ),
         ),
@@ -356,10 +356,10 @@ class _MatrixTypeRow extends StatelessWidget {
         Expanded(
           child: Center(
             child: StreamButton(
-              label: 'Label',
               style: style,
               type: type,
               size: StreamButtonSize.small,
+              child: const Text('Label'),
             ),
           ),
         ),
@@ -368,11 +368,11 @@ class _MatrixTypeRow extends StatelessWidget {
         Expanded(
           child: Center(
             child: StreamButton.icon(
-              icon: Icons.add,
+              icon: const Icon(Icons.add),
               style: style,
               type: type,
               size: StreamButtonSize.small,
-              onTap: () {},
+              onPressed: () {},
             ),
           ),
         ),
@@ -380,7 +380,7 @@ class _MatrixTypeRow extends StatelessWidget {
         Expanded(
           child: Center(
             child: StreamButton.icon(
-              icon: Icons.add,
+              icon: const Icon(Icons.add),
               style: style,
               type: type,
               size: StreamButtonSize.small,
@@ -468,9 +468,9 @@ class _SizeDemo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (isIconOnly)
-          StreamButton.icon(icon: Icons.add, size: size, onTap: () {})
+          StreamButton.icon(icon: const Icon(Icons.add), size: size, onPressed: () {})
         else
-          StreamButton(label: 'Button', size: size, onTap: () {}),
+          StreamButton(size: size, onPressed: () {}, child: const Text('Button')),
         SizedBox(height: spacing.sm),
         Text(
           size.name,
@@ -608,12 +608,12 @@ class _FullWidthOverrideExample extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: StreamButton(
-        label: 'Full Width Button',
         size: StreamButtonSize.large,
         themeStyle: StreamButtonThemeStyle.from(
           fixedSize: const Size(double.infinity, 48),
         ),
-        onTap: () {},
+        onPressed: () {},
+        child: const Text('Full Width Button'),
       ),
     );
   }
@@ -627,7 +627,6 @@ class _AlignmentOverrideExample extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: StreamButton(
-        label: 'Start-aligned label',
         size: StreamButtonSize.large,
         style: StreamButtonStyle.secondary,
         type: StreamButtonType.outline,
@@ -635,7 +634,8 @@ class _AlignmentOverrideExample extends StatelessWidget {
           fixedSize: WidgetStatePropertyAll(Size(double.infinity, 48)),
           alignment: AlignmentDirectional.centerStart,
         ),
-        onTap: () {},
+        onPressed: () {},
+        child: const Text('Start-aligned label'),
       ),
     );
   }
@@ -652,18 +652,18 @@ class _MinMaxOverrideExample extends StatelessWidget {
       spacing: spacing.md,
       children: [
         StreamButton(
-          label: 'Hi',
           themeStyle: StreamButtonThemeStyle.from(
             minimumSize: const Size(200, 0),
           ),
-          onTap: () {},
+          onPressed: () {},
+          child: const Text('Hi'),
         ),
         StreamButton(
-          label: 'This label is intentionally long',
           themeStyle: StreamButtonThemeStyle.from(
             maximumSize: const Size(250, double.infinity),
           ),
-          onTap: () {},
+          onPressed: () {},
+          child: const Text('This label is intentionally long'),
         ),
       ],
     );
@@ -681,22 +681,22 @@ class _PaddingShapeOverrideExample extends StatelessWidget {
       spacing: spacing.md,
       children: [
         StreamButton(
-          label: 'Custom Padding',
           size: StreamButtonSize.large,
           themeStyle: StreamButtonThemeStyle.from(
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
             shape: const StadiumBorder(),
           ),
-          onTap: () {},
+          onPressed: () {},
+          child: const Text('Custom Padding'),
         ),
         StreamButton(
-          label: 'Pill Button',
           style: StreamButtonStyle.destructive,
           size: StreamButtonSize.small,
           themeStyle: StreamButtonThemeStyle.from(
             shape: const StadiumBorder(),
           ),
-          onTap: () {},
+          onPressed: () {},
+          child: const Text('Pill Button'),
         ),
       ],
     );
@@ -782,12 +782,12 @@ class _ToggleButtonRowState extends State<_ToggleButtonRow> {
           children: [
             for (var i = 0; i < labels.length; i++)
               StreamButton(
-                label: labels[i],
                 style: StreamButtonStyle.secondary,
                 type: _selected == i ? StreamButtonType.solid : StreamButtonType.outline,
                 size: StreamButtonSize.small,
                 isSelected: _selected == i,
-                onTap: () => setState(() => _selected = i),
+                onPressed: () => setState(() => _selected = i),
+                child: Text(labels[i]),
               ),
           ],
         ),
@@ -830,12 +830,12 @@ class _ToggleIconRowState extends State<_ToggleIconRow> {
           children: [
             for (var i = 0; i < icons.length; i++)
               StreamButton.icon(
-                icon: icons[i],
+                icon: Icon(icons[i]),
                 style: StreamButtonStyle.secondary,
                 type: _selected == i ? StreamButtonType.solid : StreamButtonType.outline,
                 size: StreamButtonSize.small,
                 isSelected: _selected == i,
-                onTap: () => setState(() => _selected = i),
+                onPressed: () => setState(() => _selected = i),
               ),
           ],
         ),
@@ -932,22 +932,22 @@ class _DeleteDialogExample extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: StreamButton(
-            label: 'Delete Conversation',
             style: StreamButtonStyle.destructive,
             size: StreamButtonSize.large,
-            iconLeft: Icons.delete_outline,
-            onTap: () {},
+            iconLeft: const Icon(Icons.delete_outline),
+            onPressed: () {},
+            child: const Text('Delete Conversation'),
           ),
         ),
         SizedBox(height: spacing.sm),
         SizedBox(
           width: double.infinity,
           child: StreamButton(
-            label: 'Cancel',
             style: StreamButtonStyle.secondary,
             type: StreamButtonType.outline,
             size: StreamButtonSize.large,
-            onTap: () {},
+            onPressed: () {},
+            child: const Text('Cancel'),
           ),
         ),
       ],
@@ -978,11 +978,11 @@ class _ChatComposerExample extends StatelessWidget {
       child: Row(
         children: [
           StreamButton.icon(
-            icon: Icons.add_circle_outline,
+            icon: const Icon(Icons.add_circle_outline),
             style: StreamButtonStyle.secondary,
             type: StreamButtonType.ghost,
             size: StreamButtonSize.small,
-            onTap: () {},
+            onPressed: () {},
           ),
           SizedBox(width: spacing.xs),
           Expanded(
@@ -995,17 +995,17 @@ class _ChatComposerExample extends StatelessWidget {
           ),
           SizedBox(width: spacing.xs),
           StreamButton.icon(
-            icon: Icons.emoji_emotions_outlined,
+            icon: const Icon(Icons.emoji_emotions_outlined),
             style: StreamButtonStyle.secondary,
             type: StreamButtonType.ghost,
             size: StreamButtonSize.small,
-            onTap: () {},
+            onPressed: () {},
           ),
           SizedBox(width: spacing.xxs),
           StreamButton.icon(
-            icon: Icons.send,
+            icon: const Icon(Icons.send),
             size: StreamButtonSize.small,
-            onTap: () {},
+            onPressed: () {},
           ),
         ],
       ),
@@ -1048,9 +1048,9 @@ class _EmptyStateExample extends StatelessWidget {
           ),
           SizedBox(height: spacing.lg),
           StreamButton(
-            label: 'New Conversation',
-            iconLeft: Icons.add,
-            onTap: () {},
+            iconLeft: const Icon(Icons.add),
+            onPressed: () {},
+            child: const Text('New Conversation'),
           ),
         ],
       ),
