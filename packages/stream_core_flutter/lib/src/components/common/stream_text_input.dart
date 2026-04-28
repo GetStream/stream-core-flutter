@@ -293,7 +293,7 @@ class StreamTextInputProps {
 
   /// Configures how the platform keyboard capitalizes text.
   ///
-  /// Defaults to [TextCapitalization.none].
+  /// Defaults to [TextCapitalization.sentences].
   final TextCapitalization textCapitalization;
 }
 
