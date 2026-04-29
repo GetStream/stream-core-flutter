@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../components.dart';
 
 import '../../theme/components/stream_emoji_button_theme.dart';
+import '../../theme/components/stream_sheet_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 const _kGridCrossAxisCount = 7;
@@ -61,6 +62,10 @@ class StreamEmojiPickerSheet extends StatelessWidget {
   /// Shows the emoji picker as a modal bottom sheet.
   ///
   /// Returns the selected [StreamEmojiData], or `null` if dismissed.
+  ///
+  /// Visual defaults (background color, border radius) are pulled from
+  /// the ambient [StreamSheetTheme] so the picker matches the look of
+  /// other Stream-styled sheets.
   static Future<StreamEmojiData?> show({
     required BuildContext context,
     Iterable<StreamEmojiData>? emojis,
@@ -70,9 +75,11 @@ class StreamEmojiPickerSheet extends StatelessWidget {
   }) {
     final radius = context.streamRadius;
     final colorScheme = context.streamColorScheme;
+    final sheetTheme = StreamSheetTheme.of(context);
 
     final effectiveEmojis = emojis ?? streamSupportedEmojis.values;
-    final effectiveBackgroundColor = backgroundColor ?? colorScheme.backgroundElevation2;
+    final effectiveBackgroundColor = backgroundColor ?? sheetTheme.backgroundColor ?? colorScheme.backgroundElevation1;
+    final effectiveBorderRadius = sheetTheme.borderRadius ?? BorderRadius.vertical(top: radius.xxxxl);
 
     return showModalBottomSheet<StreamEmojiData>(
       context: context,
@@ -80,9 +87,7 @@ class StreamEmojiPickerSheet extends StatelessWidget {
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: effectiveBackgroundColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusDirectional.only(topStart: radius.xl, topEnd: radius.xl),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: effectiveBorderRadius),
       builder: (context) => DraggableScrollableSheet(
         snap: true,
         expand: false,
