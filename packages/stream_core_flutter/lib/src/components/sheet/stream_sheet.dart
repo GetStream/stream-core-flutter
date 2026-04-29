@@ -101,9 +101,10 @@ typedef StreamSheetDragEndCallback = void Function(DragEndDetails details, {requ
 ///  * [elevation] drives the shadow cast around the sheet. Defaults
 ///    to `1`.
 ///  * [clipBehavior] clips content against the border radius (defaults
-///    to [Clip.antiAlias]).
+///    to [Clip.none]).
 ///  * [constraints] caps the sheet's size — most useful on tablet /
 ///    desktop. The sheet is bottom-aligned within the constraints.
+///    Defaults to `BoxConstraints(maxWidth: 640)`.
 ///
 /// Dismissal:
 ///
@@ -568,15 +569,15 @@ class StreamSheet extends StatelessWidget {
   /// How to clip the sheet's content against its [shape] / [borderRadius].
   ///
   /// When `null`, falls back to [StreamSheetThemeData.clipBehavior] and
-  /// finally to [Clip.antiAlias].
+  /// finally to [Clip.none].
   final Clip? clipBehavior;
 
   /// Optional [BoxConstraints] applied around the sheet.
   ///
   /// Most useful on tablet/desktop to cap the sheet's width. The sheet
   /// is bottom-aligned within the constraints. When `null`, falls back
-  /// to [StreamSheetThemeData.constraints]; if still `null`, the sheet
-  /// is unconstrained.
+  /// to [StreamSheetThemeData.constraints] and finally to
+  /// `BoxConstraints(maxWidth: 640)`.
   final BoxConstraints? constraints;
 
   @override
@@ -1102,11 +1103,15 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
   }
 
   void _handleDragStart(DragStartDetails details) {
+    assert(mounted);
+    assert(_dragGestureController == null);
     _dragGestureController = widget.onStartPopGesture();
     widget.onDragStart?.call(details);
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
+    assert(mounted);
+    assert(_dragGestureController != null);
     final size = context.size;
     if (size == null || size.height <= 0) return;
     _dragGestureController?.dragUpdate(
@@ -1118,6 +1123,8 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
   }
 
   void _handleDragEnd(DragEndDetails details) {
+    assert(mounted);
+    assert(_dragGestureController != null);
     final size = context.size;
     final velocity = size != null && size.height > 0 ? details.velocity.pixelsPerSecond.dy / size.height : 0.0;
     final isClosing =
@@ -1131,6 +1138,10 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
   }
 
   void _handleDragCancel() {
+    assert(mounted);
+    // [VerticalDragGestureRecognizer] can fire `onCancel` even when no
+    // `onStart` preceded it (paired with the initial "down" event); the
+    // null-aware call below tolerates that case.
     _dragGestureController?.dragEnd(0, _transitionScope?.stretchController);
     _dragGestureController = null;
   }
@@ -1207,6 +1218,10 @@ class _StreamDragGestureController {
     popDragController.value -= remaining / sheetHeight;
   }
 
+  /// Whether the sheet is currently dragged below its fully-open position
+  /// (i.e. partially dismissed).
+  bool isDragged() => popDragController.value != 1.0;
+
   /// Ends the drag with a vertical velocity (in fractions of screen height
   /// per second). Either pops the route or animates it back to fully open.
   ///
@@ -1267,9 +1282,11 @@ class _StreamDragGestureController {
   }
 }
 
-// Wires the [ScrollController] forwarded to the sheet's body to the route's
-// drag-to-dismiss controller, so dragging a scroll view past its top edge
-// dismisses the sheet.
+// Wires the [ScrollController] forwarded to the sheet's body to the
+// route's drag-to-dismiss controller, so dragging a scroll view past
+// its top edge dismisses the sheet. Owns the lifecycle of a
+// [_StreamDragGestureController] for the scroll-driven path; the
+// gesture-detector path on the sheet's chrome owns its own.
 class _StreamDraggableScrollableSheet extends StatefulWidget {
   const _StreamDraggableScrollableSheet({
     required this.enableDrag,
@@ -1293,23 +1310,68 @@ class _StreamDraggableScrollableSheet extends StatefulWidget {
 
 class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrollableSheet> {
   late final _StreamSheetScrollController _scrollController;
+  _StreamDragGestureController? _dragGestureController;
 
   @override
   void initState() {
     super.initState();
     _scrollController = _StreamSheetScrollController(
-      enableDrag: widget.enableDrag,
-      popDragController: widget.popDragController,
-      navigator: widget.navigator,
-      getIsCurrent: widget.getIsCurrent,
-      getIsActive: widget.getIsActive,
+      onDragStart: _handleDragStart,
+      onDragUpdate: _handleDragUpdate,
+      onDragEnd: _handleDragEnd,
+      sheetIsDraggedDown: () => _dragGestureController?.isDragged() ?? false,
     );
   }
 
   @override
   void dispose() {
+    // If we're still mid-drag, balance the navigator's user-gesture
+    // counter post-frame so we don't leave it dangling.
+    if (_dragGestureController != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.navigator.mounted) widget.navigator.didStopUserGesture();
+        _dragGestureController = null;
+      });
+    }
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _handleDragStart() {
+    assert(mounted);
+    if (!widget.enableDrag()) return;
+    _dragGestureController ??= _StreamDragGestureController(
+      navigator: widget.navigator,
+      popDragController: widget.popDragController,
+      getIsCurrent: widget.getIsCurrent,
+      getIsActive: widget.getIsActive,
+    );
+  }
+
+  void _handleDragUpdate(double delta) {
+    assert(mounted);
+    final dragController = _dragGestureController;
+    if (dragController == null) return;
+    final size = context.size;
+    if (size == null || size.height <= 0) return;
+    dragController.dragUpdate(
+      delta,
+      sheetHeight: size.height,
+      stretchPixels: context.streamSpacing.xs,
+    );
+  }
+
+  void _handleDragEnd(double velocity) {
+    assert(mounted);
+    final dragController = _dragGestureController;
+    if (dragController == null) return;
+    _dragGestureController = null;
+    final size = context.size;
+    final sheetHeight = size != null && size.height > 0 ? size.height : 1.0;
+    // Convert scroll-position velocity (negative = finger moved down,
+    // pixels/sec) to the sheet-fraction finger-down velocity that
+    // [_StreamDragGestureController.dragEnd] expects.
+    dragController.dragEnd(-velocity / sheetHeight);
   }
 
   @override
@@ -1318,24 +1380,23 @@ class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrolla
   }
 }
 
-/// A [ScrollController] used by [StreamSheetRoute]'s body that, when the
-/// scrollable is at its top edge, hands additional drag-down deltas to the
-/// route's pop-drag controller so the user's gesture seamlessly transitions
-/// from scrolling to dismissing the sheet.
+/// A [ScrollController] used by [StreamSheetRoute]'s body that bridges
+/// the scrollable's gestures to the enclosing route's pop-drag
+/// controller. The actual drag controller lives on the parent
+/// [_StreamDraggableScrollableSheetState]; this controller forwards
+/// drag lifecycle events via callbacks.
 class _StreamSheetScrollController extends ScrollController {
   _StreamSheetScrollController({
-    required this.enableDrag,
-    required this.popDragController,
-    required this.navigator,
-    required this.getIsCurrent,
-    required this.getIsActive,
+    required this.onDragStart,
+    required this.onDragUpdate,
+    required this.onDragEnd,
+    required this.sheetIsDraggedDown,
   });
 
-  final ValueGetter<bool> enableDrag;
-  final AnimationController popDragController;
-  final NavigatorState navigator;
-  final ValueGetter<bool> getIsCurrent;
-  final ValueGetter<bool> getIsActive;
+  final VoidCallback onDragStart;
+  final ValueChanged<double> onDragUpdate;
+  final ValueChanged<double> onDragEnd;
+  final ValueGetter<bool> sheetIsDraggedDown;
 
   @override
   _StreamSheetScrollPosition createScrollPosition(
@@ -1344,10 +1405,18 @@ class _StreamSheetScrollController extends ScrollController {
     ScrollPosition? oldPosition,
   ) {
     return _StreamSheetScrollPosition(
-      physics: physics,
+      // Wrap with [AlwaysScrollableScrollPhysics] so the drag-to-dismiss
+      // gesture works even when the scrollable's content fits inside
+      // the viewport (e.g. a short body inside a tall sheet) — without
+      // this, the scrollable would reject the gesture before it reaches
+      // [applyUserOffset].
+      physics: physics.applyTo(const AlwaysScrollableScrollPhysics()),
       context: context,
       oldPosition: oldPosition,
-      controller: this,
+      onDragStart: onDragStart,
+      onDragUpdate: onDragUpdate,
+      onDragEnd: onDragEnd,
+      sheetIsDraggedDown: sheetIsDraggedDown,
     );
   }
 
@@ -1355,104 +1424,112 @@ class _StreamSheetScrollController extends ScrollController {
   _StreamSheetScrollPosition get position => super.position as _StreamSheetScrollPosition;
 }
 
-/// A [ScrollPosition] that forwards over-scroll-down at the top of the
-/// scrollable to the enclosing [StreamSheetRoute]'s drag controller, and
-/// finalises the drag (pop or animate back) when the scroll drag ends.
+/// A [ScrollPosition] that decides — based on the *release state*
+/// (current [pixels] and current [velocity]) — whether each gesture
+/// belongs to the list or to the enclosing sheet's drag-to-dismiss.
+///
+/// It emits [onDragStart] / [onDragUpdate] / [onDragEnd] callbacks; the
+/// drag controller itself lives on the parent state, keeping this
+/// class free of any animation logic.
 class _StreamSheetScrollPosition extends ScrollPositionWithSingleContext {
   _StreamSheetScrollPosition({
     required super.physics,
     required super.context,
     super.oldPosition,
-    required this.controller,
+    required this.onDragStart,
+    required this.onDragUpdate,
+    required this.onDragEnd,
+    required this.sheetIsDraggedDown,
   });
 
-  final _StreamSheetScrollController controller;
+  final VoidCallback onDragStart;
+  final ValueChanged<double> onDragUpdate;
+  final ValueChanged<double> onDragEnd;
+  final ValueGetter<bool> sheetIsDraggedDown;
 
-  _StreamDragGestureController? _dragGestureController;
+  // Captured from [drag] so we can call it before stealing the
+  // ballistic. Tells the parent [Scrollable] that we've taken over the
+  // gesture and that it should release any drag book-keeping it was
+  // holding (held pointer, current [DragScrollActivity], etc.).
+  VoidCallback? _dragCancelCallback;
 
-  AnimationController get _routeController => controller.popDragController;
-
-  bool get _isSheetPartiallyDismissed => _routeController.value < 1.0;
-
-  // The viewport's height is the closest stand-in we have for the sheet
-  // body's height: the scrollable fills the rest of the sheet under the
-  // header. Used to normalise pixel deltas to fractions of sheet height
-  // for [_StreamDragGestureController].
-  double get _sheetHeight => viewportDimension > 0 ? viewportDimension : 1;
+  bool get listShouldScroll => pixels > 0.0;
 
   @override
   void applyUserOffset(double delta) {
-    if (!controller.enableDrag()) {
+    onDragStart();
+    // While the sheet is partially dismissed, every delta belongs to
+    // the sheet (so reversing direction undoes the dismiss). At rest
+    // (sheet fully open + list at top), only downward deltas redirect;
+    // upward deltas start scrolling the list normally.
+    if (!listShouldScroll && (delta > 0 || sheetIsDraggedDown())) {
+      onDragUpdate(delta);
+    } else {
       super.applyUserOffset(delta);
-      return;
     }
-
-    // `delta` mirrors `DragUpdateDetails.primaryDelta`: positive = finger
-    // moved down, negative = finger moved up.
-    final atTop = pixels <= minScrollExtent;
-    final draggingDown = delta > 0;
-    final draggingUp = delta < 0;
-    final sheetHeight = _sheetHeight;
-    final stretchPixels = controller.navigator.context.streamSpacing.xs;
-
-    // Drag down past the top of the scrollable: redirect the delta to the
-    // route's drag controller to dismiss the sheet.
-    if (atTop && draggingDown) {
-      _dragGestureController ??= _StreamDragGestureController(
-        navigator: controller.navigator,
-        popDragController: _routeController,
-        getIsCurrent: controller.getIsCurrent,
-        getIsActive: controller.getIsActive,
-      );
-      _dragGestureController!.dragUpdate(
-        delta,
-        sheetHeight: sheetHeight,
-        stretchPixels: stretchPixels,
-      );
-      return;
-    }
-
-    // If a sheet drag is in progress, allow upward finger movement to undo
-    // the dismissal before resuming normal scroll.
-    if (_dragGestureController != null && _isSheetPartiallyDismissed && draggingUp) {
-      final remainingPixels = (1.0 - _routeController.value) * sheetHeight;
-      final fingerPixels = -delta;
-      if (fingerPixels <= remainingPixels) {
-        _dragGestureController!.dragUpdate(
-          delta,
-          sheetHeight: sheetHeight,
-          stretchPixels: stretchPixels,
-        );
-        return;
-      }
-      _dragGestureController!.dragUpdate(
-        -remainingPixels,
-        sheetHeight: sheetHeight,
-        stretchPixels: stretchPixels,
-      );
-      super.applyUserOffset(-(fingerPixels - remainingPixels));
-      return;
-    }
-
-    super.applyUserOffset(delta);
   }
 
   @override
   void goBallistic(double velocity) {
-    final dragController = _dragGestureController;
-    if (dragController != null) {
-      _dragGestureController = null;
-      final fracVelocity = velocity / _sheetHeight;
-      dragController.dragEnd(fracVelocity);
+    // [ScrollDragController.end] forwards `-finger.primaryVelocity`
+    // here, so:
+    //   negative velocity = finger moved down (dismiss direction)
+    //   positive velocity = finger moved up   (scroll-forward direction)
+    //
+    // The list owns this fling — settle the sheet by its position
+    // threshold (no fling on the sheet) and run the normal scroll
+    // ballistic. Covers:
+    //   * no velocity at all
+    //   * finger down but the list isn't at the top (it scrolls back up)
+    //   * finger up but the list isn't at its bottom (it keeps scrolling)
+    if (velocity == 0.0 || (velocity < 0.0 && listShouldScroll) || (velocity > 0.0 && pixels != maxScrollExtent)) {
+      onDragEnd(0);
+      super.goBallistic(velocity);
+      return;
+    }
+
+    // Tell the parent [Scrollable] we're handling the rest of the
+    // gesture so it doesn't keep tracking the drag underneath us.
+    _dragCancelCallback?.call();
+    _dragCancelCallback = null;
+
+    // Finger flung down at the top of the list — dismiss the sheet
+    // (the parent state converts velocity to a sheet-fraction).
+    if (velocity < 0.0 && !listShouldScroll) {
+      onDragEnd(velocity);
       super.goBallistic(0);
       return;
     }
+
+    // Else: finger flung up at the bottom of the list — sheet settles
+    // by position; list runs its ballistic with the fling velocity.
+    onDragEnd(0);
     super.goBallistic(velocity);
   }
 
   @override
+  Drag drag(DragStartDetails details, VoidCallback dragCancelCallback) {
+    _dragCancelCallback = dragCancelCallback;
+    return super.drag(details, dragCancelCallback);
+  }
+
+  @override
+  void absorb(ScrollPosition other) {
+    super.absorb(other);
+    // Migrate the cancel callback across position swaps (viewport
+    // metric changes, scroll physics swaps, etc.) so an in-flight
+    // gesture isn't dropped on the floor.
+    assert(_dragCancelCallback == null);
+    if (other is! _StreamSheetScrollPosition) return;
+    if (other._dragCancelCallback != null) {
+      _dragCancelCallback = other._dragCancelCallback;
+      other._dragCancelCallback = null;
+    }
+  }
+
+  @override
   void dispose() {
-    _dragGestureController = null;
+    _dragCancelCallback = null;
     super.dispose();
   }
 }

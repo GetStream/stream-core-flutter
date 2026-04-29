@@ -137,12 +137,11 @@ void main() {
         expect(find.text('Item 0'), findsNothing);
         expect(find.byType(ListView), findsOneWidget);
 
-        // Scroll back to the top.
-        await tester.fling(
-          find.byType(ListView),
-          const Offset(0, 1500),
-          2000,
-        );
+        // Programmatically scroll back to the top so we can test the
+        // "drag down at top dismisses" path without coupling the test to
+        // over-scroll behaviour at the end of a scroll-back fling.
+        final scrollable = tester.widget<Scrollable>(find.byType(Scrollable));
+        scrollable.controller!.jumpTo(0);
         await tester.pumpAndSettle();
         expect(find.text('Item 0'), findsOneWidget);
 
@@ -150,6 +149,51 @@ void main() {
         await tester.dragFrom(
           tester.getCenter(find.text('Item 0')),
           const Offset(0, 600),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ListView), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'flinging the scroll view downward past the top dismisses the sheet',
+      (tester) async {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            _SheetLauncher(
+              onPushed: (context) {
+                return showStreamSheet<void>(
+                  context: context,
+                  builder: (_, scrollController) {
+                    return ListView.builder(
+                      controller: scrollController,
+                      itemCount: 100,
+                      itemBuilder: (_, index) => SizedBox(
+                        height: 64,
+                        child: Center(child: Text('Item $index')),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Item 0'), findsOneWidget);
+
+        // A strong downward fling at the top of the scrollable should
+        // dismiss the sheet — the velocity is in the finger's
+        // downward-equals-dismiss direction and exceeds the fling
+        // threshold.
+        await tester.fling(
+          find.byType(ListView),
+          const Offset(0, 600),
+          2000,
         );
         await tester.pumpAndSettle();
 
@@ -408,7 +452,7 @@ void main() {
         await tester.pumpWidget(
           _withStreamTheme(
             _SheetLauncher(
-              onPushed: (context) => pushOnce(context),
+              onPushed: pushOnce,
             ),
           ),
         );

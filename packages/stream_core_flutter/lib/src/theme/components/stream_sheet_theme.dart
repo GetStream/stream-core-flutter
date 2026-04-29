@@ -163,13 +163,13 @@ class StreamSheetThemeData with _$StreamSheetThemeData {
   /// Overrides how the sheet's content is clipped against its [shape]
   /// / [borderRadius].
   ///
-  /// If null, the sheet defaults to [Clip.antiAlias].
+  /// If null, the sheet defaults to [Clip.none].
   final Clip? clipBehavior;
 
   /// Constrains the size of the sheet.
   ///
-  /// Most useful on tablet/desktop to cap the sheet's width. When null,
-  /// the sheet's size is unconstrained.
+  /// Most useful on tablet/desktop to cap the sheet's width. If null,
+  /// the sheet defaults to `BoxConstraints(maxWidth: 640)`.
   final BoxConstraints? constraints;
 
   /// Overrides the default value of `StreamSheetRoute.showDragHandle`.
