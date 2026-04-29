@@ -25,6 +25,7 @@ import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
+import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
@@ -125,6 +126,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
+    StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
@@ -166,6 +168,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
     sheetHeaderTheme ??= const StreamSheetHeaderThemeData();
+    sheetTheme ??= const StreamSheetThemeData();
     skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
     stepperTheme ??= const StreamStepperThemeData();
     switchTheme ??= const StreamSwitchThemeData();
@@ -201,6 +204,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme,
+      sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
@@ -250,6 +254,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.reactionPickerTheme,
     required this.reactionsTheme,
     required this.sheetHeaderTheme,
+    required this.sheetTheme,
     required this.skeletonLoadingTheme,
     required this.stepperTheme,
     required this.switchTheme,
@@ -381,6 +386,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The sheet header theme for this theme.
   final StreamSheetHeaderThemeData sheetHeaderTheme;
 
+  /// The sheet theme for this theme.
+  final StreamSheetThemeData sheetTheme;
+
   /// The skeleton theme for this theme.
   final StreamSkeletonLoadingThemeData skeletonLoadingTheme;
 
@@ -440,6 +448,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme,
+      sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
