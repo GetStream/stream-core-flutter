@@ -776,8 +776,12 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     return context.streamSpacing.sm;
   }
 
+  /// Falls back to the standard modal-sheet [Colors.black54] scrim
+  /// when no `barrierColor` is provided. [showStreamSheet] instead
+  /// resolves [StreamSheetThemeData.barrierColor] (defaulting to
+  /// [StreamColorScheme.backgroundScrim]) from the calling context.
   @override
-  Color? get barrierColor => _barrierColor ?? Colors.transparent;
+  Color? get barrierColor => _barrierColor ?? Colors.black54;
 
   @override
   bool get barrierDismissible => isDismissible;
@@ -998,8 +1002,11 @@ class StreamSheetRoute<T> extends PageRoute<T> {
 ///
 /// A small pill-shaped indicator that signals the sheet can be
 /// dismissed by dragging. Wrapped in a [Semantics] node so assistive
-/// technology can dismiss the enclosing sheet by tapping the handle
-/// (`Navigator.maybePop`).
+/// technology can dismiss the enclosing sheet by tapping the handle —
+/// the tap targets the enclosing [StreamSheetRoute] (via
+/// [StreamSheetRoute.maybeOf]) so a nested navigator inside the sheet
+/// can't intercept it, and falls back to the nearest [Navigator] when
+/// the handle is composed outside a [StreamSheetRoute].
 ///
 /// The handle's color and size resolve from
 /// [StreamSheetThemeData.dragHandleColor] /
@@ -1026,7 +1033,16 @@ class StreamSheetDragHandle extends StatelessWidget {
       label: localizations.modalBarrierDismissLabel,
       container: true,
       button: true,
-      onTap: Navigator.of(context).maybePop,
+      onTap: () {
+        // Prefer dismissing the enclosing sheet route directly so a
+        // nested navigator inside the sheet (see `useNestedNavigation`
+        // on [showStreamSheet]) can't swallow the dismiss. Fall back to
+        // the nearest [Navigator] when the handle is composed outside
+        // a [StreamSheetRoute].
+        final route = StreamSheetRoute.maybeOf(context);
+        final navigator = route?.navigator ?? Navigator.maybeOf(context);
+        navigator?.maybePop();
+      },
       child: Container(
         height: size.height,
         width: size.width,
