@@ -9,6 +9,7 @@ import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import '../common/stream_visibility.dart';
+import '../sheet/stream_sheet.dart';
 
 /// A header for bottom sheets, modals, and dialogs in the Stream design
 /// system.
@@ -24,9 +25,19 @@ import '../common/stream_visibility.dart';
 ///
 /// When [leading] is null and [automaticallyImplyLeading] is true (the
 /// default), a dismissal button is inserted if the enclosing route can
-/// pop. The icon is a cross (`xmark`) on modal surfaces (bottom sheets,
-/// dialogs, fullscreen dialogs) and a back chevron on regular pushed
-/// pages.
+/// pop. The icon and behaviour depend on the surface:
+///
+///  * Inside a standalone [StreamSheetRoute] (or its nested navigator's
+///    first route), a cross (`xmark`) is shown — pressing it closes the
+///    entire sheet.
+///  * Inside a stacked [StreamSheetRoute] (one that covers another sheet),
+///    a back chevron is shown — pressing it pops back to the previous
+///    sheet.
+///  * Inside deeper nested routes within a [StreamSheetRoute], a back
+///    chevron is shown — pressing it pops one level inside the sheet.
+///  * On any other modal surface (bottom sheets, dialogs, fullscreen
+///    dialogs), a cross is shown.
+///  * On regular pushed pages, a back chevron is shown.
 ///
 /// The drag handle shown on iOS-style bottom sheets is intentionally *not*
 /// part of this widget — the sheet itself owns that affordance, which
@@ -35,21 +46,21 @@ import '../common/stream_visibility.dart';
 ///
 /// {@tool snippet}
 ///
-/// Use inside a bottom sheet with a confirm action — the leading close
-/// button is auto-implied since the sheet's route is a modal surface:
+/// Use inside a [StreamSheetRoute] with a confirm action — the leading
+/// close button is auto-implied (cross at the root of a sheet, back
+/// chevron when stacked over another sheet):
 ///
 /// ```dart
-/// showModalBottomSheet(
+/// showStreamSheet<ProfileEdits>(
 ///   context: context,
-///   showDragHandle: true,
-///   builder: (context) => Column(
+///   builder: (sheetContext, scrollController) => Column(
 ///     mainAxisSize: MainAxisSize.min,
 ///     children: [
 ///       StreamSheetHeader(
-///         title: Text('Edit profile'),
+///         title: const Text('Edit profile'),
 ///         trailing: StreamButton.icon(
 ///           icon: Icon(context.streamIcons.checkmark),
-///           onPressed: () => Navigator.pop(context, result),
+///           onPressed: () => Navigator.of(sheetContext).pop(edits),
 ///         ),
 ///       ),
 ///       // ... sheet contents
@@ -81,6 +92,7 @@ class StreamSheetHeader extends StatelessWidget {
     Widget? title,
     Widget? subtitle,
     Widget? trailing,
+    bool primary = true,
     StreamSheetHeaderStyle? style,
   }) : props = .new(
          leading: leading,
@@ -88,6 +100,7 @@ class StreamSheetHeader extends StatelessWidget {
          title: title,
          subtitle: subtitle,
          trailing: trailing,
+         primary: primary,
          style: style,
        );
 
@@ -119,6 +132,7 @@ class StreamSheetHeaderProps {
     this.title,
     this.subtitle,
     this.trailing,
+    this.primary = true,
     this.style,
   });
 
@@ -162,6 +176,17 @@ class StreamSheetHeaderProps {
   /// the widget's own hit area; the header only reserves a 48×48 slot for
   /// symmetry.
   final Widget? trailing;
+
+  /// Whether this header is the topmost chrome of its surface.
+  ///
+  /// When true (the default), the header wraps itself in a
+  /// `SafeArea(bottom: false)` so it clears the system top inset
+  /// (status bar / notch) and horizontal insets.
+  ///
+  /// Set to false when the header isn't at the top of its surface
+  /// (e.g. inside a sub-section of a page that has already consumed
+  /// the top inset) so it doesn't double-pad.
+  final bool primary;
 
   /// The visual style applied to this header.
   ///
@@ -208,19 +233,61 @@ class DefaultStreamSheetHeader extends StatelessWidget {
     final effectiveTrailingStyle = style?.trailingStyle ?? defaults.trailingStyle;
 
     // Leading: caller-provided, or an auto-implied dismissal button when
-    // the enclosing route implies one. A regular pushed page gets a back
-    // chevron; anything else that implies dismissal (popup routes, dialogs,
-    // fullscreen dialogs, custom modal routes) gets a cross.
+    // the enclosing route implies one.
+    //
+    // Inside a [StreamSheetRoute], the dismissal semantics shift:
+    //   * The sheet's root content (or the first route in its nested
+    //     navigator) shows a cross — pressing it closes the entire sheet.
+    //   * Subsequent routes pushed inside the sheet's nested navigator
+    //     show a back chevron — pressing it pops one level inside the
+    //     sheet.
+    //
+    // For non-sheet routes the legacy heuristic applies: a regular pushed
+    // page gets a back chevron, anything else that implies dismissal
+    // (popup routes, dialogs, fullscreen dialogs, custom modal routes)
+    // gets a cross.
     var leading = props.leading;
     if (leading == null && props.automaticallyImplyLeading) {
       final parentRoute = ModalRoute.of(context);
-      if (parentRoute != null && parentRoute.impliesAppBarDismissal) {
+      final sheetRoute = StreamSheetRoute.maybeOf(context);
+
+      IconData? icon;
+      VoidCallback? onPressed;
+
+      if (parentRoute is StreamSheetRoute) {
+        // Header sits directly on a [StreamSheetRoute] (no nested nav
+        // layer between us and the route). A stacked sheet's pop
+        // returns to the parent sheet — show a back chevron. A root
+        // sheet's pop dismisses it entirely — show a close cross.
+        icon = parentRoute.isStacked ? icons.chevronLeft : icons.xmark;
+        onPressed = Navigator.of(context).maybePop;
+      } else if (sheetRoute != null && parentRoute != null) {
+        // Header is inside the enclosing sheet's nested navigator
+        // (see [showStreamSheet]'s `useNestedNavigation`).
+        if (parentRoute.isFirst) {
+          // First nested route: tapping the icon dismisses the *whole*
+          // sheet via [popSheet]. Mirror the non-nested case for the
+          // icon — chevron when the enclosing sheet is stacked (pop
+          // reveals the parent), cross when it's a root sheet.
+          icon = sheetRoute.isStacked ? icons.chevronLeft : icons.xmark;
+          onPressed = () => StreamSheetRoute.popSheet(context);
+        } else {
+          // Deeper nested route: pop one level inside the sheet.
+          icon = icons.chevronLeft;
+          onPressed = Navigator.of(context).maybePop;
+        }
+      } else if (parentRoute != null && parentRoute.impliesAppBarDismissal) {
         final isRegularPage = parentRoute is PageRoute && !parentRoute.fullscreenDialog;
+        icon = isRegularPage ? icons.chevronLeft : icons.xmark;
+        onPressed = Navigator.of(context).maybePop;
+      }
+
+      if (icon != null && onPressed != null) {
         leading = StreamButton.icon(
           type: .outline,
           style: .secondary,
-          icon: Icon(isRegularPage ? icons.chevronLeft : icons.xmark),
-          onPressed: Navigator.of(context).maybePop,
+          icon: Icon(icon),
+          onPressed: onPressed,
         );
       }
     }
@@ -272,7 +339,7 @@ class DefaultStreamSheetHeader extends StatelessWidget {
       );
     }
 
-    return Padding(
+    Widget header = Padding(
       padding: effectivePadding,
       child: Row(
         spacing: effectiveSpacing,
@@ -289,6 +356,17 @@ class DefaultStreamSheetHeader extends StatelessWidget {
         ],
       ),
     );
+
+    // When [primary] is true, wrap in a `SafeArea(bottom: false)` so
+    // the header clears the system top + horizontal insets when used
+    // at the top of a screen. Inside a [StreamSheetRoute] the sheet
+    // already strips MediaQuery's top padding, so this is a no-op
+    // there.
+    if (props.primary) {
+      header = SafeArea(bottom: false, child: header);
+    }
+
+    return header;
   }
 }
 
