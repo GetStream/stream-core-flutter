@@ -108,6 +108,8 @@ import 'package:design_system_gallery/components/reaction/stream_reaction_picker
     as _design_system_gallery_components_reaction_stream_reaction_picker;
 import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
     as _design_system_gallery_components_reaction_stream_reactions;
+import 'package:design_system_gallery/components/sheet/stream_sheet.dart'
+    as _design_system_gallery_components_sheet_stream_sheet;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -1097,6 +1099,26 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_reaction_stream_reactions
                         .buildStreamReactionsShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Sheet',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSheetRoute',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_sheet_stream_sheet
+                    .buildStreamSheetPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_sheet_stream_sheet
+                    .buildStreamSheetShowcase,
               ),
             ],
           ),

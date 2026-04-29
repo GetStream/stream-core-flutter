@@ -42,6 +42,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
+    StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
@@ -83,6 +84,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme ?? _this.sheetHeaderTheme,
+      sheetTheme: sheetTheme ?? _this.sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
       stepperTheme: stepperTheme ?? _this.stepperTheme,
       switchTheme: switchTheme ?? _this.switchTheme,
@@ -216,6 +218,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.sheetHeaderTheme,
         t,
       )!,
+      sheetTheme: StreamSheetThemeData.lerp(
+        _this.sheetTheme,
+        other.sheetTheme,
+        t,
+      )!,
       skeletonLoadingTheme: StreamSkeletonLoadingThemeData.lerp(
         _this.skeletonLoadingTheme,
         other.skeletonLoadingTheme,
@@ -277,6 +284,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
         _other.sheetHeaderTheme == _this.sheetHeaderTheme &&
+        _other.sheetTheme == _this.sheetTheme &&
         _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
         _other.stepperTheme == _this.stepperTheme &&
         _other.switchTheme == _this.switchTheme;
@@ -318,6 +326,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.reactionPickerTheme,
       _this.reactionsTheme,
       _this.sheetHeaderTheme,
+      _this.sheetTheme,
       _this.skeletonLoadingTheme,
       _this.stepperTheme,
       _this.switchTheme,

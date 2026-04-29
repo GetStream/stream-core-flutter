@@ -56,4 +56,5 @@ export 'components/message_layout/stream_message_list_kind.dart';
 export 'components/message_layout/stream_message_stack_position.dart';
 export 'components/reaction/stream_reaction_picker.dart' hide DefaultStreamReactionPicker;
 export 'components/reaction/stream_reactions.dart' hide DefaultStreamReactions;
+export 'components/sheet/stream_sheet.dart';
 export 'factory/stream_component_factory.dart';

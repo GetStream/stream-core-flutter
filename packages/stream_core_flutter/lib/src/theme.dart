@@ -28,6 +28,7 @@ export 'theme/components/stream_progress_bar_theme.dart';
 export 'theme/components/stream_reaction_picker_theme.dart';
 export 'theme/components/stream_reactions_theme.dart';
 export 'theme/components/stream_sheet_header_theme.dart';
+export 'theme/components/stream_sheet_theme.dart';
 export 'theme/components/stream_stepper_theme.dart';
 export 'theme/components/stream_switch_theme.dart';
 export 'theme/components/stream_text_input_theme.dart';

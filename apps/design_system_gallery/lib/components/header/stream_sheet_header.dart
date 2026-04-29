@@ -211,11 +211,11 @@ Widget buildStreamSheetHeaderShowcase(BuildContext context) {
   );
 }
 
-// Opens a modal bottom sheet that fills the screen by default, with no snap
-// points — matching how the sheet header is presented in Figma. Drag the
-// handle or swipe down to dismiss; there's no intermediate resting height.
-// The sheet owns the drag handle via `showDragHandle: true`, so the header
-// keeps focus on title and actions.
+// Opens a `showStreamSheet` route that fills the screen by default, with no
+// snap points — matching how the sheet header is presented in Figma. Drag
+// the handle or swipe down to dismiss; there's no intermediate resting
+// height. The sheet owns the drag handle, so the header keeps focus on
+// title and actions.
 class _BottomSheetDemo extends StatelessWidget {
   const _BottomSheetDemo();
 
@@ -251,43 +251,39 @@ class _BottomSheetDemo extends StatelessWidget {
   }
 
   void _open(BuildContext context) {
-    showModalBottomSheet<void>(
+    showStreamSheet<void>(
       context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      useSafeArea: true,
-      builder: (context) {
+      builder: (context, _) {
         final colorScheme = context.streamColorScheme;
         final textTheme = context.streamTextTheme;
         final spacing = context.streamSpacing;
 
-        return SizedBox.expand(
-          child: Column(
-            children: [
-              StreamSheetHeader(
-                title: const Text('Edit profile'),
-                subtitle: const Text('Changes are saved automatically'),
-                trailing: StreamButton.icon(
-                  icon: Icon(context.streamIcons.checkmark),
-                  onPressed: () => Navigator.pop(context),
-                ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            StreamSheetHeader(
+              title: const Text('Edit profile'),
+              subtitle: const Text('Changes are saved automatically'),
+              trailing: StreamButton.icon(
+                icon: Icon(context.streamIcons.checkmark),
+                onPressed: () => Navigator.pop(context),
               ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(spacing.lg, 0, spacing.lg, spacing.lg),
-                  child: Center(
-                    child: Text(
-                      'The sheet opens full height with no snap points. '
-                      'Drag the handle down or swipe to dismiss — there is '
-                      'no intermediate resting height.',
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
-                    ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(spacing.lg, 0, spacing.lg, spacing.lg),
+                child: Center(
+                  child: Text(
+                    'The sheet opens full height with no snap points. '
+                    'Drag the handle down or swipe to dismiss — there is '
+                    'no intermediate resting height.',
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
