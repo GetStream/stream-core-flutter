@@ -324,6 +324,16 @@ class _UnicodeEmojiWidget extends StatelessWidget {
       _ => size * _kNotoEmojiScale,
     };
 
+    // Pin the primary [fontFamily] to the platform's native emoji font so the
+    // [fontSize] correction above lines up with the font that actually renders
+    // the glyph. [fontFamilyFallback] still covers cases where the primary
+    // font is unavailable.
+    final fontFamily = switch (platform) {
+      .iOS || .macOS when !kIsWeb => 'Apple Color Emoji',
+      .windows => 'Segoe UI Emoji',
+      _ => 'Noto Color Emoji',
+    };
+
     // Both fonts produce a [Text] whose layout is larger than the visible glyph — Apple Color
     // Emoji adds whitespace above, below, and to the right; Noto has similar extra metrics.
     // See: <https://github.com/flutter/flutter/issues/119623>
@@ -351,6 +361,7 @@ class _UnicodeEmojiWidget extends StatelessWidget {
             ),
             style: TextStyle(
               fontSize: fontSize,
+              fontFamily: fontFamily,
               decoration: .none,
               // Commonly available fallback fonts for emoji rendering.
               fontFamilyFallback: const [
