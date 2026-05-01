@@ -328,8 +328,13 @@ class _UnicodeEmojiWidget extends StatelessWidget {
     // [fontSize] correction above lines up with the font that actually renders
     // the glyph. [fontFamilyFallback] still covers cases where the primary
     // font is unavailable.
+    //
+    // On web, leave [fontFamily] as null and let [fontFamilyFallback] resolve:
+    // CanvasKit bundles Noto Color Emoji and the HTML renderer defers to the
+    // browser, so a fixed primary name would lie about what actually renders.
     final fontFamily = switch (platform) {
-      .iOS || .macOS when !kIsWeb => 'Apple Color Emoji',
+      _ when kIsWeb => null,
+      .iOS || .macOS => 'Apple Color Emoji',
       .windows => 'Segoe UI Emoji',
       _ => 'Noto Color Emoji',
     };
