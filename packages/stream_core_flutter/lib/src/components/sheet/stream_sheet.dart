@@ -615,6 +615,24 @@ class StreamSheet extends StatelessWidget {
   }
 }
 
+/// Plain value holder for the sheet's available height — the height of
+/// the slot the sheet renders into, captured during layout.
+///
+/// Drag handlers convert pixel deltas / velocities into sheet fractions
+/// by dividing by [availableHeight]. We snapshot it through a
+/// [LayoutBuilder] in [StreamSheetRoute.buildPage] (where parent
+/// constraints are stable across child rebuilds) instead of reading
+/// `context.size` at end-of-gesture, which can throw if a body
+/// `setState` marked the render object dirty mid-drag.
+///
+/// Modeled on Flutter's `DraggableScrollableSheet` extent — same idea,
+/// trimmed down to just the height field we actually need.
+class _StreamSheetExtent {
+  /// Height of the slot the sheet body fills. Set by the route's
+  /// `LayoutBuilder` and read lazily by the drag handlers.
+  double availableHeight = 0;
+}
+
 /// Modal route for a Stream-styled sheet.
 ///
 /// The sheet slides up from the bottom of the screen and rests just
@@ -756,6 +774,11 @@ class StreamSheetRoute<T> extends PageRoute<T> {
   /// Set automatically by [showStreamSheet]. Pass `null` to disable.
   final CapturedThemes? capturedThemes;
 
+  /// Tracks the sheet's available height (set by [LayoutBuilder] in
+  /// [buildPage], read by the drag handlers). Stable across body
+  /// rebuilds — see [_StreamSheetExtent].
+  final _extent = _StreamSheetExtent();
+
   /// Whether this sheet was pushed on top of another [StreamSheetRoute].
   ///
   /// Stacked sheets render a back-chevron in their auto-implied
@@ -823,13 +846,24 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    final content = _StreamDraggableScrollableSheet(
-      enableDrag: () => enableDrag,
-      popDragController: controller!,
-      navigator: navigator!,
-      getIsCurrent: () => isCurrent,
-      getIsActive: () => isActive,
-      builder: _buildBodyWithDragHandle,
+    // Wrap the body in a LayoutBuilder so we can capture the sheet's
+    // available height during layout (constraints flow down from the
+    // route's outer SafeArea / DisplayFeatureSubScreen and are stable
+    // across body rebuilds). The drag handlers read this — never the
+    // rendered size, which can be dirty mid-gesture.
+    final content = LayoutBuilder(
+      builder: (context, constraints) {
+        _extent.availableHeight = constraints.maxHeight;
+        return _StreamDraggableScrollableSheet(
+          extent: _extent,
+          enableDrag: () => enableDrag,
+          popDragController: controller!,
+          navigator: navigator!,
+          getIsCurrent: () => isCurrent,
+          getIsActive: () => isActive,
+          builder: _buildBodyWithDragHandle,
+        );
+      },
     );
 
     Widget sheet = StreamSheet(
@@ -945,6 +979,7 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     // controller.
     if (!enableDrag) {
       handle = _StreamDragGestureDetector(
+        extent: _extent,
         enabledCallback: () => true,
         onStartPopGesture: _startPopGesture,
         onDragStart: onDragStart,
@@ -987,6 +1022,7 @@ class StreamSheetRoute<T> extends PageRoute<T> {
       isStacked: isStacked,
       topPadding: topPaddingFor(context),
       child: _StreamDragGestureDetector(
+        extent: _extent,
         enabledCallback: () => enableDrag,
         onStartPopGesture: _startPopGesture,
         onDragStart: onDragStart,
@@ -1067,6 +1103,7 @@ class StreamSheetDragHandle extends StatelessWidget {
 
 class _StreamDragGestureDetector extends StatefulWidget {
   const _StreamDragGestureDetector({
+    required this.extent,
     required this.enabledCallback,
     required this.onStartPopGesture,
     required this.child,
@@ -1074,6 +1111,7 @@ class _StreamDragGestureDetector extends StatefulWidget {
     this.onDragEnd,
   });
 
+  final _StreamSheetExtent extent;
   final Widget child;
   final ValueGetter<bool> enabledCallback;
   final ValueGetter<_StreamDragGestureController> onStartPopGesture;
@@ -1089,12 +1127,6 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
   late final VerticalDragGestureRecognizer _recognizer;
 
   _StreamSheetTransitionScope? _transitionScope;
-
-  // Cached sheet height captured during the last successful drag update.
-  // Used by [_handleDragEnd] instead of re-reading [context.size], which
-  // can throw if a setState elsewhere in the tree marked the render
-  // object dirty mid-gesture.
-  double? _lastSheetHeight;
 
   @override
   void initState() {
@@ -1142,12 +1174,11 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
   void _handleDragUpdate(DragUpdateDetails details) {
     assert(mounted);
     assert(_dragGestureController != null);
-    final size = context.size;
-    if (size == null || size.height <= 0) return;
-    _lastSheetHeight = size.height;
+    final sheetHeight = widget.extent.availableHeight;
+    if (sheetHeight <= 0) return;
     _dragGestureController?.dragUpdate(
       details.primaryDelta!,
-      sheetHeight: size.height,
+      sheetHeight: sheetHeight,
       stretchPixels: context.streamSpacing.xs,
       stretchController: _transitionScope?.stretchController,
     );
@@ -1156,11 +1187,11 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
   void _handleDragEnd(DragEndDetails details) {
     assert(mounted);
     assert(_dragGestureController != null);
-    // Use the height cached from the last successful drag update —
-    // re-reading context.size here can throw when the render object has
-    // been marked dirty mid-gesture (e.g. by a setState in the body).
-    final sheetHeight = _lastSheetHeight;
-    final velocity = sheetHeight != null && sheetHeight > 0 ? details.velocity.pixelsPerSecond.dy / sheetHeight : 0.0;
+    // Read the height the route's LayoutBuilder snapshotted during the
+    // last layout pass. Stable across body rebuilds — not affected by
+    // a mid-gesture setState that would dirty the rendered size.
+    final sheetHeight = widget.extent.availableHeight;
+    final velocity = sheetHeight > 0 ? details.velocity.pixelsPerSecond.dy / sheetHeight : 0.0;
     final isClosing =
         _dragGestureController?.dragEnd(
           velocity,
@@ -1323,6 +1354,7 @@ class _StreamDragGestureController {
 // gesture-detector path on the sheet's chrome owns its own.
 class _StreamDraggableScrollableSheet extends StatefulWidget {
   const _StreamDraggableScrollableSheet({
+    required this.extent,
     required this.enableDrag,
     required this.popDragController,
     required this.navigator,
@@ -1331,6 +1363,7 @@ class _StreamDraggableScrollableSheet extends StatefulWidget {
     required this.builder,
   });
 
+  final _StreamSheetExtent extent;
   final ValueGetter<bool> enableDrag;
   final AnimationController popDragController;
   final NavigatorState navigator;
@@ -1345,12 +1378,6 @@ class _StreamDraggableScrollableSheet extends StatefulWidget {
 class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrollableSheet> {
   late final _StreamSheetScrollController _scrollController;
   _StreamDragGestureController? _dragGestureController;
-
-  // Cached sheet height captured during the last successful drag update.
-  // Used by [_handleDragEnd] instead of re-reading [context.size], which
-  // can throw if a setState elsewhere in the tree marked the render
-  // object dirty mid-gesture.
-  double? _lastSheetHeight;
 
   @override
   void initState() {
@@ -1392,12 +1419,11 @@ class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrolla
     assert(mounted);
     final dragController = _dragGestureController;
     if (dragController == null) return;
-    final size = context.size;
-    if (size == null || size.height <= 0) return;
-    _lastSheetHeight = size.height;
+    final sheetHeight = widget.extent.availableHeight;
+    if (sheetHeight <= 0) return;
     dragController.dragUpdate(
       delta,
-      sheetHeight: size.height,
+      sheetHeight: sheetHeight,
       stretchPixels: context.streamSpacing.xs,
     );
   }
@@ -1407,12 +1433,11 @@ class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrolla
     final dragController = _dragGestureController;
     if (dragController == null) return;
     _dragGestureController = null;
-    // Use the height cached from the last successful drag update —
-    // re-reading context.size here can throw when the render object
-    // has been marked dirty mid-gesture (e.g. by a setState in the
-    // sheet body).
-    final cached = _lastSheetHeight;
-    final sheetHeight = cached != null && cached > 0 ? cached : 1.0;
+    // Read the height the route's LayoutBuilder snapshotted during the
+    // last layout pass. Stable across body rebuilds — not affected by
+    // a mid-gesture setState that would dirty the rendered size.
+    final cached = widget.extent.availableHeight;
+    final sheetHeight = cached > 0 ? cached : 1.0;
     // Convert scroll-position velocity (negative = finger moved down,
     // pixels/sec) to the sheet-fraction finger-down velocity that
     // [_StreamDragGestureController.dragEnd] expects.
