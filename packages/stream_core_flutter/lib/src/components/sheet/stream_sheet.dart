@@ -1090,6 +1090,12 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
 
   _StreamSheetTransitionScope? _transitionScope;
 
+  // Cached sheet height captured during the last successful drag update.
+  // Used by [_handleDragEnd] instead of re-reading [context.size], which
+  // can throw if a setState elsewhere in the tree marked the render
+  // object dirty mid-gesture.
+  double? _lastSheetHeight;
+
   @override
   void initState() {
     super.initState();
@@ -1138,6 +1144,7 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
     assert(_dragGestureController != null);
     final size = context.size;
     if (size == null || size.height <= 0) return;
+    _lastSheetHeight = size.height;
     _dragGestureController?.dragUpdate(
       details.primaryDelta!,
       sheetHeight: size.height,
@@ -1149,8 +1156,11 @@ class _StreamDragGestureDetectorState extends State<_StreamDragGestureDetector> 
   void _handleDragEnd(DragEndDetails details) {
     assert(mounted);
     assert(_dragGestureController != null);
-    final size = context.size;
-    final velocity = size != null && size.height > 0 ? details.velocity.pixelsPerSecond.dy / size.height : 0.0;
+    // Use the height cached from the last successful drag update —
+    // re-reading context.size here can throw when the render object has
+    // been marked dirty mid-gesture (e.g. by a setState in the body).
+    final sheetHeight = _lastSheetHeight;
+    final velocity = sheetHeight != null && sheetHeight > 0 ? details.velocity.pixelsPerSecond.dy / sheetHeight : 0.0;
     final isClosing =
         _dragGestureController?.dragEnd(
           velocity,
@@ -1336,6 +1346,12 @@ class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrolla
   late final _StreamSheetScrollController _scrollController;
   _StreamDragGestureController? _dragGestureController;
 
+  // Cached sheet height captured during the last successful drag update.
+  // Used by [_handleDragEnd] instead of re-reading [context.size], which
+  // can throw if a setState elsewhere in the tree marked the render
+  // object dirty mid-gesture.
+  double? _lastSheetHeight;
+
   @override
   void initState() {
     super.initState();
@@ -1378,6 +1394,7 @@ class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrolla
     if (dragController == null) return;
     final size = context.size;
     if (size == null || size.height <= 0) return;
+    _lastSheetHeight = size.height;
     dragController.dragUpdate(
       delta,
       sheetHeight: size.height,
@@ -1390,8 +1407,12 @@ class _StreamDraggableScrollableSheetState extends State<_StreamDraggableScrolla
     final dragController = _dragGestureController;
     if (dragController == null) return;
     _dragGestureController = null;
-    final size = context.size;
-    final sheetHeight = size != null && size.height > 0 ? size.height : 1.0;
+    // Use the height cached from the last successful drag update —
+    // re-reading context.size here can throw when the render object
+    // has been marked dirty mid-gesture (e.g. by a setState in the
+    // sheet body).
+    final cached = _lastSheetHeight;
+    final sheetHeight = cached != null && cached > 0 ? cached : 1.0;
     // Convert scroll-position velocity (negative = finger moved down,
     // pixels/sec) to the sheet-fraction finger-down velocity that
     // [_StreamDragGestureController.dragEnd] expects.
