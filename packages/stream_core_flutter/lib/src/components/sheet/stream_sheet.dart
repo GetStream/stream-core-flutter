@@ -953,15 +953,23 @@ class StreamSheetRoute<T> extends PageRoute<T> {
       );
     }
 
-    // The body fills the sheet; the drag handle floats over the top
-    // with a tiny offset. Stream's chrome (sheet header, etc.) is
-    // expected to leave space at the top for the handle.
+    // The drag handle floats over the top of the body with a tiny
+    // offset. Stream's chrome (sheet header, etc.) is expected to leave
+    // space at the top for the handle.
+    //
+    // The Stack uses the default [StackFit.loose] (and *not*
+    // [StackFit.expand]) so the body's intrinsic height is preserved —
+    // a body that uses [MainAxisSize.min] correctly shrink-wraps the
+    // sheet, while a body that wants to fill the screen still does so
+    // via [Expanded] / [MainAxisSize.max] from inside.
+    //
+    // The handle is placed via the Stack's [alignment] (rather than a
+    // child [Align]) so it doesn't expand to fill loose constraints —
+    // its natural 36×9 size is used and positioned at top-center of the
+    // Stack, which makes the body's size determine the Stack's size.
     return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        body,
-        Align(alignment: Alignment.topCenter, child: handle),
-      ],
+      alignment: Alignment.topCenter,
+      children: <Widget>[body, handle],
     );
   }
 
