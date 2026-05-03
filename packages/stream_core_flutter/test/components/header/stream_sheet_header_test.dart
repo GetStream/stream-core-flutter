@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
@@ -24,14 +25,36 @@ void main() {
       expect(find.byType(StreamButton), findsNothing);
     });
 
-    testWidgets('inserts back chevron on a regular pushed route', (tester) async {
-      await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
-      await tester.tap(find.text('Open'));
-      await tester.pumpAndSettle();
+    testWidgets('inserts arrow-left on a regular pushed route on Android', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      try {
+        await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(StreamButton), findsOneWidget);
-      expect(find.byIcon(StreamIconData.chevronLeft), findsOneWidget);
-      expect(find.byIcon(StreamIconData.xmark), findsNothing);
+        expect(find.byType(StreamButton), findsOneWidget);
+        expect(find.byIcon(StreamIconData.arrowLeft), findsOneWidget);
+        expect(find.byIcon(StreamIconData.chevronLeft), findsNothing);
+        expect(find.byIcon(StreamIconData.xmark), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('inserts back chevron on a regular pushed route on iOS', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(StreamButton), findsOneWidget);
+        expect(find.byIcon(StreamIconData.chevronLeft), findsOneWidget);
+        expect(find.byIcon(StreamIconData.arrowLeft), findsNothing);
+        expect(find.byIcon(StreamIconData.xmark), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
     });
 
     testWidgets('inserts cross icon on a fullscreen dialog', (tester) async {

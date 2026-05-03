@@ -278,7 +278,18 @@ class DefaultStreamSheetHeader extends StatelessWidget {
         }
       } else if (parentRoute != null && parentRoute.impliesAppBarDismissal) {
         final isRegularPage = parentRoute is PageRoute && !parentRoute.fullscreenDialog;
-        icon = isRegularPage ? icons.chevronLeft : icons.xmark;
+        if (isRegularPage) {
+          // Match the platform-aware leading [StreamAppBar] auto-implies
+          // for regular pushed pages — chevron on iOS-style platforms,
+          // arrow elsewhere. Sheet contexts above keep the chevron
+          // because they're iOS-modal-style on every platform.
+          icon = switch (Theme.of(context).platform) {
+            TargetPlatform.iOS || TargetPlatform.macOS => icons.chevronLeft,
+            _ => icons.arrowLeft,
+          };
+        } else {
+          icon = icons.xmark;
+        }
         onPressed = Navigator.of(context).maybePop;
       }
 

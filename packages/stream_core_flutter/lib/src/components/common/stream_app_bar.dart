@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../factory/stream_component_factory.dart';
+import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -188,18 +189,62 @@ class DefaultStreamAppBar extends StatelessWidget {
     final theme = Theme.of(context);
     final streamTextTheme = context.streamTextTheme;
     final streamColorScheme = context.streamColorScheme;
+    final streamIcons = context.streamIcons;
+
+    // Auto-imply a Stream-styled leading when the caller didn't pass one
+    // — mirror Material's AppBar logic but route through the design
+    // system's icons:
+    //
+    //  * Inside a fullscreen dialog → cross (xmark), since the route
+    //    presents modally rather than pushing onto a stack.
+    //  * Otherwise, on platforms with iOS-style back navigation (iOS /
+    //    macOS) → chevron-left.
+    //  * Otherwise → arrow-left (the standard Material back affordance
+    //    on Android / web / desktop platforms).
+    var leading = props.leading;
+    if (leading == null && props.automaticallyImplyLeading) {
+      final parentRoute = ModalRoute.of(context);
+      final canPop = parentRoute?.canPop ?? false;
+      if (canPop) {
+        final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
+        final tooltips = MaterialLocalizations.of(context);
+        final IconData icon;
+        final String tooltip;
+        if (useCloseIcon) {
+          icon = streamIcons.xmark;
+          tooltip = tooltips.closeButtonTooltip;
+        } else {
+          icon = switch (theme.platform) {
+            TargetPlatform.iOS || TargetPlatform.macOS => streamIcons.chevronLeft,
+            _ => streamIcons.arrowLeft,
+          };
+          tooltip = tooltips.backButtonTooltip;
+        }
+        leading = IconButton(
+          icon: Icon(icon),
+          onPressed: () => Navigator.of(context).maybePop(),
+          tooltip: tooltip,
+        );
+      }
+    }
 
     return AppBar(
-      automaticallyImplyLeading: props.automaticallyImplyLeading,
+      // Already auto-implied above; tell Material to keep its hands off
+      // the leading slot so it doesn't insert its own back button on top
+      // of ours.
+      automaticallyImplyLeading: false,
       toolbarTextStyle: theme.textTheme.bodyMedium,
       titleTextStyle: props.titleTextStyle ?? streamTextTheme.headingSm,
       systemOverlayStyle: theme.brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       elevation: props.elevation,
       scrolledUnderElevation: props.scrolledUnderElevation,
-      backgroundColor: props.backgroundColor,
-      surfaceTintColor: props.surfaceTintColor,
+      // Lock the background to elevation-1 so Material's surface-tint
+      // / scrolled-under tint never slides the bar away from the design
+      // system's white. Per-call backgroundColor still wins.
+      backgroundColor: props.backgroundColor ?? streamColorScheme.backgroundElevation1,
+      surfaceTintColor: props.surfaceTintColor ?? StreamColors.transparent,
       centerTitle: props.centerTitle,
-      leading: props.leading,
+      leading: leading,
       leadingWidth: props.leadingWidth,
       titleSpacing: props.titleSpacing,
       actions: props.actions,
