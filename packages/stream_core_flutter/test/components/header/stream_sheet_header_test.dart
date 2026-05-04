@@ -124,7 +124,7 @@ void main() {
 
     testWidgets(
       'inserts back chevron when a StreamSheetRoute covers another sheet on iOS',
-      (tester) async => _onPlatform(TargetPlatform.iOS, () async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(_withStreamTheme(const _StreamSheetLauncher()));
         await tester.tap(find.text('Open stream sheet'));
         await tester.pumpAndSettle();
@@ -167,7 +167,7 @@ void main() {
     testWidgets(
       'inserts cross at first nested route inside a StreamSheetRoute and '
       'back chevron at deeper nested routes on iOS',
-      (tester) async => _onPlatform(TargetPlatform.iOS, () async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(
           _withStreamTheme(const _StreamSheetLauncher(useNestedNavigation: true)),
         );
@@ -190,7 +190,7 @@ void main() {
     testWidgets(
       'inserts back chevron on the first nested route of a stacked sheet '
       '(stacked + nested combo) on iOS',
-      (tester) async => _onPlatform(TargetPlatform.iOS, () async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(
           _withStreamTheme(const _StreamSheetLauncher()),
         );
@@ -256,7 +256,7 @@ void main() {
     testWidgets(
       'tapping the chevron on a stacked StreamSheetRoute pops only itself; '
       'parent sheet stays mounted',
-      (tester) async => _onPlatform(TargetPlatform.iOS, () async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(_withStreamTheme(const _StreamSheetLauncher()));
         await tester.tap(find.text('Open stream sheet'));
         await tester.pumpAndSettle();
@@ -296,7 +296,7 @@ void main() {
     testWidgets(
       'tapping the chevron on a deeper nested route pops only that '
       'nested level; the sheet stays mounted',
-      (tester) async => _onPlatform(TargetPlatform.iOS, () async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(
           _withStreamTheme(const _StreamSheetLauncher(useNestedNavigation: true)),
         );
@@ -324,7 +324,7 @@ void main() {
     testWidgets(
       'tapping the chevron on the first nested route of a stacked sheet '
       'pops the entire stacked sheet (not just the nested route)',
-      (tester) async => _onPlatform(TargetPlatform.iOS, () async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(_withStreamTheme(const _StreamSheetLauncher()));
         await tester.tap(find.text('Open stream sheet'));
         await tester.pumpAndSettle();
