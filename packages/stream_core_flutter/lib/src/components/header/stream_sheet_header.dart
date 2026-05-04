@@ -8,8 +8,8 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
-import '../common/stream_visibility.dart';
 import '../sheet/stream_sheet.dart';
+import 'stream_header_toolbar.dart';
 
 /// A header for bottom sheets, modals, and dialogs in the Stream design
 /// system.
@@ -31,13 +31,17 @@ import '../sheet/stream_sheet.dart';
 ///    first route), a cross (`xmark`) is shown — pressing it closes the
 ///    entire sheet.
 ///  * Inside a stacked [StreamSheetRoute] (one that covers another sheet),
-///    a back chevron is shown — pressing it pops back to the previous
-///    sheet.
-///  * Inside deeper nested routes within a [StreamSheetRoute], a back
-///    chevron is shown — pressing it pops one level inside the sheet.
+///    a platform-aware back affordance is shown — pressing it pops back to
+///    the previous sheet.
+///  * Inside deeper nested routes within a [StreamSheetRoute], a
+///    platform-aware back affordance is shown — pressing it pops one level
+///    inside the sheet.
 ///  * On any other modal surface (bottom sheets, dialogs, fullscreen
 ///    dialogs), a cross is shown.
-///  * On regular pushed pages, a back chevron is shown.
+///  * On regular pushed pages, a platform-aware back affordance is shown.
+///
+/// The platform-aware back affordance is a chevron on iOS / macOS and an
+/// arrow-left on Android / web / desktop.
 ///
 /// The drag handle shown on iOS-style bottom sheets is intentionally *not*
 /// part of this widget — the sheet itself owns that affordance, which
@@ -48,7 +52,7 @@ import '../sheet/stream_sheet.dart';
 ///
 /// Use inside a [StreamSheetRoute] with a confirm action — the leading
 /// close button is auto-implied (cross at the root of a sheet, back
-/// chevron when stacked over another sheet):
+/// affordance when stacked over another sheet):
 ///
 /// ```dart
 /// showStreamSheet<ProfileEdits>(
@@ -83,7 +87,7 @@ import '../sheet/stream_sheet.dart';
 ///  * [StreamSheetHeaderTheme], for overriding theme in a subtree.
 ///  * [StreamAppBar], the equivalent for top-level screen chrome.
 ///  * [DefaultStreamSheetHeader], the default visual implementation.
-class StreamSheetHeader extends StatelessWidget {
+class StreamSheetHeader extends StatelessWidget implements PreferredSizeWidget {
   /// Creates a Stream sheet header.
   StreamSheetHeader({
     super.key,
@@ -106,6 +110,9 @@ class StreamSheetHeader extends StatelessWidget {
 
   /// The properties that configure this header.
   final StreamSheetHeaderProps props;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kStreamHeaderHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -143,17 +150,16 @@ class StreamSheetHeaderProps {
   /// symmetry.
   ///
   /// When null and [automaticallyImplyLeading] is true, a default dismissal
-  /// button is inserted if the enclosing route can pop — a cross on modal
-  /// surfaces, a back chevron on regular pushed pages.
+  /// button is inserted if the enclosing route can pop — see
+  /// [StreamSheetHeader] for the full resolution table.
   final Widget? leading;
 
   /// Controls whether a default dismissal button is shown when [leading] is
   /// null.
   ///
   /// When true (the default), a button is inserted as the leading widget if
-  /// the enclosing route can pop. The icon is a cross on modal surfaces
-  /// (bottom sheets, dialogs, fullscreen dialogs) and a back chevron on
-  /// regular pushed pages.
+  /// the enclosing route can pop. The icon depends on the surface — see
+  /// [StreamSheetHeader] for the full resolution table.
   final bool automaticallyImplyLeading;
 
   /// The primary content of the header.
@@ -167,7 +173,7 @@ class StreamSheetHeaderProps {
   ///
   /// Typically a [Text] widget. Its text style is resolved from
   /// [StreamSheetHeaderThemeData.subtitleTextStyle] (defaults to
-  /// `textTheme.captionDefault` on `colorScheme.textTertiary`).
+  /// `textTheme.captionDefault` on `colorScheme.textSecondary`).
   final Widget? subtitle;
 
   /// A widget to display after the [title].
@@ -201,10 +207,10 @@ class StreamSheetHeaderProps {
 /// [StreamSheetHeaderTheme]. It's used as the default factory
 /// implementation in [StreamComponentFactory].
 ///
-/// When only one of [StreamSheetHeaderProps.leading] /
-/// [StreamSheetHeaderProps.trailing] is provided, the opposite side
-/// reserves a 48×48 spacer (via [StreamVisibility.hidden]) so the title
-/// stays visually centered.
+/// The title slot is centred in the header's full inner width via
+/// [StreamHeaderToolbar], which reserves symmetric space around the
+/// middle so an asymmetric leading and trailing don't shift the title
+/// off-centre.
 ///
 /// See also:
 ///
@@ -251,15 +257,22 @@ class DefaultStreamSheetHeader extends StatelessWidget {
       final parentRoute = ModalRoute.of(context);
       final sheetRoute = StreamSheetRoute.maybeOf(context);
 
+      // Platform-aware back affordance shared by every "go back" branch
+      // below — chevron on iOS-style platforms, arrow-left elsewhere.
+      final backIcon = switch (Theme.of(context).platform) {
+        .iOS || .macOS => icons.chevronLeft,
+        _ => icons.arrowLeft,
+      };
+
       IconData? icon;
       VoidCallback? onPressed;
 
       if (parentRoute is StreamSheetRoute) {
         // Header sits directly on a [StreamSheetRoute] (no nested nav
         // layer between us and the route). A stacked sheet's pop
-        // returns to the parent sheet — show a back chevron. A root
+        // returns to the parent sheet — show a back affordance. A root
         // sheet's pop dismisses it entirely — show a close cross.
-        icon = parentRoute.isStacked ? icons.chevronLeft : icons.xmark;
+        icon = parentRoute.isStacked ? backIcon : icons.xmark;
         onPressed = Navigator.of(context).maybePop;
       } else if (sheetRoute != null && parentRoute != null) {
         // Header is inside the enclosing sheet's nested navigator
@@ -267,29 +280,21 @@ class DefaultStreamSheetHeader extends StatelessWidget {
         if (parentRoute.isFirst) {
           // First nested route: tapping the icon dismisses the *whole*
           // sheet via [popSheet]. Mirror the non-nested case for the
-          // icon — chevron when the enclosing sheet is stacked (pop
-          // reveals the parent), cross when it's a root sheet.
-          icon = sheetRoute.isStacked ? icons.chevronLeft : icons.xmark;
+          // icon — back affordance when the enclosing sheet is stacked
+          // (pop reveals the parent), cross when it's a root sheet.
+          icon = sheetRoute.isStacked ? backIcon : icons.xmark;
           onPressed = () => StreamSheetRoute.popSheet(context);
         } else {
           // Deeper nested route: pop one level inside the sheet.
-          icon = icons.chevronLeft;
+          icon = backIcon;
           onPressed = Navigator.of(context).maybePop;
         }
       } else if (parentRoute != null && parentRoute.impliesAppBarDismissal) {
-        final isRegularPage = parentRoute is PageRoute && !parentRoute.fullscreenDialog;
-        if (isRegularPage) {
-          // Match the platform-aware leading [StreamAppBar] auto-implies
-          // for regular pushed pages — chevron on iOS-style platforms,
-          // arrow elsewhere. Sheet contexts above keep the chevron
-          // because they're iOS-modal-style on every platform.
-          icon = switch (Theme.of(context).platform) {
-            TargetPlatform.iOS || TargetPlatform.macOS => icons.chevronLeft,
-            _ => icons.arrowLeft,
-          };
-        } else {
-          icon = icons.xmark;
-        }
+        // Regular pushed pages get the platform-aware back affordance.
+        // Anything else that implies dismissal (popup routes, dialogs,
+        // fullscreen dialogs, custom modal routes) gets a cross.
+        final useCloseIcon = parentRoute is! PageRoute || parentRoute.fullscreenDialog;
+        icon = useCloseIcon ? icons.xmark : backIcon;
         onPressed = Navigator.of(context).maybePop;
       }
 
@@ -322,14 +327,6 @@ class DefaultStreamSheetHeader extends StatelessWidget {
       );
     }
 
-    // When only one side is present, reserve a 48×48 spacer on the opposite
-    // side so the title stays visually centered.
-    if ((leading == null) != (trailing == null)) {
-      const spacer = SizedBox.square(dimension: kMinInteractiveDimension);
-      leading ??= StreamVisibility.hidden.apply(spacer);
-      trailing ??= StreamVisibility.hidden.apply(spacer);
-    }
-
     Widget? titleWidget;
     if (props.title case final title?) {
       titleWidget = AnimatedDefaultTextStyle(
@@ -350,21 +347,27 @@ class DefaultStreamSheetHeader extends StatelessWidget {
       );
     }
 
-    Widget header = Padding(
-      padding: effectivePadding,
-      child: Row(
+    Widget? middle;
+    if (titleWidget != null || subtitleWidget != null) {
+      middle = Column(
+        mainAxisSize: .min,
+        spacing: spacing.xxs,
+        children: [?titleWidget, ?subtitleWidget],
+      );
+    }
+
+    // The header advertises a fixed height via [PreferredSizeWidget]; the
+    // [SizedBox] enforces it for callers that don't honour the contract
+    // (sheet headers usually live inside a [Column], not a slot that reads
+    // [PreferredSizeWidget.preferredSize]).
+    Widget header = SizedBox(
+      height: kStreamHeaderHeight,
+      child: StreamHeaderToolbar(
+        padding: effectivePadding,
         spacing: effectiveSpacing,
-        children: [
-          ?leading,
-          Expanded(
-            child: Column(
-              mainAxisSize: .min,
-              spacing: spacing.xxs,
-              children: [?titleWidget, ?subtitleWidget],
-            ),
-          ),
-          ?trailing,
-        ],
+        leading: leading,
+        middle: middle,
+        trailing: trailing,
       ),
     );
 
@@ -406,5 +409,5 @@ class _StreamSheetHeaderStyleDefaults extends StreamSheetHeaderStyle {
   TextStyle get titleTextStyle => _textTheme.headingSm.copyWith(color: _colorScheme.textPrimary);
 
   @override
-  TextStyle get subtitleTextStyle => _textTheme.captionDefault.copyWith(color: _colorScheme.textTertiary);
+  TextStyle get subtitleTextStyle => _textTheme.captionDefault.copyWith(color: _colorScheme.textSecondary);
 }
