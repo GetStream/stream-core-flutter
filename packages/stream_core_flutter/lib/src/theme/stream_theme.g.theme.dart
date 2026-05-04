@@ -35,7 +35,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
     StreamMessageItemThemeData? messageItemTheme,
-    StreamMessageThemeData? messageTheme,
     StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
@@ -77,7 +76,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           jumpToUnreadButtonTheme ?? _this.jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
       messageItemTheme: messageItemTheme ?? _this.messageItemTheme,
-      messageTheme: messageTheme ?? _this.messageTheme,
       textInputTheme: textInputTheme ?? _this.textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
       playbackSpeedToggleTheme:
@@ -189,7 +187,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.messageItemTheme,
         t,
       )!,
-      messageTheme: t < 0.5 ? _this.messageTheme : other.messageTheme,
       textInputTheme: StreamTextInputThemeData.lerp(
         _this.textInputTheme,
         other.textInputTheme,
@@ -284,7 +281,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.jumpToUnreadButtonTheme == _this.jumpToUnreadButtonTheme &&
         _other.listTileTheme == _this.listTileTheme &&
         _other.messageItemTheme == _this.messageItemTheme &&
-        _other.messageTheme == _this.messageTheme &&
         _other.textInputTheme == _this.textInputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.playbackSpeedToggleTheme == _this.playbackSpeedToggleTheme &&
@@ -327,7 +323,6 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.jumpToUnreadButtonTheme,
       _this.listTileTheme,
       _this.messageItemTheme,
-      _this.messageTheme,
       _this.textInputTheme,
       _this.onlineIndicatorTheme,
       _this.playbackSpeedToggleTheme,

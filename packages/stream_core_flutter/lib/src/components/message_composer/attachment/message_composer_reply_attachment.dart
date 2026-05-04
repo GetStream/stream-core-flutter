@@ -3,6 +3,16 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../stream_core_flutter.dart';
 
+const _kDefaultConstraints = BoxConstraints(minWidth: 272, minHeight: 56);
+
+const _kIndicatorWidth = 2.0;
+const _kIndicatorHeight = 36.0;
+
+enum ReplyStyle {
+  incoming,
+  outgoing,
+}
+
 class MessageComposerReplyAttachment extends StatelessWidget {
   const MessageComposerReplyAttachment({
     super.key,
@@ -10,7 +20,7 @@ class MessageComposerReplyAttachment extends StatelessWidget {
     required this.subtitle,
     this.trailing,
     this.onRemovePressed,
-    this.style = ReplyStyle.incoming,
+    this.style = .incoming,
   });
 
   final Widget title;
@@ -21,58 +31,80 @@ class MessageComposerReplyAttachment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final messageTheme = context.streamMessageTheme.mergeWithDefaults(context);
-    final messageStyle = switch (style) {
-      ReplyStyle.incoming => messageTheme.incoming,
-      ReplyStyle.outgoing => messageTheme.outgoing,
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    final textTheme = context.streamTextTheme;
+    final colorScheme = context.streamColorScheme;
+
+    final backgroundColor = switch (style) {
+      ReplyStyle.incoming => colorScheme.backgroundSurface,
+      ReplyStyle.outgoing => colorScheme.brand.shade100,
     };
 
-    final indicatorColor = messageStyle?.replyIndicatorColor;
-    final backgroundColor = messageStyle?.backgroundColor;
-    final textColor = messageStyle?.textColor;
+    final indicatorColor = switch (style) {
+      ReplyStyle.incoming => colorScheme.chrome.shade400,
+      ReplyStyle.outgoing => colorScheme.brand.shade400,
+    };
 
-    final spacing = context.streamSpacing;
+    final textColor = switch (style) {
+      ReplyStyle.incoming => colorScheme.textPrimary,
+      ReplyStyle.outgoing => colorScheme.brand.shade900,
+    };
+
     return StreamMessageComposerAttachmentContainer(
       onRemovePressed: onRemovePressed,
       backgroundColor: backgroundColor,
       borderColor: StreamColors.transparent,
-      child: Padding(
-        padding: .all(spacing.xs),
-        child: Row(
-          spacing: spacing.xs,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 2, bottom: 2),
-              color: indicatorColor,
-              child: const SizedBox(width: 2, height: 36),
-            ),
-            Expanded(
-              child: Column(
-                spacing: spacing.xxxs,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  DefaultTextStyle.merge(
-                    style: context.streamTextTheme.metadataEmphasis.copyWith(color: textColor),
-                    child: title,
-                  ),
-                  DefaultTextStyle.merge(
-                    style: context.streamTextTheme.metadataDefault.copyWith(color: textColor),
-                    child: subtitle,
-                  ),
-                ],
+      child: ConstrainedBox(
+        constraints: _kDefaultConstraints,
+        child: Padding(
+          padding: .all(spacing.xs),
+          child: Row(
+            spacing: spacing.xs,
+            children: [
+              Expanded(
+                child: Row(
+                  spacing: spacing.xs,
+                  children: [
+                    Container(
+                      width: _kIndicatorWidth,
+                      height: _kIndicatorHeight,
+                      decoration: BoxDecoration(
+                        color: indicatorColor,
+                        borderRadius: .all(radius.max),
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: .min,
+                        spacing: spacing.xxxs,
+                        mainAxisAlignment: .center,
+                        crossAxisAlignment: .start,
+                        children: [
+                          DefaultTextStyle.merge(
+                            maxLines: 1,
+                            style: textTheme.metadataEmphasis.copyWith(color: textColor),
+                            overflow: TextOverflow.ellipsis,
+                            child: title,
+                          ),
+                          DefaultTextStyle.merge(
+                            maxLines: 1,
+                            style: textTheme.metadataDefault.copyWith(color: textColor),
+                            overflow: TextOverflow.ellipsis,
+                            child: subtitle,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            ?trailing,
-          ],
+              ?trailing,
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-enum ReplyStyle {
-  incoming,
-  outgoing,
 }

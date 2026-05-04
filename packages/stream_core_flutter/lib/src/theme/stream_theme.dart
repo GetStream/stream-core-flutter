@@ -19,7 +19,6 @@ import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_message_item_theme.dart';
-import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
@@ -120,7 +119,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
     StreamMessageItemThemeData? messageItemTheme,
-    StreamMessageThemeData? messageTheme,
     StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
@@ -163,7 +161,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     jumpToUnreadButtonTheme ??= const StreamJumpToUnreadButtonThemeData();
     listTileTheme ??= const StreamListTileThemeData();
     messageItemTheme ??= const StreamMessageItemThemeData();
-    messageTheme ??= const StreamMessageThemeData();
     textInputTheme ??= const StreamTextInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     playbackSpeedToggleTheme ??= const StreamPlaybackSpeedToggleThemeData();
@@ -200,7 +197,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
       messageItemTheme: messageItemTheme,
-      messageTheme: messageTheme,
       textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
@@ -251,7 +247,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.jumpToUnreadButtonTheme,
     required this.listTileTheme,
     required this.messageItemTheme,
-    required this.messageTheme,
     required this.textInputTheme,
     required this.onlineIndicatorTheme,
     required this.playbackSpeedToggleTheme,
@@ -370,9 +365,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// Provides resolver-based styling for message sub-components.
   final StreamMessageItemThemeData messageItemTheme;
 
-  /// The message theme for this theme.
-  final StreamMessageThemeData messageTheme;
-
   /// The text input theme for this theme.
   final StreamTextInputThemeData textInputTheme;
 
@@ -449,7 +441,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
       messageItemTheme: messageItemTheme,
-      messageTheme: messageTheme,
       textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
