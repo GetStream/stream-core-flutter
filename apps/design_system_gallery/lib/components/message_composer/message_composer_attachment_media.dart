@@ -9,10 +9,18 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: MessageComposerMediaFileAttachment,
+  type: StreamMessageComposerMediaAttachment,
   path: '[Components]/Message Composer',
 )
-Widget buildMessageComposerAttachmentMediaFilePlayground(BuildContext context) {
+Widget buildMessageComposerAttachmentMediaPlayground(BuildContext context) {
+  final size = context.knobs.double.slider(
+    label: 'Thumbnail Size',
+    initialValue: 72,
+    min: 48,
+    max: 160,
+    description: 'The square thumbnail edge length, in logical pixels.',
+  );
+
   final showBadge = context.knobs.boolean(
     label: 'Show Media Badge',
     description: 'Toggle a source badge overlay (e.g. Giphy).',
@@ -34,12 +42,13 @@ Widget buildMessageComposerAttachmentMediaFilePlayground(BuildContext context) {
   );
 
   return Center(
-    child: MessageComposerMediaFileAttachment.image(
-      image: const AssetImage('assets/attachment_image.png'),
+    child: StreamMessageComposerMediaAttachment(
       onRemovePressed: showRemoveButton ? () {} : null,
       mediaBadge: badgeType != null
           ? StreamMediaBadge(type: badgeType, duration: const Duration(minutes: 2, seconds: 34))
           : null,
+      style: StreamMessageComposerMediaAttachmentThemeData(size: Size.square(size)),
+      child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
     ),
   );
 }
@@ -50,10 +59,10 @@ Widget buildMessageComposerAttachmentMediaFilePlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: MessageComposerMediaFileAttachment,
+  type: StreamMessageComposerMediaAttachment,
   path: '[Components]/Message Composer',
 )
-Widget buildMessageComposerAttachmentMediaFileShowcase(BuildContext context) {
+Widget buildMessageComposerAttachmentMediaShowcase(BuildContext context) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(24),
     child: Column(
@@ -61,6 +70,7 @@ Widget buildMessageComposerAttachmentMediaFileShowcase(BuildContext context) {
       spacing: 32,
       children: [
         _BasicSection(),
+        _SizeSection(),
         _BadgeSection(),
         _CompositionSection(),
       ],
@@ -81,16 +91,58 @@ class _BasicSection extends StatelessWidget {
       children: [
         _ExampleCard(
           label: 'Image attachment',
-          child: MessageComposerMediaFileAttachment.image(
-            image: const AssetImage('assets/attachment_image.png'),
+          child: StreamMessageComposerMediaAttachment(
             onRemovePressed: () {},
+            child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
           ),
         ),
         _ExampleCard(
           label: 'Without remove button',
-          child: MessageComposerMediaFileAttachment.image(
-            image: const AssetImage('assets/attachment_image.png'),
-            onRemovePressed: null,
+          child: StreamMessageComposerMediaAttachment(
+            child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SizeSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return _Section(
+      label: 'SIZE',
+      description: 'Override the thumbnail size via the per-instance style.',
+      children: [
+        _ExampleCard(
+          label: 'Small (56), Default (72), Medium (96), Large (128)',
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.end,
+            spacing: spacing.sm,
+            runSpacing: spacing.sm,
+            children: [
+              StreamMessageComposerMediaAttachment(
+                onRemovePressed: () {},
+                style: const StreamMessageComposerMediaAttachmentThemeData(size: Size.square(56)),
+                child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
+              ),
+              StreamMessageComposerMediaAttachment(
+                onRemovePressed: () {},
+                child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
+              ),
+              StreamMessageComposerMediaAttachment(
+                onRemovePressed: () {},
+                style: const StreamMessageComposerMediaAttachmentThemeData(size: Size.square(96)),
+                child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
+              ),
+              StreamMessageComposerMediaAttachment(
+                onRemovePressed: () {},
+                style: const StreamMessageComposerMediaAttachmentThemeData(size: Size.square(128)),
+                child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
+              ),
+            ],
           ),
         ),
       ],
@@ -107,24 +159,24 @@ class _BadgeSection extends StatelessWidget {
       children: [
         _ExampleCard(
           label: 'Video badge',
-          child: MessageComposerMediaFileAttachment.image(
-            image: const AssetImage('assets/attachment_image.png'),
+          child: StreamMessageComposerMediaAttachment(
             onRemovePressed: () {},
             mediaBadge: const StreamMediaBadge(
               type: MediaBadgeType.video,
               duration: Duration(minutes: 1, seconds: 42),
             ),
+            child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
           ),
         ),
         _ExampleCard(
           label: 'Audio badge',
-          child: MessageComposerMediaFileAttachment.image(
-            image: const AssetImage('assets/attachment_image.png'),
+          child: StreamMessageComposerMediaAttachment(
             onRemovePressed: () {},
             mediaBadge: const StreamMediaBadge(
               type: MediaBadgeType.audio,
               duration: Duration(seconds: 30),
             ),
+            child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
           ),
         ),
       ],
@@ -148,23 +200,23 @@ class _CompositionSection extends StatelessWidget {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                MessageComposerMediaFileAttachment.image(
-                  image: const AssetImage('assets/attachment_image.png'),
+                StreamMessageComposerMediaAttachment(
                   onRemovePressed: () {},
+                  child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
                 ),
                 SizedBox(width: spacing.xxs),
-                MessageComposerMediaFileAttachment.image(
-                  image: const AssetImage('assets/attachment_image.png'),
+                StreamMessageComposerMediaAttachment(
                   onRemovePressed: () {},
                   mediaBadge: const StreamMediaBadge(
                     type: MediaBadgeType.video,
                     duration: Duration(minutes: 3, seconds: 15),
                   ),
+                  child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
                 ),
                 SizedBox(width: spacing.xxs),
-                MessageComposerMediaFileAttachment.image(
-                  image: const AssetImage('assets/attachment_image.png'),
+                StreamMessageComposerMediaAttachment(
                   onRemovePressed: () {},
+                  child: const Image(image: AssetImage('assets/attachment_image.png'), fit: BoxFit.cover),
                 ),
               ],
             ),

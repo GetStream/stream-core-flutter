@@ -1,8 +1,17 @@
-export 'message_composer/attachment/message_composer_attachment_container.dart';
-export 'message_composer/attachment/message_composer_file_attachment.dart';
-export 'message_composer/attachment/message_composer_link_preview_attachment.dart';
-export 'message_composer/attachment/message_composer_media_file_attachment.dart';
-export 'message_composer/attachment/message_composer_reply_attachment.dart';
+export 'message_composer/attachment/stream_message_composer_attachment.dart'
+    hide DefaultStreamMessageComposerAttachment;
+export 'message_composer/attachment/stream_message_composer_edit_message_attachment.dart'
+    hide DefaultStreamMessageComposerEditMessageAttachment;
+export 'message_composer/attachment/stream_message_composer_file_attachment.dart'
+    hide DefaultStreamMessageComposerFileAttachment;
+export 'message_composer/attachment/stream_message_composer_link_preview_attachment.dart'
+    hide DefaultStreamMessageComposerLinkPreviewAttachment;
+export 'message_composer/attachment/stream_message_composer_media_attachment.dart'
+    hide DefaultStreamMessageComposerMediaAttachment;
+export 'message_composer/attachment/stream_message_composer_reply_attachment.dart'
+    hide DefaultStreamMessageComposerReplyAttachment;
+export 'message_composer/attachment/stream_message_composer_unsupported_attachment.dart'
+    hide DefaultStreamMessageComposerUnsupportedAttachment;
 export 'message_composer/message_composer.dart';
 export 'message_composer/message_composer_input.dart';
 export 'message_composer/message_composer_input_trailing.dart';

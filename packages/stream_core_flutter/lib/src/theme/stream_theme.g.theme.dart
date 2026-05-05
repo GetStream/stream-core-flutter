@@ -34,6 +34,19 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageComposerAttachmentThemeData? messageComposerAttachmentTheme,
+    StreamMessageComposerEditMessageAttachmentThemeData?
+    messageComposerEditMessageAttachmentTheme,
+    StreamMessageComposerFileAttachmentThemeData?
+    messageComposerFileAttachmentTheme,
+    StreamMessageComposerLinkPreviewAttachmentThemeData?
+    messageComposerLinkPreviewAttachmentTheme,
+    StreamMessageComposerMediaAttachmentThemeData?
+    messageComposerMediaAttachmentTheme,
+    StreamMessageComposerReplyAttachmentThemeData?
+    messageComposerReplyAttachmentTheme,
+    StreamMessageComposerUnsupportedAttachmentThemeData?
+    messageComposerUnsupportedAttachmentTheme,
     StreamMessageItemThemeData? messageItemTheme,
     StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
@@ -75,6 +88,27 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       jumpToUnreadButtonTheme:
           jumpToUnreadButtonTheme ?? _this.jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
+      messageComposerAttachmentTheme:
+          messageComposerAttachmentTheme ??
+          _this.messageComposerAttachmentTheme,
+      messageComposerEditMessageAttachmentTheme:
+          messageComposerEditMessageAttachmentTheme ??
+          _this.messageComposerEditMessageAttachmentTheme,
+      messageComposerFileAttachmentTheme:
+          messageComposerFileAttachmentTheme ??
+          _this.messageComposerFileAttachmentTheme,
+      messageComposerLinkPreviewAttachmentTheme:
+          messageComposerLinkPreviewAttachmentTheme ??
+          _this.messageComposerLinkPreviewAttachmentTheme,
+      messageComposerMediaAttachmentTheme:
+          messageComposerMediaAttachmentTheme ??
+          _this.messageComposerMediaAttachmentTheme,
+      messageComposerReplyAttachmentTheme:
+          messageComposerReplyAttachmentTheme ??
+          _this.messageComposerReplyAttachmentTheme,
+      messageComposerUnsupportedAttachmentTheme:
+          messageComposerUnsupportedAttachmentTheme ??
+          _this.messageComposerUnsupportedAttachmentTheme,
       messageItemTheme: messageItemTheme ?? _this.messageItemTheme,
       textInputTheme: textInputTheme ?? _this.textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
@@ -182,6 +216,48 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.listTileTheme,
         t,
       )!,
+      messageComposerAttachmentTheme:
+          StreamMessageComposerAttachmentThemeData.lerp(
+            _this.messageComposerAttachmentTheme,
+            other.messageComposerAttachmentTheme,
+            t,
+          )!,
+      messageComposerEditMessageAttachmentTheme:
+          StreamMessageComposerEditMessageAttachmentThemeData.lerp(
+            _this.messageComposerEditMessageAttachmentTheme,
+            other.messageComposerEditMessageAttachmentTheme,
+            t,
+          )!,
+      messageComposerFileAttachmentTheme:
+          StreamMessageComposerFileAttachmentThemeData.lerp(
+            _this.messageComposerFileAttachmentTheme,
+            other.messageComposerFileAttachmentTheme,
+            t,
+          )!,
+      messageComposerLinkPreviewAttachmentTheme:
+          StreamMessageComposerLinkPreviewAttachmentThemeData.lerp(
+            _this.messageComposerLinkPreviewAttachmentTheme,
+            other.messageComposerLinkPreviewAttachmentTheme,
+            t,
+          )!,
+      messageComposerMediaAttachmentTheme:
+          StreamMessageComposerMediaAttachmentThemeData.lerp(
+            _this.messageComposerMediaAttachmentTheme,
+            other.messageComposerMediaAttachmentTheme,
+            t,
+          )!,
+      messageComposerReplyAttachmentTheme:
+          StreamMessageComposerReplyAttachmentThemeData.lerp(
+            _this.messageComposerReplyAttachmentTheme,
+            other.messageComposerReplyAttachmentTheme,
+            t,
+          )!,
+      messageComposerUnsupportedAttachmentTheme:
+          StreamMessageComposerUnsupportedAttachmentThemeData.lerp(
+            _this.messageComposerUnsupportedAttachmentTheme,
+            other.messageComposerUnsupportedAttachmentTheme,
+            t,
+          )!,
       messageItemTheme: StreamMessageItemThemeData.lerp(
         _this.messageItemTheme,
         other.messageItemTheme,
@@ -280,6 +356,20 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.jumpToUnreadButtonTheme == _this.jumpToUnreadButtonTheme &&
         _other.listTileTheme == _this.listTileTheme &&
+        _other.messageComposerAttachmentTheme ==
+            _this.messageComposerAttachmentTheme &&
+        _other.messageComposerEditMessageAttachmentTheme ==
+            _this.messageComposerEditMessageAttachmentTheme &&
+        _other.messageComposerFileAttachmentTheme ==
+            _this.messageComposerFileAttachmentTheme &&
+        _other.messageComposerLinkPreviewAttachmentTheme ==
+            _this.messageComposerLinkPreviewAttachmentTheme &&
+        _other.messageComposerMediaAttachmentTheme ==
+            _this.messageComposerMediaAttachmentTheme &&
+        _other.messageComposerReplyAttachmentTheme ==
+            _this.messageComposerReplyAttachmentTheme &&
+        _other.messageComposerUnsupportedAttachmentTheme ==
+            _this.messageComposerUnsupportedAttachmentTheme &&
         _other.messageItemTheme == _this.messageItemTheme &&
         _other.textInputTheme == _this.textInputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
@@ -322,6 +412,13 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.emojiChipTheme,
       _this.jumpToUnreadButtonTheme,
       _this.listTileTheme,
+      _this.messageComposerAttachmentTheme,
+      _this.messageComposerEditMessageAttachmentTheme,
+      _this.messageComposerFileAttachmentTheme,
+      _this.messageComposerLinkPreviewAttachmentTheme,
+      _this.messageComposerMediaAttachmentTheme,
+      _this.messageComposerReplyAttachmentTheme,
+      _this.messageComposerUnsupportedAttachmentTheme,
       _this.messageItemTheme,
       _this.textInputTheme,
       _this.onlineIndicatorTheme,

@@ -14,6 +14,13 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
+import 'components/stream_message_composer_attachment_theme.dart';
+import 'components/stream_message_composer_edit_message_attachment_theme.dart';
+import 'components/stream_message_composer_file_attachment_theme.dart';
+import 'components/stream_message_composer_link_preview_attachment_theme.dart';
+import 'components/stream_message_composer_media_attachment_theme.dart';
+import 'components/stream_message_composer_reply_attachment_theme.dart';
+import 'components/stream_message_composer_unsupported_attachment_theme.dart';
 import 'components/stream_message_item_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
@@ -121,6 +128,34 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamListTileThemeData] from the nearest ancestor.
   StreamListTileThemeData get streamListTileTheme => StreamListTileTheme.of(this);
+
+  /// Returns the [StreamMessageComposerAttachmentThemeData] from the nearest ancestor.
+  StreamMessageComposerAttachmentThemeData get streamMessageComposerAttachmentTheme =>
+      StreamMessageComposerAttachmentTheme.of(this);
+
+  /// Returns the [StreamMessageComposerEditMessageAttachmentThemeData] from the nearest ancestor.
+  StreamMessageComposerEditMessageAttachmentThemeData get streamMessageComposerEditMessageAttachmentTheme =>
+      StreamMessageComposerEditMessageAttachmentTheme.of(this);
+
+  /// Returns the [StreamMessageComposerFileAttachmentThemeData] from the nearest ancestor.
+  StreamMessageComposerFileAttachmentThemeData get streamMessageComposerFileAttachmentTheme =>
+      StreamMessageComposerFileAttachmentTheme.of(this);
+
+  /// Returns the [StreamMessageComposerLinkPreviewAttachmentThemeData] from the nearest ancestor.
+  StreamMessageComposerLinkPreviewAttachmentThemeData get streamMessageComposerLinkPreviewAttachmentTheme =>
+      StreamMessageComposerLinkPreviewAttachmentTheme.of(this);
+
+  /// Returns the [StreamMessageComposerMediaAttachmentThemeData] from the nearest ancestor.
+  StreamMessageComposerMediaAttachmentThemeData get streamMessageComposerMediaAttachmentTheme =>
+      StreamMessageComposerMediaAttachmentTheme.of(this);
+
+  /// Returns the [StreamMessageComposerReplyAttachmentThemeData] from the nearest ancestor.
+  StreamMessageComposerReplyAttachmentThemeData get streamMessageComposerReplyAttachmentTheme =>
+      StreamMessageComposerReplyAttachmentTheme.of(this);
+
+  /// Returns the [StreamMessageComposerUnsupportedAttachmentThemeData] from the nearest ancestor.
+  StreamMessageComposerUnsupportedAttachmentThemeData get streamMessageComposerUnsupportedAttachmentTheme =>
+      StreamMessageComposerUnsupportedAttachmentTheme.of(this);
 
   /// Returns the [StreamMessageItemThemeData] from the nearest ancestor.
   StreamMessageItemThemeData get streamMessageItemTheme => StreamMessageItemTheme.of(this);

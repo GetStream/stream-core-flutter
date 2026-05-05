@@ -9,28 +9,25 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: StreamMessageComposerFileAttachment,
+  type: StreamMessageComposerEditMessageAttachment,
   path: '[Components]/Message Composer',
 )
-Widget buildStreamMessageComposerFileAttachmentPlayground(BuildContext context) {
+Widget buildMessageComposerAttachmentEditMessagePlayground(BuildContext context) {
   final title = context.knobs.string(
     label: 'Title',
-    initialValue: 'quarterly_report.pdf',
-    description: 'The file name displayed in the attachment.',
+    initialValue: 'Edit message',
+    description: 'The title line, typically a localized "Edit message" label.',
   );
 
-  final fileType = context.knobs.object.dropdown<StreamFileType>(
-    label: 'File Type',
-    options: StreamFileType.values,
-    initialOption: StreamFileType.pdf,
-    labelBuilder: (v) => v.name,
-    description: 'Determines which icon is shown.',
+  final subtitle = context.knobs.string(
+    label: 'Subtitle',
+    initialValue: 'See you at 9!',
+    description: 'The subtitle line, typically the body of the message being edited.',
   );
 
-  final showSubtitle = context.knobs.boolean(
-    label: 'Show Subtitle',
-    initialValue: true,
-    description: 'Toggle a subtitle (e.g. file size).',
+  final showThumbnail = context.knobs.boolean(
+    label: 'Show Thumbnail',
+    description: 'Toggle a trailing image thumbnail.',
   );
 
   final showRemoveButton = context.knobs.boolean(
@@ -41,24 +38,19 @@ Widget buildStreamMessageComposerFileAttachmentPlayground(BuildContext context) 
 
   final maxWidth = context.knobs.double.slider(
     label: 'Parent Max Width',
-    initialValue: 320,
-    min: 150,
-    max: 500,
-    description: 'Bounds the parent width. Values below 260 force the row to shrink below its natural maximum.',
+    initialValue: 360,
+    min: 200,
+    max: 600,
+    description: 'Bounds the parent width. The preview fills this width.',
   );
 
   return Center(
     child: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
-      child: StreamMessageComposerFileAttachment(
-        fileTypeIcon: StreamFileTypeIcon(type: fileType),
+      child: StreamMessageComposerEditMessageAttachment(
         title: Text(title),
-        subtitle: showSubtitle
-            ? Text(
-                '2.4 MB',
-                style: context.streamTextTheme.metadataDefault.copyWith(color: context.streamColorScheme.textTertiary),
-              )
-            : null,
+        subtitle: Text(subtitle),
+        thumbnail: showThumbnail ? _Thumbnail() : null,
         onRemovePressed: showRemoveButton ? () {} : null,
       ),
     ),
@@ -71,18 +63,19 @@ Widget buildStreamMessageComposerFileAttachmentPlayground(BuildContext context) 
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: StreamMessageComposerFileAttachment,
+  type: StreamMessageComposerEditMessageAttachment,
   path: '[Components]/Message Composer',
 )
-Widget buildStreamMessageComposerFileAttachmentShowcase(BuildContext context) {
+Widget buildMessageComposerAttachmentEditMessageShowcase(BuildContext context) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(24),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 32,
       children: [
-        _FileTypesSection(),
-        _WithSubtitleSection(),
+        _BasicSection(),
+        _ThumbnailSection(),
+        _FileThumbnailSection(),
         _ConstrainedSection(),
       ],
     ),
@@ -93,42 +86,26 @@ Widget buildStreamMessageComposerFileAttachmentShowcase(BuildContext context) {
 // Showcase Sections
 // =============================================================================
 
-class _FileTypesSection extends StatelessWidget {
+class _BasicSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Section(
-      label: 'FILE TYPES',
-      description: 'Different file type icons based on the attachment type.',
+      label: 'BASIC',
+      description: 'Edit-message preview with brand-tinted background and indicator.',
       children: [
         _ExampleCard(
-          label: 'PDF',
-          child: StreamMessageComposerFileAttachment(
-            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.pdf),
-            title: const Text('annual_report.pdf'),
+          label: 'Short message',
+          child: StreamMessageComposerEditMessageAttachment(
+            title: const Text('Edit message'),
+            subtitle: const Text('See you at 9!'),
             onRemovePressed: () {},
           ),
         ),
         _ExampleCard(
-          label: 'Document',
-          child: StreamMessageComposerFileAttachment(
-            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.text),
-            title: const Text('meeting_notes.docx'),
-            onRemovePressed: () {},
-          ),
-        ),
-        _ExampleCard(
-          label: 'Spreadsheet',
-          child: StreamMessageComposerFileAttachment(
-            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
-            title: const Text('project_budget.xlsx'),
-            onRemovePressed: () {},
-          ),
-        ),
-        _ExampleCard(
-          label: 'Audio',
-          child: StreamMessageComposerFileAttachment(
-            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.audio),
-            title: const Text('podcast_episode.mp3'),
+          label: 'Long message',
+          child: StreamMessageComposerEditMessageAttachment(
+            title: const Text('Edit message'),
+            subtitle: const Text('We had a great time during our holiday and the views were stunning all week.'),
             onRemovePressed: () {},
           ),
         ),
@@ -137,31 +114,50 @@ class _FileTypesSection extends StatelessWidget {
   }
 }
 
-class _WithSubtitleSection extends StatelessWidget {
+class _ThumbnailSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final subtitleStyle = context.streamTextTheme.metadataDefault.copyWith(color: colorScheme.textTertiary);
-
     return _Section(
-      label: 'WITH SUBTITLE',
-      description: 'An optional subtitle for additional info like file size or upload status.',
+      label: 'WITH THUMBNAIL',
+      description: 'A trailing thumbnail for edits to messages with attached media.',
       children: [
         _ExampleCard(
-          label: 'With file size',
-          child: StreamMessageComposerFileAttachment(
-            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.pdf),
-            title: const Text('design_specs.pdf'),
-            subtitle: Text('4.2 MB', style: subtitleStyle),
+          label: 'With image thumbnail',
+          child: StreamMessageComposerEditMessageAttachment(
+            title: const Text('Edit message'),
+            subtitle: const Text('Here is the document you requested.'),
+            thumbnail: _Thumbnail(),
+            onRemovePressed: () {},
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FileThumbnailSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _Section(
+      label: 'WITH FILE ICON',
+      description: 'A file-type icon as the thumbnail for editing non-media attachments.',
+      children: [
+        _ExampleCard(
+          label: 'With PDF',
+          child: StreamMessageComposerEditMessageAttachment(
+            title: const Text('Edit message'),
+            subtitle: const Text('annual_report.pdf'),
+            thumbnail: StreamFileTypeIcon(type: StreamFileType.pdf),
             onRemovePressed: () {},
           ),
         ),
         _ExampleCard(
-          label: 'Without remove button',
-          child: StreamMessageComposerFileAttachment(
-            fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
-            title: const Text('budget_2025.xlsx'),
-            subtitle: Text('1.8 MB', style: subtitleStyle),
+          label: 'With spreadsheet',
+          child: StreamMessageComposerEditMessageAttachment(
+            title: const Text('Edit message'),
+            subtitle: const Text('project_budget.xlsx'),
+            thumbnail: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
+            onRemovePressed: () {},
           ),
         ),
       ],
@@ -172,23 +168,21 @@ class _WithSubtitleSection extends StatelessWidget {
 class _ConstrainedSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final subtitleStyle = context.streamTextTheme.metadataDefault.copyWith(color: colorScheme.textTertiary);
-
     return _Section(
       label: 'CONSTRAINED MAX WIDTH',
       description:
-          'When a parent bounds the width, long file names ellipsize on a single line '
-          'rather than wrap.',
+          'When a parent bounds the width, the message body ellipsizes on a single '
+          'line rather than wrap.',
       children: [
         _ExampleCard(
-          label: 'Bounded to 240',
+          label: 'Bounded to 280',
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 240),
-            child: StreamMessageComposerFileAttachment(
-              fileTypeIcon: StreamFileTypeIcon(type: StreamFileType.pdf),
-              title: const Text('quarterly_financial_results_summary.pdf'),
-              subtitle: Text('12.4 MB', style: subtitleStyle),
+            constraints: const BoxConstraints(maxWidth: 280),
+            child: StreamMessageComposerEditMessageAttachment(
+              title: const Text('Edit message'),
+              subtitle: const Text(
+                'A long message body that exceeds the available width and ellipsizes.',
+              ),
               onRemovePressed: () {},
             ),
           ),
@@ -201,6 +195,23 @@ class _ConstrainedSection extends StatelessWidget {
 // =============================================================================
 // Helper Widgets
 // =============================================================================
+
+class _Thumbnail extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(context.streamRadius.md),
+        image: const DecorationImage(
+          image: AssetImage('assets/attachment_image.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+}
 
 class _Section extends StatelessWidget {
   const _Section({

@@ -18,10 +18,10 @@ void main() {
           GoldenTestScenario(
             name: 'full_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
                 onRemovePressed: null,
               ),
             ),
@@ -29,10 +29,10 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
                 onRemovePressed: () {},
               ),
             ),
@@ -40,11 +40,11 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_no_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
-                image: _placeholderImage,
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
+                thumbnail: Image(image: _placeholderImage, fit: BoxFit.cover),
                 onRemovePressed: null,
               ),
             ),
@@ -52,33 +52,33 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
-                image: _placeholderImage,
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
+                thumbnail: Image(image: _placeholderImage, fit: BoxFit.cover),
                 onRemovePressed: () {},
               ),
             ),
           ),
           GoldenTestScenario(
-            name: 'url_only_no_remove',
+            name: 'caption_only_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerLinkPreviewAttachment(
+              StreamMessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
-                url: 'https://getstream.io/',
+                caption: const _UrlCaption(url: 'https://getstream.io/'),
                 onRemovePressed: null,
               ),
             ),
           ),
           GoldenTestScenario(
-            name: 'url_only_with_remove',
+            name: 'caption_only_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
+              StreamMessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
-                url: 'https://getstream.io/',
+                caption: const _UrlCaption(url: 'https://getstream.io/'),
                 onRemovePressed: () {},
               ),
             ),
@@ -96,10 +96,10 @@ void main() {
           GoldenTestScenario(
             name: 'full_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
                 onRemovePressed: null,
               ),
               brightness: Brightness.dark,
@@ -108,10 +108,10 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
                 onRemovePressed: () {},
               ),
               brightness: Brightness.dark,
@@ -120,11 +120,11 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_no_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
-                image: _placeholderImage,
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
+                thumbnail: Image(image: _placeholderImage, fit: BoxFit.cover),
                 onRemovePressed: null,
               ),
               brightness: Brightness.dark,
@@ -133,35 +133,35 @@ void main() {
           GoldenTestScenario(
             name: 'full_with_image_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
-                title: 'Getting started with Stream',
-                subtitle: 'Build in-app messaging with our flexible SDKs.',
-                url: 'https://getstream.io/chat/docs/',
-                image: _placeholderImage,
+              StreamMessageComposerLinkPreviewAttachment(
+                title: const Text('Getting started with Stream'),
+                subtitle: const Text('Build in-app messaging with our flexible SDKs.'),
+                caption: const _UrlCaption(url: 'https://getstream.io/chat/docs/'),
+                thumbnail: Image(image: _placeholderImage, fit: BoxFit.cover),
                 onRemovePressed: () {},
               ),
               brightness: Brightness.dark,
             ),
           ),
           GoldenTestScenario(
-            name: 'url_only_no_remove',
+            name: 'caption_only_no_remove',
             child: _buildLinkPreviewInTheme(
-              const MessageComposerLinkPreviewAttachment(
+              StreamMessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
-                url: 'https://getstream.io/',
+                caption: const _UrlCaption(url: 'https://getstream.io/'),
                 onRemovePressed: null,
               ),
               brightness: Brightness.dark,
             ),
           ),
           GoldenTestScenario(
-            name: 'url_only_with_remove',
+            name: 'caption_only_with_remove',
             child: _buildLinkPreviewInTheme(
-              MessageComposerLinkPreviewAttachment(
+              StreamMessageComposerLinkPreviewAttachment(
                 title: null,
                 subtitle: null,
-                url: 'https://getstream.io/',
+                caption: const _UrlCaption(url: 'https://getstream.io/'),
                 onRemovePressed: () {},
               ),
               brightness: Brightness.dark,
@@ -187,6 +187,24 @@ const _kTransparentPixelPng = <int>[
   0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, //
   0x42, 0x60, 0x82, //
 ];
+
+class _UrlCaption extends StatelessWidget {
+  const _UrlCaption({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 4,
+      children: [
+        Icon(context.streamIcons.link, size: 12),
+        Flexible(child: Text(url)),
+      ],
+    );
+  }
+}
 
 Widget _buildLinkPreviewInTheme(
   Widget linkPreview, {

@@ -151,6 +151,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner,
     StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation,
     StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble,
+    StreamComponentBuilder<StreamMessageComposerAttachmentProps>? messageComposerAttachment,
+    StreamComponentBuilder<StreamMessageComposerEditMessageAttachmentProps>? messageComposerEditMessageAttachment,
+    StreamComponentBuilder<StreamMessageComposerFileAttachmentProps>? messageComposerFileAttachment,
+    StreamComponentBuilder<StreamMessageComposerLinkPreviewAttachmentProps>? messageComposerLinkPreviewAttachment,
+    StreamComponentBuilder<StreamMessageComposerMediaAttachmentProps>? messageComposerMediaAttachment,
+    StreamComponentBuilder<StreamMessageComposerReplyAttachmentProps>? messageComposerReplyAttachment,
+    StreamComponentBuilder<StreamMessageComposerUnsupportedAttachmentProps>? messageComposerUnsupportedAttachment,
     StreamComponentBuilder<StreamMessageContentProps>? messageContent,
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
@@ -194,6 +201,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       loadingSpinner: loadingSpinner,
       messageAnnotation: messageAnnotation,
       messageBubble: messageBubble,
+      messageComposerAttachment: messageComposerAttachment,
+      messageComposerEditMessageAttachment: messageComposerEditMessageAttachment,
+      messageComposerFileAttachment: messageComposerFileAttachment,
+      messageComposerLinkPreviewAttachment: messageComposerLinkPreviewAttachment,
+      messageComposerMediaAttachment: messageComposerMediaAttachment,
+      messageComposerReplyAttachment: messageComposerReplyAttachment,
+      messageComposerUnsupportedAttachment: messageComposerUnsupportedAttachment,
       messageContent: messageContent,
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
@@ -238,6 +252,13 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.loadingSpinner,
     required this.messageAnnotation,
     required this.messageBubble,
+    required this.messageComposerAttachment,
+    required this.messageComposerEditMessageAttachment,
+    required this.messageComposerFileAttachment,
+    required this.messageComposerLinkPreviewAttachment,
+    required this.messageComposerMediaAttachment,
+    required this.messageComposerReplyAttachment,
+    required this.messageComposerUnsupportedAttachment,
     required this.messageContent,
     required this.messageMetadata,
     required this.messageReplies,
@@ -378,6 +399,48 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamMessageBubble] uses [DefaultStreamMessageBubble].
   final StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble;
+
+  /// Custom builder for composer attachment container widgets.
+  ///
+  /// When null, [StreamMessageComposerAttachment] uses
+  /// [DefaultStreamMessageComposerAttachment].
+  final StreamComponentBuilder<StreamMessageComposerAttachmentProps>? messageComposerAttachment;
+
+  /// Custom builder for composer edit-message preview attachment widgets.
+  ///
+  /// When null, [StreamMessageComposerEditMessageAttachment] uses
+  /// [DefaultStreamMessageComposerEditMessageAttachment].
+  final StreamComponentBuilder<StreamMessageComposerEditMessageAttachmentProps>? messageComposerEditMessageAttachment;
+
+  /// Custom builder for composer file attachment widgets.
+  ///
+  /// When null, [StreamMessageComposerFileAttachment] uses
+  /// [DefaultStreamMessageComposerFileAttachment].
+  final StreamComponentBuilder<StreamMessageComposerFileAttachmentProps>? messageComposerFileAttachment;
+
+  /// Custom builder for composer link preview attachment widgets.
+  ///
+  /// When null, [StreamMessageComposerLinkPreviewAttachment] uses
+  /// [DefaultStreamMessageComposerLinkPreviewAttachment].
+  final StreamComponentBuilder<StreamMessageComposerLinkPreviewAttachmentProps>? messageComposerLinkPreviewAttachment;
+
+  /// Custom builder for composer media (image/video) attachment widgets.
+  ///
+  /// When null, [StreamMessageComposerMediaAttachment] uses
+  /// [DefaultStreamMessageComposerMediaAttachment].
+  final StreamComponentBuilder<StreamMessageComposerMediaAttachmentProps>? messageComposerMediaAttachment;
+
+  /// Custom builder for composer reply preview attachment widgets.
+  ///
+  /// When null, [StreamMessageComposerReplyAttachment] uses
+  /// [DefaultStreamMessageComposerReplyAttachment].
+  final StreamComponentBuilder<StreamMessageComposerReplyAttachmentProps>? messageComposerReplyAttachment;
+
+  /// Custom builder for composer unsupported-attachment placeholder widgets.
+  ///
+  /// When null, [StreamMessageComposerUnsupportedAttachment] uses
+  /// [DefaultStreamMessageComposerUnsupportedAttachment].
+  final StreamComponentBuilder<StreamMessageComposerUnsupportedAttachmentProps>? messageComposerUnsupportedAttachment;
 
   /// Custom builder for message content layout widgets.
   ///

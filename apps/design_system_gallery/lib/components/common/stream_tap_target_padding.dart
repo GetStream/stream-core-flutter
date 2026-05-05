@@ -96,18 +96,21 @@ class _InteractiveDemoState extends State<_InteractiveDemo> {
               style: widget.showHitRegion ? BorderStyle.solid : BorderStyle.none,
             ),
           ),
-          child: StreamTapTargetPadding(
-            minSize: widget.minSize,
-            alignment: widget.alignment,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => setState(() => _taps++),
-              child: Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: colorScheme.accentPrimary,
-                  shape: BoxShape.circle,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: StreamTapTargetPadding(
+              minSize: widget.minSize,
+              alignment: widget.alignment,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => setState(() => _taps++),
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: colorScheme.accentPrimary,
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
             ),

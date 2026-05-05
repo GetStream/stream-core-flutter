@@ -75,22 +75,25 @@ class StreamRemoveControl extends StatelessWidget {
       child: GestureDetector(
         onTap: onPressed,
         behavior: .opaque,
-        child: StreamTapTargetPadding(
-          minSize: minSize,
-          alignment: AlignmentDirectional.topEnd,
-          child: Container(
-            width: _badgeSize.width,
-            height: _badgeSize.height,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: colorScheme.backgroundInverse,
-              border: Border.all(color: colorScheme.borderOnInverse, width: 2),
-            ),
-            child: Icon(
-              size: 16,
-              context.streamIcons.xmarkSmall,
-              color: colorScheme.textOnInverse,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: StreamTapTargetPadding(
+            minSize: minSize,
+            alignment: AlignmentDirectional.topEnd,
+            child: Container(
+              width: _badgeSize.width,
+              height: _badgeSize.height,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: colorScheme.backgroundInverse,
+                border: Border.all(color: colorScheme.borderOnInverse, width: 2),
+              ),
+              child: Icon(
+                size: 16,
+                context.streamIcons.xmarkSmall,
+                color: colorScheme.textOnInverse,
+              ),
             ),
           ),
         ),

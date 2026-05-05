@@ -13,27 +13,27 @@ void main() {
       builder: () => GoldenTestGroup(
         scenarioConstraints: const BoxConstraints(maxWidth: 360),
         children: [
-          for (final style in ReplyStyle.values)
+          for (final style in StreamReplyDirection.values)
             GoldenTestScenario(
               name: '${style.name}_no_remove',
               child: _buildReplyInTheme(
-                MessageComposerReplyAttachment(
+                StreamMessageComposerReplyAttachment(
                   title: const Text('Reply to John Doe'),
                   subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: null,
-                  style: style,
+                  direction: style,
                 ),
               ),
             ),
-          for (final style in ReplyStyle.values)
+          for (final style in StreamReplyDirection.values)
             GoldenTestScenario(
               name: '${style.name}_with_remove',
               child: _buildReplyInTheme(
-                MessageComposerReplyAttachment(
+                StreamMessageComposerReplyAttachment(
                   title: const Text('Reply to John Doe'),
                   subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: () {},
-                  style: style,
+                  direction: style,
                 ),
               ),
             ),
@@ -47,28 +47,28 @@ void main() {
       builder: () => GoldenTestGroup(
         scenarioConstraints: const BoxConstraints(maxWidth: 360),
         children: [
-          for (final style in ReplyStyle.values)
+          for (final style in StreamReplyDirection.values)
             GoldenTestScenario(
               name: '${style.name}_no_remove',
               child: _buildReplyInTheme(
-                MessageComposerReplyAttachment(
+                StreamMessageComposerReplyAttachment(
                   title: const Text('Reply to John Doe'),
                   subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: null,
-                  style: style,
+                  direction: style,
                 ),
                 brightness: Brightness.dark,
               ),
             ),
-          for (final style in ReplyStyle.values)
+          for (final style in StreamReplyDirection.values)
             GoldenTestScenario(
               name: '${style.name}_with_remove',
               child: _buildReplyInTheme(
-                MessageComposerReplyAttachment(
+                StreamMessageComposerReplyAttachment(
                   title: const Text('Reply to John Doe'),
                   subtitle: const Text('We had a great time during our holiday.'),
                   onRemovePressed: () {},
-                  style: style,
+                  direction: style,
                 ),
                 brightness: Brightness.dark,
               ),
