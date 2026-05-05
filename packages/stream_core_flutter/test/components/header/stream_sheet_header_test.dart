@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/stream_core_flutter.dart';
@@ -9,6 +10,21 @@ Widget _withStreamTheme(Widget child) {
     theme: ThemeData(extensions: [StreamTheme()]),
     home: child,
   );
+}
+
+// Wraps [body] in a try/finally that pins the platform for the duration
+// of the test and clears the override before flutter_test's end-of-test
+// `debugAssertAllFoundationVarsUnset` assertion runs.
+Future<void> _onPlatform(
+  TargetPlatform platform,
+  Future<void> Function() body,
+) async {
+  debugDefaultTargetPlatformOverride = platform;
+  try {
+    await body();
+  } finally {
+    debugDefaultTargetPlatformOverride = null;
+  }
 }
 
 void main() {
@@ -24,14 +40,36 @@ void main() {
       expect(find.byType(StreamButton), findsNothing);
     });
 
-    testWidgets('inserts back chevron on a regular pushed route', (tester) async {
-      await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
-      await tester.tap(find.text('Open'));
-      await tester.pumpAndSettle();
+    testWidgets('inserts arrow-left on a regular pushed route on Android', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      try {
+        await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(StreamButton), findsOneWidget);
-      expect(find.byIcon(StreamIconData.chevronLeft), findsOneWidget);
-      expect(find.byIcon(StreamIconData.xmark), findsNothing);
+        expect(find.byType(StreamButton), findsOneWidget);
+        expect(find.byIcon(StreamIconData.arrowLeft), findsOneWidget);
+        expect(find.byIcon(StreamIconData.chevronLeft), findsNothing);
+        expect(find.byIcon(StreamIconData.xmark), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('inserts back chevron on a regular pushed route on iOS', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(StreamButton), findsOneWidget);
+        expect(find.byIcon(StreamIconData.chevronLeft), findsOneWidget);
+        expect(find.byIcon(StreamIconData.arrowLeft), findsNothing);
+        expect(find.byIcon(StreamIconData.xmark), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
     });
 
     testWidgets('inserts cross icon on a fullscreen dialog', (tester) async {
@@ -85,8 +123,8 @@ void main() {
     );
 
     testWidgets(
-      'inserts back chevron when a StreamSheetRoute covers another sheet',
-      (tester) async {
+      'inserts back chevron when a StreamSheetRoute covers another sheet on iOS',
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(_withStreamTheme(const _StreamSheetLauncher()));
         await tester.tap(find.text('Open stream sheet'));
         await tester.pumpAndSettle();
@@ -123,13 +161,13 @@ void main() {
           ),
           findsNothing,
         );
-      },
+      }),
     );
 
     testWidgets(
       'inserts cross at first nested route inside a StreamSheetRoute and '
-      'back chevron at deeper nested routes',
-      (tester) async {
+      'back chevron at deeper nested routes on iOS',
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(
           _withStreamTheme(const _StreamSheetLauncher(useNestedNavigation: true)),
         );
@@ -146,13 +184,13 @@ void main() {
         // Deeper nested route: back chevron.
         expect(find.byIcon(StreamIconData.chevronLeft), findsOneWidget);
         expect(find.byIcon(StreamIconData.xmark), findsNothing);
-      },
+      }),
     );
 
     testWidgets(
       'inserts back chevron on the first nested route of a stacked sheet '
-      '(stacked + nested combo)',
-      (tester) async {
+      '(stacked + nested combo) on iOS',
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(
           _withStreamTheme(const _StreamSheetLauncher()),
         );
@@ -194,7 +232,7 @@ void main() {
           ),
           findsNothing,
         );
-      },
+      }),
     );
   });
 
@@ -218,7 +256,7 @@ void main() {
     testWidgets(
       'tapping the chevron on a stacked StreamSheetRoute pops only itself; '
       'parent sheet stays mounted',
-      (tester) async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(_withStreamTheme(const _StreamSheetLauncher()));
         await tester.tap(find.text('Open stream sheet'));
         await tester.pumpAndSettle();
@@ -252,13 +290,13 @@ void main() {
         // Only the stacked sheet popped — the parent sheet is still mounted.
         expect(find.text('Stacked'), findsNothing);
         expect(find.text('Sheet'), findsOneWidget);
-      },
+      }),
     );
 
     testWidgets(
       'tapping the chevron on a deeper nested route pops only that '
       'nested level; the sheet stays mounted',
-      (tester) async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(
           _withStreamTheme(const _StreamSheetLauncher(useNestedNavigation: true)),
         );
@@ -280,13 +318,13 @@ void main() {
         expect(find.text('Deeper'), findsNothing);
         expect(find.text('Sheet'), findsOneWidget);
         expect(find.byIcon(StreamIconData.xmark), findsOneWidget);
-      },
+      }),
     );
 
     testWidgets(
       'tapping the chevron on the first nested route of a stacked sheet '
       'pops the entire stacked sheet (not just the nested route)',
-      (tester) async {
+      (tester) => _onPlatform(TargetPlatform.iOS, () async {
         await tester.pumpWidget(_withStreamTheme(const _StreamSheetLauncher()));
         await tester.tap(find.text('Open stream sheet'));
         await tester.pumpAndSettle();
@@ -319,7 +357,7 @@ void main() {
         // The whole stacked sheet popped — parent sheet still mounted.
         expect(find.text('Stacked'), findsNothing);
         expect(find.text('Sheet'), findsOneWidget);
-      },
+      }),
     );
   });
 
@@ -328,7 +366,7 @@ void main() {
       'props.style > theme.style > token defaults (three-level merge)',
       (tester) async {
         const propsPadding = EdgeInsets.all(7);
-        const themeTitleStyle = TextStyle(fontSize: 99, color: Color(0xFF112233));
+        const themeTitleStyle = TextStyle(fontSize: 18, color: Color(0xFF112233));
 
         // Theme provides only `titleTextStyle`. Props provide only
         // `padding`. Other fields must fall through to token defaults.
@@ -341,9 +379,6 @@ void main() {
               ),
               child: Scaffold(
                 body: StreamSheetHeader(
-                  // Skip the SafeArea wrap so the inner Padding is the
-                  // first one under the header — makes the assertion
-                  // below straightforward.
                   primary: false,
                   automaticallyImplyLeading: false,
                   title: const Text('Title'),
@@ -355,16 +390,15 @@ void main() {
           ),
         );
 
-        // Props win for padding.
-        final padding = tester.widget<Padding>(
-          find
-              .descendant(
-                of: find.byType(StreamSheetHeader),
-                matching: find.byType(Padding),
-              )
-              .first,
+        // Props win for padding (the header passes its resolved padding
+        // through to the [StreamHeaderToolbar]'s `padding` property).
+        final toolbar = tester.widget<StreamHeaderToolbar>(
+          find.descendant(
+            of: find.byType(StreamSheetHeader),
+            matching: find.byType(StreamHeaderToolbar),
+          ),
         );
-        expect(padding.padding, equals(propsPadding));
+        expect(toolbar.padding, equals(propsPadding));
 
         // Theme wins for titleTextStyle (props didn't set it).
         final titleStyle = tester

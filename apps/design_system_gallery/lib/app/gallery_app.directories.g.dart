@@ -78,6 +78,8 @@ import 'package:design_system_gallery/components/controls/stream_video_play_indi
     as _design_system_gallery_components_controls_stream_video_play_indicator;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
+import 'package:design_system_gallery/components/header/stream_app_bar.dart'
+    as _design_system_gallery_components_header_stream_app_bar;
 import 'package:design_system_gallery/components/header/stream_sheet_header.dart'
     as _design_system_gallery_components_header_stream_sheet_header;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
@@ -832,6 +834,21 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'Header',
         children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamAppBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_header_stream_app_bar
+                    .buildStreamAppBarPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_header_stream_app_bar
+                    .buildStreamAppBarShowcase,
+              ),
+            ],
+          ),
           _widgetbook.WidgetbookComponent(
             name: 'StreamSheetHeader',
             useCases: [

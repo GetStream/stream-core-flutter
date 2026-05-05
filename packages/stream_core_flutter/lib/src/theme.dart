@@ -1,5 +1,6 @@
 export 'factory/stream_component_factory.dart';
 
+export 'theme/components/stream_app_bar_theme.dart';
 export 'theme/components/stream_audio_waveform_theme.dart';
 export 'theme/components/stream_avatar_theme.dart';
 export 'theme/components/stream_badge_count_theme.dart';

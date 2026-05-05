@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import 'components/stream_app_bar_theme.dart';
 import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
@@ -104,6 +105,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
     // Components themes
+    StreamAppBarThemeData? appBarTheme,
     StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
@@ -146,6 +148,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
+    appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
@@ -182,6 +185,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       colorScheme: colorScheme,
       textTheme: textTheme,
       boxShadow: boxShadow,
+      appBarTheme: appBarTheme,
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
@@ -232,6 +236,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.colorScheme,
     required this.textTheme,
     required this.boxShadow,
+    required this.appBarTheme,
     required this.audioWaveformTheme,
     required this.avatarTheme,
     required this.badgeCountTheme,
@@ -317,6 +322,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The box shadow (elevation) values for this theme.
   final StreamBoxShadow boxShadow;
+
+  /// The app bar theme for this theme.
+  final StreamAppBarThemeData appBarTheme;
 
   /// The audio waveform theme for this theme.
   final StreamAudioWaveformThemeData audioWaveformTheme;
@@ -426,6 +434,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       colorScheme: colorScheme,
       textTheme: newTextTheme,
       boxShadow: boxShadow,
+      appBarTheme: appBarTheme,
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
