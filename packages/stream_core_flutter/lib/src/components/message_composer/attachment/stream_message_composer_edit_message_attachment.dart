@@ -176,6 +176,7 @@ class DefaultStreamMessageComposerEditMessageAttachment extends StatelessWidget 
       effectiveThumbnail = SizedBox.fromSize(
         size: effectiveThumbnailSize,
         child: Material(
+          type: MaterialType.transparency,
           clipBehavior: Clip.hardEdge,
           shape: effectiveThumbnailShape,
           child: thumbnail,
