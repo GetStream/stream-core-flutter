@@ -94,13 +94,13 @@ Widget buildStreamIntrinsicFlexPlayground(BuildContext context) {
   );
 
   // null = hidden
-  final childConfigs = <({_ChildKind kind, bool candidate, _ChildAlignment alignment})?>[];
+  final childConfigs = <({_ChildKind kind, bool candidate, bool bounded, _ChildAlignment alignment})?>[];
   const defaults = [
-    (_ChildKind.fixedMedium, true, _ChildAlignment.start),
-    (_ChildKind.expanded, false, _ChildAlignment.start),
-    (_ChildKind.fixedLarge, false, _ChildAlignment.start),
-    (_ChildKind.aligned, false, _ChildAlignment.end),
-    (_ChildKind.fixedSmall, true, _ChildAlignment.start),
+    (_ChildKind.fixedMedium, true, false, _ChildAlignment.start),
+    (_ChildKind.expanded, false, false, _ChildAlignment.start),
+    (_ChildKind.fixedLarge, false, false, _ChildAlignment.start),
+    (_ChildKind.aligned, false, false, _ChildAlignment.end),
+    (_ChildKind.fixedSmall, true, false, _ChildAlignment.start),
   ];
 
   for (var i = 0; i < 5; i++) {
@@ -127,20 +127,27 @@ Widget buildStreamIntrinsicFlexPlayground(BuildContext context) {
       initialValue: defaults[i].$2,
       description: 'Mark child ${i + 1} as a StreamIntrinsicSizeCandidate.',
     );
+    final bounded = context.knobs.boolean(
+      label: 'Child ${i + 1} bounded',
+      initialValue: defaults[i].$3,
+      description:
+          'Wrap child ${i + 1} in StreamIntrinsicBoundedCrossAxis '
+          "so it is measured under the parent's cross-axis ceiling.",
+    );
 
     final isVertical = direction == Axis.vertical;
-    var alignment = defaults[i].$3;
+    var alignment = defaults[i].$4;
     if (kind == _ChildKind.aligned) {
       alignment = context.knobs.object.dropdown(
         label: 'Child ${i + 1} alignment',
         options: _ChildAlignment.values,
         labelBuilder: (value) => value.label(isVertical: isVertical),
-        initialOption: defaults[i].$3,
+        initialOption: defaults[i].$4,
         description: 'Alignment for child ${i + 1}.',
       );
     }
 
-    childConfigs.add((kind: kind, candidate: candidate, alignment: alignment));
+    childConfigs.add((kind: kind, candidate: candidate, bounded: bounded, alignment: alignment));
   }
 
   return _PlaygroundBody(
@@ -168,11 +175,11 @@ class _PlaygroundBody extends StatelessWidget {
   final MainAxisSize mainAxisSize;
   final double spacing;
   final CrossAxisAlignment crossAxisAlignment;
-  final List<({_ChildKind kind, bool candidate, _ChildAlignment alignment})?> childConfigs;
+  final List<({_ChildKind kind, bool candidate, bool bounded, _ChildAlignment alignment})?> childConfigs;
 
   List<Widget> _buildChildren(
     BuildContext context, {
-    bool wrapCandidates = true,
+    bool wrapMarkers = true,
   }) {
     final textTheme = context.streamTextTheme;
     final radius = context.streamRadius;
@@ -235,8 +242,11 @@ class _PlaygroundBody extends StatelessWidget {
               ),
             };
 
-            if (wrapCandidates && config.candidate) {
+            if (wrapMarkers && config.candidate) {
               child = StreamIntrinsicSizeCandidate(child: child);
+            }
+            if (wrapMarkers && config.bounded) {
+              child = StreamIntrinsicBoundedCrossAxis(child: child);
             }
             return child;
           }(),
@@ -301,7 +311,7 @@ class _PlaygroundBody extends StatelessWidget {
                   mainAxisSize: mainAxisSize,
                   crossAxisAlignment: crossAxisAlignment,
                   spacing: spacing,
-                  children: _buildChildren(context, wrapCandidates: false),
+                  children: _buildChildren(context, wrapMarkers: false),
                 ),
               ),
             ),
@@ -379,6 +389,7 @@ Widget buildStreamIntrinsicFlexShowcase(BuildContext context) {
         children: const [
           _ShrinkWrapSection(),
           _SizeCandidatesSection(),
+          _BoundedChildrenSection(),
           _CrossAxisAlignmentSection(),
           _BaselineAlignmentSection(),
           _NegativeSpacingSection(),
@@ -822,6 +833,180 @@ class _SizeCandidatesRowDemoState extends State<_SizeCandidatesRowDemo> {
 Widget _wrapCandidate({required bool isCandidate, required Widget child}) {
   if (isCandidate) return StreamIntrinsicSizeCandidate(child: child);
   return child;
+}
+
+// =============================================================================
+// Bounded Children Section
+// =============================================================================
+
+class _BoundedChildrenSection extends StatelessWidget {
+  const _BoundedChildrenSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: const [
+        _SectionLabel(label: 'BOUNDED CHILDREN'),
+        _ExampleCard(
+          title: 'Marker changes how a child is measured',
+          description:
+              'StreamIntrinsicColumn measures children with an unbounded '
+              'cross-axis by default, so Align shrink-wraps. Wrap a child '
+              "in StreamIntrinsicBoundedCrossAxis to give it the parent's "
+              'cross-axis ceiling — Align then fills, and the column resolves '
+              'to that wider extent.',
+          child: _BoundedAlignDemo(),
+        ),
+        _ExampleCard(
+          title: 'Hosting a ListView(shrinkWrap: true)',
+          description:
+              'A vertical viewport asserts when given an unbounded width. '
+              'Wrapping the child in StreamIntrinsicBoundedCrossAxis hands '
+              'it a bounded width during pass-1, so a shrink-wrapping '
+              'ListView (or Wrap) inside it can lay out without asserting.',
+          child: _BoundedListViewDemo(),
+        ),
+      ],
+    );
+  }
+}
+
+class _BoundedAlignDemo extends StatelessWidget {
+  const _BoundedAlignDemo();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    Widget alignedChild() => Align(
+      alignment: Alignment.centerRight,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: colorScheme.accentPrimary.withValues(alpha: 0.16),
+          borderRadius: BorderRadius.all(radius.sm),
+        ),
+        child: Text(
+          'aligned right',
+          style: textTheme.metadataEmphasis.copyWith(color: colorScheme.accentPrimary),
+        ),
+      ),
+    );
+
+    Widget card({
+      required String label,
+      required Widget alignChild,
+      required bool accent,
+    }) {
+      final accentColor = accent ? colorScheme.accentPrimary : colorScheme.textTertiary;
+      return _VariantDemo(
+        label: label,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 240),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.all(radius.md),
+              border: Border.all(color: accentColor.withValues(alpha: 0.3)),
+            ),
+            child: StreamIntrinsicColumn(
+              spacing: spacing.xs,
+              children: [
+                _ColoredBar(width: 80, label: 'Fixed 80', palette: _childPalette[0]),
+                alignChild,
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.lg,
+      children: [
+        Expanded(
+          child: card(
+            label: 'unmarked',
+            alignChild: alignedChild(),
+            accent: false,
+          ),
+        ),
+        Expanded(
+          child: card(
+            label: 'StreamIntrinsicBoundedCrossAxis',
+            alignChild: StreamIntrinsicBoundedCrossAxis(child: alignedChild()),
+            accent: true,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BoundedListViewDemo extends StatelessWidget {
+  const _BoundedListViewDemo();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    final list = ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 4,
+      separatorBuilder: (_, _) => Divider(height: 1, color: colorScheme.borderSubtle),
+      itemBuilder: (_, i) => Padding(
+        padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xs),
+        child: Text(
+          'Item ${i + 1}',
+          style: textTheme.metadataEmphasis.copyWith(color: colorScheme.textPrimary),
+        ),
+      ),
+    );
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 280),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colorScheme.accentPrimary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.all(radius.md),
+          border: Border.all(color: colorScheme.accentPrimary.withValues(alpha: 0.3)),
+        ),
+        child: StreamIntrinsicColumn(
+          spacing: spacing.xs,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xs),
+              child: Text(
+                'Header',
+                style: textTheme.captionEmphasis.copyWith(color: colorScheme.accentPrimary),
+              ),
+            ),
+            StreamIntrinsicBoundedCrossAxis(child: list),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xs),
+              child: Text(
+                'Footer',
+                style: textTheme.captionEmphasis.copyWith(color: colorScheme.accentPrimary),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // =============================================================================
