@@ -305,6 +305,7 @@ class DefaultStreamFileTypeIcon extends StatelessWidget {
     final colorScheme = context.streamColorScheme;
 
     return Stack(
+      alignment: .center,
       clipBehavior: .none,
       children: [
         SvgPicture.asset(

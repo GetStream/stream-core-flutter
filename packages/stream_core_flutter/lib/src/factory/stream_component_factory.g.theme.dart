@@ -51,6 +51,27 @@ mixin _$StreamComponentBuilders {
       loadingSpinner: t < 0.5 ? a.loadingSpinner : b.loadingSpinner,
       messageAnnotation: t < 0.5 ? a.messageAnnotation : b.messageAnnotation,
       messageBubble: t < 0.5 ? a.messageBubble : b.messageBubble,
+      messageComposerAttachment: t < 0.5
+          ? a.messageComposerAttachment
+          : b.messageComposerAttachment,
+      messageComposerEditMessageAttachment: t < 0.5
+          ? a.messageComposerEditMessageAttachment
+          : b.messageComposerEditMessageAttachment,
+      messageComposerFileAttachment: t < 0.5
+          ? a.messageComposerFileAttachment
+          : b.messageComposerFileAttachment,
+      messageComposerLinkPreviewAttachment: t < 0.5
+          ? a.messageComposerLinkPreviewAttachment
+          : b.messageComposerLinkPreviewAttachment,
+      messageComposerMediaAttachment: t < 0.5
+          ? a.messageComposerMediaAttachment
+          : b.messageComposerMediaAttachment,
+      messageComposerReplyAttachment: t < 0.5
+          ? a.messageComposerReplyAttachment
+          : b.messageComposerReplyAttachment,
+      messageComposerUnsupportedAttachment: t < 0.5
+          ? a.messageComposerUnsupportedAttachment
+          : b.messageComposerUnsupportedAttachment,
       messageContent: t < 0.5 ? a.messageContent : b.messageContent,
       messageMetadata: t < 0.5 ? a.messageMetadata : b.messageMetadata,
       messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
@@ -100,6 +121,29 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamMessageAnnotationProps)?
     messageAnnotation,
     Widget Function(BuildContext, StreamMessageBubbleProps)? messageBubble,
+    Widget Function(BuildContext, StreamMessageComposerAttachmentProps)?
+    messageComposerAttachment,
+    Widget Function(
+      BuildContext,
+      StreamMessageComposerEditMessageAttachmentProps,
+    )?
+    messageComposerEditMessageAttachment,
+    Widget Function(BuildContext, StreamMessageComposerFileAttachmentProps)?
+    messageComposerFileAttachment,
+    Widget Function(
+      BuildContext,
+      StreamMessageComposerLinkPreviewAttachmentProps,
+    )?
+    messageComposerLinkPreviewAttachment,
+    Widget Function(BuildContext, StreamMessageComposerMediaAttachmentProps)?
+    messageComposerMediaAttachment,
+    Widget Function(BuildContext, StreamMessageComposerReplyAttachmentProps)?
+    messageComposerReplyAttachment,
+    Widget Function(
+      BuildContext,
+      StreamMessageComposerUnsupportedAttachmentProps,
+    )?
+    messageComposerUnsupportedAttachment,
     Widget Function(BuildContext, StreamMessageContentProps)? messageContent,
     Widget Function(BuildContext, StreamMessageMetadataProps)? messageMetadata,
     Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
@@ -146,6 +190,25 @@ mixin _$StreamComponentBuilders {
       loadingSpinner: loadingSpinner ?? _this.loadingSpinner,
       messageAnnotation: messageAnnotation ?? _this.messageAnnotation,
       messageBubble: messageBubble ?? _this.messageBubble,
+      messageComposerAttachment:
+          messageComposerAttachment ?? _this.messageComposerAttachment,
+      messageComposerEditMessageAttachment:
+          messageComposerEditMessageAttachment ??
+          _this.messageComposerEditMessageAttachment,
+      messageComposerFileAttachment:
+          messageComposerFileAttachment ?? _this.messageComposerFileAttachment,
+      messageComposerLinkPreviewAttachment:
+          messageComposerLinkPreviewAttachment ??
+          _this.messageComposerLinkPreviewAttachment,
+      messageComposerMediaAttachment:
+          messageComposerMediaAttachment ??
+          _this.messageComposerMediaAttachment,
+      messageComposerReplyAttachment:
+          messageComposerReplyAttachment ??
+          _this.messageComposerReplyAttachment,
+      messageComposerUnsupportedAttachment:
+          messageComposerUnsupportedAttachment ??
+          _this.messageComposerUnsupportedAttachment,
       messageContent: messageContent ?? _this.messageContent,
       messageMetadata: messageMetadata ?? _this.messageMetadata,
       messageReplies: messageReplies ?? _this.messageReplies,
@@ -200,6 +263,16 @@ mixin _$StreamComponentBuilders {
       loadingSpinner: other.loadingSpinner,
       messageAnnotation: other.messageAnnotation,
       messageBubble: other.messageBubble,
+      messageComposerAttachment: other.messageComposerAttachment,
+      messageComposerEditMessageAttachment:
+          other.messageComposerEditMessageAttachment,
+      messageComposerFileAttachment: other.messageComposerFileAttachment,
+      messageComposerLinkPreviewAttachment:
+          other.messageComposerLinkPreviewAttachment,
+      messageComposerMediaAttachment: other.messageComposerMediaAttachment,
+      messageComposerReplyAttachment: other.messageComposerReplyAttachment,
+      messageComposerUnsupportedAttachment:
+          other.messageComposerUnsupportedAttachment,
       messageContent: other.messageContent,
       messageMetadata: other.messageMetadata,
       messageReplies: other.messageReplies,
@@ -255,6 +328,19 @@ mixin _$StreamComponentBuilders {
         _other.loadingSpinner == _this.loadingSpinner &&
         _other.messageAnnotation == _this.messageAnnotation &&
         _other.messageBubble == _this.messageBubble &&
+        _other.messageComposerAttachment == _this.messageComposerAttachment &&
+        _other.messageComposerEditMessageAttachment ==
+            _this.messageComposerEditMessageAttachment &&
+        _other.messageComposerFileAttachment ==
+            _this.messageComposerFileAttachment &&
+        _other.messageComposerLinkPreviewAttachment ==
+            _this.messageComposerLinkPreviewAttachment &&
+        _other.messageComposerMediaAttachment ==
+            _this.messageComposerMediaAttachment &&
+        _other.messageComposerReplyAttachment ==
+            _this.messageComposerReplyAttachment &&
+        _other.messageComposerUnsupportedAttachment ==
+            _this.messageComposerUnsupportedAttachment &&
         _other.messageContent == _this.messageContent &&
         _other.messageMetadata == _this.messageMetadata &&
         _other.messageReplies == _this.messageReplies &&
@@ -302,6 +388,13 @@ mixin _$StreamComponentBuilders {
       _this.loadingSpinner,
       _this.messageAnnotation,
       _this.messageBubble,
+      _this.messageComposerAttachment,
+      _this.messageComposerEditMessageAttachment,
+      _this.messageComposerFileAttachment,
+      _this.messageComposerLinkPreviewAttachment,
+      _this.messageComposerMediaAttachment,
+      _this.messageComposerReplyAttachment,
+      _this.messageComposerUnsupportedAttachment,
       _this.messageContent,
       _this.messageMetadata,
       _this.messageReplies,

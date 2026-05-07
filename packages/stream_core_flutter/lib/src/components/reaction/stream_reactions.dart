@@ -365,6 +365,11 @@ class DefaultStreamReactions extends StatelessWidget {
     // when overlapping (later children have higher z-order). For
     // top-positioned reactions we flip verticalDirection so the column still
     // lays out bottom-to-top while keeping reactions last in the paint order.
+    //
+    // The bubble is wrapped in StreamIntrinsicBoundedCrossAxis so descendants
+    // like ListView(shrinkWrap: true) inside it receive a bounded width.
+    // Resolution still treats it as a regular child — column width remains
+    // max(bubble, strip).
     return StreamIntrinsicColumn(
       spacing: columnSpacing,
       crossAxisAlignment: effectiveCrossAxisAlignment,
@@ -373,7 +378,10 @@ class DefaultStreamReactions extends StatelessWidget {
         .header => VerticalDirection.up,
         .footer => VerticalDirection.down,
       },
-      children: [props.child!, alignedStrip],
+      children: [
+        StreamIntrinsicBoundedCrossAxis(child: props.child!),
+        alignedStrip,
+      ],
     );
   }
 

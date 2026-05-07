@@ -18,8 +18,14 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
+import 'components/stream_message_composer_attachment_theme.dart';
+import 'components/stream_message_composer_edit_message_attachment_theme.dart';
+import 'components/stream_message_composer_file_attachment_theme.dart';
+import 'components/stream_message_composer_link_preview_attachment_theme.dart';
+import 'components/stream_message_composer_media_attachment_theme.dart';
+import 'components/stream_message_composer_reply_attachment_theme.dart';
+import 'components/stream_message_composer_unsupported_attachment_theme.dart';
 import 'components/stream_message_item_theme.dart';
-import 'components/stream_message_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
@@ -119,8 +125,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMessageComposerAttachmentThemeData? messageComposerAttachmentTheme,
+    StreamMessageComposerEditMessageAttachmentThemeData? messageComposerEditMessageAttachmentTheme,
+    StreamMessageComposerFileAttachmentThemeData? messageComposerFileAttachmentTheme,
+    StreamMessageComposerLinkPreviewAttachmentThemeData? messageComposerLinkPreviewAttachmentTheme,
+    StreamMessageComposerMediaAttachmentThemeData? messageComposerMediaAttachmentTheme,
+    StreamMessageComposerReplyAttachmentThemeData? messageComposerReplyAttachmentTheme,
+    StreamMessageComposerUnsupportedAttachmentThemeData? messageComposerUnsupportedAttachmentTheme,
     StreamMessageItemThemeData? messageItemTheme,
-    StreamMessageThemeData? messageTheme,
     StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
@@ -162,8 +174,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     emojiChipTheme ??= const StreamEmojiChipThemeData();
     jumpToUnreadButtonTheme ??= const StreamJumpToUnreadButtonThemeData();
     listTileTheme ??= const StreamListTileThemeData();
+    messageComposerAttachmentTheme ??= const StreamMessageComposerAttachmentThemeData();
+    messageComposerEditMessageAttachmentTheme ??= const StreamMessageComposerEditMessageAttachmentThemeData();
+    messageComposerFileAttachmentTheme ??= const StreamMessageComposerFileAttachmentThemeData();
+    messageComposerLinkPreviewAttachmentTheme ??= const StreamMessageComposerLinkPreviewAttachmentThemeData();
+    messageComposerMediaAttachmentTheme ??= const StreamMessageComposerMediaAttachmentThemeData();
+    messageComposerReplyAttachmentTheme ??= const StreamMessageComposerReplyAttachmentThemeData();
+    messageComposerUnsupportedAttachmentTheme ??= const StreamMessageComposerUnsupportedAttachmentThemeData();
     messageItemTheme ??= const StreamMessageItemThemeData();
-    messageTheme ??= const StreamMessageThemeData();
     textInputTheme ??= const StreamTextInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     playbackSpeedToggleTheme ??= const StreamPlaybackSpeedToggleThemeData();
@@ -199,8 +217,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiChipTheme: emojiChipTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
+      messageComposerAttachmentTheme: messageComposerAttachmentTheme,
+      messageComposerEditMessageAttachmentTheme: messageComposerEditMessageAttachmentTheme,
+      messageComposerFileAttachmentTheme: messageComposerFileAttachmentTheme,
+      messageComposerLinkPreviewAttachmentTheme: messageComposerLinkPreviewAttachmentTheme,
+      messageComposerMediaAttachmentTheme: messageComposerMediaAttachmentTheme,
+      messageComposerReplyAttachmentTheme: messageComposerReplyAttachmentTheme,
+      messageComposerUnsupportedAttachmentTheme: messageComposerUnsupportedAttachmentTheme,
       messageItemTheme: messageItemTheme,
-      messageTheme: messageTheme,
       textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
@@ -250,8 +274,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.emojiChipTheme,
     required this.jumpToUnreadButtonTheme,
     required this.listTileTheme,
+    required this.messageComposerAttachmentTheme,
+    required this.messageComposerEditMessageAttachmentTheme,
+    required this.messageComposerFileAttachmentTheme,
+    required this.messageComposerLinkPreviewAttachmentTheme,
+    required this.messageComposerMediaAttachmentTheme,
+    required this.messageComposerReplyAttachmentTheme,
+    required this.messageComposerUnsupportedAttachmentTheme,
     required this.messageItemTheme,
-    required this.messageTheme,
     required this.textInputTheme,
     required this.onlineIndicatorTheme,
     required this.playbackSpeedToggleTheme,
@@ -365,13 +395,31 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The list tile theme for this theme.
   final StreamListTileThemeData listTileTheme;
 
+  /// The composer attachment container theme for this theme.
+  final StreamMessageComposerAttachmentThemeData messageComposerAttachmentTheme;
+
+  /// The composer edit-message attachment theme for this theme.
+  final StreamMessageComposerEditMessageAttachmentThemeData messageComposerEditMessageAttachmentTheme;
+
+  /// The composer file attachment theme for this theme.
+  final StreamMessageComposerFileAttachmentThemeData messageComposerFileAttachmentTheme;
+
+  /// The composer link preview attachment theme for this theme.
+  final StreamMessageComposerLinkPreviewAttachmentThemeData messageComposerLinkPreviewAttachmentTheme;
+
+  /// The composer media attachment theme for this theme.
+  final StreamMessageComposerMediaAttachmentThemeData messageComposerMediaAttachmentTheme;
+
+  /// The composer reply attachment theme for this theme.
+  final StreamMessageComposerReplyAttachmentThemeData messageComposerReplyAttachmentTheme;
+
+  /// The composer unsupported attachment theme for this theme.
+  final StreamMessageComposerUnsupportedAttachmentThemeData messageComposerUnsupportedAttachmentTheme;
+
   /// The message item theme for this theme.
   ///
   /// Provides resolver-based styling for message sub-components.
   final StreamMessageItemThemeData messageItemTheme;
-
-  /// The message theme for this theme.
-  final StreamMessageThemeData messageTheme;
 
   /// The text input theme for this theme.
   final StreamTextInputThemeData textInputTheme;
@@ -448,8 +496,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiChipTheme: emojiChipTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
+      messageComposerAttachmentTheme: messageComposerAttachmentTheme,
+      messageComposerEditMessageAttachmentTheme: messageComposerEditMessageAttachmentTheme,
+      messageComposerFileAttachmentTheme: messageComposerFileAttachmentTheme,
+      messageComposerLinkPreviewAttachmentTheme: messageComposerLinkPreviewAttachmentTheme,
+      messageComposerMediaAttachmentTheme: messageComposerMediaAttachmentTheme,
+      messageComposerReplyAttachmentTheme: messageComposerReplyAttachmentTheme,
+      messageComposerUnsupportedAttachmentTheme: messageComposerUnsupportedAttachmentTheme,
       messageItemTheme: messageItemTheme,
-      messageTheme: messageTheme,
       textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,

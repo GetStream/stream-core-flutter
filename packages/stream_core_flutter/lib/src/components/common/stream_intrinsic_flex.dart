@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -29,6 +30,19 @@ import 'package:flutter/rendering.dart';
 /// only those children determine the cross-axis extent. All other children
 /// are laid out within that extent. If no candidates exist, every child
 /// participates.
+///
+/// ## Bounded children
+///
+/// By default children are measured with an unbounded cross-axis so they
+/// can report their natural extent. Descendants that require a bounded
+/// cross-axis to lay out (e.g. [ListView] with `shrinkWrap: true`,
+/// [Wrap]) assert under that contract.
+///
+/// If one or more children are wrapped in [StreamIntrinsicBoundedCrossAxis],
+/// those children are measured under the incoming cross-axis ceiling
+/// instead. The marker is independent of [StreamIntrinsicSizeCandidate] —
+/// the marked child still participates in cross-axis resolution like any
+/// other child.
 ///
 /// {@tool snippet}
 ///
@@ -63,12 +77,30 @@ import 'package:flutter/rendering.dart';
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// If a child contains a descendant that requires a bounded cross-axis
+/// (a shrink-wrapping viewport, a [Wrap]), wrap it in
+/// [StreamIntrinsicBoundedCrossAxis]:
+///
+/// ```dart
+/// StreamIntrinsicColumn(
+///   spacing: 8.0,
+///   children: [
+///     StreamIntrinsicBoundedCrossAxis(child: MyContent()), // bounded
+///     MyFooter(),                                          // unbounded (default)
+///   ],
+/// )
+/// ```
+/// {@end-tool}
+///
 /// ## Layout algorithm
 ///
 /// 1. Lay out non-flex children with unbounded cross-axis to measure their
-///    natural sizes.
+///    natural sizes. Children wrapped in [StreamIntrinsicBoundedCrossAxis]
+///    are measured under the parent's cross-axis ceiling instead.
 /// 2. Distribute remaining main-axis space to flexible children and lay
-///    them out with unbounded cross-axis.
+///    them out, with the same cross-axis treatment as step 1.
 /// 3. Resolve the cross-axis extent:
 ///    - With candidates: `min(max(candidate extents), constraint)`.
 ///    - Without candidates: `min(max(all extents), constraint)`.
@@ -89,6 +121,8 @@ import 'package:flutter/rendering.dart';
 ///  * [StreamIntrinsicRow], for a horizontal variant.
 ///  * [StreamIntrinsicSizeCandidate], to mark specific children as
 ///    cross-axis candidates.
+///  * [StreamIntrinsicBoundedCrossAxis], to give specific children
+///    bounded cross-axis measurement.
 class StreamIntrinsicFlex extends MultiChildRenderObjectWidget {
   /// Creates an intrinsic flex layout.
   ///
@@ -261,6 +295,8 @@ class StreamIntrinsicFlex extends MultiChildRenderObjectWidget {
 ///  * [StreamIntrinsicFlex], the direction-agnostic variant.
 ///  * [StreamIntrinsicSizeCandidate], to mark specific children as
 ///    width candidates.
+///  * [StreamIntrinsicBoundedCrossAxis], to give specific children a
+///    bounded width.
 class StreamIntrinsicColumn extends StreamIntrinsicFlex {
   /// Creates a vertical intrinsic flex layout that shrink-wraps its width.
   const StreamIntrinsicColumn({
@@ -306,6 +342,8 @@ class StreamIntrinsicColumn extends StreamIntrinsicFlex {
 ///  * [StreamIntrinsicFlex], the direction-agnostic variant.
 ///  * [StreamIntrinsicSizeCandidate], to mark specific children as
 ///    height candidates.
+///  * [StreamIntrinsicBoundedCrossAxis], to give specific children a
+///    bounded height.
 class StreamIntrinsicRow extends StreamIntrinsicFlex {
   /// Creates a horizontal intrinsic flex layout that shrink-wraps its height.
   const StreamIntrinsicRow({
@@ -380,9 +418,73 @@ class StreamIntrinsicSizeCandidate extends ParentDataWidget<_IntrinsicFlexParent
   Type get debugTypicalAncestorWidgetClass => StreamIntrinsicFlex;
 }
 
+/// Marks a child of [StreamIntrinsicFlex] to be measured under the
+/// parent's cross-axis ceiling instead of unbounded constraints.
+///
+/// By default children are measured unbounded so [Align] and similar
+/// widgets shrink-wrap. Descendants that require a bounded cross-axis
+/// (e.g. [ListView] with `shrinkWrap: true`, [Wrap]) assert under that
+/// contract — wrap them in this widget to opt into the bounded path.
+///
+/// Has no effect when the parent's cross-axis is itself unbounded.
+///
+/// This can be combined with [StreamIntrinsicSizeCandidate] on the same
+/// child:
+///
+/// ```dart
+/// StreamIntrinsicColumn(
+///   children: [
+///     StreamIntrinsicSizeCandidate(
+///       child: StreamIntrinsicBoundedCrossAxis(child: MyContent()),
+///     ),
+///   ],
+/// )
+/// ```
+///
+/// {@tool snippet}
+///
+/// A column whose first child needs a bounded width to host a [ListView]
+/// with `shrinkWrap: true`:
+///
+/// ```dart
+/// StreamIntrinsicColumn(
+///   children: [
+///     StreamIntrinsicBoundedCrossAxis(child: BubbleWithListView()),
+///     ReactionStrip(),
+///   ],
+/// )
+/// ```
+/// {@end-tool}
+class StreamIntrinsicBoundedCrossAxis extends ParentDataWidget<_IntrinsicFlexParentData> {
+  /// Creates a widget that marks its child for bounded cross-axis
+  /// measurement.
+  const StreamIntrinsicBoundedCrossAxis({
+    super.key,
+    required super.child,
+  });
+
+  @override
+  void applyParentData(RenderObject renderObject) {
+    final parentData = renderObject.parentData;
+    if (parentData is _IntrinsicFlexParentData && !parentData.boundedCrossAxis) {
+      parentData.boundedCrossAxis = true;
+      final renderParent = renderObject.parent;
+      if (renderParent is RenderObject) {
+        renderParent.markNeedsLayout();
+      }
+    }
+  }
+
+  @override
+  Type get debugTypicalAncestorWidgetClass => StreamIntrinsicFlex;
+}
+
 class _IntrinsicFlexParentData extends FlexParentData {
   // ignore: type_annotate_public_apis
   var isSizeCandidate = false;
+
+  // ignore: type_annotate_public_apis
+  var boundedCrossAxis = false;
 }
 
 // ─── Render object ───
@@ -668,6 +770,79 @@ class _RenderStreamIntrinsicFlex extends RenderBox
 
   // ── Shared sizing (used by both performLayout and computeDryLayout) ──
 
+  // Lays out [child] with [constraints], augmenting the first
+  // FlutterError raised in the descendant subtree with a
+  // StreamIntrinsicBoundedCrossAxis hint and silencing the cascade.
+  // No-op when [constraints] are bounded on the cross-axis.
+  Size _layoutChildOrAddBoundedHint(
+    RenderBox child,
+    BoxConstraints constraints,
+    ChildLayouter layoutChild,
+  ) {
+    final crossBounded = _isVertical ? constraints.hasBoundedWidth : constraints.hasBoundedHeight;
+    if (crossBounded) return layoutChild(child, constraints);
+
+    final originalOnError = FlutterError.onError;
+    var hintAttached = false;
+    FlutterError.onError = (details) {
+      if (!hintAttached) {
+        hintAttached = true;
+        originalOnError?.call(_appendBoundedHint(details));
+        return;
+      }
+      // Cascade — every ancestor proxy in the failed subtree rethrows
+      // when accessing the missing size. Carries no new information;
+      // dropped entirely so it doesn't reach error reporters or the
+      // debug console.
+    };
+    try {
+      return layoutChild(child, constraints);
+    } catch (_) {
+      // The descendant's failure escaped layoutChild (typically the
+      // AssertionError from accessing the failed child's `size`). The
+      // actionable error is already reported above; swallow this trailing
+      // throw and return a zero-size fallback so pass 2 can re-lay out
+      // every child under the resolved cross extent. Without this, parent
+      // data stays dirty and flushSemantics asserts later in the frame.
+      return Size.zero;
+    } finally {
+      FlutterError.onError = originalOnError;
+    }
+  }
+
+  // Returns [details] with a StreamIntrinsicBoundedCrossAxis hint
+  // appended via FlutterErrorDetails.informationCollector. The hint is
+  // conditional — the unbounded constraint may originate here or from
+  // an intermediate widget below.
+  FlutterErrorDetails _appendBoundedHint(FlutterErrorDetails details) {
+    return FlutterErrorDetails(
+      exception: details.exception,
+      stack: details.stack,
+      library: details.library,
+      context: details.context,
+      silent: details.silent,
+      informationCollector: () => [
+        ErrorHint(
+          'A StreamIntrinsicFlex ancestor is measuring its children with '
+          'an unbounded cross-axis. Wrap the affected child of the '
+          'StreamIntrinsicFlex in StreamIntrinsicBoundedCrossAxis.',
+        ),
+        ErrorSpacer(),
+        describeForError('The StreamIntrinsicFlex'),
+        ErrorSpacer(),
+        ErrorDescription(
+          'If wrapping does not resolve the error, an UnconstrainedBox '
+          'or OverflowBox below is forcing unbounded constraints; remove '
+          'or replace it instead.',
+        ),
+        ErrorSpacer(),
+        ErrorHint('See also: https://flutter.dev/unbounded-constraints'),
+        ErrorSpacer(),
+        if (details.informationCollector != null) ...details.informationCollector!(),
+      ],
+    );
+  }
+
   _LayoutSizes _computeSizes({
     required BoxConstraints constraints,
     required ChildLayouter layoutChild,
@@ -687,7 +862,8 @@ class _RenderStreamIntrinsicFlex extends RenderBox
               )))
         : null;
 
-    // Pass 1a: lay out non-flex children with unbounded cross-axis.
+    // Pass 1a: lay out non-flex children with unbounded cross-axis,
+    // overridden per-child by StreamIntrinsicBoundedCrossAxis.
     var totalFlex = 0;
     var candidateExtent = 0.0;
     var allExtent = 0.0;
@@ -706,8 +882,8 @@ class _RenderStreamIntrinsicFlex extends RenderBox
         totalFlex += flex;
         firstFlexChild ??= child;
       } else {
-        const childConstraints = BoxConstraints();
-        final s = layoutChild(child, childConstraints);
+        final childConstraints = data.boundedCrossAxis ? _withCross(maxCross) : const BoxConstraints();
+        final s = _layoutChildOrAddBoundedHint(child, childConstraints, layoutChild);
         final cross = _crossSize(s);
         inflexibleMainTotal += _mainSize(s);
         allExtent = math.max(allExtent, cross);
@@ -732,7 +908,7 @@ class _RenderStreamIntrinsicFlex extends RenderBox
     final freeSpace = math.max<double>(0, maxMainSize - inflexibleMainTotal - totalSpacing);
     final spacePerFlex = totalFlex > 0 ? freeSpace / totalFlex : 0.0;
 
-    // Pass 1c: lay out flex children with their allocation + unbounded cross.
+    // Pass 1c: lay out flex children with their allocation + cross-axis ceiling matching pass 1a.
     for (var fc = firstFlexChild; fc != null; fc = childAfter(fc)) {
       final data = fc.parentData! as _IntrinsicFlexParentData;
       final flex = _getFlex(fc);
@@ -742,8 +918,9 @@ class _RenderStreamIntrinsicFlex extends RenderBox
         FlexFit.tight => maxChildExtent,
         FlexFit.loose => 0.0,
       };
-      final childConstraints = _flexConstraints(minChildExtent, maxChildExtent, double.infinity);
-      final s = layoutChild(fc, childConstraints);
+      final crossCeiling = data.boundedCrossAxis ? maxCross : double.infinity;
+      final childConstraints = _flexConstraints(minChildExtent, maxChildExtent, crossCeiling);
+      final s = _layoutChildOrAddBoundedHint(fc, childConstraints, layoutChild);
       final cross = _crossSize(s);
       allExtent = math.max(allExtent, cross);
       if (data.isSizeCandidate) {

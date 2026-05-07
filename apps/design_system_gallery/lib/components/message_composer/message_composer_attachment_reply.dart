@@ -9,7 +9,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: MessageComposerReplyAttachment,
+  type: StreamMessageComposerReplyAttachment,
   path: '[Components]/Message Composer',
 )
 Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
@@ -25,10 +25,10 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
     description: 'The subtitle line, typically the message preview.',
   );
 
-  final style = context.knobs.object.dropdown<ReplyStyle>(
+  final style = context.knobs.object.dropdown<StreamReplyDirection>(
     label: 'Style',
-    options: ReplyStyle.values,
-    initialOption: ReplyStyle.incoming,
+    options: StreamReplyDirection.values,
+    initialOption: StreamReplyDirection.incoming,
     labelBuilder: (option) => option.name,
     description: 'Incoming uses left-hand bar and incoming colors; outgoing uses right-hand bar and outgoing colors.',
   );
@@ -44,15 +44,23 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
     description: 'Toggle the remove attachment control.',
   );
 
+  final maxWidth = context.knobs.double.slider(
+    label: 'Parent Max Width',
+    initialValue: 360,
+    min: 200,
+    max: 600,
+    description: 'Bounds the parent width. The preview fills this width.',
+  );
+
   return Center(
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 360),
-      child: MessageComposerReplyAttachment(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: StreamMessageComposerReplyAttachment(
         title: Text(title),
         subtitle: Text(subtitle),
-        trailing: showThumbnail ? _Thumbnail() : null,
+        thumbnail: showThumbnail ? _Thumbnail() : null,
         onRemovePressed: showRemoveButton ? () {} : null,
-        style: style,
+        direction: style,
       ),
     ),
   );
@@ -64,7 +72,7 @@ Widget buildMessageComposerAttachmentReplyPlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: MessageComposerReplyAttachment,
+  type: StreamMessageComposerReplyAttachment,
   path: '[Components]/Message Composer',
 )
 Widget buildMessageComposerAttachmentReplyShowcase(BuildContext context) {
@@ -76,6 +84,8 @@ Widget buildMessageComposerAttachmentReplyShowcase(BuildContext context) {
       children: [
         _ReplyStyleSection(),
         _ThumbnailSection(),
+        _FileThumbnailSection(),
+        _ConstrainedSection(),
       ],
     ),
   );
@@ -94,7 +104,7 @@ class _ReplyStyleSection extends StatelessWidget {
       children: [
         _ExampleCard(
           label: 'Incoming',
-          child: MessageComposerReplyAttachment(
+          child: StreamMessageComposerReplyAttachment(
             title: const Text('Reply to Alice'),
             subtitle: const Text('Did you see the sunset yesterday?'),
             onRemovePressed: () {},
@@ -102,11 +112,11 @@ class _ReplyStyleSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'Outgoing',
-          child: MessageComposerReplyAttachment(
+          child: StreamMessageComposerReplyAttachment(
             title: const Text('Reply to You'),
             subtitle: const Text('Sure, I can help with that!'),
             onRemovePressed: () {},
-            style: ReplyStyle.outgoing,
+            direction: StreamReplyDirection.outgoing,
           ),
         ),
       ],
@@ -123,21 +133,79 @@ class _ThumbnailSection extends StatelessWidget {
       children: [
         _ExampleCard(
           label: 'Incoming with image',
-          child: MessageComposerReplyAttachment(
+          child: StreamMessageComposerReplyAttachment(
             title: const Text('Reply to Bob'),
             subtitle: const Text('Check out this photo from our trip!'),
-            trailing: _Thumbnail(),
+            thumbnail: _Thumbnail(),
             onRemovePressed: () {},
           ),
         ),
         _ExampleCard(
           label: 'Outgoing with image',
-          child: MessageComposerReplyAttachment(
+          child: StreamMessageComposerReplyAttachment(
             title: const Text('Reply to You'),
             subtitle: const Text('Here is the document you requested.'),
-            trailing: _Thumbnail(),
+            thumbnail: _Thumbnail(),
             onRemovePressed: () {},
-            style: ReplyStyle.outgoing,
+            direction: StreamReplyDirection.outgoing,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FileThumbnailSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _Section(
+      label: 'WITH FILE ICON',
+      description: 'A file-type icon as the thumbnail for replies to non-media attachments.',
+      children: [
+        _ExampleCard(
+          label: 'Incoming with PDF',
+          child: StreamMessageComposerReplyAttachment(
+            title: const Text('Reply to Alice'),
+            subtitle: const Text('annual_report.pdf'),
+            thumbnail: StreamFileTypeIcon(type: StreamFileType.pdf),
+            onRemovePressed: () {},
+          ),
+        ),
+        _ExampleCard(
+          label: 'Outgoing with spreadsheet',
+          child: StreamMessageComposerReplyAttachment(
+            title: const Text('Reply to You'),
+            subtitle: const Text('project_budget.xlsx'),
+            thumbnail: StreamFileTypeIcon(type: StreamFileType.spreadsheet),
+            onRemovePressed: () {},
+            direction: StreamReplyDirection.outgoing,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ConstrainedSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _Section(
+      label: 'CONSTRAINED MAX WIDTH',
+      description:
+          'When a parent bounds the width, long titles and subtitles ellipsize on a '
+          'single line rather than wrap.',
+      children: [
+        _ExampleCard(
+          label: 'Bounded to 280',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 280),
+            child: StreamMessageComposerReplyAttachment(
+              title: const Text('Reply to Charlotte Bennett-Williams'),
+              subtitle: const Text(
+                'Here is a very long message that will not fit on a single line at this width.',
+              ),
+              onRemovePressed: () {},
+            ),
           ),
         ),
       ],

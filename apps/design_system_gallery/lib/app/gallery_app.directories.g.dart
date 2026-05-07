@@ -98,12 +98,16 @@ import 'package:design_system_gallery/components/message/stream_message_text.dar
     as _design_system_gallery_components_message_stream_message_text;
 import 'package:design_system_gallery/components/message_composer/message_composer.dart'
     as _design_system_gallery_components_message_composer_message_composer;
+import 'package:design_system_gallery/components/message_composer/message_composer_attachment_edit_message.dart'
+    as _design_system_gallery_components_message_composer_message_composer_attachment_edit_message;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_link_preview;
-import 'package:design_system_gallery/components/message_composer/message_composer_attachment_media_file.dart'
-    as _design_system_gallery_components_message_composer_message_composer_attachment_media_file;
+import 'package:design_system_gallery/components/message_composer/message_composer_attachment_media.dart'
+    as _design_system_gallery_components_message_composer_message_composer_attachment_media;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_reply.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_reply;
+import 'package:design_system_gallery/components/message_composer/message_composer_attachment_unsupported.dart'
+    as _design_system_gallery_components_message_composer_message_composer_attachment_unsupported;
 import 'package:design_system_gallery/components/message_composer/message_composer_file_attachment.dart'
     as _design_system_gallery_components_message_composer_message_composer_file_attachment;
 import 'package:design_system_gallery/components/reaction/stream_reaction_picker.dart'
@@ -996,24 +1000,58 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'Message Composer',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerFileAttachment',
+            name: 'StreamCoreMessageComposer',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer
+                        .buildStreamMessageComposerPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Real-world Example',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer
+                        .buildStreamMessageComposerExample,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamMessageComposerEditMessageAttachment',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_edit_message
+                        .buildMessageComposerAttachmentEditMessagePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_message_composer_message_composer_attachment_edit_message
+                        .buildMessageComposerAttachmentEditMessageShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamMessageComposerFileAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
                     _design_system_gallery_components_message_composer_message_composer_file_attachment
-                        .buildMessageComposerFileAttachmentPlayground,
+                        .buildStreamMessageComposerFileAttachmentPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Showcase',
                 builder:
                     _design_system_gallery_components_message_composer_message_composer_file_attachment
-                        .buildMessageComposerFileAttachmentShowcase,
+                        .buildStreamMessageComposerFileAttachmentShowcase,
               ),
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerLinkPreviewAttachment',
+            name: 'StreamMessageComposerLinkPreviewAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -1030,24 +1068,24 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerMediaFileAttachment',
+            name: 'StreamMessageComposerMediaAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_message_composer_message_composer_attachment_media_file
-                        .buildMessageComposerAttachmentMediaFilePlayground,
+                    _design_system_gallery_components_message_composer_message_composer_attachment_media
+                        .buildMessageComposerAttachmentMediaPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Showcase',
                 builder:
-                    _design_system_gallery_components_message_composer_message_composer_attachment_media_file
-                        .buildMessageComposerAttachmentMediaFileShowcase,
+                    _design_system_gallery_components_message_composer_message_composer_attachment_media
+                        .buildMessageComposerAttachmentMediaShowcase,
               ),
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'MessageComposerReplyAttachment',
+            name: 'StreamMessageComposerReplyAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
@@ -1064,19 +1102,19 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'StreamCoreMessageComposer',
+            name: 'StreamMessageComposerUnsupportedAttachment',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_message_composer_message_composer
-                        .buildStreamMessageComposerPlayground,
+                    _design_system_gallery_components_message_composer_message_composer_attachment_unsupported
+                        .buildMessageComposerAttachmentUnsupportedPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
-                name: 'Real-world Example',
+                name: 'Showcase',
                 builder:
-                    _design_system_gallery_components_message_composer_message_composer
-                        .buildStreamMessageComposerExample,
+                    _design_system_gallery_components_message_composer_message_composer_attachment_unsupported
+                        .buildMessageComposerAttachmentUnsupportedShowcase,
               ),
             ],
           ),
