@@ -9,6 +9,7 @@ import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
+import 'components/stream_bottom_app_bar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
@@ -18,6 +19,7 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
+import 'components/stream_media_viewer_theme.dart';
 import 'components/stream_message_composer_attachment_theme.dart';
 import 'components/stream_message_composer_edit_message_attachment_theme.dart';
 import 'components/stream_message_composer_file_attachment_theme.dart';
@@ -116,6 +118,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
+    StreamBottomAppBarThemeData? bottomAppBarTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamCommandChipThemeData? commandChipTheme,
@@ -125,6 +128,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMediaViewerThemeData? mediaViewerTheme,
     StreamMessageComposerAttachmentThemeData? messageComposerAttachmentTheme,
     StreamMessageComposerEditMessageAttachmentThemeData? messageComposerEditMessageAttachmentTheme,
     StreamMessageComposerFileAttachmentThemeData? messageComposerFileAttachmentTheme,
@@ -165,6 +169,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     badgeNotificationTheme ??= const StreamBadgeNotificationThemeData();
+    bottomAppBarTheme ??= const StreamBottomAppBarThemeData();
     buttonTheme ??= const StreamButtonThemeData();
     checkboxTheme ??= const StreamCheckboxThemeData();
     commandChipTheme ??= const StreamCommandChipThemeData();
@@ -174,6 +179,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     emojiChipTheme ??= const StreamEmojiChipThemeData();
     jumpToUnreadButtonTheme ??= const StreamJumpToUnreadButtonThemeData();
     listTileTheme ??= const StreamListTileThemeData();
+    mediaViewerTheme ??= const StreamMediaViewerThemeData();
     messageComposerAttachmentTheme ??= const StreamMessageComposerAttachmentThemeData();
     messageComposerEditMessageAttachmentTheme ??= const StreamMessageComposerEditMessageAttachmentThemeData();
     messageComposerFileAttachmentTheme ??= const StreamMessageComposerFileAttachmentThemeData();
@@ -208,6 +214,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
+      bottomAppBarTheme: bottomAppBarTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       commandChipTheme: commandChipTheme,
@@ -217,6 +224,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiChipTheme: emojiChipTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
+      mediaViewerTheme: mediaViewerTheme,
       messageComposerAttachmentTheme: messageComposerAttachmentTheme,
       messageComposerEditMessageAttachmentTheme: messageComposerEditMessageAttachmentTheme,
       messageComposerFileAttachmentTheme: messageComposerFileAttachmentTheme,
@@ -265,6 +273,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.avatarTheme,
     required this.badgeCountTheme,
     required this.badgeNotificationTheme,
+    required this.bottomAppBarTheme,
     required this.buttonTheme,
     required this.checkboxTheme,
     required this.commandChipTheme,
@@ -274,6 +283,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.emojiChipTheme,
     required this.jumpToUnreadButtonTheme,
     required this.listTileTheme,
+    required this.mediaViewerTheme,
     required this.messageComposerAttachmentTheme,
     required this.messageComposerEditMessageAttachmentTheme,
     required this.messageComposerFileAttachmentTheme,
@@ -368,6 +378,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The badge notification theme for this theme.
   final StreamBadgeNotificationThemeData badgeNotificationTheme;
 
+  /// The bottom app bar theme for this theme.
+  final StreamBottomAppBarThemeData bottomAppBarTheme;
+
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
 
@@ -394,6 +407,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The list tile theme for this theme.
   final StreamListTileThemeData listTileTheme;
+
+  /// The media viewer theme for this theme.
+  final StreamMediaViewerThemeData mediaViewerTheme;
 
   /// The composer attachment container theme for this theme.
   final StreamMessageComposerAttachmentThemeData messageComposerAttachmentTheme;
@@ -487,6 +503,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
+      bottomAppBarTheme: bottomAppBarTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       commandChipTheme: commandChipTheme,
@@ -496,6 +513,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiChipTheme: emojiChipTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
+      mediaViewerTheme: mediaViewerTheme,
       messageComposerAttachmentTheme: messageComposerAttachmentTheme,
       messageComposerEditMessageAttachmentTheme: messageComposerEditMessageAttachmentTheme,
       messageComposerFileAttachmentTheme: messageComposerFileAttachmentTheme,

@@ -9,10 +9,10 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(
   name: 'Playground',
-  type: StreamAppBar,
-  path: '[Components]/Header',
+  type: StreamSheetHeader,
+  path: '[Components]/Toolbar',
 )
-Widget buildStreamAppBarPlayground(BuildContext context) {
+Widget buildStreamSheetHeaderPlayground(BuildContext context) {
   final title = context.knobs.stringOrNull(
     label: 'Title',
     initialValue: 'Details',
@@ -28,15 +28,15 @@ Widget buildStreamAppBarPlayground(BuildContext context) {
     label: 'Show leading',
     initialValue: true,
     description:
-        'Renders a back-style icon button before the title. '
-        'When off, auto-implied leading only appears if the bar is '
+        'Renders a close-style icon button before the title. '
+        'When off, auto-implied leading only appears if the header is '
         'inside a poppable route (see Showcase).',
   );
 
   final showTrailing = context.knobs.boolean(
     label: 'Show trailing',
     initialValue: true,
-    description: 'Renders a primary-action button after the title.',
+    description: 'Renders a confirm-style icon button after the title.',
   );
 
   final padding = context.knobs.double.slider(
@@ -55,16 +55,16 @@ Widget buildStreamAppBarPlayground(BuildContext context) {
 
   return Align(
     alignment: Alignment.topCenter,
-    child: StreamAppBar(
-      style: StreamAppBarStyle(
+    child: StreamSheetHeader(
+      style: StreamSheetHeaderStyle(
         padding: EdgeInsets.all(padding),
         spacing: spacing,
       ),
       leading: showLeading
           ? StreamButton.icon(
-              icon: Icon(context.streamIcons.chevronLeft),
+              icon: Icon(context.streamIcons.xmark),
               style: StreamButtonStyle.secondary,
-              type: StreamButtonType.ghost,
+              type: StreamButtonType.outline,
               onPressed: () {},
             )
           : null,
@@ -72,7 +72,7 @@ Widget buildStreamAppBarPlayground(BuildContext context) {
       subtitle: (subtitle != null && subtitle.isNotEmpty) ? Text(subtitle) : null,
       trailing: showTrailing
           ? StreamButton.icon(
-              icon: Icon(context.streamIcons.plus),
+              icon: Icon(context.streamIcons.checkmark),
               onPressed: () {},
             )
           : null,
@@ -86,10 +86,10 @@ Widget buildStreamAppBarPlayground(BuildContext context) {
 
 @widgetbook.UseCase(
   name: 'Showcase',
-  type: StreamAppBar,
-  path: '[Components]/Header',
+  type: StreamSheetHeader,
+  path: '[Components]/Toolbar',
 )
-Widget buildStreamAppBarShowcase(BuildContext context) {
+Widget buildStreamSheetHeaderShowcase(BuildContext context) {
   final colorScheme = context.streamColorScheme;
   final textTheme = context.streamTextTheme;
   final spacing = context.streamSpacing;
@@ -101,68 +101,68 @@ Widget buildStreamAppBarShowcase(BuildContext context) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _AppBarExample(
+          _HeaderExample(
             label: 'Title only',
-            bar: StreamAppBar(title: const Text('Details')),
+            header: StreamSheetHeader(title: const Text('Details')),
           ),
           SizedBox(height: spacing.md),
-          _AppBarExample(
+          _HeaderExample(
             label: 'Title and subtitle',
-            bar: StreamAppBar(
+            header: StreamSheetHeader(
               title: const Text('Details'),
               subtitle: const Text('Additional information'),
             ),
           ),
           SizedBox(height: spacing.md),
-          _AppBarExample(
+          _HeaderExample(
             label: 'Leading only — trailing reserves a spacer',
-            bar: StreamAppBar(
+            header: StreamSheetHeader(
               leading: StreamButton.icon(
-                icon: Icon(context.streamIcons.chevronLeft),
+                icon: Icon(context.streamIcons.xmark),
                 style: StreamButtonStyle.secondary,
-                type: StreamButtonType.ghost,
+                type: StreamButtonType.outline,
                 onPressed: () {},
               ),
               title: const Text('Details'),
             ),
           ),
           SizedBox(height: spacing.md),
-          _AppBarExample(
+          _HeaderExample(
             label: 'Trailing only — leading reserves a spacer',
-            bar: StreamAppBar(
+            header: StreamSheetHeader(
               title: const Text('Details'),
               trailing: StreamButton.icon(
-                icon: Icon(context.streamIcons.plus),
+                icon: Icon(context.streamIcons.checkmark),
                 onPressed: () {},
               ),
             ),
           ),
           SizedBox(height: spacing.md),
-          _AppBarExample(
+          _HeaderExample(
             label: 'Full layout with subtitle',
-            bar: StreamAppBar(
+            header: StreamSheetHeader(
               leading: StreamButton.icon(
-                icon: Icon(context.streamIcons.chevronLeft),
+                icon: Icon(context.streamIcons.xmark),
                 style: StreamButtonStyle.secondary,
-                type: StreamButtonType.ghost,
+                type: StreamButtonType.outline,
                 onPressed: () {},
               ),
-              title: const Text('Group chat'),
-              subtitle: const Text('5 members, 3 online'),
+              title: const Text('Edit profile'),
+              subtitle: const Text('Tap save to apply changes'),
               trailing: StreamButton.icon(
-                icon: Icon(context.streamIcons.plus),
+                icon: Icon(context.streamIcons.checkmark),
                 onPressed: () {},
               ),
             ),
           ),
           SizedBox(height: spacing.md),
-          _AppBarExample(
+          _HeaderExample(
             label: 'Long title truncates gracefully',
-            bar: StreamAppBar(
+            header: StreamSheetHeader(
               leading: StreamButton.icon(
-                icon: Icon(context.streamIcons.chevronLeft),
+                icon: Icon(context.streamIcons.xmark),
                 style: StreamButtonStyle.secondary,
-                type: StreamButtonType.ghost,
+                type: StreamButtonType.outline,
                 onPressed: () {},
               ),
               title: const Text(
@@ -171,7 +171,7 @@ Widget buildStreamAppBarShowcase(BuildContext context) {
                 overflow: TextOverflow.ellipsis,
               ),
               trailing: StreamButton.icon(
-                icon: Icon(context.streamIcons.plus),
+                icon: Icon(context.streamIcons.checkmark),
                 onPressed: () {},
               ),
             ),
@@ -179,33 +179,31 @@ Widget buildStreamAppBarShowcase(BuildContext context) {
           SizedBox(height: spacing.md),
           // Demonstrates the layout's centred-title behaviour: a narrow icon
           // leading and a wide text-button trailing have very different
-          // intrinsic widths, but [StreamHeaderToolbar] reserves symmetric
+          // intrinsic widths, but [StreamToolbar] reserves symmetric
           // space around the middle so the title stays geometrically
           // centred in the bar's full width.
-          _AppBarExample(
+          _HeaderExample(
             label: 'Asymmetric leading / trailing — title stays centred',
-            bar: StreamAppBar(
+            header: StreamSheetHeader(
               leading: StreamButton.icon(
-                icon: Icon(context.streamIcons.chevronLeft),
-                style: StreamButtonStyle.secondary,
-                type: StreamButtonType.ghost,
-                onPressed: () {},
-              ),
-              title: const Text('Group Info'),
-              trailing: StreamButton(
+                icon: Icon(context.streamIcons.xmark),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.outline,
+                onPressed: () {},
+              ),
+              title: const Text('Edit profile'),
+              trailing: StreamButton(
                 size: StreamButtonSize.small,
                 onPressed: () {},
-                child: const Text('Edit'),
+                child: const Text('Save'),
               ),
             ),
           ),
           SizedBox(height: spacing.md),
-          _AppBarExample(
+          _HeaderExample(
             label: 'Style leadingStyle/trailingStyle propagates to plain StreamButtons',
-            bar: StreamAppBar(
-              style: StreamAppBarStyle(
+            header: StreamSheetHeader(
+              style: StreamSheetHeaderStyle(
                 leadingStyle: StreamButtonThemeStyle.from(
                   backgroundColor: colorScheme.backgroundSurfaceSubtle,
                   foregroundColor: colorScheme.textPrimary,
@@ -216,7 +214,7 @@ Widget buildStreamAppBarShowcase(BuildContext context) {
                 ),
               ),
               leading: StreamButton.icon(
-                icon: Icon(context.streamIcons.chevronLeft),
+                icon: Icon(context.streamIcons.xmark),
                 onPressed: () {},
               ),
               title: const Text('Discard changes?'),
@@ -228,17 +226,97 @@ Widget buildStreamAppBarShowcase(BuildContext context) {
           ),
           SizedBox(height: spacing.md),
           const _AutoImplyLeadingDemo(),
+          SizedBox(height: spacing.md),
+          const _BottomSheetDemo(),
         ],
       ),
     ),
   );
 }
 
-// Demonstrates the auto-implied leading button. Each launcher pushes a route
-// whose Scaffold uses a StreamAppBar with no explicit `leading`. On a regular
-// pushed page the icon adapts to the host platform — chevron on iOS / macOS,
-// arrow-left on Android / web / desktop. On a fullscreen dialog the icon is
-// always a cross. Pressing the auto-inserted button pops the route.
+// Opens a `showStreamSheet` route that fills the screen by default, with no
+// snap points — matching how the sheet header is presented in Figma. Drag
+// the handle or swipe down to dismiss; there's no intermediate resting
+// height. The sheet owns the drag handle, so the header keeps focus on
+// title and actions.
+class _BottomSheetDemo extends StatelessWidget {
+  const _BottomSheetDemo();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Inside a full-height bottom sheet with a drag handle',
+          style: textTheme.captionEmphasis.copyWith(color: colorScheme.textSecondary),
+        ),
+        SizedBox(height: spacing.xs),
+        Container(
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurface,
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          padding: EdgeInsets.all(spacing.sm),
+          child: StreamButton(
+            onPressed: () => _open(context),
+            child: const Text('Open bottom sheet'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _open(BuildContext context) {
+    showStreamSheet<void>(
+      context: context,
+      builder: (context, _) {
+        final colorScheme = context.streamColorScheme;
+        final textTheme = context.streamTextTheme;
+        final spacing = context.streamSpacing;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            StreamSheetHeader(
+              title: const Text('Edit profile'),
+              subtitle: const Text('Changes are saved automatically'),
+              trailing: StreamButton.icon(
+                icon: Icon(context.streamIcons.checkmark),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(spacing.lg, 0, spacing.lg, spacing.lg),
+                child: Center(
+                  child: Text(
+                    'The sheet opens full height with no snap points. '
+                    'Drag the handle down or swipe to dismiss — there is '
+                    'no intermediate resting height.',
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// Demonstrates the auto-implied leading button. Tapping each launcher pushes
+// a route containing a StreamSheetHeader with no explicit `leading`. On a
+// fullscreen dialog the header shows a cross; on a normal page it shows a
+// back chevron. Pressing either dismisses the route.
 class _AutoImplyLeadingDemo extends StatelessWidget {
   const _AutoImplyLeadingDemo();
 
@@ -253,7 +331,7 @@ class _AutoImplyLeadingDemo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Auto-implied leading — tap to see the pushed app bar',
+          'Auto-implied leading — tap to see the pushed header',
           style: textTheme.captionEmphasis.copyWith(color: colorScheme.textSecondary),
         ),
         SizedBox(height: spacing.xs),
@@ -293,21 +371,27 @@ class _AutoImplyLeadingDemo extends StatelessWidget {
       MaterialPageRoute<void>(
         fullscreenDialog: fullscreenDialog,
         builder: (_) => Scaffold(
-          appBar: StreamAppBar(
-            title: Text(fullscreenDialog ? 'Fullscreen dialog' : 'Pushed page'),
+          body: SafeArea(
+            child: Column(
+              children: [
+                StreamSheetHeader(
+                  title: Text(fullscreenDialog ? 'Fullscreen dialog' : 'Pushed page'),
+                ),
+                const Expanded(child: Center(child: Text('Pop via the auto-implied leading button.'))),
+              ],
+            ),
           ),
-          body: const Center(child: Text('Pop via the auto-implied leading button.')),
         ),
       ),
     );
   }
 }
 
-class _AppBarExample extends StatelessWidget {
-  const _AppBarExample({required this.label, required this.bar});
+class _HeaderExample extends StatelessWidget {
+  const _HeaderExample({required this.label, required this.header});
 
   final String label;
-  final Widget bar;
+  final Widget header;
 
   @override
   Widget build(BuildContext context) {
@@ -333,7 +417,7 @@ class _AppBarExample extends StatelessWidget {
             borderRadius: BorderRadius.all(radius.lg),
             border: Border.all(color: colorScheme.borderSubtle),
           ),
-          child: bar,
+          child: header,
         ),
       ],
     );

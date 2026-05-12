@@ -78,10 +78,8 @@ import 'package:design_system_gallery/components/controls/stream_video_play_indi
     as _design_system_gallery_components_controls_stream_video_play_indicator;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
-import 'package:design_system_gallery/components/header/stream_app_bar.dart'
-    as _design_system_gallery_components_header_stream_app_bar;
-import 'package:design_system_gallery/components/header/stream_sheet_header.dart'
-    as _design_system_gallery_components_header_stream_sheet_header;
+import 'package:design_system_gallery/components/media_viewer/stream_media_viewer.dart'
+    as _design_system_gallery_components_media_viewer_stream_media_viewer;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
     as _design_system_gallery_components_message_stream_message_annotation;
 import 'package:design_system_gallery/components/message/stream_message_attachment.dart'
@@ -118,6 +116,12 @@ import 'package:design_system_gallery/components/sheet/stream_sheet.dart'
     as _design_system_gallery_components_sheet_stream_sheet;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
+import 'package:design_system_gallery/components/toolbar/stream_app_bar.dart'
+    as _design_system_gallery_components_toolbar_stream_app_bar;
+import 'package:design_system_gallery/components/toolbar/stream_bottom_app_bar.dart'
+    as _design_system_gallery_components_toolbar_stream_bottom_app_bar;
+import 'package:design_system_gallery/components/toolbar/stream_sheet_header.dart'
+    as _design_system_gallery_components_toolbar_stream_sheet_header;
 import 'package:design_system_gallery/primitives/colors.dart'
     as _design_system_gallery_primitives_colors;
 import 'package:design_system_gallery/primitives/icons.dart'
@@ -836,37 +840,22 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
-        name: 'Header',
+        name: 'Media Viewer',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'StreamAppBar',
-            useCases: [
-              _widgetbook.WidgetbookUseCase(
-                name: 'Playground',
-                builder: _design_system_gallery_components_header_stream_app_bar
-                    .buildStreamAppBarPlayground,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Showcase',
-                builder: _design_system_gallery_components_header_stream_app_bar
-                    .buildStreamAppBarShowcase,
-              ),
-            ],
-          ),
-          _widgetbook.WidgetbookComponent(
-            name: 'StreamSheetHeader',
+            name: 'StreamMediaViewer',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
-                    _design_system_gallery_components_header_stream_sheet_header
-                        .buildStreamSheetHeaderPlayground,
+                    _design_system_gallery_components_media_viewer_stream_media_viewer
+                        .buildStreamMediaViewerPlayground,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'Showcase',
                 builder:
-                    _design_system_gallery_components_header_stream_sheet_header
-                        .buildStreamSheetHeaderShowcase,
+                    _design_system_gallery_components_media_viewer_stream_media_viewer
+                        .buildStreamMediaViewerShowcase,
               ),
             ],
           ),
@@ -1196,6 +1185,62 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_tiles_stream_list_tile
                         .buildStreamListTileShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Toolbar',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamAppBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_app_bar
+                        .buildStreamAppBarPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_app_bar
+                        .buildStreamAppBarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamBottomAppBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_bottom_app_bar
+                        .buildStreamBottomAppBarPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_bottom_app_bar
+                        .buildStreamBottomAppBarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSheetHeader',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_sheet_header
+                        .buildStreamSheetHeaderPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_sheet_header
+                        .buildStreamSheetHeaderShowcase,
               ),
             ],
           ),

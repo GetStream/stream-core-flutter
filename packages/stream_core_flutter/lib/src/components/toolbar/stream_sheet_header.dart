@@ -9,7 +9,7 @@ import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import '../sheet/stream_sheet.dart';
-import 'stream_header_toolbar.dart';
+import 'stream_toolbar.dart';
 
 /// A header for bottom sheets, modals, and dialogs in the Stream design
 /// system.
@@ -19,9 +19,9 @@ import 'stream_header_toolbar.dart';
 /// typically a close button on the leading side and a confirm action on
 /// the trailing side.
 ///
-/// The heading occupies the flexible center of the row, with a 48×48
-/// spacer reserved opposite a lone [leading] or [trailing] so the title
-/// stays visually balanced.
+/// The heading occupies the flexible center of the row, with the wider of
+/// [leading] / [trailing] mirrored on the opposite side so the title stays
+/// geometrically centred.
 ///
 /// When [leading] is null and [automaticallyImplyLeading] is true (the
 /// default), a dismissal button is inserted if the enclosing route can
@@ -146,8 +146,7 @@ class StreamSheetHeaderProps {
   /// A widget to display before the [title].
   ///
   /// Typically a close button or avatar. The caller is responsible for the
-  /// widget's own hit area; the header only reserves a 48×48 slot for
-  /// symmetry.
+  /// widget's own size and hit area.
   ///
   /// When null and [automaticallyImplyLeading] is true, a default dismissal
   /// button is inserted if the enclosing route can pop — see
@@ -179,8 +178,7 @@ class StreamSheetHeaderProps {
   /// A widget to display after the [title].
   ///
   /// Typically a confirm or overflow action. The caller is responsible for
-  /// the widget's own hit area; the header only reserves a 48×48 slot for
-  /// symmetry.
+  /// the widget's own size and hit area.
   final Widget? trailing;
 
   /// Whether this header is the topmost chrome of its surface.
@@ -208,7 +206,7 @@ class StreamSheetHeaderProps {
 /// implementation in [StreamComponentFactory].
 ///
 /// The title slot is centred in the header's full inner width via
-/// [StreamHeaderToolbar], which reserves symmetric space around the
+/// [StreamToolbar], which reserves symmetric space around the
 /// middle so an asymmetric leading and trailing don't shift the title
 /// off-centre.
 ///
@@ -362,7 +360,7 @@ class DefaultStreamSheetHeader extends StatelessWidget {
     // [PreferredSizeWidget.preferredSize]).
     Widget header = SizedBox(
       height: kStreamHeaderHeight,
-      child: StreamHeaderToolbar(
+      child: StreamToolbar(
         padding: effectivePadding,
         spacing: effectiveSpacing,
         leading: leading,

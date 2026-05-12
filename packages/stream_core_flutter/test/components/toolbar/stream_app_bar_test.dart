@@ -109,11 +109,11 @@ void main() {
         );
 
         // Props win for padding (the bar passes its resolved padding through
-        // to the [StreamHeaderToolbar]'s `padding` property).
-        final toolbar = tester.widget<StreamHeaderToolbar>(
+        // to the [StreamToolbar]'s `padding` property).
+        final toolbar = tester.widget<StreamToolbar>(
           find.descendant(
             of: find.byType(StreamAppBar),
-            matching: find.byType(StreamHeaderToolbar),
+            matching: find.byType(StreamToolbar),
           ),
         );
         expect(toolbar.padding, equals(propsPadding));
