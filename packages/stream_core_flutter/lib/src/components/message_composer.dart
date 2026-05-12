@@ -12,6 +12,3 @@ export 'message_composer/attachment/stream_message_composer_reply_attachment.dar
     hide DefaultStreamMessageComposerReplyAttachment;
 export 'message_composer/attachment/stream_message_composer_unsupported_attachment.dart'
     hide DefaultStreamMessageComposerUnsupportedAttachment;
-export 'message_composer/message_composer.dart';
-export 'message_composer/message_composer_input.dart';
-export 'message_composer/message_composer_input_trailing.dart';

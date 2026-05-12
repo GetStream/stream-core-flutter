@@ -1,5 +1,9 @@
 ## Upcoming
 
+### 🛑 Breaking / Removals
+
+- Removed `StreamCoreMessageComposer`, `StreamMessageComposerInput`, `StreamMessageComposerInputField`, `StreamCoreMessageComposerInputTrailing`, `StreamVoiceRecordingButton`, `VoiceRecordingCallback`, `StreamMessageComposerInputTrailingState`, and `InputThemeDefaults`. These composer-flow widgets now live entirely in `stream_chat_flutter`. The attachment widgets (`StreamMessageComposerAttachment` and variants) remain in this package.
+
 ### ✨ Features
 
 - Added `StreamJumpToUnreadButton` component and `StreamJumpToUnreadButtonTheme`.
@@ -23,6 +27,10 @@
 - Added a themed `thumbnail` slot to `StreamMessageComposerReplyAttachment` and `StreamMessageComposerEditMessageAttachment`, with matching `thumbnailSize`/`thumbnailShape`/`thumbnailSide` theme fields.
 - Added per-widget themes for the message composer attachments: `StreamMessageComposerAttachmentTheme`, `StreamMessageComposerEditMessageAttachmentTheme`, `StreamMessageComposerFileAttachmentTheme`, `StreamMessageComposerLinkPreviewAttachmentTheme`, `StreamMessageComposerMediaAttachmentTheme`, `StreamMessageComposerReplyAttachmentTheme`, and `StreamMessageComposerUnsupportedAttachmentTheme`. All seven are wired into `StreamTheme` with matching `BuildContext` extensions.
 - The composer attachment widgets (`StreamMessageComposerAttachment`, `StreamMessageComposerEditMessageAttachment`, `StreamMessageComposerFileAttachment`, `StreamMessageComposerLinkPreviewAttachment`, `StreamMessageComposerMediaAttachment`, `StreamMessageComposerReplyAttachment`, `StreamMessageComposerUnsupportedAttachment`) can now be customized via `StreamComponentFactory` — each exposes a matching builder slot taking its `*Props` configuration object.
+
+### ⚠️ Breaking Changes
+
+- Renamed `inputBody` to `inputCenter` on `StreamCoreMessageComposer` and `StreamMessageComposerInput`.
 
 ### 🐞 Fixed
 

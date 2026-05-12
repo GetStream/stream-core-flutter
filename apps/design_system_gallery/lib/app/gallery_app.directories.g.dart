@@ -96,8 +96,6 @@ import 'package:design_system_gallery/components/message/stream_message_replies.
     as _design_system_gallery_components_message_stream_message_replies;
 import 'package:design_system_gallery/components/message/stream_message_text.dart'
     as _design_system_gallery_components_message_stream_message_text;
-import 'package:design_system_gallery/components/message_composer/message_composer.dart'
-    as _design_system_gallery_components_message_composer_message_composer;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_edit_message.dart'
     as _design_system_gallery_components_message_composer_message_composer_attachment_edit_message;
 import 'package:design_system_gallery/components/message_composer/message_composer_attachment_link_preview.dart'
@@ -999,23 +997,6 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'Message Composer',
         children: [
-          _widgetbook.WidgetbookComponent(
-            name: 'StreamCoreMessageComposer',
-            useCases: [
-              _widgetbook.WidgetbookUseCase(
-                name: 'Playground',
-                builder:
-                    _design_system_gallery_components_message_composer_message_composer
-                        .buildStreamMessageComposerPlayground,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Real-world Example',
-                builder:
-                    _design_system_gallery_components_message_composer_message_composer
-                        .buildStreamMessageComposerExample,
-              ),
-            ],
-          ),
           _widgetbook.WidgetbookComponent(
             name: 'StreamMessageComposerEditMessageAttachment',
             useCases: [
