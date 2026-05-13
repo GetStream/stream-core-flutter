@@ -55,12 +55,8 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
       StreamMediaViewerTheme(
         data: StreamMediaViewerThemeData(
           chromeAnimationDuration: Duration(milliseconds: animationMs.round()),
-          appBarStyle: tintChrome
-              ? const StreamAppBarStyle(backgroundColor: Color(0x55000000))
-              : null,
-          bottomAppBarStyle: tintChrome
-              ? const StreamBottomAppBarStyle(backgroundColor: Color(0x55000000))
-              : null,
+          appBarStyle: tintChrome ? const StreamAppBarStyle(backgroundColor: Color(0x55000000)) : null,
+          bottomAppBarStyle: tintChrome ? const StreamBottomAppBarStyle(backgroundColor: Color(0x55000000)) : null,
         ),
         child: _PlaygroundMediaViewer(
           showHeader: showHeader,

@@ -112,7 +112,7 @@ class StreamSheetHeader extends StatelessWidget implements PreferredSizeWidget {
   final StreamSheetHeaderProps props;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kStreamHeaderHeight);
+  Size get preferredSize => const Size.fromHeight(kStreamToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -359,7 +359,7 @@ class DefaultStreamSheetHeader extends StatelessWidget {
     // (sheet headers usually live inside a [Column], not a slot that reads
     // [PreferredSizeWidget.preferredSize]).
     Widget header = SizedBox(
-      height: kStreamHeaderHeight,
+      height: kStreamToolbarHeight,
       child: StreamToolbar(
         padding: effectivePadding,
         spacing: effectiveSpacing,

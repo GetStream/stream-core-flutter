@@ -86,7 +86,7 @@ class StreamBottomAppBar extends StatelessWidget implements PreferredSizeWidget 
   final StreamBottomAppBarProps props;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kStreamHeaderHeight);
+  Size get preferredSize => const Size.fromHeight(kStreamToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +251,7 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
     // (e.g. when placed directly inside a [Column] or a [Container]
     // rather than in a [Scaffold.bottomNavigationBar] slot).
     Widget bar = SizedBox(
-      height: kStreamHeaderHeight,
+      height: kStreamToolbarHeight,
       child: StreamToolbar(
         padding: effectivePadding,
         spacing: effectiveSpacing,

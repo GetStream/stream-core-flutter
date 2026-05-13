@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Default height of [StreamAppBar], [StreamBottomAppBar], and
 /// [StreamSheetHeader] per the Figma design system.
-const double kStreamHeaderHeight = 72;
+const double kStreamToolbarHeight = 72;
 
 /// Three-slot horizontal layout shared by [StreamAppBar],
 /// [StreamBottomAppBar], and [StreamSheetHeader].
@@ -18,7 +18,7 @@ const double kStreamHeaderHeight = 72;
 /// Each slot is vertically centred inside the available content height. The
 /// toolbar takes its size from the parent's tight height constraint —
 /// callers are responsible for sitting in a fixed-height slot (e.g. via
-/// [PreferredSize] or a [SizedBox] using [kStreamHeaderHeight]).
+/// [PreferredSize] or a [SizedBox] using [kStreamToolbarHeight]).
 ///
 /// [padding] is the bar-edge padding around all three slots; [spacing] is
 /// the minimum gap reserved between the middle and either side slot.

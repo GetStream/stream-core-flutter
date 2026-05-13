@@ -50,9 +50,9 @@ void main() {
       expect(find.byKey(const ValueKey('trailing')), findsOneWidget);
     });
 
-    testWidgets('preferredSize is kStreamHeaderHeight', (tester) async {
+    testWidgets('preferredSize is kStreamToolbarHeight', (tester) async {
       final bar = StreamBottomAppBar(title: const Text('Title'));
-      expect(bar.preferredSize, equals(const Size.fromHeight(kStreamHeaderHeight)));
+      expect(bar.preferredSize, equals(const Size.fromHeight(kStreamToolbarHeight)));
     });
   });
 

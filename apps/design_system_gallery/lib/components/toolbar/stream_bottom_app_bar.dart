@@ -53,7 +53,8 @@ Widget buildStreamBottomAppBarPlayground(BuildContext context) {
   final primary = context.knobs.boolean(
     label: 'Primary',
     initialValue: true,
-    description: 'When true, wraps in SafeArea(top: false) so the bar clears '
+    description:
+        'When true, wraps in SafeArea(top: false) so the bar clears '
         'the system bottom inset (home indicator).',
   );
 
