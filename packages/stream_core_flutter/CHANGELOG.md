@@ -1,5 +1,9 @@
 ## Upcoming
 
+### 🛑 Breaking / Removals
+
+- Removed `StreamCoreMessageComposer`, `StreamMessageComposerInput`, `StreamMessageComposerInputField`, `StreamCoreMessageComposerInputTrailing`, `StreamVoiceRecordingButton`, `VoiceRecordingCallback`, `StreamMessageComposerInputTrailingState`, and `InputThemeDefaults`. These composer-flow widgets now live entirely in `stream_chat_flutter`. The attachment widgets (`StreamMessageComposerAttachment` and variants) remain in this package.
+
 ### ✨ Features
 
 - Added `StreamJumpToUnreadButton` component and `StreamJumpToUnreadButtonTheme`.

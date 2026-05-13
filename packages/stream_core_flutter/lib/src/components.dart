@@ -48,7 +48,20 @@ export 'components/message/stream_message_content.dart' hide DefaultStreamMessag
 export 'components/message/stream_message_metadata.dart' hide DefaultStreamMessageMetadata;
 export 'components/message/stream_message_replies.dart' hide DefaultStreamMessageReplies;
 export 'components/message/stream_message_text.dart' hide DefaultStreamMessageText;
-export 'components/message_composer.dart';
+export 'components/message_composer/attachment/stream_message_composer_attachment.dart'
+    hide DefaultStreamMessageComposerAttachment;
+export 'components/message_composer/attachment/stream_message_composer_edit_message_attachment.dart'
+    hide DefaultStreamMessageComposerEditMessageAttachment;
+export 'components/message_composer/attachment/stream_message_composer_file_attachment.dart'
+    hide DefaultStreamMessageComposerFileAttachment;
+export 'components/message_composer/attachment/stream_message_composer_link_preview_attachment.dart'
+    hide DefaultStreamMessageComposerLinkPreviewAttachment;
+export 'components/message_composer/attachment/stream_message_composer_media_attachment.dart'
+    hide DefaultStreamMessageComposerMediaAttachment;
+export 'components/message_composer/attachment/stream_message_composer_reply_attachment.dart'
+    hide DefaultStreamMessageComposerReplyAttachment;
+export 'components/message_composer/attachment/stream_message_composer_unsupported_attachment.dart'
+    hide DefaultStreamMessageComposerUnsupportedAttachment;
 export 'components/message_layout/stream_message_alignment.dart';
 export 'components/message_layout/stream_message_channel_kind.dart';
 export 'components/message_layout/stream_message_content_kind.dart';
