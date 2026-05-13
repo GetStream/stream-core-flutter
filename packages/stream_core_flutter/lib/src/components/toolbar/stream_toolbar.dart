@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 /// Default height of [StreamAppBar], [StreamBottomAppBar], and
-/// [StreamSheetHeader] per the Figma design system.
+/// [StreamSheetHeader] per the Stream design system.
 const double kStreamToolbarHeight = 72;
 
 /// Three-slot horizontal layout shared by [StreamAppBar],
