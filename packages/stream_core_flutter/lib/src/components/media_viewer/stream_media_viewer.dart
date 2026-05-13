@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_app_bar_theme.dart';
@@ -80,7 +81,8 @@ class StreamMediaViewerProps {
     this.showChrome = true,
   });
 
-  /// The media content rendered edge-to-edge beneath the chrome.
+  /// The media content. Inset to fit between [header] and [footer] (plus
+  /// the top / bottom safe-area insets) so chrome never overlaps it.
   final Widget child;
 
   /// The top chrome — typically a [StreamAppBar]. Slides off-screen
@@ -144,6 +146,10 @@ class DefaultStreamMediaViewer extends StatelessWidget {
       return scoped;
     }
 
+    final mediaQueryPadding = MediaQuery.paddingOf(context);
+    final headerInset = props.header?.let((it) => it.preferredSize.height + mediaQueryPadding.top) ?? 0.0;
+    final footerInset = props.footer?.let((it) => it.preferredSize.height + mediaQueryPadding.bottom) ?? 0.0;
+
     return AnimatedContainer(
       curve: Curves.easeInOut,
       duration: effectiveDuration,
@@ -152,7 +158,12 @@ class DefaultStreamMediaViewer extends StatelessWidget {
         Stack(
           fit: .expand,
           children: [
-            props.child,
+            AnimatedPadding(
+              duration: effectiveDuration,
+              curve: Curves.easeInOut,
+              padding: .only(top: headerInset, bottom: footerInset),
+              child: props.child,
+            ),
             if (props.header case final header?)
               Positioned(
                 top: 0,
