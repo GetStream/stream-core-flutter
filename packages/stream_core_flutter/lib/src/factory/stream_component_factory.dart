@@ -133,6 +133,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   factory StreamComponentBuilders({
     StreamComponentBuilder<StreamAppBarProps>? appBar,
     StreamComponentBuilder<StreamAvatarProps>? avatar,
+    StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar,
     StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup,
     StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
     StreamComponentBuilder<StreamBadgeCountProps>? badgeCount,
@@ -149,6 +150,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamListTileProps>? listTile,
     StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner,
+    StreamComponentBuilder<StreamMediaViewerProps>? mediaViewer,
     StreamComponentBuilder<StreamMessageAnnotationProps>? messageAnnotation,
     StreamComponentBuilder<StreamMessageBubbleProps>? messageBubble,
     StreamComponentBuilder<StreamMessageComposerAttachmentProps>? messageComposerAttachment,
@@ -183,6 +185,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     return .raw(
       appBar: appBar,
       avatar: avatar,
+      bottomAppBar: bottomAppBar,
       avatarGroup: avatarGroup,
       avatarStack: avatarStack,
       badgeCount: badgeCount,
@@ -199,6 +202,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       fileTypeIcon: fileTypeIcon,
       listTile: listTile,
       loadingSpinner: loadingSpinner,
+      mediaViewer: mediaViewer,
       messageAnnotation: messageAnnotation,
       messageBubble: messageBubble,
       messageComposerAttachment: messageComposerAttachment,
@@ -234,6 +238,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   const StreamComponentBuilders.raw({
     required this.appBar,
     required this.avatar,
+    required this.bottomAppBar,
     required this.avatarGroup,
     required this.avatarStack,
     required this.badgeCount,
@@ -250,6 +255,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.fileTypeIcon,
     required this.listTile,
     required this.loadingSpinner,
+    required this.mediaViewer,
     required this.messageAnnotation,
     required this.messageBubble,
     required this.messageComposerAttachment,
@@ -308,6 +314,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamAvatar] uses [DefaultStreamAvatar].
   final StreamComponentBuilder<StreamAvatarProps>? avatar;
+
+  /// Custom builder for bottom app bar widgets.
+  ///
+  /// When null, [StreamBottomAppBar] uses [DefaultStreamBottomAppBar].
+  final StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar;
 
   /// Custom builder for avatar group widgets.
   ///
@@ -389,6 +400,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamLoadingSpinner] uses [DefaultStreamLoadingSpinner].
   final StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner;
+
+  /// Custom builder for media viewer widgets.
+  ///
+  /// When null, [StreamMediaViewer] uses [DefaultStreamMediaViewer].
+  final StreamComponentBuilder<StreamMediaViewerProps>? mediaViewer;
 
   /// Custom builder for message annotation widgets.
   ///

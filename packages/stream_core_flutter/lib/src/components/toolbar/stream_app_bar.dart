@@ -8,7 +8,7 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
-import 'stream_header_toolbar.dart';
+import 'stream_toolbar.dart';
 
 /// A top-of-screen header for full-page surfaces in the Stream design system.
 ///
@@ -17,9 +17,9 @@ import 'stream_header_toolbar.dart';
 /// typically a back button on the leading side and a primary action on the
 /// trailing side.
 ///
-/// The heading occupies the flexible center of the row, with a 48×48 spacer
-/// reserved opposite a lone [leading] or [trailing] so the title stays
-/// visually balanced.
+/// The heading occupies the flexible center of the row, with the wider of
+/// [leading] / [trailing] mirrored on the opposite side so the title stays
+/// geometrically centred.
 ///
 /// When [leading] is null and [automaticallyImplyLeading] is true (the
 /// default), a dismissal button is inserted if the enclosing route can pop:
@@ -86,7 +86,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
   final StreamAppBarProps props;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kStreamHeaderHeight);
+  Size get preferredSize => const Size.fromHeight(kStreamToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +120,7 @@ class StreamAppBarProps {
   /// A widget to display before the [title].
   ///
   /// Typically a back button. The caller is responsible for the widget's
-  /// own hit area; the app bar only reserves a 48×48 slot for symmetry.
+  /// own size and hit area.
   ///
   /// When null and [automaticallyImplyLeading] is true, a default dismissal
   /// button is inserted if the enclosing route can pop — a cross on
@@ -153,8 +153,7 @@ class StreamAppBarProps {
   /// A widget to display after the [title].
   ///
   /// Typically a primary or overflow action. The caller is responsible for
-  /// the widget's own hit area; the app bar only reserves a 48×48 slot for
-  /// symmetry.
+  /// the widget's own size and hit area.
   final Widget? trailing;
 
   /// Whether this app bar is the topmost chrome of its surface.
@@ -291,8 +290,8 @@ class DefaultStreamAppBar extends StatelessWidget {
     // (e.g. when placed directly inside a [Column] or a [Container]
     // rather than in a [Scaffold.appBar] slot).
     Widget bar = SizedBox(
-      height: kStreamHeaderHeight,
-      child: StreamHeaderToolbar(
+      height: kStreamToolbarHeight,
+      child: StreamToolbar(
         padding: effectivePadding,
         spacing: effectiveSpacing,
         leading: leading,

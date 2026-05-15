@@ -25,6 +25,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
+    StreamBottomAppBarThemeData? bottomAppBarTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamCommandChipThemeData? commandChipTheme,
@@ -34,6 +35,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
+    StreamMediaViewerThemeData? mediaViewerTheme,
     StreamMessageComposerAttachmentThemeData? messageComposerAttachmentTheme,
     StreamMessageComposerEditMessageAttachmentThemeData?
     messageComposerEditMessageAttachmentTheme,
@@ -77,6 +79,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       badgeNotificationTheme:
           badgeNotificationTheme ?? _this.badgeNotificationTheme,
+      bottomAppBarTheme: bottomAppBarTheme ?? _this.bottomAppBarTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       commandChipTheme: commandChipTheme ?? _this.commandChipTheme,
@@ -88,6 +91,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       jumpToUnreadButtonTheme:
           jumpToUnreadButtonTheme ?? _this.jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
+      mediaViewerTheme: mediaViewerTheme ?? _this.mediaViewerTheme,
       messageComposerAttachmentTheme:
           messageComposerAttachmentTheme ??
           _this.messageComposerAttachmentTheme,
@@ -171,6 +175,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.badgeNotificationTheme,
         t,
       )!,
+      bottomAppBarTheme: StreamBottomAppBarThemeData.lerp(
+        _this.bottomAppBarTheme,
+        other.bottomAppBarTheme,
+        t,
+      )!,
       buttonTheme: StreamButtonThemeData.lerp(
         _this.buttonTheme,
         other.buttonTheme,
@@ -214,6 +223,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       listTileTheme: StreamListTileThemeData.lerp(
         _this.listTileTheme,
         other.listTileTheme,
+        t,
+      )!,
+      mediaViewerTheme: StreamMediaViewerThemeData.lerp(
+        _this.mediaViewerTheme,
+        other.mediaViewerTheme,
         t,
       )!,
       messageComposerAttachmentTheme:
@@ -347,6 +361,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
+        _other.bottomAppBarTheme == _this.bottomAppBarTheme &&
         _other.buttonTheme == _this.buttonTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
         _other.commandChipTheme == _this.commandChipTheme &&
@@ -356,6 +371,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.jumpToUnreadButtonTheme == _this.jumpToUnreadButtonTheme &&
         _other.listTileTheme == _this.listTileTheme &&
+        _other.mediaViewerTheme == _this.mediaViewerTheme &&
         _other.messageComposerAttachmentTheme ==
             _this.messageComposerAttachmentTheme &&
         _other.messageComposerEditMessageAttachmentTheme ==
@@ -403,6 +419,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.badgeNotificationTheme,
+      _this.bottomAppBarTheme,
       _this.buttonTheme,
       _this.checkboxTheme,
       _this.commandChipTheme,
@@ -412,6 +429,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.emojiChipTheme,
       _this.jumpToUnreadButtonTheme,
       _this.listTileTheme,
+      _this.mediaViewerTheme,
       _this.messageComposerAttachmentTheme,
       _this.messageComposerEditMessageAttachmentTheme,
       _this.messageComposerFileAttachmentTheme,

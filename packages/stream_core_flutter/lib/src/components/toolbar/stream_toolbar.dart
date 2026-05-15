@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// Default height of [StreamAppBar] and [StreamSheetHeader] per the Figma
-/// design system.
-const double kStreamHeaderHeight = 72;
+/// Default height of [StreamAppBar], [StreamBottomAppBar], and
+/// [StreamSheetHeader] per the Stream design system.
+const double kStreamToolbarHeight = 72;
 
-/// Three-slot horizontal layout shared by [StreamAppBar] and
-/// [StreamSheetHeader].
+/// Three-slot horizontal layout shared by [StreamAppBar],
+/// [StreamBottomAppBar], and [StreamSheetHeader].
 ///
 /// Lays out an optional [leading] / [trailing] flush against the bar's start
 /// and end edges (after [padding]) and an optional [middle] centred in the
@@ -18,13 +18,13 @@ const double kStreamHeaderHeight = 72;
 /// Each slot is vertically centred inside the available content height. The
 /// toolbar takes its size from the parent's tight height constraint —
 /// callers are responsible for sitting in a fixed-height slot (e.g. via
-/// [PreferredSize] or a [SizedBox] using [kStreamHeaderHeight]).
+/// [PreferredSize] or a [SizedBox] using [kStreamToolbarHeight]).
 ///
 /// [padding] is the bar-edge padding around all three slots; [spacing] is
 /// the minimum gap reserved between the middle and either side slot.
-class StreamHeaderToolbar extends StatelessWidget {
-  /// Creates a header toolbar layout with the given slots.
-  const StreamHeaderToolbar({
+class StreamToolbar extends StatelessWidget {
+  /// Creates a toolbar layout with the given slots.
+  const StreamToolbar({
     super.key,
     this.leading,
     this.middle,
@@ -52,7 +52,7 @@ class StreamHeaderToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final textDirection = Directionality.of(context);
     return CustomMultiChildLayout(
-      delegate: _StreamHeaderToolbarLayout(
+      delegate: _StreamToolbarLayout(
         spacing: spacing,
         textDirection: textDirection,
         padding: padding.resolve(textDirection),
@@ -68,8 +68,8 @@ class StreamHeaderToolbar extends StatelessWidget {
 
 enum _Slot { leading, middle, trailing }
 
-class _StreamHeaderToolbarLayout extends MultiChildLayoutDelegate {
-  _StreamHeaderToolbarLayout({
+class _StreamToolbarLayout extends MultiChildLayoutDelegate {
+  _StreamToolbarLayout({
     required this.padding,
     required this.spacing,
     required this.textDirection,
@@ -124,7 +124,7 @@ class _StreamHeaderToolbarLayout extends MultiChildLayoutDelegate {
   }
 
   @override
-  bool shouldRelayout(covariant _StreamHeaderToolbarLayout oldDelegate) {
+  bool shouldRelayout(covariant _StreamToolbarLayout oldDelegate) {
     return padding != oldDelegate.padding ||
         spacing != oldDelegate.spacing ||
         textDirection != oldDelegate.textDirection;

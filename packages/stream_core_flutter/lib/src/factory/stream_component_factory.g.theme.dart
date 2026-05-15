@@ -33,6 +33,7 @@ mixin _$StreamComponentBuilders {
       extensions: t < 0.5 ? a.extensions : b.extensions,
       appBar: t < 0.5 ? a.appBar : b.appBar,
       avatar: t < 0.5 ? a.avatar : b.avatar,
+      bottomAppBar: t < 0.5 ? a.bottomAppBar : b.bottomAppBar,
       avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
@@ -49,6 +50,7 @@ mixin _$StreamComponentBuilders {
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       listTile: t < 0.5 ? a.listTile : b.listTile,
       loadingSpinner: t < 0.5 ? a.loadingSpinner : b.loadingSpinner,
+      mediaViewer: t < 0.5 ? a.mediaViewer : b.mediaViewer,
       messageAnnotation: t < 0.5 ? a.messageAnnotation : b.messageAnnotation,
       messageBubble: t < 0.5 ? a.messageBubble : b.messageBubble,
       messageComposerAttachment: t < 0.5
@@ -99,6 +101,7 @@ mixin _$StreamComponentBuilders {
     Map<Object, StreamComponentBuilderExtension<Object>>? extensions,
     Widget Function(BuildContext, StreamAppBarProps)? appBar,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
+    Widget Function(BuildContext, StreamBottomAppBarProps)? bottomAppBar,
     Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
@@ -118,6 +121,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamListTileProps)? listTile,
     Widget Function(BuildContext, StreamLoadingSpinnerProps)? loadingSpinner,
+    Widget Function(BuildContext, StreamMediaViewerProps)? mediaViewer,
     Widget Function(BuildContext, StreamMessageAnnotationProps)?
     messageAnnotation,
     Widget Function(BuildContext, StreamMessageBubbleProps)? messageBubble,
@@ -172,6 +176,7 @@ mixin _$StreamComponentBuilders {
       extensions: extensions ?? _this.extensions,
       appBar: appBar ?? _this.appBar,
       avatar: avatar ?? _this.avatar,
+      bottomAppBar: bottomAppBar ?? _this.bottomAppBar,
       avatarGroup: avatarGroup ?? _this.avatarGroup,
       avatarStack: avatarStack ?? _this.avatarStack,
       badgeCount: badgeCount ?? _this.badgeCount,
@@ -188,6 +193,7 @@ mixin _$StreamComponentBuilders {
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       listTile: listTile ?? _this.listTile,
       loadingSpinner: loadingSpinner ?? _this.loadingSpinner,
+      mediaViewer: mediaViewer ?? _this.mediaViewer,
       messageAnnotation: messageAnnotation ?? _this.messageAnnotation,
       messageBubble: messageBubble ?? _this.messageBubble,
       messageComposerAttachment:
@@ -245,6 +251,7 @@ mixin _$StreamComponentBuilders {
       extensions: other.extensions,
       appBar: other.appBar,
       avatar: other.avatar,
+      bottomAppBar: other.bottomAppBar,
       avatarGroup: other.avatarGroup,
       avatarStack: other.avatarStack,
       badgeCount: other.badgeCount,
@@ -261,6 +268,7 @@ mixin _$StreamComponentBuilders {
       fileTypeIcon: other.fileTypeIcon,
       listTile: other.listTile,
       loadingSpinner: other.loadingSpinner,
+      mediaViewer: other.mediaViewer,
       messageAnnotation: other.messageAnnotation,
       messageBubble: other.messageBubble,
       messageComposerAttachment: other.messageComposerAttachment,
@@ -310,6 +318,7 @@ mixin _$StreamComponentBuilders {
     return _other.extensions == _this.extensions &&
         _other.appBar == _this.appBar &&
         _other.avatar == _this.avatar &&
+        _other.bottomAppBar == _this.bottomAppBar &&
         _other.avatarGroup == _this.avatarGroup &&
         _other.avatarStack == _this.avatarStack &&
         _other.badgeCount == _this.badgeCount &&
@@ -326,6 +335,7 @@ mixin _$StreamComponentBuilders {
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.listTile == _this.listTile &&
         _other.loadingSpinner == _this.loadingSpinner &&
+        _other.mediaViewer == _this.mediaViewer &&
         _other.messageAnnotation == _this.messageAnnotation &&
         _other.messageBubble == _this.messageBubble &&
         _other.messageComposerAttachment == _this.messageComposerAttachment &&
@@ -370,6 +380,7 @@ mixin _$StreamComponentBuilders {
       _this.extensions,
       _this.appBar,
       _this.avatar,
+      _this.bottomAppBar,
       _this.avatarGroup,
       _this.avatarStack,
       _this.badgeCount,
@@ -386,6 +397,7 @@ mixin _$StreamComponentBuilders {
       _this.fileTypeIcon,
       _this.listTile,
       _this.loadingSpinner,
+      _this.mediaViewer,
       _this.messageAnnotation,
       _this.messageBubble,
       _this.messageComposerAttachment,

@@ -5,6 +5,7 @@ import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
+import 'components/stream_bottom_app_bar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
@@ -14,6 +15,7 @@ import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
+import 'components/stream_media_viewer_theme.dart';
 import 'components/stream_message_composer_attachment_theme.dart';
 import 'components/stream_message_composer_edit_message_attachment_theme.dart';
 import 'components/stream_message_composer_file_attachment_theme.dart';
@@ -102,6 +104,9 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamBadgeNotificationThemeData] from the nearest ancestor.
   StreamBadgeNotificationThemeData get streamBadgeNotificationTheme => StreamBadgeNotificationTheme.of(this);
 
+  /// Returns the [StreamBottomAppBarThemeData] from the nearest ancestor.
+  StreamBottomAppBarThemeData get streamBottomAppBarTheme => StreamBottomAppBarTheme.of(this);
+
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
 
@@ -128,6 +133,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamListTileThemeData] from the nearest ancestor.
   StreamListTileThemeData get streamListTileTheme => StreamListTileTheme.of(this);
+
+  /// Returns the [StreamMediaViewerThemeData] from the nearest ancestor.
+  StreamMediaViewerThemeData get streamMediaViewerTheme => StreamMediaViewerTheme.of(this);
 
   /// Returns the [StreamMessageComposerAttachmentThemeData] from the nearest ancestor.
   StreamMessageComposerAttachmentThemeData get streamMessageComposerAttachmentTheme =>
