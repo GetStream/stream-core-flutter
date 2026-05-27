@@ -72,6 +72,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget? trailing,
     bool primary = true,
     StreamAppBarStyle? style,
+    bool floating = false,
   }) : props = .new(
          leading: leading,
          automaticallyImplyLeading: automaticallyImplyLeading,
@@ -80,6 +81,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
          trailing: trailing,
          primary: primary,
          style: style,
+         floating: floating,
        );
 
   /// The properties that configure this app bar.
@@ -115,6 +117,7 @@ class StreamAppBarProps {
     this.trailing,
     this.primary = true,
     this.style,
+    this.floating = false,
   });
 
   /// A widget to display before the [title].
@@ -172,6 +175,11 @@ class StreamAppBarProps {
   /// Resolution order per field: this [style] → ambient [StreamAppBarTheme]
   /// → token-backed defaults.
   final StreamAppBarStyle? style;
+
+  /// Whether this app bar is floating.
+  ///
+  /// When true, the app bar is floating and will be displayed above the content.
+  final bool floating;
 }
 
 /// The default implementation of [StreamAppBar].
@@ -205,7 +213,10 @@ class DefaultStreamAppBar extends StatelessWidget {
     final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveBackgroundColor = switch (props.floating) {
+      true => style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor,
+      false => style?.backgroundColor ?? defaults.backgroundColor,
+    };
     final effectivePadding = style?.padding ?? defaults.padding;
     final effectiveSpacing = style?.spacing ?? defaults.spacing;
     final effectiveTitleTextStyle = style?.titleTextStyle ?? defaults.titleTextStyle;
@@ -229,7 +240,8 @@ class DefaultStreamAppBar extends StatelessWidget {
         };
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
         leading = StreamButton.icon(
-          type: .ghost,
+          type: props.floating ? .outline : .ghost,
+          isFloating: props.floating,
           style: .secondary,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
           onPressed: Navigator.of(context).maybePop,
@@ -309,12 +321,47 @@ class DefaultStreamAppBar extends StatelessWidget {
     // not a configurable divider.
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: effectiveBackgroundColor,
-        border: Border(
-          bottom: BorderSide(color: context.streamColorScheme.borderSubtle),
-        ),
+        color: props.floating ? null : effectiveBackgroundColor,
+        gradient: props.floating
+            ? _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor)
+            : null,
+        backgroundBlendMode: BlendMode.screen,
+        border: props.floating ? null : Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
       ),
       child: bar,
+    );
+  }
+
+  LinearGradient _getFloatingGradient(
+    BuildContext context, {
+    required Color effectiveBackgroundColor,
+  }) {
+    // Compute the fraction of the total bar height occupied by the system
+    // safe area so the gradient fade only starts below the status bar.
+    // Above that boundary the background is fully solid.
+    final safeAreaTop = props.primary ? MediaQuery.paddingOf(context).top : 0.0;
+    final totalHeight = safeAreaTop + kStreamToolbarHeight;
+    final f = totalHeight > 0 ? safeAreaTop / totalHeight : 0.0;
+
+    return LinearGradient(
+      colors: [
+        effectiveBackgroundColor, // solid through safe area
+        effectiveBackgroundColor, // solid at safe area boundary
+        effectiveBackgroundColor.withAlpha(0xE8), // ~91 %
+        effectiveBackgroundColor.withAlpha(0xA8), // ~66 %
+        effectiveBackgroundColor.withAlpha(0x40), // ~25 %
+        effectiveBackgroundColor.withAlpha(0x00), // transparent
+      ],
+      stops: [
+        0.0,
+        f,
+        f + (1 - f) * 0.55,
+        f + (1 - f) * 0.75,
+        f + (1 - f) * 0.90,
+        1.0,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
     );
   }
 }
@@ -335,6 +382,9 @@ class _StreamAppBarStyleDefaults extends StreamAppBarStyle {
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;
+
+  @override
+  Color get floatingBackgroundColor => _colorScheme.backgroundElevation0;
 
   @override
   double get spacing => _spacing.sm;

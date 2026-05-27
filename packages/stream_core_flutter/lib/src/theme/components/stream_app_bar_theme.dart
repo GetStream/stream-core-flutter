@@ -137,6 +137,7 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
   /// Creates an app bar style with optional property overrides.
   const StreamAppBarStyle({
     this.backgroundColor,
+    this.floatingBackgroundColor,
     this.padding,
     this.spacing,
     this.titleTextStyle,
@@ -147,6 +148,9 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
 
   /// The background colour of the app bar.
   final Color? backgroundColor;
+
+  /// The background colour of the floating app bar.
+  final Color? floatingBackgroundColor;
 
   /// The padding around the header's content row.
   final EdgeInsetsGeometry? padding;
