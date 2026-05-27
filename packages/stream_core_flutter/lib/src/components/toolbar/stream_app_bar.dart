@@ -325,7 +325,6 @@ class DefaultStreamAppBar extends StatelessWidget {
         gradient: props.floating
             ? _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor)
             : null,
-        backgroundBlendMode: BlendMode.screen,
         border: props.floating ? null : Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
       ),
       child: bar,

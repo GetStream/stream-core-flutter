@@ -53,31 +53,63 @@ Widget buildStreamAppBarPlayground(BuildContext context) {
     description: 'Horizontal gap between leading, heading, and trailing.',
   );
 
-  return Align(
-    alignment: Alignment.topCenter,
-    child: StreamAppBar(
-      style: StreamAppBarStyle(
-        padding: EdgeInsets.all(padding),
-        spacing: spacing,
-      ),
-      leading: showLeading
-          ? StreamButton.icon(
-              icon: Icon(context.streamIcons.chevronLeft),
-              style: StreamButtonStyle.secondary,
-              type: StreamButtonType.ghost,
-              onPressed: () {},
-            )
-          : null,
-      title: (title != null && title.isNotEmpty) ? Text(title) : null,
-      subtitle: (subtitle != null && subtitle.isNotEmpty) ? Text(subtitle) : null,
-      trailing: showTrailing
-          ? StreamButton.icon(
-              icon: Icon(context.streamIcons.plus),
-              onPressed: () {},
-            )
-          : null,
-    ),
+  final floating = context.knobs.boolean(
+    label: 'Floating',
+    initialValue: false,
+    description:
+        'When true, the app bar floats above content with a gradient fade '
+        'instead of a solid background and a bottom border.',
   );
+
+  final colorScheme = context.streamColorScheme;
+
+  Widget bar = StreamAppBar(
+    primary: false,
+    floating: floating,
+    style: StreamAppBarStyle(
+      padding: EdgeInsets.all(padding),
+      spacing: spacing,
+    ),
+    leading: showLeading
+        ? StreamButton.icon(
+            icon: Icon(context.streamIcons.chevronLeft),
+            style: StreamButtonStyle.secondary,
+            type: floating ? StreamButtonType.outline : StreamButtonType.ghost,
+            isFloating: floating,
+            onPressed: () {},
+          )
+        : null,
+    title: (title != null && title.isNotEmpty) ? Text(title) : null,
+    subtitle: (subtitle != null && subtitle.isNotEmpty) ? Text(subtitle) : null,
+    trailing: showTrailing
+        ? StreamButton.icon(
+            icon: Icon(context.streamIcons.plus),
+            isFloating: floating,
+            onPressed: () {},
+          )
+        : null,
+  );
+
+  if (floating) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: ColoredBox(
+            color: colorScheme.backgroundApp,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 32),
+              decoration: BoxDecoration(
+                color: colorScheme.accentPrimary,
+              ),
+            ),
+          ),
+        ),
+        Align(alignment: Alignment.topCenter, child: bar),
+      ],
+    );
+  }
+
+  return Align(alignment: Alignment.topCenter, child: bar);
 }
 
 // =============================================================================
@@ -227,6 +259,31 @@ Widget buildStreamAppBarShowcase(BuildContext context) {
             ),
           ),
           SizedBox(height: spacing.md),
+          _AppBarExample(
+            label: 'Floating — gradient fade over content',
+            bar: _FloatingAppBarPreview(
+              bar: StreamAppBar(
+                automaticallyImplyLeading: false,
+                primary: false,
+                floating: true,
+                leading: StreamButton.icon(
+                  icon: Icon(context.streamIcons.chevronLeft),
+                  style: StreamButtonStyle.secondary,
+                  type: StreamButtonType.outline,
+                  isFloating: true,
+                  onPressed: () {},
+                ),
+                title: const Text('Group chat'),
+                subtitle: const Text('5 members, 3 online'),
+                trailing: StreamButton.icon(
+                  icon: Icon(context.streamIcons.plus),
+                  isFloating: true,
+                  onPressed: () {},
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: spacing.md),
           const _AutoImplyLeadingDemo(),
         ],
       ),
@@ -298,6 +355,41 @@ class _AutoImplyLeadingDemo extends StatelessWidget {
           ),
           body: const Center(child: Text('Pop via the auto-implied leading button.')),
         ),
+      ),
+    );
+  }
+}
+
+/// Renders a floating [StreamAppBar] over a simulated gradient background so
+/// the fade effect is clearly visible in the Showcase.
+class _FloatingAppBarPreview extends StatelessWidget {
+  const _FloatingAppBarPreview({required this.bar});
+
+  final Widget bar;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    return SizedBox(
+      height: kStreamToolbarHeight * 2,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    colorScheme.accentPrimary.withAlpha(0x40),
+                    colorScheme.backgroundApp,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(top: 0, left: 0, right: 0, child: bar),
+        ],
       ),
     );
   }
