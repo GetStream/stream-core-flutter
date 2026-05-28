@@ -47,6 +47,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
+import 'stream_app_style.dart';
 
 part 'stream_theme.g.theme.dart';
 
@@ -106,6 +107,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme({
     Brightness brightness = .light,
     TargetPlatform? platform,
+    StreamAppStyle? appStyle,
     StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
@@ -166,6 +168,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
+    appStyle ??= const StreamAppStyle.regular();
     appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
@@ -205,6 +208,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     return .raw(
       brightness: brightness,
+      appStyle: appStyle,
       icons: icons,
       radius: radius,
       spacing: spacing,
@@ -265,6 +269,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   const StreamTheme.raw({
     required this.brightness,
+    required this.appStyle,
     required this.icons,
     required this.radius,
     required this.spacing,
@@ -341,6 +346,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The brightness of this theme.
   final Brightness brightness;
+
+  /// The app style for this theme.
+  final StreamAppStyle appStyle;
 
   /// The icons for this theme.
   final StreamIcons icons;
@@ -499,6 +507,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     return StreamTheme.raw(
       brightness: brightness,
+      appStyle: appStyle,
       icons: icons,
       radius: radius,
       spacing: spacing,

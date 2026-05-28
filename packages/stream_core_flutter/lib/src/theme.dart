@@ -53,6 +53,7 @@ export 'theme/semantics/stream_box_shadow.dart';
 export 'theme/semantics/stream_color_scheme.dart';
 export 'theme/semantics/stream_text_theme.dart';
 
+export 'theme/stream_app_style.dart';
 export 'theme/stream_theme.dart';
 export 'theme/stream_theme_extensions.dart';
 export 'theme/widget_state_utils.dart';

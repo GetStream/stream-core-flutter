@@ -13,6 +13,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   @override
   ThemeExtension<StreamTheme> copyWith({
     Brightness? brightness,
+    StreamAppStyle? appStyle,
     StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
@@ -67,6 +68,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: brightness ?? _this.brightness,
+      appStyle: appStyle ?? _this.appStyle,
       icons: icons ?? _this.icons,
       radius: radius ?? _this.radius,
       spacing: spacing ?? _this.spacing,
@@ -144,6 +146,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: t < 0.5 ? _this.brightness : other.brightness,
+      appStyle: t < 0.5 ? _this.appStyle : other.appStyle,
       icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
       radius: StreamRadius.lerp(_this.radius, other.radius, t)!,
       spacing: StreamSpacing.lerp(_this.spacing, other.spacing, t)!,
@@ -356,6 +359,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _other = (other as StreamTheme);
 
     return _other.brightness == _this.brightness &&
+        _other.appStyle == _this.appStyle &&
         _other.icons == _this.icons &&
         _other.radius == _this.radius &&
         _other.spacing == _this.spacing &&
@@ -415,6 +419,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     return Object.hashAll([
       runtimeType,
       _this.brightness,
+      _this.appStyle,
       _this.icons,
       _this.radius,
       _this.spacing,

@@ -6,6 +6,7 @@ import '../../theme/components/stream_button_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
+import '../../theme/stream_app_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import 'stream_toolbar.dart';
@@ -72,7 +73,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget? trailing,
     bool primary = true,
     StreamAppBarStyle? style,
-    bool floating = false,
+    AppBarBehavior? appBarBehavior,
   }) : props = .new(
          leading: leading,
          automaticallyImplyLeading: automaticallyImplyLeading,
@@ -81,7 +82,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
          trailing: trailing,
          primary: primary,
          style: style,
-         floating: floating,
+         appBarBehavior: appBarBehavior,
        );
 
   /// The properties that configure this app bar.
@@ -117,7 +118,7 @@ class StreamAppBarProps {
     this.trailing,
     this.primary = true,
     this.style,
-    this.floating = false,
+    this.appBarBehavior,
   });
 
   /// A widget to display before the [title].
@@ -179,7 +180,7 @@ class StreamAppBarProps {
   /// Whether this app bar is floating.
   ///
   /// When true, the app bar is floating and will be displayed above the content.
-  final bool floating;
+  final AppBarBehavior? appBarBehavior;
 }
 
 /// The default implementation of [StreamAppBar].
@@ -213,9 +214,11 @@ class DefaultStreamAppBar extends StatelessWidget {
     final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveBackgroundColor = switch (props.floating) {
-      true => style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor,
-      false => style?.backgroundColor ?? defaults.backgroundColor,
+    final effectiveAppBarBehavior = props.appBarBehavior ?? context.streamTheme.appStyle.appBarBehavior;
+
+    final effectiveBackgroundColor = switch (effectiveAppBarBehavior) {
+      .floating => style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor,
+      .regular => style?.backgroundColor ?? defaults.backgroundColor,
     };
     final effectivePadding = style?.padding ?? defaults.padding;
     final effectiveSpacing = style?.spacing ?? defaults.spacing;
@@ -240,8 +243,11 @@ class DefaultStreamAppBar extends StatelessWidget {
         };
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
         leading = StreamButton.icon(
-          type: props.floating ? .outline : .ghost,
-          isFloating: props.floating,
+          type: switch (effectiveAppBarBehavior) {
+            .floating => .outline,
+            .regular => .ghost,
+          },
+          isFloating: effectiveAppBarBehavior == .floating,
           style: .secondary,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
           onPressed: Navigator.of(context).maybePop,
@@ -321,11 +327,18 @@ class DefaultStreamAppBar extends StatelessWidget {
     // not a configurable divider.
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: props.floating ? null : effectiveBackgroundColor,
-        gradient: props.floating
-            ? _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor)
-            : null,
-        border: props.floating ? null : Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
+        color: switch (effectiveAppBarBehavior) {
+          .floating => null,
+          .regular => effectiveBackgroundColor,
+        },
+        gradient: switch (effectiveAppBarBehavior) {
+          .floating => _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor),
+          .regular => null,
+        },
+        border: switch (effectiveAppBarBehavior) {
+          .floating => null,
+          .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
+        },
       ),
       child: bar,
     );
