@@ -73,6 +73,7 @@ export 'components/sheet/stream_sheet.dart';
 export 'components/snackbar/stream_snackbar.dart' hide DefaultStreamSnackbar;
 export 'components/toolbar/stream_app_bar.dart' hide DefaultStreamAppBar;
 export 'components/toolbar/stream_bottom_app_bar.dart' hide DefaultStreamBottomAppBar;
+export 'components/toolbar/stream_bottom_nav_bar.dart';
 export 'components/toolbar/stream_sheet_header.dart' hide DefaultStreamSheetHeader;
 export 'components/toolbar/stream_toolbar.dart';
 export 'factory/stream_component_factory.dart';
