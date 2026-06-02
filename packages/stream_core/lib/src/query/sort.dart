@@ -15,8 +15,7 @@ enum SortDirection {
 
   /// Sort in descending order (Z to A, 9 to 1, etc.).
   @JsonValue(-1)
-  desc(-1)
-  ;
+  desc(-1);
 
   /// Creates a new [SortDirection] instance with the specified direction.
   const SortDirection(this.value);

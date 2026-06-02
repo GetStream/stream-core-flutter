@@ -217,7 +217,7 @@ class DefaultStreamOnlineIndicator extends StatelessWidget {
     StreamOnlineIndicatorSize size,
   ) => switch (size) {
     .sm => 1,
-    .md || .lg || .xl => 2,
+    .md || .lg || .xl || .xxl => 2,
   };
 }
 

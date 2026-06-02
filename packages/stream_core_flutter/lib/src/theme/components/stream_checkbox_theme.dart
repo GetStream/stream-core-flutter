@@ -18,8 +18,7 @@ enum StreamCheckboxSize {
   sm(20),
 
   /// Medium checkbox (24px).
-  md(24)
-  ;
+  md(24);
 
   /// Constructs a [StreamCheckboxSize] with the given dimension.
   const StreamCheckboxSize(this.value);

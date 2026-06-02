@@ -1144,8 +1144,7 @@ enum _ChipType {
   single,
   cluster,
   overflow,
-  addEmoji
-  ;
+  addEmoji;
 
   String get label => switch (this) {
     _ChipType.single => 'Single',

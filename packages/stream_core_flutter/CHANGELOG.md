@@ -6,6 +6,7 @@
 
 ### ✨ Features
 
+- Added `StreamOnlineIndicatorSize.xxl` (20px) to pair with `StreamAvatarSize.xxl`.
 - Added `StreamJumpToUnreadButton` component and `StreamJumpToUnreadButtonTheme`.
 - Added `StreamVideoPlayIndicator` component with `StreamVideoPlayIndicatorSize` variants.
 - Added `StreamFileTypeIconSize.md` and `StreamFileTypeIconSize.sm` variants.

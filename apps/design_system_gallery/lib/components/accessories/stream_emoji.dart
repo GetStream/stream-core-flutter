@@ -416,8 +416,7 @@ class _Card extends StatelessWidget {
 
 enum _ContentType {
   unicode('Unicode'),
-  image('Image (Twemoji)')
-  ;
+  image('Image (Twemoji)');
 
   const _ContentType(this.label);
   final String label;

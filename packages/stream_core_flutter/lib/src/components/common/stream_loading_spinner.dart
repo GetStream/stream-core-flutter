@@ -21,8 +21,7 @@ enum StreamLoadingSpinnerSize {
   sm(20, 15, 2),
 
   /// Extra small spinner (16px container, 12px indicator, 2px stroke).
-  xs(16, 12, 2)
-  ;
+  xs(16, 12, 2);
 
   const StreamLoadingSpinnerSize(
     this.value,

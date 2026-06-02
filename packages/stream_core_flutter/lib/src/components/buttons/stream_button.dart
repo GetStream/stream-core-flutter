@@ -270,8 +270,7 @@ enum StreamButtonSize {
   medium(40),
 
   /// Large button (48px).
-  large(48)
-  ;
+  large(48);
 
   /// Constructs a [StreamButtonSize] with the given dimension.
   const StreamButtonSize(this.value);

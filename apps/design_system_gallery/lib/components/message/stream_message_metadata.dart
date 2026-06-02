@@ -540,8 +540,7 @@ enum _StatusOption {
   sending('Sending', StreamIconData.clock),
   sent('Sent', StreamIconData.checkmark),
   delivered('Delivered', StreamIconData.checks),
-  read('Read', StreamIconData.checks)
-  ;
+  read('Read', StreamIconData.checks);
 
   const _StatusOption(this.label, this.iconData);
 

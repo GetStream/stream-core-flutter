@@ -105,8 +105,7 @@ enum StreamEmojiSize {
   xl(48),
 
   /// Extra extra large emoji (64px).
-  xxl(64)
-  ;
+  xxl(64);
 
   /// Constructs a [StreamEmojiSize] with the given dimension.
   const StreamEmojiSize(this.value);

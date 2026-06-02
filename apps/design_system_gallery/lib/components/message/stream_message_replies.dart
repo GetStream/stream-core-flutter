@@ -506,8 +506,7 @@ enum _ClipOption {
   none(Clip.none, 'none'),
   hardEdge(Clip.hardEdge, 'hardEdge'),
   antiAlias(Clip.antiAlias, 'antiAlias'),
-  antiAliasWithSaveLayer(Clip.antiAliasWithSaveLayer, 'antiAliasWithSaveLayer')
-  ;
+  antiAliasWithSaveLayer(Clip.antiAliasWithSaveLayer, 'antiAliasWithSaveLayer');
 
   const _ClipOption(this.clip, this.label);
 

@@ -16,8 +16,7 @@ enum StreamErrorBadgeSize {
   sm(20, 16),
 
   /// Extra-small badge (16px diameter, 12px icon).
-  xs(16, 12)
-  ;
+  xs(16, 12);
 
   const StreamErrorBadgeSize(this.value, this.iconSize);
 

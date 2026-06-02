@@ -116,8 +116,7 @@ Widget buildStreamImageSourceBadgePlayground(BuildContext context) {
 enum _BadgeVariant {
   giphy('Giphy'),
   imgur('Imgur'),
-  custom('Custom')
-  ;
+  custom('Custom');
 
   const _BadgeVariant(this.label);
   final String label;
@@ -128,8 +127,7 @@ enum _LeadingOption {
   imgur('Imgur (SVG)'),
   file('File Icon'),
   playFill('Play Icon'),
-  video('Video Icon')
-  ;
+  video('Video Icon');
 
   const _LeadingOption(this.label);
   final String label;
@@ -141,8 +139,7 @@ enum _ColorOption {
   blue('Blue', Colors.blue),
   green('Green', Colors.green),
   white('White', Colors.white),
-  black('Black', Colors.black)
-  ;
+  black('Black', Colors.black);
 
   const _ColorOption(this.label, this.color);
   final String label;

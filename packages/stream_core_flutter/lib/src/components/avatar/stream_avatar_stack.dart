@@ -19,8 +19,7 @@ enum StreamAvatarStackSize {
   xs(20),
 
   /// Small avatar stack (24px diameter).
-  sm(24)
-  ;
+  sm(24);
 
   /// Constructs a [StreamAvatarStackSize] with the given diameter.
   const StreamAvatarStackSize(this.value);
