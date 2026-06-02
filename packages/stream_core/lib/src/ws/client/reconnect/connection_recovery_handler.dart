@@ -46,7 +46,7 @@ class ConnectionRecoveryHandler extends Disposable {
        _reconnectStrategy = retryStrategy ?? RetryStrategy(),
        _keepConnectionAliveInBackground = keepConnectionAliveInBackground,
        _policies = <AutomaticReconnectionPolicy>[
-         if (policies != null) ...policies,
+         ...?policies,
          WebSocketAutomaticReconnectionPolicy(
            connectionState: client.connectionState,
          ),
