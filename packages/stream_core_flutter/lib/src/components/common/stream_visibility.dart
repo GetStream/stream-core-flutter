@@ -33,8 +33,7 @@ enum StreamVisibility {
   hidden,
 
   /// The widget is removed from the layout entirely — it takes no space.
-  gone
-  ;
+  gone;
 
   /// Applies this visibility to the given [child] widget.
   ///

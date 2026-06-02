@@ -41,8 +41,7 @@ enum Priority implements Comparable<Priority> {
   info(level: 4),
   warning(level: 5),
   error(level: 6),
-  none(level: 7)
-  ;
+  none(level: 7);
 
   const Priority({required this.level});
 

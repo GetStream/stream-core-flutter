@@ -86,8 +86,7 @@ enum _ColorOption {
   red('Red', Colors.red),
   green('Green', Colors.green),
   orange('Orange', Colors.orange),
-  teal('Teal', Colors.teal)
-  ;
+  teal('Teal', Colors.teal);
 
   const _ColorOption(this.label, this.color);
   final String label;

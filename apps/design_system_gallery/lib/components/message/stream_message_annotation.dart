@@ -411,8 +411,7 @@ enum _IconOption {
   pin('Pin'),
   bellNotification('Bell'),
   arrowUp('Arrow Up'),
-  translate('Translate')
-  ;
+  translate('Translate');
 
   const _IconOption(this.label);
 

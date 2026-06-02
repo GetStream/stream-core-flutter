@@ -17,8 +17,7 @@ enum StreamVideoPlayIndicatorSize {
   md(dimension: 40, iconSize: 20),
 
   /// Small indicator (20px diameter, 12px icon).
-  sm(dimension: 20, iconSize: 12)
-  ;
+  sm(dimension: 20, iconSize: 12);
 
   const StreamVideoPlayIndicatorSize({
     required this.dimension,

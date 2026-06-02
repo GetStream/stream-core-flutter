@@ -13,8 +13,7 @@ enum StreamRetryBadgeSize {
   lg(32, 16),
 
   /// Medium badge (24px diameter, 12px icon).
-  md(24, 12)
-  ;
+  md(24, 12);
 
   const StreamRetryBadgeSize(this.value, this.iconSize);
 

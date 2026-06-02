@@ -20,8 +20,7 @@ enum StreamEmojiButtonSize {
   lg(40),
 
   /// Extra large button (48px diameter).
-  xl(48)
-  ;
+  xl(48);
 
   /// Constructs a [StreamEmojiButtonSize] with the given diameter.
   const StreamEmojiButtonSize(this.value);

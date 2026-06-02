@@ -18,8 +18,7 @@ enum StreamBadgeNotificationSize {
   xs(16),
 
   /// Small badge (20px height).
-  sm(20)
-  ;
+  sm(20);
 
   /// Constructs a [StreamBadgeNotificationSize] with the given height.
   const StreamBadgeNotificationSize(this.value);

@@ -23,8 +23,7 @@ enum StreamFileTypeIconSize {
   md(width: 26, height: 32),
 
   /// Small icon (19×24 pixels).
-  sm(width: 19, height: 24)
-  ;
+  sm(width: 19, height: 24);
 
   /// Constructs a [StreamFileTypeIconSize] with the given dimensions.
   const StreamFileTypeIconSize({

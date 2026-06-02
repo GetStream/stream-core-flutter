@@ -86,8 +86,7 @@ enum PlatformType {
   linux('linux'),
 
   /// Fuchsia: <https://fuchsia.dev/fuchsia-src/concepts>
-  fuchsia('fuchsia')
-  ;
+  fuchsia('fuchsia');
 
   /// Creates a [PlatformType] with the specified [operatingSystem] identifier.
   const PlatformType(this.operatingSystem);

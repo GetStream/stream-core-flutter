@@ -22,8 +22,7 @@ enum StreamAvatarGroupSize {
   xl(48),
 
   /// Extra-extra large avatar group (80px diameter).
-  xxl(80)
-  ;
+  xxl(80);
 
   /// Constructs a [StreamAvatarGroupSize] with the given diameter.
   const StreamAvatarGroupSize(this.value);
