@@ -24,7 +24,10 @@ enum StreamOnlineIndicatorSize {
   lg(14),
 
   /// Extra large indicator (16px diameter).
-  xl(16)
+  xl(16),
+
+  /// Extra-extra large indicator (20px diameter).
+  xxl(20)
   ;
 
   /// Constructs a [StreamOnlineIndicatorSize] with the given diameter.

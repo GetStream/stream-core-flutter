@@ -226,6 +226,7 @@ class _SizeDemo extends StatelessWidget {
       StreamOnlineIndicatorSize.md => '12px',
       StreamOnlineIndicatorSize.lg => '14px',
       StreamOnlineIndicatorSize.xl => '16px',
+      StreamOnlineIndicatorSize.xxl => '20px',
     };
   }
 
