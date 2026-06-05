@@ -1,4 +1,4 @@
-## Upcoming
+## 0.3.0
 
 ### 🛑 Breaking / Removals
 
@@ -11,6 +11,7 @@
 - Added `StreamVideoPlayIndicator` component with `StreamVideoPlayIndicatorSize` variants.
 - Added `StreamFileTypeIconSize.md` and `StreamFileTypeIconSize.sm` variants.
 - Added `trailing` slot to `StreamMessageAnnotation`, with matching `trailingTextStyle`/`trailingTextColor` on `StreamMessageAnnotationStyle`.
+- Added `StreamIntrinsicFlex`, `StreamIntrinsicRow`, and `StreamIntrinsicColumn` layout primitives, extending `StreamFlex` with full main-axis flex behavior (`Expanded`, `Flexible`, `MainAxisAlignment`, `MainAxisSize`) and `CrossAxisAlignment.baseline` support while retaining cross-axis shrink-wrapping.
 - Added `StreamTapTargetPadding`, a reusable primitive that grows a child's layout and hit-test area to a configurable `minSize` without changing its visual size, with a directional `alignment` that controls which direction the extra tap area extends into.
 - Added `StreamSheetHeader` component and `StreamSheetHeaderTheme` for bottom-sheet and modal headers, with platform-aware auto-implied dismissal based on the enclosing route.
 - Added `StreamToolbar`, a three-slot layout primitive shared by `StreamAppBar`, `StreamBottomAppBar`, and `StreamSheetHeader` that keeps the title geometrically centred even when leading and trailing widths differ.
@@ -19,7 +20,7 @@
 - Added `StreamSheet`, `StreamSheetDragHandle`, `StreamSheetRoute`, `StreamSheetTransition` and the `showStreamSheet` helper — Stream-styled modal bottom sheets with scroll-aware drag-to-dismiss and stacking support. `StreamSheet` can also be used standalone outside the modal route.
 - Added `StreamSheetTheme` and `StreamSheetThemeData` (`StreamTheme.sheetTheme`) for theming `StreamSheet` and modal sheets opened with `showStreamSheet`.
 - `StreamEmojiPickerSheet.show` now resolves its background color and border radius from the ambient `StreamSheetTheme` so the picker visually matches other Stream-styled sheets by default.
-- `StreamLoadingSpinner` now renders a completion checkmark when progress reaches 100%.
+- `StreamLoadingSpinner` now supports determinate progress via a `value` parameter (`0.0`–`1.0`), and renders a completion checkmark when `value` reaches `1.0`. Omit `value` for the existing indeterminate spinning state.
 - `StreamCommandChip` is now tappable across its whole surface, not just the × icon.
 - `StreamRemoveControl` now meets the 48 dp minimum tap target by default while keeping its 20 dp visible badge anchored to the top-end corner. Exposes `tapTargetSize`, `visualDensity`, and `semanticLabel`, announces itself as a button to screen readers, and shows a click cursor on web/desktop when hovered.
 - Added `textAlignVertical` to `StreamTextInput` (and `StreamTextInputProps`) for controlling the vertical alignment of the text within the input.
@@ -48,6 +49,7 @@
 - Unified `StreamRadius` across platforms; removed platform factory, `.raw()`, `.ios`, and `.android`.
 - Renamed Stream Icons by removing the size suffix from the icon names.
 - Renamed `StreamFileTypeIconSize` variants: `s48` → `xl`, `s40` → `lg`.
+- `StreamFlex`, `StreamRow`, and `StreamColumn` now default `mainAxisSize` to `MainAxisSize.min` (was `MainAxisSize.max`). Callers that relied on the widget expanding to fill available space must now pass `mainAxisSize: MainAxisSize.max` explicitly.
 - Removed `StreamMessageAnnotation.rich` and `spanTextStyle`/`spanTextColor`; use the new `trailing` slot instead.
 - Aligned `StreamButton` API with Flutter's built-in buttons: renamed `label` (`String?`) to required `child` (`Widget`), changed `icon`/`iconLeft`/`iconRight` from `IconData` to `Widget`, and renamed `onTap` to `onPressed`. `StreamButtonProps` mirrors the same renames.
 - Redesigned `StreamAppBar` with a slots-based API (`leading`/`title`/`subtitle`/`trailing`) and platform-aware auto-implied leading; replaces the previous Material `AppBar` wrapper. Adds `StreamAppBarStyle`, `StreamAppBarTheme`, and `StreamAppBarThemeData`.
