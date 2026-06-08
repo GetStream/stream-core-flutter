@@ -70,25 +70,63 @@ void main() {
         ],
       ),
     );
+
+    goldenTest(
+      'renders RTL variant matrix',
+      fileName: 'stream_snackbar_rtl_matrix',
+      pumpBeforeTest: pumpOnce,
+      builder: () => GoldenTestGroup(
+        columns: 1,
+        children: [
+          for (final variant in StreamSnackbarVariant.values) ...[
+            GoldenTestScenario(
+              name: '${variant.name} · message only',
+              child: _buildInTheme(
+                StreamSnackbar(
+                  message: const Text('تم الحفظ بنجاح'),
+                  variant: variant,
+                ),
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+            GoldenTestScenario(
+              name: '${variant.name} · with action',
+              child: _buildInTheme(
+                StreamSnackbar(
+                  message: const Text('تم حذف الرسالة'),
+                  variant: variant,
+                  action: StreamSnackbarAction(label: const Text('تراجع'), onPressed: () {}),
+                ),
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   });
 }
 
 Widget _buildInTheme(
   Widget child, {
   Brightness brightness = Brightness.light,
+  TextDirection textDirection = TextDirection.ltr,
 }) {
   final streamTheme = StreamTheme(brightness: brightness);
-  return Theme(
-    data: ThemeData(
-      brightness: brightness,
-      extensions: [streamTheme],
-    ),
-    child: Builder(
-      builder: (context) => Material(
-        color: StreamTheme.of(context).colorScheme.backgroundApp,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Center(child: child),
+  return Directionality(
+    textDirection: textDirection,
+    child: Theme(
+      data: ThemeData(
+        brightness: brightness,
+        extensions: [streamTheme],
+      ),
+      child: Builder(
+        builder: (context) => Material(
+          color: StreamTheme.of(context).colorScheme.backgroundApp,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(child: child),
+          ),
         ),
       ),
     ),
