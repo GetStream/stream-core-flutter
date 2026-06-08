@@ -216,7 +216,9 @@ void main() {
           home: Stack(
             children: [
               Positioned(
-                bottom: 0, left: 0, right: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
                 child: StreamSnackbarHost(messenger: messenger),
               ),
             ],
@@ -255,7 +257,9 @@ void main() {
           home: Stack(
             children: [
               Positioned(
-                bottom: 0, left: 0, right: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
                 child: StreamSnackbarHost(messenger: messenger),
               ),
             ],
@@ -263,13 +267,15 @@ void main() {
         ),
       );
 
-      final controller = messenger.show(StreamSnackbar(
-        message: const Text('Boom'),
-        action: StreamSnackbarAction(
-          label: const Text('Throw'),
-          onPressed: () => throw StateError('user callback failed'),
+      final controller = messenger.show(
+        StreamSnackbar(
+          message: const Text('Boom'),
+          action: StreamSnackbarAction(
+            label: const Text('Throw'),
+            onPressed: () => throw StateError('user callback failed'),
+          ),
         ),
-      ));
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
