@@ -324,10 +324,10 @@ class StreamSnackbarHost extends StatefulWidget {
   final StreamSnackbarMessenger messenger;
 
   @override
-  State<StreamSnackbarHost> createState() => _StreamSnackbarMessenger();
+  State<StreamSnackbarHost> createState() => _StreamSnackbarHostState();
 }
 
-class _StreamSnackbarMessenger extends State<StreamSnackbarHost> {
+class _StreamSnackbarHostState extends State<StreamSnackbarHost> {
   @override
   Widget build(BuildContext context) {
     return _StreamSnackbarHostProvider(

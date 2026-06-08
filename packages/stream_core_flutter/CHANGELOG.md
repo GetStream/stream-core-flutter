@@ -2,9 +2,7 @@
 
 ### ✨ Features
 
-- Added `StreamSnackbar`, a transient pill-shaped feedback container with success/error/loading/neutral variants, optional trailing action, and per-variant auto-dismiss rules (`StreamSnackbarVariant`, `StreamSnackbarAction`, `StreamSnackbarClosedReason`). Themable via `StreamSnackbarTheme` / `StreamSnackbarStyle`, with a built-in `StreamButtonThemeStyle` for the action; rendering overridable via `StreamComponentFactory.snackbar`.
-- Added `StreamSnackbarMessenger`, the imperative queue owner. `StreamSnackbarMessenger.of(context)` is the single canonical lookup that resolves to the nearest enclosing snackbar surface. `show()` returns a `StreamSnackbarController` exposing `closed: Future<StreamSnackbarClosedReason>` and `close([reason])`.
-- Added three surfaces that work without a `Scaffold`: `StreamSnackbarScope` (app-wide convenience, wrap once in `MaterialApp.builder`), `StreamSnackbarPopup` (anchored above a small surface like a composer, escapes the anchor's bounds via `Overlay`), and `StreamSnackbarHost` (low-level inline render slot). Each ctor auto-manages its own `StreamSnackbarMessenger`; `.withState` is the escape hatch for externally-owned messengers.
+- Added `StreamSnackbar` and `StreamSnackbarTheme` — a transient pill-shaped feedback container with success/error/loading/neutral variants and an optional trailing action. Wrap an app with `StreamSnackbarScope` or a component with `StreamSnackbarPopup` (anchored above a small surface), then fire via `StreamSnackbarMessenger.of(context).show(...)`.
 
 ## 0.3.0
 
