@@ -115,9 +115,7 @@ class _SnackbarPlaygroundState extends State<_SnackbarPlayground> {
     final snackbar = StreamSnackbar(
       message: Text(widget.message),
       variant: widget.variant,
-      action: widget.withAction
-          ? StreamSnackbarAction(label: const Text('Undo'), onPressed: () {})
-          : null,
+      action: widget.withAction ? StreamSnackbarAction(label: const Text('Undo'), onPressed: () {}) : null,
       duration: isLoading ? null : Duration(seconds: widget.durationSeconds),
     );
 
@@ -360,10 +358,13 @@ class _VariantsSection extends StatelessWidget {
           child: _SnackbarList(
             entries: [
               for (final variant in StreamSnackbarVariant.values)
-                (variant.name, StreamSnackbar(
-                  message: Text(_messageFor(variant)),
-                  variant: variant,
-                )),
+                (
+                  variant.name,
+                  StreamSnackbar(
+                    message: Text(_messageFor(variant)),
+                    variant: variant,
+                  ),
+                ),
             ],
           ),
         ),
@@ -408,14 +409,17 @@ class _WithActionSection extends StatelessWidget {
                 (StreamSnackbarVariant.error, 'Could not connect', 'Retry'),
                 (StreamSnackbarVariant.loading, 'Uploading 1 of 3', 'Cancel'),
               ])
-                (entry.$1.name, StreamSnackbar(
-                  message: Text(entry.$2),
-                  variant: entry.$1,
-                  action: StreamSnackbarAction(
-                    label: Text(entry.$3),
-                    onPressed: () {},
+                (
+                  entry.$1.name,
+                  StreamSnackbar(
+                    message: Text(entry.$2),
+                    variant: entry.$1,
+                    action: StreamSnackbarAction(
+                      label: Text(entry.$3),
+                      onPressed: () {},
+                    ),
                   ),
-                )),
+                ),
             ],
           ),
         ),
@@ -449,13 +453,16 @@ class _MessageLengthSection extends StatelessWidget {
             entries: [
               ('short', StreamSnackbar(message: const Text('Saved'))),
               ('medium', StreamSnackbar(message: const Text('Your draft was saved automatically'))),
-              ('long (truncates)', StreamSnackbar(
-                message: const Text(
-                  'Your draft has been saved and is now available across '
-                  'every device signed in to your account.',
+              (
+                'long (truncates)',
+                StreamSnackbar(
+                  message: const Text(
+                    'Your draft has been saved and is now available across '
+                    'every device signed in to your account.',
+                  ),
+                  action: StreamSnackbarAction(label: const Text('OK'), onPressed: () {}),
                 ),
-                action: StreamSnackbarAction(label: const Text('OK'), onPressed: () {}),
-              )),
+              ),
             ],
           ),
         ),
@@ -533,9 +540,7 @@ class _ReplaceVsQueueDemo extends StatelessWidget {
       scope.show(
         StreamSnackbar(
           message: Text(message),
-          variant: message == 'Connected'
-              ? StreamSnackbarVariant.success
-              : StreamSnackbarVariant.loading,
+          variant: message == 'Connected' ? StreamSnackbarVariant.success : StreamSnackbarVariant.loading,
         ),
       );
       await Future<void>.delayed(const Duration(milliseconds: 600));
@@ -647,19 +652,25 @@ class _CustomizationSection extends StatelessWidget {
               'renderer would.',
           child: _SnackbarList(
             entries: [
-              ('default', StreamSnackbar(
-                message: const Text('Message sent'),
-                variant: StreamSnackbarVariant.success,
-              )),
-              ('custom', StreamComponentFactory(
-                builders: StreamComponentBuilders(
-                  snackbar: (context, props) => _BannerStyleSnackbar(props: props),
-                ),
-                child: StreamSnackbar(
+              (
+                'default',
+                StreamSnackbar(
                   message: const Text('Message sent'),
                   variant: StreamSnackbarVariant.success,
                 ),
-              )),
+              ),
+              (
+                'custom',
+                StreamComponentFactory(
+                  builders: StreamComponentBuilders(
+                    snackbar: (context, props) => _BannerStyleSnackbar(props: props),
+                  ),
+                  child: StreamSnackbar(
+                    message: const Text('Message sent'),
+                    variant: StreamSnackbarVariant.success,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -1019,9 +1030,7 @@ class _LiveDemoCard extends StatelessWidget {
               StreamSnackbar(
                 message: Text(message),
                 variant: variant,
-                action: actionLabel == null
-                    ? null
-                    : StreamSnackbarAction(label: Text(actionLabel!), onPressed: () {}),
+                action: actionLabel == null ? null : StreamSnackbarAction(label: Text(actionLabel!), onPressed: () {}),
               ),
             );
             if (autoDismissAfter case final delay?) {
@@ -1084,7 +1093,9 @@ class _LabeledSnackbar extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(child: Align(alignment: Alignment.centerLeft, child: snackbar)),
+        Expanded(
+          child: Align(alignment: Alignment.centerLeft, child: snackbar),
+        ),
       ],
     );
   }
