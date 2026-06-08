@@ -69,6 +69,7 @@ export 'components/message_layout/stream_message_stack_position.dart';
 export 'components/reaction/stream_reaction_picker.dart' hide DefaultStreamReactionPicker;
 export 'components/reaction/stream_reactions.dart' hide DefaultStreamReactions;
 export 'components/sheet/stream_sheet.dart';
+export 'components/snackbar/stream_snackbar.dart' hide DefaultStreamSnackbar;
 export 'components/toolbar/stream_app_bar.dart' hide DefaultStreamAppBar;
 export 'components/toolbar/stream_bottom_app_bar.dart' hide DefaultStreamBottomAppBar;
 export 'components/toolbar/stream_sheet_header.dart' hide DefaultStreamSheetHeader;

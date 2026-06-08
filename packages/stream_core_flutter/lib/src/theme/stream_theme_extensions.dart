@@ -32,6 +32,7 @@ import 'components/stream_reactions_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
+import 'components/stream_snackbar_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
@@ -194,6 +195,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamSkeletonLoadingThemeData] from the nearest ancestor.
   StreamSkeletonLoadingThemeData get streamSkeletonLoadingTheme => StreamSkeletonLoadingTheme.of(this);
+
+  /// Returns the [StreamSnackbarThemeData] from the nearest ancestor.
+  StreamSnackbarThemeData get streamSnackbarTheme => StreamSnackbarTheme.of(this);
 
   /// Returns the [StreamStepperThemeData] from the nearest ancestor.
   StreamStepperThemeData get streamStepperTheme => StreamStepperTheme.of(this);

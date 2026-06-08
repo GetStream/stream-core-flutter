@@ -173,6 +173,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
     StreamComponentBuilder<StreamSheetHeaderProps>? sheetHeader,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
+    StreamComponentBuilder<StreamSnackbarProps>? snackbar,
     StreamComponentBuilder<StreamStepperProps>? stepper,
     StreamComponentBuilder<StreamTextInputProps>? textInput,
     StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
@@ -225,6 +226,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       retryBadge: retryBadge,
       sheetHeader: sheetHeader,
       skeletonLoading: skeletonLoading,
+      snackbar: snackbar,
       stepper: stepper,
       textInput: textInput,
       toggleSwitch: toggleSwitch,
@@ -278,6 +280,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.retryBadge,
     required this.sheetHeader,
     required this.skeletonLoading,
+    required this.snackbar,
     required this.stepper,
     required this.textInput,
     required this.toggleSwitch,
@@ -523,6 +526,14 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamSkeletonLoading] uses [DefaultStreamSkeletonLoading].
   final StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading;
+
+  /// Custom builder for snackbar widgets.
+  ///
+  /// When null, [StreamSnackbar] uses its built-in pill rendering. Every
+  /// snackbar dispatched through a [StreamSnackbarMessenger] passes through
+  /// this slot, so embedders can restyle SDK-fired snackbars (or suppress
+  /// them by returning `const SizedBox.shrink()`).
+  final StreamComponentBuilder<StreamSnackbarProps>? snackbar;
 
   /// Custom builder for stepper widgets.
   ///

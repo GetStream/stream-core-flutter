@@ -89,6 +89,7 @@ mixin _$StreamComponentBuilders {
       retryBadge: t < 0.5 ? a.retryBadge : b.retryBadge,
       sheetHeader: t < 0.5 ? a.sheetHeader : b.sheetHeader,
       skeletonLoading: t < 0.5 ? a.skeletonLoading : b.skeletonLoading,
+      snackbar: t < 0.5 ? a.snackbar : b.snackbar,
       stepper: t < 0.5 ? a.stepper : b.stepper,
       textInput: t < 0.5 ? a.textInput : b.textInput,
       toggleSwitch: t < 0.5 ? a.toggleSwitch : b.toggleSwitch,
@@ -162,6 +163,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,
     Widget Function(BuildContext, StreamSheetHeaderProps)? sheetHeader,
     Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
+    Widget Function(BuildContext, StreamSnackbarProps)? snackbar,
     Widget Function(BuildContext, StreamStepperProps)? stepper,
     Widget Function(BuildContext, StreamTextInputProps)? textInput,
     Widget Function(BuildContext, StreamSwitchProps)? toggleSwitch,
@@ -228,6 +230,7 @@ mixin _$StreamComponentBuilders {
       retryBadge: retryBadge ?? _this.retryBadge,
       sheetHeader: sheetHeader ?? _this.sheetHeader,
       skeletonLoading: skeletonLoading ?? _this.skeletonLoading,
+      snackbar: snackbar ?? _this.snackbar,
       stepper: stepper ?? _this.stepper,
       textInput: textInput ?? _this.textInput,
       toggleSwitch: toggleSwitch ?? _this.toggleSwitch,
@@ -294,6 +297,7 @@ mixin _$StreamComponentBuilders {
       retryBadge: other.retryBadge,
       sheetHeader: other.sheetHeader,
       skeletonLoading: other.skeletonLoading,
+      snackbar: other.snackbar,
       stepper: other.stepper,
       textInput: other.textInput,
       toggleSwitch: other.toggleSwitch,
@@ -364,6 +368,7 @@ mixin _$StreamComponentBuilders {
         _other.retryBadge == _this.retryBadge &&
         _other.sheetHeader == _this.sheetHeader &&
         _other.skeletonLoading == _this.skeletonLoading &&
+        _other.snackbar == _this.snackbar &&
         _other.stepper == _this.stepper &&
         _other.textInput == _this.textInput &&
         _other.toggleSwitch == _this.toggleSwitch &&
@@ -420,6 +425,7 @@ mixin _$StreamComponentBuilders {
       _this.retryBadge,
       _this.sheetHeader,
       _this.skeletonLoading,
+      _this.snackbar,
       _this.stepper,
       _this.textInput,
       _this.toggleSwitch,
