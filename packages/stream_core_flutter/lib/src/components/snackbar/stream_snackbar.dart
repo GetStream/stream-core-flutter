@@ -238,14 +238,24 @@ class StreamSnackbarMessenger extends ChangeNotifier {
     return marker?.messenger;
   }
 
-  // Requests the head of the queue to exit with [reason]. The host widget
-  // picks up the request, plays the exit animation, then calls _finalize
-  // to pop the queue.
+  // Requests exit for [hosted] with [reason]. When [hosted] is the head of
+  // the queue, the host widget picks up the request, plays the exit
+  // animation, then calls _finalize. When [hosted] is queued but not yet
+  // shown, it is removed silently and its future is completed immediately
+  // — no animation, since it never reached the screen.
   void _requestExit(_HostedSnackbar hosted, StreamSnackbarClosedReason reason) {
-    if (_queue.isEmpty || _queue.first != hosted) return;
+    if (_queue.isEmpty) return;
     if (hosted._requestedExit != null) return;
-    hosted._requestedExit = reason;
-    notifyListeners();
+
+    if (identical(_queue.first, hosted)) {
+      hosted._requestedExit = reason;
+      notifyListeners();
+      return;
+    }
+
+    if (_queue.remove(hosted)) {
+      if (!hosted.completer.isCompleted) hosted.completer.complete(reason);
+    }
   }
 
   // Pops the head of the queue and completes its future. Called by the
@@ -606,13 +616,22 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
       return;
     }
 
-    if (_showing != null) return;
+    // The head changed under us — either we're already exiting (in which
+    // case the exit completion will trigger another sync) or _showing was
+    // removed externally (e.g. messenger.dispose). In both cases, drop
+    // local state and pick up the new head fresh.
+    if (_exiting) return;
+
+    _timer?.cancel();
+    _showing = null;
+    _animation.value = 0;
 
     if (next != null) {
       _showing = next;
-      _exiting = false;
       setState(() {});
       _animation.forward(from: 0).whenComplete(_startTimer);
+    } else {
+      setState(() {});
     }
   }
 
@@ -922,8 +941,12 @@ class DefaultStreamSnackbar extends StatelessWidget {
   final StreamSnackbarProps props;
 
   void _handleActionPressed(BuildContext context) {
-    props.action?.onPressed.call();
-    StreamSnackbarMessenger.maybeOf(context)?.close(StreamSnackbarClosedReason.action);
+    final messenger = StreamSnackbarMessenger.maybeOf(context);
+    try {
+      props.action?.onPressed.call();
+    } finally {
+      messenger?.close(StreamSnackbarClosedReason.action);
+    }
   }
 
   @override

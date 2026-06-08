@@ -206,6 +206,80 @@ void main() {
       expect(await second.closed, StreamSnackbarClosedReason.dismiss);
     });
 
+    testWidgets('queued (not yet shown) snackbar can be closed before its turn', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Stack(
+            children: [
+              Positioned(
+                bottom: 0, left: 0, right: 0,
+                child: StreamSnackbarHost(messenger: messenger),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final first = messenger.show(StreamSnackbar(message: const Text('First')));
+      final queued = messenger.show(StreamSnackbar(message: const Text('Queued')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Cancel the queued one before it ever shows.
+      queued.close();
+      expect(await queued.closed, StreamSnackbarClosedReason.dismiss);
+      expect(find.text('First'), findsOneWidget);
+      expect(find.text('Queued'), findsNothing);
+
+      // First should still be on screen and behave normally.
+      first.close();
+      await tester.pumpAndSettle();
+      expect(await first.closed, StreamSnackbarClosedReason.dismiss);
+    });
+
+    testWidgets('throwing action callback still closes the snackbar', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+      final errors = <Object>[];
+      final originalHandler = FlutterError.onError;
+      FlutterError.onError = (details) => errors.add(details.exception);
+      addTearDown(() => FlutterError.onError = originalHandler);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Stack(
+            children: [
+              Positioned(
+                bottom: 0, left: 0, right: 0,
+                child: StreamSnackbarHost(messenger: messenger),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final controller = messenger.show(StreamSnackbar(
+        message: const Text('Boom'),
+        action: StreamSnackbarAction(
+          label: const Text('Throw'),
+          onPressed: () => throw StateError('user callback failed'),
+        ),
+      ));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      await tester.tap(find.text('Throw'));
+      await tester.pumpAndSettle();
+
+      expect(await controller.closed, StreamSnackbarClosedReason.action);
+      expect(errors.whereType<StateError>(), isNotEmpty);
+    });
+
     testWidgets('StreamComponentFactory.snackbar override is honoured', (tester) async {
       final messenger = StreamSnackbarMessenger();
       addTearDown(messenger.dispose);
