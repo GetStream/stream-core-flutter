@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_app_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -34,8 +35,8 @@ class StreamScaffoldInsets extends InheritedWidget {
     required this.topPadding,
     required this.bottomPadding,
     required super.child,
-  })  : assert(topPadding >= 0, 'topPadding must be non-negative'),
-        assert(bottomPadding >= 0, 'bottomPadding must be non-negative');
+  }) : assert(topPadding >= 0, 'topPadding must be non-negative'),
+       assert(bottomPadding >= 0, 'bottomPadding must be non-negative');
 
   /// The vertical space (in logical pixels) occupied by the floating app bar
   /// at the top, including the system status-bar inset.
@@ -176,7 +177,7 @@ class StreamScaffold extends StatelessWidget {
 
   /// Background color of the scaffold.
   ///
-  /// Defaults to [Scaffold.backgroundColor].
+  /// Defaults to [StreamColorScheme.backgroundApp].
   final Color? backgroundColor;
 
   /// Whether the scaffold should resize to avoid the on-screen keyboard.
@@ -189,19 +190,18 @@ class StreamScaffold extends StatelessWidget {
     final appStyle = context.streamTheme.appStyle;
     final effectiveAppBarBehavior = appBarBehavior ?? appStyle.appBarBehavior;
     final effectiveBottomBarBehavior = bottomBarBehavior ?? appStyle.bottomBarBehavior;
+    final effectiveBackgroundColor = backgroundColor ?? context.streamColorScheme.backgroundApp;
 
     final appBarFloating = effectiveAppBarBehavior == AppBarBehavior.floating;
     final bottomFloating = effectiveBottomBarBehavior == BottomBarBehavior.floating && bottom != null;
 
-    final topInset = appBarFloating
-        ? (appBar?.preferredSize.height ?? 0) + MediaQuery.paddingOf(context).top
-        : 0.0;
+    final topInset = appBarFloating ? (appBar?.preferredSize.height ?? 0) + MediaQuery.paddingOf(context).top : 0.0;
 
     // When neither slot is floating, use a plain Scaffold for maximum
     // compatibility (e.g. keyboard avoidance, Scaffold.of, etc.).
     if (!appBarFloating && !bottomFloating) {
       return Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: effectiveBackgroundColor,
         resizeToAvoidBottomInset: resizeToAvoidBottomInset,
         appBar: appBar,
         drawer: drawer,
@@ -216,7 +216,7 @@ class StreamScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: effectiveBackgroundColor,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       // The appBar always goes in the Scaffold's standard slot.
       // extendBodyBehindAppBar controls whether the body overlaps it (floating)
@@ -326,8 +326,7 @@ class _StreamScaffoldBody extends StatelessWidget {
           id: _Slot.body,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final bottomHeight =
-                  constraints is _BodyBoxConstraints ? constraints.bottomHeight : 0.0;
+              final bottomHeight = constraints is _BodyBoxConstraints ? constraints.bottomHeight : 0.0;
               return StreamScaffoldInsets(
                 topPadding: topInset,
                 bottomPadding: bottomHeight,
