@@ -462,7 +462,7 @@ mixin _SharedButtonDefaults on StreamButtonThemeStyle {
   @override
   WidgetStateProperty<double> get elevation => WidgetStateProperty.resolveWith((states) {
     if (!isFloating) return 0;
-    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.disabled)) return 6.0;
     if (states.contains(WidgetState.pressed)) return 6.0;
     if (states.contains(WidgetState.hovered)) return 8.0;
     return 6.0;
@@ -636,8 +636,8 @@ class _SecondaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButto
 
   @override
   WidgetStateProperty<Color> get backgroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     final base = isFloating ? colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.disabled)) return base;
     if (states.contains(WidgetState.selected)) return .alphaBlend(colorScheme.backgroundSelected, base);
     return base;
   });
