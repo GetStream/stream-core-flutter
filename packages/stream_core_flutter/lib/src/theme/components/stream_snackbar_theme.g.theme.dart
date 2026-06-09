@@ -113,6 +113,7 @@ mixin _$StreamSnackbarStyle {
       constraints: BoxConstraints.lerp(a.constraints, b.constraints, t),
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       actionStyle: StreamButtonThemeStyle.lerp(a.actionStyle, b.actionStyle, t),
+      dismissDirection: t < 0.5 ? a.dismissDirection : b.dismissDirection,
     );
   }
 
@@ -127,6 +128,7 @@ mixin _$StreamSnackbarStyle {
     BoxConstraints? constraints,
     TextStyle? textStyle,
     StreamButtonThemeStyle? actionStyle,
+    DismissDirection? dismissDirection,
   }) {
     final _this = (this as StreamSnackbarStyle);
 
@@ -141,6 +143,7 @@ mixin _$StreamSnackbarStyle {
       constraints: constraints ?? _this.constraints,
       textStyle: textStyle ?? _this.textStyle,
       actionStyle: actionStyle ?? _this.actionStyle,
+      dismissDirection: dismissDirection ?? _this.dismissDirection,
     );
   }
 
@@ -169,6 +172,7 @@ mixin _$StreamSnackbarStyle {
       textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
       actionStyle:
           _this.actionStyle?.merge(other.actionStyle) ?? other.actionStyle,
+      dismissDirection: other.dismissDirection,
     );
   }
 
@@ -194,7 +198,8 @@ mixin _$StreamSnackbarStyle {
         _other.margin == _this.margin &&
         _other.constraints == _this.constraints &&
         _other.textStyle == _this.textStyle &&
-        _other.actionStyle == _this.actionStyle;
+        _other.actionStyle == _this.actionStyle &&
+        _other.dismissDirection == _this.dismissDirection;
   }
 
   @override
@@ -213,6 +218,7 @@ mixin _$StreamSnackbarStyle {
       _this.constraints,
       _this.textStyle,
       _this.actionStyle,
+      _this.dismissDirection,
     );
   }
 }

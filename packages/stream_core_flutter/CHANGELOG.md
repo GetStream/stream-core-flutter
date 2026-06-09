@@ -2,7 +2,7 @@
 
 ### ✨ Features
 
-- Added `StreamSnackbar` and `StreamSnackbarTheme` — a transient pill-shaped feedback container with success/error/loading/neutral variants and an optional trailing action. Wrap an app with `StreamSnackbarScope` or a component with `StreamSnackbarPopup` (anchored above a small surface), then fire via `StreamSnackbarMessenger.of(context).show(...)`.
+- Added `StreamSnackbar` and `StreamSnackbarTheme` — Stream-styled transient feedback snackbars with a messenger-driven queue.
 
 ## 0.3.0
 

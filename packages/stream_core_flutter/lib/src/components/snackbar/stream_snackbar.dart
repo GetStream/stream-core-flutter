@@ -55,12 +55,12 @@ enum StreamSnackbarClosedReason {
   timeout,
 
   /// Programmatically dismissed via [StreamSnackbarController.close] or
-  /// [StreamSnackbarMessenger.close]. The exit animation
-  /// played.
+  /// [StreamSnackbarMessenger.hideCurrent]. The exit animation played.
   dismiss,
 
   /// Removed without an exit animation. Fires when the messenger is
-  /// disposed while a snackbar is still queued.
+  /// disposed, [StreamSnackbarMessenger.removeCurrent] is called, or
+  /// [StreamSnackbarMessenger.clearSnackbars] is called.
   remove,
 }
 
@@ -198,19 +198,83 @@ class StreamSnackbarMessenger extends ChangeNotifier {
   /// Returns a [StreamSnackbarController]. If another snackbar is currently
   /// shown, [controller.closed] does not resolve until the queue advances to
   /// this snackbar and it is then dismissed.
-  StreamSnackbarController show(StreamSnackbar snackbar) {
+  ///
+  /// When [replace] is true, the currently-displayed snackbar (if any) is
+  /// removed without an exit animation before enqueueing — equivalent to
+  /// calling [removeCurrent] first. Useful for "snap to the freshest" UX
+  /// (e.g. a hint that should reset on each retrigger).
+  StreamSnackbarController show(
+    StreamSnackbar snackbar, {
+    bool replace = false,
+  }) {
     assert(!_disposed, 'show called after dispose');
+    if (replace) removeCurrent();
     final hosted = _HostedSnackbar(snackbar: snackbar, host: this);
     _queue.add(hosted);
-    if (_queue.length == 1) notifyListeners();
+    if (_queue.length != 1) return hosted.controller;
+    try {
+      notifyListeners();
+    } catch (exception) {
+      assert(() {
+        if (exception is FlutterError) {
+          final summary = exception.diagnostics.first.toDescription();
+          if (summary == 'setState() or markNeedsBuild() called during build.') {
+            final information = <DiagnosticsNode>[
+              ErrorSummary('The show() method cannot be called during build.'),
+              ErrorDescription(
+                'The show() method was called during build, which is '
+                'prohibited as showing snack bars requires updating state. Updating '
+                'state is not possible during build.',
+              ),
+              ErrorHint(
+                'Instead of calling show() during build, call it directly '
+                'in your on tap (and related) callbacks. If you need to immediately '
+                'show a snack bar, make the call in initState() or '
+                'didChangeDependencies() instead. Otherwise, you can also schedule a '
+                'post-frame callback using SchedulerBinding.addPostFrameCallback to '
+                'show the snack bar after the current frame.',
+              ),
+            ];
+            throw FlutterError.fromParts(information);
+          }
+        }
+        return true;
+      }());
+      rethrow;
+    }
     return hosted.controller;
   }
 
-  /// Dismisses the currently-displayed snackbar (if any) with [reason].
+  /// Dismisses the currently-displayed snackbar with the exit animation.
   /// No-op when the queue is empty.
-  void close([StreamSnackbarClosedReason reason = .dismiss]) {
+  void hideCurrent([StreamSnackbarClosedReason reason = .dismiss]) {
     if (_queue.isEmpty) return;
     _requestExit(_queue.first, reason);
+  }
+
+  /// Dismisses the currently-displayed snackbar **without** an exit
+  /// animation and immediately advances to the next queued one.
+  /// No-op when the queue is empty.
+  ///
+  /// Use for snap-replacement when a fresh snackbar should win immediately
+  /// (e.g. a rapidly retriggered hint).
+  void removeCurrent([StreamSnackbarClosedReason reason = .remove]) {
+    if (_queue.isEmpty) return;
+    final hosted = _queue.removeFirst();
+    if (!hosted.completer.isCompleted) hosted.completer.complete(reason);
+    notifyListeners();
+  }
+
+  /// Removes every snackbar — current and queued — without animation.
+  void clearSnackbars() {
+    if (_queue.isEmpty) return;
+    while (_queue.isNotEmpty) {
+      final hosted = _queue.removeFirst();
+      if (!hosted.completer.isCompleted) {
+        hosted.completer.complete(StreamSnackbarClosedReason.remove);
+      }
+    }
+    notifyListeners();
   }
 
   /// Returns the nearest [StreamSnackbarMessenger] ancestor provided by a
@@ -221,12 +285,36 @@ class StreamSnackbarMessenger extends ChangeNotifier {
   static StreamSnackbarMessenger of(BuildContext context) {
     final messenger = maybeOf(context);
     if (messenger != null) return messenger;
-    throw FlutterError(
-      'StreamSnackbarMessenger.of() called without an enclosing snackbar surface.\n'
-      'Wrap the relevant subtree with `StreamSnackbarScope(child: ...)` for '
-      'app-wide snackbars, or `StreamSnackbarPopup(child: ...)` for an '
-      'anchored popup.',
-    );
+    throw FlutterError.fromParts(<DiagnosticsNode>[
+      ErrorSummary(
+        'StreamSnackbarMessenger.of() called with a context that does not '
+        'contain a StreamSnackbarMessenger.',
+      ),
+      ErrorDescription(
+        'No StreamSnackbarMessenger ancestor could be found starting from '
+        'the context that was passed to StreamSnackbarMessenger.of(). This '
+        'usually happens when the context provided is from the same '
+        'StatefulWidget as the one that creates the surface (the '
+        'StreamSnackbarScope, StreamSnackbarPopup, or StreamSnackbarHost) '
+        'being sought.',
+      ),
+      ErrorHint(
+        'There are several ways to avoid this problem. The simplest is to '
+        'use a Builder to get a context that is "under" the snackbar '
+        'surface. Wrap the relevant subtree with `StreamSnackbarScope` for '
+        'app-wide snackbars, or `StreamSnackbarPopup` for an anchored '
+        'popup.',
+      ),
+      ErrorHint(
+        'A more efficient solution is to split your build function into '
+        'several widgets. This introduces a new context from which you '
+        'can obtain the StreamSnackbarMessenger. In this solution, you '
+        'would have an outer widget that creates the snackbar surface '
+        'populated by instances of your new inner widgets, and then in '
+        'these inner widgets you would use StreamSnackbarMessenger.of().',
+      ),
+      context.describeElement('The context used was'),
+    ]);
   }
 
   /// Returns the nearest [StreamSnackbarMessenger] ancestor, or null if none
@@ -402,10 +490,30 @@ class _SnackbarTransitionState extends State<_SnackbarTransition> {
   }
 }
 
-/// An anchored render slot that floats snackbars above a [child].
+/// Where the snackbar is positioned relative to its [StreamSnackbarPopup]
+/// anchor.
 ///
-/// Renders into the surrounding [Overlay], with the snackbar's bottom edge
-/// aligned to [child]'s top edge. Use this for small surfaces (composer,
+/// See also:
+///
+///  * [StreamSnackbarPopup.placement], which selects one of these values.
+enum StreamSnackbarPopupPlacement {
+  /// Snackbar's bottom edge aligns to the anchor's top edge.
+  ///
+  /// The default. Suitable for anchors at the bottom of the screen — e.g.
+  /// a message composer.
+  over,
+
+  /// Snackbar's top edge aligns to the anchor's bottom edge.
+  ///
+  /// Suitable for anchors at the top of the screen — e.g. a top-pinned
+  /// header or composer.
+  under,
+}
+
+/// An anchored render slot that floats snackbars next to a [child].
+///
+/// Renders into the surrounding [Overlay], anchored above or below [child]
+/// according to [placement]. Use this for small surfaces (composer,
 /// attachment picker) where the snackbar would otherwise be obscured by —
 /// or clipped to — the surface's bounds. For full-screen surfaces, prefer
 /// [StreamSnackbarHost].
@@ -446,6 +554,7 @@ class StreamSnackbarPopup extends StatefulWidget {
   const StreamSnackbarPopup({
     super.key,
     required this.child,
+    this.placement = StreamSnackbarPopupPlacement.over,
   }) : externalMessenger = null;
 
   /// Creates a popup that delegates to an externally-owned [messenger].
@@ -454,11 +563,18 @@ class StreamSnackbarPopup extends StatefulWidget {
     super.key,
     required StreamSnackbarMessenger messenger,
     required this.child,
+    this.placement = StreamSnackbarPopupPlacement.over,
   }) : externalMessenger = messenger;
 
-  /// The anchor widget. The snackbar's bottom edge aligns to this widget's
-  /// top edge, centered horizontally over its width.
+  /// The anchor widget. The snackbar's edge is aligned to this widget's
+  /// opposite edge, centered horizontally over its width, according to
+  /// [placement].
   final Widget child;
+
+  /// Where the snackbar is positioned relative to [child].
+  ///
+  /// Defaults to [StreamSnackbarPopupPlacement.over].
+  final StreamSnackbarPopupPlacement placement;
 
   /// External messenger used when constructed via [withState].
   final StreamSnackbarMessenger? externalMessenger;
@@ -507,15 +623,27 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
                   final style = context.streamSnackbarTheme.style;
                   final defaults = _StreamSnackbarDefaults(context);
                   final effectiveMargin = (style?.margin ?? defaults.margin).resolve(Directionality.of(context));
+                  final (targetAnchor, followerAnchor, offset) = switch (widget.placement) {
+                    StreamSnackbarPopupPlacement.over => (
+                      Alignment.topCenter,
+                      Alignment.bottomCenter,
+                      Offset(0, -effectiveMargin.bottom),
+                    ),
+                    StreamSnackbarPopupPlacement.under => (
+                      Alignment.bottomCenter,
+                      Alignment.topCenter,
+                      Offset(0, effectiveMargin.top),
+                    ),
+                  };
 
                   return Positioned(
                     left: 0,
                     top: 0,
                     child: CompositedTransformFollower(
                       link: _link,
-                      targetAnchor: Alignment.topCenter,
-                      followerAnchor: Alignment.bottomCenter,
-                      offset: Offset(0, -effectiveMargin.bottom),
+                      targetAnchor: targetAnchor,
+                      followerAnchor: followerAnchor,
+                      offset: offset,
                       showWhenUnlinked: false,
                       child: _SnackbarTransition(animation: animation, child: child),
                     ),
@@ -575,9 +703,16 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
       vsync: this,
       duration: _enterDuration,
       reverseDuration: _exitDuration,
-    );
+    )..addStatusListener(_handleAnimationStatus);
     widget.messenger.addListener(_onControllerChanged);
     _syncWithController();
+  }
+
+  // Drives the auto-dismiss timer off the enter-animation status instead
+  // of chaining whenComplete onto the forward future.
+  void _handleAnimationStatus(AnimationStatus status) {
+    if (!mounted) return;
+    if (status == AnimationStatus.completed) _startTimer();
   }
 
   @override
@@ -623,16 +758,10 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     if (_exiting) return;
 
     _timer?.cancel();
-    _showing = null;
+    _showing = next;
     _animation.value = 0;
-
-    if (next != null) {
-      _showing = next;
-      setState(() {});
-      _animation.forward(from: 0).whenComplete(_startTimer);
-    } else {
-      setState(() {});
-    }
+    setState(() {});
+    if (next != null) _animation.forward(from: 0);
   }
 
   void _startTimer() {
@@ -641,6 +770,7 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     if (hosted == null) return;
     final duration = _resolveDuration(hosted.snackbar.props);
     if (duration == _persistentDuration) return;
+    _timer?.cancel();
     _timer = Timer(duration, () {
       final current = _showing;
       if (current == null) return;
@@ -650,37 +780,36 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
 
   Future<void> _startExit(_HostedSnackbar hosted, StreamSnackbarClosedReason reason) async {
     if (_exiting || !mounted) return;
+    // Capture before the await — the host's messenger may swap while the
+    // exit animation plays, and `hosted` belongs to whichever messenger
+    // owned it at the start of the exit.
+    final messenger = widget.messenger;
     _exiting = true;
     _timer?.cancel();
     await _animation.reverse();
     if (!mounted) return;
     _showing = null;
     _exiting = false;
-    _animation.value = 0;
     setState(() {});
-    widget.messenger._finalize(hosted, reason);
+    messenger._finalize(hosted, reason);
   }
 
   void _handleSwipeDismissed() {
     if (_exiting || !mounted) return;
-    final hosted = _showing;
-    if (hosted == null) return;
-    _exiting = true;
-    _timer?.cancel();
-    _showing = null;
-    _animation.value = 0;
-    setState(() {});
-    widget.messenger._finalize(hosted, StreamSnackbarClosedReason.swipe);
-    _exiting = false;
+    // Delegate to the public API; _syncWithController picks up the new
+    // head after notifyListeners and resets the local state.
+    widget.messenger.removeCurrent(StreamSnackbarClosedReason.swipe);
   }
 
   @override
   Widget build(BuildContext context) {
     final hosted = _showing;
     if (hosted == null) return const SizedBox.shrink();
+    final style = context.streamSnackbarTheme.style;
+    final direction = hosted.snackbar.props.dismissDirection ?? style?.dismissDirection ?? DismissDirection.down;
     final dismissible = Dismissible(
       key: ObjectKey(hosted),
-      direction: DismissDirection.down,
+      direction: direction,
       onDismissed: (_) => _handleSwipeDismissed(),
       child: hosted.snackbar,
     );
@@ -796,13 +925,17 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> {
 
   @override
   Widget build(BuildContext context) {
+    // Push the snackbar above the keyboard when one is open. `SafeArea`
+    // covers static insets (home indicator, side notches) but ignores the
+    // soft keyboard's `viewInsets`.
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     return _StreamSnackbarHostProvider(
       messenger: _effectiveMessenger,
       child: Stack(
         children: [
           widget.child,
           Positioned(
-            bottom: 0,
+            bottom: keyboardInset,
             left: 0,
             right: 0,
             child: SafeArea(
@@ -867,14 +1000,16 @@ class StreamSnackbar extends StatelessWidget {
   StreamSnackbar({
     super.key,
     required Widget message,
-    StreamSnackbarVariant variant = StreamSnackbarVariant.neutral,
+    StreamSnackbarVariant variant = .neutral,
     StreamSnackbarAction? action,
     Duration? duration,
-  }) : props = StreamSnackbarProps(
+    DismissDirection? dismissDirection,
+  }) : props = .new(
          message: message,
          variant: variant,
          action: action,
          duration: duration,
+         dismissDirection: dismissDirection,
        );
 
   /// The properties that configure this snackbar.
@@ -897,9 +1032,10 @@ class StreamSnackbarProps {
   /// Creates properties for a snackbar.
   const StreamSnackbarProps({
     required this.message,
-    this.variant = StreamSnackbarVariant.neutral,
+    this.variant = .neutral,
     this.action,
     this.duration,
+    this.dismissDirection,
   });
 
   /// The message displayed inside the snackbar.
@@ -925,6 +1061,13 @@ class StreamSnackbarProps {
   ///  * Otherwise, a snackbar with an [action] lingers 10 s; a snackbar
   ///    without an action auto-dismisses after 5 s.
   final Duration? duration;
+
+  /// Direction the user can swipe to dismiss this snackbar.
+  ///
+  /// Overrides [StreamSnackbarStyle.dismissDirection]. Set to
+  /// [DismissDirection.none] to disable swipe-dismissal entirely. When
+  /// null on both, defaults to [DismissDirection.down].
+  final DismissDirection? dismissDirection;
 }
 
 /// The default implementation of [StreamSnackbar].
@@ -939,15 +1082,6 @@ class DefaultStreamSnackbar extends StatelessWidget {
 
   /// The properties that configure this snackbar.
   final StreamSnackbarProps props;
-
-  void _handleActionPressed(BuildContext context) {
-    final messenger = StreamSnackbarMessenger.maybeOf(context);
-    try {
-      props.action?.onPressed.call();
-    } finally {
-      messenger?.close(StreamSnackbarClosedReason.action);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -970,50 +1104,52 @@ class DefaultStreamSnackbar extends StatelessWidget {
     final variant = props.variant;
     final hasLeading = variant != StreamSnackbarVariant.neutral;
 
-    return ConstrainedBox(
-      constraints: effectiveConstraints,
-      child: Material(
-        shape: effectiveShape,
-        elevation: effectiveElevation,
-        color: effectiveBackgroundColor,
-        child: Padding(
-          padding: effectivePadding,
-          child: Row(
-            mainAxisSize: .min,
-            spacing: spacing.xxs,
-            children: [
-              Flexible(
-                child: Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    start: hasLeading ? spacing.xxs : spacing.xs,
-                    end: spacing.xs,
-                  ),
-                  child: Row(
-                    mainAxisSize: .min,
-                    spacing: spacing.xs,
-                    children: [
-                      ?_buildLeading(context, variant, effectiveForegroundColor),
-                      Flexible(
-                        child: DefaultTextStyle(
-                          maxLines: 1,
-                          style: effectiveTextStyle,
-                          overflow: TextOverflow.ellipsis,
-                          child: props.message,
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      onDismiss: () => StreamSnackbarMessenger.maybeOf(context)?.removeCurrent(),
+      child: ConstrainedBox(
+        constraints: effectiveConstraints,
+        child: Material(
+          shape: effectiveShape,
+          elevation: effectiveElevation,
+          color: effectiveBackgroundColor,
+          child: Padding(
+            padding: effectivePadding,
+            child: Row(
+              mainAxisSize: .min,
+              spacing: spacing.xxs,
+              children: [
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.only(
+                      start: hasLeading ? spacing.xxs : spacing.xs,
+                      end: spacing.xs,
+                    ),
+                    child: Row(
+                      mainAxisSize: .min,
+                      spacing: spacing.xs,
+                      children: [
+                        ?_buildLeading(context, variant, effectiveForegroundColor),
+                        Flexible(
+                          child: DefaultTextStyle(
+                            maxLines: 1,
+                            style: effectiveTextStyle,
+                            overflow: TextOverflow.ellipsis,
+                            child: props.message,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              if (props.action case final action?)
-                StreamButton(
-                  onPressed: () => _handleActionPressed(context),
-                  size: StreamButtonSize.small,
-                  type: StreamButtonType.outline,
-                  themeStyle: effectiveActionStyle,
-                  child: action.label,
-                ),
-            ],
+                if (props.action case final action?)
+                  _SnackbarActionButton(
+                    action: action,
+                    themeStyle: effectiveActionStyle,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1033,6 +1169,48 @@ class DefaultStreamSnackbar extends StatelessWidget {
         trackColor: iconColor.withValues(alpha: 0.32),
       ),
     };
+  }
+}
+
+// Inline trailing action button. Tracks `_handled` so a rapid double-tap
+// during the exit animation only fires the callback once and only sends
+// one .action dismissal.
+class _SnackbarActionButton extends StatefulWidget {
+  const _SnackbarActionButton({
+    required this.action,
+    this.themeStyle,
+  });
+
+  final StreamSnackbarAction action;
+  final StreamButtonThemeStyle? themeStyle;
+
+  @override
+  State<_SnackbarActionButton> createState() => _SnackbarActionButtonState();
+}
+
+class _SnackbarActionButtonState extends State<_SnackbarActionButton> {
+  var _handled = false;
+
+  void _onPressed() {
+    if (_handled) return;
+    setState(() => _handled = true);
+    final messenger = StreamSnackbarMessenger.maybeOf(context);
+    try {
+      widget.action.onPressed();
+    } finally {
+      messenger?.hideCurrent(StreamSnackbarClosedReason.action);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamButton(
+      onPressed: _handled ? null : _onPressed,
+      size: StreamButtonSize.small,
+      type: StreamButtonType.outline,
+      themeStyle: widget.themeStyle,
+      child: widget.action.label,
+    );
   }
 }
 

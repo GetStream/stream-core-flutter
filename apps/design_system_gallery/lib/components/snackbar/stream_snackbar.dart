@@ -39,7 +39,7 @@ Widget buildStreamSnackbarPlayground(BuildContext context) {
     label: 'Replace current',
     description:
         'Dismiss current then show next — useful for status transitions. '
-        'Pattern: state.close() then show().',
+        'Pattern: show(snackbar, replace: true).',
   );
   final durationSeconds = context.knobs.double.slider(
     label: 'Duration (sec)',
@@ -57,8 +57,23 @@ Widget buildStreamSnackbarPlayground(BuildContext context) {
     labelBuilder: (option) => option.label,
     description:
         'scopeFullScreen → StreamSnackbarScope (wraps the surface, snackbar '
-        'at the bottom). aboveComposer → StreamSnackbarPopup (anchored '
-        'above a composer-like row, escapes its bounds via Overlay).',
+        'at the bottom). aboveComposer → StreamSnackbarPopup over a '
+        'composer-like row at the bottom. belowHeader → StreamSnackbarPopup '
+        'under a header-like row at the top.',
+  );
+  final dismissDirection = context.knobs.object.dropdown<DismissDirection>(
+    label: 'Dismiss direction',
+    options: const [
+      DismissDirection.down,
+      DismissDirection.up,
+      DismissDirection.horizontal,
+      DismissDirection.none,
+    ],
+    initialOption: DismissDirection.down,
+    labelBuilder: (option) => option.name,
+    description:
+        'Per-snackbar swipe-to-dismiss direction. Overrides '
+        'StreamSnackbarStyle.dismissDirection. Use .none to disable swipe.',
   );
 
   return _SnackbarPlayground(
@@ -68,12 +83,14 @@ Widget buildStreamSnackbarPlayground(BuildContext context) {
     replace: replace,
     durationSeconds: durationSeconds.toInt(),
     hostMode: hostMode,
+    dismissDirection: dismissDirection,
   );
 }
 
 enum _HostMode {
   scopeFullScreen('Scope — full-screen surface'),
-  aboveComposer('Popup — anchored above composer');
+  aboveComposer('Popup — placement: above (over a bottom composer)'),
+  belowHeader('Popup — placement: below (under a top header)');
 
   const _HostMode(this.label);
   final String label;
@@ -87,6 +104,7 @@ class _SnackbarPlayground extends StatefulWidget {
     required this.replace,
     required this.durationSeconds,
     required this.hostMode,
+    required this.dismissDirection,
   });
 
   final String message;
@@ -95,6 +113,7 @@ class _SnackbarPlayground extends StatefulWidget {
   final bool replace;
   final int durationSeconds;
   final _HostMode hostMode;
+  final DismissDirection dismissDirection;
 
   @override
   State<_SnackbarPlayground> createState() => _SnackbarPlaygroundState();
@@ -110,6 +129,8 @@ class _SnackbarPlaygroundState extends State<_SnackbarPlayground> {
     super.dispose();
   }
 
+  bool get _isPopup => widget.hostMode == _HostMode.aboveComposer || widget.hostMode == _HostMode.belowHeader;
+
   void _show(BuildContext context) {
     final isLoading = widget.variant == StreamSnackbarVariant.loading;
     final snackbar = StreamSnackbar(
@@ -117,23 +138,21 @@ class _SnackbarPlaygroundState extends State<_SnackbarPlayground> {
       variant: widget.variant,
       action: widget.withAction ? StreamSnackbarAction(label: const Text('Undo'), onPressed: () {}) : null,
       duration: isLoading ? null : Duration(seconds: widget.durationSeconds),
+      dismissDirection: widget.dismissDirection,
     );
 
-    if (widget.hostMode == _HostMode.aboveComposer) {
-      if (widget.replace) _popupState.close();
-      _popupState.show(snackbar);
+    if (_isPopup) {
+      _popupState.show(snackbar, replace: widget.replace);
     } else {
-      final scope = StreamSnackbarMessenger.of(context);
-      if (widget.replace) scope.close();
-      scope.show(snackbar);
+      StreamSnackbarMessenger.of(context).show(snackbar, replace: widget.replace);
     }
   }
 
   void _closeActive(BuildContext context) {
-    if (widget.hostMode == _HostMode.aboveComposer) {
-      _popupState.close();
+    if (_isPopup) {
+      _popupState.hideCurrent();
     } else {
-      StreamSnackbarMessenger.maybeOf(context)?.close();
+      StreamSnackbarMessenger.maybeOf(context)?.hideCurrent();
     }
   }
 
@@ -152,6 +171,10 @@ class _SnackbarPlaygroundState extends State<_SnackbarPlayground> {
         child: switch (widget.hostMode) {
           _HostMode.scopeFullScreen => StreamSnackbarScope(child: body),
           _HostMode.aboveComposer => _AboveComposerLayout(
+            popupState: _popupState,
+            body: body,
+          ),
+          _HostMode.belowHeader => _BelowHeaderLayout(
             popupState: _popupState,
             body: body,
           ),
@@ -233,6 +256,57 @@ class _AboveComposerLayout extends StatelessWidget {
           child: const _FakeComposer(),
         ),
       ],
+    );
+  }
+}
+
+/// Layout for the below-header demo: fake header at the top with a
+/// [StreamSnackbarPopup] anchored to it via `placement: below`, body fills
+/// the rest.
+class _BelowHeaderLayout extends StatelessWidget {
+  const _BelowHeaderLayout({required this.popupState, required this.body});
+
+  final StreamSnackbarMessenger popupState;
+  final Widget body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        StreamSnackbarPopup.withState(
+          messenger: popupState,
+          placement: StreamSnackbarPopupPlacement.under,
+          child: const _FakeHeader(),
+        ),
+        Expanded(child: body),
+      ],
+    );
+  }
+}
+
+/// A header-like row at the top that the popup anchors to with
+/// `placement: below`.
+class _FakeHeader extends StatelessWidget {
+  const _FakeHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final spacing = context.streamSpacing;
+    final textTheme = context.streamTextTheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundSurfaceCard,
+        border: Border(bottom: BorderSide(color: colorScheme.borderSubtle)),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.sm),
+      child: Center(
+        child: Text(
+          'Fake header — snackbar floats below this',
+          style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
+        ),
+      ),
     );
   }
 }
@@ -505,9 +579,9 @@ class _ReplaceVsQueueDemo extends StatelessWidget {
       title: 'Queue vs. replace',
       description:
           'show() always queues. To preempt the current snackbar, '
-          'dismiss it first: state.close(). '
-          '"Queue 3" fires three back-to-back; "Replace 3" dismisses '
-          'between each so only the latest is visible.',
+          'pass replace: true (or call hideCurrent() / removeCurrent() '
+          'first). "Queue 3" fires three back-to-back; "Replace 3" '
+          'snap-replaces between each so only the latest is visible.',
       child: Row(
         children: [
           Wrap(
@@ -535,13 +609,12 @@ class _ReplaceVsQueueDemo extends StatelessWidget {
     const messages = ['Connecting…', 'Authenticating…', 'Connected'];
     for (final message in messages) {
       if (!context.mounted) return;
-      final scope = StreamSnackbarMessenger.of(context);
-      if (replace) scope.close();
-      scope.show(
+      StreamSnackbarMessenger.of(context).show(
         StreamSnackbar(
           message: Text(message),
           variant: message == 'Connected' ? StreamSnackbarVariant.success : StreamSnackbarVariant.loading,
         ),
+        replace: replace,
       );
       await Future<void>.delayed(const Duration(milliseconds: 600));
     }
@@ -608,7 +681,7 @@ class _PersistentLoadingDemo extends StatelessWidget {
       title: 'Persistent loading + manual dismiss',
       description:
           'The loading variant is persistent. Dismiss when work completes '
-          'via StreamSnackbarMessenger.of(context).close(). Tap '
+          'via StreamSnackbarMessenger.of(context).hideCurrent(). Tap '
           'below for a 3 s simulated upload.',
       child: StreamButton(
         onPressed: () {
@@ -619,7 +692,7 @@ class _PersistentLoadingDemo extends StatelessWidget {
             ),
           );
           Future<void>.delayed(const Duration(seconds: 3), () {
-            if (context.mounted) StreamSnackbarMessenger.of(context).close();
+            if (context.mounted) StreamSnackbarMessenger.of(context).hideCurrent();
           });
         },
         child: const Text('Start fake upload'),
@@ -688,7 +761,7 @@ class _BannerStyleSnackbar extends StatelessWidget {
 
   void _handleActionPressed(BuildContext context) {
     props.action?.onPressed.call();
-    StreamSnackbarMessenger.maybeOf(context)?.close(StreamSnackbarClosedReason.action);
+    StreamSnackbarMessenger.maybeOf(context)?.hideCurrent(StreamSnackbarClosedReason.action);
   }
 
   @override
@@ -1035,7 +1108,7 @@ class _LiveDemoCard extends StatelessWidget {
             );
             if (autoDismissAfter case final delay?) {
               Future<void>.delayed(delay, () {
-                if (context.mounted) StreamSnackbarMessenger.of(context).close();
+                if (context.mounted) StreamSnackbarMessenger.of(context).hideCurrent();
               });
             }
           },

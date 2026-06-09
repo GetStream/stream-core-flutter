@@ -100,6 +100,7 @@ class StreamSnackbarStyle with _$StreamSnackbarStyle {
     this.constraints,
     this.textStyle,
     this.actionStyle,
+    this.dismissDirection,
   });
 
   /// Pill background colour.
@@ -148,6 +149,12 @@ class StreamSnackbarStyle with _$StreamSnackbarStyle {
   /// snackbar tints the action's foreground and border to match the pill's
   /// [foregroundColor]; override to fully restyle the action button.
   final StreamButtonThemeStyle? actionStyle;
+
+  /// Direction the user can swipe to dismiss the snackbar.
+  ///
+  /// Defaults to [DismissDirection.down]. Set to
+  /// [DismissDirection.none] to disable swipe-dismissal entirely.
+  final DismissDirection? dismissDirection;
 
   /// Linearly interpolate between two [StreamSnackbarStyle] objects.
   static StreamSnackbarStyle? lerp(

@@ -206,6 +206,40 @@ void main() {
       expect(await second.closed, StreamSnackbarClosedReason.dismiss);
     });
 
+    testWidgets('queued snackbar shows after the current one is swipe-dismissed', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: StreamSnackbarHost(messenger: messenger),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final first = messenger.show(StreamSnackbar(message: const Text('First')));
+      messenger.show(StreamSnackbar(message: const Text('Second')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('First'), findsOneWidget);
+
+      await tester.fling(find.text('First'), const Offset(0, 300), 1000);
+      await tester.pumpAndSettle();
+
+      expect(await first.closed, StreamSnackbarClosedReason.swipe);
+      expect(find.text('Second'), findsOneWidget);
+    });
+
     testWidgets('queued (not yet shown) snackbar can be closed before its turn', (tester) async {
       final messenger = StreamSnackbarMessenger();
       addTearDown(messenger.dispose);
@@ -327,6 +361,271 @@ void main() {
       expect(find.text('custom: '), findsOneWidget);
       expect(find.text('hello'), findsOneWidget);
     });
+
+    testWidgets('action button cannot be tapped twice', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+      var pressCount = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: StreamSnackbarHost(messenger: messenger),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      messenger.show(
+        StreamSnackbar(
+          message: const Text('Saved'),
+          action: StreamSnackbarAction(
+            label: const Text('Undo'),
+            onPressed: () => pressCount++,
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      await tester.tap(find.text('Undo'));
+      expect(pressCount, 1);
+
+      // Second tap during the exit animation must be a no-op.
+      await tester.tap(find.text('Undo'), warnIfMissed: false);
+      expect(pressCount, 1);
+
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('snackbar contributes dismiss semantics', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: StreamSnackbarHost(messenger: messenger),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      messenger.show(StreamSnackbar(message: const Text('Saved')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(
+        tester.getSemantics(find.byType(StreamSnackbar)),
+        matchesSemantics(
+          isLiveRegion: true,
+          hasDismissAction: true,
+          children: [matchesSemantics(label: 'Saved')],
+        ),
+      );
+
+      semantics.dispose();
+    });
+
+    group('default display duration', () {
+      testWidgets('neutral without action auto-dismisses after 5s', (tester) async {
+        final messenger = StreamSnackbarMessenger();
+        addTearDown(messenger.dispose);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(extensions: [StreamTheme.light()]),
+            home: Stack(
+              children: [
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: StreamSnackbarHost(messenger: messenger),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        final controller = messenger.show(StreamSnackbar(message: const Text('msg')));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // Still visible just before the 5 s threshold.
+        await tester.pump(const Duration(seconds: 4, milliseconds: 500));
+        expect(find.text('msg'), findsOneWidget);
+
+        // Past the threshold + exit animation: gone.
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+        expect(find.text('msg'), findsNothing);
+        expect(await controller.closed, StreamSnackbarClosedReason.timeout);
+      });
+
+      testWidgets('neutral with action lingers 10s', (tester) async {
+        final messenger = StreamSnackbarMessenger();
+        addTearDown(messenger.dispose);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(extensions: [StreamTheme.light()]),
+            home: Stack(
+              children: [
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: StreamSnackbarHost(messenger: messenger),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        messenger.show(
+          StreamSnackbar(
+            message: const Text('msg'),
+            action: StreamSnackbarAction(label: const Text('Undo'), onPressed: () {}),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // Still visible at 7 s (would have dismissed at 5 s without the action).
+        await tester.pump(const Duration(seconds: 7));
+        expect(find.text('msg'), findsOneWidget);
+
+        // Past 10 s + exit anim: gone.
+        await tester.pump(const Duration(seconds: 4));
+        await tester.pumpAndSettle();
+        expect(find.text('msg'), findsNothing);
+      });
+
+      testWidgets('loading variant is persistent', (tester) async {
+        final messenger = StreamSnackbarMessenger();
+        addTearDown(messenger.dispose);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(extensions: [StreamTheme.light()]),
+            home: Stack(
+              children: [
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: StreamSnackbarHost(messenger: messenger),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        messenger.show(
+          StreamSnackbar(
+            message: const Text('loading'),
+            variant: StreamSnackbarVariant.loading,
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // Stays through any sane interval.
+        await tester.pump(const Duration(seconds: 30));
+        expect(find.text('loading'), findsOneWidget);
+      });
+
+      testWidgets('error with action is persistent', (tester) async {
+        final messenger = StreamSnackbarMessenger();
+        addTearDown(messenger.dispose);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(extensions: [StreamTheme.light()]),
+            home: Stack(
+              children: [
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: StreamSnackbarHost(messenger: messenger),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        messenger.show(
+          StreamSnackbar(
+            message: const Text('boom'),
+            variant: StreamSnackbarVariant.error,
+            action: StreamSnackbarAction(label: const Text('Retry'), onPressed: () {}),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        await tester.pump(const Duration(seconds: 30));
+        expect(find.text('boom'), findsOneWidget);
+      });
+    });
+
+    testWidgets('per-instance dismissDirection overrides default', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: StreamSnackbarHost(messenger: messenger),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final controller = messenger.show(
+        StreamSnackbar(
+          message: const Text('Swipe up'),
+          dismissDirection: DismissDirection.up,
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Swipe DOWN — should not dismiss (configured direction is up).
+      await tester.fling(find.text('Swipe up'), const Offset(0, 300), 1000);
+      await tester.pumpAndSettle();
+      expect(find.text('Swipe up'), findsOneWidget);
+
+      // Swipe UP — dismisses.
+      await tester.fling(find.text('Swipe up'), const Offset(0, -300), 1000);
+      await tester.pumpAndSettle();
+      expect(find.text('Swipe up'), findsNothing);
+      expect(await controller.closed, StreamSnackbarClosedReason.swipe);
+    });
   });
 
   group('StreamSnackbarScope', () {
@@ -365,7 +664,7 @@ void main() {
       );
     });
 
-    testWidgets('close dismisses the current snackbar', (tester) async {
+    testWidgets('hideCurrent dismisses the current snackbar', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
         MaterialApp(
@@ -382,7 +681,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('Goodbye'), findsOneWidget);
 
-      host.close();
+      host.hideCurrent();
       await tester.pumpAndSettle();
       expect(find.text('Goodbye'), findsNothing);
     });
@@ -493,6 +792,35 @@ void main() {
       final anchorTopY = tester.getTopLeft(find.byKey(anchorKey)).dy;
       final snackbarBottomY = tester.getBottomLeft(find.text('Above')).dy;
       expect(snackbarBottomY, lessThanOrEqualTo(anchorTopY));
+    });
+
+    testWidgets('placement: under renders snackbar below its anchor', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+      final anchorKey = GlobalKey();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Center(
+            child: StreamSnackbarPopup.withState(
+              messenger: messenger,
+              placement: StreamSnackbarPopupPlacement.under,
+              child: SizedBox(key: anchorKey, width: 200, height: 60),
+            ),
+          ),
+        ),
+      );
+
+      messenger.show(StreamSnackbar(message: const Text('Under')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Under'), findsOneWidget);
+
+      final anchorBottomY = tester.getBottomLeft(find.byKey(anchorKey)).dy;
+      final snackbarTopY = tester.getTopLeft(find.text('Under')).dy;
+      expect(snackbarTopY, greaterThanOrEqualTo(anchorBottomY));
     });
 
     testWidgets('default ctor auto-manages messenger — descendants fire via context', (tester) async {
