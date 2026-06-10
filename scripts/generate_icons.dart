@@ -770,6 +770,7 @@ const _rtlIcons = [
   'chevron-left',
   'chevron-right',
   'leave',
+  'megaphone',
   'mute',
   'reply',
   'search',

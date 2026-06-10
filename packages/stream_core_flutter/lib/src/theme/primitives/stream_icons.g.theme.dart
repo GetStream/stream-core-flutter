@@ -79,6 +79,7 @@ mixin _$StreamIcons {
       link: t < 0.5 ? a.link : b.link,
       location: t < 0.5 ? a.location : b.location,
       lock: t < 0.5 ? a.lock : b.lock,
+      megaphone: t < 0.5 ? a.megaphone : b.megaphone,
       mention: t < 0.5 ? a.mention : b.mention,
       messageBubble: t < 0.5 ? a.messageBubble : b.messageBubble,
       messageBubbleFill: t < 0.5 ? a.messageBubbleFill : b.messageBubbleFill,
@@ -109,6 +110,7 @@ mixin _$StreamIcons {
       search: t < 0.5 ? a.search : b.search,
       send: t < 0.5 ? a.send : b.send,
       share: t < 0.5 ? a.share : b.share,
+      shield: t < 0.5 ? a.shield : b.shield,
       sidebar: t < 0.5 ? a.sidebar : b.sidebar,
       stopFill: t < 0.5 ? a.stopFill : b.stopFill,
       thread: t < 0.5 ? a.thread : b.thread,
@@ -187,6 +189,7 @@ mixin _$StreamIcons {
     IconData? link,
     IconData? location,
     IconData? lock,
+    IconData? megaphone,
     IconData? mention,
     IconData? messageBubble,
     IconData? messageBubbleFill,
@@ -215,6 +218,7 @@ mixin _$StreamIcons {
     IconData? search,
     IconData? send,
     IconData? share,
+    IconData? shield,
     IconData? sidebar,
     IconData? stopFill,
     IconData? thread,
@@ -293,6 +297,7 @@ mixin _$StreamIcons {
       link: link ?? _this.link,
       location: location ?? _this.location,
       lock: lock ?? _this.lock,
+      megaphone: megaphone ?? _this.megaphone,
       mention: mention ?? _this.mention,
       messageBubble: messageBubble ?? _this.messageBubble,
       messageBubbleFill: messageBubbleFill ?? _this.messageBubbleFill,
@@ -321,6 +326,7 @@ mixin _$StreamIcons {
       search: search ?? _this.search,
       send: send ?? _this.send,
       share: share ?? _this.share,
+      shield: shield ?? _this.shield,
       sidebar: sidebar ?? _this.sidebar,
       stopFill: stopFill ?? _this.stopFill,
       thread: thread ?? _this.thread,
@@ -409,6 +415,7 @@ mixin _$StreamIcons {
       link: other.link,
       location: other.location,
       lock: other.lock,
+      megaphone: other.megaphone,
       mention: other.mention,
       messageBubble: other.messageBubble,
       messageBubbleFill: other.messageBubbleFill,
@@ -437,6 +444,7 @@ mixin _$StreamIcons {
       search: other.search,
       send: other.send,
       share: other.share,
+      shield: other.shield,
       sidebar: other.sidebar,
       stopFill: other.stopFill,
       thread: other.thread,
@@ -525,6 +533,7 @@ mixin _$StreamIcons {
         _other.link == _this.link &&
         _other.location == _this.location &&
         _other.lock == _this.lock &&
+        _other.megaphone == _this.megaphone &&
         _other.mention == _this.mention &&
         _other.messageBubble == _this.messageBubble &&
         _other.messageBubbleFill == _this.messageBubbleFill &&
@@ -553,6 +562,7 @@ mixin _$StreamIcons {
         _other.search == _this.search &&
         _other.send == _this.send &&
         _other.share == _this.share &&
+        _other.shield == _this.shield &&
         _other.sidebar == _this.sidebar &&
         _other.stopFill == _this.stopFill &&
         _other.thread == _this.thread &&
@@ -633,6 +643,7 @@ mixin _$StreamIcons {
       _this.link,
       _this.location,
       _this.lock,
+      _this.megaphone,
       _this.mention,
       _this.messageBubble,
       _this.messageBubbleFill,
@@ -661,6 +672,7 @@ mixin _$StreamIcons {
       _this.search,
       _this.send,
       _this.share,
+      _this.shield,
       _this.sidebar,
       _this.stopFill,
       _this.thread,

@@ -1,3 +1,9 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamIcons.megaphone` and `StreamIcons.shield` (20px) to the icon set.
+
 ## 0.3.0
 
 ### 🛑 Breaking / Removals
