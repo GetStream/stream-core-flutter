@@ -105,6 +105,7 @@ class StreamIcons with _$StreamIcons {
     this.link = StreamIconData.link,
     this.location = StreamIconData.location,
     this.lock = StreamIconData.lock,
+    this.megaphone = StreamIconData.megaphone,
     this.mention = StreamIconData.mention,
     this.messageBubble = StreamIconData.messageBubble,
     this.messageBubbleFill = StreamIconData.messageBubbleFill,
@@ -133,6 +134,7 @@ class StreamIcons with _$StreamIcons {
     this.search = StreamIconData.search,
     this.send = StreamIconData.send,
     this.share = StreamIconData.share,
+    this.shield = StreamIconData.shield,
     this.sidebar = StreamIconData.sidebar,
     this.stopFill = StreamIconData.stopFill,
     this.thread = StreamIconData.thread,
@@ -301,6 +303,9 @@ class StreamIcons with _$StreamIcons {
   /// The lock icon.
   final IconData lock;
 
+  /// The megaphone icon.
+  final IconData megaphone;
+
   /// The mention icon.
   final IconData mention;
 
@@ -384,6 +389,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The share icon.
   final IconData share;
+
+  /// The shield icon.
+  final IconData shield;
 
   /// The sidebar icon.
   final IconData sidebar;
@@ -519,6 +527,7 @@ class StreamIcons with _$StreamIcons {
     'link': link,
     'location': location,
     'lock': lock,
+    'megaphone': megaphone,
     'mention': mention,
     'messageBubble': messageBubble,
     'messageBubbleFill': messageBubbleFill,
@@ -547,6 +556,7 @@ class StreamIcons with _$StreamIcons {
     'search': search,
     'send': send,
     'share': share,
+    'shield': shield,
     'sidebar': sidebar,
     'stopFill': stopFill,
     'thread': thread,
