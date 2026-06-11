@@ -112,6 +112,8 @@ import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
     as _design_system_gallery_components_reaction_stream_reactions;
 import 'package:design_system_gallery/components/sheet/stream_sheet.dart'
     as _design_system_gallery_components_sheet_stream_sheet;
+import 'package:design_system_gallery/components/snackbar/stream_snackbar.dart'
+    as _design_system_gallery_components_snackbar_stream_snackbar;
 import 'package:design_system_gallery/components/tiles/stream_list_tile.dart'
     as _design_system_gallery_components_tiles_stream_list_tile;
 import 'package:design_system_gallery/components/toolbar/stream_app_bar.dart'
@@ -1144,6 +1146,28 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Showcase',
                 builder: _design_system_gallery_components_sheet_stream_sheet
                     .buildStreamSheetShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Snackbar',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSnackbar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_snackbar_stream_snackbar
+                        .buildStreamSnackbarPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_snackbar_stream_snackbar
+                        .buildStreamSnackbarShowcase,
               ),
             ],
           ),
