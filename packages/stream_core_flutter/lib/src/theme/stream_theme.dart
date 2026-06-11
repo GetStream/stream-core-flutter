@@ -36,6 +36,7 @@ import 'components/stream_reactions_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
+import 'components/stream_snackbar_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
@@ -146,6 +147,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamSheetHeaderThemeData? sheetHeaderTheme,
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
+    StreamSnackbarThemeData? snackbarTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
   }) {
@@ -197,6 +199,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     sheetHeaderTheme ??= const StreamSheetHeaderThemeData();
     sheetTheme ??= const StreamSheetThemeData();
     skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
+    snackbarTheme ??= const StreamSnackbarThemeData();
     stepperTheme ??= const StreamStepperThemeData();
     switchTheme ??= const StreamSwitchThemeData();
 
@@ -242,6 +245,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       sheetHeaderTheme: sheetHeaderTheme,
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
+      snackbarTheme: snackbarTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
     );
@@ -301,6 +305,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.sheetHeaderTheme,
     required this.sheetTheme,
     required this.skeletonLoadingTheme,
+    required this.snackbarTheme,
     required this.stepperTheme,
     required this.switchTheme,
   });
@@ -464,6 +469,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The skeleton theme for this theme.
   final StreamSkeletonLoadingThemeData skeletonLoadingTheme;
 
+  /// The snackbar theme for this theme.
+  final StreamSnackbarThemeData snackbarTheme;
+
   /// The stepper theme for this theme.
   final StreamStepperThemeData stepperTheme;
 
@@ -531,6 +539,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       sheetHeaderTheme: sheetHeaderTheme,
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
+      snackbarTheme: snackbarTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
     );
