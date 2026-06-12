@@ -38,7 +38,7 @@ extension type const MentionType(String value) {
   /// A mention referencing a role, e.g. `@admin`.
   static const role = MentionType('role');
 
-  /// A mention referencing a named subset of channel members.
+  /// A mention referencing a named group of users.
   static const group = MentionType('group');
 }
 
