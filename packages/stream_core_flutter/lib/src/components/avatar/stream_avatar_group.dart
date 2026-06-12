@@ -91,7 +91,8 @@ class StreamAvatarGroup extends StatelessWidget {
     super.key,
     StreamAvatarGroupSize? size,
     required Iterable<Widget> children,
-  }) : props = .new(size: size, children: children);
+    bool showShadow = false,
+  }) : props = .new(size: size, children: children, showShadow: showShadow);
 
   /// The properties that configure this avatar group.
   final StreamAvatarGroupProps props;
@@ -118,6 +119,7 @@ class StreamAvatarGroupProps {
   const StreamAvatarGroupProps({
     this.size,
     required this.children,
+    this.showShadow = false,
   });
 
   /// The list of avatars to display in the group.
@@ -129,6 +131,12 @@ class StreamAvatarGroupProps {
   ///
   /// If null, defaults to [StreamAvatarGroupSize.lg].
   final StreamAvatarGroupSize? size;
+
+  /// Whether to show a drop shadow around each individual avatar.
+  ///
+  /// Defaults to false. The shadow style is determined by
+  /// [StreamBoxShadow.elevation3].
+  final bool showShadow;
 }
 
 /// The default implementation of [StreamAvatarGroup].
@@ -174,6 +182,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
               color: colorScheme.borderOnInverse,
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
+            boxShadow: props.showShadow ? context.streamBoxShadow.elevation3 : null,
           ),
           child: StreamBadgeCountTheme(
             data: StreamBadgeCountThemeData(size: badgeCountSize),

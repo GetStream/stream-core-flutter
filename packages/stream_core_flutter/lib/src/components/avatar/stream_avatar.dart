@@ -85,6 +85,7 @@ class StreamAvatar extends StatelessWidget {
     Color? backgroundColor,
     Color? foregroundColor,
     bool showBorder = true,
+    bool showShadow = false,
   }) : props = .new(
          size: size,
          imageUrl: imageUrl,
@@ -92,6 +93,7 @@ class StreamAvatar extends StatelessWidget {
          backgroundColor: backgroundColor,
          foregroundColor: foregroundColor,
          showBorder: showBorder,
+         showShadow: showShadow,
        );
 
   /// The properties that configure this avatar.
@@ -123,6 +125,7 @@ class StreamAvatarProps {
     this.backgroundColor,
     this.foregroundColor,
     this.showBorder = true,
+    this.showShadow = false,
   });
 
   /// The URL of the avatar image.
@@ -164,6 +167,13 @@ class StreamAvatarProps {
   /// Defaults to true. The border style is determined by
   /// [StreamAvatarThemeData.border].
   final bool showBorder;
+
+  /// Whether to show a drop shadow around the avatar.
+  ///
+  /// Defaults to false. The shadow style is determined by
+  /// [StreamAvatarThemeData.boxShadow], falling back to
+  /// [StreamBoxShadow.elevation3].
+  final bool showShadow;
 }
 
 /// The default implementation of [StreamAvatar].
@@ -192,6 +202,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveBackgroundColor = props.backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = props.foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
+    final effectiveBoxShadow = avatarTheme.boxShadow ?? (props.showShadow ? defaults.boxShadow : null);
 
     final border = props.showBorder ? effectiveBorder : null;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);
@@ -207,7 +218,7 @@ class DefaultStreamAvatar extends StatelessWidget {
       height: effectiveSize.value,
       duration: kThemeChangeDuration,
       foregroundDecoration: BoxDecoration(shape: .circle, border: border),
-      decoration: BoxDecoration(shape: .circle, color: effectiveBackgroundColor),
+      decoration: BoxDecoration(shape: .circle, color: effectiveBackgroundColor, boxShadow: effectiveBoxShadow),
       child: Center(
         // Need to disable text scaling here so that the text doesn't
         // escape the avatar when the textScaleFactor is large.
@@ -279,6 +290,9 @@ class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
 
   @override
   BoxBorder get border => Border.all(color: StreamColors.black10);
+
+  @override
+  List<BoxShadow> get boxShadow => context.streamBoxShadow.elevation3;
 
   @override
   Color get backgroundColor => _colorScheme.avatarPalette.first.backgroundColor;

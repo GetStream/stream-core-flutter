@@ -43,11 +43,17 @@ Widget buildStreamAvatarGroupPlayground(BuildContext context) {
     description: 'Use images or show initials placeholder.',
   );
 
+  final showShadow = context.knobs.boolean(
+    label: 'Show Shadow',
+    description: 'Whether to show a drop shadow around each individual avatar.',
+  );
+
   final palette = context.streamColorScheme.avatarPalette;
 
   return Center(
     child: StreamAvatarGroup(
       size: size,
+      showShadow: showShadow,
       children: List.generate(
         avatarCount,
         (index) => StreamAvatar(

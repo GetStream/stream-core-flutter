@@ -102,8 +102,9 @@ class StreamAvatarStack extends StatelessWidget {
     required Iterable<Widget> children,
     double overlap = 0.33,
     int max = 5,
+    bool showShadow = false,
   }) : assert(max >= 2, 'max must be at least 2'),
-       props = .new(size: size, children: children, overlap: overlap, max: max);
+       props = .new(size: size, children: children, overlap: overlap, max: max, showShadow: showShadow);
 
   /// The properties that configure this avatar stack.
   final StreamAvatarStackProps props;
@@ -132,6 +133,7 @@ class StreamAvatarStackProps {
     required this.children,
     this.overlap = 0.33,
     this.max = 5,
+    this.showShadow = false,
   });
 
   /// The list of widgets to display in the stack.
@@ -158,6 +160,12 @@ class StreamAvatarStackProps {
   ///
   /// Must be at least 2. Defaults to 5.
   final int max;
+
+  /// Whether to show a drop shadow around each individual avatar.
+  ///
+  /// Defaults to false. The shadow style is determined by
+  /// [StreamBoxShadow.elevation3].
+  final bool showShadow;
 }
 
 /// The default implementation of [StreamAvatarStack].
@@ -202,6 +210,7 @@ class DefaultStreamAvatarStack extends StatelessWidget {
             color: colorScheme.borderOnInverse,
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
+          boxShadow: props.showShadow ? context.streamBoxShadow.elevation3 : null,
         ),
         child: StreamRow(
           spacing: -diameter * props.overlap,

@@ -132,6 +132,7 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
     this.backgroundColor,
     this.foregroundColor,
     this.border,
+    this.boxShadow,
   });
 
   /// The default size for avatars.
@@ -155,6 +156,12 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
   /// Applied when [StreamAvatar.showBorder] is true. Allows customization
   /// of both border color and width.
   final BoxBorder? border;
+
+  /// The box shadow for this avatar.
+  ///
+  /// Applied when [StreamAvatar.showShadow] is true. Defaults to
+  /// [StreamBoxShadow.elevation3].
+  final List<BoxShadow>? boxShadow;
 
   /// Linearly interpolate between two [StreamAvatarThemeData] objects.
   static StreamAvatarThemeData? lerp(

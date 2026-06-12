@@ -58,6 +58,11 @@ Widget buildStreamAvatarStackPlayground(BuildContext context) {
     description: 'Use images or show initials placeholder.',
   );
 
+  final showShadow = context.knobs.boolean(
+    label: 'Show Shadow',
+    description: 'Whether to show a drop shadow around each individual avatar.',
+  );
+
   final colorScheme = context.streamColorScheme;
   final palette = colorScheme.avatarPalette;
 
@@ -66,6 +71,7 @@ Widget buildStreamAvatarStackPlayground(BuildContext context) {
       size: size,
       overlap: overlap,
       max: maxAvatars,
+      showShadow: showShadow,
       children: [
         for (var i = 0; i < avatarCount; i++)
           StreamAvatar(

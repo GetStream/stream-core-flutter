@@ -112,7 +112,7 @@ void main() {
               StreamAppBar(
                 automaticallyImplyLeading: false,
                 primary: false,
-                floating: true,
+                appBarBehavior: AppBarBehavior.floating,
                 title: const Text('Details'),
               ),
             ),
@@ -123,7 +123,7 @@ void main() {
               StreamAppBar(
                 automaticallyImplyLeading: false,
                 primary: false,
-                floating: true,
+                appBarBehavior: AppBarBehavior.floating,
                 leading: StreamButton.icon(
                   icon: const Icon(Icons.chevron_left),
                   style: StreamButtonStyle.secondary,
@@ -156,7 +156,7 @@ void main() {
               StreamAppBar(
                 automaticallyImplyLeading: false,
                 primary: false,
-                floating: true,
+                appBarBehavior: AppBarBehavior.floating,
                 title: const Text('Details'),
               ),
               brightness: Brightness.dark,
@@ -168,7 +168,7 @@ void main() {
               StreamAppBar(
                 automaticallyImplyLeading: false,
                 primary: false,
-                floating: true,
+                appBarBehavior: AppBarBehavior.floating,
                 leading: StreamButton.icon(
                   icon: const Icon(Icons.chevron_left),
                   style: StreamButtonStyle.secondary,
