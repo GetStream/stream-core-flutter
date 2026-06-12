@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/components/stream_badge_notification_theme.dart';
 import '../../theme/stream_app_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -209,9 +210,12 @@ class _FloatingNavBarItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: spacing.xxxs,
           children: [
-            IconTheme(
-              data: IconThemeData(color: color, size: 20),
-              child: selected ? item.selectedIcon : item.icon,
+            StreamBadgeNotificationTheme(
+              data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
+              child: IconTheme(
+                data: IconThemeData(color: color, size: 20),
+                child: selected ? item.selectedIcon : item.icon,
+              ),
             ),
             Text(
               item.label,
@@ -249,24 +253,27 @@ class _RegularNavBar extends StatelessWidget {
         color: colorScheme.backgroundElevation1,
         border: Border(top: BorderSide(color: colorScheme.borderSubtle)),
       ),
-      child: BottomNavigationBar(
-        elevation: 0,
-        iconSize: 20,
-        currentIndex: currentIndex,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: colorScheme.textPrimary,
-        unselectedItemColor: colorScheme.textTertiary,
-        backgroundColor: Colors.transparent,
-        selectedLabelStyle: textTheme.metadataEmphasis,
-        unselectedLabelStyle: textTheme.metadataEmphasis,
-        onTap: onTap,
-        items: items.map((item) {
-          return BottomNavigationBarItem(
-            icon: item.icon,
-            activeIcon: item.selectedIcon,
-            label: item.label,
-          );
-        }).toList(),
+      child: StreamBadgeNotificationTheme(
+        data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
+        child: BottomNavigationBar(
+          elevation: 0,
+          iconSize: 20,
+          currentIndex: currentIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: colorScheme.textPrimary,
+          unselectedItemColor: colorScheme.textTertiary,
+          backgroundColor: Colors.transparent,
+          selectedLabelStyle: textTheme.metadataEmphasis,
+          unselectedLabelStyle: textTheme.metadataEmphasis,
+          onTap: onTap,
+          items: items.map((item) {
+            return BottomNavigationBarItem(
+              icon: item.icon,
+              activeIcon: item.selectedIcon,
+              label: item.label,
+            );
+          }).toList(),
+        ),
       ),
     );
   }
