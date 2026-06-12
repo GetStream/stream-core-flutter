@@ -143,38 +143,73 @@ class _FloatingNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
+  LinearGradient _buildGradient(BuildContext context, Color backgroundColor) {
+    final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
+    // Approximate rendered height: safe area + vertical padding + item height.
+    const itemHeight = 56.0;
+    final totalHeight = safeAreaBottom + itemHeight;
+    final f = totalHeight > 0 ? safeAreaBottom / totalHeight : 0.0;
+
+    return LinearGradient(
+      colors: [
+        backgroundColor,
+        backgroundColor,
+        backgroundColor.withAlpha(0xE8),
+        backgroundColor.withAlpha(0xA8),
+        backgroundColor.withAlpha(0x40),
+        backgroundColor.withAlpha(0x00),
+      ],
+      stops: [
+        0.0,
+        f,
+        f + (1 - f) * 0.55,
+        f + (1 - f) * 0.75,
+        f + (1 - f) * 0.90,
+        1.0,
+      ],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
     final spacing = context.streamSpacing;
     final radius = context.streamRadius;
+    final backgroundColor = colorScheme.backgroundElevation0;
 
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: spacing.xl),
-        child: Container(
-          decoration: BoxDecoration(
-            color: colorScheme.backgroundElevation1,
-            borderRadius: BorderRadius.all(radius.max),
-            boxShadow: context.streamBoxShadow.elevation1,
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.all(radius.max),
-            border: Border.all(color: colorScheme.borderSubtle),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: spacing.xs),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                for (var i = 0; i < items.length; i++)
-                  _FloatingNavBarItem(
-                    item: items[i],
-                    selected: i == currentIndex,
-                    onTap: () => onTap(i),
-                  ),
-              ],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: _buildGradient(context, backgroundColor),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+          child: Container(
+            decoration: BoxDecoration(
+              color: colorScheme.backgroundElevation1,
+              borderRadius: BorderRadius.all(radius.max),
+              boxShadow: context.streamBoxShadow.elevation1,
+            ),
+            foregroundDecoration: BoxDecoration(
+              borderRadius: BorderRadius.all(radius.max),
+              border: Border.all(color: colorScheme.borderSubtle),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: spacing.xs),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  for (var i = 0; i < items.length; i++)
+                    _FloatingNavBarItem(
+                      item: items[i],
+                      selected: i == currentIndex,
+                      onTap: () => onTap(i),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
