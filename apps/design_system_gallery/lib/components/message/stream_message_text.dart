@@ -54,13 +54,45 @@ Widget buildStreamMessageTextPlayground(BuildContext context) {
     label: 'Mention Color',
     options: _ColorOption.values,
     labelBuilder: (v) => v.label,
-    description: 'Override mention color.',
+    description: 'Override the base mention color (fallback for all kinds).',
+  );
+
+  final mentionUserColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · User Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @user mention color.',
+  );
+
+  final mentionBroadcastColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · Broadcast Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @channel / @here mention color.',
+  );
+
+  final mentionRoleColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · Role Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @role mention color.',
+  );
+
+  final mentionGroupColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · Group Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @group mention color.',
   );
 
   final style = StreamMessageTextStyle.from(
     textColor: textColor.color,
     linkColor: linkColor.color,
     mentionColor: mentionColor.color,
+    mentionUserColor: mentionUserColor.color,
+    mentionBroadcastColor: mentionBroadcastColor.color,
+    mentionRoleColor: mentionRoleColor.color,
+    mentionGroupColor: mentionGroupColor.color,
   );
 
   return StreamMessageItemTheme(
@@ -116,6 +148,11 @@ const _conversationMessages = [
     stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
+    text: 'PSA [@channel](mention-channel:general) — deploy at 3pm today',
+    alignment: StreamMessageAlignment.start,
+    stackPosition: StreamMessageStackPosition.single,
+  ),
+  _ChatMessage(
     text: 'Not yet! Got a [link](https://flutter.dev)?',
     alignment: StreamMessageAlignment.end,
     stackPosition: StreamMessageStackPosition.single,
@@ -129,6 +166,11 @@ const _conversationMessages = [
     text: 'Jank is _basically_ gone',
     alignment: StreamMessageAlignment.start,
     stackPosition: StreamMessageStackPosition.bottom,
+  ),
+  _ChatMessage(
+    text: 'Anyone free [@here](mention-here:general) for a quick pairing?',
+    alignment: StreamMessageAlignment.end,
+    stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
     text: '\u{1F44D}\u{1F525}',
@@ -151,6 +193,11 @@ const _conversationMessages = [
   _ChatMessage(
     text: '> Always call `dispose()` to avoid leaks',
     alignment: StreamMessageAlignment.start,
+    stackPosition: StreamMessageStackPosition.single,
+  ),
+  _ChatMessage(
+    text: 'cc [@admin](mention-role:admin) for sign-off on the release',
+    alignment: StreamMessageAlignment.end,
     stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
@@ -177,6 +224,11 @@ const _conversationMessages = [
     text: 'Something about **null safety** migration',
     alignment: StreamMessageAlignment.start,
     stackPosition: StreamMessageStackPosition.bottom,
+  ),
+  _ChatMessage(
+    text: '[@frontend](mention-group:frontend) — please pick this up',
+    alignment: StreamMessageAlignment.start,
+    stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
     text: '\u{2764}\u{FE0F}\u{1F389}\u{1F60D}',
@@ -246,8 +298,8 @@ class _ConversationMessage extends StatelessWidget {
                   softLineBreak: softLineBreak,
                   fitContent: fitContent,
                   onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
-                  onTapMention: (displayText, id) =>
-                      _showSnack(context, 'Mention: $displayText (id: $id)'),
+                  onTapAnyMention: (displayText, type, id) =>
+                      _showSnack(context, '$type: $displayText (id: $id)'),
                 );
 
                 if (!hideBubble) {

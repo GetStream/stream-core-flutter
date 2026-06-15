@@ -396,10 +396,10 @@ class DefaultStreamMessageText extends StatelessWidget {
     );
   }
 
-  // Resolves one text style per mention kind. The variant-specific style
-  // falls back to the base [mentionStyle] when unset, while a missing
-  // variant color or background passes through as null so the builder's
-  // [_StreamMentionBuilder.fallbackStyle] supplies them via merge.
+  // Resolves one text style per mention kind. Each variant-specific lookup
+  // falls back to the corresponding base property — [mentionStyle],
+  // [mentionColor], [mentionBackgroundColor] — so the entry is always
+  // fully populated.
   Map<StreamMentionType, TextStyle> _resolveMentionStyles(
     StreamMessageLayoutResolver<StreamMessageTextStyle> resolve,
   ) {
@@ -419,16 +419,16 @@ class DefaultStreamMessageText extends StatelessWidget {
         .role => resolve.maybeResolve((s) => s?.mentionRoleColor),
         .group => resolve.maybeResolve((s) => s?.mentionGroupColor),
         .user => resolve.maybeResolve((s) => s?.mentionUserColor),
-        _ => resolve((s) => s?.mentionColor),
-      };
+        _ => null,
+      } ?? resolve((s) => s?.mentionColor);
 
       final variantBg = switch (type) {
         .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastBackgroundColor),
         .role => resolve.maybeResolve((s) => s?.mentionRoleBackgroundColor),
         .group => resolve.maybeResolve((s) => s?.mentionGroupBackgroundColor),
         .user => resolve.maybeResolve((s) => s?.mentionUserBackgroundColor),
-        _ => resolve((s) => s?.mentionBackgroundColor),
-      };
+        _ => null,
+      } ?? resolve((s) => s?.mentionBackgroundColor);
 
       return variantStyle.copyWith(
         color: variantColor,
