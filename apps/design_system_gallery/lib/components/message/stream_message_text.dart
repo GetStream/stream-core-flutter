@@ -298,8 +298,7 @@ class _ConversationMessage extends StatelessWidget {
                   softLineBreak: softLineBreak,
                   fitContent: fitContent,
                   onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
-                  onTapAnyMention: (displayText, type, id) =>
-                      _showSnack(context, '$type: $displayText (id: $id)'),
+                  onTapAnyMention: (displayText, type, id) => _showSnack(context, '$type: $displayText (id: $id)'),
                 );
 
                 if (!hideBubble) {
@@ -384,8 +383,7 @@ class _MarkdownFeaturesSection extends StatelessWidget {
             builder: (context) => StreamMessageText(
               'Hey [@Alice](mention:alice123), have you seen '
               "[@Bob's update](mention:bob456)?",
-              onTapMention: (displayText, id) =>
-                  _showSnack(context, 'Mention: $displayText (id: $id)'),
+              onTapMention: (displayText, id) => _showSnack(context, 'Mention: $displayText (id: $id)'),
             ),
           ),
         ),
@@ -579,9 +577,7 @@ class _EmojiSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'ZWJ family (1 grapheme)',
-          child: StreamMessageText(
-            '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}',
-          ),
+          child: StreamMessageText('\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}'),
         ),
         _ExampleCard(
           label: 'Flag (1 grapheme)',
@@ -664,39 +660,29 @@ class _ThemeOverridesSection extends StatelessWidget {
                   data: StreamMessageItemThemeData(
                     text: StreamMessageTextStyle(
                       textColor: StreamMessageLayoutProperty.resolveWith((p) {
-                        return p.alignment == StreamMessageAlignment.end
-                            ? Colors.white
-                            : Colors.black87;
+                        return p.alignment == StreamMessageAlignment.end ? Colors.white : Colors.black87;
                       }),
                     ),
                   ),
                   child: StreamMessageBubble(
-                    child: StreamMessageText(
-                      'Start-aligned message (dark text)',
-                    ),
+                    child: StreamMessageText('Start-aligned message (dark text)'),
                   ),
                 ),
               ),
               Align(
                 alignment: Alignment.centerRight,
                 child: StreamMessageLayout(
-                  data: const StreamMessageLayoutData(
-                    alignment: StreamMessageAlignment.end,
-                  ),
+                  data: const StreamMessageLayoutData(alignment: StreamMessageAlignment.end),
                   child: StreamMessageItemTheme(
                     data: StreamMessageItemThemeData(
                       text: StreamMessageTextStyle(
                         textColor: StreamMessageLayoutProperty.resolveWith((p) {
-                          return p.alignment == StreamMessageAlignment.end
-                              ? Colors.white
-                              : Colors.black87;
+                          return p.alignment == StreamMessageAlignment.end ? Colors.white : Colors.black87;
                         }),
                       ),
                     ),
                     child: StreamMessageBubble(
-                      child: StreamMessageText(
-                        'End-aligned message (white text)',
-                      ),
+                      child: StreamMessageText('End-aligned message (white text)'),
                     ),
                   ),
                 ),
@@ -723,14 +709,15 @@ class _RealWorldSection extends StatelessWidget {
           subtitle: 'Text in bubble with a mention and metadata.',
           child: Builder(
             builder: (context) => StreamMessageContent(
-              footer: StreamMessageMetadata(timestamp: const Text('09:41')),
+              footer: StreamMessageMetadata(
+                timestamp: const Text('09:41'),
+              ),
               child: StreamMessageBubble(
                 child: StreamMessageText(
                   'Hey [@Sarah](mention:sarah42), have you tried the '
                   '**new Flutter update**? The performance '
                   'improvements are _amazing_!',
-                  onTapMention: (displayText, id) =>
-                      _showSnack(context, 'Mention: $displayText (id: $id)'),
+                  onTapMention: (displayText, id) => _showSnack(context, 'Mention: $displayText (id: $id)'),
                 ),
               ),
             ),
@@ -740,7 +727,9 @@ class _RealWorldSection extends StatelessWidget {
           label: 'AI response',
           subtitle: 'Rich markdown with code in bubble.',
           child: StreamMessageContent(
-            footer: StreamMessageMetadata(timestamp: const Text('09:43')),
+            footer: StreamMessageMetadata(
+              timestamp: const Text('09:43'),
+            ),
             child: StreamMessageBubble(
               child: StreamMessageText(
                 '## Quick Sort in Dart\n\n'
@@ -771,8 +760,12 @@ class _RealWorldSection extends StatelessWidget {
             footer: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StreamMessageMetadata(timestamp: const Text('08:30')),
-                StreamMessageReplies(label: const Text('4 replies')),
+                StreamMessageMetadata(
+                  timestamp: const Text('08:30'),
+                ),
+                StreamMessageReplies(
+                  label: const Text('4 replies'),
+                ),
               ],
             ),
             child: StreamMessageBubble(
@@ -790,21 +783,14 @@ class _RealWorldSection extends StatelessWidget {
           label: 'Message with reactions',
           subtitle: 'Bubble with markdown text and reaction chips.',
           child: StreamMessageContent(
-            footer: StreamMessageMetadata(timestamp: const Text('10:15')),
+            footer: StreamMessageMetadata(
+              timestamp: const Text('10:15'),
+            ),
             child: StreamReactions.segmented(
               items: const [
-                StreamReactionsItem(
-                  emoji: StreamUnicodeEmoji('\u{1F680}'),
-                  count: 5,
-                ),
-                StreamReactionsItem(
-                  emoji: StreamUnicodeEmoji('\u{1F44D}'),
-                  count: 3,
-                ),
-                StreamReactionsItem(
-                  emoji: StreamUnicodeEmoji('\u{2764}\u{FE0F}'),
-                  count: 2,
-                ),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('\u{1F680}'), count: 5),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('\u{1F44D}'), count: 3),
+                StreamReactionsItem(emoji: StreamUnicodeEmoji('\u{2764}\u{FE0F}'), count: 2),
               ],
               child: StreamMessageBubble(
                 child: StreamMessageText(
@@ -887,8 +873,7 @@ class _ExtensibilitySection extends StatelessWidget {
               '[@Alice](mention:alice123) shared '
               '[this article](https://example.com) with '
               '[@Bob](mention:bob456).',
-              onTapMention: (displayText, id) =>
-                  _showSnack(context, 'Mention: $displayText (id: $id)'),
+              onTapMention: (displayText, id) => _showSnack(context, 'Mention: $displayText (id: $id)'),
               onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
             ),
           ),
@@ -906,9 +891,7 @@ class _ExtensibilitySection extends StatelessWidget {
                   width: 200,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) => DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colorScheme.backgroundSurface,
-                    ),
+                    decoration: BoxDecoration(color: colorScheme.backgroundSurface),
                     child: SizedBox(
                       width: 200,
                       height: 100,
@@ -1015,15 +998,9 @@ class _DemoSyntaxHighlighter extends SyntaxHighlighter {
   }
 
   TextStyle _styleFor(_MatchType type) => switch (type) {
-    _MatchType.keyword => TextStyle(
-      color: _colorScheme.accentPrimary,
-      fontWeight: FontWeight.bold,
-    ),
+    _MatchType.keyword => TextStyle(color: _colorScheme.accentPrimary, fontWeight: FontWeight.bold),
     _MatchType.string => TextStyle(color: Colors.green.shade700),
-    _MatchType.comment => TextStyle(
-      color: _colorScheme.textTertiary,
-      fontStyle: FontStyle.italic,
-    ),
+    _MatchType.comment => TextStyle(color: _colorScheme.textTertiary, fontStyle: FontStyle.italic),
     _MatchType.type => TextStyle(color: Colors.teal.shade600),
   };
 }
@@ -1054,8 +1031,7 @@ class _CopyableCodeBlockBuilder extends MarkdownElementBuilder {
     TextStyle? parentStyle,
   ) {
     final code = element.textContent.trimRight();
-    final language =
-        element.attributes['class']?.replaceFirst('language-', '') ?? '';
+    final language = element.attributes['class']?.replaceFirst('language-', '') ?? '';
 
     return _CopyableCodeBlock(
       code: code,
@@ -1110,9 +1086,7 @@ class _CopyableCodeBlockState extends State<_CopyableCodeBlock> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: cs.borderSubtle.withValues(alpha: 0.3),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(7),
-              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(7)),
             ),
             child: Row(
               children: [
@@ -1205,9 +1179,7 @@ class _Section extends StatelessWidget {
             if (description case final desc?)
               Text(
                 desc,
-                style: context.streamTextTheme.metadataDefault.copyWith(
-                  color: colorScheme.textTertiary,
-                ),
+                style: context.streamTextTheme.metadataDefault.copyWith(color: colorScheme.textTertiary),
               ),
           ],
         ),
@@ -1237,7 +1209,11 @@ class _SectionLabel extends StatelessWidget {
 }
 
 class _ExampleCard extends StatelessWidget {
-  const _ExampleCard({required this.label, required this.child, this.subtitle});
+  const _ExampleCard({
+    required this.label,
+    required this.child,
+    this.subtitle,
+  });
 
   final String label;
   final String? subtitle;
@@ -1277,9 +1253,7 @@ class _ExampleCard extends StatelessWidget {
               if (subtitle case final sub?)
                 Text(
                   sub,
-                  style: textTheme.metadataDefault.copyWith(
-                    color: colorScheme.textTertiary,
-                  ),
+                  style: textTheme.metadataDefault.copyWith(color: colorScheme.textTertiary),
                 ),
             ],
           ),
