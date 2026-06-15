@@ -446,25 +446,21 @@ class _MentionTypesSection extends StatelessWidget {
       children: [
         _ExampleCard(
           label: 'User mention',
-          subtitle:
-              '`[@Alice](mention:alice)` — bare `mention:` resolves to user.',
+          subtitle: '`[@Alice](mention:alice)` — bare `mention:` resolves to user.',
           child: Builder(
             builder: (context) => StreamMessageText(
               'Hey [@Alice](mention:alice), can you review the PR?',
-              onTapAnyMention: (text, type, id) =>
-                  _showSnack(context, '$type: $text (id: $id)'),
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
             ),
           ),
         ),
         _ExampleCard(
           label: 'Channel mention',
-          subtitle:
-              '`[@channel](mention-channel:channel)` — broadcast styling.',
+          subtitle: '`[@channel](mention-channel:channel)` — broadcast styling.',
           child: Builder(
             builder: (context) => StreamMessageText(
               'Heads up [@channel](mention-channel:channel) — deployment at 3pm.',
-              onTapAnyMention: (text, type, id) =>
-                  _showSnack(context, '$type: $text (id: $id)'),
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
             ),
           ),
         ),
@@ -474,8 +470,7 @@ class _MentionTypesSection extends StatelessWidget {
           child: Builder(
             builder: (context) => StreamMessageText(
               'Quick poll [@here](mention-here:here) — anyone free for a sync?',
-              onTapAnyMention: (text, type, id) =>
-                  _showSnack(context, '$type: $text (id: $id)'),
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
             ),
           ),
         ),
@@ -485,8 +480,7 @@ class _MentionTypesSection extends StatelessWidget {
           child: Builder(
             builder: (context) => StreamMessageText(
               'Pinging [@admin](mention-role:admin) for approval on this change.',
-              onTapAnyMention: (text, type, id) =>
-                  _showSnack(context, '$type: $text (id: $id)'),
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
             ),
           ),
         ),
@@ -496,8 +490,7 @@ class _MentionTypesSection extends StatelessWidget {
           child: Builder(
             builder: (context) => StreamMessageText(
               'Heads up [@frontend](mention-group:frontend) — review the new spec.',
-              onTapAnyMention: (text, type, id) =>
-                  _showSnack(context, '$type: $text (id: $id)'),
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
             ),
           ),
         ),
@@ -511,8 +504,7 @@ class _MentionTypesSection extends StatelessWidget {
               '[@here](mention-here:here), '
               '[@admin](mention-role:admin), '
               '[@frontend](mention-group:frontend).',
-              onTapAnyMention: (text, type, id) =>
-                  _showSnack(context, '$type: $text (id: $id)'),
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
             ),
           ),
         ),
@@ -535,8 +527,7 @@ class _MentionTypesSection extends StatelessWidget {
                 '[@here](mention-here:here) (red), '
                 '[@admin](mention-role:admin) (purple), '
                 '[@frontend](mention-group:frontend) (teal).',
-                onTapAnyMention: (text, type, id) =>
-                    _showSnack(context, '$type: $text (id: $id)'),
+                onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
               ),
             ),
           ),
