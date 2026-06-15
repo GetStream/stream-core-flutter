@@ -357,8 +357,8 @@ class DefaultStreamMessageText extends StatelessWidget {
       ...?props.inlineSyntaxes,
     ];
 
-    // Base mention style — used as the defensive fallback when the parser
-    // ever emits a type outside the closed set in [mentionStyles].
+    // Base mention style — variant-specific overrides from [mentionStyles]
+    // are merged on top of this in [_StreamMentionBuilder].
     final baseMentionStyle = resolve((s) => s?.mentionStyle).copyWith(
       color: resolve((s) => s?.mentionColor),
       backgroundColor: resolve((s) => s?.mentionBackgroundColor),
@@ -396,37 +396,40 @@ class DefaultStreamMessageText extends StatelessWidget {
     );
   }
 
-  // Pre-resolves one text style per mention kind via the variant→base
-  // fallback chain. Known types yield a fully-populated entry; unknown
-  // types are omitted and fall through to [_StreamMentionBuilder.fallbackStyle].
+  // Resolves one text style per mention kind. The variant-specific style
+  // falls back to the base [mentionStyle] when unset, while a missing
+  // variant color or background passes through as null so the builder's
+  // [_StreamMentionBuilder.fallbackStyle] supplies them via merge.
   Map<StreamMentionType, TextStyle> _resolveMentionStyles(
     StreamMessageLayoutResolver<StreamMessageTextStyle> resolve,
   ) {
-    TextStyle? styleFor(StreamMentionType type) {
+    TextStyle styleFor(StreamMentionType type) {
       // Per the chat design system, `@channel` and `@here` share the
       // `mention-broadcast` styling.
       final variantStyle = switch (type) {
-        .channel || .here => resolve((s) => s?.mentionBroadcastStyle ?? s?.mentionStyle),
-        .role => resolve((s) => s?.mentionRoleStyle ?? s?.mentionStyle),
-        .group => resolve((s) => s?.mentionGroupStyle ?? s?.mentionStyle),
-        .user => resolve((s) => s?.mentionUserStyle ?? s?.mentionStyle),
+        .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastStyle),
+        .role => resolve.maybeResolve((s) => s?.mentionRoleStyle),
+        .group => resolve.maybeResolve((s) => s?.mentionGroupStyle),
+        .user => resolve.maybeResolve((s) => s?.mentionUserStyle),
         _ => null,
-      };
-      if (variantStyle == null) return null;
+      } ?? resolve((s) => s?.mentionStyle);
+
       final variantColor = switch (type) {
-        .channel || .here => resolve((s) => s?.mentionBroadcastColor ?? s?.mentionColor),
-        .role => resolve((s) => s?.mentionRoleColor ?? s?.mentionColor),
-        .group => resolve((s) => s?.mentionGroupColor ?? s?.mentionColor),
-        .user => resolve((s) => s?.mentionUserColor ?? s?.mentionColor),
-        _ => null,
+        .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastColor),
+        .role => resolve.maybeResolve((s) => s?.mentionRoleColor),
+        .group => resolve.maybeResolve((s) => s?.mentionGroupColor),
+        .user => resolve.maybeResolve((s) => s?.mentionUserColor),
+        _ => resolve((s) => s?.mentionColor),
       };
+
       final variantBg = switch (type) {
-        .channel || .here => resolve((s) => s?.mentionBroadcastBackgroundColor ?? s?.mentionBackgroundColor),
-        .role => resolve((s) => s?.mentionRoleBackgroundColor ?? s?.mentionBackgroundColor),
-        .group => resolve((s) => s?.mentionGroupBackgroundColor ?? s?.mentionBackgroundColor),
-        .user => resolve((s) => s?.mentionUserBackgroundColor ?? s?.mentionBackgroundColor),
-        _ => null,
+        .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastBackgroundColor),
+        .role => resolve.maybeResolve((s) => s?.mentionRoleBackgroundColor),
+        .group => resolve.maybeResolve((s) => s?.mentionGroupBackgroundColor),
+        .user => resolve.maybeResolve((s) => s?.mentionUserBackgroundColor),
+        _ => resolve((s) => s?.mentionBackgroundColor),
       };
+
       return variantStyle.copyWith(
         color: variantColor,
         backgroundColor: variantBg,
@@ -441,7 +444,7 @@ class DefaultStreamMessageText extends StatelessWidget {
         StreamMentionType.group,
         StreamMentionType.user,
       ])
-        type: ?styleFor(type),
+        type: styleFor(type),
     };
   }
 }
@@ -480,9 +483,9 @@ class _StreamMentionSyntax extends md.InlineSyntax {
 // Renders `mention` elements as tappable styled text with pointer cursor.
 //
 // Per-element style resolution: reads the `type` attribute set by
-// [_StreamMentionSyntax] and looks it up in [stylesByType]. [fallbackStyle]
-// is a defensive guard — the parser only emits the five built-in
-// [MentionType] values, all of which are present in the map.
+// [_StreamMentionSyntax] and merges any variant-specific overrides from
+// [stylesByType] on top of [fallbackStyle], which carries the base mention
+// style. Variants without overrides fall through to [fallbackStyle] alone.
 //
 // Tap dispatch: [onTapAny] takes precedence and receives the [MentionType].
 // When [onTapAny] is null, the legacy [onTap] fires only for user mentions so
@@ -512,7 +515,7 @@ class _StreamMentionBuilder extends MarkdownElementBuilder {
     final type = StreamMentionType(
       element.attributes['type'] ?? StreamMentionType.user,
     );
-    final style = stylesByType[type] ?? fallbackStyle;
+    final style = fallbackStyle.merge(stylesByType[type]);
 
     final VoidCallback? handleTap;
     if (onTapAny case final onTapAny?) {
