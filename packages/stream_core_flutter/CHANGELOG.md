@@ -4,7 +4,7 @@
 
 - Added `StreamSnackbar` and `StreamSnackbarTheme` — Stream-styled transient feedback snackbars with a messenger-driven queue.
 - Added `StreamIcons.megaphone` and `StreamIcons.shield` (20px) to the icon set.
-- Added `MentionType` identifier for supported mention types and options for mention text customisation per type.
+- Added `StreamMentionType` identifier for supported mention types and options for mention text customisation per type.
 
 ## 0.3.0
 
