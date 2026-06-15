@@ -406,29 +406,35 @@ class DefaultStreamMessageText extends StatelessWidget {
     TextStyle styleFor(StreamMentionType type) {
       // Per the chat design system, `@channel` and `@here` share the
       // `mention-broadcast` styling.
-      final variantStyle = switch (type) {
-        .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastStyle),
-        .role => resolve.maybeResolve((s) => s?.mentionRoleStyle),
-        .group => resolve.maybeResolve((s) => s?.mentionGroupStyle),
-        .user => resolve.maybeResolve((s) => s?.mentionUserStyle),
-        _ => null,
-      } ?? resolve((s) => s?.mentionStyle);
+      final variantStyle =
+          switch (type) {
+            .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastStyle),
+            .role => resolve.maybeResolve((s) => s?.mentionRoleStyle),
+            .group => resolve.maybeResolve((s) => s?.mentionGroupStyle),
+            .user => resolve.maybeResolve((s) => s?.mentionUserStyle),
+            _ => null,
+          } ??
+          resolve((s) => s?.mentionStyle);
 
-      final variantColor = switch (type) {
-        .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastColor),
-        .role => resolve.maybeResolve((s) => s?.mentionRoleColor),
-        .group => resolve.maybeResolve((s) => s?.mentionGroupColor),
-        .user => resolve.maybeResolve((s) => s?.mentionUserColor),
-        _ => null,
-      } ?? resolve((s) => s?.mentionColor);
+      final variantColor =
+          switch (type) {
+            .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastColor),
+            .role => resolve.maybeResolve((s) => s?.mentionRoleColor),
+            .group => resolve.maybeResolve((s) => s?.mentionGroupColor),
+            .user => resolve.maybeResolve((s) => s?.mentionUserColor),
+            _ => null,
+          } ??
+          resolve((s) => s?.mentionColor);
 
-      final variantBg = switch (type) {
-        .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastBackgroundColor),
-        .role => resolve.maybeResolve((s) => s?.mentionRoleBackgroundColor),
-        .group => resolve.maybeResolve((s) => s?.mentionGroupBackgroundColor),
-        .user => resolve.maybeResolve((s) => s?.mentionUserBackgroundColor),
-        _ => null,
-      } ?? resolve((s) => s?.mentionBackgroundColor);
+      final variantBg =
+          switch (type) {
+            .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastBackgroundColor),
+            .role => resolve.maybeResolve((s) => s?.mentionRoleBackgroundColor),
+            .group => resolve.maybeResolve((s) => s?.mentionGroupBackgroundColor),
+            .user => resolve.maybeResolve((s) => s?.mentionUserBackgroundColor),
+            _ => null,
+          } ??
+          resolve((s) => s?.mentionBackgroundColor);
 
       return variantStyle.copyWith(
         color: variantColor,
