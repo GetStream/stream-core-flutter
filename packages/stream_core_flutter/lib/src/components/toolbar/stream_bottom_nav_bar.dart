@@ -236,27 +236,35 @@ class _FloatingNavBarItem extends StatelessWidget {
     final spacing = context.streamSpacing;
     final color = selected ? colorScheme.textPrimary : colorScheme.textTertiary;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: item.label,
       onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.xxs),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: spacing.xxxs,
-          children: [
-            StreamBadgeNotificationTheme(
-              data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
-              child: IconTheme(
-                data: IconThemeData(color: color, size: 20),
-                child: selected ? item.selectedIcon : item.icon,
+      onTapHint: 'select',
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.xxs),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: spacing.xxxs,
+            children: [
+              StreamBadgeNotificationTheme(
+                data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
+                child: IconTheme(
+                  data: IconThemeData(color: color, size: 20),
+                  child: selected ? item.selectedIcon : item.icon,
+                ),
               ),
-            ),
-            Text(
-              item.label,
-              style: textTheme.metadataEmphasis.copyWith(color: color),
-            ),
-          ],
+              Text(
+                item.label,
+                style: textTheme.metadataEmphasis.copyWith(color: color),
+              ),
+            ],
+          ),
         ),
       ),
     );
