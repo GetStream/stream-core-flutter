@@ -10,16 +10,61 @@ import '../message_layout/stream_message_layout.dart';
 /// The default protocol prefix used to identify mention links.
 ///
 /// Links with this scheme (e.g., `[text](mention:id)`) are treated as
-/// mentions rather than regular links.
+/// mentions rather than regular links. A mention type qualifier can follow
+/// the scheme to distinguish kinds, e.g. `[text](mention-role:id)`. Bare
+/// `mention:` is treated as a user mention.
 const kStreamMentionScheme = 'mention';
 
-/// Callback fired when a mention link is tapped.
+/// The mention kind carried by a mention link.
+///
+/// Encoded as the optional suffix on the mention URL scheme: `mention-user:`,
+/// `mention-channel:`, `mention-here:`, `mention-role:`, `mention-group:`. A
+/// bare `mention:` scheme resolves to [user].
+///
+/// Defined as a Dart extension type over [String] so the same value flows
+/// through the markdown URL, the [md.Element] attribute, and callbacks
+/// without wrapper allocations. The set is closed — only the five constants
+/// declared on this type are recognised by the markdown mention parser.
+extension type const StreamMentionType(String _) implements String {
+  /// A mention referencing a single user.
+  static const user = StreamMentionType('user');
+
+  /// A channel-wide broadcast mention, e.g. `@channel`.
+  static const channel = StreamMentionType('channel');
+
+  /// A broadcast mention targeting online channel members, e.g. `@here`.
+  static const here = StreamMentionType('here');
+
+  /// A mention referencing a role, e.g. `@admin`.
+  static const role = StreamMentionType('role');
+
+  /// A mention referencing a named group of users.
+  static const group = StreamMentionType('group');
+}
+
+/// Callback fired when a user-type mention link is tapped.
 ///
 /// [displayText] is the raw display text from the link
 /// (e.g., `'@Alice'` from `[@Alice](mention:user123)`).
 /// [id] is the mention identifier (the URL-decoded portion after the
 /// `mention:` scheme).
+///
+/// Only invoked for user-type mentions. To handle the full set of mention
+/// kinds (channel / here / role / group) in a single callback, use
+/// [MarkdownTapAnyMentionCallback].
 typedef MarkdownTapMentionCallback = void Function(String displayText, String id);
+
+/// Callback fired when any mention link is tapped.
+///
+/// [displayText] is the raw display text from the link.
+/// [type] is the mention kind decoded from the URL scheme.
+/// [id] is the URL-decoded payload following the scheme.
+typedef MarkdownTapAnyMentionCallback =
+    void Function(
+      String displayText,
+      StreamMentionType type,
+      String id,
+    );
 
 // Matches characters that render as emoji — either those with default emoji
 // presentation, or text-default characters forced to emoji via VS16 (U+FE0F).
@@ -69,6 +114,7 @@ class StreamMessageText extends StatelessWidget {
     bool selectable = false,
     MarkdownTapLinkCallback? onTapLink,
     MarkdownTapMentionCallback? onTapMention,
+    MarkdownTapAnyMentionCallback? onTapAnyMention,
     VoidCallback? onTapText,
     MarkdownImageBuilder? imageBuilder,
     SyntaxHighlighter? syntaxHighlighter,
@@ -87,6 +133,7 @@ class StreamMessageText extends StatelessWidget {
          selectable: selectable,
          onTapLink: onTapLink,
          onTapMention: onTapMention,
+         onTapAnyMention: onTapAnyMention,
          onTapText: onTapText,
          imageBuilder: imageBuilder,
          syntaxHighlighter: syntaxHighlighter,
@@ -157,6 +204,7 @@ class StreamMessageTextProps {
     this.selectable = false,
     this.onTapLink,
     this.onTapMention,
+    this.onTapAnyMention,
     this.onTapText,
     this.imageBuilder,
     this.syntaxHighlighter,
@@ -190,10 +238,22 @@ class StreamMessageTextProps {
   /// Called when a link is tapped.
   final MarkdownTapLinkCallback? onTapLink;
 
-  /// Called when a mention is tapped.
+  /// Called when a user-type mention is tapped.
   ///
-  /// Mentions use the `[text](mention:id)` format.
+  /// Mentions use the `[text](mention:id)` format. Only invoked for user
+  /// mentions; to handle every mention kind in a single callback, prefer
+  /// [onTapAnyMention] instead.
+  ///
+  /// When both callbacks are provided, [onTapAnyMention] takes precedence
+  /// and this callback is not invoked.
   final MarkdownTapMentionCallback? onTapMention;
+
+  /// Called when a mention of any kind is tapped.
+  ///
+  /// Receives the [StreamMentionType] decoded from the URL scheme along with the
+  /// display text and the URL-decoded id payload. Takes precedence over
+  /// [onTapMention] when both are set.
+  final MarkdownTapAnyMentionCallback? onTapAnyMention;
 
   /// Called when non-link text is tapped.
   final VoidCallback? onTapText;
@@ -256,8 +316,8 @@ class DefaultStreamMessageText extends StatelessWidget {
     var effectiveTextStyle = resolve((s) => s?.textStyle).copyWith(color: effectiveTextColor);
     final effectiveLinkColor = resolve((s) => s?.linkColor);
     final effectiveLinkStyle = resolve((s) => s?.linkStyle).copyWith(color: effectiveLinkColor);
-    final effectiveMentionColor = resolve((s) => s?.mentionColor);
-    final effectiveMentionStyle = resolve((s) => s?.mentionStyle).copyWith(color: effectiveMentionColor);
+
+    final mentionStyles = _resolveMentionStyles(resolve);
 
     final contentType = layout.contentKind;
     final emojiCount = StreamMessageText.emojiCount(props.text);
@@ -289,20 +349,27 @@ class DefaultStreamMessageText extends StatelessWidget {
       streamThemeData, // Apply stream theme data
     ).copyWith(p: effectiveTextStyle, a: effectiveLinkStyle).merge(props.styleSheet);
 
-    // Prepend mention syntax so `[text](mention:id)` is intercepted
+    // Prepend mention syntax so `[text](mention[-type]:id)` is intercepted
     // before the standard LinkSyntax, producing `mention` elements.
     // Regular `a` elements are never touched.
-    final mentionStyle = effectiveMentionStyle.copyWith(color: effectiveMentionColor);
-
     final effectiveInlineSyntaxes = [
       _StreamMentionSyntax(),
       ...?props.inlineSyntaxes,
     ];
 
+    // Base mention style — variant-specific overrides from [mentionStyles]
+    // are merged on top of this in [_StreamMentionBuilder].
+    final baseMentionStyle = resolve((s) => s?.mentionStyle).copyWith(
+      color: resolve((s) => s?.mentionColor),
+      backgroundColor: resolve((s) => s?.mentionBackgroundColor),
+    );
+
     final effectiveBuilders = {
       kStreamMentionScheme: _StreamMentionBuilder(
-        style: mentionStyle,
+        stylesByType: mentionStyles,
+        fallbackStyle: baseMentionStyle,
         onTap: props.onTapMention,
+        onTapAny: props.onTapAnyMention,
       ),
       ...?props.builders,
     };
@@ -328,39 +395,119 @@ class DefaultStreamMessageText extends StatelessWidget {
       ),
     );
   }
+
+  // Resolves one text style per mention kind. Each variant-specific lookup
+  // falls back to the corresponding base property — [mentionStyle],
+  // [mentionColor], [mentionBackgroundColor] — so the entry is always
+  // fully populated.
+  Map<StreamMentionType, TextStyle> _resolveMentionStyles(
+    StreamMessageLayoutResolver<StreamMessageTextStyle> resolve,
+  ) {
+    TextStyle styleFor(StreamMentionType type) {
+      // Per the chat design system, `@channel` and `@here` share the
+      // `mention-broadcast` styling.
+      final variantStyle =
+          switch (type) {
+            .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastStyle),
+            .role => resolve.maybeResolve((s) => s?.mentionRoleStyle),
+            .group => resolve.maybeResolve((s) => s?.mentionGroupStyle),
+            .user => resolve.maybeResolve((s) => s?.mentionUserStyle),
+            _ => null,
+          } ??
+          resolve((s) => s?.mentionStyle);
+
+      final variantColor =
+          switch (type) {
+            .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastColor),
+            .role => resolve.maybeResolve((s) => s?.mentionRoleColor),
+            .group => resolve.maybeResolve((s) => s?.mentionGroupColor),
+            .user => resolve.maybeResolve((s) => s?.mentionUserColor),
+            _ => null,
+          } ??
+          resolve((s) => s?.mentionColor);
+
+      final variantBg =
+          switch (type) {
+            .channel || .here => resolve.maybeResolve((s) => s?.mentionBroadcastBackgroundColor),
+            .role => resolve.maybeResolve((s) => s?.mentionRoleBackgroundColor),
+            .group => resolve.maybeResolve((s) => s?.mentionGroupBackgroundColor),
+            .user => resolve.maybeResolve((s) => s?.mentionUserBackgroundColor),
+            _ => null,
+          } ??
+          resolve((s) => s?.mentionBackgroundColor);
+
+      return variantStyle.copyWith(
+        color: variantColor,
+        backgroundColor: variantBg,
+      );
+    }
+
+    return {
+      for (final type in const [
+        StreamMentionType.channel,
+        StreamMentionType.here,
+        StreamMentionType.role,
+        StreamMentionType.group,
+        StreamMentionType.user,
+      ])
+        type: styleFor(type),
+    };
+  }
 }
 
-// Intercepts `[text](mention:id)` patterns before the standard link parser,
-// emitting a `mention` element instead of a regular link.
+// Intercepts `[text](mention[-type]:id)` patterns before the standard link
+// parser, emitting a `mention` element instead of a regular link.
 //
-// Given `[@Alice](mention:user123)`:
+// Given `[@Alice](mention:user123)` or `[@admin](mention-role:admin)`:
 //
-//  * Emits a `mention` element with text content `@Alice`.
-//  * Stores the URL-decoded id (`user123`) in the `id` attribute.
+//  * Emits a `mention` element with text content `@Alice` / `@admin`.
+//  * Stores the URL-decoded id (`user123` / `admin`) in the `id` attribute.
+//  * Stores the captured type (`user` / `channel` / `here` / `role` / `group`)
+//    in the `type` attribute. Bare `mention:` (no suffix) resolves to `user`.
 //  * Regular links are never touched.
 class _StreamMentionSyntax extends md.InlineSyntax {
   _StreamMentionSyntax({
     String scheme = kStreamMentionScheme,
-  }) : super('\\[([^\\]\\n]+)\\]\\(${RegExp.escape(scheme)}:([^)\\s]+)\\)');
+  }) : super(
+         '\\[([^\\]\\n]+)\\]\\(${RegExp.escape(scheme)}(?:-(user|channel|here|role|group))?:([^)\\s]+)\\)',
+       );
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     final displayText = match.group(1)!;
-    final rawId = match.group(2)!;
+    final type = match.group(2) ?? StreamMentionType.user;
+    final rawId = match.group(3)!;
 
     final el = md.Element.text('mention', displayText);
     el.attributes['id'] = Uri.decodeComponent(rawId);
+    el.attributes['type'] = type;
     parser.addNode(el);
     return true;
   }
 }
 
 // Renders `mention` elements as tappable styled text with pointer cursor.
+//
+// Per-element style resolution: reads the `type` attribute set by
+// [_StreamMentionSyntax] and merges any variant-specific overrides from
+// [stylesByType] on top of [fallbackStyle], which carries the base mention
+// style. Variants without overrides fall through to [fallbackStyle] alone.
+//
+// Tap dispatch: [onTapAny] takes precedence and receives the [MentionType].
+// When [onTapAny] is null, the legacy [onTap] fires only for user mentions so
+// existing customer code never sees a non-user payload.
 class _StreamMentionBuilder extends MarkdownElementBuilder {
-  _StreamMentionBuilder({required this.style, this.onTap});
+  _StreamMentionBuilder({
+    required this.stylesByType,
+    required this.fallbackStyle,
+    this.onTap,
+    this.onTapAny,
+  });
 
-  final TextStyle style;
+  final Map<StreamMentionType, TextStyle> stylesByType;
+  final TextStyle fallbackStyle;
   final MarkdownTapMentionCallback? onTap;
+  final MarkdownTapAnyMentionCallback? onTapAny;
 
   @override
   Widget? visitElementAfterWithContext(
@@ -371,11 +518,24 @@ class _StreamMentionBuilder extends MarkdownElementBuilder {
   ) {
     final displayText = element.textContent;
     final id = element.attributes['id'] ?? '';
+    final type = StreamMentionType(
+      element.attributes['type'] ?? StreamMentionType.user,
+    );
+    final style = fallbackStyle.merge(stylesByType[type]);
+
+    final VoidCallback? handleTap;
+    if (onTapAny case final onTapAny?) {
+      handleTap = () => onTapAny(displayText, type, id);
+    } else if (onTap case final onTap? when type == StreamMentionType.user) {
+      handleTap = () => onTap(displayText, id);
+    } else {
+      handleTap = null;
+    }
 
     return MouseRegion(
-      cursor: onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
+      cursor: handleTap != null ? SystemMouseCursors.click : MouseCursor.defer,
       child: GestureDetector(
-        onTap: onTap != null ? () => onTap!(displayText, id) : null,
+        onTap: handleTap,
         child: Text(displayText, style: preferredStyle?.merge(style) ?? style),
       ),
     );
@@ -421,6 +581,9 @@ class _StreamMessageTextDefaults extends StreamMessageTextStyle {
 
   @override
   StreamMessageLayoutProperty<Color> get mentionColor => .all(_colorScheme.textLink);
+
+  @override
+  StreamMessageLayoutProperty<Color> get mentionBackgroundColor => .all(StreamColors.transparent);
 
   @override
   StreamMessageLayoutProperty<TextStyle> get singleEmojiStyle {
