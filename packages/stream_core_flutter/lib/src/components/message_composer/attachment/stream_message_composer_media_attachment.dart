@@ -1,6 +1,11 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../../stream_core_flutter.dart';
+import '../../../factory/stream_component_factory.dart';
+import '../../../theme/components/stream_message_composer_attachment_theme.dart';
+import '../../../theme/components/stream_message_composer_media_attachment_theme.dart';
+import '../../../theme/stream_theme_extensions.dart';
+import '../../badge/stream_media_badge.dart';
+import 'stream_message_composer_attachment.dart';
 
 /// A composer attachment that displays a fixed-size thumbnail for an image or video.
 ///

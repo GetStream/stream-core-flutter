@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../theme.dart';
+import '../../factory/stream_component_factory.dart';
+import '../../theme/components/stream_message_item_theme.dart';
+import '../../theme/components/stream_message_metadata_theme.dart';
+import '../../theme/components/stream_message_style_property.dart';
+import '../../theme/primitives/stream_spacing.dart';
+import '../../theme/semantics/stream_color_scheme.dart';
+import '../../theme/semantics/stream_text_theme.dart';
+import '../../theme/stream_theme_extensions.dart';
 import '../message_layout/stream_message_layout.dart';
 
 /// The bottom metadata row of a chat message bubble.

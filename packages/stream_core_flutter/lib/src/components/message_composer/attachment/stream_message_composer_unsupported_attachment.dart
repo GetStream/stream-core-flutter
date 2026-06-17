@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../../stream_core_flutter.dart';
+import '../../../factory/stream_component_factory.dart';
+import '../../../theme/components/stream_message_composer_unsupported_attachment_theme.dart';
+import '../../../theme/stream_theme_extensions.dart';
+import 'stream_message_composer_attachment.dart';
 
 const _kDefaultConstraints = BoxConstraints(maxWidth: 260, maxHeight: 260, minHeight: 72);
 

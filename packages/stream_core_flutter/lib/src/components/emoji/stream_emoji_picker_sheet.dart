@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../components.dart';
-
 import '../../theme/components/stream_emoji_button_theme.dart';
 import '../../theme/components/stream_sheet_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../accessories/stream_emoji.dart';
+import '../buttons/stream_emoji_button.dart';
+import 'data/stream_emoji_data.dart';
+import 'data/stream_supported_emojis.dart';
 
 const _kGridCrossAxisCount = 7;
 

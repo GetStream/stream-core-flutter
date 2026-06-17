@@ -125,6 +125,10 @@ scripts:
     run: melos exec -c 1 --file-exists="stream_icons.yaml" -- "dart run \$MELOS_ROOT_PATH/scripts/generate_icons.dart"
     description: Generate icon font and Dart classes from SVG files.
 
+  check:barrels:
+    run: melos exec -c 1 --file-exists="check_barrels.yaml" -- "dart run \$MELOS_ROOT_PATH/scripts/check_barrels.dart"
+    description: Validate the public-barrel contract for packages with a check_barrels.yaml config.
+
   generate:dart:
     run: melos exec -c 1 --depends-on="build_runner" --no-flutter -- "dart run build_runner build --delete-conflicting-outputs"
     description: Build all generated files for Dart packages in this project.

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme.dart';
+import '../../../factory/stream_component_factory.dart';
+import '../../../theme/components/stream_message_composer_attachment_theme.dart';
+import '../../../theme/stream_theme_extensions.dart';
 import '../../controls/stream_remove_control.dart';
+import '../../message/stream_message_attachment.dart';
 
 /// A styled container that wraps composer attachment content with a themed background, shape,
 /// and border.

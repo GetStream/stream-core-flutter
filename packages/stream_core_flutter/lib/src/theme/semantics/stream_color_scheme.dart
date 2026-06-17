@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../../theme/primitives/stream_colors.dart';
-import '../primitives/tokens/dark/stream_tokens.dart' as dark_tokens;
-import '../primitives/tokens/light/stream_tokens.dart' as light_tokens;
+import '../primitives/internal/tokens/dark/stream_tokens.dart' as dark_tokens;
+import '../primitives/internal/tokens/light/stream_tokens.dart' as light_tokens;
 
 part 'stream_color_scheme.g.theme.dart';
 

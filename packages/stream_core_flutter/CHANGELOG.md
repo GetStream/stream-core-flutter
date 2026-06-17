@@ -2,6 +2,7 @@
 
 ### ✨ Features
 
+- Split the public API into `package:stream_core_flutter/core.dart` (shared primitives for any Stream SDK) and `package:stream_core_flutter/chat.dart` (chat-only widgets; re-exports `core.dart`); the convenience barrel `package:stream_core_flutter/stream_core_flutter.dart` is now deprecated.
 - Added `StreamSnackbar` and `StreamSnackbarTheme` — Stream-styled transient feedback snackbars with a messenger-driven queue.
 - Added `StreamIcons.megaphone` and `StreamIcons.shield` (20px) to the icon set.
 - Added `StreamMentionType` identifier for supported mention types and options for mention text customisation per type.
