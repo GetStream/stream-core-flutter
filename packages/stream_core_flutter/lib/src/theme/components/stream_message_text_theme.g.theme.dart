@@ -72,6 +72,84 @@ mixin _$StreamMessageTextStyle {
         t,
         Color.lerp,
       ),
+      mentionBackgroundColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionBackgroundColor,
+        b.mentionBackgroundColor,
+        t,
+        Color.lerp,
+      ),
+      mentionBroadcastStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.mentionBroadcastStyle,
+        b.mentionBroadcastStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      mentionBroadcastColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionBroadcastColor,
+        b.mentionBroadcastColor,
+        t,
+        Color.lerp,
+      ),
+      mentionBroadcastBackgroundColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionBroadcastBackgroundColor,
+        b.mentionBroadcastBackgroundColor,
+        t,
+        Color.lerp,
+      ),
+      mentionRoleStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.mentionRoleStyle,
+        b.mentionRoleStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      mentionRoleColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionRoleColor,
+        b.mentionRoleColor,
+        t,
+        Color.lerp,
+      ),
+      mentionRoleBackgroundColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionRoleBackgroundColor,
+        b.mentionRoleBackgroundColor,
+        t,
+        Color.lerp,
+      ),
+      mentionGroupStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.mentionGroupStyle,
+        b.mentionGroupStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      mentionGroupColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionGroupColor,
+        b.mentionGroupColor,
+        t,
+        Color.lerp,
+      ),
+      mentionGroupBackgroundColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionGroupBackgroundColor,
+        b.mentionGroupBackgroundColor,
+        t,
+        Color.lerp,
+      ),
+      mentionUserStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.mentionUserStyle,
+        b.mentionUserStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      mentionUserColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionUserColor,
+        b.mentionUserColor,
+        t,
+        Color.lerp,
+      ),
+      mentionUserBackgroundColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.mentionUserBackgroundColor,
+        b.mentionUserBackgroundColor,
+        t,
+        Color.lerp,
+      ),
       singleEmojiStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.singleEmojiStyle,
         b.singleEmojiStyle,
@@ -101,6 +179,19 @@ mixin _$StreamMessageTextStyle {
     StreamMessageLayoutProperty<Color?>? linkColor,
     StreamMessageLayoutProperty<TextStyle?>? mentionStyle,
     StreamMessageLayoutProperty<Color?>? mentionColor,
+    StreamMessageLayoutProperty<Color?>? mentionBackgroundColor,
+    StreamMessageLayoutProperty<TextStyle?>? mentionBroadcastStyle,
+    StreamMessageLayoutProperty<Color?>? mentionBroadcastColor,
+    StreamMessageLayoutProperty<Color?>? mentionBroadcastBackgroundColor,
+    StreamMessageLayoutProperty<TextStyle?>? mentionRoleStyle,
+    StreamMessageLayoutProperty<Color?>? mentionRoleColor,
+    StreamMessageLayoutProperty<Color?>? mentionRoleBackgroundColor,
+    StreamMessageLayoutProperty<TextStyle?>? mentionGroupStyle,
+    StreamMessageLayoutProperty<Color?>? mentionGroupColor,
+    StreamMessageLayoutProperty<Color?>? mentionGroupBackgroundColor,
+    StreamMessageLayoutProperty<TextStyle?>? mentionUserStyle,
+    StreamMessageLayoutProperty<Color?>? mentionUserColor,
+    StreamMessageLayoutProperty<Color?>? mentionUserBackgroundColor,
     StreamMessageLayoutProperty<TextStyle?>? singleEmojiStyle,
     StreamMessageLayoutProperty<TextStyle?>? doubleEmojiStyle,
     StreamMessageLayoutProperty<TextStyle?>? tripleEmojiStyle,
@@ -115,6 +206,27 @@ mixin _$StreamMessageTextStyle {
       linkColor: linkColor ?? _this.linkColor,
       mentionStyle: mentionStyle ?? _this.mentionStyle,
       mentionColor: mentionColor ?? _this.mentionColor,
+      mentionBackgroundColor:
+          mentionBackgroundColor ?? _this.mentionBackgroundColor,
+      mentionBroadcastStyle:
+          mentionBroadcastStyle ?? _this.mentionBroadcastStyle,
+      mentionBroadcastColor:
+          mentionBroadcastColor ?? _this.mentionBroadcastColor,
+      mentionBroadcastBackgroundColor:
+          mentionBroadcastBackgroundColor ??
+          _this.mentionBroadcastBackgroundColor,
+      mentionRoleStyle: mentionRoleStyle ?? _this.mentionRoleStyle,
+      mentionRoleColor: mentionRoleColor ?? _this.mentionRoleColor,
+      mentionRoleBackgroundColor:
+          mentionRoleBackgroundColor ?? _this.mentionRoleBackgroundColor,
+      mentionGroupStyle: mentionGroupStyle ?? _this.mentionGroupStyle,
+      mentionGroupColor: mentionGroupColor ?? _this.mentionGroupColor,
+      mentionGroupBackgroundColor:
+          mentionGroupBackgroundColor ?? _this.mentionGroupBackgroundColor,
+      mentionUserStyle: mentionUserStyle ?? _this.mentionUserStyle,
+      mentionUserColor: mentionUserColor ?? _this.mentionUserColor,
+      mentionUserBackgroundColor:
+          mentionUserBackgroundColor ?? _this.mentionUserBackgroundColor,
       singleEmojiStyle: singleEmojiStyle ?? _this.singleEmojiStyle,
       doubleEmojiStyle: doubleEmojiStyle ?? _this.doubleEmojiStyle,
       tripleEmojiStyle: tripleEmojiStyle ?? _this.tripleEmojiStyle,
@@ -140,6 +252,19 @@ mixin _$StreamMessageTextStyle {
       linkColor: other.linkColor,
       mentionStyle: other.mentionStyle,
       mentionColor: other.mentionColor,
+      mentionBackgroundColor: other.mentionBackgroundColor,
+      mentionBroadcastStyle: other.mentionBroadcastStyle,
+      mentionBroadcastColor: other.mentionBroadcastColor,
+      mentionBroadcastBackgroundColor: other.mentionBroadcastBackgroundColor,
+      mentionRoleStyle: other.mentionRoleStyle,
+      mentionRoleColor: other.mentionRoleColor,
+      mentionRoleBackgroundColor: other.mentionRoleBackgroundColor,
+      mentionGroupStyle: other.mentionGroupStyle,
+      mentionGroupColor: other.mentionGroupColor,
+      mentionGroupBackgroundColor: other.mentionGroupBackgroundColor,
+      mentionUserStyle: other.mentionUserStyle,
+      mentionUserColor: other.mentionUserColor,
+      mentionUserBackgroundColor: other.mentionUserBackgroundColor,
       singleEmojiStyle: other.singleEmojiStyle,
       doubleEmojiStyle: other.doubleEmojiStyle,
       tripleEmojiStyle: other.tripleEmojiStyle,
@@ -166,6 +291,21 @@ mixin _$StreamMessageTextStyle {
         _other.linkColor == _this.linkColor &&
         _other.mentionStyle == _this.mentionStyle &&
         _other.mentionColor == _this.mentionColor &&
+        _other.mentionBackgroundColor == _this.mentionBackgroundColor &&
+        _other.mentionBroadcastStyle == _this.mentionBroadcastStyle &&
+        _other.mentionBroadcastColor == _this.mentionBroadcastColor &&
+        _other.mentionBroadcastBackgroundColor ==
+            _this.mentionBroadcastBackgroundColor &&
+        _other.mentionRoleStyle == _this.mentionRoleStyle &&
+        _other.mentionRoleColor == _this.mentionRoleColor &&
+        _other.mentionRoleBackgroundColor == _this.mentionRoleBackgroundColor &&
+        _other.mentionGroupStyle == _this.mentionGroupStyle &&
+        _other.mentionGroupColor == _this.mentionGroupColor &&
+        _other.mentionGroupBackgroundColor ==
+            _this.mentionGroupBackgroundColor &&
+        _other.mentionUserStyle == _this.mentionUserStyle &&
+        _other.mentionUserColor == _this.mentionUserColor &&
+        _other.mentionUserBackgroundColor == _this.mentionUserBackgroundColor &&
         _other.singleEmojiStyle == _this.singleEmojiStyle &&
         _other.doubleEmojiStyle == _this.doubleEmojiStyle &&
         _other.tripleEmojiStyle == _this.tripleEmojiStyle;
@@ -175,7 +315,7 @@ mixin _$StreamMessageTextStyle {
   int get hashCode {
     final _this = (this as StreamMessageTextStyle);
 
-    return Object.hash(
+    return Object.hashAll([
       runtimeType,
       _this.padding,
       _this.textStyle,
@@ -184,9 +324,22 @@ mixin _$StreamMessageTextStyle {
       _this.linkColor,
       _this.mentionStyle,
       _this.mentionColor,
+      _this.mentionBackgroundColor,
+      _this.mentionBroadcastStyle,
+      _this.mentionBroadcastColor,
+      _this.mentionBroadcastBackgroundColor,
+      _this.mentionRoleStyle,
+      _this.mentionRoleColor,
+      _this.mentionRoleBackgroundColor,
+      _this.mentionGroupStyle,
+      _this.mentionGroupColor,
+      _this.mentionGroupBackgroundColor,
+      _this.mentionUserStyle,
+      _this.mentionUserColor,
+      _this.mentionUserBackgroundColor,
       _this.singleEmojiStyle,
       _this.doubleEmojiStyle,
       _this.tripleEmojiStyle,
-    );
+    ]);
   }
 }

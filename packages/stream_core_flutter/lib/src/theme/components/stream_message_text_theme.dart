@@ -56,6 +56,19 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
     this.linkColor,
     this.mentionStyle,
     this.mentionColor,
+    this.mentionBackgroundColor,
+    this.mentionBroadcastStyle,
+    this.mentionBroadcastColor,
+    this.mentionBroadcastBackgroundColor,
+    this.mentionRoleStyle,
+    this.mentionRoleColor,
+    this.mentionRoleBackgroundColor,
+    this.mentionGroupStyle,
+    this.mentionGroupColor,
+    this.mentionGroupBackgroundColor,
+    this.mentionUserStyle,
+    this.mentionUserColor,
+    this.mentionUserBackgroundColor,
     this.singleEmojiStyle,
     this.doubleEmojiStyle,
     this.tripleEmojiStyle,
@@ -84,6 +97,19 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
     Color? linkColor,
     TextStyle? mentionStyle,
     Color? mentionColor,
+    Color? mentionBackgroundColor,
+    TextStyle? mentionBroadcastStyle,
+    Color? mentionBroadcastColor,
+    Color? mentionBroadcastBackgroundColor,
+    TextStyle? mentionRoleStyle,
+    Color? mentionRoleColor,
+    Color? mentionRoleBackgroundColor,
+    TextStyle? mentionGroupStyle,
+    Color? mentionGroupColor,
+    Color? mentionGroupBackgroundColor,
+    TextStyle? mentionUserStyle,
+    Color? mentionUserColor,
+    Color? mentionUserBackgroundColor,
     TextStyle? singleEmojiStyle,
     TextStyle? doubleEmojiStyle,
     TextStyle? tripleEmojiStyle,
@@ -96,6 +122,19 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
       linkColor: linkColor?.let(StreamMessageLayoutProperty.all),
       mentionStyle: mentionStyle?.let(StreamMessageLayoutProperty.all),
       mentionColor: mentionColor?.let(StreamMessageLayoutProperty.all),
+      mentionBackgroundColor: mentionBackgroundColor?.let(StreamMessageLayoutProperty.all),
+      mentionBroadcastStyle: mentionBroadcastStyle?.let(StreamMessageLayoutProperty.all),
+      mentionBroadcastColor: mentionBroadcastColor?.let(StreamMessageLayoutProperty.all),
+      mentionBroadcastBackgroundColor: mentionBroadcastBackgroundColor?.let(StreamMessageLayoutProperty.all),
+      mentionRoleStyle: mentionRoleStyle?.let(StreamMessageLayoutProperty.all),
+      mentionRoleColor: mentionRoleColor?.let(StreamMessageLayoutProperty.all),
+      mentionRoleBackgroundColor: mentionRoleBackgroundColor?.let(StreamMessageLayoutProperty.all),
+      mentionGroupStyle: mentionGroupStyle?.let(StreamMessageLayoutProperty.all),
+      mentionGroupColor: mentionGroupColor?.let(StreamMessageLayoutProperty.all),
+      mentionGroupBackgroundColor: mentionGroupBackgroundColor?.let(StreamMessageLayoutProperty.all),
+      mentionUserStyle: mentionUserStyle?.let(StreamMessageLayoutProperty.all),
+      mentionUserColor: mentionUserColor?.let(StreamMessageLayoutProperty.all),
+      mentionUserBackgroundColor: mentionUserBackgroundColor?.let(StreamMessageLayoutProperty.all),
       singleEmojiStyle: singleEmojiStyle?.let(StreamMessageLayoutProperty.all),
       doubleEmojiStyle: doubleEmojiStyle?.let(StreamMessageLayoutProperty.all),
       tripleEmojiStyle: tripleEmojiStyle?.let(StreamMessageLayoutProperty.all),
@@ -121,10 +160,82 @@ class StreamMessageTextStyle with _$StreamMessageTextStyle {
   final StreamMessageLayoutProperty<Color?>? linkColor;
 
   /// The text style for @mention text.
+  ///
+  /// Applies to every mention kind unless a kind-specific style — e.g.
+  /// [mentionRoleStyle] — is set.
   final StreamMessageLayoutProperty<TextStyle?>? mentionStyle;
 
   /// The color for @mention text.
+  ///
+  /// Applies to every mention kind unless a kind-specific color — e.g.
+  /// [mentionRoleColor] — is set.
   final StreamMessageLayoutProperty<Color?>? mentionColor;
+
+  /// The background color for @mention text.
+  ///
+  /// Applies to every mention kind unless a kind-specific background — e.g.
+  /// [mentionRoleBackgroundColor] — is set.
+  final StreamMessageLayoutProperty<Color?>? mentionBackgroundColor;
+
+  /// The text style for broadcast mentions (e.g. `@channel`, `@here`).
+  ///
+  /// When null, falls back to [mentionStyle].
+  final StreamMessageLayoutProperty<TextStyle?>? mentionBroadcastStyle;
+
+  /// The color for broadcast mention text (e.g. `@channel`, `@here`).
+  ///
+  /// When null, falls back to [mentionColor].
+  final StreamMessageLayoutProperty<Color?>? mentionBroadcastColor;
+
+  /// The background color for broadcast mention text.
+  ///
+  /// When null, falls back to [mentionBackgroundColor].
+  final StreamMessageLayoutProperty<Color?>? mentionBroadcastBackgroundColor;
+
+  /// The text style for role mentions (e.g. `@admin`).
+  ///
+  /// When null, falls back to [mentionStyle].
+  final StreamMessageLayoutProperty<TextStyle?>? mentionRoleStyle;
+
+  /// The color for role mention text.
+  ///
+  /// When null, falls back to [mentionColor].
+  final StreamMessageLayoutProperty<Color?>? mentionRoleColor;
+
+  /// The background color for role mention text.
+  ///
+  /// When null, falls back to [mentionBackgroundColor].
+  final StreamMessageLayoutProperty<Color?>? mentionRoleBackgroundColor;
+
+  /// The text style for group mentions.
+  ///
+  /// When null, falls back to [mentionStyle].
+  final StreamMessageLayoutProperty<TextStyle?>? mentionGroupStyle;
+
+  /// The color for group mention text.
+  ///
+  /// When null, falls back to [mentionColor].
+  final StreamMessageLayoutProperty<Color?>? mentionGroupColor;
+
+  /// The background color for group mention text.
+  ///
+  /// When null, falls back to [mentionBackgroundColor].
+  final StreamMessageLayoutProperty<Color?>? mentionGroupBackgroundColor;
+
+  /// The text style for user mentions.
+  ///
+  /// When null, falls back to [mentionStyle].
+  final StreamMessageLayoutProperty<TextStyle?>? mentionUserStyle;
+
+  /// The color for user mention text.
+  ///
+  /// When null, falls back to [mentionColor].
+  final StreamMessageLayoutProperty<Color?>? mentionUserColor;
+
+  /// The background color for user mention text.
+  ///
+  /// When null, falls back to [mentionBackgroundColor].
+  final StreamMessageLayoutProperty<Color?>? mentionUserBackgroundColor;
 
   /// The text style for emoji-only messages containing exactly one emoji.
   final StreamMessageLayoutProperty<TextStyle?>? singleEmojiStyle;

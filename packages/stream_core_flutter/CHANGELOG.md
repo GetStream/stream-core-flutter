@@ -10,6 +10,7 @@
 - Floating buttons (`isFloating: true`) now retain their pill surface (`backgroundElevation1`) when disabled, across all style/type combinations. Previously, outline and ghost variants fell back to transparent when disabled, losing the floating visual.
 - Added `StreamSnackbar` and `StreamSnackbarTheme` — Stream-styled transient feedback snackbars with a messenger-driven queue.
 - Added `StreamIcons.megaphone` and `StreamIcons.shield` (20px) to the icon set.
+- Added `StreamMentionType` identifier for supported mention types and options for mention text customisation per type.
 
 ## 0.3.0
 

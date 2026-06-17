@@ -54,13 +54,45 @@ Widget buildStreamMessageTextPlayground(BuildContext context) {
     label: 'Mention Color',
     options: _ColorOption.values,
     labelBuilder: (v) => v.label,
-    description: 'Override mention color.',
+    description: 'Override the base mention color (fallback for all kinds).',
+  );
+
+  final mentionUserColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · User Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @user mention color.',
+  );
+
+  final mentionBroadcastColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · Broadcast Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @channel / @here mention color.',
+  );
+
+  final mentionRoleColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · Role Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @role mention color.',
+  );
+
+  final mentionGroupColor = context.knobs.object.dropdown<_ColorOption>(
+    label: 'Mention · Group Color',
+    options: _ColorOption.values,
+    labelBuilder: (v) => v.label,
+    description: 'Override @group mention color.',
   );
 
   final style = StreamMessageTextStyle.from(
     textColor: textColor.color,
     linkColor: linkColor.color,
     mentionColor: mentionColor.color,
+    mentionUserColor: mentionUserColor.color,
+    mentionBroadcastColor: mentionBroadcastColor.color,
+    mentionRoleColor: mentionRoleColor.color,
+    mentionGroupColor: mentionGroupColor.color,
   );
 
   return StreamMessageItemTheme(
@@ -116,6 +148,11 @@ const _conversationMessages = [
     stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
+    text: 'PSA [@channel](mention-channel:general) — deploy at 3pm today',
+    alignment: StreamMessageAlignment.start,
+    stackPosition: StreamMessageStackPosition.single,
+  ),
+  _ChatMessage(
     text: 'Not yet! Got a [link](https://flutter.dev)?',
     alignment: StreamMessageAlignment.end,
     stackPosition: StreamMessageStackPosition.single,
@@ -129,6 +166,11 @@ const _conversationMessages = [
     text: 'Jank is _basically_ gone',
     alignment: StreamMessageAlignment.start,
     stackPosition: StreamMessageStackPosition.bottom,
+  ),
+  _ChatMessage(
+    text: 'Anyone free [@here](mention-here:general) for a quick pairing?',
+    alignment: StreamMessageAlignment.end,
+    stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
     text: '\u{1F44D}\u{1F525}',
@@ -151,6 +193,11 @@ const _conversationMessages = [
   _ChatMessage(
     text: '> Always call `dispose()` to avoid leaks',
     alignment: StreamMessageAlignment.start,
+    stackPosition: StreamMessageStackPosition.single,
+  ),
+  _ChatMessage(
+    text: 'cc [@admin](mention-role:admin) for sign-off on the release',
+    alignment: StreamMessageAlignment.end,
     stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
@@ -177,6 +224,11 @@ const _conversationMessages = [
     text: 'Something about **null safety** migration',
     alignment: StreamMessageAlignment.start,
     stackPosition: StreamMessageStackPosition.bottom,
+  ),
+  _ChatMessage(
+    text: '[@frontend](mention-group:frontend) — please pick this up',
+    alignment: StreamMessageAlignment.start,
+    stackPosition: StreamMessageStackPosition.single,
   ),
   _ChatMessage(
     text: '\u{2764}\u{FE0F}\u{1F389}\u{1F60D}',
@@ -246,7 +298,7 @@ class _ConversationMessage extends StatelessWidget {
                   softLineBreak: softLineBreak,
                   fitContent: fitContent,
                   onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
-                  onTapMention: (displayText, id) => _showSnack(context, 'Mention: $displayText (id: $id)'),
+                  onTapAnyMention: (displayText, type, id) => _showSnack(context, '$type: $displayText (id: $id)'),
                 );
 
                 if (!hideBubble) {
@@ -285,6 +337,7 @@ Widget buildStreamMessageTextShowcase(BuildContext context) {
         spacing: 32,
         children: [
           _MarkdownFeaturesSection(),
+          _MentionTypesSection(),
           _EmojiSection(),
           _ThemeOverridesSection(),
           _RealWorldSection(),
@@ -376,6 +429,108 @@ class _MarkdownFeaturesSection extends StatelessWidget {
         _ExampleCard(
           label: 'Horizontal rule',
           child: StreamMessageText('Above the line\n\n---\n\nBelow the line'),
+        ),
+      ],
+    );
+  }
+}
+
+class _MentionTypesSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _Section(
+      label: 'MENTION TYPES',
+      description:
+          'Five mention kinds, each themable independently. `@channel` and '
+          '`@here` share the broadcast styling per the design system.',
+      children: [
+        _ExampleCard(
+          label: 'User mention',
+          subtitle: '`[@Alice](mention:alice)` — bare `mention:` resolves to user.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              'Hey [@Alice](mention:alice), can you review the PR?',
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Channel mention',
+          subtitle: '`[@channel](mention-channel:channel)` — broadcast styling.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              'Heads up [@channel](mention-channel:channel) — deployment at 3pm.',
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Here mention',
+          subtitle: '`[@here](mention-here:here)` — broadcast styling.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              'Quick poll [@here](mention-here:here) — anyone free for a sync?',
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Role mention',
+          subtitle: '`[@admin](mention-role:admin)`.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              'Pinging [@admin](mention-role:admin) for approval on this change.',
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Group mention',
+          subtitle: '`[@frontend](mention-group:frontend)`.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              'Heads up [@frontend](mention-group:frontend) — review the new spec.',
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'All kinds together',
+          subtitle: 'Default design-system styling per kind.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              '[@Alice](mention:alice), '
+              '[@channel](mention-channel:channel), '
+              '[@here](mention-here:here), '
+              '[@admin](mention-role:admin), '
+              '[@frontend](mention-group:frontend).',
+              onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Per-variant color overrides',
+          subtitle: 'Each kind themed independently via `mentionXxxColor`.',
+          child: Builder(
+            builder: (context) => StreamMessageItemTheme(
+              data: StreamMessageItemThemeData(
+                text: StreamMessageTextStyle.from(
+                  mentionUserColor: Colors.blue,
+                  mentionBroadcastColor: Colors.red,
+                  mentionRoleColor: Colors.purple,
+                  mentionGroupColor: Colors.teal,
+                ),
+              ),
+              child: StreamMessageText(
+                '[@Alice](mention:alice) (blue), '
+                '[@channel](mention-channel:channel) and '
+                '[@here](mention-here:here) (red), '
+                '[@admin](mention-role:admin) (purple), '
+                '[@frontend](mention-group:frontend) (teal).',
+                onTapAnyMention: (text, type, id) => _showSnack(context, '$type: $text (id: $id)'),
+              ),
+            ),
+          ),
         ),
       ],
     );
