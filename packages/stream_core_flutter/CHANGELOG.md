@@ -2,6 +2,10 @@
 
 ### ✨ Features
 
+- Added `StreamScaffold` — a full-page scaffold that supports both regular and floating app-bar / bottom-bar layouts. Injects `StreamScaffoldInsets` into the widget tree so scrollable bodies can read the effective top and bottom padding from floating bars without coupling to layout details.
+- Added `StreamBottomNavBar` and `StreamBottomNavBarItem` — a bottom navigation bar with icon, selected-icon, and label slots per item. Supports the ambient `BottomBarBehavior` from `StreamAppStyle`, rendering either a regular bar or a floating pill with a gradient fade-out beneath it. Items announce themselves as accessible buttons via `Semantics`.
+- Added floating-bar support to `StreamAppBar` via a new `appBarBehavior` property. When set to `AppBarBehavior.floating`, the app bar renders above the body with a translucent background and a gradient overlay.
+- Added `showShadow` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. When true, applies the `StreamAvatarThemeData.boxShadow` (falling back to `StreamBoxShadow.elevation3`) as a drop shadow around the avatar shape.
 - Added `StreamSnackbar` and `StreamSnackbarTheme` — Stream-styled transient feedback snackbars with a messenger-driven queue.
 - Added `StreamIcons.megaphone` and `StreamIcons.shield` (20px) to the icon set.
 
