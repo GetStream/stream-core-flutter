@@ -7,6 +7,7 @@ import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_app_style.dart';
+import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import 'stream_toolbar.dart';
@@ -349,32 +350,13 @@ class DefaultStreamAppBar extends StatelessWidget {
     required Color effectiveBackgroundColor,
   }) {
     // Compute the fraction of the total bar height occupied by the system
-    // safe area so the gradient fade only starts below the status bar.
-    // Above that boundary the background is fully solid.
+    // safe area so the gradient is solid through the status bar and fades only
+    // in the toolbar zone below it.
     final safeAreaTop = props.primary ? MediaQuery.paddingOf(context).top : 0.0;
     final totalHeight = safeAreaTop + kStreamToolbarHeight;
-    final f = totalHeight > 0 ? safeAreaTop / totalHeight : 0.0;
+    final solidFraction = totalHeight > 0 ? safeAreaTop / totalHeight : 0.0;
 
-    return LinearGradient(
-      colors: [
-        effectiveBackgroundColor, // solid through safe area
-        effectiveBackgroundColor, // solid at safe area boundary
-        effectiveBackgroundColor.withAlpha(0xE8), // ~91 %
-        effectiveBackgroundColor.withAlpha(0xA8), // ~66 %
-        effectiveBackgroundColor.withAlpha(0x40), // ~25 %
-        effectiveBackgroundColor.withAlpha(0x00), // transparent
-      ],
-      stops: [
-        0.0,
-        f,
-        f + (1 - f) * 0.55,
-        f + (1 - f) * 0.75,
-        f + (1 - f) * 0.90,
-        1.0,
-      ],
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-    );
+    return streamFloatingFade(color: effectiveBackgroundColor, solidFraction: solidFraction);
   }
 }
 

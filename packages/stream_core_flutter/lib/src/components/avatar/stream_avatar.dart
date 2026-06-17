@@ -202,7 +202,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveBackgroundColor = props.backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = props.foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
-    final effectiveBoxShadow = avatarTheme.boxShadow ?? (props.showShadow ? defaults.boxShadow : null);
+    final effectiveBoxShadow = props.showShadow ? (avatarTheme.boxShadow ?? defaults.boxShadow) : null;
 
     final border = props.showBorder ? effectiveBorder : null;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);

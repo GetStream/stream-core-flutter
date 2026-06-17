@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/components/stream_badge_notification_theme.dart';
 import '../../theme/stream_app_style.dart';
+import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// A single item in a [StreamBottomNavBar].
@@ -148,25 +149,11 @@ class _FloatingNavBar extends StatelessWidget {
     // Approximate rendered height: safe area + vertical padding + item height.
     const itemHeight = 56.0;
     final totalHeight = safeAreaBottom + itemHeight;
-    final f = totalHeight > 0 ? safeAreaBottom / totalHeight : 0.0;
+    final solidFraction = totalHeight > 0 ? safeAreaBottom / totalHeight : 0.0;
 
-    return LinearGradient(
-      colors: [
-        backgroundColor,
-        backgroundColor,
-        backgroundColor.withAlpha(0xE8),
-        backgroundColor.withAlpha(0xA8),
-        backgroundColor.withAlpha(0x40),
-        backgroundColor.withAlpha(0x00),
-      ],
-      stops: [
-        0.0,
-        f,
-        f + (1 - f) * 0.55,
-        f + (1 - f) * 0.75,
-        f + (1 - f) * 0.90,
-        1.0,
-      ],
+    return streamFloatingFade(
+      color: backgroundColor,
+      solidFraction: solidFraction,
       begin: Alignment.bottomCenter,
       end: Alignment.topCenter,
     );

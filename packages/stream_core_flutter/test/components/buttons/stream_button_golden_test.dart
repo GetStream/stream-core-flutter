@@ -144,6 +144,56 @@ void main() {
         ],
       ),
     );
+
+    goldenTest(
+      'renders floating button matrix correctly',
+      fileName: 'stream_button_floating_matrix',
+      builder: () => GoldenTestGroup(
+        scenarioConstraints: const BoxConstraints(maxWidth: 400),
+        children: [
+          for (final style in StreamButtonStyle.values)
+            for (final type in StreamButtonType.values)
+              for (final size in StreamButtonSize.values)
+                GoldenTestScenario(
+                  name: '${style.name}_${type.name}_${size.name}',
+                  child: _buildButtonInTheme(
+                    StreamButton(
+                      onPressed: () {},
+                      style: style,
+                      type: type,
+                      size: size,
+                      isFloating: true,
+                      child: const Text('Button'),
+                    ),
+                  ),
+                ),
+        ],
+      ),
+    );
+
+    goldenTest(
+      'renders disabled floating button correctly',
+      fileName: 'stream_button_floating_disabled',
+      builder: () => GoldenTestGroup(
+        scenarioConstraints: const BoxConstraints(maxWidth: 300),
+        children: [
+          for (final style in StreamButtonStyle.values)
+            for (final type in StreamButtonType.values)
+              GoldenTestScenario(
+                name: '${style.name}_${type.name}',
+                child: _buildButtonInTheme(
+                  StreamButton(
+                    onPressed: null,
+                    style: style,
+                    type: type,
+                    isFloating: true,
+                    child: const Text('Disabled'),
+                  ),
+                ),
+              ),
+        ],
+      ),
+    );
   });
 }
 
