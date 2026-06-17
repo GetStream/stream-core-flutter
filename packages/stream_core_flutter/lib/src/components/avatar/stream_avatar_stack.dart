@@ -210,7 +210,7 @@ class DefaultStreamAvatarStack extends StatelessWidget {
             color: colorScheme.borderOnInverse,
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
-          boxShadow: props.showShadow ? context.streamBoxShadow.elevation3 : null,
+          showShadow: props.showShadow,
         ),
         child: StreamRow(
           spacing: -diameter * props.overlap,

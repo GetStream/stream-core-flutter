@@ -182,7 +182,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
               color: colorScheme.borderOnInverse,
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
-            boxShadow: props.showShadow ? context.streamBoxShadow.elevation3 : null,
+            showShadow: props.showShadow,
           ),
           child: StreamBadgeCountTheme(
             data: StreamBadgeCountThemeData(size: badgeCountSize),

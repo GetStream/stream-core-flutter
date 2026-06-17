@@ -85,7 +85,7 @@ class StreamAvatar extends StatelessWidget {
     Color? backgroundColor,
     Color? foregroundColor,
     bool showBorder = true,
-    bool showShadow = false,
+    bool? showShadow,
   }) : props = .new(
          size: size,
          imageUrl: imageUrl,
@@ -125,7 +125,7 @@ class StreamAvatarProps {
     this.backgroundColor,
     this.foregroundColor,
     this.showBorder = true,
-    this.showShadow = false,
+    this.showShadow,
   });
 
   /// The URL of the avatar image.
@@ -170,10 +170,10 @@ class StreamAvatarProps {
 
   /// Whether to show a drop shadow around the avatar.
   ///
-  /// Defaults to false. The shadow style is determined by
-  /// [StreamAvatarThemeData.boxShadow], falling back to
-  /// [StreamBoxShadow.elevation3].
-  final bool showShadow;
+  /// When null, falls back to [StreamAvatarThemeData.showShadow], then false.
+  /// The shadow style is determined by [StreamAvatarThemeData.boxShadow],
+  /// falling back to [StreamBoxShadow.elevation3].
+  final bool? showShadow;
 }
 
 /// The default implementation of [StreamAvatar].
@@ -202,7 +202,9 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveBackgroundColor = props.backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = props.foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
-    final effectiveBoxShadow = props.showShadow ? (avatarTheme.boxShadow ?? defaults.boxShadow) : null;
+    final effectiveBoxShadow = (props.showShadow ?? avatarTheme.showShadow ?? false)
+        ? (avatarTheme.boxShadow ?? defaults.boxShadow)
+        : null;
 
     final border = props.showBorder ? effectiveBorder : null;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);

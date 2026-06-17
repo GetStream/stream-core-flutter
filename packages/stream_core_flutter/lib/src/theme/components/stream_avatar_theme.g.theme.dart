@@ -35,6 +35,7 @@ mixin _$StreamAvatarThemeData {
       foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
       border: BoxBorder.lerp(a.border, b.border, t),
       boxShadow: t < 0.5 ? a.boxShadow : b.boxShadow,
+      showShadow: t < 0.5 ? a.showShadow : b.showShadow,
     );
   }
 
@@ -44,6 +45,7 @@ mixin _$StreamAvatarThemeData {
     Color? foregroundColor,
     BoxBorder? border,
     List<BoxShadow>? boxShadow,
+    bool? showShadow,
   }) {
     final _this = (this as StreamAvatarThemeData);
 
@@ -53,6 +55,7 @@ mixin _$StreamAvatarThemeData {
       foregroundColor: foregroundColor ?? _this.foregroundColor,
       border: border ?? _this.border,
       boxShadow: boxShadow ?? _this.boxShadow,
+      showShadow: showShadow ?? _this.showShadow,
     );
   }
 
@@ -73,6 +76,7 @@ mixin _$StreamAvatarThemeData {
       foregroundColor: other.foregroundColor,
       border: other.border,
       boxShadow: other.boxShadow,
+      showShadow: other.showShadow,
     );
   }
 
@@ -93,7 +97,8 @@ mixin _$StreamAvatarThemeData {
         _other.backgroundColor == _this.backgroundColor &&
         _other.foregroundColor == _this.foregroundColor &&
         _other.border == _this.border &&
-        _other.boxShadow == _this.boxShadow;
+        _other.boxShadow == _this.boxShadow &&
+        _other.showShadow == _this.showShadow;
   }
 
   @override
@@ -107,6 +112,7 @@ mixin _$StreamAvatarThemeData {
       _this.foregroundColor,
       _this.border,
       _this.boxShadow,
+      _this.showShadow,
     );
   }
 }
