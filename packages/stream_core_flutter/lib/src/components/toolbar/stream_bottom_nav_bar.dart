@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/components/stream_badge_notification_theme.dart';
-import '../../theme/stream_app_style.dart';
+import '../../theme/components/stream_bottom_app_bar_theme.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -32,26 +32,30 @@ class StreamBottomNavBarItem {
 
 /// A bottom navigation bar for Stream surfaces that automatically adapts
 /// between a floating pill style and a regular docked style based on the
-/// ambient [BottomBarBehavior] from [StreamAppStyle].
+/// ambient [BottomBarBehavior] from [StreamBottomAppBarTheme] or
+/// [StreamAppStyle].
 ///
 /// ## Floating style
 ///
-/// When [StreamAppStyle.bottomBarBehavior] is [BottomBarBehavior.floating],
-/// the bar renders as a horizontally padded pill with a rounded background,
-/// a subtle box shadow, and a hairline border. It sits above the body content
-/// and is typically used with [StreamScaffold]'s floating bottom slot.
+/// When [BottomBarBehavior.floating] is in effect, the bar renders as a
+/// horizontally padded pill with a rounded background, a subtle box shadow,
+/// and a hairline border. It sits above the body content and is typically
+/// used with [StreamScaffold]'s floating bottom slot.
 ///
 /// ## Regular style
 ///
-/// When [BottomBarBehavior.regular], the bar renders as a standard docked
-/// bottom navigation bar using Flutter's [BottomNavigationBar] with Stream
-/// colour and typography tokens. A hairline `borderSubtle` top border
-/// separates it from the body.
+/// When [BottomBarBehavior.regular] is in effect, the bar renders as a
+/// standard docked bottom navigation bar using Flutter's [BottomNavigationBar]
+/// with Stream colour and typography tokens. A hairline `borderSubtle` top
+/// border separates it from the body.
 ///
-/// ## Behaviour override
+/// ## Behaviour resolution
 ///
-/// Pass an explicit [behavior] to override the ambient style for this
-/// instance only.
+/// The effective behaviour is resolved in this priority order:
+/// 1. The per-instance [behavior] parameter on this widget.
+/// 2. [StreamBottomAppBarStyle.behavior] from the ambient
+///    [StreamBottomAppBarTheme].
+/// 3. The ambient [StreamAppStyle] enum value.
 ///
 /// {@tool snippet}
 ///
@@ -81,7 +85,8 @@ class StreamBottomNavBarItem {
 ///
 ///  * [StreamBottomNavBarItem], which configures each tab.
 ///  * [StreamScaffold], which accepts this widget in its `bottom` slot.
-///  * [StreamAppStyle], which controls the floating/regular behaviour.
+///  * [StreamAppStyle], the global app-wide style that acts as fallback.
+///  * [StreamBottomAppBarStyle.behavior], the per-theme component override.
 class StreamBottomNavBar extends StatelessWidget {
   /// Creates a Stream bottom navigation bar.
   const StreamBottomNavBar({
@@ -103,15 +108,20 @@ class StreamBottomNavBar extends StatelessWidget {
   /// Called when the user taps a navigation item.
   final ValueChanged<int> onTap;
 
-  /// Overrides the ambient [BottomBarBehavior] for this instance only.
+  /// Overrides the resolved [BottomBarBehavior] for this instance only.
   ///
-  /// When null, the value is read from [StreamAppStyle] in the current
-  /// [StreamTheme].
+  /// When null the effective behaviour is resolved from
+  /// [StreamBottomAppBarStyle.behavior] in the ambient
+  /// [StreamBottomAppBarTheme], falling back to the ambient [StreamAppStyle].
   final BottomBarBehavior? behavior;
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBehavior = behavior ?? context.streamTheme.appStyle.bottomBarBehavior;
+    final appStyle = context.streamTheme.appStyle;
+    final effectiveBehavior =
+        behavior ??
+        context.streamBottomAppBarTheme.style?.behavior ??
+        (appStyle.isFloating ? BottomBarBehavior.floating : BottomBarBehavior.regular);
 
     if (effectiveBehavior == BottomBarBehavior.floating) {
       return _FloatingNavBar(

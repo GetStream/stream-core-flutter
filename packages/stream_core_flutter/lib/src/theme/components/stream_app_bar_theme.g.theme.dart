@@ -99,6 +99,7 @@ mixin _$StreamAppBarStyle {
     }
 
     return StreamAppBarStyle(
+      behavior: t < 0.5 ? a.behavior : b.behavior,
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       floatingBackgroundColor: Color.lerp(
         a.floatingBackgroundColor,
@@ -127,6 +128,7 @@ mixin _$StreamAppBarStyle {
   }
 
   StreamAppBarStyle copyWith({
+    AppBarBehavior? behavior,
     Color? backgroundColor,
     Color? floatingBackgroundColor,
     EdgeInsetsGeometry? padding,
@@ -139,6 +141,7 @@ mixin _$StreamAppBarStyle {
     final _this = (this as StreamAppBarStyle);
 
     return StreamAppBarStyle(
+      behavior: behavior ?? _this.behavior,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       floatingBackgroundColor:
           floatingBackgroundColor ?? _this.floatingBackgroundColor,
@@ -163,6 +166,7 @@ mixin _$StreamAppBarStyle {
     }
 
     return copyWith(
+      behavior: other.behavior,
       backgroundColor: other.backgroundColor,
       floatingBackgroundColor: other.floatingBackgroundColor,
       padding: other.padding,
@@ -194,7 +198,8 @@ mixin _$StreamAppBarStyle {
     final _this = (this as StreamAppBarStyle);
     final _other = (other as StreamAppBarStyle);
 
-    return _other.backgroundColor == _this.backgroundColor &&
+    return _other.behavior == _this.behavior &&
+        _other.backgroundColor == _this.backgroundColor &&
         _other.floatingBackgroundColor == _this.floatingBackgroundColor &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
@@ -210,6 +215,7 @@ mixin _$StreamAppBarStyle {
 
     return Object.hash(
       runtimeType,
+      _this.behavior,
       _this.backgroundColor,
       _this.floatingBackgroundColor,
       _this.padding,

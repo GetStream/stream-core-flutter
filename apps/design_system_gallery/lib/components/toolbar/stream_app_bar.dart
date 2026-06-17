@@ -60,13 +60,12 @@ Widget buildStreamAppBarPlayground(BuildContext context) {
         'instead of a solid background and a bottom border.',
   );
 
-  final appBarBehavior = floating ? AppBarBehavior.floating : AppBarBehavior.regular;
   final colorScheme = context.streamColorScheme;
 
   final Widget bar = StreamAppBar(
     primary: false,
-    appBarBehavior: appBarBehavior,
     style: StreamAppBarStyle(
+      behavior: floating ? AppBarBehavior.floating : AppBarBehavior.regular,
       padding: EdgeInsets.all(padding),
       spacing: spacing,
     ),
@@ -265,7 +264,7 @@ Widget buildStreamAppBarShowcase(BuildContext context) {
               bar: StreamAppBar(
                 automaticallyImplyLeading: false,
                 primary: false,
-                appBarBehavior: AppBarBehavior.floating,
+                style: const StreamAppBarStyle(behavior: AppBarBehavior.floating),
                 leading: StreamButton.icon(
                   icon: Icon(context.streamIcons.chevronLeft),
                   style: StreamButtonStyle.secondary,

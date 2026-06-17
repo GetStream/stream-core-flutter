@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/components/stream_app_bar_theme.dart';
+import '../../theme/components/stream_bottom_app_bar_theme.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
-import '../../theme/stream_app_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 // ---------------------------------------------------------------------------
@@ -82,19 +83,22 @@ class StreamScaffoldInsets extends InheritedWidget {
 ///
 /// ## Floating vs. regular
 ///
-/// The behaviour of each slot is controlled by [StreamAppStyle]:
+/// The behaviour of each slot is resolved via a three-step priority chain:
 ///
-/// * `AppBarBehavior.floating` — the body extends *behind* the app bar;
+/// 1. Per-instance [appBarBehavior] / [bottomBarBehavior] on this widget.
+/// 2. [StreamAppBarStyle.behavior] / [StreamBottomAppBarStyle.behavior]
+///    from the ambient component theme.
+/// 3. The ambient [StreamAppStyle] enum value ([StreamAppStyle.floating] or
+///    [StreamAppStyle.regular]).
+///
+/// * [AppBarBehavior.floating] — the body extends *behind* the app bar;
 ///   [StreamScaffoldInsets.topPadding] is set to the bar height plus the
 ///   system status-bar inset so the body can add its own inset.
-/// * `BottomBarBehavior.floating` — the body extends *behind* the bottom
+/// * [BottomBarBehavior.floating] — the body extends *behind* the bottom
 ///   widget; [StreamScaffoldInsets.bottomPadding] equals the measured height of
 ///   that widget.
 /// * `regular` for either slot — no overlap; the slot occupies its own space
 ///   and the corresponding inset is `0.0`.
-///
-/// Per-instance [appBarBehavior] / [bottomBarBehavior] override the ambient
-/// [StreamAppStyle] for this scaffold only.
 ///
 /// ## Drawer support
 ///
@@ -167,12 +171,16 @@ class StreamScaffold extends StatelessWidget {
 
   /// Per-instance override for the app-bar floating behaviour.
   ///
-  /// When null the value is read from the ambient [StreamAppStyle].
+  /// When null the value is resolved from [StreamAppBarStyle.behavior]
+  /// in the ambient [StreamAppBarTheme], falling back to the ambient
+  /// [StreamAppStyle].
   final AppBarBehavior? appBarBehavior;
 
   /// Per-instance override for the bottom-bar floating behaviour.
   ///
-  /// When null the value is read from the ambient [StreamAppStyle].
+  /// When null the value is resolved from
+  /// [StreamBottomAppBarStyle.behavior] in the ambient
+  /// [StreamBottomAppBarTheme], falling back to the ambient [StreamAppStyle].
   final BottomBarBehavior? bottomBarBehavior;
 
   /// Background color of the scaffold.
@@ -188,8 +196,14 @@ class StreamScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appStyle = context.streamTheme.appStyle;
-    final effectiveAppBarBehavior = appBarBehavior ?? appStyle.appBarBehavior;
-    final effectiveBottomBarBehavior = bottomBarBehavior ?? appStyle.bottomBarBehavior;
+    final effectiveAppBarBehavior =
+        appBarBehavior ??
+        context.streamAppBarTheme.style?.behavior ??
+        (appStyle.isFloating ? AppBarBehavior.floating : AppBarBehavior.regular);
+    final effectiveBottomBarBehavior =
+        bottomBarBehavior ??
+        context.streamBottomAppBarTheme.style?.behavior ??
+        (appStyle.isFloating ? BottomBarBehavior.floating : BottomBarBehavior.regular);
     final effectiveBackgroundColor = backgroundColor ?? context.streamColorScheme.backgroundApp;
 
     final appBarFloating = effectiveAppBarBehavior == AppBarBehavior.floating;

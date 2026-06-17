@@ -35,7 +35,11 @@ mixin _$StreamAvatarThemeData {
       foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
       border: BoxBorder.lerp(a.border, b.border, t),
       isFloating: t < 0.5 ? a.isFloating : b.isFloating,
-      floatingElevation: lerpDouble$(a.floatingElevation, b.floatingElevation, t),
+      floatingElevation: lerpDouble$(
+        a.floatingElevation,
+        b.floatingElevation,
+        t,
+      ),
     );
   }
 

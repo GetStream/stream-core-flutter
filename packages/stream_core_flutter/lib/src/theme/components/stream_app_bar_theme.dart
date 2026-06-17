@@ -6,6 +6,24 @@ import 'stream_button_theme.dart';
 
 part 'stream_app_bar_theme.g.theme.dart';
 
+/// The floating or regular layout behaviour for a [StreamAppBar].
+///
+/// When null on [StreamAppBarStyle], the ambient [StreamAppStyle] is used
+/// as a fallback — [StreamAppStyle.floating] maps to [floating] and
+/// [StreamAppStyle.regular] maps to [regular].
+///
+/// See also:
+///
+///  * [StreamAppBarStyle.behavior], which carries this value.
+///  * [StreamAppStyle], the global app-wide style that acts as fallback.
+enum AppBarBehavior {
+  /// The app bar sits within the layout flow with a solid background.
+  regular,
+
+  /// The app bar floats above the body with a translucent background.
+  floating,
+}
+
 /// Applies an app bar theme to descendant [StreamAppBar] widgets.
 ///
 /// Wrap a subtree with [StreamAppBarTheme] to override app bar styling.
@@ -136,6 +154,7 @@ class StreamAppBarThemeData with _$StreamAppBarThemeData {
 class StreamAppBarStyle with _$StreamAppBarStyle {
   /// Creates an app bar style with optional property overrides.
   const StreamAppBarStyle({
+    this.behavior,
     this.backgroundColor,
     this.floatingBackgroundColor,
     this.padding,
@@ -145,6 +164,16 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
     this.leadingStyle,
     this.trailingStyle,
   });
+
+  /// The floating or regular layout behaviour for this app bar.
+  ///
+  /// When null the value falls back to the ambient [StreamAppStyle]:
+  /// [StreamAppStyle.floating] → [AppBarBehavior.floating],
+  /// [StreamAppStyle.regular] → [AppBarBehavior.regular].
+  ///
+  /// Set this to override the global style for this component only, without
+  /// affecting other components.
+  final AppBarBehavior? behavior;
 
   /// The background colour of the app bar.
   final Color? backgroundColor;

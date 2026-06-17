@@ -116,7 +116,7 @@ void main() {
             body: StreamAppBar(
               automaticallyImplyLeading: false,
               primary: false,
-              appBarBehavior: AppBarBehavior.floating,
+              style: const StreamAppBarStyle(behavior: AppBarBehavior.floating),
               title: const Text('Title'),
             ),
           ),
@@ -138,7 +138,11 @@ void main() {
     });
 
     testWidgets('floating: true uses outline button type for auto-implied leading', (tester) async {
-      await tester.pumpWidget(_withStreamTheme(const _LauncherScreen(appBarBehavior: AppBarBehavior.floating)));
+      await tester.pumpWidget(
+        _withStreamTheme(
+          const _LauncherScreen(appBarStyle: StreamAppBarStyle(behavior: AppBarBehavior.floating)),
+        ),
+      );
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
@@ -229,13 +233,13 @@ class _LauncherScreen extends StatelessWidget {
     this.customLeading = false,
     this.implyLeading = true,
     this.fullscreenDialog = false,
-    this.appBarBehavior,
+    this.appBarStyle,
   });
 
   final bool customLeading;
   final bool implyLeading;
   final bool fullscreenDialog;
-  final AppBarBehavior? appBarBehavior;
+  final StreamAppBarStyle? appBarStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +254,7 @@ class _LauncherScreen extends StatelessWidget {
                   builder: (_) => Scaffold(
                     appBar: StreamAppBar(
                       automaticallyImplyLeading: implyLeading,
-                      appBarBehavior: appBarBehavior,
+                      style: appBarStyle,
                       leading: customLeading
                           ? const SizedBox(key: ValueKey('custom-leading'), width: 40, height: 40)
                           : null,

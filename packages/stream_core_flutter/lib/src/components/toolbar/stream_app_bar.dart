@@ -6,7 +6,6 @@ import '../../theme/components/stream_button_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
-import '../../theme/stream_app_style.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
@@ -74,7 +73,6 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget? trailing,
     bool primary = true,
     StreamAppBarStyle? style,
-    AppBarBehavior? appBarBehavior,
   }) : props = .new(
          leading: leading,
          automaticallyImplyLeading: automaticallyImplyLeading,
@@ -83,7 +81,6 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
          trailing: trailing,
          primary: primary,
          style: style,
-         appBarBehavior: appBarBehavior,
        );
 
   /// The properties that configure this app bar.
@@ -119,7 +116,6 @@ class StreamAppBarProps {
     this.trailing,
     this.primary = true,
     this.style,
-    this.appBarBehavior,
   });
 
   /// A widget to display before the [title].
@@ -177,11 +173,6 @@ class StreamAppBarProps {
   /// Resolution order per field: this [style] → ambient [StreamAppBarTheme]
   /// → token-backed defaults.
   final StreamAppBarStyle? style;
-
-  /// Whether this app bar is floating.
-  ///
-  /// When true, the app bar is floating and will be displayed above the content.
-  final AppBarBehavior? appBarBehavior;
 }
 
 /// The default implementation of [StreamAppBar].
@@ -215,7 +206,8 @@ class DefaultStreamAppBar extends StatelessWidget {
     final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveAppBarBehavior = props.appBarBehavior ?? context.streamTheme.appStyle.appBarBehavior;
+    final effectiveAppBarBehavior =
+        style?.behavior ?? (context.streamTheme.appStyle.isFloating ? AppBarBehavior.floating : AppBarBehavior.regular);
 
     final effectiveBackgroundColor = switch (effectiveAppBarBehavior) {
       .floating => style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor,

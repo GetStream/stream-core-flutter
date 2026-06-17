@@ -99,6 +99,7 @@ mixin _$StreamBottomAppBarStyle {
     }
 
     return StreamBottomAppBarStyle(
+      behavior: t < 0.5 ? a.behavior : b.behavior,
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       spacing: lerpDouble$(a.spacing, b.spacing, t),
@@ -122,6 +123,7 @@ mixin _$StreamBottomAppBarStyle {
   }
 
   StreamBottomAppBarStyle copyWith({
+    BottomBarBehavior? behavior,
     Color? backgroundColor,
     EdgeInsetsGeometry? padding,
     double? spacing,
@@ -133,6 +135,7 @@ mixin _$StreamBottomAppBarStyle {
     final _this = (this as StreamBottomAppBarStyle);
 
     return StreamBottomAppBarStyle(
+      behavior: behavior ?? _this.behavior,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       padding: padding ?? _this.padding,
       spacing: spacing ?? _this.spacing,
@@ -155,6 +158,7 @@ mixin _$StreamBottomAppBarStyle {
     }
 
     return copyWith(
+      behavior: other.behavior,
       backgroundColor: other.backgroundColor,
       padding: other.padding,
       spacing: other.spacing,
@@ -185,7 +189,8 @@ mixin _$StreamBottomAppBarStyle {
     final _this = (this as StreamBottomAppBarStyle);
     final _other = (other as StreamBottomAppBarStyle);
 
-    return _other.backgroundColor == _this.backgroundColor &&
+    return _other.behavior == _this.behavior &&
+        _other.backgroundColor == _this.backgroundColor &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
         _other.titleTextStyle == _this.titleTextStyle &&
@@ -200,6 +205,7 @@ mixin _$StreamBottomAppBarStyle {
 
     return Object.hash(
       runtimeType,
+      _this.behavior,
       _this.backgroundColor,
       _this.padding,
       _this.spacing,
