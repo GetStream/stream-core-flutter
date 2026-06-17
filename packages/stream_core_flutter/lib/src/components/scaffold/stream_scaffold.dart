@@ -218,7 +218,7 @@ class StreamScaffold extends StatelessWidget {
                 child: body,
               ),
             ),
-            if (bottom != null) bottom!,
+            ?bottom,
           ],
         ),
       );
