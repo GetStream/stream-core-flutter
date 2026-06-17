@@ -199,6 +199,9 @@ class StreamScaffold extends StatelessWidget {
 
     // When neither slot is floating, use a plain Scaffold for maximum
     // compatibility (e.g. keyboard avoidance, Scaffold.of, etc.).
+    // The bottom widget lives inside the body Column (not bottomNavigationBar)
+    // because bottomNavigationBar is not repositioned above the keyboard on
+    // Android, which causes text-input composers to be hidden behind the IME.
     if (!appBarFloating && !bottomFloating) {
       return Scaffold(
         backgroundColor: effectiveBackgroundColor,
@@ -206,11 +209,17 @@ class StreamScaffold extends StatelessWidget {
         appBar: appBar,
         drawer: drawer,
         endDrawer: endDrawer,
-        bottomNavigationBar: bottom,
-        body: StreamScaffoldInsets(
-          topPadding: 0,
-          bottomPadding: 0,
-          child: body,
+        body: Column(
+          children: [
+            Expanded(
+              child: StreamScaffoldInsets(
+                topPadding: 0,
+                bottomPadding: 0,
+                child: body,
+              ),
+            ),
+            if (bottom != null) bottom!,
+          ],
         ),
       );
     }
