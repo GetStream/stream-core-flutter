@@ -35,9 +35,12 @@ Widget buildStreamAvatarPlayground(BuildContext context) {
     description: 'Whether to show a border around the avatar.',
   );
 
-  final showShadow = context.knobs.boolean(
-    label: 'Show Shadow',
-    description: 'Whether to show a drop shadow around the avatar.',
+  final elevation = context.knobs.double.slider(
+    label: 'Elevation',
+    initialValue: 0,
+    min: 0,
+    max: 12,
+    description: 'Material elevation applied to the avatar (0 = no shadow).',
   );
 
   final initials = context.knobs.string(
@@ -51,7 +54,7 @@ Widget buildStreamAvatarPlayground(BuildContext context) {
       imageUrl: (imageUrl?.isNotEmpty ?? false) ? imageUrl : null,
       size: size,
       showBorder: showBorder,
-      showShadow: showShadow,
+      elevation: elevation,
       placeholder: (context) => Text(
         initials.substring(0, initials.length.clamp(0, 2)).toUpperCase(),
       ),

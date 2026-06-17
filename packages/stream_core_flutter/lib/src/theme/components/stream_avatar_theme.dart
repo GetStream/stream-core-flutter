@@ -132,8 +132,7 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
     this.backgroundColor,
     this.foregroundColor,
     this.border,
-    this.boxShadow,
-    this.showShadow,
+    this.elevation,
   });
 
   /// The default size for avatars.
@@ -158,18 +157,11 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
   /// of both border color and width.
   final BoxBorder? border;
 
-  /// The box shadow for this avatar.
+  /// The Material elevation applied to this avatar.
   ///
-  /// Applied when [StreamAvatar.showShadow] is true. Defaults to
-  /// [StreamBoxShadow.elevation3].
-  final List<BoxShadow>? boxShadow;
-
-  /// Whether to show a drop shadow around the avatar.
-  ///
-  /// When set via [StreamAvatarTheme], this overrides the per-widget
-  /// [StreamAvatar.showShadow] default, allowing parent widgets such as
-  /// [StreamAvatarGroup] to enable shadows for all child avatars at once.
-  final bool? showShadow;
+  /// Used as the fallback when no elevation is set on [StreamAvatar]. A value
+  /// of `0` renders no shadow.
+  final double? elevation;
 
   /// Linearly interpolate between two [StreamAvatarThemeData] objects.
   static StreamAvatarThemeData? lerp(

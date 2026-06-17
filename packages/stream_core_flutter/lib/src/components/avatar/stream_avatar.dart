@@ -85,7 +85,7 @@ class StreamAvatar extends StatelessWidget {
     Color? backgroundColor,
     Color? foregroundColor,
     bool showBorder = true,
-    bool? showShadow,
+    double? elevation,
   }) : props = .new(
          size: size,
          imageUrl: imageUrl,
@@ -93,7 +93,7 @@ class StreamAvatar extends StatelessWidget {
          backgroundColor: backgroundColor,
          foregroundColor: foregroundColor,
          showBorder: showBorder,
-         showShadow: showShadow,
+         elevation: elevation,
        );
 
   /// The properties that configure this avatar.
@@ -125,7 +125,7 @@ class StreamAvatarProps {
     this.backgroundColor,
     this.foregroundColor,
     this.showBorder = true,
-    this.showShadow,
+    this.elevation,
   });
 
   /// The URL of the avatar image.
@@ -168,12 +168,12 @@ class StreamAvatarProps {
   /// [StreamAvatarThemeData.border].
   final bool showBorder;
 
-  /// Whether to show a drop shadow around the avatar.
+  /// The Material elevation applied to this avatar.
   ///
-  /// When null, falls back to [StreamAvatarThemeData.showShadow], then false.
-  /// The shadow style is determined by [StreamAvatarThemeData.boxShadow],
-  /// falling back to [StreamBoxShadow.elevation3].
-  final bool? showShadow;
+  /// Falls back to [StreamAvatarThemeData.elevation], or `0` (no shadow) when
+  /// neither is set. Translates to a Material shadow using the ambient
+  /// [ThemeData.shadowColor].
+  final double? elevation;
 }
 
 /// The default implementation of [StreamAvatar].
@@ -201,45 +201,44 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveSize = props.size ?? avatarTheme.size ?? defaults.size;
     final effectiveBackgroundColor = props.backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = props.foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
+    final effectiveElevation = props.elevation ?? avatarTheme.elevation ?? defaults.elevation;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
-    final effectiveBoxShadow = (props.showShadow ?? avatarTheme.showShadow ?? false)
-        ? (avatarTheme.boxShadow ?? defaults.boxShadow)
-        : null;
 
-    final border = props.showBorder ? effectiveBorder : null;
+    // Avatars are circular, so the border is always uniform — use any side.
+    final borderSide = props.showBorder ? effectiveBorder.top : BorderSide.none;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);
     final iconTheme = IconTheme.of(context).copyWith(
       color: effectiveForegroundColor,
       size: _iconSizeForSize(effectiveSize),
     );
 
-    return AnimatedContainer(
-      alignment: .center,
+    return Material(
+      shape: CircleBorder(side: borderSide),
+      color: effectiveBackgroundColor,
+      elevation: effectiveElevation,
       clipBehavior: .antiAlias,
-      width: effectiveSize.value,
-      height: effectiveSize.value,
-      duration: kThemeChangeDuration,
-      foregroundDecoration: BoxDecoration(shape: .circle, border: border),
-      decoration: BoxDecoration(shape: .circle, color: effectiveBackgroundColor, boxShadow: effectiveBoxShadow),
-      child: Center(
-        // Need to disable text scaling here so that the text doesn't
-        // escape the avatar when the textScaleFactor is large.
-        child: MediaQuery.withNoTextScaling(
-          child: IconTheme(
-            data: iconTheme,
-            child: DefaultTextStyle(
-              style: textStyle,
-              child: switch (props.imageUrl) {
-                final imageUrl? => StreamNetworkImage(
-                  imageUrl,
-                  fit: .cover,
-                  width: effectiveSize.value,
-                  height: effectiveSize.value,
-                  placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
-                  errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
-                ),
-                _ => props.placeholder.call(context),
-              },
+      child: SizedBox.square(
+        dimension: effectiveSize.value,
+        child: Center(
+          // Need to disable text scaling here so that the text doesn't
+          // escape the avatar when the textScaleFactor is large.
+          child: MediaQuery.withNoTextScaling(
+            child: IconTheme(
+              data: iconTheme,
+              child: DefaultTextStyle(
+                style: textStyle,
+                child: switch (props.imageUrl) {
+                  final imageUrl? => StreamNetworkImage(
+                    imageUrl,
+                    fit: .cover,
+                    width: effectiveSize.value,
+                    height: effectiveSize.value,
+                    placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
+                    errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
+                  ),
+                  _ => props.placeholder.call(context),
+                },
+              ),
             ),
           ),
         ),
@@ -288,13 +287,13 @@ class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
   final StreamColorScheme _colorScheme;
 
   @override
+  double get elevation => 0;
+
+  @override
   StreamAvatarSize get size => StreamAvatarSize.lg;
 
   @override
   BoxBorder get border => Border.all(color: StreamColors.black10);
-
-  @override
-  List<BoxShadow> get boxShadow => context.streamBoxShadow.elevation3;
 
   @override
   Color get backgroundColor => _colorScheme.avatarPalette.first.backgroundColor;
