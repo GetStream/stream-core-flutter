@@ -85,7 +85,7 @@ class StreamAvatar extends StatelessWidget {
     Color? backgroundColor,
     Color? foregroundColor,
     bool showBorder = true,
-    double? elevation,
+    bool? isFloating,
   }) : props = .new(
          size: size,
          imageUrl: imageUrl,
@@ -93,7 +93,7 @@ class StreamAvatar extends StatelessWidget {
          backgroundColor: backgroundColor,
          foregroundColor: foregroundColor,
          showBorder: showBorder,
-         elevation: elevation,
+         isFloating: isFloating,
        );
 
   /// The properties that configure this avatar.
@@ -125,7 +125,7 @@ class StreamAvatarProps {
     this.backgroundColor,
     this.foregroundColor,
     this.showBorder = true,
-    this.elevation,
+    this.isFloating,
   });
 
   /// The URL of the avatar image.
@@ -168,12 +168,11 @@ class StreamAvatarProps {
   /// [StreamAvatarThemeData.border].
   final bool showBorder;
 
-  /// The Material elevation applied to this avatar.
+  /// Whether this avatar is in a floating state, rendering with a drop shadow.
   ///
-  /// Falls back to [StreamAvatarThemeData.elevation], or `0` (no shadow) when
-  /// neither is set. Translates to a Material shadow using the ambient
-  /// [ThemeData.shadowColor].
-  final double? elevation;
+  /// When true, the elevation is taken from [StreamAvatarThemeData.floatingElevation],
+  /// falling back to `3`. When false or null (resolved to false), no shadow is shown.
+  final bool? isFloating;
 }
 
 /// The default implementation of [StreamAvatar].
@@ -201,7 +200,10 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveSize = props.size ?? avatarTheme.size ?? defaults.size;
     final effectiveBackgroundColor = props.backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = props.foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
-    final effectiveElevation = props.elevation ?? avatarTheme.elevation ?? defaults.elevation;
+    final effectiveIsFloating = props.isFloating ?? avatarTheme.isFloating ?? false;
+    final effectiveElevation = effectiveIsFloating
+        ? (avatarTheme.floatingElevation ?? defaults.floatingElevation)
+        : 0.0;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
 
     // Avatars are circular, so the border is always uniform — use any side.
@@ -287,7 +289,7 @@ class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
   final StreamColorScheme _colorScheme;
 
   @override
-  double get elevation => 0;
+  double get floatingElevation => 3;
 
   @override
   StreamAvatarSize get size => StreamAvatarSize.lg;

@@ -91,8 +91,8 @@ class StreamAvatarGroup extends StatelessWidget {
     super.key,
     StreamAvatarGroupSize? size,
     required Iterable<Widget> children,
-    double? elevation,
-  }) : props = .new(size: size, children: children, elevation: elevation);
+    bool isFloating = false,
+  }) : props = .new(size: size, children: children, isFloating: isFloating);
 
   /// The properties that configure this avatar group.
   final StreamAvatarGroupProps props;
@@ -119,7 +119,7 @@ class StreamAvatarGroupProps {
   const StreamAvatarGroupProps({
     this.size,
     required this.children,
-    this.elevation,
+    this.isFloating = false,
   });
 
   /// The list of avatars to display in the group.
@@ -132,11 +132,11 @@ class StreamAvatarGroupProps {
   /// If null, defaults to [StreamAvatarGroupSize.lg].
   final StreamAvatarGroupSize? size;
 
-  /// The Material elevation applied to each individual avatar.
+  /// Whether each individual avatar is in a floating state, rendering with a drop shadow.
   ///
-  /// Falls back to [StreamAvatarThemeData.elevation], or `0` (no shadow) when
-  /// neither is set.
-  final double? elevation;
+  /// Defaults to false. The elevation used is [StreamAvatarThemeData.floatingElevation],
+  /// falling back to `3`.
+  final bool isFloating;
 }
 
 /// The default implementation of [StreamAvatarGroup].
@@ -182,7 +182,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
               color: colorScheme.borderOnInverse,
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
-            elevation: props.elevation,
+            isFloating: props.isFloating,
           ),
           child: StreamBadgeCountTheme(
             data: StreamBadgeCountThemeData(size: badgeCountSize),

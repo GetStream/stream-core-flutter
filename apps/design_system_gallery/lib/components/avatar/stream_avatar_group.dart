@@ -43,12 +43,9 @@ Widget buildStreamAvatarGroupPlayground(BuildContext context) {
     description: 'Use images or show initials placeholder.',
   );
 
-  final elevation = context.knobs.double.slider(
-    label: 'Elevation',
-    initialValue: 0,
-    min: 0,
-    max: 12,
-    description: 'Material elevation applied to each individual avatar.',
+  final isFloating = context.knobs.boolean(
+    label: 'Is Floating',
+    description: 'Whether to show a drop shadow around each individual avatar.',
   );
 
   final palette = context.streamColorScheme.avatarPalette;
@@ -56,7 +53,7 @@ Widget buildStreamAvatarGroupPlayground(BuildContext context) {
   return Center(
     child: StreamAvatarGroup(
       size: size,
-      elevation: elevation,
+      isFloating: isFloating,
       children: List.generate(
         avatarCount,
         (index) => StreamAvatar(

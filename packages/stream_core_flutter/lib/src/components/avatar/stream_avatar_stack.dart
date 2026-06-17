@@ -102,14 +102,14 @@ class StreamAvatarStack extends StatelessWidget {
     required Iterable<Widget> children,
     double overlap = 0.33,
     int max = 5,
-    double? elevation,
+    bool isFloating = false,
   }) : assert(max >= 2, 'max must be at least 2'),
        props = .new(
          size: size,
          children: children,
          overlap: overlap,
          max: max,
-         elevation: elevation,
+         isFloating: isFloating,
        );
 
   /// The properties that configure this avatar stack.
@@ -139,7 +139,7 @@ class StreamAvatarStackProps {
     required this.children,
     this.overlap = 0.33,
     this.max = 5,
-    this.elevation,
+    this.isFloating = false,
   });
 
   /// The list of widgets to display in the stack.
@@ -167,11 +167,11 @@ class StreamAvatarStackProps {
   /// Must be at least 2. Defaults to 5.
   final int max;
 
-  /// The Material elevation applied to each individual avatar.
+  /// Whether each individual avatar is in a floating state, rendering with a drop shadow.
   ///
-  /// Falls back to [StreamAvatarThemeData.elevation], or `0` (no shadow) when
-  /// neither is set.
-  final double? elevation;
+  /// Defaults to false. The elevation used is [StreamAvatarThemeData.floatingElevation],
+  /// falling back to `3`.
+  final bool isFloating;
 }
 
 /// The default implementation of [StreamAvatarStack].
@@ -216,7 +216,7 @@ class DefaultStreamAvatarStack extends StatelessWidget {
             color: colorScheme.borderOnInverse,
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
-          elevation: props.elevation,
+          isFloating: props.isFloating,
         ),
         child: StreamRow(
           spacing: -diameter * props.overlap,

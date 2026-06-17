@@ -21,7 +21,7 @@ void main() {
                 StreamAvatar(
                   size: size,
                   showBorder: false,
-                  elevation: 0,
+                  isFloating: false,
                   placeholder: (context) => const Text('AB'),
                 ),
               ),
@@ -32,7 +32,7 @@ void main() {
                 StreamAvatar(
                   size: size,
                   showBorder: false,
-                  elevation: 3,
+                  isFloating: true,
                   placeholder: (context) => const Text('AB'),
                 ),
               ),
@@ -58,7 +58,7 @@ void main() {
                 StreamAvatar(
                   size: size,
                   showBorder: false,
-                  elevation: 0,
+                  isFloating: false,
                   placeholder: (context) => const Text('AB'),
                 ),
                 brightness: Brightness.dark,
@@ -70,7 +70,7 @@ void main() {
                 StreamAvatar(
                   size: size,
                   showBorder: false,
-                  elevation: 3,
+                  isFloating: true,
                   placeholder: (context) => const Text('AB'),
                 ),
                 brightness: Brightness.dark,
@@ -97,7 +97,7 @@ void main() {
                 child: _buildAvatarInTheme(
                   StreamAvatarGroup(
                     size: size,
-                    elevation: 3,
+                    isFloating: true,
                     children: List.generate(
                       count,
                       (i) => StreamAvatar(
@@ -127,7 +127,7 @@ void main() {
                 child: _buildAvatarInTheme(
                   StreamAvatarGroup(
                     size: size,
-                    elevation: 3,
+                    isFloating: true,
                     children: List.generate(
                       count,
                       (i) => StreamAvatar(
@@ -157,7 +157,7 @@ void main() {
               child: _buildAvatarInTheme(
                 StreamAvatarStack(
                   size: size,
-                  elevation: 3,
+                  isFloating: true,
                   children: List.generate(
                     4,
                     (i) => StreamAvatar(
@@ -186,7 +186,7 @@ void main() {
               child: _buildAvatarInTheme(
                 StreamAvatarStack(
                   size: size,
-                  elevation: 3,
+                  isFloating: true,
                   children: List.generate(
                     4,
                     (i) => StreamAvatar(
