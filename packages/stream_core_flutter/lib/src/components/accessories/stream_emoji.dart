@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../stream_core_flutter.dart';
+import '../../factory/stream_component_factory.dart';
+import '../common/stream_network_image.dart';
+import '../emoji/data/stream_emoji_data.dart';
 
 /// The content model for an emoji rendered by [StreamEmoji].
 ///

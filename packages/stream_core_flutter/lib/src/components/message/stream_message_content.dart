@@ -1,8 +1,15 @@
 import 'package:flutter/widgets.dart';
 
-import '../../theme.dart';
+import '../../factory/stream_component_factory.dart';
+import '../../theme/primitives/stream_spacing.dart';
+import '../../theme/stream_theme_extensions.dart';
 import '../common/stream_flex.dart';
 import '../message_layout/stream_message_layout.dart';
+import '../reaction/stream_reactions.dart';
+import 'stream_message_annotation.dart';
+import 'stream_message_bubble.dart';
+import 'stream_message_metadata.dart';
+import 'stream_message_replies.dart';
 
 /// A composite layout container that arranges message primitives into the
 /// full message content structure.

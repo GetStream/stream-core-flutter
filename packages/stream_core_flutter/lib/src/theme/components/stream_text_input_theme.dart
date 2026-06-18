@@ -1,7 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
-import '../../../stream_core_flutter.dart';
+import '../../components/common/stream_text_input.dart';
+import '../primitives/stream_radius.dart';
+import '../semantics/stream_color_scheme.dart';
+import '../semantics/stream_text_theme.dart';
+import '../stream_theme.dart';
 
 part 'stream_text_input_theme.g.theme.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:stream_core_flutter/stream_core_flutter.dart';
+import 'package:stream_core_flutter/core.dart';
 
 /// A tile for editing a single avatar color pair (background and foreground).
 class AvatarColorPairTile extends StatelessWidget {

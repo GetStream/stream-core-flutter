@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../stream_core_flutter.dart';
+import '../../theme/stream_theme_extensions.dart';
 
 /// Controls how a duration value is formatted inside [StreamMediaBadge].
 enum MediaBadgeDurationFormat {

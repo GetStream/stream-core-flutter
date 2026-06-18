@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stream_core_flutter/stream_core_flutter.dart';
+import 'package:stream_core_flutter/core.dart';
 
 /// A dropdown selector for choosing the text direction (LTR/RTL).
 class TextDirectionSelector extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stream_core_flutter/stream_core_flutter.dart';
+import 'package:stream_core_flutter/core.dart';
 
 /// A toggle button for switching between light and dark theme modes.
 class ThemeModeToggle extends StatelessWidget {
