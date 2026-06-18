@@ -113,8 +113,6 @@ linter:
     public_member_api_docs: false
     avoid_print: false
 
-    # Fires on every `@Deprecated` while the package is at 0.x, because
-    # pub.dev semver treats every 0.x bump as breaking. That makes soft
-    # deprecations impossible — the lint would demand removal in the
-    # same release the deprecation is introduced. Disable until 1.0.0.
+    # There are situations where we want to keep some deprecations around for a while,
+    # if they don't impact the maintainability.
     remove_deprecations_in_breaking_versions: false
