@@ -214,32 +214,38 @@ class DefaultStreamAvatar extends StatelessWidget {
       size: _iconSizeForSize(effectiveSize),
     );
 
-    return Material(
-      shape: CircleBorder(side: borderSide),
-      color: effectiveBackgroundColor,
-      elevation: effectiveElevation,
-      clipBehavior: .antiAlias,
-      child: SizedBox.square(
-        dimension: effectiveSize.value,
-        child: Center(
-          // Need to disable text scaling here so that the text doesn't
-          // escape the avatar when the textScaleFactor is large.
-          child: MediaQuery.withNoTextScaling(
-            child: IconTheme(
-              data: iconTheme,
-              child: DefaultTextStyle(
-                style: textStyle,
-                child: switch (props.imageUrl) {
-                  final imageUrl? => StreamNetworkImage(
-                    imageUrl,
-                    fit: .cover,
-                    width: effectiveSize.value,
-                    height: effectiveSize.value,
-                    placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
-                    errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
-                  ),
-                  _ => props.placeholder.call(context),
-                },
+    // Material clips children via PhysicalShape, so a border with strokeAlignOutside
+    // on the Material's shape gets clipped. Draw the border outside Material instead.
+    return SizedBox.square(
+      dimension: effectiveSize.value,
+      child: DecoratedBox(
+        decoration: ShapeDecoration(shape: CircleBorder(side: borderSide)),
+        position: DecorationPosition.foreground,
+        child: Material(
+          shape: const CircleBorder(),
+          color: effectiveBackgroundColor,
+          elevation: effectiveElevation,
+          clipBehavior: .antiAlias,
+          child: Center(
+            // Need to disable text scaling here so that the text doesn't
+            // escape the avatar when the textScaleFactor is large.
+            child: MediaQuery.withNoTextScaling(
+              child: IconTheme(
+                data: iconTheme,
+                child: DefaultTextStyle(
+                  style: textStyle,
+                  child: switch (props.imageUrl) {
+                    final imageUrl? => StreamNetworkImage(
+                      imageUrl,
+                      fit: .cover,
+                      width: effectiveSize.value,
+                      height: effectiveSize.value,
+                      placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
+                      errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
+                    ),
+                    _ => props.placeholder.call(context),
+                  },
+                ),
               ),
             ),
           ),
