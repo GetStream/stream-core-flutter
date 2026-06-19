@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../stream_core_flutter.dart';
+import '../../theme/stream_theme_extensions.dart';
+import '../common/stream_tap_target_padding.dart';
 
 /// A small circular "remove" badge typically overlaid on top of an
 /// attachment preview.

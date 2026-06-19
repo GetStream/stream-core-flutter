@@ -112,3 +112,7 @@ linter:
     # Temporarily disabled to find more important issues
     public_member_api_docs: false
     avoid_print: false
+
+    # There are situations where we want to keep some deprecations around for a while,
+    # if they don't impact the maintainability.
+    remove_deprecations_in_breaking_versions: false

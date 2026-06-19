@@ -1,7 +1,7 @@
 import 'package:device_frame_plus/device_frame_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stream_core_flutter/stream_core_flutter.dart';
+import 'package:stream_core_flutter/core.dart';
 
 import '../config/preview_configuration.dart';
 

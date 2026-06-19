@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
-import 'stream_color_swatch_helper.dart';
-import 'tokens/light/stream_tokens.dart' as tokens;
+import 'internal/stream_color_swatch_helper.dart';
+import 'internal/tokens/light/stream_tokens.dart' as tokens;
 
 /// [Color] and [ColorSwatch] constants for the Stream design system.
 ///

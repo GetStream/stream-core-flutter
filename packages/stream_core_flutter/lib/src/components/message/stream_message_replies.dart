@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../theme.dart';
+import '../../factory/stream_component_factory.dart';
+import '../../theme/components/stream_message_item_theme.dart';
+import '../../theme/components/stream_message_replies_theme.dart';
+import '../../theme/components/stream_message_style_property.dart';
+import '../../theme/primitives/stream_spacing.dart';
+import '../../theme/semantics/stream_color_scheme.dart';
+import '../../theme/semantics/stream_text_theme.dart';
+import '../../theme/stream_theme_extensions.dart';
 import '../avatar/stream_avatar_stack.dart';
 import '../message_layout/stream_message_alignment.dart';
 import '../message_layout/stream_message_layout.dart';

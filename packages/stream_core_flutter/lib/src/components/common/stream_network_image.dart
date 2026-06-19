@@ -1,8 +1,11 @@
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../components.dart';
+import '../../factory/stream_component_factory.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../badge/stream_retry_badge.dart';
+import 'stream_loading_spinner.dart';
+import 'stream_skeleton_loading.dart';
 
 /// Signature for a function that builds a placeholder widget while a
 /// [StreamNetworkImage] is loading.

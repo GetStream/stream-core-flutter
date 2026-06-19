@@ -5,7 +5,7 @@ import 'dart:math' as math;
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stream_core_flutter/stream_core_flutter.dart';
+import 'package:stream_core_flutter/core.dart';
 
 final List<double> _sampleWaveform = List.generate(
   120,

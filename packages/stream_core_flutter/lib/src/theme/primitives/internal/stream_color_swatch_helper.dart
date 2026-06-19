@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
-import '../../../stream_core_flutter.dart';
+import '../stream_colors.dart';
 
 class StreamColorSwatchHelper {
   const StreamColorSwatchHelper._();

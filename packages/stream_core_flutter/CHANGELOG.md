@@ -2,6 +2,7 @@
 
 ### ✨ Features
 
+- Split the public API into `package:stream_core_flutter/core.dart` (shared primitives for any Stream SDK) and `package:stream_core_flutter/chat.dart` (chat-only widgets; re-exports `core.dart`); the convenience barrel `package:stream_core_flutter/stream_core_flutter.dart` is now deprecated.
 - Added `StreamScaffold` — a full-page scaffold that supports both regular and floating app-bar / bottom-bar layouts. Injects `StreamScaffoldInsets` into the widget tree so scrollable bodies can read the effective top and bottom padding from floating bars without coupling to layout details.
 - Added `StreamBottomNavBar` and `StreamBottomNavBarItem` — a bottom navigation bar with icon, selected-icon, and label slots per item. Supports the ambient `StreamBottomAppBarBehavior` from `StreamAppStyle`, rendering either a regular bar or a floating pill with a gradient fade-out beneath it. Items announce themselves as accessible buttons via `Semantics`.
 - Added floating-bar support to `StreamAppBar` via a new `appBarBehavior` property. When set to `StreamAppBarBehavior.floating`, the app bar renders above the body with a translucent background and a gradient overlay.
