@@ -207,7 +207,8 @@ class DefaultStreamAppBar extends StatelessWidget {
     final defaults = _StreamAppBarStyleDefaults(context);
 
     final effectiveStreamAppBarBehavior =
-        style?.behavior ?? (context.streamTheme.appStyle.isFloating ? StreamAppBarBehavior.floating : StreamAppBarBehavior.regular);
+        style?.behavior ??
+        (context.streamTheme.appStyle.isFloating ? StreamAppBarBehavior.floating : StreamAppBarBehavior.regular);
 
     final effectiveBackgroundColor = switch (effectiveStreamAppBarBehavior) {
       .floating => style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor,
