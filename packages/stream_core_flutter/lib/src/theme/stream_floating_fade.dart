@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 ///   floating app bars, where the bar fades into the scrollable content below.
 /// * bottom-to-top (`Alignment.bottomCenter` → `Alignment.topCenter`) for
 ///   floating nav bars and composers, where they fade into content above.
-LinearGradient streamFloatingFade({
+LinearGradient streamFloatingFadeLinearGradient({
   required Color color,
   double solidFraction = 0.0,
   AlignmentGeometry begin = Alignment.topCenter,

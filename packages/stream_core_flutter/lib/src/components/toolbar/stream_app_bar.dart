@@ -349,7 +349,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     final totalHeight = safeAreaTop + kStreamToolbarHeight;
     final solidFraction = totalHeight > 0 ? safeAreaTop / totalHeight : 0.0;
 
-    return streamFloatingFade(color: effectiveBackgroundColor, solidFraction: solidFraction);
+    return streamFloatingFadeLinearGradient(color: effectiveBackgroundColor, solidFraction: solidFraction);
   }
 }
 

@@ -161,7 +161,7 @@ class _FloatingNavBar extends StatelessWidget {
     final totalHeight = safeAreaBottom + itemHeight;
     final solidFraction = totalHeight > 0 ? safeAreaBottom / totalHeight : 0.0;
 
-    return streamFloatingFade(
+    return streamFloatingFadeLinearGradient(
       color: backgroundColor,
       solidFraction: solidFraction,
       begin: Alignment.bottomCenter,
