@@ -206,10 +206,10 @@ class DefaultStreamAppBar extends StatelessWidget {
     final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveAppBarBehavior =
-        style?.behavior ?? (context.streamTheme.appStyle.isFloating ? AppBarBehavior.floating : AppBarBehavior.regular);
+    final effectiveStreamAppBarBehavior =
+        style?.behavior ?? (context.streamTheme.appStyle.isFloating ? StreamAppBarBehavior.floating : StreamAppBarBehavior.regular);
 
-    final effectiveBackgroundColor = switch (effectiveAppBarBehavior) {
+    final effectiveBackgroundColor = switch (effectiveStreamAppBarBehavior) {
       .floating => style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor,
       .regular => style?.backgroundColor ?? defaults.backgroundColor,
     };
@@ -236,11 +236,11 @@ class DefaultStreamAppBar extends StatelessWidget {
         };
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
         leading = StreamButton.icon(
-          type: switch (effectiveAppBarBehavior) {
+          type: switch (effectiveStreamAppBarBehavior) {
             .floating => .outline,
             .regular => .ghost,
           },
-          isFloating: effectiveAppBarBehavior == .floating,
+          isFloating: effectiveStreamAppBarBehavior == .floating,
           style: .secondary,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
           onPressed: Navigator.of(context).maybePop,
@@ -320,15 +320,15 @@ class DefaultStreamAppBar extends StatelessWidget {
     // not a configurable divider.
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: switch (effectiveAppBarBehavior) {
+        color: switch (effectiveStreamAppBarBehavior) {
           .floating => null,
           .regular => effectiveBackgroundColor,
         },
-        gradient: switch (effectiveAppBarBehavior) {
+        gradient: switch (effectiveStreamAppBarBehavior) {
           .floating => _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor),
           .regular => null,
         },
-        border: switch (effectiveAppBarBehavior) {
+        border: switch (effectiveStreamAppBarBehavior) {
           .floating => null,
           .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
         },

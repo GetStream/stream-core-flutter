@@ -123,7 +123,7 @@ mixin _$StreamBottomAppBarStyle {
   }
 
   StreamBottomAppBarStyle copyWith({
-    BottomBarBehavior? behavior,
+    StreamBottomAppBarBehavior? behavior,
     Color? backgroundColor,
     EdgeInsetsGeometry? padding,
     double? spacing,

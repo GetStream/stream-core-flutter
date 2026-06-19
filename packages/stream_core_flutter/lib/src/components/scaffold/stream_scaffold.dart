@@ -91,10 +91,10 @@ class StreamScaffoldInsets extends InheritedWidget {
 /// 3. The ambient [StreamAppStyle] enum value ([StreamAppStyle.floating] or
 ///    [StreamAppStyle.regular]).
 ///
-/// * [AppBarBehavior.floating] — the body extends *behind* the app bar;
+/// * [StreamAppBarBehavior.floating] — the body extends *behind* the app bar;
 ///   [StreamScaffoldInsets.topPadding] is set to the bar height plus the
 ///   system status-bar inset so the body can add its own inset.
-/// * [BottomBarBehavior.floating] — the body extends *behind* the bottom
+/// * [StreamBottomAppBarBehavior.floating] — the body extends *behind* the bottom
 ///   widget; [StreamScaffoldInsets.bottomPadding] equals the measured height of
 ///   that widget.
 /// * `regular` for either slot — no overlap; the slot occupies its own space
@@ -152,7 +152,7 @@ class StreamScaffold extends StatelessWidget {
 
   /// An optional widget displayed at the bottom of the scaffold.
   ///
-  /// When [bottomBarBehavior] is [BottomBarBehavior.floating] this widget
+  /// When [bottomBarBehavior] is [StreamBottomAppBarBehavior.floating] this widget
   /// overlaps the body; otherwise it sits below it (equivalent to
   /// [Scaffold.bottomNavigationBar]).
   final Widget? bottom;
@@ -174,14 +174,14 @@ class StreamScaffold extends StatelessWidget {
   /// When null the value is resolved from [StreamAppBarStyle.behavior]
   /// in the ambient [StreamAppBarTheme], falling back to the ambient
   /// [StreamAppStyle].
-  final AppBarBehavior? appBarBehavior;
+  final StreamAppBarBehavior? appBarBehavior;
 
   /// Per-instance override for the bottom-bar floating behaviour.
   ///
   /// When null the value is resolved from
   /// [StreamBottomAppBarStyle.behavior] in the ambient
   /// [StreamBottomAppBarTheme], falling back to the ambient [StreamAppStyle].
-  final BottomBarBehavior? bottomBarBehavior;
+  final StreamBottomAppBarBehavior? bottomBarBehavior;
 
   /// Background color of the scaffold.
   ///
@@ -196,18 +196,18 @@ class StreamScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appStyle = context.streamTheme.appStyle;
-    final effectiveAppBarBehavior =
+    final effectiveStreamAppBarBehavior =
         appBarBehavior ??
         context.streamAppBarTheme.style?.behavior ??
-        (appStyle.isFloating ? AppBarBehavior.floating : AppBarBehavior.regular);
-    final effectiveBottomBarBehavior =
+        (appStyle.isFloating ? StreamAppBarBehavior.floating : StreamAppBarBehavior.regular);
+    final effectiveStreamBottomAppBarBehavior =
         bottomBarBehavior ??
         context.streamBottomAppBarTheme.style?.behavior ??
-        (appStyle.isFloating ? BottomBarBehavior.floating : BottomBarBehavior.regular);
+        (appStyle.isFloating ? StreamBottomAppBarBehavior.floating : StreamBottomAppBarBehavior.regular);
     final effectiveBackgroundColor = backgroundColor ?? context.streamColorScheme.backgroundApp;
 
-    final appBarFloating = effectiveAppBarBehavior == AppBarBehavior.floating;
-    final bottomFloating = effectiveBottomBarBehavior == BottomBarBehavior.floating && bottom != null;
+    final appBarFloating = effectiveStreamAppBarBehavior == StreamAppBarBehavior.floating;
+    final bottomFloating = effectiveStreamBottomAppBarBehavior == StreamBottomAppBarBehavior.floating && bottom != null;
 
     final topInset = appBarFloating ? (appBar?.preferredSize.height ?? 0) + MediaQuery.paddingOf(context).top : 0.0;
 

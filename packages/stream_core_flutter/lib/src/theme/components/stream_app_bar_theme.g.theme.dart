@@ -128,7 +128,7 @@ mixin _$StreamAppBarStyle {
   }
 
   StreamAppBarStyle copyWith({
-    AppBarBehavior? behavior,
+    StreamAppBarBehavior? behavior,
     Color? backgroundColor,
     Color? floatingBackgroundColor,
     EdgeInsetsGeometry? padding,

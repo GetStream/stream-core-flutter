@@ -16,7 +16,7 @@ part 'stream_app_bar_theme.g.theme.dart';
 ///
 ///  * [StreamAppBarStyle.behavior], which carries this value.
 ///  * [StreamAppStyle], the global app-wide style that acts as fallback.
-enum AppBarBehavior {
+enum StreamAppBarBehavior {
   /// The app bar sits within the layout flow with a solid background.
   regular,
 
@@ -168,12 +168,12 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
   /// The floating or regular layout behaviour for this app bar.
   ///
   /// When null the value falls back to the ambient [StreamAppStyle]:
-  /// [StreamAppStyle.floating] → [AppBarBehavior.floating],
-  /// [StreamAppStyle.regular] → [AppBarBehavior.regular].
+  /// [StreamAppStyle.floating] → [StreamAppBarBehavior.floating],
+  /// [StreamAppStyle.regular] → [StreamAppBarBehavior.regular].
   ///
   /// Set this to override the global style for this component only, without
   /// affecting other components.
-  final AppBarBehavior? behavior;
+  final StreamAppBarBehavior? behavior;
 
   /// The background colour of the app bar.
   final Color? backgroundColor;

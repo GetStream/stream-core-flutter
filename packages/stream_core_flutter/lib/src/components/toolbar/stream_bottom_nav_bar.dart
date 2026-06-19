@@ -32,19 +32,19 @@ class StreamBottomNavBarItem {
 
 /// A bottom navigation bar for Stream surfaces that automatically adapts
 /// between a floating pill style and a regular docked style based on the
-/// ambient [BottomBarBehavior] from [StreamBottomAppBarTheme] or
+/// ambient [StreamBottomAppBarBehavior] from [StreamBottomAppBarTheme] or
 /// [StreamAppStyle].
 ///
 /// ## Floating style
 ///
-/// When [BottomBarBehavior.floating] is in effect, the bar renders as a
+/// When [StreamBottomAppBarBehavior.floating] is in effect, the bar renders as a
 /// horizontally padded pill with a rounded background, a subtle box shadow,
 /// and a hairline border. It sits above the body content and is typically
 /// used with [StreamScaffold]'s floating bottom slot.
 ///
 /// ## Regular style
 ///
-/// When [BottomBarBehavior.regular] is in effect, the bar renders as a
+/// When [StreamBottomAppBarBehavior.regular] is in effect, the bar renders as a
 /// standard docked bottom navigation bar using Flutter's [BottomNavigationBar]
 /// with Stream colour and typography tokens. A hairline `borderSubtle` top
 /// border separates it from the body.
@@ -108,12 +108,12 @@ class StreamBottomNavBar extends StatelessWidget {
   /// Called when the user taps a navigation item.
   final ValueChanged<int> onTap;
 
-  /// Overrides the resolved [BottomBarBehavior] for this instance only.
+  /// Overrides the resolved [StreamBottomAppBarBehavior] for this instance only.
   ///
   /// When null the effective behaviour is resolved from
   /// [StreamBottomAppBarStyle.behavior] in the ambient
   /// [StreamBottomAppBarTheme], falling back to the ambient [StreamAppStyle].
-  final BottomBarBehavior? behavior;
+  final StreamBottomAppBarBehavior? behavior;
 
   @override
   Widget build(BuildContext context) {
@@ -121,9 +121,9 @@ class StreamBottomNavBar extends StatelessWidget {
     final effectiveBehavior =
         behavior ??
         context.streamBottomAppBarTheme.style?.behavior ??
-        (appStyle.isFloating ? BottomBarBehavior.floating : BottomBarBehavior.regular);
+        (appStyle.isFloating ? StreamBottomAppBarBehavior.floating : StreamBottomAppBarBehavior.regular);
 
-    if (effectiveBehavior == BottomBarBehavior.floating) {
+    if (effectiveBehavior == StreamBottomAppBarBehavior.floating) {
       return _FloatingNavBar(
         items: items,
         currentIndex: currentIndex,

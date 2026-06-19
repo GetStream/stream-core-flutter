@@ -116,7 +116,7 @@ void main() {
             body: StreamAppBar(
               automaticallyImplyLeading: false,
               primary: false,
-              style: const StreamAppBarStyle(behavior: AppBarBehavior.floating),
+              style: const StreamAppBarStyle(behavior: StreamAppBarBehavior.floating),
               title: const Text('Title'),
             ),
           ),
@@ -140,7 +140,7 @@ void main() {
     testWidgets('floating: true uses outline button type for auto-implied leading', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
-          const _LauncherScreen(appBarStyle: StreamAppBarStyle(behavior: AppBarBehavior.floating)),
+          const _LauncherScreen(appBarStyle: StreamAppBarStyle(behavior: StreamAppBarBehavior.floating)),
         ),
       );
       await tester.tap(find.text('Open'));
