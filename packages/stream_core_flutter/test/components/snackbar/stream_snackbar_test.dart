@@ -432,10 +432,10 @@ void main() {
 
       expect(
         tester.getSemantics(find.byType(StreamSnackbar)),
-        matchesSemantics(
+        isSemantics(
           isLiveRegion: true,
           hasDismissAction: true,
-          children: [matchesSemantics(label: 'Saved')],
+          children: [isSemantics(label: 'Saved')],
         ),
       );
 
@@ -845,6 +845,72 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Auto-managed'), findsOneWidget);
+    });
+  });
+
+  group('accessibleNavigation', () {
+    Widget hostScaffold(StreamSnackbarMessenger messenger) {
+      return MaterialApp(
+        theme: ThemeData(extensions: [StreamTheme.light()]),
+        home: Stack(
+          children: [
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: StreamSnackbarHost(messenger: messenger),
+            ),
+          ],
+        ),
+      );
+    }
+
+    FadeTransition fadeOf(WidgetTester tester) {
+      return tester.widget<FadeTransition>(
+        find.descendant(
+          of: find.byType(StreamSnackbarHost),
+          matching: find.byType(FadeTransition),
+        ),
+      );
+    }
+
+    testWidgets('on — entry skips animation (opacity 1.0 after one frame)', (tester) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+        accessibleNavigation: true,
+      );
+      addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      await tester.pumpWidget(hostScaffold(messenger));
+
+      messenger.show(StreamSnackbar(message: const Text('Hello')));
+      await tester.pump();
+
+      expect(fadeOf(tester).opacity.value, equals(1.0));
+    });
+
+    testWidgets('on — exit skips animation and resolves controller after one frame', (tester) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+        accessibleNavigation: true,
+      );
+      addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      await tester.pumpWidget(hostScaffold(messenger));
+
+      final controller = messenger.show(StreamSnackbar(message: const Text('Bye')));
+      await tester.pump();
+      expect(find.text('Bye'), findsOneWidget);
+
+      controller.close();
+      await tester.pump();
+
+      expect(find.text('Bye'), findsNothing);
+      expect(await controller.closed, StreamSnackbarClosedReason.dismiss);
     });
   });
 }

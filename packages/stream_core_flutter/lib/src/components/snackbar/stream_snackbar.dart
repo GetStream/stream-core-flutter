@@ -240,7 +240,7 @@ class DefaultStreamSnackbar extends StatelessWidget {
     return Semantics(
       container: true,
       liveRegion: true,
-      onDismiss: () => StreamSnackbarMessenger.maybeOf(context)?.removeCurrent(),
+      onDismiss: () => StreamSnackbarMessenger.maybeOf(context)?.hideCurrent(),
       child: ConstrainedBox(
         constraints: effectiveConstraints,
         child: Material(
