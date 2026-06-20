@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -324,12 +325,33 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
   TextEditingController? _controller;
   FocusNode? _focusNode;
 
+  late final _leadingSortKey = OrdinalSortKey(0, name: hashCode.toString());
+  late final _trailingSortKey = OrdinalSortKey(1, name: hashCode.toString());
+  late final _helperSortKey = OrdinalSortKey(2, name: hashCode.toString());
+
   StreamTextInputProps get props => widget.props;
 
   TextEditingController get _effectiveController =>
       props.controller ?? (_controller ??= TextEditingController(text: props.initialValue));
 
   FocusNode get _effectiveFocusNode => props.focusNode ?? (_focusNode ??= FocusNode());
+
+  int get _currentLength => _effectiveController.value.text.characters.length;
+
+  int? get _semanticsMaxValueLength {
+    final maxLength = props.maxLength;
+    return (maxLength != null && maxLength > 0) ? maxLength : null;
+  }
+
+  void _handleDidGainAccessibilityFocus() {
+    if (_effectiveFocusNode.hasFocus) return;
+    if (!_effectiveFocusNode.canRequestFocus) return;
+    _effectiveFocusNode.requestFocus();
+  }
+
+  void _handleDidLoseAccessibilityFocus() {
+    _effectiveFocusNode.unfocus();
+  }
 
   @override
   void initState() {
@@ -418,82 +440,135 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
       _ => style?.border ?? inputStyle?.border ?? defaults.border,
     };
 
-    return GestureDetector(
-      onTap: props.enabled ? _effectiveFocusNode.requestFocus : null,
-      child: Container(
-        clipBehavior: .hardEdge,
-        constraints: effectiveConstraints,
-        decoration: ShapeDecoration(
-          color: effectiveFillColor,
-          shape: RoundedSuperellipseBorder(
-            side: effectiveBorder,
-            borderRadius: effectiveBorderRadius,
-          ),
-        ),
-        child: Padding(
-          padding: effectiveContentPadding,
-          child: IconTheme(
-            data: IconThemeData(
-              size: effectiveIconSize,
-              color: effectiveIconColor,
+    return ListenableBuilder(
+      listenable: .merge([_effectiveFocusNode, _effectiveController]),
+      builder: (context, child) => Semantics(
+        container: true,
+        // Keep leading / trailing / helper as their own semantic siblings
+        // instead of merging into the field-level node.
+        explicitChildNodes: true,
+        textField: true,
+        focusable: true,
+        readOnly: props.readOnly,
+        enabled: props.enabled,
+        // Suppress the hint as the label once the user enters text — SR
+        // should announce the value alone, not the value + hint.
+        label: _effectiveController.text.isEmpty ? props.hintText : null,
+        value: _effectiveController.text,
+        // When the field has an error, surface its message as the semantic
+        // hint so SR users hear "<label>, edit box, <value>, <error>" rather
+        // than missing the validation feedback entirely.
+        hint: props.helperState == StreamHelperState.error ? props.helperText : null,
+        maxValueLength: _semanticsMaxValueLength,
+        currentValueLength: _currentLength,
+        onTap: switch (props.readOnly) {
+          true => null,
+          _ => () {
+            if (!_effectiveController.selection.isValid) {
+              _effectiveController.selection = TextSelection.collapsed(
+                offset: _effectiveController.text.length,
+              );
+            }
+            _effectiveFocusNode.requestFocus();
+          },
+        },
+        focused: _effectiveFocusNode.hasFocus,
+        onFocus: props.enabled ? _effectiveFocusNode.requestFocus : null,
+        onDidGainAccessibilityFocus: _handleDidGainAccessibilityFocus,
+        onDidLoseAccessibilityFocus: _handleDidLoseAccessibilityFocus,
+        child: child,
+      ),
+      child: GestureDetector(
+        onTap: props.enabled ? _effectiveFocusNode.requestFocus : null,
+        excludeFromSemantics: true,
+        child: Container(
+          clipBehavior: .hardEdge,
+          constraints: effectiveConstraints,
+          decoration: ShapeDecoration(
+            color: effectiveFillColor,
+            shape: RoundedSuperellipseBorder(
+              side: effectiveBorder,
+              borderRadius: effectiveBorderRadius,
             ),
-            child: StreamColumn(
-              spacing: spacing.sm,
-              mainAxisAlignment: .center,
-              crossAxisAlignment: .start,
-              children: [
-                StreamRow(
-                  spacing: spacing.xs,
-                  children: [
-                    ?props.leading,
-                    Expanded(
-                      child: TextField(
-                        autocorrect: props.autocorrect,
-                        controller: _effectiveController,
-                        focusNode: _effectiveFocusNode,
-                        onChanged: props.onChanged,
-                        onEditingComplete: props.onEditingComplete,
-                        onSubmitted: props.onSubmitted,
-                        onTap: props.onTap,
-                        style: effectiveTextStyle,
-                        cursorColor: effectiveCursorColor,
-                        cursorWidth: effectiveCursorWidth,
-                        cursorHeight: effectiveCursorHeight,
-                        cursorRadius: effectiveCursorRadius,
-                        keyboardType: props.keyboardType,
-                        textInputAction: props.textInputAction,
-                        inputFormatters: effectiveInputFormatters,
-                        autofocus: props.autofocus,
-                        readOnly: props.readOnly,
-                        textAlign: props.textAlign,
-                        textAlignVertical: props.textAlignVertical,
-                        textCapitalization: props.textCapitalization,
-                        maxLines: props.maxLines,
-                        minLines: props.minLines,
-                        maxLength: props.maxLength,
-                        enabled: props.enabled,
-                        decoration: InputDecoration(
-                          isCollapsed: true,
-                          filled: false,
-                          contentPadding: .zero,
-                          border: .none,
-                          enabledBorder: .none,
-                          focusedBorder: .none,
-                          disabledBorder: .none,
-                          errorBorder: .none,
-                          focusedErrorBorder: .none,
-                          enabled: props.enabled,
-                          hintText: props.hintText,
-                          hintStyle: effectiveHintStyle,
+          ),
+          child: Padding(
+            padding: effectiveContentPadding,
+            child: IconTheme(
+              data: IconThemeData(
+                size: effectiveIconSize,
+                color: effectiveIconColor,
+              ),
+              child: StreamColumn(
+                spacing: spacing.sm,
+                mainAxisAlignment: .center,
+                crossAxisAlignment: .start,
+                children: [
+                  StreamRow(
+                    spacing: spacing.xs,
+                    children: [
+                      if (props.leading case final leading?)
+                        Semantics(
+                          sortKey: _leadingSortKey,
+                          child: leading,
+                        ),
+                      Expanded(
+                        child: ExcludeSemantics(
+                          child: TextField(
+                            autocorrect: props.autocorrect,
+                            controller: _effectiveController,
+                            focusNode: _effectiveFocusNode,
+                            onChanged: props.onChanged,
+                            onEditingComplete: props.onEditingComplete,
+                            onSubmitted: props.onSubmitted,
+                            onTap: props.onTap,
+                            style: effectiveTextStyle,
+                            cursorColor: effectiveCursorColor,
+                            cursorWidth: effectiveCursorWidth,
+                            cursorHeight: effectiveCursorHeight,
+                            cursorRadius: effectiveCursorRadius,
+                            keyboardType: props.keyboardType,
+                            textInputAction: props.textInputAction,
+                            inputFormatters: effectiveInputFormatters,
+                            autofocus: props.autofocus,
+                            readOnly: props.readOnly,
+                            textAlign: props.textAlign,
+                            textAlignVertical: props.textAlignVertical,
+                            textCapitalization: props.textCapitalization,
+                            maxLines: props.maxLines,
+                            minLines: props.minLines,
+                            maxLength: props.maxLength,
+                            enabled: props.enabled,
+                            decoration: InputDecoration(
+                              isCollapsed: true,
+                              filled: false,
+                              contentPadding: .zero,
+                              border: .none,
+                              enabledBorder: .none,
+                              focusedBorder: .none,
+                              disabledBorder: .none,
+                              errorBorder: .none,
+                              focusedErrorBorder: .none,
+                              enabled: props.enabled,
+                              hintText: props.hintText,
+                              hintStyle: effectiveHintStyle,
+                            ),
+                          ),
                         ),
                       ),
+                      if (props.trailing case final trailing?)
+                        Semantics(
+                          sortKey: _trailingSortKey,
+                          child: trailing,
+                        ),
+                    ],
+                  ),
+                  if (props.helperText case final helperText?)
+                    Semantics(
+                      sortKey: _helperSortKey,
+                      child: StreamHelperText(text: helperText, state: props.helperState),
                     ),
-                    ?props.trailing,
-                  ],
-                ),
-                if (props.helperText case final helperText?)
-                  StreamHelperText(text: helperText, state: props.helperState),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -656,34 +731,40 @@ class _StreamHelperTextState extends State<StreamHelperText> with SingleTickerPr
       ),
     };
 
-    return FadeTransition(
-      opacity: _controller,
-      child: FractionalTranslation(
-        translation: Tween<Offset>(
-          begin: const Offset(0, -0.25),
-          end: Offset.zero,
-        ).evaluate(_controller.view),
-        child: IconTheme(
-          data: .new(
-            size: effectiveIconSize,
-            color: effectiveStyle.color,
-          ),
-          child: StreamRow(
-            spacing: spacing.xs,
-            mainAxisAlignment: .center,
-            crossAxisAlignment: .start,
-            children: [
-              effectiveIcon,
-              Expanded(
-                child: Text(
-                  widget.text,
-                  style: effectiveStyle,
-                  textAlign: widget.textAlign,
-                  maxLines: effectiveMaxLines,
-                  overflow: .ellipsis,
+    return Semantics(
+      container: true,
+      // Auto-announce error messages on appearance so SR users hear
+      // validation feedback without having to re-focus the field.
+      liveRegion: effectiveState == .error,
+      child: FadeTransition(
+        opacity: _controller,
+        child: FractionalTranslation(
+          translation: Tween<Offset>(
+            begin: const Offset(0, -0.25),
+            end: Offset.zero,
+          ).evaluate(_controller.view),
+          child: IconTheme(
+            data: .new(
+              size: effectiveIconSize,
+              color: effectiveStyle.color,
+            ),
+            child: StreamRow(
+              spacing: spacing.xs,
+              mainAxisAlignment: .center,
+              crossAxisAlignment: .start,
+              children: [
+                ExcludeSemantics(child: effectiveIcon),
+                Expanded(
+                  child: Text(
+                    widget.text,
+                    style: effectiveStyle,
+                    textAlign: widget.textAlign,
+                    maxLines: effectiveMaxLines,
+                    overflow: .ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
