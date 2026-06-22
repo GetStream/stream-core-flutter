@@ -48,6 +48,12 @@ class CurrentPlatform {
   /// Whether the current platform is Fuchsia.
   static bool get isFuchsia => type == PlatformType.fuchsia;
 
+  /// Whether the current platform is a mobile platform (Android or iOS).
+  static bool get isMobile => isAndroid || isIos;
+
+  /// Whether the current platform is a desktop platform (Windows, macOS, or Linux).
+  static bool get isDesktop => isWindows || isMacOS || isLinux;
+
   /// Whether the current environment is a Flutter test.
   ///
   /// Returns true when running in the Flutter test environment,
