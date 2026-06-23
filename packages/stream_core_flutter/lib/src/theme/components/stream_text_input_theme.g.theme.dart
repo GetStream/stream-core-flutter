@@ -101,6 +101,7 @@ mixin _$StreamTextInputStyle {
     return StreamTextInputStyle(
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       hintStyle: TextStyle.lerp(a.hintStyle, b.hintStyle, t),
+      labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
       iconColor: Color.lerp(a.iconColor, b.iconColor, t),
       iconSize: lerpDouble$(a.iconSize, b.iconSize, t),
       cursorColor: Color.lerp(a.cursorColor, b.cursorColor, t),
@@ -119,6 +120,7 @@ mixin _$StreamTextInputStyle {
         b.helperSuccessStyle,
         t,
       ),
+      helperAffinity: t < 0.5 ? a.helperAffinity : b.helperAffinity,
       borderRadius: BorderRadiusGeometry.lerp(
         a.borderRadius,
         b.borderRadius,
@@ -154,6 +156,7 @@ mixin _$StreamTextInputStyle {
   StreamTextInputStyle copyWith({
     TextStyle? textStyle,
     TextStyle? hintStyle,
+    TextStyle? labelStyle,
     Color? iconColor,
     double? iconSize,
     Color? cursorColor,
@@ -164,6 +167,7 @@ mixin _$StreamTextInputStyle {
     TextStyle? helperInfoStyle,
     TextStyle? helperErrorStyle,
     TextStyle? helperSuccessStyle,
+    StreamHelperAffinity? helperAffinity,
     BorderRadiusGeometry? borderRadius,
     BorderSide? border,
     BorderSide? focusBorder,
@@ -179,6 +183,7 @@ mixin _$StreamTextInputStyle {
     return StreamTextInputStyle(
       textStyle: textStyle ?? _this.textStyle,
       hintStyle: hintStyle ?? _this.hintStyle,
+      labelStyle: labelStyle ?? _this.labelStyle,
       iconColor: iconColor ?? _this.iconColor,
       iconSize: iconSize ?? _this.iconSize,
       cursorColor: cursorColor ?? _this.cursorColor,
@@ -189,6 +194,7 @@ mixin _$StreamTextInputStyle {
       helperInfoStyle: helperInfoStyle ?? _this.helperInfoStyle,
       helperErrorStyle: helperErrorStyle ?? _this.helperErrorStyle,
       helperSuccessStyle: helperSuccessStyle ?? _this.helperSuccessStyle,
+      helperAffinity: helperAffinity ?? _this.helperAffinity,
       borderRadius: borderRadius ?? _this.borderRadius,
       border: border ?? _this.border,
       focusBorder: focusBorder ?? _this.focusBorder,
@@ -215,6 +221,7 @@ mixin _$StreamTextInputStyle {
     return copyWith(
       textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
       hintStyle: _this.hintStyle?.merge(other.hintStyle) ?? other.hintStyle,
+      labelStyle: _this.labelStyle?.merge(other.labelStyle) ?? other.labelStyle,
       iconColor: other.iconColor,
       iconSize: other.iconSize,
       cursorColor: other.cursorColor,
@@ -231,6 +238,7 @@ mixin _$StreamTextInputStyle {
       helperSuccessStyle:
           _this.helperSuccessStyle?.merge(other.helperSuccessStyle) ??
           other.helperSuccessStyle,
+      helperAffinity: other.helperAffinity,
       borderRadius: other.borderRadius,
       border: _this.border != null && other.border != null
           ? BorderSide.merge(_this.border!, other.border!)
@@ -264,6 +272,7 @@ mixin _$StreamTextInputStyle {
 
     return _other.textStyle == _this.textStyle &&
         _other.hintStyle == _this.hintStyle &&
+        _other.labelStyle == _this.labelStyle &&
         _other.iconColor == _this.iconColor &&
         _other.iconSize == _this.iconSize &&
         _other.cursorColor == _this.cursorColor &&
@@ -274,6 +283,7 @@ mixin _$StreamTextInputStyle {
         _other.helperInfoStyle == _this.helperInfoStyle &&
         _other.helperErrorStyle == _this.helperErrorStyle &&
         _other.helperSuccessStyle == _this.helperSuccessStyle &&
+        _other.helperAffinity == _this.helperAffinity &&
         _other.borderRadius == _this.borderRadius &&
         _other.border == _this.border &&
         _other.focusBorder == _this.focusBorder &&
@@ -293,6 +303,7 @@ mixin _$StreamTextInputStyle {
       runtimeType,
       _this.textStyle,
       _this.hintStyle,
+      _this.labelStyle,
       _this.iconColor,
       _this.iconSize,
       _this.cursorColor,
@@ -303,6 +314,7 @@ mixin _$StreamTextInputStyle {
       _this.helperInfoStyle,
       _this.helperErrorStyle,
       _this.helperSuccessStyle,
+      _this.helperAffinity,
       _this.borderRadius,
       _this.border,
       _this.focusBorder,

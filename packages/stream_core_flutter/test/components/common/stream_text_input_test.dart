@@ -105,6 +105,56 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('labelText becomes the persistent semantic label', (tester) async {
+      // When labelText is provided it's the semantic label regardless of
+      // whether the field is empty or filled, and the hint stops
+      // contributing to the label.
+      final handle = tester.ensureSemantics();
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamTextInput(
+            labelText: 'Email',
+            hintText: 'name@example.com',
+            controller: controller,
+          ),
+        ),
+      );
+
+      var node = tester.getSemantics(find.byType(StreamTextInput));
+      expect(node.label, 'Email');
+      expect(node.value, '');
+
+      controller.text = 'user@example.com';
+      await tester.pump();
+
+      node = tester.getSemantics(find.byType(StreamTextInput));
+      expect(node.label, 'Email');
+      expect(node.value, 'user@example.com');
+
+      handle.dispose();
+    });
+
+    testWidgets('labelText renders a visible label widget above the field', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(StreamTextInput(labelText: 'Email')),
+      );
+
+      expect(find.text('Email'), findsOneWidget);
+    });
+
+    testWidgets('no visible label widget when labelText is null', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(StreamTextInput(hintText: 'visible-hint')),
+      );
+
+      // The hint renders exactly once via the inner editable. If a label
+      // were also rendering, we'd see two Text widgets with this string.
+      expect(find.text('visible-hint'), findsOneWidget);
+    });
+
     testWidgets('hint is only the semantic label while the field is empty', (tester) async {
       // Once the user enters text, the hint is hidden visually and should
       // disappear from the semantic label so SR users don't hear it
@@ -206,6 +256,61 @@ void main() {
       );
 
       handle.dispose();
+    });
+
+    testWidgets('helperAffinity.inside renders helper inside the bordered area (default)', (tester) async {
+      // Inside affinity: the helper text is inset by the container's
+      // contentPadding, so its left edge sits to the right of the
+      // StreamTextInput's left edge.
+      await tester.pumpWidget(
+        _withStreamTheme(StreamTextInput(helperText: 'Required')),
+      );
+
+      final inputLeft = tester.getTopLeft(find.byType(StreamTextInput)).dx;
+      final helperLeft = tester.getTopLeft(find.byType(StreamHelperText)).dx;
+      expect(helperLeft, greaterThan(inputLeft));
+    });
+
+    testWidgets('helperAffinity.outside renders helper below the bordered area', (tester) async {
+      // Outside affinity: the helper text sits at the column root, flush
+      // with the input's left edge (no internal padding offset).
+      // Passed via per-instance style — there is no widget-level prop.
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamTextInput(
+            helperText: 'Required',
+            style: StreamTextInputStyle(helperAffinity: StreamHelperAffinity.outside),
+          ),
+        ),
+      );
+
+      final inputLeft = tester.getTopLeft(find.byType(StreamTextInput)).dx;
+      final helperLeft = tester.getTopLeft(find.byType(StreamHelperText)).dx;
+      expect(helperLeft, equals(inputLeft));
+    });
+
+    testWidgets('helperAffinity inherits from StreamTextInputTheme', (tester) async {
+      // Theme sets outside, prop is null — resolution chain should pick
+      // up the theme value, not fall back to the .inside default.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme()]),
+          home: StreamTextInputTheme(
+            data: StreamTextInputThemeData(
+              style: StreamTextInputStyle(
+                helperAffinity: StreamHelperAffinity.outside,
+              ),
+            ),
+            child: Scaffold(
+              body: StreamTextInput(helperText: 'Required'),
+            ),
+          ),
+        ),
+      );
+
+      final inputLeft = tester.getTopLeft(find.byType(StreamTextInput)).dx;
+      final helperLeft = tester.getTopLeft(find.byType(StreamHelperText)).dx;
+      expect(helperLeft, equals(inputLeft));
     });
 
     testWidgets('helperText with info state does not become the semantic hint', (tester) async {
