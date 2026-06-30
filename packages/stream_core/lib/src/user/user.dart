@@ -16,6 +16,7 @@ class User extends Equatable {
     this.role = 'user',
     this.type = UserType.regular,
     Map<String, Object?>? custom,
+    this.teams = const [],
   }) : originalName = name,
        custom = custom ?? const {};
 
@@ -43,6 +44,9 @@ class User extends Equatable {
   /// The user's custom data.
   final Map<String, Object?> custom;
 
+  /// Teams this user belongs to.
+  final List<String> teams;
+
   /// User's name that was provided when the object was created. It will be used when communicating
   /// with the API and in cases where it doesn't make sense to override `null` values with the
   /// `non-null` id.
@@ -53,7 +57,7 @@ class User extends Equatable {
   String get name => originalName ?? id;
 
   @override
-  List<Object?> get props => [id, image, role, type, originalName, custom];
+  List<Object?> get props => [id, image, role, type, originalName, custom, teams];
 }
 
 /// The user authorization type.
