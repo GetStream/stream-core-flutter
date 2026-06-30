@@ -20,10 +20,15 @@ class User extends Equatable {
   }) : originalName = name,
        custom = custom ?? const {};
 
-  /// Creates a guest user with the provided id.
+  /// Creates a guest user with the provided id and an optional display name.
   /// - Parameter userId: the id of the user.
+  /// - Parameter name: the display name of the user. Defaults to [userId] when not provided.
   /// - Returns: a guest `User`.
-  const User.guest(String userId) : this(id: userId, name: userId, type: UserType.guest);
+  factory User.guest(String userId, {String? name}) => User(
+    id: userId,
+    name: name,
+    type: UserType.guest,
+  );
 
   /// Creates an anonymous user.
   /// - Returns: an anonymous `User`.
