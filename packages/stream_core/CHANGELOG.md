@@ -1,3 +1,9 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `teams` field to `User` class.
+
 ## 0.4.0
 
 ### 💥 BREAKING CHANGES
