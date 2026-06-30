@@ -24,8 +24,7 @@ class User extends Equatable {
   /// - Parameter userId: the id of the user.
   /// - Parameter name: the display name of the user. Defaults to [userId] when not provided.
   /// - Returns: a guest `User`.
-  const User.guest(String userId, {String? name})
-      : this(id: userId, name: name, type: UserType.guest);
+  const User.guest(String userId, {String? name}) : this(id: userId, name: name, type: UserType.guest);
 
   /// Creates an anonymous user.
   /// - Returns: an anonymous `User`.
