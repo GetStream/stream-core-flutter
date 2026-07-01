@@ -808,53 +808,26 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Reactive state
+### Use of streams and `Listenable`s
 
-This repo is transport + design system; it doesn't own a state-management
-layer of its own.
+At the Flutter widget layer, prefer `Listenable` subclasses (`ValueNotifier`
+or `ChangeNotifier`) over `Stream` for widget-owned state. Streams have several
+disadvantages that make them awkward inside widget code:
 
-- Transport-layer state (WS events, connection lifecycle, network state) uses
-  `SharedEmitter` / `StateEmitter` from the utils layer.
-- Widget-owned state in the Flutter layer (animations, toggles,
-  controller-adjacent state, controllers exposed to the widget tree) uses
-  `Listenable` — `ValueNotifier` / `ChangeNotifier`. Matches Flutter's own
-  conventions.
+- Streams have a heavy API. They can be synchronous or asynchronous, broadcast
+  or single-client, paused and resumed. Determining the right semantics for a
+  particular stream when it's used in all the ways widget code could use it is
+  non-trivial.
+- Streams don't have a "current value" accessor, which makes them difficult to
+  use in `build` methods.
+- The APIs for manipulating streams are non-trivial (e.g. transformers).
 
-Release resources when the owning object is torn down: cancel
-`StreamSubscription`s, close emitters, dispose notifiers. Prefer RxDart
-operators over hand-rolled `.listen()` + `Controller` plumbing.
+This matches Flutter's own guidance inside the framework.
 
-Product SDKs built on top of this repo choose their own state primitives —
-each defines them in its own style guide.
-
-### Error handling with `Result<T>`
-
-Public methods that can fail return `Future<Result<T>>` (from
-`stream_core/lib/src/utils/result.dart`) rather than throwing. Existing examples:
-`StreamAttachmentUploader.upload`, `CdnClient.uploadImage`/`uploadFile`.
-
-```dart
-Future<Result<UploadedFile>> uploadImage(File image) async {
-  try {
-    final response = await _api.uploadImage(image);
-    return Result.success(response.toModel());
-  } on DioException catch (e) {
-    return Result.failure(_mapException(e));
-  }
-}
-
-// Consumer.
-switch (await cdn.uploadImage(file)) {
-  case Success(:final data): attach(data);
-  case Failure(:final error): showError(error);
-}
-```
-
-Internal helpers can throw when a failure is truly exceptional (assert
-violation, programming error) — convert to `Result.failure` at the boundary.
-`Result` is a `sealed class` — prefer exhaustive `switch` over
-`isSuccess`/`isFailure`.
-
+At the transport layer, streams are the natural primitive — WebSocket events
+and connection lifecycle changes arrive asynchronously and have no meaningful
+"current value" at every moment. `SharedEmitter` and `StateEmitter` are the
+primitives; both implement `Stream<T>`.
 
 ## Testing
 
