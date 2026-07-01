@@ -824,10 +824,11 @@ disadvantages that make them awkward inside widget code:
 
 This matches Flutter's own guidance inside the framework.
 
-At the transport layer, streams are the natural primitive — WebSocket events
-and connection lifecycle changes arrive asynchronously and have no meaningful
-"current value" at every moment. `SharedEmitter` and `StateEmitter` are the
-primitives; both implement `Stream<T>`.
+At the transport layer, events arrive asynchronously — WebSocket messages,
+connection changes, network state. `SharedEmitter` handles broadcast events
+(with optional replay for late subscribers); `StateEmitter` adds a
+current-value accessor for state that has a definite "now" and conflates
+duplicate emissions. Both implement `Stream<T>`.
 
 ## Testing
 
