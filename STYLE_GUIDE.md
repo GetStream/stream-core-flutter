@@ -643,11 +643,11 @@ groups (`directives_ordering`).
 
 ### Guidelines for `extension`s
 
-New utility extensions on common types belong in `stream_core/lib/src/utils/`
-alongside the existing helpers. Add to that layer rather than scattering
-new extensions across feature code.
+New utility extensions on common types belong in the shared utils layer,
+alongside the existing helpers. Add to that layer rather than scattering new
+extensions across feature code.
 
-Extensions outside `utils/` are fine on:
+Extensions outside the utils layer are fine on:
 
 - Domain types the caller is already working with.
 - `BuildContext`, for scoped lookups.
