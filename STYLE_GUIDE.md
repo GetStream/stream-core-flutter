@@ -818,39 +818,34 @@ Widget build(BuildContext context) {
 
 ### Reactive state
 
-The choice of primitive depends on the layer:
+This repo is transport + design system, not a product SDK — it doesn't own a
+state-management layer. The primitives here are:
 
-- **Pure-Dart product SDKs** — `StateNotifier<S>` from `package:state_notifier`.
-  `S` is an immutable `@freezed` state class. The notifier is internal; the
-  public API is a high-level object that wraps it. See
-  [Product-SDK architecture](#product-sdk-architecture) for the shape.
-  `StateNotifier` is functionally a pure-Dart equivalent of `ValueNotifier` —
-  used here because `Listenable` lives in `package:flutter/foundation.dart` and
-  isn't available in pure-Dart LLCs.
-- **Flutter widget code** — `ValueNotifier` / `ChangeNotifier` for widget-owned
-  state (animations, toggles, controller-adjacent state) and for controllers
-  exposed to the widget tree. Matches Flutter's own conventions.
-- **Transport internals** — `SharedEmitter<T>` / `StateEmitter<T>` in
-  `stream_core/lib/src/utils/` for WS events, connection lifecycle, and other
-  stream-based state that predates `StateNotifier` here. Kotlin
-  `SharedFlow`/`StateFlow` equivalents; both implement `Stream<T>`. Don't build
-  new product-facing state on emitters.
+- **`SharedEmitter<T>` / `StateEmitter<T>`** (in `stream_core/lib/src/utils/`)
+  — internal transport-layer state: WS events, connection lifecycle, network
+  state. Kotlin `SharedFlow`/`StateFlow` equivalents; both implement `Stream<T>`.
+- **`ValueNotifier` / `ChangeNotifier`** — widget-owned state in
+  `stream_core_flutter`: animations, toggles, controller-adjacent state, and
+  controllers exposed to the widget tree. Matches Flutter's own conventions.
 
 Cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` /
-`MutableStateEmitter` have `close()`; `StateNotifier`, `ValueNotifier`, and
-`ChangeNotifier` all have `dispose()`. Prefer RxDart operators over hand-rolled
-`.listen()` + `Controller` plumbing.
+`MutableStateEmitter` have `close()`; `ValueNotifier` / `ChangeNotifier` have
+`dispose()`. Prefer RxDart operators over hand-rolled `.listen()` + `Controller`
+plumbing.
+
+Product SDKs built on top of `stream_core` (pure-Dart LLCs, Flutter UI wrappers)
+choose their own state primitives — each defines them in its own style guide.
 
 ### Error handling with `Result<T>`
 
-Public methods on repositories, clients, and CDN wrappers return
-`Future<Result<T>>` (from `stream_core/lib/src/utils/result.dart`) rather than
-throwing. Existing examples: `StreamAttachmentUploader.upload`, `CdnClient.uploadImage`.
+Public methods that can fail return `Future<Result<T>>` (from
+`stream_core/lib/src/utils/result.dart`) rather than throwing. Existing examples:
+`StreamAttachmentUploader.upload`, `CdnClient.uploadImage`/`uploadFile`.
 
 ```dart
-Future<Result<UserData>> getUser(String id) async {
+Future<Result<UploadedFile>> uploadImage(File image) async {
   try {
-    final response = await _api.getUser(id: id);
+    final response = await _api.uploadImage(image);
     return Result.success(response.toModel());
   } on DioException catch (e) {
     return Result.failure(_mapException(e));
@@ -858,9 +853,8 @@ Future<Result<UserData>> getUser(String id) async {
 }
 
 // Consumer.
-final result = await client.getUser('123');
-switch (result) {
-  case Success(:final data): render(data);
+switch (await cdn.uploadImage(file)) {
+  case Success(:final data): attach(data);
   case Failure(:final error): showError(error);
 }
 ```
@@ -870,83 +864,12 @@ violation, programming error) — convert to `Result.failure` at the boundary.
 `Result` is a `sealed class` — prefer exhaustive `switch` over
 `isSuccess`/`isFailure`.
 
-### Product-SDK architecture
-
-New **pure-Dart** product SDKs built on top of `stream_core` (Chat LLC, Feeds
-LLC, …) use this layering. Flutter UI packages built on top of an LLC follow
-Flutter conventions — see [Reactive state](#reactive-state) for the primitive
-per layer.
-
-```text
-Client                    # public entry point (thin factory)
-  └── Repository          # data access, returns Future<Result<T>>
-      └── StateNotifier   # internal; wraps state, reacts to WS events
-          └── State       # public @freezed value the UI renders
-```
-
-Skeleton:
-
-```dart
-// State — @freezed with Freezed 3.0 mixed-mode syntax + @override on fields.
-@freezed
-class FeatureState with _$FeatureState {
-  const FeatureState({required this.id, required this.items});
-
-  @override
-  final String id;
-  @override
-  final List<ItemData> items;
-}
-
-// StateNotifier — internal, under lib/src/state/.
-class FeatureStateNotifier extends StateNotifier<FeatureState> {
-  FeatureStateNotifier(this._repo, FeatureState initial) : super(initial);
-
-  final FeatureRepository _repo;
-
-  Future<void> refresh() async {
-    switch (await _repo.fetch(id: state.id)) {
-      case Success(:final data): state = state.copyWith(items: data);
-      case Failure(): break;
-    }
-  }
-}
-
-// Public wrapper — lives at the top of lib/.
-class Feature {
-  Feature._(this._notifier);
-  final FeatureStateNotifier _notifier;
-  FeatureState get state => _notifier.state;
-  Stream<FeatureState> get stateChanges => _notifier.stream;
-}
-```
-
-- Public: `Client` + high-level wrappers (like `Feature` above). Both at top of `lib/`.
-- Internal: `Repository`, `*StateNotifier`. Under `lib/src/`.
-- Models under `src/models/`: `*Data` (domain), `*Query` (query descriptor),
-  `*Request` (HTTP payload). All `@freezed`.
-- Tests exercise the public API only — see [Testing](#testing).
-
 
 ## Testing
 
 This section covers repo-level testing conventions. For guidance on **how to write
 good tests** — naming, factoring, one behavior per test — see
 [`TESTING.md`](TESTING.md).
-
-**For product-SDK tests built on top of `stream_core`**, test exclusively through
-the public API:
-
-- **Never test internal implementation directly** — no `.toModel()` mapper
-  invocations, no `*Repository` instantiations, no `*StateNotifier` instantiations
-  in tests. If a consuming app cannot call it, the test cannot either.
-- **Prefer typed test helpers** (`<Product>ClientTest`, `<Product>Test`) that
-  wire up a real client against a mocked HTTP API and expose `mockApi(...)` /
-  `verifyApi(...)` / `emitEvent(...)`. Each product SDK ships its own such
-  helper package alongside its tests.
-- **Mock exact requests, not `any()`** — passing the concrete expected request
-  object simultaneously stubs the response and validates what the SDK sent. Using
-  `any()` matchers hides bugs where the SDK sends the wrong payload.
 
 ### Make each test entirely self-contained
 
