@@ -845,19 +845,23 @@ There are three layers of reactive state in this repo, each with its own primiti
 **1. Product-SDK state → `StateNotifier` (from `package:state_notifier`) — the
 going-forward pattern for new code.**
 
-Product SDKs built on top of `stream_core` (chat, feeds, video, …) manage state
-via `StateNotifier<State>` with an immutable `@freezed` `State` class. The
-reference implementation is stream-feeds-flutter — see its
-[`AGENTS.md`](https://github.com/GetStream/stream-feeds-flutter/blob/main/AGENTS.md)
-for the full pattern (Client → Repository → StateNotifier → public State object).
+Product SDKs built on top of `stream_core` manage state via
+`StateNotifier<State>` with an immutable `@freezed` `State` class. The public
+surface is a high-level state object that wraps the notifier; the notifier
+itself is internal.
+
 Key rules for new state code:
 
 - `*State` classes use `@freezed` with const constructors and Freezed 3.0
   mixed-mode syntax (`@override` on fields).
 - `*StateNotifier` implementations extend `StateNotifier<*State>` and are an
-  **internal** implementation detail — never exposed on the public API.
-- The public surface is the high-level state object (e.g. `Feed`, `ActivityList`)
-  that wraps the notifier.
+  **internal** implementation detail (`lib/src/`) — never exposed on the public
+  API.
+- The public surface is the high-level state object that wraps the notifier;
+  callers hold a reference to that object and read its state.
+
+See [Product-SDK architecture](#product-sdk-architecture) below for the full
+layering that surrounds `StateNotifier`.
 
 **2. Transport-layer state → existing emitters in `stream_core/lib/src/utils/`.**
 
@@ -911,12 +915,10 @@ Rules:
   `switch` (exhaustive) over `isSuccess`/`isFailure` when acting on the outcome
   in code you control.
 
-### Reference architecture: stream-feeds-flutter
+### Product-SDK architecture
 
 For new product-SDK code built on top of `stream_core` — a client that fetches
-data, hosts state, and exposes it to UI — mirror the layered architecture
-documented in
-[stream-feeds-flutter's AGENTS.md](https://github.com/GetStream/stream-feeds-flutter/blob/main/AGENTS.md):
+data, hosts state, and exposes it to UI — use this layered architecture:
 
 ```text
 Client                    # public API entry point (thin factory)
@@ -925,12 +927,19 @@ Client                    # public API entry point (thin factory)
           └── State       # public @freezed value; what the UI renders
 ```
 
-- Client and State/high-level state objects (`Feed`, `ActivityList`, …) are
-  public. Repository and StateNotifier are internal (`lib/src/`).
-- All Repository methods return `Result<T>` — no thrown exceptions.
-- Models under `src/models/` are `@freezed` (mixed-mode 3.0 with `@override`),
-  named `*Data`. Queries: `*Query`. Requests: `*Request`.
-- Tests go against the public API only — see [Testing](#testing) below.
+- **Public API**: the `Client` + high-level state objects (the wrappers around
+  `StateNotifier`, exposed as classes like `Feed`, `ActivityList`, or whatever
+  the domain calls for). Both live at the top of `lib/`.
+- **Internal**: `Repository` and `*StateNotifier` implementations live under
+  `lib/src/`.
+- **All Repository methods return `Future<Result<T>>`** — no thrown exceptions
+  crossing the SDK boundary.
+- **Models** live under `src/models/`, are `@freezed` (mixed-mode 3.0 with
+  `@override` on fields), and follow naming conventions:
+  - `*Data` — domain models (e.g. `MessageData`, `UserData`).
+  - `*Query` — query descriptors (e.g. `MessagesQuery`).
+  - `*Request` — HTTP request payloads (e.g. `SendMessageRequest`).
+- **Tests** exercise the public API only — see [Testing](#testing) below.
 
 
 ## Testing
@@ -939,16 +948,16 @@ This section covers repo-level testing conventions. For guidance on **how to wri
 good tests** — naming, factoring, one behavior per test — see
 [`TESTING.md`](TESTING.md).
 
-**For product-SDK tests built on top of `stream_core`** (chat, feeds, video), test
-exclusively through the public API. The reference is
-[stream-feeds-flutter's AGENTS.md](https://github.com/GetStream/stream-feeds-flutter/blob/main/AGENTS.md):
+**For product-SDK tests built on top of `stream_core`**, test exclusively through
+the public API:
 
 - **Never test internal implementation directly** — no `.toModel()` mapper
   invocations, no `*Repository` instantiations, no `*StateNotifier` instantiations
   in tests. If a consuming app cannot call it, the test cannot either.
-- **Test via typed test helpers** (`feedsClientTest`, `feedTest`, and analogues
-  for other product SDKs). These wire up a real client against a mocked HTTP API
-  and expose `mockApi(...)` / `verifyApi(...)` / `emitEvent(...)`.
+- **Prefer typed test helpers** (`<Product>ClientTest`, `<Product>Test`) that
+  wire up a real client against a mocked HTTP API and expose `mockApi(...)` /
+  `verifyApi(...)` / `emitEvent(...)`. Each product SDK ships its own such
+  helper package alongside its tests.
 - **Mock exact requests, not `any()`** — passing the concrete expected request
   object simultaneously stubs the response and validates what the SDK sent. Using
   `any()` matchers hides bugs where the SDK sends the wrong payload.
