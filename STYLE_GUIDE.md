@@ -808,21 +808,27 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Reactive primitives
+### Use of `Stream`s
 
-Two primitives cover reactive state in this repo:
+In general we avoid direct use of `Stream` classes in this repo. Streams in
+general are fine — we encourage people to use them — but they have some
+disadvantages that make them awkward as a public reactive primitive, and we
+prefer to wrap them in our own emitter types for this reason. For example:
 
-- **`SharedEmitter` / `StateEmitter`** — for stream-like reactive data (WS
-  events, connection changes, transport-layer state). `SharedEmitter`
-  broadcasts events with optional replay for late subscribers; `StateEmitter`
-  adds a current-value accessor and conflates duplicate emissions. Both
-  implement `Stream<T>`, so `StreamBuilder` can consume them directly.
-- **`Listenable` subclasses** (`ValueNotifier`, `ChangeNotifier`) — for
-  widget-owned state at the Flutter layer: animations, toggles,
-  controller-adjacent state, and controllers exposed to the widget tree.
-  Matches Flutter's own convention.
+- Streams have a heavy API. For example, they can be synchronous or asynchronous,
+  broadcast or single-client, and they can be paused and resumed. It is
+  non-trivial to determine the right semantics for a particular stream when it
+  will be used in all the ways SDK code could be used, and it is non-trivial to
+  fully implement the semantics correctly.
 
-Don't use raw `Stream` directly — reach for the emitters instead.
+- The APIs for manipulating streams are non-trivial (e.g. transformers).
+
+We generally prefer `SharedEmitter` for broadcast events and `StateEmitter` for
+state with a definite "current value". Both implement `Stream<T>`, so consumers
+can still use `StreamBuilder`.
+
+At the Flutter widget layer, we prefer `Listenable` subclasses (e.g.
+`ValueNotifier` or `ChangeNotifier`) for widget-owned state.
 
 ## Testing
 
