@@ -819,7 +819,7 @@ This repo is transport + design system; it doesn't own a state-management
 layer of its own.
 
 - Transport-layer state (WS events, connection lifecycle, network state) uses
-  the shared emitter primitives in the utils layer.
+  `SharedEmitter` / `StateEmitter` from the utils layer.
 - Widget-owned state in the Flutter layer (animations, toggles,
   controller-adjacent state, controllers exposed to the widget tree) uses
   `Listenable` — `ValueNotifier` / `ChangeNotifier`. Matches Flutter's own
