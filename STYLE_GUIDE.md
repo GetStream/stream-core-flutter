@@ -160,14 +160,12 @@ Concretely for this repo: theme values flow one direction (theme data → widget
 `build`); widgets don't cache computed theme values. `ChangeNotifier`-driven state
 (controllers) is the source of truth; snapshots in local `State` are stale by design.
 
-### Getters feel faster than methods
+### Getters should be cheap
 
-Property getters should be efficient (e.g. returning a cached value or an O(1) table
-lookup). If an operation is inefficient, it should be a method instead.
-
-Similarly, a getter that returns a `Future` or `Stream` should not kick off the work
-represented by the future. The work should be started from a method or constructor,
-and the getter should return the preexisting future or stream.
+Getters should be O(1) or return a cached value — callers may hit them repeatedly
+during `build`, layout, or event handling. If an operation is slow or side-effectful,
+use a method. A getter that returns a `Future` or `Stream` returns the existing one;
+it doesn't kick off new work.
 
 ### No synchronous slow work
 
@@ -180,7 +178,7 @@ and the type signature (`Future`, `Stream`) should show it.
 The SDK is two-package layered:
 
 ```text
-stream_core            # Pure Dart — WebSocket (RxDart), HTTP (Dio), models
+stream_core            # Pure Dart transport layer
   └── stream_core_flutter  # Flutter UI primitives + design system
 ```
 
@@ -192,16 +190,6 @@ pulls higher-level concepts into places they don't belong.
 (cross-product primitives) and `chat.dart` (chat-domain widgets). See
 [Public barrel contract](#public-barrel-contract).
 
-### Avoid interleaving multiple concepts together
-
-Each API should be self-contained and should not know about other features.
-Interleaving concepts leads to complexity.
-
-- Widgets that take a `child` should be entirely agnostic about the type of that
-  child. Don't use `is` checks to act differently based on the type of the child.
-- Prefer immutable data models. `Message`, `User`, and friends are immutable. Themes
-  are immutable. Callers get a new instance from `copyWith`, never mutation.
-
 ### Avoid secret (or global) state
 
 A function should operate only on its arguments and, if it is an instance method,
@@ -212,30 +200,12 @@ Theme values are threaded through `StreamTheme.of(context)` — an
 `ThemeExtension` lookup that resolves to a concrete `StreamTheme`. We do
 not have singletons for theme, colors, or design tokens.
 
-### Prefer general APIs, but use dedicated APIs where there is a reason
-
-Having dedicated APIs for performance reasons is fine. If one specific operation is
-expensive using the general API but could be implemented more efficiently using a
-dedicated API, that is where a dedicated API belongs.
-
 ### Avoid APIs that encourage bad practices
 
 Don't provide APIs that walk entire trees, or that encourage O(N²) algorithms, or
 that encourage sequential long-lived operations where the operations could be run
 concurrently. Similarly, if an operation is expensive, that expense should be
 represented in the API (e.g. by returning a `Future` or a `Stream`).
-
-### Avoid heuristics and magic
-
-Predictable APIs that give the developer control are generally preferred over APIs
-that mostly do the right thing but don't give the developer any way to adjust the
-results. Predictability is reassuring.
-
-### Solve real problems by literally solving a real problem
-
-Where possible, partner with a real customer (an internal Stream product team or an
-external integrator) who wants the feature and is willing to help you test it. Only
-by actually using a feature in the real world can we be confident it is ready.
 
 ### Start designing APIs from the closest point to the developer
 
@@ -246,14 +216,12 @@ touch — then work down to the primitives.
 
 ### Only log actionable messages to the console
 
-If the logs contain messages users can safely ignore, they will do so, and eventually
-their logs will be so chatty they'll miss the critical messages. Only log actual
-errors and actionable warnings.
+If logs contain messages callers can safely ignore, they will do so, and eventually
+the logs are so chatty the critical messages get lost. Only log actual errors and
+actionable warnings.
 
-Use `Logger` from `stream_core/src/logger/` at an appropriate level. `avoid_print` is
-disabled repo-wide (`analysis_options.yaml`) but that's a temporary allowance — in
-`stream_core_flutter`, prefer `debugPrint` (which respects the framework's rate
-limiter) over raw `print`.
+Use the SDK's `Logger` utility, gated at an appropriate level. In Flutter code,
+prefer `debugPrint` over raw `print`.
 
 ### Error messages should be useful
 
@@ -298,7 +266,7 @@ stream-core-flutter/
 ├── STYLE_GUIDE.md            # This file
 ├── CLAUDE.md                 # AI-agent pointer to this guide + repo overview
 ├── packages/
-│   ├── stream_core/          # LLC — pure Dart (RxDart WebSocket, Dio HTTP)
+│   ├── stream_core/          # LLC — pure Dart transport layer
 │   └── stream_core_flutter/  # Flutter UI + design system
 ├── apps/
 │   └── design_system_gallery/  # Widgetbook-based interactive showcase
@@ -1117,14 +1085,11 @@ Padding(padding: EdgeInsets.all(8));   // avoid — reads as int
 
 ### Component structure
 
-Components live under `packages/stream_core_flutter/lib/src/components/<category>/`.
-Current categories: `accessories/`, `avatar/`, `badge/`, `buttons/`, `common/`,
-`context_menu/`, `controls/`, `emoji/`, `list/`, `media_viewer/`, `message/`,
-`message_composer/`, `message_layout/`, `reaction/`, `sheet/`, `snackbar/`,
-`toolbar/`. Add a new category directory when a component doesn't fit an existing
+Components live under `lib/src/components/<category>/`, one directory per
+category. Add a new category directory when a component doesn't fit an existing
 one.
 
-Each component ships with:
+Each new component ships with:
 
 - **Widget file** — under `lib/src/components/<category>/<name>.dart`.
 - **Theme file** — under `lib/src/theme/components/<name>_theme.dart`. See
@@ -1139,13 +1104,27 @@ Each component ships with:
   add more.
 - **Widget or unit tests** — under `test/components/<category>/<name>_test.dart`.
   Golden variants use the `_golden_test.dart` suffix (e.g.
-  `stream_button_golden_test.dart`, `stream_button_test.dart`). See
-  [Golden tests](#golden-tests).
+  `stream_button_golden_test.dart`, `stream_button_test.dart`). Every visible
+  component needs a golden test covering the default state and the primary theme
+  variants. See [Golden tests](#golden-tests).
 - **Widgetbook use-case** — under
-  `apps/design_system_gallery/lib/components/<category>/`.
+  `apps/design_system_gallery/lib/components/<category>/`, exercising every
+  meaningful prop combination.
 - **Barrel export** — an `export '…';` line added to `core.dart` or `chat.dart`.
 
-Missing any of the four is a review-blocker.
+The widget itself should:
+
+- Accept `Key? key` in its constructor via `super.key`
+  (`use_key_in_widget_constructors`, `use_super_parameters`).
+- Support accessibility on both Android (TalkBack) and iOS (VoiceOver). A
+  `Tooltip` is usually sufficient as the accessible label.
+- Support both LTR and RTL layouts.
+- Support text scaling.
+- Have documentation for every public member.
+
+Some earlier components predate parts of this checklist. When you touch such a
+component for a substantive change, try to close the gap in the same PR — but
+don't block landing a fix on backfilling years of missing coverage.
 
 ### Theme system
 
@@ -1210,18 +1189,14 @@ into Material's `ThemeData.extensions`. New component themes follow the
 
 ### Component factory
 
-The design system uses `StreamComponentFactory` to let consumers substitute
-individual components without forking. When adding a new component that has a
-default implementation, register a factory hook so consumers can override it.
+The design system exposes `StreamComponentFactory` so consumers can substitute
+individual components without forking. When adding a component with a default
+implementation, register a factory hook: add a nullable builder field on the
+factory class, wire it through `copyWith` and the default fallback, and consume
+it in the component's `build` with the standard null-coalescing chain.
 
-Reference pattern: see how `StreamMessageBubble` resolves its default builder via
-`StreamComponentFactory.of(context).messageBubble` in
-`packages/stream_core_flutter/lib/src/components/message/stream_message_bubble.dart`.
-The factory class itself lives at
-`packages/stream_core_flutter/lib/src/factory/stream_component_factory.dart` —
-add a nullable builder field there, wire it up through the factory's `copyWith`
-and default fallback, and consume it in the component's `build` with the standard
-null-coalescing chain.
+Look at any existing component that goes through the factory for the reference
+shape.
 
 ### Icons
 
@@ -1239,27 +1214,6 @@ When adding or updating icons:
    they must stay in sync.
 
 Do not edit the generated `StreamIcons.dart` or the icon font by hand.
-
-### Widget essentials
-
-Every **new** public widget in `stream_core_flutter` should:
-
-- Accept `Key? key` in its constructor via `super.key`
-  (`use_key_in_widget_constructors`, `use_super_parameters`).
-- Support accessibility on both Android (TalkBack) and iOS (VoiceOver). A `Tooltip`
-  is usually sufficient as the accessible label.
-- Support both LTR and RTL layouts.
-- Support text scaling.
-- Have documentation for every public member.
-- Have a golden test covering the default state and the primary theme variants.
-- Have a Widgetbook use-case that lets a designer or reviewer interact with all
-  props.
-
-Some earlier components predate parts of this checklist (e.g. missing widget tests
-or Widgetbook use-cases). When you touch such a component for a substantive change,
-try to close the gap in the same PR — but don't block landing a fix on backfilling
-years of missing coverage.
-
 
 ## Commits, PRs, and changelogs
 
@@ -1322,9 +1276,8 @@ X.Y.Z") is handled by the release tooling — do not write these entries by hand
 - **Melos commands**: `melos.yaml` — every task the repo runs.
 - **Design source**: the Chat SDK Design System Figma project — accessed via the
   Figma MCP when implementing UI.
-- **Design tokens**: `packages/stream_core_flutter/lib/src/theme/primitives/internal/tokens/`
-  and the [design-system-tokens](https://github.com/GetStream/design-system-tokens)
-  sibling repo.
+- **Design tokens**: the [design-system-tokens](https://github.com/GetStream/design-system-tokens)
+  sibling repo (mirrored internally in the theme primitives).
 
 When something isn't covered here and isn't obvious from surrounding code, prefer
 to ask in the PR rather than guessing. If a convention isn't documented, propose
