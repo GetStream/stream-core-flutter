@@ -818,8 +818,6 @@ disadvantages that make them awkward inside widget code:
   or single-client, paused and resumed. Determining the right semantics for a
   particular stream when it's used in all the ways widget code could use it is
   non-trivial.
-- Streams don't have a "current value" accessor, which makes them difficult to
-  use in `build` methods.
 - The APIs for manipulating streams are non-trivial (e.g. transformers).
 
 This matches Flutter's own guidance inside the framework.
