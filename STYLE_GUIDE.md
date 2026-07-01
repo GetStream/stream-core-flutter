@@ -192,15 +192,17 @@ pulls higher-level concepts into places they don't belong.
 (cross-product primitives) and `chat.dart` (chat-domain widgets). See
 [Public barrel contract](#public-barrel-contract).
 
-### Avoid interleaving multiple concepts together
+### Prefer immutable data
 
-Each API should be self-contained and should not know about other features.
-Interleaving concepts leads to complexity.
+Themes, `@freezed` models, and other value classes are immutable — callers get a
+new instance from `copyWith`, never mutation. Widgets that take a `child` should
+be agnostic about the type of that child; don't `is`-check to act differently on
+the child's runtime type.
 
-- Widgets that take a `child` should be entirely agnostic about the type of that
-  child. Don't use `is` checks to act differently based on the type of the child.
-- Prefer immutable data models. `Message`, `User`, and friends are immutable. Themes
-  are immutable. Callers get a new instance from `copyWith`, never mutation.
+Note that "immutable" applies to values and configuration, not to the design
+system as a whole: components compose deliberately here (component factory,
+theme hierarchy, related message-layer widgets referencing each other). Coupling
+between design-system pieces is part of the point, not a smell.
 
 ### Avoid secret (or global) state
 
