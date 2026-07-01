@@ -815,23 +815,22 @@ Widget build(BuildContext context) {
 
 ### Reactive state
 
-This repo is transport + design system, not a product SDK — it doesn't own a
-state-management layer. The primitives here are:
+This repo is transport + design system; it doesn't own a state-management
+layer of its own.
 
-- **`SharedEmitter<T>` / `StateEmitter<T>`** (in `stream_core/lib/src/utils/`)
-  — internal transport-layer state: WS events, connection lifecycle, network
-  state. Kotlin `SharedFlow`/`StateFlow` equivalents; both implement `Stream<T>`.
-- **`ValueNotifier` / `ChangeNotifier`** — widget-owned state in
-  `stream_core_flutter`: animations, toggles, controller-adjacent state, and
-  controllers exposed to the widget tree. Matches Flutter's own conventions.
+- Transport-layer state (WS events, connection lifecycle, network state) uses
+  the shared emitter primitives in the utils layer.
+- Widget-owned state in the Flutter layer (animations, toggles,
+  controller-adjacent state, controllers exposed to the widget tree) uses
+  `Listenable` — `ValueNotifier` / `ChangeNotifier`. Matches Flutter's own
+  conventions.
 
-Cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` /
-`MutableStateEmitter` have `close()`; `ValueNotifier` / `ChangeNotifier` have
-`dispose()`. Prefer RxDart operators over hand-rolled `.listen()` + `Controller`
-plumbing.
+Release resources when the owning object is torn down: cancel
+`StreamSubscription`s, close emitters, dispose notifiers. Prefer RxDart
+operators over hand-rolled `.listen()` + `Controller` plumbing.
 
-Product SDKs built on top of `stream_core` (pure-Dart LLCs, Flutter UI wrappers)
-choose their own state primitives — each defines them in its own style guide.
+Product SDKs built on top of this repo choose their own state primitives —
+each defines them in its own style guide.
 
 ### Error handling with `Result<T>`
 
