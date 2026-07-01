@@ -643,24 +643,19 @@ groups (`directives_ordering`).
 
 ### Guidelines for `extension`s
 
-New utility extensions on common types belong in the shared utils layer,
-alongside the existing helpers. Add to that layer rather than scattering new
-extensions across feature code.
+Extension methods let you add additional functionality to an existing type.
+When choosing between declaring a regular instance method and an extension
+method, consider the trade-offs. Extension methods are resolved statically and
+cannot be overridden. Furthermore, misusing extension methods can pollute IDE
+suggestions and cause naming collisions.
 
-Extensions outside the utils layer are fine on:
+Don't declare an extension method when declaring a regular method will do.
 
-- Domain types the caller is already working with.
-- `BuildContext`, for scoped lookups.
-- Primitives, for units-of-measure — small, unambiguous, and colocated with
-  the value type.
+Don't use extension methods if the end developer might want to override the
+extension method's implementation. Extension methods cannot be overridden.
 
-Avoid public extensions on unconstrained common types (`Object`, `Object?`,
-`Future<T>`, `String`, `Map<K, V>`) outside these patterns — they land on
-every value of that type in every file that imports the package.
-
-Extension methods are resolved statically and can't be overridden; if a caller
-might want to substitute the behaviour, expose an instance method or callback
-instead.
+Don't create extension methods with the same name on the same type in separate
+libraries. This causes collisions if both libraries are imported.
 
 ### Avoid `FutureOr<T>` in public APIs
 
