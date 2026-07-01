@@ -307,33 +307,39 @@ stream-core-flutter/
 
 ### Public barrel contract
 
-`stream_core_flutter` exposes two narrow public barrels so non-chat Stream SDKs
-(video, feeds, ...) can pull in just the shared primitives without paying for chat
-code:
+`stream_core_flutter` exposes multiple narrow public barrels so each Stream product
+SDK (chat today; video, feeds, … in the future) can pull in just the primitives it
+needs without paying for other products' code:
 
-- `package:stream_core_flutter/core.dart` — shared UI primitives, theme tokens, the
-  component factory. Safe for any Stream SDK.
+- `package:stream_core_flutter/core.dart` — cross-product primitives, theme tokens,
+  the component factory. Safe for any Stream SDK.
 - `package:stream_core_flutter/chat.dart` — chat-specific widgets (message bubble,
   composer attachments, reactions, …). Chat SDKs import this **alongside**
   `core.dart`.
 - `package:stream_core_flutter/stream_core_flutter.dart` — deprecated convenience
-  barrel that re-exports both. Will be removed at 1.0.0.
+  barrel that re-exports the others. Will be removed at 1.0.0.
+
+Additional product barrels (`video.dart`, `feeds.dart`, …) can be added when a new
+Stream product needs domain-specific widgets that don't belong in `core.dart`. Each
+new barrel gets its own entry in `check_barrels.yaml` under `barrels:`, and the
+same rules apply.
 
 Rules enforced by `melos run check:barrels` (config at
 `packages/stream_core_flutter/check_barrels.yaml`, wired into CI):
 
-1. Every public file under `lib/src/` must appear in exactly **one** barrel. No
-   duplicates, no orphans, no dangling exports.
+1. Every public file under `lib/src/` must appear in exactly **one** listed barrel.
+   No duplicates, no orphans, no dangling exports.
 2. No file under `lib/src/` may import a public barrel (`core.dart`, `chat.dart`,
-   `stream_core_flutter.dart`). Use a relative import to the source file — barrels
-   are for **consumers**, not internal code.
-3. Anything under an `internal/` directory listed in `check_barrels.yaml`'s
-   `internal_dirs` is excluded from coverage. Use this for figma-generated tokens
-   and other implementation-only artefacts.
+   `stream_core_flutter.dart`, and any future product barrel). Use a relative
+   import to the source file — barrels are for **consumers**, not internal code.
+3. Anything under a directory listed in `check_barrels.yaml`'s `internal_dirs` is
+   excluded from coverage. Use this for figma-generated tokens and other
+   implementation-only artefacts (currently: `lib/src/theme/primitives/internal`).
 
 When adding a new public widget or theme: create the file under `lib/src/…`, then
-add an `export 'src/…/my_file.dart';` line to either `core.dart` or `chat.dart`. The
-check fails on PR if you forget.
+add an `export 'src/…/my_file.dart';` line to the appropriate barrel — `core.dart`
+if the widget is product-agnostic, `chat.dart` if it's chat-specific, or a new
+product barrel if you're introducing one. The check fails on PR if you forget.
 
 ### Dependency management
 
@@ -1125,9 +1131,15 @@ Each component ships with:
 
 - **Widget file** — under `lib/src/components/<category>/<name>.dart`.
 - **Theme file** — under `lib/src/theme/components/<name>_theme.dart`. See
-  [Theme system](#theme-system). Note: the suffix is either `<Name>ThemeData` or
-  `<Name>Style` — both patterns exist in the repo (e.g. `StreamAvatarThemeData`,
-  `StreamMessageBubbleStyle`); pick whichever fits the component's semantics.
+  [Theme system](#theme-system).
+
+  Naming convention: top-level component themes use `<Component>ThemeData`;
+  sub-configurations nested inside a top-level theme use `<Component>Style`. For
+  example, `StreamButtonThemeData` (top-level) contains `StreamButtonTypeStyle` +
+  `StreamButtonThemeStyle` (per-variant sub-configurations). New code follows this
+  split. A handful of existing top-level themes are grandfathered into the `Style`
+  suffix (e.g. `StreamMessageBubbleStyle`, `StreamMessageMetadataStyle`) — don't
+  add more.
 - **Widget or unit tests** — under `test/components/<category>/<name>_test.dart`.
   Golden variants use the `_golden_test.dart` suffix (e.g.
   `stream_button_golden_test.dart`, `stream_button_test.dart`). See
@@ -1200,10 +1212,18 @@ Look at `stream_avatar_theme.dart` and any file in
 
 ### Component factory
 
-The design system uses `StreamComponentFactory` to allow consumers to substitute
+The design system uses `StreamComponentFactory` to let consumers substitute
 individual components without forking. When adding a new component that has a
-default implementation, register a factory hook so consumers can override it. See
-`lib/src/factory/stream_component_factory.dart` for the pattern.
+default implementation, register a factory hook so consumers can override it.
+
+Reference pattern: see how `StreamMessageBubble` resolves its default builder via
+`StreamComponentFactory.of(context).messageBubble` in
+`packages/stream_core_flutter/lib/src/components/message/stream_message_bubble.dart`.
+The factory class itself lives at
+`packages/stream_core_flutter/lib/src/factory/stream_component_factory.dart` —
+add a nullable builder field there, wire it up through the factory's `copyWith`
+and default fallback, and consume it in the component's `build` with the standard
+null-coalescing chain.
 
 ### Icons
 
@@ -1224,7 +1244,7 @@ Do not edit the generated `StreamIcons.dart` or the icon font by hand.
 
 ### Widget essentials
 
-Every new public widget in `stream_core_flutter` should:
+Every **new** public widget in `stream_core_flutter` should:
 
 - Accept `Key? key` in its constructor via `super.key`
   (`use_key_in_widget_constructors`, `use_super_parameters`).
@@ -1236,6 +1256,11 @@ Every new public widget in `stream_core_flutter` should:
 - Have a golden test covering the default state and the primary theme variants.
 - Have a Widgetbook use-case that lets a designer or reviewer interact with all
   props.
+
+Some earlier components predate parts of this checklist (e.g. missing widget tests
+or Widgetbook use-cases). When you touch such a component for a substantive change,
+try to close the gap in the same PR — but don't block landing a fix on backfilling
+years of missing coverage.
 
 
 ## Commits, PRs, and changelogs
