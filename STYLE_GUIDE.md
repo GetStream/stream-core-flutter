@@ -643,49 +643,27 @@ groups (`directives_ordering`).
 
 ### Guidelines for `extension`s
 
-Extension methods let you add functionality to an existing type. Consider the
-trade-offs before reaching for one:
+Extension methods are resolved statically and cannot be overridden; misuse
+pollutes IDE suggestions and causes naming collisions. Reach for one only when
+a regular method or helper function won't do.
 
-- Extension methods are resolved statically and cannot be overridden.
-- Misusing extensions pollutes IDE suggestions and causes naming collisions.
+`stream_core/lib/src/utils/` is an intentional standard-library-style layer,
+exported from `stream_core.dart` and used across 100+ call sites: `Standard on T`
+(Kotlin scope funcs `let`/`also`/`apply`/`takeIf`), `ComparableExtension`,
+`IterableExtensions`, `ListExtensions`, `SortedListExtensions`. Use these
+freely. **New utility extensions belong here** — don't scatter them across
+feature code.
 
-The repo intentionally maintains a **standard-library-style extension layer** in
-`packages/stream_core/lib/src/utils/`, exported from `stream_core.dart` and used
-across the codebase (100+ call sites). It includes:
+Accepted extension targets outside `utils/`:
 
-- `Standard<T extends Object> on T` — Kotlin-style scope functions
-  (`let`, `also`, `apply`, `takeIf`, `takeUnless`).
-- `ComparableExtension<T extends Comparable<T>> on T` — `<`, `>`, `<=`, `>=`
-  operators.
-- `IterableExtensions on Iterable<T>` — `sumOf`.
-- `ListExtensions` / `SortedListExtensions` on `List<T>` — `upsert`, `partition`,
-  `batchReplace`, `sortedInsert`, `sortedUpsert`, `merge`, `updateNested`,
-  `removeNested`, `updateWhere`, `insertUnique`.
-
-Use these freely — they are part of the SDK's DSL.
-
-Rules for new extensions:
-
-- **Standard utility extensions belong in `stream_core/lib/src/utils/`.** If you
-  need a new `on num` / `on List<T>` / `on Iterable<T>` / `on T extends Object`
-  helper, add it to the appropriate file there rather than defining a new
-  extension in feature code.
-- Don't declare an extension method when a regular method or a helper function
-  will do.
-- Extensions on domain types are fine — they only apply when the caller is
-  already working with those types. Examples in the repo: `AttachmentFile`,
-  `DioException`, `RetryStrategy`, `SystemEnvironment`.
-- Extensions on `BuildContext` for scoped lookups are an accepted Flutter idiom.
-  Examples: `StreamThemeExtension on BuildContext` exposing `context.streamTheme`;
-  `StreamComponentFactoryExtension on BuildContext` exposing the factory.
-- Units-of-measure extensions on primitives are acceptable when the extension is
-  small, unambiguous, and lives next to the value type. Example:
-  `DistanceExtension on num` exposing `5.kilometers` next to `Distance`.
+- Domain types (`AttachmentFile`, `DioException`, `RetryStrategy`).
+- `BuildContext` for scoped lookups — e.g. `context.streamTheme`.
+- Units-of-measure on primitives when small and unambiguous — e.g.
+  `DistanceExtension on num` next to `Distance` (`5.kilometers`).
 
 Outside these patterns, avoid public extensions on `Object`, `Object?`,
-`Future<T>`, `String`, `Map<K, V>` — those show up on every value of that type in
-every file that imports the package, causing IDE-completion noise and potential
-collisions with other packages.
+`Future<T>`, `String`, `Map<K, V>` — they show up on every value of that type
+in every importing file.
 
 ### Avoid `FutureOr<T>` in public APIs
 
@@ -838,108 +816,112 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Reactive state primitives
+### Reactive state
 
-There are three layers of reactive state in this repo, each with its own primitive:
+Three primitives, each for a specific job:
 
-**1. Product-SDK state → `StateNotifier` (from `package:state_notifier`) — the
-going-forward pattern for new code.**
+- **`StateNotifier<S>`** (from `package:state_notifier`) — the going-forward
+  primitive for new product-SDK state. `S` is an immutable `@freezed` state
+  class. The notifier is internal; the public API is a high-level object that
+  wraps it. See [Product-SDK architecture](#product-sdk-architecture) for the
+  shape.
+- **`SharedEmitter<T>` / `StateEmitter<T>`** — internal transport-layer state in
+  `stream_core/lib/src/utils/` (WS events, connection lifecycle). Kotlin
+  `SharedFlow`/`StateFlow` equivalents; both implement `Stream<T>`. Don't build
+  new product-facing state on emitters.
+- **`ValueNotifier` / `ChangeNotifier`** — widget-owned state that never leaves
+  the widget tree: animations, toggles, controller-adjacent state.
 
-Product SDKs built on top of `stream_core` manage state via
-`StateNotifier<State>` with an immutable `@freezed` `State` class. The public
-surface is a high-level state object that wraps the notifier; the notifier
-itself is internal.
-
-Key rules for new state code:
-
-- `*State` classes use `@freezed` with const constructors and Freezed 3.0
-  mixed-mode syntax (`@override` on fields).
-- `*StateNotifier` implementations extend `StateNotifier<*State>` and are an
-  **internal** implementation detail (`lib/src/`) — never exposed on the public
-  API.
-- The public surface is the high-level state object that wraps the notifier;
-  callers hold a reference to that object and read its state.
-
-See [Product-SDK architecture](#product-sdk-architecture) below for the full
-layering that surrounds `StateNotifier`.
-
-**2. Transport-layer state → existing emitters in `stream_core/lib/src/utils/`.**
-
-For state that lives inside `stream_core`'s transport layer (WS events,
-connection state, network state, lifecycle state) the existing
-`SharedEmitter`/`StateEmitter` primitives remain the right choice — they predate
-`StateNotifier` here and are wired into the WS reconnection machinery:
-
-- **`SharedEmitter<T>` / `MutableSharedEmitter<T>`** — Kotlin `SharedFlow`
-  equivalent. Multi-subscriber broadcast for events without a "current value".
-  Supports `replay:` for late subscribers.
-- **`StateEmitter<T>` / `MutableStateEmitter<T>`** — Kotlin `StateFlow`
-  equivalent. Has `.value`, replays it on subscribe, conflates duplicates.
-
-Both `implements Stream<T>`, so `StreamBuilder` (with `initialData:
-stateEmitter.value` for `StateEmitter`) is the standard widget-side consumer.
-Don't build new product-facing state on emitters — use `StateNotifier` for that.
-
-**3. Widget-owned state → `ValueNotifier` / `ChangeNotifier`.**
-
-For reactive state that never crosses out of the widget tree — animation-driven
-values, expanded/collapsed toggles, `TextEditingController`-adjacent state.
-
-**General rules:**
-
-- Always cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` /
-  `MutableStateEmitter` have `close()`; `StateNotifier` has `dispose()` — call
-  the right one when the owning object is torn down.
-- For pipelines that combine or transform streams, prefer RxDart operators over
-  hand-rolled `.listen()`+`Controller` plumbing.
+Cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` /
+`MutableStateEmitter` have `close()`; `StateNotifier` has `dispose()`. Prefer
+RxDart operators over hand-rolled `.listen()` + `Controller` plumbing.
 
 This intentionally diverges from Flutter's style guide, which recommends
-`Listenable` over `Stream` inside the framework — that reasoning doesn't apply
-to a real-time transport layer where events are the primary data model.
+`Listenable` over `Stream` — that reasoning doesn't apply to a real-time
+transport layer where events are the primary data model.
 
 ### Error handling with `Result<T>`
 
 Public methods on repositories, clients, and CDN wrappers return
 `Future<Result<T>>` (from `stream_core/lib/src/utils/result.dart`) rather than
-throwing. Existing examples in the repo: `StreamAttachmentUploader.upload`,
-`CdnClient.uploadImage`/`uploadFile`/`deleteImage`/`deleteFile`.
+throwing. Existing examples: `StreamAttachmentUploader.upload`, `CdnClient.uploadImage`.
 
-Rules:
+```dart
+Future<Result<UserData>> getUser(String id) async {
+  try {
+    final response = await _api.getUser(id: id);
+    return Result.success(response.toModel());
+  } on DioException catch (e) {
+    return Result.failure(_mapException(e));
+  }
+}
 
-- SDK public methods that can fail return `Result<T>`. Never throw across the
-  SDK boundary.
-- Internal helpers can still throw when a failure is truly exceptional (an
-  `assert` violation, a programming error). Convert to `Result.failure` at the
-  boundary.
-- `Result` is a `sealed class` with `Success<T>` and `Failure` variants. Prefer
-  `switch` (exhaustive) over `isSuccess`/`isFailure` when acting on the outcome
-  in code you control.
+// Consumer.
+final result = await client.getUser('123');
+switch (result) {
+  case Success(:final data): render(data);
+  case Failure(:final error): showError(error);
+}
+```
+
+Internal helpers can throw when a failure is truly exceptional (assert
+violation, programming error) — convert to `Result.failure` at the boundary.
+`Result` is a `sealed class` — prefer exhaustive `switch` over
+`isSuccess`/`isFailure`.
 
 ### Product-SDK architecture
 
-For new product-SDK code built on top of `stream_core` — a client that fetches
-data, hosts state, and exposes it to UI — use this layered architecture:
+New product-SDK code built on top of `stream_core` uses this layering:
 
 ```text
-Client                    # public API entry point (thin factory)
+Client                    # public entry point (thin factory)
   └── Repository          # data access, returns Future<Result<T>>
-      └── StateNotifier   # internal; wraps state + reacts to WS events
-          └── State       # public @freezed value; what the UI renders
+      └── StateNotifier   # internal; wraps state, reacts to WS events
+          └── State       # public @freezed value the UI renders
 ```
 
-- **Public API**: the `Client` + high-level state objects (the wrappers around
-  `StateNotifier`, exposed as classes like `Feed`, `ActivityList`, or whatever
-  the domain calls for). Both live at the top of `lib/`.
-- **Internal**: `Repository` and `*StateNotifier` implementations live under
-  `lib/src/`.
-- **All Repository methods return `Future<Result<T>>`** — no thrown exceptions
-  crossing the SDK boundary.
-- **Models** live under `src/models/`, are `@freezed` (mixed-mode 3.0 with
-  `@override` on fields), and follow naming conventions:
-  - `*Data` — domain models (e.g. `MessageData`, `UserData`).
-  - `*Query` — query descriptors (e.g. `MessagesQuery`).
-  - `*Request` — HTTP request payloads (e.g. `SendMessageRequest`).
-- **Tests** exercise the public API only — see [Testing](#testing) below.
+Skeleton:
+
+```dart
+// State — @freezed with Freezed 3.0 mixed-mode syntax + @override on fields.
+@freezed
+class FeatureState with _$FeatureState {
+  const FeatureState({required this.id, required this.items});
+
+  @override
+  final String id;
+  @override
+  final List<ItemData> items;
+}
+
+// StateNotifier — internal, under lib/src/state/.
+class FeatureStateNotifier extends StateNotifier<FeatureState> {
+  FeatureStateNotifier(this._repo, FeatureState initial) : super(initial);
+
+  final FeatureRepository _repo;
+
+  Future<void> refresh() async {
+    switch (await _repo.fetch(id: state.id)) {
+      case Success(:final data): state = state.copyWith(items: data);
+      case Failure(): break;
+    }
+  }
+}
+
+// Public wrapper — lives at the top of lib/.
+class Feature {
+  Feature._(this._notifier);
+  final FeatureStateNotifier _notifier;
+  FeatureState get state => _notifier.state;
+  Stream<FeatureState> get stateChanges => _notifier.stream;
+}
+```
+
+- Public: `Client` + high-level wrappers (like `Feature` above). Both at top of `lib/`.
+- Internal: `Repository`, `*StateNotifier`. Under `lib/src/`.
+- Models under `src/models/`: `*Data` (domain), `*Query` (query descriptor),
+  `*Request` (HTTP payload). All `@freezed`.
+- Tests exercise the public API only — see [Testing](#testing).
 
 
 ## Testing
@@ -1275,63 +1257,64 @@ Missing any of the four is a review-blocker.
 
 ### Theme system
 
-Themes are generated via the `theme_extensions_builder` package. **Do not hand-roll
-`copyWith`, `merge`, `lerp`, `==`, or `hashCode`** — annotate with `@themeGen` (or
-`@ThemeExtensions` for the root theme) and let the generator produce them.
+Themes are generated via `theme_extensions_builder`. **Never hand-roll `copyWith`,
+`merge`, `lerp`, `==`, or `hashCode`.** Annotate with `@themeGen` (or
+`@ThemeExtensions` for the root) and let the generator produce them.
 
-The hierarchy is:
+The hierarchy is layered: **primitives** (`theme/primitives/`, raw tokens) →
+**semantics** (`theme/semantics/`, semantic mappings) → **component themes**
+(`theme/components/`, per-widget classes, 50+) → **tokens** (figma-generated,
+internal).
 
-1. **Primitives** (`lib/src/theme/primitives/`) — raw design tokens: colors,
-   typography, spacing, radius, icons.
-2. **Semantics** (`lib/src/theme/semantics/`) — semantic mappings on top of
-   primitives (e.g. `primaryColor`, `bodyText`).
-3. **Component themes** (`lib/src/theme/components/`) — per-widget theme classes
-   (50+ components).
-4. **Tokens** (`lib/src/theme/primitives/internal/tokens/`) — light/dark concrete
-   values, figma-generated, not part of the public API.
+Adding a new component theme:
 
-When adding a new component theme:
+```dart
+// lib/src/theme/components/stream_widget_theme.dart
 
-1. Create a `<Component>ThemeData` class that:
-   - Uses `with _$<Component>ThemeData` (the generated mixin) and is annotated with
-     `@immutable` + `@themeGen`. Component themes do **not** extend
-     `ThemeExtension`.
-   - Declares `part '<snake_name>.g.theme.dart';` at the top of the file.
-   - Has **all fields nullable** — defaults do not live here.
+@immutable
+@themeGen
+class StreamWidgetThemeData with _$StreamWidgetThemeData {
+  const StreamWidgetThemeData({this.backgroundColor, this.borderRadius});
 
-   The root `StreamTheme` is an exception: it `extends ThemeExtension<StreamTheme>`
-   and uses `@ThemeExtensions(constructor: 'raw', buildContextExtension: false)`.
-   New component themes should follow the `@themeGen` pattern, not the root
-   pattern. There is no separate `StreamThemeData` — the root class is `StreamTheme`
-   itself.
-2. Create a `<Component>Theme` `InheritedTheme` widget that exposes the data via a
-   `static <Component>ThemeData of(BuildContext context)` lookup. Merge with the
-   root theme value in that lookup — the pattern is
-   `StreamTheme.of(context).<component>Theme.merge(localTheme?.data)`; see any file
-   under `lib/src/theme/components/` for a reference.
-3. Add the new theme data as a field on `StreamTheme`.
-4. **Place defaults in the widget's implementation, not in the theme data class.**
-   This mirrors Flutter's own convention (`AppBar`, `TabBar`): the theme data holds
-   overrides with nullable fields; the widget's `build` resolves the effective
-   value with a null-coalescing chain, falling back to hardcoded defaults or
-   upstream Material/Cupertino theme values at the leaf.
+  // All fields are nullable — defaults do not live here.
+  final Color? backgroundColor;
+  final double? borderRadius;
+}
 
-   ```dart
-   Widget build(BuildContext context) {
-     final theme = StreamAvatarTheme.of(context);
-     final backgroundColor = widget.backgroundColor
-         ?? theme.backgroundColor
-         ?? Theme.of(context).colorScheme.surface;
-     // ...
-   }
-   ```
-5. Run `melos run generate:flutter` to produce the `.g.theme.dart` part.
-6. Read the theme from context via `StreamTheme.of(context).<component>Theme`
-   in the component's `build` (or via `<Component>Theme.of(context)` when the
-   widget lives inside its own theme scope).
+class StreamWidgetTheme extends InheritedTheme {
+  const StreamWidgetTheme({super.key, required this.data, required super.child});
+  final StreamWidgetThemeData data;
 
-Look at `stream_avatar_theme.dart` and any file in
-`lib/src/theme/components/` for the reference shape.
+  static StreamWidgetThemeData of(BuildContext context) {
+    final local = context.dependOnInheritedWidgetOfExactType<StreamWidgetTheme>();
+    return StreamTheme.of(context).widgetTheme.merge(local?.data);
+  }
+  // ... wrap + updateShouldNotify.
+}
+```
+
+Then add `widgetTheme` as a field on `StreamTheme`, run `melos run generate:flutter`,
+and consume it in the widget:
+
+```dart
+Widget build(BuildContext context) {
+  final theme = StreamWidgetTheme.of(context);
+  final backgroundColor = widget.backgroundColor
+      ?? theme.backgroundColor
+      ?? Theme.of(context).colorScheme.surface;
+  // ...
+}
+```
+
+**Place defaults in the widget's `build`, not in the theme data class.** This
+mirrors Flutter's `AppBar`/`TabBar` pattern: theme data holds overrides with
+nullable fields; the widget resolves the effective value via null-coalescing.
+
+Note: the root `StreamTheme` is an exception — it extends
+`ThemeExtension<StreamTheme>` and uses
+`@ThemeExtensions(constructor: 'raw', buildContextExtension: false)` so it plugs
+into Material's `ThemeData.extensions`. New component themes follow the
+`@themeGen` pattern above, not the root pattern.
 
 ### Component factory
 
