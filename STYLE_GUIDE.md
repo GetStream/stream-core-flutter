@@ -651,13 +651,22 @@ trade-offs before reaching for one:
 
 Rules:
 
-- Don't declare an extension method when a regular method or a helper function will
-  do.
-- Extensions on domain-typed collections (`Iterable<Message>`, `List<Attachment>`)
-  are fine — they only apply when the caller is already working with those types.
-- Avoid public extensions on unconstrained common types (`Object`, `Object?`,
-  `List<T>`, `Map<K, V>`, `Future<T>`, `String`, `int`) — those show up on every
-  value in every file that imports the package.
+- Don't declare an extension method when a regular method or a helper function
+  will do.
+- Extensions on domain types are fine — they only apply when the caller is already
+  working with those types. Examples in the repo: `AttachmentFile`,
+  `DioException`, `RetryStrategy`, `SystemEnvironment`.
+- Extensions on `BuildContext` for scoped lookups are an accepted Flutter idiom.
+  Examples: `StreamThemeExtension on BuildContext` exposing `context.streamTheme`;
+  `StreamComponentFactoryExtension on BuildContext` exposing the factory.
+- Units-of-measure extensions on primitives are acceptable when the extension is
+  small, unambiguous, and lives next to the value type. Example:
+  `DistanceExtension on num` exposing `5.kilometers` next to `Distance`.
+- Avoid public extensions on common types (`Object`, `Object?`, `List<T>`,
+  `Map<K, V>`, `Future<T>`, `String`, `int`, `num`) outside the two patterns above
+  — they show up on every value of that type in every file that imports the
+  package, causing IDE-completion noise and potential collisions with other
+  packages.
 
 ### Avoid `FutureOr<T>` in public APIs
 
