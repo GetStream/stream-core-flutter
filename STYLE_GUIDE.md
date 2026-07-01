@@ -862,13 +862,19 @@ client, WebSocket, image loading). Do not mock every collaborator.
 ### Golden tests
 
 Widget tests that verify pixel-level rendering use the `alchemist` package. Golden
-files live under `test/components/<name>/goldens/`, split by target:
+tests live in `_golden_test.dart` files next to the unit tests, and the generated
+images go under `test/components/<category>/goldens/`. The alchemist config in
+`test/flutter_test_config.dart` runs:
 
-- `goldens/ci/` — used by CI
-- `goldens/macos/` — used for local macOS development
+- `ciGoldensConfig` — enabled only when `GITHUB_ACTIONS` is set. Produces
+  `goldens/ci/*.png`. **These are the goldens that get committed.**
+- `platformGoldensConfig` — enabled only locally. Produces `goldens/<platform>/`
+  (e.g. `goldens/macos/`). These are auto-generated during local runs and
+  gitignored (`.gitignore` allowlists only `goldens/ci/`).
 
 Golden tests are tagged with `golden` in `dart_test.yaml`. Every visible component
-must ship with a golden test.
+must ship with a golden test that exercises the primary variants (sizes, states,
+theme brightness).
 
 To regenerate goldens:
 
@@ -878,7 +884,8 @@ melos run update:goldens
 
 Regenerate goldens deliberately, in a separate commit from behavior changes, so
 reviewers can see what visually changed. Do not check in a golden mismatch just
-because a test "works locally".
+because a test "works locally" — only the CI-generated PNGs under `goldens/ci/`
+are committed and diffed.
 
 
 ## Naming
@@ -1121,7 +1128,9 @@ Each component ships with:
   [Theme system](#theme-system). Note: the suffix is either `<Name>ThemeData` or
   `<Name>Style` — both patterns exist in the repo (e.g. `StreamAvatarThemeData`,
   `StreamMessageBubbleStyle`); pick whichever fits the component's semantics.
-- **Golden test** — under `test/components/<name>/`. See
+- **Widget or unit tests** — under `test/components/<category>/<name>_test.dart`.
+  Golden variants use the `_golden_test.dart` suffix (e.g.
+  `stream_button_golden_test.dart`, `stream_button_test.dart`). See
   [Golden tests](#golden-tests).
 - **Widgetbook use-case** — under
   `apps/design_system_gallery/lib/components/<category>/`.
