@@ -838,48 +838,99 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Use emitters for reactive state
+### Reactive state primitives
 
-`stream_core` builds the transport layer for real-time products. The primary
-reactive primitives are the Kotlin-flavoured emitter types in
-`stream_core/lib/src/utils/` (both implement `Stream<T>` under the hood, so
-`StreamBuilder` still works on them):
+There are three layers of reactive state in this repo, each with its own primitive:
+
+**1. Product-SDK state → `StateNotifier` (from `package:state_notifier`) — the
+going-forward pattern for new code.**
+
+Product SDKs built on top of `stream_core` (chat, feeds, video, …) manage state
+via `StateNotifier<State>` with an immutable `@freezed` `State` class. The
+reference implementation is stream-feeds-flutter — see its
+[`AGENTS.md`](https://github.com/GetStream/stream-feeds-flutter/blob/main/AGENTS.md)
+for the full pattern (Client → Repository → StateNotifier → public State object).
+Key rules for new state code:
+
+- `*State` classes use `@freezed` with const constructors and Freezed 3.0
+  mixed-mode syntax (`@override` on fields).
+- `*StateNotifier` implementations extend `StateNotifier<*State>` and are an
+  **internal** implementation detail — never exposed on the public API.
+- The public surface is the high-level state object (e.g. `Feed`, `ActivityList`)
+  that wraps the notifier.
+
+**2. Transport-layer state → existing emitters in `stream_core/lib/src/utils/`.**
+
+For state that lives inside `stream_core`'s transport layer (WS events,
+connection state, network state, lifecycle state) the existing
+`SharedEmitter`/`StateEmitter` primitives remain the right choice — they predate
+`StateNotifier` here and are wired into the WS reconnection machinery:
 
 - **`SharedEmitter<T>` / `MutableSharedEmitter<T>`** — Kotlin `SharedFlow`
-  equivalent. Multi-subscriber event broadcast. Use for events that don't have a
-  "current value" (WS events, one-shot notifications, connection lifecycle).
-  Supports replay via the `replay:` constructor argument.
+  equivalent. Multi-subscriber broadcast for events without a "current value".
+  Supports `replay:` for late subscribers.
 - **`StateEmitter<T>` / `MutableStateEmitter<T>`** — Kotlin `StateFlow`
-  equivalent. Always has a `.value`, replays it on subscribe, conflates duplicate
-  emissions. Use for values with a definite "current" state
-  (connection state, network state, lifecycle state, any controller-adjacent
-  value that a UI would render).
+  equivalent. Has `.value`, replays it on subscribe, conflates duplicates.
 
-Choose based on whether the data has a meaningful "current value":
+Both `implements Stream<T>`, so `StreamBuilder` (with `initialData:
+stateEmitter.value` for `StateEmitter`) is the standard widget-side consumer.
+Don't build new product-facing state on emitters — use `StateNotifier` for that.
 
-- **`StateEmitter`** — connection state, feature-flag values, cached counts,
-  anything a widget would render as "the latest". Prefer this over
-  `ValueNotifier` for cross-boundary state (state that flows out of `stream_core`
-  into UI), because it composes with the rest of the emitter/stream ecosystem.
-- **`SharedEmitter`** — WS events, error notifications, one-shot signals.
-- **`ValueNotifier` / `ChangeNotifier`** — widget-owned reactive state that
-  never crosses out of the widget tree: animation-driven state,
-  expanded/collapsed toggles, `TextEditingController`-adjacent state.
+**3. Widget-owned state → `ValueNotifier` / `ChangeNotifier`.**
 
-Consuming emitters in widgets:
+For reactive state that never crosses out of the widget tree — animation-driven
+values, expanded/collapsed toggles, `TextEditingController`-adjacent state.
 
-- `SharedEmitter` and `StateEmitter` both `implements Stream<T>`, so
-  `StreamBuilder` (with `initialData: stateEmitter.value` when applicable) is
-  the standard consumer.
+**General rules:**
+
+- Always cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` /
+  `MutableStateEmitter` have `close()`; `StateNotifier` has `dispose()` — call
+  the right one when the owning object is torn down.
 - For pipelines that combine or transform streams, prefer RxDart operators over
   hand-rolled `.listen()`+`Controller` plumbing.
-- Always cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` and
-  `MutableStateEmitter` have `close()` — call it when the owning object is
-  disposed.
 
 This intentionally diverges from Flutter's style guide, which recommends
 `Listenable` over `Stream` inside the framework — that reasoning doesn't apply
 to a real-time transport layer where events are the primary data model.
+
+### Error handling with `Result<T>`
+
+Public methods on repositories, clients, and CDN wrappers return
+`Future<Result<T>>` (from `stream_core/lib/src/utils/result.dart`) rather than
+throwing. Existing examples in the repo: `StreamAttachmentUploader.upload`,
+`CdnClient.uploadImage`/`uploadFile`/`deleteImage`/`deleteFile`.
+
+Rules:
+
+- SDK public methods that can fail return `Result<T>`. Never throw across the
+  SDK boundary.
+- Internal helpers can still throw when a failure is truly exceptional (an
+  `assert` violation, a programming error). Convert to `Result.failure` at the
+  boundary.
+- `Result` is a `sealed class` with `Success<T>` and `Failure` variants. Prefer
+  `switch` (exhaustive) over `isSuccess`/`isFailure` when acting on the outcome
+  in code you control.
+
+### Reference architecture: stream-feeds-flutter
+
+For new product-SDK code built on top of `stream_core` — a client that fetches
+data, hosts state, and exposes it to UI — mirror the layered architecture
+documented in
+[stream-feeds-flutter's AGENTS.md](https://github.com/GetStream/stream-feeds-flutter/blob/main/AGENTS.md):
+
+```text
+Client                    # public API entry point (thin factory)
+  └── Repository          # data access, returns Future<Result<T>>
+      └── StateNotifier   # internal; wraps state + reacts to WS events
+          └── State       # public @freezed value; what the UI renders
+```
+
+- Client and State/high-level state objects (`Feed`, `ActivityList`, …) are
+  public. Repository and StateNotifier are internal (`lib/src/`).
+- All Repository methods return `Result<T>` — no thrown exceptions.
+- Models under `src/models/` are `@freezed` (mixed-mode 3.0 with `@override`),
+  named `*Data`. Queries: `*Query`. Requests: `*Request`.
+- Tests go against the public API only — see [Testing](#testing) below.
 
 
 ## Testing
@@ -887,6 +938,20 @@ to a real-time transport layer where events are the primary data model.
 This section covers repo-level testing conventions. For guidance on **how to write
 good tests** — naming, factoring, one behavior per test — see
 [`TESTING.md`](TESTING.md).
+
+**For product-SDK tests built on top of `stream_core`** (chat, feeds, video), test
+exclusively through the public API. The reference is
+[stream-feeds-flutter's AGENTS.md](https://github.com/GetStream/stream-feeds-flutter/blob/main/AGENTS.md):
+
+- **Never test internal implementation directly** — no `.toModel()` mapper
+  invocations, no `*Repository` instantiations, no `*StateNotifier` instantiations
+  in tests. If a consuming app cannot call it, the test cannot either.
+- **Test via typed test helpers** (`feedsClientTest`, `feedTest`, and analogues
+  for other product SDKs). These wire up a real client against a mocked HTTP API
+  and expose `mockApi(...)` / `verifyApi(...)` / `emitEvent(...)`.
+- **Mock exact requests, not `any()`** — passing the concrete expected request
+  object simultaneously stubs the response and validates what the SDK sent. Using
+  `any()` matchers hides bugs where the SDK sends the wrong payload.
 
 ### Make each test entirely self-contained
 
