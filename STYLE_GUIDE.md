@@ -818,27 +818,28 @@ Widget build(BuildContext context) {
 
 ### Reactive state
 
-Three primitives, each for a specific job:
+The choice of primitive depends on the layer:
 
-- **`StateNotifier<S>`** (from `package:state_notifier`) — the going-forward
-  primitive for new product-SDK state. `S` is an immutable `@freezed` state
-  class. The notifier is internal; the public API is a high-level object that
-  wraps it. See [Product-SDK architecture](#product-sdk-architecture) for the
-  shape.
-- **`SharedEmitter<T>` / `StateEmitter<T>`** — internal transport-layer state in
-  `stream_core/lib/src/utils/` (WS events, connection lifecycle). Kotlin
+- **Pure-Dart product SDKs** — `StateNotifier<S>` from `package:state_notifier`.
+  `S` is an immutable `@freezed` state class. The notifier is internal; the
+  public API is a high-level object that wraps it. See
+  [Product-SDK architecture](#product-sdk-architecture) for the shape.
+  `StateNotifier` is functionally a pure-Dart equivalent of `ValueNotifier` —
+  used here because `Listenable` lives in `package:flutter/foundation.dart` and
+  isn't available in pure-Dart LLCs.
+- **Flutter widget code** — `ValueNotifier` / `ChangeNotifier` for widget-owned
+  state (animations, toggles, controller-adjacent state) and for controllers
+  exposed to the widget tree. Matches Flutter's own conventions.
+- **Transport internals** — `SharedEmitter<T>` / `StateEmitter<T>` in
+  `stream_core/lib/src/utils/` for WS events, connection lifecycle, and other
+  stream-based state that predates `StateNotifier` here. Kotlin
   `SharedFlow`/`StateFlow` equivalents; both implement `Stream<T>`. Don't build
   new product-facing state on emitters.
-- **`ValueNotifier` / `ChangeNotifier`** — widget-owned state that never leaves
-  the widget tree: animations, toggles, controller-adjacent state.
 
 Cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` /
-`MutableStateEmitter` have `close()`; `StateNotifier` has `dispose()`. Prefer
-RxDart operators over hand-rolled `.listen()` + `Controller` plumbing.
-
-This intentionally diverges from Flutter's style guide, which recommends
-`Listenable` over `Stream` — that reasoning doesn't apply to a real-time
-transport layer where events are the primary data model.
+`MutableStateEmitter` have `close()`; `StateNotifier`, `ValueNotifier`, and
+`ChangeNotifier` all have `dispose()`. Prefer RxDart operators over hand-rolled
+`.listen()` + `Controller` plumbing.
 
 ### Error handling with `Result<T>`
 
@@ -871,7 +872,10 @@ violation, programming error) — convert to `Result.failure` at the boundary.
 
 ### Product-SDK architecture
 
-New product-SDK code built on top of `stream_core` uses this layering:
+New **pure-Dart** product SDKs built on top of `stream_core` (Chat LLC, Feeds
+LLC, …) use this layering. Flutter UI packages built on top of an LLC follow
+Flutter conventions — see [Reactive state](#reactive-state) for the primitive
+per layer.
 
 ```text
 Client                    # public entry point (thin factory)
