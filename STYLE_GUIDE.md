@@ -643,24 +643,20 @@ groups (`directives_ordering`).
 
 ### Guidelines for `extension`s
 
-New utility extensions on common types (`on T extends Object`, `on Iterable`,
-`on List`, `on Comparable`, `on num`) belong in `stream_core/lib/src/utils/`.
-That layer is exported from `stream_core.dart` and used in 100+ call sites:
-`Standard` (Kotlin scope funcs `let`/`also`/`apply`/`takeIf`),
-`ComparableExtension`, `IterableExtensions`, `ListExtensions`,
-`SortedListExtensions`. Add to it rather than scattering new extensions across
-feature code.
+New utility extensions on common types belong in `stream_core/lib/src/utils/`
+alongside the existing helpers. Add to that layer rather than scattering
+new extensions across feature code.
 
 Extensions outside `utils/` are fine on:
 
-- Domain types — `AttachmentFile`, `DioException`, `RetryStrategy`, etc.
-- `BuildContext`, for scoped lookups (`context.streamTheme`).
-- Primitives, for units-of-measure — `5.kilometers` via `DistanceExtension on num`.
-  Keep them small and colocated with the value type.
+- Domain types the caller is already working with.
+- `BuildContext`, for scoped lookups.
+- Primitives, for units-of-measure — small, unambiguous, and colocated with
+  the value type.
 
-Avoid public extensions on `Object`, `Object?`, `Future<T>`, `String`,
-`Map<K, V>` outside these patterns — they land on every value of that type in
-every file that imports the package.
+Avoid public extensions on unconstrained common types (`Object`, `Object?`,
+`Future<T>`, `String`, `Map<K, V>`) outside these patterns — they land on
+every value of that type in every file that imports the package.
 
 Extension methods are resolved statically and can't be overridden; if a caller
 might want to substitute the behaviour, expose an instance method or callback
