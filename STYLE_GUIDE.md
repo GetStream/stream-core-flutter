@@ -190,6 +190,12 @@ pulls higher-level concepts into places they don't belong.
 (cross-product primitives) and `chat.dart` (chat-domain widgets). See
 [Public barrel contract](#public-barrel-contract).
 
+### Prefer immutable data
+
+Themes, `@freezed` models, and other value classes are immutable — callers get
+a new instance via `copyWith`, not mutation. Widgets that take a `child` are
+agnostic about its runtime type; don't `is`-check the child.
+
 ### Avoid secret (or global) state
 
 A function should operate only on its arguments and, if it is an instance method,
@@ -200,12 +206,30 @@ Theme values are threaded through `StreamTheme.of(context)` — an
 `ThemeExtension` lookup that resolves to a concrete `StreamTheme`. We do
 not have singletons for theme, colors, or design tokens.
 
+### Prefer general APIs, but use dedicated APIs where there is a reason
+
+Having dedicated APIs for performance reasons is fine. If one specific operation
+is expensive using the general API but could be implemented more efficiently
+using a dedicated API, that is where a dedicated API belongs.
+
 ### Avoid APIs that encourage bad practices
 
 Don't provide APIs that walk entire trees, or that encourage O(N²) algorithms, or
 that encourage sequential long-lived operations where the operations could be run
 concurrently. Similarly, if an operation is expensive, that expense should be
 represented in the API (e.g. by returning a `Future` or a `Stream`).
+
+### Avoid heuristics and magic
+
+Predictable APIs that give the developer control are generally preferred over
+APIs that mostly do the right thing but don't give the developer any way to
+adjust the results. Predictability is reassuring.
+
+### Solve real problems by literally solving a real problem
+
+Where possible, partner with a real customer who wants the feature and is
+willing to help you test it. Only by actually using a feature in the real world
+can we be confident it is ready.
 
 ### Start designing APIs from the closest point to the developer
 
