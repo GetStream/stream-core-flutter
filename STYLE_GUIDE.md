@@ -649,12 +649,31 @@ trade-offs before reaching for one:
 - Extension methods are resolved statically and cannot be overridden.
 - Misusing extensions pollutes IDE suggestions and causes naming collisions.
 
-Rules:
+The repo intentionally maintains a **standard-library-style extension layer** in
+`packages/stream_core/lib/src/utils/`, exported from `stream_core.dart` and used
+across the codebase (100+ call sites). It includes:
 
+- `Standard<T extends Object> on T` — Kotlin-style scope functions
+  (`let`, `also`, `apply`, `takeIf`, `takeUnless`).
+- `ComparableExtension<T extends Comparable<T>> on T` — `<`, `>`, `<=`, `>=`
+  operators.
+- `IterableExtensions on Iterable<T>` — `sumOf`.
+- `ListExtensions` / `SortedListExtensions` on `List<T>` — `upsert`, `partition`,
+  `batchReplace`, `sortedInsert`, `sortedUpsert`, `merge`, `updateNested`,
+  `removeNested`, `updateWhere`, `insertUnique`.
+
+Use these freely — they are part of the SDK's DSL.
+
+Rules for new extensions:
+
+- **Standard utility extensions belong in `stream_core/lib/src/utils/`.** If you
+  need a new `on num` / `on List<T>` / `on Iterable<T>` / `on T extends Object`
+  helper, add it to the appropriate file there rather than defining a new
+  extension in feature code.
 - Don't declare an extension method when a regular method or a helper function
   will do.
-- Extensions on domain types are fine — they only apply when the caller is already
-  working with those types. Examples in the repo: `AttachmentFile`,
+- Extensions on domain types are fine — they only apply when the caller is
+  already working with those types. Examples in the repo: `AttachmentFile`,
   `DioException`, `RetryStrategy`, `SystemEnvironment`.
 - Extensions on `BuildContext` for scoped lookups are an accepted Flutter idiom.
   Examples: `StreamThemeExtension on BuildContext` exposing `context.streamTheme`;
@@ -662,11 +681,11 @@ Rules:
 - Units-of-measure extensions on primitives are acceptable when the extension is
   small, unambiguous, and lives next to the value type. Example:
   `DistanceExtension on num` exposing `5.kilometers` next to `Distance`.
-- Avoid public extensions on common types (`Object`, `Object?`, `List<T>`,
-  `Map<K, V>`, `Future<T>`, `String`, `int`, `num`) outside the two patterns above
-  — they show up on every value of that type in every file that imports the
-  package, causing IDE-completion noise and potential collisions with other
-  packages.
+
+Outside these patterns, avoid public extensions on `Object`, `Object?`,
+`Future<T>`, `String`, `Map<K, V>` — those show up on every value of that type in
+every file that imports the package, causing IDE-completion noise and potential
+collisions with other packages.
 
 ### Avoid `FutureOr<T>` in public APIs
 
@@ -819,27 +838,48 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Use streams for real-time data
+### Use emitters for reactive state
 
-`stream_core` builds the transport layer for real-time products. `Stream` (via
-RxDart) is the primary reactive primitive for data that arrives asynchronously —
-WebSocket events, connection-state changes, backoff notifications. This
-intentionally diverges from Flutter's style guide, which recommends `Listenable`
-over `Stream` inside the framework.
+`stream_core` builds the transport layer for real-time products. The primary
+reactive primitives are the Kotlin-flavoured emitter types in
+`stream_core/lib/src/utils/` (both implement `Stream<T>` under the hood, so
+`StreamBuilder` still works on them):
 
-Rules of thumb for choosing between `Stream` and `Listenable`:
+- **`SharedEmitter<T>` / `MutableSharedEmitter<T>`** — Kotlin `SharedFlow`
+  equivalent. Multi-subscriber event broadcast. Use for events that don't have a
+  "current value" (WS events, one-shot notifications, connection lifecycle).
+  Supports replay via the `replay:` constructor argument.
+- **`StateEmitter<T>` / `MutableStateEmitter<T>`** — Kotlin `StateFlow`
+  equivalent. Always has a `.value`, replays it on subscribe, conflates duplicate
+  emissions. Use for values with a definite "current" state
+  (connection state, network state, lifecycle state, any controller-adjacent
+  value that a UI would render).
 
-- **`Stream`** — for data that originates outside the widget tree: WS events,
-  network responses, RxDart pipelines.
-- **`ValueNotifier` / `ChangeNotifier`** — for widget-owned reactive state:
-  animation-driven state, expanded/collapsed toggles, controller-adjacent state.
+Choose based on whether the data has a meaningful "current value":
 
-Consuming streams in widgets:
+- **`StateEmitter`** — connection state, feature-flag values, cached counts,
+  anything a widget would render as "the latest". Prefer this over
+  `ValueNotifier` for cross-boundary state (state that flows out of `stream_core`
+  into UI), because it composes with the rest of the emitter/stream ecosystem.
+- **`SharedEmitter`** — WS events, error notifications, one-shot signals.
+- **`ValueNotifier` / `ChangeNotifier`** — widget-owned reactive state that
+  never crosses out of the widget tree: animation-driven state,
+  expanded/collapsed toggles, `TextEditingController`-adjacent state.
 
-- Use `StreamBuilder` (or `initialData` on it) when a stream drives a widget subtree.
+Consuming emitters in widgets:
+
+- `SharedEmitter` and `StateEmitter` both `implements Stream<T>`, so
+  `StreamBuilder` (with `initialData: stateEmitter.value` when applicable) is
+  the standard consumer.
 - For pipelines that combine or transform streams, prefer RxDart operators over
   hand-rolled `.listen()`+`Controller` plumbing.
-- Always cancel `StreamSubscription`s in `dispose()`.
+- Always cancel `StreamSubscription`s in `dispose()`. `MutableSharedEmitter` and
+  `MutableStateEmitter` have `close()` — call it when the owning object is
+  disposed.
+
+This intentionally diverges from Flutter's style guide, which recommends
+`Listenable` over `Stream` inside the framework — that reasoning doesn't apply
+to a real-time transport layer where events are the primary data model.
 
 
 ## Testing
