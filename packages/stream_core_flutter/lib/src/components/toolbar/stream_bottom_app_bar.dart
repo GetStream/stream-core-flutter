@@ -239,10 +239,15 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
 
     Widget? middle;
     if (titleWidget != null || subtitleWidget != null) {
-      middle = Column(
-        mainAxisSize: .min,
-        spacing: spacing.xxs,
-        children: [?titleWidget, ?subtitleWidget],
+      // Title and subtitle read as a single announcement. The bottom bar
+      // is a secondary toolbar — it doesn't claim the route's accessible
+      // name or expose itself as a heading.
+      middle = MergeSemantics(
+        child: Column(
+          mainAxisSize: .min,
+          spacing: spacing.xxs,
+          children: [?titleWidget, ?subtitleWidget],
+        ),
       );
     }
 
@@ -268,14 +273,24 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
     // The bar's top edge is intentionally a hairline border in the design
     // system's `borderSubtle` colour — part of the bar's identity, not a
     // configurable divider.
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: effectiveBackgroundColor,
-        border: Border(
-          top: BorderSide(color: context.streamColorScheme.borderSubtle),
+    //
+    // The outer [Semantics] keeps the bar's children grouped for screen
+    // readers, so leading, title, subtitle, and trailing aren't intermixed
+    // with surrounding page content. The inner [Semantics] forces each
+    // slot's semantics onto its own node — without it, a raw
+    // [GestureDetector] in a slot would attach its action to the outer
+    // container and collapse the bar into a single tappable focus stop.
+    return Semantics(
+      container: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: effectiveBackgroundColor,
+          border: Border(
+            top: BorderSide(color: context.streamColorScheme.borderSubtle),
+          ),
         ),
+        child: Semantics(explicitChildNodes: true, child: bar),
       ),
-      child: bar,
     );
   }
 }
