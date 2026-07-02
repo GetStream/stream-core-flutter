@@ -400,43 +400,40 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
           false => WidgetStatePropertyAll(.symmetric(horizontal: spacing.md)),
         };
 
-    return ElevatedButton(
-      autofocus: props.autofocus,
-      onPressed: props.onPressed,
-      statesController: _statesController,
-      style: ButtonStyle(
-        tapTargetSize: effectiveTapTargetSize,
-        visualDensity: .standard,
-        textStyle: effectiveTextStyle,
-        iconSize: effectiveIconSize,
-        elevation: effectiveElevation,
-        backgroundColor: effectiveBackgroundColor,
-        foregroundColor: effectiveForegroundColor,
-        overlayColor: effectiveOverlayColor,
-        fixedSize: effectiveFixedSize,
-        minimumSize: effectiveMinimumSize,
-        maximumSize: effectiveMaximumSize,
-        padding: effectivePadding,
-        alignment: effectiveAlignment,
-        shape: effectiveShape,
-        side: switch (effectiveBorderColor) {
-          final color? => .resolveWith(
-            (states) {
-              final resolvedColor = color.resolve(states);
-              if (resolvedColor == null) return null;
-              return BorderSide(color: resolvedColor);
-            },
-          ),
-          _ => null,
-        },
-      ),
-      child: Semantics(
-        selected: props.isSelected,
-        child: switch (isIconButton) {
-          true => switch (props.tooltip) {
-            final tooltip? => Tooltip(message: tooltip, child: props.iconLeft),
-            null => props.iconLeft,
+    Widget button = Semantics(
+      selected: props.isSelected,
+      child: ElevatedButton(
+        autofocus: props.autofocus,
+        onPressed: props.onPressed,
+        statesController: _statesController,
+        style: ButtonStyle(
+          tapTargetSize: effectiveTapTargetSize,
+          visualDensity: .standard,
+          textStyle: effectiveTextStyle,
+          iconSize: effectiveIconSize,
+          elevation: effectiveElevation,
+          backgroundColor: effectiveBackgroundColor,
+          foregroundColor: effectiveForegroundColor,
+          overlayColor: effectiveOverlayColor,
+          fixedSize: effectiveFixedSize,
+          minimumSize: effectiveMinimumSize,
+          maximumSize: effectiveMaximumSize,
+          padding: effectivePadding,
+          alignment: effectiveAlignment,
+          shape: effectiveShape,
+          side: switch (effectiveBorderColor) {
+            final color? => .resolveWith(
+              (states) {
+                final resolvedColor = color.resolve(states);
+                if (resolvedColor == null) return null;
+                return BorderSide(color: resolvedColor);
+              },
+            ),
+            _ => null,
           },
+        ),
+        child: switch (isIconButton) {
+          true => props.iconLeft,
           false => Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -450,6 +447,12 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
         },
       ),
     );
+
+    if (props.tooltip case final tooltip?) {
+      button = Tooltip(message: tooltip, child: button);
+    }
+
+    return MergeSemantics(child: button);
   }
 }
 
