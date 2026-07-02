@@ -372,16 +372,6 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
     return (maxLength != null && maxLength > 0) ? maxLength : null;
   }
 
-  void _handleDidGainAccessibilityFocus() {
-    if (_effectiveFocusNode.hasFocus) return;
-    if (!_effectiveFocusNode.canRequestFocus) return;
-    _effectiveFocusNode.requestFocus();
-  }
-
-  void _handleDidLoseAccessibilityFocus() {
-    _effectiveFocusNode.unfocus();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -478,49 +468,64 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
     final helperWidget = switch (props.helperText) {
       final helperText? => Semantics(
         sortKey: _helperSortKey,
+        liveRegion: hasError,
         child: StreamHelperText(text: helperText, state: props.helperState),
       ),
       _ => null,
     };
 
+    VoidCallback? handleDidGainAccessibilityFocus;
+    VoidCallback? handleDidLoseAccessibilityFocus;
+
+    final platform = Theme.of(context).platform;
+    if (platform == .macOS || platform == .linux || platform == .windows) {
+      // Automatically activate the TextField when it receives accessibility focus.
+      handleDidGainAccessibilityFocus = () {
+        if (_effectiveFocusNode.hasFocus) return;
+        if (!_effectiveFocusNode.canRequestFocus) return;
+        _effectiveFocusNode.requestFocus();
+      };
+
+      // Automatically unfocus the TextField when it loses accessibility focus.
+      handleDidLoseAccessibilityFocus = () {
+        _effectiveFocusNode.unfocus();
+      };
+    }
+
     return ListenableBuilder(
       listenable: .merge([_effectiveFocusNode, _effectiveController]),
-      builder: (context, child) => Semantics(
-        container: true,
-        // Keep leading / trailing / helper as their own semantic siblings
-        // instead of merging into the field-level node.
-        explicitChildNodes: true,
-        textField: true,
-        focusable: true,
-        readOnly: props.readOnly,
-        enabled: props.enabled,
-        // When a persistent label is provided it's always the semantic label;
-        // otherwise fall back to the hint while the field is empty so SR users hear *some* identifier.
-        label: props.labelText ?? (_effectiveController.text.isEmpty ? props.hintText : null),
-        value: _effectiveController.text,
-        // When the field has an error, surface its message as the semantic
-        // hint so SR users hear "<label>, edit box, <value>, <error>" rather
-        // than missing the validation feedback entirely.
-        hint: props.helperState == StreamHelperState.error ? props.helperText : null,
-        maxValueLength: _semanticsMaxValueLength,
-        currentValueLength: _currentLength,
-        onTap: switch (props.readOnly) {
-          true => null,
-          _ => () {
-            if (!_effectiveController.selection.isValid) {
-              _effectiveController.selection = TextSelection.collapsed(
-                offset: _effectiveController.text.length,
-              );
-            }
-            _effectiveFocusNode.requestFocus();
+      builder: (context, child) {
+        final hasLabel = props.labelText != null;
+        return Semantics(
+          container: true,
+          explicitChildNodes: true,
+          textField: true,
+          focusable: true,
+          readOnly: props.readOnly,
+          enabled: props.enabled,
+          label: hasLabel ? props.labelText : (_effectiveController.text.isEmpty ? props.hintText : null),
+          value: _effectiveController.text,
+          hint: hasLabel ? props.hintText : null,
+          maxValueLength: _semanticsMaxValueLength,
+          currentValueLength: _currentLength,
+          onTap: switch (props.readOnly) {
+            true => null,
+            _ => () {
+              if (!_effectiveController.selection.isValid) {
+                _effectiveController.selection = TextSelection.collapsed(
+                  offset: _effectiveController.text.length,
+                );
+              }
+              _effectiveFocusNode.requestFocus();
+            },
           },
-        },
-        focused: _effectiveFocusNode.hasFocus,
-        onFocus: props.enabled ? _effectiveFocusNode.requestFocus : null,
-        onDidGainAccessibilityFocus: _handleDidGainAccessibilityFocus,
-        onDidLoseAccessibilityFocus: _handleDidLoseAccessibilityFocus,
-        child: child,
-      ),
+          focused: _effectiveFocusNode.hasFocus,
+          onFocus: props.enabled ? _effectiveFocusNode.requestFocus : null,
+          onDidGainAccessibilityFocus: handleDidGainAccessibilityFocus,
+          onDidLoseAccessibilityFocus: handleDidLoseAccessibilityFocus,
+          child: child,
+        );
+      },
       child: StreamColumn(
         spacing: spacing.xs,
         mainAxisAlignment: .center,

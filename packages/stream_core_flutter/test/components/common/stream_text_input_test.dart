@@ -231,9 +231,10 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('helperText with error state surfaces as the semantic hint', (tester) async {
-      // The error lands on the field's semantic `hint` and the helper
-      // container becomes a live region so SR auto-fires on appearance.
+    testWidgets('helperText with error state announces via a live region, not on the field hint', (tester) async {
+      // The error sits in its own live-region semantics container so SR
+      // auto-fires on appearance, and is not duplicated onto the field's
+      // own hint.
       final handle = tester.ensureSemantics();
 
       await tester.pumpWidget(
@@ -248,7 +249,7 @@ void main() {
 
       expect(
         tester.getSemantics(find.byType(StreamTextInput)).hint,
-        'Invalid email address',
+        isNot(contains('Invalid email address')),
       );
       expect(
         tester.getSemantics(find.byType(StreamHelperText)).getSemanticsData().flagsCollection.isLiveRegion,
