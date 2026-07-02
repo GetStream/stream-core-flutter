@@ -165,29 +165,33 @@ class DefaultStreamMessageComposerFileAttachment extends StatelessWidget {
       );
     }
 
-    return StreamMessageComposerAttachment(
-      onRemovePressed: props.onRemovePressed,
-      child: ConstrainedBox(
-        constraints: _kDefaultConstraints,
-        child: Padding(
-          padding: effectivePadding,
-          child: Row(
-            mainAxisSize: .min,
-            spacing: effectiveSpacing,
-            children: [
-              ?props.fileTypeIcon,
-              Expanded(
-                child: Column(
-                  spacing: spacing.xxs,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [effectiveTitle, ?effectiveSubtitle],
-                ),
+    final content = ConstrainedBox(
+      constraints: _kDefaultConstraints,
+      child: Padding(
+        padding: effectivePadding,
+        child: Row(
+          mainAxisSize: .min,
+          spacing: effectiveSpacing,
+          children: [
+            ?props.fileTypeIcon,
+            Expanded(
+              child: Column(
+                spacing: spacing.xxs,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [effectiveTitle, ?effectiveSubtitle],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+
+    return StreamMessageComposerAttachment(
+      onRemovePressed: props.onRemovePressed,
+      // TODO(localize): move "File" prefix to localizations.
+      semanticLabel: 'File',
+      child: content,
     );
   }
 }
