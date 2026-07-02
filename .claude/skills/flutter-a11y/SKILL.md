@@ -41,7 +41,7 @@ When adding a new component to the design system or modifying an existing one, t
 - **For icon-only widgets, expose a label parameter.** Either a `tooltip:` (matches `IconButton`) or a `semanticLabel:` (matches `Icon`). Either is acceptable; pick one and be consistent across the library.
 - **Place internal `Semantics` / `Tooltip` widgets inside the component, not as the wrapper around it.** This matters especially for `ButtonStyleButton` subclasses (Elevated/Text/Outlined/Filled) — their outer `Semantics(container: true)` blocks ancestor merging. The component itself should wrap the child below that boundary.
 - **Internal MergeSemantics for composite chrome.** If your component renders bordered chrome around an inner editable widget (a text input with leading/trailing icons; a card with an avatar), wrap the chassis in `MergeSemantics` so consumers see one focus region matching the visible bounds — not the inner editable area alone.
-- **Preserve a11y across customization.** If your component supports a factory / builder / override pattern (e.g., `StreamComponentFactory`-style), the default implementation must be accessible. Document which `Semantics` properties a custom implementation must preserve to keep parity. A consumer overriding your button should not silently lose tooltip behavior.
+- **Preserve a11y across customization.** If your component supports a factory / builder / override pattern (custom child builders, `WidgetBuilder`-style hooks, replaceable sub-slots), the default implementation must be accessible and the docs should call out which `Semantics` properties a custom implementation must preserve to keep parity. A consumer overriding your button should not silently lose tooltip behavior.
 - **Test the component's a11y in isolation.** A regression in the design system breaks every consumer. The component's tests should hold the line — see *Auditing accessibility* below.
 - **Document a11y behavior in the component dartdoc.** Public APIs that affect a11y (`tooltip:`, `autofocus:`, `isSelected:`, `semanticLabel:`) should call out the effect — "Used as the visual tooltip and as the screen-reader accessibility label" — so consumers don't have to read source.
 
@@ -80,59 +80,28 @@ Semantics(
 
 Without `explicitChildNodes`, children merge into the container and lose individual access.
 
-### Re-emitting semantics on a custom chassis
+### Role-annotation vs. container wrapping
 
-When you wrap an inner widget that auto-emits its own semantics (most commonly `EditableText` / `TextField`, but also `Image`, `Switch`, framework chips) inside a chassis with chrome — border, leading/trailing slots, helper text — the inner widget's semantic node lives at *its* bounds, not the chassis bounds. Screen-reader focus lands on the inner editable area only and the chrome is invisible to the SR.
-
-The fix is to **replace** the inner's semantics rather than merge with them: suppress the inner's auto-emitted node and re-emit a full semantic node on the outer chassis.
+For a widget that only needs to carry a semantic *role* (`tabPanel`, `list`, `search`, `alert`), pass the role as an annotation on a non-container `Semantics`; don't reach for `container: true` reflexively.
 
 ```dart
-return Semantics(
+// ✓ Matches Flutter's own TabBarView — role attaches to the panel content's
+//   existing semantic node, no extra SR stop introduced.
+Semantics(role: SemanticsRole.tabPanel, child: panelContent)
+
+// ✗ Introduces a separate SR stop announcing the panel-level label before
+//   the user can reach panel content. If the tab bar already announced
+//   "Poll tab, selected", the second announcement is redundant.
+Semantics(
   container: true,
   explicitChildNodes: true,
-  textField: true,                       // mirror the inner widget's role
-  enabled: enabled,
-  readOnly: readOnly,
-  focused: focusNode.hasFocus,
-  label: value.isEmpty ? hintText : null,
-  value: value,
-  hint: errorText,                       // surface validation errors
-  maxValueLength: maxLength,
-  currentValueLength: value.length,
-  onTap: (enabled && !readOnly) ? focusNode.requestFocus : null,
-  onFocus: enabled ? focusNode.requestFocus : null,
-  child: ChassisFrame(
-    leading: leadingWidget,
-    trailing: trailingWidget,
-    child: ExcludeSemantics(child: innerEditable),
-  ),
-);
+  role: SemanticsRole.tabPanel,
+  label: tabTitle,
+  child: panelContent,
+)
 ```
 
-Why each piece matters:
-
-- `container: true` — the chassis becomes the semantic node, at the chassis's visible bounds.
-- `explicitChildNodes: true` — interactive leading / trailing widgets stay individually focusable instead of merging into the chassis.
-- `ExcludeSemantics(child: inner)` — drops the inner widget's redundant duplicate node.
-- Every a11y property the inner would have provided (`textField`, `value`, `maxValueLength`, etc.) is re-emitted manually on the chassis.
-
-Don't reach for `MergeSemantics` for this case — it absorbs interactive leading / trailing widgets too. Don't omit `container: true` — without it the outer `Semantics` decorates whatever ancestor container exists, not the chassis bounds.
-
-### Logical traversal order in RTL
-
-A `Row` of `[leading, content, trailing]` widgets renders trailing-on-the-left visually in an RTL text direction. Without a sort key, screen readers walk siblings by visual position — so in RTL they read trailing before leading, the wrong order for a left-to-right logical flow.
-
-Force logical order with `OrdinalSortKey`:
-
-```dart
-Row(children: [
-  Semantics(sortKey: const OrdinalSortKey(0), child: leading),
-  Expanded(child: content),
-  Semantics(sortKey: const OrdinalSortKey(2), child: trailing),
-])
-```
-
-`OrdinalSortKey` is sibling-relative — lower values come first regardless of layout direction. Apply only where visual and logical orders diverge; sprinkling it everywhere fights the platform's default traversal.
+Rule of thumb: if the descendant already establishes its own container (typical for interactive widgets), a role-only wrapper is enough. Reach for `container: true, explicitChildNodes: true` only when you need the wrapper itself to be a distinct orientation stop with its own label.
 
 ### Focus management
 
@@ -147,29 +116,26 @@ IconButton(autofocus: isSelected, ...)      // for the current tab/option in a t
 
 For design-system widgets that have a "selected" or "current" notion (tab buttons, segmented controls, radio chips), accept an `autofocus` param and forward it to the inner focusable. Don't force consumers to plumb FocusNodes for the common case.
 
-### Gating SR-specific behavior
+Gate SR-specific behavior with `MediaQuery.accessibleNavigationOf(context)`.
 
-`MediaQuery.accessibleNavigationOf(context)` returns `true` when a screen reader (TalkBack / VoiceOver / Switch Control / comparable AT) is active. Use it to *adapt* UI to SR users — not to add a parallel SR-only code path.
+### `FocusTraversalGroup` is for keyboards, not screen readers
 
-Common adaptations:
+Common misconception: `FocusTraversalGroup` does *not* control screen-reader traversal order. Its dartdoc is explicit — "the policy used to move the focus from one focus node to another when traversing them using a keyboard." Internally the widget wraps its child in a `Focus(includeSemantics: false, …)`, so it contributes nothing to the semantic tree.
 
-- **Skip transient animations.** When a snackbar / banner / toast fades in over 250ms while the SR announces its content, the announcement and the visible state diverge. Jump the animation to its terminal value so the SR experience matches what sighted users see at the end of the fade. This mirrors `ScaffoldMessenger`'s own pattern:
+Two separate trees; only one is walked by SR gestures:
 
-  ```dart
-  if (MediaQuery.accessibleNavigationOf(context)) {
-    _animation.value = 1; // entry: skip to fully visible
-  } else {
-    _animation.forward(from: 0);
-  }
-  ```
+| Tree | Built from | Traversed by |
+|---|---|---|
+| Focus | `Focus` / `FocusScope` / `FocusTraversalGroup` | Keyboard Tab, arrow keys |
+| Semantics | `Semantics` widget | TalkBack / VoiceOver swipe gestures |
 
-  And likewise on exit (`_animation.value = 0` instead of `_animation.reverse()`).
+To reorder SR traversal, use `Semantics(sortKey: OrdinalSortKey(...))` on siblings, restructure the widget tree, or use `Semantics(container: true)` grouping — not `FocusTraversalGroup`.
 
-- **Extend or remove auto-dismiss timers.** A 4-second snackbar may not give an SR user enough time to read it; a 10-second timeout (or manual-dismiss-only) is safer when SR is active.
+### Programmatic focus dispatch (`FocusSemanticEvent`)
 
-- **Promote swipe-only affordances to discoverable actions.** Sighted users get swipe-to-dismiss; SR users need an explicit dismiss action. Expose `Semantics(onDismiss: ...)` so VoiceOver / TalkBack get a discoverable handler.
+`RenderObject.sendSemanticsEvent(const FocusSemanticEvent())` moves the SR reading cursor onto a specific node. Use it for the narrow case where the platform's automatic focus decision on route/modal entry isn't the element the user needs to interact with (e.g., landing focus on the primary input rather than the toolbar's first button). For everything else, prefer declarative Semantics (`autofocus:`, `scopesRoute: true`, `namesRoute: true`) which the platform handles more reliably.
 
-Don't subscribe to `accessibleNavigationOf` inside list items or other widgets that rebuild frequently — toggling SR re-renders every subscriber. Subscribe only in components that actually swap behavior based on SR state.
+One constraint to know: **`onDidGainAccessibilityFocus` does not fire from these dispatches.** The callback fires only when the platform SR service explicitly acquires focus via `ACTION_ACCESSIBILITY_FOCUS` (user-initiated navigation). A programmatic `FocusSemanticEvent` moves the cursor but doesn't round-trip back through the callback, so it isn't usable as an "early stop" signal for retry loops.
 
 ### Modal sheets & dialogs
 
@@ -239,25 +205,6 @@ The critical distinction: `liveRegion: true` dedupes on string identity (correct
    Chrome DevTools → Elements tab → "Accessibility" sub-tab shows the exported ARIA tree.
 
 6. **On Android, TalkBack may fail to focus content rendered outside its parent's measured bounds.** Android's accessibility framework uses each view's `getBoundsInScreen()` for hit testing. If a Flutter `Stack` child overflows the Stack via `Positioned` with offsets that exceed the parent's bounds, the visual rendering can look fine while TalkBack reports degenerate bounds and can't focus the content. Most Flutter overlays (via `Overlay`/`OverlayPortal`) mount into the Navigator's full-screen overlay and aren't affected — but a `Stack`-with-overflow in a small parent (e.g., a tooltip-like popover inside a 48dp button row) can hit this. If you suspect it, dump the a11y tree with `uiautomator dump` (see Debugging section) and look for `bounds="[x,y][x,y]"` with `top > bottom` — that's the symptom. Fix by mounting the overlay in a taller ancestor (use `Overlay.of(context)` rather than a local `Stack`).
-
-7. **`Semantics(container: false)` merges *upward* into ancestor containers, not downward into descendant containers.** This is the most-misremembered semantic rule, and it makes "wrap from the outside" feel like it should work when it doesn't. The framework dartdoc spells it out: `'If [container] is true, this widget will introduce a new node in the semantics tree. Otherwise, the semantics will be merged with the semantics of any ancestors (if the ancestor allows that)'`. To decorate a *descendant* interactive widget (e.g. `ElevatedButton`'s built-in `Semantics(container: true, button: true)` node, or any custom widget that establishes its own container) with extra properties like `selected:`, the decorating `Semantics` must be placed *inside* the descendant — typically as its `child:` — not wrapping it from above. Concrete:
-
-   ```dart
-   // ✓ selected: lands on ElevatedButton's semantic node
-   ElevatedButton(
-     onPressed: onPressed,
-     child: Semantics(selected: isSelected, child: label),
-   )
-
-   // ✗ selected: floats up to the ambient Scaffold/Material instead;
-   //   the button itself has no isSelected flag.
-   Semantics(
-     selected: isSelected,
-     child: ElevatedButton(onPressed: onPressed, child: label),
-   )
-   ```
-
-   The "if the ancestor allows that" caveat refers to `explicitChildNodes`: an ancestor `Semantics(container: true, explicitChildNodes: true)` blocks descendants' `container: false` configs from merging in, forcing them to introduce their own nodes. The same rule applies to any `container: false` decorator (`Tooltip` semantics, custom `hint:`/`label:` overrides) wrapping a `container: true` widget. If you genuinely need to wrap from the outside, set `container: true` on your wrapper so it becomes its own node — but then you lose the merge-into-descendant behavior and pick up the wrapper's bounds instead of the inner widget's.
 
 ### Anti-patterns to avoid
 
@@ -372,20 +319,16 @@ This pins the announcement-on-action contract — pickers, mention overlays, err
 
 ### Simulating a screen-reader-triggered action
 
-To verify the SR-driven activation path (which can differ from finger-tap — desktop `TextField` focus, semantic dismiss handlers, custom `onTap` on a non-tappable widget, etc.), use the higher-level `tester.semantics.performAction`:
+To verify the SR-driven activation path (which can differ from finger-tap, especially for desktop `TextField` focus):
 
 ```dart
-tester.semantics.performAction(
-  find.semantics.byLabel('Email'),
-  SemanticsAction.tap,
-);
+tester.platformDispatcher.onSemanticsActionEvent!(SemanticsActionEvent(
+  type: SemanticsAction.tap,
+  viewId: tester.view.viewId,
+  nodeId: tester.semantics.find(find.byType(MyWidget)).id,
+));
 await tester.pumpAndSettle();
-expect(focusNode.hasFocus, isTrue);
 ```
-
-`find.semantics.byLabel(...)` returns a `SemanticsFinder`. For other lookups use `find.semantics.byPredicate(...)`, or convert from a widget finder via `tester.semantics.find(widgetFinder)`.
-
-The lower-level `tester.platformDispatcher.onSemanticsActionEvent!` route still works but requires manually constructing a `SemanticsActionEvent` with a node ID and view ID — prefer the higher-level API for new tests.
 
 ### Validating `Semantics(role: ...)` configuration
 
