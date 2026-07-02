@@ -75,11 +75,12 @@ class _ScopedSemanticsDebuggerState extends State<ScopedSemanticsDebugger> with 
   }
 
   void _attach() {
+    // `View.pipelineOwnerOf(context)` uses `dependOnInheritedWidgetOfExactType`
+    // and can't be called from `initState`. The listener wire-up happens in
+    // `didChangeDependencies` instead, which is always called after
+    // `initState` on first mount (and again on any owner change).
     _semanticsHandle = SemanticsBinding.instance.ensureSemantics();
     WidgetsBinding.instance.addObserver(this);
-    final owner = View.pipelineOwnerOf(context);
-    owner.semanticsOwner?.addListener(_update);
-    _pipelineOwner = owner;
   }
 
   void _detach() {
@@ -230,7 +231,7 @@ class _ScopedSemanticsDebuggerPainter extends CustomPainter {
     final data = node.getSemanticsData();
     if (data.flagsCollection.isTextField) return StreamColors.green.shade500;
     if (data.flagsCollection.isButton) return StreamColors.blue.shade500;
-    if (data.flagsCollection.isSelected != Tristate.none) return StreamColors.purple.shade500;
+    if (data.flagsCollection.isSelected == Tristate.isTrue) return StreamColors.purple.shade500;
     if (data.hasAction(SemanticsAction.tap)) return StreamColors.cyan.shade500;
     return StreamColors.neutral.shade400;
   }

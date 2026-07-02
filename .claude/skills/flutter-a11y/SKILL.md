@@ -262,13 +262,13 @@ await expectLater(tester, meetsGuideline(textContrastGuideline));       // ≥4.
 
 | Matcher | Behavior | When to use |
 |---|---|---|
-| `containsSemantics(...)` | Subset — only specified properties checked; allows extras | **Default for most tests.** Survives SDK upgrades that add new flags. |
-| `matchesSemantics(...)` | Exhaustive — every parameter checked, unspecified MUST be absent | When you want to lock down a precise spec. Brittle to Flutter SDK additions. |
-| `isSemantics(...)` | Strict (Flutter 3.43+ replacement for `matchesSemantics`) | Same use case as `matchesSemantics`; preferred for new code. |
+| `containsSemantics(...)` | Subset — only specified properties checked; allows extras. **`@Deprecated` in Flutter 3.41+**, replaced by `isSemantics`. | Legacy code. Prefer `isSemantics` on any repo pinned to Flutter 3.41 or later. |
+| `matchesSemantics(...)` | Exhaustive — every parameter checked, unspecified MUST be absent. | When you want to lock down a precise spec. Brittle to Flutter SDK additions. |
+| `isSemantics(...)` | Subset — same behavior as `containsSemantics`, updated naming (Flutter 3.41+). | **Default for most tests.** Survives SDK upgrades that add new flags. |
 | `includesNodeWith(...)` | "Some node in the tree matches" | Existence checks ("there's a node labeled 'Alert' with `namesRoute` flag"). |
 | `meetsGuideline(...)` | Guideline-level | Tap targets, contrast, label presence. |
 
-> ⚠️ `TestSemantics`/`SemanticsTester`/`hasSemantics(TestSemantics.root(...))` are **`@Deprecated` (Flutter 3.43+)**. Don't reach for full-tree-shape assertions in new tests — they break on every SDK change. Use `containsSemantics`/`isSemantics` against `tester.semantics.find(finder)` or `tester.getSemantics(finder)` instead.
+> ⚠️ `TestSemantics`/`SemanticsTester`/`hasSemantics(TestSemantics.root(...))` are **`@Deprecated`**. Don't reach for full-tree-shape assertions in new tests — they break on every SDK change. Use `isSemantics` (or `containsSemantics` on older SDKs) against `tester.semantics.find(finder)` or `tester.getSemantics(finder)` instead.
 
 ### Inspecting a single node
 
