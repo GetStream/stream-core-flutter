@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
@@ -79,6 +80,140 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(StreamButton), findsNothing);
+    });
+  });
+
+  group('StreamAppBar semantics', () {
+    testWidgets('auto-implied back button carries the localized Back tooltip', (tester) async {
+      await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.byTooltip('Back'), findsOneWidget);
+    });
+
+    testWidgets('auto-implied close button carries the localized Close tooltip', (tester) async {
+      await tester.pumpWidget(_withStreamTheme(const _LauncherScreen(fullscreenDialog: true)));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.byTooltip('Close'), findsOneWidget);
+    });
+
+    testWidgets('title is marked as a heading by default', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            appBar: StreamAppBar(
+              automaticallyImplyLeading: false,
+              title: const Text('Title'),
+            ),
+          ),
+        ),
+      );
+
+      final data = tester.getSemantics(find.text('Title')).getSemanticsData();
+      expect(data.label, equals('Title'));
+      expect(data.hasFlag(SemanticsFlag.isHeader), isTrue);
+
+      handle.dispose();
+    });
+
+    testWidgets('title names the route on Android', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      final handle = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            Scaffold(
+              appBar: StreamAppBar(
+                automaticallyImplyLeading: false,
+                title: const Text('Title'),
+              ),
+            ),
+          ),
+        );
+
+        expect(
+          tester.getSemantics(find.text('Title')),
+          matchesSemantics(label: 'Title', isHeader: true, namesRoute: true),
+        );
+      } finally {
+        handle.dispose();
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('title does not name the route on iOS', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final handle = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            Scaffold(
+              appBar: StreamAppBar(
+                automaticallyImplyLeading: false,
+                title: const Text('Title'),
+              ),
+            ),
+          ),
+        );
+
+        // isHeader is set but namesRoute is not — iOS-style platforms
+        // don't expect a route name announcement on entry.
+        final data = tester.getSemantics(find.text('Title')).getSemanticsData();
+        expect(data.hasFlag(SemanticsFlag.isHeader), isTrue);
+        expect(data.hasFlag(SemanticsFlag.namesRoute), isFalse);
+      } finally {
+        handle.dispose();
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('excludeHeaderSemantics omits the heading role', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            appBar: StreamAppBar(
+              automaticallyImplyLeading: false,
+              title: const Text('Title'),
+              excludeHeaderSemantics: true,
+            ),
+          ),
+        ),
+      );
+
+      final data = tester.getSemantics(find.text('Title')).getSemanticsData();
+      expect(data.hasFlag(SemanticsFlag.isHeader), isFalse);
+      expect(data.hasFlag(SemanticsFlag.namesRoute), isFalse);
+
+      handle.dispose();
+    });
+
+    testWidgets('title and subtitle resolve to a single merged semantic node', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            appBar: StreamAppBar(
+              automaticallyImplyLeading: false,
+              title: const Text('John Doe'),
+              subtitle: const Text('Online'),
+            ),
+          ),
+        ),
+      );
+
+      // Both Text widgets project into the same merged node because
+      // MergeSemantics flattens the title + subtitle column.
+      final titleNode = tester.getSemantics(find.text('John Doe'));
+      final subtitleNode = tester.getSemantics(find.text('Online'));
+      expect(identical(titleNode, subtitleNode), isTrue);
+      expect(titleNode.label, equals('John Doe\nOnline'));
+
+      handle.dispose();
     });
   });
 
