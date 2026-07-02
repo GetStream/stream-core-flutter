@@ -63,13 +63,11 @@ class StreamMessageComposerAttachment extends StatelessWidget {
     required Widget child,
     VoidCallback? onRemovePressed,
     String? semanticLabel,
-    bool mergeRemoveAction = true,
     StreamMessageComposerAttachmentThemeData? style,
   }) : props = .new(
          child: child,
          onRemovePressed: onRemovePressed,
          semanticLabel: semanticLabel,
-         mergeRemoveAction: mergeRemoveAction,
          style: style,
        );
 
@@ -99,7 +97,6 @@ class StreamMessageComposerAttachmentProps {
     required this.child,
     this.onRemovePressed,
     this.semanticLabel,
-    this.mergeRemoveAction = true,
     this.style,
   });
 
@@ -121,18 +118,6 @@ class StreamMessageComposerAttachmentProps {
   /// `tap` action whose hint reads "remove"; activating it calls
   /// [onRemovePressed].
   final String? semanticLabel;
-
-  /// Whether the entire tile (content + remove button) collapses into a
-  /// single screen-reader focus stop whose `tap` action maps to
-  /// [onRemovePressed].
-  ///
-  /// Defaults to `true` — appropriate for tiles whose [child] has no
-  /// interactive elements (file row, image thumbnail, unsupported chip).
-  /// Set to `false` when the [child] exposes its own actions (e.g. a voice
-  /// recording with play/pause and seek controls); the remove button then
-  /// stays as a separate stop and the outer tile contributes no `tap`
-  /// action.
-  final bool mergeRemoveAction;
 
   /// Per-instance style overrides.
   ///
@@ -177,23 +162,21 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
       ),
     );
 
-    final container = props.mergeRemoveAction
-        // TODO(localize): move "remove" hint to localizations.
-        ? MergeSemantics(
-            child: Semantics(
-              label: props.semanticLabel,
-              onTap: props.onRemovePressed,
-              onTapHint: 'remove',
-              child: innerContent,
-            ),
-          )
-        : Semantics(
-            label: props.semanticLabel,
-            child: innerContent,
-          );
+    // The whole tile is one SR focus stop that reads `semanticLabel` and
+    // activates the remove callback on tap. The overlaid remove control is
+    // hidden from SR since its behavior is already exposed on the merged
+    // node.
+    // TODO(localize): move "remove" hint to localizations.
+    final container = MergeSemantics(
+      child: Semantics(
+        label: props.semanticLabel,
+        onTap: props.onRemovePressed,
+        onTapHint: 'remove',
+        child: innerContent,
+      ),
+    );
 
     if (props.onRemovePressed case final onPressed?) {
-      final removeControl = StreamRemoveControl(onPressed: onPressed);
       return Stack(
         clipBehavior: .none,
         children: [
@@ -201,11 +184,7 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
           PositionedDirectional(
             top: 0,
             end: 0,
-            child:
-                props
-                    .mergeRemoveAction //
-                ? ExcludeSemantics(child: removeControl)
-                : removeControl,
+            child: ExcludeSemantics(child: StreamRemoveControl(onPressed: onPressed)),
           ),
         ],
       );
