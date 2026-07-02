@@ -468,7 +468,6 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
     final helperWidget = switch (props.helperText) {
       final helperText? => Semantics(
         sortKey: _helperSortKey,
-        liveRegion: hasError,
         child: StreamHelperText(text: helperText, state: props.helperState),
       ),
       _ => null,

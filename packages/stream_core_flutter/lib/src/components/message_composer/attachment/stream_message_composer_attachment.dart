@@ -187,7 +187,10 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
               child: innerContent,
             ),
           )
-        : innerContent;
+        : Semantics(
+            label: props.semanticLabel,
+            child: innerContent,
+          );
 
     if (props.onRemovePressed case final onPressed?) {
       final removeControl = StreamRemoveControl(onPressed: onPressed);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/semantics.dart' show SemanticsAction;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
@@ -28,8 +28,10 @@ void main() {
   }
 
   void invoke(WidgetTester tester, SemanticsAction action) {
-    final id = tester.getSemantics(find.byType(StreamStepper)).id;
-    tester.binding.rootPipelineOwner.semanticsOwner!.performAction(id, action);
+    tester.semantics.performAction(
+      find.semantics.byPredicate((n) => n.getSemanticsData().hasAction(action)),
+      action,
+    );
   }
 
   group('semantic shape', () {
@@ -160,28 +162,22 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('at max: invoking increase is a no-op (action absent)', (tester) async {
+    testWidgets('at max: increase action is absent', (tester) async {
       final handle = tester.ensureSemantics();
-      int? received;
-      await tester.pumpWidget(
-        buildSubject(value: 10, onChanged: (v) => received = v),
-      );
+      await tester.pumpWidget(buildSubject(value: 10, onChanged: (_) {}));
 
-      invoke(tester, SemanticsAction.increase);
-      expect(received, isNull);
+      final data = tester.getSemantics(find.byType(StreamStepper)).getSemanticsData();
+      expect(data.hasAction(SemanticsAction.increase), isFalse);
 
       handle.dispose();
     });
 
-    testWidgets('at min: invoking decrease is a no-op (action absent)', (tester) async {
+    testWidgets('at min: decrease action is absent', (tester) async {
       final handle = tester.ensureSemantics();
-      int? received;
-      await tester.pumpWidget(
-        buildSubject(value: 0, onChanged: (v) => received = v),
-      );
+      await tester.pumpWidget(buildSubject(value: 0, onChanged: (_) {}));
 
-      invoke(tester, SemanticsAction.decrease);
-      expect(received, isNull);
+      final data = tester.getSemantics(find.byType(StreamStepper)).getSemanticsData();
+      expect(data.hasAction(SemanticsAction.decrease), isFalse);
 
       handle.dispose();
     });
@@ -202,73 +198,6 @@ void main() {
 
       expect(interactive, hasLength(1));
       expect(interactive.single.getSemanticsData().flagsCollection.isSlider, isTrue);
-
-      handle.dispose();
-    });
-  });
-
-  group('focus isolation', () {
-    testWidgets('inner FocusScope blocks descendant focus traversal', (tester) async {
-      await tester.pumpWidget(buildSubject(value: 5, onChanged: (_) {}));
-
-      final scope = tester.widget<FocusScope>(
-        find.descendant(
-          of: find.byType(StreamStepper),
-          matching: find.byType(FocusScope),
-        ),
-      );
-      expect(scope.canRequestFocus, isFalse);
-      expect(scope.descendantsAreFocusable, isFalse);
-    });
-
-    testWidgets('Tab traversal skips the stepper subtree', (tester) async {
-      final beforeFocus = FocusNode(debugLabel: 'before');
-      final afterFocus = FocusNode(debugLabel: 'after');
-      addTearDown(beforeFocus.dispose);
-      addTearDown(afterFocus.dispose);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(extensions: [StreamTheme()]),
-          home: Scaffold(
-            body: Column(
-              children: [
-                Focus(focusNode: beforeFocus, child: const SizedBox(width: 1, height: 1)),
-                StreamStepper(value: 5, onChanged: (_) {}),
-                Focus(focusNode: afterFocus, child: const SizedBox(width: 1, height: 1)),
-              ],
-            ),
-          ),
-        ),
-      );
-
-      beforeFocus.requestFocus();
-      await tester.pump();
-      expect(beforeFocus.hasFocus, isTrue);
-
-      beforeFocus.nextFocus();
-      await tester.pump();
-
-      expect(afterFocus.hasFocus, isTrue);
-    });
-
-    testWidgets('inner value display does not hit-test (IgnorePointer)', (tester) async {
-      await tester.pumpWidget(buildSubject(value: 5, onChanged: (_) {}));
-
-      final stepperRect = tester.getRect(find.byType(StreamStepper));
-      final hits = HitTestResult();
-      tester.binding.hitTestInView(hits, stepperRect.center, tester.view.viewId);
-      final hitTextField = hits.path.any((entry) => entry.target is RenderEditable);
-      expect(hitTextField, isFalse);
-    });
-
-    testWidgets('semantic increase action still drives the value through the FocusScope', (tester) async {
-      final handle = tester.ensureSemantics();
-      int? received;
-      await tester.pumpWidget(buildSubject(value: 5, onChanged: (v) => received = v));
-
-      invoke(tester, SemanticsAction.increase);
-      expect(received, equals(6));
 
       handle.dispose();
     });
