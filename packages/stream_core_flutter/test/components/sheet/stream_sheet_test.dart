@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
-Widget _withStreamTheme(Widget child) {
+Widget _withStreamTheme(Widget child, {TargetPlatform? platform}) {
   return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme()]),
+    theme: ThemeData(platform: platform, extensions: [StreamTheme()]),
     home: child,
   );
 }
@@ -595,5 +596,125 @@ void main() {
         expect(find.text('Open'), findsOneWidget);
       },
     );
+  });
+
+  group('semantics', () {
+    // Walks the semantics subtree looking for the first node where [test]
+    // returns true. Returns null when no such node exists.
+    SemanticsNode? findSemanticsNode(WidgetTester tester, bool Function(SemanticsData) test) {
+      SemanticsNode? found;
+      void walk(SemanticsNode node) {
+        if (found != null) return;
+        if (test(node.getSemanticsData())) {
+          found = node;
+          return;
+        }
+        node.visitChildren((c) {
+          walk(c);
+          return true;
+        });
+      }
+
+      walk(tester.binding.pipelineOwner.semanticsOwner!.rootSemanticsNode!);
+      return found;
+    }
+
+    testWidgets('sheet route is scoped for focus management', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          _SheetLauncher(
+            onPushed: (context) => showStreamSheet<void>(
+              context: context,
+              builder: (_, __) => const Text('body'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final routeNode = findSemanticsNode(
+        tester,
+        (d) => d.flagsCollection.scopesRoute,
+      );
+      expect(routeNode, isNotNull);
+      final data = routeNode!.getSemanticsData();
+      expect(data.flagsCollection.namesRoute, isFalse, reason: 'descendants own the name');
+      expect(data.label, isEmpty);
+
+      handle.dispose();
+    });
+
+    testWidgets('StreamSheetHeader title provides the route name on Android', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          platform: TargetPlatform.android,
+          _SheetLauncher(
+            onPushed: (context) => showStreamSheet<void>(
+              context: context,
+              builder: (_, __) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  StreamSheetHeader(title: const Text('Create Poll')),
+                  const Text('body'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final headerRouteNode = findSemanticsNode(
+        tester,
+        (d) => d.flagsCollection.namesRoute && d.label == 'Create Poll',
+      );
+      expect(headerRouteNode, isNotNull);
+
+      handle.dispose();
+    });
+
+    testWidgets('drag handle exposes a Dismiss button that pops the route', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          _SheetLauncher(
+            onPushed: (context) => showStreamSheet<void>(
+              context: context,
+              builder: (_, __) => const Text('body'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final dragHandleNode = findSemanticsNode(
+        tester,
+        (d) => d.flagsCollection.isButton && d.label == 'Dismiss',
+      );
+      expect(dragHandleNode, isNotNull);
+      expect(dragHandleNode!.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+
+      tester.binding.pipelineOwner.semanticsOwner!.performAction(
+        dragHandleNode.id,
+        SemanticsAction.tap,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('body'), findsNothing);
+      expect(find.text('Open'), findsOneWidget);
+
+      handle.dispose();
+    });
   });
 }
