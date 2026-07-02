@@ -615,7 +615,7 @@ void main() {
         });
       }
 
-      walk(tester.binding.pipelineOwner.semanticsOwner!.rootSemanticsNode!);
+      walk(tester.binding.rootPipelineOwner.semanticsOwner!.rootSemanticsNode!);
       return found;
     }
 
@@ -627,7 +627,7 @@ void main() {
           _SheetLauncher(
             onPushed: (context) => showStreamSheet<void>(
               context: context,
-              builder: (_, __) => const Text('body'),
+              builder: (_, _) => const Text('body'),
             ),
           ),
         ),
@@ -657,7 +657,7 @@ void main() {
           _SheetLauncher(
             onPushed: (context) => showStreamSheet<void>(
               context: context,
-              builder: (_, __) => Column(
+              builder: (_, _) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   StreamSheetHeader(title: const Text('Create Poll')),
@@ -689,7 +689,7 @@ void main() {
           _SheetLauncher(
             onPushed: (context) => showStreamSheet<void>(
               context: context,
-              builder: (_, __) => const Text('body'),
+              builder: (_, _) => const Text('body'),
             ),
           ),
         ),
@@ -705,7 +705,7 @@ void main() {
       expect(dragHandleNode, isNotNull);
       expect(dragHandleNode!.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
 
-      tester.binding.pipelineOwner.semanticsOwner!.performAction(
+      tester.binding.rootPipelineOwner.semanticsOwner!.performAction(
         dragHandleNode.id,
         SemanticsAction.tap,
       );

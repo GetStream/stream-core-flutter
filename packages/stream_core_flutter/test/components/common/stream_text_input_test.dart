@@ -280,7 +280,7 @@ void main() {
         _withStreamTheme(
           StreamTextInput(
             helperText: 'Required',
-            style: StreamTextInputStyle(helperAffinity: StreamHelperAffinity.outside),
+            style: const StreamTextInputStyle(helperAffinity: StreamHelperAffinity.outside),
           ),
         ),
       );
@@ -297,7 +297,7 @@ void main() {
         MaterialApp(
           theme: ThemeData(extensions: [StreamTheme()]),
           home: StreamTextInputTheme(
-            data: StreamTextInputThemeData(
+            data: const StreamTextInputThemeData(
               style: StreamTextInputStyle(
                 helperAffinity: StreamHelperAffinity.outside,
               ),

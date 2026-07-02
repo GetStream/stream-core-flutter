@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
@@ -30,7 +29,7 @@ void main() {
 
   void invoke(WidgetTester tester, SemanticsAction action) {
     final id = tester.getSemantics(find.byType(StreamStepper)).id;
-    tester.binding.pipelineOwner.semanticsOwner!.performAction(id, action);
+    tester.binding.rootPipelineOwner.semanticsOwner!.performAction(id, action);
   }
 
   group('semantic shape', () {
@@ -60,7 +59,7 @@ void main() {
 
     testWidgets('disabled (onChanged null) drops actions', (tester) async {
       final handle = tester.ensureSemantics();
-      await tester.pumpWidget(buildSubject(value: 5, onChanged: null));
+      await tester.pumpWidget(buildSubject(value: 5));
 
       expect(
         tester.getSemantics(find.byType(StreamStepper)),
@@ -89,7 +88,7 @@ void main() {
   group('boundaries', () {
     testWidgets('at min: no decrease action exposed', (tester) async {
       final handle = tester.ensureSemantics();
-      await tester.pumpWidget(buildSubject(value: 0, min: 0, max: 10, onChanged: (_) {}));
+      await tester.pumpWidget(buildSubject(value: 0, onChanged: (_) {}));
 
       expect(
         tester.getSemantics(find.byType(StreamStepper)),
@@ -108,7 +107,7 @@ void main() {
 
     testWidgets('at max: no increase action exposed', (tester) async {
       final handle = tester.ensureSemantics();
-      await tester.pumpWidget(buildSubject(value: 10, min: 0, max: 10, onChanged: (_) {}));
+      await tester.pumpWidget(buildSubject(value: 10, onChanged: (_) {}));
 
       expect(
         tester.getSemantics(find.byType(StreamStepper)),
@@ -165,7 +164,7 @@ void main() {
       final handle = tester.ensureSemantics();
       int? received;
       await tester.pumpWidget(
-        buildSubject(value: 10, min: 0, max: 10, onChanged: (v) => received = v),
+        buildSubject(value: 10, onChanged: (v) => received = v),
       );
 
       invoke(tester, SemanticsAction.increase);
@@ -178,7 +177,7 @@ void main() {
       final handle = tester.ensureSemantics();
       int? received;
       await tester.pumpWidget(
-        buildSubject(value: 0, min: 0, max: 10, onChanged: (v) => received = v),
+        buildSubject(value: 0, onChanged: (v) => received = v),
       );
 
       invoke(tester, SemanticsAction.decrease);
@@ -197,14 +196,12 @@ void main() {
 
       final traversal = tester.semantics.simulatedAccessibilityTraversal().toList();
       final interactive = traversal.where((node) {
-        final data = node.getSemanticsData();
-        return data.hasFlag(SemanticsFlag.isButton) ||
-            data.hasFlag(SemanticsFlag.isTextField) ||
-            data.hasFlag(SemanticsFlag.isSlider);
+        final flags = node.getSemanticsData().flagsCollection;
+        return flags.isButton || flags.isTextField || flags.isSlider;
       }).toList();
 
       expect(interactive, hasLength(1));
-      expect(interactive.single.getSemanticsData().hasFlag(SemanticsFlag.isSlider), isTrue);
+      expect(interactive.single.getSemanticsData().flagsCollection.isSlider, isTrue);
 
       handle.dispose();
     });

@@ -16,7 +16,7 @@ String _fmt(SemanticsData d) {
   }
 
   final actions = SemanticsAction.values.where((a) => (d.actions & a.index) != 0).map((a) => a.name).toList();
-  final flags = SemanticsFlag.values.where((f) => d.hasFlag(f)).map((f) => f.name).toList();
+  final flags = d.flagsCollection.toStrings();
 
   add('actions', actions);
   add('flags', flags);

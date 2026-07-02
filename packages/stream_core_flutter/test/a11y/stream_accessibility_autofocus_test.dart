@@ -202,12 +202,12 @@ void main() {
 
     testWidgets('trips the debug assertion when two instances share a route', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(accessibleNavigation: true),
+            data: MediaQueryData(accessibleNavigation: true),
             child: Scaffold(
               body: Column(
-                children: const [
+                children: [
                   StreamAccessibilityAutofocus(child: SizedBox()),
                   StreamAccessibilityAutofocus(child: SizedBox()),
                 ],
@@ -230,9 +230,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           navigatorKey: navigatorKey,
-          home: MediaQuery(
-            data: const MediaQueryData(accessibleNavigation: true),
-            child: const Scaffold(
+          home: const MediaQuery(
+            data: MediaQueryData(accessibleNavigation: true),
+            child: Scaffold(
               body: StreamAccessibilityAutofocus(child: SizedBox()),
             ),
           ),
@@ -244,9 +244,9 @@ void main() {
       unawaited(
         navigatorKey.currentState!.push(
           MaterialPageRoute<void>(
-            builder: (_) => MediaQuery(
-              data: const MediaQueryData(accessibleNavigation: true),
-              child: const Scaffold(
+            builder: (_) => const MediaQuery(
+              data: MediaQueryData(accessibleNavigation: true),
+              child: Scaffold(
                 body: StreamAccessibilityAutofocus(child: SizedBox()),
               ),
             ),
@@ -263,8 +263,8 @@ void main() {
       await tester.pumpWidget(
         host(
           accessibleNavigation: true,
-          child: Column(
-            children: const [
+          child: const Column(
+            children: [
               StreamAccessibilityAutofocus(child: SizedBox()),
               StreamAccessibilityAutofocus(child: SizedBox()),
             ],

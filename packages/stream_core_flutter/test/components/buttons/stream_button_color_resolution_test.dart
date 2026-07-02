@@ -17,7 +17,6 @@ void main() {
       'secondary outline icon button uses light textPrimary when supplied',
       (tester) async {
         final lightStreamTheme = StreamTheme(
-          brightness: Brightness.light,
           colorScheme: StreamColorScheme.light(),
         );
         final expectedTextPrimary = lightStreamTheme.colorScheme.textPrimary;
@@ -62,7 +61,6 @@ void main() {
       'secondary ghost icon button uses light textPrimary when supplied',
       (tester) async {
         final lightStreamTheme = StreamTheme(
-          brightness: Brightness.light,
           colorScheme: StreamColorScheme.light(),
         );
         final expectedTextPrimary = lightStreamTheme.colorScheme.textPrimary;

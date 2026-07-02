@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
@@ -115,7 +114,7 @@ void main() {
 
       final data = tester.getSemantics(find.text('Title')).getSemanticsData();
       expect(data.label, equals('Title'));
-      expect(data.hasFlag(SemanticsFlag.isHeader), isTrue);
+      expect(data.flagsCollection.isHeader, isTrue);
 
       handle.dispose();
     });
@@ -163,8 +162,8 @@ void main() {
         // isHeader is set but namesRoute is not — iOS-style platforms
         // don't expect a route name announcement on entry.
         final data = tester.getSemantics(find.text('Title')).getSemanticsData();
-        expect(data.hasFlag(SemanticsFlag.isHeader), isTrue);
-        expect(data.hasFlag(SemanticsFlag.namesRoute), isFalse);
+        expect(data.flagsCollection.isHeader, isTrue);
+        expect(data.flagsCollection.namesRoute, isFalse);
       } finally {
         handle.dispose();
         debugDefaultTargetPlatformOverride = null;
@@ -186,8 +185,8 @@ void main() {
       );
 
       final data = tester.getSemantics(find.text('Title')).getSemanticsData();
-      expect(data.hasFlag(SemanticsFlag.isHeader), isFalse);
-      expect(data.hasFlag(SemanticsFlag.namesRoute), isFalse);
+      expect(data.flagsCollection.isHeader, isFalse);
+      expect(data.flagsCollection.namesRoute, isFalse);
 
       handle.dispose();
     });

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/chat.dart';
-import 'package:stream_core_flutter/core.dart';
 
 Widget _withStreamTheme(Widget child) {
   return MaterialApp(
@@ -41,14 +40,14 @@ void main() {
     for (final node in order) {
       final data = node.getSemanticsData();
       final actions = SemanticsAction.values.where((a) => (data.actions & a.index) != 0).map((a) => a.name).toList();
-      final flags = SemanticsFlag.values.where((f) => data.hasFlag(f)).map((f) => f.name).toList();
+      final flags = data.flagsCollection.toStrings();
       if (data.label.isEmpty && actions.isEmpty && flags.isEmpty) continue;
       debugPrint('[$i] rect=${node.rect}  label="${data.label}"  flags=$flags  actions=$actions');
       i++;
     }
 
     debugPrint('\n=== FULL TREE ===');
-    final root = tester.binding.pipelineOwner.semanticsOwner?.rootSemanticsNode;
+    final root = RendererBinding.instance.rootPipelineOwner.semanticsOwner?.rootSemanticsNode;
     debugPrint(root?.toStringDeep() ?? '(none)');
 
     handle.dispose();

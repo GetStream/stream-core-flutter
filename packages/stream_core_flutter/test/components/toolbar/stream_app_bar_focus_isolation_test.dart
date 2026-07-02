@@ -61,7 +61,7 @@ void main() {
       });
     }
 
-    visit(tester.binding.pipelineOwner.semanticsOwner!.rootSemanticsNode!);
+    visit(tester.binding.rootPipelineOwner.semanticsOwner!.rootSemanticsNode!);
     expect(barNode, isNotNull);
 
     // The outer bar node must have NO actions. A leak from a slot would
