@@ -72,12 +72,14 @@ class StreamStepper extends StatelessWidget {
     required ValueChanged<int>? onChanged,
     int min = 0,
     int max = 99,
+    String? semanticLabel,
     StreamStepperStyle? style,
   }) : props = .new(
          value: value,
          onChanged: onChanged,
          min: min,
          max: max,
+         semanticLabel: semanticLabel,
          style: style,
        );
 
@@ -108,6 +110,7 @@ class StreamStepperProps {
     required this.onChanged,
     this.min = 0,
     this.max = 99,
+    this.semanticLabel,
     this.style,
   }) : assert(min <= max, 'min must be <= max'),
        assert(value >= min && value <= max, 'value must be between min and max');
@@ -131,6 +134,14 @@ class StreamStepperProps {
   /// The increment button is disabled when [value] equals [max].
   /// Defaults to 99.
   final int max;
+
+  /// Semantic label announced when a screen reader focuses the stepper.
+  ///
+  /// Describes what the value represents (e.g. `"Quantity"`,
+  /// `"Number of items"`). Announced alongside the current [value], and
+  /// followed by the platform's adjustable hint ("Swipe up or down" on
+  /// iOS VoiceOver; "Use volume keys" on Android TalkBack).
+  final String? semanticLabel;
 
   /// Per-instance style overrides.
   ///
@@ -211,32 +222,43 @@ class _DefaultStreamStepperState extends State<DefaultStreamStepper> {
     final effectiveInputStyle = style?.inputStyle ?? themeStyle?.inputStyle ?? defaults.inputStyle;
     final effectiveSpacing = style?.spacing ?? themeStyle?.spacing ?? defaults.spacing;
 
-    return Row(
-      mainAxisSize: .min,
-      spacing: effectiveSpacing,
-      children: [
-        StreamButton.icon(
-          icon: Icon(icons.minus),
-          style: .secondary,
-          type: .outline,
-          themeStyle: effectiveButtonStyle,
-          onPressed: canDecrement ? _decrement : null,
-        ),
-        StreamTextInput(
-          controller: _controller,
-          readOnly: true,
-          enabled: _isEnabled,
-          textAlign: TextAlign.center,
-          style: effectiveInputStyle,
-        ),
-        StreamButton.icon(
-          icon: Icon(icons.plus),
-          style: .secondary,
-          type: .outline,
-          themeStyle: effectiveButtonStyle,
-          onPressed: canIncrement ? _increment : null,
-        ),
-      ],
+    return Semantics(
+      slider: true,
+      enabled: _isEnabled,
+      excludeSemantics: true,
+      label: props.semanticLabel,
+      value: props.value.toString(),
+      increasedValue: canIncrement ? (props.value + 1).toString() : null,
+      decreasedValue: canDecrement ? (props.value - 1).toString() : null,
+      onIncrease: canIncrement ? _increment : null,
+      onDecrease: canDecrement ? _decrement : null,
+      child: Row(
+        mainAxisSize: .min,
+        spacing: effectiveSpacing,
+        children: [
+          StreamButton.icon(
+            icon: Icon(icons.minus),
+            style: .secondary,
+            type: .outline,
+            themeStyle: effectiveButtonStyle,
+            onPressed: canDecrement ? _decrement : null,
+          ),
+          StreamTextInput(
+            controller: _controller,
+            readOnly: true,
+            enabled: _isEnabled,
+            textAlign: TextAlign.center,
+            style: effectiveInputStyle,
+          ),
+          StreamButton.icon(
+            icon: Icon(icons.plus),
+            style: .secondary,
+            type: .outline,
+            themeStyle: effectiveButtonStyle,
+            onPressed: canIncrement ? _increment : null,
+          ),
+        ],
+      ),
     );
   }
 }
