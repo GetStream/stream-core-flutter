@@ -1,3 +1,22 @@
+## 0.5.0
+
+### ✨ Features
+
+- Added `StreamAccessibilityAutofocus` — behavior-only wrapper that requests screen-reader focus on its child shortly after mount; useful for redirecting focus on route entry (bounded retries, SR-toggle reactive, per-route debug uniqueness assertion).
+- Added `StreamSemanticsAnnouncer` — imperative one-shot screen-reader announcement helper wrapping `SemanticsService.sendAnnouncement`.
+- Added `StreamSemanticsTransitionAnnouncer` — observes a `Listenable`, snapshots its value on each notification, derives a transition message via a resolver, and dispatches through `StreamSemanticsAnnouncer`.
+- Added `labelText` and `helperAffinity` to `StreamTextInput` for a floating label above the field and helper text positioned inside or outside the bordered chassis.
+- Added `focusNode` and `autofocus` pass-through on `StreamListTile`.
+- Added optional `semanticLabel` to `StreamBadgeNotification` and `StreamFileTypeIcon`.
+- Added `onVisible` callback to `StreamSnackbar` — fires after the entrance animation completes (or synchronously when SR is active), enabling explicit a11y announcement hooks.
+- Improved `StreamSheet` a11y semantics: route scoping, semantic dismissal, hit-test-opaque wrap so barrier taps don't fall through.
+- Improved `StreamAppBar` and `StreamSheetHeader` a11y: title/subtitle merged as one announcement; wrapped in `Semantics(header: true, namesRoute: true)` by default (with `excludeHeaderSemantics` opt-out); auto-implied leading gets localized close/back tooltip.
+- Improved `StreamBottomAppBar` a11y: outer semantic container groups children; title/subtitle merged (no heading role, secondary toolbar).
+- Improved `StreamButton` a11y: `Semantics(selected)` and `Tooltip` moved outside `ElevatedButton` with a `MergeSemantics` wrap so a11y state merges cleanly with the button's own node.
+- Improved `StreamStepper` a11y: announces as a single `slider` node with `value`/`increasedValue`/`decreasedValue`/`onIncrease`/`onDecrease`; internal +/- buttons and text field excluded from SR. New optional `semanticLabel` prop.
+- Improved `StreamTextInput` a11y: desktop-only `onDidGainAccessibilityFocus` / `onDidLoseAccessibilityFocus` handlers (no more IME open on SR swipe on iOS/Android); error text moved to its own live-region container.
+- Improved `StreamMessageComposerAttachment` a11y: new `semanticLabel` and `mergeRemoveAction` props; content sub-trees excluded so the tile is one focus stop with a `remove` tap action. Forwarded through file, media, and unsupported attachment subclasses.
+
 ## 0.4.0
 
 ### ✨ Features
