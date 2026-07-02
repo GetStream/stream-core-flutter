@@ -198,7 +198,9 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
           PositionedDirectional(
             top: 0,
             end: 0,
-            child: props.mergeRemoveAction //
+            child:
+                props
+                    .mergeRemoveAction //
                 ? ExcludeSemantics(child: removeControl)
                 : removeControl,
           ),
