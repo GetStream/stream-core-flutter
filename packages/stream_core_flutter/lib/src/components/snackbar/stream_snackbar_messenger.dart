@@ -703,7 +703,10 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
   // of chaining whenComplete onto the forward future.
   void _handleAnimationStatus(AnimationStatus status) {
     if (!mounted) return;
-    if (status == AnimationStatus.completed) _startTimer();
+    if (status == AnimationStatus.completed) {
+      _startTimer();
+      _showing?.snackbar.props.onVisible?.call();
+    }
   }
 
   @override

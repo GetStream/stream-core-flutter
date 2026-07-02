@@ -137,12 +137,14 @@ class StreamSnackbar extends StatelessWidget {
     StreamSnackbarAction? action,
     Duration? duration,
     DismissDirection? dismissDirection,
+    VoidCallback? onVisible,
   }) : props = .new(
          message: message,
          variant: variant,
          action: action,
          duration: duration,
          dismissDirection: dismissDirection,
+         onVisible: onVisible,
        );
 
   /// The properties that configure this snackbar.
@@ -169,6 +171,7 @@ class StreamSnackbarProps {
     this.action,
     this.duration,
     this.dismissDirection,
+    this.onVisible,
   });
 
   /// The message displayed inside the snackbar.
@@ -201,6 +204,14 @@ class StreamSnackbarProps {
   /// [DismissDirection.none] to disable swipe-dismissal entirely. When
   /// null on both, defaults to [DismissDirection.down].
   final DismissDirection? dismissDirection;
+
+  /// Called once after the snackbar has fully animated in.
+  ///
+  /// When [MediaQuery.accessibleNavigationOf] is true the entrance animation
+  /// is skipped and this fires synchronously on display. Useful for pushing
+  /// an explicit [SemanticsService.sendAnnouncement] for screen readers that
+  /// don't reliably observe newly-mounted live regions.
+  final VoidCallback? onVisible;
 }
 
 /// The default implementation of [StreamSnackbar].
