@@ -61,7 +61,10 @@ void main() {
       });
     }
 
-    visit(tester.binding.rootPipelineOwner.semanticsOwner!.rootSemanticsNode!);
+    // rootPipelineOwner.semanticsOwner is null in test env; the deprecated
+    // pipelineOwner path still points at the semantic root in tests.
+    // ignore: deprecated_member_use
+    visit(tester.binding.pipelineOwner.semanticsOwner!.rootSemanticsNode!);
     expect(barNode, isNotNull);
 
     // The outer bar node must have NO actions. A leak from a slot would

@@ -615,7 +615,10 @@ void main() {
         });
       }
 
-      walk(tester.binding.rootPipelineOwner.semanticsOwner!.rootSemanticsNode!);
+      // rootPipelineOwner.semanticsOwner is null in test env; the deprecated
+      // pipelineOwner path still points at the semantic root.
+      // ignore: deprecated_member_use
+      walk(tester.binding.pipelineOwner.semanticsOwner!.rootSemanticsNode!);
       return found;
     }
 
@@ -705,7 +708,9 @@ void main() {
       expect(dragHandleNode, isNotNull);
       expect(dragHandleNode!.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
 
-      tester.binding.rootPipelineOwner.semanticsOwner!.performAction(
+      // See comment above; test env only.
+      // ignore: deprecated_member_use
+      tester.binding.pipelineOwner.semanticsOwner!.performAction(
         dragHandleNode.id,
         SemanticsAction.tap,
       );
