@@ -197,6 +197,7 @@ class _StreamAccessibilityAutofocusState extends State<StreamAccessibilityAutofo
 
   void _requestFocus() {
     if (!mounted) return;
+    if (!widget.enabled) return;
     if (!MediaQuery.accessibleNavigationOf(context)) return;
     final target = _targetKey.currentContext?.findRenderObject();
     if (target == null) return;
