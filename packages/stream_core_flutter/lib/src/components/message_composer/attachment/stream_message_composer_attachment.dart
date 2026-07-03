@@ -165,13 +165,13 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
     // The whole tile is one SR focus stop that reads `semanticLabel` and
     // activates the remove callback on tap. The overlaid remove control is
     // hidden from SR since its behavior is already exposed on the merged
-    // node.
-    // TODO(localize): move "remove" hint to localizations.
+    // node. Uses MaterialLocalizations.deleteButtonTooltip so the hint
+    // is localized alongside the rest of the Material widgets in the app.
     final container = MergeSemantics(
       child: Semantics(
         label: props.semanticLabel,
         onTap: props.onRemovePressed,
-        onTapHint: 'remove',
+        onTapHint: MaterialLocalizations.of(context).deleteButtonTooltip,
         child: innerContent,
       ),
     );

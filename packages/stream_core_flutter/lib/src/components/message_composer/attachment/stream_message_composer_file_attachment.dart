@@ -51,12 +51,14 @@ class StreamMessageComposerFileAttachment extends StatelessWidget {
     Widget? subtitle,
     StreamFileTypeIcon? fileTypeIcon,
     VoidCallback? onRemovePressed,
+    String? semanticLabel,
     StreamMessageComposerFileAttachmentThemeData? style,
   }) : props = .new(
          title: title,
          subtitle: subtitle,
          fileTypeIcon: fileTypeIcon,
          onRemovePressed: onRemovePressed,
+         semanticLabel: semanticLabel,
          style: style,
        );
 
@@ -87,6 +89,7 @@ class StreamMessageComposerFileAttachmentProps {
     this.subtitle,
     this.fileTypeIcon,
     this.onRemovePressed,
+    this.semanticLabel,
     this.style,
   });
 
@@ -111,6 +114,9 @@ class StreamMessageComposerFileAttachmentProps {
   ///
   /// When null, no remove control is shown on the surrounding container.
   final VoidCallback? onRemovePressed;
+
+  /// Semantic label announced when a screen reader focuses the attachment.
+  final String? semanticLabel;
 
   /// Per-instance style overrides.
   ///
@@ -189,8 +195,7 @@ class DefaultStreamMessageComposerFileAttachment extends StatelessWidget {
 
     return StreamMessageComposerAttachment(
       onRemovePressed: props.onRemovePressed,
-      // TODO(localize): move "File" prefix to localizations.
-      semanticLabel: 'File',
+      semanticLabel: props.semanticLabel,
       child: content,
     );
   }
