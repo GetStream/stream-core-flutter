@@ -115,7 +115,14 @@ class StreamMessageComposerFileAttachmentProps {
   /// When null, no remove control is shown on the surrounding container.
   final VoidCallback? onRemovePressed;
 
-  /// Semantic label announced when a screen reader focuses the attachment.
+  /// Semantic label for the attachment.
+  ///
+  /// Announced in accessibility modes (e.g. TalkBack/VoiceOver). This label
+  /// does not show in the UI. Typically a type prefix ("File", "Document")
+  /// so screen-reader users can distinguish attachment kinds.
+  ///
+  ///  * [SemanticsProperties.label], which is set to [semanticLabel] in
+  ///    the underlying [Semantics] widget.
   final String? semanticLabel;
 
   /// Per-instance style overrides.

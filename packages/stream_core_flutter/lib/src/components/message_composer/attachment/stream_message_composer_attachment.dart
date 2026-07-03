@@ -113,10 +113,10 @@ class StreamMessageComposerAttachmentProps {
 
   /// Semantic label announced when a screen reader focuses the attachment.
   ///
-  /// Typically a type prefix ("File", "Photo", "Video", …). When
-  /// [onRemovePressed] is non-null, the focused tile additionally exposes a
-  /// `tap` action whose hint reads "remove"; activating it calls
-  /// [onRemovePressed].
+  /// Typically a localized type prefix (e.g. `"File"`, `"Photo"`, `"Video"`).
+  /// When [onRemovePressed] is non-null, the tile additionally exposes a
+  /// `tap` action hinted by [MaterialLocalizations.deleteButtonTooltip]
+  /// that invokes [onRemovePressed].
   final String? semanticLabel;
 
   /// Per-instance style overrides.
@@ -147,6 +147,8 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
     final theme = context.streamMessageComposerAttachmentTheme.merge(props.style);
     final defaults = _StreamMessageComposerAttachmentDefaults(context);
 
+    final localizations = MaterialLocalizations.of(context);
+
     final effectiveSide = theme.side ?? defaults.side;
     final effectiveShape = (theme.shape ?? defaults.shape).copyWith(side: effectiveSide);
     final effectiveBackgroundColor = theme.backgroundColor ?? defaults.backgroundColor;
@@ -165,13 +167,12 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
     // The whole tile is one SR focus stop that reads `semanticLabel` and
     // activates the remove callback on tap. The overlaid remove control is
     // hidden from SR since its behavior is already exposed on the merged
-    // node. Uses MaterialLocalizations.deleteButtonTooltip so the hint
-    // is localized alongside the rest of the Material widgets in the app.
+    // node.
     final container = MergeSemantics(
       child: Semantics(
         label: props.semanticLabel,
         onTap: props.onRemovePressed,
-        onTapHint: MaterialLocalizations.of(context).deleteButtonTooltip,
+        onTapHint: localizations.deleteButtonTooltip,
         child: innerContent,
       ),
     );
