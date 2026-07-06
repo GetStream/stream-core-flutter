@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/chat.dart';
 
@@ -11,7 +10,7 @@ Widget _withStreamTheme(Widget child) {
 }
 
 void main() {
-  testWidgets('media attachment — semantic tree', (tester) async {
+  testWidgets('media attachments — one merged SR node per tile, correct traversal order', (tester) async {
     final handle = tester.ensureSemantics();
 
     await tester.pumpWidget(
@@ -34,21 +33,23 @@ void main() {
       ),
     );
 
-    debugPrint('=== TRAVERSAL ===');
-    final order = tester.semantics.simulatedAccessibilityTraversal();
-    var i = 0;
-    for (final node in order) {
-      final data = node.getSemanticsData();
-      final actions = SemanticsAction.values.where((a) => (data.actions & a.index) != 0).map((a) => a.name).toList();
-      final flags = data.flagsCollection.toStrings();
-      if (data.label.isEmpty && actions.isEmpty && flags.isEmpty) continue;
-      debugPrint('[$i] rect=${node.rect}  label="${data.label}"  flags=$flags  actions=$actions');
-      i++;
+    final photo1 = tester.getSemantics(find.bySemanticsLabel('Photo 1'));
+    final photo2 = tester.getSemantics(find.bySemanticsLabel('Photo 2'));
+
+    for (final tile in [photo1, photo2]) {
+      expect(tile, containsSemantics(hasTapAction: true, onTapHint: 'Delete'));
     }
 
-    debugPrint('\n=== FULL TREE ===');
-    final root = RendererBinding.instance.rootPipelineOwner.semanticsOwner?.rootSemanticsNode;
-    debugPrint(root?.toStringDeep() ?? '(none)');
+    // The remove control is ExcludeSemantics'd — no separate button node.
+    expect(find.bySemanticsLabel('Delete'), findsNothing);
+
+    // SR walks Photo 1 before Photo 2.
+    final labels = tester.semantics
+        .simulatedAccessibilityTraversal()
+        .map((n) => n.getSemanticsData().label)
+        .where((l) => l == 'Photo 1' || l == 'Photo 2')
+        .toList();
+    expect(labels, ['Photo 1', 'Photo 2']);
 
     handle.dispose();
   });

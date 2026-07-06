@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/chat.dart';
 
@@ -11,7 +10,7 @@ Widget _withStreamTheme(Widget child) {
 }
 
 void main() {
-  testWidgets('file attachment — semantic tree', (tester) async {
+  testWidgets('file attachment — single merged SR node with delete affordance', (tester) async {
     final handle = tester.ensureSemantics();
 
     await tester.pumpWidget(
@@ -25,22 +24,16 @@ void main() {
       ),
     );
 
-    debugPrint('=== ACCESSIBILITY TRAVERSAL ORDER (what SR walks) ===');
-    final order = tester.semantics.simulatedAccessibilityTraversal();
-    var i = 0;
-    for (final node in order) {
-      final data = node.getSemanticsData();
-      final actions = SemanticsAction.values.where((a) => (data.actions & a.index) != 0).map((a) => a.name).toList();
-      final flags = data.flagsCollection.toStrings();
-      if (data.label.isEmpty && actions.isEmpty && flags.isEmpty) continue;
-      debugPrint('[$i] rect=${node.rect}  label="${data.label}"  flags=$flags  actions=$actions');
-      i++;
-    }
+    // MergeSemantics rolls up the title + subtitle Text nodes into one SR
+    // focus stop that reads the joined label.
+    final semantics = tester.getSemantics(find.bySemanticsLabel(RegExp('report\\.pdf')));
 
-    debugPrint('\n=== FULL SEMANTIC TREE ===');
-    final owner = RendererBinding.instance.rootPipelineOwner.semanticsOwner;
-    final root = owner?.rootSemanticsNode;
-    debugPrint(root?.toStringDeep() ?? '(no root semantic node)');
+    expect(semantics.label, contains('report.pdf'));
+    expect(semantics.label, contains('2 MB'));
+
+    // Tap on the merged node invokes the remove callback (VoiceOver says
+    // "double-tap to Delete" via onTapHint).
+    expect(semantics, containsSemantics(hasTapAction: true, onTapHint: 'Delete'));
 
     handle.dispose();
   });
