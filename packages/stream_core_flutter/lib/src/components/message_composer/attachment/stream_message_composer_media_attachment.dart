@@ -62,11 +62,13 @@ class StreamMessageComposerMediaAttachment extends StatelessWidget {
     required Widget child,
     VoidCallback? onRemovePressed,
     Widget? mediaBadge,
+    String? semanticLabel,
     StreamMessageComposerMediaAttachmentThemeData? style,
   }) : props = .new(
          child: child,
          onRemovePressed: onRemovePressed,
          mediaBadge: mediaBadge,
+         semanticLabel: semanticLabel,
          style: style,
        );
 
@@ -96,6 +98,7 @@ class StreamMessageComposerMediaAttachmentProps {
     required this.child,
     this.onRemovePressed,
     this.mediaBadge,
+    this.semanticLabel,
     this.style,
   });
 
@@ -114,6 +117,16 @@ class StreamMessageComposerMediaAttachmentProps {
   ///
   /// When null, no remove control is shown on the surrounding container.
   final VoidCallback? onRemovePressed;
+
+  /// Semantic label for the attachment.
+  ///
+  /// Announced in accessibility modes (e.g. TalkBack/VoiceOver). This label
+  /// does not show in the UI. Typically the type prefix ("Photo", "Video",
+  /// "GIF") so screen-reader users can distinguish media kinds.
+  ///
+  ///  * [SemanticsProperties.label], which is set to [semanticLabel] in the
+  ///    underlying [Semantics] widget.
+  final String? semanticLabel;
 
   /// Per-instance style overrides.
   ///
@@ -149,26 +162,29 @@ class DefaultStreamMessageComposerMediaAttachment extends StatelessWidget {
     final effectiveBorderColor = theme.borderColor ?? defaults.borderColor;
     final effectiveSize = theme.size ?? defaults.size;
 
+    final content = SizedBox.fromSize(
+      size: effectiveSize,
+      child: Stack(
+        fit: .expand,
+        children: [
+          ExcludeSemantics(child: props.child),
+          if (props.mediaBadge case final badge?)
+            PositionedDirectional(
+              start: spacing.xxs,
+              bottom: spacing.xxs,
+              child: badge,
+            ),
+        ],
+      ),
+    );
+
     return StreamMessageComposerAttachment(
       onRemovePressed: props.onRemovePressed,
+      semanticLabel: props.semanticLabel,
       style: StreamMessageComposerAttachmentThemeData(
         side: BorderSide(color: effectiveBorderColor),
       ),
-      child: SizedBox.fromSize(
-        size: effectiveSize,
-        child: Stack(
-          fit: .expand,
-          children: [
-            props.child,
-            if (props.mediaBadge case final badge?)
-              PositionedDirectional(
-                start: spacing.xxs,
-                bottom: spacing.xxs,
-                child: badge,
-              ),
-          ],
-        ),
-      ),
+      child: content,
     );
   }
 }

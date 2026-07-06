@@ -138,7 +138,8 @@ class StreamFileTypeIcon extends StatelessWidget {
     required StreamFileType type,
     StreamFileTypeIconSize size = .lg,
     String? extension,
-  }) : props = .new(type: type, size: size, extension: extension);
+    String? semanticLabel,
+  }) : props = .new(type: type, size: size, extension: extension, semanticLabel: semanticLabel);
 
   /// Creates a file type icon from a MIME type string.
   ///
@@ -155,9 +156,10 @@ class StreamFileTypeIcon extends StatelessWidget {
     Key? key,
     String? mimeType,
     StreamFileTypeIconSize size = .lg,
+    String? semanticLabel,
   }) {
     final (type, extension) = _getFileTypeFromMimeType(mimeType);
-    return .new(key: key, type: type, size: size, extension: extension);
+    return .new(key: key, type: type, size: size, extension: extension, semanticLabel: semanticLabel);
   }
 
   /// The properties that configure this file type icon.
@@ -262,6 +264,7 @@ class StreamFileTypeIconProps {
     required this.type,
     required this.size,
     this.extension,
+    this.semanticLabel,
   });
 
   /// The file type to display.
@@ -279,6 +282,15 @@ class StreamFileTypeIconProps {
   /// When provided, this text is rendered on the icon (e.g., 'pdf', 'mp3').
   /// If null, no extension label is shown.
   final String? extension;
+
+  /// Semantic label for the icon.
+  ///
+  /// Announced in accessibility modes (e.g. TalkBack/VoiceOver). This
+  /// label does not show in the UI.
+  ///
+  ///  * [SemanticsProperties.label], which is set to [semanticLabel] in
+  ///    the underlying [Semantics] widget.
+  final String? semanticLabel;
 }
 
 /// The default implementation of [StreamFileTypeIcon].
@@ -303,7 +315,7 @@ class DefaultStreamFileTypeIcon extends StatelessWidget {
     final textTheme = context.streamTextTheme;
     final colorScheme = context.streamColorScheme;
 
-    return Stack(
+    final icon = Stack(
       alignment: .center,
       clipBehavior: .none,
       children: [
@@ -333,6 +345,12 @@ class DefaultStreamFileTypeIcon extends StatelessWidget {
           ),
       ],
     );
+
+    if (props.semanticLabel case final label?) {
+      return Semantics(label: label, excludeSemantics: true, child: icon);
+    }
+
+    return ExcludeSemantics(child: icon);
   }
 
   // Returns whether the given size renders an extension label overlay.

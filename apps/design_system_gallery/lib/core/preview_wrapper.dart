@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/core.dart';
 
 import '../config/preview_configuration.dart';
+import '../widgets/scoped_semantics_debugger.dart';
 
 /// Wrapper widget that applies device frame and text scale to the preview.
 ///
@@ -59,6 +60,11 @@ class PreviewWrapper extends StatelessWidget {
     if (previewConfig.targetPlatform case final targetPlatform?) {
       content = _PlatformOverride(platform: targetPlatform, child: content);
     }
+
+    content = ScopedSemanticsDebugger(
+      enabled: previewConfig.showSemanticsDebugger,
+      child: content,
+    );
 
     if (previewConfig.showDeviceFrame) {
       return Center(

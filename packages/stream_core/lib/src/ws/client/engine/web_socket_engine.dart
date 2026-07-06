@@ -176,7 +176,7 @@ extension type const CloseCode(int code) implements int {
   static const tlsHandshakeFailure = CloseCode(1015);
 }
 
-class WebSocketEngineException with EquatableMixin implements Exception {
+class WebSocketEngineException extends Equatable implements Exception {
   const WebSocketEngineException({
     String? reason,
     int? code = 0,

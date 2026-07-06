@@ -62,10 +62,12 @@ class StreamMessageComposerAttachment extends StatelessWidget {
     super.key,
     required Widget child,
     VoidCallback? onRemovePressed,
+    String? semanticLabel,
     StreamMessageComposerAttachmentThemeData? style,
   }) : props = .new(
          child: child,
          onRemovePressed: onRemovePressed,
+         semanticLabel: semanticLabel,
          style: style,
        );
 
@@ -94,6 +96,7 @@ class StreamMessageComposerAttachmentProps {
   const StreamMessageComposerAttachmentProps({
     required this.child,
     this.onRemovePressed,
+    this.semanticLabel,
     this.style,
   });
 
@@ -107,6 +110,14 @@ class StreamMessageComposerAttachmentProps {
   /// When non-null, a [StreamRemoveControl] is overlaid at the top-end corner of the
   /// container. When null, no remove control is shown.
   final VoidCallback? onRemovePressed;
+
+  /// Semantic label announced when a screen reader focuses the attachment.
+  ///
+  /// Typically a localized type prefix (e.g. `"File"`, `"Photo"`, `"Video"`).
+  /// When [onRemovePressed] is non-null, the tile additionally exposes a
+  /// `tap` action hinted by [MaterialLocalizations.deleteButtonTooltip]
+  /// that invokes [onRemovePressed].
+  final String? semanticLabel;
 
   /// Per-instance style overrides.
   ///
@@ -136,18 +147,33 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
     final theme = context.streamMessageComposerAttachmentTheme.merge(props.style);
     final defaults = _StreamMessageComposerAttachmentDefaults(context);
 
+    final localizations = MaterialLocalizations.of(context);
+
     final effectiveSide = theme.side ?? defaults.side;
     final effectiveShape = (theme.shape ?? defaults.shape).copyWith(side: effectiveSide);
     final effectiveBackgroundColor = theme.backgroundColor ?? defaults.backgroundColor;
     final effectivePadding = theme.padding ?? defaults.padding;
 
-    final container = Padding(
+    final innerContent = Padding(
       padding: effectivePadding,
       child: Material(
         clipBehavior: .hardEdge,
         shape: effectiveShape,
         color: effectiveBackgroundColor,
         child: props.child,
+      ),
+    );
+
+    // The whole tile is one SR focus stop that reads `semanticLabel` and
+    // activates the remove callback on tap. The overlaid remove control is
+    // hidden from SR since its behavior is already exposed on the merged
+    // node.
+    final container = MergeSemantics(
+      child: Semantics(
+        label: props.semanticLabel,
+        onTap: props.onRemovePressed,
+        onTapHint: localizations.deleteButtonTooltip,
+        child: innerContent,
       ),
     );
 
@@ -159,7 +185,7 @@ class DefaultStreamMessageComposerAttachment extends StatelessWidget {
           PositionedDirectional(
             top: 0,
             end: 0,
-            child: StreamRemoveControl(onPressed: onPressed),
+            child: ExcludeSemantics(child: StreamRemoveControl(onPressed: onPressed)),
           ),
         ],
       );

@@ -97,6 +97,7 @@ class StreamSheetHeader extends StatelessWidget implements PreferredSizeWidget {
     Widget? subtitle,
     Widget? trailing,
     bool primary = true,
+    bool excludeHeaderSemantics = false,
     StreamSheetHeaderStyle? style,
   }) : props = .new(
          leading: leading,
@@ -105,6 +106,7 @@ class StreamSheetHeader extends StatelessWidget implements PreferredSizeWidget {
          subtitle: subtitle,
          trailing: trailing,
          primary: primary,
+         excludeHeaderSemantics: excludeHeaderSemantics,
          style: style,
        );
 
@@ -140,6 +142,7 @@ class StreamSheetHeaderProps {
     this.subtitle,
     this.trailing,
     this.primary = true,
+    this.excludeHeaderSemantics = false,
     this.style,
   });
 
@@ -191,6 +194,14 @@ class StreamSheetHeaderProps {
   /// (e.g. inside a sub-section of a page that has already consumed
   /// the top inset) so it doesn't double-pad.
   final bool primary;
+
+  /// Whether to omit the heading role from the [title].
+  ///
+  /// Defaults to false. When true, the header doesn't mark the title as a
+  /// heading or claim the sheet's accessible name — useful when the title
+  /// widget carries its own heading semantics, or when the header is shown
+  /// in a sub-section that shouldn't identify the sheet.
+  final bool excludeHeaderSemantics;
 
   /// The visual style applied to this header.
   ///
@@ -297,9 +308,11 @@ class DefaultStreamSheetHeader extends StatelessWidget {
       }
 
       if (icon != null && onPressed != null) {
+        final localizations = MaterialLocalizations.of(context);
         leading = StreamButton.icon(
           type: .outline,
           style: .secondary,
+          tooltip: icon == icons.xmark ? localizations.closeButtonTooltip : localizations.backButtonTooltip,
           icon: Icon(icon),
           onPressed: onPressed,
         );
@@ -347,11 +360,24 @@ class DefaultStreamSheetHeader extends StatelessWidget {
 
     Widget? middle;
     if (titleWidget != null || subtitleWidget != null) {
-      middle = Column(
+      // Title and subtitle read as a single announcement; when not
+      // excluded, the node is also marked as a heading and used as the
+      // sheet's accessible name on platforms that announce one.
+      Widget child = Column(
         mainAxisSize: .min,
         spacing: spacing.xxs,
         children: [?titleWidget, ?subtitleWidget],
       );
+
+      if (!props.excludeHeaderSemantics) {
+        child = Semantics(
+          header: true,
+          namesRoute: true,
+          child: child,
+        );
+      }
+
+      middle = MergeSemantics(child: child);
     }
 
     // The header advertises a fixed height via [PreferredSizeWidget]; the
@@ -378,7 +404,16 @@ class DefaultStreamSheetHeader extends StatelessWidget {
       header = SafeArea(bottom: false, child: header);
     }
 
-    return header;
+    // The outer [Semantics] keeps the header's children grouped for screen
+    // readers, so leading, title, subtitle, and trailing aren't intermixed
+    // with surrounding sheet content. The inner [Semantics] forces each
+    // slot's semantics onto its own node — without it, a raw
+    // [GestureDetector] in a slot would attach its action to the outer
+    // container and collapse the bar into a single tappable focus stop.
+    return Semantics(
+      container: true,
+      child: Semantics(explicitChildNodes: true, child: header),
+    );
   }
 }
 

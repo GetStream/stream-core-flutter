@@ -10,6 +10,7 @@ import 'baselines_toggle.dart';
 import 'debug_paint_toggle.dart';
 import 'device_selector.dart';
 import 'platform_selector.dart';
+import 'semantics_debugger_toggle.dart';
 import 'text_direction_selector.dart';
 import 'text_scale_selector.dart';
 import 'theme_mode_toggle.dart';
@@ -103,6 +104,7 @@ class GalleryToolbar extends StatelessWidget {
                     const DebugPaintToggle(),
                     const BaselinesToggle(),
                     const WidgetSelectToggle(),
+                    const SemanticsDebuggerToggle(),
                   ],
                 ],
               ),

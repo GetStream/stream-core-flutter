@@ -107,6 +107,30 @@ class StreamTextInputThemeData with _$StreamTextInputThemeData {
   ) => _$StreamTextInputThemeData.lerp(a, b, t);
 }
 
+/// Where [StreamTextInput.helperText] is rendered relative to the bordered
+/// input area.
+///
+/// Describes which side of the field the helper text gravitates toward.
+///
+/// See also:
+///
+///  * [StreamTextInputStyle.helperAffinity], the theme-level setting.
+enum StreamHelperAffinity {
+  /// Helper text sits inside the bordered area, directly below the
+  /// input row.
+  ///
+  /// Useful when the design treats helper text as part of the field's
+  /// own chrome — visually contained, scoped to the input.
+  inside,
+
+  /// Helper text sits outside the bordered area, below the field.
+  ///
+  /// Useful when helper text should read as an external caption — for
+  /// fields with limited vertical space, or when the design calls for
+  /// stronger visual separation between input and feedback.
+  outside,
+}
+
 /// Visual styling properties for [StreamTextInput].
 ///
 /// Controls the border, colors, text styles, and helper text appearance.
@@ -129,6 +153,7 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
   const StreamTextInputStyle({
     this.textStyle,
     this.hintStyle,
+    this.labelStyle,
     this.iconColor,
     this.iconSize,
     this.cursorColor,
@@ -139,6 +164,7 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
     this.helperInfoStyle,
     this.helperErrorStyle,
     this.helperSuccessStyle,
+    this.helperAffinity,
     this.borderRadius,
     this.border,
     this.focusBorder,
@@ -161,6 +187,7 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
   const StreamTextInputStyle.collapsed({
     this.textStyle,
     this.hintStyle,
+    this.labelStyle,
     this.iconColor,
     this.iconSize,
     this.cursorColor,
@@ -171,6 +198,7 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
     this.helperInfoStyle,
     this.helperErrorStyle,
     this.helperSuccessStyle,
+    this.helperAffinity,
     this.borderRadius,
     this.fillColor,
     this.constraints,
@@ -200,6 +228,16 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
   /// Defaults to [StreamTextTheme.bodyDefault] with
   /// [StreamColorScheme.textTertiary].
   final TextStyle? hintStyle;
+
+  /// The text style for the persistent label rendered above the input.
+  ///
+  /// Supports [WidgetStateTextStyle] for per-state styling (e.g. disabled).
+  /// When the input is disabled, the default resolves to
+  /// [StreamColorScheme.textDisabled].
+  ///
+  /// Defaults to [StreamTextTheme.captionEmphasis] with
+  /// [StreamColorScheme.textPrimary].
+  final TextStyle? labelStyle;
 
   /// The color for leading and trailing icons.
   ///
@@ -258,6 +296,14 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
   /// Defaults to [StreamTextTheme.captionDefault] with
   /// [StreamColorScheme.accentSuccess].
   final TextStyle? helperSuccessStyle;
+
+  /// Where helper text is rendered relative to the bordered input area.
+  ///
+  /// Set globally via [StreamTextInputTheme]; overridable per-instance by
+  /// passing a [StreamTextInputStyle] to [StreamTextInput.style].
+  ///
+  /// Defaults to [StreamHelperAffinity.inside].
+  final StreamHelperAffinity? helperAffinity;
 
   /// The border radius of the text input.
   ///

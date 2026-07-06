@@ -90,6 +90,8 @@ class StreamListTile extends StatelessWidget {
     EdgeInsetsGeometry? contentPadding,
     TextStyle? titleTextStyle,
     TextStyle? subtitleTextStyle,
+    FocusNode? focusNode,
+    bool autofocus = false,
   }) : props = .new(
          leading: leading,
          title: title,
@@ -103,6 +105,8 @@ class StreamListTile extends StatelessWidget {
          contentPadding: contentPadding,
          titleTextStyle: titleTextStyle,
          subtitleTextStyle: subtitleTextStyle,
+         focusNode: focusNode,
+         autofocus: autofocus,
        );
 
   /// The props controlling the appearance and behavior of this tile.
@@ -140,6 +144,8 @@ class StreamListTileProps {
     this.contentPadding,
     this.titleTextStyle,
     this.subtitleTextStyle,
+    this.focusNode,
+    this.autofocus = false,
   });
 
   /// A widget displayed before the title.
@@ -207,6 +213,12 @@ class StreamListTileProps {
   ///
   /// Overrides [StreamListTileThemeData.subtitleTextStyle] for this tile.
   final TextStyle? subtitleTextStyle;
+
+  /// {@macro flutter.widgets.Focus.focusNode}
+  final FocusNode? focusNode;
+
+  /// {@macro flutter.widgets.Focus.autofocus}
+  final bool autofocus;
 }
 
 /// The default implementation of [StreamListTile].
@@ -300,6 +312,8 @@ class DefaultStreamListTile extends StatelessWidget {
       onTap: props.onTap,
       onLongPress: props.onLongPress,
       contentPadding: props.contentPadding,
+      focusNode: props.focusNode,
+      autofocus: props.autofocus,
       child: IconTheme.merge(
         data: IconThemeData(color: effectiveIconColor),
         child: ConstrainedBox(
@@ -426,6 +440,8 @@ class StreamListTileContainer extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.contentPadding,
+    this.focusNode,
+    this.autofocus = false,
   });
 
   /// The content to display inside the container.
@@ -460,6 +476,12 @@ class StreamListTileContainer extends StatelessWidget {
   /// Overrides [StreamListTileThemeData.contentPadding] for this tile.
   final EdgeInsetsGeometry? contentPadding;
 
+  /// {@macro flutter.widgets.Focus.focusNode}
+  final FocusNode? focusNode;
+
+  /// {@macro flutter.widgets.Focus.autofocus}
+  final bool autofocus;
+
   @override
   Widget build(BuildContext context) {
     final theme = context.streamListTileTheme;
@@ -493,6 +515,8 @@ class StreamListTileContainer extends StatelessWidget {
       onTap: enabled ? onTap : null,
       onLongPress: enabled ? onLongPress : null,
       canRequestFocus: enabled,
+      focusNode: focusNode,
+      autofocus: autofocus,
       mouseCursor: effectiveMouseCursor,
       overlayColor: effectiveOverlayColor,
       child: Semantics(

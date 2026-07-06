@@ -15,6 +15,7 @@ class PreviewConfiguration extends ChangeNotifier {
   DeviceInfo _selectedDevice = Devices.ios.iPhone13ProMax;
   var _textScale = 1.0;
   var _showDeviceFrame = false;
+  var _showSemanticsDebugger = false;
   var _textDirection = TextDirection.ltr;
   TargetPlatform? _targetPlatform;
 
@@ -25,6 +26,7 @@ class PreviewConfiguration extends ChangeNotifier {
   DeviceInfo get selectedDevice => _selectedDevice;
   double get textScale => _textScale;
   bool get showDeviceFrame => _showDeviceFrame;
+  bool get showSemanticsDebugger => _showSemanticsDebugger;
   TextDirection get textDirection => _textDirection;
 
   /// The target platform override, or `null` to use the system default.
@@ -77,6 +79,11 @@ class PreviewConfiguration extends ChangeNotifier {
 
   void toggleDeviceFrame() {
     _showDeviceFrame = !_showDeviceFrame;
+    notifyListeners();
+  }
+
+  void toggleSemanticsDebugger() {
+    _showSemanticsDebugger = !_showSemanticsDebugger;
     notifyListeners();
   }
 

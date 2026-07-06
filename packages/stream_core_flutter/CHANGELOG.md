@@ -1,3 +1,16 @@
+## 0.5.0
+
+### ✨ Features
+
+- Added `StreamAccessibilityAutofocus` — behavior-only wrapper that requests screen-reader focus on its child shortly after mount; useful for redirecting focus on route entry.
+- Added `StreamSemanticsAnnouncer` — imperative one-shot screen-reader announcement helper.
+- Added `StreamSemanticsTransitionAnnouncer` — observes a `Listenable` and dispatches transition announcements to the screen reader.
+- Added `labelText` and `helperAffinity` to `StreamTextInput` for a floating label above the field and helper text positioned inside or outside the bordered chassis.
+- Added `focusNode` and `autofocus` pass-through on `StreamListTile`.
+- Added optional `semanticLabel` to `StreamBadgeNotification`, `StreamFileTypeIcon`, `StreamStepper`, `StreamMessageComposerAttachment`, and `StreamMessageComposerMediaAttachment`.
+- Added `excludeHeaderSemantics` to `StreamAppBar` and `StreamSheetHeader` for opting out of the default heading role and route naming on the title.
+- Added `onVisible` callback to `StreamSnackbar` — fires after the entrance animation completes (or synchronously when a screen reader is active).
+
 ## 0.4.0
 
 ### ✨ Features

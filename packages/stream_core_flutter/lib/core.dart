@@ -10,6 +10,9 @@ library;
 
 export 'package:svg_icon_widget/svg_icon_widget.dart';
 
+export 'src/a11y/stream_accessibility_autofocus.dart';
+export 'src/a11y/stream_semantics_announcer.dart';
+export 'src/a11y/stream_semantics_transition_announcer.dart';
 export 'src/components/accessories/stream_audio_waveform.dart';
 export 'src/components/accessories/stream_emoji.dart';
 export 'src/components/accessories/stream_file_type_icon.dart';
