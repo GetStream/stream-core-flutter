@@ -177,6 +177,26 @@ When writing a test, imagine the developer who will read it six months from now.
 Anything you can do to help that reader understand what and why the test is
 checking is worth doing.
 
+## `group` is for shared preconditions, not for organizing a file
+
+Reach for `group(...)` when several tests share a precondition that's worth
+stating once: "when the widget is in dark mode", "when `textDirection` is RTL",
+"when the button is disabled". The group description names the precondition;
+the test descriptions inside name the behaviors that follow from it.
+
+```dart
+group('when textDirection is RTL', () {
+  testWidgets('StreamAvatar keeps its label on the trailing side', (tester) async { ... });
+  testWidgets('StreamButton mirrors its leading icon', (tester) async { ... });
+});
+```
+
+Do not use `group` to organize a file by widget or method — that's what the
+file itself is for. If a `group` is doing the work a separate file should be
+doing,
+[split the file instead](STYLE_GUIDE.md#prefer-more-test-files-avoid-long-test-files).
+Nested groups more than one level deep are almost always a signal to split.
+
 ## Golden tests are behavioural tests too
 
 Golden tests aren't a shortcut around the four principles above. A golden with a
@@ -201,8 +221,10 @@ goldenTest(
 );
 ```
 
-Regenerate goldens (`melos run update:goldens`) deliberately, in a separate commit
-from behavior changes, so reviewers can see what visually changed.
+Regenerate goldens deliberately, in a separate commit from behavior changes, so
+reviewers can see what visually changed. Prefer the `update_goldens` GitHub
+Action over regenerating locally — see
+[Golden tests in STYLE_GUIDE.md](STYLE_GUIDE.md#golden-tests) for the workflow.
 
 ## See also
 

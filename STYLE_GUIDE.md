@@ -107,17 +107,7 @@ document; the section link is provided.
   `fix(scope): …`, `feat(scope): …`, `refactor(scope)!: …` for breaking changes.
 
 
-## A word on designing APIs
-
-Designing an API is an art. Like all forms of art, one learns by practicing. In the
-absence of one's own experience, one can attempt to rely on the experience of others.
-When receiving feedback about API design from an experienced API designer, they will
-sometimes seem unhappy without being able to articulate why. When this happens,
-seriously consider that your API should be scrapped and a new solution found.
-
-This requires a different and equally important skill: not getting attached to your
-creations. Try many wildly different APIs, then write code that uses them. Throw away
-APIs that feel frustrating or lead to buggy code.
+## Public API stability
 
 An SDK API is for years, not just for the one PR you are working on. A design system
 is even worse — every widget lands in downstream apps, and each field of each theme
@@ -225,11 +215,14 @@ Predictable APIs that give the developer control are generally preferred over
 APIs that mostly do the right thing but don't give the developer any way to
 adjust the results. Predictability is reassuring.
 
-### Solve real problems by literally solving a real problem
+### Design against a concrete use case
 
-Where possible, partner with a real customer who wants the feature and is
-willing to help you test it. Only by actually using a feature in the real world
-can we be confident it is ready.
+Before adding a public API, be able to point to a specific integration that needs
+it — a real customer request, a downstream consumer in `stream-chat-flutter` or
+`stream-video-flutter`, a documented gallery use-case. APIs designed against
+hypothetical needs tend to have the wrong shape for every real caller; APIs
+designed against one real caller are easier to generalize later, once a second
+caller shows up.
 
 ### Start designing APIs from the closest point to the developer
 
@@ -271,11 +264,19 @@ If a component is being deprecated, follow the deprecation policy: annotate with
 `@Deprecated('Use X instead.')`, add a `### 🛑 Breaking / Removals` CHANGELOG entry,
 and keep the deprecated API for at least one minor release before removal.
 
-### Copyright and licensing
+Deprecating an API that a product SDK (`stream-chat-flutter`, `stream-video-flutter`)
+re-exports is different — those product SDKs have their own deprecation cycles with
+their own users. Removing a re-exported API in the next minor of core would break
+the product SDK's public surface without going through *its* deprecation cycle. Do
+not remove such an API until every product SDK that re-exports it has completed a
+deprecation cycle for it (typically the next major of the product SDK). When in
+doubt, check who re-exports the symbol before removing it.
 
-New source files should carry the standard header used elsewhere in the repo.
+### Third-party code
+
 Third-party code must live in a `third_party/` subdirectory of the package with a
-`LICENSE` file that describes the license and a `README` describing its provenance.
+`LICENSE` file that describes the license and a `README` describing its
+provenance. Avoid third-party code unless strictly necessary.
 
 
 ## Repository structure
@@ -844,6 +845,15 @@ Organize tests into smaller files grouped by feature, widget, or behavior. Split
 one big `stream_avatar_test.dart` into `stream_avatar_layout_test.dart`,
 `stream_avatar_theme_test.dart`, etc., as the test surface grows.
 
+### Use `group` sparingly, only for tight clusters
+
+`group(...)` is fine — and used widely across the repo — for a small cluster of
+tests that share a precondition, e.g. "when the widget is in dark mode", "when
+`textDirection` is RTL". Keep the group's description short and describe the
+precondition, not the widget under test. Prefer splitting the file over piling
+up nested groups; if a group is doing the job a separate file should be doing,
+split the file instead.
+
 ### Mock only at the seam
 
 Prefer mocking at the boundary between your code and the outside world (HTTP
@@ -871,16 +881,23 @@ Golden tests are tagged with `golden` in `dart_test.yaml`. Every visible compone
 must ship with a golden test that exercises the primary variants (sizes, states,
 theme brightness).
 
-To regenerate goldens:
+**Regenerate committed goldens via the `update_goldens` GitHub Action**, not
+locally. The action runs on Linux — the same host CI uses — so the committed
+`goldens/ci/*.png` match what CI compares against. Locally-generated goldens
+carry host-specific font hinting and antialiasing that will fail CI on other
+machines.
+
+For local iteration only, you can run:
 
 ```bash
 melos run update:goldens
 ```
 
-Regenerate goldens deliberately, in a separate commit from behavior changes, so
-reviewers can see what visually changed. Do not check in a golden mismatch just
-because a test "works locally" — only the CI-generated PNGs under `goldens/ci/`
-are committed and diffed.
+…but do not commit those files. Once you're confident the visual change is what
+you want, dispatch the `update_goldens` workflow from the PR branch — it runs
+`melos run update:goldens` on Linux and auto-commits the updated PNGs back to
+the branch as a `chore: Update Goldens` commit. Pull the branch after the
+workflow finishes.
 
 
 ## Naming
@@ -1084,8 +1101,23 @@ If no order is obvious, use:
 8. Read-only properties (other than `hashCode`).
 9. Operators (other than `==`).
 10. Methods (other than `toString` and `build`).
-11. The `build` method.
+11. The `build` method (together with its `_build*` helpers — see below).
 12. `operator ==`, `hashCode`, `toString`, and diagnostics methods.
+
+### Group methods by feature, not by visibility
+
+The list above is a fallback ordering. Within slots 10–11 (`Methods` and
+`build`), group by concept, not by public/private:
+
+- A private helper called by one public method should live directly under that
+  method, not in a separate "private helpers" block at the bottom of the class.
+- Related methods (e.g. all the drag handlers for a sheet, or all the setup
+  helpers used by `initState`) sit as a run.
+- `_build*` helpers used by `build` cluster around it. `build` heads the block,
+  its helpers follow. Don't separate them with unrelated methods.
+
+This matches the existing repo (e.g. `StreamSheet`, `StreamSnackbarMessenger`)
+and keeps a private helper visually close to the code that uses it.
 
 ### Use braces for long function bodies
 
@@ -1232,9 +1264,17 @@ When adding or updating icons:
 
 1. Pull the latest SVGs from `design-system-tokens/assets/icons/` into
    `assets_source/icons/`.
-2. Run `melos run generate:icons` to regenerate the icon font and the `StreamIcons`
-   class.
-3. Commit both the SVG sources and the regenerated font + Dart output together —
+2. If the icon should mirror in RTL layouts, add its base name to the
+   `_rtlIcons` list in `scripts/generate_icons.dart` so the generator emits
+   `matchTextDirection: true` for it. This covers obvious directional glyphs
+   (arrows, chevrons, `reply`, `send`, `sidebar`) but also icons with
+   directional metaphors that read wrong when unmirrored (`audio`, `megaphone`,
+   `search`, `video`). Skip icons that are symmetric or shouldn't mirror
+   (a bell, a heart, brand logos). If in doubt, look at what comparable icons
+   already do in `_rtlIcons`.
+3. Run `melos run generate:icons` to regenerate the icon font and the
+   `StreamIcons` class.
+4. Commit both the SVG sources and the regenerated font + Dart output together —
    they must stay in sync.
 
 Do not edit the generated `StreamIcons.dart` or the icon font by hand.
