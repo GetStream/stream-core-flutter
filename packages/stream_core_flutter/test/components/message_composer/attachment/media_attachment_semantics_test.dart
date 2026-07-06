@@ -37,7 +37,7 @@ void main() {
     final photo2 = tester.getSemantics(find.bySemanticsLabel('Photo 2'));
 
     for (final tile in [photo1, photo2]) {
-      expect(tile, containsSemantics(hasTapAction: true, onTapHint: 'Delete'));
+      expect(tile, isSemantics(hasTapAction: true, onTapHint: 'Delete'));
     }
 
     // The remove control is ExcludeSemantics'd — no separate button node.

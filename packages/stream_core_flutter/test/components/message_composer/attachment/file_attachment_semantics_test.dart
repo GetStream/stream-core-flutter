@@ -26,14 +26,14 @@ void main() {
 
     // MergeSemantics rolls up the title + subtitle Text nodes into one SR
     // focus stop that reads the joined label.
-    final semantics = tester.getSemantics(find.bySemanticsLabel(RegExp('report\\.pdf')));
+    final semantics = tester.getSemantics(find.bySemanticsLabel(RegExp(r'report\.pdf')));
 
     expect(semantics.label, contains('report.pdf'));
     expect(semantics.label, contains('2 MB'));
 
     // Tap on the merged node invokes the remove callback (VoiceOver says
     // "double-tap to Delete" via onTapHint).
-    expect(semantics, containsSemantics(hasTapAction: true, onTapHint: 'Delete'));
+    expect(semantics, isSemantics(hasTapAction: true, onTapHint: 'Delete'));
 
     handle.dispose();
   });
