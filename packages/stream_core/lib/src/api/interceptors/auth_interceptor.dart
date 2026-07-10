@@ -23,7 +23,12 @@ class AuthInterceptor extends QueuedInterceptor {
     try {
       final token = await _tokenManager.getToken();
 
-      options.queryParameters['user_id'] = _tokenManager.userId;
+      // Use the resolved token's own user id rather than
+      // `_tokenManager.userId`: some token providers (e.g. guest exchanges)
+      // can resolve to a different id than the one originally requested, and
+      // this must stay consistent with the identity in the `Authorization`
+      // header below.
+      options.queryParameters['user_id'] = token.userId;
       options.headers['Authorization'] = token.rawValue;
       options.headers['stream-auth-type'] = token.authType.headerValue;
 
