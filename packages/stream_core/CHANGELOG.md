@@ -4,6 +4,10 @@
 
 - Added `teams` field to `User` class.
 
+### 🐛 Bug Fixes
+
+- `AuthInterceptor` now sets the `user_id` query parameter from the resolved token's own user id instead of `TokenManager.userId`. This keeps REST calls consistent for token providers that can resolve to a different id than requested (e.g. guest token exchanges).
+
 ## 0.4.0
 
 ### 💥 BREAKING CHANGES
