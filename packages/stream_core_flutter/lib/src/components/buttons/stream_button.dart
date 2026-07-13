@@ -414,6 +414,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
           elevation: effectiveElevation,
           backgroundColor: effectiveBackgroundColor,
           foregroundColor: effectiveForegroundColor,
+          iconColor: effectiveForegroundColor,
           overlayColor: effectiveOverlayColor,
           fixedSize: effectiveFixedSize,
           minimumSize: effectiveMinimumSize,

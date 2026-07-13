@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
-Widget _withStreamTheme(Widget child) {
+Widget _withStreamTheme(
+  Widget child, {
+  StreamTheme? streamTheme,
+  ElevatedButtonThemeData? elevatedButtonTheme,
+}) {
   return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme()]),
+    theme: ThemeData(
+      extensions: [streamTheme ?? StreamTheme()],
+      elevatedButtonTheme: elevatedButtonTheme,
+    ),
     home: Scaffold(body: Center(child: child)),
   );
 }
@@ -154,4 +161,33 @@ void main() {
       handle.dispose();
     });
   });
+
+  // Test for https://github.com/GetStream/stream-chat-flutter/issues/2786
+  testWidgets(
+    'host-app ElevatedButtonThemeData.iconColor does not leak into StreamButton icons',
+    (tester) async {
+      const hostIconColor = Color(0xFF00FF00);
+
+      Color? capturedIconColor;
+      await tester.pumpWidget(
+        _withStreamTheme(
+          elevatedButtonTheme: const ElevatedButtonThemeData(
+            style: ButtonStyle(iconColor: WidgetStatePropertyAll(hostIconColor)),
+          ),
+          StreamButton.icon(
+            onPressed: () {},
+            icon: Builder(
+              builder: (context) {
+                capturedIconColor = IconTheme.of(context).color;
+                return const Icon(Icons.add);
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(capturedIconColor, isNot(hostIconColor));
+    },
+  );
 }
