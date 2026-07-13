@@ -1,4 +1,4 @@
-## 0.5.0
+## Upcoming
 
 ### ✨ Features
 
@@ -10,6 +10,10 @@
 - Added optional `semanticLabel` to `StreamBadgeNotification`, `StreamFileTypeIcon`, `StreamStepper`, `StreamMessageComposerAttachment`, and `StreamMessageComposerMediaAttachment`.
 - Added `excludeHeaderSemantics` to `StreamAppBar` and `StreamSheetHeader` for opting out of the default heading role and route naming on the title.
 - Added `onVisible` callback to `StreamSnackbar` — fires after the entrance animation completes (or synchronously when a screen reader is active).
+
+### 🐞 Fixed
+
+- Fixed `StreamButton` icons picking up the host app's `ElevatedButtonThemeData.iconColor` instead of the button's own `foregroundColor`.
 
 ## 0.4.0
 
