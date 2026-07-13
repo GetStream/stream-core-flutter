@@ -2,6 +2,9 @@ name: update_goldens
 
 on: workflow_dispatch
 
+permissions:
+  contents: read
+
 jobs:
   update_goldens:
     runs-on: ubuntu-latest
