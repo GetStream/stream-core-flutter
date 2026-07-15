@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:stream_core/stream_core.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import 'components/stream_app_bar_theme.dart';
@@ -40,6 +41,7 @@ import 'components/stream_snackbar_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'primitives/stream_colors.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -255,13 +257,33 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   ///
   /// This is a convenience factory that calls [StreamTheme] with
   /// [Brightness.dark].
-  factory StreamTheme.dark() => StreamTheme(brightness: .dark);
+  factory StreamTheme.dark({Color? brandColor, Color? chromeColor}) => StreamTheme(
+    brightness: .dark,
+    colorScheme: StreamColorScheme.dark(
+      brand: brandColor?.let(
+        (brandColor) => StreamColorSwatch.fromColor(brandColor, brightness: .dark),
+      ),
+      chrome: chromeColor?.let(
+        (chromeColor) => StreamColorSwatch.fromColor(chromeColor, brightness: .dark),
+      ),
+    ),
+  );
 
   /// Creates a light theme configuration.
   ///
   /// This is a convenience factory that calls [StreamTheme] with
   /// [Brightness.light].
-  factory StreamTheme.light() => StreamTheme(brightness: .light);
+  factory StreamTheme.light({Color? brandColor, Color? chromeColor}) => StreamTheme(
+    brightness: .light,
+    colorScheme: StreamColorScheme.light(
+      brand: brandColor?.let(
+        (color) => StreamColorSwatch.fromColor(brandColor),
+      ),
+      chrome: chromeColor?.let(
+        (color) => StreamColorSwatch.fromColor(chromeColor),
+      ),
+    ),
+  );
 
   const StreamTheme.raw({
     required this.brightness,
