@@ -9,11 +9,24 @@ class ColorPickerTile extends StatelessWidget {
     required this.label,
     required this.color,
     required this.onColorChanged,
+    this.isDefault = false,
+    this.onReset,
   });
 
   final String label;
   final Color color;
   final ValueChanged<Color> onColorChanged;
+
+  /// Whether [color] is still the SDK default (i.e. not overridden).
+  ///
+  /// When true, a "default" subtitle is shown below [label] and no reset
+  /// control is displayed.
+  final bool isDefault;
+
+  /// Reverts this color back to its SDK default.
+  ///
+  /// Ignored (no reset control shown) when [isDefault] is true.
+  final VoidCallback? onReset;
 
   @override
   Widget build(BuildContext context) {
@@ -59,12 +72,25 @@ class ColorPickerTile extends StatelessWidget {
               ),
               SizedBox(width: spacing.sm + spacing.xxs),
               Expanded(
-                child: Text(
-                  label,
-                  style: textTheme.metadataDefault.copyWith(
-                    color: colorScheme.textPrimary,
-                    fontFamily: 'monospace',
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      style: textTheme.metadataDefault.copyWith(
+                        color: colorScheme.textPrimary,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                    if (isDefault)
+                      Text(
+                        'default',
+                        style: textTheme.metadataDefault.copyWith(
+                          color: colorScheme.textTertiary,
+                        ),
+                      ),
+                  ],
                 ),
               ),
               Text(
@@ -74,6 +100,17 @@ class ColorPickerTile extends StatelessWidget {
                   fontFamily: 'monospace',
                 ),
               ),
+              if (!isDefault && onReset != null) ...[
+                SizedBox(width: spacing.xs + spacing.xxs),
+                Tooltip(
+                  message: 'Reset to default',
+                  child: InkWell(
+                    onTap: onReset,
+                    borderRadius: BorderRadius.all(radius.xs),
+                    child: Icon(Icons.restart_alt, color: colorScheme.textSecondary, size: 14),
+                  ),
+                ),
+              ],
               SizedBox(width: spacing.xs + spacing.xxs),
               Icon(Icons.edit, color: colorScheme.textSecondary, size: 12),
             ],

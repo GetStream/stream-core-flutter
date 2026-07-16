@@ -253,37 +253,55 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     );
   }
 
-  /// Creates a dark theme configuration.
-  ///
-  /// This is a convenience factory that calls [StreamTheme] with
-  /// [Brightness.dark].
-  factory StreamTheme.dark({Color? brandColor, Color? chromeColor}) => StreamTheme(
-    brightness: .dark,
-    colorScheme: StreamColorScheme.dark(
-      brand: brandColor?.let(
-        (brandColor) => StreamColorSwatch.fromColor(brandColor, brightness: .dark),
-      ),
-      chrome: chromeColor?.let(
-        (chromeColor) => StreamColorSwatch.fromColor(chromeColor, brightness: .dark),
-      ),
-    ),
-  );
-
   /// Creates a light theme configuration.
   ///
   /// This is a convenience factory that calls [StreamTheme] with
   /// [Brightness.light].
-  factory StreamTheme.light({Color? brandColor, Color? chromeColor}) => StreamTheme(
-    brightness: .light,
-    colorScheme: StreamColorScheme.light(
-      brand: brandColor?.let(
-        (color) => StreamColorSwatch.fromColor(brandColor),
+  factory StreamTheme.light({Color? brandColor, Color? chromeColor}) {
+    final brand = brandColor?.let(
+      (brandColor) => StreamColorSwatch.fromColor(brandColor, brightness: .light),
+    );
+    final chrome =
+        chromeColor?.let(
+          (chromeColor) => StreamColorSwatch.fromColor(chromeColor, brightness: .light),
+        ) ??
+        brandColor?.let(
+          (brandColor) => StreamColorSwatch.fromColor(brandColor, brightness: .light, saturation: 0.1),
+        );
+
+    return StreamTheme(
+      brightness: .light,
+      colorScheme: StreamColorScheme.light(
+        brand: brand,
+        chrome: chrome,
       ),
-      chrome: chromeColor?.let(
-        (color) => StreamColorSwatch.fromColor(chromeColor),
+    );
+  }
+
+  /// Creates a dark theme configuration.
+  ///
+  /// This is a convenience factory that calls [StreamTheme] with
+  /// [Brightness.dark].
+  factory StreamTheme.dark({Color? brandColor, Color? chromeColor}) {
+    final brand = brandColor?.let(
+      (brandColor) => StreamColorSwatch.fromColor(brandColor, brightness: .dark),
+    );
+    final chrome =
+        chromeColor?.let(
+          (chromeColor) => StreamColorSwatch.fromColor(chromeColor, brightness: .dark),
+        ) ??
+        brandColor?.let(
+          (brandColor) => StreamColorSwatch.fromColor(brandColor, brightness: .dark, saturation: 0.1),
+        );
+
+    return StreamTheme(
+      brightness: .dark,
+      colorScheme: StreamColorScheme.dark(
+        brand: brand,
+        chrome: chrome,
       ),
-    ),
-  );
+    );
+  }
 
   const StreamTheme.raw({
     required this.brightness,

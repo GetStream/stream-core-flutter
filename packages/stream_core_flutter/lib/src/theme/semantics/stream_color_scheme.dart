@@ -484,31 +484,6 @@ class StreamColorScheme with _$StreamColorScheme {
     );
   }
 
-  factory StreamColorScheme.fromColorScheme(
-    ColorScheme colorScheme, {
-    Brightness brightness = Brightness.light,
-  }) {
-    final brand = StreamColorSwatch.fromColor(colorScheme.primary, brightness: brightness);
-    final chrome = StreamColorSwatch.fromColor(colorScheme.surface, brightness: brightness);
-
-    final base = brightness == Brightness.light
-        ? StreamColorScheme.light(brand: brand, chrome: chrome)
-        : StreamColorScheme.dark(brand: brand, chrome: chrome);
-
-    return base.copyWith(
-      // Accent
-      accentError: colorScheme.error,
-      accentNeutral: colorScheme.secondary,
-      // // Text
-      textPrimary: colorScheme.onSurface,
-      textSecondary: colorScheme.onSurfaceVariant,
-      textTertiary: colorScheme.outline,
-      textLink: colorScheme.primary,
-      textOnAccent: colorScheme.onPrimary,
-      textOnInverse: colorScheme.onInverseSurface,
-    );
-  }
-
   const StreamColorScheme.raw({
     required this.brand,
     required this.chrome,

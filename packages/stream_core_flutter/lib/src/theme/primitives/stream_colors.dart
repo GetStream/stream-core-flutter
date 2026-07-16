@@ -269,10 +269,14 @@ abstract final class StreamColors {
 class StreamColorSwatch extends ColorSwatch<int> {
   const StreamColorSwatch(super.primary, super._swatch);
 
-  factory StreamColorSwatch.fromColor(Color color, {Brightness brightness = Brightness.light}) {
+  factory StreamColorSwatch.fromColor(
+    Color color, {
+    Brightness brightness = Brightness.light,
+    double? saturation,
+  }) {
     return StreamColorSwatch(
       color.toARGB32(),
-      StreamColorSwatchHelper.generateShadeMap(color, brightness: brightness),
+      StreamColorSwatchHelper.generateShadeMap(color, brightness: brightness, saturation: saturation),
     );
   }
 

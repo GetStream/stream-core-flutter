@@ -15,11 +15,21 @@ class StreamColorSwatchHelper {
   /// When [brightness] is [Brightness.dark], the lightness values are inverted
   /// so that lower shade numbers (e.g., 50) are darker and higher shade numbers
   /// (e.g., 900) are lighter.
+  ///
+  /// The [saturation] parameter controls the saturation of the base color.
+  /// The default value is null, which means the saturation is not changed.
+  ///
+  /// The return value is a map of color shades, indexed by the shade number.
   static Map<int, Color> generateShadeMap(
     Color baseColor, {
     Brightness brightness = Brightness.light,
+    double? saturation,
   }) {
-    final hslBase = HSLColor.fromColor(baseColor);
+    var hslBase = HSLColor.fromColor(baseColor);
+    if (saturation != null) {
+      hslBase = hslBase.withSaturation(saturation);
+    }
+
     final centerLightness = hslBase.lightness;
 
     final shades = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900];

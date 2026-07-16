@@ -219,7 +219,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
       child: ColorPickerTile(
         label: 'brandPrimary',
         color: config.brandPrimaryColor,
+        isDefault: !config.brandIsCustom,
         onColorChanged: config.setBrandPrimaryColor,
+        onReset: config.resetBrand,
       ),
     );
   }
@@ -233,7 +235,9 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
       child: ColorPickerTile(
         label: 'chromePrimary',
         color: config.chromePrimaryColor,
+        isDefault: !config.chromeIsCustom,
         onColorChanged: config.setChromePrimaryColor,
+        onReset: config.resetChrome,
       ),
     );
   }
@@ -249,27 +253,37 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'accentPrimary',
             color: config.accentPrimary,
+            isDefault: !config.accentPrimaryIsCustom,
             onColorChanged: config.setAccentPrimary,
+            onReset: config.resetAccentPrimary,
           ),
           ColorPickerTile(
             label: 'accentSuccess',
             color: config.accentSuccess,
+            isDefault: !config.accentSuccessIsCustom,
             onColorChanged: config.setAccentSuccess,
+            onReset: config.resetAccentSuccess,
           ),
           ColorPickerTile(
             label: 'accentWarning',
             color: config.accentWarning,
+            isDefault: !config.accentWarningIsCustom,
             onColorChanged: config.setAccentWarning,
+            onReset: config.resetAccentWarning,
           ),
           ColorPickerTile(
             label: 'accentError',
             color: config.accentError,
+            isDefault: !config.accentErrorIsCustom,
             onColorChanged: config.setAccentError,
+            onReset: config.resetAccentError,
           ),
           ColorPickerTile(
             label: 'accentNeutral',
             color: config.accentNeutral,
+            isDefault: !config.accentNeutralIsCustom,
             onColorChanged: config.setAccentNeutral,
+            onReset: config.resetAccentNeutral,
           ),
         ],
       ),
@@ -287,32 +301,44 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'textPrimary',
             color: config.textPrimary,
+            isDefault: !config.textPrimaryIsCustom,
             onColorChanged: config.setTextPrimary,
+            onReset: config.resetTextPrimary,
           ),
           ColorPickerTile(
             label: 'textSecondary',
             color: config.textSecondary,
+            isDefault: !config.textSecondaryIsCustom,
             onColorChanged: config.setTextSecondary,
+            onReset: config.resetTextSecondary,
           ),
           ColorPickerTile(
             label: 'textTertiary',
             color: config.textTertiary,
+            isDefault: !config.textTertiaryIsCustom,
             onColorChanged: config.setTextTertiary,
+            onReset: config.resetTextTertiary,
           ),
           ColorPickerTile(
             label: 'textDisabled',
             color: config.textDisabled,
+            isDefault: !config.textDisabledIsCustom,
             onColorChanged: config.setTextDisabled,
+            onReset: config.resetTextDisabled,
           ),
           ColorPickerTile(
             label: 'textLink',
             color: config.textLink,
+            isDefault: !config.textLinkIsCustom,
             onColorChanged: config.setTextLink,
+            onReset: config.resetTextLink,
           ),
           ColorPickerTile(
             label: 'textOnAccent',
             color: config.textOnAccent,
+            isDefault: !config.textOnAccentIsCustom,
             onColorChanged: config.setTextOnAccent,
+            onReset: config.resetTextOnAccent,
           ),
         ],
       ),
@@ -332,57 +358,79 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'backgroundApp',
             color: config.backgroundApp,
+            isDefault: !config.backgroundAppIsCustom,
             onColorChanged: config.setBackgroundApp,
+            onReset: config.resetBackgroundApp,
           ),
           ColorPickerTile(
             label: 'backgroundInverse',
             color: config.backgroundInverse,
+            isDefault: !config.backgroundInverseIsCustom,
             onColorChanged: config.setBackgroundInverse,
+            onReset: config.resetBackgroundInverse,
           ),
           ColorPickerTile(
             label: 'backgroundOnAccent',
             color: config.backgroundOnAccent,
+            isDefault: !config.backgroundOnAccentIsCustom,
             onColorChanged: config.setBackgroundOnAccent,
+            onReset: config.resetBackgroundOnAccent,
           ),
           ColorPickerTile(
             label: 'backgroundHighlight',
             color: config.backgroundHighlight,
+            isDefault: !config.backgroundHighlightIsCustom,
             onColorChanged: config.setBackgroundHighlight,
+            onReset: config.resetBackgroundHighlight,
           ),
           ColorPickerTile(
             label: 'backgroundScrim',
             color: config.backgroundScrim,
+            isDefault: !config.backgroundScrimIsCustom,
             onColorChanged: config.setBackgroundScrim,
+            onReset: config.resetBackgroundScrim,
           ),
           ColorPickerTile(
             label: 'backgroundOverlayLight',
             color: config.backgroundOverlayLight,
+            isDefault: !config.backgroundOverlayLightIsCustom,
             onColorChanged: config.setBackgroundOverlayLight,
+            onReset: config.resetBackgroundOverlayLight,
           ),
           ColorPickerTile(
             label: 'backgroundOverlayDark',
             color: config.backgroundOverlayDark,
+            isDefault: !config.backgroundOverlayDarkIsCustom,
             onColorChanged: config.setBackgroundOverlayDark,
+            onReset: config.resetBackgroundOverlayDark,
           ),
           ColorPickerTile(
             label: 'backgroundDisabled',
             color: config.backgroundDisabled,
+            isDefault: !config.backgroundDisabledIsCustom,
             onColorChanged: config.setBackgroundDisabled,
+            onReset: config.resetBackgroundDisabled,
           ),
           ColorPickerTile(
             label: 'backgroundHover',
             color: config.backgroundHover,
+            isDefault: !config.backgroundHoverIsCustom,
             onColorChanged: config.setBackgroundHover,
+            onReset: config.resetBackgroundHover,
           ),
           ColorPickerTile(
             label: 'backgroundPressed',
             color: config.backgroundPressed,
+            isDefault: !config.backgroundPressedIsCustom,
             onColorChanged: config.setBackgroundPressed,
+            onReset: config.resetBackgroundPressed,
           ),
           ColorPickerTile(
             label: 'backgroundSelected',
             color: config.backgroundSelected,
+            isDefault: !config.backgroundSelectedIsCustom,
             onColorChanged: config.setBackgroundSelected,
+            onReset: config.resetBackgroundSelected,
           ),
           SizedBox(height: spacing.xs),
           Text(
@@ -395,22 +443,30 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'backgroundSurface',
             color: config.backgroundSurface,
+            isDefault: !config.backgroundSurfaceIsCustom,
             onColorChanged: config.setBackgroundSurface,
+            onReset: config.resetBackgroundSurface,
           ),
           ColorPickerTile(
             label: 'backgroundSurfaceSubtle',
             color: config.backgroundSurfaceSubtle,
+            isDefault: !config.backgroundSurfaceSubtleIsCustom,
             onColorChanged: config.setBackgroundSurfaceSubtle,
+            onReset: config.resetBackgroundSurfaceSubtle,
           ),
           ColorPickerTile(
             label: 'backgroundSurfaceStrong',
             color: config.backgroundSurfaceStrong,
+            isDefault: !config.backgroundSurfaceStrongIsCustom,
             onColorChanged: config.setBackgroundSurfaceStrong,
+            onReset: config.resetBackgroundSurfaceStrong,
           ),
           ColorPickerTile(
             label: 'backgroundSurfaceCard',
             color: config.backgroundSurfaceCard,
+            isDefault: !config.backgroundSurfaceCardIsCustom,
             onColorChanged: config.setBackgroundSurfaceCard,
+            onReset: config.resetBackgroundSurfaceCard,
           ),
           SizedBox(height: spacing.xs),
           Text(
@@ -423,27 +479,30 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'backgroundElevation0',
             color: config.backgroundElevation0,
+            isDefault: !config.backgroundElevation0IsCustom,
             onColorChanged: config.setBackgroundElevation0,
+            onReset: config.resetBackgroundElevation0,
           ),
           ColorPickerTile(
             label: 'backgroundElevation1',
             color: config.backgroundElevation1,
+            isDefault: !config.backgroundElevation1IsCustom,
             onColorChanged: config.setBackgroundElevation1,
+            onReset: config.resetBackgroundElevation1,
           ),
           ColorPickerTile(
             label: 'backgroundElevation2',
             color: config.backgroundElevation2,
+            isDefault: !config.backgroundElevation2IsCustom,
             onColorChanged: config.setBackgroundElevation2,
+            onReset: config.resetBackgroundElevation2,
           ),
           ColorPickerTile(
             label: 'backgroundElevation3',
             color: config.backgroundElevation3,
+            isDefault: !config.backgroundElevation3IsCustom,
             onColorChanged: config.setBackgroundElevation3,
-          ),
-          ColorPickerTile(
-            label: 'backgroundHighlight',
-            color: config.backgroundHighlight,
-            onColorChanged: config.setBackgroundHighlight,
+            onReset: config.resetBackgroundElevation3,
           ),
         ],
       ),
@@ -461,37 +520,51 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'borderDefault',
             color: config.borderDefault,
+            isDefault: !config.borderDefaultIsCustom,
             onColorChanged: config.setBorderDefault,
+            onReset: config.resetBorderDefault,
           ),
           ColorPickerTile(
             label: 'borderSubtle',
             color: config.borderSubtle,
+            isDefault: !config.borderSubtleIsCustom,
             onColorChanged: config.setBorderSubtle,
+            onReset: config.resetBorderSubtle,
           ),
           ColorPickerTile(
             label: 'borderStrong',
             color: config.borderStrong,
+            isDefault: !config.borderStrongIsCustom,
             onColorChanged: config.setBorderStrong,
+            onReset: config.resetBorderStrong,
           ),
           ColorPickerTile(
             label: 'borderOnAccent',
             color: config.borderOnAccent,
+            isDefault: !config.borderOnAccentIsCustom,
             onColorChanged: config.setBorderOnAccent,
+            onReset: config.resetBorderOnAccent,
           ),
           ColorPickerTile(
             label: 'borderOnSurface',
             color: config.borderOnSurface,
+            isDefault: !config.borderOnSurfaceIsCustom,
             onColorChanged: config.setBorderOnSurface,
+            onReset: config.resetBorderOnSurface,
           ),
           ColorPickerTile(
             label: 'borderOpacitySubtle',
             color: config.borderOpacitySubtle,
+            isDefault: !config.borderOpacitySubtleIsCustom,
             onColorChanged: config.setBorderOpacitySubtle,
+            onReset: config.resetBorderOpacitySubtle,
           ),
           ColorPickerTile(
             label: 'borderOpacityStrong',
             color: config.borderOpacityStrong,
+            isDefault: !config.borderOpacityStrongIsCustom,
             onColorChanged: config.setBorderOpacityStrong,
+            onReset: config.resetBorderOpacityStrong,
           ),
         ],
       ),
@@ -509,47 +582,65 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'borderFocus',
             color: config.borderFocus,
+            isDefault: !config.borderFocusIsCustom,
             onColorChanged: config.setBorderFocus,
+            onReset: config.resetBorderFocus,
           ),
           ColorPickerTile(
             label: 'borderActive',
             color: config.borderActive,
+            isDefault: !config.borderActiveIsCustom,
             onColorChanged: config.setBorderActive,
+            onReset: config.resetBorderActive,
           ),
           ColorPickerTile(
             label: 'borderHover',
             color: config.borderHover,
+            isDefault: !config.borderHoverIsCustom,
             onColorChanged: config.setBorderHover,
+            onReset: config.resetBorderHover,
           ),
           ColorPickerTile(
             label: 'borderPressed',
             color: config.borderPressed,
+            isDefault: !config.borderPressedIsCustom,
             onColorChanged: config.setBorderPressed,
+            onReset: config.resetBorderPressed,
           ),
           ColorPickerTile(
             label: 'borderDisabled',
             color: config.borderDisabled,
+            isDefault: !config.borderDisabledIsCustom,
             onColorChanged: config.setBorderDisabled,
+            onReset: config.resetBorderDisabled,
           ),
           ColorPickerTile(
             label: 'borderError',
             color: config.borderError,
+            isDefault: !config.borderErrorIsCustom,
             onColorChanged: config.setBorderError,
+            onReset: config.resetBorderError,
           ),
           ColorPickerTile(
             label: 'borderWarning',
             color: config.borderWarning,
+            isDefault: !config.borderWarningIsCustom,
             onColorChanged: config.setBorderWarning,
+            onReset: config.resetBorderWarning,
           ),
           ColorPickerTile(
             label: 'borderSuccess',
             color: config.borderSuccess,
+            isDefault: !config.borderSuccessIsCustom,
             onColorChanged: config.setBorderSuccess,
+            onReset: config.resetBorderSuccess,
           ),
           ColorPickerTile(
             label: 'borderSelected',
             color: config.borderSelected,
+            isDefault: !config.borderSelectedIsCustom,
             onColorChanged: config.setBorderSelected,
+            onReset: config.resetBorderSelected,
           ),
         ],
       ),
@@ -567,12 +658,16 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
           ColorPickerTile(
             label: 'systemText',
             color: config.systemText,
+            isDefault: !config.systemTextIsCustom,
             onColorChanged: config.setSystemText,
+            onReset: config.resetSystemText,
           ),
           ColorPickerTile(
             label: 'systemScrollbar',
             color: config.systemScrollbar,
+            isDefault: !config.systemScrollbarIsCustom,
             onColorChanged: config.setSystemScrollbar,
+            onReset: config.resetSystemScrollbar,
           ),
         ],
       ),
@@ -582,7 +677,10 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   Widget _buildAvatarPaletteSection(BuildContext context) {
     final config = context.read<ThemeConfiguration>();
     final palette = config.avatarPalette;
+    final isDefault = !config.avatarPaletteIsCustom;
     final spacing = context.streamSpacing;
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
 
     return SectionCard(
       title: 'Avatar Palette',
@@ -623,6 +721,26 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
               config.addAvatarPaletteEntry(_generateRandomAvatarPair(isDark: isDark));
             },
           ),
+          if (!isDefault) ...[
+            SizedBox(height: spacing.sm),
+            InkWell(
+              onTap: config.resetAvatarPalette,
+              borderRadius: BorderRadius.all(context.streamRadius.sm),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.restart_alt, color: colorScheme.textTertiary, size: 14),
+                  SizedBox(width: spacing.xs),
+                  Text(
+                    'Reset to default palette',
+                    style: textTheme.captionDefault.copyWith(
+                      color: colorScheme.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
