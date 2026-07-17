@@ -134,22 +134,24 @@ class DefaultStreamMessageComposerUnsupportedAttachment extends StatelessWidget 
       child: props.label,
     );
 
-    return StreamMessageComposerAttachment(
-      onRemovePressed: props.onRemovePressed,
-      child: ConstrainedBox(
-        constraints: _kDefaultConstraints,
-        child: Padding(
-          padding: effectivePadding,
-          child: Row(
-            mainAxisSize: .min,
-            spacing: effectiveSpacing,
-            children: [
-              Icon(icons.unsupportedAttachment, size: 20, color: effectiveLabelStyle.color),
-              Expanded(child: effectiveLabel),
-            ],
-          ),
+    final content = ConstrainedBox(
+      constraints: _kDefaultConstraints,
+      child: Padding(
+        padding: effectivePadding,
+        child: Row(
+          mainAxisSize: .min,
+          spacing: effectiveSpacing,
+          children: [
+            Icon(icons.unsupportedAttachment, size: 20, color: effectiveLabelStyle.color),
+            Expanded(child: effectiveLabel),
+          ],
         ),
       ),
+    );
+
+    return StreamMessageComposerAttachment(
+      onRemovePressed: props.onRemovePressed,
+      child: content,
     );
   }
 }

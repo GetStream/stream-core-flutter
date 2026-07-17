@@ -51,12 +51,14 @@ class StreamMessageComposerFileAttachment extends StatelessWidget {
     Widget? subtitle,
     StreamFileTypeIcon? fileTypeIcon,
     VoidCallback? onRemovePressed,
+    String? semanticLabel,
     StreamMessageComposerFileAttachmentThemeData? style,
   }) : props = .new(
          title: title,
          subtitle: subtitle,
          fileTypeIcon: fileTypeIcon,
          onRemovePressed: onRemovePressed,
+         semanticLabel: semanticLabel,
          style: style,
        );
 
@@ -87,6 +89,7 @@ class StreamMessageComposerFileAttachmentProps {
     this.subtitle,
     this.fileTypeIcon,
     this.onRemovePressed,
+    this.semanticLabel,
     this.style,
   });
 
@@ -111,6 +114,16 @@ class StreamMessageComposerFileAttachmentProps {
   ///
   /// When null, no remove control is shown on the surrounding container.
   final VoidCallback? onRemovePressed;
+
+  /// Semantic label for the attachment.
+  ///
+  /// Announced in accessibility modes (e.g. TalkBack/VoiceOver). This label
+  /// does not show in the UI. Typically a type prefix ("File", "Document")
+  /// so screen-reader users can distinguish attachment kinds.
+  ///
+  ///  * [SemanticsProperties.label], which is set to [semanticLabel] in
+  ///    the underlying [Semantics] widget.
+  final String? semanticLabel;
 
   /// Per-instance style overrides.
   ///
@@ -165,29 +178,32 @@ class DefaultStreamMessageComposerFileAttachment extends StatelessWidget {
       );
     }
 
-    return StreamMessageComposerAttachment(
-      onRemovePressed: props.onRemovePressed,
-      child: ConstrainedBox(
-        constraints: _kDefaultConstraints,
-        child: Padding(
-          padding: effectivePadding,
-          child: Row(
-            mainAxisSize: .min,
-            spacing: effectiveSpacing,
-            children: [
-              ?props.fileTypeIcon,
-              Expanded(
-                child: Column(
-                  spacing: spacing.xxs,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [effectiveTitle, ?effectiveSubtitle],
-                ),
+    final content = ConstrainedBox(
+      constraints: _kDefaultConstraints,
+      child: Padding(
+        padding: effectivePadding,
+        child: Row(
+          mainAxisSize: .min,
+          spacing: effectiveSpacing,
+          children: [
+            ?props.fileTypeIcon,
+            Expanded(
+              child: Column(
+                spacing: spacing.xxs,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [effectiveTitle, ?effectiveSubtitle],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+
+    return StreamMessageComposerAttachment(
+      onRemovePressed: props.onRemovePressed,
+      semanticLabel: props.semanticLabel,
+      child: content,
     );
   }
 }

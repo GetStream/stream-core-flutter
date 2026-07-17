@@ -2,6 +2,23 @@
 
 ### ✨ Features
 
+- Added `StreamAccessibilityAutofocus` — behavior-only wrapper that requests screen-reader focus on its child shortly after mount; useful for redirecting focus on route entry.
+- Added `StreamSemanticsAnnouncer` — imperative one-shot screen-reader announcement helper.
+- Added `StreamSemanticsTransitionAnnouncer` — observes a `Listenable` and dispatches transition announcements to the screen reader.
+- Added `labelText` and `helperAffinity` to `StreamTextInput` for a floating label above the field and helper text positioned inside or outside the bordered chassis.
+- Added `focusNode` and `autofocus` pass-through on `StreamListTile`.
+- Added optional `semanticLabel` to `StreamBadgeNotification`, `StreamFileTypeIcon`, `StreamStepper`, `StreamMessageComposerAttachment`, and `StreamMessageComposerMediaAttachment`.
+- Added `excludeHeaderSemantics` to `StreamAppBar` and `StreamSheetHeader` for opting out of the default heading role and route naming on the title.
+- Added `onVisible` callback to `StreamSnackbar` — fires after the entrance animation completes (or synchronously when a screen reader is active).
+
+### 🐞 Fixed
+
+- Fixed `StreamButton` icons picking up the host app's `ElevatedButtonThemeData.iconColor` instead of the button's own `foregroundColor`.
+
+## 0.4.0
+
+### ✨ Features
+
 - Split the public API into `package:stream_core_flutter/core.dart` (shared primitives for any Stream SDK) and `package:stream_core_flutter/chat.dart` (chat-only widgets; re-exports `core.dart`); the convenience barrel `package:stream_core_flutter/stream_core_flutter.dart` is now deprecated.
 - Added `StreamScaffold` — a full-page scaffold that supports both regular and floating app-bar / bottom-bar layouts. Injects `StreamScaffoldInsets` into the widget tree so scrollable bodies can read the effective top and bottom padding from floating bars without coupling to layout details.
 - Added `StreamBottomNavBar` and `StreamBottomNavBarItem` — a bottom navigation bar with icon, selected-icon, and label slots per item. Supports the ambient `StreamBottomAppBarBehavior` from `StreamAppStyle`, rendering either a regular bar or a floating pill with a gradient fade-out beneath it. Items announce themselves as accessible buttons via `Semantics`.

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -72,6 +73,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget? subtitle,
     Widget? trailing,
     bool primary = true,
+    bool excludeHeaderSemantics = false,
     StreamAppBarStyle? style,
   }) : props = .new(
          leading: leading,
@@ -80,6 +82,7 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
          subtitle: subtitle,
          trailing: trailing,
          primary: primary,
+         excludeHeaderSemantics: excludeHeaderSemantics,
          style: style,
        );
 
@@ -115,6 +118,7 @@ class StreamAppBarProps {
     this.subtitle,
     this.trailing,
     this.primary = true,
+    this.excludeHeaderSemantics = false,
     this.style,
   });
 
@@ -167,6 +171,14 @@ class StreamAppBarProps {
   /// inside a sub-section of a page that has already consumed the top
   /// inset) so it doesn't double-pad.
   final bool primary;
+
+  /// Whether to omit the heading role from the [title].
+  ///
+  /// Defaults to false. When true, the bar doesn't mark the title as a
+  /// heading or claim the route's accessible name — useful when the title
+  /// widget carries its own heading semantics, or when the bar is shown in
+  /// a sub-section that shouldn't identify the route.
+  final bool excludeHeaderSemantics;
 
   /// The visual style applied to this app bar.
   ///
@@ -236,6 +248,7 @@ class DefaultStreamAppBar extends StatelessWidget {
           _ => icons.arrowLeft,
         };
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
+        final localizations = MaterialLocalizations.of(context);
         leading = StreamButton.icon(
           type: switch (effectiveStreamAppBarBehavior) {
             .floating => .outline,
@@ -243,6 +256,7 @@ class DefaultStreamAppBar extends StatelessWidget {
           },
           isFloating: effectiveStreamAppBarBehavior == .floating,
           style: .secondary,
+          tooltip: useCloseIcon ? localizations.closeButtonTooltip : localizations.backButtonTooltip,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
           onPressed: Navigator.of(context).maybePop,
         );
@@ -290,11 +304,27 @@ class DefaultStreamAppBar extends StatelessWidget {
 
     Widget? middle;
     if (titleWidget != null || subtitleWidget != null) {
-      middle = Column(
+      // Title and subtitle read as a single announcement; when not
+      // excluded, the node is also marked as a heading and used as the
+      // route's accessible name on platforms that announce one.
+      Widget child = Column(
         mainAxisSize: .min,
         spacing: spacing.xxs,
         children: [?titleWidget, ?subtitleWidget],
       );
+
+      if (!props.excludeHeaderSemantics) {
+        child = Semantics(
+          header: true,
+          namesRoute: switch (defaultTargetPlatform) {
+            .android || .fuchsia || .linux || .windows => true,
+            _ => null,
+          },
+          child: child,
+        );
+      }
+
+      middle = MergeSemantics(child: child);
     }
 
     // The bar advertises a fixed height via [PreferredSizeWidget]; the
@@ -319,22 +349,32 @@ class DefaultStreamAppBar extends StatelessWidget {
     // The bar's bottom edge is intentionally a hairline border in the
     // design system's `borderSubtle` colour — part of the bar's identity,
     // not a configurable divider.
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: switch (effectiveStreamAppBarBehavior) {
-          .floating => null,
-          .regular => effectiveBackgroundColor,
-        },
-        gradient: switch (effectiveStreamAppBarBehavior) {
-          .floating => _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor),
-          .regular => null,
-        },
-        border: switch (effectiveStreamAppBarBehavior) {
-          .floating => null,
-          .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
-        },
+    //
+    // The outer [Semantics] keeps the bar's children grouped for screen
+    // readers, so leading, title, subtitle, and trailing aren't intermixed
+    // with surrounding page content. The inner [Semantics] forces each
+    // slot's semantics onto its own node — without it, a raw
+    // [GestureDetector] in a slot would attach its action to the outer
+    // container and collapse the bar into a single tappable focus stop.
+    return Semantics(
+      container: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: switch (effectiveStreamAppBarBehavior) {
+            .floating => null,
+            .regular => effectiveBackgroundColor,
+          },
+          gradient: switch (effectiveStreamAppBarBehavior) {
+            .floating => _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor),
+            .regular => null,
+          },
+          border: switch (effectiveStreamAppBarBehavior) {
+            .floating => null,
+            .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
+          },
+        ),
+        child: Semantics(explicitChildNodes: true, child: bar),
       ),
-      child: bar,
     );
   }
 

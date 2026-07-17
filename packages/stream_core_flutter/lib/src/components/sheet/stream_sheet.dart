@@ -168,6 +168,7 @@ Future<T?> showStreamSheet<T>({
   Color? backgroundColor,
   Color? barrierColor,
   String? barrierLabel,
+  String? barrierOnTapHint,
   ShapeBorder? shape,
   BorderRadiusGeometry? borderRadius,
   BoxConstraints? constraints,
@@ -215,6 +216,7 @@ Future<T?> showStreamSheet<T>({
       backgroundColor: backgroundColor,
       barrierColor: barrierColor ?? sheetTheme.barrierColor ?? defaults.barrierColor,
       barrierLabel: barrierLabel ?? localizations.scrimLabel,
+      barrierOnTapHint: barrierOnTapHint ?? localizations.scrimOnTapHint(localizations.bottomSheetLabel),
       shape: shape,
       borderRadius: borderRadius,
       constraints: constraints,
@@ -656,6 +658,7 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     this.backgroundColor,
     Color? barrierColor,
     this.barrierLabel,
+    String? barrierOnTapHint,
     this.shape,
     this.borderRadius,
     this.constraints,
@@ -669,7 +672,8 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     this.onDragEnd,
     this.parentSheet,
     this.capturedThemes,
-  }) : _barrierColor = barrierColor;
+  }) : _barrierColor = barrierColor,
+       _barrierOnTapHint = barrierOnTapHint;
 
   /// Builds the primary contents of the sheet. The provided [ScrollController]
   /// should be attached to the topmost scrollable widget inside the sheet.
@@ -683,6 +687,11 @@ class StreamSheetRoute<T> extends PageRoute<T> {
   // Private storage so we can override [ModalRoute.barrierColor] while still
   // accepting a constructor argument with the same name.
   final Color? _barrierColor;
+
+  // Backs the [barrierOnTapHint] override — read by the barrier's Semantics
+  // to give SR users a specific "double tap to <hint>" prompt (e.g. "close
+  // Bottom Sheet") instead of a generic "activate".
+  final String? _barrierOnTapHint;
 
   /// The shape applied to the sheet.
   ///
@@ -804,13 +813,20 @@ class StreamSheetRoute<T> extends PageRoute<T> {
   /// resolves [StreamSheetThemeData.barrierColor] (defaulting to
   /// [StreamColorScheme.backgroundScrim]) from the calling context.
   @override
-  Color? get barrierColor => _barrierColor ?? Colors.black54;
+  Color get barrierColor => _barrierColor ?? Colors.black54;
 
   @override
   bool get barrierDismissible => isDismissible;
 
   @override
+  bool get semanticsDismissible => isDismissible;
+
+  @override
   final String? barrierLabel;
+
+  /// Screen-reader hint spoken as `double tap to <hint>` when the barrier
+  /// is focused; e.g. `'close attachment picker'`.
+  String? get barrierOnTapHint => _barrierOnTapHint;
 
   @override
   bool get maintainState => true;
@@ -851,19 +867,23 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     // route's outer SafeArea / DisplayFeatureSubScreen and are stable
     // across body rebuilds). The drag handlers read this — never the
     // rendered size, which can be dirty mid-gesture.
-    final content = LayoutBuilder(
-      builder: (context, constraints) {
-        _extent.availableHeight = constraints.maxHeight;
-        return _StreamDraggableScrollableSheet(
-          extent: _extent,
-          enableDrag: () => enableDrag,
-          popDragController: controller!,
-          navigator: navigator!,
-          getIsCurrent: () => isCurrent,
-          getIsActive: () => isActive,
-          builder: _buildBodyWithDragHandle,
-        );
-      },
+    final content = Semantics(
+      scopesRoute: true,
+      explicitChildNodes: true,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          _extent.availableHeight = constraints.maxHeight;
+          return _StreamDraggableScrollableSheet(
+            extent: _extent,
+            enableDrag: () => enableDrag,
+            popDragController: controller!,
+            navigator: navigator!,
+            getIsCurrent: () => isCurrent,
+            getIsActive: () => isActive,
+            builder: _buildBodyWithDragHandle,
+          );
+        },
+      ),
     );
 
     Widget sheet = StreamSheet(
@@ -875,6 +895,8 @@ class StreamSheetRoute<T> extends PageRoute<T> {
       constraints: constraints,
       child: _StreamSheetScope(route: this, child: content),
     );
+
+    sheet = DisplayFeatureSubScreen(anchorPoint: anchorPoint, child: sheet);
 
     // System-inset handling. A single `SafeArea(bottom: false)`
     // consumes the top, left, and right system insets *and* strips
@@ -890,16 +912,44 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     // design-system peek (`topPadding`) plus the rubber-band stretch.
     sheet = SafeArea(bottom: false, child: sheet);
 
-    sheet = DisplayFeatureSubScreen(
-      anchorPoint: anchorPoint,
-      child: sheet,
-    );
+    // Prevent clicks inside the sheet from passing through to the barrier
+    sheet = Semantics(hitTestBehavior: .opaque, child: sheet);
 
     // Re-apply captured InheritedThemes (StreamTheme, Theme,
     // Directionality, etc.) so the sheet renders with the same
     // ambient theme as the calling context, even though it's pushed
     // onto the navigator's overlay above any local theme overrides.
     return capturedThemes?.wrap(sheet) ?? sheet;
+  }
+
+  @override
+  Widget buildModalBarrier() {
+    if (barrierColor.a != 0 && !offstage) {
+      // changedInternalState is called if barrierColor or offstage updates
+      assert(barrierColor != barrierColor.withValues(alpha: 0));
+      final color = animation!.drive(
+        ColorTween(
+          begin: barrierColor.withValues(alpha: 0),
+          end: barrierColor, // changedInternalState is called if barrierColor updates
+        ).chain(
+          CurveTween(curve: barrierCurve),
+        ), // changedInternalState is called if barrierCurve updates
+      );
+      return AnimatedModalBarrier(
+        color: color,
+        dismissible: barrierDismissible, // changedInternalState is called if barrierDismissible updates
+        semanticsLabel: barrierLabel, // changedInternalState is called if barrierLabel updates
+        barrierSemanticsDismissible: semanticsDismissible,
+        semanticsOnTapHint: barrierOnTapHint,
+      );
+    }
+
+    return ModalBarrier(
+      dismissible: barrierDismissible, // changedInternalState is called if barrierDismissible updates
+      semanticsLabel: barrierLabel, // changedInternalState is called if barrierLabel updates
+      barrierSemanticsDismissible: semanticsDismissible,
+      semanticsOnTapHint: barrierOnTapHint,
+    );
   }
 
   /// The nearest enclosing [StreamSheetRoute] for [context], or `null`

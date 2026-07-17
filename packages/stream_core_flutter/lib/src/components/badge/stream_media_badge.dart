@@ -24,6 +24,7 @@ class StreamMediaBadge extends StatelessWidget {
     required this.type,
     this.duration,
     this.durationFormat = MediaBadgeDurationFormat.compact,
+    this.semanticsLabel,
   });
 
   final MediaBadgeType type;
@@ -31,6 +32,12 @@ class StreamMediaBadge extends StatelessWidget {
 
   /// How the [duration] value is formatted. Defaults to [MediaBadgeDurationFormat.compact].
   final MediaBadgeDurationFormat durationFormat;
+
+  /// An alternative semantics label for this badge.
+  ///
+  /// If present, the semantics of this widget will contain this value instead
+  /// of the rendered icon and duration.
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +48,7 @@ class StreamMediaBadge extends StatelessWidget {
     final textTheme = context.streamTextTheme;
     final colorScheme = context.streamColorScheme;
 
-    return Container(
+    Widget badge = Container(
       decoration: BoxDecoration(
         color: colorScheme.backgroundInverse,
         borderRadius: .all(radius.max),
@@ -74,6 +81,15 @@ class StreamMediaBadge extends StatelessWidget {
         ],
       ),
     );
+
+    if (semanticsLabel case final label?) {
+      badge = Semantics(
+        label: label,
+        child: ExcludeSemantics(child: badge),
+      );
+    }
+
+    return badge;
   }
 }
 

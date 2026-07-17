@@ -34,6 +34,11 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
     final radius = context.streamRadius;
     final spacing = context.streamSpacing;
 
+    final labelText = context.knobs.stringOrNull(
+      label: 'Label Text',
+      description: 'Persistent label rendered above the input.',
+    );
+
     final hintText = context.knobs.string(
       label: 'Hint Text',
       initialValue: 'Enter text...',
@@ -48,6 +53,15 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       options: StreamHelperState.values,
       labelBuilder: (s) => s.name,
       description: 'Only visible when helper text is set.',
+    );
+
+    final helperAffinity = context.knobs.object.dropdown<StreamHelperAffinity>(
+      label: 'Helper Affinity',
+      options: StreamHelperAffinity.values,
+      labelBuilder: (a) => a.name,
+      description:
+          'Where the helper text sits — inside the bordered area or '
+          'below it as an external caption.',
     );
 
     final isDisabled = context.knobs.boolean(
@@ -125,9 +139,11 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
                   spacing: spacing.sm,
                   children: [
                     StreamTextInput(
+                      labelText: labelText,
                       hintText: hintText,
                       helperText: helperText,
                       helperState: helperText != null ? helperState : null,
+                      style: StreamTextInputStyle(helperAffinity: helperAffinity),
                       enabled: !isDisabled,
                       readOnly: isReadOnly,
                       maxLines: maxLines,
@@ -214,6 +230,16 @@ class _StatesSection extends StatelessWidget {
                 description: 'Empty field with hint text',
                 child: StreamTextInput(
                   hintText: 'Enter text...',
+                  onChanged: (_) {},
+                ),
+              ),
+              Divider(height: 1, color: colorScheme.borderSubtle),
+              _StateDemo(
+                label: 'Labeled',
+                description: 'Persistent label above the field',
+                child: StreamTextInput(
+                  labelText: 'Email',
+                  hintText: 'name@example.com',
                   onChanged: (_) {},
                 ),
               ),
@@ -625,7 +651,8 @@ class _LoginFormExampleState extends State<_LoginFormExample> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         StreamTextInput(
-          hintText: 'Email address',
+          labelText: 'Email',
+          hintText: 'name@example.com',
           initialValue: _email,
           keyboardType: TextInputType.emailAddress,
           leading: const Icon(Icons.email_outlined, size: 20),
@@ -634,7 +661,8 @@ class _LoginFormExampleState extends State<_LoginFormExample> {
           onChanged: (v) => setState(() => _email = v),
         ),
         StreamTextInput(
-          hintText: 'Password',
+          labelText: 'Password',
+          hintText: 'Enter your password',
           initialValue: _password,
           leading: Icon(context.streamIcons.lock),
           helperText: _successText(_passwordError),

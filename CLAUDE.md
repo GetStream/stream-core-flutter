@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Before writing or reviewing code, read [`STYLE_GUIDE.md`](STYLE_GUIDE.md).** It is the source of truth for coding conventions, the barrel contract, theming, testing, and changelog policy. See [`TESTING.md`](TESTING.md) for guidance on writing effective tests. This file is a repo overview; the style guide is the rulebook.
+
 ## Project Overview
 
 A Flutter monorepo managed with **Melos** containing:

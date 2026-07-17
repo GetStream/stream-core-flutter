@@ -96,6 +96,7 @@ class StreamBadgeNotification extends StatelessWidget {
     StreamBadgeNotificationType? type,
     StreamBadgeNotificationSize? size,
     required String label,
+    String? semanticLabel,
     Widget? child,
     AlignmentGeometry? alignment,
     Offset? offset,
@@ -103,6 +104,7 @@ class StreamBadgeNotification extends StatelessWidget {
          type: type,
          size: size,
          label: label,
+         semanticLabel: semanticLabel,
          child: child,
          alignment: alignment,
          offset: offset,
@@ -134,6 +136,7 @@ class StreamBadgeNotificationProps {
     this.type,
     this.size,
     required this.label,
+    this.semanticLabel,
     this.child,
     this.alignment,
     this.offset,
@@ -155,6 +158,13 @@ class StreamBadgeNotificationProps {
   /// Typically a numeric count (e.g., "5") or an overflow indicator
   /// (e.g., "99+").
   final String label;
+
+  /// An alternative label spoken by screen readers in place of [label].
+  ///
+  /// When null (the default), the visible [label] is announced as-is.
+  /// Provide a longer or more descriptive string (e.g. `"5 unread"`) when
+  /// the bare count would be ambiguous on its own.
+  final String? semanticLabel;
 
   /// The widget below this widget in the tree.
   ///
@@ -232,7 +242,7 @@ class DefaultStreamBadgeNotification extends StatelessWidget {
         ),
         child: DefaultTextStyle(
           style: textStyle,
-          child: Text(props.label),
+          child: Text(props.label, semanticsLabel: props.semanticLabel),
         ),
       ),
     );

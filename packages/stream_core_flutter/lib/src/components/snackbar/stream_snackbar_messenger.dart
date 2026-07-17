@@ -703,7 +703,10 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
   // of chaining whenComplete onto the forward future.
   void _handleAnimationStatus(AnimationStatus status) {
     if (!mounted) return;
-    if (status == AnimationStatus.completed) _startTimer();
+    if (status == AnimationStatus.completed) {
+      _startTimer();
+      _showing?.snackbar.props.onVisible?.call();
+    }
   }
 
   @override
@@ -752,7 +755,13 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     _showing = next;
     _animation.value = 0;
     setState(() {});
-    if (next != null) _animation.forward(from: 0);
+    if (next != null) {
+      if (MediaQuery.accessibleNavigationOf(context)) {
+        _animation.value = 1;
+      } else {
+        _animation.forward(from: 0);
+      }
+    }
   }
 
   void _startTimer() {
@@ -777,7 +786,11 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     final messenger = widget.messenger;
     _exiting = true;
     _timer?.cancel();
-    await _animation.reverse();
+    if (MediaQuery.accessibleNavigationOf(context)) {
+      _animation.value = 0;
+    } else {
+      await _animation.reverse();
+    }
     if (!mounted) return;
     _showing = null;
     _exiting = false;

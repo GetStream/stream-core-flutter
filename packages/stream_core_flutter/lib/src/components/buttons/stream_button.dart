@@ -79,6 +79,7 @@ class StreamButton extends StatelessWidget {
     Widget? iconLeft,
     Widget? iconRight,
     bool? isSelected,
+    bool autofocus = false,
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
          child: child,
@@ -89,6 +90,7 @@ class StreamButton extends StatelessWidget {
          iconLeft: iconLeft,
          iconRight: iconRight,
          isSelected: isSelected,
+         autofocus: autofocus,
          themeStyle: themeStyle,
        );
 
@@ -114,6 +116,8 @@ class StreamButton extends StatelessWidget {
     StreamButtonSize size = .medium,
     bool? isFloating,
     bool? isSelected,
+    bool autofocus = false,
+    String? tooltip,
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
          onPressed: onPressed,
@@ -123,6 +127,8 @@ class StreamButton extends StatelessWidget {
          iconLeft: icon,
          isFloating: isFloating,
          isSelected: isSelected,
+         autofocus: autofocus,
+         tooltip: tooltip,
          themeStyle: themeStyle,
        );
 
@@ -165,6 +171,8 @@ class StreamButtonProps {
     this.iconRight,
     this.isFloating,
     this.isSelected,
+    this.autofocus = false,
+    this.tooltip,
     this.themeStyle,
   });
 
@@ -219,6 +227,21 @@ class StreamButtonProps {
   /// When true, the button displays selected styling.
   /// When false or null, the button is not selected.
   final bool? isSelected;
+
+  /// Whether the button should request focus when first mounted.
+  ///
+  /// When true, the button takes input focus as soon as it is inserted
+  /// into the tree.
+  /// When false, the button uses normal focus traversal.
+  final bool autofocus;
+
+  /// Text shown in a [Tooltip] on hover / long-press, and used as the
+  /// button's accessibility label.
+  ///
+  /// Only honoured by [StreamButton.icon]; the regular [StreamButton]
+  /// derives its label from its [child].
+  /// When null, the icon button has no tooltip.
+  final String? tooltip;
 
   /// Per-instance style overrides for this button.
   ///
@@ -377,49 +400,60 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
           false => WidgetStatePropertyAll(.symmetric(horizontal: spacing.md)),
         };
 
-    return ElevatedButton(
-      onPressed: props.onPressed,
-      statesController: _statesController,
-      style: ButtonStyle(
-        tapTargetSize: effectiveTapTargetSize,
-        visualDensity: .standard,
-        textStyle: effectiveTextStyle,
-        iconSize: effectiveIconSize,
-        elevation: effectiveElevation,
-        backgroundColor: effectiveBackgroundColor,
-        foregroundColor: effectiveForegroundColor,
-        overlayColor: effectiveOverlayColor,
-        fixedSize: effectiveFixedSize,
-        minimumSize: effectiveMinimumSize,
-        maximumSize: effectiveMaximumSize,
-        padding: effectivePadding,
-        alignment: effectiveAlignment,
-        shape: effectiveShape,
-        side: switch (effectiveBorderColor) {
-          final color? => .resolveWith(
-            (states) {
-              final resolvedColor = color.resolve(states);
-              if (resolvedColor == null) return null;
-              return BorderSide(color: resolvedColor);
-            },
+    Widget button = Semantics(
+      selected: props.isSelected,
+      child: ElevatedButton(
+        autofocus: props.autofocus,
+        onPressed: props.onPressed,
+        statesController: _statesController,
+        style: ButtonStyle(
+          tapTargetSize: effectiveTapTargetSize,
+          visualDensity: .standard,
+          textStyle: effectiveTextStyle,
+          iconSize: effectiveIconSize,
+          elevation: effectiveElevation,
+          backgroundColor: effectiveBackgroundColor,
+          foregroundColor: effectiveForegroundColor,
+          iconColor: effectiveForegroundColor,
+          overlayColor: effectiveOverlayColor,
+          fixedSize: effectiveFixedSize,
+          minimumSize: effectiveMinimumSize,
+          maximumSize: effectiveMaximumSize,
+          padding: effectivePadding,
+          alignment: effectiveAlignment,
+          shape: effectiveShape,
+          side: switch (effectiveBorderColor) {
+            final color? => .resolveWith(
+              (states) {
+                final resolvedColor = color.resolve(states);
+                if (resolvedColor == null) return null;
+                return BorderSide(color: resolvedColor);
+              },
+            ),
+            _ => null,
+          },
+        ),
+        child: switch (isIconButton) {
+          true => props.iconLeft,
+          false => Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: spacing.xs,
+            children: [
+              ?props.iconLeft,
+              if (props.child case final child?) Flexible(child: child),
+              ?props.iconRight,
+            ],
           ),
-          _ => null,
         },
       ),
-      child: switch (isIconButton) {
-        true => props.iconLeft,
-        false => Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: spacing.xs,
-          children: [
-            ?props.iconLeft,
-            if (props.child case final child?) Flexible(child: child),
-            ?props.iconRight,
-          ],
-        ),
-      },
     );
+
+    if (props.tooltip case final tooltip?) {
+      button = Tooltip(message: tooltip, child: button);
+    }
+
+    return MergeSemantics(child: button);
   }
 }
 
