@@ -274,10 +274,8 @@ class StreamColorSwatch extends ColorSwatch<int> {
     Brightness brightness = Brightness.light,
     double? saturation,
   }) {
-    return StreamColorSwatch(
-      color.toARGB32(),
-      StreamColorSwatchHelper.generateShadeMap(color, brightness: brightness, saturation: saturation),
-    );
+    final shadeMap = StreamColorSwatchHelper.generateShadeMap(color, brightness: brightness, saturation: saturation);
+    return StreamColorSwatch(shadeMap[500]!.toARGB32(), shadeMap);
   }
 
   /// The lightest shade.
