@@ -8,7 +8,7 @@ import 'package:stream_core_flutter/core.dart';
 const _shades = [0, 50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 
 void main() {
-  group('StreamTheme color generation Golden Tests', () {
+  group('StreamColorScheme color generation Golden Tests', () {
     goldenTest(
       'renders the generated brand and chrome scales for custom seed colors',
       fileName: 'stream_theme_color_generation',
@@ -57,8 +57,8 @@ class _SeedColorPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final light = StreamTheme.light(brandColor: seedColor).colorScheme;
-    final dark = StreamTheme.dark(brandColor: seedColor).colorScheme;
+    final light = StreamColorScheme.fromSeed(brand: seedColor);
+    final dark = StreamColorScheme.fromSeed(brand: seedColor, brightness: .dark);
 
     return Column(
       mainAxisSize: MainAxisSize.min,

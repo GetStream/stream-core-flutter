@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
 void main() {
-  group('StreamTheme.light color generation', () {
+  group('StreamColorScheme.fromSeed light color generation', () {
     test('generates the exact brand scale for a deep orange seed', () {
-      final brand = StreamTheme.light(brandColor: const Color(0xFFFF5722)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722)).brand;
 
       expect(brand[0], const Color(0xFFFFFFFF));
       expect(brand[50], const Color(0xFFFFECE5));
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a deep orange seed', () {
-      final chrome = StreamTheme.light(brandColor: const Color(0xFFFF5722)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722)).chrome;
 
       expect(chrome[0], const Color(0xFFFFFFFF));
       expect(chrome[50], const Color(0xFFF4F2F1));
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a purple seed', () {
-      final brand = StreamTheme.light(brandColor: const Color(0xFF9C27B0)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0)).brand;
 
       expect(brand[0], const Color(0xFFFFFFFF));
       expect(brand[50], const Color(0xFFF8EAFA));
@@ -59,7 +59,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a purple seed', () {
-      final chrome = StreamTheme.light(brandColor: const Color(0xFF9C27B0)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0)).chrome;
 
       expect(chrome[0], const Color(0xFFFFFFFF));
       expect(chrome[50], const Color(0xFFF3F1F4));
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a yellow seed', () {
-      final brand = StreamTheme.light(brandColor: const Color(0xFFFFEB3B)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B)).brand;
 
       expect(brand[0], const Color(0xFFFFFFFF));
       expect(brand[50], const Color(0xFFFFFCE5));
@@ -95,7 +95,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a yellow seed', () {
-      final chrome = StreamTheme.light(brandColor: const Color(0xFFFFEB3B)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B)).chrome;
 
       expect(chrome[0], const Color(0xFFFFFFFF));
       expect(chrome[50], const Color(0xFFF4F3F1));
@@ -113,7 +113,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a green seed', () {
-      final brand = StreamTheme.light(brandColor: const Color(0xFF4CAF50)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50)).brand;
 
       expect(brand[0], const Color(0xFFFFFFFF));
       expect(brand[50], const Color(0xFFEDF7EE));
@@ -131,7 +131,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a green seed', () {
-      final chrome = StreamTheme.light(brandColor: const Color(0xFF4CAF50)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50)).chrome;
 
       expect(chrome[0], const Color(0xFFFFFFFF));
       expect(chrome[50], const Color(0xFFF1F4F1));
@@ -149,7 +149,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a blue seed', () {
-      final brand = StreamTheme.light(brandColor: const Color(0xFF2196F3)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3)).brand;
 
       expect(brand[0], const Color(0xFFFFFFFF));
       expect(brand[50], const Color(0xFFE7F4FE));
@@ -167,7 +167,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a blue seed', () {
-      final chrome = StreamTheme.light(brandColor: const Color(0xFF2196F3)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3)).chrome;
 
       expect(chrome[0], const Color(0xFFFFFFFF));
       expect(chrome[50], const Color(0xFFF1F2F4));
@@ -185,7 +185,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a red seed', () {
-      final brand = StreamTheme.light(brandColor: const Color(0xFFF44336)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336)).brand;
 
       expect(brand[0], const Color(0xFFFFFFFF));
       expect(brand[50], const Color(0xFFFEE8E7));
@@ -203,7 +203,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a red seed', () {
-      final chrome = StreamTheme.light(brandColor: const Color(0xFFF44336)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336)).chrome;
 
       expect(chrome[0], const Color(0xFFFFFFFF));
       expect(chrome[50], const Color(0xFFF4F1F1));
@@ -223,15 +223,15 @@ void main() {
     test('uses the seed color unchanged as brand shade 500', () {
       const seed = Color(0xFF2196F3);
 
-      final brand = StreamTheme.light(brandColor: seed).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: seed).brand;
 
       expect(brand[500], seed);
     });
   });
 
-  group('StreamTheme.dark color generation', () {
+  group('StreamColorScheme.fromSeed dark color generation', () {
     test('generates the exact brand scale for a deep orange seed', () {
-      final brand = StreamTheme.dark(brandColor: const Color(0xFFFF5722)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722), brightness: .dark).brand;
 
       expect(brand[0], const Color(0xFF000000));
       expect(brand[50], const Color(0xFF3D0F00));
@@ -249,7 +249,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a deep orange seed', () {
-      final chrome = StreamTheme.dark(brandColor: const Color(0xFFFF5722)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722), brightness: .dark).chrome;
 
       expect(chrome[0], const Color(0xFF000000));
       expect(chrome[50], const Color(0xFF221D1C));
@@ -267,7 +267,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a purple seed', () {
-      final brand = StreamTheme.dark(brandColor: const Color(0xFF9C27B0)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0), brightness: .dark).brand;
 
       expect(brand[0], const Color(0xFF000000));
       expect(brand[50], const Color(0xFF2C0B32));
@@ -285,7 +285,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a purple seed', () {
-      final chrome = StreamTheme.dark(brandColor: const Color(0xFF9C27B0)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0), brightness: .dark).chrome;
 
       expect(chrome[0], const Color(0xFF000000));
       expect(chrome[50], const Color(0xFF211C22));
@@ -303,7 +303,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a yellow seed', () {
-      final brand = StreamTheme.dark(brandColor: const Color(0xFFFFEB3B)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B), brightness: .dark).brand;
 
       expect(brand[0], const Color(0xFF000000));
       expect(brand[50], const Color(0xFF3D3700));
@@ -321,7 +321,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a yellow seed', () {
-      final chrome = StreamTheme.dark(brandColor: const Color(0xFFFFEB3B)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B), brightness: .dark).chrome;
 
       expect(chrome[0], const Color(0xFF000000));
       expect(chrome[50], const Color(0xFF22211C));
@@ -339,7 +339,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a green seed', () {
-      final brand = StreamTheme.dark(brandColor: const Color(0xFF4CAF50)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50), brightness: .dark).brand;
 
       expect(brand[0], const Color(0xFF000000));
       expect(brand[50], const Color(0xFF132B14));
@@ -357,7 +357,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a green seed', () {
-      final chrome = StreamTheme.dark(brandColor: const Color(0xFF4CAF50)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50), brightness: .dark).chrome;
 
       expect(chrome[0], const Color(0xFF000000));
       expect(chrome[50], const Color(0xFF1C221C));
@@ -375,7 +375,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a blue seed', () {
-      final brand = StreamTheme.dark(brandColor: const Color(0xFF2196F3)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3), brightness: .dark).brand;
 
       expect(brand[0], const Color(0xFF000000));
       expect(brand[50], const Color(0xFF03223A));
@@ -393,7 +393,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a blue seed', () {
-      final chrome = StreamTheme.dark(brandColor: const Color(0xFF2196F3)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3), brightness: .dark).chrome;
 
       expect(chrome[0], const Color(0xFF000000));
       expect(chrome[50], const Color(0xFF1C1F22));
@@ -411,7 +411,7 @@ void main() {
     });
 
     test('generates the exact brand scale for a red seed', () {
-      final brand = StreamTheme.dark(brandColor: const Color(0xFFF44336)).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336), brightness: .dark).brand;
 
       expect(brand[0], const Color(0xFF000000));
       expect(brand[50], const Color(0xFF3A0703));
@@ -429,7 +429,7 @@ void main() {
     });
 
     test('generates the exact auto-derived chrome scale for a red seed', () {
-      final chrome = StreamTheme.dark(brandColor: const Color(0xFFF44336)).colorScheme.chrome;
+      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336), brightness: .dark).chrome;
 
       expect(chrome[0], const Color(0xFF000000));
       expect(chrome[50], const Color(0xFF221C1C));
@@ -449,7 +449,7 @@ void main() {
     test('uses the seed color unchanged as brand shade 500', () {
       const seed = Color(0xFF2196F3);
 
-      final brand = StreamTheme.dark(brandColor: seed).colorScheme.brand;
+      final brand = StreamColorScheme.fromSeed(brand: seed, brightness: .dark).brand;
 
       expect(brand[500], seed);
     });

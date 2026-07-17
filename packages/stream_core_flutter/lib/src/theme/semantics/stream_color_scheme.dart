@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stream_core/stream_core.dart' show Standard;
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../../theme/primitives/stream_colors.dart';
@@ -207,6 +208,7 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
+      brightness: .light,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,
@@ -427,6 +429,7 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
+      brightness: .dark,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,
@@ -484,7 +487,27 @@ class StreamColorScheme with _$StreamColorScheme {
     );
   }
 
+  factory StreamColorScheme.fromSeed({
+    required Color brand,
+    Color? chrome,
+    Brightness brightness = Brightness.light,
+  }) {
+    final colorScheme = brightness == Brightness.light ? StreamColorScheme.light : StreamColorScheme.dark;
+    return colorScheme(
+      brand: StreamColorSwatch.fromColor(brand, brightness: brightness),
+      chrome:
+          chrome?.let(
+            (chromeColor) => StreamColorSwatch.fromColor(
+              chromeColor,
+              brightness: brightness,
+            ),
+          ) ??
+          StreamColorSwatch.fromColor(brand, brightness: brightness, saturation: 0.1),
+    );
+  }
+
   const StreamColorScheme.raw({
+    this.brightness = Brightness.light,
     required this.brand,
     required this.chrome,
     // Accent
@@ -549,6 +572,9 @@ class StreamColorScheme with _$StreamColorScheme {
     // Avatar
     required this.avatarPalette,
   });
+
+  /// The brightness of the color scheme.
+  final Brightness brightness;
 
   // ---- Brand ----
 
