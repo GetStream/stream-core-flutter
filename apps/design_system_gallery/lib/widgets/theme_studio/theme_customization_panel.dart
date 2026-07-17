@@ -179,7 +179,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildAppearanceSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     final spacing = context.streamSpacing;
 
     return SectionCard(
@@ -211,7 +211,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildBrandSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     return SectionCard(
       title: 'Brand Color',
       subtitle: 'brand',
@@ -227,7 +227,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildChromeSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     return SectionCard(
       title: 'Chrome Color',
       subtitle: 'chrome',
@@ -243,7 +243,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildAccentColorsSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     return SectionCard(
       title: 'Accent Colors',
       subtitle: 'accent*',
@@ -291,7 +291,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildTextColorsSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     return SectionCard(
       title: 'Text Colors',
       subtitle: 'text*',
@@ -346,7 +346,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildBackgroundColorsSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     final spacing = context.streamSpacing;
     return SectionCard(
       title: 'Background Colors',
@@ -510,7 +510,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildBorderCoreSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     return SectionCard(
       title: 'Border Colors - Core',
       subtitle: 'border*',
@@ -572,7 +572,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildBorderUtilitySection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     return SectionCard(
       title: 'Border Colors - Utility',
       subtitle: 'border*',
@@ -648,7 +648,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildSystemColorsSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     return SectionCard(
       title: 'System Colors',
       subtitle: 'system*',
@@ -675,7 +675,7 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
   }
 
   Widget _buildAvatarPaletteSection(BuildContext context) {
-    final config = context.read<ThemeConfiguration>();
+    final config = context.watch<ThemeConfiguration>();
     final palette = config.avatarPalette;
     final isDefault = !config.avatarPaletteIsCustom;
     final spacing = context.streamSpacing;
