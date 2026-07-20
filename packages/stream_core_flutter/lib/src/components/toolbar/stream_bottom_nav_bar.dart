@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_badge_notification_theme.dart';
-import '../../theme/components/stream_bottom_app_bar_theme.dart';
+import '../../theme/components/stream_bottom_nav_bar_theme.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -32,30 +33,34 @@ class StreamBottomNavBarItem {
 
 /// A bottom navigation bar for Stream surfaces that automatically adapts
 /// between a floating pill style and a regular docked style based on the
-/// ambient [StreamBottomAppBarBehavior] from [StreamBottomAppBarTheme] or
-/// [StreamAppStyle].
+/// ambient [StreamBottomNavBarBehavior].
 ///
 /// ## Floating style
 ///
-/// When [StreamBottomAppBarBehavior.floating] is in effect, the bar renders as a
+/// When [StreamBottomNavBarBehavior.floating] is in effect, the bar renders as a
 /// horizontally padded pill with a rounded background, a subtle box shadow,
 /// and a hairline border. It sits above the body content and is typically
 /// used with [StreamScaffold]'s floating bottom slot.
 ///
 /// ## Regular style
 ///
-/// When [StreamBottomAppBarBehavior.regular] is in effect, the bar renders as a
-/// standard docked bottom navigation bar using Flutter's [BottomNavigationBar]
-/// with Stream colour and typography tokens. A hairline `borderSubtle` top
-/// border separates it from the body.
+/// When [StreamBottomNavBarBehavior.regular] is in effect, the bar renders as a
+/// standard docked bar with Stream colour and typography tokens. A hairline
+/// `borderSubtle` top border separates it from the body.
 ///
 /// ## Behaviour resolution
 ///
 /// The effective behaviour is resolved in this priority order:
 /// 1. The per-instance [behavior] parameter on this widget.
-/// 2. [StreamBottomAppBarStyle.behavior] from the ambient
-///    [StreamBottomAppBarTheme].
+/// 2. [StreamBottomNavBarStyle.behavior] from the ambient
+///    [StreamBottomNavBarTheme].
 /// 3. The ambient [StreamAppStyle] enum value.
+///
+/// ## Theming
+///
+/// Item colours, icon size, label styles, border, and pill radius are resolved
+/// from [StreamBottomNavBarStyle] — set per-instance via `style` or globally
+/// via [StreamBottomNavBarTheme], falling back to token-backed defaults.
 ///
 /// {@tool snippet}
 ///
@@ -84,18 +89,56 @@ class StreamBottomNavBarItem {
 /// See also:
 ///
 ///  * [StreamBottomNavBarItem], which configures each tab.
+///  * [StreamBottomNavBarTheme], which styles this widget.
 ///  * [StreamScaffold], which accepts this widget in its `bottom` slot.
-///  * [StreamAppStyle], the global app-wide style that acts as fallback.
-///  * [StreamBottomAppBarStyle.behavior], the per-theme component override.
+///  * [DefaultStreamBottomNavBar], the default visual implementation.
 class StreamBottomNavBar extends StatelessWidget {
   /// Creates a Stream bottom navigation bar.
-  const StreamBottomNavBar({
+  StreamBottomNavBar({
     super.key,
+    required List<StreamBottomNavBarItem> items,
+    required int currentIndex,
+    required ValueChanged<int> onTap,
+    StreamBottomNavBarBehavior? behavior,
+    StreamBottomNavBarStyle? style,
+  }) : assert(items.length >= 2, 'StreamBottomNavBar requires at least 2 items'),
+       props = .new(
+         items: items,
+         currentIndex: currentIndex,
+         onTap: onTap,
+         behavior: behavior,
+         style: style,
+       );
+
+  /// The properties that configure this navigation bar.
+  final StreamBottomNavBarProps props;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = StreamComponentFactory.of(context).bottomNavBar;
+    if (builder != null) return builder(context, props);
+    return DefaultStreamBottomNavBar(props: props);
+  }
+}
+
+/// Properties for configuring a [StreamBottomNavBar].
+///
+/// This class holds all configuration options for a navigation bar, allowing
+/// them to be passed through the [StreamComponentFactory].
+///
+/// See also:
+///
+///  * [StreamBottomNavBar], which uses these properties.
+///  * [DefaultStreamBottomNavBar], the default implementation.
+class StreamBottomNavBarProps {
+  /// Creates properties for a bottom navigation bar.
+  const StreamBottomNavBarProps({
     required this.items,
     required this.currentIndex,
     required this.onTap,
     this.behavior,
-  }) : assert(items.length >= 2, 'StreamBottomNavBar requires at least 2 items');
+    this.style,
+  });
 
   /// The list of items to display in the navigation bar.
   ///
@@ -108,61 +151,330 @@ class StreamBottomNavBar extends StatelessWidget {
   /// Called when the user taps a navigation item.
   final ValueChanged<int> onTap;
 
-  /// Overrides the resolved [StreamBottomAppBarBehavior] for this instance only.
+  /// Overrides the resolved [StreamBottomNavBarBehavior] for this instance only.
   ///
-  /// When null the effective behaviour is resolved from
-  /// [StreamBottomAppBarStyle.behavior] in the ambient
-  /// [StreamBottomAppBarTheme], falling back to the ambient [StreamAppStyle].
-  final StreamBottomAppBarBehavior? behavior;
+  /// When null the effective behaviour is resolved from the ambient themes;
+  /// see [StreamBottomNavBar] for the full resolution order.
+  final StreamBottomNavBarBehavior? behavior;
+
+  /// The visual style applied to this navigation bar.
+  ///
+  /// Resolution order per field: this [style] → ambient
+  /// [StreamBottomNavBarTheme] → token-backed defaults.
+  final StreamBottomNavBarStyle? style;
+}
+
+/// The default implementation of [StreamBottomNavBar].
+///
+/// Renders the navigation bar with theming from [StreamBottomNavBarTheme] and
+/// serves as the default factory implementation in [StreamComponentFactory].
+///
+/// Depending on the resolved [StreamBottomNavBarBehavior], the bar is either a
+/// docked bar (a solid surface with a hairline top border) or a floating pill
+/// (a rounded surface over a gradient fade). Both share the same tiles, each of
+/// which animates its icon and label colour between the unselected and selected
+/// states on tap.
+///
+/// See also:
+///
+///  * [StreamBottomNavBar], the public API widget.
+///  * [StreamBottomNavBarProps], which configures this widget.
+class DefaultStreamBottomNavBar extends StatefulWidget {
+  /// Creates a default bottom navigation bar with the given [props].
+  const DefaultStreamBottomNavBar({super.key, required this.props});
+
+  /// The properties that configure this navigation bar.
+  final StreamBottomNavBarProps props;
+
+  @override
+  State<DefaultStreamBottomNavBar> createState() => _DefaultStreamBottomNavBarState();
+}
+
+class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> with TickerProviderStateMixin {
+  var _controllers = <AnimationController>[];
+  var _animations = <CurvedAnimation>[];
+
+  List<StreamBottomNavBarItem> get _items => widget.props.items;
+
+  void _resetState() {
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+    for (final animation in _animations) {
+      animation.dispose();
+    }
+
+    _controllers = List<AnimationController>.generate(_items.length, (index) {
+      return AnimationController(duration: kThemeAnimationDuration, vsync: this)..addListener(_rebuild);
+    });
+    _animations = List<CurvedAnimation>.generate(_items.length, (index) {
+      return CurvedAnimation(
+        parent: _controllers[index],
+        curve: Curves.fastOutSlowIn,
+        reverseCurve: Curves.fastOutSlowIn.flipped,
+      );
+    });
+    _controllers[widget.props.currentIndex].value = 1;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _resetState();
+  }
+
+  void _rebuild() {
+    setState(() {
+      // Rebuild when any controller ticks so the tiles animate.
+    });
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+    for (final animation in _animations) {
+      animation.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(DefaultStreamBottomNavBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // No animated segue if the number of items changes.
+    if (_items.length != oldWidget.props.items.length) {
+      _resetState();
+      return;
+    }
+
+    if (widget.props.currentIndex != oldWidget.props.currentIndex) {
+      _controllers[oldWidget.props.currentIndex].reverse();
+      _controllers[widget.props.currentIndex].forward();
+    }
+  }
+
+  List<Widget> _createTiles({
+    required double iconSize,
+    required Color selectedItemColor,
+    required Color unselectedItemColor,
+    required TextStyle selectedLabelStyle,
+    required TextStyle unselectedLabelStyle,
+  }) {
+    final localizations = MaterialLocalizations.of(context);
+
+    // Selected and unselected tiles share the animated colour tween; only the
+    // label style is chosen per selection state.
+    final colorTween = ColorTween(begin: unselectedItemColor, end: selectedItemColor);
+
+    return <Widget>[
+      for (var i = 0; i < _items.length; i++)
+        _StreamNavTile(
+          item: _items[i],
+          animation: _animations[i],
+          iconSize: iconSize,
+          selected: i == widget.props.currentIndex,
+          onTap: () => widget.props.onTap(i),
+          colorTween: colorTween,
+          labelStyle: i == widget.props.currentIndex ? selectedLabelStyle : unselectedLabelStyle,
+          indexLabel: localizations.tabLabel(tabIndex: i + 1, tabCount: _items.length),
+        ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    assert(debugCheckHasDirectionality(context), 'A Directionality ancestor is required.');
+    assert(debugCheckHasMaterialLocalizations(context), 'MaterialLocalizations are required.');
+    assert(debugCheckHasMediaQuery(context), 'A MediaQuery ancestor is required.');
+
     final appStyle = context.streamTheme.appStyle;
-    final effectiveBehavior =
-        behavior ??
-        context.streamBottomAppBarTheme.style?.behavior ??
-        (appStyle.isFloating ? StreamBottomAppBarBehavior.floating : StreamBottomAppBarBehavior.regular);
 
-    if (effectiveBehavior == StreamBottomAppBarBehavior.floating) {
-      return _FloatingNavBar(
-        items: items,
-        currentIndex: currentIndex,
-        onTap: onTap,
-      );
-    }
+    final style = context.streamBottomNavBarTheme.style?.merge(widget.props.style) ?? widget.props.style;
+    final defaults = _StreamBottomNavBarStyleDefaults(context);
 
-    return _RegularNavBar(
-      items: items,
-      currentIndex: currentIndex,
-      onTap: onTap,
+    var effectiveBehavior = widget.props.behavior ?? style?.behavior;
+    effectiveBehavior ??= appStyle.isFloating ? .floating : .regular;
+
+    final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
+    final effectiveSelectedItemColor = style?.selectedItemColor ?? defaults.selectedItemColor;
+    final effectiveUnselectedItemColor = style?.unselectedItemColor ?? defaults.unselectedItemColor;
+    final effectiveIconSize = style?.iconSize ?? defaults.iconSize;
+    final effectiveSelectedLabelStyle = style?.selectedLabelStyle ?? defaults.selectedLabelStyle;
+    final effectiveUnselectedLabelStyle = style?.unselectedLabelStyle ?? defaults.unselectedLabelStyle;
+    final effectiveBorderColor = style?.borderColor ?? defaults.borderColor;
+    final effectiveBorderRadius = style?.borderRadius ?? defaults.borderRadius;
+
+    final tiles = StreamBadgeNotificationTheme(
+      data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: kBottomNavigationBarHeight),
+        // A transparent surface above the bar background so each tile can paint
+        // its tap ripple.
+        child: Material(
+          type: MaterialType.transparency,
+          child: DefaultTextStyle.merge(
+            overflow: TextOverflow.ellipsis,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: _createTiles(
+                iconSize: effectiveIconSize,
+                selectedItemColor: effectiveSelectedItemColor,
+                unselectedItemColor: effectiveUnselectedItemColor,
+                selectedLabelStyle: effectiveSelectedLabelStyle,
+                unselectedLabelStyle: effectiveUnselectedLabelStyle,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return Semantics(
+      explicitChildNodes: true,
+      child: switch (effectiveBehavior) {
+        StreamBottomNavBarBehavior.regular => _RegularChrome(
+          backgroundColor: effectiveBackgroundColor,
+          borderColor: effectiveBorderColor,
+          child: tiles,
+        ),
+        StreamBottomNavBarBehavior.floating => _FloatingChrome(
+          pillColor: effectiveBackgroundColor,
+          gradientColor: effectiveFloatingBackgroundColor,
+          borderColor: effectiveBorderColor,
+          borderRadius: effectiveBorderRadius,
+          child: tiles,
+        ),
+      },
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Floating pill nav bar
-// ---------------------------------------------------------------------------
-
-class _FloatingNavBar extends StatelessWidget {
-  const _FloatingNavBar({
-    required this.items,
-    required this.currentIndex,
+// A single navigation tile: an icon above a label, both sharing a colour that
+// animates between the unselected and selected states.
+class _StreamNavTile extends StatelessWidget {
+  const _StreamNavTile({
+    required this.item,
+    required this.animation,
+    required this.iconSize,
+    required this.selected,
     required this.onTap,
+    required this.colorTween,
+    required this.labelStyle,
+    required this.indexLabel,
   });
 
-  final List<StreamBottomNavBarItem> items;
-  final int currentIndex;
-  final ValueChanged<int> onTap;
+  final StreamBottomNavBarItem item;
+  final Animation<double> animation;
+  final double iconSize;
+  final bool selected;
+  final VoidCallback onTap;
+  final ColorTween colorTween;
+  final TextStyle labelStyle;
+  final String indexLabel;
 
-  LinearGradient _buildGradient(BuildContext context, Color backgroundColor) {
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+    final color = colorTween.evaluate(animation);
+
+    final Widget result = Semantics(
+      selected: selected,
+      button: true,
+      container: true,
+      child: Stack(
+        children: <Widget>[
+          InkResponse(
+            onTap: onTap,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: spacing.xs),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: spacing.xxxs,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.topCenter,
+                    heightFactor: 1,
+                    child: IconTheme(
+                      data: IconThemeData(color: color, size: iconSize),
+                      child: selected ? item.selectedIcon : item.icon,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    heightFactor: 1,
+                    child: MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1,
+                      child: Text(item.label, style: labelStyle.copyWith(color: color)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Semantics(label: indexLabel),
+        ],
+      ),
+    );
+
+    return Expanded(child: result);
+  }
+}
+
+// Docked chrome: a solid surface with a hairline top border, inset above the
+// system bottom inset.
+class _RegularChrome extends StatelessWidget {
+  const _RegularChrome({
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.child,
+  });
+
+  final Color backgroundColor;
+  final Color borderColor;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: Border(top: BorderSide(color: borderColor)),
+      ),
+      child: SafeArea(top: false, child: child),
+    );
+  }
+}
+
+// Floating chrome: a rounded pill with a shadow and hairline border, sitting
+// above a gradient that fades the bar into the content behind it.
+class _FloatingChrome extends StatelessWidget {
+  const _FloatingChrome({
+    required this.pillColor,
+    required this.gradientColor,
+    required this.borderColor,
+    required this.borderRadius,
+    required this.child,
+  });
+
+  final Color pillColor;
+  final Color gradientColor;
+  final Color borderColor;
+  final BorderRadiusGeometry borderRadius;
+  final Widget child;
+
+  LinearGradient _buildGradient(BuildContext context) {
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
-    // Approximate rendered height: safe area + vertical padding + item height.
-    const itemHeight = 56.0;
+    // Approximate rendered height: safe area + item height.
+    const itemHeight = kBottomNavigationBarHeight;
     final totalHeight = safeAreaBottom + itemHeight;
     final solidFraction = totalHeight > 0 ? safeAreaBottom / totalHeight : 0.0;
 
     return streamFloatingFadeLinearGradient(
-      color: backgroundColor,
+      color: gradientColor,
       solidFraction: solidFraction,
       begin: Alignment.bottomCenter,
       end: Alignment.topCenter,
@@ -171,43 +483,26 @@ class _FloatingNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
     final spacing = context.streamSpacing;
-    final radius = context.streamRadius;
-    final backgroundColor = colorScheme.backgroundElevation0;
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: _buildGradient(context, backgroundColor),
-      ),
+      decoration: BoxDecoration(gradient: _buildGradient(context)),
       child: SafeArea(
         top: false,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: spacing.xl),
           child: Container(
+            clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: colorScheme.backgroundElevation1,
-              borderRadius: BorderRadius.all(radius.max),
+              color: pillColor,
+              borderRadius: borderRadius,
               boxShadow: context.streamBoxShadow.elevation1,
             ),
             foregroundDecoration: BoxDecoration(
-              borderRadius: BorderRadius.all(radius.max),
-              border: Border.all(color: colorScheme.borderSubtle),
+              borderRadius: borderRadius,
+              border: Border.all(color: borderColor),
             ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: spacing.xs),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  for (var i = 0; i < items.length; i++)
-                    _FloatingNavBarItem(
-                      item: items[i],
-                      selected: i == currentIndex,
-                      onTap: () => onTap(i),
-                    ),
-                ],
-              ),
-            ),
+            child: child,
           ),
         ),
       ),
@@ -215,106 +510,44 @@ class _FloatingNavBar extends StatelessWidget {
   }
 }
 
-class _FloatingNavBarItem extends StatelessWidget {
-  const _FloatingNavBarItem({
-    required this.item,
-    required this.selected,
-    required this.onTap,
-  });
+// Default style values for [StreamBottomNavBar].
+//
+// These defaults are used when no explicit value is provided via
+// [StreamBottomNavBarStyle]. They are context-aware and use values from
+// [StreamColorScheme], [StreamTextTheme], and [StreamRadius].
+class _StreamBottomNavBarStyleDefaults extends StreamBottomNavBarStyle {
+  _StreamBottomNavBarStyleDefaults(this._context);
 
-  final StreamBottomNavBarItem item;
-  final bool selected;
-  final VoidCallback onTap;
+  final BuildContext _context;
 
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = context.streamTextTheme;
-    final colorScheme = context.streamColorScheme;
-    final spacing = context.streamSpacing;
-    final color = selected ? colorScheme.textPrimary : colorScheme.textTertiary;
-
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: item.label,
-      onTap: onTap,
-      onTapHint: 'select',
-      excludeSemantics: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.xxs),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: spacing.xxxs,
-            children: [
-              StreamBadgeNotificationTheme(
-                data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
-                child: IconTheme(
-                  data: IconThemeData(color: color, size: 20),
-                  child: selected ? item.selectedIcon : item.icon,
-                ),
-              ),
-              Text(
-                item.label,
-                style: textTheme.metadataEmphasis.copyWith(color: color),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Regular docked nav bar
-// ---------------------------------------------------------------------------
-
-class _RegularNavBar extends StatelessWidget {
-  const _RegularNavBar({
-    required this.items,
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  final List<StreamBottomNavBarItem> items;
-  final int currentIndex;
-  final ValueChanged<int> onTap;
+  late final _colorScheme = _context.streamColorScheme;
+  late final _textTheme = _context.streamTextTheme;
+  late final _radius = _context.streamRadius;
 
   @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
+  Color get backgroundColor => _colorScheme.backgroundElevation1;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colorScheme.backgroundElevation1,
-        border: Border(top: BorderSide(color: colorScheme.borderSubtle)),
-      ),
-      child: StreamBadgeNotificationTheme(
-        data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
-        child: BottomNavigationBar(
-          elevation: 0,
-          iconSize: 20,
-          currentIndex: currentIndex,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: colorScheme.textPrimary,
-          unselectedItemColor: colorScheme.textTertiary,
-          backgroundColor: Colors.transparent,
-          selectedLabelStyle: textTheme.metadataEmphasis,
-          unselectedLabelStyle: textTheme.metadataEmphasis,
-          onTap: onTap,
-          items: items.map((item) {
-            return BottomNavigationBarItem(
-              icon: item.icon,
-              activeIcon: item.selectedIcon,
-              label: item.label,
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
+  @override
+  Color get floatingBackgroundColor => _colorScheme.backgroundElevation0;
+
+  @override
+  Color get selectedItemColor => _colorScheme.textPrimary;
+
+  @override
+  Color get unselectedItemColor => _colorScheme.textTertiary;
+
+  @override
+  double get iconSize => 20;
+
+  @override
+  TextStyle get selectedLabelStyle => _textTheme.metadataEmphasis;
+
+  @override
+  TextStyle get unselectedLabelStyle => _textTheme.metadataEmphasis;
+
+  @override
+  Color get borderColor => _colorScheme.borderSubtle;
+
+  @override
+  BorderRadiusGeometry get borderRadius => BorderRadius.all(_radius.max);
 }

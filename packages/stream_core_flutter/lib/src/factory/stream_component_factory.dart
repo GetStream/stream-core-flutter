@@ -48,6 +48,7 @@ import '../components/reaction/stream_reactions.dart';
 import '../components/snackbar/stream_snackbar.dart';
 import '../components/toolbar/stream_app_bar.dart';
 import '../components/toolbar/stream_bottom_app_bar.dart';
+import '../components/toolbar/stream_bottom_nav_bar.dart';
 import '../components/toolbar/stream_sheet_header.dart';
 
 part 'stream_component_factory.g.theme.dart';
@@ -181,6 +182,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamAppBarProps>? appBar,
     StreamComponentBuilder<StreamAvatarProps>? avatar,
     StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar,
+    StreamComponentBuilder<StreamBottomNavBarProps>? bottomNavBar,
     StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup,
     StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
     StreamComponentBuilder<StreamBadgeCountProps>? badgeCount,
@@ -234,6 +236,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       appBar: appBar,
       avatar: avatar,
       bottomAppBar: bottomAppBar,
+      bottomNavBar: bottomNavBar,
       avatarGroup: avatarGroup,
       avatarStack: avatarStack,
       badgeCount: badgeCount,
@@ -288,6 +291,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.appBar,
     required this.avatar,
     required this.bottomAppBar,
+    required this.bottomNavBar,
     required this.avatarGroup,
     required this.avatarStack,
     required this.badgeCount,
@@ -369,6 +373,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamBottomAppBar] uses [DefaultStreamBottomAppBar].
   final StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar;
+
+  /// Custom builder for bottom navigation bar widgets.
+  ///
+  /// When null, [StreamBottomNavBar] uses [DefaultStreamBottomNavBar].
+  final StreamComponentBuilder<StreamBottomNavBarProps>? bottomNavBar;
 
   /// Custom builder for avatar group widgets.
   ///

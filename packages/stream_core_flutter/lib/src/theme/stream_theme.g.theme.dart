@@ -27,6 +27,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamBottomAppBarThemeData? bottomAppBarTheme,
+    StreamBottomNavBarThemeData? bottomNavBarTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamCommandChipThemeData? commandChipTheme,
@@ -83,6 +84,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeNotificationTheme:
           badgeNotificationTheme ?? _this.badgeNotificationTheme,
       bottomAppBarTheme: bottomAppBarTheme ?? _this.bottomAppBarTheme,
+      bottomNavBarTheme: bottomNavBarTheme ?? _this.bottomNavBarTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       commandChipTheme: commandChipTheme ?? _this.commandChipTheme,
@@ -183,6 +185,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       bottomAppBarTheme: StreamBottomAppBarThemeData.lerp(
         _this.bottomAppBarTheme,
         other.bottomAppBarTheme,
+        t,
+      )!,
+      bottomNavBarTheme: StreamBottomNavBarThemeData.lerp(
+        _this.bottomNavBarTheme,
+        other.bottomNavBarTheme,
         t,
       )!,
       buttonTheme: StreamButtonThemeData.lerp(
@@ -373,6 +380,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
         _other.bottomAppBarTheme == _this.bottomAppBarTheme &&
+        _other.bottomNavBarTheme == _this.bottomNavBarTheme &&
         _other.buttonTheme == _this.buttonTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
         _other.commandChipTheme == _this.commandChipTheme &&
@@ -433,6 +441,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.badgeCountTheme,
       _this.badgeNotificationTheme,
       _this.bottomAppBarTheme,
+      _this.bottomNavBarTheme,
       _this.buttonTheme,
       _this.checkboxTheme,
       _this.commandChipTheme,

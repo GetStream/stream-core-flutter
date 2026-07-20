@@ -6,6 +6,7 @@ import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
 import 'components/stream_bottom_app_bar_theme.dart';
+import 'components/stream_bottom_nav_bar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
@@ -107,6 +108,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamBottomAppBarThemeData] from the nearest ancestor.
   StreamBottomAppBarThemeData get streamBottomAppBarTheme => StreamBottomAppBarTheme.of(this);
+
+  /// Returns the [StreamBottomNavBarThemeData] from the nearest ancestor.
+  StreamBottomNavBarThemeData get streamBottomNavBarTheme => StreamBottomNavBarTheme.of(this);
 
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);

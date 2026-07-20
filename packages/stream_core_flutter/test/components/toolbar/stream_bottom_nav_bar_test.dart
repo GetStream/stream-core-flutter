@@ -22,6 +22,15 @@ Widget _withStreamTheme(Widget child, {StreamAppStyle appStyle = StreamAppStyle.
   );
 }
 
+/// Whether the bar resolved to the floating style, detected by the presence of
+/// the gradient fade (only the floating chrome paints one).
+bool _isFloating(WidgetTester tester) {
+  final boxes = tester.widgetList<DecoratedBox>(
+    find.descendant(of: find.byType(StreamBottomNavBar), matching: find.byType(DecoratedBox)),
+  );
+  return boxes.any((box) => (box.decoration as BoxDecoration).gradient != null);
+}
+
 void main() {
   testWidgets('renders a label for every item', (tester) async {
     await tester.pumpWidget(
@@ -55,19 +64,30 @@ void main() {
   });
 
   group('regular behavior', () {
-    testWidgets('renders a docked BottomNavigationBar', (tester) async {
+    testWidgets('renders a docked bar with a top border and no gradient', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamBottomNavBar(
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomAppBarBehavior.regular,
+            behavior: StreamBottomNavBarBehavior.regular,
           ),
         ),
       );
 
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
+      final decoratedBox = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byType(StreamBottomNavBar),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      final decoration = decoratedBox.decoration as BoxDecoration;
+      expect(decoration.gradient, isNull);
+      expect(decoration.border, isNotNull);
+      expect(find.text('Chats'), findsOneWidget);
     });
   });
 
@@ -79,7 +99,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomAppBarBehavior.floating,
+            behavior: StreamBottomNavBarBehavior.floating,
           ),
         ),
       );
@@ -96,7 +116,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (index) => tappedIndex = index,
-            behavior: StreamBottomAppBarBehavior.floating,
+            behavior: StreamBottomNavBarBehavior.floating,
           ),
         ),
       );
@@ -113,7 +133,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomAppBarBehavior.floating,
+            behavior: StreamBottomNavBarBehavior.floating,
           ),
         ),
       );
@@ -132,7 +152,22 @@ void main() {
   });
 
   group('behavior resolution', () {
-    testWidgets('falls back to StreamBottomAppBarTheme when the instance behavior is unset', (tester) async {
+    testWidgets('resolves behavior from StreamBottomNavBarTheme', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBarTheme(
+            data: const StreamBottomNavBarThemeData(
+              style: StreamBottomNavBarStyle(behavior: StreamBottomNavBarBehavior.floating),
+            ),
+            child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
+          ),
+        ),
+      );
+
+      expect(_isFloating(tester), isTrue);
+    });
+
+    testWidgets('is independent of StreamBottomAppBarTheme', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamBottomAppBarTheme(
@@ -144,7 +179,9 @@ void main() {
         ),
       );
 
-      expect(find.byType(BottomNavigationBar), findsNothing);
+      // The nav bar resolves only from its own theme and StreamAppStyle, so a
+      // floating StreamBottomAppBarTheme has no effect (defaults to regular).
+      expect(_isFloating(tester), isFalse);
     });
 
     testWidgets('falls back to the ambient StreamAppStyle when neither instance nor theme set a behavior', (
@@ -157,7 +194,51 @@ void main() {
         ),
       );
 
-      expect(find.byType(BottomNavigationBar), findsNothing);
+      expect(_isFloating(tester), isTrue);
+    });
+  });
+
+  group('StreamBottomNavBarTheme styling', () {
+    testWidgets('applies the selected item color to the selected tile', (tester) async {
+      const selectedColor = Color(0xFF123456);
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBarTheme(
+            data: const StreamBottomNavBarThemeData(
+              style: StreamBottomNavBarStyle(selectedItemColor: selectedColor),
+            ),
+            child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
+          ),
+        ),
+      );
+
+      final selectedLabel = tester.widget<Text>(find.text('Chats'));
+      expect(selectedLabel.style?.color, equals(selectedColor));
+    });
+  });
+
+  group('semantics', () {
+    testWidgets('marks each item as a button, flags the selected one, and labels tabs by index', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
+        ),
+      );
+
+      // Each tab announces its position (localized "Tab N of M"), merged onto
+      // the tile alongside its label (e.g. "Chats\nTab 1 of 2").
+      final selected = find.semantics.byPredicate((n) => n.label.contains('Tab 1 of 2'));
+      final unselected = find.semantics.byPredicate((n) => n.label.contains('Tab 2 of 2'));
+
+      expect(selected, findsOneWidget);
+      expect(unselected, findsOneWidget);
+
+      // The selected item is a selected button; the other an unselected button.
+      expect(selected.evaluate().single, isSemantics(isButton: true, isSelected: true));
+      expect(unselected.evaluate().single, isSemantics(isButton: true, isSelected: false));
+
+      handle.dispose();
     });
   });
 }

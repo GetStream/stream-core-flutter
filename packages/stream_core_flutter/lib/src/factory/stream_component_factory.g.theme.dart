@@ -34,6 +34,7 @@ mixin _$StreamComponentBuilders {
       appBar: t < 0.5 ? a.appBar : b.appBar,
       avatar: t < 0.5 ? a.avatar : b.avatar,
       bottomAppBar: t < 0.5 ? a.bottomAppBar : b.bottomAppBar,
+      bottomNavBar: t < 0.5 ? a.bottomNavBar : b.bottomNavBar,
       avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
@@ -103,6 +104,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamAppBarProps)? appBar,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
     Widget Function(BuildContext, StreamBottomAppBarProps)? bottomAppBar,
+    Widget Function(BuildContext, StreamBottomNavBarProps)? bottomNavBar,
     Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
@@ -179,6 +181,7 @@ mixin _$StreamComponentBuilders {
       appBar: appBar ?? _this.appBar,
       avatar: avatar ?? _this.avatar,
       bottomAppBar: bottomAppBar ?? _this.bottomAppBar,
+      bottomNavBar: bottomNavBar ?? _this.bottomNavBar,
       avatarGroup: avatarGroup ?? _this.avatarGroup,
       avatarStack: avatarStack ?? _this.avatarStack,
       badgeCount: badgeCount ?? _this.badgeCount,
@@ -255,6 +258,7 @@ mixin _$StreamComponentBuilders {
       appBar: other.appBar,
       avatar: other.avatar,
       bottomAppBar: other.bottomAppBar,
+      bottomNavBar: other.bottomNavBar,
       avatarGroup: other.avatarGroup,
       avatarStack: other.avatarStack,
       badgeCount: other.badgeCount,
@@ -323,6 +327,7 @@ mixin _$StreamComponentBuilders {
         _other.appBar == _this.appBar &&
         _other.avatar == _this.avatar &&
         _other.bottomAppBar == _this.bottomAppBar &&
+        _other.bottomNavBar == _this.bottomNavBar &&
         _other.avatarGroup == _this.avatarGroup &&
         _other.avatarStack == _this.avatarStack &&
         _other.badgeCount == _this.badgeCount &&
@@ -386,6 +391,7 @@ mixin _$StreamComponentBuilders {
       _this.appBar,
       _this.avatar,
       _this.bottomAppBar,
+      _this.bottomNavBar,
       _this.avatarGroup,
       _this.avatarStack,
       _this.badgeCount,

@@ -10,6 +10,7 @@ import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
 import 'components/stream_bottom_app_bar_theme.dart';
+import 'components/stream_bottom_nav_bar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
@@ -122,6 +123,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamBottomAppBarThemeData? bottomAppBarTheme,
+    StreamBottomNavBarThemeData? bottomNavBarTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamCommandChipThemeData? commandChipTheme,
@@ -175,6 +177,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     badgeNotificationTheme ??= const StreamBadgeNotificationThemeData();
     bottomAppBarTheme ??= const StreamBottomAppBarThemeData();
+    bottomNavBarTheme ??= const StreamBottomNavBarThemeData();
     buttonTheme ??= const StreamButtonThemeData();
     checkboxTheme ??= const StreamCheckboxThemeData();
     commandChipTheme ??= const StreamCommandChipThemeData();
@@ -222,6 +225,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
       bottomAppBarTheme: bottomAppBarTheme,
+      bottomNavBarTheme: bottomNavBarTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       commandChipTheme: commandChipTheme,
@@ -283,6 +287,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.badgeCountTheme,
     required this.badgeNotificationTheme,
     required this.bottomAppBarTheme,
+    required this.bottomNavBarTheme,
     required this.buttonTheme,
     required this.checkboxTheme,
     required this.commandChipTheme,
@@ -393,6 +398,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The bottom app bar theme for this theme.
   final StreamBottomAppBarThemeData bottomAppBarTheme;
+
+  /// The bottom navigation bar theme for this theme.
+  final StreamBottomNavBarThemeData bottomNavBarTheme;
 
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
@@ -521,6 +529,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
       bottomAppBarTheme: bottomAppBarTheme,
+      bottomNavBarTheme: bottomNavBarTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       commandChipTheme: commandChipTheme,
