@@ -215,17 +215,16 @@ class DefaultStreamAppBar extends StatelessWidget {
     final icons = context.streamIcons;
     final spacing = context.streamSpacing;
 
+    final appStyle = context.streamTheme.appStyle;
+
     final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveStreamAppBarBehavior =
-        style?.behavior ??
-        (context.streamTheme.appStyle.isFloating ? StreamAppBarBehavior.floating : StreamAppBarBehavior.regular);
+    var effectiveBehavior = style?.behavior ?? defaults.behavior;
+    effectiveBehavior ??= appStyle.isFloating ? .floating : .regular;
 
-    final effectiveBackgroundColor = switch (effectiveStreamAppBarBehavior) {
-      .floating => style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor,
-      .regular => style?.backgroundColor ?? defaults.backgroundColor,
-    };
+    final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
     final effectivePadding = style?.padding ?? defaults.padding;
     final effectiveSpacing = style?.spacing ?? defaults.spacing;
     final effectiveTitleTextStyle = style?.titleTextStyle ?? defaults.titleTextStyle;
@@ -250,11 +249,11 @@ class DefaultStreamAppBar extends StatelessWidget {
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
         final localizations = MaterialLocalizations.of(context);
         leading = StreamButton.icon(
-          type: switch (effectiveStreamAppBarBehavior) {
+          type: switch (effectiveBehavior) {
             .floating => .outline,
             .regular => .ghost,
           },
-          isFloating: effectiveStreamAppBarBehavior == .floating,
+          isFloating: effectiveBehavior == .floating,
           style: .secondary,
           tooltip: useCloseIcon ? localizations.closeButtonTooltip : localizations.backButtonTooltip,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
@@ -360,15 +359,15 @@ class DefaultStreamAppBar extends StatelessWidget {
       container: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: switch (effectiveStreamAppBarBehavior) {
+          color: switch (effectiveBehavior) {
             .floating => null,
             .regular => effectiveBackgroundColor,
           },
-          gradient: switch (effectiveStreamAppBarBehavior) {
-            .floating => _getFloatingGradient(context, effectiveBackgroundColor: effectiveBackgroundColor),
+          gradient: switch (effectiveBehavior) {
+            .floating => _getFloatingGradient(context, color: effectiveFloatingBackgroundColor),
             .regular => null,
           },
-          border: switch (effectiveStreamAppBarBehavior) {
+          border: switch (effectiveBehavior) {
             .floating => null,
             .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
           },
@@ -380,7 +379,7 @@ class DefaultStreamAppBar extends StatelessWidget {
 
   LinearGradient _getFloatingGradient(
     BuildContext context, {
-    required Color effectiveBackgroundColor,
+    required Color color,
   }) {
     // Compute the fraction of the total bar height occupied by the system
     // safe area so the gradient is solid through the status bar and fades only
@@ -389,7 +388,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     final totalHeight = safeAreaTop + kStreamToolbarHeight;
     final solidFraction = totalHeight > 0 ? safeAreaTop / totalHeight : 0.0;
 
-    return streamFloatingFadeLinearGradient(color: effectiveBackgroundColor, solidFraction: solidFraction);
+    return streamFloatingFadeLinearGradient(color: color, solidFraction: solidFraction);
   }
 }
 
