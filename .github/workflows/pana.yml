@@ -27,3 +27,25 @@ jobs:
         with:
           working_directory: packages/stream_core
           min_score: 125  # Missing 10 points for no example, 10 points for license, and 10 points for `publish_to` in pubspec.
+
+  stream_core_flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+      - name: 📊 Verify Pana Score
+        uses: ./.github/actions/pana
+        with:
+          working_directory: packages/stream_core_flutter
+          min_score: 125  # Aligned with stream_core for now; tune after the first run.
+
+  stream_thumbnail:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+      - name: 📊 Verify Pana Score
+        uses: ./.github/actions/pana
+        with:
+          working_directory: packages/stream_thumbnail
+          min_score: 125  # Aligned with stream_core for now; tune after the first run.
