@@ -12,16 +12,23 @@ import 'package:stream_video_thumbnail/src/stream_video_thumbnail_platform.dart'
 /// can be installed as the active instance without the mock mixin.
 class FakeStreamVideoThumbnailPlatform extends StreamVideoThumbnailPlatform {
   final _data = Uint8List.fromList([1, 2, 3]);
+  final _file = XFile('/thumb.png');
   var _filesCalled = false;
 
   /// The canned bytes returned by [thumbnailData].
   Uint8List get data => _data;
+
+  /// The canned file returned by [thumbnailFile].
+  XFile get file => _file;
 
   /// Whether [thumbnailFiles] was invoked.
   bool get filesCalled => _filesCalled;
 
   /// The arguments captured from the most recent [thumbnailData] call.
   Map<String, Object?>? lastDataCall;
+
+  /// The arguments captured from the most recent [thumbnailFile] call.
+  Map<String, Object?>? lastFileCall;
 
   @override
   Future<Uint8List> thumbnailData({
@@ -43,6 +50,25 @@ class FakeStreamVideoThumbnailPlatform extends StreamVideoThumbnailPlatform {
       'quality': quality,
     };
     return _data;
+  }
+
+  @override
+  Future<XFile> thumbnailFile({
+    required String video,
+    required Map<String, String>? headers,
+    required String? thumbnailPath,
+    required StreamThumbnailFormat imageFormat,
+    required int maxHeight,
+    required int maxWidth,
+    int? timeMs,
+    required int quality,
+  }) async {
+    lastFileCall = {
+      'video': video,
+      'thumbnailPath': thumbnailPath,
+      'imageFormat': imageFormat,
+    };
+    return _file;
   }
 
   @override
@@ -112,6 +138,15 @@ void main() {
         'timeMs': null,
         'quality': 10,
       });
+    });
+
+    test('thumbnailFile forwards to the platform and returns its file', () async {
+      final fake = useFakePlatform();
+
+      final result = await StreamVideoThumbnail.thumbnailFile(video: 'a.mp4');
+
+      expect(result, same(fake.file));
+      expect(fake.lastFileCall?['video'], 'a.mp4');
     });
 
     test('thumbnailFiles returns an empty list without hitting the platform for no videos', () async {

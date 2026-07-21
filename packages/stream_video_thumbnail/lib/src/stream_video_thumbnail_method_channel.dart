@@ -1,3 +1,7 @@
+// The method-channel plumbing (request encoding and the native-to-Dart result
+// callbacks) is exercised end-to-end via the example app on each platform
+// rather than through unit tests.
+// coverage:ignore-file
 import 'dart:async';
 
 import 'package:cross_file/cross_file.dart';

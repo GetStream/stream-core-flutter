@@ -26,6 +26,7 @@ jobs:
             llc
             ui
             repo
+            thumb
           requireScope: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,7 +40,8 @@ jobs:
           scopes: |
             {
               "llc": "packages/stream_core",
-              "ui": "packages/stream_core_flutter"
+              "ui": "packages/stream_core_flutter",
+              "thumb": "packages/stream_video_thumbnail"
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

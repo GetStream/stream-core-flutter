@@ -1,3 +1,6 @@
+// The web implementation is browser/DOM glue that requires a real browser to
+// exercise, so it is validated via the example app rather than unit tests.
+// coverage:ignore-file
 import 'dart:async';
 import 'dart:js_interop';
 import 'dart:math' as math;

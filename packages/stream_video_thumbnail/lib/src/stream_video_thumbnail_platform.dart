@@ -1,3 +1,6 @@
+// Platform-interface boilerplate (token, default instance, and the
+// UnimplementedError stubs that platform implementations override).
+// coverage:ignore-file
 import 'dart:typed_data';
 
 import 'package:cross_file/cross_file.dart';
