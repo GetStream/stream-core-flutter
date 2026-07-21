@@ -259,7 +259,22 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
         ..src = videoSrc;
     }
 
-    return completer.future;
+    // Bound a source that never fires `seeked`/`error` so the future can't hang
+    // (and retain the video element) forever, and release the media element once
+    // the result settles.
+    return completer.future
+        .timeout(
+          const Duration(seconds: 30),
+          onTimeout: () => throw PlatformException(
+            code: 'TIMEOUT',
+            message: 'Timed out generating a thumbnail for the video.',
+          ),
+        )
+        .whenComplete(() {
+          video
+            ..src = ''
+            ..load();
+        });
   }
 
   // Fetches the video using the given headers.

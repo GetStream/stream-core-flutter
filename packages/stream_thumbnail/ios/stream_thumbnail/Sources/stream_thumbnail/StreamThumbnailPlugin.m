@@ -174,15 +174,16 @@
         else {
             NSLog(@"Sorry, don't support this CGImageAlphaInfo: %d", (int) binfo );
         }
-        CGDataProviderRelease(dataProvider);
+        // `colorSpace` (CGImageGetColorSpace) and `dataProvider`
+        // (CGImageGetDataProvider) are get-references and must not be released.
+        // `imageData` (CGDataProviderCopyData) and `cgImage` (copyCGImageAtTime)
+        // are owned and must be.
         CFRelease(imageData);
-        CGColorSpaceRelease(colorSpace);
-        
-        if (ret_size == 0) {
-            return nil;
-        }
-        NSData *data = [NSData dataWithBytes:(const void *)output length:ret_size];
-        return( data );
+        CGImageRelease(cgImage);
+
+        NSData *data = ret_size > 0 ? [NSData dataWithBytes:(const void *)output length:ret_size] : nil;
+        WebPFree(output);
+        return data;
     }
 }
 
