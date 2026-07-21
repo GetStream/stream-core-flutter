@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'stream_thumbnail'
-  s.version          = '0.0.1'
+  s.version          = '0.1.0'
   s.summary          = 'A Flutter plugin for creating a thumbnail from a local video file or from a video URL.'
   s.description      = <<-DESC
 A Flutter plugin for creating a thumbnail from a local video file or from a video URL.
