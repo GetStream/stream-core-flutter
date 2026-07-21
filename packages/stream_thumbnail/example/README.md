@@ -1,4 +1,4 @@
-# stream_video_thumbnail_example
+# stream_thumbnail_example
 
 A new Flutter project.
 

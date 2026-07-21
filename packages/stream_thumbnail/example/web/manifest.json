@@ -1,6 +1,6 @@
 {
-    "name": "stream_video_thumbnail_example",
-    "short_name": "stream_video_thumbnail_example",
+    "name": "stream_thumbnail_example",
+    "short_name": "stream_thumbnail_example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

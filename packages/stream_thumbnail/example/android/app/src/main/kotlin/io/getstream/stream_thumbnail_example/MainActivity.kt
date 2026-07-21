@@ -1,4 +1,4 @@
-package io.getstream.stream_video_thumbnail_example
+package io.getstream.stream_thumbnail_example
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -2,7 +2,7 @@
     <!-- Required to fetch the remote sample video for thumbnail generation. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="stream_video_thumbnail_example"
+        android:label="stream_thumbnail_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

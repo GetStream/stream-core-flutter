@@ -10,9 +10,9 @@ class ExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'stream_thumbnail example',
-      home: const ThumbnailPage(),
+      home: ThumbnailPage(),
     );
   }
 }
