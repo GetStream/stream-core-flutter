@@ -25,8 +25,7 @@ class ThumbnailPage extends StatefulWidget {
 }
 
 class _ThumbnailPageState extends State<ThumbnailPage> {
-  static const _sampleVideo =
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
+  static const _sampleVideo = 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
 
   final _controller = TextEditingController(text: _sampleVideo);
   Future<Uint8List>? _thumbnail;

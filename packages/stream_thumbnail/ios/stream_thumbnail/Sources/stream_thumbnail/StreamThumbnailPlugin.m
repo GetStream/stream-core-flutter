@@ -47,9 +47,13 @@
 
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
             //Background Thread
-            result([StreamThumbnailPlugin generateThumbnail:url headers:headers format:format maxHeight:maxh maxWidth:maxw timeMs:timeMs quality:quality]);
+            NSData *data = [StreamThumbnailPlugin generateThumbnail:url headers:headers format:format maxHeight:maxh maxWidth:maxw timeMs:timeMs quality:quality];
+            //Deliver the result on the main thread, as Flutter requires.
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                result(data);
+            });
         });
-        
+
     } else if ([@"file" isEqualToString:call.method]) {
         if( [path isEqual:[NSNull null]] && !isLocalFile ) {
             path = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
@@ -71,21 +75,23 @@
             }
             
             NSError *error = nil;
+            id fileResult;
             if( [data writeToURL:thumbnail options:0 error:&error] != YES ) {
                 if( error != nil ) {
-                    result( [FlutterError errorWithCode:[NSString stringWithFormat:@"Error %ld", error.code]
-                                                message:error.domain
-                                                details:error.localizedDescription] );
-                } else result( [FlutterError errorWithCode:@"IO Error" message:@"Failed to write data to file" details:nil] );
+                    fileResult = [FlutterError errorWithCode:[NSString stringWithFormat:@"Error %ld", error.code]
+                                                     message:error.domain
+                                                     details:error.localizedDescription];
+                } else {
+                    fileResult = [FlutterError errorWithCode:@"IO Error" message:@"Failed to write data to file" details:nil];
+                }
             } else {
                 NSString *fullpath = [thumbnail absoluteString];
-                if([fullpath hasPrefix:@"file://"]) {
-                    result([fullpath substringFromIndex:7]);
-                }
-                else {
-                    result(fullpath);
-                }
+                fileResult = [fullpath hasPrefix:@"file://"] ? [fullpath substringFromIndex:7] : fullpath;
             }
+            //Deliver the result on the main thread, as Flutter requires.
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                result(fileResult);
+            });
         });
         
     } else {

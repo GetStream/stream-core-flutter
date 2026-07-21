@@ -39,6 +39,9 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
+        if (executor.isShutdown) {
+            executor = Executors.newCachedThreadPool()
+        }
         channel = MethodChannel(
             flutterPluginBinding.binaryMessenger,
             "plugins.getstream.io/stream_thumbnail"

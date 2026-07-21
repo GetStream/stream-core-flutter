@@ -209,6 +209,24 @@ void main() {
       expect(args['quality'], 80);
     });
 
+    test('thumbnailFile wraps a directly-returned path in an XFile', () async {
+      // iOS replies with the written file path directly (Android uses the
+      // 'result#file' reverse callback instead).
+      mockChannel('/tmp/thumb.png');
+
+      final result = await MethodChannelStreamThumbnail().thumbnailFile(
+        video: 'a.mp4',
+        headers: null,
+        thumbnailPath: null,
+        imageFormat: StreamThumbnailFormat.png,
+        maxHeight: 0,
+        maxWidth: 0,
+        quality: 10,
+      );
+
+      expect(result.path, '/tmp/thumb.png');
+    });
+
     test('a null timeMs is sent as -1 on Android', () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);

@@ -188,7 +188,9 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     final result = await methodChannel.invokeMethod('file', reqMap);
 
     if (result != true) {
-      _resolveFuture(callId, result);
+      // iOS returns the written file path directly; wrap it as an [XFile] to
+      // satisfy the Future<XFile> contract (Android replies via 'result#file').
+      _resolveFuture(callId, XFile(result as String));
     }
 
     return completer.future;
