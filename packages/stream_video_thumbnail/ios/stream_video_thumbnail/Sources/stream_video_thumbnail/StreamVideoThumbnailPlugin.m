@@ -106,7 +106,7 @@
     NSError *error = nil;
     CGImageRef cgImage = [imgGenerator copyCGImageAtTime:CMTimeMake(timeMs, 1000) actualTime:nil error:&error];
     
-    if( error != nil ) {
+    if( error != nil || cgImage == NULL ) {
         NSLog(@"couldn't generate thumbnail, error:%@", error);
         return nil;
     }

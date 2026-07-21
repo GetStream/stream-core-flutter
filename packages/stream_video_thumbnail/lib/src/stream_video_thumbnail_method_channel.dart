@@ -25,6 +25,8 @@ class MethodChannelStreamVideoThumbnail extends StreamVideoThumbnailPlatform {
 
   final _futures = <int, Completer<Object>>{};
 
+  var _nextCallId = 0;
+
   Future<dynamic> _resolveCall(MethodCall call) async {
     switch (call.method) {
       case 'result#files':
@@ -94,7 +96,7 @@ class MethodChannelStreamVideoThumbnail extends StreamVideoThumbnailPlatform {
 
   (Completer<T>, int) _createCompleterAndCallId<T extends Object>() {
     final completer = Completer<T>();
-    final callId = completer.hashCode;
+    final callId = _nextCallId++;
 
     _futures[callId] = completer;
 

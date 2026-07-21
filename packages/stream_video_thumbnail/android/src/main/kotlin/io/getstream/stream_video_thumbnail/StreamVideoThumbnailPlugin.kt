@@ -38,6 +38,7 @@ class StreamVideoThumbnailPlugin : FlutterPlugin, MethodCallHandler {
     private var executor = Executors.newCachedThreadPool()
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        context = flutterPluginBinding.applicationContext
         channel = MethodChannel(
             flutterPluginBinding.binaryMessenger,
             "plugins.getstream.io/stream_video_thumbnail"
@@ -105,6 +106,7 @@ class StreamVideoThumbnailPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        context = null
         channel.setMethodCallHandler(null)
         executor.shutdown()
     }
