@@ -37,7 +37,7 @@ jobs:
         uses: ./.github/actions/pana
         with:
           working_directory: packages/stream_core_flutter
-          min_score: 125  # Aligned with stream_core for now; tune after the first run.
+          min_score: 120  # Missing 10 points for no license, 10 points for no example, and 20 points for static analysis issues.
 
   stream_thumbnail:
     runs-on: ubuntu-latest
@@ -48,4 +48,4 @@ jobs:
         uses: ./.github/actions/pana
         with:
           working_directory: packages/stream_thumbnail
-          min_score: 125  # Aligned with stream_core for now; tune after the first run.
+          min_score: 150  # Missing 10 points for static analysis issues.
