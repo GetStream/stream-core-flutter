@@ -209,9 +209,7 @@ void main() {
       expect(args['quality'], 80);
     });
 
-    test('thumbnailFile wraps a directly-returned path in an XFile', () async {
-      // iOS replies with the written file path directly (Android uses the
-      // 'result#file' reverse callback instead).
+    test('thumbnailFile wraps the returned path in an XFile', () async {
       mockChannel('/tmp/thumb.png');
 
       final result = await MethodChannelStreamThumbnail().thumbnailFile(
@@ -225,6 +223,77 @@ void main() {
       );
 
       expect(result.path, '/tmp/thumb.png');
+    });
+
+    test('thumbnailData rethrows a PlatformException from the native side', () async {
+      messenger.setMockMethodCallHandler(
+        channel,
+        (call) => Future<dynamic>.error(PlatformException(code: 'THUMBNAIL_ERROR', message: 'native error')),
+      );
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+
+      await expectLater(
+        MethodChannelStreamThumbnail().thumbnailData(
+          video: 'a.mp4',
+          headers: null,
+          imageFormat: StreamThumbnailFormat.png,
+          maxHeight: 0,
+          maxWidth: 0,
+          quality: 10,
+        ),
+        throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'THUMBNAIL_ERROR')),
+      );
+    });
+
+    test('thumbnailFiles invokes "file" once per video and returns their XFiles in order', () async {
+      final paths = ['/a.png', '/b.png', '/c.png'];
+      var index = 0;
+      final calls = <MethodCall>[];
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        calls.add(call);
+        return paths[index++];
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+
+      final result = await MethodChannelStreamThumbnail().thumbnailFiles(
+        videos: ['a.mp4', 'b.mp4', 'c.mp4'],
+        headers: null,
+        thumbnailPath: null,
+        imageFormat: StreamThumbnailFormat.png,
+        maxHeight: 0,
+        maxWidth: 0,
+        quality: 10,
+      );
+
+      expect(calls, hasLength(3));
+      expect(calls.every((call) => call.method == 'file'), isTrue);
+      expect(result.map((file) => file.path), paths);
+    });
+
+    test('thumbnailFiles stops at the first failing video instead of skipping it', () async {
+      var callCount = 0;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        callCount++;
+        if (callCount == 2) {
+          throw PlatformException(code: 'THUMBNAIL_ERROR', message: 'boom');
+        }
+        return '/ok.png';
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+
+      await expectLater(
+        MethodChannelStreamThumbnail().thumbnailFiles(
+          videos: ['a.mp4', 'b.mp4', 'c.mp4'],
+          headers: null,
+          thumbnailPath: null,
+          imageFormat: StreamThumbnailFormat.png,
+          maxHeight: 0,
+          maxWidth: 0,
+          quality: 10,
+        ),
+        throwsA(isA<PlatformException>()),
+      );
+      expect(callCount, 2);
     });
 
     test('a null timeMs is sent as -1 on Android', () async {

@@ -1,3 +1,20 @@
+## Upcoming
+
+### 💥 BREAKING CHANGES
+
+- `thumbnailFiles` now fails fast: if any video fails to produce a thumbnail, the call
+  throws instead of silently omitting that video from the returned list.
+
+### 🐞 Fixed
+
+- Fixed a crash on iOS where a failed `thumbnailData` call returned `null` instead of an
+  error, causing the Dart side to crash casting `null` to `Uint8List`.
+- Native errors now surface as typed `PlatformException`s on all platforms instead of a
+  generic `Exception` wrapping a raw Android stack trace.
+- Unified the platform-channel implementation: Android previously acknowledged a call
+  immediately and delivered the real result via a separate reverse invocation; it now
+  replies once with the actual result, like iOS and web.
+
 ## 0.1.0
 
 * Initial release.

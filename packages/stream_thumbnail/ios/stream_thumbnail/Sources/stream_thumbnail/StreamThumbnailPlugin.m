@@ -50,7 +50,13 @@
             NSData *data = [StreamThumbnailPlugin generateThumbnail:url headers:headers format:format maxHeight:maxh maxWidth:maxw timeMs:timeMs quality:quality];
             //Deliver the result on the main thread, as Flutter requires.
             dispatch_async(dispatch_get_main_queue(), ^(void){
-                result(data);
+                if (data == nil) {
+                    result([FlutterError errorWithCode:@"THUMBNAIL_ERROR"
+                                                message:@"Failed to generate a thumbnail for the video."
+                                                details:nil]);
+                } else {
+                    result(data);
+                }
             });
         });
 

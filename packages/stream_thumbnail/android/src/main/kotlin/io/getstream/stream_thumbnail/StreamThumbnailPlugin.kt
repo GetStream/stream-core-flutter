@@ -22,7 +22,6 @@ import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.LinkedList
 import java.util.concurrent.Executors
 
 /** StreamThumbnailPlugin */
@@ -50,60 +49,11 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        val method = call.method
         val args = call.arguments<Map<String, Any>>()
-        val callId = args?.get("callId") as Int
 
-        when (method) {
-            "files" -> {
-                result.success(true)
-                executor.execute {
-                    try {
-                        processFiles(args, result)
-                    } catch (e: Exception) {
-                        try {
-                            onResult("result#error", callId, Log.getStackTraceString(e))
-                        } catch (e2: Exception) {
-                            onResult("result#error", callId, e2.toString())
-                        }
-                    }
-                }
-            }
-
-            "file" -> {
-                result.success(true)
-                executor.execute {
-                    try {
-                        processFile(args, result)
-                    } catch (e: Exception) {
-                        try {
-                            onResult("result#error", callId, Log.getStackTraceString(e))
-                        } catch (e2: Exception) {
-                            onResult("result#error", callId, e2.toString())
-                        }
-                    }
-                }
-            }
-
-            "data" -> {
-                result.success(true)
-                executor.execute {
-                    try {
-                        processData(args, result)
-                    } catch (e: Exception) {
-                        try {
-                            onResult("result#error", callId, Log.getStackTraceString(e))
-                        } catch (e2: Exception) {
-                            onResult("result#error", callId, e2.toString())
-                        }
-                    }
-                }
-            }
-
-            "getPlatformVersion" -> {
-                result.success("Android ${android.os.Build.VERSION.RELEASE}")
-            }
-
+        when (call.method) {
+            "file" -> executeAsync(result) { processFile(args!!) }
+            "data" -> executeAsync(result) { processData(args!!) }
             else -> result.notImplemented()
         }
     }
@@ -114,67 +64,24 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
         executor.shutdown()
     }
 
-    private fun processFiles(args: Map<String, Any>, result: Result) {
-        val callId = args["callId"] as Int
-        val videos: List<String> = if (args["videos"] is List<*>) {
-            (args["videos"] as? List<*>)
-                ?.filterIsInstance<String>()
-                ?: emptyList()
-        } else {
-            emptyList()
-        }
-        val headers: HashMap<String, String> = if (args["headers"] is HashMap<*, *>) {
-            (args["headers"] as? HashMap<*, *>)
-                ?.filter { (key, value) -> key is String && value is String }
-                ?.map { (key, value) -> key as String to value as String }
-                ?.toMap(HashMap())
-                ?: HashMap()
-        } else {
-            HashMap()
-        }
-        val format = args["format"] as Int
-        val maxh = args["maxh"] as Int
-        val maxw = args["maxw"] as Int
-        val timeMs = args["timeMs"] as Int
-        val quality = args["quality"] as Int
-        val path = args["path"] as String?
-
-        val results = LinkedList<Any>()
-        for (video in videos) {
+    /**
+     * Runs [block] on the background executor and delivers its outcome back to Flutter on the
+     * main thread via [result] — either `result.success` or `result.error`, exactly once.
+     */
+    private fun executeAsync(result: Result, block: () -> Any) {
+        executor.execute {
             try {
-                if (File(video).exists()) {
-                    results.add(
-                        buildThumbnailFile(
-                            video,
-                            headers,
-                            path,
-                            format,
-                            maxh,
-                            maxw,
-                            timeMs,
-                            quality
-                        )
-                    )
-                }
-            } catch (e: IOException) {
-                continue
+                val value = block()
+                runOnUiThread { result.success(value) }
+            } catch (e: Exception) {
+                runOnUiThread { result.error("THUMBNAIL_ERROR", e.message, e.stackTraceToString()) }
             }
         }
-        onResult("result#files", callId, results)
     }
 
-    private fun processFile(args: Map<String, Any>, result: Result) {
-        val callId = args["callId"] as Int
+    private fun processFile(args: Map<String, Any>): String {
         val video = args["video"] as String
-        val headers: HashMap<String, String> = if (args["headers"] is HashMap<*, *>) {
-            (args["headers"] as? HashMap<*, *>)
-                ?.filter { (key, value) -> key is String && value is String }
-                ?.map { (key, value) -> key as String to value as String }
-                ?.toMap(HashMap())
-                ?: HashMap()
-        } else {
-            HashMap()
-        }
+        val headers = parseHeaders(args)
         val format = args["format"] as Int
         val maxh = args["maxh"] as Int
         val maxw = args["maxw"] as Int
@@ -182,31 +89,27 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
         val quality = args["quality"] as Int
         val path = args["path"] as String?
 
-        val thumbnail =
-            buildThumbnailFile(video, headers, path, format, maxh, maxw, timeMs, quality)
-        onResult("result#file", callId, thumbnail)
+        return buildThumbnailFile(video, headers, path, format, maxh, maxw, timeMs, quality)
     }
 
-    private fun processData(args: Map<String, Any>, result: Result) {
-        val callId = args["callId"] as Int
+    private fun processData(args: Map<String, Any>): ByteArray {
         val video = args["video"] as String
-        val headers: HashMap<String, String> = if (args["headers"] is HashMap<*, *>) {
-            (args["headers"] as? HashMap<*, *>)
-                ?.filter { (key, value) -> key is String && value is String }
-                ?.map { (key, value) -> key as String to value as String }
-                ?.toMap(HashMap())
-                ?: HashMap()
-        } else {
-            HashMap()
-        }
+        val headers = parseHeaders(args)
         val format = args["format"] as Int
         val maxh = args["maxh"] as Int
         val maxw = args["maxw"] as Int
         val timeMs = args["timeMs"] as Int
         val quality = args["quality"] as Int
 
-        val thumbnail = buildThumbnailData(video, headers, format, maxh, maxw, timeMs, quality)
-        onResult("result#data", callId, thumbnail)
+        return buildThumbnailData(video, headers, format, maxh, maxw, timeMs, quality)
+    }
+
+    private fun parseHeaders(args: Map<String, Any>): HashMap<String, String> {
+        return (args["headers"] as? HashMap<*, *>)
+            ?.filter { (key, value) -> key is String && value is String }
+            ?.map { (key, value) -> key as String to value as String }
+            ?.toMap(HashMap())
+            ?: HashMap()
     }
 
     private fun buildThumbnailData(
@@ -266,15 +169,6 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
             Log.d(TAG, String.format("buildThumbnailFile( written:%d )", bytes.size))
         }
         return fullpath
-    }
-
-    private fun onResult(methodName: String, callId: Int, result: Any) {
-        runOnUiThread {
-            val resultMap = HashMap<String, Any>()
-            resultMap["callId"] = callId
-            resultMap["result"] = result
-            channel.invokeMethod(methodName, resultMap)
-        }
     }
 
     private fun runOnUiThread(runnable: Runnable) {

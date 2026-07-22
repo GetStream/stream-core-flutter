@@ -1,7 +1,3 @@
-// The method-channel plumbing (request encoding and the native-to-Dart result
-// callbacks) is exercised end-to-end via the example app on each platform
-// rather than through unit tests.
-// coverage:ignore-file
 import 'dart:async';
 
 import 'package:cross_file/cross_file.dart';
@@ -14,94 +10,10 @@ import 'stream_thumbnail_platform.dart';
 /// An implementation of [StreamThumbnailPlatform] that uses method
 /// channels.
 class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
-  MethodChannelStreamThumbnail() {
-    methodChannel.setMethodCallHandler(_resolveCall);
-  }
-
   /// The method channel used to interact with the native platform.
   static const methodChannel = MethodChannel(
     'plugins.getstream.io/stream_thumbnail',
   );
-
-  final _futures = <int, Completer<Object>>{};
-
-  var _nextCallId = 0;
-
-  Future<dynamic> _resolveCall(MethodCall call) async {
-    switch (call.method) {
-      case 'result#files':
-        _resolveFilesCall(call);
-        return;
-
-      case 'result#file':
-        _resolveFileCall(call);
-        return;
-
-      case 'result#data':
-        _resolveDataCall(call);
-        return;
-
-      case 'result#error':
-        _resolveError(call);
-        return;
-
-      default:
-        throw PlatformException(
-          code: 'Unimplemented',
-          details: 'Unknown method ${call.method}',
-        );
-    }
-  }
-
-  void _resolveFilesCall(MethodCall call) {
-    final args = call.arguments as Map<Object?, Object?>;
-    final result = (args['result'] as List?)?.cast<String>() ?? <String>[];
-    final callId = args['callId']! as int;
-
-    _resolveFuture(callId, result.map(XFile.new).toList());
-  }
-
-  void _resolveFileCall(MethodCall call) {
-    final args = call.arguments as Map<Object?, Object?>;
-    final result = args['result']! as String;
-    final callId = args['callId']! as int;
-
-    _resolveFuture(callId, XFile(result));
-  }
-
-  void _resolveDataCall(MethodCall call) {
-    final args = call.arguments as Map<Object?, Object?>;
-    final result = args['result']! as List<int>;
-    final callId = args['callId']! as int;
-
-    _resolveFuture(callId, Uint8List.fromList(result));
-  }
-
-  void _resolveError(MethodCall call) {
-    final args = call.arguments as Map<Object?, Object?>;
-    final error = args['result']!;
-    final callId = args['callId']! as int;
-
-    _resolveFuture(callId, error is Exception ? error : Exception(error));
-  }
-
-  void _resolveFuture(int callId, Object value) {
-    if (value is Exception) {
-      _futures[callId]?.completeError(value);
-    } else {
-      _futures[callId]?.complete(value);
-    }
-    _futures.remove(callId);
-  }
-
-  (Completer<T>, int) _createCompleterAndCallId<T extends Object>() {
-    final completer = Completer<T>();
-    final callId = _nextCallId++;
-
-    _futures[callId] = completer;
-
-    return (completer, callId);
-  }
 
   int _getTimeMsValue(int? timeMs) => defaultTargetPlatform == TargetPlatform.android ? timeMs ?? -1 : timeMs ?? 0;
 
@@ -116,53 +28,24 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     int? timeMs,
     required int quality,
   }) async {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final results = <XFile>[];
+    final results = <XFile>[];
 
-      for (final video in videos) {
-        results.add(
-          await thumbnailFile(
-            video: video,
-            headers: headers,
-            thumbnailPath: thumbnailPath,
-            imageFormat: imageFormat,
-            maxHeight: maxHeight,
-            maxWidth: maxWidth,
-            timeMs: timeMs,
-            quality: quality,
-          ),
-        );
-      }
-
-      return results;
+    for (final video in videos) {
+      results.add(
+        await thumbnailFile(
+          video: video,
+          headers: headers,
+          thumbnailPath: thumbnailPath,
+          imageFormat: imageFormat,
+          maxHeight: maxHeight,
+          maxWidth: maxWidth,
+          timeMs: timeMs,
+          quality: quality,
+        ),
+      );
     }
 
-    final (completer, callId) = _createCompleterAndCallId<List<XFile>>();
-
-    final reqMap = <String, dynamic>{
-      'callId': callId,
-      'videos': videos,
-      'headers': headers,
-      'path': thumbnailPath,
-      'format': imageFormat.index,
-      'maxh': maxHeight,
-      'maxw': maxWidth,
-      'timeMs': _getTimeMsValue(timeMs),
-      'quality': quality,
-    };
-
-    try {
-      final result = await methodChannel.invokeMethod('files', reqMap);
-      if (result != true) {
-        _resolveFuture(callId, result);
-      }
-    } catch (_) {
-      // Drop the pending completer so it doesn't linger in `_futures`.
-      _futures.remove(callId);
-      rethrow;
-    }
-
-    return completer.future;
+    return results;
   }
 
   @override
@@ -176,10 +59,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     int? timeMs,
     required int quality,
   }) async {
-    final (completer, callId) = _createCompleterAndCallId<XFile>();
-
     final reqMap = <String, dynamic>{
-      'callId': callId,
       'video': video,
       'headers': headers,
       'path': thumbnailPath,
@@ -190,19 +70,8 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
       'quality': quality,
     };
 
-    try {
-      final result = await methodChannel.invokeMethod('file', reqMap);
-      if (result != true) {
-        // iOS returns the written file path directly; wrap it as an [XFile] to
-        // satisfy the Future<XFile> contract (Android replies via 'result#file').
-        _resolveFuture(callId, XFile(result as String));
-      }
-    } catch (_) {
-      _futures.remove(callId);
-      rethrow;
-    }
-
-    return completer.future;
+    final path = await methodChannel.invokeMethod<String>('file', reqMap);
+    return XFile(path!);
   }
 
   @override
@@ -215,10 +84,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     int? timeMs,
     required int quality,
   }) async {
-    final (completer, callId) = _createCompleterAndCallId<Uint8List>();
-
     final reqMap = <String, dynamic>{
-      'callId': callId,
       'video': video,
       'headers': headers,
       'format': imageFormat.index,
@@ -228,16 +94,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
       'quality': quality,
     };
 
-    try {
-      final result = await methodChannel.invokeMethod('data', reqMap);
-      if (result != true) {
-        _resolveFuture(callId, result);
-      }
-    } catch (_) {
-      _futures.remove(callId);
-      rethrow;
-    }
-
-    return completer.future;
+    final result = await methodChannel.invokeMethod<Uint8List>('data', reqMap);
+    return result!;
   }
 }
