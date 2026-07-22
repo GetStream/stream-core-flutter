@@ -2,6 +2,8 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:stream_thumbnail/src/messages.g.dart';
 import 'package:stream_thumbnail/src/stream_thumbnail.dart';
 import 'package:stream_thumbnail/src/stream_thumbnail_format.dart';
 import 'package:stream_thumbnail/src/stream_thumbnail_method_channel.dart';
@@ -97,22 +99,24 @@ FakeStreamThumbnailPlatform useFakePlatform() {
   return fake;
 }
 
+/// A mock of the Pigeon-generated host API, used to test
+/// [MethodChannelStreamThumbnail] without a real platform channel.
+class MockStreamThumbnailHostApi extends Mock implements StreamThumbnailHostApi {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('StreamThumbnailFormat', () {
-    // The wire protocol sends `imageFormat.index` to the native side, where the
-    // int maps to jpg/png/webp. This order is a cross-language contract.
-    test('exposes JPEG, PNG and WEBP at indices 0, 1 and 2', () {
-      expect(StreamThumbnailFormat.values, [
-        StreamThumbnailFormat.jpeg,
-        StreamThumbnailFormat.png,
-        StreamThumbnailFormat.webp,
-      ]);
-      expect(StreamThumbnailFormat.jpeg.index, 0);
-      expect(StreamThumbnailFormat.png.index, 1);
-      expect(StreamThumbnailFormat.webp.index, 2);
-    });
+  setUpAll(() {
+    registerFallbackValue(
+      ThumbnailRequest(
+        video: '',
+        format: ThumbnailFormat.png,
+        maxHeight: 0,
+        maxWidth: 0,
+        timeMs: 0,
+        quality: 0,
+      ),
+    );
   });
 
   group('StreamThumbnail', () {
@@ -169,26 +173,19 @@ void main() {
   });
 
   group('MethodChannelStreamThumbnail', () {
-    const channel = MethodChannelStreamThumbnail.methodChannel;
-    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    late MockStreamThumbnailHostApi hostApi;
+    late MethodChannelStreamThumbnail channel;
 
-    /// Intercepts outgoing calls on the plugin channel, recording them and
-    /// replying with [reply].
-    List<MethodCall> mockChannel(Object? reply) {
-      final calls = <MethodCall>[];
-      messenger.setMockMethodCallHandler(channel, (call) async {
-        calls.add(call);
-        return reply;
-      });
-      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
-      return calls;
-    }
+    setUp(() {
+      hostApi = MockStreamThumbnailHostApi();
+      channel = MethodChannelStreamThumbnail(hostApi: hostApi);
+    });
 
-    test('thumbnailData invokes "data" with the encoded request and returns the bytes', () async {
+    test('thumbnailData sends the encoded request and returns the bytes', () async {
       final data = Uint8List.fromList([9, 8, 7]);
-      final calls = mockChannel(data);
+      when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => data);
 
-      final result = await MethodChannelStreamThumbnail().thumbnailData(
+      final result = await channel.thumbnailData(
         video: 'a.mp4',
         headers: null,
         imageFormat: StreamThumbnailFormat.webp,
@@ -199,20 +196,19 @@ void main() {
       );
 
       expect(result, data);
-      expect(calls.single.method, 'data');
-      final args = calls.single.arguments as Map<Object?, Object?>;
-      expect(args['video'], 'a.mp4');
-      expect(args['format'], StreamThumbnailFormat.webp.index);
-      expect(args['maxh'], 10);
-      expect(args['maxw'], 20);
-      expect(args['timeMs'], 500);
-      expect(args['quality'], 80);
+      final request = verify(() => hostApi.thumbnailData(captureAny())).captured.single as ThumbnailRequest;
+      expect(request.video, 'a.mp4');
+      expect(request.format, ThumbnailFormat.webp);
+      expect(request.maxHeight, 10);
+      expect(request.maxWidth, 20);
+      expect(request.timeMs, 500);
+      expect(request.quality, 80);
     });
 
     test('thumbnailFile wraps the returned path in an XFile', () async {
-      mockChannel('/tmp/thumb.png');
+      when(() => hostApi.thumbnailFile(any())).thenAnswer((_) async => '/tmp/thumb.png');
 
-      final result = await MethodChannelStreamThumbnail().thumbnailFile(
+      final result = await channel.thumbnailFile(
         video: 'a.mp4',
         headers: null,
         thumbnailPath: null,
@@ -226,14 +222,12 @@ void main() {
     });
 
     test('thumbnailData rethrows a PlatformException from the native side', () async {
-      messenger.setMockMethodCallHandler(
-        channel,
-        (call) => Future<dynamic>.error(PlatformException(code: 'THUMBNAIL_ERROR', message: 'native error')),
+      when(() => hostApi.thumbnailData(any())).thenAnswer(
+        (_) async => throw PlatformException(code: 'THUMBNAIL_ERROR', message: 'native error'),
       );
-      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
 
       await expectLater(
-        MethodChannelStreamThumbnail().thumbnailData(
+        channel.thumbnailData(
           video: 'a.mp4',
           headers: null,
           imageFormat: StreamThumbnailFormat.png,
@@ -245,17 +239,12 @@ void main() {
       );
     });
 
-    test('thumbnailFiles invokes "file" once per video and returns their XFiles in order', () async {
+    test('thumbnailFiles invokes the host API once per video and returns their XFiles in order', () async {
       final paths = ['/a.png', '/b.png', '/c.png'];
       var index = 0;
-      final calls = <MethodCall>[];
-      messenger.setMockMethodCallHandler(channel, (call) async {
-        calls.add(call);
-        return paths[index++];
-      });
-      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+      when(() => hostApi.thumbnailFile(any())).thenAnswer((_) async => paths[index++]);
 
-      final result = await MethodChannelStreamThumbnail().thumbnailFiles(
+      final result = await channel.thumbnailFiles(
         videos: ['a.mp4', 'b.mp4', 'c.mp4'],
         headers: null,
         thumbnailPath: null,
@@ -265,24 +254,22 @@ void main() {
         quality: 10,
       );
 
-      expect(calls, hasLength(3));
-      expect(calls.every((call) => call.method == 'file'), isTrue);
+      verify(() => hostApi.thumbnailFile(any())).called(3);
       expect(result.map((file) => file.path), paths);
     });
 
     test('thumbnailFiles stops at the first failing video instead of skipping it', () async {
       var callCount = 0;
-      messenger.setMockMethodCallHandler(channel, (call) async {
+      when(() => hostApi.thumbnailFile(any())).thenAnswer((_) async {
         callCount++;
         if (callCount == 2) {
           throw PlatformException(code: 'THUMBNAIL_ERROR', message: 'boom');
         }
         return '/ok.png';
       });
-      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
 
       await expectLater(
-        MethodChannelStreamThumbnail().thumbnailFiles(
+        channel.thumbnailFiles(
           videos: ['a.mp4', 'b.mp4', 'c.mp4'],
           headers: null,
           thumbnailPath: null,
@@ -299,9 +286,9 @@ void main() {
     test('a null timeMs is sent as -1 on Android', () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
-      final calls = mockChannel(Uint8List(0));
+      when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => Uint8List(0));
 
-      await MethodChannelStreamThumbnail().thumbnailData(
+      await channel.thumbnailData(
         video: 'a.mp4',
         headers: null,
         imageFormat: StreamThumbnailFormat.png,
@@ -310,15 +297,16 @@ void main() {
         quality: 10,
       );
 
-      expect((calls.single.arguments as Map)['timeMs'], -1);
+      final request = verify(() => hostApi.thumbnailData(captureAny())).captured.single as ThumbnailRequest;
+      expect(request.timeMs, -1);
     });
 
     test('a null timeMs is sent as 0 on non-Android platforms', () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
-      final calls = mockChannel(Uint8List(0));
+      when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => Uint8List(0));
 
-      await MethodChannelStreamThumbnail().thumbnailData(
+      await channel.thumbnailData(
         video: 'a.mp4',
         headers: null,
         imageFormat: StreamThumbnailFormat.png,
@@ -327,7 +315,8 @@ void main() {
         quality: 10,
       );
 
-      expect((calls.single.arguments as Map)['timeMs'], 0);
+      final request = verify(() => hostApi.thumbnailData(captureAny())).captured.single as ThumbnailRequest;
+      expect(request.timeMs, 0);
     });
   });
 }

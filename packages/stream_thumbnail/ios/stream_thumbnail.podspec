@@ -12,13 +12,10 @@ A Flutter plugin for creating a thumbnail from a local video file or from a vide
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Stream' => 'support@getstream.io' }
   s.source           = { :path => '.' }
-  s.source_files = 'stream_thumbnail/Sources/stream_thumbnail/**/*.{h,m}'
-  s.public_header_files = 'stream_thumbnail/Sources/stream_thumbnail/include/**/*.h'
-  s.pod_target_xcconfig = {
-    'USER_HEADER_SEARCH_PATHS' => '$(inherited) ${PODS_ROOT}/libwebp/**'
-  }
+  s.source_files = 'stream_thumbnail/Sources/stream_thumbnail/**/*.swift'
   s.dependency 'Flutter'
   s.dependency 'libwebp'
 
   s.ios.deployment_target = '13.0'
+  s.swift_version = '5.9'
 end

@@ -15,6 +15,13 @@
   immediately and delivered the real result via a separate reverse invocation; it now
   replies once with the actual result, like iOS and web.
 
+### 🔧 Internal
+
+- Migrated the Android/iOS platform channel to Pigeon-generated, type-safe messaging
+  and rewrote the iOS plugin in Swift (previously Objective-C). The public Dart API is
+  unchanged; web keeps its separate hand-written implementation, since Pigeon does not
+  support it.
+
 ## 0.1.0
 
 * Initial release.

@@ -120,12 +120,16 @@ scripts:
        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
   generate:all:
-    run: melos run generate:dart && melos run generate:flutter
+    run: melos run generate:dart && melos run generate:flutter && melos run generate:pigeon
     description: Build all generated files for Dart & Flutter packages in this project.
 
   generate:icons:
     run: melos exec -c 1 --file-exists="stream_icons.yaml" -- "dart run \$MELOS_ROOT_PATH/scripts/generate_icons.dart"
     description: Generate icon font and Dart classes from SVG files.
+
+  generate:pigeon:
+    run: melos exec -c 1 --file-exists="pigeons/messages.dart" -- "dart run pigeon --input pigeons/messages.dart && dart format lib/src/messages.g.dart"
+    description: Generate Pigeon platform-channel bindings for packages with a pigeons/messages.dart schema.
 
   check:barrels:
     run: melos exec -c 1 --file-exists="check_barrels.yaml" -- "dart run \$MELOS_ROOT_PATH/scripts/check_barrels.dart"

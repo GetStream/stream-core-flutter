@@ -12,10 +12,6 @@ import android.os.Looper
 import android.util.Log
 import android.util.Size
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileDescriptor
@@ -25,12 +21,7 @@ import java.io.IOException
 import java.util.concurrent.Executors
 
 /** StreamThumbnailPlugin */
-class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
-    /// The MethodChannel that will the communication between Flutter and native Android
-    ///
-    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-    /// when the Flutter Engine is detached from the Activity
-    private lateinit var channel: MethodChannel
+class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
     private val TAG = "ThumbnailPlugin"
 
     private var context: Context? = null
@@ -41,112 +32,62 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
         if (executor.isShutdown) {
             executor = Executors.newCachedThreadPool()
         }
-        channel = MethodChannel(
-            flutterPluginBinding.binaryMessenger,
-            "plugins.getstream.io/stream_thumbnail"
-        )
-        channel.setMethodCallHandler(this)
-    }
-
-    override fun onMethodCall(call: MethodCall, result: Result) {
-        val args = call.arguments<Map<String, Any>>()
-
-        when (call.method) {
-            "file" -> executeAsync(result) { processFile(args!!) }
-            "data" -> executeAsync(result) { processData(args!!) }
-            else -> result.notImplemented()
-        }
+        StreamThumbnailHostApi.setUp(flutterPluginBinding.binaryMessenger, this)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = null
-        channel.setMethodCallHandler(null)
+        StreamThumbnailHostApi.setUp(binding.binaryMessenger, null)
         executor.shutdown()
+    }
+
+    override fun thumbnailData(request: ThumbnailRequest, callback: (Result<ByteArray>) -> Unit) {
+        executeAsync(callback) { buildThumbnailData(request) }
+    }
+
+    override fun thumbnailFile(request: ThumbnailRequest, callback: (Result<String>) -> Unit) {
+        executeAsync(callback) { buildThumbnailFile(request) }
     }
 
     /**
      * Runs [block] on the background executor and delivers its outcome back to Flutter on the
-     * main thread via [result] — either `result.success` or `result.error`, exactly once.
+     * main thread via [callback], exactly once.
      */
-    private fun executeAsync(result: Result, block: () -> Any) {
+    private fun <T> executeAsync(callback: (Result<T>) -> Unit, block: () -> T) {
         executor.execute {
-            try {
-                val value = block()
-                runOnUiThread { result.success(value) }
+            val result = try {
+                Result.success(block())
             } catch (e: Exception) {
-                runOnUiThread { result.error("THUMBNAIL_ERROR", e.message, e.stackTraceToString()) }
+                Result.failure(FlutterError("THUMBNAIL_ERROR", e.message, e.stackTraceToString()))
             }
+            Handler(Looper.getMainLooper()).post { callback(result) }
         }
     }
 
-    private fun processFile(args: Map<String, Any>): String {
-        val video = args["video"] as String
-        val headers = parseHeaders(args)
-        val format = args["format"] as Int
-        val maxh = args["maxh"] as Int
-        val maxw = args["maxw"] as Int
-        val timeMs = args["timeMs"] as Int
-        val quality = args["quality"] as Int
-        val path = args["path"] as String?
-
-        return buildThumbnailFile(video, headers, path, format, maxh, maxw, timeMs, quality)
-    }
-
-    private fun processData(args: Map<String, Any>): ByteArray {
-        val video = args["video"] as String
-        val headers = parseHeaders(args)
-        val format = args["format"] as Int
-        val maxh = args["maxh"] as Int
-        val maxw = args["maxw"] as Int
-        val timeMs = args["timeMs"] as Int
-        val quality = args["quality"] as Int
-
-        return buildThumbnailData(video, headers, format, maxh, maxw, timeMs, quality)
-    }
-
-    private fun parseHeaders(args: Map<String, Any>): HashMap<String, String> {
-        return (args["headers"] as? HashMap<*, *>)
-            ?.filter { (key, value) -> key is String && value is String }
-            ?.map { (key, value) -> key as String to value as String }
-            ?.toMap(HashMap())
-            ?: HashMap()
-    }
-
-    private fun buildThumbnailData(
-        vidPath: String,
-        headers: HashMap<String, String>,
-        format: Int,
-        maxh: Int,
-        maxw: Int,
-        timeMs: Int,
-        quality: Int
-    ): ByteArray {
-        val bitmap = createVideoThumbnail(vidPath, headers, maxh, maxw, timeMs)
-            ?: throw NullPointerException()
+    private fun buildThumbnailData(request: ThumbnailRequest): ByteArray {
+        val bitmap = createVideoThumbnail(
+            request.video,
+            request.headers ?: emptyMap(),
+            request.maxHeight.toInt(),
+            request.maxWidth.toInt(),
+            request.timeMs.toInt()
+        ) ?: throw IOException("Failed to generate a thumbnail for the video.")
         val stream = ByteArrayOutputStream()
-        bitmap.compress(intToFormat(format), quality, stream)
+        bitmap.compress(compressFormat(request.format), request.quality.toInt(), stream)
         bitmap.recycle()
         return stream.toByteArray()
     }
 
-    private fun buildThumbnailFile(
-        vidPath: String,
-        headers: HashMap<String, String>,
-        path: String?,
-        format: Int,
-        maxh: Int,
-        maxw: Int,
-        timeMs: Int,
-        quality: Int
-    ): String {
-        val bytes = buildThumbnailData(vidPath, headers, format, maxh, maxw, timeMs, quality)
-        val ext = formatExt(format)
+    private fun buildThumbnailFile(request: ThumbnailRequest): String {
+        val bytes = buildThumbnailData(request)
+        val ext = formatExt(request.format)
+        val vidPath = request.video
         val i = vidPath.lastIndexOf(".")
         var fullpath = vidPath.substring(0, i + 1) + ext
         val isLocalFile = vidPath.startsWith("/") || vidPath.startsWith("file://")
 
-        var savePath = path
-        if (path == null && !isLocalFile) {
+        var savePath = request.thumbnailPath
+        if (savePath == null && !isLocalFile) {
             savePath = context?.cacheDir?.absolutePath
         }
 
@@ -171,10 +112,6 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
         return fullpath
     }
 
-    private fun runOnUiThread(runnable: Runnable) {
-        Handler(Looper.getMainLooper()).post(runnable)
-    }
-
     /**
      * Create a video thumbnail for a video. May return null if the video is corrupt
      * or the format is not supported.
@@ -186,7 +123,7 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
     @Throws(IOException::class)
     fun createVideoThumbnail(
         video: String,
-        headers: HashMap<String, String>,
+        headers: Map<String, String>,
         targetH: Int,
         targetW: Int,
         timeMs: Int
@@ -281,22 +218,19 @@ class StreamThumbnailPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun intToFormat(format: Int): Bitmap.CompressFormat {
+    private fun compressFormat(format: ThumbnailFormat): Bitmap.CompressFormat {
         return when (format) {
-            0 -> Bitmap.CompressFormat.JPEG
-            1 -> Bitmap.CompressFormat.PNG
-            2 -> Bitmap.CompressFormat.WEBP
-            else -> Bitmap.CompressFormat.JPEG
+            ThumbnailFormat.JPEG -> Bitmap.CompressFormat.JPEG
+            ThumbnailFormat.PNG -> Bitmap.CompressFormat.PNG
+            ThumbnailFormat.WEBP -> Bitmap.CompressFormat.WEBP
         }
     }
 
-    private fun formatExt(format: Int): String {
+    private fun formatExt(format: ThumbnailFormat): String {
         return when (format) {
-            0 -> "jpg"
-            1 -> "png"
-            2 -> "webp"
-            else -> "jpg"
+            ThumbnailFormat.JPEG -> "jpg"
+            ThumbnailFormat.PNG -> "png"
+            ThumbnailFormat.WEBP -> "webp"
         }
     }
-
 }
