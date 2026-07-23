@@ -9,7 +9,7 @@
 G_BEGIN_DECLS
 
 /**
- * ThumbnailFormat:
+ * StreamThumbnailThumbnailFormat:
  * STREAM_THUMBNAIL_THUMBNAIL_FORMAT_JPEG:
  * STREAM_THUMBNAIL_THUMBNAIL_FORMAT_PNG:
  * STREAM_THUMBNAIL_THUMBNAIL_FORMAT_WEBP:
@@ -20,18 +20,18 @@ typedef enum {
   STREAM_THUMBNAIL_THUMBNAIL_FORMAT_JPEG = 0,
   STREAM_THUMBNAIL_THUMBNAIL_FORMAT_PNG = 1,
   STREAM_THUMBNAIL_THUMBNAIL_FORMAT_WEBP = 2
-} ThumbnailFormat;
+} StreamThumbnailThumbnailFormat;
 
 /**
- * ThumbnailRequest:
+ * StreamThumbnailThumbnailRequest:
  *
  * A single thumbnail generation request sent to the native platform.
  */
 
-G_DECLARE_FINAL_TYPE(ThumbnailRequest, thumbnail_request, , THUMBNAIL_REQUEST, GObject)
+G_DECLARE_FINAL_TYPE(StreamThumbnailThumbnailRequest, stream_thumbnail_thumbnail_request, STREAM_THUMBNAIL, THUMBNAIL_REQUEST, GObject)
 
 /**
- * thumbnail_request_new:
+ * stream_thumbnail_thumbnail_request_new:
  * video: field in this object.
  * headers: field in this object.
  * thumbnail_path: field in this object.
@@ -43,122 +43,122 @@ G_DECLARE_FINAL_TYPE(ThumbnailRequest, thumbnail_request, , THUMBNAIL_REQUEST, G
  *
  * Creates a new #ThumbnailRequest object.
  *
- * Returns: a new #ThumbnailRequest
+ * Returns: a new #StreamThumbnailThumbnailRequest
  */
-ThumbnailRequest* thumbnail_request_new(const gchar* video, FlValue* headers, const gchar* thumbnail_path, ThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality);
+StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, const gchar* thumbnail_path, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality);
 
 /**
- * thumbnail_request_get_video
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_video
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the video field of @object.
  *
  * Returns: the field value.
  */
-const gchar* thumbnail_request_get_video(ThumbnailRequest* object);
+const gchar* stream_thumbnail_thumbnail_request_get_video(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_get_headers
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_headers
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the headers field of @object.
  *
  * Returns: the field value.
  */
-FlValue* thumbnail_request_get_headers(ThumbnailRequest* object);
+FlValue* stream_thumbnail_thumbnail_request_get_headers(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_get_thumbnail_path
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_thumbnail_path
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the thumbnailPath field of @object.
  *
  * Returns: the field value.
  */
-const gchar* thumbnail_request_get_thumbnail_path(ThumbnailRequest* object);
+const gchar* stream_thumbnail_thumbnail_request_get_thumbnail_path(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_get_format
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_format
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the format field of @object.
  *
  * Returns: the field value.
  */
-ThumbnailFormat thumbnail_request_get_format(ThumbnailRequest* object);
+StreamThumbnailThumbnailFormat stream_thumbnail_thumbnail_request_get_format(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_get_max_height
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_max_height
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the maxHeight field of @object.
  *
  * Returns: the field value.
  */
-int64_t thumbnail_request_get_max_height(ThumbnailRequest* object);
+int64_t stream_thumbnail_thumbnail_request_get_max_height(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_get_max_width
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_max_width
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the maxWidth field of @object.
  *
  * Returns: the field value.
  */
-int64_t thumbnail_request_get_max_width(ThumbnailRequest* object);
+int64_t stream_thumbnail_thumbnail_request_get_max_width(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_get_time_ms
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_time_ms
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the timeMs field of @object.
  *
  * Returns: the field value.
  */
-int64_t thumbnail_request_get_time_ms(ThumbnailRequest* object);
+int64_t stream_thumbnail_thumbnail_request_get_time_ms(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_get_quality
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_get_quality
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
  * Gets the value of the quality field of @object.
  *
  * Returns: the field value.
  */
-int64_t thumbnail_request_get_quality(ThumbnailRequest* object);
+int64_t stream_thumbnail_thumbnail_request_get_quality(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_equals:
- * @a: a #ThumbnailRequest.
- * @b: another #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_equals:
+ * @a: a #StreamThumbnailThumbnailRequest.
+ * @b: another #StreamThumbnailThumbnailRequest.
  *
- * Checks if two #ThumbnailRequest objects are equal.
+ * Checks if two #StreamThumbnailThumbnailRequest objects are equal.
  *
  * Returns: TRUE if @a and @b are equal.
  */
-gboolean thumbnail_request_equals(ThumbnailRequest* a, ThumbnailRequest* b);
+gboolean stream_thumbnail_thumbnail_request_equals(StreamThumbnailThumbnailRequest* a, StreamThumbnailThumbnailRequest* b);
 
 /**
- * thumbnail_request_hash:
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_hash:
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
- * Calculates a hash code for a #ThumbnailRequest object.
+ * Calculates a hash code for a #StreamThumbnailThumbnailRequest object.
  *
  * Returns: the hash code.
  */
-guint thumbnail_request_hash(ThumbnailRequest* object);
+guint stream_thumbnail_thumbnail_request_hash(StreamThumbnailThumbnailRequest* object);
 
 /**
- * thumbnail_request_to_string:
- * @object: a #ThumbnailRequest.
+ * stream_thumbnail_thumbnail_request_to_string:
+ * @object: a #StreamThumbnailThumbnailRequest.
  *
- * Returns a string representation of a #ThumbnailRequest object.
+ * Returns a string representation of a #StreamThumbnailThumbnailRequest object.
  *
  * Returns: (transfer full): a new string, free with g_free().
  */
-gchar* thumbnail_request_to_string(ThumbnailRequest* object);
+gchar* stream_thumbnail_thumbnail_request_to_string(StreamThumbnailThumbnailRequest* object);
 
-G_DECLARE_FINAL_TYPE(MessageCodec, message_codec, , MESSAGE_CODEC, FlStandardMessageCodec)
+G_DECLARE_FINAL_TYPE(StreamThumbnailMessageCodec, stream_thumbnail_message_codec, STREAM_THUMBNAIL, MESSAGE_CODEC, FlStandardMessageCodec)
 
 /**
  * Custom type ID constants:
@@ -167,25 +167,25 @@ G_DECLARE_FINAL_TYPE(MessageCodec, message_codec, , MESSAGE_CODEC, FlStandardMes
  * They are used in the codec to encode and decode custom types.
  * They may be used in custom object creation functions to identify the type.
  */
-extern const int thumbnail_format_type_id;
-extern const int thumbnail_request_type_id;
+extern const int stream_thumbnail_thumbnail_format_type_id;
+extern const int stream_thumbnail_thumbnail_request_type_id;
 
-G_DECLARE_FINAL_TYPE(StreamThumbnailHostApi, stream_thumbnail_host_api, , STREAM_THUMBNAIL_HOST_API, GObject)
+G_DECLARE_FINAL_TYPE(StreamThumbnailStreamThumbnailHostApi, stream_thumbnail_stream_thumbnail_host_api, STREAM_THUMBNAIL, STREAM_THUMBNAIL_HOST_API, GObject)
 
-G_DECLARE_FINAL_TYPE(StreamThumbnailHostApiResponseHandle, stream_thumbnail_host_api_response_handle, , STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE, GObject)
+G_DECLARE_FINAL_TYPE(StreamThumbnailStreamThumbnailHostApiResponseHandle, stream_thumbnail_stream_thumbnail_host_api_response_handle, STREAM_THUMBNAIL, STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE, GObject)
 
 /**
- * StreamThumbnailHostApiVTable:
+ * StreamThumbnailStreamThumbnailHostApiVTable:
  *
  * Table of functions exposed by StreamThumbnailHostApi to be implemented by the API provider.
  */
 typedef struct {
-  void (*thumbnail_data)(ThumbnailRequest* request, StreamThumbnailHostApiResponseHandle* response_handle, gpointer user_data);
-  void (*thumbnail_file)(ThumbnailRequest* request, StreamThumbnailHostApiResponseHandle* response_handle, gpointer user_data);
-} StreamThumbnailHostApiVTable;
+  void (*thumbnail_data)(StreamThumbnailThumbnailRequest* request, StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, gpointer user_data);
+  void (*thumbnail_file)(StreamThumbnailThumbnailRequest* request, StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, gpointer user_data);
+} StreamThumbnailStreamThumbnailHostApiVTable;
 
 /**
- * stream_thumbnail_host_api_set_method_handlers:
+ * stream_thumbnail_stream_thumbnail_host_api_set_method_handlers:
  *
  * @messenger: an #FlBinaryMessenger.
  * @suffix: (allow-none): a suffix to add to the API or %NULL for none.
@@ -195,58 +195,58 @@ typedef struct {
  *
  * Connects the method handlers in the StreamThumbnailHostApi API.
  */
-void stream_thumbnail_host_api_set_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix, const StreamThumbnailHostApiVTable* vtable, gpointer user_data, GDestroyNotify user_data_free_func);
+void stream_thumbnail_stream_thumbnail_host_api_set_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix, const StreamThumbnailStreamThumbnailHostApiVTable* vtable, gpointer user_data, GDestroyNotify user_data_free_func);
 
 /**
- * stream_thumbnail_host_api_clear_method_handlers:
+ * stream_thumbnail_stream_thumbnail_host_api_clear_method_handlers:
  *
  * @messenger: an #FlBinaryMessenger.
  * @suffix: (allow-none): a suffix to add to the API or %NULL for none.
  *
  * Clears the method handlers in the StreamThumbnailHostApi API.
  */
-void stream_thumbnail_host_api_clear_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix);
+void stream_thumbnail_stream_thumbnail_host_api_clear_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix);
 
 /**
- * stream_thumbnail_host_api_respond_thumbnail_data:
- * @response_handle: a #StreamThumbnailHostApiResponseHandle.
+ * stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_data:
+ * @response_handle: a #StreamThumbnailStreamThumbnailHostApiResponseHandle.
  * @return_value: location to write the value returned by this method.
  * @return_value_length: (allow-none): location to write length of @return_value or %NULL to ignore.
  *
  * Responds to StreamThumbnailHostApi.thumbnailData. 
  */
-void stream_thumbnail_host_api_respond_thumbnail_data(StreamThumbnailHostApiResponseHandle* response_handle, const uint8_t* return_value, size_t return_value_length);
+void stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_data(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const uint8_t* return_value, size_t return_value_length);
 
 /**
- * stream_thumbnail_host_api_respond_error_thumbnail_data:
- * @response_handle: a #StreamThumbnailHostApiResponseHandle.
+ * stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_data:
+ * @response_handle: a #StreamThumbnailStreamThumbnailHostApiResponseHandle.
  * @code: error code.
  * @message: error message.
  * @details: (allow-none): error details or %NULL.
  *
  * Responds with an error to StreamThumbnailHostApi.thumbnailData. 
  */
-void stream_thumbnail_host_api_respond_error_thumbnail_data(StreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details);
+void stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_data(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details);
 
 /**
- * stream_thumbnail_host_api_respond_thumbnail_file:
- * @response_handle: a #StreamThumbnailHostApiResponseHandle.
+ * stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_file:
+ * @response_handle: a #StreamThumbnailStreamThumbnailHostApiResponseHandle.
  * @return_value: location to write the value returned by this method.
  *
  * Responds to StreamThumbnailHostApi.thumbnailFile. 
  */
-void stream_thumbnail_host_api_respond_thumbnail_file(StreamThumbnailHostApiResponseHandle* response_handle, const gchar* return_value);
+void stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_file(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const gchar* return_value);
 
 /**
- * stream_thumbnail_host_api_respond_error_thumbnail_file:
- * @response_handle: a #StreamThumbnailHostApiResponseHandle.
+ * stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_file:
+ * @response_handle: a #StreamThumbnailStreamThumbnailHostApiResponseHandle.
  * @code: error code.
  * @message: error message.
  * @details: (allow-none): error details or %NULL.
  *
  * Responds with an error to StreamThumbnailHostApi.thumbnailFile. 
  */
-void stream_thumbnail_host_api_respond_error_thumbnail_file(StreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details);
+void stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_file(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details);
 
 G_END_DECLS
 

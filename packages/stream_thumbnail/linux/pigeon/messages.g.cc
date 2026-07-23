@@ -286,38 +286,38 @@ static gchar* G_GNUC_UNUSED flpigeon_to_string(FlValue* value) {
 }
 
 
-struct _ThumbnailRequest {
+struct _StreamThumbnailThumbnailRequest {
   GObject parent_instance;
 
   gchar* video;
   FlValue* headers;
   gchar* thumbnail_path;
-  ThumbnailFormat format;
+  StreamThumbnailThumbnailFormat format;
   int64_t max_height;
   int64_t max_width;
   int64_t time_ms;
   int64_t quality;
 };
 
-G_DEFINE_TYPE(ThumbnailRequest, thumbnail_request, G_TYPE_OBJECT)
+G_DEFINE_TYPE(StreamThumbnailThumbnailRequest, stream_thumbnail_thumbnail_request, G_TYPE_OBJECT)
 
-static void thumbnail_request_dispose(GObject* object) {
-  ThumbnailRequest* self = THUMBNAIL_REQUEST(object);
+static void stream_thumbnail_thumbnail_request_dispose(GObject* object) {
+  StreamThumbnailThumbnailRequest* self = STREAM_THUMBNAIL_THUMBNAIL_REQUEST(object);
   g_clear_pointer(&self->video, g_free);
   g_clear_pointer(&self->headers, fl_value_unref);
   g_clear_pointer(&self->thumbnail_path, g_free);
-  G_OBJECT_CLASS(thumbnail_request_parent_class)->dispose(object);
+  G_OBJECT_CLASS(stream_thumbnail_thumbnail_request_parent_class)->dispose(object);
 }
 
-static void thumbnail_request_init(ThumbnailRequest* self) {
+static void stream_thumbnail_thumbnail_request_init(StreamThumbnailThumbnailRequest* self) {
 }
 
-static void thumbnail_request_class_init(ThumbnailRequestClass* klass) {
-  G_OBJECT_CLASS(klass)->dispose = thumbnail_request_dispose;
+static void stream_thumbnail_thumbnail_request_class_init(StreamThumbnailThumbnailRequestClass* klass) {
+  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_thumbnail_request_dispose;
 }
 
-ThumbnailRequest* thumbnail_request_new(const gchar* video, FlValue* headers, const gchar* thumbnail_path, ThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality) {
-  ThumbnailRequest* self = THUMBNAIL_REQUEST(g_object_new(thumbnail_request_get_type(), nullptr));
+StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, const gchar* thumbnail_path, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality) {
+  StreamThumbnailThumbnailRequest* self = STREAM_THUMBNAIL_THUMBNAIL_REQUEST(g_object_new(stream_thumbnail_thumbnail_request_get_type(), nullptr));
   self->video = g_strdup(video);
   if (headers != nullptr) {
     self->headers = fl_value_ref(headers);
@@ -339,52 +339,52 @@ ThumbnailRequest* thumbnail_request_new(const gchar* video, FlValue* headers, co
   return self;
 }
 
-const gchar* thumbnail_request_get_video(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), nullptr);
+const gchar* stream_thumbnail_thumbnail_request_get_video(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), nullptr);
   return self->video;
 }
 
-FlValue* thumbnail_request_get_headers(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), nullptr);
+FlValue* stream_thumbnail_thumbnail_request_get_headers(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), nullptr);
   return self->headers;
 }
 
-const gchar* thumbnail_request_get_thumbnail_path(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), nullptr);
+const gchar* stream_thumbnail_thumbnail_request_get_thumbnail_path(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), nullptr);
   return self->thumbnail_path;
 }
 
-ThumbnailFormat thumbnail_request_get_format(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), static_cast<ThumbnailFormat>(0));
+StreamThumbnailThumbnailFormat stream_thumbnail_thumbnail_request_get_format(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), static_cast<StreamThumbnailThumbnailFormat>(0));
   return self->format;
 }
 
-int64_t thumbnail_request_get_max_height(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), 0);
+int64_t stream_thumbnail_thumbnail_request_get_max_height(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), 0);
   return self->max_height;
 }
 
-int64_t thumbnail_request_get_max_width(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), 0);
+int64_t stream_thumbnail_thumbnail_request_get_max_width(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), 0);
   return self->max_width;
 }
 
-int64_t thumbnail_request_get_time_ms(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), 0);
+int64_t stream_thumbnail_thumbnail_request_get_time_ms(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), 0);
   return self->time_ms;
 }
 
-int64_t thumbnail_request_get_quality(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), 0);
+int64_t stream_thumbnail_thumbnail_request_get_quality(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), 0);
   return self->quality;
 }
 
-static FlValue* thumbnail_request_to_list(ThumbnailRequest* self) {
+static FlValue* stream_thumbnail_thumbnail_request_to_list(StreamThumbnailThumbnailRequest* self) {
   FlValue* values = fl_value_new_list();
   fl_value_append_take(values, fl_value_new_string(self->video));
   fl_value_append_take(values, self->headers != nullptr ? fl_value_ref(self->headers) : fl_value_new_null());
   fl_value_append_take(values, self->thumbnail_path != nullptr ? fl_value_new_string(self->thumbnail_path) : fl_value_new_null());
-  fl_value_append_take(values, fl_value_new_custom(thumbnail_format_type_id, fl_value_new_int(self->format), (GDestroyNotify)fl_value_unref));
+  fl_value_append_take(values, fl_value_new_custom(stream_thumbnail_thumbnail_format_type_id, fl_value_new_int(self->format), (GDestroyNotify)fl_value_unref));
   fl_value_append_take(values, fl_value_new_int(self->max_height));
   fl_value_append_take(values, fl_value_new_int(self->max_width));
   fl_value_append_take(values, fl_value_new_int(self->time_ms));
@@ -392,7 +392,7 @@ static FlValue* thumbnail_request_to_list(ThumbnailRequest* self) {
   return values;
 }
 
-static ThumbnailRequest* thumbnail_request_new_from_list(FlValue* values) {
+static StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new_from_list(FlValue* values) {
   FlValue* value0 = fl_value_get_list_value(values, 0);
   const gchar* video = fl_value_get_string(value0);
   FlValue* value1 = fl_value_get_list_value(values, 1);
@@ -406,7 +406,7 @@ static ThumbnailRequest* thumbnail_request_new_from_list(FlValue* values) {
     thumbnail_path = fl_value_get_string(value2);
   }
   FlValue* value3 = fl_value_get_list_value(values, 3);
-  ThumbnailFormat format = static_cast<ThumbnailFormat>(fl_value_get_int(reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value3)))));
+  StreamThumbnailThumbnailFormat format = static_cast<StreamThumbnailThumbnailFormat>(fl_value_get_int(reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value3)))));
   FlValue* value4 = fl_value_get_list_value(values, 4);
   int64_t max_height = fl_value_get_int(value4);
   FlValue* value5 = fl_value_get_list_value(values, 5);
@@ -415,10 +415,10 @@ static ThumbnailRequest* thumbnail_request_new_from_list(FlValue* values) {
   int64_t time_ms = fl_value_get_int(value6);
   FlValue* value7 = fl_value_get_list_value(values, 7);
   int64_t quality = fl_value_get_int(value7);
-  return thumbnail_request_new(video, headers, thumbnail_path, format, max_height, max_width, time_ms, quality);
+  return stream_thumbnail_thumbnail_request_new(video, headers, thumbnail_path, format, max_height, max_width, time_ms, quality);
 }
 
-gboolean thumbnail_request_equals(ThumbnailRequest* a, ThumbnailRequest* b) {
+gboolean stream_thumbnail_thumbnail_request_equals(StreamThumbnailThumbnailRequest* a, StreamThumbnailThumbnailRequest* b) {
   if (a == b) {
     return TRUE;
   }
@@ -452,8 +452,8 @@ gboolean thumbnail_request_equals(ThumbnailRequest* a, ThumbnailRequest* b) {
   return TRUE;
 }
 
-guint thumbnail_request_hash(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), 0);
+guint stream_thumbnail_thumbnail_request_hash(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), 0);
   guint result = 0;
   result = result * 31 + (self->video != nullptr ? g_str_hash(self->video) : 0);
   result = result * 31 + flpigeon_deep_hash(self->headers);
@@ -466,8 +466,8 @@ guint thumbnail_request_hash(ThumbnailRequest* self) {
   return result;
 }
 
-gchar* thumbnail_request_to_string(ThumbnailRequest* self) {
-  g_return_val_if_fail(_IS_THUMBNAIL_REQUEST(self), NULL);
+gchar* stream_thumbnail_thumbnail_request_to_string(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), NULL);
   GString* str = g_string_new("ThumbnailRequest(");
   g_string_append(str, "video: ");
   if (self->video != nullptr) {
@@ -506,147 +506,147 @@ gchar* thumbnail_request_to_string(ThumbnailRequest* self) {
   return g_string_free(str, FALSE);
 }
 
-struct _MessageCodec {
+struct _StreamThumbnailMessageCodec {
   FlStandardMessageCodec parent_instance;
 
 };
 
-G_DEFINE_TYPE(MessageCodec, message_codec, fl_standard_message_codec_get_type())
+G_DEFINE_TYPE(StreamThumbnailMessageCodec, stream_thumbnail_message_codec, fl_standard_message_codec_get_type())
 
-const int thumbnail_format_type_id = 129;
-const int thumbnail_request_type_id = 130;
+const int stream_thumbnail_thumbnail_format_type_id = 129;
+const int stream_thumbnail_thumbnail_request_type_id = 130;
 
-static gboolean message_codec_write_thumbnail_format(FlStandardMessageCodec* codec, GByteArray* buffer, FlValue* value, GError** error) {
-  uint8_t type = thumbnail_format_type_id;
+static gboolean stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_format(FlStandardMessageCodec* codec, GByteArray* buffer, FlValue* value, GError** error) {
+  uint8_t type = stream_thumbnail_thumbnail_format_type_id;
   g_byte_array_append(buffer, &type, sizeof(uint8_t));
   return fl_standard_message_codec_write_value(codec, buffer, value, error);
 }
 
-static gboolean message_codec_write_thumbnail_request(FlStandardMessageCodec* codec, GByteArray* buffer, ThumbnailRequest* value, GError** error) {
-  uint8_t type = thumbnail_request_type_id;
+static gboolean stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_request(FlStandardMessageCodec* codec, GByteArray* buffer, StreamThumbnailThumbnailRequest* value, GError** error) {
+  uint8_t type = stream_thumbnail_thumbnail_request_type_id;
   g_byte_array_append(buffer, &type, sizeof(uint8_t));
-  g_autoptr(FlValue) values = thumbnail_request_to_list(value);
+  g_autoptr(FlValue) values = stream_thumbnail_thumbnail_request_to_list(value);
   return fl_standard_message_codec_write_value(codec, buffer, values, error);
 }
 
-static gboolean message_codec_write_value(FlStandardMessageCodec* codec, GByteArray* buffer, FlValue* value, GError** error) {
+static gboolean stream_thumbnail_message_codec_write_value(FlStandardMessageCodec* codec, GByteArray* buffer, FlValue* value, GError** error) {
   if (fl_value_get_type(value) == FL_VALUE_TYPE_CUSTOM) {
     switch (fl_value_get_custom_type(value)) {
-      case thumbnail_format_type_id:
-        return message_codec_write_thumbnail_format(codec, buffer, reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value))), error);
-      case thumbnail_request_type_id:
-        return message_codec_write_thumbnail_request(codec, buffer, THUMBNAIL_REQUEST(fl_value_get_custom_value_object(value)), error);
+      case stream_thumbnail_thumbnail_format_type_id:
+        return stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_format(codec, buffer, reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value))), error);
+      case stream_thumbnail_thumbnail_request_type_id:
+        return stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_request(codec, buffer, STREAM_THUMBNAIL_THUMBNAIL_REQUEST(fl_value_get_custom_value_object(value)), error);
     }
   }
 
-  return FL_STANDARD_MESSAGE_CODEC_CLASS(message_codec_parent_class)->write_value(codec, buffer, value, error);
+  return FL_STANDARD_MESSAGE_CODEC_CLASS(stream_thumbnail_message_codec_parent_class)->write_value(codec, buffer, value, error);
 }
 
-static FlValue* message_codec_read_thumbnail_format(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, GError** error) {
-  return fl_value_new_custom(thumbnail_format_type_id, fl_standard_message_codec_read_value(codec, buffer, offset, error), (GDestroyNotify)fl_value_unref);
+static FlValue* stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_format(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, GError** error) {
+  return fl_value_new_custom(stream_thumbnail_thumbnail_format_type_id, fl_standard_message_codec_read_value(codec, buffer, offset, error), (GDestroyNotify)fl_value_unref);
 }
 
-static FlValue* message_codec_read_thumbnail_request(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, GError** error) {
+static FlValue* stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_request(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, GError** error) {
   g_autoptr(FlValue) values = fl_standard_message_codec_read_value(codec, buffer, offset, error);
   if (values == nullptr) {
     return nullptr;
   }
 
-  g_autoptr(ThumbnailRequest) value = thumbnail_request_new_from_list(values);
+  g_autoptr(StreamThumbnailThumbnailRequest) value = stream_thumbnail_thumbnail_request_new_from_list(values);
   if (value == nullptr) {
     g_set_error(error, FL_MESSAGE_CODEC_ERROR, FL_MESSAGE_CODEC_ERROR_FAILED, "Invalid data received for MessageData");
     return nullptr;
   }
 
-  return fl_value_new_custom_object(thumbnail_request_type_id, G_OBJECT(value));
+  return fl_value_new_custom_object(stream_thumbnail_thumbnail_request_type_id, G_OBJECT(value));
 }
 
-static FlValue* message_codec_read_value_of_type(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, int type, GError** error) {
+static FlValue* stream_thumbnail_message_codec_read_value_of_type(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, int type, GError** error) {
   switch (type) {
-    case thumbnail_format_type_id:
-      return message_codec_read_thumbnail_format(codec, buffer, offset, error);
-    case thumbnail_request_type_id:
-      return message_codec_read_thumbnail_request(codec, buffer, offset, error);
+    case stream_thumbnail_thumbnail_format_type_id:
+      return stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_format(codec, buffer, offset, error);
+    case stream_thumbnail_thumbnail_request_type_id:
+      return stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_request(codec, buffer, offset, error);
     default:
-      return FL_STANDARD_MESSAGE_CODEC_CLASS(message_codec_parent_class)->read_value_of_type(codec, buffer, offset, type, error);
+      return FL_STANDARD_MESSAGE_CODEC_CLASS(stream_thumbnail_message_codec_parent_class)->read_value_of_type(codec, buffer, offset, type, error);
   }
 }
 
-static void message_codec_init(MessageCodec* self) {
+static void stream_thumbnail_message_codec_init(StreamThumbnailMessageCodec* self) {
 }
 
-static void message_codec_class_init(MessageCodecClass* klass) {
-  FL_STANDARD_MESSAGE_CODEC_CLASS(klass)->write_value = message_codec_write_value;
-  FL_STANDARD_MESSAGE_CODEC_CLASS(klass)->read_value_of_type = message_codec_read_value_of_type;
+static void stream_thumbnail_message_codec_class_init(StreamThumbnailMessageCodecClass* klass) {
+  FL_STANDARD_MESSAGE_CODEC_CLASS(klass)->write_value = stream_thumbnail_message_codec_write_value;
+  FL_STANDARD_MESSAGE_CODEC_CLASS(klass)->read_value_of_type = stream_thumbnail_message_codec_read_value_of_type;
 }
 
-static MessageCodec* message_codec_new() {
-  MessageCodec* self = MESSAGE_CODEC(g_object_new(message_codec_get_type(), nullptr));
+static StreamThumbnailMessageCodec* stream_thumbnail_message_codec_new() {
+  StreamThumbnailMessageCodec* self = STREAM_THUMBNAIL_MESSAGE_CODEC(g_object_new(stream_thumbnail_message_codec_get_type(), nullptr));
   return self;
 }
 
-struct _StreamThumbnailHostApiResponseHandle {
+struct _StreamThumbnailStreamThumbnailHostApiResponseHandle {
   GObject parent_instance;
 
   FlBasicMessageChannel* channel;
   FlBasicMessageChannelResponseHandle* response_handle;
 };
 
-G_DEFINE_TYPE(StreamThumbnailHostApiResponseHandle, stream_thumbnail_host_api_response_handle, G_TYPE_OBJECT)
+G_DEFINE_TYPE(StreamThumbnailStreamThumbnailHostApiResponseHandle, stream_thumbnail_stream_thumbnail_host_api_response_handle, G_TYPE_OBJECT)
 
-static void stream_thumbnail_host_api_response_handle_dispose(GObject* object) {
-  StreamThumbnailHostApiResponseHandle* self = STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(object);
+static void stream_thumbnail_stream_thumbnail_host_api_response_handle_dispose(GObject* object) {
+  StreamThumbnailStreamThumbnailHostApiResponseHandle* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(object);
   g_clear_object(&self->channel);
   g_clear_object(&self->response_handle);
-  G_OBJECT_CLASS(stream_thumbnail_host_api_response_handle_parent_class)->dispose(object);
+  G_OBJECT_CLASS(stream_thumbnail_stream_thumbnail_host_api_response_handle_parent_class)->dispose(object);
 }
 
-static void stream_thumbnail_host_api_response_handle_init(StreamThumbnailHostApiResponseHandle* self) {
+static void stream_thumbnail_stream_thumbnail_host_api_response_handle_init(StreamThumbnailStreamThumbnailHostApiResponseHandle* self) {
 }
 
-static void stream_thumbnail_host_api_response_handle_class_init(StreamThumbnailHostApiResponseHandleClass* klass) {
-  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_host_api_response_handle_dispose;
+static void stream_thumbnail_stream_thumbnail_host_api_response_handle_class_init(StreamThumbnailStreamThumbnailHostApiResponseHandleClass* klass) {
+  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_stream_thumbnail_host_api_response_handle_dispose;
 }
 
-static StreamThumbnailHostApiResponseHandle* stream_thumbnail_host_api_response_handle_new(FlBasicMessageChannel* channel, FlBasicMessageChannelResponseHandle* response_handle) {
-  StreamThumbnailHostApiResponseHandle* self = STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(g_object_new(stream_thumbnail_host_api_response_handle_get_type(), nullptr));
+static StreamThumbnailStreamThumbnailHostApiResponseHandle* stream_thumbnail_stream_thumbnail_host_api_response_handle_new(FlBasicMessageChannel* channel, FlBasicMessageChannelResponseHandle* response_handle) {
+  StreamThumbnailStreamThumbnailHostApiResponseHandle* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(g_object_new(stream_thumbnail_stream_thumbnail_host_api_response_handle_get_type(), nullptr));
   self->channel = FL_BASIC_MESSAGE_CHANNEL(g_object_ref(channel));
   self->response_handle = FL_BASIC_MESSAGE_CHANNEL_RESPONSE_HANDLE(g_object_ref(response_handle));
   return self;
 }
 
-G_DECLARE_FINAL_TYPE(StreamThumbnailHostApiThumbnailDataResponse, stream_thumbnail_host_api_thumbnail_data_response, , STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE, GObject)
+G_DECLARE_FINAL_TYPE(StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse, stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response, STREAM_THUMBNAIL, STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE, GObject)
 
-struct _StreamThumbnailHostApiThumbnailDataResponse {
+struct _StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse {
   GObject parent_instance;
 
   FlValue* value;
 };
 
-G_DEFINE_TYPE(StreamThumbnailHostApiThumbnailDataResponse, stream_thumbnail_host_api_thumbnail_data_response, G_TYPE_OBJECT)
+G_DEFINE_TYPE(StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse, stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response, G_TYPE_OBJECT)
 
-static void stream_thumbnail_host_api_thumbnail_data_response_dispose(GObject* object) {
-  StreamThumbnailHostApiThumbnailDataResponse* self = STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE(object);
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_dispose(GObject* object) {
+  StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE(object);
   g_clear_pointer(&self->value, fl_value_unref);
-  G_OBJECT_CLASS(stream_thumbnail_host_api_thumbnail_data_response_parent_class)->dispose(object);
+  G_OBJECT_CLASS(stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_parent_class)->dispose(object);
 }
 
-static void stream_thumbnail_host_api_thumbnail_data_response_init(StreamThumbnailHostApiThumbnailDataResponse* self) {
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_init(StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse* self) {
 }
 
-static void stream_thumbnail_host_api_thumbnail_data_response_class_init(StreamThumbnailHostApiThumbnailDataResponseClass* klass) {
-  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_host_api_thumbnail_data_response_dispose;
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_class_init(StreamThumbnailStreamThumbnailHostApiThumbnailDataResponseClass* klass) {
+  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_dispose;
 }
 
-static StreamThumbnailHostApiThumbnailDataResponse* stream_thumbnail_host_api_thumbnail_data_response_new(const uint8_t* return_value, size_t return_value_length) {
-  StreamThumbnailHostApiThumbnailDataResponse* self = STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE(g_object_new(stream_thumbnail_host_api_thumbnail_data_response_get_type(), nullptr));
+static StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse* stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_new(const uint8_t* return_value, size_t return_value_length) {
+  StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE(g_object_new(stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_get_type(), nullptr));
   self->value = fl_value_new_list();
   fl_value_append_take(self->value, fl_value_new_uint8_list(return_value, return_value_length));
   return self;
 }
 
-static StreamThumbnailHostApiThumbnailDataResponse* stream_thumbnail_host_api_thumbnail_data_response_new_error(const gchar* code, const gchar* message, FlValue* details) {
-  StreamThumbnailHostApiThumbnailDataResponse* self = STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE(g_object_new(stream_thumbnail_host_api_thumbnail_data_response_get_type(), nullptr));
+static StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse* stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_new_error(const gchar* code, const gchar* message, FlValue* details) {
+  StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_THUMBNAIL_DATA_RESPONSE(g_object_new(stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_get_type(), nullptr));
   self->value = fl_value_new_list();
   fl_value_append_take(self->value, fl_value_new_string(code));
   fl_value_append_take(self->value, fl_value_new_string(message != nullptr ? message : ""));
@@ -654,38 +654,38 @@ static StreamThumbnailHostApiThumbnailDataResponse* stream_thumbnail_host_api_th
   return self;
 }
 
-G_DECLARE_FINAL_TYPE(StreamThumbnailHostApiThumbnailFileResponse, stream_thumbnail_host_api_thumbnail_file_response, , STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE, GObject)
+G_DECLARE_FINAL_TYPE(StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse, stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response, STREAM_THUMBNAIL, STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE, GObject)
 
-struct _StreamThumbnailHostApiThumbnailFileResponse {
+struct _StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse {
   GObject parent_instance;
 
   FlValue* value;
 };
 
-G_DEFINE_TYPE(StreamThumbnailHostApiThumbnailFileResponse, stream_thumbnail_host_api_thumbnail_file_response, G_TYPE_OBJECT)
+G_DEFINE_TYPE(StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse, stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response, G_TYPE_OBJECT)
 
-static void stream_thumbnail_host_api_thumbnail_file_response_dispose(GObject* object) {
-  StreamThumbnailHostApiThumbnailFileResponse* self = STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE(object);
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_dispose(GObject* object) {
+  StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE(object);
   g_clear_pointer(&self->value, fl_value_unref);
-  G_OBJECT_CLASS(stream_thumbnail_host_api_thumbnail_file_response_parent_class)->dispose(object);
+  G_OBJECT_CLASS(stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_parent_class)->dispose(object);
 }
 
-static void stream_thumbnail_host_api_thumbnail_file_response_init(StreamThumbnailHostApiThumbnailFileResponse* self) {
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_init(StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse* self) {
 }
 
-static void stream_thumbnail_host_api_thumbnail_file_response_class_init(StreamThumbnailHostApiThumbnailFileResponseClass* klass) {
-  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_host_api_thumbnail_file_response_dispose;
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_class_init(StreamThumbnailStreamThumbnailHostApiThumbnailFileResponseClass* klass) {
+  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_dispose;
 }
 
-static StreamThumbnailHostApiThumbnailFileResponse* stream_thumbnail_host_api_thumbnail_file_response_new(const gchar* return_value) {
-  StreamThumbnailHostApiThumbnailFileResponse* self = STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE(g_object_new(stream_thumbnail_host_api_thumbnail_file_response_get_type(), nullptr));
+static StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse* stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_new(const gchar* return_value) {
+  StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE(g_object_new(stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_get_type(), nullptr));
   self->value = fl_value_new_list();
   fl_value_append_take(self->value, fl_value_new_string(return_value));
   return self;
 }
 
-static StreamThumbnailHostApiThumbnailFileResponse* stream_thumbnail_host_api_thumbnail_file_response_new_error(const gchar* code, const gchar* message, FlValue* details) {
-  StreamThumbnailHostApiThumbnailFileResponse* self = STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE(g_object_new(stream_thumbnail_host_api_thumbnail_file_response_get_type(), nullptr));
+static StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse* stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_new_error(const gchar* code, const gchar* message, FlValue* details) {
+  StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_THUMBNAIL_FILE_RESPONSE(g_object_new(stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_get_type(), nullptr));
   self->value = fl_value_new_list();
   fl_value_append_take(self->value, fl_value_new_string(code));
   fl_value_append_take(self->value, fl_value_new_string(message != nullptr ? message : ""));
@@ -693,83 +693,83 @@ static StreamThumbnailHostApiThumbnailFileResponse* stream_thumbnail_host_api_th
   return self;
 }
 
-struct _StreamThumbnailHostApi {
+struct _StreamThumbnailStreamThumbnailHostApi {
   GObject parent_instance;
 
-  const StreamThumbnailHostApiVTable* vtable;
+  const StreamThumbnailStreamThumbnailHostApiVTable* vtable;
   gpointer user_data;
   GDestroyNotify user_data_free_func;
 };
 
-G_DEFINE_TYPE(StreamThumbnailHostApi, stream_thumbnail_host_api, G_TYPE_OBJECT)
+G_DEFINE_TYPE(StreamThumbnailStreamThumbnailHostApi, stream_thumbnail_stream_thumbnail_host_api, G_TYPE_OBJECT)
 
-static void stream_thumbnail_host_api_dispose(GObject* object) {
-  StreamThumbnailHostApi* self = STREAM_THUMBNAIL_HOST_API(object);
+static void stream_thumbnail_stream_thumbnail_host_api_dispose(GObject* object) {
+  StreamThumbnailStreamThumbnailHostApi* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API(object);
   if (self->user_data != nullptr) {
     self->user_data_free_func(self->user_data);
   }
   self->user_data = nullptr;
-  G_OBJECT_CLASS(stream_thumbnail_host_api_parent_class)->dispose(object);
+  G_OBJECT_CLASS(stream_thumbnail_stream_thumbnail_host_api_parent_class)->dispose(object);
 }
 
-static void stream_thumbnail_host_api_init(StreamThumbnailHostApi* self) {
+static void stream_thumbnail_stream_thumbnail_host_api_init(StreamThumbnailStreamThumbnailHostApi* self) {
 }
 
-static void stream_thumbnail_host_api_class_init(StreamThumbnailHostApiClass* klass) {
-  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_host_api_dispose;
+static void stream_thumbnail_stream_thumbnail_host_api_class_init(StreamThumbnailStreamThumbnailHostApiClass* klass) {
+  G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_stream_thumbnail_host_api_dispose;
 }
 
-static StreamThumbnailHostApi* stream_thumbnail_host_api_new(const StreamThumbnailHostApiVTable* vtable, gpointer user_data, GDestroyNotify user_data_free_func) {
-  StreamThumbnailHostApi* self = STREAM_THUMBNAIL_HOST_API(g_object_new(stream_thumbnail_host_api_get_type(), nullptr));
+static StreamThumbnailStreamThumbnailHostApi* stream_thumbnail_stream_thumbnail_host_api_new(const StreamThumbnailStreamThumbnailHostApiVTable* vtable, gpointer user_data, GDestroyNotify user_data_free_func) {
+  StreamThumbnailStreamThumbnailHostApi* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API(g_object_new(stream_thumbnail_stream_thumbnail_host_api_get_type(), nullptr));
   self->vtable = vtable;
   self->user_data = user_data;
   self->user_data_free_func = user_data_free_func;
   return self;
 }
 
-static void stream_thumbnail_host_api_thumbnail_data_cb(FlBasicMessageChannel* channel, FlValue* message_, FlBasicMessageChannelResponseHandle* response_handle, gpointer user_data) {
-  StreamThumbnailHostApi* self = STREAM_THUMBNAIL_HOST_API(user_data);
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_cb(FlBasicMessageChannel* channel, FlValue* message_, FlBasicMessageChannelResponseHandle* response_handle, gpointer user_data) {
+  StreamThumbnailStreamThumbnailHostApi* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API(user_data);
 
   if (self->vtable == nullptr || self->vtable->thumbnail_data == nullptr) {
     return;
   }
 
   FlValue* value0 = fl_value_get_list_value(message_, 0);
-  ThumbnailRequest* request = THUMBNAIL_REQUEST(fl_value_get_custom_value_object(value0));
-  g_autoptr(StreamThumbnailHostApiResponseHandle) handle = stream_thumbnail_host_api_response_handle_new(channel, response_handle);
+  StreamThumbnailThumbnailRequest* request = STREAM_THUMBNAIL_THUMBNAIL_REQUEST(fl_value_get_custom_value_object(value0));
+  g_autoptr(StreamThumbnailStreamThumbnailHostApiResponseHandle) handle = stream_thumbnail_stream_thumbnail_host_api_response_handle_new(channel, response_handle);
   self->vtable->thumbnail_data(request, handle, self->user_data);
 }
 
-static void stream_thumbnail_host_api_thumbnail_file_cb(FlBasicMessageChannel* channel, FlValue* message_, FlBasicMessageChannelResponseHandle* response_handle, gpointer user_data) {
-  StreamThumbnailHostApi* self = STREAM_THUMBNAIL_HOST_API(user_data);
+static void stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_cb(FlBasicMessageChannel* channel, FlValue* message_, FlBasicMessageChannelResponseHandle* response_handle, gpointer user_data) {
+  StreamThumbnailStreamThumbnailHostApi* self = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API(user_data);
 
   if (self->vtable == nullptr || self->vtable->thumbnail_file == nullptr) {
     return;
   }
 
   FlValue* value0 = fl_value_get_list_value(message_, 0);
-  ThumbnailRequest* request = THUMBNAIL_REQUEST(fl_value_get_custom_value_object(value0));
-  g_autoptr(StreamThumbnailHostApiResponseHandle) handle = stream_thumbnail_host_api_response_handle_new(channel, response_handle);
+  StreamThumbnailThumbnailRequest* request = STREAM_THUMBNAIL_THUMBNAIL_REQUEST(fl_value_get_custom_value_object(value0));
+  g_autoptr(StreamThumbnailStreamThumbnailHostApiResponseHandle) handle = stream_thumbnail_stream_thumbnail_host_api_response_handle_new(channel, response_handle);
   self->vtable->thumbnail_file(request, handle, self->user_data);
 }
 
-void stream_thumbnail_host_api_set_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix, const StreamThumbnailHostApiVTable* vtable, gpointer user_data, GDestroyNotify user_data_free_func) {
+void stream_thumbnail_stream_thumbnail_host_api_set_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix, const StreamThumbnailStreamThumbnailHostApiVTable* vtable, gpointer user_data, GDestroyNotify user_data_free_func) {
   g_autofree gchar* dot_suffix = suffix != nullptr ? g_strdup_printf(".%s", suffix) : g_strdup("");
-  g_autoptr(StreamThumbnailHostApi) api_data = stream_thumbnail_host_api_new(vtable, user_data, user_data_free_func);
+  g_autoptr(StreamThumbnailStreamThumbnailHostApi) api_data = stream_thumbnail_stream_thumbnail_host_api_new(vtable, user_data, user_data_free_func);
 
-  g_autoptr(MessageCodec) codec = message_codec_new();
+  g_autoptr(StreamThumbnailMessageCodec) codec = stream_thumbnail_message_codec_new();
   g_autofree gchar* thumbnail_data_channel_name = g_strdup_printf("dev.flutter.pigeon.stream_thumbnail.StreamThumbnailHostApi.thumbnailData%s", dot_suffix);
   g_autoptr(FlBasicMessageChannel) thumbnail_data_channel = fl_basic_message_channel_new(messenger, thumbnail_data_channel_name, FL_MESSAGE_CODEC(codec));
-  fl_basic_message_channel_set_message_handler(thumbnail_data_channel, stream_thumbnail_host_api_thumbnail_data_cb, g_object_ref(api_data), g_object_unref);
+  fl_basic_message_channel_set_message_handler(thumbnail_data_channel, stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_cb, g_object_ref(api_data), g_object_unref);
   g_autofree gchar* thumbnail_file_channel_name = g_strdup_printf("dev.flutter.pigeon.stream_thumbnail.StreamThumbnailHostApi.thumbnailFile%s", dot_suffix);
   g_autoptr(FlBasicMessageChannel) thumbnail_file_channel = fl_basic_message_channel_new(messenger, thumbnail_file_channel_name, FL_MESSAGE_CODEC(codec));
-  fl_basic_message_channel_set_message_handler(thumbnail_file_channel, stream_thumbnail_host_api_thumbnail_file_cb, g_object_ref(api_data), g_object_unref);
+  fl_basic_message_channel_set_message_handler(thumbnail_file_channel, stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_cb, g_object_ref(api_data), g_object_unref);
 }
 
-void stream_thumbnail_host_api_clear_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix) {
+void stream_thumbnail_stream_thumbnail_host_api_clear_method_handlers(FlBinaryMessenger* messenger, const gchar* suffix) {
   g_autofree gchar* dot_suffix = suffix != nullptr ? g_strdup_printf(".%s", suffix) : g_strdup("");
 
-  g_autoptr(MessageCodec) codec = message_codec_new();
+  g_autoptr(StreamThumbnailMessageCodec) codec = stream_thumbnail_message_codec_new();
   g_autofree gchar* thumbnail_data_channel_name = g_strdup_printf("dev.flutter.pigeon.stream_thumbnail.StreamThumbnailHostApi.thumbnailData%s", dot_suffix);
   g_autoptr(FlBasicMessageChannel) thumbnail_data_channel = fl_basic_message_channel_new(messenger, thumbnail_data_channel_name, FL_MESSAGE_CODEC(codec));
   fl_basic_message_channel_set_message_handler(thumbnail_data_channel, nullptr, nullptr, nullptr);
@@ -778,32 +778,32 @@ void stream_thumbnail_host_api_clear_method_handlers(FlBinaryMessenger* messenge
   fl_basic_message_channel_set_message_handler(thumbnail_file_channel, nullptr, nullptr, nullptr);
 }
 
-void stream_thumbnail_host_api_respond_thumbnail_data(StreamThumbnailHostApiResponseHandle* response_handle, const uint8_t* return_value, size_t return_value_length) {
-  g_autoptr(StreamThumbnailHostApiThumbnailDataResponse) response = stream_thumbnail_host_api_thumbnail_data_response_new(return_value, return_value_length);
+void stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_data(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const uint8_t* return_value, size_t return_value_length) {
+  g_autoptr(StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse) response = stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_new(return_value, return_value_length);
   g_autoptr(GError) error = nullptr;
   if (!fl_basic_message_channel_respond(response_handle->channel, response_handle->response_handle, response->value, &error)) {
     g_warning("Failed to send response to %s.%s: %s", "StreamThumbnailHostApi", "thumbnailData", error->message);
   }
 }
 
-void stream_thumbnail_host_api_respond_error_thumbnail_data(StreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details) {
-  g_autoptr(StreamThumbnailHostApiThumbnailDataResponse) response = stream_thumbnail_host_api_thumbnail_data_response_new_error(code, message, details);
+void stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_data(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details) {
+  g_autoptr(StreamThumbnailStreamThumbnailHostApiThumbnailDataResponse) response = stream_thumbnail_stream_thumbnail_host_api_thumbnail_data_response_new_error(code, message, details);
   g_autoptr(GError) error = nullptr;
   if (!fl_basic_message_channel_respond(response_handle->channel, response_handle->response_handle, response->value, &error)) {
     g_warning("Failed to send response to %s.%s: %s", "StreamThumbnailHostApi", "thumbnailData", error->message);
   }
 }
 
-void stream_thumbnail_host_api_respond_thumbnail_file(StreamThumbnailHostApiResponseHandle* response_handle, const gchar* return_value) {
-  g_autoptr(StreamThumbnailHostApiThumbnailFileResponse) response = stream_thumbnail_host_api_thumbnail_file_response_new(return_value);
+void stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_file(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const gchar* return_value) {
+  g_autoptr(StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse) response = stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_new(return_value);
   g_autoptr(GError) error = nullptr;
   if (!fl_basic_message_channel_respond(response_handle->channel, response_handle->response_handle, response->value, &error)) {
     g_warning("Failed to send response to %s.%s: %s", "StreamThumbnailHostApi", "thumbnailFile", error->message);
   }
 }
 
-void stream_thumbnail_host_api_respond_error_thumbnail_file(StreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details) {
-  g_autoptr(StreamThumbnailHostApiThumbnailFileResponse) response = stream_thumbnail_host_api_thumbnail_file_response_new_error(code, message, details);
+void stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_file(StreamThumbnailStreamThumbnailHostApiResponseHandle* response_handle, const gchar* code, const gchar* message, FlValue* details) {
+  g_autoptr(StreamThumbnailStreamThumbnailHostApiThumbnailFileResponse) response = stream_thumbnail_stream_thumbnail_host_api_thumbnail_file_response_new_error(code, message, details);
   g_autoptr(GError) error = nullptr;
   if (!fl_basic_message_channel_respond(response_handle->channel, response_handle->response_handle, response->value, &error)) {
     g_warning("Failed to send response to %s.%s: %s", "StreamThumbnailHostApi", "thumbnailFile", error->message);

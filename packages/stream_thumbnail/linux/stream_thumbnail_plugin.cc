@@ -74,7 +74,7 @@ std::string VideoPath(const std::string &video) {
   return video;
 }
 
-std::string FileExtension(ThumbnailFormat format) {
+std::string FileExtension(StreamThumbnailThumbnailFormat format) {
   switch (format) {
     case STREAM_THUMBNAIL_THUMBNAIL_FORMAT_JPEG:
       return "jpg";
@@ -255,7 +255,7 @@ std::vector<uint8_t> EncodeWebP(const AVFrame *frame, int64_t quality) {
 }
 
 std::vector<uint8_t> GenerateThumbnailData(const std::string &video, const std::map<std::string, std::string> *headers,
-                                            ThumbnailFormat format, int64_t max_width, int64_t max_height,
+                                            StreamThumbnailThumbnailFormat format, int64_t max_width, int64_t max_height,
                                             int64_t time_ms, int64_t quality) {
   const FramePtr native = DecodeFrame(VideoPath(video), headers, time_ms);
 
@@ -280,7 +280,7 @@ std::vector<uint8_t> GenerateThumbnailData(const std::string &video, const std::
 }
 
 std::string WriteThumbnailFile(const std::string &video, const std::map<std::string, std::string> *headers,
-                                const std::string *thumbnail_path, ThumbnailFormat format, int64_t max_width,
+                                const std::string *thumbnail_path, StreamThumbnailThumbnailFormat format, int64_t max_width,
                                 int64_t max_height, int64_t time_ms, int64_t quality) {
   const std::vector<uint8_t> data = GenerateThumbnailData(video, headers, format, max_width, max_height, time_ms, quality);
   const std::string ext = FileExtension(format);
@@ -344,7 +344,7 @@ std::unique_ptr<std::map<std::string, std::string>> ExtractHeaders(FlValue *head
 struct ThumbnailDataTaskData {
   std::string video;
   std::unique_ptr<std::map<std::string, std::string>> headers;
-  ThumbnailFormat format;
+  StreamThumbnailThumbnailFormat format;
   int64_t max_width;
   int64_t max_height;
   int64_t time_ms;
@@ -363,7 +363,7 @@ struct ThumbnailFileTaskData {
   std::unique_ptr<std::map<std::string, std::string>> headers;
   std::string thumbnail_path;
   bool has_thumbnail_path;
-  ThumbnailFormat format;
+  StreamThumbnailThumbnailFormat format;
   int64_t max_width;
   int64_t max_height;
   int64_t time_ms;
@@ -394,14 +394,14 @@ void ThumbnailDataThread(GTask *task, gpointer, gpointer task_data, GCancellable
 
 void OnThumbnailDataDone(GObject *, GAsyncResult *res, gpointer user_data) {
   // Not g_autoptr: the generated header doesn't declare a
-  // G_DEFINE_AUTOPTR_CLEANUP_FUNC for StreamThumbnailHostApiResponseHandle.
-  StreamThumbnailHostApiResponseHandle *handle = STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(user_data);
+  // G_DEFINE_AUTOPTR_CLEANUP_FUNC for StreamThumbnailStreamThumbnailHostApiResponseHandle.
+  StreamThumbnailStreamThumbnailHostApiResponseHandle *handle = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(user_data);
   std::unique_ptr<ThumbnailDataResult> result(
       static_cast<ThumbnailDataResult *>(g_task_propagate_pointer(G_TASK(res), nullptr)));
   if (result->ok) {
-    stream_thumbnail_host_api_respond_thumbnail_data(handle, result->bytes.data(), result->bytes.size());
+    stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_data(handle, result->bytes.data(), result->bytes.size());
   } else {
-    stream_thumbnail_host_api_respond_error_thumbnail_data(handle, result->error_code.c_str(),
+    stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_data(handle, result->error_code.c_str(),
                                                             result->error_message.c_str(), nullptr);
   }
   g_object_unref(handle);
@@ -423,28 +423,28 @@ void ThumbnailFileThread(GTask *task, gpointer, gpointer task_data, GCancellable
 }
 
 void OnThumbnailFileDone(GObject *, GAsyncResult *res, gpointer user_data) {
-  StreamThumbnailHostApiResponseHandle *handle = STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(user_data);
+  StreamThumbnailStreamThumbnailHostApiResponseHandle *handle = STREAM_THUMBNAIL_STREAM_THUMBNAIL_HOST_API_RESPONSE_HANDLE(user_data);
   std::unique_ptr<ThumbnailFileResult> result(
       static_cast<ThumbnailFileResult *>(g_task_propagate_pointer(G_TASK(res), nullptr)));
   if (result->ok) {
-    stream_thumbnail_host_api_respond_thumbnail_file(handle, result->path.c_str());
+    stream_thumbnail_stream_thumbnail_host_api_respond_thumbnail_file(handle, result->path.c_str());
   } else {
-    stream_thumbnail_host_api_respond_error_thumbnail_file(handle, result->error_code.c_str(),
+    stream_thumbnail_stream_thumbnail_host_api_respond_error_thumbnail_file(handle, result->error_code.c_str(),
                                                             result->error_message.c_str(), nullptr);
   }
   g_object_unref(handle);
 }
 
-void HandleThumbnailData(ThumbnailRequest *request, StreamThumbnailHostApiResponseHandle *response_handle,
+void HandleThumbnailData(StreamThumbnailThumbnailRequest *request, StreamThumbnailStreamThumbnailHostApiResponseHandle *response_handle,
                           gpointer) {
   auto *data = new ThumbnailDataTaskData{
-      thumbnail_request_get_video(request),
-      ExtractHeaders(thumbnail_request_get_headers(request)),
-      thumbnail_request_get_format(request),
-      thumbnail_request_get_max_width(request),
-      thumbnail_request_get_max_height(request),
-      thumbnail_request_get_time_ms(request),
-      thumbnail_request_get_quality(request),
+      stream_thumbnail_thumbnail_request_get_video(request),
+      ExtractHeaders(stream_thumbnail_thumbnail_request_get_headers(request)),
+      stream_thumbnail_thumbnail_request_get_format(request),
+      stream_thumbnail_thumbnail_request_get_max_width(request),
+      stream_thumbnail_thumbnail_request_get_max_height(request),
+      stream_thumbnail_thumbnail_request_get_time_ms(request),
+      stream_thumbnail_thumbnail_request_get_quality(request),
   };
 
   GTask *task = g_task_new(nullptr, nullptr, OnThumbnailDataDone, g_object_ref(response_handle));
@@ -453,19 +453,19 @@ void HandleThumbnailData(ThumbnailRequest *request, StreamThumbnailHostApiRespon
   g_object_unref(task);
 }
 
-void HandleThumbnailFile(ThumbnailRequest *request, StreamThumbnailHostApiResponseHandle *response_handle,
+void HandleThumbnailFile(StreamThumbnailThumbnailRequest *request, StreamThumbnailStreamThumbnailHostApiResponseHandle *response_handle,
                           gpointer) {
-  const gchar *thumbnail_path = thumbnail_request_get_thumbnail_path(request);
+  const gchar *thumbnail_path = stream_thumbnail_thumbnail_request_get_thumbnail_path(request);
   auto *data = new ThumbnailFileTaskData{
-      thumbnail_request_get_video(request),
-      ExtractHeaders(thumbnail_request_get_headers(request)),
+      stream_thumbnail_thumbnail_request_get_video(request),
+      ExtractHeaders(stream_thumbnail_thumbnail_request_get_headers(request)),
       thumbnail_path != nullptr ? std::string(thumbnail_path) : std::string(),
       thumbnail_path != nullptr,
-      thumbnail_request_get_format(request),
-      thumbnail_request_get_max_width(request),
-      thumbnail_request_get_max_height(request),
-      thumbnail_request_get_time_ms(request),
-      thumbnail_request_get_quality(request),
+      stream_thumbnail_thumbnail_request_get_format(request),
+      stream_thumbnail_thumbnail_request_get_max_width(request),
+      stream_thumbnail_thumbnail_request_get_max_height(request),
+      stream_thumbnail_thumbnail_request_get_time_ms(request),
+      stream_thumbnail_thumbnail_request_get_quality(request),
   };
 
   GTask *task = g_task_new(nullptr, nullptr, OnThumbnailFileDone, g_object_ref(response_handle));
@@ -474,7 +474,7 @@ void HandleThumbnailFile(ThumbnailRequest *request, StreamThumbnailHostApiRespon
   g_object_unref(task);
 }
 
-constexpr StreamThumbnailHostApiVTable kVTable = {
+constexpr StreamThumbnailStreamThumbnailHostApiVTable kVTable = {
     HandleThumbnailData,
     HandleThumbnailFile,
 };
@@ -495,7 +495,7 @@ void stream_thumbnail_plugin_register_with_registrar(FlPluginRegistrar *registra
   StreamThumbnailPlugin *plugin =
       STREAM_THUMBNAIL_PLUGIN(g_object_new(stream_thumbnail_plugin_get_type(), nullptr));
 
-  stream_thumbnail_host_api_set_method_handlers(fl_plugin_registrar_get_messenger(registrar), nullptr, &kVTable,
+  stream_thumbnail_stream_thumbnail_host_api_set_method_handlers(fl_plugin_registrar_get_messenger(registrar), nullptr, &kVTable,
                                                  g_object_ref(plugin), g_object_unref);
 
   g_object_unref(plugin);
