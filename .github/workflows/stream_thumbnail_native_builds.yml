@@ -1,0 +1,182 @@
+name: stream_thumbnail_native_builds
+
+env:
+  FLUTTER_CHANNEL: stable
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+    paths:
+      - 'packages/stream_thumbnail/**'
+      - '.github/workflows/stream_thumbnail_native_builds.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/stream_thumbnail/**'
+      - '.github/workflows/stream_thumbnail_native_builds.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  android:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/stream_thumbnail/example
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --debug
+
+  ios:
+    timeout-minutes: 20
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: packages/stream_thumbnail/example
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build iOS (no codesign)
+        run: flutter build ios --debug --no-codesign
+
+  macos:
+    timeout-minutes: 20
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: packages/stream_thumbnail/example
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Enable macOS Desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build macOS
+        run: flutter build macos --debug
+
+  windows:
+    timeout-minutes: 20
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: packages/stream_thumbnail/example
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build Windows
+        run: flutter build windows --debug
+
+  linux:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/stream_thumbnail/example
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Linux Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libwebp-dev
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Enable Linux Desktop
+        run: flutter config --enable-linux-desktop
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build Linux
+        run: flutter build linux --debug
+
+  web:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/stream_thumbnail/example
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build Web
+        run: flutter build web
