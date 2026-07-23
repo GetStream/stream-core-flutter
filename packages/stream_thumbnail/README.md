@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A Flutter plugin for creating a thumbnail image from a video. Give it a local file path or a video URL and it returns the thumbnail as bytes or as a saved image file. Works on Android, iOS, and web.
+A Flutter plugin for creating a thumbnail image from a video. Give it a local file path or a video URL and it returns the thumbnail as bytes or as a saved image file. Works on Android, iOS, macOS, and web.
 
 ## Installation
 
@@ -64,7 +64,7 @@ Every method accepts the same options:
 | `video`(s)      | Path to a local video file or a video URL.                                      |
 | `headers`       | HTTP headers sent when fetching a remote video.                                 |
 | `thumbnailPath` | Output path (file variants only). Defaults to the video's folder or cache dir.  |
-| `imageFormat`   | `JPEG`, `PNG`, or `WEBP`. Defaults to `PNG`. WebP on iOS is backed by `libwebp`.|
+| `imageFormat`   | `JPEG`, `PNG`, or `WEBP`. Defaults to `PNG`. WebP on iOS/macOS is backed by `libwebp`.|
 | `maxHeight` / `maxWidth` | Max size in pixels, or `0` to keep the source resolution.              |
 | `timeMs`        | Capture position in milliseconds.                                               |
 | `quality`       | Output quality, `0`–`100` (ignored for PNG).                                    |

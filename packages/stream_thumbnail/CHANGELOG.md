@@ -1,5 +1,10 @@
 ## Upcoming
 
+### ✨ Features
+
+- Added macOS support, sharing the same `AVAssetImageGenerator` + `libwebp` approach
+  as iOS.
+
 ### 💥 BREAKING CHANGES
 
 - `thumbnailFiles` now fails fast: if any video fails to produce a thumbnail, the call

@@ -1,11 +1,15 @@
 import 'package:pigeon/pigeon.dart';
 
+// `swiftOut` is intentionally omitted here: iOS and macOS each need their own
+// physical copy under their own SwiftPM package root (SPM rejects a target
+// `path:` that escapes its package root), so it's passed explicitly via
+// `--swift_out` for each platform in melos.yaml's `generate:pigeon` script
+// instead of being fixed to a single path here.
 @ConfigurePigeon(
   PigeonOptions(
     dartOut: 'lib/src/messages.g.dart',
     kotlinOut: 'android/src/main/kotlin/io/getstream/stream_thumbnail/Messages.g.kt',
     kotlinOptions: KotlinOptions(package: 'io.getstream.stream_thumbnail'),
-    swiftOut: 'ios/stream_thumbnail/Sources/stream_thumbnail/Messages.g.swift',
     dartPackageName: 'stream_thumbnail',
   ),
 )
