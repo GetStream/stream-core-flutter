@@ -4,6 +4,9 @@
 
 - Added macOS support, sharing the same `AVAssetImageGenerator` + `libwebp` approach
   as iOS.
+- Added Windows support, via Media Foundation for decoding and WIC for JPEG/PNG
+  encoding. `StreamThumbnailFormat.webp` and `headers` (for authenticated remote
+  videos) are not yet supported on Windows.
 
 ### 💥 BREAKING CHANGES
 

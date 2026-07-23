@@ -10,6 +10,9 @@ import 'package:pigeon/pigeon.dart';
     dartOut: 'lib/src/messages.g.dart',
     kotlinOut: 'android/src/main/kotlin/io/getstream/stream_thumbnail/Messages.g.kt',
     kotlinOptions: KotlinOptions(package: 'io.getstream.stream_thumbnail'),
+    cppHeaderOut: 'windows/pigeon/messages.g.h',
+    cppSourceOut: 'windows/pigeon/messages.g.cpp',
+    cppOptions: CppOptions(namespace: 'stream_thumbnail_windows', headerIncludePath: 'messages.g.h'),
     dartPackageName: 'stream_thumbnail',
   ),
 )
