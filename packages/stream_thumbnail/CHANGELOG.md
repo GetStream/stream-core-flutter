@@ -7,6 +7,9 @@
 - Added Windows support, via Media Foundation for decoding and WIC for JPEG/PNG
   encoding. `StreamThumbnailFormat.webp` and `headers` (for authenticated remote
   videos) are not yet supported on Windows.
+- Added Linux support, via FFmpeg for decoding and jpeg/png encoding, and `libwebp`
+  for WebP — the only platform besides Android with full format support, including
+  `headers` for authenticated remote videos.
 
 ### 💥 BREAKING CHANGES
 

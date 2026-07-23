@@ -13,6 +13,9 @@ import 'package:pigeon/pigeon.dart';
     cppHeaderOut: 'windows/pigeon/messages.g.h',
     cppSourceOut: 'windows/pigeon/messages.g.cpp',
     cppOptions: CppOptions(namespace: 'stream_thumbnail_windows', headerIncludePath: 'messages.g.h'),
+    gobjectHeaderOut: 'linux/pigeon/messages.g.h',
+    gobjectSourceOut: 'linux/pigeon/messages.g.cc',
+    gobjectOptions: GObjectOptions(module: '', headerIncludePath: 'messages.g.h'),
     dartPackageName: 'stream_thumbnail',
   ),
 )

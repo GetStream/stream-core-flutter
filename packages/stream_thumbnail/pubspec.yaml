@@ -32,6 +32,8 @@ flutter:
         pluginClass: StreamThumbnailPlugin
       ios:
         pluginClass: StreamThumbnailPlugin
+      linux:
+        pluginClass: StreamThumbnailPlugin
       macos:
         pluginClass: StreamThumbnailPlugin
       web:

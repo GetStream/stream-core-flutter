@@ -2,9 +2,11 @@
 
 ## Introduction
 
-A Flutter plugin for creating a thumbnail image from a video. Give it a local file path or a video URL and it returns the thumbnail as bytes or as a saved image file. Works on Android, iOS, macOS, Windows, and web.
+A Flutter plugin for creating a thumbnail image from a video. Give it a local file path or a video URL and it returns the thumbnail as bytes or as a saved image file. Works on Android, iOS, macOS, Windows, Linux, and web.
 
 Windows requires the [Media Feature Pack](https://support.microsoft.com/en-us/topic/media-feature-pack-list-for-windows-n-editions-c1c6bfba-4bf7-4be6-ae13-8608318bf3d4) for decoding (present by default outside of "N"/"KN" Windows editions), and doesn't yet support `StreamThumbnailFormat.webp` or `headers` for authenticated remote videos.
+
+Linux requires FFmpeg and libwebp development packages on the build machine, e.g. on Debian/Ubuntu: `libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libwebp-dev`.
 
 ## Installation
 
