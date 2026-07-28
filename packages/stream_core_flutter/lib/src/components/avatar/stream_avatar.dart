@@ -85,6 +85,7 @@ class StreamAvatar extends StatelessWidget {
     Color? backgroundColor,
     Color? foregroundColor,
     bool showBorder = true,
+    String? semanticsLabel,
   }) : props = .new(
          size: size,
          imageUrl: imageUrl,
@@ -92,6 +93,7 @@ class StreamAvatar extends StatelessWidget {
          backgroundColor: backgroundColor,
          foregroundColor: foregroundColor,
          showBorder: showBorder,
+         semanticsLabel: semanticsLabel,
        );
 
   /// The properties that configure this avatar.
@@ -123,6 +125,7 @@ class StreamAvatarProps {
     this.backgroundColor,
     this.foregroundColor,
     this.showBorder = true,
+    this.semanticsLabel,
   });
 
   /// The URL of the avatar image.
@@ -164,6 +167,14 @@ class StreamAvatarProps {
   /// Defaults to true. The border style is determined by
   /// [StreamAvatarThemeData.border].
   final bool showBorder;
+
+  /// Screen-reader label for the avatar.
+  ///
+  /// When null (the default), the placeholder speaks for itself — wrap in
+  /// [ExcludeSemantics] when the surrounding row already labels the user.
+  /// When non-null, the avatar is exposed as a labeled image node and the
+  /// placeholder is dropped from the semantics tree.
+  final String? semanticsLabel;
 }
 
 /// The default implementation of [StreamAvatar].
@@ -200,7 +211,7 @@ class DefaultStreamAvatar extends StatelessWidget {
       size: _iconSizeForSize(effectiveSize),
     );
 
-    return AnimatedContainer(
+    Widget avatar = AnimatedContainer(
       alignment: .center,
       clipBehavior: .antiAlias,
       width: effectiveSize.value,
@@ -232,6 +243,17 @@ class DefaultStreamAvatar extends StatelessWidget {
         ),
       ),
     );
+
+    if (props.semanticsLabel case final label?) {
+      avatar = Semantics(
+        label: label,
+        image: true,
+        excludeSemantics: true,
+        child: avatar,
+      );
+    }
+
+    return avatar;
   }
 
   // Returns the appropriate text style for the given avatar size.

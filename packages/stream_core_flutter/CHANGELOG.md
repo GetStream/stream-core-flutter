@@ -1,4 +1,4 @@
-## Upcoming
+## 0.4.1
 
 ### ✨ Features
 
@@ -8,6 +8,7 @@
 - Added `labelText` and `helperAffinity` to `StreamTextInput` for a floating label above the field and helper text positioned inside or outside the bordered chassis.
 - Added `focusNode` and `autofocus` pass-through on `StreamListTile`.
 - Added optional `semanticLabel` to `StreamBadgeNotification`, `StreamFileTypeIcon`, `StreamStepper`, `StreamMessageComposerAttachment`, and `StreamMessageComposerMediaAttachment`.
+- Added optional `semanticsLabel` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. On `StreamAvatar`, `null` (default) drops the placeholder's initials from the semantics tree via `ExcludeSemantics`; a non-null value exposes it as a labeled image node. On `StreamAvatarGroup` / `StreamAvatarStack`, `null` composes through — each child's own `semanticsLabel` applies — while a non-null value collapses the group into a single labeled image node and hides children and the "+N" overflow badge.
 - Added `excludeHeaderSemantics` to `StreamAppBar` and `StreamSheetHeader` for opting out of the default heading role and route naming on the title.
 - Added `onVisible` callback to `StreamSnackbar` — fires after the entrance animation completes (or synchronously when a screen reader is active).
 - Added `StreamColorScheme.fromSeed` — builds a complete light or dark color scheme from a single brand color, optionally with a custom chrome color. When chrome is omitted it is derived from the brand hue at `StreamColorScheme.neutralChroma`.
