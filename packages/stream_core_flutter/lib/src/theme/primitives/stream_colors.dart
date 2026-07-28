@@ -269,12 +269,21 @@ abstract final class StreamColors {
 class StreamColorSwatch extends ColorSwatch<int> {
   const StreamColorSwatch(super.primary, super._swatch);
 
+  /// Generates a full shade scale from a single seed [color].
+  ///
+  /// Shades are derived in the HCT color space, holding the seed's hue constant while
+  /// stepping tone along a fixed ladder measured from the Stream design tokens. This
+  /// keeps each shade's contrast predictable across hues, but means [color] is
+  /// normalized onto the ladder rather than reproduced verbatim at shade 500.
+  ///
+  /// Pass [chroma] to override the seed's chroma, in HCT units — a low value yields a
+  /// near-neutral scale that still carries the seed's hue.
   factory StreamColorSwatch.fromColor(
     Color color, {
     Brightness brightness = Brightness.light,
-    double? saturation,
+    double? chroma,
   }) {
-    final shadeMap = StreamColorSwatchHelper.generateShadeMap(color, brightness: brightness, saturation: saturation);
+    final shadeMap = StreamColorSwatchHelper.generateShadeMap(color, brightness: brightness, chroma: chroma);
     return StreamColorSwatch(shadeMap[500]!.toARGB32(), shadeMap);
   }
 

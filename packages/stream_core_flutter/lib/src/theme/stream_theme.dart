@@ -1,8 +1,5 @@
-// ignore_for_file: avoid_redundant_argument_values
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:stream_core/stream_core.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import 'components/stream_app_bar_theme.dart';
@@ -41,7 +38,6 @@ import 'components/stream_snackbar_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
-import 'primitives/stream_colors.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -212,7 +208,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
-      brightness: effectiveBrightness,
       icons: icons,
       radius: radius,
       spacing: spacing,
@@ -506,7 +501,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
 
     return StreamTheme.raw(
-      brightness: brightness,
       icons: icons,
       radius: radius,
       spacing: spacing,

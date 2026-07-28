@@ -454,7 +454,7 @@ class ThemeConfiguration extends ChangeNotifier {
     _brandPrimaryColor = null;
     // Chrome
     _chromePrimaryColor = null;
-    
+
     // Accent
     _accentPrimary = null;
     _accentSuccess = null;
@@ -522,13 +522,17 @@ class ThemeConfiguration extends ChangeNotifier {
         ? StreamColorSwatch.fromColor(_brandPrimaryColor!, brightness: _brightness)
         : null;
 
-    // Chrome swatch. Mirrors StreamTheme.light()/.dark(): an explicit chrome color wins;
+    // Chrome swatch. Mirrors StreamColorScheme.fromSeed: an explicit chrome color wins;
     // otherwise, when a brand color is set but chrome isn't, derive chrome from brand at
-    // low saturation so chrome-dependent colors still pick up the brand's hue.
+    // neutral chroma so chrome-dependent colors still pick up the brand's hue.
     final effectiveChrome = _chromePrimaryColor != null
         ? StreamColorSwatch.fromColor(_chromePrimaryColor!, brightness: _brightness)
         : _brandPrimaryColor != null
-        ? StreamColorSwatch.fromColor(_brandPrimaryColor!, brightness: _brightness, saturation: 0.1)
+        ? StreamColorSwatch.fromColor(
+            _brandPrimaryColor!,
+            brightness: _brightness,
+            chroma: StreamColorScheme.neutralChroma,
+          )
         : null;
 
     // Every other override is passed through as-is: StreamColorScheme.light()/.dark()

@@ -1,457 +1,318 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:stream_core_flutter/core.dart';
 
+/// Every shade a generated [StreamColorSwatch] exposes.
+const _shades = [0, 50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+
+/// The tone (CIE L*) each shade is expected to land on in light mode. Mirrored in dark
+/// mode. Kept in sync with `StreamColorSwatchHelper._toneLadder`.
+const _expectedTones = {
+  50: 97.0,
+  100: 93.5,
+  150: 86.0,
+  200: 79.0,
+  300: 69.0,
+  400: 58.0,
+  500: 46.0,
+  600: 38.0,
+  700: 29.0,
+  800: 20.5,
+  900: 10.0,
+};
+
+/// Seeds spanning the hue circle, including the two pathological cases for HSL-based
+/// generation: yellow (very light at full saturation) and purple (very dark).
+const _seeds = {
+  'deep orange': Color(0xFFFF5722),
+  'blue': Color(0xFF2196F3),
+  'green': Color(0xFF4CAF50),
+  'purple': Color(0xFF9C27B0),
+  'red': Color(0xFFF44336),
+  'yellow': Color(0xFFFFEB3B),
+};
+
+/// The Stream brand color, which the default token palette is built from.
+const _defaultSeed = Color(0xFF005FFF);
+
+double _toneOf(Color color) => Hct.fromInt(color.toARGB32()).tone;
+
+double _hueOf(Color color) => Hct.fromInt(color.toARGB32()).hue;
+
+double _chromaOf(Color color) => Hct.fromInt(color.toARGB32()).chroma;
+
+/// WCAG 2.1 contrast ratio between two opaque colors.
+double _contrast(Color a, Color b) {
+  final la = a.computeLuminance();
+  final lb = b.computeLuminance();
+  final (hi, lo) = la > lb ? (la, lb) : (lb, la);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
 void main() {
-  group('StreamColorScheme.fromSeed light color generation', () {
-    test('generates the exact brand scale for a deep orange seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722)).brand;
+  group('StreamColorScheme.fromSeed exact values', () {
+    // A full snapshot for the default seed. The remaining seeds are covered by the
+    // property tests below and by the golden test, which is a more useful regression
+    // net than transcribing every hue's hex values.
+    test('generates the expected light scales for the Stream brand seed', () {
+      final scheme = StreamColorScheme.fromSeed(brand: _defaultSeed);
 
-      expect(brand[0], const Color(0xFFFFFFFF));
-      expect(brand[50], const Color(0xFFFFECE5));
-      expect(brand[100], const Color(0xFFFFDBD0));
-      expect(brand[150], const Color(0xFFFFCBBA));
-      expect(brand[200], const Color(0xFFFFBAA4));
-      expect(brand[300], const Color(0xFFFF9979));
-      expect(brand[400], const Color(0xFFFF784D));
-      expect(brand[500], const Color(0xFFFF5722));
-      expect(brand[600], const Color(0xFFE83800));
-      expect(brand[700], const Color(0xFFAF2A00));
-      expect(brand[800], const Color(0xFF761C00));
-      expect(brand[900], const Color(0xFF3D0F00));
-      expect(brand[1000], const Color(0xFF000000));
+      expect(scheme.brand[0], const Color(0xFFFFFFFF));
+      expect(scheme.brand[50], const Color(0xFFF6F5FF));
+      expect(scheme.brand[100], const Color(0xFFE9EBFF));
+      expect(scheme.brand[150], const Color(0xFFCCD6FF));
+      expect(scheme.brand[200], const Color(0xFFB1C2FF));
+      expect(scheme.brand[300], const Color(0xFF89A5FF));
+      expect(scheme.brand[400], const Color(0xFF5984FF));
+      expect(scheme.brand[500], const Color(0xFF005FFE));
+      expect(scheme.brand[600], const Color(0xFF2651BE));
+      expect(scheme.brand[700], const Color(0xFF223F8C));
+      expect(scheme.brand[800], const Color(0xFF1B2E63));
+      expect(scheme.brand[900], const Color(0xFF0E1A3B));
+      expect(scheme.brand[1000], const Color(0xFF000000));
+
+      expect(scheme.chrome[0], const Color(0xFFFFFFFF));
+      expect(scheme.chrome[50], const Color(0xFFF9F5F7));
+      expect(scheme.chrome[100], const Color(0xFFEEEBEE));
+      expect(scheme.chrome[150], const Color(0xFFD8D6DD));
+      expect(scheme.chrome[200], const Color(0xFFC3C3CD));
+      expect(scheme.chrome[300], const Color(0xFFA6A8B6));
+      expect(scheme.chrome[400], const Color(0xFF878B9C));
+      expect(scheme.chrome[500], const Color(0xFF676C81));
+      expect(scheme.chrome[600], const Color(0xFF565968));
+      expect(scheme.chrome[700], const Color(0xFF42444F));
+      expect(scheme.chrome[800], const Color(0xFF303139));
+      expect(scheme.chrome[900], const Color(0xFF1A1B20));
+      expect(scheme.chrome[1000], const Color(0xFF000000));
     });
 
-    test('generates the exact auto-derived chrome scale for a deep orange seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722)).chrome;
+    test('generates the expected dark scales for the Stream brand seed', () {
+      final scheme = StreamColorScheme.fromSeed(brand: _defaultSeed, brightness: .dark);
 
-      expect(chrome[0], const Color(0xFFFFFFFF));
-      expect(chrome[50], const Color(0xFFF4F2F1));
-      expect(chrome[100], const Color(0xFFEAE6E5));
-      expect(chrome[150], const Color(0xFFE0DBD9));
-      expect(chrome[200], const Color(0xFFD6CFCD));
-      expect(chrome[300], const Color(0xFFC3B8B5));
-      expect(chrome[400], const Color(0xFFAFA29D));
-      expect(chrome[500], const Color(0xFF9C8B85));
-      expect(chrome[600], const Color(0xFF806E68));
-      expect(chrome[700], const Color(0xFF60534F));
-      expect(chrome[800], const Color(0xFF413835));
-      expect(chrome[900], const Color(0xFF221D1C));
-      expect(chrome[1000], const Color(0xFF000000));
-    });
+      expect(scheme.brand[0], const Color(0xFF000000));
+      expect(scheme.brand[50], const Color(0xFF0E1A3B));
+      expect(scheme.brand[100], const Color(0xFF1B2E63));
+      expect(scheme.brand[150], const Color(0xFF223F8C));
+      expect(scheme.brand[200], const Color(0xFF2651BE));
+      expect(scheme.brand[300], const Color(0xFF005FFE));
+      expect(scheme.brand[400], const Color(0xFF5984FF));
+      expect(scheme.brand[500], const Color(0xFF89A5FF));
+      expect(scheme.brand[600], const Color(0xFFB1C2FF));
+      expect(scheme.brand[700], const Color(0xFFCCD6FF));
+      expect(scheme.brand[800], const Color(0xFFE9EBFF));
+      expect(scheme.brand[900], const Color(0xFFF6F5FF));
+      expect(scheme.brand[1000], const Color(0xFFFFFFFF));
 
-    test('generates the exact brand scale for a purple seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0)).brand;
-
-      expect(brand[0], const Color(0xFFFFFFFF));
-      expect(brand[50], const Color(0xFFF8EAFA));
-      expect(brand[100], const Color(0xFFF0D2F5));
-      expect(brand[150], const Color(0xFFE8B9F0));
-      expect(brand[200], const Color(0xFFDFA1EA));
-      expect(brand[300], const Color(0xFFCF70DF));
-      expect(brand[400], const Color(0xFFBE3FD4));
-      expect(brand[500], const Color(0xFF9C27B0));
-      expect(brand[600], const Color(0xFF802091));
-      expect(brand[700], const Color(0xFF641971));
-      expect(brand[800], const Color(0xFF481252));
-      expect(brand[900], const Color(0xFF2C0B32));
-      expect(brand[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact auto-derived chrome scale for a purple seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0)).chrome;
-
-      expect(chrome[0], const Color(0xFFFFFFFF));
-      expect(chrome[50], const Color(0xFFF3F1F4));
-      expect(chrome[100], const Color(0xFFE5E1E6));
-      expect(chrome[150], const Color(0xFFD7D0D9));
-      expect(chrome[200], const Color(0xFFC9C0CB));
-      expect(chrome[300], const Color(0xFFAE9FB0));
-      expect(chrome[400], const Color(0xFF927E95));
-      expect(chrome[500], const Color(0xFF736176));
-      expect(chrome[600], const Color(0xFF5F4F61));
-      expect(chrome[700], const Color(0xFF4A3E4C));
-      expect(chrome[800], const Color(0xFF352D37));
-      expect(chrome[900], const Color(0xFF211C22));
-      expect(chrome[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact brand scale for a yellow seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B)).brand;
-
-      expect(brand[0], const Color(0xFFFFFFFF));
-      expect(brand[50], const Color(0xFFFFFCE5));
-      expect(brand[100], const Color(0xFFFFFAD3));
-      expect(brand[150], const Color(0xFFFFF9C0));
-      expect(brand[200], const Color(0xFFFFF7AD));
-      expect(brand[300], const Color(0xFFFFF387));
-      expect(brand[400], const Color(0xFFFFEF61));
-      expect(brand[500], const Color(0xFFFFEB3B));
-      expect(brand[600], const Color(0xFFFBE100));
-      expect(brand[700], const Color(0xFFBCA800));
-      expect(brand[800], const Color(0xFF7C7000));
-      expect(brand[900], const Color(0xFF3D3700));
-      expect(brand[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact auto-derived chrome scale for a yellow seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B)).chrome;
-
-      expect(chrome[0], const Color(0xFFFFFFFF));
-      expect(chrome[50], const Color(0xFFF4F3F1));
-      expect(chrome[100], const Color(0xFFEBEBE7));
-      expect(chrome[150], const Color(0xFFE2E2DC));
-      expect(chrome[200], const Color(0xFFDAD9D2));
-      expect(chrome[300], const Color(0xFFC9C8BD));
-      expect(chrome[400], const Color(0xFFB8B6A8));
-      expect(chrome[500], const Color(0xFFA7A593));
-      expect(chrome[600], const Color(0xFF8A8771));
-      expect(chrome[700], const Color(0xFF676554));
-      expect(chrome[800], const Color(0xFF444338));
-      expect(chrome[900], const Color(0xFF22211C));
-      expect(chrome[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact brand scale for a green seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50)).brand;
-
-      expect(brand[0], const Color(0xFFFFFFFF));
-      expect(brand[50], const Color(0xFFEDF7EE));
-      expect(brand[100], const Color(0xFFDBEFDC));
-      expect(brand[150], const Color(0xFFC9E8CA));
-      expect(brand[200], const Color(0xFFB7E0B9));
-      expect(brand[300], const Color(0xFF93D095));
-      expect(brand[400], const Color(0xFF6FC072));
-      expect(brand[500], const Color(0xFF4CAF50));
-      expect(brand[600], const Color(0xFF3E8E41));
-      expect(brand[700], const Color(0xFF2F6D32));
-      expect(brand[800], const Color(0xFF214C23));
-      expect(brand[900], const Color(0xFF132B14));
-      expect(brand[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact auto-derived chrome scale for a green seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50)).chrome;
-
-      expect(chrome[0], const Color(0xFFFFFFFF));
-      expect(chrome[50], const Color(0xFFF1F4F1));
-      expect(chrome[100], const Color(0xFFE3E8E3));
-      expect(chrome[150], const Color(0xFFD4DCD5));
-      expect(chrome[200], const Color(0xFFC6D1C7));
-      expect(chrome[300], const Color(0xFFAAB9AA));
-      expect(chrome[400], const Color(0xFF8DA28E));
-      expect(chrome[500], const Color(0xFF718A72));
-      expect(chrome[600], const Color(0xFF5C705C));
-      expect(chrome[700], const Color(0xFF465647));
-      expect(chrome[800], const Color(0xFF313C31));
-      expect(chrome[900], const Color(0xFF1C221C));
-      expect(chrome[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact brand scale for a blue seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3)).brand;
-
-      expect(brand[0], const Color(0xFFFFFFFF));
-      expect(brand[50], const Color(0xFFE7F4FE));
-      expect(brand[100], const Color(0xFFD1E9FD));
-      expect(brand[150], const Color(0xFFBBDFFB));
-      expect(brand[200], const Color(0xFFA5D4FA));
-      expect(brand[300], const Color(0xFF79C0F8));
-      expect(brand[400], const Color(0xFF4DABF5));
-      expect(brand[500], const Color(0xFF2196F3));
-      expect(brand[600], const Color(0xFF0B7BD3));
-      expect(brand[700], const Color(0xFF095DA0));
-      expect(brand[800], const Color(0xFF063F6D));
-      expect(brand[900], const Color(0xFF03223A));
-      expect(brand[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact auto-derived chrome scale for a blue seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3)).chrome;
-
-      expect(chrome[0], const Color(0xFFFFFFFF));
-      expect(chrome[50], const Color(0xFFF1F2F4));
-      expect(chrome[100], const Color(0xFFE4E7E9));
-      expect(chrome[150], const Color(0xFFD7DBDF));
-      expect(chrome[200], const Color(0xFFCBD0D4));
-      expect(chrome[300], const Color(0xFFB1B9BF));
-      expect(chrome[400], const Color(0xFF98A2AB));
-      expect(chrome[500], const Color(0xFF7E8B96));
-      expect(chrome[600], const Color(0xFF64707A));
-      expect(chrome[700], const Color(0xFF4C555D));
-      expect(chrome[800], const Color(0xFF343A3F));
-      expect(chrome[900], const Color(0xFF1C1F22));
-      expect(chrome[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact brand scale for a red seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336)).brand;
-
-      expect(brand[0], const Color(0xFFFFFFFF));
-      expect(brand[50], const Color(0xFFFEE8E7));
-      expect(brand[100], const Color(0xFFFDD6D3));
-      expect(brand[150], const Color(0xFFFCC4C0));
-      expect(brand[200], const Color(0xFFFAB1AC));
-      expect(brand[300], const Color(0xFFF88D85));
-      expect(brand[400], const Color(0xFFF6685D));
-      expect(brand[500], const Color(0xFFF44336));
-      expect(brand[600], const Color(0xFFE21B0C));
-      expect(brand[700], const Color(0xFFAA1409));
-      expect(brand[800], const Color(0xFF720E06));
-      expect(brand[900], const Color(0xFF3A0703));
-      expect(brand[1000], const Color(0xFF000000));
-    });
-
-    test('generates the exact auto-derived chrome scale for a red seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336)).chrome;
-
-      expect(chrome[0], const Color(0xFFFFFFFF));
-      expect(chrome[50], const Color(0xFFF4F1F1));
-      expect(chrome[100], const Color(0xFFEAE6E6));
-      expect(chrome[150], const Color(0xFFE1DBDA));
-      expect(chrome[200], const Color(0xFFD8CFCF));
-      expect(chrome[300], const Color(0xFFC5B9B8));
-      expect(chrome[400], const Color(0xFFB2A2A1));
-      expect(chrome[500], const Color(0xFFA08C8A));
-      expect(chrome[600], const Color(0xFF836D6B));
-      expect(chrome[700], const Color(0xFF635251));
-      expect(chrome[800], const Color(0xFF423736));
-      expect(chrome[900], const Color(0xFF221C1C));
-      expect(chrome[1000], const Color(0xFF000000));
-    });
-
-    test('uses the seed color unchanged as brand shade 500', () {
-      const seed = Color(0xFF2196F3);
-
-      final brand = StreamColorScheme.fromSeed(brand: seed).brand;
-
-      expect(brand[500], seed);
+      expect(scheme.chrome[0], const Color(0xFF000000));
+      expect(scheme.chrome[50], const Color(0xFF1A1B20));
+      expect(scheme.chrome[900], const Color(0xFFF9F5F7));
+      expect(scheme.chrome[1000], const Color(0xFFFFFFFF));
     });
   });
 
-  group('StreamColorScheme.fromSeed dark color generation', () {
-    test('generates the exact brand scale for a deep orange seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722), brightness: .dark).brand;
+  group('StreamColorScheme.fromSeed reproduces the default palette', () {
+    // The payoff for generating in HCT: seeding the brand color the design tokens were
+    // built from lands back on those tokens. If this drifts, the tone ladder or chroma
+    // envelope in StreamColorSwatchHelper no longer matches Figma.
+    test('lands within 2 tone of the default light brand scale', () {
+      final generated = StreamColorScheme.fromSeed(brand: _defaultSeed).brand;
+      final tokens = StreamBrandColor.light();
 
-      expect(brand[0], const Color(0xFF000000));
-      expect(brand[50], const Color(0xFF3D0F00));
-      expect(brand[100], const Color(0xFF571500));
-      expect(brand[150], const Color(0xFF701B00));
-      expect(brand[200], const Color(0xFF892100));
-      expect(brand[300], const Color(0xFFBC2D00));
-      expect(brand[400], const Color(0xFFEE3900));
-      expect(brand[500], const Color(0xFFFF5722));
-      expect(brand[600], const Color(0xFFFF7C53));
-      expect(brand[700], const Color(0xFFFFA184));
-      expect(brand[800], const Color(0xFFFFC6B5));
-      expect(brand[900], const Color(0xFFFFECE5));
-      expect(brand[1000], const Color(0xFFFFFFFF));
+      for (final shade in _expectedTones.keys) {
+        expect(
+          _toneOf(generated[shade]!),
+          closeTo(_toneOf(tokens[shade]!), 2),
+          reason: 'brand shade $shade tone drifted from the design token',
+        );
+      }
     });
 
-    test('generates the exact auto-derived chrome scale for a deep orange seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFF5722), brightness: .dark).chrome;
+    test('lands within 2 tone of the default dark brand scale', () {
+      final generated = StreamColorScheme.fromSeed(brand: _defaultSeed, brightness: .dark).brand;
+      final tokens = StreamBrandColor.dark();
 
-      expect(chrome[0], const Color(0xFF000000));
-      expect(chrome[50], const Color(0xFF221D1C));
-      expect(chrome[100], const Color(0xFF302927));
-      expect(chrome[150], const Color(0xFF3E3532));
-      expect(chrome[200], const Color(0xFF4B413E));
-      expect(chrome[300], const Color(0xFF675954));
-      expect(chrome[400], const Color(0xFF83716B));
-      expect(chrome[500], const Color(0xFF9C8B85));
-      expect(chrome[600], const Color(0xFFB2A4A0));
-      expect(chrome[700], const Color(0xFFC8BEBB));
-      expect(chrome[800], const Color(0xFFDED8D6));
-      expect(chrome[900], const Color(0xFFF4F2F1));
-      expect(chrome[1000], const Color(0xFFFFFFFF));
+      for (final shade in _expectedTones.keys) {
+        expect(
+          _toneOf(generated[shade]!),
+          closeTo(_toneOf(tokens[shade]!), 2),
+          reason: 'brand shade $shade tone drifted from the design token',
+        );
+      }
     });
 
-    test('generates the exact brand scale for a purple seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0), brightness: .dark).brand;
+    test('stays close in chroma to the default light brand scale', () {
+      final generated = StreamColorScheme.fromSeed(brand: _defaultSeed).brand;
+      final tokens = StreamBrandColor.light();
 
-      expect(brand[0], const Color(0xFF000000));
-      expect(brand[50], const Color(0xFF2C0B32));
-      expect(brand[100], const Color(0xFF390E40));
-      expect(brand[150], const Color(0xFF45114E));
-      expect(brand[200], const Color(0xFF52145C));
-      expect(brand[300], const Color(0xFF6A1B78));
-      expect(brand[400], const Color(0xFF832194));
-      expect(brand[500], const Color(0xFF9C27B0));
-      expect(brand[600], const Color(0xFFC145D6));
-      expect(brand[700], const Color(0xFFD37CE2));
-      expect(brand[800], const Color(0xFFE6B3EE));
-      expect(brand[900], const Color(0xFFF8EAFA));
-      expect(brand[1000], const Color(0xFFFFFFFF));
+      for (final shade in _expectedTones.keys) {
+        expect(
+          _chromaOf(generated[shade]!),
+          closeTo(_chromaOf(tokens[shade]!), 3),
+          reason: 'brand shade $shade chroma drifted from the design token',
+        );
+      }
+    });
+  });
+
+  group('StreamColorScheme.fromSeed tone ladder', () {
+    for (final MapEntry(key: name, value: seed) in _seeds.entries) {
+      test('places every light $name shade on the expected tone', () {
+        final brand = StreamColorScheme.fromSeed(brand: seed).brand;
+
+        for (final MapEntry(key: shade, value: tone) in _expectedTones.entries) {
+          expect(
+            _toneOf(brand[shade]!),
+            closeTo(tone, 1),
+            reason: '$name shade $shade should sit on tone $tone regardless of hue',
+          );
+        }
+      });
+
+      test('mirrors the ladder for dark $name shades', () {
+        final brand = StreamColorScheme.fromSeed(brand: seed, brightness: .dark).brand;
+        const mirror = {50: 900, 100: 800, 150: 700, 200: 600, 300: 500, 400: 400};
+
+        for (final MapEntry(key: shade, value: mirrored) in mirror.entries) {
+          expect(
+            _toneOf(brand[shade]!),
+            closeTo(_expectedTones[mirrored]!, 1),
+            reason: 'dark $name shade $shade should take the tone of light shade $mirrored',
+          );
+        }
+      });
+
+      test('produces a monotonically darkening light $name scale', () {
+        final brand = StreamColorScheme.fromSeed(brand: seed).brand;
+
+        for (var i = 1; i < _shades.length; i++) {
+          expect(
+            _toneOf(brand[_shades[i]]!),
+            lessThan(_toneOf(brand[_shades[i - 1]]!)),
+            reason: '$name shade ${_shades[i]} should be darker than ${_shades[i - 1]}',
+          );
+        }
+      });
+
+      test('preserves the $name seed hue across the scale', () {
+        final brand = StreamColorScheme.fromSeed(brand: seed).brand;
+        final seedHue = _hueOf(seed);
+
+        for (final shade in _expectedTones.keys) {
+          final shadeColor = brand[shade]!;
+          // Hue is meaningless once chroma is clamped to near zero.
+          if (_chromaOf(shadeColor) < 5) continue;
+          final delta = (_hueOf(shadeColor) - seedHue).abs();
+          expect(
+            delta < 15 || delta > 345,
+            isTrue,
+            reason: '$name shade $shade drifted to hue ${_hueOf(shadeColor)} from $seedHue',
+          );
+        }
+      });
+    }
+  });
+
+  group('StreamColorScheme.fromSeed contrast guarantees', () {
+    // The reason for normalizing the seed onto a tone ladder rather than reproducing it
+    // verbatim at shade 500. Under the previous HSL generation a yellow seed produced an
+    // accent with 1.22:1 against white text.
+    for (final MapEntry(key: name, value: seed) in _seeds.entries) {
+      test('gives the light $name accent readable contrast against its on-color', () {
+        final scheme = StreamColorScheme.fromSeed(brand: seed);
+
+        expect(
+          _contrast(scheme.accentPrimary, scheme.textOnAccent),
+          greaterThanOrEqualTo(4.5),
+          reason: 'white text on the $name accent must meet WCAG AA',
+        );
+      });
+
+      test('gives $name brand text readable contrast on its tinted surface', () {
+        final brand = StreamColorScheme.fromSeed(brand: seed).brand;
+
+        expect(
+          _contrast(brand.shade900, brand.shade100),
+          greaterThanOrEqualTo(4.5),
+          reason: 'brand 900 on brand 100 must meet WCAG AA for $name',
+        );
+      });
+    }
+  });
+
+  group('StreamColorScheme.fromSeed derived chrome', () {
+    for (final MapEntry(key: name, value: seed) in _seeds.entries) {
+      test('derives a near-neutral chrome scale from the $name brand', () {
+        final chrome = StreamColorScheme.fromSeed(brand: seed).chrome;
+
+        for (final shade in _expectedTones.keys) {
+          expect(
+            _chromaOf(chrome[shade]!),
+            // Rounding into 8-bit sRGB can land a fraction above the requested chroma.
+            lessThanOrEqualTo(StreamColorScheme.neutralChroma + 0.5),
+            reason: 'derived chrome shade $shade should stay neutral for $name',
+          );
+        }
+      });
+    }
+
+    test('honors an explicitly supplied chrome color', () {
+      final scheme = StreamColorScheme.fromSeed(
+        brand: _defaultSeed,
+        chrome: const Color(0xFF4CAF50),
+      );
+
+      // Chrome follows the supplied green rather than the blue brand hue.
+      expect(_hueOf(scheme.chrome.shade500), closeTo(_hueOf(const Color(0xFF4CAF50)), 15));
+      expect(_toneOf(scheme.chrome.shade500), closeTo(_expectedTones[500]!, 1));
     });
 
-    test('generates the exact auto-derived chrome scale for a purple seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF9C27B0), brightness: .dark).chrome;
+    test('keeps the endpoints pinned to white and black', () {
+      final light = StreamColorScheme.fromSeed(brand: _defaultSeed);
+      final dark = StreamColorScheme.fromSeed(brand: _defaultSeed, brightness: .dark);
 
-      expect(chrome[0], const Color(0xFF000000));
-      expect(chrome[50], const Color(0xFF211C22));
-      expect(chrome[100], const Color(0xFF2A232B));
-      expect(chrome[150], const Color(0xFF332B34));
-      expect(chrome[200], const Color(0xFF3C333E));
-      expect(chrome[300], const Color(0xFF4F4251));
-      expect(chrome[400], const Color(0xFF615163));
-      expect(chrome[500], const Color(0xFF736176));
-      expect(chrome[600], const Color(0xFF958299));
-      expect(chrome[700], const Color(0xFFB5A7B7));
-      expect(chrome[800], const Color(0xFFD4CCD5));
-      expect(chrome[900], const Color(0xFFF3F1F4));
-      expect(chrome[1000], const Color(0xFFFFFFFF));
+      expect(light.chrome[0], const Color(0xFFFFFFFF));
+      expect(light.chrome[1000], const Color(0xFF000000));
+      expect(dark.chrome[0], const Color(0xFF000000));
+      expect(dark.chrome[1000], const Color(0xFFFFFFFF));
+    });
+  });
+
+  group('StreamColorSwatch.fromColor', () {
+    test('normalizes the seed onto the ladder rather than preserving it verbatim', () {
+      // Deliberate replacement for the old "shade 500 == seed" contract. A yellow seed
+      // is far too light to carry white text, so it is pulled down onto tone 46.
+      const seed = Color(0xFFFFEB3B);
+      final swatch = StreamColorSwatch.fromColor(seed);
+
+      expect(swatch[500], isNot(seed));
+      expect(_toneOf(swatch[500]!), closeTo(_expectedTones[500]!, 1));
+      expect(_hueOf(swatch[500]!), closeTo(_hueOf(seed), 15));
     });
 
-    test('generates the exact brand scale for a yellow seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B), brightness: .dark).brand;
+    test('uses shade 500 as the swatch primary', () {
+      final swatch = StreamColorSwatch.fromColor(_defaultSeed);
 
-      expect(brand[0], const Color(0xFF000000));
-      expect(brand[50], const Color(0xFF3D3700));
-      expect(brand[100], const Color(0xFF595000));
-      expect(brand[150], const Color(0xFF756900));
-      expect(brand[200], const Color(0xFF918300));
-      expect(brand[300], const Color(0xFFCAB500));
-      expect(brand[400], const Color(0xFFFFE503));
-      expect(brand[500], const Color(0xFFFFEB3B));
-      expect(brand[600], const Color(0xFFFFEF66));
-      expect(brand[700], const Color(0xFFFFF490));
-      expect(brand[800], const Color(0xFFFFF8BB));
-      expect(brand[900], const Color(0xFFFFFCE5));
-      expect(brand[1000], const Color(0xFFFFFFFF));
+      expect(swatch.toARGB32(), swatch[500]!.toARGB32());
     });
 
-    test('generates the exact auto-derived chrome scale for a yellow seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFFFEB3B), brightness: .dark).chrome;
+    test('collapses to a neutral scale for an achromatic seed', () {
+      final swatch = StreamColorSwatch.fromColor(const Color(0xFF808080));
 
-      expect(chrome[0], const Color(0xFF000000));
-      expect(chrome[50], const Color(0xFF22211C));
-      expect(chrome[100], const Color(0xFF313028));
-      expect(chrome[150], const Color(0xFF413F35));
-      expect(chrome[200], const Color(0xFF504F41));
-      expect(chrome[300], const Color(0xFF6F6D5B));
-      expect(chrome[400], const Color(0xFF8E8B74));
-      expect(chrome[500], const Color(0xFFA7A593));
-      expect(chrome[600], const Color(0xFFBAB8AB));
-      expect(chrome[700], const Color(0xFFCDCCC2));
-      expect(chrome[800], const Color(0xFFE0E0DA));
-      expect(chrome[900], const Color(0xFFF4F3F1));
-      expect(chrome[1000], const Color(0xFFFFFFFF));
+      for (final shade in _expectedTones.keys) {
+        expect(_chromaOf(swatch[shade]!), lessThan(2));
+        expect(_toneOf(swatch[shade]!), closeTo(_expectedTones[shade]!, 1));
+      }
     });
 
-    test('generates the exact brand scale for a green seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50), brightness: .dark).brand;
+    test('honors an explicit chroma override', () {
+      final vivid = StreamColorSwatch.fromColor(_defaultSeed);
+      final muted = StreamColorSwatch.fromColor(_defaultSeed, chroma: 8);
 
-      expect(brand[0], const Color(0xFF000000));
-      expect(brand[50], const Color(0xFF132B14));
-      expect(brand[100], const Color(0xFF19391A));
-      expect(brand[150], const Color(0xFF1F4821));
-      expect(brand[200], const Color(0xFF265728));
-      expect(brand[300], const Color(0xFF327435));
-      expect(brand[400], const Color(0xFF3F9243));
-      expect(brand[500], const Color(0xFF4CAF50));
-      expect(brand[600], const Color(0xFF73C276));
-      expect(brand[700], const Color(0xFF9CD49E));
-      expect(brand[800], const Color(0xFFC5E6C6));
-      expect(brand[900], const Color(0xFFEDF7EE));
-      expect(brand[1000], const Color(0xFFFFFFFF));
-    });
-
-    test('generates the exact auto-derived chrome scale for a green seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF4CAF50), brightness: .dark).chrome;
-
-      expect(chrome[0], const Color(0xFF000000));
-      expect(chrome[50], const Color(0xFF1C221C));
-      expect(chrome[100], const Color(0xFF252D25));
-      expect(chrome[150], const Color(0xFF2F392F));
-      expect(chrome[200], const Color(0xFF384439));
-      expect(chrome[300], const Color(0xFF4B5C4C));
-      expect(chrome[400], const Color(0xFF5E735F));
-      expect(chrome[500], const Color(0xFF718A72));
-      expect(chrome[600], const Color(0xFF91A591));
-      expect(chrome[700], const Color(0xFFB1BFB1));
-      expect(chrome[800], const Color(0xFFD1D9D1));
-      expect(chrome[900], const Color(0xFFF1F4F1));
-      expect(chrome[1000], const Color(0xFFFFFFFF));
-    });
-
-    test('generates the exact brand scale for a blue seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3), brightness: .dark).brand;
-
-      expect(brand[0], const Color(0xFF000000));
-      expect(brand[50], const Color(0xFF03223A));
-      expect(brand[100], const Color(0xFF042F51));
-      expect(brand[150], const Color(0xFF063C67));
-      expect(brand[200], const Color(0xFF07497E));
-      expect(brand[300], const Color(0xFF0964AB));
-      expect(brand[400], const Color(0xFF0C7ED9));
-      expect(brand[500], const Color(0xFF2196F3));
-      expect(brand[600], const Color(0xFF52ADF6));
-      expect(brand[700], const Color(0xFF84C5F8));
-      expect(brand[800], const Color(0xFFB5DCFB));
-      expect(brand[900], const Color(0xFFE7F4FE));
-      expect(brand[1000], const Color(0xFFFFFFFF));
-    });
-
-    test('generates the exact auto-derived chrome scale for a blue seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFF2196F3), brightness: .dark).chrome;
-
-      expect(chrome[0], const Color(0xFF000000));
-      expect(chrome[50], const Color(0xFF1C1F22));
-      expect(chrome[100], const Color(0xFF262B2F));
-      expect(chrome[150], const Color(0xFF31373C));
-      expect(chrome[200], const Color(0xFF3C4349));
-      expect(chrome[300], const Color(0xFF515B63));
-      expect(chrome[400], const Color(0xFF67737E));
-      expect(chrome[500], const Color(0xFF7E8B96));
-      expect(chrome[600], const Color(0xFF9BA5AD));
-      expect(chrome[700], const Color(0xFFB8BFC5));
-      expect(chrome[800], const Color(0xFFD4D9DC));
-      expect(chrome[900], const Color(0xFFF1F2F4));
-      expect(chrome[1000], const Color(0xFFFFFFFF));
-    });
-
-    test('generates the exact brand scale for a red seed', () {
-      final brand = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336), brightness: .dark).brand;
-
-      expect(brand[0], const Color(0xFF000000));
-      expect(brand[50], const Color(0xFF3A0703));
-      expect(brand[100], const Color(0xFF530A05));
-      expect(brand[150], const Color(0xFF6C0D06));
-      expect(brand[200], const Color(0xFF851007));
-      expect(brand[300], const Color(0xFFB7160A));
-      expect(brand[400], const Color(0xFFE91C0D));
-      expect(brand[500], const Color(0xFFF44336));
-      expect(brand[600], const Color(0xFFF66C62));
-      expect(brand[700], const Color(0xFFF9968E));
-      expect(brand[800], const Color(0xFFFBBFBB));
-      expect(brand[900], const Color(0xFFFEE8E7));
-      expect(brand[1000], const Color(0xFFFFFFFF));
-    });
-
-    test('generates the exact auto-derived chrome scale for a red seed', () {
-      final chrome = StreamColorScheme.fromSeed(brand: const Color(0xFFF44336), brightness: .dark).chrome;
-
-      expect(chrome[0], const Color(0xFF000000));
-      expect(chrome[50], const Color(0xFF221C1C));
-      expect(chrome[100], const Color(0xFF302827));
-      expect(chrome[150], const Color(0xFF3F3433));
-      expect(chrome[200], const Color(0xFF4D403F));
-      expect(chrome[300], const Color(0xFF6A5857));
-      expect(chrome[400], const Color(0xFF87706E));
-      expect(chrome[500], const Color(0xFFA08C8A));
-      expect(chrome[600], const Color(0xFFB5A5A4));
-      expect(chrome[700], const Color(0xFFCABEBE));
-      expect(chrome[800], const Color(0xFFDFD8D7));
-      expect(chrome[900], const Color(0xFFF4F1F1));
-      expect(chrome[1000], const Color(0xFFFFFFFF));
-    });
-
-    test('uses the seed color unchanged as brand shade 500', () {
-      const seed = Color(0xFF2196F3);
-
-      final brand = StreamColorScheme.fromSeed(brand: seed, brightness: .dark).brand;
-
-      expect(brand[500], seed);
+      expect(_chromaOf(muted.shade500), lessThan(_chromaOf(vivid.shade500)));
+      expect(_chromaOf(muted.shade500), closeTo(8, 1));
+      // The override changes chroma only; tone is still driven by the ladder.
+      expect(_toneOf(muted.shade500), closeTo(_toneOf(vivid.shade500), 1));
     });
   });
 }

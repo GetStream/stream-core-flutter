@@ -45,11 +45,13 @@ void main() {
   });
 }
 
-/// Renders the [StreamTheme.light] and [StreamTheme.dark] brand/chrome
-/// scales generated from a single [seedColor] as plain color swatches,
-/// pinning the HSL-based shade generation in `StreamColorSwatchHelper`
-/// against regressions. See `stream_theme_color_generation_test.dart` for
-/// assertions on the exact generated values.
+/// Renders the light and dark brand/chrome scales generated from a single
+/// [seedColor] as plain color swatches, pinning the HCT tone-ladder shade
+/// generation in `StreamColorSwatchHelper` against regressions.
+///
+/// Only color is painted here, so this golden cannot catch a contrast
+/// regression — see `stream_theme_color_generation_test.dart` for the tone
+/// ladder, contrast and hue assertions.
 class _SeedColorPreview extends StatelessWidget {
   const _SeedColorPreview({required this.seedColor});
 
