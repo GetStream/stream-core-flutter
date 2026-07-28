@@ -450,6 +450,11 @@ class ThemeConfiguration extends ChangeNotifier {
   }
 
   void resetToDefaults() {
+    // Brand
+    _brandPrimaryColor = null;
+    // Chrome
+    _chromePrimaryColor = null;
+    
     // Accent
     _accentPrimary = null;
     _accentSuccess = null;
@@ -506,10 +511,6 @@ class ThemeConfiguration extends ChangeNotifier {
     _systemScrollbar = null;
     // Avatar
     _avatarPalette = null;
-    // Brand
-    _brandPrimaryColor = null;
-    // Chrome
-    _chromePrimaryColor = null;
 
     _rebuildTheme();
     notifyListeners();
