@@ -272,7 +272,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme.dark() => StreamTheme(brightness: .dark);
 
   const StreamTheme.raw({
-    required this.brightness,
+    @Deprecated('Use colorScheme.brightness instead') Brightness? brightness,
     required this.icons,
     required this.radius,
     required this.spacing,
@@ -348,7 +348,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   }
 
   /// The brightness of this theme.
-  final Brightness brightness;
+  Brightness get brightness => colorScheme.brightness;
 
   /// The icons for this theme.
   final StreamIcons icons;
