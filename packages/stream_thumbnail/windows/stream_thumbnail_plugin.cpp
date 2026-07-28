@@ -365,32 +365,76 @@ void StreamThumbnailPlugin::RegisterWithRegistrar(flutter::PluginRegistrarWindow
 
 StreamThumbnailPlugin::StreamThumbnailPlugin() { MFStartup(MF_VERSION); }
 
-StreamThumbnailPlugin::~StreamThumbnailPlugin() { MFShutdown(); }
+StreamThumbnailPlugin::~StreamThumbnailPlugin() {
+  // Media Foundation must not be torn down underneath a decode that is still
+  // running, so every in-flight request has to finish first.
+  std::vector<std::unique_ptr<Worker>> workers;
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    workers = std::move(workers_);
+  }
+  for (const auto &worker : workers) {
+    if (worker->thread.joinable()) worker->thread.join();
+  }
+
+  MFShutdown();
+}
+
+// Replying from a worker thread is supported: the client wrapper's BinaryReply
+// locks the messenger and drops the reply if the engine is already gone.
+void StreamThumbnailPlugin::RunOnWorker(std::function<void()> work) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  ReapFinishedWorkers();
+
+  auto worker = std::make_unique<Worker>();
+  Worker *worker_ptr = worker.get();
+  worker->thread = std::thread([worker_ptr, work = std::move(work)]() {
+    const bool co_initialized = SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
+    work();
+    if (co_initialized) CoUninitialize();
+    worker_ptr->done.store(true);
+  });
+  workers_.push_back(std::move(worker));
+}
+
+void StreamThumbnailPlugin::ReapFinishedWorkers() {
+  for (auto it = workers_.begin(); it != workers_.end();) {
+    if ((*it)->done.load()) {
+      (*it)->thread.join();
+      it = workers_.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
 
 void StreamThumbnailPlugin::ThumbnailData(const ThumbnailRequest &request,
                                            std::function<void(ErrorOr<std::vector<uint8_t>> reply)> result) {
-  std::thread([request, result]() {
-    const bool co_initialized = SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
+  RunOnWorker([request, result]() {
     try {
       result(ErrorOr<std::vector<uint8_t>>(GenerateThumbnailData(request)));
     } catch (const ThumbnailException &e) {
       result(ErrorOr<std::vector<uint8_t>>(FlutterError(e.code(), e.what())));
+    } catch (const std::exception &e) {
+      // Anything unexpected (std::bad_alloc, ...) must still come back as a
+      // Flutter-side error: an exception escaping the worker would terminate
+      // the process, and the request would never be replied to.
+      result(ErrorOr<std::vector<uint8_t>>(FlutterError("THUMBNAIL_ERROR", e.what())));
     }
-    if (co_initialized) CoUninitialize();
-  }).detach();
+  });
 }
 
 void StreamThumbnailPlugin::ThumbnailFile(const ThumbnailRequest &request,
                                            std::function<void(ErrorOr<std::string> reply)> result) {
-  std::thread([request, result]() {
-    const bool co_initialized = SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
+  RunOnWorker([request, result]() {
     try {
       result(ErrorOr<std::string>(WriteThumbnailFile(request)));
     } catch (const ThumbnailException &e) {
       result(ErrorOr<std::string>(FlutterError(e.code(), e.what())));
+    } catch (const std::exception &e) {
+      result(ErrorOr<std::string>(FlutterError("THUMBNAIL_ERROR", e.what())));
     }
-    if (co_initialized) CoUninitialize();
-  }).detach();
+  });
 }
 
 }  // namespace stream_thumbnail

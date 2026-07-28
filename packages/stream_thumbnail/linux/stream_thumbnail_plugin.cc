@@ -68,6 +68,13 @@ bool IsLocalPath(const std::string &video) {
   return video.rfind("/", 0) == 0 || video.rfind("file://", 0) == 0;
 }
 
+// True only for an explicit non-file URL scheme, e.g. "https://host/clip.mp4".
+// Bare absolute and relative paths are local.
+bool IsRemoteUrl(const std::string &video) {
+  const size_t scheme = video.find("://");
+  return scheme != std::string::npos && video.compare(0, scheme, "file") != 0;
+}
+
 // Strips a leading "file://" prefix, if present.
 std::string VideoPath(const std::string &video) {
   if (video.rfind("file://", 0) == 0) return video.substr(7);
@@ -98,6 +105,14 @@ FramePtr DecodeFrame(const std::string &video, const std::map<std::string, std::
     }
     av_dict_set(&options, "headers", header_lines.c_str(), 0);
   }
+
+  // FFmpeg would otherwise happily open any protocol it was built with, so a
+  // crafted path could reach handlers like `subfile:`/`concat:`, and a remote
+  // playlist could nest a `file:` open to read local files. Whitelist only
+  // what thumbnailing actually needs — including the subprotocols https
+  // delegates to (tls -> tcp) — and allow `file` only for local inputs.
+  const std::string protocols = IsRemoteUrl(video) ? "http,https,tls,tcp" : "file,http,https,tls,tcp";
+  av_dict_set(&options, "protocol_whitelist", protocols.c_str(), 0);
 
   AVFormatContext *raw_format_ctx = nullptr;
   const int open_result = avformat_open_input(&raw_format_ctx, video.c_str(), nullptr, &options);
@@ -388,6 +403,12 @@ void ThumbnailDataThread(GTask *task, gpointer, gpointer task_data, GCancellable
   } catch (const ThumbnailException &e) {
     result->error_code = e.code();
     result->error_message = e.what();
+  } catch (const std::exception &e) {
+    // Anything unexpected (std::bad_alloc, ...) must still come back as a
+    // Flutter-side error: letting it escape into GLib's C frames would
+    // terminate the process.
+    result->error_code = "THUMBNAIL_ERROR";
+    result->error_message = e.what();
   }
   g_task_return_pointer(task, result, [](gpointer p) { delete static_cast<ThumbnailDataResult *>(p); });
 }
@@ -417,6 +438,9 @@ void ThumbnailFileThread(GTask *task, gpointer, gpointer task_data, GCancellable
     result->ok = true;
   } catch (const ThumbnailException &e) {
     result->error_code = e.code();
+    result->error_message = e.what();
+  } catch (const std::exception &e) {
+    result->error_code = "THUMBNAIL_ERROR";
     result->error_message = e.what();
   }
   g_task_return_pointer(task, result, [](gpointer p) { delete static_cast<ThumbnailFileResult *>(p); });

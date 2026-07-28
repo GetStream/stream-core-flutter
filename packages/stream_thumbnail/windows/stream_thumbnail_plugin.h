@@ -3,7 +3,12 @@
 
 #include <flutter/plugin_registrar_windows.h>
 
+#include <atomic>
+#include <functional>
 #include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 #include "pigeon/messages.g.h"
 
@@ -28,6 +33,23 @@ class StreamThumbnailPlugin : public flutter::Plugin,
   void ThumbnailFile(
       const stream_thumbnail_windows::ThumbnailRequest &request,
       std::function<void(stream_thumbnail_windows::ErrorOr<std::string> reply)> result) override;
+
+ private:
+  // One in-flight request. `done` is set by the worker as its very last action,
+  // so finished workers can be spotted and joined without blocking.
+  struct Worker {
+    std::thread thread;
+    std::atomic<bool> done{false};
+  };
+
+  // Runs `work` on a tracked worker thread, with COM initialized for it.
+  void RunOnWorker(std::function<void()> work);
+
+  // Joins and drops every worker that has finished. Caller must hold `mutex_`.
+  void ReapFinishedWorkers();
+
+  std::mutex mutex_;
+  std::vector<std::unique_ptr<Worker>> workers_;
 };
 
 }  // namespace stream_thumbnail
