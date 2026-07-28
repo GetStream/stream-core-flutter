@@ -171,7 +171,20 @@ void main() {
 
       test('mirrors the ladder for dark $name shades', () {
         final brand = StreamColorScheme.fromSeed(brand: seed, brightness: .dark).brand;
-        const mirror = {50: 900, 100: 800, 150: 700, 200: 600, 300: 500, 400: 400};
+        // The full mapping from StreamColorSwatchHelper._darkMirror.
+        const mirror = {
+          50: 900,
+          100: 800,
+          150: 700,
+          200: 600,
+          300: 500,
+          400: 400,
+          500: 300,
+          600: 200,
+          700: 150,
+          800: 100,
+          900: 50,
+        };
 
         for (final MapEntry(key: shade, value: mirrored) in mirror.entries) {
           expect(
