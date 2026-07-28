@@ -1,11 +1,11 @@
 {
-    "name": "design_system_gallery",
-    "short_name": "design_system_gallery",
+    "name": "Flutter Gallery for the Stream Design System",
+    "short_name": "Stream Design System",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Flutter Gallery for the Stream Design System with components and examples. Built with Widgetbook.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
