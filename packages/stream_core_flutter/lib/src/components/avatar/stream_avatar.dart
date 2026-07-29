@@ -86,6 +86,7 @@ class StreamAvatar extends StatelessWidget {
     Color? foregroundColor,
     bool showBorder = true,
     bool? isFloating,
+    String? semanticsLabel,
   }) : props = .new(
          size: size,
          imageUrl: imageUrl,
@@ -94,6 +95,7 @@ class StreamAvatar extends StatelessWidget {
          foregroundColor: foregroundColor,
          showBorder: showBorder,
          isFloating: isFloating,
+         semanticsLabel: semanticsLabel,
        );
 
   /// The properties that configure this avatar.
@@ -126,6 +128,7 @@ class StreamAvatarProps {
     this.foregroundColor,
     this.showBorder = true,
     this.isFloating,
+    this.semanticsLabel,
   });
 
   /// The URL of the avatar image.
@@ -173,6 +176,14 @@ class StreamAvatarProps {
   /// When true, the elevation is taken from [StreamAvatarThemeData.floatingElevation],
   /// falling back to `3`. When false or null (resolved to false), no shadow is shown.
   final bool? isFloating;
+
+  /// Screen-reader label for the avatar.
+  ///
+  /// When null (the default), the placeholder speaks for itself — wrap in
+  /// [ExcludeSemantics] when the surrounding row already labels the user.
+  /// When non-null, the avatar is exposed as a labeled image node and the
+  /// placeholder is dropped from the semantics tree.
+  final String? semanticsLabel;
 }
 
 /// The default implementation of [StreamAvatar].
@@ -216,7 +227,7 @@ class DefaultStreamAvatar extends StatelessWidget {
 
     // Material clips children via PhysicalShape, so a border with strokeAlignOutside
     // on the Material's shape gets clipped. Draw the border outside Material instead.
-    return SizedBox.square(
+    Widget avatar = SizedBox.square(
       dimension: effectiveSize.value,
       child: DecoratedBox(
         decoration: ShapeDecoration(shape: CircleBorder(side: borderSide)),
@@ -252,6 +263,17 @@ class DefaultStreamAvatar extends StatelessWidget {
         ),
       ),
     );
+
+    if (props.semanticsLabel case final label?) {
+      avatar = Semantics(
+        label: label,
+        image: true,
+        excludeSemantics: true,
+        child: avatar,
+      );
+    }
+
+    return avatar;
   }
 
   // Returns the appropriate text style for the given avatar size.

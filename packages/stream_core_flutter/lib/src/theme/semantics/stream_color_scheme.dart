@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stream_core/stream_core.dart' show Standard;
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../../theme/primitives/stream_colors.dart';
@@ -207,6 +208,7 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
+      brightness: .light,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,
@@ -427,6 +429,7 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
+      brightness: .dark,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,
@@ -484,7 +487,34 @@ class StreamColorScheme with _$StreamColorScheme {
     );
   }
 
+  /// Builds a complete color scheme from a single [brand] seed color.
+  ///
+  /// The brand and chrome scales are generated in HCT — see
+  /// [StreamColorSwatch.fromColor]. When [chrome] is omitted it is derived from
+  /// [brand] at [neutralChroma], so chrome-dependent colors still pick up the brand's
+  /// hue. Every semantic color not covered by those two scales falls back to the SDK
+  /// default for [brightness].
+  factory StreamColorScheme.fromSeed({
+    required Color brand,
+    Color? chrome,
+    Brightness brightness = Brightness.light,
+  }) {
+    final colorScheme = brightness == Brightness.light ? StreamColorScheme.light : StreamColorScheme.dark;
+    return colorScheme(
+      brand: StreamColorSwatch.fromColor(brand, brightness: brightness),
+      chrome:
+          chrome?.let(
+            (chromeColor) => StreamColorSwatch.fromColor(
+              chromeColor,
+              brightness: brightness,
+            ),
+          ) ??
+          StreamColorSwatch.fromColor(brand, brightness: brightness, chroma: neutralChroma),
+    );
+  }
+
   const StreamColorScheme.raw({
+    this.brightness = Brightness.light,
     required this.brand,
     required this.chrome,
     // Accent
@@ -549,6 +579,16 @@ class StreamColorScheme with _$StreamColorScheme {
     // Avatar
     required this.avatarPalette,
   });
+
+  /// Chroma, in HCT units, used to derive a chrome scale from a brand color.
+  ///
+  /// Measured from the default chrome scale, whose chroma peaks at 15.9 on shade 500.
+  /// Low enough that the result reads as neutral, high enough that it still carries the
+  /// brand's hue rather than collapsing to grey.
+  static const neutralChroma = 16.0;
+
+  /// The brightness of the color scheme.
+  final Brightness brightness;
 
   // ---- Brand ----
 

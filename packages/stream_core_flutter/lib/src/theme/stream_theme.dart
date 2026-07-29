@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_redundant_argument_values
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
@@ -106,7 +104,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   ///  * [StreamTheme.light], which creates a light theme.
   ///  * [StreamTheme.dark], which creates a dark theme.
   factory StreamTheme({
-    Brightness brightness = .light,
+    Brightness? brightness,
     TargetPlatform? platform,
     StreamAppStyle? appStyle,
     StreamIcons? icons,
@@ -155,8 +153,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
   }) {
+    assert(
+      colorScheme == null || brightness == null || colorScheme.brightness == brightness,
+      'colorScheme brightness must match theme brightness if provided',
+    );
+
     platform ??= defaultTargetPlatform;
-    final isDark = brightness == Brightness.dark;
+    final effectiveBrightness = brightness ?? colorScheme?.brightness ?? .light;
+    final isDark = effectiveBrightness == Brightness.dark;
 
     // Primitives
     icons ??= const StreamIcons();
@@ -210,7 +214,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
-      brightness: brightness,
       appStyle: appStyle,
       icons: icons,
       radius: radius,
@@ -259,20 +262,20 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     );
   }
 
-  /// Creates a dark theme configuration.
-  ///
-  /// This is a convenience factory that calls [StreamTheme] with
-  /// [Brightness.dark].
-  factory StreamTheme.dark() => StreamTheme(brightness: .dark);
-
   /// Creates a light theme configuration.
   ///
   /// This is a convenience factory that calls [StreamTheme] with
   /// [Brightness.light].
   factory StreamTheme.light() => StreamTheme(brightness: .light);
 
+  /// Creates a dark theme configuration.
+  ///
+  /// This is a convenience factory that calls [StreamTheme] with
+  /// [Brightness.dark].
+  factory StreamTheme.dark() => StreamTheme(brightness: .dark);
+
   const StreamTheme.raw({
-    required this.brightness,
+    @Deprecated('Use colorScheme.brightness instead') Brightness? brightness,
     required this.appStyle,
     required this.icons,
     required this.radius,
@@ -350,7 +353,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   }
 
   /// The brightness of this theme.
-  final Brightness brightness;
+  Brightness get brightness => colorScheme.brightness;
 
   /// The app style for this theme.
   final StreamAppStyle appStyle;
@@ -514,7 +517,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
 
     return StreamTheme.raw(
-      brightness: brightness,
       appStyle: appStyle,
       icons: icons,
       radius: radius,

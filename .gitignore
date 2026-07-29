@@ -89,6 +89,10 @@
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
+# Swift Package Manager related
+**/ios/**/.build/
+**/ios/**/.swiftpm/
+
 # macOS
 **/Flutter/ephemeral/
 **/Pods/
