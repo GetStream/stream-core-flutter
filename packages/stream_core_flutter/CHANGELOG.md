@@ -1,3 +1,9 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `chipStyle` to `StreamReactionsThemeData` for overriding the per-reaction chip appearance (background, size, etc.); it is merged over the default reaction chip style.
+
 ## 0.4.1
 
 ### ✨ Features
