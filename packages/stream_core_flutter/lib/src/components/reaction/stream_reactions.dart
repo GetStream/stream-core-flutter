@@ -157,28 +157,7 @@ class StreamReactions extends StatelessWidget {
   Widget build(BuildContext context) {
     final builder = StreamComponentFactory.of(context).reactions;
     if (builder != null) return builder(context, props);
-
-    final spacing = context.streamSpacing;
-    final textTheme = context.streamTextTheme;
-
-    return StreamEmojiChipTheme(
-      data: StreamEmojiChipThemeData(
-        style: StreamEmojiChipThemeStyle(
-          // Reaction chips must shrink to their content width so that multiple
-          // chips fit side-by-side within the bubble bounds. The global default
-          // (64px minimum) is designed for stand-alone emoji chip bars and is
-          // too wide for a segmented reaction row.
-          minimumSize: const Size(32, 24),
-          maximumSize: const Size.fromHeight(24),
-          emojiSize: StreamEmojiSize.sm.value,
-          elevation: .all(props.overlap ? 3 : 0),
-          backgroundColor: .all(context.streamColorScheme.backgroundElevation2),
-          textStyle: .all(textTheme.numericMd.copyWith(fontFeatures: const [.tabularFigures()])),
-          padding: EdgeInsetsGeometry.symmetric(vertical: spacing.xxxs, horizontal: spacing.xs),
-        ),
-      ),
-      child: DefaultStreamReactions(props: props),
-    );
+    return DefaultStreamReactions(props: props);
   }
 }
 
@@ -300,11 +279,14 @@ class DefaultStreamReactions extends StatelessWidget {
     if (props.items.isEmpty) return props.child ?? const SizedBox.shrink();
 
     final reactionTheme = context.streamReactionsTheme;
-    final defaults = _StreamReactionsThemeDefaults(context);
+    final defaults = _StreamReactionsThemeDefaults(context, overlap: props.overlap);
 
     final effectiveSpacing = reactionTheme.spacing ?? defaults.spacing;
     final effectiveGap = reactionTheme.gap ?? defaults.gap;
     final effectiveOverlapExtent = reactionTheme.overlapExtent ?? defaults.overlapExtent;
+    // A composite style, so the theme override is merged over the default
+    // rather than replacing it wholesale (unlike the scalar values above).
+    final effectiveChipStyle = defaults.chipStyle.merge(reactionTheme.chipStyle);
     // Limit is only applied when reactions overlap the child; otherwise show all.
     final maxVisible = props.overlap ? (props.max ?? _kMaxVisibleSegments) : props.items.length;
 
@@ -330,7 +312,12 @@ class DefaultStreamReactions extends StatelessWidget {
     };
 
     // Standalone mode — no child to position relative to.
-    if (props.child == null) return reactionStrip;
+    if (props.child == null) {
+      return StreamEmojiChipTheme(
+        data: .new(style: effectiveChipStyle),
+        child: reactionStrip,
+      );
+    }
 
     // Negative spacing when overlapping makes reactions overlap the child edge.
     final columnSpacing = props.overlap ? -effectiveOverlapExtent : effectiveGap;
@@ -370,18 +357,21 @@ class DefaultStreamReactions extends StatelessWidget {
     // like ListView(shrinkWrap: true) inside it receive a bounded width.
     // Resolution still treats it as a regular child — column width remains
     // max(bubble, strip).
-    return StreamIntrinsicColumn(
-      spacing: columnSpacing,
-      crossAxisAlignment: effectiveCrossAxisAlignment,
-      clipBehavior: props.clipBehavior,
-      verticalDirection: switch (effectivePosition) {
-        .header => VerticalDirection.up,
-        .footer => VerticalDirection.down,
-      },
-      children: [
-        StreamIntrinsicBoundedCrossAxis(child: props.child!),
-        alignedStrip,
-      ],
+    return StreamEmojiChipTheme(
+      data: .new(style: effectiveChipStyle),
+      child: StreamIntrinsicColumn(
+        spacing: columnSpacing,
+        crossAxisAlignment: effectiveCrossAxisAlignment,
+        clipBehavior: props.clipBehavior,
+        verticalDirection: switch (effectivePosition) {
+          .header => VerticalDirection.up,
+          .footer => VerticalDirection.down,
+        },
+        children: [
+          StreamIntrinsicBoundedCrossAxis(child: props.child!),
+          alignedStrip,
+        ],
+      ),
     );
   }
 
@@ -433,11 +423,14 @@ class DefaultStreamReactions extends StatelessWidget {
 // Used by [DefaultStreamReactions] as a fallback when a property is not
 // explicitly set in the inherited theme.
 class _StreamReactionsThemeDefaults extends StreamReactionsThemeData {
-  _StreamReactionsThemeDefaults(this._context);
+  _StreamReactionsThemeDefaults(this._context, {required this.overlap});
 
   final BuildContext _context;
 
+  final bool overlap;
+
   late final _spacing = _context.streamSpacing;
+  late final _textTheme = _context.streamTextTheme;
 
   @override
   double get spacing => _spacing.xxs;
@@ -447,6 +440,21 @@ class _StreamReactionsThemeDefaults extends StreamReactionsThemeData {
 
   @override
   double get overlapExtent => _spacing.xs;
+
+  @override
+  StreamEmojiChipThemeStyle get chipStyle => StreamEmojiChipThemeStyle(
+    // Reaction chips must shrink to their content width so that multiple
+    // chips fit side-by-side within the bubble bounds. The global default
+    // (64px minimum) is designed for stand-alone emoji chip bars and is
+    // too wide for a segmented reaction row.
+    minimumSize: const Size(32, 24),
+    maximumSize: const Size.fromHeight(24),
+    emojiSize: StreamEmojiSize.sm.value,
+    elevation: .all(overlap ? 3 : 0),
+    backgroundColor: .all(_context.streamColorScheme.backgroundElevation2),
+    textStyle: .all(_textTheme.numericMd.copyWith(fontFeatures: const [.tabularFigures()])),
+    padding: .symmetric(vertical: _spacing.xxxs, horizontal: _spacing.xs),
+  );
 }
 
 /// Adapts an [Offset] for the current [TextDirection].

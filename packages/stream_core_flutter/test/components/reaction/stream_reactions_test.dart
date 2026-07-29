@@ -1,0 +1,158 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:stream_core_flutter/chat.dart';
+
+void main() {
+  Widget buildSubject({
+    StreamEmojiChipThemeData? emojiChipTheme,
+    StreamReactionsThemeData? reactionsTheme,
+    StreamReactionsThemeData? localReactionsTheme,
+  }) {
+    Widget reactions = StreamReactions.segmented(
+      items: const [
+        StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3),
+        StreamReactionsItem(emoji: StreamUnicodeEmoji('❤️'), count: 2),
+      ],
+    );
+
+    if (localReactionsTheme case final data?) {
+      reactions = StreamReactionsTheme(data: data, child: reactions);
+    }
+
+    return MaterialApp(
+      home: Theme(
+        data: ThemeData(
+          extensions: [
+            StreamTheme(
+              emojiChipTheme: emojiChipTheme ?? const StreamEmojiChipThemeData(),
+              reactionsTheme: reactionsTheme ?? const StreamReactionsThemeData(),
+            ),
+          ],
+        ),
+        child: Scaffold(body: reactions),
+      ),
+    );
+  }
+
+  ButtonStyle chipStyle(WidgetTester tester) {
+    final button = tester.widgetList<IconButton>(find.byType(IconButton)).first;
+    return button.style!;
+  }
+
+  Color? resolvedChipBackground(WidgetTester tester) {
+    return chipStyle(tester).backgroundColor?.resolve(<WidgetState>{});
+  }
+
+  group('reaction chip background resolution', () {
+    testWidgets('falls back to the elevated reaction default', (tester) async {
+      await tester.pumpWidget(buildSubject());
+
+      final context = tester.element(find.byType(DefaultStreamReactions));
+      expect(
+        resolvedChipBackground(tester),
+        context.streamColorScheme.backgroundElevation2,
+      );
+    });
+
+    testWidgets('honors a reactionsTheme.chipStyle override', (tester) async {
+      const green = Color(0xFF4CAF50);
+      await tester.pumpWidget(
+        buildSubject(
+          reactionsTheme: const StreamReactionsThemeData(
+            chipStyle: StreamEmojiChipThemeStyle(
+              backgroundColor: WidgetStatePropertyAll(green),
+            ),
+          ),
+        ),
+      );
+
+      expect(resolvedChipBackground(tester), green);
+    });
+
+    testWidgets('does not leak a generic emoji chip background into reactions', (
+      tester,
+    ) async {
+      const amber = Color(0xFFFFC107);
+      await tester.pumpWidget(
+        buildSubject(
+          emojiChipTheme: const StreamEmojiChipThemeData(
+            style: StreamEmojiChipThemeStyle(
+              backgroundColor: WidgetStatePropertyAll(amber),
+            ),
+          ),
+        ),
+      );
+
+      // Reaction chips are themed only via reactionsTheme, so a generic emoji
+      // chip theme must not leak into their background.
+      final context = tester.element(find.byType(DefaultStreamReactions));
+      expect(
+        resolvedChipBackground(tester),
+        context.streamColorScheme.backgroundElevation2,
+      );
+    });
+
+    testWidgets('merges a partial override over the reaction defaults', (
+      tester,
+    ) async {
+      const green = Color(0xFF4CAF50);
+      await tester.pumpWidget(
+        buildSubject(
+          reactionsTheme: const StreamReactionsThemeData(
+            chipStyle: StreamEmojiChipThemeStyle(
+              backgroundColor: WidgetStatePropertyAll(green),
+            ),
+          ),
+        ),
+      );
+
+      // Background is overridden, but the reaction-specific sizing default
+      // survives because chipStyle is merged, not replaced.
+      expect(resolvedChipBackground(tester), green);
+      expect(
+        chipStyle(tester).minimumSize?.resolve(<WidgetState>{}),
+        const Size(32, 24),
+      );
+    });
+
+    testWidgets('honors a chipStyle override from a wrapping StreamReactionsTheme', (
+      tester,
+    ) async {
+      const blue = Color(0xFF2196F3);
+      await tester.pumpWidget(
+        buildSubject(
+          localReactionsTheme: const StreamReactionsThemeData(
+            chipStyle: StreamEmojiChipThemeStyle(
+              backgroundColor: WidgetStatePropertyAll(blue),
+            ),
+          ),
+        ),
+      );
+
+      expect(resolvedChipBackground(tester), blue);
+    });
+
+    testWidgets('local StreamReactionsTheme wins over the global reactionsTheme', (
+      tester,
+    ) async {
+      const green = Color(0xFF4CAF50);
+      const blue = Color(0xFF2196F3);
+      await tester.pumpWidget(
+        buildSubject(
+          reactionsTheme: const StreamReactionsThemeData(
+            chipStyle: StreamEmojiChipThemeStyle(
+              backgroundColor: WidgetStatePropertyAll(green),
+            ),
+          ),
+          localReactionsTheme: const StreamReactionsThemeData(
+            chipStyle: StreamEmojiChipThemeStyle(
+              backgroundColor: WidgetStatePropertyAll(blue),
+            ),
+          ),
+        ),
+      );
+
+      expect(resolvedChipBackground(tester), blue);
+    });
+  });
+}
