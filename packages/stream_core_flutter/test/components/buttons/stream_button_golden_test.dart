@@ -100,6 +100,30 @@ void main() {
     );
 
     goldenTest(
+      'renders floating button correctly',
+      fileName: 'stream_button_floating',
+      builder: () => GoldenTestGroup(
+        scenarioConstraints: const BoxConstraints(maxWidth: 300),
+        children: [
+          for (final style in StreamButtonStyle.values)
+            for (final type in StreamButtonType.values)
+              GoldenTestScenario(
+                name: '${style.name}_${type.name}',
+                child: _buildButtonInTheme(
+                  StreamButton(
+                    onPressed: () {},
+                    style: style,
+                    type: type,
+                    isFloating: true,
+                    child: const Text('Floating'),
+                  ),
+                ),
+              ),
+        ],
+      ),
+    );
+
+    goldenTest(
       'renders icon only button correctly',
       fileName: 'stream_button_icon_only',
       builder: () => GoldenTestGroup(

@@ -69,6 +69,8 @@ import '../../theme/stream_theme_extensions.dart';
 class StreamButton extends StatelessWidget {
   /// Creates a button that displays [child], optionally flanked by leading
   /// and/or trailing icons ([iconLeft] and [iconRight]).
+  ///
+  /// Set [isFloating] to true for a floating button with a shadow.
   StreamButton({
     super.key,
     required Widget child,
@@ -78,6 +80,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonSize size = .medium,
     Widget? iconLeft,
     Widget? iconRight,
+    bool? isFloating,
     bool? isSelected,
     bool autofocus = false,
     StreamButtonThemeStyle? themeStyle,
@@ -89,6 +92,7 @@ class StreamButton extends StatelessWidget {
          size: size,
          iconLeft: iconLeft,
          iconRight: iconRight,
+         isFloating: isFloating,
          isSelected: isSelected,
          autofocus: autofocus,
          themeStyle: themeStyle,

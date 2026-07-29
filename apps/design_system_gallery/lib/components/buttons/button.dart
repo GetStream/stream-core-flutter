@@ -68,12 +68,10 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       description: 'Whether the button is disabled (non-interactive).',
     );
 
-    final isFloating =
-        isIconOnly &&
-        context.knobs.boolean(
-          label: 'Floating',
-          description: 'Whether the button has a floating (elevated) appearance.',
-        );
+    final isFloating = context.knobs.boolean(
+      label: 'Floating',
+      description: 'Whether the button has a floating (elevated) appearance.',
+    );
 
     final isSelectable = context.knobs.boolean(
       label: 'Selectable',
@@ -125,6 +123,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
               style: style,
               type: type,
               size: size,
+              isFloating: isFloating ? true : null,
               isSelected: isSelectable ? _isSelected : null,
               onPressed: isDisabled ? null : onTap,
               iconLeft: showLeadingIcon ? const Icon(Icons.add) : null,
