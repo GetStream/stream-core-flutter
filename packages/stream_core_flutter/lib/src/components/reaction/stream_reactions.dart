@@ -81,7 +81,7 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
-    ValueSetter<StreamReactionsItem?>? onReactionPressed,
+    OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -108,7 +108,7 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
-    ValueSetter<StreamReactionsItem?>? onReactionPressed,
+    OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -135,7 +135,7 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
-    ValueSetter<StreamReactionsItem?>? onReactionPressed,
+    OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -229,7 +229,7 @@ class StreamReactionsProps {
   /// In segmented mode, the pressed [StreamReactionsItem] is provided for each
   /// visible chip; the overflow chip reports `null`. In clustered mode, the
   /// single grouped chip reports `null` since it represents no single item.
-  final ValueSetter<StreamReactionsItem?>? onReactionPressed;
+  final OnReactionItemPressed? onReactionPressed;
 }
 
 /// A single reaction item with an emoji widget and optional count.
@@ -265,6 +265,10 @@ class StreamReactionsItem {
   /// When null, the reaction is treated as having a count of 1.
   final int? count;
 }
+
+/// Callback when a reaction item is pressed, or `null` for a chip that
+/// represents no single item (the cluster or overflow chip).
+typedef OnReactionItemPressed = ValueSetter<StreamReactionsItem?>;
 
 const _kMaxVisibleSegments = 4;
 const _kDefaultStripIndent = 8.0;

@@ -102,7 +102,7 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
         overlap: reactionOverlap,
         alignment: reactionOverlap ? .end : .start,
         indent: reactionOverlap ? 8 : null,
-        onPressed: () {},
+        onReactionPressed: (_) {},
         child: child,
       ),
       StreamReactionsType.clustered => StreamReactions.clustered(
@@ -111,7 +111,7 @@ Widget buildStreamMessageContentPlayground(BuildContext context) {
         overlap: reactionOverlap,
         alignment: reactionOverlap ? .end : .start,
         indent: reactionOverlap ? 8 : null,
-        onPressed: () {},
+        onReactionPressed: (_) {},
         child: child,
       ),
     };
