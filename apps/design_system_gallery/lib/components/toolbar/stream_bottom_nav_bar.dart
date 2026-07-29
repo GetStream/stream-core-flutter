@@ -216,6 +216,11 @@ class _BarExample extends StatelessWidget {
           decoration: BoxDecoration(
             color: colorScheme.backgroundSurface,
             borderRadius: BorderRadius.all(radius.lg),
+          ),
+          // The clip follows the outer rounded rect, so at the corners the bar
+          // paints over an inside-aligned border. Draw it in the foreground.
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
             border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: bar,

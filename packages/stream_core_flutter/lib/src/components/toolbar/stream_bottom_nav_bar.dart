@@ -102,6 +102,11 @@ class StreamBottomNavBar extends StatelessWidget {
     StreamBottomNavBarBehavior? behavior,
     StreamBottomNavBarStyle? style,
   }) : assert(items.length >= 2, 'StreamBottomNavBar requires at least 2 items'),
+       assert(
+         currentIndex >= 0 && currentIndex < items.length,
+         'currentIndex must be within the items range: '
+         '0 <= $currentIndex < ${items.length}',
+       ),
        props = .new(
          items: items,
          currentIndex: currentIndex,
@@ -138,7 +143,10 @@ class StreamBottomNavBarProps {
     required this.onTap,
     this.behavior,
     this.style,
-  });
+  }) : assert(
+         currentIndex >= 0 && currentIndex < items.length,
+         'currentIndex must be within the items range',
+       );
 
   /// The list of items to display in the navigation bar.
   ///
@@ -146,6 +154,8 @@ class StreamBottomNavBarProps {
   final List<StreamBottomNavBarItem> items;
 
   /// The index of the currently selected item.
+  ///
+  /// Must be a valid index into [items].
   final int currentIndex;
 
   /// Called when the user taps a navigation item.
