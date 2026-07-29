@@ -443,6 +443,7 @@ class _StreamReactionsThemeDefaults extends StreamReactionsThemeData {
 
   late final _spacing = _context.streamSpacing;
   late final _textTheme = _context.streamTextTheme;
+  late final _colorScheme = _context.streamColorScheme;
 
   @override
   double get spacing => _spacing.xxs;
@@ -463,7 +464,7 @@ class _StreamReactionsThemeDefaults extends StreamReactionsThemeData {
     maximumSize: const Size.fromHeight(24),
     emojiSize: StreamEmojiSize.sm.value,
     elevation: .all(overlap ? 3 : 0),
-    backgroundColor: .all(_context.streamColorScheme.backgroundElevation2),
+    backgroundColor: .all(_colorScheme.backgroundElevation2),
     textStyle: .all(_textTheme.numericMd.copyWith(fontFeatures: const [.tabularFigures()])),
     padding: .symmetric(vertical: _spacing.xxxs, horizontal: _spacing.xs),
   );
