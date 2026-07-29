@@ -81,7 +81,7 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
-    VoidCallback? onPressed,
+    ValueSetter<StreamReactionsItem?>? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -93,7 +93,7 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
-         onPressed: onPressed,
+         onReactionPressed: onReactionPressed,
        );
 
   /// Creates segmented reactions where each type is rendered as its own chip.
@@ -108,7 +108,7 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
-    VoidCallback? onPressed,
+    ValueSetter<StreamReactionsItem?>? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -120,7 +120,7 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
-         onPressed: onPressed,
+         onReactionPressed: onReactionPressed,
        );
 
   /// Creates clustered reactions that group all reaction types into one chip.
@@ -135,7 +135,7 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
-    VoidCallback? onPressed,
+    ValueSetter<StreamReactionsItem?>? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -147,7 +147,7 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
-         onPressed: onPressed,
+         onReactionPressed: onReactionPressed,
        );
 
   /// The properties that configure this widget.
@@ -202,7 +202,7 @@ class StreamReactionsProps {
     this.indent,
     this.crossAxisAlignment,
     this.clipBehavior = Clip.none,
-    this.onPressed,
+    this.onReactionPressed,
   });
 
   /// The reaction presentation style.
@@ -245,11 +245,12 @@ class StreamReactionsProps {
   /// The clip behavior applied to the layout.
   final Clip clipBehavior;
 
-  /// Called when any reaction chip is tapped.
+  /// Called when a reaction chip is pressed, with the pressed item.
   ///
-  /// In segmented mode, this is used for each visible chip, including the
-  /// overflow chip. In clustered mode, it is used for the grouped chip.
-  final VoidCallback? onPressed;
+  /// In segmented mode, the pressed [StreamReactionsItem] is provided for each
+  /// visible chip; the overflow chip reports `null`. In clustered mode, the
+  /// single grouped chip reports `null` since it represents no single item.
+  final ValueSetter<StreamReactionsItem?>? onReactionPressed;
 }
 
 /// A single reaction item with an emoji widget and optional count.
@@ -265,6 +266,7 @@ class StreamReactionsItem {
   const StreamReactionsItem({
     required this.emoji,
     this.count,
+    this.key,
   });
 
   /// The content model describing what to render.
@@ -277,6 +279,12 @@ class StreamReactionsItem {
   ///
   /// When null, the reaction is treated as having a count of 1.
   final int? count;
+
+  /// An optional identifier for this item.
+  ///
+  /// [StreamReactions.onReactionPressed] reports the pressed item, so callers
+  /// can set [key] (e.g. a reaction type) to identify which item was pressed.
+  final String? key;
 }
 
 const _kMaxVisibleSegments = 4;
@@ -397,17 +405,19 @@ class DefaultStreamReactions extends StatelessWidget {
     final overflow = items.skip(maxVisible).toList();
     final overflowCount = overflow.sumOf((item) => item.count ?? 1);
 
+    final onReactionPressed = props.onReactionPressed;
     final children = [
       for (final item in visible)
         StreamEmojiChip(
           emoji: item.emoji,
           count: showCounts ? item.count ?? 1 : null,
-          onPressed: props.onPressed,
+          onPressed: onReactionPressed == null ? null : () => onReactionPressed(item),
         ),
+      // The overflow chip aggregates hidden reactions, so it has no single item.
       if (overflow.isNotEmpty)
         StreamEmojiChip.overflow(
           count: overflowCount,
-          onPressed: props.onPressed,
+          onPressed: onReactionPressed == null ? null : () => onReactionPressed(null),
         ),
     ];
 
@@ -420,10 +430,12 @@ class DefaultStreamReactions extends StatelessWidget {
     final visible = items.take(maxVisible).map((item) => item.emoji).toList();
     final totalCount = items.sumOf((item) => item.count ?? 1);
 
+    // The cluster groups all reactions into one chip, so it has no single item.
+    final onReactionPressed = props.onReactionPressed;
     return StreamEmojiChip.cluster(
       emojis: visible,
       count: totalCount > 1 ? totalCount : null,
-      onPressed: props.onPressed,
+      onPressed: onReactionPressed == null ? null : () => onReactionPressed(null),
     );
   }
 }

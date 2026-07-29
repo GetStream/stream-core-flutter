@@ -1,3 +1,9 @@
+## Upcoming
+
+### 🛑 Breaking / Removals
+
+- Replaced `StreamReactions.onPressed` (a `VoidCallback`) with `onReactionPressed`, which reports the pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip, which represents no single reaction. Added an optional `StreamReactionsItem.key` so callers can identify the pressed item.
+
 ## 0.4.1
 
 ### ✨ Features
