@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -162,6 +164,54 @@ void main() {
       expect(fake.filesCalled, isFalse);
     });
 
+    test('thumbnailFiles rejects a thumbnailPath that names a file for multiple videos', () {
+      final fake = useFakePlatform();
+
+      expect(
+        () => StreamThumbnail.thumbnailFiles(
+          videos: ['a.mp4', 'b.mp4'],
+          thumbnailPath: '/tmp/thumb.png',
+        ),
+        throwsA(isA<ArgumentError>().having((e) => e.name, 'name', 'thumbnailPath')),
+      );
+      expect(fake.filesCalled, isFalse);
+    });
+
+    test('thumbnailFiles matches the extension of the requested format, not just png', () {
+      useFakePlatform();
+
+      expect(
+        () => StreamThumbnail.thumbnailFiles(
+          videos: ['a.mp4', 'b.mp4'],
+          thumbnailPath: '/tmp/thumb.jpg',
+          imageFormat: StreamThumbnailFormat.jpeg,
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('thumbnailFiles allows a directory thumbnailPath for multiple videos', () async {
+      final fake = useFakePlatform();
+
+      await StreamThumbnail.thumbnailFiles(
+        videos: ['a.mp4', 'b.mp4'],
+        thumbnailPath: '/tmp/thumbs/',
+      );
+
+      expect(fake.filesCalled, isTrue);
+    });
+
+    test('thumbnailFiles allows a file thumbnailPath for a single video', () async {
+      final fake = useFakePlatform();
+
+      await StreamThumbnail.thumbnailFiles(
+        videos: ['a.mp4'],
+        thumbnailPath: '/tmp/thumb.png',
+      );
+
+      expect(fake.filesCalled, isTrue);
+    });
+
     test('thumbnailData rejects an empty video path', () {
       useFakePlatform();
 
@@ -281,6 +331,41 @@ void main() {
         throwsA(isA<PlatformException>()),
       );
       expect(callCount, 2);
+    });
+
+    test('thumbnailFiles decodes one video at a time', () async {
+      final pending = <Completer<String>>[];
+      when(() => hostApi.thumbnailFile(any())).thenAnswer((_) {
+        final completer = Completer<String>();
+        pending.add(completer);
+        return completer.future;
+      });
+
+      final result = channel.thumbnailFiles(
+        videos: ['a.mp4', 'b.mp4', 'c.mp4'],
+        headers: null,
+        thumbnailPath: null,
+        imageFormat: StreamThumbnailFormat.png,
+        maxHeight: 0,
+        maxWidth: 0,
+        quality: 10,
+      );
+
+      // Only the first request is in flight: the batch must not fan out and
+      // leave the platform juggling every decode at once.
+      await pumpEventQueue();
+      expect(pending, hasLength(1));
+
+      pending[0].complete('/a.png');
+      await pumpEventQueue();
+      expect(pending, hasLength(2));
+
+      pending[1].complete('/b.png');
+      await pumpEventQueue();
+      expect(pending, hasLength(3));
+
+      pending[2].complete('/c.png');
+      expect((await result).map((file) => file.path), ['/a.png', '/b.png', '/c.png']);
     });
 
     test('a null timeMs is sent as -1 on Android', () async {

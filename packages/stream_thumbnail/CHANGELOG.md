@@ -15,6 +15,9 @@
 
 - `thumbnailFiles` now fails fast: if any video fails to produce a thumbnail, the call
   throws instead of silently omitting that video from the returned list.
+- `thumbnailFiles` now throws an `ArgumentError` when `thumbnailPath` names a file rather
+  than a directory and more than one video was given. That combination pointed every
+  video in the batch at the same output path.
 
 ### 🐞 Fixed
 

@@ -8,6 +8,16 @@ import 'package:flutter/services.dart';
 import 'stream_thumbnail_format.dart';
 import 'stream_thumbnail_platform.dart';
 
+/// The file extension the native implementations give a thumbnail of [format].
+///
+/// Kept in sync with `formatExt` (Android), `fileExtension` (iOS/macOS), and
+/// `FileExtension` (Windows/Linux).
+String _extensionFor(StreamThumbnailFormat format) => switch (format) {
+  StreamThumbnailFormat.jpeg => 'jpg',
+  StreamThumbnailFormat.png => 'png',
+  StreamThumbnailFormat.webp => 'webp',
+};
+
 /// Creates thumbnails from a local video file or from a video URL.
 abstract final class StreamThumbnail {
   /// Generates a thumbnail file for each of the given `videos`.
@@ -17,6 +27,10 @@ abstract final class StreamThumbnail {
   /// video. Use `maxHeight`/`maxWidth` to bound the size, or `0` to keep the
   /// source resolution. A lower `quality` reduces image quality but is ignored
   /// for the `PNG` format.
+  ///
+  /// For more than one video, `thumbnailPath` must name a directory rather than
+  /// a file, otherwise an [ArgumentError] is thrown. Every video in the batch
+  /// would otherwise be written to that one path.
   static Future<List<XFile>> thumbnailFiles({
     required List<String> videos,
     Map<String, String>? headers,
@@ -28,6 +42,18 @@ abstract final class StreamThumbnail {
     int quality = 10,
   }) async {
     if (videos.isEmpty) return [];
+
+    // Every platform treats a `thumbnailPath` that already ends in the target
+    // extension as the exact file to write to. With more than one video that
+    // points the whole batch at a single path, so the requests overwrite each
+    // other and the returned files all describe the same bytes.
+    if (videos.length > 1 && thumbnailPath != null && thumbnailPath.endsWith(_extensionFor(imageFormat))) {
+      throw ArgumentError.value(
+        thumbnailPath,
+        'thumbnailPath',
+        'must be a directory when generating thumbnails for multiple videos, not a single file',
+      );
+    }
 
     return StreamThumbnailPlatform.instance.thumbnailFiles(
       videos: videos,
