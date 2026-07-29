@@ -33,6 +33,7 @@ mixin _$StreamReactionsThemeData {
       spacing: lerpDouble$(a.spacing, b.spacing, t),
       gap: lerpDouble$(a.gap, b.gap, t),
       overlapExtent: lerpDouble$(a.overlapExtent, b.overlapExtent, t),
+      chipStyle: StreamEmojiChipThemeStyle.lerp(a.chipStyle, b.chipStyle, t),
     );
   }
 
@@ -40,6 +41,7 @@ mixin _$StreamReactionsThemeData {
     double? spacing,
     double? gap,
     double? overlapExtent,
+    StreamEmojiChipThemeStyle? chipStyle,
   }) {
     final _this = (this as StreamReactionsThemeData);
 
@@ -47,6 +49,7 @@ mixin _$StreamReactionsThemeData {
       spacing: spacing ?? _this.spacing,
       gap: gap ?? _this.gap,
       overlapExtent: overlapExtent ?? _this.overlapExtent,
+      chipStyle: chipStyle ?? _this.chipStyle,
     );
   }
 
@@ -65,6 +68,7 @@ mixin _$StreamReactionsThemeData {
       spacing: other.spacing,
       gap: other.gap,
       overlapExtent: other.overlapExtent,
+      chipStyle: _this.chipStyle?.merge(other.chipStyle) ?? other.chipStyle,
     );
   }
 
@@ -83,7 +87,8 @@ mixin _$StreamReactionsThemeData {
 
     return _other.spacing == _this.spacing &&
         _other.gap == _this.gap &&
-        _other.overlapExtent == _this.overlapExtent;
+        _other.overlapExtent == _this.overlapExtent &&
+        _other.chipStyle == _this.chipStyle;
   }
 
   @override
@@ -95,6 +100,7 @@ mixin _$StreamReactionsThemeData {
       _this.spacing,
       _this.gap,
       _this.overlapExtent,
+      _this.chipStyle,
     );
   }
 }
