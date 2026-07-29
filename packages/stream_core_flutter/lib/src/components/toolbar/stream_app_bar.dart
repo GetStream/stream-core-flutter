@@ -7,6 +7,7 @@ import '../../theme/components/stream_button_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
+import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import 'stream_toolbar.dart';
@@ -214,10 +215,16 @@ class DefaultStreamAppBar extends StatelessWidget {
     final icons = context.streamIcons;
     final spacing = context.streamSpacing;
 
+    final appStyle = context.streamTheme.appStyle;
+
     final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
+    var effectiveBehavior = style?.behavior ?? defaults.behavior;
+    effectiveBehavior ??= appStyle.isFloating ? .floating : .regular;
+
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
     final effectivePadding = style?.padding ?? defaults.padding;
     final effectiveSpacing = style?.spacing ?? defaults.spacing;
     final effectiveTitleTextStyle = style?.titleTextStyle ?? defaults.titleTextStyle;
@@ -242,7 +249,11 @@ class DefaultStreamAppBar extends StatelessWidget {
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
         final localizations = MaterialLocalizations.of(context);
         leading = StreamButton.icon(
-          type: .ghost,
+          type: switch (effectiveBehavior) {
+            .floating => .outline,
+            .regular => .ghost,
+          },
+          isFloating: effectiveBehavior == .floating,
           style: .secondary,
           tooltip: useCloseIcon ? localizations.closeButtonTooltip : localizations.backButtonTooltip,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
@@ -348,14 +359,36 @@ class DefaultStreamAppBar extends StatelessWidget {
       container: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: effectiveBackgroundColor,
-          border: Border(
-            bottom: BorderSide(color: context.streamColorScheme.borderSubtle),
-          ),
+          color: switch (effectiveBehavior) {
+            .floating => null,
+            .regular => effectiveBackgroundColor,
+          },
+          gradient: switch (effectiveBehavior) {
+            .floating => _getFloatingGradient(context, color: effectiveFloatingBackgroundColor),
+            .regular => null,
+          },
+          border: switch (effectiveBehavior) {
+            .floating => null,
+            .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
+          },
         ),
         child: Semantics(explicitChildNodes: true, child: bar),
       ),
     );
+  }
+
+  LinearGradient _getFloatingGradient(
+    BuildContext context, {
+    required Color color,
+  }) {
+    // Compute the fraction of the total bar height occupied by the system
+    // safe area so the gradient is solid through the status bar and fades only
+    // in the toolbar zone below it.
+    final safeAreaTop = props.primary ? MediaQuery.paddingOf(context).top : 0.0;
+    final totalHeight = safeAreaTop + kStreamToolbarHeight;
+    final solidFraction = totalHeight > 0 ? safeAreaTop / totalHeight : 0.0;
+
+    return streamFloatingFadeLinearGradient(color: color, solidFraction: solidFraction);
   }
 }
 
@@ -375,6 +408,9 @@ class _StreamAppBarStyleDefaults extends StreamAppBarStyle {
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;
+
+  @override
+  Color get floatingBackgroundColor => _colorScheme.backgroundElevation0;
 
   @override
   double get spacing => _spacing.sm;

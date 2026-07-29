@@ -10,6 +10,20 @@ Widget _withStreamTheme(Widget child) {
 }
 
 void main() {
+  testWidgets('StreamAvatar renders a StreamNetworkImage when imageUrl is set', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        StreamAvatar(
+          imageUrl: 'https://example.com/avatar.png',
+          placeholder: (context) => const Text('A'),
+        ),
+      ),
+    );
+
+    final networkImage = tester.widget<StreamNetworkImage>(find.byType(StreamNetworkImage));
+    expect(networkImage.props.url, equals('https://example.com/avatar.png'));
+  });
+
   group('StreamAvatar a11y', () {
     testWidgets('semanticsLabel: null (default) — placeholder speaks for itself', (tester) async {
       final handle = tester.ensureSemantics();

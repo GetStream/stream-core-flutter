@@ -132,6 +132,8 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
     this.backgroundColor,
     this.foregroundColor,
     this.border,
+    this.isFloating,
+    this.floatingElevation,
   });
 
   /// The default size for avatars.
@@ -155,6 +157,19 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
   /// Applied when [StreamAvatar.showBorder] is true. Allows customization
   /// of both border color and width.
   final BoxBorder? border;
+
+  /// Whether the avatar is in a floating state, rendering with elevation.
+  ///
+  /// When set via [StreamAvatarTheme], this overrides the per-widget
+  /// [StreamAvatar.isFloating] default, allowing parent widgets such as
+  /// [StreamAvatarGroup] to enable floating for all child avatars at once.
+  final bool? isFloating;
+
+  /// The Material elevation applied to this avatar when it is floating.
+  ///
+  /// Used when [StreamAvatar.isFloating] (or [isFloating]) is true.
+  /// Falls back to the default elevation of `3`.
+  final double? floatingElevation;
 
   /// Linearly interpolate between two [StreamAvatarThemeData] objects.
   static StreamAvatarThemeData? lerp(

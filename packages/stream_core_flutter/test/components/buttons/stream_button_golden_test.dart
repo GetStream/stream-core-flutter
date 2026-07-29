@@ -123,6 +123,54 @@ void main() {
     );
 
     goldenTest(
+      'renders floating icon only button correctly',
+      fileName: 'stream_button_icon_only_floating',
+      builder: () => GoldenTestGroup(
+        scenarioConstraints: const BoxConstraints(maxWidth: 300),
+        children: [
+          for (final style in StreamButtonStyle.values)
+            for (final type in StreamButtonType.values)
+              GoldenTestScenario(
+                name: '${style.name}_${type.name}',
+                child: _buildButtonInTheme(
+                  StreamButton.icon(
+                    onPressed: () {},
+                    style: style,
+                    type: type,
+                    isFloating: true,
+                    icon: const Icon(Icons.add),
+                  ),
+                ),
+              ),
+        ],
+      ),
+    );
+
+    goldenTest(
+      'renders disabled floating icon only button correctly',
+      fileName: 'stream_button_icon_only_floating_disabled',
+      builder: () => GoldenTestGroup(
+        scenarioConstraints: const BoxConstraints(maxWidth: 300),
+        children: [
+          for (final style in StreamButtonStyle.values)
+            for (final type in StreamButtonType.values)
+              GoldenTestScenario(
+                name: '${style.name}_${type.name}',
+                child: _buildButtonInTheme(
+                  StreamButton.icon(
+                    onPressed: null,
+                    style: style,
+                    type: type,
+                    isFloating: true,
+                    icon: const Icon(Icons.add),
+                  ),
+                ),
+              ),
+        ],
+      ),
+    );
+
+    goldenTest(
       'renders disabled button correctly',
       fileName: 'stream_button_disabled',
       builder: () => GoldenTestGroup(

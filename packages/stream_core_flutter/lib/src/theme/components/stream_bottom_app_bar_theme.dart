@@ -6,6 +6,25 @@ import 'stream_button_theme.dart';
 
 part 'stream_bottom_app_bar_theme.g.theme.dart';
 
+/// The floating or regular layout behaviour for a [StreamBottomAppBar] or
+/// [StreamBottomNavBar].
+///
+/// When null on [StreamBottomAppBarStyle], the ambient [StreamAppStyle] is
+/// used as a fallback — [StreamAppStyle.floating] maps to [floating] and
+/// [StreamAppStyle.regular] maps to [regular].
+///
+/// See also:
+///
+///  * [StreamBottomAppBarStyle.behavior], which carries this value.
+///  * [StreamAppStyle], the global app-wide style that acts as fallback.
+enum StreamBottomAppBarBehavior {
+  /// The bottom bar sits within the layout flow with a solid background.
+  regular,
+
+  /// The bottom bar floats above the body with a translucent background.
+  floating,
+}
+
 /// Applies a bottom app bar theme to descendant [StreamBottomAppBar] widgets.
 ///
 /// Wrap a subtree with [StreamBottomAppBarTheme] to override bottom app bar
@@ -139,6 +158,7 @@ class StreamBottomAppBarThemeData with _$StreamBottomAppBarThemeData {
 class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
   /// Creates a bottom app bar style with optional property overrides.
   const StreamBottomAppBarStyle({
+    this.behavior,
     this.backgroundColor,
     this.padding,
     this.spacing,
@@ -147,6 +167,16 @@ class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
     this.leadingStyle,
     this.trailingStyle,
   });
+
+  /// The floating or regular layout behaviour for this bottom bar.
+  ///
+  /// When null the value falls back to the ambient [StreamAppStyle]:
+  /// [StreamAppStyle.floating] → [StreamBottomAppBarBehavior.floating],
+  /// [StreamAppStyle.regular] → [StreamBottomAppBarBehavior.regular].
+  ///
+  /// Set this to override the global style for this component only, without
+  /// affecting other components.
+  final StreamBottomAppBarBehavior? behavior;
 
   /// The background colour of the bottom app bar.
   final Color? backgroundColor;

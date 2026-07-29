@@ -496,7 +496,7 @@ mixin _SharedButtonDefaults on StreamButtonThemeStyle {
   @override
   WidgetStateProperty<double> get elevation => WidgetStateProperty.resolveWith((states) {
     if (!isFloating) return 0;
-    if (states.contains(WidgetState.disabled)) return 0.0;
+    if (states.contains(WidgetState.disabled)) return 6.0;
     if (states.contains(WidgetState.pressed)) return 6.0;
     if (states.contains(WidgetState.hovered)) return 8.0;
     return 6.0;
@@ -560,8 +560,8 @@ class _PrimaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButtonD
 
   @override
   WidgetStateProperty<Color> get backgroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     final base = isFloating ? colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.disabled)) return base;
     if (states.contains(WidgetState.selected)) return .alphaBlend(colorScheme.backgroundSelected, base);
     return base;
   });
@@ -600,8 +600,8 @@ class _PrimaryGhostDefaults extends StreamButtonThemeStyle with _SharedButtonDef
 
   @override
   WidgetStateProperty<Color> get backgroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     final base = isFloating ? colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.disabled)) return base;
     if (states.contains(WidgetState.selected)) return .alphaBlend(colorScheme.backgroundSelected, base);
     return base;
   });
@@ -670,8 +670,8 @@ class _SecondaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButto
 
   @override
   WidgetStateProperty<Color> get backgroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     final base = isFloating ? colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.disabled)) return base;
     if (states.contains(WidgetState.selected)) return .alphaBlend(colorScheme.backgroundSelected, base);
     return base;
   });
@@ -710,8 +710,8 @@ class _SecondaryGhostDefaults extends StreamButtonThemeStyle with _SharedButtonD
 
   @override
   WidgetStateProperty<Color> get backgroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     final base = isFloating ? colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.disabled)) return base;
     if (states.contains(WidgetState.selected)) return .alphaBlend(colorScheme.backgroundSelected, base);
     return base;
   });
@@ -780,8 +780,8 @@ class _DestructiveOutlineDefaults extends StreamButtonThemeStyle with _SharedBut
 
   @override
   WidgetStateProperty<Color> get backgroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     final base = isFloating ? colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.disabled)) return base;
     if (states.contains(WidgetState.selected)) return .alphaBlend(colorScheme.backgroundSelected, base);
     return base;
   });
@@ -820,8 +820,8 @@ class _DestructiveGhostDefaults extends StreamButtonThemeStyle with _SharedButto
 
   @override
   WidgetStateProperty<Color> get backgroundColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     final base = isFloating ? colorScheme.backgroundElevation1 : StreamColors.transparent;
+    if (states.contains(WidgetState.disabled)) return base;
     if (states.contains(WidgetState.selected)) return .alphaBlend(colorScheme.backgroundSelected, base);
     return base;
   });

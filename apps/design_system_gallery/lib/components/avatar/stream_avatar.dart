@@ -35,6 +35,11 @@ Widget buildStreamAvatarPlayground(BuildContext context) {
     description: 'Whether to show a border around the avatar.',
   );
 
+  final isFloating = context.knobs.boolean(
+    label: 'Is Floating',
+    description: 'Whether to show a drop shadow around the avatar.',
+  );
+
   final initials = context.knobs.string(
     label: 'Initials',
     initialValue: 'JD',
@@ -46,6 +51,7 @@ Widget buildStreamAvatarPlayground(BuildContext context) {
       imageUrl: (imageUrl?.isNotEmpty ?? false) ? imageUrl : null,
       size: size,
       showBorder: showBorder,
+      isFloating: isFloating,
       placeholder: (context) => Text(
         initials.substring(0, initials.length.clamp(0, 2)).toUpperCase(),
       ),

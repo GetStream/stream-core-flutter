@@ -48,21 +48,29 @@ class _ScopedSemanticsDebuggerState extends State<ScopedSemanticsDebugger> with 
   @override
   void didUpdateWidget(ScopedSemanticsDebugger oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.enabled != oldWidget.enabled) {
-      widget.enabled ? _attach() : _detach();
+    if (widget.enabled == oldWidget.enabled) return;
+    if (widget.enabled) {
+      _attach();
+      // didChangeDependencies isn't re-run on a plain prop toggle, so wire the
+      // owner here — otherwise build sees a null owner right after enabling.
+      _syncOwner();
+    } else {
+      _detach();
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!widget.enabled) return;
+    if (widget.enabled) _syncOwner();
+  }
+
+  void _syncOwner() {
     final newOwner = View.pipelineOwnerOf(context);
-    if (newOwner != _pipelineOwner) {
-      _pipelineOwner?.semanticsOwner?.removeListener(_update);
-      newOwner.semanticsOwner?.addListener(_update);
-      _pipelineOwner = newOwner;
-    }
+    if (newOwner == _pipelineOwner) return;
+    _pipelineOwner?.semanticsOwner?.removeListener(_update);
+    newOwner.semanticsOwner?.addListener(_update);
+    _pipelineOwner = newOwner;
   }
 
   @override
@@ -100,11 +108,12 @@ class _ScopedSemanticsDebuggerState extends State<ScopedSemanticsDebugger> with 
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.enabled) return widget.child;
+    final owner = _pipelineOwner;
+    if (!widget.enabled || owner == null) return widget.child;
     return CustomPaint(
       key: _paintKey,
       foregroundPainter: _ScopedSemanticsDebuggerPainter(
-        owner: _pipelineOwner!,
+        owner: owner,
         generation: _generation,
         devicePixelRatio: View.of(context).devicePixelRatio,
         dimColor: context.streamColorScheme.backgroundApp,
