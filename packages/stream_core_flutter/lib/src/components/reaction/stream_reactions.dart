@@ -243,10 +243,16 @@ class StreamReactionsProps {
 class StreamReactionsItem {
   /// Creates a reaction item.
   const StreamReactionsItem({
+    this.key,
     required this.emoji,
     this.count,
-    this.key,
   });
+
+  /// An optional identifier for this item.
+  ///
+  /// [StreamReactions.onReactionPressed] reports the pressed item, so callers
+  /// can set [key] (e.g. a reaction type) to identify which item was pressed.
+  final String? key;
 
   /// The content model describing what to render.
   ///
@@ -258,12 +264,6 @@ class StreamReactionsItem {
   ///
   /// When null, the reaction is treated as having a count of 1.
   final int? count;
-
-  /// An optional identifier for this item.
-  ///
-  /// [StreamReactions.onReactionPressed] reports the pressed item, so callers
-  /// can set [key] (e.g. a reaction type) to identify which item was pressed.
-  final String? key;
 }
 
 const _kMaxVisibleSegments = 4;
