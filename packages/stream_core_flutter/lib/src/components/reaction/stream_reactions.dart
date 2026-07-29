@@ -12,6 +12,9 @@ import '../controls/stream_emoji_chip.dart';
 import '../message_layout/stream_message_alignment.dart';
 import '../message_layout/stream_message_layout.dart';
 
+/// Callback when a reaction item is pressed.
+typedef OnReactionItemPressed = ValueSetter<StreamReactionsItem?>;
+
 /// Displays reactions as either individual chips or a single grouped chip.
 ///
 /// Use [StreamReactions.segmented] to render each reaction type as its own
@@ -265,10 +268,6 @@ class StreamReactionsItem {
   /// When null, the reaction is treated as having a count of 1.
   final int? count;
 }
-
-/// Callback when a reaction item is pressed, or `null` for a chip that
-/// represents no single item (the cluster or overflow chip).
-typedef OnReactionItemPressed = ValueSetter<StreamReactionsItem?>;
 
 const _kMaxVisibleSegments = 4;
 const _kDefaultStripIndent = 8.0;
