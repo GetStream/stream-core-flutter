@@ -46,25 +46,8 @@ jobs:
           git config user.name "Stream SDK Bot"
           git config user.email "60655709+Stream-SDK-Bot@users.noreply.github.com"
 
-          # Tag every publishable package whose current version is not yet on
-          # pub.dev. Tags are derived from package state, not parsed from the
-          # commit message, so multi-package release PRs and title typos are
-          # handled correctly. `|| true`: an unchanged package may already
-          # carry its tag from a previous release.
-          #
-          # Single quotes are intentional: the string is passed verbatim to
-          # melos, which expands $MELOS_PACKAGE_NAME/$MELOS_PACKAGE_VERSION in
-          # each package's child shell.
-          # shellcheck disable=SC2016
-          melos exec --no-published --no-private -- \
-            'git tag "$MELOS_PACKAGE_NAME-v$MELOS_PACKAGE_VERSION" || true'
-
-          # Push tags one at a time (`-c 1`) — bulk pushes can drop individual
-          # tag events, which would skip the publish workflow — and in
-          # dependency order (`--order-dependents`: dependencies first) so a
-          # dependent's publish is triggered after its dependency's, minimising
-          # the wait in release_publish's dependency gate. Idempotent: pushing a
-          # tag that already exists on the remote is a no-op.
-          # shellcheck disable=SC2016
-          melos exec -c 1 --no-published --no-private --order-dependents -- \
-            'git push origin "$MELOS_PACKAGE_NAME-v$MELOS_PACKAGE_VERSION"'
+          # Tag every package whose version is not yet on pub.dev and push the
+          # tags in dependency order. See the `release:tag` script in melos.yaml.
+          # Tags are derived from package state, not the commit message, so
+          # multi-package release PRs and title typos are handled correctly.
+          melos run release:tag

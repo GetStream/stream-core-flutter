@@ -120,6 +120,38 @@ scripts:
       Run `pub publish --dry-run` in all packages.
        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
+  release:tag:
+    run: |
+      melos exec -c 1 --no-published --no-private --order-dependents -- \
+        "git tag \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION || true"
+      melos exec -c 1 --no-published --no-private --order-dependents -- \
+        "git push origin \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION"
+    description: |
+      Tag every publishable package whose current version is not yet on pub.dev
+      as `<package>-v<version>`, then push the tags — both in dependency order
+      (`--order-dependents`: dependencies first) so a dependent's publish is
+      triggered after its dependency's. `|| true`: an unchanged package may
+      already carry its tag. Used by the release_tag workflow after a merge.
+
+  release:pub:dry:
+    run: |
+      melos exec -c 1 --no-published --no-private --order-dependents -- \
+        "flutter pub publish --dry-run"
+    description: |
+      Dry-run publish of the unpublished packages, in dependency order. Set the
+      MELOS_PACKAGES env var to scope to one package (release_publish does this).
+
+  release:pub:
+    run: |
+      melos exec -c 1 --no-published --no-private --order-dependents -- \
+        "flutter pub publish --force"
+    description: |
+      Publish unpublished packages to pub.dev (via OIDC in CI) in dependency
+      order — a dependency is published before any package that depends on it.
+      Set MELOS_PACKAGES to scope to one package. Idempotent: `--no-published`
+      skips versions already on pub.dev, so re-runs are a clean no-op. Used by
+      the release_publish workflow.
+
   generate:all:
     run: melos run generate:dart && melos run generate:flutter
     description: Build all generated files for Dart & Flutter packages in this project.

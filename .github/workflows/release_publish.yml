@@ -83,9 +83,12 @@ jobs:
         run: melos bootstrap --verbose
 
       # melos publish only ever touches unpublished versions, so a re-run of an
-      # already-published tag is a clean no-op. Scoped to the single tagged package.
+      # already-published tag is a clean no-op. MELOS_PACKAGES scopes the
+      # `release:pub*` scripts (melos.yaml) to just the tagged package.
       - name: 🌵 Dry Run
-        run: melos publish --dry-run --yes --no-published --no-private --scope="${{ steps.parse.outputs.package }}"
+        run: melos run release:pub:dry
+        env:
+          MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
 
       # Guarantee dependent-order publishing. Each package publishes in its own
       # run (OIDC binds one tag ref → one package), so when a release bumps both
@@ -136,7 +139,9 @@ jobs:
           done
 
       - name: 📢 Publish to pub.dev
-        run: melos publish --no-dry-run --yes --no-published --no-private --scope="${{ steps.parse.outputs.package }}"
+        run: melos run release:pub
+        env:
+          MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
 
       - name: 📝 Extract CHANGELOG section
         id: notes
