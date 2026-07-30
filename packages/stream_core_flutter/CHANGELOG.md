@@ -2,6 +2,7 @@
 
 ### ✨ Features
 
+- Added `StreamReactions.onReactionPressed`, which reports the pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip, which represents no single reaction. Added an optional `StreamReactionsItem.key` so callers can identify the pressed item.
 - Added optional `semanticsLabel` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. On `StreamAvatar`, `null` (default) drops the placeholder's initials from the semantics tree via `ExcludeSemantics`; a non-null value exposes it as a labeled image node. On `StreamAvatarGroup` / `StreamAvatarStack`, `null` composes through — each child's own `semanticsLabel` applies — while a non-null value collapses the group into a single labeled image node and hides children and the "+N" overflow badge.
 - Added `StreamColorScheme.fromSeed` — builds a complete light or dark color scheme from a single brand color, optionally with a custom chrome color. When chrome is omitted it is derived from the brand hue at `StreamColorScheme.neutralChroma`.
 - `StreamColorSwatch.fromColor` now generates shades in the HCT color space instead of HSL. Each shade takes its tone from a fixed ladder measured from the Stream design tokens, so a shade's contrast is predictable regardless of the seed's hue — seeding a light color such as yellow now yields an accent that can carry white text. Two consequences: the seed is no longer reproduced verbatim at shade 500 (it is normalized onto the ladder), and dark scales now mirror the ladder so the seed's tone lands on shade 300, matching the default dark palette.
@@ -20,6 +21,7 @@
 
 ### ⚠️ Deprecations
 
+- Deprecated `StreamReactions.onPressed` in favor of `onReactionPressed`.
 - Deprecated `StreamTheme.brightness`. Read `colorScheme.brightness` instead. The property, and the `brightness` parameter on `copyWith` and `StreamTheme.raw`, all keep working — for a theme built through the `StreamTheme` factory the value still mirrors `colorScheme.brightness`.
 
 ## 0.4.1

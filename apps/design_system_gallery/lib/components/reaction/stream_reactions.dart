@@ -100,7 +100,16 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
       max: max,
       overlap: overlap,
       indent: indent,
-      onPressed: () => _showSnack(context, 'Reaction tapped'),
+      onReactionPressed: (item) {
+        final emoji = switch (item?.emoji) {
+          StreamUnicodeEmoji(:final emoji) => emoji,
+          _ => null,
+        };
+        _showSnack(
+          context,
+          emoji != null ? 'Tapped $emoji' : 'Tapped all reactions',
+        );
+      },
       child: bubble,
     ),
     StreamReactionsType.clustered => StreamReactions.clustered(
@@ -111,7 +120,16 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
       max: max,
       overlap: overlap,
       indent: indent,
-      onPressed: () => _showSnack(context, 'Reaction tapped'),
+      onReactionPressed: (item) {
+        final emoji = switch (item?.emoji) {
+          StreamUnicodeEmoji(:final emoji) => emoji,
+          _ => null,
+        };
+        _showSnack(
+          context,
+          emoji != null ? 'Tapped $emoji' : 'Tapped all reactions',
+        );
+      },
       child: bubble,
     ),
   };
@@ -584,7 +602,7 @@ class _ShowcaseSection extends StatelessWidget {
                             max: t.max,
                             overlap: t.overlap,
                             child: bubble,
-                            onPressed: () {},
+                            onReactionPressed: (_) {},
                           ),
                           StreamReactionsType.clustered => StreamReactions.clustered(
                             items: t.items,
@@ -592,7 +610,7 @@ class _ShowcaseSection extends StatelessWidget {
                             max: t.max,
                             overlap: t.overlap,
                             child: bubble,
-                            onPressed: () {},
+                            onReactionPressed: (_) {},
                           ),
                         },
                       ),
@@ -645,7 +663,7 @@ class _EmojiOnlyShowcaseSection extends StatelessWidget {
             ? StreamReactionsAlignment.end
             : StreamReactionsAlignment.start,
         indent: position == StreamReactionsPosition.header ? 8 : null,
-        onPressed: () {},
+        onReactionPressed: (_) {},
         child: messageText,
       );
 

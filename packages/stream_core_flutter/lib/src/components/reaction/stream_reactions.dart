@@ -12,6 +12,9 @@ import '../controls/stream_emoji_chip.dart';
 import '../message_layout/stream_message_alignment.dart';
 import '../message_layout/stream_message_layout.dart';
 
+/// Callback when a reaction item is pressed.
+typedef OnReactionItemPressed = ValueSetter<StreamReactionsItem?>;
+
 /// Displays reactions as either individual chips or a single grouped chip.
 ///
 /// Use [StreamReactions.segmented] to render each reaction type as its own
@@ -81,7 +84,9 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
+    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
     VoidCallback? onPressed,
+    OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -94,6 +99,7 @@ class StreamReactions extends StatelessWidget {
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
          onPressed: onPressed,
+         onReactionPressed: onReactionPressed,
        );
 
   /// Creates segmented reactions where each type is rendered as its own chip.
@@ -108,7 +114,9 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
+    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
     VoidCallback? onPressed,
+    OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -121,6 +129,7 @@ class StreamReactions extends StatelessWidget {
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
          onPressed: onPressed,
+         onReactionPressed: onReactionPressed,
        );
 
   /// Creates clustered reactions that group all reaction types into one chip.
@@ -135,7 +144,9 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
+    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
     VoidCallback? onPressed,
+    OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -148,6 +159,7 @@ class StreamReactions extends StatelessWidget {
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
          onPressed: onPressed,
+         onReactionPressed: onReactionPressed,
        );
 
   /// The properties that configure this widget.
@@ -182,7 +194,12 @@ class StreamReactionsProps {
     this.crossAxisAlignment,
     this.clipBehavior = Clip.none,
     this.onPressed,
-  });
+    this.onReactionPressed,
+  }) : assert(
+         onPressed == null || onReactionPressed == null,
+         'Only one of onPressed or onReactionPressed can be provided. '
+         'Prefer onReactionPressed; onPressed is deprecated.',
+       );
 
   /// The reaction presentation style.
   final StreamReactionsType type;
@@ -224,11 +241,18 @@ class StreamReactionsProps {
   /// The clip behavior applied to the layout.
   final Clip clipBehavior;
 
-  /// Called when any reaction chip is tapped.
+  /// Called when any reaction chip is pressed.
   ///
-  /// In segmented mode, this is used for each visible chip, including the
-  /// overflow chip. In clustered mode, it is used for the grouped chip.
+  /// Prefer [onReactionPressed], which also reports the pressed
+  /// [StreamReactionsItem].
   final VoidCallback? onPressed;
+
+  /// Called when a reaction chip is pressed, with the pressed item.
+  ///
+  /// In segmented mode, the pressed [StreamReactionsItem] is provided for each
+  /// visible chip; the overflow chip reports `null`. In clustered mode, the
+  /// single grouped chip reports `null` since it represents no single item.
+  final OnReactionItemPressed? onReactionPressed;
 }
 
 /// A single reaction item with an emoji widget and optional count.
@@ -242,9 +266,16 @@ class StreamReactionsProps {
 class StreamReactionsItem {
   /// Creates a reaction item.
   const StreamReactionsItem({
+    this.key,
     required this.emoji,
     this.count,
   });
+
+  /// An optional identifier for this item.
+  ///
+  /// [StreamReactions.onReactionPressed] reports the pressed item, so callers
+  /// can set [key] (e.g. a reaction type) to identify which item was pressed.
+  final String? key;
 
   /// The content model describing what to render.
   ///
@@ -392,12 +423,13 @@ class DefaultStreamReactions extends StatelessWidget {
         StreamEmojiChip(
           emoji: item.emoji,
           count: showCounts ? item.count ?? 1 : null,
-          onPressed: props.onPressed,
+          onPressed: _chipCallback(item),
         ),
+      // The overflow chip aggregates hidden reactions, so it has no single item.
       if (overflow.isNotEmpty)
         StreamEmojiChip.overflow(
           count: overflowCount,
-          onPressed: props.onPressed,
+          onPressed: _chipCallback(null),
         ),
     ];
 
@@ -410,11 +442,21 @@ class DefaultStreamReactions extends StatelessWidget {
     final visible = items.take(maxVisible).map((item) => item.emoji).toList();
     final totalCount = items.sumOf((item) => item.count ?? 1);
 
+    // The cluster groups all reactions into one chip, so it has no single item.
     return StreamEmojiChip.cluster(
       emojis: visible,
       count: totalCount > 1 ? totalCount : null,
-      onPressed: props.onPressed,
+      onPressed: _chipCallback(null),
     );
+  }
+
+  // Resolves a chip's tap callback, preferring the item-aware
+  // [StreamReactions.onReactionPressed] and falling back to the deprecated
+  // [StreamReactions.onPressed].
+  VoidCallback? _chipCallback(StreamReactionsItem? item) {
+    final onReactionPressed = props.onReactionPressed;
+    if (onReactionPressed != null) return () => onReactionPressed(item);
+    return props.onPressed;
   }
 }
 
@@ -431,6 +473,7 @@ class _StreamReactionsThemeDefaults extends StreamReactionsThemeData {
 
   late final _spacing = _context.streamSpacing;
   late final _textTheme = _context.streamTextTheme;
+  late final _colorScheme = _context.streamColorScheme;
 
   @override
   double get spacing => _spacing.xxs;
@@ -451,7 +494,7 @@ class _StreamReactionsThemeDefaults extends StreamReactionsThemeData {
     maximumSize: const Size.fromHeight(24),
     emojiSize: StreamEmojiSize.sm.value,
     elevation: .all(overlap ? 3 : 0),
-    backgroundColor: .all(_context.streamColorScheme.backgroundElevation2),
+    backgroundColor: .all(_colorScheme.backgroundElevation2),
     textStyle: .all(_textTheme.numericMd.copyWith(fontFeatures: const [.tabularFigures()])),
     padding: .symmetric(vertical: _spacing.xxxs, horizontal: _spacing.xs),
   );
