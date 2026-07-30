@@ -98,7 +98,6 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
-         // ignore: deprecated_member_use_from_same_package
          onPressed: onPressed,
          onReactionPressed: onReactionPressed,
        );
@@ -129,7 +128,6 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
-         // ignore: deprecated_member_use_from_same_package
          onPressed: onPressed,
          onReactionPressed: onReactionPressed,
        );
@@ -160,7 +158,6 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
-         // ignore: deprecated_member_use_from_same_package
          onPressed: onPressed,
          onReactionPressed: onReactionPressed,
        );
@@ -196,7 +193,6 @@ class StreamReactionsProps {
     this.indent,
     this.crossAxisAlignment,
     this.clipBehavior = Clip.none,
-    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
     this.onPressed,
     this.onReactionPressed,
   }) : assert(
@@ -249,7 +245,6 @@ class StreamReactionsProps {
   ///
   /// Prefer [onReactionPressed], which also reports the pressed
   /// [StreamReactionsItem].
-  @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
   final VoidCallback? onPressed;
 
   /// Called when a reaction chip is pressed, with the pressed item.
@@ -461,7 +456,6 @@ class DefaultStreamReactions extends StatelessWidget {
   VoidCallback? _chipCallback(StreamReactionsItem? item) {
     final onReactionPressed = props.onReactionPressed;
     if (onReactionPressed != null) return () => onReactionPressed(item);
-    // ignore: deprecated_member_use_from_same_package
     return props.onPressed;
   }
 }
