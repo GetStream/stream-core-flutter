@@ -5,6 +5,8 @@ on:
       - opened
       - edited
       - synchronize
+      - labeled
+      - unlabeled
     branches:
       - main
         
@@ -45,3 +47,57 @@ jobs:
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # [semantic_changelog_update] checks that a changelog was updated at all; this
+  # checks that the entries went under `## Upcoming` rather than into a section
+  # for a version that is already published.
+  changelog_placement:
+    runs-on: ubuntu-latest
+    steps:
+      # On `pull_request_target` this checks out the base branch, so the script
+      # run below is always the trusted copy from `main`, never the PR's own.
+      - name: Git Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Verify changelog entries land under Upcoming
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          OVERRIDE: ${{ contains(github.event.pull_request.labels.*.name, 'changelog-override') }}
+        run: |
+          set -euo pipefail
+
+          if [ "$OVERRIDE" = 'true' ]; then
+            echo 'The changelog-override label is set; skipping the placement check.'
+            exit 0
+          fi
+
+          changelogs=$(gh api "repos/$REPO/pulls/$PR/files" --paginate \
+            --jq '.[].filename | select(endswith("CHANGELOG.md"))')
+
+          if [ -z "$changelogs" ]; then
+            echo 'This PR touches no CHANGELOG.md.'
+            exit 0
+          fi
+
+          # The PR's CHANGELOG is fetched as data and only ever read by the
+          # script. A file absent at that revision fetches as empty.
+          fetch() {
+            gh api "repos/$REPO/contents/$1?ref=$2" \
+              -H 'Accept: application/vnd.github.raw' > "$3" 2>/dev/null || : > "$3"
+          }
+
+          status=0
+          while IFS= read -r path; do
+            fetch "$path" "$BASE_SHA" base.md
+            fetch "$path" "$HEAD_SHA" head.md
+            .github/workflows/scripts/check-changelog-placement.sh \
+              base.md head.md "$path" || status=1
+          done <<< "$changelogs"
+
+          exit $status
