@@ -78,18 +78,41 @@ jobs:
           fi
 
           changelogs=$(gh api "repos/$REPO/pulls/$PR/files" --paginate \
-            --jq '.[].filename | select(endswith("CHANGELOG.md"))')
+            --jq '.[].filename | select((split("/") | last) == "CHANGELOG.md")')
 
           if [ -z "$changelogs" ]; then
             echo 'This PR touches no CHANGELOG.md.'
             exit 0
           fi
 
-          # The PR's CHANGELOG is fetched as data and only ever read by the
-          # script. A file absent at that revision fetches as empty.
+          # Fetches $1 at revision $2 into $3. The PR's CHANGELOG is fetched as
+          # data and only ever read by the script.
+          #
+          # A 404 is a real answer -- the file does not exist at that revision --
+          # so it yields an empty result. Any other failure (auth, rate limit,
+          # transient 5xx) must fail the job: an empty base revision looks like a
+          # brand-new changelog and would wave a real violation through.
           fetch() {
-            gh api "repos/$REPO/contents/$1?ref=$2" \
-              -H 'Accept: application/vnd.github.raw' > "$3" 2>/dev/null || : > "$3"
+            local err
+            err=$(mktemp)
+
+            if gh api "repos/$REPO/contents/$1?ref=$2" \
+                 -H 'Accept: application/vnd.github.raw' > "$3" 2>"$err"; then
+              rm -f "$err"
+              return 0
+            fi
+
+            # gh writes the error body to stdout, so $3 holds JSON, not content.
+            if grep -q '(HTTP 404)' "$err"; then
+              : > "$3"
+              rm -f "$err"
+              return 0
+            fi
+
+            echo "::error::Could not fetch $1 at $2"
+            cat "$err" >&2
+            rm -f "$err"
+            return 1
           }
 
           # `refs/pull/N/head` rather than the head SHA: for a PR from a fork
@@ -97,8 +120,12 @@ jobs:
           # the base repo.
           status=0
           while IFS= read -r path; do
-            fetch "$path" "$BASE_SHA" base.md
-            fetch "$path" "refs/pull/$PR/head" head.md
+            if ! fetch "$path" "$BASE_SHA" base.md \
+               || ! fetch "$path" "refs/pull/$PR/head" head.md; then
+              status=1
+              continue
+            fi
+
             .github/workflows/scripts/check-changelog-placement.sh \
               base.md head.md "$path" "$HEAD_BRANCH" || status=1
           done <<< "$changelogs"
