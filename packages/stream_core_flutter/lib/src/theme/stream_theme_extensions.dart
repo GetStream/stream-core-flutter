@@ -37,6 +37,7 @@ import 'components/stream_snackbar_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'primitives/stream_elevation.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -87,6 +88,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamSpacing] from the current theme.
   StreamSpacing get streamSpacing => streamTheme.spacing;
+
+  /// Returns the [StreamElevation] from the current theme.
+  StreamElevation get streamElevation => streamTheme.elevation;
 
   /// Returns the [StreamBoxShadow] from the current theme.
   StreamBoxShadow get streamBoxShadow => streamTheme.boxShadow;

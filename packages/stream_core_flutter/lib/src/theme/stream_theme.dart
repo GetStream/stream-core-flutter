@@ -39,6 +39,7 @@ import 'components/stream_snackbar_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'primitives/stream_elevation.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -82,6 +83,7 @@ part 'stream_theme.g.theme.dart';
 ///  * [StreamTextTheme], which defines semantic text styles.
 ///  * [StreamRadius], which defines border radius values.
 ///  * [StreamSpacing], which defines spacing values.
+///  * [StreamElevation], which defines Material elevation levels.
 ///  * [StreamBoxShadow], which defines elevation shadows.
 ///  * [StreamButtonThemeData], which defines button styles.
 ///  * [StreamAvatarThemeData], which defines avatar styles.
@@ -107,6 +109,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     Brightness? brightness,
     TargetPlatform? platform,
     StreamAppStyle? appStyle,
+    StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
@@ -163,6 +166,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final isDark = effectiveBrightness == Brightness.dark;
 
     // Primitives
+    elevation ??= const StreamElevation();
     icons ??= const StreamIcons();
     radius ??= const StreamRadius();
     spacing ??= const StreamSpacing();
@@ -214,7 +218,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
+      // ignore: deprecated_member_use_from_same_package
+      brightness: effectiveBrightness,
       appStyle: appStyle,
+      elevation: elevation,
       icons: icons,
       radius: radius,
       spacing: spacing,
@@ -275,8 +282,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme.dark() => StreamTheme(brightness: .dark);
 
   const StreamTheme.raw({
-    @Deprecated('Use colorScheme.brightness instead') Brightness? brightness,
+    @Deprecated('Use colorScheme.brightness instead') this.brightness = Brightness.light,
     required this.appStyle,
+    required this.elevation,
     required this.icons,
     required this.radius,
     required this.spacing,
@@ -353,10 +361,20 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   }
 
   /// The brightness of this theme.
-  Brightness get brightness => colorScheme.brightness;
+  ///
+  /// For a theme built through the [StreamTheme] factory this always mirrors
+  /// `colorScheme.brightness` — the factory asserts the two agree. Only
+  /// [StreamTheme.raw] and [copyWith] can set it independently, and a value
+  /// that disagrees with [colorScheme] changes nothing about how the theme
+  /// renders. Read `colorScheme.brightness` instead.
+  @Deprecated('Use colorScheme.brightness instead')
+  final Brightness brightness;
 
   /// The app style for this theme.
   final StreamAppStyle appStyle;
+
+  /// The Material elevation values for this theme.
+  final StreamElevation elevation;
 
   /// The icons for this theme.
   final StreamIcons icons;
@@ -517,7 +535,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
 
     return StreamTheme.raw(
+      // ignore: deprecated_member_use_from_same_package
+      brightness: brightness,
       appStyle: appStyle,
+      elevation: elevation,
       icons: icons,
       radius: radius,
       spacing: spacing,

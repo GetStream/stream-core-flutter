@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
@@ -16,7 +17,93 @@ Widget _withStreamTheme(
   );
 }
 
+/// The [Material] that [ElevatedButton] renders its surface with — the one
+/// carrying the resolved elevation and background colour.
+Material _surfaceOf(WidgetTester tester) {
+  return tester.widget<Material>(
+    find.descendant(of: find.byType(StreamButton), matching: find.byType(Material)).first,
+  );
+}
+
 void main() {
+  group('StreamButton floating', () {
+    testWidgets('resolves its elevation from StreamTheme.elevation', (tester) async {
+      // Not just "is elevated": the value has to come from the theme primitive,
+      // so an app that retunes the elevation scale retunes floating buttons.
+      await tester.pumpWidget(
+        _withStreamTheme(
+          streamTheme: StreamTheme(elevation: const StreamElevation(level3: 20)),
+          StreamButton(
+            onPressed: () {},
+            isFloating: true,
+            child: const Text('Floating'),
+          ),
+        ),
+      );
+
+      expect(_surfaceOf(tester).elevation, 20);
+    });
+
+    testWidgets('is flat when not floating, whatever the theme says', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          streamTheme: StreamTheme(elevation: const StreamElevation(level3: 20)),
+          StreamButton(
+            onPressed: () {},
+            child: const Text('Flat'),
+          ),
+        ),
+      );
+
+      expect(_surfaceOf(tester).elevation, 0);
+    });
+
+    // Regression: outline and ghost fell back to a transparent background when
+    // disabled, so a disabled floating button lost its pill and only the shadow
+    // was left.
+    for (final type in [StreamButtonType.outline, StreamButtonType.ghost]) {
+      testWidgets('disabled ${type.name} keeps its pill surface', (tester) async {
+        final streamTheme = StreamTheme();
+
+        await tester.pumpWidget(
+          _withStreamTheme(
+            streamTheme: streamTheme,
+            StreamButton(
+              type: type,
+              isFloating: true,
+              child: const Text('Floating'),
+            ),
+          ),
+        );
+
+        expect(_surfaceOf(tester).color, streamTheme.colorScheme.backgroundElevation1);
+      });
+    }
+
+    testWidgets('lifts further on hover', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          streamTheme: StreamTheme(elevation: const StreamElevation(level4: 20)),
+          StreamButton(
+            onPressed: () {},
+            isFloating: true,
+            child: const Text('Floating'),
+          ),
+        ),
+      );
+
+      // Resting is level3, left at its default here.
+      expect(_surfaceOf(tester).elevation, const StreamElevation().level3);
+
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: tester.getCenter(find.byType(StreamButton)));
+      addTearDown(gesture.removePointer);
+      await tester.pumpAndSettle();
+
+      expect(_surfaceOf(tester).elevation, 20);
+    });
+  });
+
   group('StreamButton.icon a11y', () {
     testWidgets('enabled — label, isButton, isEnabled, hasTapAction', (tester) async {
       final handle = tester.ensureSemantics();

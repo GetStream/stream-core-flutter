@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/primitives/stream_colors.dart';
+import '../../theme/primitives/stream_elevation.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -214,7 +215,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveIsFloating = props.isFloating ?? avatarTheme.isFloating ?? false;
     final effectiveElevation = effectiveIsFloating
         ? (avatarTheme.floatingElevation ?? defaults.floatingElevation)
-        : 0.0;
+        : context.streamElevation.none;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
 
     // Avatars are circular, so the border is always uniform — use any side.
@@ -311,13 +312,15 @@ class DefaultStreamAvatar extends StatelessWidget {
 class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
   _StreamAvatarThemeDefaults(
     this.context,
-  ) : _colorScheme = context.streamColorScheme;
+  ) : _colorScheme = context.streamColorScheme,
+      _elevation = context.streamElevation;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;
+  final StreamElevation _elevation;
 
   @override
-  double get floatingElevation => 3;
+  double get floatingElevation => _elevation.level2;
 
   @override
   StreamAvatarSize get size => StreamAvatarSize.lg;
