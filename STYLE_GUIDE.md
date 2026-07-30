@@ -1373,6 +1373,51 @@ If a PR touches both `stream_core` and `stream_core_flutter`, update each packag
 `CHANGELOG.md` separately. Cross-linking between packages ("bumps stream_core to
 X.Y.Z") is handled by the release tooling — do not write these entries by hand.
 
+### Releasing
+
+Publishing to [pub.dev](https://pub.dev) is automated. Packages are versioned
+**independently**, each on its own tag `<package>-v<version>` (e.g.
+`stream_core-v0.4.0`) — but a single release PR may bump **any number of
+packages at once**. Each bumped package still gets its own tag and its own
+publish run, so releasing all three together and releasing one on its own follow
+the exact same steps.
+
+Cut every release from a `release/...` branch (e.g. `release/2026-07-30`). This
+is required, not a convention: the changelog-placement check in
+[`pr_title.yml`](.github/workflows/pr_title.yml) only allows a `## Upcoming`
+heading to become `## X.Y.Z` on a `release/` branch. On that branch, for **each**
+package you are releasing:
+
+- bump its `version` in `pubspec.yaml`
+- promote its CHANGELOG `## Upcoming` heading to `## X.Y.Z`
+
+Title the PR `chore(repo): release` for a multi-package release, or
+`chore(<scope>): release <package> vX.Y.Z` (scope `llc` / `ui` / `thumb`) for a
+single package. The tooling keys only on the `chore(...): release` prefix — tags
+are derived from **package state**, not the title — so a title mentioning one
+version while the PR bumps several still tags and publishes every bumped package.
+
+When the PR merges to `main`:
+
+1. [`release_tag.yml`](.github/workflows/release_tag.yml) tags every package
+   whose current version is not yet on pub.dev — `<package>-vX.Y.Z` — and pushes
+   the tags one at a time.
+2. [`release_publish.yml`](.github/workflows/release_publish.yml) fires once per
+   pushed tag and publishes only that package (OIDC — no stored credentials),
+   then creates a GitHub Release whose body is the package's `## X.Y.Z` CHANGELOG
+   section.
+
+**Dependent order is automatic.** `stream_core_flutter` depends on `stream_core`,
+and each package publishes in its own run, so releasing both together could
+otherwise let the dependent publish before its dependency is on pub.dev.
+`release_publish.yml` prevents this: before publishing, it waits until every
+in-workspace dependency it needs is live on pub.dev at the pinned version (and
+`release_tag.yml` pushes tags dependency-first to keep that wait short). No
+manual step is needed. If a dependency's own publish genuinely fails, the
+dependent times out after 15 minutes; fix the dependency, then re-run the
+dependent's workflow (`workflow_dispatch` on its tag) — publishing is idempotent,
+so re-runs are safe.
+
 
 ## Where to look when you're stuck
 
