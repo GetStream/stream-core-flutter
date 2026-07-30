@@ -2,7 +2,21 @@
 
 ### ✨ Features
 
+- Added optional `semanticsLabel` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. On `StreamAvatar`, `null` (default) drops the placeholder's initials from the semantics tree via `ExcludeSemantics`; a non-null value exposes it as a labeled image node. On `StreamAvatarGroup` / `StreamAvatarStack`, `null` composes through — each child's own `semanticsLabel` applies — while a non-null value collapses the group into a single labeled image node and hides children and the "+N" overflow badge.
+- Added `StreamColorScheme.fromSeed` — builds a complete light or dark color scheme from a single brand color, optionally with a custom chrome color. When chrome is omitted it is derived from the brand hue at `StreamColorScheme.neutralChroma`.
+- `StreamColorSwatch.fromColor` now generates shades in the HCT color space instead of HSL. Each shade takes its tone from a fixed ladder measured from the Stream design tokens, so a shade's contrast is predictable regardless of the seed's hue — seeding a light color such as yellow now yields an accent that can carry white text. Two consequences: the seed is no longer reproduced verbatim at shade 500 (it is normalized onto the ladder), and dark scales now mirror the ladder so the seed's tone lands on shade 300, matching the default dark palette.
+- Added `StreamScaffold` — a full-page scaffold that supports both regular and floating app-bar / bottom-bar layouts. Injects `StreamScaffoldInsets` into the widget tree so scrollable bodies can read the effective top and bottom padding from floating bars without coupling to layout details.
+- Added `StreamBottomNavBar` and `StreamBottomNavBarItem` — a bottom navigation bar with icon, selected-icon, and label slots per item. Renders either a regular docked bar or a floating pill with a gradient fade-out beneath it, resolved from the per-instance `behavior`, the `StreamBottomNavBarTheme`, then `StreamAppStyle`. Follows the standard `Props`/`Default`/`StreamComponentFactory` pattern (`bottomNavBar` builder) and is themeable via `StreamBottomNavBarTheme` / `StreamBottomNavBarStyle` (selected/unselected item colours, icon size, label styles, border, pill radius). Items announce themselves as accessible buttons via `Semantics`.
+- Added floating-bar support to `StreamAppBar` via a new `appBarBehavior` property. When set to `StreamAppBarBehavior.floating`, the app bar renders above the body with a translucent background and a gradient overlay.
+- Added `showShadow` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. When true, applies the `StreamAvatarThemeData.boxShadow` (falling back to `StreamBoxShadow.elevation3`) as a drop shadow around the avatar shape. Fixed: a themed `boxShadow` in `StreamAvatarThemeData` no longer bleeds onto avatars where `showShadow` is `false`.
+- Added `streamFloatingFade` helper — a shared `LinearGradient` factory (alpha stops `0xE8/0xA8/0x40/0x00` with solid-fraction support for safe-area zones) used internally by `StreamAppBar`, `StreamBottomNavBar`, and `StreamMessageComposer` floating fade effects.
+- Added `isFloating` to the default `StreamButton` constructor — the floating (elevated) appearance was previously reachable only through `StreamButton.icon`. Labelled buttons now get the same treatment: elevation for every type, plus a `backgroundElevation1` fill for `outline` and `ghost`.
+- Added `StreamElevation` — the four elevation levels of the design system as logical-pixel constants, for passing to `Material.elevation` or a component theme's `elevation` field. `StreamAvatar` and `StreamButton` now resolve their elevations from it instead of hard-coded numbers; the rendered values are unchanged.
 - Added `chipStyle` to `StreamReactionsThemeData` for overriding the per-reaction chip appearance (background, size, etc.); it is merged over the default reaction chip style.
+
+### 🐛 Bug Fixes
+
+- Floating buttons (`isFloating: true`) now retain their pill surface (`backgroundElevation1`) when disabled, across all style/type combinations. Previously, outline and ghost variants fell back to transparent when disabled, losing the floating visual.
 
 ## 0.4.1
 
@@ -14,12 +28,8 @@
 - Added `labelText` and `helperAffinity` to `StreamTextInput` for a floating label above the field and helper text positioned inside or outside the bordered chassis.
 - Added `focusNode` and `autofocus` pass-through on `StreamListTile`.
 - Added optional `semanticLabel` to `StreamBadgeNotification`, `StreamFileTypeIcon`, `StreamStepper`, `StreamMessageComposerAttachment`, and `StreamMessageComposerMediaAttachment`.
-- Added optional `semanticsLabel` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. On `StreamAvatar`, `null` (default) drops the placeholder's initials from the semantics tree via `ExcludeSemantics`; a non-null value exposes it as a labeled image node. On `StreamAvatarGroup` / `StreamAvatarStack`, `null` composes through — each child's own `semanticsLabel` applies — while a non-null value collapses the group into a single labeled image node and hides children and the "+N" overflow badge.
-- Added `isFloating` to the default `StreamButton` constructor — the floating (elevated) appearance was previously reachable only through `StreamButton.icon`. Labelled buttons now get the same treatment: elevation for every type, plus a `backgroundElevation1` fill for `outline` and `ghost`.
 - Added `excludeHeaderSemantics` to `StreamAppBar` and `StreamSheetHeader` for opting out of the default heading role and route naming on the title.
 - Added `onVisible` callback to `StreamSnackbar` — fires after the entrance animation completes (or synchronously when a screen reader is active).
-- Added `StreamColorScheme.fromSeed` — builds a complete light or dark color scheme from a single brand color, optionally with a custom chrome color. When chrome is omitted it is derived from the brand hue at `StreamColorScheme.neutralChroma`.
-- `StreamColorSwatch.fromColor` now generates shades in the HCT color space instead of HSL. Each shade takes its tone from a fixed ladder measured from the Stream design tokens, so a shade's contrast is predictable regardless of the seed's hue — seeding a light color such as yellow now yields an accent that can carry white text. Two consequences: the seed is no longer reproduced verbatim at shade 500 (it is normalized onto the ladder), and dark scales now mirror the ladder so the seed's tone lands on shade 300, matching the default dark palette.
 
 ### 🐞 Fixed
 
@@ -30,12 +40,6 @@
 ### ✨ Features
 
 - Split the public API into `package:stream_core_flutter/core.dart` (shared primitives for any Stream SDK) and `package:stream_core_flutter/chat.dart` (chat-only widgets; re-exports `core.dart`); the convenience barrel `package:stream_core_flutter/stream_core_flutter.dart` is now deprecated.
-- Added `StreamScaffold` — a full-page scaffold that supports both regular and floating app-bar / bottom-bar layouts. Injects `StreamScaffoldInsets` into the widget tree so scrollable bodies can read the effective top and bottom padding from floating bars without coupling to layout details.
-- Added `StreamBottomNavBar` and `StreamBottomNavBarItem` — a bottom navigation bar with icon, selected-icon, and label slots per item. Renders either a regular docked bar or a floating pill with a gradient fade-out beneath it, resolved from the per-instance `behavior`, the `StreamBottomNavBarTheme`, then `StreamAppStyle`. Follows the standard `Props`/`Default`/`StreamComponentFactory` pattern (`bottomNavBar` builder) and is themeable via `StreamBottomNavBarTheme` / `StreamBottomNavBarStyle` (selected/unselected item colours, icon size, label styles, border, pill radius). Items announce themselves as accessible buttons via `Semantics`.
-- Added floating-bar support to `StreamAppBar` via a new `appBarBehavior` property. When set to `StreamAppBarBehavior.floating`, the app bar renders above the body with a translucent background and a gradient overlay.
-- Added `showShadow` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. When true, applies the `StreamAvatarThemeData.boxShadow` (falling back to `StreamBoxShadow.elevation3`) as a drop shadow around the avatar shape. Fixed: a themed `boxShadow` in `StreamAvatarThemeData` no longer bleeds onto avatars where `showShadow` is `false`.
-- Added `streamFloatingFade` helper — a shared `LinearGradient` factory (alpha stops `0xE8/0xA8/0x40/0x00` with solid-fraction support for safe-area zones) used internally by `StreamAppBar`, `StreamBottomNavBar`, and `StreamMessageComposer` floating fade effects.
-- Floating buttons (`isFloating: true`) now retain their pill surface (`backgroundElevation1`) when disabled, across all style/type combinations. Previously, outline and ghost variants fell back to transparent when disabled, losing the floating visual.
 - Added `StreamSnackbar` and `StreamSnackbarTheme` — Stream-styled transient feedback snackbars with a messenger-driven queue.
 - Added `StreamIcons.megaphone` and `StreamIcons.shield` (20px) to the icon set.
 - Added `StreamMentionType` identifier for supported mention types and options for mention text customisation per type.
