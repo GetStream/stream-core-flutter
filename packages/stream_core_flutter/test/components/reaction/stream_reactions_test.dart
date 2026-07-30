@@ -252,5 +252,23 @@ void main() {
       final button = tester.widget<IconButton>(find.byType(IconButton).first);
       expect(button.onPressed, isNull);
     });
+
+    testWidgets('deprecated onPressed still fires when tapped', (tester) async {
+      var count = 0;
+      await tester.pumpWidget(
+        wrap(
+          StreamReactions.segmented(
+            items: const [
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3, key: 'like'),
+            ],
+            // ignore: deprecated_member_use_from_same_package
+            onPressed: () => count++,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(IconButton).first);
+      expect(count, 1);
+    });
   });
 }

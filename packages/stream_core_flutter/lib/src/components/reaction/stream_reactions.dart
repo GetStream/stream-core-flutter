@@ -84,6 +84,8 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
+    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
+    VoidCallback? onPressed,
     OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
@@ -96,6 +98,8 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
+         // ignore: deprecated_member_use_from_same_package
+         onPressed: onPressed,
          onReactionPressed: onReactionPressed,
        );
 
@@ -111,6 +115,8 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
+    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
+    VoidCallback? onPressed,
     OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
@@ -123,6 +129,8 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
+         // ignore: deprecated_member_use_from_same_package
+         onPressed: onPressed,
          onReactionPressed: onReactionPressed,
        );
 
@@ -138,6 +146,8 @@ class StreamReactions extends StatelessWidget {
     double? indent,
     CrossAxisAlignment? crossAxisAlignment,
     Clip clipBehavior = Clip.none,
+    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
+    VoidCallback? onPressed,
     OnReactionItemPressed? onReactionPressed,
   }) : props = .new(
          items: items,
@@ -150,6 +160,8 @@ class StreamReactions extends StatelessWidget {
          indent: indent,
          crossAxisAlignment: crossAxisAlignment,
          clipBehavior: clipBehavior,
+         // ignore: deprecated_member_use_from_same_package
+         onPressed: onPressed,
          onReactionPressed: onReactionPressed,
        );
 
@@ -184,8 +196,14 @@ class StreamReactionsProps {
     this.indent,
     this.crossAxisAlignment,
     this.clipBehavior = Clip.none,
+    @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
+    this.onPressed,
     this.onReactionPressed,
-  });
+  }) : assert(
+         onPressed == null || onReactionPressed == null,
+         'Only one of onPressed or onReactionPressed can be provided. '
+         'Prefer onReactionPressed; onPressed is deprecated.',
+       );
 
   /// The reaction presentation style.
   final StreamReactionsType type;
@@ -226,6 +244,13 @@ class StreamReactionsProps {
 
   /// The clip behavior applied to the layout.
   final Clip clipBehavior;
+
+  /// Called when any reaction chip is pressed.
+  ///
+  /// Prefer [onReactionPressed], which also reports the pressed
+  /// [StreamReactionsItem].
+  @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
+  final VoidCallback? onPressed;
 
   /// Called when a reaction chip is pressed, with the pressed item.
   ///
@@ -398,19 +423,18 @@ class DefaultStreamReactions extends StatelessWidget {
     final overflow = items.skip(maxVisible).toList();
     final overflowCount = overflow.sumOf((item) => item.count ?? 1);
 
-    final onReactionPressed = props.onReactionPressed;
     final children = [
       for (final item in visible)
         StreamEmojiChip(
           emoji: item.emoji,
           count: showCounts ? item.count ?? 1 : null,
-          onPressed: onReactionPressed == null ? null : () => onReactionPressed(item),
+          onPressed: _chipCallback(item),
         ),
       // The overflow chip aggregates hidden reactions, so it has no single item.
       if (overflow.isNotEmpty)
         StreamEmojiChip.overflow(
           count: overflowCount,
-          onPressed: onReactionPressed == null ? null : () => onReactionPressed(null),
+          onPressed: _chipCallback(null),
         ),
     ];
 
@@ -424,12 +448,21 @@ class DefaultStreamReactions extends StatelessWidget {
     final totalCount = items.sumOf((item) => item.count ?? 1);
 
     // The cluster groups all reactions into one chip, so it has no single item.
-    final onReactionPressed = props.onReactionPressed;
     return StreamEmojiChip.cluster(
       emojis: visible,
       count: totalCount > 1 ? totalCount : null,
-      onPressed: onReactionPressed == null ? null : () => onReactionPressed(null),
+      onPressed: _chipCallback(null),
     );
+  }
+
+  // Resolves a chip's tap callback, preferring the item-aware
+  // [StreamReactions.onReactionPressed] and falling back to the deprecated
+  // [StreamReactions.onPressed].
+  VoidCallback? _chipCallback(StreamReactionsItem? item) {
+    final onReactionPressed = props.onReactionPressed;
+    if (onReactionPressed != null) return () => onReactionPressed(item);
+    // ignore: deprecated_member_use_from_same_package
+    return props.onPressed;
   }
 }
 

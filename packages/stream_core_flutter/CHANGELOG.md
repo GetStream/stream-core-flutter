@@ -1,12 +1,13 @@
 ## Upcoming
 
-### 🛑 Breaking / Removals
-
-- Replaced `StreamReactions.onPressed` (a `VoidCallback`) with `onReactionPressed`, which reports the pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip, which represents no single reaction. Added an optional `StreamReactionsItem.key` so callers can identify the pressed item.
-
 ### ✨ Features
 
+- Added `StreamReactions.onReactionPressed`, which reports the pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip, which represents no single reaction. Added an optional `StreamReactionsItem.key` so callers can identify the pressed item.
 - Added `chipStyle` to `StreamReactionsThemeData` for overriding the per-reaction chip appearance (background, size, etc.); it is merged over the default reaction chip style.
+
+### ⚠️ Deprecated
+
+- Deprecated `StreamReactions.onPressed` in favor of `onReactionPressed`.
 
 ## 0.4.1
 
