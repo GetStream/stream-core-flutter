@@ -79,8 +79,8 @@ jobs:
         run: melos bootstrap --verbose
 
       - name: 🌵 Dry Run
-        # MELOS_PACKAGES scopes release:pub* to just the tagged package.
-        run: melos run release:pub:dry
+        # MELOS_PACKAGES scopes lint:pub / release:pub to just the tagged package.
+        run: melos run lint:pub
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
 
