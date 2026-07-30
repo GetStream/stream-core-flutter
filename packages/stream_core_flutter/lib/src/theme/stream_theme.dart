@@ -39,6 +39,7 @@ import 'components/stream_snackbar_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'primitives/stream_elevation.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -82,6 +83,7 @@ part 'stream_theme.g.theme.dart';
 ///  * [StreamTextTheme], which defines semantic text styles.
 ///  * [StreamRadius], which defines border radius values.
 ///  * [StreamSpacing], which defines spacing values.
+///  * [StreamElevation], which defines Material elevation levels.
 ///  * [StreamBoxShadow], which defines elevation shadows.
 ///  * [StreamButtonThemeData], which defines button styles.
 ///  * [StreamAvatarThemeData], which defines avatar styles.
@@ -107,6 +109,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     Brightness? brightness,
     TargetPlatform? platform,
     StreamAppStyle? appStyle,
+    StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
@@ -163,6 +166,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final isDark = effectiveBrightness == Brightness.dark;
 
     // Primitives
+    elevation ??= const StreamElevation();
     icons ??= const StreamIcons();
     radius ??= const StreamRadius();
     spacing ??= const StreamSpacing();
@@ -215,6 +219,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     return .raw(
       appStyle: appStyle,
+      elevation: elevation,
       icons: icons,
       radius: radius,
       spacing: spacing,
@@ -277,6 +282,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   const StreamTheme.raw({
     @Deprecated('Use colorScheme.brightness instead') Brightness? brightness,
     required this.appStyle,
+    required this.elevation,
     required this.icons,
     required this.radius,
     required this.spacing,
@@ -357,6 +363,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The app style for this theme.
   final StreamAppStyle appStyle;
+
+  /// The Material elevation values for this theme.
+  final StreamElevation elevation;
 
   /// The icons for this theme.
   final StreamIcons icons;
@@ -518,6 +527,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     return StreamTheme.raw(
       appStyle: appStyle,
+      elevation: elevation,
       icons: icons,
       radius: radius,
       spacing: spacing,

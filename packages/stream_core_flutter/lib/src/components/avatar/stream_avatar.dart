@@ -215,7 +215,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveIsFloating = props.isFloating ?? avatarTheme.isFloating ?? false;
     final effectiveElevation = effectiveIsFloating
         ? (avatarTheme.floatingElevation ?? defaults.floatingElevation)
-        : StreamElevation.none;
+        : context.streamElevation.none;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
 
     // Avatars are circular, so the border is always uniform — use any side.
@@ -312,13 +312,15 @@ class DefaultStreamAvatar extends StatelessWidget {
 class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
   _StreamAvatarThemeDefaults(
     this.context,
-  ) : _colorScheme = context.streamColorScheme;
+  ) : _colorScheme = context.streamColorScheme,
+      _elevation = context.streamElevation;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;
+  final StreamElevation _elevation;
 
   @override
-  double get floatingElevation => StreamElevation.level2;
+  double get floatingElevation => _elevation.level2;
 
   @override
   StreamAvatarSize get size => StreamAvatarSize.lg;
