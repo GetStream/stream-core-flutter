@@ -12,6 +12,7 @@ part of 'stream_theme.dart';
 mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   @override
   ThemeExtension<StreamTheme> copyWith({
+    Brightness? brightness,
     StreamAppStyle? appStyle,
     StreamElevation? elevation,
     StreamIcons? icons,
@@ -68,6 +69,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _this = (this as StreamTheme);
 
     return StreamTheme.raw(
+      brightness: brightness ?? _this.brightness,
       appStyle: appStyle ?? _this.appStyle,
       elevation: elevation ?? _this.elevation,
       icons: icons ?? _this.icons,
@@ -147,6 +149,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _this = (this as StreamTheme);
 
     return StreamTheme.raw(
+      brightness: t < 0.5 ? _this.brightness : other.brightness,
       appStyle: t < 0.5 ? _this.appStyle : other.appStyle,
       elevation: StreamElevation.lerp(_this.elevation, other.elevation, t)!,
       icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
@@ -365,7 +368,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _this = (this as StreamTheme);
     final _other = (other as StreamTheme);
 
-    return _other.appStyle == _this.appStyle &&
+    return _other.brightness == _this.brightness &&
+        _other.appStyle == _this.appStyle &&
         _other.elevation == _this.elevation &&
         _other.icons == _this.icons &&
         _other.radius == _this.radius &&
@@ -426,6 +430,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return Object.hashAll([
       runtimeType,
+      _this.brightness,
       _this.appStyle,
       _this.elevation,
       _this.icons,

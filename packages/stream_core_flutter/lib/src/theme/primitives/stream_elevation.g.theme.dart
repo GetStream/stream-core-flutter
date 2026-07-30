@@ -30,7 +30,6 @@ mixin _$StreamElevation {
     }
 
     return StreamElevation(
-      none: lerpDouble$(a.none, b.none, t)!,
       level1: lerpDouble$(a.level1, b.level1, t)!,
       level2: lerpDouble$(a.level2, b.level2, t)!,
       level3: lerpDouble$(a.level3, b.level3, t)!,
@@ -39,7 +38,6 @@ mixin _$StreamElevation {
   }
 
   StreamElevation copyWith({
-    double? none,
     double? level1,
     double? level2,
     double? level3,
@@ -48,7 +46,6 @@ mixin _$StreamElevation {
     final _this = (this as StreamElevation);
 
     return StreamElevation(
-      none: none ?? _this.none,
       level1: level1 ?? _this.level1,
       level2: level2 ?? _this.level2,
       level3: level3 ?? _this.level3,
@@ -68,7 +65,6 @@ mixin _$StreamElevation {
     }
 
     return copyWith(
-      none: other.none,
       level1: other.level1,
       level2: other.level2,
       level3: other.level3,
@@ -89,8 +85,7 @@ mixin _$StreamElevation {
     final _this = (this as StreamElevation);
     final _other = (other as StreamElevation);
 
-    return _other.none == _this.none &&
-        _other.level1 == _this.level1 &&
+    return _other.level1 == _this.level1 &&
         _other.level2 == _this.level2 &&
         _other.level3 == _this.level3 &&
         _other.level4 == _this.level4;
@@ -102,7 +97,6 @@ mixin _$StreamElevation {
 
     return Object.hash(
       runtimeType,
-      _this.none,
       _this.level1,
       _this.level2,
       _this.level3,

@@ -22,6 +22,9 @@ part 'stream_elevation.g.theme.dart';
 /// field) rather than painting a `BoxShadow`. See `StreamBoxShadow` for the
 /// cases where Material cannot render the shadow, such as text shadows.
 ///
+/// The four levels are themeable, so an app can retune the whole system at
+/// once. [none] is not — it is always `0`.
+///
 /// {@tool snippet}
 ///
 /// Elevate a surface to the level used by floating components:
@@ -38,7 +41,6 @@ part 'stream_elevation.g.theme.dart';
 class StreamElevation with _$StreamElevation {
   /// Creates a [StreamElevation] with the default values.
   const StreamElevation({
-    this.none = 0,
     this.level1 = 1,
     this.level2 = 3,
     this.level3 = 6,
@@ -46,7 +48,11 @@ class StreamElevation with _$StreamElevation {
   });
 
   /// No elevation, for a surface flush with its background.
-  final double none;
+  ///
+  /// Always `0`, and deliberately not a constructor field: a theme that could
+  /// redefine "flat" as elevated would put a shadow under every unelevated
+  /// surface in the design system.
+  double get none => 0;
 
   /// Low elevation, for subtle separation.
   ///

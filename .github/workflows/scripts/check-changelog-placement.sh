@@ -62,11 +62,12 @@ headings() {
 }
 
 # A released section: `0.4.1`, `1.0.0-beta.1`, `0.4.1 (2026-07-22)`, ...
+#
+# Two leading numeric components are required, so a prose heading that happens to
+# start with a digit (`## 2 quick fixes`) is reported as a misnamed heading
+# rather than as a version.
 is_version() {
-  case "$1" in
-    [0-9]*) return 0 ;;
-    *) return 1 ;;
-  esac
+  [[ $1 =~ ^[0-9]+\.[0-9]+ ]]
 }
 
 has_heading() {

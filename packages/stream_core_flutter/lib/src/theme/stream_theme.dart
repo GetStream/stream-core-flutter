@@ -218,6 +218,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
+      // ignore: deprecated_member_use_from_same_package
+      brightness: effectiveBrightness,
       appStyle: appStyle,
       elevation: elevation,
       icons: icons,
@@ -280,7 +282,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme.dark() => StreamTheme(brightness: .dark);
 
   const StreamTheme.raw({
-    @Deprecated('Use colorScheme.brightness instead') Brightness? brightness,
+    @Deprecated('Use colorScheme.brightness instead') this.brightness = Brightness.light,
     required this.appStyle,
     required this.elevation,
     required this.icons,
@@ -359,7 +361,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   }
 
   /// The brightness of this theme.
-  Brightness get brightness => colorScheme.brightness;
+  ///
+  /// For a theme built through the [StreamTheme] factory this always mirrors
+  /// `colorScheme.brightness` — the factory asserts the two agree. Only
+  /// [StreamTheme.raw] and [copyWith] can set it independently, and a value
+  /// that disagrees with [colorScheme] changes nothing about how the theme
+  /// renders. Read `colorScheme.brightness` instead.
+  @Deprecated('Use colorScheme.brightness instead')
+  final Brightness brightness;
 
   /// The app style for this theme.
   final StreamAppStyle appStyle;
@@ -526,6 +535,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
 
     return StreamTheme.raw(
+      // ignore: deprecated_member_use_from_same_package
+      brightness: brightness,
       appStyle: appStyle,
       elevation: elevation,
       icons: icons,

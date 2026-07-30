@@ -1253,14 +1253,11 @@ needs a drop shadow exposes `elevation` (a `double`, in dp) on its theme data an
 renders through `Material` — not `boxShadow` on a `BoxDecoration`.
 
 The design system specifies each elevation token as both a shadow and a Material
-level, so the dp value is the authoritative representation for Flutter:
-
-| Token | Material level | dp |
-| --- | --- | --- |
-| `elevation-1` | 1 | 1 |
-| `elevation-2` | 2 | 3 |
-| `elevation-3` | 3 | 6 |
-| `elevation-4` | 3–4 | 6–8 |
+level, so the dp value is the authoritative representation for Flutter. Take it
+from `StreamElevation` (`context.streamElevation.level3`, or `StreamTheme.elevation`)
+rather than writing a number — that class carries the token-to-dp table and is the
+single place it lives. `StreamElevation.none` is a fixed `0` for the unelevated
+case; the four levels are themeable.
 
 Two shadow systems side by side do not match. `Canvas.drawShadow` (what Material
 renders) computes an ambient and a spot shadow from a single colour, which no
