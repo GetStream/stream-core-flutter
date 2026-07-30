@@ -67,7 +67,7 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
           OVERRIDE: ${{ contains(github.event.pull_request.labels.*.name, 'changelog-override') }}
         run: |
           set -euo pipefail
@@ -92,12 +92,15 @@ jobs:
               -H 'Accept: application/vnd.github.raw' > "$3" 2>/dev/null || : > "$3"
           }
 
+          # `refs/pull/N/head` rather than the head SHA: for a PR from a fork
+          # the head commit lives in the fork, but this ref always resolves in
+          # the base repo.
           status=0
           while IFS= read -r path; do
             fetch "$path" "$BASE_SHA" base.md
-            fetch "$path" "$HEAD_SHA" head.md
+            fetch "$path" "refs/pull/$PR/head" head.md
             .github/workflows/scripts/check-changelog-placement.sh \
-              base.md head.md "$path" || status=1
+              base.md head.md "$path" "$HEAD_BRANCH" || status=1
           done <<< "$changelogs"
 
           exit $status
