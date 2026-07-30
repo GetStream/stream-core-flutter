@@ -39,13 +39,15 @@ See the "Releasing" section of `STYLE_GUIDE.md`.
 - **`release/` branch is required**, not a convention: the changelog-placement check in `pr_title.yml` only allows a
   `## Upcoming` heading to become `## X.Y.Z` on a `release/` branch.
 
-Packages and their conventional-commit scopes:
+Publishable packages are the non-private ones under `packages/*` — list them with
+`melos list --no-private`. Their conventional-commit scopes are defined in
+`.github/workflows/pr_title.yml` (the `semantic_changelog_update` job maps each
+scope to a package path); read that map rather than hard-coding it, so adding a
+package needs no change here:
 
-| Package | Path | Scope |
-|---|---|---|
-| `stream_core` | `packages/stream_core` | `llc` |
-| `stream_core_flutter` | `packages/stream_core_flutter` | `ui` |
-| `stream_thumbnail` | `packages/stream_thumbnail` | `thumb` |
+```bash
+grep -A6 'semantic_changelog_update' .github/workflows/pr_title.yml
+```
 
 ## Inputs
 
@@ -128,7 +130,7 @@ git push -u origin <branch>
 Single commit. **The title is load-bearing** — `release_tag.yml` gates on the `chore(...): release` prefix:
 
 - One package: `chore(<scope>): release <package> vX.Y.Z` (e.g. `chore(llc): release stream_core v0.4.1`).
-- Several: `chore(repo): release <pkg1> vX.Y.Z, <pkg2> vA.B.C`.
+- Several: `chore(repo): release packages` — generic, so the title stays short no matter how many packages bump.
 
 Tagging derives from package state, not this title, so a typo can't mis-tag — but keep the prefix intact or the tag
 job won't fire.

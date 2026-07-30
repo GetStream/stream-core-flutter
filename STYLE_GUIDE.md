@@ -1391,9 +1391,9 @@ package you are releasing:
 - bump its `version` in `pubspec.yaml`
 - promote its CHANGELOG `## Upcoming` heading to `## X.Y.Z`
 
-Title the PR `chore(repo): release` for a multi-package release, or
-`chore(<scope>): release <package> vX.Y.Z` (scope `llc` / `ui` / `thumb`) for a
-single package. The tooling keys only on the `chore(...): release` prefix — tags
+Title the PR `chore(repo): release packages` for a multi-package release
+(generic, so it stays short), or `chore(<scope>): release <package> vX.Y.Z`
+(scope `llc` / `ui` / `thumb`) for a single package. The tooling keys only on the `chore(...): release` prefix — tags
 are derived from **package state**, not the title — so a title mentioning one
 version while the PR bumps several still tags and publishes every bumped package.
 
