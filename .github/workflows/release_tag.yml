@@ -5,24 +5,20 @@ on:
     branches: [main]
 
 concurrency:
-  # Keyed on the branch ref, so back-to-back release merges share this group.
-  # cancel-in-progress must stay false: cancelling a run mid tag-push would
-  # silently drop a release.
+  # false: never cancel a run mid tag-push (would drop a release).
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   release:
-    # Run only for release commits. GitHub expressions have no regex, so the
-    # `chore(<scope>): release ...` prefix is matched with startsWith + contains.
+    # No regex in GH expressions; match the `chore(<scope>): release` prefix.
     if: "${{ startsWith(github.event.head_commit.message, 'chore(') && contains(github.event.head_commit.message, '): release') }}"
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required to create and push tags
+      contents: write
     steps:
       - name: 📚 Checkout branch
-        # Bot PAT (not the default GITHUB_TOKEN): tags pushed with GITHUB_TOKEN
-        # do not trigger the `on: push: tags` publish workflow.
+        # Bot PAT: GITHUB_TOKEN tag pushes don't trigger the publish workflow.
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -34,20 +30,13 @@ jobs:
           channel: stable
 
       - name: 📦 Install Tools
-        # melos exec --no-published queries pub.dev, so melos must be installed.
-        # No bootstrap needed — package discovery does not require it.
         run: flutter pub global activate melos
 
       - name: 🏷️ Tag unpublished packages
+        # Tags derive from package state, not the commit message. See release:tag.
         shell: bash
         run: |
           set -euo pipefail
-
           git config user.name "Stream SDK Bot"
           git config user.email "60655709+Stream-SDK-Bot@users.noreply.github.com"
-
-          # Tag every package whose version is not yet on pub.dev and push the
-          # tags in dependency order. See the `release:tag` script in melos.yaml.
-          # Tags are derived from package state, not the commit message, so
-          # multi-package release PRs and title typos are handled correctly.
           melos run release:tag

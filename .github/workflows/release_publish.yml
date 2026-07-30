@@ -3,21 +3,20 @@ name: release_publish
 on:
   push:
     tags:
-      - '*-v[0-9]+.[0-9]+.[0-9]+'   # per-package release tags, e.g. stream_core-v0.4.0
-      - '*-v[0-9]+.[0-9]+.[0-9]+-*' # per-package pre-release tags, e.g. stream_core-v0.4.0-beta.1
-  workflow_dispatch: # Allow manual re-runs against an existing tag ref
+      - '*-v[0-9]+.[0-9]+.[0-9]+'   # <pkg>-vX.Y.Z
+      - '*-v[0-9]+.[0-9]+.[0-9]+-*' # <pkg>-vX.Y.Z-<pre>
+  workflow_dispatch: # manual re-runs against a tag ref
 
 concurrency:
-  # Keyed on the tag ref. cancel-in-progress must stay false so a manual re-run
-  # does not cancel an in-flight publish of the same tag.
+  # false: don't let a re-run cancel an in-flight publish of the same tag.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   release:
     permissions:
-      contents: write # Required to create the GitHub Release
-      id-token: write # Required for OIDC authentication to pub.dev
+      contents: write # create the GitHub Release
+      id-token: write # OIDC auth to pub.dev
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Checkout branch
@@ -35,7 +34,6 @@ jobs:
           ref="${GITHUB_REF#refs/tags/}"
           echo "📦 Tag: $ref"
 
-          # <package>-v<version>; version may carry a pre-release suffix.
           if [[ ! "$ref" =~ ^([a-z0-9_]+)-v(.+)$ ]]; then
             echo "::error ::Tag '$ref' does not match '<package>-v<version>'."
             exit 1
@@ -50,8 +48,7 @@ jobs:
             exit 1
           fi
 
-          # Guard against a stray tag: the pubspec version must equal the tag.
-          # pub.dev's OIDC check enforces this too, but failing here is clearer.
+          # Guard a stray tag: pubspec version must equal the tag version.
           pubspec_version="$(grep -E '^version:' "$pubspec" | head -n1 | sed -E 's/^version:[[:space:]]*//')"
           if [[ "$pubspec_version" != "$version" ]]; then
             echo "::error ::Tag version ($version) does not match $pubspec version ($pubspec_version)."
@@ -66,9 +63,8 @@ jobs:
             echo "prerelease=$is_prerelease"
           } >> "$GITHUB_OUTPUT"
 
-      # setup-dart provisions the OIDC token used to authenticate with pub.dev.
-      # It must run before flutter-action, which bundles Dart but not the OIDC setup.
       - name: 🎯 Setup Dart
+        # Before flutter-action: this provides the OIDC token for pub.dev.
         uses: dart-lang/setup-dart@v1
 
       - name: 🐦 Install Flutter
@@ -82,54 +78,43 @@ jobs:
       - name: 🔧 Bootstrap Workspace
         run: melos bootstrap --verbose
 
-      # melos publish only ever touches unpublished versions, so a re-run of an
-      # already-published tag is a clean no-op. MELOS_PACKAGES scopes the
-      # `release:pub*` scripts (melos.yaml) to just the tagged package.
       - name: 🌵 Dry Run
+        # MELOS_PACKAGES scopes release:pub* to just the tagged package.
         run: melos run release:pub:dry
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
 
-      # Guarantee dependent-order publishing. Each package publishes in its own
-      # run (OIDC binds one tag ref → one package), so when a release bumps both
-      # a package and something it depends on, the dependent's run can start
-      # before the dependency is live on pub.dev and its publish would fail
-      # resolution. Rather than lean on a manual re-run, wait here until every
-      # in-workspace dependency this package needs is live at the version the
-      # workspace pins. Common case (dependency already published, or none):
-      # returns immediately.
       - name: ⏳ Wait for in-workspace dependencies
+        # Each package publishes in its own OIDC run, so wait until this
+        # package's in-workspace deps are live before publishing — a dependent
+        # never publishes before its dependency. No-op when there are none.
         shell: bash
         run: |
           set -euo pipefail
 
           pkg="${{ steps.parse.outputs.package }}"
 
-          # This package's workspace dependencies, from melos's own dependency
-          # graph (`{package: [deps]}`). awk keeps only the JSON object, dropping
-          # any trailing log lines; it drains the whole stream (no early exit) so
-          # melos never takes a SIGPIPE that pipefail would turn into a failure.
+          # $pkg's workspace deps from melos's graph; awk keeps only the JSON
+          # object and drains the stream (no early exit -> no SIGPIPE).
           graph="$(melos list --graph 2>/dev/null | awk '/^\{/{f=1} f{print} /^\}$/{f=0}')"
           mapfile -t deps < <(printf '%s' "$graph" | jq -r --arg p "$pkg" '.[$p] // [] | .[]')
 
           if [[ "${#deps[@]}" -eq 0 ]]; then
-            echo "✅ $pkg has no in-workspace dependencies; nothing to wait for."
+            echo "✅ $pkg has no in-workspace dependencies."
             exit 0
           fi
 
           for dep in "${deps[@]}"; do
             dep_pubspec="packages/$dep/pubspec.yaml"
-            # A dependency outside packages/ (e.g. a private app) is never on
-            # pub.dev and cannot be a real dependency of a published package.
-            [[ -f "$dep_pubspec" ]] || continue
+            [[ -f "$dep_pubspec" ]] || continue # non-packages/ dep can't be on pub.dev
 
             want="$(grep -E '^version:' "$dep_pubspec" | head -n1 | sed -E 's/^version:[[:space:]]*//')"
-            echo "⏳ $pkg depends on $dep — waiting for $dep v$want on pub.dev…"
+            echo "⏳ Waiting for $dep v$want on pub.dev…"
 
             deadline=$((SECONDS + 900)) # 15 minutes
             until curl -sfL -o /dev/null "https://pub.dev/api/packages/$dep/versions/$want"; do
               if (( SECONDS >= deadline )); then
-                echo "::error ::Timed out waiting for $dep v$want on pub.dev. Once $dep is published, re-run this workflow (workflow_dispatch on this tag)."
+                echo "::error ::Timed out waiting for $dep v$want. Once it is published, re-run this workflow."
                 exit 1
               fi
               echo "  …not live yet; retrying in 15s"
@@ -154,10 +139,8 @@ jobs:
           changelog="packages/$pkg/CHANGELOG.md"
           notes_file="$RUNNER_TEMP/release_notes.md"
 
-          # Extract the `## <version>` section. Exact heading compare — versions
-          # carry dots and pre-release hyphens, so no regex. Not
-          # generate_release_notes: that would list every repo commit since the
-          # previous tag of *any* package.
+          # Exact `## <version>` heading match. Not generate_release_notes: it
+          # would list every package's commits since the previous tag.
           if [[ -f "$changelog" ]]; then
             awk -v version="$version" '
               $0 == "## " version { capture = 1; next }
@@ -166,8 +149,7 @@ jobs:
             ' "$changelog" > "$notes_file"
           fi
 
-          # Publishing already happened and is irreversible, so a missing or
-          # renamed heading must not fail the release — fall back to a link.
+          # Publish is irreversible; never fail the release on a missing heading.
           if [[ ! -s "$notes_file" ]]; then
             echo "See [CHANGELOG](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/packages/$pkg/CHANGELOG.md)." > "$notes_file"
           fi
@@ -181,9 +163,5 @@ jobs:
           name: ${{ steps.parse.outputs.package }} v${{ steps.parse.outputs.version }}
           body_path: ${{ steps.notes.outputs.path }}
           prerelease: ${{ steps.parse.outputs.prerelease }}
-          # Packages are versioned independently, so no single release is "the
-          # repo's latest" — a stream_thumbnail patch must not outrank a
-          # stream_core_flutter release for the Latest badge. Keep every
-          # per-package release off it.
-          make_latest: false
+          make_latest: false # independent versioning: no single "latest" release
           token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
