@@ -69,6 +69,8 @@ import '../../theme/stream_theme_extensions.dart';
 class StreamButton extends StatelessWidget {
   /// Creates a button that displays [child], optionally flanked by leading
   /// and/or trailing icons ([iconLeft] and [iconRight]).
+  ///
+  /// Set [isFloating] to true for a floating button with a shadow.
   StreamButton({
     super.key,
     required Widget child,
@@ -78,6 +80,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonSize size = .medium,
     Widget? iconLeft,
     Widget? iconRight,
+    bool? isFloating,
     bool? isSelected,
     bool autofocus = false,
     StreamButtonThemeStyle? themeStyle,
@@ -89,6 +92,7 @@ class StreamButton extends StatelessWidget {
          size: size,
          iconLeft: iconLeft,
          iconRight: iconRight,
+         isFloating: isFloating,
          isSelected: isSelected,
          autofocus: autofocus,
          themeStyle: themeStyle,
@@ -460,6 +464,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
 // -- Shared defaults --------------------------------------------------------
 
 mixin _SharedButtonDefaults on StreamButtonThemeStyle {
+  BuildContext get context;
   bool get isFloating;
   StreamRadius get radius;
   StreamTextTheme get textTheme;
@@ -494,13 +499,16 @@ mixin _SharedButtonDefaults on StreamButtonThemeStyle {
   WidgetStateProperty<Size> get maximumSize => const WidgetStatePropertyAll(Size.infinite);
 
   @override
-  WidgetStateProperty<double> get elevation => WidgetStateProperty.resolveWith((states) {
-    if (!isFloating) return 0;
-    if (states.contains(WidgetState.disabled)) return 6.0;
-    if (states.contains(WidgetState.pressed)) return 6.0;
-    if (states.contains(WidgetState.hovered)) return 8.0;
-    return 6.0;
-  });
+  WidgetStateProperty<double> get elevation {
+    final elevations = context.streamElevation;
+    return WidgetStateProperty.resolveWith((states) {
+      if (!isFloating) return elevations.none;
+      if (states.contains(WidgetState.disabled)) return elevations.level3;
+      if (states.contains(WidgetState.pressed)) return elevations.level3;
+      if (states.contains(WidgetState.hovered)) return elevations.level4;
+      return elevations.level3;
+    });
+  }
 }
 
 // -- Primary defaults -------------------------------------------------------
@@ -514,6 +522,7 @@ class _PrimarySolidDefaults extends StreamButtonThemeStyle with _SharedButtonDef
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -548,6 +557,7 @@ class _PrimaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButtonD
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -588,6 +598,7 @@ class _PrimaryGhostDefaults extends StreamButtonThemeStyle with _SharedButtonDef
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -624,6 +635,7 @@ class _SecondarySolidDefaults extends StreamButtonThemeStyle with _SharedButtonD
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -658,6 +670,7 @@ class _SecondaryOutlineDefaults extends StreamButtonThemeStyle with _SharedButto
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -698,6 +711,7 @@ class _SecondaryGhostDefaults extends StreamButtonThemeStyle with _SharedButtonD
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -734,6 +748,7 @@ class _DestructiveSolidDefaults extends StreamButtonThemeStyle with _SharedButto
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -768,6 +783,7 @@ class _DestructiveOutlineDefaults extends StreamButtonThemeStyle with _SharedBut
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;
@@ -808,6 +824,7 @@ class _DestructiveGhostDefaults extends StreamButtonThemeStyle with _SharedButto
        textTheme = context.streamTextTheme,
        colorScheme = context.streamColorScheme;
 
+  @override
   final BuildContext context;
   @override
   final StreamRadius radius;

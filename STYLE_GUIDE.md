@@ -84,6 +84,9 @@ document; the section link is provided.
   chain in `build`) — mirrors Flutter's own `AppBar`/`TabBar` pattern.
 - Never hand-roll `copyWith`, `merge`, `lerp`, `==`, or `hashCode` on theme classes —
   the generator produces them. → [Theme system](#theme-system)
+- Drop shadows use Material `elevation` in dp, not hand-painted `BoxShadow` lists.
+  `StreamBoxShadow` is reserved for the places Material cannot reach. →
+  [Elevation and shadows](#elevation-and-shadows)
 - Icons are generated from SVGs. Do not hand-edit the icon font or the generated
   `StreamIcons` class. → [Icons](#icons)
 
@@ -1242,6 +1245,45 @@ Note: the root `StreamTheme` is an exception — it extends
 `@ThemeExtensions(constructor: 'raw', buildContextExtension: false)` so it plugs
 into Material's `ThemeData.extensions`. New component themes follow the
 `@themeGen` pattern above, not the root pattern.
+
+### Elevation and shadows
+
+**Prefer Material `elevation` over a hand-painted `BoxShadow`.** A component that
+needs a drop shadow exposes `elevation` (a `double`, in dp) on its theme data and
+renders through `Material` — not `boxShadow` on a `BoxDecoration`.
+
+The design system specifies each elevation token as both a shadow and a Material
+level, so the dp value is the authoritative representation for Flutter. Take it
+from `StreamElevation` (`context.streamElevation.level3`, or `StreamTheme.elevation`)
+rather than writing a number — that class carries the token-to-dp table and is the
+single place it lives. `StreamElevation.none` is a fixed `0` for the unelevated
+case; the four levels are themeable.
+
+Two shadow systems side by side do not match. `Canvas.drawShadow` (what Material
+renders) computes an ambient and a spot shadow from a single colour, which no
+multi-layer `BoxShadow` list reproduces — so a component painting its own shadow
+reads visibly different from the elevated component next to it.
+
+`StreamBoxShadow` stays for the cases Material genuinely cannot reach:
+
+- text shadows (`TextStyle.shadows`), as in `StreamBadgeCount`;
+- custom painting, where there is no `Material` to elevate;
+- a surface that must stay translucent — `Material` treats a transparent colour as
+  a transparent occluder and the shadow shows through.
+
+Reaching for a `BoxShadow` outside those cases needs a comment explaining why
+`Material` did not work.
+
+Two things to expect when elevating a component:
+
+- Material clips its children with `PhysicalShape`, so a border with
+  `strokeAlignOutside` on the Material's own `shape` gets clipped. Draw the border
+  in a `DecoratedBox` **outside** the `Material` instead. `StreamAvatar` shows the
+  shape.
+- The shadow colour resolves to `ThemeData.shadowColor` from the **host** app, since
+  this package contributes a `ThemeExtension` rather than building its own
+  `ThemeData`. Pass an explicit `shadowColor` when a component must not drift with
+  the embedding app's theme.
 
 ### Component factory
 
