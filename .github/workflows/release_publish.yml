@@ -105,22 +105,19 @@ jobs:
           fi
 
           for dep in "${deps[@]}"; do
-            dep_pubspec="packages/$dep/pubspec.yaml"
-            [[ -f "$dep_pubspec" ]] || continue # non-packages/ dep can't be on pub.dev
-
-            want="$(grep -E '^version:' "$dep_pubspec" | head -n1 | sed -E 's/^version:[[:space:]]*//')"
-            echo "⏳ Waiting for $dep v$want on pub.dev…"
-
+            echo "⏳ Waiting for $dep to be published on pub.dev…"
             deadline=$((SECONDS + 900)) # 15 minutes
-            until curl -sfL -o /dev/null "https://pub.dev/api/packages/$dep/versions/$want"; do
+            # melos's own published-check (same detection as --no-published):
+            # lists $dep only once its current version is live on pub.dev.
+            until melos list --published --scope="$dep" 2>/dev/null | grep -qx "$dep"; do
               if (( SECONDS >= deadline )); then
-                echo "::error ::Timed out waiting for $dep v$want. Once it is published, re-run this workflow."
+                echo "::error ::Timed out waiting for $dep on pub.dev. Once it is published, re-run this workflow."
                 exit 1
               fi
               echo "  …not live yet; retrying in 15s"
               sleep 15
             done
-            echo "✅ $dep v$want is live."
+            echo "✅ $dep is published."
           done
 
       - name: 📢 Publish to pub.dev
