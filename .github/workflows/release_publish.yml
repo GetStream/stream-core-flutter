@@ -23,11 +23,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          # Read-only checkout: this job never pushes (the Release step passes its
-          # own token), so use the default GITHUB_TOKEN and don't persist it in
-          # git config through the later melos/pub steps. The bot PAT never enters
-          # this job.
-          persist-credentials: false
+          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
 
       - name: 🏷️ Parse package and version from tag
         id: parse
