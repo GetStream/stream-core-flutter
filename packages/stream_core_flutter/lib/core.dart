@@ -89,6 +89,7 @@ export 'src/theme/components/stream_switch_theme.dart';
 export 'src/theme/components/stream_text_input_theme.dart';
 
 export 'src/theme/primitives/stream_colors.dart';
+export 'src/theme/primitives/stream_elevation.dart';
 export 'src/theme/primitives/stream_icons.dart';
 export 'src/theme/primitives/stream_radius.dart';
 export 'src/theme/primitives/stream_spacing.dart';

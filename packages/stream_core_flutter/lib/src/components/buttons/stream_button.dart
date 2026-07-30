@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_button_theme.dart';
 import '../../theme/primitives/stream_colors.dart';
+import '../../theme/primitives/stream_elevation.dart';
 import '../../theme/primitives/stream_radius.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
@@ -499,11 +500,11 @@ mixin _SharedButtonDefaults on StreamButtonThemeStyle {
 
   @override
   WidgetStateProperty<double> get elevation => WidgetStateProperty.resolveWith((states) {
-    if (!isFloating) return 0;
-    if (states.contains(WidgetState.disabled)) return 6.0;
-    if (states.contains(WidgetState.pressed)) return 6.0;
-    if (states.contains(WidgetState.hovered)) return 8.0;
-    return 6.0;
+    if (!isFloating) return StreamElevation.none;
+    if (states.contains(WidgetState.disabled)) return StreamElevation.level3;
+    if (states.contains(WidgetState.pressed)) return StreamElevation.level3;
+    if (states.contains(WidgetState.hovered)) return StreamElevation.level4;
+    return StreamElevation.level3;
   });
 }
 
