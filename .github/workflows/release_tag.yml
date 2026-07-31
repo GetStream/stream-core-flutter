@@ -3,6 +3,7 @@ name: release_tag
 on:
   push:
     branches: [main]
+  workflow_dispatch: # manual recovery, e.g. if a release commit's title was edited past the gate
 
 concurrency:
   # false: never cancel a run mid tag-push (would drop a release).
@@ -11,8 +12,10 @@ concurrency:
 
 jobs:
   release:
-    # No regex in GH expressions; match the `chore(<scope>): release` prefix.
-    if: "${{ startsWith(github.event.head_commit.message, 'chore(') && contains(github.event.head_commit.message, '): release') }}"
+    # Run on a manual dispatch, or when the commit matches the `chore(<scope>):
+    # release` prefix (no regex in GH expressions). Tags derive from package
+    # state, so a manual run tags whatever is currently unpublished.
+    if: "${{ github.event_name == 'workflow_dispatch' || (startsWith(github.event.head_commit.message, 'chore(') && contains(github.event.head_commit.message, '): release')) }}"
     runs-on: ubuntu-latest
     permissions:
       contents: write

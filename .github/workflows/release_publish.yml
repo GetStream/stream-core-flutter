@@ -98,18 +98,27 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Dep names from the graph; versions from list --json (dir name may differ).
+          # Dep names from the graph (all in-workspace deps, incl. dev/override);
+          # versions from list --json (dir name may differ). Skip private deps —
+          # they never publish, so waiting on one would hang until timeout.
           info="$(melos list --json 2>/dev/null)"
-          deps="$(melos list --graph 2>/dev/null | awk '/^\{/{f=1} f{print} /^\}$/{f=0}' \
+          raw="$(melos list --graph 2>/dev/null | awk '/^\{/{f=1} f{print} /^\}$/{f=0}' \
             | jq -r --arg p "$PKG" '.[$p] // [] | .[]')"
 
-          [[ -z "$deps" ]] && { echo "✅ $PKG has no in-workspace dependencies."; exit 0; }
+          deps=""
+          for dep in $raw; do
+            priv="$(printf '%s' "$info" | jq -r --arg n "$dep" '.[] | select(.name==$n) | .private')"
+            if [ "$priv" != "true" ]; then deps="$deps $dep"; fi
+          done
+
+          [[ -z "${deps// /}" ]] && { echo "✅ $PKG has no publishable in-workspace dependencies."; exit 0; }
 
           for dep in $deps; do
             want="$(printf '%s' "$info" | jq -r --arg n "$dep" '.[] | select(.name==$n) | .version')"
+            enc="${want//+/%2B}" # url-encode a build-metadata '+'
             echo "⏳ Waiting for $dep v$want on pub.dev…"
             deadline=$((SECONDS + 900)) # 15 minutes
-            until curl -sfL --connect-timeout 10 --max-time 30 -o /dev/null "https://pub.dev/api/packages/$dep/versions/$want"; do
+            until curl -sfL --connect-timeout 10 --max-time 30 -o /dev/null "https://pub.dev/api/packages/$dep/versions/$enc"; do
               (( SECONDS < deadline )) || { echo "::error ::Timed out after 15m waiting for $dep v$want on pub.dev. If $dep is a new package, publish it (enable automated publishing) before releasing packages that depend on it; otherwise re-run this once $dep v$want is live."; exit 1; }
               echo "  …not live yet; retrying in 15s"
               sleep 15
@@ -121,6 +130,25 @@ jobs:
         run: melos run release:pub
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
+
+      - name: ✅ Verify published
+        # Guard against a no-op publish (e.g. release:pub matching zero packages)
+        # cutting a GitHub Release for a version that never reached pub.dev.
+        shell: bash
+        env:
+          PKG: ${{ steps.parse.outputs.package }}
+          VERSION: ${{ steps.parse.outputs.version }}
+        run: |
+          set -euo pipefail
+          enc="${VERSION//+/%2B}" # url-encode a build-metadata '+'
+          echo "⏳ Confirming $PKG v$VERSION is live on pub.dev…"
+          deadline=$((SECONDS + 300)) # 5 minutes
+          until curl -sfL --connect-timeout 10 --max-time 30 -o /dev/null "https://pub.dev/api/packages/$PKG/versions/$enc"; do
+            (( SECONDS < deadline )) || { echo "::error ::$PKG v$VERSION is not on pub.dev after the publish step (it may have matched no packages); no GitHub Release was created."; exit 1; }
+            echo "  …not live yet; retrying in 10s"
+            sleep 10
+          done
+          echo "✅ $PKG v$VERSION is live on pub.dev."
 
       - name: 📝 Extract CHANGELOG section
         id: notes

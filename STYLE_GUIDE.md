@@ -1438,7 +1438,6 @@ only the ones this PR bumped. So:
   15 minutes. Land the new package on its own first (or set up its publishing and
   let its run finish), then release the dependents.
 
-
 ## Where to look when you're stuck
 
 - **Repo-wide overview**: [`CLAUDE.md`](CLAUDE.md) — architecture, commands, package

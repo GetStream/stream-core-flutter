@@ -22,7 +22,7 @@ allowed-tools:
 # release-pr
 
 Opens a release PR for stream-core-flutter. Branch `release/<...>` → base `main` → title
-`chore(<scope>): release <package> vX.Y.Z` (single package) or `chore(repo): release <...>` (multiple).
+`chore(<scope>): release <package> vX.Y.Z` (single package) or `chore(repo): release packages` (multiple).
 
 **This skill only opens the PR.** After merge, tagging and pub.dev publishing are automatic:
 [`release_tag.yml`](../../../.github/workflows/release_tag.yml) tags every bumped package (`<pkg>-vX.Y.Z`) and
@@ -46,7 +46,7 @@ scope to a package path); read that map rather than hard-coding it, so adding a
 package needs no change here:
 
 ```bash
-grep -A6 'semantic_changelog_update' .github/workflows/pr_title.yml
+grep -A12 'semantic_changelog_update' .github/workflows/pr_title.yml
 ```
 
 ## Inputs
