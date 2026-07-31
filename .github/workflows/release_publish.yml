@@ -86,45 +86,13 @@ jobs:
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
 
-      - name: ⏳ Wait for in-workspace dependencies
-        # Each package publishes in its own OIDC run, so wait until this
-        # package's in-workspace deps are live before publishing — a dependent
-        # never publishes before its dependency. No-op when there are none.
-        shell: bash
-        env:
-          PKG: ${{ steps.parse.outputs.package }}
-        run: |
-          set -euo pipefail
-
-          # $PKG's workspace deps from melos's graph; awk keeps only the JSON
-          # object and drains the stream (no early exit -> no SIGPIPE).
-          graph="$(melos list --graph 2>/dev/null | awk '/^\{/{f=1} f{print} /^\}$/{f=0}')"
-          mapfile -t deps < <(printf '%s' "$graph" | jq -r --arg p "$PKG" '.[$p] // [] | .[]')
-
-          if [[ "${#deps[@]}" -eq 0 ]]; then
-            echo "✅ $PKG has no in-workspace dependencies."
-            exit 0
-          fi
-
-          for dep in "${deps[@]}"; do
-            echo "⏳ Waiting for $dep to be published on pub.dev…"
-            deadline=$((SECONDS + 900)) # 15 minutes
-            # melos's own published-check (same detection as --no-published):
-            # lists $dep only once its current version is live on pub.dev.
-            until melos list --published --scope="$dep" 2>/dev/null | grep -qx "$dep"; do
-              if (( SECONDS >= deadline )); then
-                echo "::error ::Timed out waiting for $dep on pub.dev. Once it is published, re-run this workflow."
-                exit 1
-              fi
-              echo "  …not live yet; retrying in 15s"
-              sleep 15
-            done
-            echo "✅ $dep is published."
-          done
-
-      # melos publish only ever touches unpublished versions (--no-published),
-      # so a re-run of an already-published tag is a no-op. Scoped to the tagged
-      # package via MELOS_PACKAGES.
+      # Each package publishes in its own OIDC run, so when a release bumps a
+      # package and something it depends on, the dependent can reach the server
+      # before the dependency is indexed. release:pub uses `--skip-validation`
+      # (Dart's recommended approach for interdependent packages) so publishing
+      # doesn't block on the dependency being live — the dependent resolves once
+      # its dependency's own run lands moments later. --no-published still makes
+      # a re-run of an already-published tag a no-op.
       - name: 📢 Publish to pub.dev
         run: melos run release:pub
         env:

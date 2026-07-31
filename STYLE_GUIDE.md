@@ -1407,16 +1407,18 @@ When the PR merges to `main`:
    then creates a GitHub Release whose body is the package's `## X.Y.Z` CHANGELOG
    section.
 
-**Dependent order is automatic.** `stream_core_flutter` depends on `stream_core`,
-and each package publishes in its own run, so releasing both together could
-otherwise let the dependent publish before its dependency is on pub.dev.
-`release_publish.yml` prevents this: before publishing, it waits until every
-in-workspace dependency it needs is live on pub.dev at the pinned version (and
-`release_tag.yml` pushes tags dependency-first to keep that wait short). No
-manual step is needed. If a dependency's own publish genuinely fails, the
-dependent times out after 15 minutes; fix the dependency, then re-run the
-dependent's workflow (`workflow_dispatch` on its tag) — publishing is idempotent,
-so re-runs are safe.
+**Dependent order needs no coordination.** `stream_core_flutter` depends on
+`stream_core`, and each package publishes in its own run, so releasing both
+together could otherwise let the dependent reach pub.dev before its dependency
+is indexed (which the server rejects with `Dependency … does not exist`).
+`release:pub` publishes with `flutter pub publish --skip-validation` — Dart's
+[recommended approach](https://dart.dev/tools/pub/cmd/pub-lish) for publishing
+interdependent packages — so a package doesn't block on its dependency being
+live; the dependent resolves as soon as the dependency's own run lands moments
+later. No wait, no manual step. Caveat: if a dependency's own publish genuinely
+*fails*, the dependent is published momentarily unresolvable until you re-run
+the failed dependency (`workflow_dispatch` on its tag) — publishing is
+idempotent, so that re-run is safe.
 
 
 ## Where to look when you're stuck
