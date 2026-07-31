@@ -1415,10 +1415,28 @@ publishing, `release_publish.yml`'s **⏳ Wait for in-workspace dependencies** s
 polls pub.dev's per-version endpoint until every in-workspace dependency of the
 tagged package is live, so publish never races ahead of a dependency. The
 dependency's own run lands moments earlier (tags push in dependency order), so
-the wait is usually a single poll. If a dependency's publish genuinely *fails*,
+the wait usually resolves within a poll or two — an already-live dependency
+passes on the first check; a just-published one needs a retry or so while
+pub.dev indexes it. If a dependency's publish genuinely *fails*,
 the dependent's wait times out and reports it — re-run the failed dependency
 (`workflow_dispatch` on its tag), then the dependent; publishing is idempotent,
 so re-runs are safe.
+
+**Tagging is state-derived — mind two consequences.** `release_tag.yml` tags
+*every* package whose current `pubspec.yaml` version isn't on pub.dev yet, not
+only the ones this PR bumped. So:
+
+- **Keep version bumps to release PRs.** If a `version:` bump merges in an
+  ordinary feature PR, the next release will tag and publish it as a side effect.
+  Bump versions only on a `release/` branch.
+- **Publish a brand-new package before releasing anything that depends on it.**
+  A new package's first publish needs pub.dev automated-publishing configured for
+  it; until then its automated publish fails. If that new package is also an
+  in-workspace dependency of an existing one (as `stream_core` is for
+  `stream_core_flutter`), releasing the dependent alongside it makes the
+  dependent's wait step poll for a version that never appears and time out after
+  15 minutes. Land the new package on its own first (or set up its publishing and
+  let its run finish), then release the dependents.
 
 
 ## Where to look when you're stuck
