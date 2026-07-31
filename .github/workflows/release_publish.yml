@@ -127,24 +127,34 @@ jobs:
           done
 
       - name: 📢 Publish to pub.dev
-        run: melos run release:pub
-        env:
-          MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
-
-      - name: ✅ Verify published
-        # Guard against a no-op publish (e.g. release:pub matching zero packages)
-        # cutting a GitHub Release for a version that never reached pub.dev.
+        # Idempotent by pub.dev state, not `melos --no-published` (which lags in
+        # CI): skip if the version is already live, else publish and confirm it
+        # landed before the release is cut.
         shell: bash
         env:
           PKG: ${{ steps.parse.outputs.package }}
           VERSION: ${{ steps.parse.outputs.version }}
+          MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
         run: |
           set -euo pipefail
           enc="${VERSION//+/%2B}" # url-encode a build-metadata '+'
-          echo "⏳ Confirming $PKG v$VERSION is live on pub.dev…"
+          url="https://pub.dev/api/packages/$PKG/versions/$enc"
+
+          # Already live? Nothing to do — a genuinely idempotent re-run.
+          if curl -sfL --connect-timeout 10 --max-time 30 -o /dev/null "$url"; then
+            echo "✅ $PKG v$VERSION is already on pub.dev; nothing to publish."
+            exit 0
+          fi
+
+          echo "📦 Publishing $PKG v$VERSION…"
+          melos run release:pub
+
+          # Confirm it actually landed before the release is cut (guards a no-op
+          # publish from producing a Release for a version that isn't on pub.dev).
+          echo "⏳ Confirming $PKG v$VERSION is live…"
           deadline=$((SECONDS + 300)) # 5 minutes
-          until curl -sfL --connect-timeout 10 --max-time 30 -o /dev/null "https://pub.dev/api/packages/$PKG/versions/$enc"; do
-            (( SECONDS < deadline )) || { echo "::error ::$PKG v$VERSION is not on pub.dev after the publish step (it may have matched no packages); no GitHub Release was created."; exit 1; }
+          until curl -sfL --connect-timeout 10 --max-time 30 -o /dev/null "$url"; do
+            (( SECONDS < deadline )) || { echo "::error ::$PKG v$VERSION did not appear on pub.dev after publishing."; exit 1; }
             echo "  …not live yet; retrying in 10s"
             sleep 10
           done

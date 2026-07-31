@@ -1419,8 +1419,10 @@ the wait usually resolves within a poll or two — an already-live dependency
 passes on the first check; a just-published one needs a retry or so while
 pub.dev indexes it. If a dependency's publish genuinely *fails*,
 the dependent's wait times out and reports it — re-run the failed dependency
-(`workflow_dispatch` on its tag), then the dependent; publishing is idempotent,
-so re-runs are safe.
+(`workflow_dispatch` on its tag), then the dependent. Re-runs are safe: the
+publish step skips if the version is already on pub.dev (checked against the
+live per-version endpoint, not `melos --no-published`), so re-running a tag
+publishes it only if it isn't already there.
 
 **Tagging is state-derived — mind two consequences.** `release_tag.yml` tags
 *every* package whose current `pubspec.yaml` version isn't on pub.dev yet, not
