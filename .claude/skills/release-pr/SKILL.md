@@ -157,7 +157,7 @@ publish job waits for in-workspace dependencies to be live first).
 
 - **Never run `melos version`** — it clobbers the hand-curated CHANGELOGs.
 - **Never tag or push a tag** — `release_tag.yml` does it on merge.
-- **Never run `melos run release:pub`** (or `release:tag`) locally — those are the CI publish/tag steps; running them
-  publishes from an unreviewed tree. Refuse even if asked.
+- **Never run `melos run release:pub` locally** — it's the CI publish step; running it publishes from an unreviewed
+  tree. Refuse even if asked. (Tagging is inlined in `release_tag.yml`, not a melos script — don't run it by hand.)
 - **Never create a GitHub release** (`gh release create`) — `release_publish.yml` creates it after the tag is pushed.
 - **Never merge the PR.** Return the URL and stop.

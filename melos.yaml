@@ -121,17 +121,6 @@ scripts:
       even for already-released versions. The publish workflow scopes it to the
       tagged package via MELOS_PACKAGES.
 
-  release:tag:
-    run: |
-      melos exec -c 1 --no-published --no-private --order-dependents -- \
-        "if git tag \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION 2>/dev/null; then git push origin \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION; else echo \"::warning ::Skipped \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION: tag already exists (stale tag on an old commit?), not pushed.\"; fi"
-    description: |
-      Tag unpublished packages (`<package>-v<version>`) at HEAD and push each, in
-      dependency order, one at a time — so a dependency publishes before its
-      dependent and each push emits its own tag event (one publish run). A tag
-      that already exists (e.g. a stale tag on an old commit) fails `git tag`, so
-      it is skipped (with a `::warning`) and never pushed. Used by release_tag.
-
   release:pub:
     run: melos exec -c 1 --no-published --no-private --order-dependents -- "flutter pub publish -f"
     description: |

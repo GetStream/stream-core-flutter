@@ -36,10 +36,16 @@ jobs:
         run: flutter pub global activate melos
 
       - name: 🏷️ Tag unpublished packages
-        # Tags derive from package state, not the commit message. See release:tag.
+        # Tag every package whose current version isn't on pub.dev (state-derived,
+        # not parsed from the commit message) and push each, in dependency order,
+        # one at a time — so a dependency publishes before its dependent and each
+        # push emits its own tag event (one publish run). A tag that already
+        # exists (e.g. a stale tag on an old commit) fails `git tag`, so it is
+        # skipped (with a `::warning`) and never pushed.
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "Stream SDK Bot"
           git config user.email "60655709+Stream-SDK-Bot@users.noreply.github.com"
-          melos run release:tag
+          melos exec -c 1 --no-published --no-private --order-dependents -- \
+            "if git tag \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION 2>/dev/null; then git push origin \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION; else echo \"::warning ::Skipped \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION: tag already exists (stale tag on an old commit?), not pushed.\"; fi"
