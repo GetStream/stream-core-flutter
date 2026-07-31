@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Create a package's release tag (<pkg>-v<version>) at HEAD, idempotently.
+# Tag a package's release (<pkg>-v<version>) at HEAD and push it, idempotently.
 # Invoked by `melos run release:tag` via `melos exec`, once per unpublished
 # package — MELOS_PACKAGE_NAME / MELOS_PACKAGE_VERSION come from melos.
 set -euo pipefail
@@ -15,8 +15,11 @@ if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
     echo "::error ::Tag $tag already exists at a different commit than HEAD; resolve it before releasing."
     exit 1
   fi
-  echo "✅ $tag already exists at HEAD; nothing to do."
+  echo "✅ $tag already exists at HEAD."
 else
   git tag "$tag"
   echo "🏷️ Created $tag."
 fi
+
+# Idempotent: a no-op if origin already has the tag.
+git push origin "$tag"

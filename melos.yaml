@@ -119,7 +119,7 @@ scripts:
   release:tag:
     run: |
       melos exec -c 1 --no-published --no-private --order-dependents -- \
-        "\$MELOS_ROOT_PATH/.github/workflows/scripts/tag_package.sh && git push origin \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION"
+        "\$MELOS_ROOT_PATH/.github/workflows/scripts/tag_package.sh"
     description: |
       Tag unpublished packages (`<package>-v<version>`) and push, in dependency
       order. Used by the release_tag workflow.
