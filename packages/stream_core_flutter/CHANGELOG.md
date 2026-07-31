@@ -14,6 +14,7 @@
 - Added `isFloating` to the default `StreamButton` constructor — the floating (elevated) appearance was previously reachable only through `StreamButton.icon`. Labelled buttons now get the same treatment: elevation for every type, plus a `backgroundElevation1` fill for `outline` and `ghost`.
 - Added `StreamElevation` — the four elevation levels of the design system as logical pixels, for passing to `Material.elevation` or a component theme's `elevation` field. Like `StreamRadius` and `StreamSpacing` it is a theme primitive: reachable as `StreamTheme.elevation` or `context.streamElevation`, overridable per theme through the `StreamTheme` constructor, and lerped on theme transitions. `StreamElevation.none` is a fixed `0` rather than a themeable level, so "flat" cannot be redefined as elevated. `StreamAvatar` and `StreamButton` now resolve their elevations from it instead of hard-coded numbers; the rendered values are unchanged.
 - Added `chipStyle` to `StreamReactionsThemeData` for overriding the per-reaction chip appearance (background, size, etc.); it is merged over the default reaction chip style.
+- `StreamNetworkImage` now caches through a shared cache manager which, on IO platforms, is stored in its own app-scoped directory (isolated from the host app's image cache) with LRU eviction, while other platforms fall back to the library defaults.
 
 ### 🐛 Bug Fixes
 
