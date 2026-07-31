@@ -3,8 +3,9 @@ name: release_publish
 on:
   push:
     tags:
-      - '*-v[0-9]+.[0-9]+.[0-9]+'   # <pkg>-vX.Y.Z
-      - '*-v[0-9]+.[0-9]+.[0-9]+-*' # <pkg>-vX.Y.Z-<pre>
+      # <pkg>-vX.Y.Z plus any pre-release (-…) or build (+…) suffix — matches
+      # pub.dev's suggested OIDC tag pattern; the parse step validates the rest.
+      - '*-v[0-9]+.[0-9]+.[0-9]+*'
   workflow_dispatch: # manual re-runs against a tag ref
 
 concurrency:
@@ -34,8 +35,8 @@ jobs:
           ref="${GITHUB_REF#refs/tags/}"
           echo "📦 Tag: $ref"
 
-          # <package>-v<semver>, with an optional pre-release suffix.
-          if [[ ! "$ref" =~ ^([a-z0-9_]+)-v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?)$ ]]; then
+          # <package>-v<semver>, with optional pre-release (-…) and build (+…) suffixes.
+          if [[ ! "$ref" =~ ^([a-z0-9_]+)-v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?)$ ]]; then
             echo "::error ::Tag '$ref' does not match '<package>-v<semver>'."
             exit 1
           fi
@@ -56,7 +57,8 @@ jobs:
             exit 1
           fi
 
-          is_prerelease=$([[ "$version" == *-* ]] && echo true || echo false)
+          # Pre-release = a hyphen suffix, ignoring any build-metadata (+…) part.
+          is_prerelease=$([[ "${version%%+*}" == *-* ]] && echo true || echo false)
 
           {
             echo "package=$pkg"

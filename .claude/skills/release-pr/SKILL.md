@@ -62,7 +62,8 @@ grep -A6 'semantic_changelog_update' .github/workflows/pr_title.yml
 Run these. **If any fails, stop, surface it to the user, and do not auto-fix** (no stashing, no force-pull, no
 killing processes).
 
-- `git checkout main && git pull --ff-only` leaves `git status --short -uno` clean.
+- `git checkout main && git pull --ff-only` leaves `git status --short` clean — **including untracked files**, so a
+  stray local file can't slip into the release commit at `git add -A` (step 5).
 - `which melos`, `gh auth status` succeed.
 - Latest CI on `main` is green: `gh run list --branch main --limit 5` — no failures on the most recent runs.
 - No open release PR for the same branch: `gh pr list --head <branch> --state all --json number` returns `[]`.
