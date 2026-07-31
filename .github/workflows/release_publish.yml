@@ -34,8 +34,7 @@ jobs:
           ref="${GITHUB_REF#refs/tags/}"
           echo "📦 Tag: $ref"
 
-          # <package>-v<semver>; version is bounded to a semver shape (with an
-          # optional pre-release suffix), not an open-ended capture.
+          # <package>-v<semver>, with an optional pre-release suffix.
           if [[ ! "$ref" =~ ^([a-z0-9_]+)-v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?)$ ]]; then
             echo "::error ::Tag '$ref' does not match '<package>-v<semver>'."
             exit 1
@@ -66,7 +65,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: 🎯 Setup Dart
-        # Before flutter-action: this provides the OIDC token for pub.dev.
+        # Before Flutter: provides the pub.dev OIDC token.
         uses: dart-lang/setup-dart@v1
 
       - name: 🐦 Install Flutter
@@ -86,13 +85,37 @@ jobs:
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
 
-      # Each package publishes in its own OIDC run, so when a release bumps a
-      # package and something it depends on, the dependent can reach the server
-      # before the dependency is indexed. release:pub uses `--skip-validation`
-      # (Dart's recommended approach for interdependent packages) so publishing
-      # doesn't block on the dependency being live — the dependent resolves once
-      # its dependency's own run lands moments later. --no-published still makes
-      # a re-run of an already-published tag a no-op.
+      - name: ⏳ Wait for in-workspace dependencies
+        # A dependent can reach pub.dev before its dependency is indexed (each
+        # publishes in its own OIDC run), which the server rejects. Wait until
+        # each in-workspace dependency is live — via the per-version endpoint,
+        # fresh in CI unlike the listing `melos --published` reads.
+        shell: bash
+        env:
+          PKG: ${{ steps.parse.outputs.package }}
+        run: |
+          set -euo pipefail
+
+          # Dep names from the graph; versions from list --json (dir name may differ).
+          info="$(melos list --json 2>/dev/null)"
+          deps="$(melos list --graph 2>/dev/null | awk '/^\{/{f=1} f{print} /^\}$/{f=0}' \
+            | jq -r --arg p "$PKG" '.[$p] // [] | .[]')"
+
+          [[ -z "$deps" ]] && { echo "✅ $PKG has no in-workspace dependencies."; exit 0; }
+
+          for dep in $deps; do
+            want="$(printf '%s' "$info" | jq -r --arg n "$dep" '.[] | select(.name==$n) | .version')"
+            echo "⏳ Waiting for $dep v$want on pub.dev…"
+            deadline=$((SECONDS + 900)) # 15 minutes
+            until curl -sfL -o /dev/null "https://pub.dev/api/packages/$dep/versions/$want"; do
+              (( SECONDS < deadline )) || { echo "::error ::Timed out waiting for $dep v$want. Re-run once it's published."; exit 1; }
+              echo "  …not live yet; retrying in 15s"
+              sleep 15
+            done
+            echo "✅ $dep v$want is live."
+          done
+
+      # --no-published makes a re-run of an already-published tag a no-op.
       - name: 📢 Publish to pub.dev
         run: melos run release:pub
         env:
@@ -107,17 +130,14 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Resolve the package's location from melos rather than assuming the
-          # directory name matches the package name.
+          # Resolve location from melos (dir name may differ from package name).
           pkg_path="$(melos list --json 2>/dev/null | jq -r --arg n "$PKG" '.[] | select(.name==$n) | .location')"
           rel_path="${pkg_path#"$GITHUB_WORKSPACE"/}"
           changelog="$pkg_path/CHANGELOG.md"
           notes_file="$RUNNER_TEMP/release_notes.md"
 
-          # Extract the `## <version>` section by matching the version *token*
-          # ($2), so a dated heading like `## 0.4.0 (2026-07-31)` still matches
-          # and "0.4.0" never matches "0.4.00". Not generate_release_notes: that
-          # would list every package's commits since the previous tag.
+          # Match the version *token* ($2) so a dated heading still matches and
+          # "0.4.0" never matches "0.4.00".
           if [[ -f "$changelog" ]]; then
             awk -v ver="$VERSION" '/^## /{flag=($2==ver); next} flag' "$changelog" > "$notes_file"
           fi
@@ -127,7 +147,6 @@ jobs:
             echo "See [CHANGELOG](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/$rel_path/CHANGELOG.md)." > "$notes_file"
           fi
 
-          # Footer linking to the published version.
           {
             echo ""
             echo "---"
