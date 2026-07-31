@@ -82,7 +82,7 @@ jobs:
         run: melos bootstrap --verbose
 
       - name: 🌵 Dry Run
-        # MELOS_PACKAGES scopes lint:pub / release:pub to just the tagged package.
+        # MELOS_PACKAGES scopes lint:pub to just the tagged package.
         run: melos run lint:pub
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
@@ -127,14 +127,14 @@ jobs:
           done
 
       - name: 📢 Publish to pub.dev
-        # Idempotent by pub.dev state, not `melos --no-published` (which lags in
-        # CI): skip if the version is already live, else publish and confirm it
-        # landed before the release is cut.
+        # One tag = one package, so publish it directly. Idempotent by pub.dev
+        # state, not `melos --no-published` (which lags in CI): skip if the
+        # version is already live, else publish and confirm it landed before the
+        # release is cut.
         shell: bash
         env:
           PKG: ${{ steps.parse.outputs.package }}
           VERSION: ${{ steps.parse.outputs.version }}
-          MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
         run: |
           set -euo pipefail
           enc="${VERSION//+/%2B}" # url-encode a build-metadata '+'
@@ -146,8 +146,11 @@ jobs:
             exit 0
           fi
 
-          echo "📦 Publishing $PKG v$VERSION…"
-          melos run release:pub
+          # Publish just this package. Resolve its location via melos (the
+          # directory name may differ from the package name).
+          pkg_path="$(melos list --json 2>/dev/null | jq -r --arg n "$PKG" '.[] | select(.name==$n) | .location')"
+          echo "📦 Publishing $PKG v$VERSION from $pkg_path…"
+          (cd "$pkg_path" && flutter pub publish --force)
 
           # Confirm it actually landed before the release is cut (guards a no-op
           # publish from producing a Release for a version that isn't on pub.dev).
