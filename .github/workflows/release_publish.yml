@@ -109,7 +109,7 @@ jobs:
             want="$(printf '%s' "$info" | jq -r --arg n "$dep" '.[] | select(.name==$n) | .version')"
             echo "⏳ Waiting for $dep v$want on pub.dev…"
             deadline=$((SECONDS + 900)) # 15 minutes
-            until curl -sfL -o /dev/null "https://pub.dev/api/packages/$dep/versions/$want"; do
+            until curl -sfL --connect-timeout 10 --max-time 30 -o /dev/null "https://pub.dev/api/packages/$dep/versions/$want"; do
               (( SECONDS < deadline )) || { echo "::error ::Timed out waiting for $dep v$want. Re-run once it's published."; exit 1; }
               echo "  …not live yet; retrying in 15s"
               sleep 15
