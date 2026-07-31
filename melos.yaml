@@ -115,19 +115,16 @@ scripts:
   lint:pub:
     run: melos exec -c 1 --no-private --order-dependents -- "flutter pub publish -n"
     description: |
-      Dry run `pub publish` for all non-private packages, in dependency order.
-      No `--no-published`: `pub publish -n` never publishes and doesn't check
-      version collisions, so it stays a useful "are these publishable?" check
-      even for already-released versions. The publish workflow scopes it to the
-      tagged package via MELOS_PACKAGES.
+      Dry-run `pub publish` for all non-private packages, in dependency order.
+      No `--no-published`: `-n` never publishes and skips collision checks, so it
+      stays useful even for already-released versions. Scope with MELOS_PACKAGES.
 
   release:pub:
     run: melos exec -c 1 --no-published --no-private --order-dependents -- "flutter pub publish -f"
     description: |
-      Publish unpublished packages to pub.dev (OIDC in CI). Set MELOS_PACKAGES
-      to scope to one package. Re-runs are a no-op (`--no-published`). Used by
-      the release_publish workflow, which first waits for in-workspace
-      dependencies to be live so publish never fails on a missing dependency.
+      Publish the scoped package to pub.dev (OIDC in CI). Set MELOS_PACKAGES to
+      the target. Called by release_publish, which first checks the version
+      isn't already live and waits for in-workspace dependencies.
 
   generate:all:
     run: melos run generate:dart && melos run generate:flutter

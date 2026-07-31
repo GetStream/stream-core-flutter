@@ -82,24 +82,22 @@ jobs:
         run: melos bootstrap --verbose
 
       - name: 🌵 Dry Run
-        # MELOS_PACKAGES scopes lint:pub / release:pub to just the tagged package.
+        # MELOS_PACKAGES scopes lint:pub to the tagged package.
         run: melos run lint:pub
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
 
       - name: ⏳ Wait for in-workspace dependencies
         # A dependent can reach pub.dev before its dependency is indexed (each
-        # publishes in its own OIDC run), which the server rejects. Wait until
-        # each in-workspace dependency is live — via the per-version endpoint,
-        # fresh in CI unlike the listing `melos --published` reads.
+        # runs separately), which the server rejects. Wait via the per-version
+        # endpoint — fresh in CI, unlike the listing `melos --published` reads.
         shell: bash
         env:
           PKG: ${{ steps.parse.outputs.package }}
         run: |
           set -euo pipefail
 
-          # Dep names from the graph (all in-workspace deps, incl. dev/override);
-          # versions from list --json (dir name may differ). Skip private deps —
+          # Deps from the graph, versions from list --json. Skip private deps —
           # they never publish, so waiting on one would hang until timeout.
           info="$(melos list --json 2>/dev/null)"
           raw="$(melos list --graph 2>/dev/null | awk '/^\{/{f=1} f{print} /^\}$/{f=0}' \
