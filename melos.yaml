@@ -132,6 +132,14 @@ scripts:
       that already exists (e.g. a stale tag on an old commit) fails `git tag`, so
       it is skipped (with a `::warning`) and never pushed. Used by release_tag.
 
+  release:pub:
+    run: melos exec -c 1 --no-published --no-private --order-dependents -- "flutter pub publish -f"
+    description: |
+      Publish unpublished packages to pub.dev (OIDC in CI). Set MELOS_PACKAGES
+      to scope to one package. Re-runs are a no-op (`--no-published`). Used by
+      the release_publish workflow, which first waits for in-workspace
+      dependencies to be live so publish never fails on a missing dependency.
+
   generate:all:
     run: melos run generate:dart && melos run generate:flutter
     description: Build all generated files for Dart & Flutter packages in this project.
