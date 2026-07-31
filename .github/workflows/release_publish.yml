@@ -122,7 +122,27 @@ jobs:
             echo "✅ $dep is published."
           done
 
+      # Idempotency guard. melos's --no-published (which release:pub relies on)
+      # reads pub.dev's package listing, which can lag for minutes after a
+      # publish, so re-running a finished publish may wrongly retry and fail
+      # "already exists". The per-version endpoint stays fresh — gate on it.
+      - name: 🔎 Skip publish if already on pub.dev
+        id: pubcheck
+        shell: bash
+        env:
+          PKG: ${{ steps.parse.outputs.package }}
+          VERSION: ${{ steps.parse.outputs.version }}
+        run: |
+          set -euo pipefail
+          if curl -sfL -o /dev/null "https://pub.dev/api/packages/$PKG/versions/$VERSION"; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "✅ $PKG $VERSION is already on pub.dev — skipping publish (idempotent re-run)."
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: 📢 Publish to pub.dev
+        if: steps.pubcheck.outputs.published == 'false'
         run: melos run release:pub
         env:
           MELOS_PACKAGES: ${{ steps.parse.outputs.package }}
