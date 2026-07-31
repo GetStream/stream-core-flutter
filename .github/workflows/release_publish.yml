@@ -115,7 +115,6 @@ jobs:
             echo "✅ $dep v$want is live."
           done
 
-      # --no-published makes a re-run of an already-published tag a no-op.
       - name: 📢 Publish to pub.dev
         run: melos run release:pub
         env:
