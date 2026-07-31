@@ -21,10 +21,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Checkout branch
+        # Default GITHUB_TOKEN: this job never pushes to git (the release step
+        # passes its own token), so no bot PAT sits in git config during setup.
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
 
       - name: 🏷️ Parse package and version from tag
         id: parse
@@ -44,9 +45,11 @@ jobs:
           pkg="${BASH_REMATCH[1]}"
           version="${BASH_REMATCH[2]}"
 
-          pubspec="packages/$pkg/pubspec.yaml"
-          if [[ ! -f "$pubspec" ]]; then
-            echo "::error ::No package found at $pubspec."
+          # Find the package's pubspec by name — melos isn't installed yet, and a
+          # package's directory may differ from its name.
+          pubspec="$(grep -rlE "^name:[[:space:]]+$pkg\$" --include=pubspec.yaml packages/ 2>/dev/null | head -n1)"
+          if [[ -z "$pubspec" ]]; then
+            echo "::error ::No package named '$pkg' found under packages/."
             exit 1
           fi
 

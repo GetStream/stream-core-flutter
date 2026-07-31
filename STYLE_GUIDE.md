@@ -1397,6 +1397,12 @@ Title the PR `chore(repo): release packages` for a multi-package release
 are derived from **package state**, not the title — so a title mentioning one
 version while the PR bumps several still tags and publishes every bumped package.
 
+**Squash-merge the release PR.** `release_tag.yml`'s gate reads the *tip*
+commit's message (`github.event.head_commit.message`), so a squash lands the
+`chore(...): release` title as that commit. A **merge commit** would make the tip
+`Merge pull request #… ` — the gate wouldn't fire and nothing would tag/publish,
+silently. (This is why the tag job also has a `workflow_dispatch` escape hatch.)
+
 When the PR merges to `main`:
 
 1. [`release_tag.yml`](.github/workflows/release_tag.yml) tags every package

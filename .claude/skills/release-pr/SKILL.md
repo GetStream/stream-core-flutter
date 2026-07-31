@@ -147,6 +147,10 @@ gh pr create --base main --head <branch> --title "<title>" --body-file <notes>
 
 A good body lists each released package, its version, and its `## <newver>` CHANGELOG section. Return the PR URL.
 
+**Tell the user to squash-merge it.** `release_tag.yml` gates on the *tip* commit's message, so a squash lands the
+`chore(...): release` title as that commit. A merge commit would make the tip `Merge pull request #…` and the release
+would silently not run.
+
 ## After merge (FYI)
 
 `release_tag.yml` tags every bumped package and `release_publish.yml` publishes each (OIDC) and creates a per-package
