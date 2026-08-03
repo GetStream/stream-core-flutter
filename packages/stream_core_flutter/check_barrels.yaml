@@ -26,3 +26,4 @@ forbidden_src_imports:
 # internal to the package. Anything under these is excluded from coverage.
 internal_dirs:
   - lib/src/theme/primitives/internal
+  - lib/src/cache/internal
