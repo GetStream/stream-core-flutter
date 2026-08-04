@@ -115,12 +115,18 @@ scripts:
        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
   lint:pub:
-    run: |
-      melos exec -c 5 --no-private --ignore="*example*" -- \
-            flutter pub publish --dry-run
+    run: melos exec -c 1 --no-private --order-dependents -- "flutter pub publish -n"
     description: |
-      Run `pub publish --dry-run` in all packages.
-       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
+      Dry-run `pub publish` for all non-private packages, in dependency order.
+      No `--no-published`: `-n` never publishes and skips collision checks, so it
+      stays useful even for already-released versions. Scope with MELOS_PACKAGES.
+
+  release:pub:
+    run: melos exec -c 1 --no-published --no-private --order-dependents -- "flutter pub publish -f"
+    description: |
+      Publish the scoped package to pub.dev (OIDC in CI). Set MELOS_PACKAGES to
+      the target. Called by release_publish, which first checks the version
+      isn't already live and waits for in-workspace dependencies.
 
   generate:all:
     run: melos run generate:dart && melos run generate:flutter
