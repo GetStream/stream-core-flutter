@@ -110,6 +110,8 @@ import 'package:design_system_gallery/components/reaction/stream_reaction_picker
     as _design_system_gallery_components_reaction_stream_reaction_picker;
 import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
     as _design_system_gallery_components_reaction_stream_reactions;
+import 'package:design_system_gallery/components/scaffold/stream_scaffold.dart'
+    as _design_system_gallery_components_scaffold_stream_scaffold;
 import 'package:design_system_gallery/components/sheet/stream_sheet.dart'
     as _design_system_gallery_components_sheet_stream_sheet;
 import 'package:design_system_gallery/components/snackbar/stream_snackbar.dart'
@@ -1128,6 +1130,28 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_reaction_stream_reactions
                         .buildStreamReactionsShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Scaffold',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamScaffold',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Drawers',
+                builder:
+                    _design_system_gallery_components_scaffold_stream_scaffold
+                        .buildStreamScaffoldDrawers,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_scaffold_stream_scaffold
+                        .buildStreamScaffoldPlayground,
               ),
             ],
           ),

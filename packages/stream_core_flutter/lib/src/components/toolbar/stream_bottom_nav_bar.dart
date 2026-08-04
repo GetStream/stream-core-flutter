@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -476,12 +478,10 @@ class _FloatingChrome extends StatelessWidget {
   final BorderRadiusGeometry borderRadius;
   final Widget child;
 
-  LinearGradient _buildGradient(BuildContext context) {
-    final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
-    // Approximate rendered height: safe area + item height.
-    const itemHeight = kBottomNavigationBarHeight;
-    final totalHeight = safeAreaBottom + itemHeight;
-    final solidFraction = totalHeight > 0 ? safeAreaBottom / totalHeight : 0.0;
+  LinearGradient _buildGradient(double bottomInset) {
+    // Solid across the bottom inset, fading over the item height into the
+    // content behind the bar.
+    final solidFraction = bottomInset / (bottomInset + kBottomNavigationBarHeight);
 
     return streamFloatingFadeLinearGradient(
       color: gradientColor,
@@ -493,14 +493,17 @@ class _FloatingChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacing = context.streamSpacing;
+    final margin = context.streamSpacing.xl;
+    // Floored so the pill never sits flush when the device reports no bottom inset.
+    final bottomInset = math.max(MediaQuery.paddingOf(context).bottom, margin);
 
     return DecoratedBox(
-      decoration: BoxDecoration(gradient: _buildGradient(context)),
+      decoration: BoxDecoration(gradient: _buildGradient(bottomInset)),
       child: SafeArea(
         top: false,
+        minimum: EdgeInsets.only(bottom: margin),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+          padding: EdgeInsets.symmetric(horizontal: margin),
           child: Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
