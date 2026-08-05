@@ -33,6 +33,7 @@ export 'src/components/message_layout/stream_message_channel_kind.dart';
 export 'src/components/message_layout/stream_message_content_kind.dart';
 export 'src/components/message_layout/stream_message_layout.dart';
 export 'src/components/message_layout/stream_message_list_kind.dart';
+export 'src/components/message_layout/stream_message_presentation.dart';
 export 'src/components/message_layout/stream_message_stack_position.dart';
 export 'src/components/reaction/stream_reaction_picker.dart';
 export 'src/components/reaction/stream_reactions.dart';
