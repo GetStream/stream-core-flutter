@@ -18,7 +18,7 @@ command:
 
     # List of all the dependencies used in the project.
     dependencies:
-      cached_network_image: ^3.4.1
+      cached_network_image_ce: ^4.9.0
       collection: ^1.19.0
       cross_file: ^0.3.4+2
       dio: ^5.8.0+1
@@ -33,6 +33,8 @@ command:
       material_color_utilities: '>=0.11.0 <0.14.0'
       meta: ^1.15.0
       mime: ^2.0.0
+      path: ^1.9.0
+      path_provider: ^2.1.5
       plugin_platform_interface: ^2.1.8
       rxdart: ^0.28.0
       shimmer: ^3.0.0
@@ -113,12 +115,18 @@ scripts:
        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
   lint:pub:
-    run: |
-      melos exec -c 5 --no-private --ignore="*example*" -- \
-            flutter pub publish --dry-run
+    run: melos exec -c 1 --no-private --order-dependents -- "flutter pub publish -n"
     description: |
-      Run `pub publish --dry-run` in all packages.
-       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
+      Dry-run `pub publish` for all non-private packages, in dependency order.
+      No `--no-published`: `-n` never publishes and skips collision checks, so it
+      stays useful even for already-released versions. Scope with MELOS_PACKAGES.
+
+  release:pub:
+    run: melos exec -c 1 --no-published --no-private --order-dependents -- "flutter pub publish -f"
+    description: |
+      Publish the scoped package to pub.dev (OIDC in CI). Set MELOS_PACKAGES to
+      the target. Called by release_publish, which first checks the version
+      isn't already live and waits for in-workspace dependencies.
 
   generate:all:
     run: melos run generate:dart && melos run generate:flutter

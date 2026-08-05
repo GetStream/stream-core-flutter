@@ -1373,6 +1373,78 @@ If a PR touches both `stream_core` and `stream_core_flutter`, update each packag
 `CHANGELOG.md` separately. Cross-linking between packages ("bumps stream_core to
 X.Y.Z") is handled by the release tooling — do not write these entries by hand.
 
+### Releasing
+
+Publishing to [pub.dev](https://pub.dev) is automated. Packages are versioned
+**independently**, each on its own tag `<package>-v<version>` (e.g.
+`stream_core-v0.4.0`) — but a single release PR may bump **any number of
+packages at once**. Each bumped package still gets its own tag and its own
+publish run, so releasing all three together and releasing one on its own follow
+the exact same steps.
+
+Cut every release from a `release/...` branch (e.g. `release/2026-07-30`). This
+is required, not a convention: the changelog-placement check in
+[`pr_title.yml`](.github/workflows/pr_title.yml) only allows a `## Upcoming`
+heading to become `## X.Y.Z` on a `release/` branch. On that branch, for **each**
+package you are releasing:
+
+- bump its `version` in `pubspec.yaml`
+- promote its CHANGELOG `## Upcoming` heading to `## X.Y.Z`
+
+Title the PR `chore(repo): release packages` for a multi-package release
+(generic, so it stays short), or `chore(<scope>): release <package> vX.Y.Z`
+(scope `llc` / `ui` / `thumb`) for a single package. The tooling keys only on the `chore(...): release` prefix — tags
+are derived from **package state**, not the title — so a title mentioning one
+version while the PR bumps several still tags and publishes every bumped package.
+
+**Squash-merge the release PR.** `release_tag.yml`'s gate reads the *tip*
+commit's message (`github.event.head_commit.message`), so a squash lands the
+`chore(...): release` title as that commit. A **merge commit** would make the tip
+`Merge pull request #… ` — the gate wouldn't fire and nothing would tag/publish,
+silently. (This is why the tag job also has a `workflow_dispatch` escape hatch.)
+
+When the PR merges to `main`:
+
+1. [`release_tag.yml`](.github/workflows/release_tag.yml) tags every package
+   whose current version is not yet on pub.dev — `<package>-vX.Y.Z` — and pushes
+   the tags one at a time.
+2. [`release_publish.yml`](.github/workflows/release_publish.yml) fires once per
+   pushed tag and publishes only that package (OIDC — no stored credentials),
+   then creates a GitHub Release whose body is the package's `## X.Y.Z` CHANGELOG
+   section.
+
+**Dependent order is handled automatically.** `stream_core_flutter` depends on
+`stream_core`, and each package publishes in its own run, so releasing both
+together could otherwise let the dependent reach pub.dev before its dependency
+is indexed (which the server rejects with `Dependency … does not exist`). Before
+publishing, `release_publish.yml`'s **⏳ Wait for in-workspace dependencies** step
+polls pub.dev's per-version endpoint until every in-workspace dependency of the
+tagged package is live, so publish never races ahead of a dependency. The
+dependency's own run lands moments earlier (tags push in dependency order), so
+the wait usually resolves within a poll or two — an already-live dependency
+passes on the first check; a just-published one needs a retry or so while
+pub.dev indexes it. If a dependency's publish genuinely *fails*,
+the dependent's wait times out and reports it — re-run the failed dependency
+(`workflow_dispatch` on its tag), then the dependent. Re-runs are safe: the
+publish step skips if the version is already on pub.dev (checked against the
+live per-version endpoint, not `melos --no-published`), so re-running a tag
+publishes it only if it isn't already there.
+
+**Tagging is state-derived — mind two consequences.** `release_tag.yml` tags
+*every* package whose current `pubspec.yaml` version isn't on pub.dev yet, not
+only the ones this PR bumped. So:
+
+- **Keep version bumps to release PRs.** If a `version:` bump merges in an
+  ordinary feature PR, the next release will tag and publish it as a side effect.
+  Bump versions only on a `release/` branch.
+- **Publish a brand-new package before releasing anything that depends on it.**
+  A new package's first publish needs pub.dev automated-publishing configured for
+  it; until then its automated publish fails. If that new package is also an
+  in-workspace dependency of an existing one (as `stream_core` is for
+  `stream_core_flutter`), releasing the dependent alongside it makes the
+  dependent's wait step poll for a version that never appears and time out after
+  15 minutes. Land the new package on its own first (or set up its publishing and
+  let its run finish), then release the dependents.
 
 ## Where to look when you're stuck
 
