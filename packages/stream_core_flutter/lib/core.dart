@@ -34,6 +34,7 @@ export 'src/components/common/stream_intrinsic_flex.dart';
 export 'src/components/common/stream_loading_spinner.dart';
 export 'src/components/common/stream_network_image.dart';
 export 'src/components/common/stream_progress_bar.dart';
+export 'src/components/common/stream_safe_area.dart';
 export 'src/components/common/stream_skeleton_loading.dart';
 export 'src/components/common/stream_tap_target_padding.dart';
 export 'src/components/common/stream_text_input.dart';

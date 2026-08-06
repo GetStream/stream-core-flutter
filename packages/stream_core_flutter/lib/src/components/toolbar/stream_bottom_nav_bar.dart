@@ -6,6 +6,7 @@ import '../../theme/components/stream_bottom_nav_bar_theme.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../common/stream_safe_area.dart';
 
 /// Default height of [StreamBottomNavBar] per the Stream design system.
 const double kStreamBottomNavBarHeight = 64;
@@ -541,32 +542,28 @@ class _FloatingChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final margin = context.streamSpacing.xl;
-    final bottomInset = MediaQuery.viewPaddingOf(context).bottom + margin;
+    final margin = EdgeInsets.all(context.streamSpacing.xl);
+    final insets = StreamSafeArea.resolveInsets(context, top: false, margin: margin);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: _buildGradient(
-          topInset: margin,
-          bottomInset: bottomInset,
+          topInset: margin.top,
+          bottomInset: insets.bottom,
         ),
       ),
-      child: SafeArea(
+      child: StreamSafeArea(
         top: false,
-        maintainBottomViewPadding: true,
-        minimum: EdgeInsets.symmetric(horizontal: margin),
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: margin),
-          child: Material(
-            shape: RoundedRectangleBorder(
-              borderRadius: borderRadius,
-              side: BorderSide(color: borderColor),
-            ),
-            color: pillColor,
-            elevation: elevation,
-            clipBehavior: Clip.antiAlias,
-            child: child,
+        margin: margin,
+        child: Material(
+          shape: RoundedRectangleBorder(
+            borderRadius: borderRadius,
+            side: BorderSide(color: borderColor),
           ),
+          color: pillColor,
+          elevation: elevation,
+          clipBehavior: Clip.antiAlias,
+          child: child,
         ),
       ),
     );
