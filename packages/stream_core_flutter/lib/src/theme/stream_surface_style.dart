@@ -1,5 +1,4 @@
-/// The presentation of a Stream surface — grounded ([regular]) or airy
-/// ([floating]).
+/// The presentation of a Stream surface.
 ///
 /// A component's own style (e.g. [StreamAppBarStyle.surfaceStyle]) takes
 /// precedence over the app-wide default on [StreamTheme].
