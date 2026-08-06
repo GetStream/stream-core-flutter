@@ -81,8 +81,8 @@ void main() {
       );
 
       final button = tester.widget<StreamButton>(find.byType(StreamButton));
-      expect(button.type, StreamButtonType.outline);
-      expect(button.isFloating, isTrue);
+      expect(button.props.type, StreamButtonType.outline);
+      expect(button.props.isFloating, isTrue);
     });
 
     testWidgets('renders a ghost, docked button inside a regular toolbar', (tester) async {
@@ -96,8 +96,8 @@ void main() {
       );
 
       final button = tester.widget<StreamButton>(find.byType(StreamButton));
-      expect(button.type, StreamButtonType.ghost);
-      expect(button.isFloating, isFalse);
+      expect(button.props.type, StreamButtonType.ghost);
+      expect(button.props.isFloating, isFalse);
     });
   });
 }

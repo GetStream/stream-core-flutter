@@ -9,7 +9,7 @@ import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// Default height of [StreamBottomNavBar] per the Stream design system.
-const double kStreamBottomNavBarHeight = 72;
+const double kStreamBottomNavBarHeight = 64;
 
 /// A single item in a [StreamBottomNavBar].
 ///
