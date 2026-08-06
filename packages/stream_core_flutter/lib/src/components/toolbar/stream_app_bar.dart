@@ -8,7 +8,6 @@ import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_floating_fade.dart';
-import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 import 'stream_toolbar.dart';
 import 'stream_toolbar_button.dart';
@@ -222,7 +221,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     final style = appBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveSurfaceStyle = style?.surfaceStyle ?? defaults.surfaceStyle;
+    final effectiveSurfaceStyle = style?.surfaceStyle ?? context.streamTheme.surfaceStyle;
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
@@ -404,10 +403,6 @@ class _StreamAppBarStyleDefaults extends StreamAppBarStyle {
   late final StreamColorScheme _colorScheme = _context.streamColorScheme;
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
   late final StreamSpacing _spacing = _context.streamSpacing;
-  late final StreamSurfaceStyle _surfaceStyle = _context.streamTheme.surfaceStyle;
-
-  @override
-  StreamSurfaceStyle get surfaceStyle => _surfaceStyle;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;

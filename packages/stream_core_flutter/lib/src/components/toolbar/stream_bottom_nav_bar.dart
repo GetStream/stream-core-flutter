@@ -300,7 +300,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
     final style = context.streamBottomNavBarTheme.style?.merge(widget.props.style) ?? widget.props.style;
     final defaults = _StreamBottomNavBarStyleDefaults(context);
 
-    final effectiveSurfaceStyle = style?.surfaceStyle ?? defaults.surfaceStyle;
+    final effectiveSurfaceStyle = style?.surfaceStyle ?? context.streamTheme.surfaceStyle;
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
@@ -538,11 +538,7 @@ class _StreamBottomNavBarStyleDefaults extends StreamBottomNavBarStyle {
   late final _colorScheme = _context.streamColorScheme;
   late final _textTheme = _context.streamTextTheme;
   late final _radius = _context.streamRadius;
-  late final _surfaceStyle = _context.streamTheme.surfaceStyle;
   late final _elevation = _context.streamElevation;
-
-  @override
-  StreamSurfaceStyle get surfaceStyle => _surfaceStyle;
 
   @override
   double get floatingElevation => _elevation.level3;

@@ -370,7 +370,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   @Deprecated('Use colorScheme.brightness instead')
   final Brightness brightness;
 
-  /// The app style for this theme.
+  /// The app-wide surface style for this theme.
+  ///
+  /// The default [StreamSurfaceStyle] every component falls back to when it
+  /// doesn't pin its own `surfaceStyle`.
   final StreamSurfaceStyle surfaceStyle;
 
   /// The Material elevation values for this theme.
