@@ -151,7 +151,7 @@ class DefaultStreamMediaViewer extends StatelessWidget {
     // ambient StreamSurfaceStyle — not from a per-instance style on the header /
     // footer widget, so pin the surfaceStyle on the media-viewer theme to keep the
     // inset and the chrome in sync.
-    final fallbackFloating = context.streamTheme.surfaceStyle.isFloating;
+    final fallbackFloating = context.streamSurfaceStyle.isFloating;
     final headerFloating = effectiveAppBarStyle?.surfaceStyle?.isFloating ?? fallbackFloating;
     final footerFloating = effectiveBottomAppBarStyle?.surfaceStyle?.isFloating ?? fallbackFloating;
 

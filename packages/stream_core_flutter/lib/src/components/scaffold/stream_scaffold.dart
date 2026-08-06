@@ -197,7 +197,7 @@ class StreamScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
 
-    final surfaceStyle = context.streamTheme.surfaceStyle;
+    final surfaceStyle = context.streamSurfaceStyle;
     final appBarStyle = context.streamAppBarTheme.style;
     final bottomAppBarStyle = context.streamBottomAppBarTheme.style;
 

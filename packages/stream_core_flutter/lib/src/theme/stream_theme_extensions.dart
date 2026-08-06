@@ -45,6 +45,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
+import 'stream_surface_style.dart';
 import 'stream_theme.dart';
 
 /// Extension on [BuildContext] for convenient access to [StreamTheme].
@@ -91,6 +92,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamElevation] from the current theme.
   StreamElevation get streamElevation => streamTheme.elevation;
+
+  /// Returns the app-wide [StreamSurfaceStyle] from the current theme.
+  StreamSurfaceStyle get streamSurfaceStyle => streamTheme.surfaceStyle;
 
   /// Returns the [StreamBoxShadow] from the current theme.
   StreamBoxShadow get streamBoxShadow => streamTheme.boxShadow;

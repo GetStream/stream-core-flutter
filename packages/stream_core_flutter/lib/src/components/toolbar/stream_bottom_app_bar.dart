@@ -193,7 +193,7 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
     final style = bottomAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamBottomAppBarStyleDefaults(context);
 
-    final effectiveSurfaceStyle = style?.surfaceStyle ?? context.streamTheme.surfaceStyle;
+    final effectiveSurfaceStyle = style?.surfaceStyle ?? context.streamSurfaceStyle;
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
