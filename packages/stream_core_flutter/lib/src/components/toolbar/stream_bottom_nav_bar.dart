@@ -445,8 +445,6 @@ class _StreamNavTile extends StatelessWidget {
                     heightFactor: 1,
                     child: MediaQuery.withClampedTextScaling(
                       maxScaleFactor: 1,
-                      // semanticsLabel, when set, overrides the announced text
-                      // while keeping the visible label — same as Material's bar.
                       child: Text(
                         item.label,
                         semanticsLabel: item.semanticsLabel,
@@ -466,9 +464,11 @@ class _StreamNavTile extends StatelessWidget {
     if (item.tooltip case final tooltip? when tooltip.isNotEmpty) {
       tile = Tooltip(
         message: tooltip,
-        // Show above — the bar sits at the bottom edge — and keep the tooltip
-        // out of the semantics tree; the tile's label already describes it.
+        // Show above (the bar is bottom-anchored), offset past the icon + label
+        // so the bubble clears the tile, and keep it out of the semantics tree
+        // since the tile's label already describes the item.
         preferBelow: false,
+        verticalOffset: iconSize + (labelStyle.fontSize ?? 0),
         excludeFromSemantics: true,
         child: tile,
       );
