@@ -1,28 +1,38 @@
 import 'package:flutter/widgets.dart';
 
-/// A [SafeArea] that additionally insets its [child] by a per-side [margin]
-/// beyond the system insets.
+/// Keeps a fixed [margin] between its [child] and the system insets, so the
+/// child never sits flush against them.
 ///
-/// Where [SafeArea] pads each edge to `max(systemInset, minimum)`, this composes
-/// it and adds [margin] on top — the padding becomes `systemInset + margin`. A
-/// surface pinned to an edge then keeps a consistent gap beyond the status bar,
-/// navigation bar, notch, or home indicator instead of sitting flush against
-/// it, and still gets at least [margin] on a device that reports no inset.
+/// Each enabled edge is inset by the system inset there *plus* [margin]. A
+/// surface pinned to an edge therefore floats a consistent gap clear of the
+/// status bar, navigation bar, notch, or home indicator, and still gets at
+/// least [margin] on an edge that reports no inset. Where a [SafeArea] stops at
+/// the system inset, this adds [margin] beyond it.
 ///
-/// Unlike [SafeArea], [maintainBottomViewPadding] defaults to `true`, so the
-/// bottom gap is measured from [MediaQueryData.viewPadding] and stays put when a
-/// keyboard opens rather than collapsing — the sensible default for a floating
-/// surface. Set it to `false` for [SafeArea]'s standard behaviour.
+/// The bottom gap holds steady while an on-screen keyboard is open rather than
+/// collapsing; set [maintainBottomViewPadding] to `false` to opt out.
 ///
-/// The applied insets are available without the widget via [resolveInsets] —
-/// useful when the value also feeds something else, such as a gradient painted
-/// behind [child].
+/// Read the same insets as a value with [resolveInsets] — for example to size a
+/// decoration painted behind [child].
+///
+/// {@tool snippet}
+///
+/// Float a bar a uniform 16dp clear of the bottom edge:
+///
+/// ```dart
+/// StreamSafeArea(
+///   top: false,
+///   margin: const EdgeInsets.all(16),
+///   child: myBar,
+/// )
+/// ```
+/// {@end-tool}
 ///
 /// See also:
 ///
-///  * [SafeArea], which floors at the system inset rather than adding to it.
+///  * [SafeArea], which insets only as far as the system inset, without a margin.
 class StreamSafeArea extends StatelessWidget {
-  /// Creates a safe area that insets [child] by [margin] beyond the system insets.
+  /// Creates a safe area that keeps [margin] between [child] and the system insets.
   const StreamSafeArea({
     super.key,
     this.top = true,
@@ -34,41 +44,37 @@ class StreamSafeArea extends StatelessWidget {
     required this.child,
   });
 
-  /// Whether to inset the top edge by the system top inset ([margin] applies regardless).
+  /// Whether the top edge is inset by the system top inset ([margin] applies either way).
   final bool top;
 
-  /// Whether to inset the bottom edge by the system bottom inset ([margin] applies regardless).
+  /// Whether the bottom edge is inset by the system bottom inset ([margin] applies either way).
   final bool bottom;
 
-  /// Whether to inset the left edge by the system left inset ([margin] applies regardless).
+  /// Whether the left edge is inset by the system left inset ([margin] applies either way).
   final bool left;
 
-  /// Whether to inset the right edge by the system right inset ([margin] applies regardless).
+  /// Whether the right edge is inset by the system right inset ([margin] applies either way).
   final bool right;
 
-  /// Breathing space added beyond the system inset on each edge.
+  /// The gap kept between [child] and each edge, added beyond the system inset.
   final EdgeInsets margin;
 
-  /// Whether the bottom gap is measured from [MediaQueryData.viewPadding] rather
-  /// than [MediaQueryData.padding], so it survives an open keyboard instead of
+  /// Whether the bottom gap holds steady while a keyboard is open instead of
   /// collapsing.
   ///
-  /// Defaults to `true` — unlike [SafeArea.maintainBottomViewPadding], which
-  /// defaults to `false` — because a surface with a [margin] is typically
-  /// floating and should keep a stable gap.
+  /// Defaults to `true`, unlike [SafeArea.maintainBottomViewPadding], because a
+  /// surface with a [margin] is usually floating and wants a stable gap.
   final bool maintainBottomViewPadding;
 
-  /// The widget below this one in the tree.
+  /// The widget below this widget in the tree.
   final Widget child;
 
-  /// The insets [StreamSafeArea] applies for [context] with the given options —
-  /// the system inset on each enabled edge, plus [margin].
+  /// The insets this widget applies for [context] with the given options — the
+  /// system inset on each enabled edge, plus [margin].
   ///
-  /// Mirrors the composed [SafeArea]: the sides and top read
-  /// [MediaQueryData.padding]; the bottom reads [MediaQueryData.viewPadding] when
-  /// [maintainBottomViewPadding] is `true`, otherwise [MediaQueryData.padding].
-  /// Use this when the value feeds something besides padding (e.g. a background
-  /// gradient) as well.
+  /// Use this when the value is also needed directly, such as to size a
+  /// decoration painted behind the child. [maintainBottomViewPadding] governs
+  /// the bottom edge exactly as it does on the widget.
   static EdgeInsets resolveInsets(
     BuildContext context, {
     bool top = true,

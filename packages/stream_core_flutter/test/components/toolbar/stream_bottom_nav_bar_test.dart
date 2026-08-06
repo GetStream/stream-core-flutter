@@ -350,18 +350,22 @@ void main() {
       return barBottom - pillBottom;
     }
 
-    testWidgets('keeps a spacing.xl gap when the device reports no bottom inset', (tester) async {
-      await pumpFloating(tester, deviceBottom: 0);
+    // Representative bottom system insets (viewPadding.bottom) per navigation
+    // mode. In every mode the pill must float spacing.xl (24) *above* whatever
+    // the system reserves — a uniform gap, never flush against it.
+    const navigationModes = <String, double>{
+      'iOS home button / no inset': 0,
+      'Android gesture (floating) nav': 24,
+      'iOS home indicator': 34,
+      'Android 2- and 3-button nav': 48,
+    };
 
-      // spacing.xl is 24; without the gap the pill would sit flush (gap 0).
-      expect(gapBelowPill(tester), moreOrLessEquals(24, epsilon: 0.5));
-    });
+    for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
+      testWidgets('floats spacing.xl above the bottom inset — $mode ($inset)', (tester) async {
+        await pumpFloating(tester, deviceBottom: inset);
 
-    testWidgets('adds the spacing.xl gap on top of the device bottom inset', (tester) async {
-      await pumpFloating(tester, deviceBottom: 48);
-
-      // 48 (e.g. 3-button navigation) + 24 (spacing.xl) — the pill clears the inset.
-      expect(gapBelowPill(tester), moreOrLessEquals(72, epsilon: 0.5));
-    });
+        expect(gapBelowPill(tester), moreOrLessEquals(inset + 24, epsilon: 0.5));
+      });
+    }
   });
 }
