@@ -165,7 +165,7 @@ void main() {
   });
 
   group('when the bottom widget is floating', () {
-    testWidgets('extends the body and drops the bottomNavigationBar slot', (tester) async {
+    testWidgets('keeps a floating bottom widget out of the bottomNavigationBar slot', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           const StreamScaffold(
@@ -176,8 +176,9 @@ void main() {
         ),
       );
 
+      // The floating bottom overlaps the body from within it (see
+      // _StreamScaffoldBody), never via the Scaffold's bottomNavigationBar slot.
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(scaffold.extendBody, isTrue);
       expect(scaffold.bottomNavigationBar, isNull);
     });
 
@@ -197,18 +198,18 @@ void main() {
       expect(captured.padding!.bottom, 80);
     });
 
-    testWidgets('is not floating when no bottom widget is provided', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          const StreamScaffold(
-            bottomBarBehavior: StreamToolbarBehavior.floating,
-            body: SizedBox(),
-          ),
-        ),
+    testWidgets('injects no bottom inset when floating is set but no bottom widget is provided', (tester) async {
+      final captured = _CapturedInsets();
+      await _pumpStreamScaffold(
+        tester,
+        bottomBarBehavior: StreamToolbarBehavior.floating,
+        devicePadding: const EdgeInsets.only(bottom: 34),
+        body: _InsetProbe(captured),
       );
 
-      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(scaffold.extendBody, isFalse);
+      // With no bottom widget the floating layout is skipped, so the body keeps
+      // the raw device inset — nothing is added.
+      expect(captured.padding!.bottom, 34);
     });
   });
 
