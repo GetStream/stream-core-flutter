@@ -4,6 +4,7 @@ import 'stream_message_alignment.dart';
 import 'stream_message_channel_kind.dart';
 import 'stream_message_content_kind.dart';
 import 'stream_message_list_kind.dart';
+import 'stream_message_presentation.dart';
 import 'stream_message_stack_position.dart';
 
 // The aspect of a [StreamMessageLayoutData] that a widget depends on.
@@ -26,6 +27,9 @@ enum _StreamMessageLayoutAspect {
 
   // The content kind (standard / singleAttachment / jumbomoji).
   contentKind,
+
+  // The presentation (standard / preview).
+  presentation,
 }
 
 /// Provides [StreamMessageLayoutData] to descendant widgets.
@@ -47,11 +51,14 @@ enum _StreamMessageLayoutAspect {
 ///    changes).
 ///  * [contentKindOf] — returns only the content kind (ignores other
 ///    field changes).
+///  * [presentationOf] — returns only the presentation (ignores other
+///    field changes).
 ///
 /// When no [StreamMessageLayout] is found in the tree, a default layout of
 /// [StreamMessageAlignment.start] + [StreamMessageStackPosition.single] +
 /// [StreamMessageChannelKind.group] + [StreamMessageListKind.channel] +
-/// [StreamMessageContentKind.standard] is returned.
+/// [StreamMessageContentKind.standard] +
+/// [StreamMessagePresentation.standard] is returned.
 ///
 /// {@tool snippet}
 ///
@@ -98,7 +105,8 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
   /// If there is no [StreamMessageLayout] in scope, a default layout of
   /// [StreamMessageAlignment.start] + [StreamMessageStackPosition.single] +
   /// [StreamMessageChannelKind.group] + [StreamMessageListKind.channel] +
-  /// [StreamMessageContentKind.standard] is returned.
+  /// [StreamMessageContentKind.standard] +
+  /// [StreamMessagePresentation.standard] is returned.
   static StreamMessageLayoutData of(BuildContext context) => _of(context);
 
   static StreamMessageLayoutData _of(BuildContext context, [_StreamMessageLayoutAspect? aspect]) {
@@ -227,6 +235,21 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
     return _of(context, _StreamMessageLayoutAspect.contentKind).contentKind;
   }
 
+  /// Returns [StreamMessageLayoutData.presentation] from the nearest
+  /// [StreamMessageLayout] ancestor.
+  ///
+  /// Use of this method will cause the given [context] to rebuild any time
+  /// that the [StreamMessageLayoutData.presentation] property of the
+  /// ancestor [StreamMessageLayout] changes.
+  ///
+  /// Prefer using this function over getting the attribute directly from the
+  /// [StreamMessageLayoutData] returned from [of], because using this
+  /// function will only rebuild the [context] when this specific attribute
+  /// changes, not when _any_ attribute changes.
+  static StreamMessagePresentation presentationOf(BuildContext context) {
+    return _of(context, _StreamMessageLayoutAspect.presentation).presentation;
+  }
+
   @override
   bool updateShouldNotify(StreamMessageLayout oldWidget) => data != oldWidget.data;
 
@@ -243,6 +266,7 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
         .channelKind => data.channelKind != oldWidget.data.channelKind,
         .listKind => data.listKind != oldWidget.data.listKind,
         .contentKind => data.contentKind != oldWidget.data.contentKind,
+        .presentation => data.presentation != oldWidget.data.presentation,
       };
     },
   );
@@ -253,10 +277,10 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
 /// Combines positional properties — [alignment] (start vs end),
 /// [stackPosition] (single, top, middle, bottom) — with environmental
 /// context — [channelKind] (direct vs group), [listKind] (channel vs
-/// thread) — and content classification — [contentKind] (standard,
-/// singleAttachment, jumbomoji) — into a single value that
-/// [StreamMessageLayoutProperty] resolvers use to compute
-/// layout-dependent styling.
+/// thread), [presentation] (standard vs preview) — and content
+/// classification — [contentKind] (standard, singleAttachment, jumbomoji) —
+/// into a single value that [StreamMessageLayoutProperty] resolvers use to
+/// compute layout-dependent styling.
 ///
 /// {@tool snippet}
 ///
@@ -270,6 +294,7 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
 ///   channelKind: StreamMessageChannelKind.group,
 ///   listKind: StreamMessageListKind.channel,
 ///   contentKind: StreamMessageContentKind.singleAttachment,
+///   presentation: StreamMessagePresentation.standard,
 /// );
 ///
 /// print(layout.alignment);       // StreamMessageAlignment.end
@@ -277,6 +302,7 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
 /// print(layout.channelKind);     // StreamMessageChannelKind.group
 /// print(layout.listKind);        // StreamMessageListKind.channel
 /// print(layout.contentKind);     // StreamMessageContentKind.singleAttachment
+/// print(layout.presentation);    // StreamMessagePresentation.standard
 /// ```
 /// {@end-tool}
 ///
@@ -287,21 +313,24 @@ class StreamMessageLayout extends InheritedModel<_StreamMessageLayoutAspect> {
 ///  * [StreamMessageChannelKind], the kind of channel the message is displayed in.
 ///  * [StreamMessageListKind], the kind of list the message is displayed in.
 ///  * [StreamMessageContentKind], the kind of content the message carries.
+///  * [StreamMessagePresentation], how the message is presented to the user.
 ///  * [StreamMessageLayoutProperty], which resolves values from this context.
 @immutable
 class StreamMessageLayoutData {
   /// Creates message layout data.
   ///
   /// Defaults to a start-aligned, standalone message in a group channel list
-  /// with standard content ([StreamMessageAlignment.start] +
+  /// with standard content, presented inline ([StreamMessageAlignment.start] +
   /// [StreamMessageStackPosition.single] + [StreamMessageChannelKind.group] +
-  /// [StreamMessageListKind.channel] + [StreamMessageContentKind.standard]).
+  /// [StreamMessageListKind.channel] + [StreamMessageContentKind.standard] +
+  /// [StreamMessagePresentation.standard]).
   const StreamMessageLayoutData({
     this.alignment = .start,
     this.stackPosition = .single,
     this.channelKind = .group,
     this.listKind = .channel,
     this.contentKind = .standard,
+    this.presentation = .standard,
   });
 
   /// The horizontal alignment of the message.
@@ -319,6 +348,29 @@ class StreamMessageLayoutData {
   /// The kind of content this message carries.
   final StreamMessageContentKind contentKind;
 
+  /// How this message is presented to the user.
+  final StreamMessagePresentation presentation;
+
+  /// Returns a copy of this [StreamMessageLayoutData] with the given fields
+  /// replaced with new values.
+  StreamMessageLayoutData copyWith({
+    StreamMessageAlignment? alignment,
+    StreamMessageStackPosition? stackPosition,
+    StreamMessageChannelKind? channelKind,
+    StreamMessageListKind? listKind,
+    StreamMessageContentKind? contentKind,
+    StreamMessagePresentation? presentation,
+  }) {
+    return StreamMessageLayoutData(
+      alignment: alignment ?? this.alignment,
+      stackPosition: stackPosition ?? this.stackPosition,
+      channelKind: channelKind ?? this.channelKind,
+      listKind: listKind ?? this.listKind,
+      contentKind: contentKind ?? this.contentKind,
+      presentation: presentation ?? this.presentation,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -327,13 +379,14 @@ class StreamMessageLayoutData {
         other.stackPosition == stackPosition &&
         other.channelKind == channelKind &&
         other.listKind == listKind &&
-        other.contentKind == contentKind;
+        other.contentKind == contentKind &&
+        other.presentation == presentation;
   }
 
   @override
-  int get hashCode => Object.hash(alignment, stackPosition, channelKind, listKind, contentKind);
+  int get hashCode => Object.hash(alignment, stackPosition, channelKind, listKind, contentKind, presentation);
 
   @override
   String toString() =>
-      'StreamMessageLayoutData(alignment: $alignment, stackPosition: $stackPosition, channelKind: $channelKind, listKind: $listKind, contentKind: $contentKind)';
+      'StreamMessageLayoutData(alignment: $alignment, stackPosition: $stackPosition, channelKind: $channelKind, listKind: $listKind, contentKind: $contentKind, presentation: $presentation)';
 }

@@ -23,3 +23,10 @@ This package is **not designed for direct use by customers**. It acts as the fou
 ## ⚠️ Versioning Notice
 
 This library does follow semantic versioning. Breaking changes may be introduced at any time without warning. We reserve the right to refactor or remove functionality without deprecation periods. However, as all our products need to depend on the same version of the core packages we want to limit breaking changes as much as possible.
+
+## License
+
+Licenses in this repository are package-specific:
+
+- Root files, `stream_core`, and `stream_core_flutter` are governed by the [Stream Source Code License](./LICENSE).
+- `stream_thumbnail` is governed by its [MIT License](./packages/stream_thumbnail/LICENSE).
