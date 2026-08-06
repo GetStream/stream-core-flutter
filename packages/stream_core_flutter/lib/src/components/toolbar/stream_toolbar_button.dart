@@ -8,7 +8,7 @@ import 'stream_toolbar_scope.dart';
 /// ([StreamAppBar] / [StreamBottomAppBar]) — outlined and elevated when the bar
 /// floats, ghost when it's docked.
 ///
-/// Use it for actions placed in a toolbar slot (the leading back affordance, a
+/// Suitable for actions placed in a toolbar slot (the leading back affordance, a
 /// trailing text action like _Edit_, footer actions) so they match the bar
 /// without each caller styling them by hand.
 ///

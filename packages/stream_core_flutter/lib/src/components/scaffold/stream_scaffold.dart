@@ -40,8 +40,9 @@ import '../../theme/stream_theme_extensions.dart';
 /// a `style` set directly on the bar widget. A bar that pins its own `behavior`
 /// (or a [StreamBottomNavBar], which resolves floating from its own theme) can
 /// float while this scaffold keeps the slot docked and publishes no inset. To
-/// keep the layout and chrome in sync, set the matching [appBarBehavior] /
-/// [bottomBarBehavior] here, or drive both from the ambient [StreamAppStyle].
+/// keep the layout and chrome in sync, consider setting the matching
+/// [appBarBehavior] / [bottomBarBehavior] here, or driving both from the
+/// ambient [StreamAppStyle].
 ///
 /// ## Drawer support
 ///
