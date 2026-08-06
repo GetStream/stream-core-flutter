@@ -96,7 +96,7 @@ class StreamMediaViewerProps {
   /// Whether the chrome (header / footer) is visible.
   ///
   /// When false, chrome slides off-screen and the background fades to
-  /// the immersive colour. The caller owns this state — typically a
+  /// the immersive color. The caller owns this state — typically a
   /// tap on the media toggles it.
   final bool showChrome;
 }

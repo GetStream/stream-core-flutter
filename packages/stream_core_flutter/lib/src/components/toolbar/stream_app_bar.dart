@@ -53,7 +53,7 @@ import 'stream_toolbar_scope.dart';
 ///
 /// ## Theming
 ///
-/// [StreamAppBar] uses [StreamAppBarThemeData] for default styling — colours,
+/// [StreamAppBar] uses [StreamAppBarThemeData] for default styling — colors,
 /// padding, spacing, title/subtitle text styles, and per-slot button style
 /// propagation. Defaults are derived from [StreamColorScheme],
 /// [StreamTextTheme], and [StreamSpacing].
@@ -340,7 +340,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     }
 
     // The bar's bottom edge is intentionally a hairline border in the
-    // design system's `borderSubtle` colour — part of the bar's identity,
+    // design system's `borderSubtle` color — part of the bar's identity,
     // not a configurable divider.
     //
     // The outer [Semantics] keeps the bar's children grouped for screen

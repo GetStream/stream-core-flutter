@@ -111,7 +111,7 @@ class StreamBottomAppBarThemeData with _$StreamBottomAppBarThemeData {
 
 /// Visual styling properties for a [StreamBottomAppBar].
 ///
-/// Defines the appearance of the bottom app bar — background colour,
+/// Defines the appearance of the bottom app bar — background color,
 /// padding, inter-slot spacing, title and subtitle text styles, and
 /// per-slot button style propagation.
 ///
@@ -157,10 +157,10 @@ class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
   /// [StreamTheme].
   final StreamSurfaceStyle? surfaceStyle;
 
-  /// The background colour of the bottom app bar.
+  /// The background color of the bottom app bar.
   final Color? backgroundColor;
 
-  /// The background colour of the floating bottom app bar.
+  /// The background color of the floating bottom app bar.
   final Color? floatingBackgroundColor;
 
   /// The padding around the bar's content row.

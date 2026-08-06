@@ -49,7 +49,7 @@ class StreamBottomNavBarItem {
 /// ## Regular style
 ///
 /// When [StreamSurfaceStyle.regular] is in effect, the bar renders as a
-/// standard docked bar with Stream colour and typography tokens. A hairline
+/// standard docked bar with Stream color and typography tokens. A hairline
 /// `borderSubtle` top border separates it from the body.
 ///
 /// ## Behaviour resolution
@@ -62,7 +62,7 @@ class StreamBottomNavBarItem {
 ///
 /// ## Theming
 ///
-/// Item colours, icon size, label styles, border, and pill radius are resolved
+/// Item colors, icon size, label styles, border, and pill radius are resolved
 /// from [StreamBottomNavBarStyle] — set per-instance via `style` or globally
 /// via [StreamBottomNavBarTheme], falling back to token-backed defaults.
 ///
@@ -177,7 +177,7 @@ class StreamBottomNavBarProps {
 /// Depending on the resolved [StreamSurfaceStyle], the bar is either a
 /// docked bar (a solid surface with a hairline top border) or a floating pill
 /// (a rounded surface over a gradient fade). Both share the same tiles, each of
-/// which animates its icon and label colour between the unselected and selected
+/// which animates its icon and label color between the unselected and selected
 /// states on tap.
 ///
 /// See also:
@@ -270,7 +270,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
   }) {
     final localizations = MaterialLocalizations.of(context);
 
-    // Selected and unselected tiles share the animated colour tween; only the
+    // Selected and unselected tiles share the animated color tween; only the
     // label style is chosen per selection state.
     final colorTween = ColorTween(begin: unselectedItemColor, end: selectedItemColor);
 
@@ -357,7 +357,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
   }
 }
 
-// A single navigation tile: an icon above a label, both sharing a colour that
+// A single navigation tile: an icon above a label, both sharing a color that
 // animates between the unselected and selected states.
 class _StreamNavTile extends StatelessWidget {
   const _StreamNavTile({

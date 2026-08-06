@@ -55,7 +55,7 @@ import 'stream_toolbar_scope.dart';
 /// ## Theming
 ///
 /// [StreamBottomAppBar] uses [StreamBottomAppBarThemeData] for default
-/// styling — colours, padding, spacing, title text style, and per-slot
+/// styling — colors, padding, spacing, title text style, and per-slot
 /// button style propagation. Defaults are derived from [StreamColorScheme],
 /// [StreamTextTheme], and [StreamSpacing].
 ///
@@ -278,7 +278,7 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
     }
 
     // The bar's top edge is intentionally a hairline border in the design
-    // system's `borderSubtle` colour — part of the bar's identity, not a
+    // system's `borderSubtle` color — part of the bar's identity, not a
     // configurable divider. When floating, the border is dropped and the bar
     // fades into the content behind it via a gradient instead.
     //

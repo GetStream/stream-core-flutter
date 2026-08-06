@@ -15,7 +15,7 @@ part 'stream_bottom_nav_bar_theme.g.theme.dart';
 ///
 /// {@tool snippet}
 ///
-/// Override the selected item colour for a specific subtree:
+/// Override the selected item color for a specific subtree:
 ///
 /// ```dart
 /// StreamBottomNavBarTheme(
@@ -106,7 +106,7 @@ class StreamBottomNavBarThemeData with _$StreamBottomNavBarThemeData {
 /// Visual styling properties for a [StreamBottomNavBar].
 ///
 /// Defines the appearance of the navigation bar — the docked/floating
-/// behaviour, background colours, per-item selected and unselected colours,
+/// behaviour, background colors, per-item selected and unselected colors,
 /// icon size, item label styles, and the border and corner radius used by the
 /// floating pill.
 ///
@@ -157,16 +157,16 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
   /// The elevation of the floating pill.
   final double? floatingElevation;
 
-  /// The background colour of the docked bar and of the floating pill.
+  /// The background color of the docked bar and of the floating pill.
   final Color? backgroundColor;
 
-  /// The base colour of the floating gradient fade behind the pill.
+  /// The base color of the floating gradient fade behind the pill.
   final Color? floatingBackgroundColor;
 
-  /// The colour of the icon and label of the selected item.
+  /// The color of the icon and label of the selected item.
   final Color? selectedItemColor;
 
-  /// The colour of the icon and label of unselected items.
+  /// The color of the icon and label of unselected items.
   final Color? unselectedItemColor;
 
   /// The size of each item's icon.
@@ -178,7 +178,7 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
   /// The text style for the label of unselected items.
   final TextStyle? unselectedLabelStyle;
 
-  /// The colour of the docked bar's top border and the floating pill's border.
+  /// The color of the docked bar's top border and the floating pill's border.
   final Color? borderColor;
 
   /// The corner radius of the floating pill.

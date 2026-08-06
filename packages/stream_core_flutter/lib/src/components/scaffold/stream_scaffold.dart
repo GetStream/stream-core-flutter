@@ -152,7 +152,7 @@ class StreamScaffold extends StatelessWidget {
   /// Defaults to `true`.
   final bool endDrawerEnableOpenDragGesture;
 
-  /// Determines the way a drawer's open-drag gesture is handled.
+  /// The way a drawer's open-drag gesture is handled.
   ///
   /// Defaults to [DragStartBehavior.start].
   final DragStartBehavior drawerDragStartBehavior;
@@ -176,7 +176,7 @@ class StreamScaffold extends StatelessWidget {
   /// [StreamBottomAppBarTheme], falling back to the ambient [StreamSurfaceStyle].
   final StreamSurfaceStyle? bottomBarSurfaceStyle;
 
-  /// Background color of the scaffold.
+  /// The background color of the scaffold.
   ///
   /// Defaults to [StreamColorScheme.backgroundApp].
   final Color? backgroundColor;

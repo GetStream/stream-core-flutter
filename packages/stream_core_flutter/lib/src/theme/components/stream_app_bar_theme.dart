@@ -108,7 +108,7 @@ class StreamAppBarThemeData with _$StreamAppBarThemeData {
 
 /// Visual styling properties for a [StreamAppBar].
 ///
-/// Defines the appearance of the app bar — background colour, padding,
+/// Defines the appearance of the app bar — background color, padding,
 /// inter-slot spacing, title and subtitle text styles, and per-slot button
 /// style propagation.
 ///
@@ -154,13 +154,13 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
   /// [StreamTheme].
   final StreamSurfaceStyle? surfaceStyle;
 
-  /// The background colour of the app bar.
+  /// The background color of the app bar.
   final Color? backgroundColor;
 
-  /// The background colour of the floating app bar.
+  /// The background color of the floating app bar.
   final Color? floatingBackgroundColor;
 
-  /// The padding around the header's content row.
+  /// The padding around the bar's content row.
   final EdgeInsetsGeometry? padding;
 
   /// The horizontal space between the leading, heading, and trailing slots.

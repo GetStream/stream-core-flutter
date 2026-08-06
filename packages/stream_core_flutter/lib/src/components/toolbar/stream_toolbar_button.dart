@@ -89,7 +89,7 @@ class StreamToolbarButton extends StatelessWidget {
   /// When null, the button is rendered disabled.
   final VoidCallback? onPressed;
 
-  /// The colour-scheme variant of the button.
+  /// The color-scheme variant of the button.
   ///
   /// Defaults to [StreamButtonStyle.secondary].
   final StreamButtonStyle style;
