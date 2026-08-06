@@ -157,7 +157,7 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
   /// The background color of the app bar.
   final Color? backgroundColor;
 
-  /// The base color of the floating app bar's gradient fade.
+  /// The background color of the app bar when floating.
   final Color? floatingBackgroundColor;
 
   /// The padding around the bar's content row.

@@ -160,7 +160,7 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
   /// The background color of the docked bar and of the floating pill.
   final Color? backgroundColor;
 
-  /// The base color of the floating gradient fade behind the pill.
+  /// The background color shown behind the pill when floating.
   final Color? floatingBackgroundColor;
 
   /// The color of the icon and label of the selected item.
