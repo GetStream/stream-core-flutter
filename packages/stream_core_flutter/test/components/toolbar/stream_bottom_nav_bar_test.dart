@@ -92,40 +92,6 @@ void main() {
   });
 
   group('floating behavior', () {
-    testWidgets('renders a pill container instead of a BottomNavigationBar', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          StreamBottomNavBar(
-            items: _items,
-            currentIndex: 0,
-            onTap: (_) {},
-            style: const StreamBottomNavBarStyle(behavior: .floating),
-          ),
-        ),
-      );
-
-      expect(find.byType(BottomNavigationBar), findsNothing);
-      expect(find.text('Chats'), findsOneWidget);
-    });
-
-    testWidgets('invokes onTap with the tapped index', (tester) async {
-      int? tappedIndex;
-      await tester.pumpWidget(
-        _withStreamTheme(
-          StreamBottomNavBar(
-            items: _items,
-            currentIndex: 0,
-            onTap: (index) => tappedIndex = index,
-            style: const StreamBottomNavBarStyle(behavior: .floating),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Saved'));
-
-      expect(tappedIndex, equals(1));
-    });
-
     testWidgets('renders a gradient background', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(

@@ -230,9 +230,6 @@ class StreamScaffold extends StatelessWidget {
       drawerDragStartBehavior: drawerDragStartBehavior,
       drawerBarrierDismissible: drawerBarrierDismissible,
       extendBodyBehindAppBar: appBarFloating,
-      // No extendBody: a floating bottom bar is never placed in the Scaffold's
-      // bottomNavigationBar slot (it lives in the body), so the body-behind-bar
-      // overlap is done by _StreamScaffoldBody, not the Scaffold flag.
       body: _StreamScaffoldBody(
         floating: bottomFloating,
         bottom: bottom,

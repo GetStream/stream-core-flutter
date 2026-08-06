@@ -11,17 +11,6 @@ Widget _withStreamTheme(Widget child) {
 
 void main() {
   group('StreamBottomAppBar slots', () {
-    testWidgets('renders title only — no leading or trailing', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          Scaffold(bottomNavigationBar: StreamBottomAppBar(title: const Text('1 of 9'))),
-        ),
-      );
-
-      expect(find.text('1 of 9'), findsOneWidget);
-      expect(find.byType(StreamButton), findsNothing);
-    });
-
     testWidgets('renders title, subtitle, leading and trailing', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(

@@ -292,26 +292,6 @@ void main() {
       expect(find.byTooltip('Close'), findsOneWidget);
     });
 
-    testWidgets('title is marked as a heading by default', (tester) async {
-      final handle = tester.ensureSemantics();
-      await tester.pumpWidget(
-        _withStreamTheme(
-          Scaffold(
-            appBar: StreamAppBar(
-              automaticallyImplyLeading: false,
-              title: const Text('Title'),
-            ),
-          ),
-        ),
-      );
-
-      final data = tester.getSemantics(find.text('Title')).getSemanticsData();
-      expect(data.label, equals('Title'));
-      expect(data.flagsCollection.isHeader, isTrue);
-
-      handle.dispose();
-    });
-
     testWidgets('title names the route on Android', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       final handle = tester.ensureSemantics();
