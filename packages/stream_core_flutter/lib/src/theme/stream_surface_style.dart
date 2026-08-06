@@ -1,4 +1,4 @@
-/// How a Stream surface presents itself — grounded (*regular*) or airy
+/// The presentation of a Stream surface — grounded (*regular*) or airy
 /// (*floating*).
 ///
 /// Used at two scopes with the same values: the app-wide default on

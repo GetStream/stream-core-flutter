@@ -155,9 +155,6 @@ class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
   ///
   /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
   /// [StreamTheme].
-  ///
-  /// Set this to override the global style for this component only, without
-  /// affecting other components.
   final StreamSurfaceStyle? surfaceStyle;
 
   /// The background colour of the bottom app bar.
