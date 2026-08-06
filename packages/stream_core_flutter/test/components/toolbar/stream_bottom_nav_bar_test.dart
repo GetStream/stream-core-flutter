@@ -241,4 +241,62 @@ void main() {
       handle.dispose();
     });
   });
+
+  group('floating pill margin', () {
+    // The floating pill floors its gap above the bottom edge at spacing.xl, so
+    // it never sits flush on devices reporting no bottom inset, and otherwise
+    // grows the gap with the device inset.
+
+    // The pill is the only Material carrying a RoundedRectangleBorder shape.
+    final pillFinder = find.byWidgetPredicate(
+      (widget) => widget is Material && widget.shape is RoundedRectangleBorder,
+    );
+
+    Future<void> pumpFloating(WidgetTester tester, {required double deviceBottom}) {
+      return tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamAppStyle.floating)]),
+          home: Builder(
+            builder: (context) {
+              final base = MediaQuery.of(context);
+              return MediaQuery(
+                data: base.copyWith(
+                  padding: EdgeInsets.only(bottom: deviceBottom),
+                  viewPadding: EdgeInsets.only(bottom: deviceBottom),
+                ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: StreamBottomNavBar(
+                    items: _items,
+                    currentIndex: 0,
+                    onTap: (_) {},
+                    style: const StreamBottomNavBarStyle(behavior: .floating),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    double gapBelowPill(WidgetTester tester) {
+      final barBottom = tester.getRect(find.byType(StreamBottomNavBar)).bottom;
+      final pillBottom = tester.getRect(pillFinder).bottom;
+      return barBottom - pillBottom;
+    }
+
+    testWidgets('floors the gap at spacing.xl when the device reports no bottom inset', (tester) async {
+      await pumpFloating(tester, deviceBottom: 0);
+
+      // spacing.xl is 24; without the floor the pill would sit flush (gap 0).
+      expect(gapBelowPill(tester), moreOrLessEquals(24, epsilon: 0.5));
+    });
+
+    testWidgets('grows the gap with the device bottom inset when it exceeds spacing.xl', (tester) async {
+      await pumpFloating(tester, deviceBottom: 40);
+
+      expect(gapBelowPill(tester), moreOrLessEquals(40, epsilon: 0.5));
+    });
+  });
 }
