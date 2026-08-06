@@ -116,7 +116,7 @@ void main() {
             body: StreamAppBar(
               automaticallyImplyLeading: false,
               primary: false,
-              style: const StreamAppBarStyle(behavior: StreamAppBarBehavior.floating),
+              style: const StreamAppBarStyle(behavior: StreamToolbarBehavior.floating),
               title: const Text('Title'),
             ),
           ),
@@ -140,7 +140,7 @@ void main() {
     testWidgets('floating: true uses outline button type for auto-implied leading', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
-          const _LauncherScreen(appBarStyle: StreamAppBarStyle(behavior: StreamAppBarBehavior.floating)),
+          const _LauncherScreen(appBarStyle: StreamAppBarStyle(behavior: StreamToolbarBehavior.floating)),
         ),
       );
       await tester.tap(find.text('Open'));
@@ -157,6 +157,121 @@ void main() {
 
       final button = tester.widget<StreamButton>(find.byType(StreamButton));
       expect(button.props.type, equals(StreamButtonType.ghost));
+    });
+  });
+
+  group('StreamAppBar slot behaviour', () {
+    // A slot resolves its behaviour from the ambient StreamToolbarScope — the
+    // value downstream SDKs read to drive floating-aware slots. The bar
+    // publishes its resolved behaviour so a `style` handed only to the bar
+    // still reaches its slots.
+    StreamToolbarBehavior? captured;
+
+    Widget probe() {
+      return Builder(
+        builder: (context) {
+          captured = StreamToolbarScope.of(context);
+          return const SizedBox.shrink();
+        },
+      );
+    }
+
+    tearDown(() => captured = null);
+
+    testWidgets('slot resolves floating when style is passed to the bar', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            body: StreamAppBar(
+              automaticallyImplyLeading: false,
+              primary: false,
+              style: const StreamAppBarStyle(behavior: StreamToolbarBehavior.floating),
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.floating);
+    });
+
+    testWidgets('slot resolves regular by default', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            appBar: StreamAppBar(
+              automaticallyImplyLeading: false,
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.regular);
+    });
+
+    testWidgets('slot resolves floating from the ambient app style', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamAppStyle.floating)]),
+          home: Scaffold(
+            body: StreamAppBar(
+              automaticallyImplyLeading: false,
+              primary: false,
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.floating);
+    });
+
+    testWidgets('slot resolves floating from an ambient app bar theme', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamAppBarTheme(
+            data: const StreamAppBarThemeData(
+              style: StreamAppBarStyle(behavior: StreamToolbarBehavior.floating),
+            ),
+            child: Scaffold(
+              body: StreamAppBar(
+                automaticallyImplyLeading: false,
+                primary: false,
+                title: const Text('Title'),
+                trailing: probe(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.floating);
+    });
+
+    testWidgets('bar style overrides the ambient app bar theme for slots', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamAppBarTheme(
+            data: const StreamAppBarThemeData(
+              style: StreamAppBarStyle(behavior: StreamToolbarBehavior.floating),
+            ),
+            child: Scaffold(
+              appBar: StreamAppBar(
+                automaticallyImplyLeading: false,
+                style: const StreamAppBarStyle(behavior: StreamToolbarBehavior.regular),
+                title: const Text('Title'),
+                trailing: probe(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.regular);
     });
   });
 

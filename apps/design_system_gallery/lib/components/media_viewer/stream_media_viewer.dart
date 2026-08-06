@@ -41,12 +41,22 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
     description: 'Duration of the chrome show/hide animation.',
   );
 
+  final floating = context.knobs.boolean(
+    label: 'Floating chrome',
+    initialValue: true,
+    description:
+        'Floating chrome overlays full-bleed media with a gradient fade; '
+        'regular chrome insets the media between opaque bars.',
+  );
+
   final tintChrome = context.knobs.boolean(
     label: 'Tint chrome over dark media',
     description:
         'Demonstrates StreamMediaViewerThemeData.appBarStyle / '
-        'bottomAppBarStyle — scopes a translucent chrome over the media.',
+        'bottomAppBarStyle — scopes a translucent chrome colour over the media.',
   );
+
+  final tint = tintChrome ? const Color(0x55000000) : null;
 
   return _MediaViewerLauncher(
     label: 'Open media viewer',
@@ -55,8 +65,16 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
       StreamMediaViewerTheme(
         data: StreamMediaViewerThemeData(
           chromeAnimationDuration: Duration(milliseconds: animationMs.round()),
-          appBarStyle: tintChrome ? const StreamAppBarStyle(backgroundColor: Color(0x55000000)) : null,
-          bottomAppBarStyle: tintChrome ? const StreamBottomAppBarStyle(backgroundColor: Color(0x55000000)) : null,
+          appBarStyle: StreamAppBarStyle(
+            behavior: floating ? .floating : .regular,
+            backgroundColor: tint,
+            floatingBackgroundColor: tint,
+          ),
+          bottomAppBarStyle: StreamBottomAppBarStyle(
+            behavior: floating ? .floating : .regular,
+            backgroundColor: tint,
+            floatingBackgroundColor: tint,
+          ),
         ),
         child: _PlaygroundMediaViewer(
           showHeader: showHeader,

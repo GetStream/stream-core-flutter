@@ -53,5 +53,5 @@ enum StreamAppStyle {
   ///
   /// Convenience getter used by components when mapping to their own
   /// component-specific behavior enums without hard-coding enum names.
-  bool get isFloating => this == StreamAppStyle.floating;
+  bool get isFloating => this == .floating;
 }

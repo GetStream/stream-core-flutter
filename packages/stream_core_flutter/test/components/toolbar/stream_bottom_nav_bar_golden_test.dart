@@ -68,7 +68,7 @@ Widget _regularBar() {
     items: _items,
     currentIndex: 0,
     onTap: (_) {},
-    behavior: StreamBottomNavBarBehavior.regular,
+    style: const StreamBottomNavBarStyle(behavior: .regular),
   );
 }
 
@@ -77,7 +77,7 @@ Widget _floatingBar() {
     items: _items,
     currentIndex: 1,
     onTap: (_) {},
-    behavior: StreamBottomNavBarBehavior.floating,
+    style: const StreamBottomNavBarStyle(behavior: .floating),
   );
 }
 

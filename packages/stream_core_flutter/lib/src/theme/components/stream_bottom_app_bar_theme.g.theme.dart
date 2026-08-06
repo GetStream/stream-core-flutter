@@ -101,6 +101,11 @@ mixin _$StreamBottomAppBarStyle {
     return StreamBottomAppBarStyle(
       behavior: t < 0.5 ? a.behavior : b.behavior,
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+      floatingBackgroundColor: Color.lerp(
+        a.floatingBackgroundColor,
+        b.floatingBackgroundColor,
+        t,
+      ),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       spacing: lerpDouble$(a.spacing, b.spacing, t),
       titleTextStyle: TextStyle.lerp(a.titleTextStyle, b.titleTextStyle, t),
@@ -123,8 +128,9 @@ mixin _$StreamBottomAppBarStyle {
   }
 
   StreamBottomAppBarStyle copyWith({
-    StreamBottomAppBarBehavior? behavior,
+    StreamToolbarBehavior? behavior,
     Color? backgroundColor,
+    Color? floatingBackgroundColor,
     EdgeInsetsGeometry? padding,
     double? spacing,
     TextStyle? titleTextStyle,
@@ -137,6 +143,8 @@ mixin _$StreamBottomAppBarStyle {
     return StreamBottomAppBarStyle(
       behavior: behavior ?? _this.behavior,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
+      floatingBackgroundColor:
+          floatingBackgroundColor ?? _this.floatingBackgroundColor,
       padding: padding ?? _this.padding,
       spacing: spacing ?? _this.spacing,
       titleTextStyle: titleTextStyle ?? _this.titleTextStyle,
@@ -160,6 +168,7 @@ mixin _$StreamBottomAppBarStyle {
     return copyWith(
       behavior: other.behavior,
       backgroundColor: other.backgroundColor,
+      floatingBackgroundColor: other.floatingBackgroundColor,
       padding: other.padding,
       spacing: other.spacing,
       titleTextStyle:
@@ -191,6 +200,7 @@ mixin _$StreamBottomAppBarStyle {
 
     return _other.behavior == _this.behavior &&
         _other.backgroundColor == _this.backgroundColor &&
+        _other.floatingBackgroundColor == _this.floatingBackgroundColor &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
         _other.titleTextStyle == _this.titleTextStyle &&
@@ -207,6 +217,7 @@ mixin _$StreamBottomAppBarStyle {
       runtimeType,
       _this.behavior,
       _this.backgroundColor,
+      _this.floatingBackgroundColor,
       _this.padding,
       _this.spacing,
       _this.titleTextStyle,

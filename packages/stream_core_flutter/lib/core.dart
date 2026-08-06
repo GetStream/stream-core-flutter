@@ -60,6 +60,8 @@ export 'src/components/toolbar/stream_bottom_app_bar.dart';
 export 'src/components/toolbar/stream_bottom_nav_bar.dart';
 export 'src/components/toolbar/stream_sheet_header.dart';
 export 'src/components/toolbar/stream_toolbar.dart';
+export 'src/components/toolbar/stream_toolbar_button.dart';
+export 'src/components/toolbar/stream_toolbar_scope.dart';
 export 'src/factory/stream_component_factory.dart';
 
 export 'src/theme/components/stream_app_bar_theme.dart';
@@ -87,6 +89,7 @@ export 'src/theme/components/stream_snackbar_theme.dart';
 export 'src/theme/components/stream_stepper_theme.dart';
 export 'src/theme/components/stream_switch_theme.dart';
 export 'src/theme/components/stream_text_input_theme.dart';
+export 'src/theme/components/stream_toolbar_behavior.dart';
 
 export 'src/theme/primitives/stream_colors.dart';
 export 'src/theme/primitives/stream_elevation.dart';

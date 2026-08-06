@@ -71,7 +71,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomNavBarBehavior.regular,
+            style: const StreamBottomNavBarStyle(behavior: .regular),
           ),
         ),
       );
@@ -99,7 +99,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomNavBarBehavior.floating,
+            style: const StreamBottomNavBarStyle(behavior: .floating),
           ),
         ),
       );
@@ -116,7 +116,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (index) => tappedIndex = index,
-            behavior: StreamBottomNavBarBehavior.floating,
+            style: const StreamBottomNavBarStyle(behavior: .floating),
           ),
         ),
       );
@@ -133,7 +133,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomNavBarBehavior.floating,
+            style: const StreamBottomNavBarStyle(behavior: .floating),
           ),
         ),
       );
@@ -157,7 +157,7 @@ void main() {
         _withStreamTheme(
           StreamBottomNavBarTheme(
             data: const StreamBottomNavBarThemeData(
-              style: StreamBottomNavBarStyle(behavior: StreamBottomNavBarBehavior.floating),
+              style: StreamBottomNavBarStyle(behavior: .floating),
             ),
             child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
           ),
@@ -172,7 +172,7 @@ void main() {
         _withStreamTheme(
           StreamBottomAppBarTheme(
             data: const StreamBottomAppBarThemeData(
-              style: StreamBottomAppBarStyle(behavior: StreamBottomAppBarBehavior.floating),
+              style: StreamBottomAppBarStyle(behavior: .floating),
             ),
             child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
           ),

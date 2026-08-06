@@ -100,6 +100,11 @@ mixin _$StreamBottomNavBarStyle {
 
     return StreamBottomNavBarStyle(
       behavior: t < 0.5 ? a.behavior : b.behavior,
+      floatingElevation: lerpDouble$(
+        a.floatingElevation,
+        b.floatingElevation,
+        t,
+      ),
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       floatingBackgroundColor: Color.lerp(
         a.floatingBackgroundColor,
@@ -138,6 +143,7 @@ mixin _$StreamBottomNavBarStyle {
 
   StreamBottomNavBarStyle copyWith({
     StreamBottomNavBarBehavior? behavior,
+    double? floatingElevation,
     Color? backgroundColor,
     Color? floatingBackgroundColor,
     Color? selectedItemColor,
@@ -152,6 +158,7 @@ mixin _$StreamBottomNavBarStyle {
 
     return StreamBottomNavBarStyle(
       behavior: behavior ?? _this.behavior,
+      floatingElevation: floatingElevation ?? _this.floatingElevation,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       floatingBackgroundColor:
           floatingBackgroundColor ?? _this.floatingBackgroundColor,
@@ -178,6 +185,7 @@ mixin _$StreamBottomNavBarStyle {
 
     return copyWith(
       behavior: other.behavior,
+      floatingElevation: other.floatingElevation,
       backgroundColor: other.backgroundColor,
       floatingBackgroundColor: other.floatingBackgroundColor,
       selectedItemColor: other.selectedItemColor,
@@ -208,6 +216,7 @@ mixin _$StreamBottomNavBarStyle {
     final _other = (other as StreamBottomNavBarStyle);
 
     return _other.behavior == _this.behavior &&
+        _other.floatingElevation == _this.floatingElevation &&
         _other.backgroundColor == _this.backgroundColor &&
         _other.floatingBackgroundColor == _this.floatingBackgroundColor &&
         _other.selectedItemColor == _this.selectedItemColor &&
@@ -226,6 +235,7 @@ mixin _$StreamBottomNavBarStyle {
     return Object.hash(
       runtimeType,
       _this.behavior,
+      _this.floatingElevation,
       _this.backgroundColor,
       _this.floatingBackgroundColor,
       _this.selectedItemColor,

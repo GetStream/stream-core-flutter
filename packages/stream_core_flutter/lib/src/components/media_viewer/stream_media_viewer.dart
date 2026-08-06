@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_app_bar_theme.dart';
@@ -81,8 +80,9 @@ class StreamMediaViewerProps {
     this.showChrome = true,
   });
 
-  /// The media content. Inset to fit between [header] and [footer] (plus
-  /// the top / bottom safe-area insets) so chrome never overlaps it.
+  /// The media content. Extends full-bleed behind floating chrome; when the
+  /// chrome is regular it is inset to fit between [header] and [footer] (plus
+  /// the top / bottom safe-area insets) so the chrome never overlaps it.
   final Widget child;
 
   /// The top chrome — typically a [StreamAppBar]. Slides off-screen
@@ -146,9 +146,21 @@ class DefaultStreamMediaViewer extends StatelessWidget {
       return scoped;
     }
 
+    // Resolve the chrome's floating state the same way the bars (and
+    // StreamScaffold) do, so the media extends full-bleed behind floating
+    // chrome and is inset under docked (regular) chrome. Falls back to the
+    // ambient StreamAppStyle when the chrome style doesn't pin a behavior.
+    final fallbackFloating = context.streamTheme.appStyle.isFloating;
+    final headerFloating = effectiveAppBarStyle?.behavior?.isFloating ?? fallbackFloating;
+    final footerFloating = effectiveBottomAppBarStyle?.behavior?.isFloating ?? fallbackFloating;
+
     final mediaQueryPadding = MediaQuery.paddingOf(context);
-    final headerInset = props.header?.let((it) => it.preferredSize.height + mediaQueryPadding.top) ?? 0.0;
-    final footerInset = props.footer?.let((it) => it.preferredSize.height + mediaQueryPadding.bottom) ?? 0.0;
+
+    final header = props.header?.preferredSize;
+    final footer = props.footer?.preferredSize;
+
+    final headerInset = (header == null || headerFloating) ? 0.0 : header.height + mediaQueryPadding.top;
+    final footerInset = (footer == null || footerFloating) ? 0.0 : footer.height + mediaQueryPadding.bottom;
 
     return AnimatedContainer(
       curve: Curves.easeInOut,

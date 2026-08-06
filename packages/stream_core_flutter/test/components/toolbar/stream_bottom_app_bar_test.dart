@@ -165,4 +165,139 @@ void main() {
       },
     );
   });
+
+  group('StreamBottomAppBar floating', () {
+    testWidgets('regular uses solid background and top border', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(bottomNavigationBar: StreamBottomAppBar(title: const Text('Title'))),
+        ),
+      );
+
+      final decoratedBox = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byType(StreamBottomAppBar),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      final decoration = decoratedBox.decoration as BoxDecoration;
+      expect(decoration.color, isNotNull);
+      expect(decoration.gradient, isNull);
+      expect(decoration.border, isNotNull);
+    });
+
+    testWidgets('floating uses gradient and no border', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            bottomNavigationBar: StreamBottomAppBar(
+              style: const StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.floating),
+              title: const Text('Title'),
+            ),
+          ),
+        ),
+      );
+
+      final decoratedBox = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byType(StreamBottomAppBar),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      final decoration = decoratedBox.decoration as BoxDecoration;
+      expect(decoration.color, isNull);
+      expect(decoration.gradient, isA<LinearGradient>());
+      expect(decoration.border, isNull);
+    });
+  });
+
+  group('StreamBottomAppBar slot behaviour', () {
+    // A slot resolves its behaviour from the ambient StreamToolbarScope.
+    // The bar publishes its resolved behaviour so a `style` handed only to
+    // the bar still reaches its slots.
+    StreamToolbarBehavior? captured;
+
+    Widget probe() {
+      return Builder(
+        builder: (context) {
+          captured = StreamToolbarScope.of(context);
+          return const SizedBox.shrink();
+        },
+      );
+    }
+
+    tearDown(() => captured = null);
+
+    testWidgets('slot resolves floating when style is passed to the bar', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            bottomNavigationBar: StreamBottomAppBar(
+              style: const StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.floating),
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.floating);
+    });
+
+    testWidgets('slot resolves regular by default', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            bottomNavigationBar: StreamBottomAppBar(
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.regular);
+    });
+
+    testWidgets('slot resolves floating from the ambient app style', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamAppStyle.floating)]),
+          home: Scaffold(
+            bottomNavigationBar: StreamBottomAppBar(
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.floating);
+    });
+
+    testWidgets('bar style overrides the ambient app bar theme for slots', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomAppBarTheme(
+            data: const StreamBottomAppBarThemeData(
+              style: StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.floating),
+            ),
+            child: Scaffold(
+              bottomNavigationBar: StreamBottomAppBar(
+                style: const StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.regular),
+                title: const Text('Title'),
+                trailing: probe(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamToolbarBehavior.regular);
+    });
+  });
 }

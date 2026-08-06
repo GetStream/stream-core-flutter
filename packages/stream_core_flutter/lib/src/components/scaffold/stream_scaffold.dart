@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/components/stream_app_bar_theme.dart';
 import '../../theme/components/stream_bottom_app_bar_theme.dart';
+import '../../theme/components/stream_toolbar_behavior.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
@@ -26,10 +27,10 @@ import '../../theme/stream_theme_extensions.dart';
 /// 3. The ambient [StreamAppStyle] enum value ([StreamAppStyle.floating] or
 ///    [StreamAppStyle.regular]).
 ///
-/// * [StreamAppBarBehavior.floating] — the body extends *behind* the app bar;
-///   the body's `MediaQuery.padding.top` is set to the app-bar height so content
-///   rests clear of the bar.
-/// * [StreamBottomAppBarBehavior.floating] — the body extends *behind* the bottom
+/// * [StreamToolbarBehavior.floating] on the app bar — the body extends *behind*
+///   the app bar; the body's `MediaQuery.padding.top` is set to the app-bar
+///   height so content rests clear of the bar.
+/// * [StreamToolbarBehavior.floating] on the bottom widget — the body extends *behind* the bottom
 ///   widget; the body's `MediaQuery.padding.bottom` is set to the measured height
 ///   of that widget.
 /// * `regular` for either slot — no overlap; the slot occupies its own space
@@ -104,7 +105,7 @@ class StreamScaffold extends StatelessWidget {
 
   /// An optional widget displayed at the bottom of the scaffold.
   ///
-  /// When [bottomBarBehavior] is [StreamBottomAppBarBehavior.floating] this widget
+  /// When [bottomBarBehavior] is [StreamToolbarBehavior.floating] this widget
   /// overlaps the body; otherwise it sits below it.
   final Widget? bottom;
 
@@ -158,14 +159,14 @@ class StreamScaffold extends StatelessWidget {
   /// When null the value is resolved from [StreamAppBarStyle.behavior]
   /// in the ambient [StreamAppBarTheme], falling back to the ambient
   /// [StreamAppStyle].
-  final StreamAppBarBehavior? appBarBehavior;
+  final StreamToolbarBehavior? appBarBehavior;
 
   /// Per-instance override for the bottom-bar floating behaviour.
   ///
   /// When null the value is resolved from
   /// [StreamBottomAppBarStyle.behavior] in the ambient
   /// [StreamBottomAppBarTheme], falling back to the ambient [StreamAppStyle].
-  final StreamBottomAppBarBehavior? bottomBarBehavior;
+  final StreamToolbarBehavior? bottomBarBehavior;
 
   /// Background color of the scaffold.
   ///
@@ -317,7 +318,11 @@ class _StreamScaffoldBody extends StatelessWidget {
       return Column(
         children: [
           Expanded(
-            child: MediaQuery.removePadding(context: context, removeBottom: true, child: child),
+            child: MediaQuery.removePadding(
+              context: context,
+              removeBottom: true,
+              child: child,
+            ),
           ),
           bottom,
         ],

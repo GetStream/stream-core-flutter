@@ -8,6 +8,9 @@ import '../../theme/components/stream_bottom_nav_bar_theme.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
 
+/// Default height of [StreamBottomNavBar] per the Stream design system.
+const double kStreamBottomNavBarHeight = 72;
+
 /// A single item in a [StreamBottomNavBar].
 ///
 /// Each item has an [icon] and [selectedIcon] widget (the latter is shown
@@ -40,7 +43,7 @@ class StreamBottomNavBarItem {
 /// ## Floating style
 ///
 /// When [StreamBottomNavBarBehavior.floating] is in effect, the bar renders as a
-/// horizontally padded pill with a rounded background, a subtle box shadow,
+/// horizontally padded pill with a rounded background, a subtle shadow,
 /// and a hairline border. It sits above the body content and is typically
 /// used with [StreamScaffold]'s floating bottom slot.
 ///
@@ -53,10 +56,10 @@ class StreamBottomNavBarItem {
 /// ## Behaviour resolution
 ///
 /// The effective behaviour is resolved in this priority order:
-/// 1. The per-instance [behavior] parameter on this widget.
-/// 2. [StreamBottomNavBarStyle.behavior] from the ambient
-///    [StreamBottomNavBarTheme].
-/// 3. The ambient [StreamAppStyle] enum value.
+/// 1. [StreamBottomNavBarStyle.behavior] — set per-instance via `style` or the
+///    ambient [StreamBottomNavBarTheme].
+/// 2. The ambient [StreamAppStyle] — floating maps to a floating pill, regular to
+///    a docked bar.
 ///
 /// ## Theming
 ///
@@ -101,7 +104,6 @@ class StreamBottomNavBar extends StatelessWidget {
     required List<StreamBottomNavBarItem> items,
     required int currentIndex,
     required ValueChanged<int> onTap,
-    StreamBottomNavBarBehavior? behavior,
     StreamBottomNavBarStyle? style,
   }) : assert(items.length >= 2, 'StreamBottomNavBar requires at least 2 items'),
        assert(
@@ -113,7 +115,6 @@ class StreamBottomNavBar extends StatelessWidget {
          items: items,
          currentIndex: currentIndex,
          onTap: onTap,
-         behavior: behavior,
          style: style,
        );
 
@@ -143,7 +144,6 @@ class StreamBottomNavBarProps {
     required this.items,
     required this.currentIndex,
     required this.onTap,
-    this.behavior,
     this.style,
   }) : assert(
          currentIndex >= 0 && currentIndex < items.length,
@@ -162,12 +162,6 @@ class StreamBottomNavBarProps {
 
   /// Called when the user taps a navigation item.
   final ValueChanged<int> onTap;
-
-  /// Overrides the resolved [StreamBottomNavBarBehavior] for this instance only.
-  ///
-  /// When null the effective behaviour is resolved from the ambient themes;
-  /// see [StreamBottomNavBar] for the full resolution order.
-  final StreamBottomNavBarBehavior? behavior;
 
   /// The visual style applied to this navigation bar.
   ///
@@ -302,13 +296,10 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
     assert(debugCheckHasMaterialLocalizations(context), 'MaterialLocalizations are required.');
     assert(debugCheckHasMediaQuery(context), 'A MediaQuery ancestor is required.');
 
-    final appStyle = context.streamTheme.appStyle;
-
     final style = context.streamBottomNavBarTheme.style?.merge(widget.props.style) ?? widget.props.style;
     final defaults = _StreamBottomNavBarStyleDefaults(context);
 
-    var effectiveBehavior = widget.props.behavior ?? style?.behavior;
-    effectiveBehavior ??= appStyle.isFloating ? .floating : .regular;
+    final effectiveBehavior = style?.behavior ?? defaults.behavior;
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
@@ -319,11 +310,12 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
     final effectiveUnselectedLabelStyle = style?.unselectedLabelStyle ?? defaults.unselectedLabelStyle;
     final effectiveBorderColor = style?.borderColor ?? defaults.borderColor;
     final effectiveBorderRadius = style?.borderRadius ?? defaults.borderRadius;
+    final effectiveElevation = style?.floatingElevation ?? defaults.floatingElevation;
 
     final tiles = StreamBadgeNotificationTheme(
       data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: kBottomNavigationBarHeight),
+        constraints: const BoxConstraints(minHeight: kStreamBottomNavBarHeight),
         // A transparent surface above the bar background so each tile can paint
         // its tap ripple.
         child: Material(
@@ -358,6 +350,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
           gradientColor: effectiveFloatingBackgroundColor,
           borderColor: effectiveBorderColor,
           borderRadius: effectiveBorderRadius,
+          elevation: effectiveElevation,
           child: tiles,
         ),
       },
@@ -469,6 +462,7 @@ class _FloatingChrome extends StatelessWidget {
     required this.gradientColor,
     required this.borderColor,
     required this.borderRadius,
+    required this.elevation,
     required this.child,
   });
 
@@ -476,12 +470,18 @@ class _FloatingChrome extends StatelessWidget {
   final Color gradientColor;
   final Color borderColor;
   final BorderRadiusGeometry borderRadius;
+  final double elevation;
   final Widget child;
 
-  LinearGradient _buildGradient(double bottomInset) {
-    // Solid across the bottom inset, fading over the item height into the
-    // content behind the bar.
-    final solidFraction = bottomInset / (bottomInset + kBottomNavigationBarHeight);
+  LinearGradient _buildGradient({
+    required double topInset,
+    required double bottomInset,
+  }) {
+    // The gradient spans the whole chrome — top margin, pill, and bottom inset.
+    // Keep it solid across the bottom inset and fade up through the pill into
+    // the content behind the bar.
+    final totalHeight = topInset + kStreamBottomNavBarHeight + bottomInset;
+    final solidFraction = totalHeight > 0 ? bottomInset / totalHeight : 0.0;
 
     return streamFloatingFadeLinearGradient(
       color: gradientColor,
@@ -494,29 +494,26 @@ class _FloatingChrome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final margin = context.streamSpacing.xl;
-    // Floored so the pill never sits flush when the device reports no bottom inset.
+    // Matches the SafeArea below: at least `margin`, growing with the device's
+    // bottom inset so the pill never sits flush against the edge.
     final bottomInset = math.max(MediaQuery.paddingOf(context).bottom, margin);
 
     return DecoratedBox(
-      decoration: BoxDecoration(gradient: _buildGradient(bottomInset)),
+      decoration: BoxDecoration(
+        gradient: _buildGradient(topInset: margin, bottomInset: bottomInset),
+      ),
       child: SafeArea(
         top: false,
-        minimum: EdgeInsets.only(bottom: margin),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: margin),
-          child: Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              color: pillColor,
-              borderRadius: borderRadius,
-              boxShadow: context.streamBoxShadow.elevation1,
-            ),
-            foregroundDecoration: BoxDecoration(
-              borderRadius: borderRadius,
-              border: Border.all(color: borderColor),
-            ),
-            child: child,
+        minimum: .all(margin),
+        child: Material(
+          shape: RoundedRectangleBorder(
+            borderRadius: borderRadius,
+            side: BorderSide(color: borderColor),
           ),
+          color: pillColor,
+          elevation: elevation,
+          clipBehavior: Clip.antiAlias,
+          child: child,
         ),
       ),
     );
@@ -536,6 +533,14 @@ class _StreamBottomNavBarStyleDefaults extends StreamBottomNavBarStyle {
   late final _colorScheme = _context.streamColorScheme;
   late final _textTheme = _context.streamTextTheme;
   late final _radius = _context.streamRadius;
+  late final _appStyle = _context.streamTheme.appStyle;
+  late final _elevation = _context.streamElevation;
+
+  @override
+  StreamBottomNavBarBehavior get behavior => _appStyle.isFloating ? .floating : .regular;
+
+  @override
+  double get floatingElevation => _elevation.level3;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;
@@ -562,5 +567,5 @@ class _StreamBottomNavBarStyleDefaults extends StreamBottomNavBarStyle {
   Color get borderColor => _colorScheme.borderSubtle;
 
   @override
-  BorderRadiusGeometry get borderRadius => BorderRadius.all(_radius.max);
+  BorderRadiusGeometry get borderRadius => .all(_radius.max);
 }

@@ -1,0 +1,94 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:stream_core_flutter/core.dart';
+
+const _childKey = Key('media-child');
+
+class _FakeBar extends StatelessWidget implements PreferredSizeWidget {
+  const _FakeBar({required this.height});
+
+  final double height;
+
+  @override
+  Size get preferredSize => Size.fromHeight(height);
+
+  @override
+  Widget build(BuildContext context) => SizedBox(height: height);
+}
+
+Widget _wrap(
+  Widget child, {
+  StreamMediaViewerThemeData? viewerTheme,
+  StreamAppStyle appStyle = StreamAppStyle.regular,
+}) {
+  final scoped = viewerTheme == null ? child : StreamMediaViewerTheme(data: viewerTheme, child: child);
+  return MaterialApp(
+    theme: ThemeData(extensions: [StreamTheme(appStyle: appStyle)]),
+    home: scoped,
+  );
+}
+
+EdgeInsets _mediaInset(WidgetTester tester) {
+  final padding = tester.widget<AnimatedPadding>(
+    find.ancestor(of: find.byKey(_childKey), matching: find.byType(AnimatedPadding)),
+  );
+  return padding.padding.resolve(TextDirection.ltr);
+}
+
+void main() {
+  group('StreamMediaViewer chrome layout', () {
+    testWidgets('follows a regular app style → media is inset between the bars', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamMediaViewer(
+            header: const _FakeBar(height: 56),
+            footer: const _FakeBar(height: 72),
+            child: const SizedBox.expand(key: _childKey),
+          ),
+        ),
+      );
+
+      final inset = _mediaInset(tester);
+      expect(inset.top, 56.0);
+      expect(inset.bottom, 72.0);
+    });
+
+    testWidgets('follows a floating app style → media is full-bleed behind the chrome', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamMediaViewer(
+            header: const _FakeBar(height: 56),
+            footer: const _FakeBar(height: 72),
+            child: const SizedBox.expand(key: _childKey),
+          ),
+          appStyle: .floating,
+        ),
+      );
+
+      final inset = _mediaInset(tester);
+      expect(inset.top, 0.0);
+      expect(inset.bottom, 0.0);
+    });
+
+    testWidgets('a regular chrome override insets the media even under a floating app style', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamMediaViewer(
+            header: const _FakeBar(height: 56),
+            footer: const _FakeBar(height: 72),
+            child: const SizedBox.expand(key: _childKey),
+          ),
+          appStyle: .floating,
+          viewerTheme: const StreamMediaViewerThemeData(
+            appBarStyle: StreamAppBarStyle(behavior: .regular),
+            bottomAppBarStyle: StreamBottomAppBarStyle(behavior: .regular),
+          ),
+        ),
+      );
+
+      final inset = _mediaInset(tester);
+      expect(inset.top, 56.0);
+      expect(inset.bottom, 72.0);
+    });
+  });
+}

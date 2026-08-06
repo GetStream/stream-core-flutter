@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_app_bar_theme.dart';
 import '../../theme/components/stream_button_theme.dart';
+import '../../theme/components/stream_toolbar_behavior.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
+import '../../theme/stream_app_style.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_theme_extensions.dart';
-import '../buttons/stream_button.dart';
 import 'stream_toolbar.dart';
+import 'stream_toolbar_button.dart';
+import 'stream_toolbar_scope.dart';
 
 /// A top-of-screen header for full-page surfaces in the Stream design system.
 ///
@@ -215,13 +218,12 @@ class DefaultStreamAppBar extends StatelessWidget {
     final icons = context.streamIcons;
     final spacing = context.streamSpacing;
 
-    final appStyle = context.streamTheme.appStyle;
+    final appBarTheme = context.streamAppBarTheme;
 
-    final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
+    final style = appBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    var effectiveBehavior = style?.behavior ?? defaults.behavior;
-    effectiveBehavior ??= appStyle.isFloating ? .floating : .regular;
+    final effectiveBehavior = style?.behavior ?? defaults.behavior;
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
@@ -248,13 +250,7 @@ class DefaultStreamAppBar extends StatelessWidget {
         };
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
         final localizations = MaterialLocalizations.of(context);
-        leading = StreamButton.icon(
-          type: switch (effectiveBehavior) {
-            .floating => .outline,
-            .regular => .ghost,
-          },
-          isFloating: effectiveBehavior == .floating,
-          style: .secondary,
+        leading = StreamToolbarButton.icon(
           tooltip: useCloseIcon ? localizations.closeButtonTooltip : localizations.backButtonTooltip,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
           onPressed: Navigator.of(context).maybePop,
@@ -355,7 +351,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     // slot's semantics onto its own node — without it, a raw
     // [GestureDetector] in a slot would attach its action to the outer
     // container and collapse the bar into a single tappable focus stop.
-    return Semantics(
+    bar = Semantics(
       container: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -375,6 +371,10 @@ class DefaultStreamAppBar extends StatelessWidget {
         child: Semantics(explicitChildNodes: true, child: bar),
       ),
     );
+
+    // Publish the resolved behaviour to the slots via a [StreamToolbarScope] so
+    // slot widgets ([StreamToolbarButton], header avatars, ...) match the bar.
+    return StreamToolbarScope(behavior: effectiveBehavior, child: bar);
   }
 
   LinearGradient _getFloatingGradient(
@@ -405,6 +405,10 @@ class _StreamAppBarStyleDefaults extends StreamAppBarStyle {
   late final StreamColorScheme _colorScheme = _context.streamColorScheme;
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
   late final StreamSpacing _spacing = _context.streamSpacing;
+  late final StreamAppStyle _appStyle = _context.streamTheme.appStyle;
+
+  @override
+  StreamToolbarBehavior get behavior => _appStyle.isFloating ? .floating : .regular;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;

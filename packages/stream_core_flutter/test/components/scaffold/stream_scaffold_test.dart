@@ -53,8 +53,8 @@ PreferredSizeWidget _rawAppBar({double height = _kBarHeight, Key? childKey}) {
 Future<void> _pumpStreamScaffold(
   WidgetTester tester, {
   required Widget body,
-  StreamAppBarBehavior? appBarBehavior,
-  StreamBottomAppBarBehavior? bottomBarBehavior,
+  StreamToolbarBehavior? appBarBehavior,
+  StreamToolbarBehavior? bottomBarBehavior,
   PreferredSizeWidget? appBar,
   Widget? bottom,
   bool resizeToAvoidBottomInset = true,
@@ -131,7 +131,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           const StreamScaffold(
-            appBarBehavior: StreamAppBarBehavior.floating,
+            appBarBehavior: StreamToolbarBehavior.floating,
             appBar: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: SizedBox()),
             body: SizedBox(),
           ),
@@ -148,7 +148,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           const StreamScaffold(
-            bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+            bottomBarBehavior: StreamToolbarBehavior.floating,
             bottom: SizedBox(height: 64),
             body: SizedBox(),
           ),
@@ -164,7 +164,7 @@ void main() {
       final captured = _CapturedInsets();
       Future<void> pumpWithHeight(double height) => _pumpStreamScaffold(
         tester,
-        bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+        bottomBarBehavior: StreamToolbarBehavior.floating,
         bottom: SizedBox(height: height),
         body: _InsetProbe(captured),
       );
@@ -180,7 +180,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           const StreamScaffold(
-            bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+            bottomBarBehavior: StreamToolbarBehavior.floating,
             body: SizedBox(),
           ),
         ),
@@ -196,7 +196,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           const StreamAppBarTheme(
-            data: StreamAppBarThemeData(style: StreamAppBarStyle(behavior: StreamAppBarBehavior.floating)),
+            data: StreamAppBarThemeData(style: StreamAppBarStyle(behavior: StreamToolbarBehavior.floating)),
             child: StreamScaffold(
               appBar: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: SizedBox()),
               body: SizedBox(),
@@ -251,7 +251,7 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
         devicePadding: device,
         body: _InsetProbe(captured),
@@ -265,7 +265,7 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+        bottomBarBehavior: StreamToolbarBehavior.floating,
         bottom: const SizedBox(height: bottomBarHeight),
         devicePadding: device,
         body: _InsetProbe(captured),
@@ -279,8 +279,8 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
-        bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
+        bottomBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
         bottom: const SizedBox(height: bottomBarHeight),
         devicePadding: device,
@@ -300,7 +300,7 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(height: 80),
         devicePadding: device,
         body: _InsetProbe(captured),
@@ -313,7 +313,7 @@ void main() {
       const barKey = ValueKey('bar');
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(childKey: barKey),
         devicePadding: device,
         body: ListView(
@@ -335,10 +335,10 @@ void main() {
       const firstItemKey = ValueKey('first');
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: StreamAppBar(
           automaticallyImplyLeading: false,
-          style: const StreamAppBarStyle(behavior: StreamAppBarBehavior.floating),
+          style: const StreamAppBarStyle(behavior: StreamToolbarBehavior.floating),
           title: const Text('Title'),
         ),
         devicePadding: device,
@@ -374,7 +374,7 @@ void main() {
     testWidgets('null-padding ListView auto-insets while its viewport still spans full height', (tester) async {
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
         devicePadding: device,
         body: listBody(),
@@ -389,7 +389,7 @@ void main() {
     testWidgets('explicit padding opts out of auto-inset', (tester) async {
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
         devicePadding: device,
         body: listBody(padding: EdgeInsets.zero),
@@ -404,7 +404,7 @@ void main() {
     ) async {
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
         devicePadding: device,
         body: SafeArea(child: listBody()),
@@ -427,7 +427,7 @@ void main() {
     ) async {
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
         devicePadding: device,
         body: Column(
@@ -458,7 +458,7 @@ void main() {
     ) async {
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
         devicePadding: device,
         body: Builder(
@@ -489,9 +489,9 @@ void main() {
       var capturedBottom = -1.0;
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
-        bottomBarBehavior: StreamBottomAppBarBehavior.regular,
+        bottomBarBehavior: StreamToolbarBehavior.regular,
         bottom: const SizedBox(height: 80),
         devicePadding: const EdgeInsets.only(top: 44, bottom: 34),
         body: IndexedStack(
@@ -550,7 +550,7 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+        bottomBarBehavior: StreamToolbarBehavior.floating,
         bottom: const SizedBox(height: bottomBarHeight),
         devicePadding: const EdgeInsets.only(bottom: 34),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
@@ -564,7 +564,7 @@ void main() {
       const barKey = ValueKey('bar');
       await _pumpStreamScaffold(
         tester,
-        bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+        bottomBarBehavior: StreamToolbarBehavior.floating,
         bottom: const SizedBox(key: barKey, height: bottomBarHeight),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
         body: const SizedBox.expand(),
@@ -581,7 +581,7 @@ void main() {
       const barKey = ValueKey('bar');
       await _pumpStreamScaffold(
         tester,
-        bottomBarBehavior: StreamBottomAppBarBehavior.floating,
+        bottomBarBehavior: StreamToolbarBehavior.floating,
         bottom: const SizedBox(key: barKey, height: bottomBarHeight),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
         resizeToAvoidBottomInset: false,
@@ -598,9 +598,9 @@ void main() {
     testWidgets('keeps a regular bottom out of the bottomNavigationBar slot', (tester) async {
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
-        bottomBarBehavior: StreamBottomAppBarBehavior.regular,
+        bottomBarBehavior: StreamToolbarBehavior.regular,
         bottom: const SizedBox(height: 64),
         body: const SizedBox.expand(),
       );
@@ -617,9 +617,9 @@ void main() {
 
       await _pumpStreamScaffold(
         tester,
-        appBarBehavior: StreamAppBarBehavior.floating,
+        appBarBehavior: StreamToolbarBehavior.floating,
         appBar: _rawAppBar(),
-        bottomBarBehavior: StreamBottomAppBarBehavior.regular,
+        bottomBarBehavior: StreamToolbarBehavior.regular,
         bottom: const SizedBox(key: barKey, height: 64),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
         body: const SizedBox.expand(),

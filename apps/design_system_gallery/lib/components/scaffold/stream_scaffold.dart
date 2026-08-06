@@ -33,9 +33,9 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 
   final appBarBehavior = context.knobs.object.dropdown(
     label: 'App bar behavior',
-    options: StreamAppBarBehavior.values,
+    options: StreamToolbarBehavior.values,
     labelBuilder: (value) => value.name,
-    initialOption: StreamAppBarBehavior.floating,
+    initialOption: StreamToolbarBehavior.floating,
     description:
         'regular — the body sits below the app bar. '
         'floating — the body extends behind the translucent app bar; the list '
@@ -44,9 +44,9 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 
   final bottomBarBehavior = context.knobs.object.dropdown(
     label: 'Bottom bar behavior',
-    options: StreamBottomAppBarBehavior.values,
+    options: StreamToolbarBehavior.values,
     labelBuilder: (value) => value.name,
-    initialOption: StreamBottomAppBarBehavior.floating,
+    initialOption: StreamToolbarBehavior.floating,
     description:
         'regular — the bottom bar sits below the body. '
         'floating — the body extends behind the translucent bottom bar; the list '
@@ -59,8 +59,8 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
   );
 
   final colorScheme = context.streamColorScheme;
-  final appBarFloating = appBarBehavior == StreamAppBarBehavior.floating;
-  final bottomFloating = bottomBarBehavior == StreamBottomAppBarBehavior.floating;
+  final appBarFloating = appBarBehavior == StreamToolbarBehavior.floating;
+  final bottomFloating = bottomBarBehavior == StreamToolbarBehavior.floating;
 
   final scaffold = StreamScaffold(
     appBarBehavior: appBarBehavior,
@@ -245,7 +245,7 @@ PreferredSizeWidget _demoAppBar(
   return StreamAppBar(
     // primary: true (default) so the bar self-insets the status bar / notch.
     style: StreamAppBarStyle(
-      behavior: floating ? StreamAppBarBehavior.floating : StreamAppBarBehavior.regular,
+      behavior: floating ? StreamToolbarBehavior.floating : StreamToolbarBehavior.regular,
     ),
     leading: withDrawerButton
         ? Builder(
@@ -290,7 +290,9 @@ class _DemoBottomNavState extends State<_DemoBottomNav> {
     return StreamBottomNavBar(
       currentIndex: _index,
       onTap: (index) => setState(() => _index = index),
-      behavior: widget.floating ? StreamBottomNavBarBehavior.floating : StreamBottomNavBarBehavior.regular,
+      style: StreamBottomNavBarStyle(
+        behavior: widget.floating ? StreamBottomNavBarBehavior.floating : StreamBottomNavBarBehavior.regular,
+      ),
       items: [
         StreamBottomNavBarItem(
           icon: Icon(icons.messageBubble),
