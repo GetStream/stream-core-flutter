@@ -60,6 +60,22 @@ void main() {
       // viewPadding.bottom (34) + 24, not padding.bottom (0) + 24.
       expect(insets.bottom, 58);
     });
+
+    testWidgets('measures the bottom from padding when maintainBottomViewPadding is false', (tester) async {
+      final insets = await resolve(
+        tester,
+        padding: const EdgeInsets.only(bottom: 10),
+        viewPadding: const EdgeInsets.only(bottom: 50),
+        compute: (context) => StreamSafeArea.resolveInsets(
+          context,
+          margin: const EdgeInsets.all(24),
+          maintainBottomViewPadding: false,
+        ),
+      );
+
+      // padding.bottom (10) + 24, not viewPadding.bottom (50) + 24.
+      expect(insets.bottom, 34);
+    });
   });
 
   group('StreamSafeArea widget', () {
