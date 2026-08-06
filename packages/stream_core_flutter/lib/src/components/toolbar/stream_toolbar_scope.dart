@@ -5,8 +5,7 @@ import '../../theme/components/stream_toolbar_behavior.dart';
 /// Publishes the resolved [StreamToolbarBehavior] of the enclosing toolbar to
 /// its slots.
 ///
-/// A [StreamAppBar] / [StreamBottomAppBar] resolves its behaviour once — from
-/// its style, then the ambient [StreamAppStyle] — and wraps its slots in a
+/// A [StreamAppBar] / [StreamBottomAppBar] wraps its slots in a
 /// [StreamToolbarScope] so slot widgets ([StreamToolbarButton], header avatars,
 /// ...) can match the bar they sit in via [of].
 ///
@@ -23,9 +22,6 @@ class StreamToolbarScope extends InheritedWidget {
   });
 
   /// The enclosing toolbar's resolved behaviour.
-  ///
-  /// Always concrete — the bar resolves the style/app-style fallback before
-  /// publishing.
   final StreamToolbarBehavior behavior;
 
   /// The [StreamToolbarBehavior] of the nearest enclosing toolbar.

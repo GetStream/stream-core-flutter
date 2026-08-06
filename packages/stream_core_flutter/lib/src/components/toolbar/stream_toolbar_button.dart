@@ -15,7 +15,7 @@ import 'stream_toolbar_scope.dart';
 /// Mirrors [StreamButton]: the shape is determined by the presence of [child] —
 /// a labelled button when [child] is non-null, and a circular icon-only button
 /// (via [StreamToolbarButton.icon]) when it is null. Every [StreamButton] knob
-/// is forwarded except `type` and `isFloating`, which the toolbar controls.
+/// is available except `type` and `isFloating`, which the toolbar sets.
 ///
 /// {@tool snippet}
 ///
