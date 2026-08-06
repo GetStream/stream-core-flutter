@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -544,8 +542,7 @@ class _FloatingChrome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final margin = context.streamSpacing.xl;
-    final viewPadding = MediaQuery.viewPaddingOf(context);
-    final bottomInset = viewPadding.bottom + margin;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom + margin;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -554,22 +551,22 @@ class _FloatingChrome extends StatelessWidget {
           bottomInset: bottomInset,
         ),
       ),
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: margin,
-          left: math.max(viewPadding.left, margin),
-          right: math.max(viewPadding.right, margin),
-          bottom: bottomInset,
-        ),
-        child: Material(
-          shape: RoundedRectangleBorder(
-            borderRadius: borderRadius,
-            side: BorderSide(color: borderColor),
+      child: SafeArea(
+        top: false,
+        maintainBottomViewPadding: true,
+        minimum: EdgeInsets.symmetric(horizontal: margin),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: margin),
+          child: Material(
+            shape: RoundedRectangleBorder(
+              borderRadius: borderRadius,
+              side: BorderSide(color: borderColor),
+            ),
+            color: pillColor,
+            elevation: elevation,
+            clipBehavior: Clip.antiAlias,
+            child: child,
           ),
-          color: pillColor,
-          elevation: elevation,
-          clipBehavior: Clip.antiAlias,
-          child: child,
         ),
       ),
     );
