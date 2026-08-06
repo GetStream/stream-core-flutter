@@ -14,27 +14,52 @@ const double kStreamBottomNavBarHeight = 64;
 
 /// A single item in a [StreamBottomNavBar].
 ///
-/// Each item has an [icon] and [selectedIcon] widget (the latter is shown
-/// when the item is active) and a text [label].
+/// Each item has an [icon] and a text [label]. An optional [selectedIcon]
+/// replaces the icon while the item is active, and an optional [tooltip] is
+/// shown on long-press or hover.
 ///
 /// The icon widgets are fully generic — callers are free to wrap them in
 /// badge overlays, unread indicators, or any other decorator.
 class StreamBottomNavBarItem {
   /// Creates a bottom nav bar item.
   const StreamBottomNavBarItem({
+    this.key,
     required this.icon,
-    required this.selectedIcon,
+    this.selectedIcon,
     required this.label,
+    this.tooltip,
+    this.semanticsLabel,
   });
 
-  /// The icon displayed when this item is inactive.
+  /// A key forwarded to the widget that renders this item.
+  ///
+  /// Give each item a stable key when the item list changes at runtime, so the
+  /// tiles keep their identity across rebuilds.
+  final Key? key;
+
+  /// The icon displayed when this item is inactive — and while active when
+  /// [selectedIcon] is null.
   final Widget icon;
 
   /// The icon displayed when this item is active.
-  final Widget selectedIcon;
+  ///
+  /// Falls back to [icon] when null.
+  final Widget? selectedIcon;
 
   /// The text label shown below the icon.
   final String label;
+
+  /// The text to display in a tooltip when the item is long-pressed (or
+  /// hovered on desktop / web).
+  ///
+  /// When null, no tooltip is shown.
+  final String? tooltip;
+
+  /// The label announced by accessibility tools, overriding [label].
+  ///
+  /// Use this when the visible [label] doesn't fully describe the destination.
+  /// When null, [label] is announced.
+  final String? semanticsLabel;
 }
 
 /// A bottom navigation bar for Stream surfaces.
@@ -283,6 +308,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
     return <Widget>[
       for (var i = 0; i < _items.length; i++)
         _StreamNavTile(
+          key: _items[i].key,
           item: _items[i],
           animation: _animations[i],
           iconSize: iconSize,
@@ -367,6 +393,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
 // animates between the unselected and selected states.
 class _StreamNavTile extends StatelessWidget {
   const _StreamNavTile({
+    super.key,
     required this.item,
     required this.animation,
     required this.iconSize,
@@ -391,7 +418,7 @@ class _StreamNavTile extends StatelessWidget {
     final spacing = context.streamSpacing;
     final color = colorTween.evaluate(animation);
 
-    final Widget result = Semantics(
+    Widget tile = Semantics(
       selected: selected,
       button: true,
       container: true,
@@ -410,7 +437,7 @@ class _StreamNavTile extends StatelessWidget {
                     heightFactor: 1,
                     child: IconTheme(
                       data: IconThemeData(color: color, size: iconSize),
-                      child: selected ? item.selectedIcon : item.icon,
+                      child: selected ? (item.selectedIcon ?? item.icon) : item.icon,
                     ),
                   ),
                   Align(
@@ -418,7 +445,15 @@ class _StreamNavTile extends StatelessWidget {
                     heightFactor: 1,
                     child: MediaQuery.withClampedTextScaling(
                       maxScaleFactor: 1,
-                      child: Text(item.label, style: labelStyle.copyWith(color: color)),
+                      child: switch (item.semanticsLabel) {
+                        final semanticsLabel? => Semantics(
+                          label: semanticsLabel,
+                          child: ExcludeSemantics(
+                            child: Text(item.label, style: labelStyle.copyWith(color: color)),
+                          ),
+                        ),
+                        null => Text(item.label, style: labelStyle.copyWith(color: color)),
+                      },
                     ),
                   ),
                 ],
@@ -430,7 +465,11 @@ class _StreamNavTile extends StatelessWidget {
       ),
     );
 
-    return Expanded(child: result);
+    if (item.tooltip case final tooltip?) {
+      tile = Tooltip(message: tooltip, child: tile);
+    }
+
+    return Expanded(child: tile);
   }
 }
 

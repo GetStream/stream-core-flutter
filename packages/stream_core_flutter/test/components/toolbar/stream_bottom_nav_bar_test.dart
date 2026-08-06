@@ -63,6 +63,91 @@ void main() {
     );
   });
 
+  group('item options', () {
+    testWidgets('selectedIcon falls back to icon when null', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home'),
+              StreamBottomNavBarItem(
+                icon: Icon(Icons.search_outlined),
+                selectedIcon: Icon(Icons.search),
+                label: 'Search',
+              ),
+            ],
+          ),
+        ),
+      );
+
+      // Item 0 is selected but sets no selectedIcon → its plain icon is shown.
+      expect(find.byIcon(Icons.home), findsOneWidget);
+    });
+
+    testWidgets('renders a Tooltip when an item sets tooltip', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home', tooltip: 'Go home'),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      expect(find.byTooltip('Go home'), findsOneWidget);
+    });
+
+    testWidgets('announces semanticsLabel in place of the visible label', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home', semanticsLabel: 'Home screen'),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      final tile = find.semantics.byPredicate((n) => n.label.contains('Tab 1 of 2'));
+      final label = tile.evaluate().single.label;
+
+      // The override is announced, and the visible "Home" label is excluded — so
+      // it isn't spoken a second time (only the one inside "Home screen" remains).
+      expect(label, contains('Home screen'));
+      expect(RegExp('Home').allMatches(label), hasLength(1));
+
+      handle.dispose();
+    });
+
+    testWidgets('forwards an item key to its tile', (tester) async {
+      const homeKey = ValueKey('home-tile');
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(key: homeKey, icon: Icon(Icons.home), label: 'Home'),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      expect(find.byKey(homeKey), findsOneWidget);
+    });
+  });
+
   group('regular surfaceStyle', () {
     testWidgets('renders a docked bar with a top border and no gradient', (tester) async {
       await tester.pumpWidget(
