@@ -14,15 +14,15 @@ import '../../theme/stream_surface_style.dart';
 ///  * [StreamSurfaceStyle], the value carried by this scope.
 ///  * [StreamToolbarButton], which reads it to style itself.
 class StreamToolbarScope extends InheritedWidget {
-  /// Creates a [StreamToolbarScope] for the given resolved [behavior].
+  /// Creates a [StreamToolbarScope] for the given resolved [surfaceStyle].
   const StreamToolbarScope({
     super.key,
-    required this.behavior,
+    required this.surfaceStyle,
     required super.child,
   });
 
-  /// The enclosing toolbar's resolved behaviour.
-  final StreamSurfaceStyle behavior;
+  /// The enclosing toolbar's resolved surface style.
+  final StreamSurfaceStyle surfaceStyle;
 
   /// The [StreamSurfaceStyle] of the nearest enclosing toolbar.
   ///
@@ -54,9 +54,9 @@ class StreamToolbarScope extends InheritedWidget {
   /// The [StreamSurfaceStyle] of the nearest enclosing toolbar, or null when
   /// there is none.
   static StreamSurfaceStyle? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<StreamToolbarScope>()?.behavior;
+    return context.dependOnInheritedWidgetOfExactType<StreamToolbarScope>()?.surfaceStyle;
   }
 
   @override
-  bool updateShouldNotify(StreamToolbarScope oldWidget) => behavior != oldWidget.behavior;
+  bool updateShouldNotify(StreamToolbarScope oldWidget) => surfaceStyle != oldWidget.surfaceStyle;
 }

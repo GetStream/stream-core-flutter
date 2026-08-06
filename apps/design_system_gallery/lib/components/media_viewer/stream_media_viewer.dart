@@ -41,8 +41,8 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
     description: 'Duration of the chrome show/hide animation.',
   );
 
-  final behavior = context.knobs.object.dropdown(
-    label: 'Chrome behavior',
+  final surfaceStyle = context.knobs.object.dropdown(
+    label: 'Chrome surfaceStyle',
     options: StreamSurfaceStyle.values,
     initialOption: StreamSurfaceStyle.floating,
     description:
@@ -67,12 +67,12 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
         data: StreamMediaViewerThemeData(
           chromeAnimationDuration: Duration(milliseconds: animationMs.round()),
           appBarStyle: StreamAppBarStyle(
-            behavior: behavior,
+            surfaceStyle: surfaceStyle,
             backgroundColor: tint,
             floatingBackgroundColor: tint,
           ),
           bottomAppBarStyle: StreamBottomAppBarStyle(
-            behavior: behavior,
+            surfaceStyle: surfaceStyle,
             backgroundColor: tint,
             floatingBackgroundColor: tint,
           ),

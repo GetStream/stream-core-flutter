@@ -45,11 +45,11 @@ void main() {
   });
 }
 
-Widget _bar(StreamSurfaceStyle behavior) {
-  final floating = behavior.isFloating;
+Widget _bar(StreamSurfaceStyle surfaceStyle) {
+  final floating = surfaceStyle.isFloating;
   final type = floating ? StreamButtonType.outline : StreamButtonType.ghost;
   return StreamBottomAppBar(
-    style: StreamBottomAppBarStyle(behavior: behavior),
+    style: StreamBottomAppBarStyle(surfaceStyle: surfaceStyle),
     leading: StreamButton.icon(
       icon: const Icon(Icons.share),
       type: type,

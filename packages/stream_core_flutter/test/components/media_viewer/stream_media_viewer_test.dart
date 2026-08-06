@@ -19,11 +19,11 @@ class _FakeBar extends StatelessWidget implements PreferredSizeWidget {
 Widget _wrap(
   Widget child, {
   StreamMediaViewerThemeData? viewerTheme,
-  StreamSurfaceStyle appStyle = StreamSurfaceStyle.regular,
+  StreamSurfaceStyle surfaceStyle = StreamSurfaceStyle.regular,
 }) {
   final scoped = viewerTheme == null ? child : StreamMediaViewerTheme(data: viewerTheme, child: child);
   return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme(appStyle: appStyle)]),
+    theme: ThemeData(extensions: [StreamTheme(surfaceStyle: surfaceStyle)]),
     home: scoped,
   );
 }
@@ -61,7 +61,7 @@ void main() {
             footer: const _FakeBar(height: 72),
             child: const SizedBox.expand(key: _childKey),
           ),
-          appStyle: .floating,
+          surfaceStyle: .floating,
         ),
       );
 
@@ -78,10 +78,10 @@ void main() {
             footer: const _FakeBar(height: 72),
             child: const SizedBox.expand(key: _childKey),
           ),
-          appStyle: .floating,
+          surfaceStyle: .floating,
           viewerTheme: const StreamMediaViewerThemeData(
-            appBarStyle: StreamAppBarStyle(behavior: .regular),
-            bottomAppBarStyle: StreamBottomAppBarStyle(behavior: .regular),
+            appBarStyle: StreamAppBarStyle(surfaceStyle: .regular),
+            bottomAppBarStyle: StreamBottomAppBarStyle(surfaceStyle: .regular),
           ),
         ),
       );

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
-Widget _withStreamTheme(Widget child, {StreamSurfaceStyle appStyle = StreamSurfaceStyle.regular}) {
+Widget _withStreamTheme(Widget child, {StreamSurfaceStyle surfaceStyle = StreamSurfaceStyle.regular}) {
   return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme(appStyle: appStyle)]),
+    theme: ThemeData(extensions: [StreamTheme(surfaceStyle: surfaceStyle)]),
     home: Scaffold(body: child),
   );
 }
 
-Widget _scoped(StreamSurfaceStyle behavior, Widget child) {
-  return StreamToolbarScope(behavior: behavior, child: child);
+Widget _scoped(StreamSurfaceStyle surfaceStyle, Widget child) {
+  return StreamToolbarScope(surfaceStyle: surfaceStyle, child: child);
 }
 
 void main() {
@@ -46,7 +46,7 @@ void main() {
       expect(tester.takeException(), isA<FlutterError>());
     });
 
-    testWidgets('of and maybeOf return the published behavior inside a scope', (tester) async {
+    testWidgets('of and maybeOf return the published surfaceStyle inside a scope', (tester) async {
       late StreamSurfaceStyle fromOf;
       StreamSurfaceStyle? fromMaybeOf;
       await tester.pumpWidget(

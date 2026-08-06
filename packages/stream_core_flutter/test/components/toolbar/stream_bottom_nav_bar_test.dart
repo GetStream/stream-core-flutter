@@ -15,9 +15,9 @@ const _items = [
   ),
 ];
 
-Widget _withStreamTheme(Widget child, {StreamSurfaceStyle appStyle = StreamSurfaceStyle.regular}) {
+Widget _withStreamTheme(Widget child, {StreamSurfaceStyle surfaceStyle = StreamSurfaceStyle.regular}) {
   return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme(appStyle: appStyle)]),
+    theme: ThemeData(extensions: [StreamTheme(surfaceStyle: surfaceStyle)]),
     home: Scaffold(body: child),
   );
 }
@@ -63,7 +63,7 @@ void main() {
     );
   });
 
-  group('regular behavior', () {
+  group('regular surfaceStyle', () {
     testWidgets('renders a docked bar with a top border and no gradient', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
@@ -71,7 +71,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            style: const StreamBottomNavBarStyle(behavior: .regular),
+            style: const StreamBottomNavBarStyle(surfaceStyle: .regular),
           ),
         ),
       );
@@ -91,7 +91,7 @@ void main() {
     });
   });
 
-  group('floating behavior', () {
+  group('floating surfaceStyle', () {
     testWidgets('renders a gradient background', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
@@ -99,7 +99,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            style: const StreamBottomNavBarStyle(behavior: .floating),
+            style: const StreamBottomNavBarStyle(surfaceStyle: .floating),
           ),
         ),
       );
@@ -117,13 +117,13 @@ void main() {
     });
   });
 
-  group('behavior resolution', () {
-    testWidgets('resolves behavior from StreamBottomNavBarTheme', (tester) async {
+  group('surfaceStyle resolution', () {
+    testWidgets('resolves surfaceStyle from StreamBottomNavBarTheme', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamBottomNavBarTheme(
             data: const StreamBottomNavBarThemeData(
-              style: StreamBottomNavBarStyle(behavior: .floating),
+              style: StreamBottomNavBarStyle(surfaceStyle: .floating),
             ),
             child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
           ),
@@ -138,7 +138,7 @@ void main() {
         _withStreamTheme(
           StreamBottomAppBarTheme(
             data: const StreamBottomAppBarThemeData(
-              style: StreamBottomAppBarStyle(behavior: .floating),
+              style: StreamBottomAppBarStyle(surfaceStyle: .floating),
             ),
             child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
           ),
@@ -150,13 +150,13 @@ void main() {
       expect(_isFloating(tester), isFalse);
     });
 
-    testWidgets('falls back to the ambient StreamSurfaceStyle when neither instance nor theme set a behavior', (
+    testWidgets('falls back to the ambient StreamSurfaceStyle when neither instance nor theme set a surfaceStyle', (
       tester,
     ) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
-          appStyle: StreamSurfaceStyle.floating,
+          surfaceStyle: StreamSurfaceStyle.floating,
         ),
       );
 
@@ -221,7 +221,7 @@ void main() {
     Future<void> pumpFloating(WidgetTester tester, {required double deviceBottom}) {
       return tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamSurfaceStyle.floating)]),
+          theme: ThemeData(extensions: [StreamTheme(surfaceStyle: StreamSurfaceStyle.floating)]),
           home: Builder(
             builder: (context) {
               final base = MediaQuery.of(context);
@@ -236,7 +236,7 @@ void main() {
                     items: _items,
                     currentIndex: 0,
                     onTap: (_) {},
-                    style: const StreamBottomNavBarStyle(behavior: .floating),
+                    style: const StreamBottomNavBarStyle(surfaceStyle: .floating),
                   ),
                 ),
               );

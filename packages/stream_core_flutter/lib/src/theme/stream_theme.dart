@@ -108,7 +108,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme({
     Brightness? brightness,
     TargetPlatform? platform,
-    StreamSurfaceStyle? appStyle,
+    StreamSurfaceStyle? surfaceStyle,
     StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
@@ -178,7 +178,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
-    appStyle ??= StreamSurfaceStyle.regular;
+    surfaceStyle ??= StreamSurfaceStyle.regular;
     appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
@@ -220,7 +220,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     return .raw(
       // ignore: deprecated_member_use_from_same_package
       brightness: effectiveBrightness,
-      appStyle: appStyle,
+      surfaceStyle: surfaceStyle,
       elevation: elevation,
       icons: icons,
       radius: radius,
@@ -283,7 +283,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   const StreamTheme.raw({
     @Deprecated('Use colorScheme.brightness instead') this.brightness = Brightness.light,
-    required this.appStyle,
+    required this.surfaceStyle,
     required this.elevation,
     required this.icons,
     required this.radius,
@@ -371,7 +371,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   final Brightness brightness;
 
   /// The app style for this theme.
-  final StreamSurfaceStyle appStyle;
+  final StreamSurfaceStyle surfaceStyle;
 
   /// The Material elevation values for this theme.
   final StreamElevation elevation;
@@ -537,7 +537,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     return StreamTheme.raw(
       // ignore: deprecated_member_use_from_same_package
       brightness: brightness,
-      appStyle: appStyle,
+      surfaceStyle: surfaceStyle,
       elevation: elevation,
       icons: icons,
       radius: radius,

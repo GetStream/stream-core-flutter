@@ -135,7 +135,7 @@ class StreamBottomNavBarThemeData with _$StreamBottomNavBarThemeData {
 class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
   /// Creates a bottom navigation bar style with optional property overrides.
   const StreamBottomNavBarStyle({
-    this.behavior,
+    this.surfaceStyle,
     this.floatingElevation,
     this.backgroundColor,
     this.floatingBackgroundColor,
@@ -148,11 +148,11 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
     this.borderRadius,
   });
 
-  /// The floating or regular layout behaviour for this navigation bar.
+  /// The floating or regular surface style for this navigation bar.
   ///
   /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
   /// [StreamTheme].
-  final StreamSurfaceStyle? behavior;
+  final StreamSurfaceStyle? surfaceStyle;
 
   /// The elevation of the floating pill.
   final double? floatingElevation;

@@ -21,8 +21,8 @@ import '../../theme/stream_theme_extensions.dart';
 ///
 /// The behaviour of each slot is resolved via a three-step priority chain:
 ///
-/// 1. Per-instance [appBarBehavior] / [bottomBarBehavior] on this widget.
-/// 2. [StreamAppBarStyle.behavior] / [StreamBottomAppBarStyle.behavior]
+/// 1. Per-instance [appBarSurfaceStyle] / [bottomBarSurfaceStyle] on this widget.
+/// 2. [StreamAppBarStyle.surfaceStyle] / [StreamBottomAppBarStyle.surfaceStyle]
 ///    from the ambient component theme.
 /// 3. The ambient [StreamSurfaceStyle] enum value ([StreamSurfaceStyle.floating] or
 ///    [StreamSurfaceStyle.regular]).
@@ -37,11 +37,11 @@ import '../../theme/stream_theme_extensions.dart';
 ///   and the corresponding inset is `0.0`.
 ///
 /// This resolution reads the ambient component theme and [StreamSurfaceStyle], not
-/// a `style` set directly on the bar widget. A bar that pins its own `behavior`
+/// a `style` set directly on the bar widget. A bar that pins its own `surfaceStyle`
 /// (or a [StreamBottomNavBar], which resolves floating from its own theme) can
 /// float while this scaffold keeps the slot docked and publishes no inset. To
 /// keep the layout and chrome in sync, consider setting the matching
-/// [appBarBehavior] / [bottomBarBehavior] here, or driving both from the
+/// [appBarSurfaceStyle] / [bottomBarSurfaceStyle] here, or driving both from the
 /// ambient [StreamSurfaceStyle].
 ///
 /// ## Drawer support
@@ -93,8 +93,8 @@ class StreamScaffold extends StatelessWidget {
     this.endDrawerEnableOpenDragGesture = true,
     this.drawerDragStartBehavior = .start,
     this.drawerBarrierDismissible = true,
-    this.appBarBehavior,
-    this.bottomBarBehavior,
+    this.appBarSurfaceStyle,
+    this.bottomBarSurfaceStyle,
     this.backgroundColor,
     this.resizeToAvoidBottomInset = true,
     this.restorationId,
@@ -114,7 +114,7 @@ class StreamScaffold extends StatelessWidget {
 
   /// An optional widget displayed at the bottom of the scaffold.
   ///
-  /// When [bottomBarBehavior] is [StreamSurfaceStyle.floating] this widget
+  /// When [bottomBarSurfaceStyle] is [StreamSurfaceStyle.floating] this widget
   /// overlaps the body; otherwise it sits below it.
   final Widget? bottom;
 
@@ -163,19 +163,19 @@ class StreamScaffold extends StatelessWidget {
   /// Defaults to `true`.
   final bool drawerBarrierDismissible;
 
-  /// Per-instance override for the app-bar floating behaviour.
+  /// Per-instance override for the app bar's surface style.
   ///
-  /// When null the value is resolved from [StreamAppBarStyle.behavior]
+  /// When null the value is resolved from [StreamAppBarStyle.surfaceStyle]
   /// in the ambient [StreamAppBarTheme], falling back to the ambient
   /// [StreamSurfaceStyle].
-  final StreamSurfaceStyle? appBarBehavior;
+  final StreamSurfaceStyle? appBarSurfaceStyle;
 
-  /// Per-instance override for the bottom-bar floating behaviour.
+  /// Per-instance override for the bottom bar's surface style.
   ///
   /// When null the value is resolved from
-  /// [StreamBottomAppBarStyle.behavior] in the ambient
+  /// [StreamBottomAppBarStyle.surfaceStyle] in the ambient
   /// [StreamBottomAppBarTheme], falling back to the ambient [StreamSurfaceStyle].
-  final StreamSurfaceStyle? bottomBarBehavior;
+  final StreamSurfaceStyle? bottomBarSurfaceStyle;
 
   /// Background color of the scaffold.
   ///
@@ -197,20 +197,20 @@ class StreamScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.streamColorScheme;
 
-    final appStyle = context.streamTheme.appStyle;
+    final surfaceStyle = context.streamTheme.surfaceStyle;
     final appBarStyle = context.streamAppBarTheme.style;
     final bottomAppBarStyle = context.streamBottomAppBarTheme.style;
 
-    var effectiveAppBarBehavior = appBarBehavior ?? appBarStyle?.behavior;
-    effectiveAppBarBehavior ??= appStyle;
+    var effectiveAppBarSurfaceStyle = appBarSurfaceStyle ?? appBarStyle?.surfaceStyle;
+    effectiveAppBarSurfaceStyle ??= surfaceStyle;
 
-    var effectiveBottomBarBehavior = bottomBarBehavior ?? bottomAppBarStyle?.behavior;
-    effectiveBottomBarBehavior ??= appStyle;
+    var effectiveBottomBarSurfaceStyle = bottomBarSurfaceStyle ?? bottomAppBarStyle?.surfaceStyle;
+    effectiveBottomBarSurfaceStyle ??= surfaceStyle;
 
     final effectiveBackgroundColor = backgroundColor ?? colorScheme.backgroundApp;
 
-    final appBarFloating = effectiveAppBarBehavior == .floating;
-    final bottomFloating = effectiveBottomBarBehavior == .floating && bottom != null;
+    final appBarFloating = effectiveAppBarSurfaceStyle == .floating;
+    final bottomFloating = effectiveBottomBarSurfaceStyle == .floating && bottom != null;
 
     return Scaffold(
       backgroundColor: effectiveBackgroundColor,

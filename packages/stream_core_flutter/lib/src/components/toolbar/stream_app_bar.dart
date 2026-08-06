@@ -222,7 +222,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     final style = appBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveBehavior = style?.behavior ?? defaults.behavior;
+    final effectiveSurfaceStyle = style?.surfaceStyle ?? defaults.surfaceStyle;
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
@@ -354,15 +354,15 @@ class DefaultStreamAppBar extends StatelessWidget {
       container: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: switch (effectiveBehavior) {
+          color: switch (effectiveSurfaceStyle) {
             .floating => null,
             .regular => effectiveBackgroundColor,
           },
-          gradient: switch (effectiveBehavior) {
+          gradient: switch (effectiveSurfaceStyle) {
             .floating => _getFloatingGradient(context, color: effectiveFloatingBackgroundColor),
             .regular => null,
           },
-          border: switch (effectiveBehavior) {
+          border: switch (effectiveSurfaceStyle) {
             .floating => null,
             .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
           },
@@ -373,7 +373,7 @@ class DefaultStreamAppBar extends StatelessWidget {
 
     // Publish the resolved behaviour to the slots via a [StreamToolbarScope] so
     // slot widgets ([StreamToolbarButton], header avatars, ...) match the bar.
-    return StreamToolbarScope(behavior: effectiveBehavior, child: bar);
+    return StreamToolbarScope(surfaceStyle: effectiveSurfaceStyle, child: bar);
   }
 
   LinearGradient _getFloatingGradient(
@@ -404,10 +404,10 @@ class _StreamAppBarStyleDefaults extends StreamAppBarStyle {
   late final StreamColorScheme _colorScheme = _context.streamColorScheme;
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
   late final StreamSpacing _spacing = _context.streamSpacing;
-  late final StreamSurfaceStyle _appStyle = _context.streamTheme.appStyle;
+  late final StreamSurfaceStyle _surfaceStyle = _context.streamTheme.surfaceStyle;
 
   @override
-  StreamSurfaceStyle get behavior => _appStyle;
+  StreamSurfaceStyle get surfaceStyle => _surfaceStyle;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;

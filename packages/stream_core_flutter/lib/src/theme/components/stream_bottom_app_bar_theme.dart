@@ -140,7 +140,7 @@ class StreamBottomAppBarThemeData with _$StreamBottomAppBarThemeData {
 class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
   /// Creates a bottom app bar style with optional property overrides.
   const StreamBottomAppBarStyle({
-    this.behavior,
+    this.surfaceStyle,
     this.backgroundColor,
     this.floatingBackgroundColor,
     this.padding,
@@ -151,14 +151,14 @@ class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
     this.trailingStyle,
   });
 
-  /// The floating or regular layout behaviour for this bottom bar.
+  /// The floating or regular surface style for this bottom bar.
   ///
   /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
   /// [StreamTheme].
   ///
   /// Set this to override the global style for this component only, without
   /// affecting other components.
-  final StreamSurfaceStyle? behavior;
+  final StreamSurfaceStyle? surfaceStyle;
 
   /// The background colour of the bottom app bar.
   final Color? backgroundColor;

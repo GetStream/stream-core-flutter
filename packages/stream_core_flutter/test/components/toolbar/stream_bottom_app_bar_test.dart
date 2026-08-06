@@ -182,7 +182,7 @@ void main() {
         _withStreamTheme(
           Scaffold(
             bottomNavigationBar: StreamBottomAppBar(
-              style: const StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.floating),
+              style: const StreamBottomAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
               title: const Text('Title'),
             ),
           ),
@@ -226,7 +226,7 @@ void main() {
         _withStreamTheme(
           Scaffold(
             bottomNavigationBar: StreamBottomAppBar(
-              style: const StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.floating),
+              style: const StreamBottomAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
               title: const Text('Title'),
               trailing: probe(),
             ),
@@ -255,7 +255,7 @@ void main() {
     testWidgets('slot resolves floating from the ambient app style', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamSurfaceStyle.floating)]),
+          theme: ThemeData(extensions: [StreamTheme(surfaceStyle: StreamSurfaceStyle.floating)]),
           home: Scaffold(
             bottomNavigationBar: StreamBottomAppBar(
               title: const Text('Title'),
@@ -273,11 +273,11 @@ void main() {
         _withStreamTheme(
           StreamBottomAppBarTheme(
             data: const StreamBottomAppBarThemeData(
-              style: StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.floating),
+              style: StreamBottomAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
             ),
             child: Scaffold(
               bottomNavigationBar: StreamBottomAppBar(
-                style: const StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.regular),
+                style: const StreamBottomAppBarStyle(surfaceStyle: StreamSurfaceStyle.regular),
                 title: const Text('Title'),
                 trailing: probe(),
               ),

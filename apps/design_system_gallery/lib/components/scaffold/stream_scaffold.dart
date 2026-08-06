@@ -31,8 +31,8 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
     description: 'Adds a navigation drawer, opened from the app-bar leading button.',
   );
 
-  final appBarBehavior = context.knobs.object.dropdown(
-    label: 'App bar behavior',
+  final appBarSurfaceStyle = context.knobs.object.dropdown(
+    label: 'App bar surfaceStyle',
     options: StreamSurfaceStyle.values,
     labelBuilder: (value) => value.name,
     initialOption: StreamSurfaceStyle.floating,
@@ -42,8 +42,8 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
         'auto-insets from MediaQuery.padding.top. Scroll to see rows pass behind it.',
   );
 
-  final bottomBarBehavior = context.knobs.object.dropdown(
-    label: 'Bottom bar behavior',
+  final bottomBarSurfaceStyle = context.knobs.object.dropdown(
+    label: 'Bottom bar surfaceStyle',
     options: StreamSurfaceStyle.values,
     labelBuilder: (value) => value.name,
     initialOption: StreamSurfaceStyle.floating,
@@ -59,12 +59,12 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
   );
 
   final colorScheme = context.streamColorScheme;
-  final appBarFloating = appBarBehavior == StreamSurfaceStyle.floating;
-  final bottomFloating = bottomBarBehavior == StreamSurfaceStyle.floating;
+  final appBarFloating = appBarSurfaceStyle == StreamSurfaceStyle.floating;
+  final bottomFloating = bottomBarSurfaceStyle == StreamSurfaceStyle.floating;
 
   final scaffold = StreamScaffold(
-    appBarBehavior: appBarBehavior,
-    bottomBarBehavior: bottomBarBehavior,
+    appBarSurfaceStyle: appBarSurfaceStyle,
+    bottomBarSurfaceStyle: bottomBarSurfaceStyle,
     backgroundColor: customBackground ? colorScheme.backgroundSurfaceSubtle : null,
     appBar: showAppBar ? _demoAppBar(context, floating: appBarFloating, withDrawerButton: showDrawer) : null,
     drawer: showDrawer ? const _ExampleDrawer() : null,
@@ -245,7 +245,7 @@ PreferredSizeWidget _demoAppBar(
   return StreamAppBar(
     // primary: true (default) so the bar self-insets the status bar / notch.
     style: StreamAppBarStyle(
-      behavior: floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
+      surfaceStyle: floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
     ),
     leading: withDrawerButton
         ? Builder(
@@ -291,7 +291,7 @@ class _DemoBottomNavState extends State<_DemoBottomNav> {
       currentIndex: _index,
       onTap: (index) => setState(() => _index = index),
       style: StreamBottomNavBarStyle(
-        behavior: widget.floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
+        surfaceStyle: widget.floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
       ),
       items: [
         StreamBottomNavBarItem(

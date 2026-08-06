@@ -13,7 +13,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   @override
   ThemeExtension<StreamTheme> copyWith({
     Brightness? brightness,
-    StreamSurfaceStyle? appStyle,
+    StreamSurfaceStyle? surfaceStyle,
     StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
@@ -70,7 +70,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: brightness ?? _this.brightness,
-      appStyle: appStyle ?? _this.appStyle,
+      surfaceStyle: surfaceStyle ?? _this.surfaceStyle,
       elevation: elevation ?? _this.elevation,
       icons: icons ?? _this.icons,
       radius: radius ?? _this.radius,
@@ -150,7 +150,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: t < 0.5 ? _this.brightness : other.brightness,
-      appStyle: t < 0.5 ? _this.appStyle : other.appStyle,
+      surfaceStyle: t < 0.5 ? _this.surfaceStyle : other.surfaceStyle,
       elevation: StreamElevation.lerp(_this.elevation, other.elevation, t)!,
       icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
       radius: StreamRadius.lerp(_this.radius, other.radius, t)!,
@@ -369,7 +369,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _other = (other as StreamTheme);
 
     return _other.brightness == _this.brightness &&
-        _other.appStyle == _this.appStyle &&
+        _other.surfaceStyle == _this.surfaceStyle &&
         _other.elevation == _this.elevation &&
         _other.icons == _this.icons &&
         _other.radius == _this.radius &&
@@ -431,7 +431,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     return Object.hashAll([
       runtimeType,
       _this.brightness,
-      _this.appStyle,
+      _this.surfaceStyle,
       _this.elevation,
       _this.icons,
       _this.radius,

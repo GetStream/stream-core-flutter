@@ -70,7 +70,7 @@ Widget buildStreamBottomAppBarPlayground(BuildContext context) {
   final Widget bar = StreamBottomAppBar(
     primary: primary,
     style: StreamBottomAppBarStyle(
-      behavior: floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
+      surfaceStyle: floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
       padding: EdgeInsets.all(padding),
       spacing: spacing,
     ),

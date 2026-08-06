@@ -116,7 +116,7 @@ void main() {
             body: StreamAppBar(
               automaticallyImplyLeading: false,
               primary: false,
-              style: const StreamAppBarStyle(behavior: StreamSurfaceStyle.floating),
+              style: const StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
               title: const Text('Title'),
             ),
           ),
@@ -140,7 +140,7 @@ void main() {
     testWidgets('floating: true uses outline button type for auto-implied leading', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
-          const _LauncherScreen(appBarStyle: StreamAppBarStyle(behavior: StreamSurfaceStyle.floating)),
+          const _LauncherScreen(appBarStyle: StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating)),
         ),
       );
       await tester.tap(find.text('Open'));
@@ -185,7 +185,7 @@ void main() {
             body: StreamAppBar(
               automaticallyImplyLeading: false,
               primary: false,
-              style: const StreamAppBarStyle(behavior: StreamSurfaceStyle.floating),
+              style: const StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
               title: const Text('Title'),
               trailing: probe(),
             ),
@@ -215,7 +215,7 @@ void main() {
     testWidgets('slot resolves floating from the ambient app style', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamSurfaceStyle.floating)]),
+          theme: ThemeData(extensions: [StreamTheme(surfaceStyle: StreamSurfaceStyle.floating)]),
           home: Scaffold(
             body: StreamAppBar(
               automaticallyImplyLeading: false,
@@ -235,7 +235,7 @@ void main() {
         _withStreamTheme(
           StreamAppBarTheme(
             data: const StreamAppBarThemeData(
-              style: StreamAppBarStyle(behavior: StreamSurfaceStyle.floating),
+              style: StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
             ),
             child: Scaffold(
               body: StreamAppBar(
@@ -257,12 +257,12 @@ void main() {
         _withStreamTheme(
           StreamAppBarTheme(
             data: const StreamAppBarThemeData(
-              style: StreamAppBarStyle(behavior: StreamSurfaceStyle.floating),
+              style: StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
             ),
             child: Scaffold(
               appBar: StreamAppBar(
                 automaticallyImplyLeading: false,
-                style: const StreamAppBarStyle(behavior: StreamSurfaceStyle.regular),
+                style: const StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.regular),
                 title: const Text('Title'),
                 trailing: probe(),
               ),

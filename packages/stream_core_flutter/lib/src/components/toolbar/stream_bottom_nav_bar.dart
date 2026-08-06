@@ -57,7 +57,7 @@ class StreamBottomNavBarItem {
 /// ## Behaviour resolution
 ///
 /// The effective behaviour is resolved in this priority order:
-/// 1. [StreamBottomNavBarStyle.behavior] — set per-instance via `style` or the
+/// 1. [StreamBottomNavBarStyle.surfaceStyle] — set per-instance via `style` or the
 ///    ambient [StreamBottomNavBarTheme].
 /// 2. The ambient [StreamSurfaceStyle] — floating maps to a floating pill, regular to
 ///    a docked bar.
@@ -300,7 +300,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
     final style = context.streamBottomNavBarTheme.style?.merge(widget.props.style) ?? widget.props.style;
     final defaults = _StreamBottomNavBarStyleDefaults(context);
 
-    final effectiveBehavior = style?.behavior ?? defaults.behavior;
+    final effectiveSurfaceStyle = style?.surfaceStyle ?? defaults.surfaceStyle;
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
@@ -340,7 +340,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
 
     return Semantics(
       explicitChildNodes: true,
-      child: switch (effectiveBehavior) {
+      child: switch (effectiveSurfaceStyle) {
         StreamSurfaceStyle.regular => _RegularChrome(
           backgroundColor: effectiveBackgroundColor,
           borderColor: effectiveBorderColor,
@@ -538,11 +538,11 @@ class _StreamBottomNavBarStyleDefaults extends StreamBottomNavBarStyle {
   late final _colorScheme = _context.streamColorScheme;
   late final _textTheme = _context.streamTextTheme;
   late final _radius = _context.streamRadius;
-  late final _appStyle = _context.streamTheme.appStyle;
+  late final _surfaceStyle = _context.streamTheme.surfaceStyle;
   late final _elevation = _context.streamElevation;
 
   @override
-  StreamSurfaceStyle get behavior => _appStyle;
+  StreamSurfaceStyle get surfaceStyle => _surfaceStyle;
 
   @override
   double get floatingElevation => _elevation.level3;
