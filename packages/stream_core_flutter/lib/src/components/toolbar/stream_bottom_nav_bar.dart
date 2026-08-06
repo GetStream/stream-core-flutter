@@ -52,7 +52,7 @@ class StreamBottomNavBarItem {
   /// The text to display in a tooltip when the item is long-pressed (or
   /// hovered on desktop / web).
   ///
-  /// When null, no tooltip is shown.
+  /// When null or empty, no tooltip is shown.
   final String? tooltip;
 
   /// The label announced by accessibility tools, overriding [label].
@@ -445,15 +445,13 @@ class _StreamNavTile extends StatelessWidget {
                     heightFactor: 1,
                     child: MediaQuery.withClampedTextScaling(
                       maxScaleFactor: 1,
-                      child: switch (item.semanticsLabel) {
-                        final semanticsLabel? => Semantics(
-                          label: semanticsLabel,
-                          child: ExcludeSemantics(
-                            child: Text(item.label, style: labelStyle.copyWith(color: color)),
-                          ),
-                        ),
-                        null => Text(item.label, style: labelStyle.copyWith(color: color)),
-                      },
+                      // semanticsLabel, when set, overrides the announced text
+                      // while keeping the visible label — same as Material's bar.
+                      child: Text(
+                        item.label,
+                        semanticsLabel: item.semanticsLabel,
+                        style: labelStyle.copyWith(color: color),
+                      ),
                     ),
                   ),
                 ],
@@ -465,8 +463,15 @@ class _StreamNavTile extends StatelessWidget {
       ),
     );
 
-    if (item.tooltip case final tooltip?) {
-      tile = Tooltip(message: tooltip, child: tile);
+    if (item.tooltip case final tooltip? when tooltip.isNotEmpty) {
+      tile = Tooltip(
+        message: tooltip,
+        // Show above — the bar sits at the bottom edge — and keep the tooltip
+        // out of the semantics tree; the tile's label already describes it.
+        preferBelow: false,
+        excludeFromSemantics: true,
+        child: tile,
+      );
     }
 
     return Expanded(child: tile);

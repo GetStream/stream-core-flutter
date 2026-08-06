@@ -103,6 +103,23 @@ void main() {
       expect(find.byTooltip('Go home'), findsOneWidget);
     });
 
+    testWidgets('shows no tooltip for an empty tooltip string', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home', tooltip: ''),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      expect(find.byType(Tooltip), findsNothing);
+    });
+
     testWidgets('announces semanticsLabel in place of the visible label', (tester) async {
       final handle = tester.ensureSemantics();
       await tester.pumpWidget(
