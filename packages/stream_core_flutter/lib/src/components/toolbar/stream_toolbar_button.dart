@@ -4,9 +4,10 @@ import '../../theme/components/stream_button_theme.dart';
 import '../buttons/stream_button.dart';
 import 'stream_toolbar_scope.dart';
 
-/// A button that adapts to the floating state of its enclosing Stream toolbar
-/// ([StreamAppBar] / [StreamBottomAppBar]) — outlined and elevated when the bar
-/// floats, ghost when it's docked.
+/// A button that adapts to its enclosing Stream toolbar
+/// ([StreamAppBar] / [StreamBottomAppBar]).
+///
+/// Outlined and elevated when the bar floats, ghost when it's docked.
 ///
 /// Suitable for actions placed in a toolbar slot (the leading back affordance, a
 /// trailing text action like _Edit_, footer actions) so they match the bar

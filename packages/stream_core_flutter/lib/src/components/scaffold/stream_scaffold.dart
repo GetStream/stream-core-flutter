@@ -9,8 +9,7 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 
-/// A scaffold for full-page surfaces in the Stream design system, supporting
-/// both regular and floating app-bar / bottom-bar layouts.
+/// A scaffold for full-page surfaces in the Stream design system.
 ///
 /// [StreamScaffold] composes three slots — [appBar], [body], and [bottom] —
 /// and enlarges the body's [MediaQuery] padding by the extent of any floating

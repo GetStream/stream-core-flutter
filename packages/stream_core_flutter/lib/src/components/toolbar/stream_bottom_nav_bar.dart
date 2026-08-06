@@ -37,9 +37,7 @@ class StreamBottomNavBarItem {
   final String label;
 }
 
-/// A bottom navigation bar for Stream surfaces that automatically adapts
-/// between a floating pill style and a regular docked style based on the
-/// ambient [StreamSurfaceStyle].
+/// A bottom navigation bar for Stream surfaces.
 ///
 /// ## Floating style
 ///
