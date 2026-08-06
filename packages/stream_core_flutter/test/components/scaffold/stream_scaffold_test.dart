@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
@@ -91,16 +92,26 @@ Future<void> _pumpStreamScaffold(
 
 void main() {
   group('when neither slot is floating', () {
-    testWidgets('forwards drawer/endDrawer to the underlying Scaffold', (tester) async {
+    testWidgets('forwards the full drawer configuration to the underlying Scaffold', (tester) async {
       const drawer = Drawer(key: ValueKey('drawer'));
       const endDrawer = Drawer(key: ValueKey('end-drawer'));
+      const scrimColor = Color(0xFF123456);
 
       await tester.pumpWidget(
         _withStreamTheme(
-          const StreamScaffold(
+          StreamScaffold(
             drawer: drawer,
             endDrawer: endDrawer,
-            body: SizedBox(),
+            onDrawerChanged: (_) {},
+            onEndDrawerChanged: (_) {},
+            drawerScrimColor: scrimColor,
+            drawerEdgeDragWidth: 42,
+            drawerEnableOpenDragGesture: false,
+            endDrawerEnableOpenDragGesture: false,
+            drawerDragStartBehavior: DragStartBehavior.down,
+            drawerBarrierDismissible: false,
+            restorationId: 'scaffold-restoration',
+            body: const SizedBox(),
           ),
         ),
       );
@@ -108,6 +119,16 @@ void main() {
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
       expect(scaffold.drawer, same(drawer));
       expect(scaffold.endDrawer, same(endDrawer));
+      // Callbacks are compared by presence: a mis-wire to null would fail here.
+      expect(scaffold.onDrawerChanged, isNotNull);
+      expect(scaffold.onEndDrawerChanged, isNotNull);
+      expect(scaffold.drawerScrimColor, scrimColor);
+      expect(scaffold.drawerEdgeDragWidth, 42);
+      expect(scaffold.drawerEnableOpenDragGesture, isFalse);
+      expect(scaffold.endDrawerEnableOpenDragGesture, isFalse);
+      expect(scaffold.drawerDragStartBehavior, DragStartBehavior.down);
+      expect(scaffold.drawerBarrierDismissible, isFalse);
+      expect(scaffold.restorationId, 'scaffold-restoration');
     });
 
     testWidgets('places a regular bottom widget below the body instead of in bottomNavigationBar', (tester) async {
@@ -243,8 +264,10 @@ void main() {
         body: _InsetProbe(captured),
       );
 
-      // A regular app bar consumes the system top; nothing enlarges it.
-      expect(captured.padding!.top, lessThan(_kBarHeight));
+      // A regular app bar consumes the system top; nothing enlarges it, and the
+      // docked bottom owns the home-indicator inset (stripped from the body).
+      expect(captured.padding!.top, 0);
+      expect(captured.padding!.bottom, 0);
     });
 
     testWidgets('floating app bar → padding.top = measured app-bar height', (tester) async {
@@ -480,9 +503,10 @@ void main() {
     });
 
     // Mixed mode: floating app bar (top injected) + REGULAR bottom (docked, so
-    // the body's bottom padding is stripped). This is what makes the channel
-    // list's `bottomPadding > 0 ? … : null` resolve to null → the inner ListView
-    // auto-consumes the top inset → gap after the header.
+    // the body's bottom padding is stripped). When a nested scrollable applies
+    // padding only for a non-zero bottom inset (`bottomInset > 0 ? … : null`), a
+    // zero bottom inset resolves it to null → the inner ListView auto-consumes
+    // the injected top inset → gap after the header.
     Future<double> pumpMixedMode(WidgetTester tester, {required bool alwaysExplicit}) async {
       const searchKey = ValueKey('search');
       const firstKey = ValueKey('first');
@@ -572,7 +596,7 @@ void main() {
 
       final surfaceHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
       final barBottom = tester.getRect(find.byKey(barKey)).bottom;
-      expect(barBottom, lessThanOrEqualTo(surfaceHeight - keyboard + 0.5));
+      expect(barBottom, moreOrLessEquals(surfaceHeight - keyboard, epsilon: 0.5));
     });
 
     testWidgets('floating bottom bar stays at the surface bottom when resizeToAvoidBottomInset is false', (
@@ -627,7 +651,7 @@ void main() {
 
       final surfaceHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
       final barBottom = tester.getRect(find.byKey(barKey)).bottom;
-      expect(barBottom, lessThanOrEqualTo(surfaceHeight - keyboard + 0.5));
+      expect(barBottom, moreOrLessEquals(surfaceHeight - keyboard, epsilon: 0.5));
     });
   });
 

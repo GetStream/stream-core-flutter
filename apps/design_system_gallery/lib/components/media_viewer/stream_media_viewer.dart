@@ -41,9 +41,10 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
     description: 'Duration of the chrome show/hide animation.',
   );
 
-  final floating = context.knobs.boolean(
-    label: 'Floating chrome',
-    initialValue: true,
+  final behavior = context.knobs.object.dropdown(
+    label: 'Chrome behavior',
+    options: StreamToolbarBehavior.values,
+    initialOption: StreamToolbarBehavior.floating,
     description:
         'Floating chrome overlays full-bleed media with a gradient fade; '
         'regular chrome insets the media between opaque bars.',
@@ -66,12 +67,12 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
         data: StreamMediaViewerThemeData(
           chromeAnimationDuration: Duration(milliseconds: animationMs.round()),
           appBarStyle: StreamAppBarStyle(
-            behavior: floating ? .floating : .regular,
+            behavior: behavior,
             backgroundColor: tint,
             floatingBackgroundColor: tint,
           ),
           bottomAppBarStyle: StreamBottomAppBarStyle(
-            behavior: floating ? .floating : .regular,
+            behavior: behavior,
             backgroundColor: tint,
             floatingBackgroundColor: tint,
           ),

@@ -146,10 +146,11 @@ class DefaultStreamMediaViewer extends StatelessWidget {
       return scoped;
     }
 
-    // Resolve the chrome's floating state the same way the bars (and
-    // StreamScaffold) do, so the media extends full-bleed behind floating
-    // chrome and is inset under docked (regular) chrome. Falls back to the
-    // ambient StreamAppStyle when the chrome style doesn't pin a behavior.
+    // Resolve the chrome's floating state: media is full-bleed behind floating
+    // chrome, inset under docked chrome. Resolved from the chrome style then the
+    // ambient StreamAppStyle — not from a per-instance style on the header /
+    // footer widget, so pin the behavior on the media-viewer theme to keep the
+    // inset and the chrome in sync.
     final fallbackFloating = context.streamTheme.appStyle.isFloating;
     final headerFloating = effectiveAppBarStyle?.behavior?.isFloating ?? fallbackFloating;
     final footerFloating = effectiveBottomAppBarStyle?.behavior?.isFloating ?? fallbackFloating;

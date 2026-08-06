@@ -1142,16 +1142,16 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'StreamScaffold',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Drawers',
-                builder:
-                    _design_system_gallery_components_scaffold_stream_scaffold
-                        .buildStreamScaffoldDrawers,
-              ),
-              _widgetbook.WidgetbookUseCase(
                 name: 'Playground',
                 builder:
                     _design_system_gallery_components_scaffold_stream_scaffold
                         .buildStreamScaffoldPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Real-world Example',
+                builder:
+                    _design_system_gallery_components_scaffold_stream_scaffold
+                        .buildStreamScaffoldDrawers,
               ),
             ],
           ),

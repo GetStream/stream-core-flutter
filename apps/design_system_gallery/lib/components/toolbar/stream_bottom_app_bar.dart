@@ -103,7 +103,7 @@ Widget buildStreamBottomAppBarPlayground(BuildContext context) {
           child: ColoredBox(
             color: colorScheme.backgroundApp,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 32),
+              margin: EdgeInsets.symmetric(horizontal: context.streamSpacing.xxl),
               decoration: BoxDecoration(color: colorScheme.accentPrimary),
             ),
           ),

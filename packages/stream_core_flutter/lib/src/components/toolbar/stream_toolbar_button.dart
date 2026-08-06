@@ -122,7 +122,15 @@ class StreamToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFloating = StreamToolbarScope.of(context).isFloating;
+    // The floating look is cosmetic, so degrade to the docked style outside a
+    // toolbar rather than crashing; assert to flag the likely misuse in debug.
+    final behavior = StreamToolbarScope.maybeOf(context);
+    assert(
+      behavior != null,
+      'StreamToolbarButton is meant for a Stream toolbar slot; it falls back to '
+      'the docked style elsewhere.',
+    );
+    final isFloating = behavior?.isFloating ?? false;
     final type = isFloating ? StreamButtonType.outline : StreamButtonType.ghost;
 
     if (child case final child?) {

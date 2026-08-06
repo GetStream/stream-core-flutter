@@ -84,7 +84,7 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 // =============================================================================
 
 @widgetbook.UseCase(
-  name: 'Drawers',
+  name: 'Real-world Example',
   type: StreamScaffold,
   path: '[Components]/Scaffold',
 )

@@ -36,10 +36,18 @@ import '../../theme/stream_theme_extensions.dart';
 /// * `regular` for either slot — no overlap; the slot occupies its own space
 ///   and the corresponding inset is `0.0`.
 ///
+/// This resolution reads the ambient component theme and [StreamAppStyle], not
+/// a `style` set directly on the bar widget. A bar that pins its own `behavior`
+/// (or a [StreamBottomNavBar], which resolves floating from its own theme) can
+/// float while this scaffold keeps the slot docked and publishes no inset. To
+/// keep the layout and chrome in sync, set the matching [appBarBehavior] /
+/// [bottomBarBehavior] here, or drive both from the ambient [StreamAppStyle].
+///
 /// ## Drawer support
 ///
 /// Provide a [drawer] and/or [endDrawer] to add slide-in side panels; a widget
-/// in [appBar] can open them (as `StreamChannelListHeader` does for its menu).
+/// in [appBar] can open one via `Scaffold.of(context).openDrawer()` — for
+/// example a chat SDK's channel-list header menu button.
 ///
 /// ## Reading the insets
 ///
@@ -242,7 +250,9 @@ enum _Slot { body, bottom }
 // bottomHeight changes, even when the outer size constraints are unchanged.
 class _BodyBoxConstraints extends BoxConstraints {
   const _BodyBoxConstraints({
+    super.minWidth,
     super.maxWidth,
+    super.minHeight,
     super.maxHeight,
     required this.bottomHeight,
   }) : assert(bottomHeight >= 0, 'bottomHeight must be non-negative');
@@ -269,10 +279,14 @@ class _StreamScaffoldBodyDelegate extends MultiChildLayoutDelegate {
     final bottomHeight = bottomSize.height;
     positionChild(_Slot.bottom, Offset(0, size.height - bottomHeight));
 
+    // Tight constraints so a shrink-wrapping body fills the area instead of
+    // sizing to its intrinsic extent.
     layoutChild(
       _Slot.body,
       _BodyBoxConstraints(
+        minWidth: size.width,
         maxWidth: size.width,
+        minHeight: size.height,
         maxHeight: size.height,
         bottomHeight: bottomHeight,
       ),

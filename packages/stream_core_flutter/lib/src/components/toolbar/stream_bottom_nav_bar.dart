@@ -480,6 +480,10 @@ class _FloatingChrome extends StatelessWidget {
     // The gradient spans the whole chrome — top margin, pill, and bottom inset.
     // Keep it solid across the bottom inset and fade up through the pill into
     // the content behind the bar.
+    //
+    // Approximate: kStreamBottomNavBarHeight is the tiles' minHeight, not the
+    // rendered height, so a taller wrapped label drifts the fade boundary
+    // slightly off the pill edge — fine in practice.
     final totalHeight = topInset + kStreamBottomNavBarHeight + bottomInset;
     final solidFraction = totalHeight > 0 ? bottomInset / totalHeight : 0.0;
 

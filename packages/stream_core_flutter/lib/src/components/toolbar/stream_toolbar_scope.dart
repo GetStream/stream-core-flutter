@@ -30,12 +30,29 @@ class StreamToolbarScope extends InheritedWidget {
 
   /// The [StreamToolbarBehavior] of the nearest enclosing toolbar.
   ///
-  /// Asserts a [StreamToolbarScope] is in scope; call only from within a
-  /// [StreamAppBar] / [StreamBottomAppBar] slot. Use [maybeOf] otherwise.
+  /// Throws a [FlutterError] when called outside a [StreamAppBar] /
+  /// [StreamBottomAppBar] slot. Use [maybeOf] to get null instead.
   static StreamToolbarBehavior of(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<StreamToolbarScope>();
-    assert(scope != null, 'StreamToolbarScope.of() called outside a Stream toolbar.');
-    return scope!.behavior;
+    final result = maybeOf(context);
+    if (result != null) return result;
+
+    throw FlutterError.fromParts(<DiagnosticsNode>[
+      ErrorSummary(
+        'StreamToolbarScope.of() called with a context that does not contain a '
+        'StreamToolbarScope.',
+      ),
+      ErrorDescription(
+        'No StreamToolbarScope ancestor could be found starting from the '
+        'context that was passed to StreamToolbarScope.of(). A '
+        'StreamToolbarScope is published to its slots by a StreamAppBar / '
+        'StreamBottomAppBar.',
+      ),
+      ErrorHint(
+        'To fix this, ensure this widget sits inside a Stream toolbar slot '
+        '(leading / title / trailing).',
+      ),
+      context.describeElement('The context used was'),
+    ]);
   }
 
   /// The [StreamToolbarBehavior] of the nearest enclosing toolbar, or null when
