@@ -99,10 +99,11 @@ void main() {
       StreamSafeArea widget, {
       EdgeInsets padding = EdgeInsets.zero,
       EdgeInsets viewPadding = EdgeInsets.zero,
+      TextDirection textDirection = TextDirection.ltr,
     }) {
       return tester.pumpWidget(
         Directionality(
-          textDirection: TextDirection.ltr,
+          textDirection: textDirection,
           child: MediaQuery(
             data: MediaQueryData(padding: padding, viewPadding: viewPadding),
             child: widget,
@@ -125,6 +126,24 @@ void main() {
 
       // top: 0 (disabled) + 24; left: 10 + 24; bottom: 34 + 24. Matches resolveInsets.
       expect(appliedInsets(tester), const EdgeInsets.only(top: 24, left: 34, right: 24, bottom: 58));
+    });
+
+    testWidgets('insets physical edges the same way under RTL', (tester) async {
+      const widget = StreamSafeArea(
+        margin: EdgeInsets.only(left: 4, right: 8),
+        child: SizedBox.expand(key: childKey),
+      );
+      const insets = EdgeInsets.only(left: 10, right: 30);
+
+      await pump(tester, widget, padding: insets, viewPadding: insets);
+      final ltr = appliedInsets(tester);
+
+      await pump(tester, widget, padding: insets, viewPadding: insets, textDirection: TextDirection.rtl);
+      final rtl = appliedInsets(tester);
+
+      // Physical left = 10 + 4, right = 30 + 8; RTL does not swap them.
+      expect(ltr, const EdgeInsets.only(left: 14, right: 38));
+      expect(rtl, ltr);
     });
 
     testWidgets('keeps the bottom gap when a keyboard collapses the padding', (tester) async {
