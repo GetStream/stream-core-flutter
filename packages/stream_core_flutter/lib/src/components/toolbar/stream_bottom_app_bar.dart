@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_bottom_app_bar_theme.dart';
 import '../../theme/components/stream_button_theme.dart';
-import '../../theme/components/stream_toolbar_behavior.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
-import '../../theme/stream_app_style.dart';
 import '../../theme/stream_floating_fade.dart';
+import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 import 'stream_toolbar.dart';
 import 'stream_toolbar_scope.dart';
@@ -350,10 +349,10 @@ class _StreamBottomAppBarStyleDefaults extends StreamBottomAppBarStyle {
   late final StreamColorScheme _colorScheme = _context.streamColorScheme;
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
   late final StreamSpacing _spacing = _context.streamSpacing;
-  late final StreamAppStyle _appStyle = _context.streamTheme.appStyle;
+  late final StreamSurfaceStyle _appStyle = _context.streamTheme.appStyle;
 
   @override
-  StreamToolbarBehavior get behavior => _appStyle.isFloating ? .floating : .regular;
+  StreamSurfaceStyle get behavior => _appStyle;
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;

@@ -19,7 +19,7 @@ class _FakeBar extends StatelessWidget implements PreferredSizeWidget {
 Widget _wrap(
   Widget child, {
   StreamMediaViewerThemeData? viewerTheme,
-  StreamAppStyle appStyle = StreamAppStyle.regular,
+  StreamSurfaceStyle appStyle = StreamSurfaceStyle.regular,
 }) {
   final scoped = viewerTheme == null ? child : StreamMediaViewerTheme(data: viewerTheme, child: child);
   return MaterialApp(

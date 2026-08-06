@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../stream_surface_style.dart';
 import '../stream_theme.dart';
 import 'stream_button_theme.dart';
-import 'stream_toolbar_behavior.dart';
 
 part 'stream_app_bar_theme.g.theme.dart';
 
@@ -150,13 +150,12 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
 
   /// The floating or regular layout behaviour for this app bar.
   ///
-  /// When null the value falls back to the ambient [StreamAppStyle]:
-  /// [StreamAppStyle.floating] → [StreamToolbarBehavior.floating],
-  /// [StreamAppStyle.regular] → [StreamToolbarBehavior.regular].
+  /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
+  /// [StreamTheme].
   ///
   /// Set this to override the global style for this component only, without
   /// affecting other components.
-  final StreamToolbarBehavior? behavior;
+  final StreamSurfaceStyle? behavior;
 
   /// The background colour of the app bar.
   final Color? backgroundColor;

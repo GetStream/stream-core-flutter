@@ -63,7 +63,6 @@ export 'src/components/toolbar/stream_toolbar.dart';
 export 'src/components/toolbar/stream_toolbar_button.dart';
 export 'src/components/toolbar/stream_toolbar_scope.dart';
 export 'src/factory/stream_component_factory.dart';
-
 export 'src/theme/components/stream_app_bar_theme.dart';
 export 'src/theme/components/stream_audio_waveform_theme.dart';
 export 'src/theme/components/stream_avatar_theme.dart';
@@ -89,21 +88,17 @@ export 'src/theme/components/stream_snackbar_theme.dart';
 export 'src/theme/components/stream_stepper_theme.dart';
 export 'src/theme/components/stream_switch_theme.dart';
 export 'src/theme/components/stream_text_input_theme.dart';
-export 'src/theme/components/stream_toolbar_behavior.dart';
-
 export 'src/theme/primitives/stream_colors.dart';
 export 'src/theme/primitives/stream_elevation.dart';
 export 'src/theme/primitives/stream_icons.dart';
 export 'src/theme/primitives/stream_radius.dart';
 export 'src/theme/primitives/stream_spacing.dart';
 export 'src/theme/primitives/stream_typography.dart';
-
 export 'src/theme/semantics/stream_box_shadow.dart';
 export 'src/theme/semantics/stream_color_scheme.dart';
 export 'src/theme/semantics/stream_text_theme.dart';
-
-export 'src/theme/stream_app_style.dart';
 export 'src/theme/stream_floating_fade.dart';
+export 'src/theme/stream_surface_style.dart';
 export 'src/theme/stream_theme.dart';
 export 'src/theme/stream_theme_extensions.dart';
 export 'src/theme/widget_state_utils.dart';

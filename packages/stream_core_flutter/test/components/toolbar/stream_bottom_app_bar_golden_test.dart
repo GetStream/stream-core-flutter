@@ -15,11 +15,11 @@ void main() {
         children: [
           GoldenTestScenario(
             name: 'light',
-            child: _buildBarInTheme(_bar(StreamToolbarBehavior.regular)),
+            child: _buildBarInTheme(_bar(StreamSurfaceStyle.regular)),
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: _buildBarInTheme(_bar(StreamToolbarBehavior.regular), brightness: Brightness.dark),
+            child: _buildBarInTheme(_bar(StreamSurfaceStyle.regular), brightness: Brightness.dark),
           ),
         ],
       ),
@@ -33,11 +33,11 @@ void main() {
         children: [
           GoldenTestScenario(
             name: 'light',
-            child: _buildFloatingBarInTheme(_bar(StreamToolbarBehavior.floating)),
+            child: _buildFloatingBarInTheme(_bar(StreamSurfaceStyle.floating)),
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: _buildFloatingBarInTheme(_bar(StreamToolbarBehavior.floating), brightness: Brightness.dark),
+            child: _buildFloatingBarInTheme(_bar(StreamSurfaceStyle.floating), brightness: Brightness.dark),
           ),
         ],
       ),
@@ -45,7 +45,7 @@ void main() {
   });
 }
 
-Widget _bar(StreamToolbarBehavior behavior) {
+Widget _bar(StreamSurfaceStyle behavior) {
   final floating = behavior.isFloating;
   final type = floating ? StreamButtonType.outline : StreamButtonType.ghost;
   return StreamBottomAppBar(

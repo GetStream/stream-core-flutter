@@ -33,9 +33,9 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 
   final appBarBehavior = context.knobs.object.dropdown(
     label: 'App bar behavior',
-    options: StreamToolbarBehavior.values,
+    options: StreamSurfaceStyle.values,
     labelBuilder: (value) => value.name,
-    initialOption: StreamToolbarBehavior.floating,
+    initialOption: StreamSurfaceStyle.floating,
     description:
         'regular — the body sits below the app bar. '
         'floating — the body extends behind the translucent app bar; the list '
@@ -44,9 +44,9 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 
   final bottomBarBehavior = context.knobs.object.dropdown(
     label: 'Bottom bar behavior',
-    options: StreamToolbarBehavior.values,
+    options: StreamSurfaceStyle.values,
     labelBuilder: (value) => value.name,
-    initialOption: StreamToolbarBehavior.floating,
+    initialOption: StreamSurfaceStyle.floating,
     description:
         'regular — the bottom bar sits below the body. '
         'floating — the body extends behind the translucent bottom bar; the list '
@@ -59,8 +59,8 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
   );
 
   final colorScheme = context.streamColorScheme;
-  final appBarFloating = appBarBehavior == StreamToolbarBehavior.floating;
-  final bottomFloating = bottomBarBehavior == StreamToolbarBehavior.floating;
+  final appBarFloating = appBarBehavior == StreamSurfaceStyle.floating;
+  final bottomFloating = bottomBarBehavior == StreamSurfaceStyle.floating;
 
   final scaffold = StreamScaffold(
     appBarBehavior: appBarBehavior,
@@ -245,7 +245,7 @@ PreferredSizeWidget _demoAppBar(
   return StreamAppBar(
     // primary: true (default) so the bar self-insets the status bar / notch.
     style: StreamAppBarStyle(
-      behavior: floating ? StreamToolbarBehavior.floating : StreamToolbarBehavior.regular,
+      behavior: floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
     ),
     leading: withDrawerButton
         ? Builder(
@@ -291,7 +291,7 @@ class _DemoBottomNavState extends State<_DemoBottomNav> {
       currentIndex: _index,
       onTap: (index) => setState(() => _index = index),
       style: StreamBottomNavBarStyle(
-        behavior: widget.floating ? StreamToolbarBehavior.floating : StreamToolbarBehavior.regular,
+        behavior: widget.floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
       ),
       items: [
         StreamBottomNavBarItem(

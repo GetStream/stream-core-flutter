@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme/components/stream_app_bar_theme.dart';
 import '../../theme/components/stream_bottom_app_bar_theme.dart';
-import '../../theme/components/stream_toolbar_behavior.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
+import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// A scaffold for full-page surfaces in the Stream design system, supporting
@@ -24,25 +24,25 @@ import '../../theme/stream_theme_extensions.dart';
 /// 1. Per-instance [appBarBehavior] / [bottomBarBehavior] on this widget.
 /// 2. [StreamAppBarStyle.behavior] / [StreamBottomAppBarStyle.behavior]
 ///    from the ambient component theme.
-/// 3. The ambient [StreamAppStyle] enum value ([StreamAppStyle.floating] or
-///    [StreamAppStyle.regular]).
+/// 3. The ambient [StreamSurfaceStyle] enum value ([StreamSurfaceStyle.floating] or
+///    [StreamSurfaceStyle.regular]).
 ///
-/// * [StreamToolbarBehavior.floating] on the app bar — the body extends *behind*
+/// * [StreamSurfaceStyle.floating] on the app bar — the body extends *behind*
 ///   the app bar; the body's `MediaQuery.padding.top` is set to the app-bar
 ///   height so content rests clear of the bar.
-/// * [StreamToolbarBehavior.floating] on the bottom widget — the body extends *behind* the bottom
+/// * [StreamSurfaceStyle.floating] on the bottom widget — the body extends *behind* the bottom
 ///   widget; the body's `MediaQuery.padding.bottom` is set to the measured height
 ///   of that widget.
 /// * `regular` for either slot — no overlap; the slot occupies its own space
 ///   and the corresponding inset is `0.0`.
 ///
-/// This resolution reads the ambient component theme and [StreamAppStyle], not
+/// This resolution reads the ambient component theme and [StreamSurfaceStyle], not
 /// a `style` set directly on the bar widget. A bar that pins its own `behavior`
 /// (or a [StreamBottomNavBar], which resolves floating from its own theme) can
 /// float while this scaffold keeps the slot docked and publishes no inset. To
 /// keep the layout and chrome in sync, consider setting the matching
 /// [appBarBehavior] / [bottomBarBehavior] here, or driving both from the
-/// ambient [StreamAppStyle].
+/// ambient [StreamSurfaceStyle].
 ///
 /// ## Drawer support
 ///
@@ -114,7 +114,7 @@ class StreamScaffold extends StatelessWidget {
 
   /// An optional widget displayed at the bottom of the scaffold.
   ///
-  /// When [bottomBarBehavior] is [StreamToolbarBehavior.floating] this widget
+  /// When [bottomBarBehavior] is [StreamSurfaceStyle.floating] this widget
   /// overlaps the body; otherwise it sits below it.
   final Widget? bottom;
 
@@ -167,15 +167,15 @@ class StreamScaffold extends StatelessWidget {
   ///
   /// When null the value is resolved from [StreamAppBarStyle.behavior]
   /// in the ambient [StreamAppBarTheme], falling back to the ambient
-  /// [StreamAppStyle].
-  final StreamToolbarBehavior? appBarBehavior;
+  /// [StreamSurfaceStyle].
+  final StreamSurfaceStyle? appBarBehavior;
 
   /// Per-instance override for the bottom-bar floating behaviour.
   ///
   /// When null the value is resolved from
   /// [StreamBottomAppBarStyle.behavior] in the ambient
-  /// [StreamBottomAppBarTheme], falling back to the ambient [StreamAppStyle].
-  final StreamToolbarBehavior? bottomBarBehavior;
+  /// [StreamBottomAppBarTheme], falling back to the ambient [StreamSurfaceStyle].
+  final StreamSurfaceStyle? bottomBarBehavior;
 
   /// Background color of the scaffold.
   ///
@@ -202,10 +202,10 @@ class StreamScaffold extends StatelessWidget {
     final bottomAppBarStyle = context.streamBottomAppBarTheme.style;
 
     var effectiveAppBarBehavior = appBarBehavior ?? appBarStyle?.behavior;
-    effectiveAppBarBehavior ??= appStyle.isFloating ? .floating : .regular;
+    effectiveAppBarBehavior ??= appStyle;
 
     var effectiveBottomBarBehavior = bottomBarBehavior ?? bottomAppBarStyle?.behavior;
-    effectiveBottomBarBehavior ??= appStyle.isFloating ? .floating : .regular;
+    effectiveBottomBarBehavior ??= appStyle;
 
     final effectiveBackgroundColor = backgroundColor ?? colorScheme.backgroundApp;
 

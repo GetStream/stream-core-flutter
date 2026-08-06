@@ -142,7 +142,7 @@ mixin _$StreamBottomNavBarStyle {
   }
 
   StreamBottomNavBarStyle copyWith({
-    StreamToolbarBehavior? behavior,
+    StreamSurfaceStyle? behavior,
     double? floatingElevation,
     Color? backgroundColor,
     Color? floatingBackgroundColor,

@@ -47,7 +47,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
-import 'stream_app_style.dart';
+import 'stream_surface_style.dart';
 
 part 'stream_theme.g.theme.dart';
 
@@ -108,7 +108,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme({
     Brightness? brightness,
     TargetPlatform? platform,
-    StreamAppStyle? appStyle,
+    StreamSurfaceStyle? appStyle,
     StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
@@ -178,7 +178,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
-    appStyle ??= StreamAppStyle.regular;
+    appStyle ??= StreamSurfaceStyle.regular;
     appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
@@ -371,7 +371,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   final Brightness brightness;
 
   /// The app style for this theme.
-  final StreamAppStyle appStyle;
+  final StreamSurfaceStyle appStyle;
 
   /// The Material elevation values for this theme.
   final StreamElevation elevation;

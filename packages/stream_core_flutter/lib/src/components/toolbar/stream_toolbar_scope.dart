@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-import '../../theme/components/stream_toolbar_behavior.dart';
+import '../../theme/stream_surface_style.dart';
 
-/// Publishes the resolved [StreamToolbarBehavior] of the enclosing toolbar to
+/// Publishes the resolved [StreamSurfaceStyle] of the enclosing toolbar to
 /// its slots.
 ///
 /// A [StreamAppBar] / [StreamBottomAppBar] wraps its slots in a
@@ -11,7 +11,7 @@ import '../../theme/components/stream_toolbar_behavior.dart';
 ///
 /// See also:
 ///
-///  * [StreamToolbarBehavior], the value carried by this scope.
+///  * [StreamSurfaceStyle], the value carried by this scope.
 ///  * [StreamToolbarButton], which reads it to style itself.
 class StreamToolbarScope extends InheritedWidget {
   /// Creates a [StreamToolbarScope] for the given resolved [behavior].
@@ -22,13 +22,13 @@ class StreamToolbarScope extends InheritedWidget {
   });
 
   /// The enclosing toolbar's resolved behaviour.
-  final StreamToolbarBehavior behavior;
+  final StreamSurfaceStyle behavior;
 
-  /// The [StreamToolbarBehavior] of the nearest enclosing toolbar.
+  /// The [StreamSurfaceStyle] of the nearest enclosing toolbar.
   ///
   /// Throws a [FlutterError] when called outside a [StreamAppBar] /
   /// [StreamBottomAppBar] slot. Use [maybeOf] to get null instead.
-  static StreamToolbarBehavior of(BuildContext context) {
+  static StreamSurfaceStyle of(BuildContext context) {
     final result = maybeOf(context);
     if (result != null) return result;
 
@@ -51,9 +51,9 @@ class StreamToolbarScope extends InheritedWidget {
     ]);
   }
 
-  /// The [StreamToolbarBehavior] of the nearest enclosing toolbar, or null when
+  /// The [StreamSurfaceStyle] of the nearest enclosing toolbar, or null when
   /// there is none.
-  static StreamToolbarBehavior? maybeOf(BuildContext context) {
+  static StreamSurfaceStyle? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<StreamToolbarScope>()?.behavior;
   }
 

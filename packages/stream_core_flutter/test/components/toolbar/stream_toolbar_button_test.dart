@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
-Widget _withStreamTheme(Widget child, {StreamAppStyle appStyle = StreamAppStyle.regular}) {
+Widget _withStreamTheme(Widget child, {StreamSurfaceStyle appStyle = StreamSurfaceStyle.regular}) {
   return MaterialApp(
     theme: ThemeData(extensions: [StreamTheme(appStyle: appStyle)]),
     home: Scaffold(body: child),
   );
 }
 
-Widget _scoped(StreamToolbarBehavior behavior, Widget child) {
+Widget _scoped(StreamSurfaceStyle behavior, Widget child) {
   return StreamToolbarScope(behavior: behavior, child: child);
 }
 
 void main() {
   group('StreamToolbarScope', () {
     testWidgets('maybeOf returns null with no scope in the tree', (tester) async {
-      StreamToolbarBehavior? captured = StreamToolbarBehavior.floating;
+      StreamSurfaceStyle? captured = StreamSurfaceStyle.floating;
       await tester.pumpWidget(
         _withStreamTheme(
           Builder(
@@ -47,12 +47,12 @@ void main() {
     });
 
     testWidgets('of and maybeOf return the published behavior inside a scope', (tester) async {
-      late StreamToolbarBehavior fromOf;
-      StreamToolbarBehavior? fromMaybeOf;
+      late StreamSurfaceStyle fromOf;
+      StreamSurfaceStyle? fromMaybeOf;
       await tester.pumpWidget(
         _withStreamTheme(
           _scoped(
-            StreamToolbarBehavior.floating,
+            StreamSurfaceStyle.floating,
             Builder(
               builder: (context) {
                 fromOf = StreamToolbarScope.of(context);
@@ -64,8 +64,8 @@ void main() {
         ),
       );
 
-      expect(fromOf, StreamToolbarBehavior.floating);
-      expect(fromMaybeOf, StreamToolbarBehavior.floating);
+      expect(fromOf, StreamSurfaceStyle.floating);
+      expect(fromMaybeOf, StreamSurfaceStyle.floating);
     });
   });
 
@@ -74,7 +74,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _scoped(
-            StreamToolbarBehavior.floating,
+            StreamSurfaceStyle.floating,
             StreamToolbarButton(onPressed: () {}, child: const Text('Edit')),
           ),
         ),
@@ -89,7 +89,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _scoped(
-            StreamToolbarBehavior.regular,
+            StreamSurfaceStyle.regular,
             StreamToolbarButton(onPressed: () {}, child: const Text('Edit')),
           ),
         ),

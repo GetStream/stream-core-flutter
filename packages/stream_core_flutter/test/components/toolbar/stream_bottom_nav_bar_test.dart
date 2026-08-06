@@ -15,7 +15,7 @@ const _items = [
   ),
 ];
 
-Widget _withStreamTheme(Widget child, {StreamAppStyle appStyle = StreamAppStyle.regular}) {
+Widget _withStreamTheme(Widget child, {StreamSurfaceStyle appStyle = StreamSurfaceStyle.regular}) {
   return MaterialApp(
     theme: ThemeData(extensions: [StreamTheme(appStyle: appStyle)]),
     home: Scaffold(body: child),
@@ -145,18 +145,18 @@ void main() {
         ),
       );
 
-      // The nav bar resolves only from its own theme and StreamAppStyle, so a
+      // The nav bar resolves only from its own theme and StreamSurfaceStyle, so a
       // floating StreamBottomAppBarTheme has no effect (defaults to regular).
       expect(_isFloating(tester), isFalse);
     });
 
-    testWidgets('falls back to the ambient StreamAppStyle when neither instance nor theme set a behavior', (
+    testWidgets('falls back to the ambient StreamSurfaceStyle when neither instance nor theme set a behavior', (
       tester,
     ) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
-          appStyle: StreamAppStyle.floating,
+          appStyle: StreamSurfaceStyle.floating,
         ),
       );
 
@@ -221,7 +221,7 @@ void main() {
     Future<void> pumpFloating(WidgetTester tester, {required double deviceBottom}) {
       return tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamAppStyle.floating)]),
+          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamSurfaceStyle.floating)]),
           home: Builder(
             builder: (context) {
               final base = MediaQuery.of(context);

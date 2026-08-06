@@ -13,7 +13,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   @override
   ThemeExtension<StreamTheme> copyWith({
     Brightness? brightness,
-    StreamAppStyle? appStyle,
+    StreamSurfaceStyle? appStyle,
     StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,

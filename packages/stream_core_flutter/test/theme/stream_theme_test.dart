@@ -5,11 +5,11 @@ import 'package:stream_core_flutter/core.dart';
 void main() {
   group('StreamTheme.applyPlatform', () {
     test('carries non-typography fields through unchanged', () {
-      final theme = StreamTheme(platform: TargetPlatform.android, appStyle: StreamAppStyle.floating);
+      final theme = StreamTheme(platform: TargetPlatform.android, appStyle: StreamSurfaceStyle.floating);
 
       final iosTheme = theme.applyPlatform(TargetPlatform.iOS);
 
-      expect(iosTheme.appStyle, equals(StreamAppStyle.floating));
+      expect(iosTheme.appStyle, equals(StreamSurfaceStyle.floating));
       // ignore: deprecated_member_use_from_same_package
       expect(iosTheme.brightness, equals(theme.brightness));
       expect(iosTheme.colorScheme.brightness, equals(theme.colorScheme.brightness));

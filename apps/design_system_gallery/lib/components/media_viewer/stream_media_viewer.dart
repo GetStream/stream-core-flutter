@@ -43,8 +43,8 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
 
   final behavior = context.knobs.object.dropdown(
     label: 'Chrome behavior',
-    options: StreamToolbarBehavior.values,
-    initialOption: StreamToolbarBehavior.floating,
+    options: StreamSurfaceStyle.values,
+    initialOption: StreamSurfaceStyle.floating,
     description:
         'Floating chrome overlays full-bleed media with a gradient fade; '
         'regular chrome insets the media between opaque bars.',

@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_badge_notification_theme.dart';
 import '../../theme/components/stream_bottom_nav_bar_theme.dart';
-import '../../theme/components/stream_toolbar_behavior.dart';
 import '../../theme/stream_floating_fade.dart';
+import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 
 /// Default height of [StreamBottomNavBar] per the Stream design system.
@@ -39,18 +39,18 @@ class StreamBottomNavBarItem {
 
 /// A bottom navigation bar for Stream surfaces that automatically adapts
 /// between a floating pill style and a regular docked style based on the
-/// ambient [StreamToolbarBehavior].
+/// ambient [StreamSurfaceStyle].
 ///
 /// ## Floating style
 ///
-/// When [StreamToolbarBehavior.floating] is in effect, the bar renders as a
+/// When [StreamSurfaceStyle.floating] is in effect, the bar renders as a
 /// horizontally padded pill with a rounded background, a subtle shadow,
 /// and a hairline border. It sits above the body content and is typically
 /// used with [StreamScaffold]'s floating bottom slot.
 ///
 /// ## Regular style
 ///
-/// When [StreamToolbarBehavior.regular] is in effect, the bar renders as a
+/// When [StreamSurfaceStyle.regular] is in effect, the bar renders as a
 /// standard docked bar with Stream colour and typography tokens. A hairline
 /// `borderSubtle` top border separates it from the body.
 ///
@@ -59,7 +59,7 @@ class StreamBottomNavBarItem {
 /// The effective behaviour is resolved in this priority order:
 /// 1. [StreamBottomNavBarStyle.behavior] — set per-instance via `style` or the
 ///    ambient [StreamBottomNavBarTheme].
-/// 2. The ambient [StreamAppStyle] — floating maps to a floating pill, regular to
+/// 2. The ambient [StreamSurfaceStyle] — floating maps to a floating pill, regular to
 ///    a docked bar.
 ///
 /// ## Theming
@@ -176,7 +176,7 @@ class StreamBottomNavBarProps {
 /// Renders the navigation bar with theming from [StreamBottomNavBarTheme] and
 /// serves as the default factory implementation in [StreamComponentFactory].
 ///
-/// Depending on the resolved [StreamToolbarBehavior], the bar is either a
+/// Depending on the resolved [StreamSurfaceStyle], the bar is either a
 /// docked bar (a solid surface with a hairline top border) or a floating pill
 /// (a rounded surface over a gradient fade). Both share the same tiles, each of
 /// which animates its icon and label colour between the unselected and selected
@@ -341,12 +341,12 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
     return Semantics(
       explicitChildNodes: true,
       child: switch (effectiveBehavior) {
-        StreamToolbarBehavior.regular => _RegularChrome(
+        StreamSurfaceStyle.regular => _RegularChrome(
           backgroundColor: effectiveBackgroundColor,
           borderColor: effectiveBorderColor,
           child: tiles,
         ),
-        StreamToolbarBehavior.floating => _FloatingChrome(
+        StreamSurfaceStyle.floating => _FloatingChrome(
           pillColor: effectiveBackgroundColor,
           gradientColor: effectiveFloatingBackgroundColor,
           borderColor: effectiveBorderColor,
@@ -542,7 +542,7 @@ class _StreamBottomNavBarStyleDefaults extends StreamBottomNavBarStyle {
   late final _elevation = _context.streamElevation;
 
   @override
-  StreamToolbarBehavior get behavior => _appStyle.isFloating ? .floating : .regular;
+  StreamSurfaceStyle get behavior => _appStyle;
 
   @override
   double get floatingElevation => _elevation.level3;

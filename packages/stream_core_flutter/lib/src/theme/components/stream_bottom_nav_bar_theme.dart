@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../stream_surface_style.dart';
 import '../stream_theme.dart';
-import 'stream_toolbar_behavior.dart';
 
 part 'stream_bottom_nav_bar_theme.g.theme.dart';
 
@@ -150,10 +150,9 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
 
   /// The floating or regular layout behaviour for this navigation bar.
   ///
-  /// When null the value falls back to the ambient [StreamAppStyle]:
-  /// [StreamAppStyle.floating] → [StreamToolbarBehavior.floating],
-  /// [StreamAppStyle.regular] → [StreamToolbarBehavior.regular].
-  final StreamToolbarBehavior? behavior;
+  /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
+  /// [StreamTheme].
+  final StreamSurfaceStyle? behavior;
 
   /// The elevation of the floating pill.
   final double? floatingElevation;

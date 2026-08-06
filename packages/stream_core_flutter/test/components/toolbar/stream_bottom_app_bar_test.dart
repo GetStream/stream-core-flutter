@@ -182,7 +182,7 @@ void main() {
         _withStreamTheme(
           Scaffold(
             bottomNavigationBar: StreamBottomAppBar(
-              style: const StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.floating),
+              style: const StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.floating),
               title: const Text('Title'),
             ),
           ),
@@ -208,7 +208,7 @@ void main() {
     // A slot resolves its behaviour from the ambient StreamToolbarScope.
     // The bar publishes its resolved behaviour so a `style` handed only to
     // the bar still reaches its slots.
-    StreamToolbarBehavior? captured;
+    StreamSurfaceStyle? captured;
 
     Widget probe() {
       return Builder(
@@ -226,7 +226,7 @@ void main() {
         _withStreamTheme(
           Scaffold(
             bottomNavigationBar: StreamBottomAppBar(
-              style: const StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.floating),
+              style: const StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.floating),
               title: const Text('Title'),
               trailing: probe(),
             ),
@@ -234,7 +234,7 @@ void main() {
         ),
       );
 
-      expect(captured, StreamToolbarBehavior.floating);
+      expect(captured, StreamSurfaceStyle.floating);
     });
 
     testWidgets('slot resolves regular by default', (tester) async {
@@ -249,13 +249,13 @@ void main() {
         ),
       );
 
-      expect(captured, StreamToolbarBehavior.regular);
+      expect(captured, StreamSurfaceStyle.regular);
     });
 
     testWidgets('slot resolves floating from the ambient app style', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamAppStyle.floating)]),
+          theme: ThemeData(extensions: [StreamTheme(appStyle: StreamSurfaceStyle.floating)]),
           home: Scaffold(
             bottomNavigationBar: StreamBottomAppBar(
               title: const Text('Title'),
@@ -265,7 +265,7 @@ void main() {
         ),
       );
 
-      expect(captured, StreamToolbarBehavior.floating);
+      expect(captured, StreamSurfaceStyle.floating);
     });
 
     testWidgets('bar style overrides the ambient app bar theme for slots', (tester) async {
@@ -273,11 +273,11 @@ void main() {
         _withStreamTheme(
           StreamBottomAppBarTheme(
             data: const StreamBottomAppBarThemeData(
-              style: StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.floating),
+              style: StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.floating),
             ),
             child: Scaffold(
               bottomNavigationBar: StreamBottomAppBar(
-                style: const StreamBottomAppBarStyle(behavior: StreamToolbarBehavior.regular),
+                style: const StreamBottomAppBarStyle(behavior: StreamSurfaceStyle.regular),
                 title: const Text('Title'),
                 trailing: probe(),
               ),
@@ -286,7 +286,7 @@ void main() {
         ),
       );
 
-      expect(captured, StreamToolbarBehavior.regular);
+      expect(captured, StreamSurfaceStyle.regular);
     });
   });
 }
