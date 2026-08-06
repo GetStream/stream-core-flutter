@@ -2,34 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
-/// Pumps [child] under a [MediaQuery] with the given system insets and returns
-/// the resolved [EdgeInsets] the enclosed [StreamSafeArea] options produce.
-Future<EdgeInsets> resolve(
-  WidgetTester tester, {
-  EdgeInsets viewPadding = EdgeInsets.zero,
-  EdgeInsets viewInsets = EdgeInsets.zero,
-  required EdgeInsets Function(BuildContext) compute,
-}) async {
-  late EdgeInsets result;
-  await tester.pumpWidget(
-    MediaQuery(
-      data: MediaQueryData(viewPadding: viewPadding, viewInsets: viewInsets),
-      child: Builder(
-        builder: (context) {
-          result = compute(context);
-          return const SizedBox();
-        },
-      ),
-    ),
-  );
-  return result;
-}
-
 void main() {
   group('StreamSafeArea.resolveInsets', () {
+    Future<EdgeInsets> resolve(
+      WidgetTester tester, {
+      EdgeInsets padding = EdgeInsets.zero,
+      EdgeInsets viewPadding = EdgeInsets.zero,
+      required EdgeInsets Function(BuildContext) compute,
+    }) async {
+      late EdgeInsets result;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: MediaQueryData(padding: padding, viewPadding: viewPadding),
+          child: Builder(
+            builder: (context) {
+              result = compute(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      return result;
+    }
+
     testWidgets('adds the margin on top of the system inset per edge', (tester) async {
       final insets = await resolve(
         tester,
+        padding: const EdgeInsets.only(top: 44, bottom: 34, left: 10, right: 12),
         viewPadding: const EdgeInsets.only(top: 44, bottom: 34, left: 10, right: 12),
         compute: (context) => StreamSafeArea.resolveInsets(context, margin: const EdgeInsets.all(24)),
       );
@@ -40,6 +39,7 @@ void main() {
     testWidgets('drops the system inset on disabled edges but keeps the margin', (tester) async {
       final insets = await resolve(
         tester,
+        padding: const EdgeInsets.only(top: 44, bottom: 34),
         viewPadding: const EdgeInsets.only(top: 44, bottom: 34),
         compute: (context) => StreamSafeArea.resolveInsets(context, top: false, margin: const EdgeInsets.all(24)),
       );
@@ -49,47 +49,81 @@ void main() {
       expect(insets.bottom, 58);
     });
 
-    testWidgets('ignores the keyboard by default', (tester) async {
+    testWidgets('measures the bottom from viewPadding so a keyboard does not collapse it', (tester) async {
       final insets = await resolve(
         tester,
+        // A keyboard has consumed the bottom padding (34 -> 0, the default) but not viewPadding.
         viewPadding: const EdgeInsets.only(bottom: 34),
-        viewInsets: const EdgeInsets.only(bottom: 300),
         compute: (context) => StreamSafeArea.resolveInsets(context, margin: const EdgeInsets.all(24)),
       );
 
-      // viewInsets (keyboard) is not consulted: 34 + 24, not 300 + 24.
+      // viewPadding.bottom (34) + 24, not padding.bottom (0) + 24.
       expect(insets.bottom, 58);
-    });
-
-    testWidgets('clears the keyboard when avoidKeyboard is set', (tester) async {
-      final insets = await resolve(
-        tester,
-        viewPadding: const EdgeInsets.only(bottom: 34),
-        viewInsets: const EdgeInsets.only(bottom: 300),
-        compute: (context) =>
-            StreamSafeArea.resolveInsets(context, margin: const EdgeInsets.all(24), avoidKeyboard: true),
-      );
-
-      // max(34, 300) + 24.
-      expect(insets.bottom, 324);
     });
   });
 
-  testWidgets('StreamSafeArea pads its child by the resolved insets', (tester) async {
-    await tester.pumpWidget(
-      MediaQuery(
-        data: const MediaQueryData(viewPadding: EdgeInsets.only(bottom: 34)),
-        child: StreamSafeArea(
-          top: false,
-          margin: const EdgeInsets.all(24),
-          child: Container(key: const ValueKey('child')),
-        ),
-      ),
-    );
+  group('StreamSafeArea widget', () {
+    const childKey = ValueKey('child');
 
-    final padding = tester.widget<Padding>(
-      find.ancestor(of: find.byKey(const ValueKey('child')), matching: find.byType(Padding)).first,
-    );
-    expect(padding.padding, const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 58));
+    /// The gap between the [StreamSafeArea]'s edges and its child, i.e. the
+    /// insets it actually applied through the composed SafeArea + margin.
+    EdgeInsets appliedInsets(WidgetTester tester) {
+      final outer = tester.getRect(find.byType(StreamSafeArea));
+      final child = tester.getRect(find.byKey(childKey));
+      return EdgeInsets.fromLTRB(
+        child.left - outer.left,
+        child.top - outer.top,
+        outer.right - child.right,
+        outer.bottom - child.bottom,
+      );
+    }
+
+    Future<void> pump(
+      WidgetTester tester,
+      StreamSafeArea widget, {
+      EdgeInsets padding = EdgeInsets.zero,
+      EdgeInsets viewPadding = EdgeInsets.zero,
+    }) {
+      return tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: MediaQuery(
+            data: MediaQueryData(padding: padding, viewPadding: viewPadding),
+            child: widget,
+          ),
+        ),
+      );
+    }
+
+    testWidgets('insets its child by the system inset plus the margin', (tester) async {
+      await pump(
+        tester,
+        const StreamSafeArea(
+          top: false,
+          margin: EdgeInsets.all(24),
+          child: SizedBox.expand(key: childKey),
+        ),
+        padding: const EdgeInsets.only(bottom: 34, left: 10),
+        viewPadding: const EdgeInsets.only(bottom: 34, left: 10),
+      );
+
+      // top: 0 (disabled) + 24; left: 10 + 24; bottom: 34 + 24. Matches resolveInsets.
+      expect(appliedInsets(tester), const EdgeInsets.only(top: 24, left: 34, right: 24, bottom: 58));
+    });
+
+    testWidgets('keeps the bottom gap when a keyboard collapses the padding', (tester) async {
+      await pump(
+        tester,
+        const StreamSafeArea(
+          margin: EdgeInsets.all(24),
+          child: SizedBox.expand(key: childKey),
+        ),
+        // A keyboard has collapsed padding.bottom to 0 (the default); viewPadding.bottom stays 34.
+        viewPadding: const EdgeInsets.only(bottom: 34),
+      );
+
+      // The composed SafeArea's maintainBottomViewPadding keeps 34 + 24.
+      expect(appliedInsets(tester).bottom, 58);
+    });
   });
 }
