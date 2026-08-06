@@ -291,7 +291,7 @@ class _DemoBottomNavState extends State<_DemoBottomNav> {
       currentIndex: _index,
       onTap: (index) => setState(() => _index = index),
       style: StreamBottomNavBarStyle(
-        behavior: widget.floating ? StreamBottomNavBarBehavior.floating : StreamBottomNavBarBehavior.regular,
+        behavior: widget.floating ? StreamToolbarBehavior.floating : StreamToolbarBehavior.regular,
       ),
       items: [
         StreamBottomNavBarItem(

@@ -2,26 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
+import 'stream_toolbar_behavior.dart';
 
 part 'stream_bottom_nav_bar_theme.g.theme.dart';
-
-/// The floating or regular layout behaviour for a [StreamBottomNavBar].
-///
-/// When null on [StreamBottomNavBarStyle], the ambient [StreamAppStyle] is used
-/// as a fallback — [StreamAppStyle.floating] maps to [floating] and
-/// [StreamAppStyle.regular] maps to [regular].
-///
-/// See also:
-///
-///  * [StreamBottomNavBarStyle.behavior], which carries this value.
-///  * [StreamAppStyle], the global app-wide style that acts as fallback.
-enum StreamBottomNavBarBehavior {
-  /// The navigation bar sits within the layout flow with a solid background.
-  regular,
-
-  /// The navigation bar floats above the body as a pill over a gradient fade.
-  floating,
-}
 
 /// Applies a bottom navigation bar theme to descendant [StreamBottomNavBar]
 /// widgets.
@@ -168,9 +151,9 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
   /// The floating or regular layout behaviour for this navigation bar.
   ///
   /// When null the value falls back to the ambient [StreamAppStyle]:
-  /// [StreamAppStyle.floating] → [StreamBottomNavBarBehavior.floating],
-  /// [StreamAppStyle.regular] → [StreamBottomNavBarBehavior.regular].
-  final StreamBottomNavBarBehavior? behavior;
+  /// [StreamAppStyle.floating] → [StreamToolbarBehavior.floating],
+  /// [StreamAppStyle.regular] → [StreamToolbarBehavior.regular].
+  final StreamToolbarBehavior? behavior;
 
   /// The elevation of the floating pill.
   final double? floatingElevation;
