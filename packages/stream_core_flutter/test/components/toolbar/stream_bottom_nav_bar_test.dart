@@ -311,10 +311,6 @@ void main() {
   });
 
   group('floating pill margin', () {
-    // The floating pill floors its gap above the bottom edge at spacing.xl, so
-    // it never sits flush on devices reporting no bottom inset, and otherwise
-    // grows the gap with the device inset.
-
     // The pill is the only Material carrying a RoundedRectangleBorder shape.
     final pillFinder = find.byWidgetPredicate(
       (widget) => widget is Material && widget.shape is RoundedRectangleBorder,
@@ -354,17 +350,18 @@ void main() {
       return barBottom - pillBottom;
     }
 
-    testWidgets('floors the gap at spacing.xl when the device reports no bottom inset', (tester) async {
+    testWidgets('keeps a spacing.xl gap when the device reports no bottom inset', (tester) async {
       await pumpFloating(tester, deviceBottom: 0);
 
-      // spacing.xl is 24; without the floor the pill would sit flush (gap 0).
+      // spacing.xl is 24; without the gap the pill would sit flush (gap 0).
       expect(gapBelowPill(tester), moreOrLessEquals(24, epsilon: 0.5));
     });
 
-    testWidgets('grows the gap with the device bottom inset when it exceeds spacing.xl', (tester) async {
-      await pumpFloating(tester, deviceBottom: 40);
+    testWidgets('adds the spacing.xl gap on top of the device bottom inset', (tester) async {
+      await pumpFloating(tester, deviceBottom: 48);
 
-      expect(gapBelowPill(tester), moreOrLessEquals(40, epsilon: 0.5));
+      // 48 (e.g. 3-button navigation) + 24 (spacing.xl) — the pill clears the inset.
+      expect(gapBelowPill(tester), moreOrLessEquals(72, epsilon: 0.5));
     });
   });
 }

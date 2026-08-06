@@ -544,9 +544,8 @@ class _FloatingChrome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final margin = context.streamSpacing.xl;
-    // Matches the SafeArea below: at least `margin`, growing with the device's
-    // bottom inset so the pill never sits flush against the edge.
-    final bottomInset = math.max(MediaQuery.paddingOf(context).bottom, margin);
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+    final bottomInset = viewPadding.bottom + margin;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -555,9 +554,13 @@ class _FloatingChrome extends StatelessWidget {
           bottomInset: bottomInset,
         ),
       ),
-      child: SafeArea(
-        top: false,
-        minimum: .all(margin),
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: margin,
+          left: math.max(viewPadding.left, margin),
+          right: math.max(viewPadding.right, margin),
+          bottom: bottomInset,
+        ),
         child: Material(
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
