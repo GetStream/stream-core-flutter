@@ -1,23 +1,16 @@
 /// The presentation of a Stream surface — grounded (*regular*) or airy
 /// (*floating*).
 ///
-/// Used at two scopes with the same values: the app-wide default on
-/// [StreamTheme], and a per-component override on a component's style (e.g.
-/// [StreamAppBarStyle.surfaceStyle]).
+/// * [regular] — the surface is docked: opaque and occupying its own space in
+///   the layout.
+/// * [floating] — the surface hovers over the content it covers, translucent.
 ///
-/// * [regular] — app bar and bottom bar sit within the layout flow; the
-///   message composer is docked at the bottom edge.
-/// * [floating] — app bar and bottom bar float above the body with translucent
-///   backgrounds; the message composer floats above the keyboard.
-///
-/// ## Resolution order (high → low priority)
-///
-/// 1. Component theme style field (e.g. `StreamAppBarStyle.surfaceStyle`)
-/// 2. The app-wide value on [StreamTheme] (the global fallback)
+/// A component's own style (e.g. [StreamAppBarStyle.surfaceStyle]) takes
+/// precedence over the app-wide default on [StreamTheme].
 ///
 /// {@tool snippet}
 ///
-/// Apply a floating style to the whole app:
+/// Make the whole app floating:
 ///
 /// ```dart
 /// ThemeData(extensions: [StreamTheme(surfaceStyle: StreamSurfaceStyle.floating)])
@@ -30,18 +23,12 @@
 ///  * [StreamAppBarStyle.surfaceStyle], the per-component override for the app bar.
 ///  * [StreamBottomAppBarStyle.surfaceStyle], the per-component override for the bottom bar.
 enum StreamSurfaceStyle {
-  /// All components default to a grounded, regularly-positioned layout.
-  ///
-  /// App bar and bottom bar sit within the layout flow. The message composer
-  /// is docked at the bottom edge.
+  /// The surface is docked — opaque and taking its own space in the layout.
   regular,
 
-  /// All components default to an airy, floating layout.
-  ///
-  /// App bar and bottom bar float above the body with translucent backgrounds.
-  /// The message composer floats above the keyboard.
+  /// The surface floats above the content it covers, translucent.
   floating;
 
-  /// Whether this style is the floating variant.
+  /// Whether this is the [floating] variant.
   bool get isFloating => this == .floating;
 }
