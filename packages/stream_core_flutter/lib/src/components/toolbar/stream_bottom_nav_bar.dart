@@ -60,6 +60,12 @@ class StreamBottomNavBarItem {
 /// 2. The ambient [StreamSurfaceStyle] — floating maps to a floating pill, regular to
 ///    a docked bar.
 ///
+/// In a [StreamScaffold] `bottom` slot, drive floating through the ambient
+/// [StreamSurfaceStyle] (or the scaffold's `bottomBarSurfaceStyle`) so the
+/// scaffold reserves the matching body inset. Floating set only through
+/// [StreamBottomNavBarTheme] floats the pill without that inset, so content can
+/// slide under it.
+///
 /// ## Theming
 ///
 /// Item colors, icon size, label styles, border, and pill radius are resolved
@@ -503,7 +509,10 @@ class _FloatingChrome extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: _buildGradient(topInset: margin, bottomInset: bottomInset),
+        gradient: _buildGradient(
+          topInset: margin,
+          bottomInset: bottomInset,
+        ),
       ),
       child: SafeArea(
         top: false,

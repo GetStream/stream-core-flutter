@@ -53,6 +53,31 @@ void main() {
       expect(inset.bottom, 72.0);
     });
 
+    testWidgets('regular chrome adds the device inset to the bar heights', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          Builder(
+            builder: (context) {
+              final base = MediaQuery.of(context);
+              return MediaQuery(
+                data: base.copyWith(padding: const EdgeInsets.only(top: 44, bottom: 34)),
+                child: StreamMediaViewer(
+                  header: const _FakeBar(height: 56),
+                  footer: const _FakeBar(height: 72),
+                  child: const SizedBox.expand(key: _childKey),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      // Docked chrome clears the system insets: bar height + device padding.
+      final inset = _mediaInset(tester);
+      expect(inset.top, 56.0 + 44.0);
+      expect(inset.bottom, 72.0 + 34.0);
+    });
+
     testWidgets('follows a floating app style → media is full-bleed behind the chrome', (tester) async {
       await tester.pumpWidget(
         _wrap(

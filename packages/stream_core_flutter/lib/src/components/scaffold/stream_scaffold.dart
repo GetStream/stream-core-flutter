@@ -115,6 +115,10 @@ class StreamScaffold extends StatelessWidget {
   ///
   /// When [bottomBarSurfaceStyle] is [StreamSurfaceStyle.floating] this widget
   /// overlaps the body; otherwise it sits below it.
+  ///
+  /// A docked (regular) bottom rides above the on-screen keyboard rather than
+  /// being covered by it — intended for a composer, though a nav bar placed
+  /// here lifts with the keyboard too.
   final Widget? bottom;
 
   /// A panel displayed to the side of the [body], often hidden on mobile

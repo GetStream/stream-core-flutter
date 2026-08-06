@@ -157,7 +157,9 @@ class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
   /// [StreamTheme].
   final StreamSurfaceStyle? surfaceStyle;
 
-  /// The background color of the bottom app bar.
+  /// The background color of the bottom app bar when docked.
+  ///
+  /// Ignored when floating — the floating style uses [floatingBackgroundColor].
   final Color? backgroundColor;
 
   /// The background color of the bottom app bar when floating.
