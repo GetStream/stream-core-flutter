@@ -161,46 +161,40 @@ class StreamSafeArea extends StatelessWidget {
     );
   }
 
+  EdgeInsets _resolve(BuildContext context) => resolveInsets(
+    context,
+    left: left,
+    top: top,
+    right: right,
+    bottom: bottom,
+    minimum: minimum,
+    margin: margin,
+    maintainBottomViewPadding: maintainBottomViewPadding,
+  );
+
   @override
   Widget build(BuildContext context) {
+    final consumed = MediaQuery.removePadding(
+      context: context,
+      removeLeft: left,
+      removeTop: top,
+      removeRight: right,
+      removeBottom: bottom,
+      child: child,
+    );
+
     final listenable = _listenable;
     if (listenable == null) {
-      return SafeArea(
-        left: left,
-        top: top,
-        right: right,
-        bottom: bottom,
-        minimum: minimum,
-        maintainBottomViewPadding: maintainBottomViewPadding,
-        child: Padding(padding: margin, child: child),
-      );
+      return Padding(padding: _resolve(context), child: consumed);
     }
 
     return ValueListenableBuilder<double>(
       valueListenable: listenable,
+      child: consumed,
       builder: (context, t, child) {
-        final insets = resolveInsets(
-          context,
-          left: left,
-          top: top,
-          right: right,
-          bottom: bottom,
-          minimum: minimum,
-          margin: margin,
-          maintainBottomViewPadding: maintainBottomViewPadding,
-        );
-
-        final applied = EdgeInsets.lerp(insets, _to, t.clamp(0.0, 1.0))!;
+        final applied = EdgeInsets.lerp(_resolve(context), _to, t.clamp(0.0, 1.0))!;
         return Padding(padding: applied, child: child);
       },
-      child: MediaQuery.removePadding(
-        context: context,
-        removeLeft: left,
-        removeTop: top,
-        removeRight: right,
-        removeBottom: bottom,
-        child: child,
-      ),
     );
   }
 }
