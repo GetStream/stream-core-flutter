@@ -33,8 +33,8 @@ import 'package:flutter/widgets.dart';
 ///
 /// See also:
 ///
-///  * [SafeArea], which this builds on; it floors at a minimum but cannot add a
-///    margin beyond the safe area.
+///  * [SafeArea], which insets only to the safe area (with an optional minimum
+///    floor) and cannot add a margin beyond it.
 ///  * [Padding], for insetting widgets in general.
 ///  * [MediaQuery], from which the safe area is obtained.
 class StreamSafeArea extends StatelessWidget {
