@@ -10,7 +10,8 @@ import 'package:flutter/widgets.dart';
 /// Each edge is inset by `max(systemInset, minimum) + margin`. Like
 /// [SafeArea.minimum], [minimum] raises an edge to at least that much (a larger
 /// system inset absorbs it); [margin] is then added on top of every edge. With
-/// both at their defaults the widget behaves like a plain [SafeArea].
+/// both at their defaults the widget behaves like a plain [SafeArea] (with
+/// [maintainBottomViewPadding] on).
 ///
 /// Use the default constructor for a constant inset. Use [StreamSafeArea.driven]
 /// when the inset should interpolate toward a target driven by a
@@ -175,22 +176,8 @@ class StreamSafeArea extends StatelessWidget {
       );
     }
 
-    // Remove the avoided insets from the child's MediaQuery so a nested safe
-    // area doesn't inset the same intrusion twice — same as the default
-    // (SafeArea) path. This is binary: it marks the edges as handled here
-    // regardless of how far the interpolation has collapsed the visible inset.
-    final consumed = MediaQuery.removePadding(
-      context: context,
-      removeLeft: left,
-      removeTop: top,
-      removeRight: right,
-      removeBottom: bottom,
-      child: child,
-    );
-
     return ValueListenableBuilder<double>(
       valueListenable: listenable,
-      child: consumed,
       builder: (context, t, child) {
         final insets = resolveInsets(
           context,
@@ -202,9 +189,18 @@ class StreamSafeArea extends StatelessWidget {
           margin: margin,
           maintainBottomViewPadding: maintainBottomViewPadding,
         );
+
         final applied = EdgeInsets.lerp(insets, _to, t.clamp(0.0, 1.0))!;
         return Padding(padding: applied, child: child);
       },
+      child: MediaQuery.removePadding(
+        context: context,
+        removeLeft: left,
+        removeTop: top,
+        removeRight: right,
+        removeBottom: bottom,
+        child: child,
+      ),
     );
   }
 }

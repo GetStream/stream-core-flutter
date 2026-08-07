@@ -113,7 +113,7 @@ void main() {
     const childKey = ValueKey('child');
 
     /// The gap between the [StreamSafeArea]'s edges and its child, i.e. the
-    /// insets it actually applied through the composed SafeArea + margin.
+    /// insets it actually applied.
     EdgeInsets appliedInsets(WidgetTester tester) {
       final outer = tester.getRect(find.byType(StreamSafeArea));
       final child = tester.getRect(find.byKey(childKey));
@@ -236,6 +236,51 @@ void main() {
       );
 
       // The bottom inset is consumed, so a descendant sees no bottom padding.
+      expect(childBottom, 0);
+    });
+
+    testWidgets('driven rebuilds as its listenable changes', (tester) async {
+      final t = ValueNotifier<double>(0);
+      addTearDown(t.dispose);
+
+      await pump(
+        tester,
+        StreamSafeArea.driven(
+          listenable: t,
+          top: false,
+          minimum: const EdgeInsets.only(bottom: 40),
+          child: const SizedBox.expand(key: childKey),
+        ),
+        viewPadding: const EdgeInsets.only(bottom: 20),
+      );
+
+      // max(20, 40) = 40 at t=0.
+      expect(appliedInsets(tester).bottom, 40);
+
+      t.value = 1;
+      await tester.pump();
+
+      // Rebuilt and collapsed to `to` (zero) at t=1.
+      expect(appliedInsets(tester).bottom, 0);
+    });
+
+    testWidgets('default removes the avoided inset from the child MediaQuery', (tester) async {
+      late double childBottom;
+      await pump(
+        tester,
+        StreamSafeArea(
+          top: false,
+          child: Builder(
+            builder: (context) {
+              childBottom = MediaQuery.paddingOf(context).bottom;
+              return const SizedBox.expand(key: childKey);
+            },
+          ),
+        ),
+        padding: const EdgeInsets.only(bottom: 30),
+        viewPadding: const EdgeInsets.only(bottom: 30),
+      );
+
       expect(childBottom, 0);
     });
   });
