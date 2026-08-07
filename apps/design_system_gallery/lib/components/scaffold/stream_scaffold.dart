@@ -42,7 +42,7 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
         'auto-insets from MediaQuery.padding.top. Scroll to see rows pass behind it.',
   );
 
-  final bottomBarSurfaceStyle = context.knobs.object.dropdown(
+  final bottomSurfaceStyle = context.knobs.object.dropdown(
     label: 'Bottom bar surfaceStyle',
     options: StreamSurfaceStyle.values,
     labelBuilder: (value) => value.name,
@@ -60,11 +60,11 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 
   final colorScheme = context.streamColorScheme;
   final appBarFloating = appBarSurfaceStyle == StreamSurfaceStyle.floating;
-  final bottomFloating = bottomBarSurfaceStyle == StreamSurfaceStyle.floating;
+  final bottomFloating = bottomSurfaceStyle == StreamSurfaceStyle.floating;
 
   final scaffold = StreamScaffold(
     appBarSurfaceStyle: appBarSurfaceStyle,
-    bottomBarSurfaceStyle: bottomBarSurfaceStyle,
+    bottomSurfaceStyle: bottomSurfaceStyle,
     backgroundColor: customBackground ? colorScheme.backgroundSurfaceSubtle : null,
     appBar: showAppBar ? _demoAppBar(context, floating: appBarFloating, withDrawerButton: showDrawer) : null,
     drawer: showDrawer ? const _ExampleDrawer() : null,

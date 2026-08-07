@@ -55,7 +55,7 @@ Future<void> _pumpStreamScaffold(
   WidgetTester tester, {
   required Widget body,
   StreamSurfaceStyle? appBarSurfaceStyle,
-  StreamSurfaceStyle? bottomBarSurfaceStyle,
+  StreamSurfaceStyle? bottomSurfaceStyle,
   PreferredSizeWidget? appBar,
   Widget? bottom,
   bool resizeToAvoidBottomInset = true,
@@ -77,7 +77,7 @@ Future<void> _pumpStreamScaffold(
             ),
             child: StreamScaffold(
               appBarSurfaceStyle: appBarSurfaceStyle,
-              bottomBarSurfaceStyle: bottomBarSurfaceStyle,
+              bottomSurfaceStyle: bottomSurfaceStyle,
               appBar: appBar,
               bottom: bottom,
               resizeToAvoidBottomInset: resizeToAvoidBottomInset,
@@ -169,7 +169,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           const StreamScaffold(
-            bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+            bottomSurfaceStyle: StreamSurfaceStyle.floating,
             bottom: SizedBox(height: 64),
             body: SizedBox(),
           ),
@@ -186,7 +186,7 @@ void main() {
       final captured = _CapturedInsets();
       Future<void> pumpWithHeight(double height) => _pumpStreamScaffold(
         tester,
-        bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         bottom: SizedBox(height: height),
         body: _InsetProbe(captured),
       );
@@ -202,7 +202,7 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         devicePadding: const EdgeInsets.only(bottom: 34),
         body: _InsetProbe(captured),
       );
@@ -289,7 +289,7 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         bottom: const SizedBox(height: bottomBarHeight),
         devicePadding: device,
         body: _InsetProbe(captured),
@@ -304,7 +304,7 @@ void main() {
       await _pumpStreamScaffold(
         tester,
         appBarSurfaceStyle: StreamSurfaceStyle.floating,
-        bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         appBar: _rawAppBar(),
         bottom: const SizedBox(height: bottomBarHeight),
         devicePadding: device,
@@ -449,7 +449,7 @@ void main() {
       final captured = _CapturedInsets();
       await _pumpStreamScaffold(
         tester,
-        bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         bottom: const SizedBox(height: bottomBarHeight),
         devicePadding: const EdgeInsets.only(bottom: 34),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
@@ -463,7 +463,7 @@ void main() {
       const barKey = ValueKey('bar');
       await _pumpStreamScaffold(
         tester,
-        bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         bottom: const SizedBox(key: barKey, height: bottomBarHeight),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
         body: const SizedBox.expand(),
@@ -480,7 +480,7 @@ void main() {
       const barKey = ValueKey('bar');
       await _pumpStreamScaffold(
         tester,
-        bottomBarSurfaceStyle: StreamSurfaceStyle.floating,
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         bottom: const SizedBox(key: barKey, height: bottomBarHeight),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
         resizeToAvoidBottomInset: false,
@@ -502,7 +502,7 @@ void main() {
         tester,
         appBarSurfaceStyle: StreamSurfaceStyle.floating,
         appBar: _rawAppBar(),
-        bottomBarSurfaceStyle: StreamSurfaceStyle.regular,
+        bottomSurfaceStyle: StreamSurfaceStyle.regular,
         bottom: const SizedBox(key: barKey, height: 64),
         viewInsets: const EdgeInsets.only(bottom: keyboard),
         body: const SizedBox.expand(),
