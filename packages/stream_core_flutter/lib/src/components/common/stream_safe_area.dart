@@ -135,7 +135,8 @@ class StreamSafeArea extends StatelessWidget {
   final EdgeInsets _to;
 
   /// The insets this widget applies for [context] with the given options —
-  /// `max(systemInset, minimum) + margin` on each edge.
+  /// `max(systemInset, minimum) + margin` on each edge. This is the full value;
+  /// [StreamSafeArea.driven] interpolates it toward its target.
   ///
   /// Use this when the value is also needed directly, such as to size a
   /// decoration painted behind the child. [maintainBottomViewPadding] governs
@@ -174,6 +175,8 @@ class StreamSafeArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    assert(debugCheckHasMediaQuery(context));
+
     final consumed = MediaQuery.removePadding(
       context: context,
       removeLeft: left,
