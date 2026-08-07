@@ -191,5 +191,27 @@ void main() {
       // The composed SafeArea's maintainBottomViewPadding keeps 34 + 24.
       expect(appliedInsets(tester).bottom, 58);
     });
+
+    testWidgets('collapsing lerps the inset from full toward zero by the animation', (tester) async {
+      Future<EdgeInsets> collapsedAt(double t) async {
+        await pump(
+          tester,
+          StreamSafeArea.collapsing(
+            animation: AlwaysStoppedAnimation(t),
+            top: false,
+            minimum: const EdgeInsets.only(bottom: 40),
+            child: const SizedBox.expand(key: childKey),
+          ),
+          padding: const EdgeInsets.only(bottom: 20),
+          viewPadding: const EdgeInsets.only(bottom: 20),
+        );
+        return appliedInsets(tester);
+      }
+
+      // bottom = max(20, 40) = 40 at t=0, lerped toward 0 as t -> 1.
+      expect((await collapsedAt(0)).bottom, 40);
+      expect((await collapsedAt(1)).bottom, 0);
+      expect((await collapsedAt(0.5)).bottom, 20);
+    });
   });
 }

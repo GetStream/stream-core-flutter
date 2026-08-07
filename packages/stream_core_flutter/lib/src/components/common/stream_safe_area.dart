@@ -11,6 +11,12 @@ import 'package:flutter/widgets.dart';
 /// system inset absorbs it); [margin] is then added on top of every edge. With
 /// both at their defaults the widget behaves like a plain [SafeArea].
 ///
+/// Use the default constructor for a constant inset. Use
+/// [StreamSafeArea.collapsing] when the inset should animate from full to
+/// nothing — for a floating surface that hands its space to a panel sliding in
+/// beneath it (e.g. a composer whose bottom inset collapses as an attachment
+/// picker opens full-bleed).
+///
 /// {@tool snippet}
 ///
 /// This example keeps a bar at least `32` clear of the bottom of the screen,
@@ -27,9 +33,10 @@ import 'package:flutter/widgets.dart';
 ///
 /// ### [MediaQuery] impact
 ///
-/// The padding on the [MediaQuery] for the [child] is adjusted to zero out any
-/// sides that were avoided by this widget. The [minimum] and [margin] are not
-/// removed.
+/// The default constructor removes the inset it applies from the [MediaQuery]
+/// for the [child], so a nested safe area doesn't inset the same intrusion
+/// twice; [minimum] and [margin] are not removed. [StreamSafeArea.collapsing]
+/// does not remove anything, since it releases the inset as it collapses.
 ///
 /// See also:
 ///
@@ -50,7 +57,27 @@ class StreamSafeArea extends StatelessWidget {
     this.margin = EdgeInsets.zero,
     this.maintainBottomViewPadding = true,
     required this.child,
-  });
+  }) : _animation = null;
+
+  /// Creates a safe area whose inset animates between full and nothing,
+  /// driven by [animation].
+  ///
+  /// At `0` the full `max(systemInset, minimum) + margin` is applied; at `1`
+  /// nothing is applied and the [child] extends edge-to-edge. Drive it with the
+  /// same animation that reveals whatever takes over the space — e.g. an
+  /// attachment picker's open/close animation — so the inset releases in step.
+  const StreamSafeArea.collapsing({
+    super.key,
+    required Animation<double> animation,
+    this.left = true,
+    this.top = true,
+    this.right = true,
+    this.bottom = true,
+    this.minimum = EdgeInsets.zero,
+    this.margin = EdgeInsets.zero,
+    this.maintainBottomViewPadding = true,
+    required this.child,
+  }) : _animation = animation;
 
   /// Whether to avoid system intrusions on the left ([minimum] and [margin] apply either way).
   final bool left;
@@ -93,6 +120,9 @@ class StreamSafeArea extends StatelessWidget {
   /// sides that were avoided by this widget.
   final Widget child;
 
+  /// Drives the collapse for [StreamSafeArea.collapsing]; null for the default.
+  final Animation<double>? _animation;
+
   /// The insets this widget applies for [context] with the given options —
   /// `max(systemInset, minimum) + margin` on each edge.
   ///
@@ -122,14 +152,36 @@ class StreamSafeArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      left: left,
-      top: top,
-      right: right,
-      bottom: bottom,
-      minimum: minimum,
-      maintainBottomViewPadding: maintainBottomViewPadding,
-      child: Padding(padding: margin, child: child),
+    final animation = _animation;
+    if (animation == null) {
+      return SafeArea(
+        left: left,
+        top: top,
+        right: right,
+        bottom: bottom,
+        minimum: minimum,
+        maintainBottomViewPadding: maintainBottomViewPadding,
+        child: Padding(padding: margin, child: child),
+      );
+    }
+
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) {
+        final insets = resolveInsets(
+          context,
+          left: left,
+          top: top,
+          right: right,
+          bottom: bottom,
+          minimum: minimum,
+          margin: margin,
+          maintainBottomViewPadding: maintainBottomViewPadding,
+        );
+        final applied = EdgeInsets.lerp(insets, EdgeInsets.zero, animation.value.clamp(0.0, 1.0))!;
+        return Padding(padding: applied, child: child);
+      },
     );
   }
 }
