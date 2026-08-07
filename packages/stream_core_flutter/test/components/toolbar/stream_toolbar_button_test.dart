@@ -85,7 +85,7 @@ void main() {
       expect(button.props.isFloating, isTrue);
     });
 
-    testWidgets('renders a ghost, docked button inside a regular toolbar', (tester) async {
+    testWidgets('renders an outlined, docked button inside a regular toolbar', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           _scoped(
@@ -96,8 +96,39 @@ void main() {
       );
 
       final button = tester.widget<StreamButton>(find.byType(StreamButton));
+      expect(button.props.type, StreamButtonType.outline);
+      expect(button.props.isFloating, isFalse);
+    });
+
+    testWidgets('renders a ghost, docked icon button inside a regular toolbar', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          _scoped(
+            StreamSurfaceStyle.regular,
+            StreamToolbarButton.icon(onPressed: () {}, icon: const Icon(Icons.close)),
+          ),
+        ),
+      );
+
+      final button = tester.widget<StreamButton>(find.byType(StreamButton));
       expect(button.props.type, StreamButtonType.ghost);
       expect(button.props.isFloating, isFalse);
+    });
+
+    testWidgets('an explicit type overrides the resolved shape', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          _scoped(
+            StreamSurfaceStyle.floating,
+            StreamToolbarButton(type: StreamButtonType.solid, onPressed: () {}, child: const Text('Done')),
+          ),
+        ),
+      );
+
+      final button = tester.widget<StreamButton>(find.byType(StreamButton));
+      expect(button.props.type, StreamButtonType.solid);
+      // Elevation still follows the bar.
+      expect(button.props.isFloating, isTrue);
     });
   });
 }

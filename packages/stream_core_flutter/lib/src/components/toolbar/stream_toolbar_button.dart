@@ -7,7 +7,9 @@ import 'stream_toolbar_scope.dart';
 /// A button that adapts to its enclosing Stream toolbar
 /// ([StreamAppBar] / [StreamBottomAppBar]).
 ///
-/// Outlined and elevated when the bar floats, ghost when it's docked.
+/// A labelled action is outlined whether the bar is docked or floating (with
+/// elevation when floating); an icon-only action ([StreamToolbarButton.icon])
+/// is outlined when floating and ghost when docked.
 ///
 /// Suitable for actions placed in a toolbar slot (the leading back affordance, a
 /// trailing text action like _Edit_, footer actions) so they match the bar
@@ -16,7 +18,8 @@ import 'stream_toolbar_scope.dart';
 /// Mirrors [StreamButton]: the shape is determined by the presence of [child] —
 /// a labelled button when [child] is non-null, and a circular icon-only button
 /// (via [StreamToolbarButton.icon]) when it is null. Every [StreamButton] knob
-/// is available except `type` and `isFloating`, which the toolbar sets.
+/// is available: `isFloating` is set by the toolbar, and `type` is resolved from
+/// the bar but can be overridden via [type].
 ///
 /// {@tool snippet}
 ///
@@ -46,6 +49,7 @@ class StreamToolbarButton extends StatelessWidget {
   /// by [iconLeft] and/or [iconRight].
   const StreamToolbarButton({
     super.key,
+    this.type,
     required Widget this.child,
     this.iconLeft,
     this.iconRight,
@@ -60,6 +64,7 @@ class StreamToolbarButton extends StatelessWidget {
   /// Creates a circular icon-only toolbar button displaying [icon].
   const StreamToolbarButton.icon({
     super.key,
+    this.type,
     required Widget icon,
     this.onPressed,
     this.style = .secondary,
@@ -88,6 +93,11 @@ class StreamToolbarButton extends StatelessWidget {
   ///
   /// When null, the button is rendered disabled.
   final VoidCallback? onPressed;
+
+  /// The button shape.
+  ///
+  /// When null (the default), the toolbar resolves it from the enclosing bar.
+  final StreamButtonType? type;
 
   /// The color-scheme variant of the button.
   ///
@@ -124,11 +134,13 @@ class StreamToolbarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFloating = StreamToolbarScope.of(context).isFloating;
-    final type = isFloating ? StreamButtonType.outline : StreamButtonType.ghost;
 
     if (child case final child?) {
+      // A labelled action stays outlined whether docked or floating; floating
+      // only adds the elevation.
+      final effectiveType = type ?? .outline;
       return StreamButton(
-        type: type,
+        type: effectiveType,
         isFloating: isFloating,
         style: style,
         size: size,
@@ -142,8 +154,11 @@ class StreamToolbarButton extends StatelessWidget {
       );
     }
 
+    // An icon-only action (e.g. the back affordance) is ghost when docked and
+    // outlined when floating.
+    final effectiveType = type ?? (isFloating ? .outline : .ghost);
     return StreamButton.icon(
-      type: type,
+      type: effectiveType,
       isFloating: isFloating,
       style: style,
       size: size,
