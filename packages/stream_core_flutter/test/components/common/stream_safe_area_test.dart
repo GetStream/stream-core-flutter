@@ -192,12 +192,13 @@ void main() {
       expect(appliedInsets(tester).bottom, 58);
     });
 
-    testWidgets('collapsing lerps the inset from full toward zero by the animation', (tester) async {
-      Future<EdgeInsets> collapsedAt(double t) async {
+    testWidgets('driven interpolates the inset from full toward "to" by the listenable', (tester) async {
+      Future<EdgeInsets> drivenAt(double t, {EdgeInsets to = EdgeInsets.zero}) async {
         await pump(
           tester,
-          StreamSafeArea.collapsing(
-            animation: AlwaysStoppedAnimation(t),
+          StreamSafeArea.driven(
+            listenable: AlwaysStoppedAnimation(t),
+            to: to,
             top: false,
             minimum: const EdgeInsets.only(bottom: 40),
             child: const SizedBox.expand(key: childKey),
@@ -208,10 +209,12 @@ void main() {
         return appliedInsets(tester);
       }
 
-      // bottom = max(20, 40) = 40 at t=0, lerped toward 0 as t -> 1.
-      expect((await collapsedAt(0)).bottom, 40);
-      expect((await collapsedAt(1)).bottom, 0);
-      expect((await collapsedAt(0.5)).bottom, 20);
+      // bottom = max(20, 40) = 40 at t=0, toward `to` (default zero) as t -> 1.
+      expect((await drivenAt(0)).bottom, 40);
+      expect((await drivenAt(1)).bottom, 0);
+      expect((await drivenAt(0.5)).bottom, 20);
+      // A non-zero target: lerp(40, 10, 0.5) = 25.
+      expect((await drivenAt(0.5, to: const EdgeInsets.only(bottom: 10))).bottom, 25);
     });
   });
 }

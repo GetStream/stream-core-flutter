@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// A widget that insets its child to avoid intrusions by the operating system,
@@ -11,11 +12,11 @@ import 'package:flutter/widgets.dart';
 /// system inset absorbs it); [margin] is then added on top of every edge. With
 /// both at their defaults the widget behaves like a plain [SafeArea].
 ///
-/// Use the default constructor for a constant inset. Use
-/// [StreamSafeArea.collapsing] when the inset should animate from full to
-/// nothing — for a floating surface that hands its space to a panel sliding in
-/// beneath it (e.g. a composer whose bottom inset collapses as an attachment
-/// picker opens full-bleed).
+/// Use the default constructor for a constant inset. Use [StreamSafeArea.driven]
+/// when the inset should interpolate toward a target driven by a
+/// `ValueListenable<double>` — for a floating surface that hands its space to a
+/// panel sliding in beneath it (e.g. a composer whose bottom inset gives way as
+/// an attachment picker opens full-bleed).
 ///
 /// {@tool snippet}
 ///
@@ -35,8 +36,8 @@ import 'package:flutter/widgets.dart';
 ///
 /// The default constructor removes the inset it applies from the [MediaQuery]
 /// for the [child], so a nested safe area doesn't inset the same intrusion
-/// twice; [minimum] and [margin] are not removed. [StreamSafeArea.collapsing]
-/// does not remove anything, since it releases the inset as it collapses.
+/// twice; [minimum] and [margin] are not removed. [StreamSafeArea.driven] does
+/// not remove anything, since it releases the inset as it interpolates.
 ///
 /// See also:
 ///
@@ -57,18 +58,22 @@ class StreamSafeArea extends StatelessWidget {
     this.margin = EdgeInsets.zero,
     this.maintainBottomViewPadding = true,
     required this.child,
-  }) : _animation = null;
+  }) : _listenable = null,
+       _to = EdgeInsets.zero;
 
-  /// Creates a safe area whose inset animates between full and nothing,
-  /// driven by [animation].
+  /// Creates a safe area whose inset interpolates toward [to] as [listenable]
+  /// goes from `0` to `1`.
   ///
   /// At `0` the full `max(systemInset, minimum) + margin` is applied; at `1`
-  /// nothing is applied and the [child] extends edge-to-edge. Drive it with the
-  /// same animation that reveals whatever takes over the space — e.g. an
-  /// attachment picker's open/close animation — so the inset releases in step.
-  const StreamSafeArea.collapsing({
+  /// the applied inset is [to] — `EdgeInsets.zero` by default, i.e. the [child]
+  /// extends edge-to-edge. Drive it with any `ValueListenable<double>` (an
+  /// [Animation], a `ValueNotifier`, …), typically the one that reveals
+  /// whatever takes over the space, so the inset gives way in step. Values are
+  /// clamped to `[0, 1]`.
+  const StreamSafeArea.driven({
     super.key,
-    required Animation<double> animation,
+    required ValueListenable<double> listenable,
+    EdgeInsets to = EdgeInsets.zero,
     this.left = true,
     this.top = true,
     this.right = true,
@@ -77,7 +82,8 @@ class StreamSafeArea extends StatelessWidget {
     this.margin = EdgeInsets.zero,
     this.maintainBottomViewPadding = true,
     required this.child,
-  }) : _animation = animation;
+  }) : _listenable = listenable,
+       _to = to;
 
   /// Whether to avoid system intrusions on the left ([minimum] and [margin] apply either way).
   final bool left;
@@ -120,8 +126,11 @@ class StreamSafeArea extends StatelessWidget {
   /// sides that were avoided by this widget.
   final Widget child;
 
-  /// Drives the collapse for [StreamSafeArea.collapsing]; null for the default.
-  final Animation<double>? _animation;
+  /// Drives the interpolation for [StreamSafeArea.driven]; null for the default.
+  final ValueListenable<double>? _listenable;
+
+  /// The inset [StreamSafeArea.driven] interpolates toward at `1`.
+  final EdgeInsets _to;
 
   /// The insets this widget applies for [context] with the given options —
   /// `max(systemInset, minimum) + margin` on each edge.
@@ -152,8 +161,8 @@ class StreamSafeArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final animation = _animation;
-    if (animation == null) {
+    final listenable = _listenable;
+    if (listenable == null) {
       return SafeArea(
         left: left,
         top: top,
@@ -165,10 +174,10 @@ class StreamSafeArea extends StatelessWidget {
       );
     }
 
-    return AnimatedBuilder(
-      animation: animation,
+    return ValueListenableBuilder<double>(
+      valueListenable: listenable,
       child: child,
-      builder: (context, child) {
+      builder: (context, t, child) {
         final insets = resolveInsets(
           context,
           left: left,
@@ -179,7 +188,7 @@ class StreamSafeArea extends StatelessWidget {
           margin: margin,
           maintainBottomViewPadding: maintainBottomViewPadding,
         );
-        final applied = EdgeInsets.lerp(insets, EdgeInsets.zero, animation.value.clamp(0.0, 1.0))!;
+        final applied = EdgeInsets.lerp(insets, _to, t.clamp(0.0, 1.0))!;
         return Padding(padding: applied, child: child);
       },
     );
