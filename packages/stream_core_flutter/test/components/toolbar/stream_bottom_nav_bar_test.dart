@@ -354,8 +354,8 @@ void main() {
 
     // Representative bottom system insets (viewPadding.bottom) per navigation
     // mode. The pill floors each edge at spacing.xl (24) and adds spacing.xs (8)
-    // only above an opaque bar (inset >= 40, i.e. 2-/3-button); thin overlays
-    // (gesture 24, iOS indicator 34) sit flush. So gap = max(inset, 24) + extra.
+    // on the bottom, so it floats a consistent 8 above whatever the system
+    // reserves — never flush. Gap = max(inset, 24) + 8.
     const navigationModes = <String, double>{
       'iOS home button / no inset': 0,
       'Android gesture (floating) nav': 24,
@@ -364,11 +364,10 @@ void main() {
     };
 
     for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
-      testWidgets('gaps only above an opaque bar — $mode ($inset)', (tester) async {
+      testWidgets('floats spacing.xs above the bottom inset — $mode ($inset)', (tester) async {
         await pumpFloating(tester, deviceBottom: inset);
 
-        final expected = math.max<double>(inset, 24) + (inset >= 40 ? 8 : 0);
-        expect(gapBelowPill(tester), moreOrLessEquals(expected, epsilon: 0.5));
+        expect(gapBelowPill(tester), moreOrLessEquals(math.max<double>(inset, 24) + 8, epsilon: 0.5));
       });
     }
   });
