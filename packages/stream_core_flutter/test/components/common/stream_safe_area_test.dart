@@ -50,12 +50,16 @@ void main() {
       expect(insets.bottom, 58);
     });
 
-    testWidgets('measures the bottom from viewPadding so a keyboard does not collapse it', (tester) async {
+    testWidgets('measures the bottom from viewPadding when maintainBottomViewPadding is set', (tester) async {
       final insets = await resolve(
         tester,
         // A keyboard has consumed the bottom padding (34 -> 0, the default) but not viewPadding.
         viewPadding: const EdgeInsets.only(bottom: 34),
-        compute: (context) => StreamSafeArea.resolveInsets(context, margin: const EdgeInsets.all(24)),
+        compute: (context) => StreamSafeArea.resolveInsets(
+          context,
+          margin: const EdgeInsets.all(24),
+          maintainBottomViewPadding: true,
+        ),
       );
 
       // viewPadding.bottom (34) + 24, not padding.bottom (0) + 24.
@@ -93,7 +97,7 @@ void main() {
       expect(insets.bottom, 40);
     });
 
-    testWidgets('measures the bottom from padding when maintainBottomViewPadding is false', (tester) async {
+    testWidgets('measures the bottom from padding by default', (tester) async {
       final insets = await resolve(
         tester,
         padding: const EdgeInsets.only(bottom: 10),
@@ -101,7 +105,6 @@ void main() {
         compute: (context) => StreamSafeArea.resolveInsets(
           context,
           margin: const EdgeInsets.all(24),
-          maintainBottomViewPadding: false,
         ),
       );
 
@@ -183,13 +186,14 @@ void main() {
         tester,
         const StreamSafeArea(
           margin: EdgeInsets.all(24),
+          maintainBottomViewPadding: true,
           child: SizedBox.expand(key: childKey),
         ),
         // A keyboard has collapsed padding.bottom to 0 (the default); viewPadding.bottom stays 34.
         viewPadding: const EdgeInsets.only(bottom: 34),
       );
 
-      // The composed SafeArea's maintainBottomViewPadding keeps 34 + 24.
+      // maintainBottomViewPadding keeps 34 + 24.
       expect(appliedInsets(tester).bottom, 58);
     });
 

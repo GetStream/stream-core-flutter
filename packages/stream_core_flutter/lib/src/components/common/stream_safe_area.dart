@@ -10,8 +10,7 @@ import 'package:flutter/widgets.dart';
 /// Each edge is inset by `max(systemInset, minimum) + margin`. Like
 /// [SafeArea.minimum], [minimum] raises an edge to at least that much (a larger
 /// system inset absorbs it); [margin] is then added on top of every edge. With
-/// both at their defaults the widget behaves like a plain [SafeArea] (with
-/// [maintainBottomViewPadding] on).
+/// both at their defaults the widget behaves like a plain [SafeArea].
 ///
 /// Use the default constructor for a constant inset. Use [StreamSafeArea.driven]
 /// when the inset should interpolate toward a target driven by a
@@ -58,7 +57,7 @@ class StreamSafeArea extends StatelessWidget {
     this.bottom = true,
     this.minimum = EdgeInsets.zero,
     this.margin = EdgeInsets.zero,
-    this.maintainBottomViewPadding = true,
+    this.maintainBottomViewPadding = false,
     required this.child,
   }) : _listenable = null,
        _to = EdgeInsets.zero;
@@ -82,7 +81,7 @@ class StreamSafeArea extends StatelessWidget {
     this.bottom = true,
     this.minimum = EdgeInsets.zero,
     this.margin = EdgeInsets.zero,
-    this.maintainBottomViewPadding = true,
+    this.maintainBottomViewPadding = false,
     required this.child,
   }) : _listenable = listenable,
        _to = to;
@@ -114,12 +113,13 @@ class StreamSafeArea extends StatelessWidget {
 
   /// Specifies whether this widget should maintain the bottom
   /// [MediaQueryData.viewPadding] instead of the bottom [MediaQueryData.padding],
-  /// defaults to true.
+  /// defaults to false.
   ///
   /// For example, if there is an onscreen keyboard displayed above this widget,
-  /// the bottom gap is maintained above the obstruction rather than being
-  /// consumed. This keeps a floating surface from visibly moving when the
-  /// keyboard opens due to the change in the padding value.
+  /// the bottom gap can be maintained above the obstruction rather than being
+  /// consumed. This is helpful when the layout contains flexible widgets that
+  /// would otherwise visibly move when the keyboard opens due to the change in
+  /// the padding value. Setting this to true avoids that shift.
   final bool maintainBottomViewPadding;
 
   /// The widget below this widget in the tree.
@@ -149,7 +149,7 @@ class StreamSafeArea extends StatelessWidget {
     bool bottom = true,
     EdgeInsets minimum = EdgeInsets.zero,
     EdgeInsets margin = EdgeInsets.zero,
-    bool maintainBottomViewPadding = true,
+    bool maintainBottomViewPadding = false,
   }) {
     final padding = MediaQuery.paddingOf(context);
     final viewPadding = MediaQuery.viewPaddingOf(context);
@@ -211,7 +211,7 @@ class StreamSafeArea extends StatelessWidget {
       ..add(FlagProperty('bottom', value: bottom, ifTrue: 'avoid bottom padding'))
       ..add(DiagnosticsProperty<EdgeInsets>('minimum', minimum, defaultValue: EdgeInsets.zero))
       ..add(DiagnosticsProperty<EdgeInsets>('margin', margin, defaultValue: EdgeInsets.zero))
-      ..add(DiagnosticsProperty<bool>('maintainBottomViewPadding', maintainBottomViewPadding, defaultValue: true))
+      ..add(DiagnosticsProperty<bool>('maintainBottomViewPadding', maintainBottomViewPadding, defaultValue: false))
       ..add(DiagnosticsProperty<ValueListenable<double>>('listenable', _listenable, defaultValue: null))
       ..add(DiagnosticsProperty<EdgeInsets>('to', _to, defaultValue: EdgeInsets.zero));
   }
