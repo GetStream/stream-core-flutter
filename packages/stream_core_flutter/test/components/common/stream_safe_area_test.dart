@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
@@ -282,6 +283,69 @@ void main() {
       );
 
       expect(childBottom, 0);
+    });
+
+    testWidgets('nested does not inset the same edge twice', (tester) async {
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: MediaQuery(
+            data: MediaQueryData(padding: EdgeInsets.all(20), viewPadding: EdgeInsets.all(20)),
+            child: StreamSafeArea(
+              child: StreamSafeArea(child: SizedBox.expand(key: childKey)),
+            ),
+          ),
+        ),
+      );
+
+      // The outer consumes the 20 inset; the inner sees 0 → 20 total, not 40.
+      final child = tester.getRect(find.byKey(childKey));
+      expect(child.left, 20);
+      expect(child.top, 20);
+    });
+
+    testWidgets('updates when the MediaQuery padding changes', (tester) async {
+      const widget = StreamSafeArea(child: SizedBox.expand(key: childKey));
+
+      await pump(tester, widget, padding: const EdgeInsets.all(20), viewPadding: const EdgeInsets.all(20));
+      expect(appliedInsets(tester), const EdgeInsets.all(20));
+
+      await pump(
+        tester,
+        widget,
+        padding: const EdgeInsets.only(left: 40, top: 10),
+        viewPadding: const EdgeInsets.only(left: 40, top: 10),
+      );
+      expect(appliedInsets(tester), const EdgeInsets.only(left: 40, top: 10));
+    });
+
+    testWidgets('does not crash at zero area', (tester) async {
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: MediaQuery(
+            data: MediaQueryData(padding: EdgeInsets.all(20)),
+            child: Center(
+              child: SizedBox.shrink(child: StreamSafeArea(child: Placeholder())),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.getSize(find.byType(StreamSafeArea)), Size.zero);
+    });
+
+    testWidgets('debugFillProperties surfaces the avoided edges', (tester) async {
+      final widget = StreamSafeArea(right: false, bottom: false, child: Container());
+      final properties = DiagnosticPropertiesBuilder();
+      widget.debugFillProperties(properties);
+
+      bool has(String flag) =>
+          properties.properties.any((DiagnosticsNode n) => n is FlagProperty && n.toString() == flag);
+      expect(has('avoid left padding'), isTrue);
+      expect(has('avoid top padding'), isTrue);
+      expect(has('avoid right padding'), isFalse);
+      expect(has('avoid bottom padding'), isFalse);
     });
   });
 }

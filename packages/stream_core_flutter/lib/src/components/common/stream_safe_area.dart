@@ -200,4 +200,19 @@ class StreamSafeArea extends StatelessWidget {
       },
     );
   }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(FlagProperty('left', value: left, ifTrue: 'avoid left padding'))
+      ..add(FlagProperty('top', value: top, ifTrue: 'avoid top padding'))
+      ..add(FlagProperty('right', value: right, ifTrue: 'avoid right padding'))
+      ..add(FlagProperty('bottom', value: bottom, ifTrue: 'avoid bottom padding'))
+      ..add(DiagnosticsProperty<EdgeInsets>('minimum', minimum, defaultValue: EdgeInsets.zero))
+      ..add(DiagnosticsProperty<EdgeInsets>('margin', margin, defaultValue: EdgeInsets.zero))
+      ..add(DiagnosticsProperty<bool>('maintainBottomViewPadding', maintainBottomViewPadding, defaultValue: true))
+      ..add(DiagnosticsProperty<ValueListenable<double>>('listenable', _listenable, defaultValue: null))
+      ..add(DiagnosticsProperty<EdgeInsets>('to', _to, defaultValue: EdgeInsets.zero));
+  }
 }
