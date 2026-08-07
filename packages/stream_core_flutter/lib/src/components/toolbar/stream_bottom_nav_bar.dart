@@ -544,9 +544,8 @@ class _FloatingChrome extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    final minimum = EdgeInsets.all(spacing.xl);
-    final margin = EdgeInsets.only(bottom: spacing.xs);
-    final insets = StreamSafeArea.resolveInsets(context, top: false, minimum: minimum, margin: margin);
+    final minimum = EdgeInsets.only(left: spacing.xl, top: spacing.xl, right: spacing.xl, bottom: spacing.md);
+    final insets = StreamSafeArea.resolveInsets(context, top: false, minimum: minimum);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -558,7 +557,6 @@ class _FloatingChrome extends StatelessWidget {
       child: StreamSafeArea(
         top: false,
         minimum: minimum,
-        margin: margin,
         child: Material(
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
