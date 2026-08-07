@@ -61,6 +61,37 @@ void main() {
       expect(insets.bottom, 58);
     });
 
+    testWidgets('floors each edge at the minimum, which a larger inset absorbs', (tester) async {
+      final insets = await resolve(
+        tester,
+        padding: const EdgeInsets.only(top: 44, left: 10),
+        viewPadding: const EdgeInsets.only(top: 44, left: 10, bottom: 12),
+        compute: (context) => StreamSafeArea.resolveInsets(
+          context,
+          minimum: const EdgeInsets.all(32),
+        ),
+      );
+
+      // top: max(44, 32) = 44 (inset wins); left: max(10, 32) = 32 (floor wins);
+      // bottom: max(12, 32) = 32; right: max(0, 32) = 32.
+      expect(insets, const EdgeInsets.only(top: 44, left: 32, right: 32, bottom: 32));
+    });
+
+    testWidgets('adds the margin on top of the minimum', (tester) async {
+      final insets = await resolve(
+        tester,
+        viewPadding: const EdgeInsets.only(bottom: 10),
+        compute: (context) => StreamSafeArea.resolveInsets(
+          context,
+          minimum: const EdgeInsets.only(bottom: 32),
+          margin: const EdgeInsets.only(bottom: 8),
+        ),
+      );
+
+      // max(10, 32) + 8 = 40.
+      expect(insets.bottom, 40);
+    });
+
     testWidgets('measures the bottom from padding when maintainBottomViewPadding is false', (tester) async {
       final insets = await resolve(
         tester,

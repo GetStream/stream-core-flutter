@@ -1,23 +1,25 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 /// A widget that insets its child to avoid intrusions by the operating system,
-/// keeping an additional [margin] beyond them so the child never sits flush.
+/// with a [minimum] floor and an added [margin], so the child keeps a
+/// controlled gap from them rather than sitting flush.
 ///
-/// When a [margin] is specified, it is added to the safe area padding on every
-/// edge — so the child clears the status bar, navigation bar, notch, or home
-/// indicator by [margin], and is inset by [margin] even on an edge with no
-/// intrusion. This is the difference from [SafeArea], which insets only as far
-/// as the safe area.
+/// Each edge is inset by `max(systemInset, minimum) + margin`. Like
+/// [SafeArea.minimum], [minimum] raises an edge to at least that much (a larger
+/// system inset absorbs it); [margin] is then added on top of every edge. With
+/// both at their defaults the widget behaves like a plain [SafeArea].
 ///
 /// {@tool snippet}
 ///
-/// This example floats a bar a uniform 16dp above the bottom of the screen,
-/// clear of the navigation bar or home indicator.
+/// This example keeps a bar at least `32` clear of the bottom of the screen,
+/// and more on devices that reserve more:
 ///
 /// ```dart
 /// StreamSafeArea(
 ///   top: false,
-///   margin: const EdgeInsets.all(16),
+///   minimum: const EdgeInsets.only(bottom: 32),
 ///   child: myBar,
 /// )
 /// ```
@@ -26,45 +28,53 @@ import 'package:flutter/widgets.dart';
 /// ### [MediaQuery] impact
 ///
 /// The padding on the [MediaQuery] for the [child] is adjusted to zero out any
-/// sides that were avoided by this widget, so a nested safe area does not inset
-/// the same intrusion twice. The [margin] is not removed.
+/// sides that were avoided by this widget. The [minimum] and [margin] are not
+/// removed.
 ///
 /// See also:
 ///
-///  * [SafeArea], which insets only as far as the safe area, without a margin.
+///  * [SafeArea], which this builds on; it floors at a minimum but cannot add a
+///    margin beyond the safe area.
 ///  * [Padding], for insetting widgets in general.
 ///  * [MediaQuery], from which the safe area is obtained.
 class StreamSafeArea extends StatelessWidget {
-  /// Creates a widget that avoids operating system intrusions by the safe area
-  /// plus [margin].
+  /// Creates a widget that avoids operating system intrusions by at least
+  /// [minimum], plus [margin].
   const StreamSafeArea({
     super.key,
     this.left = true,
     this.top = true,
     this.right = true,
     this.bottom = true,
+    this.minimum = EdgeInsets.zero,
     this.margin = EdgeInsets.zero,
     this.maintainBottomViewPadding = true,
     required this.child,
   });
 
-  /// Whether to avoid system intrusions on the left ([margin] applies either way).
+  /// Whether to avoid system intrusions on the left ([minimum] and [margin] apply either way).
   final bool left;
 
   /// Whether to avoid system intrusions at the top of the screen, typically the
-  /// system status bar ([margin] applies either way).
+  /// system status bar ([minimum] and [margin] apply either way).
   final bool top;
 
-  /// Whether to avoid system intrusions on the right ([margin] applies either way).
+  /// Whether to avoid system intrusions on the right ([minimum] and [margin] apply either way).
   final bool right;
 
   /// Whether to avoid system intrusions on the bottom of the screen, typically
-  /// the navigation bar or home indicator ([margin] applies either way).
+  /// the navigation bar or home indicator ([minimum] and [margin] apply either way).
   final bool bottom;
+
+  /// The minimum inset to apply on each edge.
+  ///
+  /// The greater of this and the system inset is used, before [margin] is added.
+  final EdgeInsets minimum;
 
   /// The margin to apply beyond the safe area.
   ///
-  /// Added to the safe area padding on every edge.
+  /// Added to every edge on top of the system inset (or [minimum], whichever is
+  /// greater).
   final EdgeInsets margin;
 
   /// Specifies whether this widget should maintain the bottom
@@ -83,8 +93,8 @@ class StreamSafeArea extends StatelessWidget {
   /// sides that were avoided by this widget.
   final Widget child;
 
-  /// The insets this widget applies for [context] with the given options — the
-  /// safe area on each avoided edge, plus [margin].
+  /// The insets this widget applies for [context] with the given options —
+  /// `max(systemInset, minimum) + margin` on each edge.
   ///
   /// Use this when the value is also needed directly, such as to size a
   /// decoration painted behind the child. [maintainBottomViewPadding] governs
@@ -95,17 +105,18 @@ class StreamSafeArea extends StatelessWidget {
     bool top = true,
     bool right = true,
     bool bottom = true,
+    EdgeInsets minimum = EdgeInsets.zero,
     EdgeInsets margin = EdgeInsets.zero,
     bool maintainBottomViewPadding = true,
   }) {
     final padding = MediaQuery.paddingOf(context);
     final viewPadding = MediaQuery.viewPaddingOf(context);
-    final bottomInset = maintainBottomViewPadding ? viewPadding.bottom : padding.bottom;
+    final bottomSystem = maintainBottomViewPadding ? viewPadding.bottom : padding.bottom;
     return EdgeInsets.only(
-      top: (top ? padding.top : 0.0) + margin.top,
-      left: (left ? padding.left : 0.0) + margin.left,
-      right: (right ? padding.right : 0.0) + margin.right,
-      bottom: (bottom ? bottomInset : 0.0) + margin.bottom,
+      top: math.max(top ? padding.top : 0.0, minimum.top) + margin.top,
+      left: math.max(left ? padding.left : 0.0, minimum.left) + margin.left,
+      right: math.max(right ? padding.right : 0.0, minimum.right) + margin.right,
+      bottom: math.max(bottom ? bottomSystem : 0.0, minimum.bottom) + margin.bottom,
     );
   }
 
@@ -116,6 +127,7 @@ class StreamSafeArea extends StatelessWidget {
       top: top,
       right: right,
       bottom: bottom,
+      minimum: minimum,
       maintainBottomViewPadding: maintainBottomViewPadding,
       child: Padding(padding: margin, child: child),
     );

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
@@ -351,8 +353,8 @@ void main() {
     }
 
     // Representative bottom system insets (viewPadding.bottom) per navigation
-    // mode. In every mode the pill must float spacing.xs (8) *above* whatever
-    // the system reserves — a uniform gap, never flush against it.
+    // mode. The pill floors its bottom gap at spacing.xxl (32), so a larger
+    // inset absorbs it: the gap is max(inset, 32), capped by the 48 Android max.
     const navigationModes = <String, double>{
       'iOS home button / no inset': 0,
       'Android gesture (floating) nav': 24,
@@ -361,10 +363,10 @@ void main() {
     };
 
     for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
-      testWidgets('floats spacing.xs above the bottom inset — $mode ($inset)', (tester) async {
+      testWidgets('floors the bottom gap at spacing.xxl — $mode ($inset)', (tester) async {
         await pumpFloating(tester, deviceBottom: inset);
 
-        expect(gapBelowPill(tester), moreOrLessEquals(inset + 8, epsilon: 0.5));
+        expect(gapBelowPill(tester), moreOrLessEquals(math.max(inset, 32), epsilon: 0.5));
       });
     }
   });
