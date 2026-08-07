@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_badge_notification_theme.dart';
 import '../../theme/components/stream_bottom_nav_bar_theme.dart';
+import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -85,7 +86,7 @@ class StreamBottomNavBarItem {
 ///    a docked bar.
 ///
 /// In a [StreamScaffold] `bottom` slot, drive floating through the ambient
-/// [StreamSurfaceStyle] (or the scaffold's `bottomBarSurfaceStyle`) so the
+/// [StreamSurfaceStyle] (or the scaffold's `bottomSurfaceStyle`) so the
 /// scaffold reserves the matching body inset. Floating set only through
 /// [StreamBottomNavBarTheme] floats the pill without that inset, so content can
 /// slide under it.
@@ -544,7 +545,13 @@ class _FloatingChrome extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    final minimum = EdgeInsets.only(left: spacing.xl, top: spacing.xl, right: spacing.xl, bottom: spacing.md);
+    final minimum = EdgeInsets.only(
+      left: spacing.xl,
+      top: spacing.xl,
+      right: spacing.xl,
+      bottom: spacing.safeAreaBottom(),
+    );
+
     final insets = StreamSafeArea.resolveInsets(context, top: false, minimum: minimum);
 
     return DecoratedBox(

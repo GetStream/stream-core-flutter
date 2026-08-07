@@ -353,23 +353,29 @@ void main() {
     }
 
     // Representative bottom system insets (viewPadding.bottom) per navigation
-    // mode. The pill floors its bottom gap at spacing.md (16): a larger system
+    // mode. The pill floors its bottom gap at StreamSpacing.safeAreaBottom
+    // (platform-adaptive: xxl on iOS/macOS, xxxl elsewhere): a larger system
     // inset (iOS home indicator, Android nav bar) is used as-is so the pill sits
     // flush above it, while a device that reserves nothing (non-edge-to-edge,
-    // inset 0) still gets the 16 floor. Gap = max(inset, 16).
+    // inset 0) still gets the floor. Gap = max(inset, floor).
     const navigationModes = <String, double>{
-      'iOS home button / no inset': 0,
+      'no inset': 0,
       'Android gesture (floating) nav': 24,
       'iOS home indicator': 34,
       'Android 2- and 3-button nav': 48,
     };
 
     for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
-      testWidgets('floors the bottom gap at spacing.md — $mode ($inset)', (tester) async {
-        await pumpFloating(tester, deviceBottom: inset);
+      testWidgets(
+        'floors the bottom gap at safeAreaBottom — $mode ($inset)',
+        (tester) async {
+          final floor = const StreamSpacing().safeAreaBottom();
+          await pumpFloating(tester, deviceBottom: inset);
 
-        expect(gapBelowPill(tester), moreOrLessEquals(math.max<double>(inset, 16), epsilon: 0.5));
-      });
+          expect(gapBelowPill(tester), moreOrLessEquals(math.max<double>(inset, floor), epsilon: 0.5));
+        },
+        variant: const TargetPlatformVariant({TargetPlatform.iOS, TargetPlatform.android}),
+      );
     }
   });
 }

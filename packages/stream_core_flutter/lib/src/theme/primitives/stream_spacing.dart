@@ -97,3 +97,22 @@ class StreamSpacing with _$StreamSpacing {
     double t,
   ) => _$StreamSpacing.lerp(a, b, t);
 }
+
+/// Platform-adaptive spacing values derived from the [StreamSpacing] scale.
+extension StreamSpacingSafeArea on StreamSpacing {
+  /// The recommended minimum bottom inset for a floating surface, such as a
+  /// floating navigation pill or a message composer.
+  ///
+  /// Use it as the `minimum` bottom inset of a [StreamSafeArea] so the surface
+  /// keeps a comfortable gap above the bottom of the screen, while a larger
+  /// system inset (home indicator, navigation bar) is honored as-is.
+  ///
+  /// Adapts to [platform], defaulting to the current platform.
+  double safeAreaBottom({TargetPlatform? platform}) {
+    platform ??= defaultTargetPlatform;
+    return switch (platform) {
+      .iOS || .macOS => xxl,
+      _ => xxxl,
+    };
+  }
+}
