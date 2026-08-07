@@ -34,10 +34,11 @@ import 'package:flutter/widgets.dart';
 ///
 /// ### [MediaQuery] impact
 ///
-/// The default constructor removes the inset it applies from the [MediaQuery]
-/// for the [child], so a nested safe area doesn't inset the same intrusion
-/// twice; [minimum] and [margin] are not removed. [StreamSafeArea.driven] does
-/// not remove anything, since it releases the inset as it interpolates.
+/// Both constructors remove the avoided system insets from the [child]'s
+/// [MediaQuery], so a nested safe area doesn't inset the same intrusion twice;
+/// [minimum] and [margin] are not removed. For [StreamSafeArea.driven] the
+/// removal is independent of the interpolation — the avoided edges are marked
+/// handled even as the visible inset collapses toward `to`.
 ///
 /// See also:
 ///
@@ -174,9 +175,22 @@ class StreamSafeArea extends StatelessWidget {
       );
     }
 
+    // Remove the avoided insets from the child's MediaQuery so a nested safe
+    // area doesn't inset the same intrusion twice — same as the default
+    // (SafeArea) path. This is binary: it marks the edges as handled here
+    // regardless of how far the interpolation has collapsed the visible inset.
+    final consumed = MediaQuery.removePadding(
+      context: context,
+      removeLeft: left,
+      removeTop: top,
+      removeRight: right,
+      removeBottom: bottom,
+      child: child,
+    );
+
     return ValueListenableBuilder<double>(
       valueListenable: listenable,
-      child: child,
+      child: consumed,
       builder: (context, t, child) {
         final insets = resolveInsets(
           context,

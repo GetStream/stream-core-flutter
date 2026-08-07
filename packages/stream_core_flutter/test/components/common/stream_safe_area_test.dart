@@ -216,5 +216,27 @@ void main() {
       // A non-zero target: lerp(40, 10, 0.5) = 25.
       expect((await drivenAt(0.5, to: const EdgeInsets.only(bottom: 10))).bottom, 25);
     });
+
+    testWidgets('driven removes the avoided inset from the child MediaQuery', (tester) async {
+      late double childBottom;
+      await pump(
+        tester,
+        StreamSafeArea.driven(
+          listenable: const AlwaysStoppedAnimation<double>(0),
+          top: false,
+          child: Builder(
+            builder: (context) {
+              childBottom = MediaQuery.paddingOf(context).bottom;
+              return const SizedBox.expand(key: childKey);
+            },
+          ),
+        ),
+        padding: const EdgeInsets.only(bottom: 30),
+        viewPadding: const EdgeInsets.only(bottom: 30),
+      );
+
+      // The bottom inset is consumed, so a descendant sees no bottom padding.
+      expect(childBottom, 0);
+    });
   });
 }
