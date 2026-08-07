@@ -353,8 +353,9 @@ void main() {
     }
 
     // Representative bottom system insets (viewPadding.bottom) per navigation
-    // mode. The pill floors its bottom gap at spacing.xxl (32), so a larger
-    // inset absorbs it: the gap is max(inset, 32), capped by the 48 Android max.
+    // mode. The pill floors each edge at spacing.xl (24) and adds spacing.xs (8)
+    // on the bottom, so the gap is max(inset, 24) + 8: a uniform 8 above the
+    // system UI (never flush), and 24 + 8 = 32 on small-inset devices.
     const navigationModes = <String, double>{
       'iOS home button / no inset': 0,
       'Android gesture (floating) nav': 24,
@@ -363,10 +364,10 @@ void main() {
     };
 
     for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
-      testWidgets('floors the bottom gap at spacing.xxl — $mode ($inset)', (tester) async {
+      testWidgets('keeps spacing.xs above the bottom inset — $mode ($inset)', (tester) async {
         await pumpFloating(tester, deviceBottom: inset);
 
-        expect(gapBelowPill(tester), moreOrLessEquals(math.max(inset, 32), epsilon: 0.5));
+        expect(gapBelowPill(tester), moreOrLessEquals(math.max(inset, 24) + 8, epsilon: 0.5));
       });
     }
   });
