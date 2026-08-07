@@ -11,6 +11,13 @@ import '../common/stream_safe_area.dart';
 /// Default height of [StreamBottomNavBar] per the Stream design system.
 const double kStreamBottomNavBarHeight = 64;
 
+/// Bottom system insets at or above this are treated as an opaque, tappable
+/// navigation bar (2-/3-button ≈ 48), which the floating pill keeps a gap
+/// above. Smaller insets are thin overlays (gesture ≈ 24, iOS indicator ≈ 34)
+/// the pill sits flush with. Flutter exposes no nav-mode API, so we key off the
+/// inset height — 40 cleanly separates the tallest overlay from a button bar.
+const double _kOpaqueNavBarInset = 40;
+
 /// A single item in a [StreamBottomNavBar].
 ///
 /// Each item has an [icon] and a text [label]. An optional [selectedIcon]
@@ -544,8 +551,11 @@ class _FloatingChrome extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
+    final systemBottom = MediaQuery.viewPaddingOf(context).bottom;
+    final bottomGap = systemBottom >= _kOpaqueNavBarInset ? spacing.xs : 0.0;
+
     final minimum = EdgeInsets.all(spacing.xl);
-    final margin = EdgeInsets.only(bottom: spacing.xs);
+    final margin = EdgeInsets.only(bottom: bottomGap);
     final insets = StreamSafeArea.resolveInsets(context, top: false, minimum: minimum, margin: margin);
 
     return DecoratedBox(
