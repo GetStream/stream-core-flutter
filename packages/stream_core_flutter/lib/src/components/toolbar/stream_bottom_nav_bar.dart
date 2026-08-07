@@ -542,7 +542,8 @@ class _FloatingChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final margin = EdgeInsets.all(context.streamSpacing.xl);
+    final spacing = context.streamSpacing;
+    final margin = EdgeInsets.only(top: spacing.xl, left: spacing.xl, right: spacing.xl, bottom: spacing.xs);
     final insets = StreamSafeArea.resolveInsets(context, top: false, margin: margin);
 
     return DecoratedBox(

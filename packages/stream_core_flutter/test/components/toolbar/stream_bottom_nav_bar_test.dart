@@ -351,7 +351,7 @@ void main() {
     }
 
     // Representative bottom system insets (viewPadding.bottom) per navigation
-    // mode. In every mode the pill must float spacing.xl (24) *above* whatever
+    // mode. In every mode the pill must float spacing.xs (8) *above* whatever
     // the system reserves — a uniform gap, never flush against it.
     const navigationModes = <String, double>{
       'iOS home button / no inset': 0,
@@ -361,10 +361,10 @@ void main() {
     };
 
     for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
-      testWidgets('floats spacing.xl above the bottom inset — $mode ($inset)', (tester) async {
+      testWidgets('floats spacing.xs above the bottom inset — $mode ($inset)', (tester) async {
         await pumpFloating(tester, deviceBottom: inset);
 
-        expect(gapBelowPill(tester), moreOrLessEquals(inset + 24, epsilon: 0.5));
+        expect(gapBelowPill(tester), moreOrLessEquals(inset + 8, epsilon: 0.5));
       });
     }
   });
