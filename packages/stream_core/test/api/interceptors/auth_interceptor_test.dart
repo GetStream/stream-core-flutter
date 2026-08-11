@@ -29,8 +29,14 @@ class _CapturingHttpClientAdapter implements HttpClientAdapter {
 }
 
 // An adapter that always responds with a token-expired API error (code 40),
-// counting how many times it is hit so a retry can be detected.
+// counting how many times it is hit so a retry can be detected. [onFetch], if
+// provided, runs when the request is dispatched — used to simulate a token
+// manager being swapped in mid-flight.
 class _TokenExpiredHttpClientAdapter implements HttpClientAdapter {
+  _TokenExpiredHttpClientAdapter({this.onFetch});
+
+  final void Function()? onFetch;
+
   var _requestCount = 0;
   int get requestCount => _requestCount;
 
@@ -41,6 +47,7 @@ class _TokenExpiredHttpClientAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     _requestCount++;
+    onFetch?.call();
     return ResponseBody.fromString(
       jsonEncode({
         'code': 40, // token expired
@@ -155,6 +162,47 @@ void main() {
 
         // A static provider must not trigger the refresh-and-retry path, so
         // the request is attempted exactly once.
+        expect(adapter.requestCount, 1);
+      },
+    );
+
+    test(
+      'forwards a token-expired error without retrying when the token manager '
+      'is swapped to a static provider after the request was dispatched '
+      '(guest exchange resolving mid-flight)',
+      () async {
+        // Starts on a dynamic manager and swaps to a static one carrying the
+        // server-resolved id once the request is already in flight, mirroring
+        // the guest flow. onError observes the swapped-in (static) manager and
+        // must forward the error rather than expire + retry.
+        var tokenManager = TokenManager(
+          userId: 'requested-id',
+          tokenProvider: TokenProvider.dynamic(
+            (_) async => _generateTestUserToken('requested-id'),
+          ),
+        );
+
+        final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+        final adapter = _TokenExpiredHttpClientAdapter(
+          onFetch: () {
+            tokenManager = TokenManager(
+              userId: 'server-assigned-id',
+              tokenProvider: TokenProvider.static(
+                _generateTestUserToken('server-assigned-id'),
+              ),
+            );
+          },
+        );
+        dio.httpClientAdapter = adapter;
+        dio.interceptors.add(AuthInterceptor(dio, () => tokenManager));
+
+        await expectLater(
+          dio.get<void>('/test'),
+          throwsA(isA<DioException>()),
+        );
+
+        // The swapped-in manager is static, so the error is surfaced without a
+        // refresh-and-retry: the request is attempted exactly once.
         expect(adapter.requestCount, 1);
       },
     );
