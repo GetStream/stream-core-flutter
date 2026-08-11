@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
@@ -353,11 +351,11 @@ void main() {
     }
 
     // Representative bottom system insets (viewPadding.bottom) per navigation
-    // mode. The pill floors its bottom gap at StreamSpacing.safeAreaBottom
-    // (platform-adaptive: xxl on iOS/macOS, xxxl elsewhere): a larger system
-    // inset (iOS home indicator, Android nav bar) is used as-is so the pill sits
-    // flush above it, while a device that reserves nothing (non-edge-to-edge,
-    // inset 0) still gets the floor. Gap = max(inset, floor).
+    // mode. The pill clears the system inset by a margin instead of flooring its
+    // gap at a fixed value, so a device that reserves nothing (non-edge-to-edge,
+    // inset 0) keeps just the margin rather than stacking a gap above a bar the
+    // window never extends behind. Apple platforms place the pill directly on
+    // the inset, but only when there is one to rest on. Gap = inset + margin.
     const navigationModes = <String, double>{
       'no inset': 0,
       'Android gesture (floating) nav': 24,
@@ -367,12 +365,18 @@ void main() {
 
     for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
       testWidgets(
-        'floors the bottom gap at safeAreaBottom — $mode ($inset)',
+        'clears the bottom inset by its margin — $mode ($inset)',
         (tester) async {
-          final floor = const StreamSpacing().safeAreaBottom();
           await pumpFloating(tester, deviceBottom: inset);
 
-          expect(gapBelowPill(tester), moreOrLessEquals(math.max<double>(inset, floor), epsilon: 0.5));
+          const spacing = StreamSpacing();
+          final platform = Theme.of(tester.element(find.byType(StreamBottomNavBar))).platform;
+          final margin = switch (platform) {
+            TargetPlatform.iOS || TargetPlatform.macOS when inset > 0 => spacing.none,
+            _ => spacing.md,
+          };
+
+          expect(gapBelowPill(tester), moreOrLessEquals(inset + margin, epsilon: 0.5));
         },
         variant: const TargetPlatformVariant({TargetPlatform.iOS, TargetPlatform.android}),
       );

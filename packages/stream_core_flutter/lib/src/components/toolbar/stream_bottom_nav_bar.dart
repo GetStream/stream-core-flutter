@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_badge_notification_theme.dart';
 import '../../theme/components/stream_bottom_nav_bar_theme.dart';
-import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/stream_floating_fade.dart';
 import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -544,15 +543,20 @@ class _FloatingChrome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
+    final minimum = EdgeInsets.only(left: spacing.xl, top: spacing.xl, right: spacing.xl);
 
-    final minimum = EdgeInsets.only(
-      left: spacing.xl,
-      top: spacing.xl,
-      right: spacing.xl,
-      bottom: spacing.safeAreaBottom(),
-    );
+    final platform = Theme.of(context).platform;
+    final hasBottomInset = MediaQuery.paddingOf(context).bottom > 0;
 
-    final insets = StreamSafeArea.resolveInsets(context, top: false, minimum: minimum);
+    // Apple platforms rest on the bottom inset; elsewhere a margin clears it,
+    // and stands in when there is none.
+    final bottomSafeAreaMargin = switch (platform) {
+      .iOS || .macOS when hasBottomInset => spacing.none,
+      _ => spacing.md,
+    };
+
+    final margin = EdgeInsets.only(bottom: bottomSafeAreaMargin);
+    final insets = StreamSafeArea.resolveInsets(context, top: false, minimum: minimum, margin: margin);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -564,6 +568,7 @@ class _FloatingChrome extends StatelessWidget {
       child: StreamSafeArea(
         top: false,
         minimum: minimum,
+        margin: margin,
         child: Material(
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
