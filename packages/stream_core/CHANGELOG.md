@@ -1,12 +1,12 @@
 ## Upcoming
 
+### 💥 BREAKING CHANGES
+
+- `AuthInterceptor` now takes a `TokenManager Function()` getter instead of a `TokenManager` instance. This lets callers swap the active `TokenManager` at runtime — e.g. after a guest token exchange resolves a server-assigned user id — and have the interceptor pick up the new instance (and its `userId`) on the next request.
+
 ### ✨ Features
 
 - Added `teams` field to `User` class.
-
-### 🐛 Bug Fixes
-
-- `AuthInterceptor` now sets the `user_id` query parameter from the resolved token's own user id instead of `TokenManager.userId`. This keeps REST calls consistent for token providers that can resolve to a different id than requested (e.g. guest token exchanges).
 
 ## 0.4.0
 

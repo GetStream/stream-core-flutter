@@ -4,16 +4,31 @@ import '../../errors.dart';
 import '../../user.dart';
 import '../stream_core_dio_error.dart';
 
+/// Provides the [TokenManager] currently in use by an [AuthInterceptor].
+///
+/// A getter rather than a fixed reference so the caller can swap the underlying
+/// [TokenManager] at runtime — e.g. after a guest token exchange resolves a
+/// server-assigned user id — and have the interceptor pick up the new instance.
+typedef TokenManagerProvider = TokenManager Function();
+
 /// Authentication interceptor that refreshes the token if
 /// an auth error is received
 class AuthInterceptor extends QueuedInterceptor {
-  /// Initialize a new auth interceptor
-  AuthInterceptor(this._dio, this._tokenManager);
+  /// Initialize a new auth interceptor.
+  ///
+  /// [tokenManagerProvider] is a getter rather than a fixed reference so the
+  /// caller can swap the underlying [TokenManager] — e.g. after a guest token
+  /// exchange resolves a server-assigned user id — and have this interceptor
+  /// pick up the new instance on its next request.
+  AuthInterceptor(this._dio, this._tokenManagerProvider);
 
   final Dio _dio;
 
-  /// The token manager used in the client
-  final TokenManager _tokenManager;
+  /// Provides the token manager currently in use.
+  final TokenManagerProvider _tokenManagerProvider;
+
+  /// The token manager currently in use.
+  TokenManager get _tokenManager => _tokenManagerProvider();
 
   @override
   Future<void> onRequest(
@@ -23,12 +38,12 @@ class AuthInterceptor extends QueuedInterceptor {
     try {
       final token = await _tokenManager.getToken();
 
-      // Use the resolved token's own user id rather than
-      // `_tokenManager.userId`: some token providers (e.g. guest exchanges)
-      // can resolve to a different id than the one originally requested, and
-      // this must stay consistent with the identity in the `Authorization`
+      // Re-read the token manager after awaiting the token: loading it may
+      // have swapped in a new manager carrying a server-resolved user id
+      // (e.g. a guest exchange). Reading `userId` here keeps the `user_id`
+      // query parameter consistent with the identity in the `Authorization`
       // header below.
-      options.queryParameters['user_id'] = token.userId;
+      options.queryParameters['user_id'] = _tokenManager.userId;
       options.headers['Authorization'] = token.rawValue;
       options.headers['stream-auth-type'] = token.authType.headerValue;
 
@@ -62,10 +77,11 @@ class AuthInterceptor extends QueuedInterceptor {
 
     final error = StreamApiError.fromJson(data);
     if (error.isTokenExpiredError) {
+      final tokenManager = _tokenManager;
       // Don't try to refresh the token if we're using a static provider
-      if (_tokenManager.usesStaticProvider) return handler.next(err);
+      if (tokenManager.usesStaticProvider) return handler.next(err);
       // Otherwise, mark the current token as expired.
-      _tokenManager.expireToken();
+      tokenManager.expireToken();
 
       try {
         final options = err.requestOptions;
