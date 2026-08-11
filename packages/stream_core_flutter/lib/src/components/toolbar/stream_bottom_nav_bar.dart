@@ -346,21 +346,16 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
       data: const StreamBadgeNotificationThemeData(size: StreamBadgeNotificationSize.xs),
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: kStreamBottomNavBarHeight),
-        // A transparent surface above the bar background so each tile can paint
-        // its tap ripple.
-        child: Material(
-          type: MaterialType.transparency,
-          child: DefaultTextStyle.merge(
-            overflow: TextOverflow.ellipsis,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _createTiles(
-                iconSize: effectiveIconSize,
-                selectedItemColor: effectiveSelectedItemColor,
-                unselectedItemColor: effectiveUnselectedItemColor,
-                selectedLabelStyle: effectiveSelectedLabelStyle,
-                unselectedLabelStyle: effectiveUnselectedLabelStyle,
-              ),
+        child: DefaultTextStyle.merge(
+          overflow: TextOverflow.ellipsis,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: _createTiles(
+              iconSize: effectiveIconSize,
+              selectedItemColor: effectiveSelectedItemColor,
+              unselectedItemColor: effectiveUnselectedItemColor,
+              selectedLabelStyle: effectiveSelectedLabelStyle,
+              unselectedLabelStyle: effectiveUnselectedLabelStyle,
             ),
           ),
         ),
@@ -494,7 +489,10 @@ class _RegularChrome extends StatelessWidget {
         color: backgroundColor,
         border: Border(top: BorderSide(color: borderColor)),
       ),
-      child: SafeArea(top: false, child: child),
+      child: Material(
+        type: MaterialType.transparency,
+        child: StreamSafeArea(top: false, child: child),
+      ),
     );
   }
 }
@@ -570,13 +568,13 @@ class _FloatingChrome extends StatelessWidget {
         minimum: minimum,
         margin: margin,
         child: Material(
+          color: pillColor,
+          elevation: elevation,
+          clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
             side: BorderSide(color: borderColor),
           ),
-          color: pillColor,
-          elevation: elevation,
-          clipBehavior: Clip.antiAlias,
           child: child,
         ),
       ),

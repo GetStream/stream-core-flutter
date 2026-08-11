@@ -310,6 +310,63 @@ void main() {
     });
   });
 
+  group('ripple surface', () {
+    Future<void> pumpBar(WidgetTester tester, {required StreamSurfaceStyle surfaceStyle, double deviceBottom = 34}) {
+      return tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme(surfaceStyle: surfaceStyle)]),
+          home: Builder(
+            builder: (context) {
+              final base = MediaQuery.of(context);
+              return MediaQuery(
+                data: base.copyWith(
+                  padding: EdgeInsets.only(bottom: deviceBottom),
+                  viewPadding: EdgeInsets.only(bottom: deviceBottom),
+                ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    // A tile's ink paints on its nearest Material ancestor and is clipped to it,
+    // so that Material has to span the inset for a ripple to reach into it.
+    testWidgets('the docked ink surface spans the bottom inset', (tester) async {
+      await pumpBar(tester, surfaceStyle: StreamSurfaceStyle.regular);
+
+      final inkSurface = find.descendant(
+        of: find.byType(StreamBottomNavBar),
+        matching: find.byWidgetPredicate((widget) => widget is Material && widget.type == MaterialType.transparency),
+      );
+
+      // deviceBottom defaults to 34 in pumpBar.
+      expect(tester.getSize(inkSurface.first).height, kStreamBottomNavBarHeight + 34);
+    });
+
+    testWidgets('the floating pill is its own ink surface', (tester) async {
+      await pumpBar(tester, surfaceStyle: StreamSurfaceStyle.floating);
+
+      // No transparent surface inside the pill — ripples paint on the pill
+      // itself, which clips them to its rounded shape.
+      final pill = find.byWidgetPredicate(
+        (widget) => widget is Material && widget.shape is RoundedRectangleBorder,
+      );
+
+      expect(
+        find.descendant(
+          of: pill,
+          matching: find.byWidgetPredicate((widget) => widget is Material && widget.type == MaterialType.transparency),
+        ),
+        findsNothing,
+      );
+    });
+  });
+
   group('floating pill margin', () {
     // The pill is the only Material carrying a RoundedRectangleBorder shape.
     final pillFinder = find.byWidgetPredicate(
