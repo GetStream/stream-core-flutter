@@ -8,6 +8,7 @@ environment:
   flutter: ">=3.38.1"
 
 dependencies:
+  dart_style: ^3.1.9
   device_frame_plus: ^1.0.0
   flutter:
     sdk: flutter

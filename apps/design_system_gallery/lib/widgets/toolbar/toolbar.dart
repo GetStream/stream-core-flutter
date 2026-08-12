@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/core.dart';
 
+import '../../app/theme_export_page.dart';
 import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';
 import '../../core/stream_icons.dart';
@@ -127,6 +128,15 @@ class GalleryToolbar extends StatelessWidget {
             tooltip: 'Theme Studio',
             isActive: showThemePanel,
             onTap: onToggleThemePanel,
+          ),
+          SizedBox(width: spacing.sm),
+
+          // Export the current theme studio state as a Dart snippet.
+          ToolbarButton(
+            icon: Icons.ios_share,
+            tooltip: 'Export Theme',
+            isActive: false,
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ThemeExportPage())),
           ),
         ],
       ),

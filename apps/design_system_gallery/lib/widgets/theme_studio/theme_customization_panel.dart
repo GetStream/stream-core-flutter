@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/core.dart';
 
+import '../../config/component_theme_descriptors.dart';
 import '../../config/theme_configuration.dart';
+import '../../config/theme_studio_sections.dart';
+import 'add_component_theme_button.dart';
 import 'avatar_palette_section.dart';
 import 'color_picker_tile.dart';
 import 'mode_button.dart';
@@ -35,7 +38,12 @@ StreamAvatarColorPair _generateRandomAvatarPair({required bool isDark}) {
 
 /// A panel widget for customizing the Stream theme.
 ///
-/// Organized into sections matching [StreamColorScheme] structure.
+/// Color sections (accent/text/background/border/system) are rendered from
+/// [themeStudioSections] so this panel, the export page, and the code
+/// generator all stay in sync off a single list. Appearance, brand, chrome,
+/// and the avatar palette aren't slot-driven (brightness is a single value,
+/// brand/chrome are swatch seeds, and the palette is a list, not a color) so
+/// they keep bespoke sections below.
 class ThemeCustomizationPanel extends StatefulWidget {
   const ThemeCustomizationPanel({super.key});
 
@@ -85,20 +93,20 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
                     SizedBox(height: spacing.md),
                     _buildChromeSection(context),
                     SizedBox(height: spacing.md),
-                    _buildAccentColorsSection(context),
-                    SizedBox(height: spacing.md),
-                    _buildTextColorsSection(context),
-                    SizedBox(height: spacing.md),
-                    _buildBackgroundColorsSection(context),
-                    SizedBox(height: spacing.md),
-                    _buildBorderCoreSection(context),
-                    SizedBox(height: spacing.md),
-                    _buildBorderUtilitySection(context),
-                    SizedBox(height: spacing.md),
-                    _buildSystemColorsSection(context),
-                    SizedBox(height: spacing.md),
+                    for (final section in themeStudioSections) ...[
+                      _buildSlotSection(context, section),
+                      SizedBox(height: spacing.md),
+                    ],
                     _buildAvatarPaletteSection(context),
                     SizedBox(height: spacing.md),
+                    for (final component in context.watch<ThemeConfiguration>().activeComponentThemes) ...[
+                      _buildComponentThemeSection(
+                        context,
+                        componentThemeDescriptors.firstWhere((d) => d.name == component),
+                      ),
+                      SizedBox(height: spacing.md),
+                    ],
+                    _buildAddComponentThemeButton(context),
                   ],
                 ),
               ),
@@ -242,433 +250,39 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
     );
   }
 
-  Widget _buildAccentColorsSection(BuildContext context) {
+  /// Renders one [ThemeStudioSection] as a [SectionCard] of [ColorPickerTile]s,
+  /// grouped and sub-headed per [ThemeStudioSlotGroup].
+  Widget _buildSlotSection(BuildContext context, ThemeStudioSection section) {
     final config = context.watch<ThemeConfiguration>();
-    return SectionCard(
-      title: 'Accent Colors',
-      subtitle: 'accent*',
-      icon: Icons.color_lens,
-      child: Column(
-        children: [
-          ColorPickerTile(
-            label: 'accentPrimary',
-            color: config.accentPrimary,
-            isDefault: !config.accentPrimaryIsCustom,
-            onColorChanged: config.setAccentPrimary,
-            onReset: config.resetAccentPrimary,
-          ),
-          ColorPickerTile(
-            label: 'accentSuccess',
-            color: config.accentSuccess,
-            isDefault: !config.accentSuccessIsCustom,
-            onColorChanged: config.setAccentSuccess,
-            onReset: config.resetAccentSuccess,
-          ),
-          ColorPickerTile(
-            label: 'accentWarning',
-            color: config.accentWarning,
-            isDefault: !config.accentWarningIsCustom,
-            onColorChanged: config.setAccentWarning,
-            onReset: config.resetAccentWarning,
-          ),
-          ColorPickerTile(
-            label: 'accentError',
-            color: config.accentError,
-            isDefault: !config.accentErrorIsCustom,
-            onColorChanged: config.setAccentError,
-            onReset: config.resetAccentError,
-          ),
-          ColorPickerTile(
-            label: 'accentNeutral',
-            color: config.accentNeutral,
-            isDefault: !config.accentNeutralIsCustom,
-            onColorChanged: config.setAccentNeutral,
-            onReset: config.resetAccentNeutral,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextColorsSection(BuildContext context) {
-    final config = context.watch<ThemeConfiguration>();
-    return SectionCard(
-      title: 'Text Colors',
-      subtitle: 'text*',
-      icon: Icons.format_color_text,
-      child: Column(
-        children: [
-          ColorPickerTile(
-            label: 'textPrimary',
-            color: config.textPrimary,
-            isDefault: !config.textPrimaryIsCustom,
-            onColorChanged: config.setTextPrimary,
-            onReset: config.resetTextPrimary,
-          ),
-          ColorPickerTile(
-            label: 'textSecondary',
-            color: config.textSecondary,
-            isDefault: !config.textSecondaryIsCustom,
-            onColorChanged: config.setTextSecondary,
-            onReset: config.resetTextSecondary,
-          ),
-          ColorPickerTile(
-            label: 'textTertiary',
-            color: config.textTertiary,
-            isDefault: !config.textTertiaryIsCustom,
-            onColorChanged: config.setTextTertiary,
-            onReset: config.resetTextTertiary,
-          ),
-          ColorPickerTile(
-            label: 'textDisabled',
-            color: config.textDisabled,
-            isDefault: !config.textDisabledIsCustom,
-            onColorChanged: config.setTextDisabled,
-            onReset: config.resetTextDisabled,
-          ),
-          ColorPickerTile(
-            label: 'textLink',
-            color: config.textLink,
-            isDefault: !config.textLinkIsCustom,
-            onColorChanged: config.setTextLink,
-            onReset: config.resetTextLink,
-          ),
-          ColorPickerTile(
-            label: 'textOnAccent',
-            color: config.textOnAccent,
-            isDefault: !config.textOnAccentIsCustom,
-            onColorChanged: config.setTextOnAccent,
-            onReset: config.resetTextOnAccent,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBackgroundColorsSection(BuildContext context) {
-    final config = context.watch<ThemeConfiguration>();
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
     final spacing = context.streamSpacing;
+
     return SectionCard(
-      title: 'Background Colors',
-      subtitle: 'background*',
-      icon: Icons.format_paint,
+      title: section.title,
+      subtitle: section.subtitle,
+      icon: section.icon,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ColorPickerTile(
-            label: 'backgroundApp',
-            color: config.backgroundApp,
-            isDefault: !config.backgroundAppIsCustom,
-            onColorChanged: config.setBackgroundApp,
-            onReset: config.resetBackgroundApp,
-          ),
-          ColorPickerTile(
-            label: 'backgroundInverse',
-            color: config.backgroundInverse,
-            isDefault: !config.backgroundInverseIsCustom,
-            onColorChanged: config.setBackgroundInverse,
-            onReset: config.resetBackgroundInverse,
-          ),
-          ColorPickerTile(
-            label: 'backgroundOnAccent',
-            color: config.backgroundOnAccent,
-            isDefault: !config.backgroundOnAccentIsCustom,
-            onColorChanged: config.setBackgroundOnAccent,
-            onReset: config.resetBackgroundOnAccent,
-          ),
-          ColorPickerTile(
-            label: 'backgroundHighlight',
-            color: config.backgroundHighlight,
-            isDefault: !config.backgroundHighlightIsCustom,
-            onColorChanged: config.setBackgroundHighlight,
-            onReset: config.resetBackgroundHighlight,
-          ),
-          ColorPickerTile(
-            label: 'backgroundScrim',
-            color: config.backgroundScrim,
-            isDefault: !config.backgroundScrimIsCustom,
-            onColorChanged: config.setBackgroundScrim,
-            onReset: config.resetBackgroundScrim,
-          ),
-          ColorPickerTile(
-            label: 'backgroundOverlayLight',
-            color: config.backgroundOverlayLight,
-            isDefault: !config.backgroundOverlayLightIsCustom,
-            onColorChanged: config.setBackgroundOverlayLight,
-            onReset: config.resetBackgroundOverlayLight,
-          ),
-          ColorPickerTile(
-            label: 'backgroundOverlayDark',
-            color: config.backgroundOverlayDark,
-            isDefault: !config.backgroundOverlayDarkIsCustom,
-            onColorChanged: config.setBackgroundOverlayDark,
-            onReset: config.resetBackgroundOverlayDark,
-          ),
-          ColorPickerTile(
-            label: 'backgroundDisabled',
-            color: config.backgroundDisabled,
-            isDefault: !config.backgroundDisabledIsCustom,
-            onColorChanged: config.setBackgroundDisabled,
-            onReset: config.resetBackgroundDisabled,
-          ),
-          ColorPickerTile(
-            label: 'backgroundHover',
-            color: config.backgroundHover,
-            isDefault: !config.backgroundHoverIsCustom,
-            onColorChanged: config.setBackgroundHover,
-            onReset: config.resetBackgroundHover,
-          ),
-          ColorPickerTile(
-            label: 'backgroundPressed',
-            color: config.backgroundPressed,
-            isDefault: !config.backgroundPressedIsCustom,
-            onColorChanged: config.setBackgroundPressed,
-            onReset: config.resetBackgroundPressed,
-          ),
-          ColorPickerTile(
-            label: 'backgroundSelected',
-            color: config.backgroundSelected,
-            isDefault: !config.backgroundSelectedIsCustom,
-            onColorChanged: config.setBackgroundSelected,
-            onReset: config.resetBackgroundSelected,
-          ),
-          SizedBox(height: spacing.xs),
-          Text(
-            'Surface',
-            style: context.streamTextTheme.metadataEmphasis.copyWith(
-              color: context.streamColorScheme.textSecondary,
-            ),
-          ),
-          SizedBox(height: spacing.xs),
-          ColorPickerTile(
-            label: 'backgroundSurface',
-            color: config.backgroundSurface,
-            isDefault: !config.backgroundSurfaceIsCustom,
-            onColorChanged: config.setBackgroundSurface,
-            onReset: config.resetBackgroundSurface,
-          ),
-          ColorPickerTile(
-            label: 'backgroundSurfaceSubtle',
-            color: config.backgroundSurfaceSubtle,
-            isDefault: !config.backgroundSurfaceSubtleIsCustom,
-            onColorChanged: config.setBackgroundSurfaceSubtle,
-            onReset: config.resetBackgroundSurfaceSubtle,
-          ),
-          ColorPickerTile(
-            label: 'backgroundSurfaceStrong',
-            color: config.backgroundSurfaceStrong,
-            isDefault: !config.backgroundSurfaceStrongIsCustom,
-            onColorChanged: config.setBackgroundSurfaceStrong,
-            onReset: config.resetBackgroundSurfaceStrong,
-          ),
-          ColorPickerTile(
-            label: 'backgroundSurfaceCard',
-            color: config.backgroundSurfaceCard,
-            isDefault: !config.backgroundSurfaceCardIsCustom,
-            onColorChanged: config.setBackgroundSurfaceCard,
-            onReset: config.resetBackgroundSurfaceCard,
-          ),
-          SizedBox(height: spacing.xs),
-          Text(
-            'Elevation',
-            style: context.streamTextTheme.metadataEmphasis.copyWith(
-              color: context.streamColorScheme.textSecondary,
-            ),
-          ),
-          SizedBox(height: spacing.xs),
-          ColorPickerTile(
-            label: 'backgroundElevation0',
-            color: config.backgroundElevation0,
-            isDefault: !config.backgroundElevation0IsCustom,
-            onColorChanged: config.setBackgroundElevation0,
-            onReset: config.resetBackgroundElevation0,
-          ),
-          ColorPickerTile(
-            label: 'backgroundElevation1',
-            color: config.backgroundElevation1,
-            isDefault: !config.backgroundElevation1IsCustom,
-            onColorChanged: config.setBackgroundElevation1,
-            onReset: config.resetBackgroundElevation1,
-          ),
-          ColorPickerTile(
-            label: 'backgroundElevation2',
-            color: config.backgroundElevation2,
-            isDefault: !config.backgroundElevation2IsCustom,
-            onColorChanged: config.setBackgroundElevation2,
-            onReset: config.resetBackgroundElevation2,
-          ),
-          ColorPickerTile(
-            label: 'backgroundElevation3',
-            color: config.backgroundElevation3,
-            isDefault: !config.backgroundElevation3IsCustom,
-            onColorChanged: config.setBackgroundElevation3,
-            onReset: config.resetBackgroundElevation3,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBorderCoreSection(BuildContext context) {
-    final config = context.watch<ThemeConfiguration>();
-    return SectionCard(
-      title: 'Border Colors - Core',
-      subtitle: 'border*',
-      icon: Icons.border_all,
-      child: Column(
-        children: [
-          ColorPickerTile(
-            label: 'borderDefault',
-            color: config.borderDefault,
-            isDefault: !config.borderDefaultIsCustom,
-            onColorChanged: config.setBorderDefault,
-            onReset: config.resetBorderDefault,
-          ),
-          ColorPickerTile(
-            label: 'borderSubtle',
-            color: config.borderSubtle,
-            isDefault: !config.borderSubtleIsCustom,
-            onColorChanged: config.setBorderSubtle,
-            onReset: config.resetBorderSubtle,
-          ),
-          ColorPickerTile(
-            label: 'borderStrong',
-            color: config.borderStrong,
-            isDefault: !config.borderStrongIsCustom,
-            onColorChanged: config.setBorderStrong,
-            onReset: config.resetBorderStrong,
-          ),
-          ColorPickerTile(
-            label: 'borderOnAccent',
-            color: config.borderOnAccent,
-            isDefault: !config.borderOnAccentIsCustom,
-            onColorChanged: config.setBorderOnAccent,
-            onReset: config.resetBorderOnAccent,
-          ),
-          ColorPickerTile(
-            label: 'borderOnSurface',
-            color: config.borderOnSurface,
-            isDefault: !config.borderOnSurfaceIsCustom,
-            onColorChanged: config.setBorderOnSurface,
-            onReset: config.resetBorderOnSurface,
-          ),
-          ColorPickerTile(
-            label: 'borderOpacitySubtle',
-            color: config.borderOpacitySubtle,
-            isDefault: !config.borderOpacitySubtleIsCustom,
-            onColorChanged: config.setBorderOpacitySubtle,
-            onReset: config.resetBorderOpacitySubtle,
-          ),
-          ColorPickerTile(
-            label: 'borderOpacityStrong',
-            color: config.borderOpacityStrong,
-            isDefault: !config.borderOpacityStrongIsCustom,
-            onColorChanged: config.setBorderOpacityStrong,
-            onReset: config.resetBorderOpacityStrong,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBorderUtilitySection(BuildContext context) {
-    final config = context.watch<ThemeConfiguration>();
-    return SectionCard(
-      title: 'Border Colors - Utility',
-      subtitle: 'border*',
-      icon: Icons.border_style,
-      child: Column(
-        children: [
-          ColorPickerTile(
-            label: 'borderFocus',
-            color: config.borderFocus,
-            isDefault: !config.borderFocusIsCustom,
-            onColorChanged: config.setBorderFocus,
-            onReset: config.resetBorderFocus,
-          ),
-          ColorPickerTile(
-            label: 'borderActive',
-            color: config.borderActive,
-            isDefault: !config.borderActiveIsCustom,
-            onColorChanged: config.setBorderActive,
-            onReset: config.resetBorderActive,
-          ),
-          ColorPickerTile(
-            label: 'borderHover',
-            color: config.borderHover,
-            isDefault: !config.borderHoverIsCustom,
-            onColorChanged: config.setBorderHover,
-            onReset: config.resetBorderHover,
-          ),
-          ColorPickerTile(
-            label: 'borderPressed',
-            color: config.borderPressed,
-            isDefault: !config.borderPressedIsCustom,
-            onColorChanged: config.setBorderPressed,
-            onReset: config.resetBorderPressed,
-          ),
-          ColorPickerTile(
-            label: 'borderDisabled',
-            color: config.borderDisabled,
-            isDefault: !config.borderDisabledIsCustom,
-            onColorChanged: config.setBorderDisabled,
-            onReset: config.resetBorderDisabled,
-          ),
-          ColorPickerTile(
-            label: 'borderError',
-            color: config.borderError,
-            isDefault: !config.borderErrorIsCustom,
-            onColorChanged: config.setBorderError,
-            onReset: config.resetBorderError,
-          ),
-          ColorPickerTile(
-            label: 'borderWarning',
-            color: config.borderWarning,
-            isDefault: !config.borderWarningIsCustom,
-            onColorChanged: config.setBorderWarning,
-            onReset: config.resetBorderWarning,
-          ),
-          ColorPickerTile(
-            label: 'borderSuccess',
-            color: config.borderSuccess,
-            isDefault: !config.borderSuccessIsCustom,
-            onColorChanged: config.setBorderSuccess,
-            onReset: config.resetBorderSuccess,
-          ),
-          ColorPickerTile(
-            label: 'borderSelected',
-            color: config.borderSelected,
-            isDefault: !config.borderSelectedIsCustom,
-            onColorChanged: config.setBorderSelected,
-            onReset: config.resetBorderSelected,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSystemColorsSection(BuildContext context) {
-    final config = context.watch<ThemeConfiguration>();
-    return SectionCard(
-      title: 'System Colors',
-      subtitle: 'system*',
-      icon: Icons.settings_system_daydream,
-      child: Column(
-        children: [
-          ColorPickerTile(
-            label: 'systemText',
-            color: config.systemText,
-            isDefault: !config.systemTextIsCustom,
-            onColorChanged: config.setSystemText,
-            onReset: config.resetSystemText,
-          ),
-          ColorPickerTile(
-            label: 'systemScrollbar',
-            color: config.systemScrollbar,
-            isDefault: !config.systemScrollbarIsCustom,
-            onColorChanged: config.setSystemScrollbar,
-            onReset: config.resetSystemScrollbar,
-          ),
+          for (final group in section.groups) ...[
+            if (group.heading case final heading?) ...[
+              if (group != section.groups.first) SizedBox(height: spacing.xs),
+              Text(
+                heading,
+                style: textTheme.metadataEmphasis.copyWith(color: colorScheme.textSecondary),
+              ),
+              SizedBox(height: spacing.xs),
+            ],
+            for (final slot in group.slots)
+              ColorPickerTile(
+                label: slot.parameterName,
+                color: config.resolve(slot),
+                isDefault: !config.isCustom(slot),
+                onColorChanged: (color) => config.setOverride(slot, color),
+                onReset: () => config.resetOverride(slot),
+              ),
+          ],
         ],
       ),
     );
@@ -744,5 +358,45 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
         ],
       ),
     );
+  }
+
+  /// Renders one added component theme (see [ComponentThemeDescriptor]) as a
+  /// [SectionCard] of [ColorPickerTile]s, one per editable property, with a
+  /// control to remove the whole section.
+  Widget _buildComponentThemeSection(BuildContext context, ComponentThemeDescriptor descriptor) {
+    final config = context.watch<ThemeConfiguration>();
+    final spacing = context.streamSpacing;
+
+    return SectionCard(
+      title: descriptor.name,
+      subtitle: descriptor.themeParameterName,
+      icon: Icons.widgets_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final property in descriptor.properties)
+            ColorPickerTile(
+              label: property,
+              // Component theme properties have no SDK-computed default value
+              // available here (unlike StreamColorScheme slots) - the real
+              // fallback lives inside each component's own widget. Passing
+              // null (rather than guessing a color) renders as "default"
+              // instead of a fabricated hex value.
+              color: config.resolveComponentColor(descriptor.name, property),
+              isDefault: !config.isComponentColorCustom(descriptor.name, property),
+              onColorChanged: (color) => config.setComponentColor(descriptor.name, property, color),
+              onReset: () => config.resetComponentColor(descriptor.name, property),
+            ),
+          SizedBox(height: spacing.sm),
+          RemoveComponentThemeButton(onTap: () => config.removeComponentTheme(descriptor.name)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddComponentThemeButton(BuildContext context) {
+    final config = context.watch<ThemeConfiguration>();
+    final available = componentThemeDescriptors.where((d) => !config.activeComponentThemes.contains(d.name)).toList();
+    return AddComponentThemeButton(available: available, onSelected: config.addComponentTheme);
   }
 }
