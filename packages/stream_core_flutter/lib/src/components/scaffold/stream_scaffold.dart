@@ -206,8 +206,6 @@ class StreamScaffold extends StatelessWidget {
 
     final surfaceStyle = context.streamSurfaceStyle;
 
-    // The per-instance override wins; otherwise defer to the app bar's own
-    // resolution (its theme surface style, then the ambient one).
     final effectiveAppBarSurfaceStyle = appBarSurfaceStyle ?? StreamAppBar.resolveSurfaceStyle(context);
 
     final effectiveBottomSurfaceStyle = bottomSurfaceStyle ?? surfaceStyle;
@@ -234,17 +232,12 @@ class StreamScaffold extends StatelessWidget {
       endDrawerEnableOpenDragGesture: endDrawerEnableOpenDragGesture,
       drawerDragStartBehavior: drawerDragStartBehavior,
       drawerBarrierDismissible: drawerBarrierDismissible,
-      // Keep `extendBody` permanently true so Flutter's internal `_BodyBuilder`
-      // always wraps the body in its LayoutBuilder. Otherwise, toggling
-      // `extendBodyBehindAppBar` (when the app bar's surface style switches
-      // between regular and floating) flips `_BodyBuilder` between returning the
-      // body directly and wrapping it in a LayoutBuilder. That structural flip
-      // deactivates and reactivates the body subtree *during layout*; if the
-      // body hosts an `Overlay`/`OverlayPortal` (e.g. a message list), that
-      // reactivation mutates a deferred-layout box inside `LayoutBuilder`, which
-      // throws. This scaffold never uses the Material `bottomNavigationBar`
-      // slot (the `bottom` widget lives inside the body), so `extendBody` has no
-      // visual effect here — it only keeps the body wrapper stable.
+      // Pinned so the body keeps one shape whether or not it extends behind the
+      // app bar. Letting it follow appBarFloating restructures the body when the
+      // app bar switches between regular and floating, which throws mid-layout
+      // if the body hosts an Overlay. The bottom widget lives inside the body
+      // rather than the bottomNavigationBar slot, so pinning changes nothing
+      // visually.
       extendBody: true,
       extendBodyBehindAppBar: appBarFloating,
       body: _StreamScaffoldBody(

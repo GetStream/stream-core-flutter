@@ -91,15 +91,13 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// The properties that configure this app bar.
   final StreamAppBarProps props;
 
-  /// Resolves the effective [StreamSurfaceStyle] an app bar would render with in
-  /// [context].
+  /// Resolves the surface style an app bar renders with in [context].
   ///
-  /// Precedence mirrors the app bar's own resolution: the per-instance [style]
-  /// merged over the ambient [StreamAppBarTheme] style, then the ambient
-  /// [StreamSurfaceStyle].
+  /// Precedence: the per-instance [style], then the ambient [StreamAppBarTheme]
+  /// style, then the ambient [StreamSurfaceStyle].
   ///
-  /// [StreamScaffold] uses this to keep its layout (whether the body extends
-  /// behind the app bar) in sync with how the app bar actually renders.
+  /// Matches what the bar resolves for itself, so a [StreamScaffold] can lay out
+  /// its slot to match before the bar builds.
   static StreamSurfaceStyle resolveSurfaceStyle(
     BuildContext context, {
     StreamAppBarStyle? style,

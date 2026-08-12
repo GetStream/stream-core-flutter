@@ -528,14 +528,10 @@ void main() {
     expect(captured.padding!.bottom, 0);
   });
 
-  testWidgets('keeps extendBody true so the body wrapper survives an app bar float toggle', (tester) async {
-    // Regression guard for the hot-reload crash: flipping the app bar between
-    // regular and floating toggles `extendBodyBehindAppBar`. If `extendBody`
-    // were not pinned true, Flutter's internal `_BodyBuilder` would flip between
-    // returning the body directly and wrapping it in a LayoutBuilder — the
-    // structural change that reactivated the body's Overlay/OverlayPortal inside
-    // a LayoutBuilder mid-layout and threw. Pinning `extendBody` true keeps the
-    // wrapper stable across the toggle.
+  testWidgets('extends the body regardless of whether the app bar floats', (tester) async {
+    // Pinned rather than following the app bar: a body that changes shape when
+    // the app bar switches between regular and floating throws mid-layout if it
+    // hosts an overlay child.
     await tester.pumpWidget(
       _withStreamTheme(
         StreamScaffold(appBarSurfaceStyle: StreamSurfaceStyle.regular, appBar: _rawAppBar(), body: const SizedBox()),

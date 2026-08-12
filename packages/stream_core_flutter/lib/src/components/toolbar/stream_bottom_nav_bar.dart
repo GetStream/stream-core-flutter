@@ -150,18 +150,14 @@ class StreamBottomNavBar extends StatelessWidget {
   /// The properties that configure this navigation bar.
   final StreamBottomNavBarProps props;
 
-  /// Resolves the effective [StreamSurfaceStyle] a nav bar would render with in
-  /// [context].
+  /// Resolves the surface style a nav bar renders with in [context].
   ///
-  /// Precedence mirrors the nav bar's own resolution: the per-instance [style]
-  /// merged over the ambient [StreamBottomNavBarTheme] style, then the ambient
-  /// [StreamSurfaceStyle].
+  /// Precedence: the per-instance [style], then the ambient
+  /// [StreamBottomNavBarTheme] style, then the ambient [StreamSurfaceStyle].
   ///
-  /// A page that drops a nav bar into a [StreamScaffold] bottom slot passes the
-  /// result as [StreamScaffold.bottomSurfaceStyle] so the scaffold's layout
-  /// (its floating inset and body overlap) stays in sync with how the nav bar
-  /// actually renders — otherwise the scaffold falls back to the ambient style
-  /// alone and a nav-bar-only override is applied only partly.
+  /// Matches what the bar resolves for itself, so a page dropping one into a
+  /// [StreamScaffold] can pass the result as
+  /// [StreamScaffold.bottomSurfaceStyle] to lay out the slot to match.
   static StreamSurfaceStyle resolveSurfaceStyle(
     BuildContext context, {
     StreamBottomNavBarStyle? style,

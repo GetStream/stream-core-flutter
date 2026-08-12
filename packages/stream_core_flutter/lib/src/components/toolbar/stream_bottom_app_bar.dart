@@ -88,18 +88,14 @@ class StreamBottomAppBar extends StatelessWidget implements PreferredSizeWidget 
   /// The properties that configure this bottom app bar.
   final StreamBottomAppBarProps props;
 
-  /// Resolves the effective [StreamSurfaceStyle] a bottom app bar would render
-  /// with in [context].
+  /// Resolves the surface style a bottom app bar renders with in [context].
   ///
-  /// Precedence mirrors the bottom app bar's own resolution: the per-instance
-  /// [style] merged over the ambient [StreamBottomAppBarTheme] style, then the
-  /// ambient [StreamSurfaceStyle].
+  /// Precedence: the per-instance [style], then the ambient
+  /// [StreamBottomAppBarTheme] style, then the ambient [StreamSurfaceStyle].
   ///
-  /// A page that drops a bottom app bar into a [StreamScaffold] bottom slot
-  /// passes the result as [StreamScaffold.bottomSurfaceStyle] so the scaffold's
-  /// layout (its floating inset and body overlap) stays in sync with how the bar
-  /// actually renders — otherwise the scaffold falls back to the ambient style
-  /// alone and a bar-only override is applied only partly.
+  /// Matches what the bar resolves for itself, so a page dropping one into a
+  /// [StreamScaffold] can pass the result as
+  /// [StreamScaffold.bottomSurfaceStyle] to lay out the slot to match.
   static StreamSurfaceStyle resolveSurfaceStyle(
     BuildContext context, {
     StreamBottomAppBarStyle? style,
