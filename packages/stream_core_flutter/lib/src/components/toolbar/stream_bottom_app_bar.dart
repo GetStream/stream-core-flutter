@@ -7,6 +7,7 @@ import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_floating_fade.dart';
+import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 import 'stream_toolbar.dart';
 import 'stream_toolbar_scope.dart';
@@ -86,6 +87,27 @@ class StreamBottomAppBar extends StatelessWidget implements PreferredSizeWidget 
 
   /// The properties that configure this bottom app bar.
   final StreamBottomAppBarProps props;
+
+  /// Resolves the effective [StreamSurfaceStyle] a bottom app bar would render
+  /// with in [context].
+  ///
+  /// Precedence mirrors the bottom app bar's own resolution: the per-instance
+  /// [style] merged over the ambient [StreamBottomAppBarTheme] style, then the
+  /// ambient [StreamSurfaceStyle].
+  ///
+  /// A page that drops a bottom app bar into a [StreamScaffold] bottom slot
+  /// passes the result as [StreamScaffold.bottomSurfaceStyle] so the scaffold's
+  /// layout (its floating inset and body overlap) stays in sync with how the bar
+  /// actually renders — otherwise the scaffold falls back to the ambient style
+  /// alone and a bar-only override is applied only partly.
+  static StreamSurfaceStyle resolveSurfaceStyle(
+    BuildContext context, {
+    StreamBottomAppBarStyle? style,
+  }) {
+    final themeStyle = context.streamBottomAppBarTheme.style;
+    final effective = themeStyle?.merge(style) ?? style;
+    return effective?.surfaceStyle ?? context.streamSurfaceStyle;
+  }
 
   @override
   Size get preferredSize => const Size.fromHeight(kStreamToolbarHeight);
@@ -193,7 +215,7 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
     final style = bottomAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamBottomAppBarStyleDefaults(context);
 
-    final effectiveSurfaceStyle = style?.surfaceStyle ?? context.streamSurfaceStyle;
+    final effectiveSurfaceStyle = StreamBottomAppBar.resolveSurfaceStyle(context, style: props.style);
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;

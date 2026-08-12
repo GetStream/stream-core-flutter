@@ -8,6 +8,7 @@ import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_floating_fade.dart';
+import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 import 'stream_toolbar.dart';
 import 'stream_toolbar_button.dart';
@@ -89,6 +90,24 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// The properties that configure this app bar.
   final StreamAppBarProps props;
+
+  /// Resolves the effective [StreamSurfaceStyle] an app bar would render with in
+  /// [context].
+  ///
+  /// Precedence mirrors the app bar's own resolution: the per-instance [style]
+  /// merged over the ambient [StreamAppBarTheme] style, then the ambient
+  /// [StreamSurfaceStyle].
+  ///
+  /// [StreamScaffold] uses this to keep its layout (whether the body extends
+  /// behind the app bar) in sync with how the app bar actually renders.
+  static StreamSurfaceStyle resolveSurfaceStyle(
+    BuildContext context, {
+    StreamAppBarStyle? style,
+  }) {
+    final themeStyle = context.streamAppBarTheme.style;
+    final effective = themeStyle?.merge(style) ?? style;
+    return effective?.surfaceStyle ?? context.streamSurfaceStyle;
+  }
 
   @override
   Size get preferredSize => const Size.fromHeight(kStreamToolbarHeight);
@@ -221,7 +240,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     final style = appBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
-    final effectiveSurfaceStyle = style?.surfaceStyle ?? context.streamSurfaceStyle;
+    final effectiveSurfaceStyle = StreamAppBar.resolveSurfaceStyle(context, style: props.style);
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;

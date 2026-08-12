@@ -150,6 +150,27 @@ class StreamBottomNavBar extends StatelessWidget {
   /// The properties that configure this navigation bar.
   final StreamBottomNavBarProps props;
 
+  /// Resolves the effective [StreamSurfaceStyle] a nav bar would render with in
+  /// [context].
+  ///
+  /// Precedence mirrors the nav bar's own resolution: the per-instance [style]
+  /// merged over the ambient [StreamBottomNavBarTheme] style, then the ambient
+  /// [StreamSurfaceStyle].
+  ///
+  /// A page that drops a nav bar into a [StreamScaffold] bottom slot passes the
+  /// result as [StreamScaffold.bottomSurfaceStyle] so the scaffold's layout
+  /// (its floating inset and body overlap) stays in sync with how the nav bar
+  /// actually renders — otherwise the scaffold falls back to the ambient style
+  /// alone and a nav-bar-only override is applied only partly.
+  static StreamSurfaceStyle resolveSurfaceStyle(
+    BuildContext context, {
+    StreamBottomNavBarStyle? style,
+  }) {
+    final themeStyle = context.streamBottomNavBarTheme.style;
+    final effective = themeStyle?.merge(style) ?? style;
+    return effective?.surfaceStyle ?? context.streamSurfaceStyle;
+  }
+
   @override
   Widget build(BuildContext context) {
     final builder = StreamComponentFactory.of(context).bottomNavBar;
@@ -329,7 +350,7 @@ class _DefaultStreamBottomNavBarState extends State<DefaultStreamBottomNavBar> w
     final style = context.streamBottomNavBarTheme.style?.merge(widget.props.style) ?? widget.props.style;
     final defaults = _StreamBottomNavBarStyleDefaults(context);
 
-    final effectiveSurfaceStyle = style?.surfaceStyle ?? context.streamSurfaceStyle;
+    final effectiveSurfaceStyle = StreamBottomNavBar.resolveSurfaceStyle(context, style: widget.props.style);
 
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
     final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
