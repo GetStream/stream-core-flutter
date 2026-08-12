@@ -257,6 +257,44 @@ void main() {
       expect(darkSchemeSpan, isNot(contains('onlineIndicatorTheme')));
     });
 
+    test('a component property set to different colors per side becomes two suffixed consts', () {
+      // Component property colors start unlinked on the export page, so
+      // diverging light/dark values are the common case, not an edge one.
+      final code = generateThemeCode(
+        light: const ThemeExportSide(
+          componentOverrides: {
+            'Online Indicator': {'backgroundOnline': Color(0xFF112233)},
+          },
+        ),
+        dark: const ThemeExportSide(
+          componentOverrides: {
+            'Online Indicator': {'backgroundOnline': Color(0xFF445566)},
+          },
+        ),
+      );
+
+      expect(code, contains('const onlineIndicatorBackgroundOnlineLight = Color.fromARGB(255, 17, 34, 51);'));
+      expect(code, contains('const onlineIndicatorBackgroundOnlineDark = Color.fromARGB(255, 68, 85, 102);'));
+      // No shared const, since the two sides disagree.
+      expect(code, isNot(contains('const onlineIndicatorBackgroundOnline =')));
+
+      // Each side references its own const.
+      final lightSpan = code.substring(0, code.indexOf('darkStreamTheme'));
+      final darkSpan = code.substring(code.indexOf('darkStreamTheme'));
+      expect(
+        lightSpan,
+        _callMatching('onlineIndicatorTheme: StreamOnlineIndicatorThemeData', [
+          'backgroundOnline: onlineIndicatorBackgroundOnlineLight',
+        ]),
+      );
+      expect(
+        darkSpan,
+        _callMatching('onlineIndicatorTheme: StreamOnlineIndicatorThemeData', [
+          'backgroundOnline: onlineIndicatorBackgroundOnlineDark',
+        ]),
+      );
+    });
+
     test('a component with no overridden properties is omitted entirely', () {
       final code = generateThemeCode(light: const ThemeExportSide(), dark: const ThemeExportSide());
 

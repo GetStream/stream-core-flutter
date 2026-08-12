@@ -32,7 +32,7 @@ class AddComponentThemeButton extends StatelessWidget {
         borderRadius: BorderRadius.all(radius.md),
         child: Container(
           padding: EdgeInsets.all(spacing.sm),
-          decoration: BoxDecoration(
+          foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(radius.md),
             border: Border.all(color: colorScheme.borderDefault),
           ),

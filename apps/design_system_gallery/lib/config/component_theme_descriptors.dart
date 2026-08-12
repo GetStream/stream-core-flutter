@@ -89,3 +89,17 @@ final componentThemeDescriptors = <ComponentThemeDescriptor>[
     ),
   ),
 ];
+
+/// [componentThemeDescriptors] keyed by name, so resolving one is a map
+/// lookup rather than a linear rescan on every rebuild.
+final _descriptorsByName = {for (final descriptor in componentThemeDescriptors) descriptor.name: descriptor};
+
+/// The descriptor named [name], or `null` when no descriptor has that name.
+///
+/// Active component themes are tracked by free-form [String] name
+/// (`ThemeConfiguration.componentOverrides`, the studio panel, the export
+/// page), so a name with no matching descriptor is representable — e.g. one
+/// renamed or removed from [componentThemeDescriptors] while still active.
+/// Returning `null` lets callers skip it; the `firstWhere` this replaces
+/// threw a `StateError` from inside `build`.
+ComponentThemeDescriptor? componentThemeDescriptorOrNull(String name) => _descriptorsByName[name];

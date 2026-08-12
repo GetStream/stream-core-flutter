@@ -179,10 +179,17 @@ class ColorPickerTile extends StatelessWidget {
         // and a customized tile for the same slot are the same height -
         // otherwise a light/dark pair in the export page's linked rows
         // visibly misaligns whenever only one side is customized.
-        Text(
-          'default',
-          style: textTheme.metadataDefault.copyWith(
-            color: isDefault ? colorScheme.textTertiary : StreamColors.transparent,
+        //
+        // Dropped from the semantics tree when it isn't the real state,
+        // though: transparent text is still read out, so a customized tile
+        // would otherwise announce "default".
+        ExcludeSemantics(
+          excluding: !isDefault,
+          child: Text(
+            'default',
+            style: textTheme.metadataDefault.copyWith(
+              color: isDefault ? colorScheme.textTertiary : StreamColors.transparent,
+            ),
           ),
         ),
       ],

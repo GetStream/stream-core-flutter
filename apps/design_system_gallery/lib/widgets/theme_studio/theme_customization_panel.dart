@@ -99,13 +99,11 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
                     ],
                     _buildAvatarPaletteSection(context),
                     SizedBox(height: spacing.md),
-                    for (final component in context.watch<ThemeConfiguration>().activeComponentThemes) ...[
-                      _buildComponentThemeSection(
-                        context,
-                        componentThemeDescriptors.firstWhere((d) => d.name == component),
-                      ),
-                      SizedBox(height: spacing.md),
-                    ],
+                    for (final component in context.watch<ThemeConfiguration>().activeComponentThemes)
+                      if (componentThemeDescriptorOrNull(component) case final descriptor?) ...[
+                        _buildComponentThemeSection(context, descriptor),
+                        SizedBox(height: spacing.md),
+                      ],
                     _buildAddComponentThemeButton(context),
                   ],
                 ),

@@ -126,8 +126,14 @@ void main() {
     await tester.tap(find.text('Add component theme'));
     await tester.pumpAndSettle();
 
+    // Scoped to the dialog, and asserting it's actually open first: an
+    // unscoped findsNothing would pass vacuously if the picker never opened.
+    expect(find.byType(SimpleDialog), findsOneWidget);
     // Avatar isn't offered - its color story is the Avatar Palette section.
-    expect(find.text('Avatar'), findsNothing);
+    expect(
+      find.descendant(of: find.byType(SimpleDialog), matching: find.textContaining('Avatar')),
+      findsNothing,
+    );
     expect(find.textContaining('Online Indicator'), findsOneWidget);
 
     await tester.tap(find.textContaining('Online Indicator'));
@@ -177,6 +183,23 @@ void main() {
     final afterTiles = _tilesFor(tester, 'brand');
     expect(afterTiles[0].isDefault, isFalse, reason: 'light side was edited');
     expect(afterTiles[1].isDefault, isTrue, reason: 'dark side is untouched while unlinked');
+  });
+
+  testWidgets('a section header gives the title the space its subtitle chip does not need', (tester) async {
+    final studio = ThemeConfiguration.light();
+    addTearDown(studio.dispose);
+
+    await pumpWide(tester, studio);
+
+    // Both were Flexible, which split the row evenly and ellipsized the
+    // title at ~half the width while the chip sat in unused space. The
+    // title should now be far wider than the chip it sits next to.
+    final titleWidth = tester.getSize(find.text('Accent Colors').first).width;
+    final chipWidth = tester.getSize(find.text('accent*').first).width;
+
+    expect(titleWidth, greaterThan(chipWidth));
+    // Not truncated: the full title is laid out, not clipped to a share.
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('below the side-by-side breakpoint, settings and code collapse into two tabs', (tester) async {

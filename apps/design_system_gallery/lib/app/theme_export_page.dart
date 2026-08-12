@@ -17,11 +17,7 @@ import '../widgets/theme_studio/color_picker_tile.dart';
 /// the studio doesn't need to fit (e.g. wider component property names).
 const _kSettingsColumnWidth = 360.0;
 
-/// Width of the link-toggle strip between the light and dark columns —
-/// matches the middle column width [ExportColumnRow] itself uses.
-const _kLinkColumnWidth = 40.0;
-
-const _kSettingsWidth = _kSettingsColumnWidth * 2 + _kLinkColumnWidth;
+const _kSettingsWidth = _kSettingsColumnWidth * 2 + kExportLinkColumnWidth;
 
 /// The code pane's floor in the side-by-side layout — it's handed
 /// everything left over after the (fixed-width) settings columns, down to
@@ -161,7 +157,7 @@ class _SettingsColumns extends StatelessWidget {
     // intrinsic dimensions through one. See isColorPickerTileCompact.
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columnWidth = (constraints.maxWidth - spacing.md * 2 - _kLinkColumnWidth) / 2;
+        final columnWidth = (constraints.maxWidth - spacing.md * 2 - kExportLinkColumnWidth) / 2;
         final compact = isColorPickerTileCompact(columnWidth, spacing);
         final rows = _buildRows(context, spacing, compact);
 
@@ -208,7 +204,8 @@ class _SettingsColumns extends StatelessWidget {
     }
 
     for (final component in export.activeComponentThemes) {
-      final descriptor = componentThemeDescriptors.firstWhere((d) => d.name == component);
+      final descriptor = componentThemeDescriptorOrNull(component);
+      if (descriptor == null) continue;
       rows.add(_SectionHeader(title: descriptor.name, subtitle: descriptor.themeParameterName));
       rows.add(spacer(spacing.sm));
       rows.addAll(
@@ -277,7 +274,10 @@ class _SectionHeader extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.sm),
       child: Row(
         children: [
-          Flexible(
+          // Expanded, not Flexible: two Flexible children split the free
+          // space evenly, which capped the title at ~half the row and
+          // ellipsized it while the chip beside it sat in unused space.
+          Expanded(
             child: Text(
               title,
               maxLines: 1,
@@ -286,7 +286,10 @@ class _SectionHeader extends StatelessWidget {
             ),
           ),
           SizedBox(width: spacing.xs + spacing.xxs),
+          // flex: 0 sizes the chip to its content instead of claiming a
+          // share of the row, leaving the rest to the title.
           Flexible(
+            flex: 0,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 1),
               decoration: BoxDecoration(

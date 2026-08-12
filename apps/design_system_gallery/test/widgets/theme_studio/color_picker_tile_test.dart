@@ -181,6 +181,44 @@ void main() {
     expect(tester.getSize(find.byKey(defaultKey)).height, tester.getSize(find.byKey(customKey)).height);
   });
 
+  // The tile is one tappable InkWell, so its rows merge into a single
+  // semantics node whose label concatenates them (e.g.
+  // "accentError\ndefault\n#AABBCC"). Hence a RegExp: matching by exact
+  // String would never hit an individual row's text.
+  testWidgets('a customized tile does not announce "default" to a screen reader', (tester) async {
+    // Disposed inline rather than via addTearDown: the binding's
+    // "SemanticsHandle was active at the end of the test" check runs before
+    // addTearDown callbacks do.
+    final handle = tester.ensureSemantics();
+
+    await pump(
+      tester,
+      ColorPickerTile(label: 'accentError', color: const Color(0xFFAABBCC), onColorChanged: (_) {}),
+    );
+
+    // The caption stays in the widget tree (it reserves height so default
+    // and customized tiles align), but must be out of the semantics tree.
+    expect(find.text('default'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('default')), findsNothing);
+    // The rest of the tile is still announced.
+    expect(find.bySemanticsLabel(RegExp('accentError')), findsOneWidget);
+
+    handle.dispose();
+  });
+
+  testWidgets('a default tile does announce "default"', (tester) async {
+    final handle = tester.ensureSemantics();
+
+    await pump(
+      tester,
+      ColorPickerTile(label: 'accentError', color: const Color(0xFFAABBCC), isDefault: true, onColorChanged: (_) {}),
+    );
+
+    expect(find.bySemanticsLabel(RegExp('default')), findsOneWidget);
+
+    handle.dispose();
+  });
+
   group('isColorPickerTileCompact', () {
     const spacing = StreamSpacing();
 

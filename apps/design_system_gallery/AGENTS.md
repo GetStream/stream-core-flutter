@@ -58,7 +58,9 @@ apps/design_system_gallery/
 │   ├── config/
 │   │   ├── theme_color_slot.dart         # ThemeColorSlot/ThemeSeedSlot enums (source of truth for colors)
 │   │   ├── theme_studio_sections.dart    # Section/group layout shared by the panel, export page & codegen
+│   │   ├── component_theme_descriptors.dart # Editable Color props per component theme + name lookup
 │   │   ├── theme_configuration.dart      # Theme state (colors, brightness, etc.)
+│   │   ├── theme_export_configuration.dart # Export page state: a light + dark config, plus link state
 │   │   └── preview_configuration.dart    # Preview state (device, text scale)
 │   ├── core/
 │   │   ├── preview_wrapper.dart          # Wraps use cases with theme/device frame
@@ -69,7 +71,14 @@ apps/design_system_gallery/
 │       └── theme_export/                 # Export page widgets (linked color rows, message preview)
 ```
 
-The gallery also has a `test/` directory (`melos run test:flutter` picks it up automatically), currently covering `theme_color_slot.dart`'s coverage of `StreamColorScheme` and the code generator.
+The gallery also has a `test/` directory (`melos run test:flutter` picks it up automatically). It currently covers:
+
+- **`theme_color_slot.dart` vs. `StreamColorScheme`** — pins the slot list so an added SDK color fails loudly instead of being silently missed.
+- **Component themes** — that every `ComponentThemeDescriptor` matches the real `StreamTheme` API.
+- **`theme_export_configuration.dart`** — seeding from the studio, link/unlink semantics, and that export never writes back.
+- **`color_picker_tile.dart`** — the default/customized states, and that a tile keeps a constant height either way.
+- **The export page** — the light/dark columns, link toggles, the responsive side-by-side/tabs split, and the component theme picker.
+- **The code generator** — const naming (shared vs. `Light`/`Dark`-suffixed), chrome derivation, and a check that the generated snippet actually **type-checks against the real API** (`theme_code_generator_compiles_test.dart` writes it to a real `.dart` file and runs `dart analyze` over it).
 
 ## Common Commands
 

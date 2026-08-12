@@ -244,7 +244,9 @@ class ThemeConfiguration extends ChangeNotifier {
   Object? _buildComponentTheme(String name) {
     final values = _componentOverrides[name];
     if (values == null || values.isEmpty) return null;
-    final descriptor = componentThemeDescriptors.firstWhere((d) => d.name == name);
+    final descriptor = componentThemeDescriptorOrNull(name);
+    assert(descriptor != null, 'No ComponentThemeDescriptor named "$name"');
+    if (descriptor == null) return null;
     return descriptor.build(values);
   }
 

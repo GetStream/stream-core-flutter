@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stream_core_flutter/core.dart';
 
+/// Width of the strip between the light and dark halves — the link toggle
+/// column.
+///
+/// Shared with the export page, which subtracts it to work out each settings
+/// column's width: a second literal there could silently drift from this one
+/// and skew that calculation.
+const kExportLinkColumnWidth = 40.0;
+
 /// The shared building block for every row on the export page's settings
 /// columns: a light half and a dark half, each themed and painted with that
 /// side's own `backgroundApp` — so tile rows, section headers, group
@@ -48,7 +56,7 @@ class ExportColumnRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(child: _side(lightMaterialTheme, lightBuilder)),
-          SizedBox(width: 40, child: middle ?? const SizedBox.shrink()),
+          SizedBox(width: kExportLinkColumnWidth, child: middle ?? const SizedBox.shrink()),
           Expanded(child: _side(darkMaterialTheme, darkBuilder)),
         ],
       ),

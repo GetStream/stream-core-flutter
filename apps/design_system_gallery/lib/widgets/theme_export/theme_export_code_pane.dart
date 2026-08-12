@@ -71,6 +71,9 @@ class _ThemeExportCodePaneState extends State<ThemeExportCodePane> {
                       decoration: BoxDecoration(
                         color: colorScheme.backgroundElevation0,
                         borderRadius: BorderRadius.all(context.streamRadius.sm),
+                      ),
+                      foregroundDecoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(context.streamRadius.sm),
                         border: Border.all(color: colorScheme.borderSubtle),
                       ),
                       child: Scrollbar(

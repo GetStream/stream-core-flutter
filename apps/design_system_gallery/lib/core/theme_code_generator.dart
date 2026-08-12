@@ -80,10 +80,9 @@ String generateThemeCode({required ThemeExportSide light, required ThemeExportSi
     areEqual: _avatarPaletteEquals,
   );
 
-  // Component theme overrides apply identically to both sides today (the
-  // studio has no independent per-brightness editing surface for them), but
-  // are planned through the same shared/split machinery as everything else
-  // for consistency and to keep working if that ever changes.
+  // Component property colors are edited per brightness on the export page
+  // and start out unlinked, so light and dark routinely diverge here - they
+  // go through the same shared/split const planning as every other value.
   final componentPlans = <String, Map<String, _ConstPlan>>{
     for (final descriptor in componentThemeDescriptors)
       if (light.componentOverrides.containsKey(descriptor.name) || dark.componentOverrides.containsKey(descriptor.name))
