@@ -41,6 +41,8 @@ mixin _$StreamIcons {
       bolt: t < 0.5 ? a.bolt : b.bolt,
       camera: t < 0.5 ? a.camera : b.camera,
       cameraLarge: t < 0.5 ? a.cameraLarge : b.cameraLarge,
+      caretDown: t < 0.5 ? a.caretDown : b.caretDown,
+      caretUp: t < 0.5 ? a.caretUp : b.caretUp,
       checkmark: t < 0.5 ? a.checkmark : b.checkmark,
       checks: t < 0.5 ? a.checks : b.checks,
       chevronDown: t < 0.5 ? a.chevronDown : b.chevronDown,
@@ -157,6 +159,8 @@ mixin _$StreamIcons {
     IconData? bolt,
     IconData? camera,
     IconData? cameraLarge,
+    IconData? caretDown,
+    IconData? caretUp,
     IconData? checkmark,
     IconData? checks,
     IconData? chevronDown,
@@ -263,6 +267,8 @@ mixin _$StreamIcons {
       bolt: bolt ?? _this.bolt,
       camera: camera ?? _this.camera,
       cameraLarge: cameraLarge ?? _this.cameraLarge,
+      caretDown: caretDown ?? _this.caretDown,
+      caretUp: caretUp ?? _this.caretUp,
       checkmark: checkmark ?? _this.checkmark,
       checks: checks ?? _this.checks,
       chevronDown: chevronDown ?? _this.chevronDown,
@@ -383,6 +389,8 @@ mixin _$StreamIcons {
       bolt: other.bolt,
       camera: other.camera,
       cameraLarge: other.cameraLarge,
+      caretDown: other.caretDown,
+      caretUp: other.caretUp,
       checkmark: other.checkmark,
       checks: other.checks,
       chevronDown: other.chevronDown,
@@ -501,6 +509,8 @@ mixin _$StreamIcons {
         _other.bolt == _this.bolt &&
         _other.camera == _this.camera &&
         _other.cameraLarge == _this.cameraLarge &&
+        _other.caretDown == _this.caretDown &&
+        _other.caretUp == _this.caretUp &&
         _other.checkmark == _this.checkmark &&
         _other.checks == _this.checks &&
         _other.chevronDown == _this.chevronDown &&
@@ -611,6 +621,8 @@ mixin _$StreamIcons {
       _this.bolt,
       _this.camera,
       _this.cameraLarge,
+      _this.caretDown,
+      _this.caretUp,
       _this.checkmark,
       _this.checks,
       _this.chevronDown,

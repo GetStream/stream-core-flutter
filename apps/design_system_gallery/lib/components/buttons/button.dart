@@ -158,6 +158,7 @@ Widget buildStreamButtonShowcase(BuildContext context) {
         children: const [
           _StyleTypeMatrixSection(),
           _SizeScaleSection(),
+          _GroupedButtonSection(),
           _ThemeOverrideSection(),
           _SelectedStateSection(),
           _RealWorldSection(),
@@ -484,6 +485,134 @@ class _SizeDemo extends StatelessWidget {
             color: colorScheme.textTertiary,
             fontFamily: 'monospace',
             fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Grouped Button Section
+// =============================================================================
+
+class _GroupedButtonSection extends StatelessWidget {
+  const _GroupedButtonSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing.md,
+      children: const [
+        _SectionLabel(label: 'GROUPED BUTTON'),
+        _ExampleCard(
+          title: 'Call Control',
+          description: 'A medium action pill with an xsmall menu affordance nested into its trailing padding',
+          child: _GroupedButtonRow(),
+        ),
+      ],
+    );
+  }
+}
+
+class _GroupedButtonRow extends StatelessWidget {
+  const _GroupedButtonRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _GroupedCallButton(caption: 'default'),
+        _GroupedCallButton(caption: 'selected', isSelected: true),
+        _GroupedCallButton(caption: 'error', hasError: true),
+      ],
+    );
+  }
+}
+
+/// The action and its menu affordance are one 68x40 pill: the caret sits in the
+/// pill's trailing padding, so the action's ink still covers the full width.
+///
+/// Two details make that work. `mergeSemantics: false` stops the pill folding
+/// the caret's label and tap action into its own semantics node, which would
+/// leave the caret unreachable to a screen reader. And both buttons shrink-wrap
+/// their tap targets, so the pill measures exactly as designed and the error
+/// badge's offsets stay literal — the trade is Material's 48px minimum target,
+/// which a 40px pill with a 24px affordance cannot honour anyway.
+class _GroupedCallButton extends StatelessWidget {
+  const _GroupedCallButton({
+    required this.caption,
+    this.isSelected = false,
+    this.hasError = false,
+  });
+
+  final String caption;
+  final bool isSelected;
+  final bool hasError;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final icons = context.streamIcons;
+    final spacing = context.streamSpacing;
+
+    void report(String message) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(message), duration: const Duration(seconds: 1)),
+        );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Tooltip(
+              message: 'Turn off camera',
+              child: StreamButton(
+                style: StreamButtonStyle.secondary,
+                isSelected: isSelected ? true : null,
+                mergeSemantics: false,
+                themeStyle: StreamButtonThemeStyle(
+                  iconSize: .all(16),
+                  tapTargetSize: .shrinkWrap,
+                  padding: .all(EdgeInsetsDirectional.only(start: spacing.sm, end: spacing.xs)),
+                ),
+                iconRight: StreamButton.icon(
+                  icon: Icon(icons.caretUp),
+                  style: StreamButtonStyle.secondary,
+                  size: StreamButtonSize.xsmall,
+                  tooltip: 'Camera options',
+                  themeStyle: const StreamButtonThemeStyle(tapTargetSize: .shrinkWrap),
+                  onPressed: () => report('Camera options'),
+                ),
+                onPressed: () => report('Camera toggled'),
+                child: Icon(icons.videoFill),
+              ),
+            ),
+            if (hasError)
+              PositionedDirectional(
+                top: -spacing.xxs,
+                end: -spacing.xxs,
+                child: StreamErrorBadge(size: StreamErrorBadgeSize.sm),
+              ),
+          ],
+        ),
+        SizedBox(height: spacing.sm),
+        Text(
+          caption,
+          style: textTheme.metadataEmphasis.copyWith(
+            color: colorScheme.accentPrimary,
+            fontFamily: 'monospace',
           ),
         ),
       ],

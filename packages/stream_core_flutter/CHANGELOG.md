@@ -16,6 +16,8 @@
 - Added `chipStyle` to `StreamReactionsThemeData` for overriding the per-reaction chip appearance (background, size, etc.); it is merged over the default reaction chip style.
 - Added `StreamMessagePresentation` and `StreamMessageLayoutData.presentation`, describing whether a message is drawn inline in the list (`standard`) or as a preview above a scrim (`preview`, e.g. the long-press message-actions modal). Read it with `StreamMessageLayout.presentationOf(context)`, or resolve per-presentation styling through `StreamMessageLayoutProperty.resolveWith`. For `preview`, the default metadata (username, timestamp, edited, status), annotation (text, icon, trailing) and replies-label colors now resolve to `StreamColorScheme.textOnAccent` so they stay legible against `StreamColorScheme.backgroundScrim`. Also added `StreamMessageLayoutData.copyWith`.
 - `StreamNetworkImage` now caches through a shared cache manager which, on IO platforms, is stored in its own app-scoped directory (isolated from the host app's image cache) with LRU eviction, while other platforms fall back to the library defaults.
+- Added `StreamButtonSize.xsmall` (24px), for a control nested inside another control such as the menu affordance of a grouped button. It is the only size that also retunes its content: 16px icons and a `captionEmphasis` label with `spacing.sm` horizontal padding, where the larger sizes keep 20px icons, `bodyEmphasis` and `spacing.md`.
+- Added `mergeSemantics` (default `true`) to the default `StreamButton` constructor. Set it to false when `iconLeft` or `iconRight` holds a control that handles its own input, so that control keeps its own semantics node instead of being folded into the button's.
 
 ### 🐛 Bug Fixes
 

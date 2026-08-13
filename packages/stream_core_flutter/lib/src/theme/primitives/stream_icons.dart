@@ -73,6 +73,8 @@ class StreamIcons with _$StreamIcons {
     this.bolt = StreamIconData.bolt,
     this.camera = StreamIconData.camera,
     this.cameraLarge = StreamIconData.cameraLarge,
+    this.caretDown = StreamIconData.caretDown,
+    this.caretUp = StreamIconData.caretUp,
     this.checkmark = StreamIconData.checkmark,
     this.checks = StreamIconData.checks,
     this.chevronDown = StreamIconData.chevronDown,
@@ -206,6 +208,12 @@ class StreamIcons with _$StreamIcons {
 
   /// The camera large icon.
   final IconData cameraLarge;
+
+  /// The caret down icon.
+  final IconData caretDown;
+
+  /// The caret up icon.
+  final IconData caretUp;
 
   /// The checkmark icon.
   final IconData checkmark;
@@ -495,6 +503,8 @@ class StreamIcons with _$StreamIcons {
     'bolt': bolt,
     'camera': camera,
     'cameraLarge': cameraLarge,
+    'caretDown': caretDown,
+    'caretUp': caretUp,
     'checkmark': checkmark,
     'checks': checks,
     'chevronDown': chevronDown,

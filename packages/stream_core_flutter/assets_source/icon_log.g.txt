@@ -99,3 +99,5 @@ xmark-small;2026414
 unsupported-attachment;2026416
 megaphone;2026610
 shield;2026610
+caret-down;2026813
+caret-up;2026813

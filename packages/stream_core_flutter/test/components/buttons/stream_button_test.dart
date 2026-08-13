@@ -249,6 +249,157 @@ void main() {
     });
   });
 
+  group('StreamButtonSize.xsmall', () {
+    /// The [ButtonStyle] the button hands to its [ElevatedButton].
+    ButtonStyle styleOf(WidgetTester tester) {
+      return tester.widget<ElevatedButton>(find.byType(ElevatedButton)).style!;
+    }
+
+    testWidgets('icon button is 24x24 with a 16px icon', (tester) async {
+      double? capturedIconSize;
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamButton.icon(
+            size: StreamButtonSize.xsmall,
+            onPressed: () {},
+            icon: Builder(
+              builder: (context) {
+                capturedIconSize = IconTheme.of(context).size;
+                return const Icon(Icons.add);
+              },
+            ),
+          ),
+        ),
+      );
+
+      // The visual pill, not the padded tap target around it.
+      expect(
+        tester.getSize(find.descendant(of: find.byType(StreamButton), matching: find.byType(Material)).first),
+        const Size.square(24),
+      );
+      expect(capturedIconSize, 16);
+    });
+
+    testWidgets('labelled button uses captionEmphasis and 12px horizontal padding', (tester) async {
+      final streamTheme = StreamTheme();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          streamTheme: streamTheme,
+          StreamButton(
+            size: StreamButtonSize.xsmall,
+            onPressed: () {},
+            child: const Text('Label'),
+          ),
+        ),
+      );
+
+      expect(styleOf(tester).textStyle?.resolve({}), streamTheme.textTheme.captionEmphasis);
+      expect(
+        styleOf(tester).padding?.resolve({}),
+        EdgeInsets.symmetric(horizontal: streamTheme.spacing.sm),
+      );
+    });
+
+    // Regression guard: xsmall is the only size that retunes icon size, text
+    // style and padding, so a future edit must not collapse it onto the rest.
+    testWidgets('leaves the larger sizes alone', (tester) async {
+      final streamTheme = StreamTheme();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          streamTheme: streamTheme,
+          StreamButton(
+            onPressed: () {},
+            child: const Text('Label'),
+          ),
+        ),
+      );
+
+      expect(styleOf(tester).iconSize?.resolve({}), 20);
+      expect(styleOf(tester).textStyle?.resolve({}), streamTheme.textTheme.bodyEmphasis);
+      expect(
+        styleOf(tester).padding?.resolve({}),
+        EdgeInsets.symmetric(horizontal: streamTheme.spacing.md),
+      );
+    });
+  });
+
+  group('StreamButton mergeSemantics', () {
+    /// A grouped button: a main action with a smaller menu affordance nested
+    /// into its trailing edge, as the design system's grouped button draws it.
+    Widget grouped({
+      required bool mergeSemantics,
+      VoidCallback? onMainPressed,
+      VoidCallback? onMenuPressed,
+    }) {
+      return StreamButton(
+        isSelected: true,
+        mergeSemantics: mergeSemantics,
+        iconRight: StreamButton.icon(
+          icon: const Icon(Icons.arrow_drop_up),
+          size: StreamButtonSize.xsmall,
+          tooltip: 'Camera options',
+          onPressed: onMenuPressed ?? () {},
+        ),
+        onPressed: onMainPressed ?? () {},
+        child: const Text('Camera'),
+      );
+    }
+
+    testWidgets('folds a nested button into the outer node by default', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(_withStreamTheme(grouped(mergeSemantics: true)));
+
+      // Same node: the affordance is unreachable to assistive technologies.
+      expect(
+        tester.getSemantics(find.byType(StreamButton).last).id,
+        tester.getSemantics(find.byType(StreamButton).first).id,
+      );
+
+      handle.dispose();
+    });
+
+    testWidgets('leaves a nested button its own node when false', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(_withStreamTheme(grouped(mergeSemantics: false)));
+
+      final outer = tester.getSemantics(find.byType(StreamButton).first);
+      final inner = tester.getSemantics(find.byType(StreamButton).last);
+
+      expect(inner.id, isNot(outer.id));
+      expect(inner, isSemantics(tooltip: 'Camera options', isButton: true, hasTapAction: true));
+      // The outer button must not lose its own state by opting out of merging.
+      expect(outer, isSemantics(isSelected: true, hasSelectedState: true, hasTapAction: true));
+
+      handle.dispose();
+    });
+
+    testWidgets('the nested button handles its own taps', (tester) async {
+      var mainPresses = 0;
+      var menuPresses = 0;
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          grouped(
+            mergeSemantics: false,
+            onMainPressed: () => mainPresses++,
+            onMenuPressed: () => menuPresses++,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.arrow_drop_up));
+      await tester.pumpAndSettle();
+
+      expect(menuPresses, 1);
+      expect(mainPresses, 0);
+    });
+  });
+
   // Test for https://github.com/GetStream/stream-chat-flutter/issues/2786
   testWidgets(
     'host-app ElevatedButtonThemeData.iconColor does not leak into StreamButton icons',

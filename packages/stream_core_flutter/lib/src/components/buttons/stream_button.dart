@@ -59,6 +59,26 @@ import '../../theme/stream_theme_extensions.dart';
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// Group a smaller button into a larger one's trailing edge, keeping it
+/// separately reachable by assistive technologies:
+///
+/// ```dart
+/// StreamButton(
+///   mergeSemantics: false,
+///   iconRight: StreamButton.icon(
+///     icon: const Icon(Icons.arrow_drop_up),
+///     size: StreamButtonSize.xsmall,
+///     tooltip: 'Camera options',
+///     onPressed: () => showCameraOptions(),
+///   ),
+///   onPressed: () => toggleCamera(),
+///   child: const Icon(Icons.videocam),
+/// )
+/// ```
+/// {@end-tool}
+///
 /// See also:
 ///
 ///  * [StreamButton.icon], for a circular icon-only button.
@@ -83,6 +103,7 @@ class StreamButton extends StatelessWidget {
     bool? isFloating,
     bool? isSelected,
     bool autofocus = false,
+    bool mergeSemantics = true,
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
          child: child,
@@ -95,6 +116,7 @@ class StreamButton extends StatelessWidget {
          isFloating: isFloating,
          isSelected: isSelected,
          autofocus: autofocus,
+         mergeSemantics: mergeSemantics,
          themeStyle: themeStyle,
        );
 
@@ -176,6 +198,7 @@ class StreamButtonProps {
     this.isFloating,
     this.isSelected,
     this.autofocus = false,
+    this.mergeSemantics = true,
     this.tooltip,
     this.themeStyle,
   });
@@ -239,6 +262,15 @@ class StreamButtonProps {
   /// When false, the button uses normal focus traversal.
   final bool autofocus;
 
+  /// Whether to collapse the button's subtree into a single semantics node.
+  ///
+  /// Set this to false when [iconLeft] or [iconRight] holds a control that
+  /// handles its own input, such as the menu affordance of a grouped button.
+  /// Merging would fold that control's label and tap action into the button's
+  /// own node, leaving it unreachable to assistive technologies.
+  /// When true, the button reports itself as one node.
+  final bool mergeSemantics;
+
   /// Text shown in a [Tooltip] on hover / long-press, and used as the
   /// button's accessibility label.
   ///
@@ -284,12 +316,22 @@ enum StreamButtonType {
 
 /// Predefined sizes for [StreamButton].
 ///
-/// Each size corresponds to a specific dimension in logical pixels.
+/// Each size corresponds to a specific dimension in logical pixels. Most sizes
+/// differ only in that dimension, but [xsmall] also renders its icons and its
+/// label smaller — see its documentation for the exact values.
 ///
 /// See also:
 ///
 ///  * [StreamButtonThemeData], for setting global button styles.
 enum StreamButtonSize {
+  /// Extra-small button (24px).
+  ///
+  /// Renders icons at 16px and labels with [StreamTextTheme.captionEmphasis],
+  /// where the larger sizes use 20px icons and [StreamTextTheme.bodyEmphasis].
+  /// Intended for a control nested inside another control, such as the menu
+  /// affordance of a grouped button.
+  xsmall(24),
+
   /// Small button (32px).
   small(32),
 
@@ -349,6 +391,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
   @override
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
+    final textTheme = context.streamTextTheme;
     final buttonTheme = context.streamButtonTheme;
 
     final inheritedStyle = switch ((props.style, props.type)) {
@@ -383,8 +426,18 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
     final effectiveBorderColor = themeStyle?.borderColor ?? defaults.borderColor;
     final effectiveOverlayColor = themeStyle?.overlayColor ?? defaults.overlayColor;
     final effectiveElevation = themeStyle?.elevation ?? defaults.elevation;
-    final effectiveIconSize = themeStyle?.iconSize ?? defaults.iconSize;
-    final effectiveTextStyle = themeStyle?.textStyle ?? defaults.textStyle;
+    final effectiveIconSize =
+        themeStyle?.iconSize ??
+        switch (props.size) {
+          .xsmall => const WidgetStatePropertyAll<double>(16),
+          .small || .medium || .large => defaults.iconSize,
+        };
+    final effectiveTextStyle =
+        themeStyle?.textStyle ??
+        switch (props.size) {
+          .xsmall => WidgetStatePropertyAll(textTheme.captionEmphasis),
+          .small || .medium || .large => defaults.textStyle,
+        };
     final effectiveShape = themeStyle?.shape ?? defaults.shape;
     final effectiveTapTargetSize = themeStyle?.tapTargetSize ?? defaults.tapTargetSize;
 
@@ -400,43 +453,51 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
     final effectivePadding =
         themeStyle?.padding ??
         switch (isIconButton) {
+          // Icon buttons are square: the fixed size plus a centered icon
+          // already produces the padding the design calls for.
           true => const WidgetStatePropertyAll(EdgeInsets.zero),
-          false => WidgetStatePropertyAll(.symmetric(horizontal: spacing.md)),
+          false => switch (props.size) {
+            .xsmall => WidgetStatePropertyAll(.symmetric(horizontal: spacing.sm)),
+            .small || .medium || .large => WidgetStatePropertyAll(.symmetric(horizontal: spacing.md)),
+          },
         };
 
-    Widget button = Semantics(
-      selected: props.isSelected,
-      child: ElevatedButton(
-        autofocus: props.autofocus,
-        onPressed: props.onPressed,
-        statesController: _statesController,
-        style: ButtonStyle(
-          tapTargetSize: effectiveTapTargetSize,
-          visualDensity: .standard,
-          textStyle: effectiveTextStyle,
-          iconSize: effectiveIconSize,
-          elevation: effectiveElevation,
-          backgroundColor: effectiveBackgroundColor,
-          foregroundColor: effectiveForegroundColor,
-          iconColor: effectiveForegroundColor,
-          overlayColor: effectiveOverlayColor,
-          fixedSize: effectiveFixedSize,
-          minimumSize: effectiveMinimumSize,
-          maximumSize: effectiveMaximumSize,
-          padding: effectivePadding,
-          alignment: effectiveAlignment,
-          shape: effectiveShape,
-          side: switch (effectiveBorderColor) {
-            final color? => .resolveWith(
-              (states) {
-                final resolvedColor = color.resolve(states);
-                if (resolvedColor == null) return null;
-                return BorderSide(color: resolvedColor);
-              },
-            ),
-            _ => null,
-          },
-        ),
+    Widget button = ElevatedButton(
+      autofocus: props.autofocus,
+      onPressed: props.onPressed,
+      statesController: _statesController,
+      style: ButtonStyle(
+        tapTargetSize: effectiveTapTargetSize,
+        visualDensity: .standard,
+        textStyle: effectiveTextStyle,
+        iconSize: effectiveIconSize,
+        elevation: effectiveElevation,
+        backgroundColor: effectiveBackgroundColor,
+        foregroundColor: effectiveForegroundColor,
+        iconColor: effectiveForegroundColor,
+        overlayColor: effectiveOverlayColor,
+        fixedSize: effectiveFixedSize,
+        minimumSize: effectiveMinimumSize,
+        maximumSize: effectiveMaximumSize,
+        padding: effectivePadding,
+        alignment: effectiveAlignment,
+        shape: effectiveShape,
+        side: switch (effectiveBorderColor) {
+          final color? => .resolveWith(
+            (states) {
+              final resolvedColor = color.resolve(states);
+              if (resolvedColor == null) return null;
+              return BorderSide(color: resolvedColor);
+            },
+          ),
+          _ => null,
+        },
+      ),
+      // The selected state is annotated inside the button so that it merges
+      // into the button's own semantics node, rather than forming a node of
+      // its own above it when mergeSemantics is false.
+      child: Semantics(
+        selected: props.isSelected,
         child: switch (isIconButton) {
           true => props.iconLeft,
           false => Row(
@@ -457,6 +518,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
       button = Tooltip(message: tooltip, child: button);
     }
 
+    if (!props.mergeSemantics) return button;
     return MergeSemantics(child: button);
   }
 }
