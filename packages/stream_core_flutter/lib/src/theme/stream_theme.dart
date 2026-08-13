@@ -218,7 +218,6 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
-      // ignore: deprecated_member_use_from_same_package
       brightness: effectiveBrightness,
       surfaceStyle: surfaceStyle,
       elevation: elevation,
