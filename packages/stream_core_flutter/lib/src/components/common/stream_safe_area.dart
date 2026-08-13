@@ -128,13 +128,14 @@ class StreamSafeArea extends StatelessWidget {
   /// sides that were avoided by this widget.
   final Widget child;
 
-  /// Drives the interpolation for [StreamSafeArea.driven]; null for the default.
+  // Drives the interpolation for [StreamSafeArea.driven]; null for the default.
   final ValueListenable<double>? _listenable;
 
-  /// The inset [StreamSafeArea.driven] interpolates toward at `1`.
+  // The inset [StreamSafeArea.driven] interpolates toward at `1`.
   final EdgeInsets _to;
 
-  /// The insets this widget applies for [context] with the given options —
+  /// The insets this widget applies for [context] with the given options.
+  ///
   /// `max(systemInset, minimum) + margin` on each edge. This is the full value;
   /// [StreamSafeArea.driven] interpolates it toward its target.
   ///
