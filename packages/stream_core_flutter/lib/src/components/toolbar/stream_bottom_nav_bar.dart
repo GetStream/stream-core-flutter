@@ -150,7 +150,7 @@ class StreamBottomNavBar extends StatelessWidget {
   /// The properties that configure this navigation bar.
   final StreamBottomNavBarProps props;
 
-  /// Resolves the surface style a nav bar renders with in [context].
+  /// The surface style this nav bar renders with in [context].
   ///
   /// Precedence: the per-instance [style], then the ambient
   /// [StreamBottomNavBarTheme] style, then the ambient [StreamSurfaceStyle].

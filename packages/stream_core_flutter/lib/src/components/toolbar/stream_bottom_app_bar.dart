@@ -88,7 +88,7 @@ class StreamBottomAppBar extends StatelessWidget implements PreferredSizeWidget 
   /// The properties that configure this bottom app bar.
   final StreamBottomAppBarProps props;
 
-  /// Resolves the surface style a bottom app bar renders with in [context].
+  /// The surface style this bottom app bar renders with in [context].
   ///
   /// Precedence: the per-instance [style], then the ambient
   /// [StreamBottomAppBarTheme] style, then the ambient [StreamSurfaceStyle].
