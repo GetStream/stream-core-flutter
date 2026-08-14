@@ -15,9 +15,9 @@ const _items = [
   ),
 ];
 
-Widget _withStreamTheme(Widget child, {StreamAppStyle appStyle = StreamAppStyle.regular}) {
+Widget _withStreamTheme(Widget child, {StreamSurfaceStyle surfaceStyle = StreamSurfaceStyle.regular}) {
   return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme(appStyle: appStyle)]),
+    theme: ThemeData(extensions: [StreamTheme(surfaceStyle: surfaceStyle)]),
     home: Scaffold(body: child),
   );
 }
@@ -63,7 +63,109 @@ void main() {
     );
   });
 
-  group('regular behavior', () {
+  group('item options', () {
+    testWidgets('selectedIcon falls back to icon when null', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home'),
+              StreamBottomNavBarItem(
+                icon: Icon(Icons.search_outlined),
+                selectedIcon: Icon(Icons.search),
+                label: 'Search',
+              ),
+            ],
+          ),
+        ),
+      );
+
+      // Item 0 is selected but sets no selectedIcon → its plain icon is shown.
+      expect(find.byIcon(Icons.home), findsOneWidget);
+    });
+
+    testWidgets('renders a Tooltip when an item sets tooltip', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home', tooltip: 'Go home'),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      expect(find.byTooltip('Go home'), findsOneWidget);
+    });
+
+    testWidgets('shows no tooltip for an empty tooltip string', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home', tooltip: ''),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      expect(find.byType(Tooltip), findsNothing);
+    });
+
+    testWidgets('announces semanticsLabel in place of the visible label', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(icon: Icon(Icons.home), label: 'Home', semanticsLabel: 'Home screen'),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      final tile = find.semantics.byPredicate((n) => n.label.contains('Tab 1 of 2'));
+      final label = tile.evaluate().single.label;
+
+      // The override is announced, and the visible "Home" label is excluded — so
+      // it isn't spoken a second time (only the one inside "Home screen" remains).
+      expect(label, contains('Home screen'));
+      expect(RegExp('Home').allMatches(label), hasLength(1));
+
+      handle.dispose();
+    });
+
+    testWidgets('forwards an item key to its tile', (tester) async {
+      const homeKey = ValueKey('home-tile');
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamBottomNavBar(
+            currentIndex: 0,
+            onTap: (_) {},
+            items: const [
+              StreamBottomNavBarItem(key: homeKey, icon: Icon(Icons.home), label: 'Home'),
+              StreamBottomNavBarItem(icon: Icon(Icons.search), label: 'Search'),
+            ],
+          ),
+        ),
+      );
+
+      expect(find.byKey(homeKey), findsOneWidget);
+    });
+  });
+
+  group('regular surfaceStyle', () {
     testWidgets('renders a docked bar with a top border and no gradient', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
@@ -71,7 +173,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomNavBarBehavior.regular,
+            style: const StreamBottomNavBarStyle(surfaceStyle: .regular),
           ),
         ),
       );
@@ -91,41 +193,7 @@ void main() {
     });
   });
 
-  group('floating behavior', () {
-    testWidgets('renders a pill container instead of a BottomNavigationBar', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          StreamBottomNavBar(
-            items: _items,
-            currentIndex: 0,
-            onTap: (_) {},
-            behavior: StreamBottomNavBarBehavior.floating,
-          ),
-        ),
-      );
-
-      expect(find.byType(BottomNavigationBar), findsNothing);
-      expect(find.text('Chats'), findsOneWidget);
-    });
-
-    testWidgets('invokes onTap with the tapped index', (tester) async {
-      int? tappedIndex;
-      await tester.pumpWidget(
-        _withStreamTheme(
-          StreamBottomNavBar(
-            items: _items,
-            currentIndex: 0,
-            onTap: (index) => tappedIndex = index,
-            behavior: StreamBottomNavBarBehavior.floating,
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Saved'));
-
-      expect(tappedIndex, equals(1));
-    });
-
+  group('floating surfaceStyle', () {
     testWidgets('renders a gradient background', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
@@ -133,7 +201,7 @@ void main() {
             items: _items,
             currentIndex: 0,
             onTap: (_) {},
-            behavior: StreamBottomNavBarBehavior.floating,
+            style: const StreamBottomNavBarStyle(surfaceStyle: .floating),
           ),
         ),
       );
@@ -151,13 +219,13 @@ void main() {
     });
   });
 
-  group('behavior resolution', () {
-    testWidgets('resolves behavior from StreamBottomNavBarTheme', (tester) async {
+  group('surfaceStyle resolution', () {
+    testWidgets('resolves surfaceStyle from StreamBottomNavBarTheme', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamBottomNavBarTheme(
             data: const StreamBottomNavBarThemeData(
-              style: StreamBottomNavBarStyle(behavior: StreamBottomNavBarBehavior.floating),
+              style: StreamBottomNavBarStyle(surfaceStyle: .floating),
             ),
             child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
           ),
@@ -172,25 +240,25 @@ void main() {
         _withStreamTheme(
           StreamBottomAppBarTheme(
             data: const StreamBottomAppBarThemeData(
-              style: StreamBottomAppBarStyle(behavior: StreamBottomAppBarBehavior.floating),
+              style: StreamBottomAppBarStyle(surfaceStyle: .floating),
             ),
             child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
           ),
         ),
       );
 
-      // The nav bar resolves only from its own theme and StreamAppStyle, so a
+      // The nav bar resolves only from its own theme and StreamSurfaceStyle, so a
       // floating StreamBottomAppBarTheme has no effect (defaults to regular).
       expect(_isFloating(tester), isFalse);
     });
 
-    testWidgets('falls back to the ambient StreamAppStyle when neither instance nor theme set a behavior', (
+    testWidgets('falls back to the ambient StreamSurfaceStyle when neither instance nor theme set a surfaceStyle', (
       tester,
     ) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
-          appStyle: StreamAppStyle.floating,
+          surfaceStyle: StreamSurfaceStyle.floating,
         ),
       );
 
@@ -240,5 +308,135 @@ void main() {
 
       handle.dispose();
     });
+  });
+
+  group('ripple surface', () {
+    Future<void> pumpBar(WidgetTester tester, {required StreamSurfaceStyle surfaceStyle, double deviceBottom = 34}) {
+      return tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme(surfaceStyle: surfaceStyle)]),
+          home: Builder(
+            builder: (context) {
+              final base = MediaQuery.of(context);
+              return MediaQuery(
+                data: base.copyWith(
+                  padding: EdgeInsets.only(bottom: deviceBottom),
+                  viewPadding: EdgeInsets.only(bottom: deviceBottom),
+                ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: StreamBottomNavBar(items: _items, currentIndex: 0, onTap: (_) {}),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    // A tile's ink paints on its nearest Material ancestor and is clipped to it,
+    // so that Material has to span the inset for a ripple to reach into it.
+    testWidgets('the docked ink surface spans the bottom inset', (tester) async {
+      await pumpBar(tester, surfaceStyle: StreamSurfaceStyle.regular);
+
+      final inkSurface = find.descendant(
+        of: find.byType(StreamBottomNavBar),
+        matching: find.byWidgetPredicate((widget) => widget is Material && widget.type == MaterialType.transparency),
+      );
+
+      // deviceBottom defaults to 34 in pumpBar.
+      expect(tester.getSize(inkSurface.first).height, kStreamBottomNavBarHeight + 34);
+    });
+
+    testWidgets('the floating pill is its own ink surface', (tester) async {
+      await pumpBar(tester, surfaceStyle: StreamSurfaceStyle.floating);
+
+      // No transparent surface inside the pill — ripples paint on the pill
+      // itself, which clips them to its rounded shape.
+      final pill = find.byWidgetPredicate(
+        (widget) => widget is Material && widget.shape is RoundedRectangleBorder,
+      );
+
+      expect(
+        find.descendant(
+          of: pill,
+          matching: find.byWidgetPredicate((widget) => widget is Material && widget.type == MaterialType.transparency),
+        ),
+        findsNothing,
+      );
+    });
+  });
+
+  group('floating pill margin', () {
+    // The pill is the only Material carrying a RoundedRectangleBorder shape.
+    final pillFinder = find.byWidgetPredicate(
+      (widget) => widget is Material && widget.shape is RoundedRectangleBorder,
+    );
+
+    Future<void> pumpFloating(WidgetTester tester, {required double deviceBottom}) {
+      return tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme(surfaceStyle: StreamSurfaceStyle.floating)]),
+          home: Builder(
+            builder: (context) {
+              final base = MediaQuery.of(context);
+              return MediaQuery(
+                data: base.copyWith(
+                  padding: EdgeInsets.only(bottom: deviceBottom),
+                  viewPadding: EdgeInsets.only(bottom: deviceBottom),
+                ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: StreamBottomNavBar(
+                    items: _items,
+                    currentIndex: 0,
+                    onTap: (_) {},
+                    style: const StreamBottomNavBarStyle(surfaceStyle: .floating),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    double gapBelowPill(WidgetTester tester) {
+      final barBottom = tester.getRect(find.byType(StreamBottomNavBar)).bottom;
+      final pillBottom = tester.getRect(pillFinder).bottom;
+      return barBottom - pillBottom;
+    }
+
+    // Representative bottom system insets (viewPadding.bottom) per navigation
+    // mode. The pill clears the system inset by a margin instead of flooring its
+    // gap at a fixed value, so a device that reserves nothing (non-edge-to-edge,
+    // inset 0) keeps just the margin rather than stacking a gap above a bar the
+    // window never extends behind. Apple platforms place the pill directly on
+    // the inset, but only when there is one to rest on. Gap = inset + margin.
+    const navigationModes = <String, double>{
+      'no inset': 0,
+      'Android gesture (floating) nav': 24,
+      'iOS home indicator': 34,
+      'Android 2- and 3-button nav': 48,
+    };
+
+    for (final MapEntry(key: mode, value: inset) in navigationModes.entries) {
+      testWidgets(
+        'clears the bottom inset by its margin — $mode ($inset)',
+        (tester) async {
+          await pumpFloating(tester, deviceBottom: inset);
+
+          const spacing = StreamSpacing();
+          final platform = Theme.of(tester.element(find.byType(StreamBottomNavBar))).platform;
+          final margin = switch (platform) {
+            TargetPlatform.iOS || TargetPlatform.macOS when inset > 0 => spacing.none,
+            _ => spacing.md,
+          };
+
+          expect(gapBelowPill(tester), moreOrLessEquals(inset + margin, epsilon: 0.5));
+        },
+        variant: const TargetPlatformVariant({TargetPlatform.iOS, TargetPlatform.android}),
+      );
+    }
   });
 }

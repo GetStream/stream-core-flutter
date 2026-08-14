@@ -175,7 +175,7 @@ class StreamAvatarProps {
   /// Whether this avatar is in a floating state, rendering with a drop shadow.
   ///
   /// When true, the elevation is taken from [StreamAvatarThemeData.floatingElevation],
-  /// falling back to `3`. When false or null (resolved to false), no shadow is shown.
+  /// falling back to `6`. When false or null (resolved to false), no shadow is shown.
   final bool? isFloating;
 
   /// Screen-reader label for the avatar.
@@ -320,7 +320,7 @@ class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
   final StreamElevation _elevation;
 
   @override
-  double get floatingElevation => _elevation.level2;
+  double get floatingElevation => _elevation.level3;
 
   @override
   StreamAvatarSize get size => StreamAvatarSize.lg;

@@ -5,39 +5,21 @@ import 'package:stream_core_flutter/core.dart';
 
 const _kBarWidth = 390.0;
 
-const _items = [
-  StreamBottomNavBarItem(
-    icon: Icon(Icons.chat_bubble_outline),
-    selectedIcon: Icon(Icons.chat_bubble),
-    label: 'Chats',
-  ),
-  StreamBottomNavBarItem(
-    icon: Icon(Icons.alternate_email),
-    selectedIcon: Icon(Icons.alternate_email),
-    label: 'Mentions',
-  ),
-  StreamBottomNavBarItem(
-    icon: Icon(Icons.person_outline),
-    selectedIcon: Icon(Icons.person),
-    label: 'Profile',
-  ),
-];
-
 void main() {
-  group('StreamBottomNavBar Golden Tests', () {
+  group('StreamBottomAppBar Golden Tests', () {
     goldenTest(
       'renders regular variants',
-      fileName: 'stream_bottom_nav_bar_regular',
+      fileName: 'stream_bottom_app_bar_regular',
       builder: () => GoldenTestGroup(
         scenarioConstraints: const BoxConstraints(maxWidth: _kBarWidth),
         children: [
           GoldenTestScenario(
             name: 'light',
-            child: _buildNavBarInTheme(_regularBar()),
+            child: _buildBarInTheme(_bar(StreamSurfaceStyle.regular)),
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: _buildNavBarInTheme(_regularBar(), brightness: Brightness.dark),
+            child: _buildBarInTheme(_bar(StreamSurfaceStyle.regular), brightness: Brightness.dark),
           ),
         ],
       ),
@@ -45,17 +27,17 @@ void main() {
 
     goldenTest(
       'renders floating variants',
-      fileName: 'stream_bottom_nav_bar_floating',
+      fileName: 'stream_bottom_app_bar_floating',
       builder: () => GoldenTestGroup(
         scenarioConstraints: const BoxConstraints(maxWidth: _kBarWidth),
         children: [
           GoldenTestScenario(
             name: 'light',
-            child: _buildFloatingNavBarInTheme(_floatingBar()),
+            child: _buildFloatingBarInTheme(_bar(StreamSurfaceStyle.floating)),
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: _buildFloatingNavBarInTheme(_floatingBar(), brightness: Brightness.dark),
+            child: _buildFloatingBarInTheme(_bar(StreamSurfaceStyle.floating), brightness: Brightness.dark),
           ),
         ],
       ),
@@ -63,55 +45,47 @@ void main() {
   });
 }
 
-Widget _regularBar() {
-  return StreamBottomNavBar(
-    items: _items,
-    currentIndex: 0,
-    onTap: (_) {},
-    style: const StreamBottomNavBarStyle(surfaceStyle: .regular),
+Widget _bar(StreamSurfaceStyle surfaceStyle) {
+  final floating = surfaceStyle.isFloating;
+  final type = floating ? StreamButtonType.outline : StreamButtonType.ghost;
+  return StreamBottomAppBar(
+    style: StreamBottomAppBarStyle(surfaceStyle: surfaceStyle),
+    leading: StreamButton.icon(
+      icon: const Icon(Icons.share),
+      type: type,
+      isFloating: floating,
+      onPressed: () {},
+    ),
+    title: const Text('1 of 9'),
+    subtitle: const Text('Tap to share'),
+    trailing: StreamButton.icon(
+      icon: const Icon(Icons.grid_view),
+      type: type,
+      isFloating: floating,
+      onPressed: () {},
+    ),
   );
 }
 
-Widget _floatingBar() {
-  return StreamBottomNavBar(
-    items: _items,
-    currentIndex: 1,
-    onTap: (_) {},
-    style: const StreamBottomNavBarStyle(surfaceStyle: .floating),
-  );
-}
-
-Widget _buildNavBarInTheme(
-  Widget navBar, {
-  Brightness brightness = Brightness.light,
-}) {
+Widget _buildBarInTheme(Widget bar, {Brightness brightness = Brightness.light}) {
   final streamTheme = StreamTheme(brightness: brightness);
   return Theme(
-    data: ThemeData(
-      brightness: brightness,
-      extensions: [streamTheme],
-    ),
+    data: ThemeData(brightness: brightness, extensions: [streamTheme]),
     child: Builder(
       builder: (context) => Material(
         color: StreamTheme.of(context).colorScheme.backgroundApp,
-        child: SizedBox(width: _kBarWidth, child: navBar),
+        child: SizedBox(width: _kBarWidth, child: bar),
       ),
     ),
   );
 }
 
-/// Wraps a floating [StreamBottomNavBar] over a content gradient so the fade is
-/// clearly visible in the snapshot.
-Widget _buildFloatingNavBarInTheme(
-  Widget navBar, {
-  Brightness brightness = Brightness.light,
-}) {
+/// Wraps a floating [StreamBottomAppBar] over a content gradient so the upward
+/// fade is clearly visible in the snapshot.
+Widget _buildFloatingBarInTheme(Widget bar, {Brightness brightness = Brightness.light}) {
   final streamTheme = StreamTheme(brightness: brightness);
   return Theme(
-    data: ThemeData(
-      brightness: brightness,
-      extensions: [streamTheme],
-    ),
+    data: ThemeData(brightness: brightness, extensions: [streamTheme]),
     child: Builder(
       builder: (context) {
         final colorScheme = StreamTheme.of(context).colorScheme;
@@ -134,7 +108,7 @@ Widget _buildFloatingNavBarInTheme(
                   ),
                 ),
               ),
-              Positioned(bottom: 0, left: 0, right: 0, child: navBar),
+              Positioned(bottom: 0, left: 0, right: 0, child: bar),
             ],
           ),
         );

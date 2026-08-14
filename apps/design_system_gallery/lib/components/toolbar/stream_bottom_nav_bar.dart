@@ -81,7 +81,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
         items: items,
         currentIndex: currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
-        behavior: floating ? StreamBottomNavBarBehavior.floating : StreamBottomNavBarBehavior.regular,
+        style: StreamBottomNavBarStyle(surfaceStyle: floating ? .floating : .regular),
       ),
     );
   }
@@ -131,7 +131,7 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
                 items: items,
                 currentIndex: _regularIndex,
                 onTap: (index) => setState(() => _regularIndex = index),
-                behavior: StreamBottomNavBarBehavior.regular,
+                style: const StreamBottomNavBarStyle(surfaceStyle: .regular),
               ),
             ),
             SizedBox(height: spacing.md),
@@ -142,7 +142,7 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
                   items: items,
                   currentIndex: _floatingIndex,
                   onTap: (index) => setState(() => _floatingIndex = index),
-                  behavior: StreamBottomNavBarBehavior.floating,
+                  style: const StreamBottomNavBarStyle(surfaceStyle: .floating),
                 ),
               ),
             ),

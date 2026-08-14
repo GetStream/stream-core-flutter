@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_app_bar_theme.dart';
@@ -81,8 +80,9 @@ class StreamMediaViewerProps {
     this.showChrome = true,
   });
 
-  /// The media content. Inset to fit between [header] and [footer] (plus
-  /// the top / bottom safe-area insets) so chrome never overlaps it.
+  /// The media content. Extends full-bleed behind floating chrome; when the
+  /// chrome is regular it is inset to fit between [header] and [footer] (plus
+  /// the top / bottom safe-area insets) so the chrome never overlaps it.
   final Widget child;
 
   /// The top chrome — typically a [StreamAppBar]. Slides off-screen
@@ -96,7 +96,7 @@ class StreamMediaViewerProps {
   /// Whether the chrome (header / footer) is visible.
   ///
   /// When false, chrome slides off-screen and the background fades to
-  /// the immersive colour. The caller owns this state — typically a
+  /// the immersive color. The caller owns this state — typically a
   /// tap on the media toggles it.
   final bool showChrome;
 }
@@ -146,9 +146,22 @@ class DefaultStreamMediaViewer extends StatelessWidget {
       return scoped;
     }
 
+    // Resolve the chrome's floating state: media is full-bleed behind floating
+    // chrome, inset under docked chrome. Resolved from the chrome style then the
+    // ambient StreamSurfaceStyle — not from a per-instance style on the header /
+    // footer widget, so pin the surfaceStyle on the media-viewer theme to keep the
+    // inset and the chrome in sync.
+    final fallbackFloating = context.streamSurfaceStyle.isFloating;
+    final headerFloating = effectiveAppBarStyle?.surfaceStyle?.isFloating ?? fallbackFloating;
+    final footerFloating = effectiveBottomAppBarStyle?.surfaceStyle?.isFloating ?? fallbackFloating;
+
     final mediaQueryPadding = MediaQuery.paddingOf(context);
-    final headerInset = props.header?.let((it) => it.preferredSize.height + mediaQueryPadding.top) ?? 0.0;
-    final footerInset = props.footer?.let((it) => it.preferredSize.height + mediaQueryPadding.bottom) ?? 0.0;
+
+    final header = props.header?.preferredSize;
+    final footer = props.footer?.preferredSize;
+
+    final headerInset = (header == null || headerFloating) ? 0.0 : header.height + mediaQueryPadding.top;
+    final footerInset = (footer == null || footerFloating) ? 0.0 : footer.height + mediaQueryPadding.bottom;
 
     return AnimatedContainer(
       curve: Curves.easeInOut,

@@ -168,7 +168,7 @@ class StreamAvatarThemeData with _$StreamAvatarThemeData {
   /// The Material elevation applied to this avatar when it is floating.
   ///
   /// Used when [StreamAvatar.isFloating] (or [isFloating]) is true.
-  /// Falls back to the default elevation of `3`.
+  /// Falls back to the default elevation of `6`.
   final double? floatingElevation;
 
   /// Linearly interpolate between two [StreamAvatarThemeData] objects.

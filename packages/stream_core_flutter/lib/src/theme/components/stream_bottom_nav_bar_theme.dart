@@ -1,27 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../stream_surface_style.dart';
 import '../stream_theme.dart';
 
 part 'stream_bottom_nav_bar_theme.g.theme.dart';
-
-/// The floating or regular layout behaviour for a [StreamBottomNavBar].
-///
-/// When null on [StreamBottomNavBarStyle], the ambient [StreamAppStyle] is used
-/// as a fallback — [StreamAppStyle.floating] maps to [floating] and
-/// [StreamAppStyle.regular] maps to [regular].
-///
-/// See also:
-///
-///  * [StreamBottomNavBarStyle.behavior], which carries this value.
-///  * [StreamAppStyle], the global app-wide style that acts as fallback.
-enum StreamBottomNavBarBehavior {
-  /// The navigation bar sits within the layout flow with a solid background.
-  regular,
-
-  /// The navigation bar floats above the body as a pill over a gradient fade.
-  floating,
-}
 
 /// Applies a bottom navigation bar theme to descendant [StreamBottomNavBar]
 /// widgets.
@@ -32,7 +15,7 @@ enum StreamBottomNavBarBehavior {
 ///
 /// {@tool snippet}
 ///
-/// Override the selected item colour for a specific subtree:
+/// Override the selected item color for a specific subtree:
 ///
 /// ```dart
 /// StreamBottomNavBarTheme(
@@ -123,7 +106,7 @@ class StreamBottomNavBarThemeData with _$StreamBottomNavBarThemeData {
 /// Visual styling properties for a [StreamBottomNavBar].
 ///
 /// Defines the appearance of the navigation bar — the docked/floating
-/// behaviour, background colours, per-item selected and unselected colours,
+/// behaviour, background colors, per-item selected and unselected colors,
 /// icon size, item label styles, and the border and corner radius used by the
 /// floating pill.
 ///
@@ -152,7 +135,8 @@ class StreamBottomNavBarThemeData with _$StreamBottomNavBarThemeData {
 class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
   /// Creates a bottom navigation bar style with optional property overrides.
   const StreamBottomNavBarStyle({
-    this.behavior,
+    this.surfaceStyle,
+    this.floatingElevation,
     this.backgroundColor,
     this.floatingBackgroundColor,
     this.selectedItemColor,
@@ -164,23 +148,25 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
     this.borderRadius,
   });
 
-  /// The floating or regular layout behaviour for this navigation bar.
+  /// The floating or regular surface style for this navigation bar.
   ///
-  /// When null the value falls back to the ambient [StreamAppStyle]:
-  /// [StreamAppStyle.floating] → [StreamBottomNavBarBehavior.floating],
-  /// [StreamAppStyle.regular] → [StreamBottomNavBarBehavior.regular].
-  final StreamBottomNavBarBehavior? behavior;
+  /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
+  /// [StreamTheme].
+  final StreamSurfaceStyle? surfaceStyle;
 
-  /// The background colour of the docked bar and of the floating pill.
+  /// The elevation of the floating pill.
+  final double? floatingElevation;
+
+  /// The background color of the docked bar and of the floating pill.
   final Color? backgroundColor;
 
-  /// The base colour of the floating gradient fade behind the pill.
+  /// The background color shown behind the pill when floating.
   final Color? floatingBackgroundColor;
 
-  /// The colour of the icon and label of the selected item.
+  /// The color of the icon and label of the selected item.
   final Color? selectedItemColor;
 
-  /// The colour of the icon and label of unselected items.
+  /// The color of the icon and label of unselected items.
   final Color? unselectedItemColor;
 
   /// The size of each item's icon.
@@ -192,7 +178,7 @@ class StreamBottomNavBarStyle with _$StreamBottomNavBarStyle {
   /// The text style for the label of unselected items.
   final TextStyle? unselectedLabelStyle;
 
-  /// The colour of the docked bar's top border and the floating pill's border.
+  /// The color of the docked bar's top border and the floating pill's border.
   final Color? borderColor;
 
   /// The corner radius of the floating pill.

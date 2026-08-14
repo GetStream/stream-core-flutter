@@ -1,28 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../stream_surface_style.dart';
 import '../stream_theme.dart';
 import 'stream_button_theme.dart';
 
 part 'stream_app_bar_theme.g.theme.dart';
-
-/// The floating or regular layout behaviour for a [StreamAppBar].
-///
-/// When null on [StreamAppBarStyle], the ambient [StreamAppStyle] is used
-/// as a fallback — [StreamAppStyle.floating] maps to [floating] and
-/// [StreamAppStyle.regular] maps to [regular].
-///
-/// See also:
-///
-///  * [StreamAppBarStyle.behavior], which carries this value.
-///  * [StreamAppStyle], the global app-wide style that acts as fallback.
-enum StreamAppBarBehavior {
-  /// The app bar sits within the layout flow with a solid background.
-  regular,
-
-  /// The app bar floats above the body with a translucent background.
-  floating,
-}
 
 /// Applies an app bar theme to descendant [StreamAppBar] widgets.
 ///
@@ -125,7 +108,7 @@ class StreamAppBarThemeData with _$StreamAppBarThemeData {
 
 /// Visual styling properties for a [StreamAppBar].
 ///
-/// Defines the appearance of the app bar — background colour, padding,
+/// Defines the appearance of the app bar — background color, padding,
 /// inter-slot spacing, title and subtitle text styles, and per-slot button
 /// style propagation.
 ///
@@ -154,7 +137,7 @@ class StreamAppBarThemeData with _$StreamAppBarThemeData {
 class StreamAppBarStyle with _$StreamAppBarStyle {
   /// Creates an app bar style with optional property overrides.
   const StreamAppBarStyle({
-    this.behavior,
+    this.surfaceStyle,
     this.backgroundColor,
     this.floatingBackgroundColor,
     this.padding,
@@ -165,23 +148,21 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
     this.trailingStyle,
   });
 
-  /// The floating or regular layout behaviour for this app bar.
+  /// The floating or regular surface style for this app bar.
   ///
-  /// When null the value falls back to the ambient [StreamAppStyle]:
-  /// [StreamAppStyle.floating] → [StreamAppBarBehavior.floating],
-  /// [StreamAppStyle.regular] → [StreamAppBarBehavior.regular].
-  ///
-  /// Set this to override the global style for this component only, without
-  /// affecting other components.
-  final StreamAppBarBehavior? behavior;
+  /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
+  /// [StreamTheme].
+  final StreamSurfaceStyle? surfaceStyle;
 
-  /// The background colour of the app bar.
+  /// The background color of the app bar when docked.
+  ///
+  /// Ignored when floating — the floating style uses [floatingBackgroundColor].
   final Color? backgroundColor;
 
-  /// The background colour of the floating app bar.
+  /// The background color of the app bar when floating.
   final Color? floatingBackgroundColor;
 
-  /// The padding around the header's content row.
+  /// The padding around the bar's content row.
   final EdgeInsetsGeometry? padding;
 
   /// The horizontal space between the leading, heading, and trailing slots.

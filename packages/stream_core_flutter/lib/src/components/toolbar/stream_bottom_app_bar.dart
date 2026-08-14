@@ -6,8 +6,11 @@ import '../../theme/components/stream_button_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
+import '../../theme/stream_floating_fade.dart';
+import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
 import 'stream_toolbar.dart';
+import 'stream_toolbar_scope.dart';
 
 /// A bottom-of-screen toolbar for full-page surfaces in the Stream design
 /// system.
@@ -53,7 +56,7 @@ import 'stream_toolbar.dart';
 /// ## Theming
 ///
 /// [StreamBottomAppBar] uses [StreamBottomAppBarThemeData] for default
-/// styling — colours, padding, spacing, title text style, and per-slot
+/// styling — colors, padding, spacing, title text style, and per-slot
 /// button style propagation. Defaults are derived from [StreamColorScheme],
 /// [StreamTextTheme], and [StreamSpacing].
 ///
@@ -84,6 +87,23 @@ class StreamBottomAppBar extends StatelessWidget implements PreferredSizeWidget 
 
   /// The properties that configure this bottom app bar.
   final StreamBottomAppBarProps props;
+
+  /// The surface style this bottom app bar renders with in [context].
+  ///
+  /// Precedence: the per-instance [style], then the ambient
+  /// [StreamBottomAppBarTheme] style, then the ambient [StreamSurfaceStyle].
+  ///
+  /// Matches what the bar resolves for itself, so a page dropping one into a
+  /// [StreamScaffold] can pass the result as
+  /// [StreamScaffold.bottomSurfaceStyle] to lay out the slot to match.
+  static StreamSurfaceStyle resolveSurfaceStyle(
+    BuildContext context, {
+    StreamBottomAppBarStyle? style,
+  }) {
+    final themeStyle = context.streamBottomAppBarTheme.style;
+    final effective = themeStyle?.merge(style) ?? style;
+    return effective?.surfaceStyle ?? context.streamSurfaceStyle;
+  }
 
   @override
   Size get preferredSize => const Size.fromHeight(kStreamToolbarHeight);
@@ -186,10 +206,15 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    final style = context.streamBottomAppBarTheme.style?.merge(props.style) ?? props.style;
+    final bottomAppBarTheme = context.streamBottomAppBarTheme;
+
+    final style = bottomAppBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamBottomAppBarStyleDefaults(context);
 
+    final effectiveSurfaceStyle = StreamBottomAppBar.resolveSurfaceStyle(context, style: props.style);
+
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
     final effectivePadding = style?.padding ?? defaults.padding;
     final effectiveSpacing = style?.spacing ?? defaults.spacing;
     final effectiveTitleTextStyle = style?.titleTextStyle ?? defaults.titleTextStyle;
@@ -271,8 +296,9 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
     }
 
     // The bar's top edge is intentionally a hairline border in the design
-    // system's `borderSubtle` colour — part of the bar's identity, not a
-    // configurable divider.
+    // system's `borderSubtle` color — part of the bar's identity, not a
+    // configurable divider. When floating, the border is dropped and the bar
+    // fades into the content behind it via a gradient instead.
     //
     // The outer [Semantics] keeps the bar's children grouped for screen
     // readers, so leading, title, subtitle, and trailing aren't intermixed
@@ -280,17 +306,48 @@ class DefaultStreamBottomAppBar extends StatelessWidget {
     // slot's semantics onto its own node — without it, a raw
     // [GestureDetector] in a slot would attach its action to the outer
     // container and collapse the bar into a single tappable focus stop.
-    return Semantics(
+    bar = Semantics(
       container: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: effectiveBackgroundColor,
-          border: Border(
-            top: BorderSide(color: context.streamColorScheme.borderSubtle),
-          ),
+          color: switch (effectiveSurfaceStyle) {
+            .floating => null,
+            .regular => effectiveBackgroundColor,
+          },
+          gradient: switch (effectiveSurfaceStyle) {
+            .floating => _getFloatingGradient(context, color: effectiveFloatingBackgroundColor),
+            .regular => null,
+          },
+          border: switch (effectiveSurfaceStyle) {
+            .floating => null,
+            .regular => Border(top: BorderSide(color: context.streamColorScheme.borderSubtle)),
+          },
         ),
         child: Semantics(explicitChildNodes: true, child: bar),
       ),
+    );
+
+    // Publish the resolved behaviour to the slots via a [StreamToolbarScope] so
+    // slot widgets ([StreamToolbarButton], footer actions, ...) match the bar.
+    return StreamToolbarScope(surfaceStyle: effectiveSurfaceStyle, child: bar);
+  }
+
+  LinearGradient _getFloatingGradient(
+    BuildContext context, {
+    required Color color,
+  }) {
+    // Compute the fraction of the total bar height occupied by the system
+    // safe area so the gradient is solid through the bottom inset and fades up
+    // through the toolbar zone above it.
+    final safeAreaBottom = props.primary ? MediaQuery.paddingOf(context).bottom : 0.0;
+    final totalHeight = safeAreaBottom + kStreamToolbarHeight;
+    final solidFraction = totalHeight > 0 ? safeAreaBottom / totalHeight : 0.0;
+
+    return streamFloatingFadeLinearGradient(
+      color: color,
+      solidFraction: solidFraction,
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
     );
   }
 }
@@ -312,6 +369,9 @@ class _StreamBottomAppBarStyleDefaults extends StreamBottomAppBarStyle {
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;
+
+  @override
+  Color get floatingBackgroundColor => _colorScheme.backgroundElevation0;
 
   @override
   double get spacing => _spacing.sm;

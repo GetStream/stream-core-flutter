@@ -47,7 +47,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
-import 'stream_app_style.dart';
+import 'stream_surface_style.dart';
 
 part 'stream_theme.g.theme.dart';
 
@@ -108,7 +108,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   factory StreamTheme({
     Brightness? brightness,
     TargetPlatform? platform,
-    StreamAppStyle? appStyle,
+    StreamSurfaceStyle? surfaceStyle,
     StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
@@ -178,7 +178,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
-    appStyle ??= StreamAppStyle.regular;
+    surfaceStyle ??= StreamSurfaceStyle.regular;
     appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
@@ -218,9 +218,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
-      // ignore: deprecated_member_use_from_same_package
       brightness: effectiveBrightness,
-      appStyle: appStyle,
+      surfaceStyle: surfaceStyle,
       elevation: elevation,
       icons: icons,
       radius: radius,
@@ -283,7 +282,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   const StreamTheme.raw({
     @Deprecated('Use colorScheme.brightness instead') this.brightness = Brightness.light,
-    required this.appStyle,
+    required this.surfaceStyle,
     required this.elevation,
     required this.icons,
     required this.radius,
@@ -370,8 +369,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   @Deprecated('Use colorScheme.brightness instead')
   final Brightness brightness;
 
-  /// The app style for this theme.
-  final StreamAppStyle appStyle;
+  /// The app-wide surface style every component falls back to.
+  final StreamSurfaceStyle surfaceStyle;
 
   /// The Material elevation values for this theme.
   final StreamElevation elevation;
@@ -537,7 +536,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     return StreamTheme.raw(
       // ignore: deprecated_member_use_from_same_package
       brightness: brightness,
-      appStyle: appStyle,
+      surfaceStyle: surfaceStyle,
       elevation: elevation,
       icons: icons,
       radius: radius,
