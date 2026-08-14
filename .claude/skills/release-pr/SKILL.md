@@ -53,9 +53,62 @@ grep -A12 'semantic_changelog_update' .github/workflows/pr_title.yml
 
 1. **Which packages + versions.** If given as args (e.g. `/release-pr stream_core 0.4.1 stream_core_flutter 0.5.0`),
    use them; strip any leading `v`. Otherwise **detect and confirm**: a package needs releasing when its
-   `CHANGELOG.md` has a non-empty `## Upcoming` section. List those and ask the user for each new version (they pick
-   the semver bump; don't infer it).
+   `CHANGELOG.md` has a non-empty `## Upcoming` section. List those and, for each, propose a version per
+   [Choosing the version](#choosing-the-version) — the user confirms or overrides.
 2. **Base branch** is always `main`.
+
+## Choosing the version
+
+Two steps: classify the release from its CHANGELOG, then map that onto the package's current version.
+
+**1. Classify.** Read the package's curated `## Upcoming` sub-headings — the same bullets that become the release
+notes, so they are the authority on what the release contains:
+
+```bash
+sed -n '/^## Upcoming/,/^## [0-9]/p' packages/<pkg>/CHANGELOG.md | grep -i '^### .*breaking'
+```
+
+- **any** match → **breaking**. Match on the word *breaking*, not one exact heading — the current entry is
+  `### 🛑 Breaking / Removals`, but `### 💥 Breaking Changes` and `### 💥 BREAKING CHANGES` also appear in these
+  changelogs, and the wording may change again.
+- no match (only Features / Bug Fixes / Deprecations) → **compatible**
+
+**Deprecations are not breaking** — a deprecated API still works, so a release that only deprecates is compatible.
+
+**2. Map onto the current version.** The same release is a different bump depending on where the package sits,
+per the Dart community convention in
+[Package versioning](https://dart.dev/tools/pub/versioning#semantic-versions):
+
+> Although semantic versioning doesn't promise any compatibility between versions prior to `1.0.0`, the Dart
+> community convention is to treat those versions semantically as well. The interpretation of each number is just
+> shifted down one slot: going from `0.1.2` to `0.2.0` indicates a breaking change, going to `0.1.3` indicates a new
+> feature, and going to `0.1.2+1` indicates a change that doesn't affect the public API. For simplicity's sake,
+> avoid using `+` after the version reaches `1.0.0`.
+
+Read the current version first — `grep '^version:' packages/<pkg>/pubspec.yaml` — and pick the column from it
+rather than assuming either regime:
+
+| Release | at/above `1.0.0` | below `1.0.0` |
+| --- | --- | --- |
+| breaking | major | minor |
+| compatible, adds API | minor | patch |
+| no public API change | patch | build (`+1`) |
+
+The shift matters because a caret constraint stops at the leading significant digit: `^1.4.1` means
+`>=1.4.1 <2.0.0` (major breaks), while `^0.4.1` means `>=0.4.1 <0.5.0` (minor breaks). Whichever slot that is for
+the package at hand, bumping it strands every consumer on the old caret until they hand-edit their pubspec — so
+bump it only for a genuinely breaking release.
+
+State the proposed version, the heading it came from, and which column you used; then ask the user to confirm —
+**they still decide**. If they supply a version that disagrees with the derivation, say so once, then use theirs.
+
+A behavior change that is source-compatible but alters rendered output (color math, layout metrics, changed
+defaults) belongs under `### 🛑 Breaking / Removals`, not Features — file it there when writing the entry and the
+derivation above reaches the right answer on its own.
+
+> Precedent: `stream_core_flutter` v0.5.0 was released as a minor with no breaking section — it should have been
+> `0.4.2`. It shipped to pub.dev before the error was caught, and pub.dev cannot delete a version, so it was left in
+> place. Get the bump right before merge; there is no undo.
 
 ## Pre-flight
 
@@ -159,6 +212,9 @@ publish job waits for in-workspace dependencies to be live first).
 
 ## Don't
 
+- **Never bump a package's breaking slot without a breaking section** in its `## Upcoming` — that slot is the major
+  at/above `1.0.0` and the minor below it, and bumping it strands every consumer on the old caret. See
+  [Choosing the version](#choosing-the-version).
 - **Never run `melos version`** — it clobbers the hand-curated CHANGELOGs.
 - **Never tag or push a tag** — `release_tag.yml` does it on merge.
 - **Never run `melos run release:pub` locally** — it's the CI publish step; running it publishes from an unreviewed
