@@ -84,6 +84,37 @@ UserToken _generateTestUserToken(String userId) {
 void main() {
   group('AuthInterceptor', () {
     test(
+      'uses the TokenManager passed to the positional constructor, setting the '
+      'Authorization header and user_id query parameter (backwards-compatible '
+      'API)',
+      () async {
+        final tokenManager = TokenManager(
+          userId: 'user-123',
+          tokenProvider: TokenProvider.static(
+            _generateTestUserToken('user-123'),
+          ),
+        );
+
+        final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+        final adapter = _CapturingHttpClientAdapter();
+        dio.httpClientAdapter = adapter;
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
+
+        await dio.get<void>('/test');
+
+        expect(adapter.lastRequest?.queryParameters['user_id'], 'user-123');
+        expect(
+          adapter.lastRequest?.headers['Authorization'],
+          isNotNull,
+        );
+        expect(
+          adapter.lastRequest?.headers['stream-auth-type'],
+          isNotNull,
+        );
+      },
+    );
+
+    test(
       'picks up a TokenManager swapped in while the token is loading, so the '
       'user_id query parameter reflects a server-resolved id (guest exchange)',
       () async {
@@ -107,7 +138,7 @@ void main() {
         final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
         final adapter = _CapturingHttpClientAdapter();
         dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor(dio, () => tokenManager));
+        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
 
         await dio.get<void>('/test');
 
@@ -132,7 +163,7 @@ void main() {
         final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
         final adapter = _CapturingHttpClientAdapter();
         dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor(dio, () => tokenManager));
+        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
 
         await dio.get<void>('/test');
 
@@ -153,7 +184,7 @@ void main() {
         final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
         final adapter = _TokenExpiredHttpClientAdapter();
         dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor(dio, () => tokenManager));
+        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
 
         await expectLater(
           dio.get<void>('/test'),
@@ -194,7 +225,7 @@ void main() {
           },
         );
         dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor(dio, () => tokenManager));
+        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
 
         await expectLater(
           dio.get<void>('/test'),
