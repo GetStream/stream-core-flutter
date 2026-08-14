@@ -75,10 +75,18 @@ sed -n '/^## Upcoming/,/^## [0-9]/p' packages/<pkg>/CHANGELOG.md | grep -i '^###
 
 **Deprecations are not breaking** — a deprecated API still works, so a release that only deprecates is compatible.
 
-**2. Map onto the current version.** Dart shifts each number's meaning down one slot while a package is below
-`1.0.0`, so the same release is a different bump depending on where the package sits. Read the current version
-first — `grep '^version:' packages/<pkg>/pubspec.yaml` — and pick the column from it rather than assuming either
-regime:
+**2. Map onto the current version.** The same release is a different bump depending on where the package sits,
+per the Dart community convention in
+[Package versioning](https://dart.dev/tools/pub/versioning#semantic-versions):
+
+> Although semantic versioning doesn't promise any compatibility between versions prior to `1.0.0`, the Dart
+> community convention is to treat those versions semantically as well. The interpretation of each number is just
+> shifted down one slot: going from `0.1.2` to `0.2.0` indicates a breaking change, going to `0.1.3` indicates a new
+> feature, and going to `0.1.2+1` indicates a change that doesn't affect the public API. For simplicity's sake,
+> avoid using `+` after the version reaches `1.0.0`.
+
+Read the current version first — `grep '^version:' packages/<pkg>/pubspec.yaml` — and pick the column from it
+rather than assuming either regime:
 
 | Release | at/above `1.0.0` | below `1.0.0` |
 | --- | --- | --- |
@@ -86,10 +94,10 @@ regime:
 | compatible, adds API | minor | patch |
 | no public API change | patch | build (`+1`) |
 
-The column exists because a caret constraint stops at the leading significant digit: `^1.4.1` means `>=1.4.1 <2.0.0`
-(major breaks), while `^0.4.1` means `>=0.4.1 <0.5.0` (minor breaks). Whichever slot that is for the package at
-hand, bumping it strands every consumer on the old caret until they hand-edit their pubspec — so bump it only for a
-genuinely breaking release.
+The shift matters because a caret constraint stops at the leading significant digit: `^1.4.1` means
+`>=1.4.1 <2.0.0` (major breaks), while `^0.4.1` means `>=0.4.1 <0.5.0` (minor breaks). Whichever slot that is for
+the package at hand, bumping it strands every consumer on the old caret until they hand-edit their pubspec — so
+bump it only for a genuinely breaking release.
 
 State the proposed version, the heading it came from, and which column you used; then ask the user to confirm —
 **they still decide**. If they supply a version that disagrees with the derivation, say so once, then use theirs.
