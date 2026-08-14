@@ -1,11 +1,8 @@
 ## Upcoming
 
-### 💥 BREAKING CHANGES
-
-- `AuthInterceptor` now takes a `TokenManager Function()` getter instead of a `TokenManager` instance. This lets callers swap the active `TokenManager` at runtime — e.g. after a guest token exchange resolves a server-assigned user id — and have the interceptor pick up the new instance (and its `userId`) on the next request.
-
 ### ✨ Features
 
+- Added `AuthInterceptor.withProvider`, which takes a `TokenManager Function()` getter instead of a fixed `TokenManager` instance. This lets callers swap the active `TokenManager` at runtime — e.g. after a guest token exchange resolves a server-assigned user id — and have the interceptor pick up the new instance (and its `userId`) on the next request. The existing `AuthInterceptor(dio, tokenManager)` constructor is unchanged.
 - Added `teams` field to `User` class.
 
 ## 0.4.0
