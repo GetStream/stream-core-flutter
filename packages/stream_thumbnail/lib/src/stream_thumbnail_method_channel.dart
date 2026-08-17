@@ -154,7 +154,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     try {
       final result = await methodChannel.invokeMethod('files', reqMap);
       if (result != true) {
-        _resolveFuture(callId, result);
+        _resolveFuture(callId, result as Object);
       }
     } catch (_) {
       // Drop the pending completer so it doesn't linger in `_futures`.
@@ -231,7 +231,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     try {
       final result = await methodChannel.invokeMethod('data', reqMap);
       if (result != true) {
-        _resolveFuture(callId, result);
+        _resolveFuture(callId, result as Object);
       }
     } catch (_) {
       _futures.remove(callId);

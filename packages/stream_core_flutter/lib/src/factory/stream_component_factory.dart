@@ -668,8 +668,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
 final class StreamComponentBuilderExtension<T> {
   /// Creates a builder extension for a component with Props type [T].
   const StreamComponentBuilderExtension({
-    required StreamComponentBuilder<T> builder,
-  }) : _builder = builder;
+    required this._builder,
+  });
 
   // The internal builder function that creates the widget from the context and props.
   final StreamComponentBuilder<T> _builder;

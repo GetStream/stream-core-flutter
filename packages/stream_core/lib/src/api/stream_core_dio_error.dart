@@ -25,7 +25,7 @@ extension StreamDioExceptionExtension on DioException {
     final apiErrorResult = runSafelySync(
       () => switch (response?.data) {
         final Map<String, Object?> data => StreamApiError.fromJson(data),
-        final String data => StreamApiError.fromJson(jsonDecode(data)),
+        final String data => StreamApiError.fromJson(jsonDecode(data) as Map<String, Object?>),
         _ => null,
       },
     );

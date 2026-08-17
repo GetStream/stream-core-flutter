@@ -8,8 +8,8 @@ import 'system_environment.dart';
 class SystemEnvironmentManager {
   /// {@macro systemEnvironmentManager}
   SystemEnvironmentManager({
-    required SystemEnvironment environment,
-  }) : _environment = environment;
+    required this._environment,
+  });
 
   /// Returns the Stream client user agent string based on the current
   /// [environment] value.
