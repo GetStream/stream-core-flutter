@@ -3,6 +3,17 @@
 ### ✨ Features
 
 - Added `teams` field to `User` class.
+- Added `TokenManager.refreshToken()` to force a reload from the provider, bypassing the cache.
+- Added optional `initialToken` parameter to `TokenManager` to seed the token cache.
+- Added optional `onTokenUpdated` callback to `TokenManager`, awaited after every successful
+  token load.
+
+### 🐞 Fixed
+
+- `TokenManager.getToken()` now returns the cached token instead of contacting the
+  `TokenProvider` on every call.
+- The `TokenManager.tokenProvider` setter now stores the new provider, previously it only
+  expired the cached token.
 
 ## 0.4.0
 

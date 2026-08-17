@@ -62,7 +62,17 @@ class TokenManager {
   final OnTokenUpdated? onTokenUpdated;
 
   // The provider used to load tokens when needed.
-  final TokenProvider _tokenProvider;
+  TokenProvider _tokenProvider;
+
+  /// Replaces the provider used to load tokens.
+  ///
+  /// Expires the cached token when the provider changes, so the next
+  /// [getToken] call loads a fresh token from the new provider.
+  set tokenProvider(TokenProvider provider) {
+    if (_tokenProvider == provider) return;
+    _tokenProvider = provider;
+    expireToken();
+  }
 
   // The currently cached token, if any.
   UserToken? _cachedToken;

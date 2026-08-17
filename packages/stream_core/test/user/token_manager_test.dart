@@ -190,6 +190,52 @@ void main() {
       });
     });
 
+    group('tokenProvider setter', () {
+      test('swaps the provider and expires the cached token', () async {
+        final oldProvider = _CountingProvider((_) async => _token('old'));
+        final newProvider = _CountingProvider((_) async => _token('new'));
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: oldProvider,
+        );
+
+        expect(await manager.getToken(), _token('old'));
+
+        manager.tokenProvider = newProvider;
+
+        expect(manager.peekToken(), isNull);
+        expect(await manager.getToken(), _token('new'));
+        expect(oldProvider.loadCount, 1);
+        expect(newProvider.loadCount, 1);
+      });
+
+      test('keeps the cached token when the provider is unchanged', () async {
+        final provider = _CountingProvider((_) async => _token('token-1'));
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: provider,
+        );
+
+        await manager.getToken();
+        manager.tokenProvider = provider;
+
+        expect(manager.peekToken(), _token('token-1'));
+      });
+
+      test('usesStaticProvider reflects the swapped provider', () {
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: TokenProvider.static(_token('user-1')),
+        );
+
+        expect(manager.usesStaticProvider, isTrue);
+
+        manager.tokenProvider = _CountingProvider((_) async => _token('t'));
+
+        expect(manager.usesStaticProvider, isFalse);
+      });
+    });
+
     group('usesStaticProvider', () {
       test('reflects the provider type', () {
         final staticManager = TokenManager(
