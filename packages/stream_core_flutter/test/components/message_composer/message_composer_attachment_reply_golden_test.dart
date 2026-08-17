@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:stream_core_flutter/chat.dart';
 
+import '../../utils/material_localizations.dart';
+
 void main() {
   group('MessageComposerAttachmentReply Golden Tests', () {
     goldenTest(
@@ -84,17 +86,19 @@ Widget _buildReplyInTheme(
   Brightness brightness = Brightness.light,
 }) {
   final streamTheme = StreamTheme(brightness: brightness);
-  return Theme(
-    data: ThemeData(
-      brightness: brightness,
-      extensions: [streamTheme],
-    ),
-    child: Builder(
-      builder: (context) => Material(
-        color: StreamTheme.of(context).colorScheme.backgroundApp,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: reply,
+  return withMaterialLocalizations(
+    child: Theme(
+      data: ThemeData(
+        brightness: brightness,
+        extensions: [streamTheme],
+      ),
+      child: Builder(
+        builder: (context) => Material(
+          color: StreamTheme.of(context).colorScheme.backgroundApp,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: reply,
+          ),
         ),
       ),
     ),
