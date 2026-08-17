@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../theme/components/stream_context_menu_theme.dart';
 import '../../theme/primitives/stream_radius.dart';

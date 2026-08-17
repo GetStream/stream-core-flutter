@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:material_ui/material_ui.dart';
+
 import 'stream_semantics_announcer.dart';
 
 /// A behavior-only wrapper that announces transitions on [listenable] to the

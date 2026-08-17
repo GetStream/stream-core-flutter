@@ -2,8 +2,8 @@
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Dispatches screen-reader announcements with platform-aware delivery.
 ///

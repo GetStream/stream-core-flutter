@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../theme/stream_theme_extensions.dart';
 import '../common/stream_tap_target_padding.dart';

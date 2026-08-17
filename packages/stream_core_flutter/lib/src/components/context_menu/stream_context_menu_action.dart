@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';

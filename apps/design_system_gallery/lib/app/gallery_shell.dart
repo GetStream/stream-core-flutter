@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/core.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../config/theme_configuration.dart';
 import '../core/preview_wrapper.dart';
 import '../widgets/theme_studio/theme_customization_panel.dart';
 import '../widgets/toolbar/toolbar.dart';
@@ -30,8 +32,9 @@ class GalleryShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final materialTheme = Theme.of(context);
-    final isDark = materialTheme.brightness == .dark;
+    final themeConfig = context.watch<ThemeConfiguration>();
+    final widgetbookTheme = themeConfig.buildWidgetbookTheme();
+    final isDark = themeConfig.brightness == .dark;
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     // Use overlay on small screens, side-by-side on large screens
@@ -39,8 +42,8 @@ class GalleryShell extends StatelessWidget {
     final useOverlay = widgetbookWidth < kWidgetbookDesktopBreakpoint;
 
     final widgetbook = Widgetbook.material(
-      lightTheme: materialTheme,
-      darkTheme: materialTheme,
+      lightTheme: widgetbookTheme,
+      darkTheme: widgetbookTheme,
       themeMode: isDark ? .dark : .light,
       directories: _collapseDirectories(directories),
       home: const GalleryHomePage(),

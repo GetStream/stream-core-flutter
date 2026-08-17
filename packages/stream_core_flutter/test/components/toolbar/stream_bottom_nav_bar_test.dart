@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:stream_core_flutter/core.dart';
 
 const _items = [
@@ -100,7 +100,12 @@ void main() {
         ),
       );
 
-      expect(find.byTooltip('Go home'), findsOneWidget);
+      // Not `find.byTooltip`: that finder is bound to Flutter's own `Tooltip`,
+      // an unrelated type to the `material_ui` one the bar builds.
+      expect(
+        find.byWidgetPredicate((widget) => widget is Tooltip && widget.message == 'Go home'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows no tooltip for an empty tooltip string', (tester) async {

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:marionette_flutter/marionette_flutter.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'app/gallery_app.dart';
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:svg_icon_widget/svg_icon_widget.dart';
 
 import '../../factory/stream_component_factory.dart';

@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+// ignore: migrate_design_widgets
+import 'package:flutter/material.dart' as flutter;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:material_ui/material_ui.dart';
 import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -353,7 +355,7 @@ class DefaultStreamMessageText extends StatelessWidget {
     );
 
     final markdownSheet = MarkdownStyleSheet.fromTheme(
-      streamThemeData, // Apply stream theme data
+      streamThemeData.asFlutterMaterialTheme(), // Apply stream theme data
     ).copyWith(p: effectiveTextStyle, a: effectiveLinkStyle).merge(props.styleSheet);
 
     // Prepend mention syntax so `[text](mention[-type]:id)` is intercepted
@@ -605,5 +607,40 @@ class _StreamMessageTextDefaults extends StreamMessageTextStyle {
   @override
   StreamMessageLayoutProperty<TextStyle> get tripleEmojiStyle {
     return .all(.new(fontSize: StreamEmojiSize.lg.value, height: 1));
+  }
+}
+
+extension on ThemeData {
+  /// Restates this theme as a Flutter Material [flutter.ThemeData] carrying the
+  /// fields [MarkdownStyleSheet.fromTheme] reads.
+  ///
+  /// `flutter_markdown_plus` still takes Flutter's `ThemeData`, which is an
+  /// unrelated type to `material_ui`'s. Remove once it migrates.
+  flutter.ThemeData asFlutterMaterialTheme() {
+    return flutter.ThemeData(
+      colorScheme: flutter.ColorScheme(
+        brightness: colorScheme.brightness,
+        primary: colorScheme.primary,
+        onPrimary: colorScheme.onPrimary,
+        secondary: colorScheme.secondary,
+        onSecondary: colorScheme.onSecondary,
+        error: colorScheme.error,
+        onError: colorScheme.onError,
+        surface: colorScheme.surface,
+        onSurface: colorScheme.onSurface,
+        surfaceContainerHighest: colorScheme.surfaceContainerHighest,
+      ),
+      primaryColor: primaryColor,
+      cardColor: cardColor,
+      dividerColor: dividerColor,
+      cardTheme: flutter.CardThemeData(color: cardTheme.color),
+      textTheme: flutter.TextTheme(
+        bodyLarge: textTheme.bodyLarge,
+        bodyMedium: textTheme.bodyMedium,
+        headlineSmall: textTheme.headlineSmall,
+        titleLarge: textTheme.titleLarge,
+        titleMedium: textTheme.titleMedium,
+      ),
+    );
   }
 }

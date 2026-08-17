@@ -65,6 +65,9 @@ document; the section link is provided.
 - Single quotes, **relative imports inside `lib/src/`** (`always_use_package_imports`
   is disabled here — a deliberate divergence from Flutter's style, favouring
   refactor-friendly relative paths inside the package).
+- Material and Cupertino come from `package:material_ui/material_ui.dart` and
+  `package:cupertino_ui/cupertino_ui.dart`, never `package:flutter/material.dart` —
+  the two sets of types are unrelated. `migrate_design_widgets` enforces this.
 - Trailing commas preserved, `const` wherever possible, `final` for locals that
   aren't reassigned.
 - Prefer named parameters for booleans (`avoid_positional_boolean_parameters`).
@@ -626,9 +629,17 @@ import '../../theme/components/stream_avatar_theme.dart';
 import '../common/stream_network_image.dart';
 
 // GOOD — package: for external and cross-package imports.
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:stream_core/stream_core.dart';
 ```
+
+Flutter split Material and Cupertino out of the framework, so
+`package:flutter/material.dart` and `package:material_ui/material_ui.dart` declare
+*different* `ThemeData`, `ThemeExtension` and widget types that cannot be passed to
+one another. Always import `material_ui`. The `migrate_design_widgets` lint fails the
+build on the old URI; the only exceptions are the prefixed bridges that adapt a value
+for a package which has not migrated yet, each carrying an
+`// ignore: migrate_design_widgets`.
 
 Do not use `package:stream_core_flutter/...` inside `lib/src/` — that path is
 reserved for consumers, and using it internally would round-trip through the public
