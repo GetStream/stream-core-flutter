@@ -84,7 +84,7 @@ class StreamAttachmentUploader {
       ),
     );
 
-    return await result.fold(
+    return result.fold(
       onSuccess: (data) {
         final uploaded = UploadedAttachment(
           id: attachment.id,

@@ -6,7 +6,7 @@ import 'package:alchemist/alchemist.dart';
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   final isRunningInCi = Platform.environment.containsKey('GITHUB_ACTIONS');
 
-  return await AlchemistConfig.runWithConfig(
+  return AlchemistConfig.runWithConfig(
     config: AlchemistConfig(
       // Enable golden tests for CI environments and disable them for local environments.
       ciGoldensConfig: CiGoldensConfig(enabled: isRunningInCi),

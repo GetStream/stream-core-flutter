@@ -182,7 +182,7 @@ extension AttachmentFileMultipartExtension on AttachmentFile {
     );
 
     final multipartFile = result.getOrNull();
-    if (multipartFile != null) return await multipartFile;
+    if (multipartFile != null) return multipartFile;
 
     // Fallback to byte-based creation (web platforms, inaccessible paths)
     final bytes = await readAsBytes();

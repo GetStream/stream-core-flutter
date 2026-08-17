@@ -262,7 +262,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     // Bound a source that never fires `seeked`/`error` so the future can't hang
     // (and retain the video element) forever, and release the media element once
     // the result settles.
-    return await completer.future
+    return completer.future
         .timeout(
           const Duration(seconds: 30),
           onTimeout: () => throw PlatformException(
