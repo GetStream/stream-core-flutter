@@ -84,14 +84,11 @@ class StreamTapTargetPadding extends SingleChildRenderObjectWidget {
 
 class _RenderTapTargetPadding extends RenderShiftedBox {
   _RenderTapTargetPadding({
-    required Size minSize,
-    required AlignmentGeometry alignment,
-    required TextDirection? textDirection,
+    required this._minSize,
+    required this._alignment,
+    required this._textDirection,
     RenderBox? child,
-  }) : _minSize = minSize,
-       _alignment = alignment,
-       _textDirection = textDirection,
-       super(child);
+  }) : super(child);
 
   Size get minSize => _minSize;
   Size _minSize;

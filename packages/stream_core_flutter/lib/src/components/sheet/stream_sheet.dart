@@ -656,9 +656,9 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     super.requestFocus,
     required this.builder,
     this.backgroundColor,
-    Color? barrierColor,
+    this._barrierColor,
     this.barrierLabel,
-    String? barrierOnTapHint,
+    this._barrierOnTapHint,
     this.shape,
     this.borderRadius,
     this.constraints,
@@ -672,8 +672,7 @@ class StreamSheetRoute<T> extends PageRoute<T> {
     this.onDragEnd,
     this.parentSheet,
     this.capturedThemes,
-  }) : _barrierColor = barrierColor,
-       _barrierOnTapHint = barrierOnTapHint;
+  });
 
   /// Builds the primary contents of the sheet. The provided [ScrollController]
   /// should be attached to the topmost scrollable widget inside the sheet.

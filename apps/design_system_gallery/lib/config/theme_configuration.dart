@@ -7,8 +7,8 @@ import 'package:stream_core_flutter/core.dart';
 /// exact naming conventions from [StreamColorScheme].
 class ThemeConfiguration extends ChangeNotifier {
   ThemeConfiguration({
-    Brightness brightness = Brightness.light,
-  }) : _brightness = brightness {
+    this._brightness = Brightness.light,
+  }) {
     _rebuildTheme();
   }
 

@@ -4,6 +4,10 @@
 
 - Added `teams` field to `User` class.
 
+### 🔄 Changed
+
+- Raised the minimum Dart SDK to `^3.12.0`.
+
 ## 0.4.0
 
 ### 💥 BREAKING CHANGES
