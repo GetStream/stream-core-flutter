@@ -1,3 +1,5 @@
+// ignore: migrate_design_widgets
+import 'package:flutter/material.dart' as legacy;
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/core.dart';
@@ -33,7 +35,13 @@ class GalleryShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeConfig = context.watch<ThemeConfiguration>();
-    final widgetbookTheme = themeConfig.buildWidgetbookTheme();
+    // Widgetbook builds its own `MaterialApp.router`, which installs a theme of
+    // its own below the bridge — so the chrome takes the bridged theme by value
+    // rather than by inheritance.
+    //
+    // TODO(material-ui): drop once widgetbook supports material_ui.
+    // https://linear.app/stream/issue/flu-703
+    final widgetbookTheme = legacy.Theme.of(context);
     final isDark = themeConfig.brightness == .dark;
     final screenWidth = MediaQuery.sizeOf(context).width;
 

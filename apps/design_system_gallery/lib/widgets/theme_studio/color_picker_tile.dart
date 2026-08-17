@@ -39,9 +39,6 @@ class ColorPickerTile extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.xs + spacing.xxs),
       child: InkWell(
-        // TODO(material-ui): the picker reads Flutter's Theme, not
-        // material_ui's, so it renders with stock Material colors.
-        // https://linear.app/stream/issue/flu-704
         onTap: () => _showColorPicker(context),
         borderRadius: BorderRadius.all(radius.sm),
         child: Container(

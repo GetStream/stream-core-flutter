@@ -1,5 +1,3 @@
-// ignore: migrate_design_widgets
-import 'package:flutter/material.dart' as flutter;
 import 'package:material_ui/material_ui.dart';
 import 'package:stream_core_flutter/core.dart';
 
@@ -783,41 +781,6 @@ class ThemeConfiguration extends ChangeNotifier {
         labelMedium: ts.metadataEmphasis.copyWith(color: textSecondary),
         labelSmall: ts.metadataDefault.copyWith(color: textTertiary),
       ),
-    );
-  }
-
-  /// Builds the Flutter Material theme that styles Widgetbook's own chrome.
-  ///
-  /// Widgetbook still takes Flutter's `ThemeData`, which is an unrelated type
-  /// to `material_ui`'s, so the branding is restated here over the same
-  /// colors. Remove once Widgetbook migrates.
-  //
-  // TODO(material-ui): drop once widgetbook supports material_ui.
-  // https://linear.app/stream/issue/flu-703
-  flutter.ThemeData buildWidgetbookTheme() {
-    final isDark = brightness == Brightness.dark;
-
-    return flutter.ThemeData(
-      colorScheme: (isDark ? flutter.ColorScheme.dark : flutter.ColorScheme.light)(
-        primary: accentPrimary,
-        secondary: accentPrimary,
-        tertiary: accentNeutral,
-        error: accentError,
-        surface: backgroundSurface,
-        surfaceContainerHighest: backgroundSurfaceSubtle,
-        onPrimary: textOnAccent,
-        onSecondary: textOnAccent,
-        onSurface: textPrimary,
-        onSurfaceVariant: textSecondary,
-        onError: textOnAccent,
-        outline: borderDefault,
-        outlineVariant: borderSubtle,
-      ),
-      scaffoldBackgroundColor: backgroundApp,
-      cardColor: backgroundSurface,
-      dividerColor: borderSubtle,
-      disabledColor: textDisabled,
-      hintColor: textTertiary,
     );
   }
 }

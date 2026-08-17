@@ -49,6 +49,14 @@ class _StreamDesignSystemGalleryState extends State<StreamDesignSystemGallery> {
             theme: materialTheme,
             darkTheme: materialTheme,
             themeMode: isDark ? .dark : .light,
+            // Maps the theme and localizations into Flutter's Material for the
+            // dependencies still built on it — Widgetbook, DeviceFrame, the
+            // colour picker — which would otherwise resolve stock defaults.
+            //
+            // TODO(material-ui): drop as each dependency migrates.
+            // https://linear.app/stream/issue/flu-698
+            // ignore: deprecated_member_use
+            builder: (context, child) => MaterialUiCompatibilityBridge(child: child!),
             home: GalleryShell(
               showThemePanel: _showThemePanel,
               onToggleThemePanel: () => setState(() => _showThemePanel = !_showThemePanel),
