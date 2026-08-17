@@ -1,0 +1,41 @@
+name: Bootstrap Workspace
+description: >
+  Installs Flutter, activates melos and bootstraps the melos workspace, so every
+  package resolves its sibling packages from this repository instead of pub.dev.
+
+# NOTE: the calling job must check the repository out first — a local action
+# cannot check out the repository it lives in.
+
+inputs:
+  flutter-channel:
+    description: The Flutter channel to install.
+    required: false
+    default: stable
+
+runs:
+  using: composite
+  steps:
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        cache: true
+        cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+        channel: ${{ inputs.flutter-channel }}
+
+    - name: Install Melos
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: flutter pub global activate melos
+
+    # Bootstrapping is what writes the melos-managed `pubspec_overrides.yaml`
+    # files, which are gitignored. Without it, a plain `flutter pub get` in an
+    # example app resolves the very plugin it is supposed to be testing from
+    # pub.dev instead of from this checkout.
+    #
+    # Invoked through `pub global run` rather than as a bare `melos`, so it does
+    # not depend on the pub-cache bin directory being on PATH — that differs
+    # between the ubuntu, macos and windows runners this action is used from.
+    - name: Bootstrap Workspace
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: flutter pub global run melos bootstrap

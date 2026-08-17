@@ -20,6 +20,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mocktail: ^1.0.4
+  pigeon: ^27.3.0
 
 flutter:
   plugin:
@@ -30,6 +32,12 @@ flutter:
         pluginClass: StreamThumbnailPlugin
       ios:
         pluginClass: StreamThumbnailPlugin
+      linux:
+        pluginClass: StreamThumbnailPlugin
+      macos:
+        pluginClass: StreamThumbnailPlugin
       web:
         pluginClass: StreamThumbnailWeb
         fileName: stream_thumbnail_web.dart
+      windows:
+        pluginClass: StreamThumbnailPluginCApi

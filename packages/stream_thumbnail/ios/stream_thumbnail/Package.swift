@@ -21,9 +21,6 @@ let package = Package(
             dependencies: [
                 .product(name: "FlutterFramework", package: "FlutterFramework"),
                 .product(name: "libwebp", package: "libwebp-Xcode")
-            ],
-            cSettings: [
-                .headerSearchPath("include/stream_thumbnail")
             ]
         )
     ]
