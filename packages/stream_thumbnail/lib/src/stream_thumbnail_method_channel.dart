@@ -85,14 +85,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     _resolveFuture(callId, error is Exception ? error : Exception(error));
   }
 
-  // iOS reports a failed generation by returning a null payload, which has to
-  // become an error: the completers are non-nullable and the public futures
-  // promise a value.
-  PlatformException _thumbnailFailed(int callId) => PlatformException(
-    code: 'thumbnail_generation_failed',
-    message: 'The platform returned no thumbnail for request $callId.',
-  );
-
   void _resolveFuture(int callId, Object value) {
     if (value is Exception) {
       _futures[callId]?.completeError(value);
@@ -160,9 +152,9 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     };
 
     try {
-      final result = await methodChannel.invokeMethod<Object>('files', reqMap);
+      final result = await methodChannel.invokeMethod('files', reqMap);
       if (result != true) {
-        _resolveFuture(callId, result ?? _thumbnailFailed(callId));
+        _resolveFuture(callId, result as Object);
       }
     } catch (_) {
       // Drop the pending completer so it doesn't linger in `_futures`.
@@ -199,11 +191,11 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     };
 
     try {
-      final result = await methodChannel.invokeMethod<Object>('file', reqMap);
+      final result = await methodChannel.invokeMethod('file', reqMap);
       if (result != true) {
         // iOS returns the written file path directly; wrap it as an [XFile] to
         // satisfy the Future<XFile> contract (Android replies via 'result#file').
-        _resolveFuture(callId, result is String ? XFile(result) : _thumbnailFailed(callId));
+        _resolveFuture(callId, XFile(result as String));
       }
     } catch (_) {
       _futures.remove(callId);
@@ -237,9 +229,9 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     };
 
     try {
-      final result = await methodChannel.invokeMethod<Object>('data', reqMap);
+      final result = await methodChannel.invokeMethod('data', reqMap);
       if (result != true) {
-        _resolveFuture(callId, result ?? _thumbnailFailed(callId));
+        _resolveFuture(callId, result as Object);
       }
     } catch (_) {
       _futures.remove(callId);

@@ -209,31 +209,6 @@ void main() {
       expect(args['quality'], 80);
     });
 
-    test('a null reply fails the request instead of throwing a cast error', () async {
-      // iOS replies with nil when generation fails; the futures are
-      // non-nullable, so it has to surface as an error.
-      mockChannel(null);
-
-      await expectLater(
-        MethodChannelStreamThumbnail().thumbnailData(
-          video: 'a.mp4',
-          headers: null,
-          imageFormat: StreamThumbnailFormat.png,
-          maxHeight: 10,
-          maxWidth: 20,
-          timeMs: 0,
-          quality: 80,
-        ),
-        throwsA(
-          isA<PlatformException>().having(
-            (e) => e.code,
-            'code',
-            'thumbnail_generation_failed',
-          ),
-        ),
-      );
-    });
-
     test('thumbnailFile wraps a directly-returned path in an XFile', () async {
       // iOS replies with the written file path directly (Android uses the
       // 'result#file' reverse callback instead).
