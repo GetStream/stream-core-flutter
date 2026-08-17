@@ -39,10 +39,12 @@ linter:
     # Single quotes are easier to type and don't compromise on readability.
     prefer_double_quotes: false
 
-    # Conflicts with `async_return_with_no_await`, which wants the `await` this
-    # rule wants removed. Awaiting keeps the frame in the stack trace, so the
-    # newer rule wins and this one is off.
-    unnecessary_await_in_return: false
+    # Conflicts with `unnecessary_await_in_return`, which stays enabled: a bare
+    # `return future` from an async body is what we want, and awaiting it only
+    # adds a hop. Inside a `try` the choice does matter — awaiting is what makes
+    # the function catch its own errors — but that is a per-site call, not one
+    # for a repo-wide lint.
+    async_return_with_no_await: false
 
     # Enabled once the packages move to `material_ui`; until then it fires on
     # every `package:flutter/material.dart` import in the repo.

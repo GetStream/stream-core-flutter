@@ -162,7 +162,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
       rethrow;
     }
 
-    return await completer.future;
+    return completer.future;
   }
 
   @override
@@ -202,7 +202,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
       rethrow;
     }
 
-    return await completer.future;
+    return completer.future;
   }
 
   @override
@@ -238,6 +238,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
       rethrow;
     }
 
-    return await completer.future;
+    return completer.future;
   }
 }
