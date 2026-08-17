@@ -85,6 +85,14 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     _resolveFuture(callId, error is Exception ? error : Exception(error));
   }
 
+  // iOS reports a failed generation by returning a null payload, which has to
+  // become an error: the completers are non-nullable and the public futures
+  // promise a value.
+  PlatformException _thumbnailFailed(int callId) => PlatformException(
+    code: 'thumbnail_generation_failed',
+    message: 'The platform returned no thumbnail for request $callId.',
+  );
+
   void _resolveFuture(int callId, Object value) {
     if (value is Exception) {
       _futures[callId]?.completeError(value);
@@ -154,7 +162,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     try {
       final result = await methodChannel.invokeMethod('files', reqMap);
       if (result != true) {
-        _resolveFuture(callId, result as Object);
+        _resolveFuture(callId, (result as Object?) ?? _thumbnailFailed(callId));
       }
     } catch (_) {
       // Drop the pending completer so it doesn't linger in `_futures`.
@@ -231,7 +239,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     try {
       final result = await methodChannel.invokeMethod('data', reqMap);
       if (result != true) {
-        _resolveFuture(callId, result as Object);
+        _resolveFuture(callId, (result as Object?) ?? _thumbnailFailed(callId));
       }
     } catch (_) {
       _futures.remove(callId);
