@@ -41,10 +41,10 @@ abstract interface class WebSocketHealthListener {
 class WebSocketHealthMonitor {
   /// Creates a new instance of [WebSocketHealthMonitor].
   WebSocketHealthMonitor({
-    required WebSocketHealthListener listener,
+    required this._listener,
     this.pingInterval = const Duration(seconds: 25),
     this.timeoutThreshold = const Duration(seconds: 3),
-  }) : _listener = listener;
+  });
 
   /// The interval between ping requests for health checking.
   final Duration pingInterval;

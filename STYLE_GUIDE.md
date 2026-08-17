@@ -1352,11 +1352,20 @@ sub-headings:
 
 - Fixed a crash when opening the media viewer with an empty attachments list.
 
+### 🔄 Changed
+
+- Raised the minimum Flutter version to `>=3.44.0` and the Dart SDK to `^3.12.0`.
+
 ### 🛑 Breaking / Removals
 
 - Removed `StreamCoreMessageComposer`. Use `StreamMessageComposer` from
   `stream_chat_flutter` instead.
 ```
+
+`### 🔄 Changed` covers what is neither new API nor a fix and does not break
+existing code — a raised minimum Flutter/Dart version, a tightened dependency
+constraint, a changed default. A raised floor is **not** breaking: code keeps
+compiling, older SDKs simply stop resolving the new version.
 
 Prefer **one short bullet** per entry, describing the functional change. Longer
 entries are acceptable for user-visible multi-facet features where the extra

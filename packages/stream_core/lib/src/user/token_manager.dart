@@ -32,8 +32,8 @@ class TokenManager {
   /// The [tokenProvider] is used to load tokens when needed.
   TokenManager({
     required this.userId,
-    required TokenProvider tokenProvider,
-  }) : _tokenProvider = tokenProvider;
+    required this._tokenProvider,
+  });
 
   /// The unique identifier of the user whose tokens are managed.
   final String userId;
