@@ -160,9 +160,9 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     };
 
     try {
-      final result = await methodChannel.invokeMethod('files', reqMap);
+      final result = await methodChannel.invokeMethod<Object>('files', reqMap);
       if (result != true) {
-        _resolveFuture(callId, (result as Object?) ?? _thumbnailFailed(callId));
+        _resolveFuture(callId, result ?? _thumbnailFailed(callId));
       }
     } catch (_) {
       // Drop the pending completer so it doesn't linger in `_futures`.
@@ -199,11 +199,11 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     };
 
     try {
-      final result = await methodChannel.invokeMethod('file', reqMap);
+      final result = await methodChannel.invokeMethod<Object>('file', reqMap);
       if (result != true) {
         // iOS returns the written file path directly; wrap it as an [XFile] to
         // satisfy the Future<XFile> contract (Android replies via 'result#file').
-        _resolveFuture(callId, XFile(result as String));
+        _resolveFuture(callId, result is String ? XFile(result) : _thumbnailFailed(callId));
       }
     } catch (_) {
       _futures.remove(callId);
@@ -237,9 +237,9 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     };
 
     try {
-      final result = await methodChannel.invokeMethod('data', reqMap);
+      final result = await methodChannel.invokeMethod<Object>('data', reqMap);
       if (result != true) {
-        _resolveFuture(callId, (result as Object?) ?? _thumbnailFailed(callId));
+        _resolveFuture(callId, result ?? _thumbnailFailed(callId));
       }
     } catch (_) {
       _futures.remove(callId);
