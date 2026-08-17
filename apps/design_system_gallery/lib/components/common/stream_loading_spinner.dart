@@ -83,7 +83,7 @@ class _AnimatedSpinnerState extends State<_AnimatedSpinner> with SingleTickerPro
     if (!mounted) return;
 
     _controller.reset();
-    return _controller.forward();
+    return await _controller.forward();
   }
 
   @override

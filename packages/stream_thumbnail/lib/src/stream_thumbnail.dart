@@ -29,7 +29,7 @@ abstract final class StreamThumbnail {
   }) async {
     if (videos.isEmpty) return [];
 
-    return StreamThumbnailPlatform.instance.thumbnailFiles(
+    return await StreamThumbnailPlatform.instance.thumbnailFiles(
       videos: videos,
       headers: headers,
       thumbnailPath: thumbnailPath,

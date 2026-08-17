@@ -158,6 +158,6 @@ class ConnectionRecoveryHandler extends Disposable {
   Future<void> dispose() async {
     _cancelReconnection();
     await _subscriptions.dispose();
-    return super.dispose();
+    return await super.dispose();
   }
 }

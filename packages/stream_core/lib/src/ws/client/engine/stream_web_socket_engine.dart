@@ -65,7 +65,7 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
         onError: _listener?.onError,
       );
 
-      return _ws?.ready.then((_) => _listener?.onOpen());
+      return await _ws?.ready.then((_) => _listener?.onOpen());
     });
   }
 
