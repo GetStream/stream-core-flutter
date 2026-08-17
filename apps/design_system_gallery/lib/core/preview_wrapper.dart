@@ -70,6 +70,9 @@ class PreviewWrapper extends StatelessWidget {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(spacing.xl),
+          // TODO(material-ui): DeviceFrame reads Flutter's Theme, not
+          // material_ui's, so it renders with stock Material colors.
+          // https://linear.app/stream/issue/flu-704
           child: DeviceFrame(
             device: previewConfig.selectedDevice,
             screen: content,

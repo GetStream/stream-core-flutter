@@ -791,6 +791,9 @@ class ThemeConfiguration extends ChangeNotifier {
   /// Widgetbook still takes Flutter's `ThemeData`, which is an unrelated type
   /// to `material_ui`'s, so the branding is restated here over the same
   /// colors. Remove once Widgetbook migrates.
+  //
+  // TODO(material-ui): drop once widgetbook supports material_ui.
+  // https://linear.app/stream/issue/flu-703
   flutter.ThemeData buildWidgetbookTheme() {
     final isDark = brightness == Brightness.dark;
 

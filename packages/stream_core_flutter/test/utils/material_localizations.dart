@@ -8,6 +8,9 @@ import 'package:material_ui/material_ui.dart';
 /// `MaterialLocalizations.of` directly — throws `No MaterialLocalizations
 /// found` and renders an error box instead. Widget tests do not need this:
 /// they wrap in `material_ui`'s `MaterialApp`, which supplies them.
+//
+// TODO(material-ui): drop once alchemist supports material_ui.
+// https://linear.app/stream/issue/flu-702
 Widget withMaterialLocalizations({required Widget child}) {
   return Localizations(
     locale: const Locale('en', 'US'),

@@ -616,6 +616,9 @@ extension on ThemeData {
   ///
   /// `flutter_markdown_plus` still takes Flutter's `ThemeData`, which is an
   /// unrelated type to `material_ui`'s. Remove once it migrates.
+  //
+  // TODO(material-ui): drop once flutter_markdown_plus supports material_ui.
+  // https://linear.app/stream/issue/flu-701
   flutter.ThemeData asFlutterMaterialTheme() {
     return flutter.ThemeData(
       colorScheme: flutter.ColorScheme(
