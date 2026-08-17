@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Builds a [LinearGradient] that fades from a solid [color] into transparent,
 /// suitable for floating app bars, bottom navigation bars, and composers.

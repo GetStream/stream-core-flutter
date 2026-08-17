@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+// ignore: migrate_design_widgets
+import 'package:flutter/material.dart' as legacy;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:material_ui/material_ui.dart';
 import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -339,23 +341,6 @@ class DefaultStreamMessageText extends StatelessWidget {
       effectiveTextStyle = effectiveTextStyle.merge(emojiStyle);
     }
 
-    final streamThemeData = Theme.of(context).let(
-      (it) => it.copyWith(
-        textTheme: it.textTheme.apply(
-          bodyColor: effectiveTextStyle.color,
-          decoration: effectiveTextStyle.decoration,
-          decorationColor: effectiveTextStyle.decorationColor,
-          decorationStyle: effectiveTextStyle.decorationStyle,
-          fontFamily: effectiveTextStyle.fontFamily,
-          fontFamilyFallback: effectiveTextStyle.fontFamilyFallback,
-        ),
-      ),
-    );
-
-    final markdownSheet = MarkdownStyleSheet.fromTheme(
-      streamThemeData, // Apply stream theme data
-    ).copyWith(p: effectiveTextStyle, a: effectiveLinkStyle).merge(props.styleSheet);
-
     // Prepend mention syntax so `[text](mention[-type]:id)` is intercepted
     // before the standard LinkSyntax, producing `mention` elements.
     // Regular `a` elements are never touched.
@@ -381,24 +366,63 @@ class DefaultStreamMessageText extends StatelessWidget {
       ...?props.builders,
     };
 
+    // `flutter_markdown_plus` is still built on Flutter's Material, whose
+    // `ThemeData` and `MaterialLocalizations` are unrelated types to
+    // `material_ui`'s. The bridge maps the ambient theme into that universe so
+    // the style sheet, and everything `MarkdownBody` builds, resolve.
+    //
+    // TODO(material-ui): drop once flutter_markdown_plus supports material_ui.
+    // https://linear.app/stream/issue/flu-701
     return Padding(
       padding: effectivePadding,
-      child: MarkdownBody(
-        data: props.text,
-        selectable: props.selectable,
-        styleSheet: markdownSheet,
-        styleSheetTheme: .platform,
-        syntaxHighlighter: props.syntaxHighlighter,
-        onTapLink: props.onTapLink,
-        onTapText: props.onTapText,
-        imageBuilder: props.imageBuilder,
-        builders: effectiveBuilders,
-        paddingBuilders: props.paddingBuilders ?? const {},
-        blockSyntaxes: props.blockSyntaxes,
-        inlineSyntaxes: effectiveInlineSyntaxes,
-        extensionSet: props.extensionSet,
-        softLineBreak: props.softLineBreak,
-        fitContent: props.fitContent,
+      // ignore: deprecated_member_use
+      child: MaterialUiCompatibilityBridge(
+        child: Builder(
+          builder: (context) {
+            // The bridge maps the colour scheme and text theme but not the
+            // legacy-only scalars, and `fromTheme` reads all four.
+            final theme = Theme.of(context);
+
+            final markdownTheme = legacy.Theme.of(context).let(
+              (it) => it.copyWith(
+                primaryColor: theme.primaryColor,
+                cardColor: theme.cardColor,
+                dividerColor: theme.dividerColor,
+                cardTheme: legacy.CardThemeData(color: theme.cardTheme.color),
+                textTheme: it.textTheme.apply(
+                  bodyColor: effectiveTextStyle.color,
+                  decoration: effectiveTextStyle.decoration,
+                  decorationColor: effectiveTextStyle.decorationColor,
+                  decorationStyle: effectiveTextStyle.decorationStyle,
+                  fontFamily: effectiveTextStyle.fontFamily,
+                  fontFamilyFallback: effectiveTextStyle.fontFamilyFallback,
+                ),
+              ),
+            );
+
+            final markdownSheet = MarkdownStyleSheet.fromTheme(
+              markdownTheme,
+            ).copyWith(p: effectiveTextStyle, a: effectiveLinkStyle).merge(props.styleSheet);
+
+            return MarkdownBody(
+              data: props.text,
+              selectable: props.selectable,
+              styleSheet: markdownSheet,
+              styleSheetTheme: .platform,
+              syntaxHighlighter: props.syntaxHighlighter,
+              onTapLink: props.onTapLink,
+              onTapText: props.onTapText,
+              imageBuilder: props.imageBuilder,
+              builders: effectiveBuilders,
+              paddingBuilders: props.paddingBuilders ?? const {},
+              blockSyntaxes: props.blockSyntaxes,
+              inlineSyntaxes: effectiveInlineSyntaxes,
+              extensionSet: props.extensionSet,
+              softLineBreak: props.softLineBreak,
+              fitContent: props.fitContent,
+            );
+          },
+        ),
       ),
     );
   }

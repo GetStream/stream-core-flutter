@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:stream_core_flutter/core.dart';
 
 /// A tile for editing a single avatar color pair (background and foreground).

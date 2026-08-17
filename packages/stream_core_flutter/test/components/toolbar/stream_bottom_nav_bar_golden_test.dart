@@ -1,7 +1,9 @@
 import 'package:alchemist/alchemist.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:stream_core_flutter/core.dart';
+
+import '../../utils/material_localizations.dart';
 
 const _kBarWidth = 390.0;
 
@@ -86,15 +88,17 @@ Widget _buildNavBarInTheme(
   Brightness brightness = Brightness.light,
 }) {
   final streamTheme = StreamTheme(brightness: brightness);
-  return Theme(
-    data: ThemeData(
-      brightness: brightness,
-      extensions: [streamTheme],
-    ),
-    child: Builder(
-      builder: (context) => Material(
-        color: StreamTheme.of(context).colorScheme.backgroundApp,
-        child: SizedBox(width: _kBarWidth, child: navBar),
+  return withMaterialLocalizations(
+    child: Theme(
+      data: ThemeData(
+        brightness: brightness,
+        extensions: [streamTheme],
+      ),
+      child: Builder(
+        builder: (context) => Material(
+          color: StreamTheme.of(context).colorScheme.backgroundApp,
+          child: SizedBox(width: _kBarWidth, child: navBar),
+        ),
       ),
     ),
   );
@@ -107,38 +111,40 @@ Widget _buildFloatingNavBarInTheme(
   Brightness brightness = Brightness.light,
 }) {
   final streamTheme = StreamTheme(brightness: brightness);
-  return Theme(
-    data: ThemeData(
-      brightness: brightness,
-      extensions: [streamTheme],
-    ),
-    child: Builder(
-      builder: (context) {
-        final colorScheme = StreamTheme.of(context).colorScheme;
-        return SizedBox(
-          width: _kBarWidth,
-          height: kStreamToolbarHeight * 3,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        colorScheme.backgroundApp,
-                        colorScheme.accentPrimary.withAlpha(0x40),
-                      ],
+  return withMaterialLocalizations(
+    child: Theme(
+      data: ThemeData(
+        brightness: brightness,
+        extensions: [streamTheme],
+      ),
+      child: Builder(
+        builder: (context) {
+          final colorScheme = StreamTheme.of(context).colorScheme;
+          return SizedBox(
+            width: _kBarWidth,
+            height: kStreamToolbarHeight * 3,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          colorScheme.backgroundApp,
+                          colorScheme.accentPrimary.withAlpha(0x40),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(bottom: 0, left: 0, right: 0, child: navBar),
-            ],
-          ),
-        );
-      },
+                Positioned(bottom: 0, left: 0, right: 0, child: navBar),
+              ],
+            ),
+          );
+        },
+      ),
     ),
   );
 }

@@ -1,5 +1,13 @@
 ## Upcoming
 
+### 🛑 Breaking / Removals
+
+- Migrated to the `material_ui` package. Every Material type this package exposes —
+  `StreamTheme` (a `ThemeExtension`), `ThemeData`, `ColorScheme`, widgets — now comes from
+  `package:material_ui/material_ui.dart` and is unrelated to the same-named type in
+  `package:flutter/material.dart`. Apps must import `material_ui` (and `cupertino_ui`) and use its
+  `MaterialApp`, which also supplies the `MaterialLocalizations` the components read.
+
 ### 🔄 Changed
 
 - Raised the minimum Flutter version to `>=3.44.0` and the Dart SDK to `^3.12.0`.

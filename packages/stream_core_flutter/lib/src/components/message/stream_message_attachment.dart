@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../theme/components/stream_message_attachment_theme.dart';
 import '../../theme/components/stream_message_item_theme.dart';
