@@ -6,8 +6,7 @@ import 'package:test/test.dart';
 /// Builds an unsigned JWT with the given [userId] claim, sufficient for
 /// [UserToken]'s unverified parsing.
 String _fakeJwt(String userId) {
-  String encode(Map<String, dynamic> json) =>
-      base64Url.encode(utf8.encode(jsonEncode(json))).replaceAll('=', '');
+  String encode(Map<String, dynamic> json) => base64Url.encode(utf8.encode(jsonEncode(json))).replaceAll('=', '');
   final header = encode({'alg': 'HS256', 'typ': 'JWT'});
   final payload = encode({'user_id': userId});
   final signature = encode({'sig': 'fake'});
@@ -47,7 +46,6 @@ void main() {
 
       expect(() => provider.loadToken('user-2'), throwsArgumentError);
     });
-
   });
 
   group('DynamicTokenProvider', () {
