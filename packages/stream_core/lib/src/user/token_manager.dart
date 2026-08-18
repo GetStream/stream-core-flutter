@@ -6,7 +6,7 @@ import 'user_token.dart';
 /// A callback invoked whenever the manager caches a newly loaded token.
 ///
 /// The manager awaits the callback before returning the token to the caller that triggered the load.
-typedef OnTokenUpdated = Future<void> Function(UserToken token);
+typedef OnTokenUpdated = void Function(UserToken token);
 
 /// Manages user authentication tokens with caching and thread-safe access.
 ///
