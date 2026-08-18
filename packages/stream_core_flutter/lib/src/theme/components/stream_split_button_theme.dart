@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
@@ -37,6 +38,7 @@ part 'stream_split_button_theme.g.theme.dart';
 ///
 ///  * [StreamSplitButtonThemeData], which describes the split button theme.
 ///  * [StreamSplitButton], the widget affected by this theme.
+@experimental
 class StreamSplitButtonTheme extends InheritedTheme {
   /// Creates a split button theme that controls descendant split buttons.
   const StreamSplitButtonTheme({
@@ -88,6 +90,7 @@ class StreamSplitButtonTheme extends InheritedTheme {
 ///  * [StreamSplitButton], the widget that uses this theme data.
 @themeGen
 @immutable
+@experimental
 class StreamSplitButtonThemeData with _$StreamSplitButtonThemeData {
   /// Creates split button theme data with optional style overrides.
   const StreamSplitButtonThemeData({this.style});
@@ -117,6 +120,7 @@ class StreamSplitButtonThemeData with _$StreamSplitButtonThemeData {
 ///  * [StreamButtonThemeStyle], for available button style properties.
 @themeGen
 @immutable
+@experimental
 class StreamSplitButtonStyle with _$StreamSplitButtonStyle {
   /// Creates split button style properties.
   const StreamSplitButtonStyle({
