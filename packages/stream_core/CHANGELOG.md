@@ -8,6 +8,8 @@
 - Added optional `initialToken` parameter to `TokenManager` to seed the token cache.
 - Added optional `onTokenUpdated` callback to `TokenManager`, awaited after every successful
   token load.
+- Added optional `rawValue` parameter to `UserToken.anonymous` so anonymous tokens can carry
+  a JWT (e.g. call-restricted tokens for closed livestreams).
 
 ### 🐞 Fixed
 

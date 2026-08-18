@@ -15,6 +15,24 @@ String _fakeJwt(String userId) {
 }
 
 void main() {
+  group('UserToken.anonymous', () {
+    test('defaults to !anon with no raw value', () {
+      final token = UserToken.anonymous();
+
+      expect(token.userId, '!anon');
+      expect(token.rawValue, isEmpty);
+      expect(token.authType, AuthType.anonymous);
+    });
+
+    test('carries an optional raw value for restricted access', () {
+      final token = UserToken.anonymous(rawValue: 'restricted-jwt');
+
+      expect(token.userId, '!anon');
+      expect(token.rawValue, 'restricted-jwt');
+      expect(token.authType, AuthType.anonymous);
+    });
+  });
+
   group('StaticTokenProvider', () {
     test('returns the token when the user ID matches', () async {
       final token = UserToken.anonymous(userId: 'user-1');
