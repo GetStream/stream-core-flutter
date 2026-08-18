@@ -119,7 +119,7 @@ class TokenManager {
   Future<UserToken> _loadAndNotify() async {
     final updatedToken = await _tokenProvider.loadToken(userId);
     _cachedToken = updatedToken;
-    await onTokenUpdated?.call(updatedToken);
+    onTokenUpdated?.call(updatedToken);
     return updatedToken;
   }
 

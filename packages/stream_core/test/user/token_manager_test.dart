@@ -231,7 +231,7 @@ void main() {
         final manager = TokenManager(
           userId: 'user-1',
           tokenProvider: provider,
-          onTokenUpdated: (token) async => updates.add(token),
+          onTokenUpdated: updates.add,
         );
 
         await manager.getToken();
