@@ -187,46 +187,40 @@ void main() {
 
         await manager.getToken();
         await manager.getToken(); // served from cache
-        await manager.refreshToken();
+
+        manager.expireToken();
+        await manager.getToken();
 
         expect(updates, [_token('v1'), _token('v2')]);
       });
 
-      test('is awaited before the token is returned', () async {
-        final completer = Completer<void>();
-        var callbackCompleted = false;
+      test('is invoked before the token is returned', () async {
+        UserToken? notified;
         final manager = TokenManager(
           userId: 'user-1',
           tokenProvider: _CountingProvider((_) async => _token('token-1')),
-          onTokenUpdated: (_) async {
-            await completer.future;
-            callbackCompleted = true;
-          },
+          onTokenUpdated: (token) => notified = token,
         );
 
-        final tokenFuture = manager.getToken();
-        expect(callbackCompleted, isFalse);
+        final token = await manager.getToken();
 
-        completer.complete();
-        await tokenFuture;
-
-        expect(callbackCompleted, isTrue);
+        expect(notified, token);
       });
 
       test('can safely call back into the manager', () async {
         late TokenManager manager;
-        UserToken? reentrantToken;
+        Future<UserToken>? reentrantCall;
         manager = TokenManager(
           userId: 'user-1',
           tokenProvider: _CountingProvider((_) async => _token('token-1')),
-          onTokenUpdated: (_) async {
-            reentrantToken = await manager.getToken();
+          onTokenUpdated: (_) {
+            reentrantCall = manager.getToken();
           },
         );
 
         final token = await manager.getToken();
 
-        expect(reentrantToken, token);
+        expect(await reentrantCall, token);
       });
     });
   });
