@@ -2,6 +2,7 @@
 
 ### ✨ Features
 
+- Added `AuthInterceptor.withProvider`, which takes a `TokenManager Function()` getter instead of a fixed `TokenManager` instance. This lets callers swap the active `TokenManager` at runtime — e.g. after a guest token exchange resolves a server-assigned user id — and have the interceptor pick up the new instance (and its `userId`) on the next request. The existing `AuthInterceptor(dio, tokenManager)` constructor is unchanged.
 - Added `teams` field to `User` class.
 - Added `TokenManager.refreshToken()` to force a reload from the provider, bypassing the cache.
 - Added optional `initialToken` parameter to `TokenManager` to seed the token cache.
@@ -14,6 +15,10 @@
   `TokenProvider` on every call.
 - The `TokenManager.tokenProvider` setter now stores the new provider, previously it only
   expired the cached token.
+
+### 🔄 Changed
+
+- Raised the minimum Dart SDK to `^3.12.0`.
 
 ## 0.4.0
 

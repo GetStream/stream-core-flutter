@@ -73,8 +73,8 @@ class StreamSafeArea extends StatelessWidget {
   /// clamped to `[0, 1]`.
   const StreamSafeArea.driven({
     super.key,
-    required ValueListenable<double> listenable,
-    EdgeInsets to = EdgeInsets.zero,
+    required ValueListenable<double> this._listenable,
+    this._to = EdgeInsets.zero,
     this.left = true,
     this.top = true,
     this.right = true,
@@ -83,8 +83,7 @@ class StreamSafeArea extends StatelessWidget {
     this.margin = EdgeInsets.zero,
     this.maintainBottomViewPadding = false,
     required this.child,
-  }) : _listenable = listenable,
-       _to = to;
+  });
 
   /// Whether to avoid system intrusions on the left ([minimum] and [margin] apply either way).
   final bool left;

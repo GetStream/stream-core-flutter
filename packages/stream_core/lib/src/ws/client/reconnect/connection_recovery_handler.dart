@@ -39,12 +39,11 @@ class ConnectionRecoveryHandler extends Disposable {
     required StreamWebSocketClient client,
     NetworkStateProvider? networkStateProvider,
     LifecycleStateProvider? lifecycleStateProvider,
-    bool keepConnectionAliveInBackground = false,
+    this._keepConnectionAliveInBackground = false,
     List<AutomaticReconnectionPolicy>? policies,
     RetryStrategy? retryStrategy,
   }) : _client = client,
        _reconnectStrategy = retryStrategy ?? RetryStrategy(),
-       _keepConnectionAliveInBackground = keepConnectionAliveInBackground,
        _policies = <AutomaticReconnectionPolicy>[
          ...?policies,
          WebSocketAutomaticReconnectionPolicy(
