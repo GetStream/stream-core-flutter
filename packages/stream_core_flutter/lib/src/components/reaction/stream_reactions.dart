@@ -15,6 +15,9 @@ import '../message_layout/stream_message_layout.dart';
 /// Callback when a reaction item is pressed.
 typedef OnReactionItemPressed = ValueSetter<StreamReactionsItem?>;
 
+/// Callback when a reaction item is long-pressed.
+typedef OnReactionItemLongPressed = ValueSetter<StreamReactionsItem?>;
+
 /// Displays reactions as either individual chips or a single grouped chip.
 ///
 /// Use [StreamReactions.segmented] to render each reaction type as its own
@@ -87,6 +90,7 @@ class StreamReactions extends StatelessWidget {
     @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
     VoidCallback? onPressed,
     OnReactionItemPressed? onReactionPressed,
+    OnReactionItemLongPressed? onReactionLongPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -100,6 +104,7 @@ class StreamReactions extends StatelessWidget {
          clipBehavior: clipBehavior,
          onPressed: onPressed,
          onReactionPressed: onReactionPressed,
+         onReactionLongPressed: onReactionLongPressed,
        );
 
   /// Creates segmented reactions where each type is rendered as its own chip.
@@ -117,6 +122,7 @@ class StreamReactions extends StatelessWidget {
     @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
     VoidCallback? onPressed,
     OnReactionItemPressed? onReactionPressed,
+    OnReactionItemLongPressed? onReactionLongPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -130,6 +136,7 @@ class StreamReactions extends StatelessWidget {
          clipBehavior: clipBehavior,
          onPressed: onPressed,
          onReactionPressed: onReactionPressed,
+         onReactionLongPressed: onReactionLongPressed,
        );
 
   /// Creates clustered reactions that group all reaction types into one chip.
@@ -147,6 +154,7 @@ class StreamReactions extends StatelessWidget {
     @Deprecated('Use onReactionPressed instead. onReactionPressed reports the pressed StreamReactionsItem.')
     VoidCallback? onPressed,
     OnReactionItemPressed? onReactionPressed,
+    OnReactionItemLongPressed? onReactionLongPressed,
   }) : props = .new(
          items: items,
          child: child,
@@ -160,6 +168,7 @@ class StreamReactions extends StatelessWidget {
          clipBehavior: clipBehavior,
          onPressed: onPressed,
          onReactionPressed: onReactionPressed,
+         onReactionLongPressed: onReactionLongPressed,
        );
 
   /// The properties that configure this widget.
@@ -195,6 +204,7 @@ class StreamReactionsProps {
     this.clipBehavior = Clip.none,
     this.onPressed,
     this.onReactionPressed,
+    this.onReactionLongPressed,
   }) : assert(
          onPressed == null || onReactionPressed == null,
          'Only one of onPressed or onReactionPressed can be provided. '
@@ -253,6 +263,16 @@ class StreamReactionsProps {
   /// visible chip; the overflow chip reports `null`. In clustered mode, the
   /// single grouped chip reports `null` since it represents no single item.
   final OnReactionItemPressed? onReactionPressed;
+
+  /// Called when a reaction chip is long-pressed, with the pressed item.
+  ///
+  /// Reports the item the same way [onReactionPressed] does. When null, no
+  /// long-press gesture is registered on the chips, leaving the gesture to an
+  /// ancestor.
+  ///
+  /// Only fires on an enabled chip, so it also requires [onPressed] or
+  /// [onReactionPressed] to be set.
+  final OnReactionItemLongPressed? onReactionLongPressed;
 }
 
 /// A single reaction item with an emoji widget and optional count.
@@ -424,12 +444,14 @@ class DefaultStreamReactions extends StatelessWidget {
           emoji: item.emoji,
           count: showCounts ? item.count ?? 1 : null,
           onPressed: _chipCallback(item),
+          onLongPress: _chipLongPressCallback(item),
         ),
       // The overflow chip aggregates hidden reactions, so it has no single item.
       if (overflow.isNotEmpty)
         StreamEmojiChip.overflow(
           count: overflowCount,
           onPressed: _chipCallback(null),
+          onLongPress: _chipLongPressCallback(null),
         ),
     ];
 
@@ -447,6 +469,7 @@ class DefaultStreamReactions extends StatelessWidget {
       emojis: visible,
       count: totalCount > 1 ? totalCount : null,
       onPressed: _chipCallback(null),
+      onLongPress: _chipLongPressCallback(null),
     );
   }
 
@@ -457,6 +480,15 @@ class DefaultStreamReactions extends StatelessWidget {
     final onReactionPressed = props.onReactionPressed;
     if (onReactionPressed != null) return () => onReactionPressed(item);
     return props.onPressed;
+  }
+
+  // Resolves a chip's long-press callback, staying null when
+  // [StreamReactions.onReactionLongPressed] is unset so the gesture falls
+  // through to an ancestor.
+  VoidCallback? _chipLongPressCallback(StreamReactionsItem? item) {
+    final onReactionLongPressed = props.onReactionLongPressed;
+    if (onReactionLongPressed == null) return null;
+    return () => onReactionLongPressed(item);
   }
 }
 

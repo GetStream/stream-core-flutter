@@ -1,5 +1,9 @@
 ## Upcoming
 
+### ✨ Features
+
+- Added `StreamReactions.onReactionLongPressed`, reporting the long-pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip. When null, the chips register no long-press gesture, leaving it to an ancestor.
+
 ### 🔄 Changed
 
 - Raised the minimum Flutter version to `>=3.44.0` and the Dart SDK to `^3.12.0`.

@@ -85,11 +85,28 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
     description: 'Number of distinct reaction types to display.',
   );
 
+  final longPress = context.knobs.boolean(
+    label: 'Long Press',
+    initialValue: true,
+    description: 'When off, the chips register no long-press gesture, leaving it to an ancestor.',
+  );
+
   final items = _allReactionItems.take(reactionCount).toList();
   final spacing = context.streamSpacing;
 
   final alignment = alignmentOption.value;
   final crossAxisAlignment = crossAxisOption.value;
+
+  // The cluster and overflow chips map to no single item, so they report null.
+  void report(String action, StreamReactionsItem? item) {
+    final emoji = switch (item?.emoji) {
+      StreamUnicodeEmoji(:final emoji) => emoji,
+      _ => null,
+    };
+    _showSnack(context, emoji != null ? '$action $emoji' : '$action all reactions');
+  }
+
+  final onReactionLongPressed = longPress ? (StreamReactionsItem? item) => report('Long-pressed', item) : null;
 
   Widget buildReaction({required Widget bubble}) => switch (type) {
     StreamReactionsType.segmented => StreamReactions.segmented(
@@ -100,16 +117,8 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
       max: max,
       overlap: overlap,
       indent: indent,
-      onReactionPressed: (item) {
-        final emoji = switch (item?.emoji) {
-          StreamUnicodeEmoji(:final emoji) => emoji,
-          _ => null,
-        };
-        _showSnack(
-          context,
-          emoji != null ? 'Tapped $emoji' : 'Tapped all reactions',
-        );
-      },
+      onReactionPressed: (item) => report('Tapped', item),
+      onReactionLongPressed: onReactionLongPressed,
       child: bubble,
     ),
     StreamReactionsType.clustered => StreamReactions.clustered(
@@ -120,16 +129,8 @@ Widget buildStreamReactionsPlayground(BuildContext context) {
       max: max,
       overlap: overlap,
       indent: indent,
-      onReactionPressed: (item) {
-        final emoji = switch (item?.emoji) {
-          StreamUnicodeEmoji(:final emoji) => emoji,
-          _ => null,
-        };
-        _showSnack(
-          context,
-          emoji != null ? 'Tapped $emoji' : 'Tapped all reactions',
-        );
-      },
+      onReactionPressed: (item) => report('Tapped', item),
+      onReactionLongPressed: onReactionLongPressed,
       child: bubble,
     ),
   };

@@ -271,4 +271,123 @@ void main() {
       expect(count, 1);
     });
   });
+
+  group('StreamReactions.onReactionLongPressed', () {
+    Widget wrap(Widget child) {
+      return MaterialApp(
+        home: Theme(
+          data: ThemeData(extensions: [StreamTheme()]),
+          child: Scaffold(body: child),
+        ),
+      );
+    }
+
+    testWidgets('segmented reports the long-pressed item', (tester) async {
+      StreamReactionsItem? longPressed;
+      var callCount = 0;
+      await tester.pumpWidget(
+        wrap(
+          StreamReactions.segmented(
+            items: const [
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3, key: 'like'),
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('❤️'), count: 2, key: 'love'),
+            ],
+            onReactionPressed: (_) {},
+            onReactionLongPressed: (item) {
+              longPressed = item;
+              callCount++;
+            },
+          ),
+        ),
+      );
+
+      await tester.longPress(find.byType(IconButton).first);
+      expect(callCount, 1);
+      expect(longPressed?.key, 'like');
+    });
+
+    testWidgets('segmented overflow chip reports null', (tester) async {
+      StreamReactionsItem? longPressed;
+      var called = false;
+      await tester.pumpWidget(
+        wrap(
+          StreamReactions.segmented(
+            // Force an overflow chip by limiting visible segments to one.
+            max: 1,
+            items: const [
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 1, key: 'like'),
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('❤️'), count: 1, key: 'love'),
+            ],
+            onReactionPressed: (_) {},
+            onReactionLongPressed: (item) {
+              longPressed = item;
+              called = true;
+            },
+          ),
+        ),
+      );
+
+      // The overflow "+N" chip is the trailing chip.
+      await tester.longPress(find.byType(IconButton).last);
+      expect(called, isTrue);
+      expect(longPressed, isNull);
+    });
+
+    testWidgets('clustered chip reports null', (tester) async {
+      StreamReactionsItem? longPressed;
+      var called = false;
+      await tester.pumpWidget(
+        wrap(
+          StreamReactions.clustered(
+            items: const [
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3, key: 'like'),
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('❤️'), count: 2, key: 'love'),
+            ],
+            onReactionPressed: (_) {},
+            onReactionLongPressed: (item) {
+              longPressed = item;
+              called = true;
+            },
+          ),
+        ),
+      );
+
+      await tester.longPress(find.byType(IconButton).first);
+      expect(called, isTrue);
+      expect(longPressed, isNull);
+    });
+
+    testWidgets('registers no long-press gesture when onReactionLongPressed is null', (tester) async {
+      await tester.pumpWidget(
+        wrap(
+          StreamReactions.segmented(
+            items: const [
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3, key: 'like'),
+            ],
+            onReactionPressed: (_) {},
+          ),
+        ),
+      );
+
+      final button = tester.widget<IconButton>(find.byType(IconButton).first);
+      expect(button.onLongPress, isNull);
+    });
+
+    testWidgets('does not fire on a chip left disabled by a null press callback', (tester) async {
+      var called = false;
+      await tester.pumpWidget(
+        wrap(
+          StreamReactions.segmented(
+            items: const [
+              StreamReactionsItem(emoji: StreamUnicodeEmoji('👍'), count: 3, key: 'like'),
+            ],
+            onReactionLongPressed: (_) => called = true,
+          ),
+        ),
+      );
+
+      await tester.longPress(find.byType(IconButton).first);
+      expect(called, isFalse);
+    });
+  });
 }
