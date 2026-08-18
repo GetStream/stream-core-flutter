@@ -33,14 +33,6 @@ Widget buildStreamSplitButtonPlayground(BuildContext context) {
     description: 'Split button type variant. Outline draws one border around both halves.',
   );
 
-  final size = context.knobs.object.dropdown(
-    label: 'Size',
-    options: StreamButtonSize.values,
-    initialOption: StreamButtonSize.small,
-    labelBuilder: (option) => option.name,
-    description: 'Painted area of each half. The tap target stays accessible regardless.',
-  );
-
   final caretUp = context.knobs.boolean(
     label: 'Caret Up',
     description: 'Point the trailing caret up, as when the menu it opens is already showing.',
@@ -71,7 +63,6 @@ Widget buildStreamSplitButtonPlayground(BuildContext context) {
         trailingIcon: Icon(caretUp ? icons.caretUp : icons.caretDown),
         style: style,
         type: type,
-        size: size,
         tooltip: 'Mute',
         trailingTooltip: 'Audio settings',
         onPressed: leadingEnabled ? () {} : null,
@@ -104,7 +95,6 @@ Widget buildStreamSplitButtonShowcase(BuildContext context) {
         spacing: spacing.xl,
         children: const [
           _StyleTypeMatrixSection(),
-          _SizeScaleSection(),
           _DisabledSection(),
           _CallControlSection(),
         ],
@@ -139,46 +129,12 @@ class _StyleTypeMatrixSection extends StatelessWidget {
                     trailingIcon: Icon(icons.caretDown),
                     style: style,
                     type: type,
-                    size: StreamButtonSize.small,
                     tooltip: 'Mute',
                     trailingTooltip: 'Audio settings',
                     onPressed: () {},
                     onTrailingPressed: () {},
                   ),
               ],
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SizeScaleSection extends StatelessWidget {
-  const _SizeScaleSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final icons = context.streamIcons;
-    final spacing = context.streamSpacing;
-
-    return _ExampleCard(
-      title: 'Sizes',
-      description:
-          'Size sets the area a half highlights on hover and press — press one to see it. '
-          'The surface itself always hugs the tap targets.',
-      child: Row(
-        spacing: spacing.md,
-        children: [
-          for (final size in StreamButtonSize.values)
-            StreamSplitButton.icon(
-              icon: Icon(icons.voiceFill),
-              trailingIcon: Icon(icons.caretDown),
-              style: StreamButtonStyle.secondary,
-              size: size,
-              tooltip: size.name,
-              trailingTooltip: 'Audio settings',
-              onPressed: () {},
-              onTrailingPressed: () {},
             ),
         ],
       ),
@@ -212,7 +168,6 @@ class _DisabledSection extends StatelessWidget {
                   icon: Icon(icons.voiceFill),
                   trailingIcon: Icon(icons.caretDown),
                   style: StreamButtonStyle.secondary,
-                  size: StreamButtonSize.small,
                   onPressed: leading ? () {} : null,
                   onTrailingPressed: trailing ? () {} : null,
                 ),
@@ -252,7 +207,6 @@ class _CallControlSectionState extends State<_CallControlSection> {
             icon: Icon(_isMuted ? icons.voiceOffFill : icons.voiceFill),
             trailingIcon: Icon(_isSettingsOpen ? icons.caretUp : icons.caretDown),
             style: _isMuted ? StreamButtonStyle.destructive : StreamButtonStyle.secondary,
-            size: StreamButtonSize.small,
             tooltip: _isMuted ? 'Unmute' : 'Mute',
             trailingTooltip: 'Audio settings',
             onPressed: () => setState(() => _isMuted = !_isMuted),

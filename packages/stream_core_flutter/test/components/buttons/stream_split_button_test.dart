@@ -12,7 +12,6 @@ Widget _withStreamTheme(Widget child, {StreamTheme? streamTheme}) {
 StreamSplitButton _splitButton({
   StreamButtonStyle style = StreamButtonStyle.primary,
   StreamButtonType type = StreamButtonType.solid,
-  StreamButtonSize size = StreamButtonSize.small,
   IconData trailingIcon = StreamIconData.caretDown,
   VoidCallback? onPressed,
   VoidCallback? onTrailingPressed,
@@ -25,7 +24,6 @@ StreamSplitButton _splitButton({
     trailingIcon: Icon(trailingIcon),
     style: style,
     type: type,
-    size: size,
     onPressed: onPressed,
     onTrailingPressed: onTrailingPressed,
     tooltip: tooltip,
@@ -34,12 +32,14 @@ StreamSplitButton _splitButton({
   );
 }
 
+/// The shared surface both halves sit on.
+Finder _surfaceFinder() {
+  return find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(DecoratedBox)).first;
+}
+
 /// The [ShapeDecoration] of the shared surface both halves sit on.
 ShapeDecoration _surfaceOf(WidgetTester tester) {
-  final decorated = tester.widget<DecoratedBox>(
-    find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(DecoratedBox)).first,
-  );
-  return decorated.decoration as ShapeDecoration;
+  return tester.widget<DecoratedBox>(_surfaceFinder()).decoration as ShapeDecoration;
 }
 
 /// The resolved [ButtonStyle] of the half at [index] (0 leading, 1 trailing).
@@ -152,9 +152,49 @@ void main() {
   });
 
   group('StreamSplitButton layout', () {
-    testWidgets('keeps a tap target per half whatever the button theme asks for', (tester) async {
+    testWidgets('matches the design: 81x48 control over an 81x40 surface', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(_splitButton(style: .secondary, onPressed: () {}, onTrailingPressed: () {})),
+      );
+
+      expect(tester.getSize(find.byType(StreamSplitButton)), const Size(81, 48));
+      expect(tester.getSize(_surfaceFinder()), const Size(81, 40));
+
+      final halves = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(StreamButton));
+      expect(tester.getSize(halves.at(0)), const Size(32, 32));
+      expect(tester.getSize(halves.at(1)), const Size(32, 32));
+
+      // The icons are drawn at 20 in a 40-tall surface. Get either number
+      // wrong and the glyphs read as too big for the control.
+      expect(_halfStyleOf(tester, 0).iconSize!.resolve(<WidgetState>{}), 20);
+      expect(_halfStyleOf(tester, 1).iconSize!.resolve(<WidgetState>{}), 20);
+    });
+
+    testWidgets('paints a surface as tall as a lone medium StreamButton', (tester) async {
+      // The reason the surface is not simply the height of the tap targets:
+      // side by side with a plain icon button, the two have to line up.
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Column(
+            children: [
+              _splitButton(style: .secondary, onPressed: () {}, onTrailingPressed: () {}),
+              StreamButton.icon(icon: const Icon(Icons.mic), style: .secondary, onPressed: () {}),
+            ],
+          ),
+        ),
+      );
+
+      final reference = tester.getSize(
+        find.descendant(of: find.byType(StreamButton).last, matching: find.byType(Material)).first,
+      );
+      expect(tester.getSize(_surfaceFinder()).height, reference.height);
+    });
+
+    testWidgets('keeps a full-height tap target per half whatever the button theme asks for', (tester) async {
       // A theme that shrink-wraps every button must not shrink the halves
-      // below the platform tap target.
+      // below the platform tap target. Note the design makes the halves
+      // narrower than tall, so they clear the height but not the width the
+      // platform guidelines ask for.
       await tester.pumpWidget(
         _withStreamTheme(
           streamTheme: StreamTheme(
@@ -164,18 +204,54 @@ void main() {
               ),
             ),
           ),
-          _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(
+            onPressed: () {},
+            onTrailingPressed: () {},
+            tooltip: 'Mute',
+            trailingTooltip: 'Audio settings',
+          ),
         ),
       );
 
-      final halves = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(StreamButton));
-      expect(tester.getSize(halves.at(0)), const Size(48, 48));
-      expect(tester.getSize(halves.at(1)), const Size(48, 48));
-
       final handle = tester.ensureSemantics();
-      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
-      await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+      for (final tooltip in ['Mute', 'Audio settings']) {
+        final node = tester.getSemantics(find.byTooltip(tooltip));
+        expect(node.rect.height, kMinInteractiveDimension, reason: '$tooltip tap target height');
+      }
       handle.dispose();
+    });
+
+    testWidgets('taps land on the half they overhang, not its neighbour', (tester) async {
+      // Each half's target is taller than what it paints, so the two overhang
+      // the surface. Material's own tap-target padding answers every hit test
+      // regardless of position, which would let the trailing half swallow taps
+      // meant for the leading one.
+      var pressed = 0;
+      var trailingPressed = 0;
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          _splitButton(
+            onPressed: () => pressed++,
+            onTrailingPressed: () => trailingPressed++,
+            tooltip: 'Mute',
+            trailingTooltip: 'Audio settings',
+          ),
+        ),
+      );
+
+      final control = tester.getRect(find.byType(StreamSplitButton));
+      final leading = tester.getRect(find.byTooltip('Mute'));
+      final trailing = tester.getRect(find.byTooltip('Audio settings'));
+      expect(leading.top, greaterThan(control.top), reason: 'the paint should sit inside the target');
+
+      await tester.tapAt(Offset(leading.center.dx, control.top + 2));
+      await tester.pumpAndSettle();
+      expect((pressed, trailingPressed), (1, 0));
+
+      await tester.tapAt(Offset(trailing.center.dx, control.bottom - 2));
+      await tester.pumpAndSettle();
+      expect((pressed, trailingPressed), (1, 1));
     });
 
     testWidgets('separates the halves with a divider inset from the rounded ends', (tester) async {
