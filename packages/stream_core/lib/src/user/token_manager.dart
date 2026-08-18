@@ -24,9 +24,6 @@ typedef OnTokenUpdated = void Function(UserToken token);
 /// // Get a token (loads and caches if needed)
 /// final token = await manager.getToken();
 ///
-/// // Force a reload from the provider
-/// final freshToken = await manager.refreshToken();
-///
 /// // Peek at cached token without loading
 /// final cachedToken = manager.peekToken();
 ///
@@ -96,19 +93,6 @@ class TokenManager {
     return synchronized(() {
       final currentToken = _cachedToken;
       if (currentToken != null) return Future.value(currentToken);
-
-      return _loadAndNotify();
-    });
-  }
-
-  /// Forces a reload from the provider, bypassing the cache.
-  Future<UserToken> refreshToken() {
-    final snapshot = _cachedToken;
-    return synchronized(() {
-      final currentToken = _cachedToken;
-      if (snapshot != currentToken && currentToken != null) {
-        return Future.value(currentToken);
-      }
 
       return _loadAndNotify();
     });

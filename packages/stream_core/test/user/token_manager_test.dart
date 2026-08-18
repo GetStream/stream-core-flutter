@@ -112,55 +112,6 @@ void main() {
       });
     });
 
-    group('refreshToken', () {
-      test('bypasses the cache and loads a fresh token', () async {
-        var version = 0;
-        final provider = _CountingProvider((_) async => _token('v${++version}'));
-        final manager = TokenManager(
-          userId: 'user-1',
-          tokenProvider: provider,
-        );
-
-        expect(await manager.getToken(), _token('v1'));
-        expect(await manager.refreshToken(), _token('v2'));
-        expect(manager.peekToken(), _token('v2'));
-        expect(provider.loadCount, 2);
-      });
-
-      test('coalesces concurrent refreshes into a single load', () async {
-        var version = 0;
-        final completer = Completer<UserToken>();
-        final provider = _CountingProvider((_) {
-          version++;
-          return completer.future;
-        });
-        final manager = TokenManager(
-          userId: 'user-1',
-          tokenProvider: provider,
-        );
-
-        final futures = [manager.refreshToken(), manager.refreshToken()];
-        completer.complete(_token('v$version'));
-        final tokens = await Future.wait(futures);
-
-        expect(tokens, everyElement(_token('v1')));
-        expect(provider.loadCount, 1);
-      });
-
-      test('sequential refreshes each load a fresh token', () async {
-        var version = 0;
-        final provider = _CountingProvider((_) async => _token('v${++version}'));
-        final manager = TokenManager(
-          userId: 'user-1',
-          tokenProvider: provider,
-        );
-
-        expect(await manager.refreshToken(), _token('v1'));
-        expect(await manager.refreshToken(), _token('v2'));
-        expect(provider.loadCount, 2);
-      });
-    });
-
     group('tokenProvider setter', () {
       test('swaps the provider and expires the cached token', () async {
         final oldProvider = _CountingProvider((_) async => _token('old'));
