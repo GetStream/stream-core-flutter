@@ -15,12 +15,8 @@ import 'stream_button.dart';
 ///
 /// A split button pairs a primary action with a secondary one — most often a
 /// caret that opens the options for that action. Both halves are
-/// [StreamButton]s painted on a single background, so the control reads as one
-/// pill rather than two adjacent buttons.
-///
-/// The primary half takes either a [child] with an optional leading icon
-/// (the default constructor) or an icon on its own ([StreamSplitButton.icon]).
-/// The trailing half is always icon-only.
+/// [StreamButton.icon]s painted on a single background, so the control reads
+/// as one pill rather than two adjacent buttons.
 ///
 /// The surface is resolved from the same [StreamButtonTheme] entry the halves
 /// use, which is what keeps the two from drifting apart. For
@@ -49,17 +45,15 @@ import 'stream_button.dart';
 ///
 /// {@tool snippet}
 ///
-/// A labelled action whose caret flips while the menu it opens is showing:
+/// Flip the caret while the menu it opens is showing:
 ///
 /// ```dart
-/// StreamSplitButton(
+/// StreamSplitButton.icon(
 ///   type: StreamButtonType.outline,
 ///   icon: const Icon(Icons.share),
 ///   trailingIcon: Icon(isMenuOpen ? icons.caretUp : icons.caretDown),
-///   trailingTooltip: 'More share options',
 ///   onPressed: () => share(),
 ///   onTrailingPressed: () => toggleMenu(),
-///   child: const Text('Share'),
 /// )
 /// ```
 /// {@end-tool}
@@ -70,43 +64,6 @@ import 'stream_button.dart';
 ///  * [StreamSplitButtonTheme], for customizing split button appearance.
 @experimental
 class StreamSplitButton extends StatelessWidget {
-  /// Creates a split button whose primary half displays [child], optionally
-  /// preceded by [icon].
-  ///
-  /// The trailing half stays icon-only: [trailingIcon] is typically a caret
-  /// pointing at whatever that half opens.
-  ///
-  /// The primary half takes its accessibility label from [child], so there is
-  /// no tooltip for it; the trailing half has [trailingTooltip].
-  ///
-  /// A half with a null callback is disabled; the control as a whole only
-  /// takes on its disabled surface once both halves are.
-  @experimental
-  StreamSplitButton({
-    super.key,
-    required Widget child,
-    required Widget trailingIcon,
-    Widget? icon,
-    VoidCallback? onPressed,
-    VoidCallback? onTrailingPressed,
-    StreamButtonStyle style = .primary,
-    StreamButtonType type = .solid,
-    StreamButtonSize size = .small,
-    String? trailingTooltip,
-    StreamSplitButtonStyle? themeStyle,
-  }) : props = .new(
-         child: child,
-         icon: icon,
-         trailingIcon: trailingIcon,
-         onPressed: onPressed,
-         onTrailingPressed: onTrailingPressed,
-         style: style,
-         type: type,
-         size: size,
-         trailingTooltip: trailingTooltip,
-         themeStyle: themeStyle,
-       );
-
   /// Creates a split button with an icon in each half.
   ///
   /// [icon] labels the primary half and [trailingIcon] the secondary one.
@@ -165,9 +122,8 @@ class StreamSplitButton extends StatelessWidget {
 class StreamSplitButtonProps {
   /// Creates properties for a split button.
   const StreamSplitButtonProps({
+    required this.icon,
     required this.trailingIcon,
-    this.child,
-    this.icon,
     this.onPressed,
     this.onTrailingPressed,
     this.style = .primary,
@@ -176,18 +132,10 @@ class StreamSplitButtonProps {
     this.tooltip,
     this.trailingTooltip,
     this.themeStyle,
-  }) : assert(child != null || icon != null, 'A primary half with no child needs an icon');
+  });
 
-  /// The main content widget displayed in the primary (leading) half.
-  ///
-  /// When null, that half renders as an icon-only button using [icon] as its
-  /// sole icon (see [StreamSplitButton.icon]).
-  final Widget? child;
-
-  /// The icon rendered in the primary (leading) half, before [child].
-  ///
-  /// When [child] is null, this is the sole icon that half renders.
-  final Widget? icon;
+  /// The icon rendered in the primary (leading) half.
+  final Widget icon;
 
   /// The icon rendered in the secondary (trailing) half.
   ///
@@ -218,15 +166,12 @@ class StreamSplitButtonProps {
   /// The size of each half.
   ///
   /// Sets the painted area of a half — the surface it highlights on hover and
-  /// press, and the height of a half carrying a [child]. Each half keeps an
-  /// accessible tap target regardless of this value.
+  /// press. Each half keeps an accessible tap target regardless of this value.
   final StreamButtonSize size;
 
   /// Text shown in a [Tooltip] on hover / long-press of the primary half, and
   /// used as its accessibility label.
   ///
-  /// Only honoured while [child] is null; a primary half with a [child]
-  /// derives its label from that child.
   /// When null, that half has no tooltip.
   final String? tooltip;
 
@@ -245,8 +190,8 @@ class StreamSplitButtonProps {
 
 /// Default implementation of [StreamSplitButton].
 ///
-/// Renders a [Row] of two [StreamButton] halves over a shared surface, with a
-/// divider between them.
+/// Renders a [Row] of two [StreamButton.icon] halves over a shared surface,
+/// with a divider between them.
 ///
 /// See also:
 ///
@@ -292,29 +237,6 @@ class DefaultStreamSplitButton extends StatelessWidget {
       elevation: const WidgetStatePropertyAll(0),
     );
 
-    final leadingHalf = switch (props.child) {
-      final child? => StreamButton(
-        iconLeft: props.icon,
-        onPressed: props.onPressed,
-        style: props.style,
-        type: props.type,
-        // For the regular `StreamButton` we always use large, otherwise the padding is weird.
-        size: .large,
-        themeStyle: halfStyle,
-        child: child,
-      ),
-      // The assert on the props guarantees an icon once there is no child.
-      _ => StreamButton.icon(
-        icon: props.icon!,
-        onPressed: props.onPressed,
-        style: props.style,
-        type: props.type,
-        size: props.size,
-        tooltip: props.tooltip,
-        themeStyle: halfStyle,
-      ),
-    };
-
     return DecoratedBox(
       decoration: ShapeDecoration(
         color: buttonStyle.backgroundColor?.resolve(states),
@@ -326,10 +248,15 @@ class DefaultStreamSplitButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // A label can outgrow the space on offer; an icon never does, and
-          // staying inflexible keeps the icon-only variant usable in an
-          // unbounded row.
-          if (props.child != null) Flexible(child: leadingHalf) else leadingHalf,
+          StreamButton.icon(
+            icon: props.icon,
+            onPressed: props.onPressed,
+            style: props.style,
+            type: props.type,
+            size: props.size,
+            tooltip: props.tooltip,
+            themeStyle: halfStyle,
+          ),
           SizedBox(
             width: effectiveSeparatorThickness,
             height: effectiveSeparatorHeight,
