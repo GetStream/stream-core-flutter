@@ -63,6 +63,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamSnackbarThemeData? snackbarTheme,
+    StreamSplitButtonThemeData? splitButtonTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
   }) {
@@ -132,6 +133,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       sheetTheme: sheetTheme ?? _this.sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
       snackbarTheme: snackbarTheme ?? _this.snackbarTheme,
+      splitButtonTheme: splitButtonTheme ?? _this.splitButtonTheme,
       stepperTheme: stepperTheme ?? _this.stepperTheme,
       switchTheme: switchTheme ?? _this.switchTheme,
     );
@@ -342,6 +344,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.snackbarTheme,
         t,
       )!,
+      splitButtonTheme: StreamSplitButtonThemeData.lerp(
+        _this.splitButtonTheme,
+        other.splitButtonTheme,
+        t,
+      )!,
       stepperTheme: StreamStepperThemeData.lerp(
         _this.stepperTheme,
         other.stepperTheme,
@@ -420,6 +427,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.sheetTheme == _this.sheetTheme &&
         _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
         _other.snackbarTheme == _this.snackbarTheme &&
+        _other.splitButtonTheme == _this.splitButtonTheme &&
         _other.stepperTheme == _this.stepperTheme &&
         _other.switchTheme == _this.switchTheme;
   }
@@ -475,6 +483,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.sheetTheme,
       _this.skeletonLoadingTheme,
       _this.snackbarTheme,
+      _this.splitButtonTheme,
       _this.stepperTheme,
       _this.switchTheme,
     ]);
