@@ -26,7 +26,7 @@ class AuthInterceptor extends QueuedInterceptor {
   ) : _tokenManager = tokenManager,
       _tokenManagerProvider = null;
 
-  /// Initialize a new auth interceptor backed by a [tokenManagerProvider].
+  /// Initialize a new auth interceptor backed by a [_tokenManagerProvider].
   ///
   /// The provider is a getter rather than a fixed reference so the caller can
   /// swap the underlying [TokenManager] — e.g. after a guest token exchange
@@ -34,9 +34,8 @@ class AuthInterceptor extends QueuedInterceptor {
   /// the new instance on its next request.
   AuthInterceptor.withProvider(
     this._dio, {
-    required TokenManagerProvider tokenManagerProvider,
-  }) : _tokenManager = null,
-       _tokenManagerProvider = tokenManagerProvider;
+    required TokenManagerProvider this._tokenManagerProvider,
+  }) : _tokenManager = null;
 
   final Dio _dio;
 
