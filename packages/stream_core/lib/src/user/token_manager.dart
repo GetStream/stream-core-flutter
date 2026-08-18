@@ -39,20 +39,13 @@ class TokenManager {
   /// The [userId] identifies the user for whom tokens will be managed.
   /// The [_tokenProvider] is used to load tokens when needed.
   ///
-  /// An optional [initialToken] seeds the cache, so the first [getToken] call
-  /// returns it without contacting the provider. Once the token is expired
-  /// via [expireToken] (or reloaded via [refreshToken]), subsequent loads go
-  /// through the provider.
-  ///
   /// An optional [onTokenUpdated] callback is invoked after every successful
-  /// token load. It is not invoked for the [initialToken] or for callers
-  /// served from the cache.
+  /// token load. It is not invoked for callers served from the cache.
   TokenManager({
     required this.userId,
     required this._tokenProvider,
-    UserToken? initialToken,
     this.onTokenUpdated,
-  }) : _cachedToken = initialToken;
+  });
 
   /// The unique identifier of the user whose tokens are managed.
   final String userId;

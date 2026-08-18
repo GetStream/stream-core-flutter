@@ -93,35 +93,6 @@ void main() {
       });
     });
 
-    group('initialToken', () {
-      test('seeds the cache so the provider is not contacted', () async {
-        final provider = _CountingProvider((_) async => _token('loaded'));
-        final manager = TokenManager(
-          userId: 'user-1',
-          tokenProvider: provider,
-          initialToken: _token('initial'),
-        );
-
-        expect(manager.peekToken(), _token('initial'));
-        expect(await manager.getToken(), _token('initial'));
-        expect(provider.loadCount, 0);
-      });
-
-      test('is replaced via the provider after expireToken', () async {
-        final provider = _CountingProvider((_) async => _token('loaded'));
-        final manager = TokenManager(
-          userId: 'user-1',
-          tokenProvider: provider,
-          initialToken: _token('initial'),
-        );
-
-        manager.expireToken();
-
-        expect(await manager.getToken(), _token('loaded'));
-        expect(provider.loadCount, 1);
-      });
-    });
-
     group('expireToken', () {
       test('clears the cache and forces a reload', () async {
         var version = 0;
@@ -268,20 +239,6 @@ void main() {
         await manager.refreshToken();
 
         expect(updates, [_token('v1'), _token('v2')]);
-      });
-
-      test('does not fire for the initial token', () async {
-        final updates = <UserToken>[];
-        final manager = TokenManager(
-          userId: 'user-1',
-          tokenProvider: _CountingProvider((_) async => _token('loaded')),
-          initialToken: _token('initial'),
-          onTokenUpdated: (token) async => updates.add(token),
-        );
-
-        await manager.getToken();
-
-        expect(updates, isEmpty);
       });
 
       test('is awaited before the token is returned', () async {
