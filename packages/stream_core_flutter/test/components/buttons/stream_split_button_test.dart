@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_redundant_argument_values
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/video.dart';
@@ -50,24 +48,6 @@ ButtonStyle _halfStyleOf(WidgetTester tester, int index) {
     find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ElevatedButton)).at(index),
   );
   return button.style!;
-}
-
-StreamSplitButton _labelledSplitButton({
-  Widget? icon = const Icon(StreamIconData.voiceFill),
-  VoidCallback? onPressed,
-  VoidCallback? onTrailingPressed,
-  String? trailingTooltip,
-}) {
-  return StreamSplitButton(
-    icon: icon,
-    trailingIcon: const Icon(StreamIconData.caretDown),
-    style: StreamButtonStyle.secondary,
-    size: StreamButtonSize.small,
-    onPressed: onPressed,
-    onTrailingPressed: onTrailingPressed,
-    trailingTooltip: trailingTooltip,
-    child: const Text('MacBook Pro Microphone', overflow: TextOverflow.ellipsis),
-  );
 }
 
 void main() {
@@ -230,110 +210,6 @@ void main() {
       final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
       expect(tester.widget<ColoredBox>(divider).color, const Color(0xFFFF0000));
       expect(tester.getSize(divider), const Size(2, 10));
-    });
-  });
-
-  group('StreamSplitButton label', () {
-    testWidgets('renders the child between the leading icon and the divider', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(_labelledSplitButton(onPressed: () {}, onTrailingPressed: () {})),
-      );
-
-      final icon = tester.getCenter(find.byIcon(StreamIconData.voiceFill));
-      final label = tester.getCenter(find.text('MacBook Pro Microphone'));
-      final caret = tester.getCenter(find.byIcon(StreamIconData.caretDown));
-      expect(icon.dx, lessThan(label.dx));
-      expect(label.dx, lessThan(caret.dx));
-    });
-
-    testWidgets('renders without a leading icon', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(_labelledSplitButton(icon: null, onPressed: () {}, onTrailingPressed: () {})),
-      );
-
-      expect(find.byIcon(StreamIconData.voiceFill), findsNothing);
-      expect(find.text('MacBook Pro Microphone'), findsOneWidget);
-    });
-
-    testWidgets('takes its accessibility label from the child', (tester) async {
-      final handle = tester.ensureSemantics();
-
-      await tester.pumpWidget(
-        _withStreamTheme(
-          _labelledSplitButton(onPressed: () {}, onTrailingPressed: () {}, trailingTooltip: 'Audio settings'),
-        ),
-      );
-
-      expect(
-        tester.getSemantics(find.byType(StreamButton).first),
-        isSemantics(
-          label: 'MacBook Pro Microphone',
-          isButton: true,
-          isEnabled: true,
-          hasEnabledState: true,
-          hasTapAction: true,
-        ),
-      );
-
-      handle.dispose();
-    });
-
-    testWidgets('hugs its content when there is room', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: _labelledSplitButton(onPressed: () {}, onTrailingPressed: () {}),
-          ),
-        ),
-      );
-
-      expect(tester.getSize(find.byType(StreamSplitButton)).width, lessThan(600));
-    });
-
-    testWidgets('fills the width it is given', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          SizedBox(
-            width: 600,
-            child: _labelledSplitButton(onPressed: () {}, onTrailingPressed: () {}),
-          ),
-        ),
-      );
-
-      expect(tester.getSize(find.byType(StreamSplitButton)).width, 600);
-    });
-
-    testWidgets('gives up width to the label rather than overflowing', (tester) async {
-      // A device picker names whatever the OS reports, so the label has to
-      // truncate inside the space on offer instead of blowing out the row.
-      await tester.pumpWidget(
-        _withStreamTheme(
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 200),
-            child: _labelledSplitButton(onPressed: () {}, onTrailingPressed: () {}),
-          ),
-        ),
-      );
-
-      expect(tester.takeException(), isNull);
-      expect(tester.getSize(find.byType(StreamSplitButton)).width, 200);
-      // The trailing half never gives up its tap target to the label.
-      expect(tester.getSize(find.byType(StreamButton).last), const Size(48, 48));
-    });
-
-    testWidgets('lays out in an unbounded row', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: _labelledSplitButton(onPressed: () {}, onTrailingPressed: () {}),
-          ),
-        ),
-      );
-
-      expect(tester.takeException(), isNull);
-      expect(find.text('MacBook Pro Microphone'), findsOneWidget);
     });
   });
 

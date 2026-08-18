@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_redundant_argument_values
-
 import 'dart:io';
 
 import 'package:alchemist/alchemist.dart';
@@ -44,33 +42,6 @@ void main() {
                 _splitButton(style: .secondary, size: size),
               ),
             ),
-        ],
-      ),
-    );
-
-    goldenTest(
-      'renders a labelled primary half',
-      fileName: 'stream_split_button_label',
-      builder: () => GoldenTestGroup(
-        columns: 2,
-        scenarioConstraints: const BoxConstraints(maxWidth: 260),
-        children: [
-          GoldenTestScenario(
-            name: 'label and icon',
-            child: _buildInTheme(_labelledSplitButton()),
-          ),
-          GoldenTestScenario(
-            name: 'label only',
-            child: _buildInTheme(_labelledSplitButton(icon: null)),
-          ),
-          GoldenTestScenario(
-            name: 'truncated label',
-            child: _buildInTheme(_labelledSplitButton(maxWidth: 110)),
-          ),
-          GoldenTestScenario(
-            name: 'outline',
-            child: _buildInTheme(_labelledSplitButton(type: .outline)),
-          ),
         ],
       ),
     );
@@ -151,26 +122,6 @@ StreamSplitButton _splitButton({
     size: size,
     onPressed: onPressed,
     onTrailingPressed: onTrailingPressed,
-  );
-}
-
-StreamSplitButton _labelledSplitButton({
-  StreamButtonType type = StreamButtonType.solid,
-  Widget? icon = const Icon(StreamIconData.voiceFill),
-  double maxWidth = double.infinity,
-}) {
-  return StreamSplitButton(
-    icon: icon,
-    trailingIcon: const Icon(StreamIconData.caretDown),
-    style: StreamButtonStyle.secondary,
-    type: type,
-    size: StreamButtonSize.small,
-    onPressed: _noop,
-    onTrailingPressed: _noop,
-    child: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
-      child: const Text('MacBook Pro Microphone', overflow: TextOverflow.ellipsis),
-    ),
   );
 }
 

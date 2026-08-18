@@ -14,6 +14,7 @@ package_name: stream_core_flutter
 barrels:
   - lib/chat.dart
   - lib/core.dart
+  - lib/video.dart
 
 # Public-facing libraries that files under `source_root` must never import.
 # Typically: the barrels themselves, plus any deprecated entry points.
@@ -21,6 +22,7 @@ forbidden_src_imports:
   - lib/chat.dart
   - lib/core.dart
   - lib/stream_core_flutter.dart
+  - lib/video.dart
 
 # Full paths (relative to the package root) of directories whose files are
 # internal to the package. Anything under these is excluded from coverage.
