@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -17,6 +20,11 @@ import 'stream_button.dart';
 /// caret that opens the options for that action. Both halves are
 /// [StreamButton.icon]s painted on a single background, so the control reads
 /// as one pill rather than two adjacent buttons.
+///
+/// The background is as tall as the one a [StreamButtonSize.medium]
+/// [StreamButton] paints, and the halves paint smaller still — the surface
+/// wraps the two icons rather than their tap targets, which stay full height
+/// and overhang it. The control has no size of its own.
 ///
 /// The surface is resolved from the same [StreamButtonTheme] entry the halves
 /// use, which is what keeps the two from drifting apart. For
@@ -82,7 +90,6 @@ class StreamSplitButton extends StatelessWidget {
     VoidCallback? onTrailingPressed,
     StreamButtonStyle style = .primary,
     StreamButtonType type = .solid,
-    StreamButtonSize size = .medium,
     String? tooltip,
     String? trailingTooltip,
     StreamSplitButtonStyle? themeStyle,
@@ -93,7 +100,6 @@ class StreamSplitButton extends StatelessWidget {
          onTrailingPressed: onTrailingPressed,
          style: style,
          type: type,
-         size: size,
          tooltip: tooltip,
          trailingTooltip: trailingTooltip,
          themeStyle: themeStyle,
@@ -128,7 +134,6 @@ class StreamSplitButtonProps {
     this.onTrailingPressed,
     this.style = .primary,
     this.type = .solid,
-    this.size = .medium,
     this.tooltip,
     this.trailingTooltip,
     this.themeStyle,
@@ -163,12 +168,6 @@ class StreamSplitButtonProps {
   /// button draws a single border around both halves.
   final StreamButtonType type;
 
-  /// The size of each half.
-  ///
-  /// Sets the painted area of a half — the surface it highlights on hover and
-  /// press. Each half keeps an accessible tap target regardless of this value.
-  final StreamButtonSize size;
-
   /// Text shown in a [Tooltip] on hover / long-press of the primary half, and
   /// used as its accessibility label.
   ///
@@ -188,6 +187,11 @@ class StreamSplitButtonProps {
   final StreamSplitButtonStyle? themeStyle;
 }
 
+// The halves are always small buttons: the design draws the surface at the
+// height of a medium button with a pair of small ones inside it, and never
+// scales the control.
+const _halfButtonSize = StreamButtonSize.small;
+
 /// Default implementation of [StreamSplitButton].
 ///
 /// Renders a [Row] of two [StreamButton.icon] halves over a shared surface,
@@ -206,8 +210,9 @@ class DefaultStreamSplitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
     final themeStyle = context.streamSplitButtonTheme.style?.merge(props.themeStyle) ?? props.themeStyle;
-    final defaults = _StreamSplitButtonDefaults(context, size: props.size);
+    final defaults = _StreamSplitButtonDefaults(context);
 
     // Resolved once and shared: the surface below and the halves above are the
     // same button style, so they cannot render as different colors.
@@ -216,7 +221,7 @@ class DefaultStreamSplitButton extends StatelessWidget {
       style: props.style,
       type: props.type,
       isFloating: false,
-      themeStyle: defaults.buttonStyle.merge(themeStyle?.buttonStyle),
+      themeStyle: themeStyle?.buttonStyle,
     );
 
     final isEnabled = props.onPressed != null || props.onTrailingPressed != null;
@@ -229,50 +234,184 @@ class DefaultStreamSplitButton extends StatelessWidget {
     final effectiveSeparatorThickness = themeStyle?.separatorThickness ?? defaults.separatorThickness;
     final effectiveSeparatorHeight = themeStyle?.separatorHeight ?? defaults.separatorHeight;
 
+    // The halves are inset by [inset] on every edge of the surface, which puts
+    // a pair of small buttons under a surface the height of a medium one.
+    final inset = spacing.xxs;
+
     // The halves sit on the shared surface, so they paint neither their own
-    // background nor their own border.
+    // background nor their own border. Their box is the painted circle; the tap
+    // target around it comes from [_HitTarget], since MaterialTapTargetSize can
+    // only grow both axes at once and the design grows only the height.
     final halfStyle = buttonStyle.copyWith(
       backgroundColor: const WidgetStatePropertyAll(StreamColors.transparent),
       borderColor: const WidgetStatePropertyAll(null),
       elevation: const WidgetStatePropertyAll(0),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
 
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        color: buttonStyle.backgroundColor?.resolve(states),
-        shape: switch (borderColor) {
-          final color? => shape.copyWith(side: BorderSide(color: color)),
-          _ => shape,
-        },
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          StreamButton.icon(
-            icon: props.icon,
-            onPressed: props.onPressed,
+    Widget half({required Widget icon, required VoidCallback? onPressed, required String? tooltip}) {
+      // The merge lifts the half's semantics node up to the tap target, so
+      // assistive tech reports the region that actually responds to a tap
+      // rather than the smaller square the button paints.
+      return MergeSemantics(
+        child: _HitTarget(
+          minSize: Size(_halfButtonSize.value, kMinInteractiveDimension),
+          child: StreamButton.icon(
+            icon: icon,
+            onPressed: onPressed,
             style: props.style,
             type: props.type,
-            size: props.size,
-            tooltip: props.tooltip,
+            size: _halfButtonSize,
+            tooltip: tooltip,
             themeStyle: halfStyle,
           ),
-          SizedBox(
-            width: effectiveSeparatorThickness,
-            height: effectiveSeparatorHeight,
-            child: ColoredBox(color: effectiveSeparatorColor ?? StreamColors.transparent),
+        ),
+      );
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Painted behind the halves rather than around them: their tap targets
+        // are taller than the surface and overhang it top and bottom.
+        Positioned.fill(
+          child: Center(
+            child: SizedBox(
+              width: double.infinity,
+              height: _halfButtonSize.value + inset * 2,
+              child: DecoratedBox(
+                decoration: ShapeDecoration(
+                  color: buttonStyle.backgroundColor?.resolve(states),
+                  shape: switch (borderColor) {
+                    final color? => shape.copyWith(side: BorderSide(color: color)),
+                    _ => shape,
+                  },
+                ),
+              ),
+            ),
           ),
-          StreamButton.icon(
-            icon: props.trailingIcon,
-            onPressed: props.onTrailingPressed,
-            style: props.style,
-            type: props.type,
-            size: props.size,
-            tooltip: props.trailingTooltip,
-            themeStyle: halfStyle,
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: inset),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: inset,
+            children: [
+              half(icon: props.icon, onPressed: props.onPressed, tooltip: props.tooltip),
+              SizedBox(
+                width: effectiveSeparatorThickness,
+                height: effectiveSeparatorHeight,
+                child: ColoredBox(color: effectiveSeparatorColor ?? StreamColors.transparent),
+              ),
+              half(
+                icon: props.trailingIcon,
+                onPressed: props.onTrailingPressed,
+                tooltip: props.trailingTooltip,
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+}
+
+// Grows the tap target around [child] to at least [minSize] without growing
+// what the child paints.
+//
+// This mirrors the `_InputPadding` that [MaterialTapTargetSize.padded] installs
+// inside every Material button. That knob is all-or-nothing at 48x48; a split
+// button half is narrower than it is tall, so it needs the same trick with its
+// own size.
+class _HitTarget extends SingleChildRenderObjectWidget {
+  const _HitTarget({required this.minSize, required super.child});
+
+  final Size minSize;
+
+  @override
+  _RenderHitTarget createRenderObject(BuildContext context) => _RenderHitTarget(minSize);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderHitTarget renderObject) {
+    renderObject.minSize = minSize;
+  }
+}
+
+class _RenderHitTarget extends RenderShiftedBox {
+  _RenderHitTarget(this._minSize) : super(null);
+
+  Size get minSize => _minSize;
+  Size _minSize;
+  set minSize(Size value) {
+    if (_minSize == value) return;
+    _minSize = value;
+    markNeedsLayout();
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) => switch (child) {
+    final child? => math.max(child.getMinIntrinsicWidth(height), minSize.width),
+    _ => 0,
+  };
+
+  @override
+  double computeMinIntrinsicHeight(double width) => switch (child) {
+    final child? => math.max(child.getMinIntrinsicHeight(width), minSize.height),
+    _ => 0,
+  };
+
+  @override
+  double computeMaxIntrinsicWidth(double height) => switch (child) {
+    final child? => math.max(child.getMaxIntrinsicWidth(height), minSize.width),
+    _ => 0,
+  };
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => switch (child) {
+    final child? => math.max(child.getMaxIntrinsicHeight(width), minSize.height),
+    _ => 0,
+  };
+
+  Size _computeSize({required BoxConstraints constraints, required ChildLayouter layoutChild}) {
+    if (child case final child?) {
+      final childSize = layoutChild(child, constraints);
+      return constraints.constrain(
+        Size(math.max(childSize.width, minSize.width), math.max(childSize.height, minSize.height)),
+      );
+    }
+    return Size.zero;
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    return _computeSize(constraints: constraints, layoutChild: ChildLayoutHelper.dryLayoutChild);
+  }
+
+  @override
+  void performLayout() {
+    size = _computeSize(constraints: constraints, layoutChild: ChildLayoutHelper.layoutChild);
+    if (child case final child?) {
+      final childParentData = child.parentData! as BoxParentData;
+      childParentData.offset = Alignment.center.alongOffset(size - child.size as Offset);
+    }
+  }
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    // Material's own version of this skips the bounds check, which is why two
+    // `padded` buttons side by side fight over taps that belong to neither.
+    // Two halves in a row is exactly that case, so check bounds first.
+    if (!size.contains(position)) return false;
+    if (super.hitTest(result, position: position)) return true;
+
+    // Anything else inside the grown box counts as a hit on the child's centre,
+    // so the overhang taps through to the button rather than falling to
+    // whatever is behind it.
+    final center = child!.size.center(Offset.zero);
+    return result.addWithRawTransform(
+      transform: MatrixUtils.forceToPoint(center),
+      position: center,
+      hitTest: (result, position) => child!.hitTest(result, position: center),
     );
   }
 }
@@ -282,19 +421,12 @@ class DefaultStreamSplitButton extends StatelessWidget {
 // These defaults are used when no explicit value is provided via
 // [StreamSplitButtonStyle] or [StreamSplitButtonThemeData].
 class _StreamSplitButtonDefaults extends StreamSplitButtonStyle {
-  _StreamSplitButtonDefaults(this.context, {required this.size});
+  _StreamSplitButtonDefaults(this.context);
 
   final BuildContext context;
-  final StreamButtonSize size;
 
   late final StreamSpacing _spacing = context.streamSpacing;
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
-
-  // Forced onto both halves and the surface, above the inherited
-  // [StreamButtonTheme] but below the caller's own overrides: a split button
-  // whose halves lost their tap target is not worth shipping.
-  @override
-  StreamButtonThemeStyle get buttonStyle => const StreamButtonThemeStyle(tapTargetSize: MaterialTapTargetSize.padded);
 
   @override
   WidgetStateProperty<Color?> get separatorColor => WidgetStateProperty.resolveWith((states) {
@@ -305,6 +437,7 @@ class _StreamSplitButtonDefaults extends StreamSplitButtonStyle {
   @override
   double get separatorThickness => 1;
 
+  // Inset from the halves by as much as the halves are inset from the surface.
   @override
-  double get separatorHeight => size.value - _spacing.xxs * 2;
+  double get separatorHeight => _halfButtonSize.value - _spacing.xxs * 2;
 }

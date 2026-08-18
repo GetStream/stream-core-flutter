@@ -170,9 +170,10 @@ class StreamSplitButtonStyle with _$StreamSplitButtonStyle {
 
   /// The height of the divider between the two halves, in logical pixels.
   ///
-  /// The divider is shorter than the control so it does not run into the
-  /// rounded ends. Defaults to the button size inset by [StreamSpacing.xxs] on
-  /// both ends — 24 for a [StreamButtonSize.small] split button.
+  /// The divider is shorter than the halves it separates, which are in turn
+  /// shorter than the surface. Defaults to the button size inset by
+  /// [StreamSpacing.xxs] twice over on both ends — 24 for a
+  /// [StreamButtonSize.medium] split button.
   final double? separatorHeight;
 
   /// Linearly interpolate between two [StreamSplitButtonStyle] objects.

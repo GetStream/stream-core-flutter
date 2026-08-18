@@ -30,36 +30,15 @@ void main() {
     );
 
     goldenTest(
-      'renders sizes',
-      fileName: 'stream_split_button_sizes',
-      builder: () => GoldenTestGroup(
-        columns: StreamButtonSize.values.length,
-        children: [
-          for (final size in StreamButtonSize.values)
-            GoldenTestScenario(
-              name: size.name,
-              child: _buildInTheme(
-                _splitButton(style: .secondary, size: size),
-              ),
-            ),
-        ],
-      ),
-    );
-
-    goldenTest(
-      'renders the pressed leading half per size',
+      'renders the pressed leading half',
       fileName: 'stream_split_button_pressed',
-      // The highlight is the only place `size` shows up: the surface always
-      // hugs the halves' tap targets, so at rest every size looks the same.
       whilePerforming: press(find.byIcon(StreamIconData.voiceFill)),
       builder: () => GoldenTestGroup(
-        columns: StreamButtonSize.values.length,
         children: [
-          for (final size in StreamButtonSize.values)
-            GoldenTestScenario(
-              name: size.name,
-              child: _buildInTheme(_splitButton(style: .secondary, size: size)),
-            ),
+          GoldenTestScenario(
+            name: 'pressed',
+            child: _buildInTheme(_splitButton(style: .secondary)),
+          ),
         ],
       ),
     );
@@ -110,7 +89,6 @@ GoldenTestGroup _buildMatrix({Brightness brightness = Brightness.light}) {
 StreamSplitButton _splitButton({
   StreamButtonStyle style = StreamButtonStyle.primary,
   StreamButtonType type = StreamButtonType.solid,
-  StreamButtonSize size = StreamButtonSize.small,
   VoidCallback? onPressed = _noop,
   VoidCallback? onTrailingPressed = _noop,
 }) {
@@ -119,7 +97,6 @@ StreamSplitButton _splitButton({
     trailingIcon: const Icon(StreamIconData.caretDown),
     style: style,
     type: type,
-    size: size,
     onPressed: onPressed,
     onTrailingPressed: onTrailingPressed,
   );
