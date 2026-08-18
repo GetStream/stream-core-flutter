@@ -3,6 +3,15 @@
 ### ✨ Features
 
 - Added `StreamReactions.onReactionLongPressed`, reporting the long-pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip. When null, the chips register no long-press gesture, leaving it to an ancestor.
+- Added `StreamSplitButton`, a pair of icon buttons sharing one surface with a
+  divider between them — a primary action alongside a caret that opens its
+  options. Create it with `StreamSplitButton.icon`, configure both icons (so
+  the caret can point up or down), and style it with the same
+  `StreamButtonStyle` / `StreamButtonType` / `StreamButtonSize` values a
+  `StreamButton` takes. The surface resolves from the same `StreamButtonTheme`
+  entry the halves use, so the two cannot drift apart; an `outline` split
+  button draws a single border around the whole control. Customize the divider
+  through `StreamSplitButtonTheme`.
 - Refreshed the icon set from the design tokens and added 44 icons, including a
   filled variant for many existing icons: `blurFill`, `boltFill`,
   `cameraFlipFill`, `captionFill`, `caretDown`, `caretUp`, `copyFill`,
