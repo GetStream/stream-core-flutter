@@ -48,6 +48,8 @@ Source SVGs in `packages/stream_core_flutter/assets_source/icons/` come from the
 
 Upstream names carry a size suffix that this repo strips or rewrites: everything in `20/` keeps its bare name (`account-20.svg` → `account.svg`), `16/` currently holds only `xmark-small.svg`, and `32/` uses a `-large` suffix (`camera-32.svg` → `camera-large.svg`).
 
+**Names must be unique across the size folders.** Glyphs are keyed by bare filename, so copying a whole upstream size folder is how you accidentally end up with e.g. `16/xmark-small.svg` and `20/xmark-small.svg` competing for one glyph. The generator fails on a duplicate rather than letting directory-listing order pick a winner.
+
 **Code points are append-only.** `assets_source/icon_log.g.txt` records the date each icon was first seen, and the generator orders glyphs by that date so every icon keeps its code point across runs. The font ships as `lib/fonts/stream_icons_font.otf`, so a shifted code point silently repoints every icon after it in any app that has not rebuilt. Never reorder or hand-edit the log.
 
 **Deleting an icon therefore requires a deprecation entry** in `assets_source/deprecated.txt` — one `deprecated;replacement;included` line per icon:

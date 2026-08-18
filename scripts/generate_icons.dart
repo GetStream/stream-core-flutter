@@ -327,15 +327,37 @@ Map<String, String> _readSvgFiles(
     return newAdditions[fileName]!;
   }
 
-  final svgFileByName = <String, File>{
-    for (final file
-        in dir
-            .listSync(recursive: recursive)
-            .whereType<File>()
-            .where((f) => p.extension(f.path).toLowerCase() == '.svg')
-            .where((f) => !_excludedSvgIcons.contains(p.basenameWithoutExtension(f.path))))
-      p.basenameWithoutExtension(file.path): file,
-  };
+  final svgFiles =
+      dir
+          .listSync(recursive: recursive)
+          .whereType<File>()
+          .where((f) => p.extension(f.path).toLowerCase() == '.svg')
+          .where((f) => !_excludedSvgIcons.contains(p.basenameWithoutExtension(f.path)))
+          .toList()
+        // Sorted only so a duplicate-name failure names the same two files on
+        // every machine; the glyph order is decided further down.
+        ..sort((a, b) => a.path.compareTo(b.path));
+
+  final svgFileByName = <String, File>{};
+  for (final file in svgFiles) {
+    final name = p.basenameWithoutExtension(file.path);
+    final duplicate = svgFileByName[name];
+    // Glyphs are keyed by bare filename, so two files sharing a name across
+    // size folders would silently collapse into whichever the directory
+    // listing happened to yield last — a wrong glyph with no warning.
+    if (duplicate != null) {
+      throw IconGeneratorException(
+        'Duplicate icon name "$name":\n'
+        '  ${p.relative(duplicate.path, from: scriptDir)}\n'
+        '  ${p.relative(file.path, from: scriptDir)}\n'
+        'Icon names must be unique across size folders. Rename one, following the '
+        'suffix convention: bare names come from `20/`, `-large` from `32/`, '
+        '`-small` from `16/`.',
+        exitCode: 2,
+      );
+    }
+    svgFileByName[name] = file;
+  }
 
   final deprecatedByName = {for (final icon in deprecatedIcons) icon.name: icon};
 
