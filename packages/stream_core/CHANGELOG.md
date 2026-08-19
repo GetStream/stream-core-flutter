@@ -17,7 +17,6 @@
 ### 🐛 Bug Fixes
 
 - Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
-- Fixed `AuthInterceptor` sending a `user_id` that could disagree with the token in the `Authorization` header
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 
 ### 🔄 Changed
