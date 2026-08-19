@@ -61,10 +61,15 @@ class UserToken extends Equatable {
   /// Creates a token for anonymous authentication with the specified [userId].
   /// When [userId] is not provided, defaults to '!anon' for anonymous users.
   ///
+  /// An optional [rawValue] can carry a JWT that is sent along with anonymous
+  /// requests, e.g. a call-restricted token granting an anonymous user access
+  /// to specific resources (such as a closed livestream). When omitted, the
+  /// token carries no raw value and requests are sent without credentials.
+  ///
   /// Returns a [UserToken] configured for anonymous access.
-  factory UserToken.anonymous({String? userId}) {
+  factory UserToken.anonymous({String? userId, String rawValue = ''}) {
     return UserToken._(
-      rawValue: '',
+      rawValue: rawValue,
       userId: userId ?? '!anon',
       authType: AuthType.anonymous,
     );

@@ -3,6 +3,12 @@ import 'package:synchronized/extension.dart';
 import 'token_provider.dart';
 import 'user_token.dart';
 
+/// A callback invoked whenever the manager caches a newly loaded token.
+///
+/// Invoked synchronously after the token is cached, before it is returned to
+/// the caller that triggered the load. The manager does not await the result.
+typedef OnTokenUpdated = void Function(UserToken token);
+
 /// Manages user authentication tokens with caching and thread-safe access.
 ///
 /// Provides token caching and automatic loading for user authentication tokens.
@@ -26,23 +32,36 @@ import 'user_token.dart';
 /// manager.expireToken();
 /// ```
 class TokenManager {
-  /// Creates a [TokenManager] for the specified [userId] with the given [tokenProvider].
+  /// Creates a [TokenManager] for the specified [userId] with the given [_tokenProvider].
   ///
   /// The [userId] identifies the user for whom tokens will be managed.
-  /// The [tokenProvider] is used to load tokens when needed.
+  /// The [_tokenProvider] is used to load tokens when needed.
+  ///
+  /// An optional [onTokenUpdated] callback is invoked after every successful
+  /// token load. It is not invoked for callers served from the cache.
   TokenManager({
     required this.userId,
     required this._tokenProvider,
+    this.onTokenUpdated,
   });
 
   /// The unique identifier of the user whose tokens are managed.
   final String userId;
 
+  /// Invoked after every successful token load.
+  final OnTokenUpdated? onTokenUpdated;
+
   // The provider used to load tokens when needed.
-  final TokenProvider _tokenProvider;
+  TokenProvider _tokenProvider;
+
+  /// Replaces the provider used to load tokens.
+  ///
+  /// Expires the cached token when the provider changes, so the next
+  /// [getToken] call loads a fresh token from the new provider.
   set tokenProvider(TokenProvider provider) {
-    // If the provider changes, expire the current token.
-    if (_tokenProvider != provider) expireToken();
+    if (_tokenProvider == provider) return;
+    _tokenProvider = provider;
+    expireToken();
   }
 
   // The currently cached token, if any.
@@ -69,21 +88,24 @@ class TokenManager {
   ///
   /// Returns a [Future] that resolves to a [UserToken] for the user.
   Future<UserToken> getToken() {
-    final snapshot = _cachedToken;
-    return synchronized(() async {
-      // If the snapshot is no longer equal to the cached token, it means
-      // that the token has been updated by another thread, so we use the
-      // updated value.
-      final currentToken = _cachedToken;
-      if (snapshot != currentToken && currentToken != null) {
-        return currentToken;
-      }
+    final cached = _cachedToken;
+    if (cached != null) return Future.value(cached);
 
-      // Otherwise, we load a new token from the provider and cache it.
-      final updatedToken = await _tokenProvider.loadToken(userId);
-      _cachedToken = updatedToken;
-      return updatedToken;
+    return synchronized(() {
+      final currentToken = _cachedToken;
+      if (currentToken != null) return Future.value(currentToken);
+
+      return _loadAndNotify();
     });
+  }
+
+  // Loads a token from the provider, caches it, and notifies the
+  // [onTokenUpdated] callback.
+  Future<UserToken> _loadAndNotify() async {
+    final updatedToken = await _tokenProvider.loadToken(userId);
+    _cachedToken = updatedToken;
+    onTokenUpdated?.call(updatedToken);
+    return updatedToken;
   }
 
   /// Expires the currently cached token.
