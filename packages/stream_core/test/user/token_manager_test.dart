@@ -1,9 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
-
-import '../helpers/user_token.dart';
 
 /// A token provider that counts loads and delegates to a configurable loader.
 class _CountingProvider implements TokenProvider {
@@ -21,11 +20,25 @@ class _CountingProvider implements TokenProvider {
   }
 }
 
+/// Builds a JWT [UserToken] carrying [userId] as its 'user_id' claim.
+UserToken _generateTestUserToken(String userId) {
+  String b64UrlNoPad(Object jsonObj) {
+    final bytes = utf8.encode(jsonEncode(jsonObj));
+    return base64Url.encode(bytes).replaceAll('=', '');
+  }
+
+  final header = {'alg': 'none', 'typ': 'JWT'};
+  final payload = {'user_id': userId};
+
+  // Trailing dot = empty signature, which is what alg=none means.
+  return UserToken('${b64UrlNoPad(header)}.${b64UrlNoPad(payload)}.');
+}
+
 void main() {
   group('TokenManager', () {
     group('getToken', () {
       test('loads from the provider and caches the result', () async {
-        final provider = _CountingProvider((_) async => generateTestUserToken('token-1'));
+        final provider = _CountingProvider((_) async => _generateTestUserToken('token-1'));
         final manager = TokenManager(
           userId: 'user-1',
           tokenProvider: provider,
@@ -34,17 +47,17 @@ void main() {
         final first = await manager.getToken();
         final second = await manager.getToken();
 
-        expect(first, generateTestUserToken('token-1'));
-        expect(second, generateTestUserToken('token-1'));
+        expect(first, _generateTestUserToken('token-1'));
+        expect(second, _generateTestUserToken('token-1'));
         expect(provider.loadCount, 1);
-        expect(manager.peekToken(), generateTestUserToken('token-1'));
+        expect(manager.peekToken(), _generateTestUserToken('token-1'));
       });
 
       test('passes the manager userId to the provider', () async {
         String? requestedUserId;
         final provider = _CountingProvider((userId) async {
           requestedUserId = userId;
-          return generateTestUserToken('token-1');
+          return _generateTestUserToken('token-1');
         });
         final manager = TokenManager(
           userId: 'user-1',
@@ -65,10 +78,10 @@ void main() {
         );
 
         final futures = [manager.getToken(), manager.getToken()];
-        completer.complete(generateTestUserToken('token-1'));
+        completer.complete(_generateTestUserToken('token-1'));
         final tokens = await Future.wait(futures);
 
-        expect(tokens, everyElement(generateTestUserToken('token-1')));
+        expect(tokens, everyElement(_generateTestUserToken('token-1')));
         expect(provider.loadCount, 1);
       });
 
@@ -77,7 +90,7 @@ void main() {
         final provider = _CountingProvider((_) async {
           attempts++;
           if (attempts == 1) throw StateError('load failed');
-          return generateTestUserToken('token-2');
+          return _generateTestUserToken('token-2');
         });
         final manager = TokenManager(
           userId: 'user-1',
@@ -88,7 +101,7 @@ void main() {
         expect(manager.peekToken(), isNull);
 
         final token = await manager.getToken();
-        expect(token, generateTestUserToken('token-2'));
+        expect(token, _generateTestUserToken('token-2'));
         expect(provider.loadCount, 2);
       });
     });
@@ -96,18 +109,18 @@ void main() {
     group('expireToken', () {
       test('clears the cache and forces a reload', () async {
         var version = 0;
-        final provider = _CountingProvider((_) async => generateTestUserToken('v${++version}'));
+        final provider = _CountingProvider((_) async => _generateTestUserToken('v${++version}'));
         final manager = TokenManager(
           userId: 'user-1',
           tokenProvider: provider,
         );
 
-        expect(await manager.getToken(), generateTestUserToken('v1'));
+        expect(await manager.getToken(), _generateTestUserToken('v1'));
 
         manager.expireToken();
         expect(manager.peekToken(), isNull);
 
-        expect(await manager.getToken(), generateTestUserToken('v2'));
+        expect(await manager.getToken(), _generateTestUserToken('v2'));
         expect(provider.loadCount, 2);
       });
 
@@ -123,7 +136,7 @@ void main() {
           final pending = manager.getToken();
 
           manager.expireToken();
-          slowLoad.complete(generateTestUserToken('user-1'));
+          slowLoad.complete(_generateTestUserToken('user-1'));
           await pending;
 
           expect(manager.peekToken(), isNull);
@@ -135,14 +148,14 @@ void main() {
       test('points the manager at another user', () async {
         final manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+          tokenProvider: TokenProvider.static(_generateTestUserToken('user-1')),
         );
 
         expect((await manager.getToken()).userId, 'user-1');
 
         manager.setTokenProvider(
           'user-2',
-          tokenProvider: TokenProvider.static(generateTestUserToken('user-2')),
+          tokenProvider: TokenProvider.static(_generateTestUserToken('user-2')),
         );
 
         expect(manager.userId, 'user-2');
@@ -152,15 +165,15 @@ void main() {
       test('expires the token cached for the previous user', () async {
         final manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+          tokenProvider: TokenProvider.static(_generateTestUserToken('user-1')),
         );
 
         await manager.getToken();
-        expect(manager.peekToken(), generateTestUserToken('user-1'));
+        expect(manager.peekToken(), _generateTestUserToken('user-1'));
 
         manager.setTokenProvider(
           'user-2',
-          tokenProvider: TokenProvider.static(generateTestUserToken('user-2')),
+          tokenProvider: TokenProvider.static(_generateTestUserToken('user-2')),
         );
 
         expect(manager.peekToken(), isNull);
@@ -182,7 +195,7 @@ void main() {
 
           manager.setTokenProvider(
             serverId,
-            tokenProvider: TokenProvider.static(generateTestUserToken(serverId)),
+            tokenProvider: TokenProvider.static(_generateTestUserToken(serverId)),
           );
 
           final guest = await manager.getToken();
@@ -203,9 +216,9 @@ void main() {
 
         manager.setTokenProvider(
           'user-2',
-          tokenProvider: TokenProvider.static(generateTestUserToken('user-2')),
+          tokenProvider: TokenProvider.static(_generateTestUserToken('user-2')),
         );
-        slowLoad.complete(generateTestUserToken('user-1'));
+        slowLoad.complete(_generateTestUserToken('user-1'));
         await pending;
 
         // user-1's token must not be waiting in the cache for user-2 to send.
@@ -228,9 +241,9 @@ void main() {
           // replaced provider's token through.
           manager.setTokenProvider(
             'user-1',
-            tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+            tokenProvider: TokenProvider.static(_generateTestUserToken('user-1')),
           );
-          slowLoad.complete(generateTestUserToken('user-1'));
+          slowLoad.complete(_generateTestUserToken('user-1'));
           await pending;
 
           expect(manager.peekToken(), isNull);
@@ -240,14 +253,14 @@ void main() {
       test('usesStaticProvider reflects the new provider', () {
         final manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+          tokenProvider: TokenProvider.static(_generateTestUserToken('user-1')),
         );
 
         expect(manager.usesStaticProvider, isTrue);
 
         manager.setTokenProvider(
           'user-1',
-          tokenProvider: _CountingProvider((_) async => generateTestUserToken('user-1')),
+          tokenProvider: _CountingProvider((_) async => _generateTestUserToken('user-1')),
         );
 
         expect(manager.usesStaticProvider, isFalse);
@@ -258,11 +271,11 @@ void main() {
       test('reflects the provider type', () {
         final staticManager = TokenManager(
           userId: 'user-1',
-          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+          tokenProvider: TokenProvider.static(_generateTestUserToken('user-1')),
         );
         final dynamicManager = TokenManager(
           userId: 'user-1',
-          tokenProvider: _CountingProvider((_) async => generateTestUserToken('t')),
+          tokenProvider: _CountingProvider((_) async => _generateTestUserToken('t')),
         );
 
         expect(staticManager.usesStaticProvider, isTrue);
@@ -274,7 +287,7 @@ void main() {
       test('fires once per load with the loaded token', () async {
         final updates = <UserToken>[];
         var version = 0;
-        final provider = _CountingProvider((_) async => generateTestUserToken('v${++version}'));
+        final provider = _CountingProvider((_) async => _generateTestUserToken('v${++version}'));
         final manager = TokenManager(
           userId: 'user-1',
           tokenProvider: provider,
@@ -287,14 +300,14 @@ void main() {
         manager.expireToken();
         await manager.getToken();
 
-        expect(updates, [generateTestUserToken('v1'), generateTestUserToken('v2')]);
+        expect(updates, [_generateTestUserToken('v1'), _generateTestUserToken('v2')]);
       });
 
       test('is invoked before the token is returned', () async {
         UserToken? notified;
         final manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: _CountingProvider((_) async => generateTestUserToken('token-1')),
+          tokenProvider: _CountingProvider((_) async => _generateTestUserToken('token-1')),
           onTokenUpdated: (token) => notified = token,
         );
 
@@ -308,7 +321,7 @@ void main() {
         Future<UserToken>? reentrantCall;
         manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: _CountingProvider((_) async => generateTestUserToken('token-1')),
+          tokenProvider: _CountingProvider((_) async => _generateTestUserToken('token-1')),
           onTokenUpdated: (_) {
             reentrantCall = manager.getToken();
           },
