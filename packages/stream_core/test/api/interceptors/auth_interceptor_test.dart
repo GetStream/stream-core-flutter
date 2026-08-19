@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:stream_core/stream_core.dart';
@@ -220,6 +221,46 @@ void main() {
         expect(
           adapter.lastRequest?.headers['stream-auth-type'],
           AuthType.anonymous.headerValue,
+        );
+      },
+    );
+
+    test(
+      'sends the token manager user id, not the loaded token user id, so a '
+      'manager pointed at another user mid-load is rejected rather than '
+      'silently authenticated as whoever the token belongs to',
+      () async {
+        final slowLoad = Completer<UserToken>();
+        final tokenManager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: TokenProvider.dynamic((_) => slowLoad.future),
+        );
+
+        final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+        final adapter = _CapturingHttpClientAdapter();
+        dio.httpClientAdapter = adapter;
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
+
+        final pending = dio.get<void>('/test');
+        await pumpEventQueue();
+
+        // The load is already running for user-1 when the manager moves on.
+        final userTwoToken = _generateTestUserToken('user-2');
+        tokenManager.setTokenProvider(
+          'user-2',
+          tokenProvider: TokenProvider.static(userTwoToken),
+        );
+        slowLoad.complete(_generateTestUserToken('user-1'));
+        await pending;
+
+        // The mismatch is deliberate: `user_id` describes who we believe we
+        // are, so a request carrying someone else's token is rejected and the
+        // divergence surfaces. Deriving `user_id` from the token instead would
+        // make the request self-consistent and silently act as that user.
+        expect(adapter.lastRequest?.queryParameters['user_id'], 'user-2');
+        expect(
+          adapter.lastRequest?.headers['Authorization'],
+          isNot(userTwoToken.rawValue),
         );
       },
     );
