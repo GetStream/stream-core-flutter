@@ -269,49 +269,53 @@ class DefaultStreamSplitButton extends StatelessWidget {
       );
     }
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        // Painted behind the halves rather than around them: their tap targets
-        // are taller than the surface and overhang it top and bottom.
-        Positioned.fill(
-          child: Center(
-            child: SizedBox(
-              width: double.infinity,
-              height: _halfButtonSize.value + inset * 2,
-              child: DecoratedBox(
-                decoration: ShapeDecoration(
-                  color: buttonStyle.backgroundColor?.resolve(states),
-                  shape: switch (borderColor) {
-                    final color? => shape.copyWith(side: BorderSide(color: color)),
-                    _ => shape,
-                  },
+    return Padding(
+      // We only add some horizontal padding to match the extra vertical padding from the _HitTarget
+      padding: EdgeInsets.symmetric(horizontal: inset),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Painted behind the halves rather than around them: their tap targets
+          // are taller than the surface and overhang it top and bottom.
+          Positioned.fill(
+            child: Center(
+              child: SizedBox(
+                width: double.infinity,
+                height: _halfButtonSize.value + inset * 2,
+                child: DecoratedBox(
+                  decoration: ShapeDecoration(
+                    color: buttonStyle.backgroundColor?.resolve(states),
+                    shape: switch (borderColor) {
+                      final color? => shape.copyWith(side: BorderSide(color: color)),
+                      _ => shape,
+                    },
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: inset),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: inset,
-            children: [
-              half(icon: props.icon, onPressed: props.onPressed, tooltip: props.tooltip),
-              SizedBox(
-                width: effectiveSeparatorThickness,
-                height: effectiveSeparatorHeight,
-                child: ColoredBox(color: effectiveSeparatorColor ?? StreamColors.transparent),
-              ),
-              half(
-                icon: props.trailingIcon,
-                onPressed: props.onTrailingPressed,
-                tooltip: props.trailingTooltip,
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: inset),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: inset,
+              children: [
+                half(icon: props.icon, onPressed: props.onPressed, tooltip: props.tooltip),
+                SizedBox(
+                  width: effectiveSeparatorThickness,
+                  height: effectiveSeparatorHeight,
+                  child: ColoredBox(color: effectiveSeparatorColor ?? StreamColors.transparent),
+                ),
+                half(
+                  icon: props.trailingIcon,
+                  onPressed: props.onTrailingPressed,
+                  tooltip: props.trailingTooltip,
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
