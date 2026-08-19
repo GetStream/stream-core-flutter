@@ -115,43 +115,42 @@ void main() {
     );
 
     test(
-      'picks up a TokenManager swapped in while the token is loading, so the '
-      'user_id query parameter reflects a server-resolved id (guest exchange)',
+      'sends the user id a guest exchange returned, once the token manager is '
+      'pointed at it',
       () async {
-        // Simulates the guest flow: the token provider resolves to a
-        // server-assigned id and swaps in a new TokenManager carrying that id
-        // before the request headers are written. The interceptor reads the
-        // manager through the getter, so it observes the swapped instance.
-        late TokenManager tokenManager;
-        tokenManager = TokenManager(
-          userId: 'requested-id',
-          tokenProvider: TokenProvider.dynamic((_) async {
-            final token = _generateTestUserToken('server-assigned-id');
-            tokenManager = TokenManager(
-              userId: token.userId,
-              tokenProvider: TokenProvider.static(token),
-            );
-            return token;
-          }),
+        // Simulates the guest flow: the exchange is authenticated anonymously,
+        // then the manager is pointed at the id the exchange returned. The user
+        // id and the token change together, so the `user_id` query parameter
+        // always describes the token in the `Authorization` header.
+        const serverId = 'server-assigned-id';
+
+        final tokenManager = TokenManager(
+          userId: UserToken.anonymousUserId,
+          tokenProvider: TokenProvider.static(UserToken.anonymous()),
         );
 
         final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
         final adapter = _CapturingHttpClientAdapter();
         dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
+
+        tokenManager.setTokenProvider(
+          serverId,
+          tokenProvider: TokenProvider.static(_generateTestUserToken(serverId)),
+        );
 
         await dio.get<void>('/test');
 
+        expect(adapter.lastRequest?.queryParameters['user_id'], serverId);
         expect(
-          adapter.lastRequest?.queryParameters['user_id'],
-          'server-assigned-id',
+          adapter.lastRequest?.headers['stream-auth-type'],
+          AuthType.jwt.headerValue,
         );
       },
     );
 
     test(
-      'uses the current TokenManager userId when nothing swaps it '
-      '(regular/anonymous users)',
+      'uses the current TokenManager userId when nothing swaps it',
       () async {
         final tokenManager = TokenManager(
           userId: 'user-123',
@@ -168,6 +167,60 @@ void main() {
         await dio.get<void>('/test');
 
         expect(adapter.lastRequest?.queryParameters['user_id'], 'user-123');
+      },
+    );
+
+    test(
+      'sends an anonymous token as an empty Authorization header with the '
+      'anonymous auth type',
+      () async {
+        final tokenManager = TokenManager(
+          userId: UserToken.anonymousUserId,
+          tokenProvider: TokenProvider.static(UserToken.anonymous()),
+        );
+
+        final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+        final adapter = _CapturingHttpClientAdapter();
+        dio.httpClientAdapter = adapter;
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
+
+        await dio.get<void>('/test');
+
+        expect(adapter.lastRequest?.headers['Authorization'], isEmpty);
+        expect(
+          adapter.lastRequest?.headers['stream-auth-type'],
+          AuthType.anonymous.headerValue,
+        );
+        expect(
+          adapter.lastRequest?.queryParameters['user_id'],
+          UserToken.anonymousUserId,
+        );
+      },
+    );
+
+    test(
+      'sends a restricted anonymous token as the Authorization header',
+      () async {
+        final restricted = _generateTestUserToken(UserToken.anonymousUserId);
+        final tokenManager = TokenManager(
+          userId: UserToken.anonymousUserId,
+          tokenProvider: TokenProvider.static(
+            UserToken.anonymous(rawValue: restricted.rawValue),
+          ),
+        );
+
+        final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+        final adapter = _CapturingHttpClientAdapter();
+        dio.httpClientAdapter = adapter;
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
+
+        await dio.get<void>('/test');
+
+        expect(adapter.lastRequest?.headers['Authorization'], restricted.rawValue);
+        expect(
+          adapter.lastRequest?.headers['stream-auth-type'],
+          AuthType.anonymous.headerValue,
+        );
       },
     );
 
@@ -203,9 +256,9 @@ void main() {
       '(guest exchange resolving mid-flight)',
       () async {
         // Starts on a dynamic manager and swaps to a static one carrying the
-        // server-resolved id once the request is already in flight, mirroring
-        // the guest flow. onError observes the swapped-in (static) manager and
-        // must forward the error rather than expire + retry.
+        // exchanged id once the request is already in flight, mirroring the
+        // guest flow. onError observes the swapped-in (static) manager and must
+        // forward the error rather than expire + retry.
         var tokenManager = TokenManager(
           userId: 'requested-id',
           tokenProvider: TokenProvider.dynamic(

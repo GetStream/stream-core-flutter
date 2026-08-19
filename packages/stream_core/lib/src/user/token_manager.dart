@@ -6,7 +6,8 @@ import 'user_token.dart';
 /// A callback invoked whenever the manager caches a newly loaded token.
 ///
 /// Invoked synchronously after the token is cached, before it is returned to
-/// the caller that triggered the load. The manager does not await the result.
+/// the caller that triggered the load. Throwing from it surfaces to that
+/// caller, even though the token was loaded and cached successfully.
 typedef OnTokenUpdated = void Function(UserToken token);
 
 /// Manages user authentication tokens with caching and thread-safe access.
@@ -32,36 +33,66 @@ typedef OnTokenUpdated = void Function(UserToken token);
 /// manager.expireToken();
 /// ```
 class TokenManager {
-  /// Creates a [TokenManager] for the specified [userId] with the given [_tokenProvider].
+  /// Creates a [TokenManager] for the specified `userId` with the given
+  /// `tokenProvider`.
   ///
-  /// The [userId] identifies the user for whom tokens will be managed.
-  /// The [_tokenProvider] is used to load tokens when needed.
+  /// The `userId` identifies the user for whom tokens will be managed.
+  /// The `tokenProvider` is used to load tokens when needed.
   ///
-  /// An optional [onTokenUpdated] callback is invoked after every successful
+  /// An optional `onTokenUpdated` callback is invoked after every successful
   /// token load. It is not invoked for callers served from the cache.
   TokenManager({
-    required this.userId,
+    required this._userId,
     required this._tokenProvider,
-    this.onTokenUpdated,
+    this._onTokenUpdated,
   });
 
   /// The unique identifier of the user whose tokens are managed.
-  final String userId;
-
-  /// Invoked after every successful token load.
-  final OnTokenUpdated? onTokenUpdated;
+  ///
+  /// Changes when the manager is pointed at another user with
+  /// [setTokenProvider].
+  String get userId => _userId;
+  String _userId;
 
   // The provider used to load tokens when needed.
   TokenProvider _tokenProvider;
 
-  /// Replaces the provider used to load tokens.
+  // Invoked after every successful token load.
+  final OnTokenUpdated? _onTokenUpdated;
+
+  /// Points this manager at `userId`, loading its tokens from `tokenProvider`.
   ///
-  /// Expires the cached token when the provider changes, so the next
-  /// [getToken] call loads a fresh token from the new provider.
-  set tokenProvider(TokenProvider provider) {
-    if (_tokenProvider == provider) return;
-    _tokenProvider = provider;
-    expireToken();
+  /// The user and the provider change together, so the manager can never report
+  /// one user while holding another's token. Expires the cached token, so the
+  /// next [getToken] call loads a fresh one for the new user.
+  ///
+  /// Use this to reuse a manager across users, and when a user's identity is
+  /// only known after an authenticated request — a guest, whose id and token
+  /// are both issued in exchange for an anonymous one:
+  ///
+  /// ```dart
+  /// // Authenticate anonymously while the real identity is being obtained.
+  /// final manager = TokenManager(
+  ///   userId: UserToken.anonymousUserId,
+  ///   tokenProvider: TokenProvider.static(UserToken.anonymous()),
+  /// );
+  ///
+  /// // Adopt the identity once it is known.
+  /// manager.setTokenProvider(
+  ///   userId,
+  ///   tokenProvider: TokenProvider.static(UserToken(rawToken)),
+  /// );
+  /// ```
+  void setTokenProvider(
+    String userId, {
+    required TokenProvider tokenProvider,
+  }) {
+    _userId = userId;
+    _tokenProvider = tokenProvider;
+
+    // The cached token belongs to the previous user and provider, so drop it
+    // and let the next `getToken` call load a fresh one.
+    return expireToken();
   }
 
   // The currently cached token, if any.
@@ -99,12 +130,20 @@ class TokenManager {
     });
   }
 
-  // Loads a token from the provider, caches it, and notifies the
-  // [onTokenUpdated] callback.
+  // Loads a token from the provider and, unless the manager has since been
+  // pointed at another user, caches it and notifies `onTokenUpdated`.
   Future<UserToken> _loadAndNotify() async {
-    final updatedToken = await _tokenProvider.loadToken(userId);
+    final loadingFor = _userId;
+    final updatedToken = await _tokenProvider.loadToken(loadingFor);
+
+    // Only cache the token if the manager still points at the user it was
+    // loaded for; `setTokenProvider` may have run during the load, and the
+    // token belongs to whoever we were before.
+    if (loadingFor != _userId) return updatedToken;
+
     _cachedToken = updatedToken;
-    onTokenUpdated?.call(updatedToken);
+    _onTokenUpdated?.call(updatedToken);
+
     return updatedToken;
   }
 
