@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/core.dart';
 
-import '../../app/theme_export_page.dart';
 import '../../config/preview_configuration.dart';
 import '../../config/theme_configuration.dart';
 import '../../core/stream_icons.dart';
@@ -26,10 +25,12 @@ class GalleryToolbar extends StatelessWidget {
     super.key,
     required this.showThemePanel,
     required this.onToggleThemePanel,
+    required this.onExportTheme,
   });
 
   final bool showThemePanel;
   final VoidCallback onToggleThemePanel;
+  final VoidCallback onExportTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +137,7 @@ class GalleryToolbar extends StatelessWidget {
             icon: Icons.ios_share,
             tooltip: 'Export Theme',
             isActive: false,
-            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ThemeExportPage())),
+            onTap: onExportTheme,
           ),
         ],
       ),
