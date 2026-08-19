@@ -98,6 +98,10 @@ class TokenManager {
   // The currently cached token, if any.
   UserToken? _cachedToken;
 
+  // Bumped every time the cached token is invalidated, so a load that started
+  // before that point can tell its result is no longer wanted.
+  var _generation = 0;
+
   /// Returns the currently cached token without loading a new one.
   ///
   /// Returns the cached [UserToken] if available, or null if no token
@@ -130,16 +134,17 @@ class TokenManager {
     });
   }
 
-  // Loads a token from the provider and, unless the manager has since been
-  // pointed at another user, caches it and notifies `onTokenUpdated`.
+  // Loads a token from the provider and, unless the cached token was
+  // invalidated while it loaded, caches it and notifies `onTokenUpdated`.
   Future<UserToken> _loadAndNotify() async {
     final loadingFor = _userId;
+    final loadingGeneration = _generation;
     final updatedToken = await _tokenProvider.loadToken(loadingFor);
 
-    // Only cache the token if the manager still points at the user it was
-    // loaded for; `setTokenProvider` may have run during the load, and the
-    // token belongs to whoever we were before.
-    if (loadingFor != _userId) return updatedToken;
+    // Only cache the token if nothing invalidated the cache while it loaded.
+    // `setTokenProvider` or `expireToken` may have run, which means this token
+    // is the one the caller asked us to stop using.
+    if (loadingGeneration != _generation) return updatedToken;
 
     _cachedToken = updatedToken;
     _onTokenUpdated?.call(updatedToken);
@@ -152,5 +157,11 @@ class TokenManager {
   /// Clears the cached token, forcing the next call to [getToken] to
   /// load a fresh token from the provider. This is useful when a token
   /// becomes invalid or needs to be refreshed.
-  void expireToken() => _cachedToken = null;
+  ///
+  /// A load already in flight is discarded too, rather than caching the token
+  /// this call asked to stop using.
+  void expireToken() {
+    _generation++;
+    _cachedToken = null;
+  }
 }

@@ -119,6 +119,26 @@ void main() {
         expect(await manager.getToken(), _token('v2'));
         expect(provider.loadCount, 2);
       });
+
+      test(
+        'discards a load in flight, rather than caching the token it was told '
+        'to stop using',
+        () async {
+          final slowLoad = Completer<UserToken>();
+          final manager = TokenManager(
+            userId: 'user-1',
+            tokenProvider: _CountingProvider((_) => slowLoad.future),
+          );
+
+          final pending = manager.getToken();
+
+          manager.expireToken();
+          slowLoad.complete(_token('user-1'));
+          await pending;
+
+          expect(manager.peekToken(), isNull);
+        },
+      );
     });
 
     group('setTokenProvider', () {
@@ -203,6 +223,31 @@ void main() {
         expect(manager.peekToken(), isNull);
         expect((await manager.getToken()).userId, 'user-2');
       });
+
+      test(
+        'discards a load in flight when only the provider changes, so the '
+        'replaced provider cannot cache its token for the same user',
+        () async {
+          final slowLoad = Completer<UserToken>();
+          final manager = TokenManager(
+            userId: 'user-1',
+            tokenProvider: _CountingProvider((_) => slowLoad.future),
+          );
+
+          final pending = manager.getToken();
+
+          // Same user, fresh provider — the user id guard alone would let the
+          // replaced provider's token through.
+          manager.setTokenProvider(
+            'user-1',
+            tokenProvider: TokenProvider.static(_token('user-1')),
+          );
+          slowLoad.complete(_token('user-1'));
+          await pending;
+
+          expect(manager.peekToken(), isNull);
+        },
+      );
 
       test('usesStaticProvider reflects the new provider', () {
         final manager = TokenManager(
