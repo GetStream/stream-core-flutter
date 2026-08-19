@@ -55,11 +55,8 @@ class AuthInterceptor extends QueuedInterceptor {
     try {
       final token = await _effectiveTokenManager.getToken();
 
-      // Re-read the token manager after awaiting the token: loading it may
-      // have swapped in a new manager carrying a server-resolved user id
-      // (e.g. a guest exchange). Reading `userId` here keeps the `user_id`
-      // query parameter consistent with the identity in the `Authorization`
-      // header below.
+      // Read from the manager rather than the token, so a token that belongs
+      // to someone else is rejected instead of silently accepted.
       options.queryParameters['user_id'] = _effectiveTokenManager.userId;
       options.headers['Authorization'] = token.rawValue;
       options.headers['stream-auth-type'] = token.authType.headerValue;
