@@ -110,10 +110,8 @@ class DynamicTokenProvider implements TokenProvider {
   Future<UserToken> loadToken(String userId) async {
     final token = await _loader.call(userId);
 
-    // Validate the type before the user id, so a non-JWT token is reported as
-    // the wrong type rather than as belonging to the wrong user: an anonymous
-    // token always carries `UserToken.anonymousUserId`, so it would otherwise
-    // fail the user id check first.
+    // Checked before the user id: an anonymous token carries a user id that can
+    // never match, so it would otherwise be reported as the wrong user.
     if (token.authType != AuthType.jwt) {
       throw ArgumentError.value(
         token.authType.headerValue,

@@ -74,9 +74,8 @@ class _TokenExpiredHttpClientAdapter implements HttpClientAdapter {
 void main() {
   group('AuthInterceptor', () {
     test(
-      'uses the TokenManager passed to the positional constructor, setting the '
-      'Authorization header and user_id query parameter (backwards-compatible '
-      'API)',
+      'sets the Authorization header, the auth type, and the user_id query '
+      'parameter',
       () async {
         final tokenManager = TokenManager(
           userId: 'user-123',
@@ -193,10 +192,11 @@ void main() {
     );
 
     test(
-      'sends the token manager user id, not the loaded token user id, so a '
-      'manager pointed at another user mid-load is rejected rather than '
-      'silently authenticated as whoever the token belongs to',
+      'sends the token manager user id, not the loaded token user id',
       () async {
+        // The mismatch is deliberate: a request carrying someone else's token
+        // is rejected, where deriving `user_id` from the token would make it
+        // self-consistent and silently act as the token's owner.
         final slowLoad = Completer<UserToken>();
         final tokenManager = TokenManager(
           userId: 'user-1',
@@ -220,10 +220,6 @@ void main() {
         slowLoad.complete(generateTestUserToken('user-1'));
         await pending;
 
-        // The mismatch is deliberate: `user_id` describes who we believe we
-        // are, so a request carrying someone else's token is rejected and the
-        // divergence surfaces. Deriving `user_id` from the token instead would
-        // make the request self-consistent and silently act as that user.
         expect(adapter.lastRequest?.queryParameters['user_id'], 'user-2');
         expect(
           adapter.lastRequest?.headers['Authorization'],

@@ -67,9 +67,9 @@ class TokenManager {
   /// load already in flight, so the next [getToken] call loads a fresh one for
   /// the new user.
   ///
-  /// Use this to reuse a manager across users, and when a user's identity is
-  /// only known after an authenticated request — a guest, whose id and token
-  /// are both issued in exchange for an anonymous one:
+  /// To reuse a manager across users, or to authenticate as a user whose
+  /// identity is only known after an authenticated request — a guest, whose id
+  /// and token are both issued in exchange for an anonymous one — consider:
   ///
   /// ```dart
   /// // Authenticate anonymously while the real identity is being obtained.
@@ -142,9 +142,8 @@ class TokenManager {
     final loadingGeneration = _generation;
     final updatedToken = await _tokenProvider.loadToken(loadingFor);
 
-    // Only cache the token if nothing invalidated the cache while it loaded.
-    // `setTokenProvider` or `expireToken` may have run, which means this token
-    // is the one the caller asked us to stop using.
+    // `setTokenProvider` or `expireToken` may have run while this loaded, in
+    // which case the token is the one the caller asked to stop using.
     if (loadingGeneration != _generation) return updatedToken;
 
     _cachedToken = updatedToken;
