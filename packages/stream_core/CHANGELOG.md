@@ -9,7 +9,7 @@
 
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
-- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access
+- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `UserToken.anonymousUserId`
 - Added `UserToken.anonymousUserId`, the user id used for anonymous authentication
 - Added `AuthInterceptor.withProvider`, which takes a `TokenManager Function()` getter instead of a fixed instance
 - Added `teams` field to `User` class
@@ -18,6 +18,7 @@
 
 - Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
+- Fixed `TokenManager` caching a token that finished loading after `expireToken` or `setTokenProvider` had invalidated it
 
 ### 🔄 Changed
 

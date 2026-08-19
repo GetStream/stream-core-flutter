@@ -67,8 +67,9 @@ class UserToken extends Equatable {
   ///
   /// Returns a [UserToken] configured for anonymous access.
   ///
-  /// Throws an [ArgumentError] if [rawValue] is given and is not a valid JWT,
-  /// or if its 'user_id' claim is not [anonymousUserId].
+  /// Throws an [ArgumentError] if [rawValue] is given and its 'user_id' claim
+  /// is not [anonymousUserId], and a [FormatException] if it cannot be parsed
+  /// as a JWT.
   factory UserToken.anonymous({String rawValue = ''}) {
     if (rawValue.isNotEmpty) {
       final jwtBody = JsonWebToken.unverified(rawValue);
