@@ -36,8 +36,8 @@ class UserToken extends Equatable {
   ///
   /// Returns a [UserToken] configured for JWT authentication.
   ///
-  /// Throws an [ArgumentError] if the [rawValue] is not a valid JWT token
-  /// or if the 'user_id' claim is missing or empty.
+  /// Throws an [ArgumentError] if the 'user_id' claim is missing or empty, and
+  /// a [FormatException] if [rawValue] cannot be parsed as a JWT.
   factory UserToken(String rawValue) {
     final jwtBody = JsonWebToken.unverified(rawValue);
     final userId = jwtBody.claims.getTyped<String>('user_id');
@@ -76,9 +76,9 @@ class UserToken extends Equatable {
       final claim = jwtBody.claims.getTyped<String>('user_id');
       if (claim != anonymousUserId) {
         throw ArgumentError.value(
-          rawValue,
+          claim,
           'rawValue',
-          'Invalid anonymous JWT token: user_id claim must be "$anonymousUserId", got "$claim"',
+          'Expected a JWT claiming user_id "$anonymousUserId"',
         );
       }
     }

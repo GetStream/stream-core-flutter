@@ -109,9 +109,8 @@ void main() {
       'pointed at it',
       () async {
         // Simulates the guest flow: the exchange is authenticated anonymously,
-        // then the manager is pointed at the id the exchange returned. The user
-        // id and the token change together, so the `user_id` query parameter
-        // always describes the token in the `Authorization` header.
+        // then the manager is pointed at the id the exchange returned before
+        // the next request goes out, so nothing is in flight across the swap.
         const serverId = 'server-assigned-id';
 
         final tokenManager = TokenManager(
@@ -136,27 +135,6 @@ void main() {
           adapter.lastRequest?.headers['stream-auth-type'],
           AuthType.jwt.headerValue,
         );
-      },
-    );
-
-    test(
-      'uses the current TokenManager userId when nothing swaps it',
-      () async {
-        final tokenManager = TokenManager(
-          userId: 'user-123',
-          tokenProvider: TokenProvider.static(
-            generateTestUserToken('user-123'),
-          ),
-        );
-
-        final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
-        final adapter = _CapturingHttpClientAdapter();
-        dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
-
-        await dio.get<void>('/test');
-
-        expect(adapter.lastRequest?.queryParameters['user_id'], 'user-123');
       },
     );
 
@@ -267,7 +245,7 @@ void main() {
         final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
         final adapter = _TokenExpiredHttpClientAdapter();
         dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
 
         await expectLater(
           dio.get<void>('/test'),
@@ -282,14 +260,14 @@ void main() {
 
     test(
       'forwards a token-expired error without retrying when the token manager '
-      'is swapped to a static provider after the request was dispatched '
+      'is pointed at a static provider after the request was dispatched '
       '(guest exchange resolving mid-flight)',
       () async {
-        // Starts on a dynamic manager and swaps to a static one carrying the
+        // Starts on a dynamic provider and adopts a static one carrying the
         // exchanged id once the request is already in flight, mirroring the
-        // guest flow. onError observes the swapped-in (static) manager and must
-        // forward the error rather than expire + retry.
-        var tokenManager = TokenManager(
+        // guest flow. onError sees the static provider and must forward the
+        // error rather than expire + retry.
+        final tokenManager = TokenManager(
           userId: 'requested-id',
           tokenProvider: TokenProvider.dynamic(
             (_) async => generateTestUserToken('requested-id'),
@@ -299,8 +277,8 @@ void main() {
         final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
         final adapter = _TokenExpiredHttpClientAdapter(
           onFetch: () {
-            tokenManager = TokenManager(
-              userId: 'server-assigned-id',
+            tokenManager.setTokenProvider(
+              'server-assigned-id',
               tokenProvider: TokenProvider.static(
                 generateTestUserToken('server-assigned-id'),
               ),
@@ -308,14 +286,14 @@ void main() {
           },
         );
         dio.httpClientAdapter = adapter;
-        dio.interceptors.add(AuthInterceptor.withProvider(dio, tokenManagerProvider: () => tokenManager));
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
 
         await expectLater(
           dio.get<void>('/test'),
           throwsA(isA<DioException>()),
         );
 
-        // The swapped-in manager is static, so the error is surfaced without a
+        // The adopted provider is static, so the error is surfaced without a
         // refresh-and-retry: the request is attempted exactly once.
         expect(adapter.requestCount, 1);
       },

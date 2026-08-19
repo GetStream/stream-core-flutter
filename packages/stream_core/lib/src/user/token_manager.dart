@@ -62,9 +62,10 @@ class TokenManager {
 
   /// Points this manager at `userId`, loading its tokens from `tokenProvider`.
   ///
-  /// The user and the provider change together, so the manager can never report
-  /// one user while holding another's token. Expires the cached token, so the
-  /// next [getToken] call loads a fresh one for the new user.
+  /// The user and the provider change together, so the manager can never cache
+  /// one user's token under another. Expires the cached token, and discards a
+  /// load already in flight, so the next [getToken] call loads a fresh one for
+  /// the new user.
   ///
   /// Use this to reuse a manager across users, and when a user's identity is
   /// only known after an authenticated request — a guest, whose id and token
@@ -92,7 +93,7 @@ class TokenManager {
 
     // The cached token belongs to the previous user and provider, so drop it
     // and let the next `getToken` call load a fresh one.
-    return expireToken();
+    expireToken();
   }
 
   // The currently cached token, if any.

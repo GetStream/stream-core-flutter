@@ -11,7 +11,6 @@
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
 - Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `UserToken.anonymousUserId`
 - Added `UserToken.anonymousUserId`, the user id used for anonymous authentication
-- Added `AuthInterceptor.withProvider`, which takes a `TokenManager Function()` getter instead of a fixed instance
 - Added `teams` field to `User` class
 
 ### 🐛 Bug Fixes
