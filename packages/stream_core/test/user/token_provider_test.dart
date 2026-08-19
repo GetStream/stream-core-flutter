@@ -1,24 +1,7 @@
-import 'dart:convert';
-
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
-/// Builds an unsigned JWT carrying [userId] as its 'user_id' claim.
-String _generateTestJwt(String userId) {
-  String b64UrlNoPad(Object jsonObj) {
-    final bytes = utf8.encode(jsonEncode(jsonObj));
-    return base64Url.encode(bytes).replaceAll('=', '');
-  }
-
-  final header = {'alg': 'none', 'typ': 'JWT'};
-  final payload = {'user_id': userId};
-
-  // Trailing dot = empty signature, which is what alg=none means.
-  return '${b64UrlNoPad(header)}.${b64UrlNoPad(payload)}.';
-}
-
-/// Builds a JWT [UserToken] carrying [userId] as its 'user_id' claim.
-UserToken _generateTestUserToken(String userId) => UserToken(_generateTestJwt(userId));
+import '../helpers/user_token.dart';
 
 void main() {
   group('UserToken.anonymous', () {
@@ -31,7 +14,7 @@ void main() {
     });
 
     test('carries an optional raw value for restricted access', () {
-      final restricted = _generateTestJwt(UserToken.anonymousUserId);
+      final restricted = generateTestJwt(UserToken.anonymousUserId);
       final token = UserToken.anonymous(rawValue: restricted);
 
       expect(token.userId, '!anon');
@@ -44,7 +27,7 @@ void main() {
       () {
         // An anonymous token must not be able to stand in for someone else.
         expect(
-          () => UserToken.anonymous(rawValue: _generateTestJwt('alice')),
+          () => UserToken.anonymous(rawValue: generateTestJwt('alice')),
           throwsArgumentError,
         );
       },
@@ -68,14 +51,14 @@ void main() {
 
   group('StaticTokenProvider', () {
     test('returns the token when the user ID matches', () async {
-      final token = _generateTestUserToken('user-1');
+      final token = generateTestUserToken('user-1');
       final provider = TokenProvider.static(token);
 
       expect(await provider.loadToken('user-1'), token);
     });
 
     test('throws when the user ID does not match', () {
-      final token = _generateTestUserToken('user-1');
+      final token = generateTestUserToken('user-1');
       final provider = TokenProvider.static(token);
 
       expect(() => provider.loadToken('user-2'), throwsArgumentError);
@@ -85,7 +68,7 @@ void main() {
   group('DynamicTokenProvider', () {
     test('returns JWT tokens from the loader', () async {
       final provider = TokenProvider.dynamic(
-        (userId) async => _generateTestUserToken(userId),
+        (userId) async => generateTestUserToken(userId),
       );
 
       final token = await provider.loadToken('user-1');
@@ -112,7 +95,7 @@ void main() {
       () {
         // Caching it would authenticate every later request as that user.
         final provider = TokenProvider.dynamic(
-          (_) async => _generateTestUserToken('someone-else'),
+          (_) async => generateTestUserToken('someone-else'),
         );
 
         expect(() => provider.loadToken('user-1'), throwsArgumentError);
