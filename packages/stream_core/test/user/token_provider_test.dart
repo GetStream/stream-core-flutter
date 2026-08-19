@@ -96,13 +96,7 @@ void main() {
       // also carries a user id that cannot match the one requested.
       expect(
         () => provider.loadToken('user-1'),
-        throwsA(
-          isArgumentError.having(
-            (it) => it.message,
-            'message',
-            contains('Token type mismatch'),
-          ),
-        ),
+        throwsA(isArgumentError.having((it) => it.name, 'name', 'authType')),
       );
     });
 
