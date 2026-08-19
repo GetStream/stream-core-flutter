@@ -74,8 +74,10 @@ class StaticTokenProvider implements TokenProvider {
   Future<UserToken> loadToken(String userId) async {
     // Validate that the token's user_id matches the requested userId
     if (_rawToken.userId != userId) {
-      throw ArgumentError(
-        'User ID mismatch: expected "$userId", got "${_rawToken.userId}"',
+      throw ArgumentError.value(
+        _rawToken.userId,
+        'userId',
+        'User ID mismatch: expected "$userId"',
       );
     }
 
@@ -113,15 +115,19 @@ class DynamicTokenProvider implements TokenProvider {
     // token always carries `UserToken.anonymousUserId`, so it would otherwise
     // fail the user id check first.
     if (token.authType != AuthType.jwt) {
-      throw ArgumentError(
-        'Token type mismatch: expected jwt, got ${token.authType.headerValue}',
+      throw ArgumentError.value(
+        token.authType.headerValue,
+        'authType',
+        'Token type mismatch: expected ${AuthType.jwt.headerValue}',
       );
     }
 
     // Validate that the token's user_id matches the requested userId
     if (token.userId != userId) {
-      throw ArgumentError(
-        'User ID mismatch: expected "$userId", got "${token.userId}"',
+      throw ArgumentError.value(
+        token.userId,
+        'userId',
+        'User ID mismatch: expected "$userId"',
       );
     }
 
