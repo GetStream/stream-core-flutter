@@ -25,7 +25,7 @@ typedef UserTokenLoader = Future<UserToken> Function(String userId);
 ///
 /// Create an anonymous token:
 /// ```dart
-/// final token = UserToken.anonymous(userId: 'guest-123');
+/// final token = UserToken.anonymous();
 /// print(token.authType); // AuthType.anonymous
 /// ```
 class UserToken extends Equatable {
@@ -58,19 +58,33 @@ class UserToken extends Equatable {
 
   /// Creates an anonymous user token.
   ///
-  /// Creates a token for anonymous authentication with the specified [userId].
-  /// When [userId] is not provided, defaults to '!anon' for anonymous users.
+  /// Anonymous tokens always use [anonymousUserId] as their user id.
   ///
   /// An optional [rawValue] can carry a JWT that is sent along with anonymous
-  /// requests, e.g. a call-restricted token granting an anonymous user access
-  /// to specific resources (such as a closed livestream). When omitted, the
-  /// token carries no raw value and requests are sent without credentials.
+  /// requests, granting the caller access to the specific resources its claims
+  /// name. When omitted, the token carries no raw value and requests are sent
+  /// without credentials.
   ///
   /// Returns a [UserToken] configured for anonymous access.
-  factory UserToken.anonymous({String? userId, String rawValue = ''}) {
+  ///
+  /// Throws an [ArgumentError] if [rawValue] is given and is not a valid JWT,
+  /// or if its 'user_id' claim is not [anonymousUserId].
+  factory UserToken.anonymous({String rawValue = ''}) {
+    if (rawValue.isNotEmpty) {
+      final jwtBody = JsonWebToken.unverified(rawValue);
+      final claim = jwtBody.claims.getTyped<String>('user_id');
+      if (claim != anonymousUserId) {
+        throw ArgumentError.value(
+          rawValue,
+          'rawValue',
+          'Invalid anonymous JWT token: user_id claim must be "$anonymousUserId", got "$claim"',
+        );
+      }
+    }
+
     return UserToken._(
       rawValue: rawValue,
-      userId: userId ?? '!anon',
+      userId: anonymousUserId,
       authType: AuthType.anonymous,
     );
   }
@@ -81,16 +95,19 @@ class UserToken extends Equatable {
     required this.authType,
   });
 
+  /// The user id used for anonymous authentication.
+  static const anonymousUserId = '!anon';
+
   /// The raw token value.
   ///
   /// For JWT tokens, contains the complete JWT string. For anonymous tokens,
-  /// this field is empty as no token value is required.
+  /// it is empty unless one was supplied to grant restricted access.
   final String rawValue;
 
   /// The unique identifier of the user.
   ///
   /// For JWT tokens, this value is extracted from the 'user_id' claim.
-  /// For anonymous tokens, this can be a custom identifier or defaults to '!anon'.
+  /// For anonymous tokens, it is always [anonymousUserId].
   final String userId;
 
   /// The authentication type of this token.

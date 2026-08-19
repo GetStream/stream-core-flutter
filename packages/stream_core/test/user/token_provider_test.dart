@@ -24,24 +24,51 @@ void main() {
     });
 
     test('carries an optional raw value for restricted access', () {
-      final token = UserToken.anonymous(rawValue: 'restricted-jwt');
+      final restricted = _fakeJwt(UserToken.anonymousUserId);
+      final token = UserToken.anonymous(rawValue: restricted);
 
       expect(token.userId, '!anon');
-      expect(token.rawValue, 'restricted-jwt');
+      expect(token.rawValue, restricted);
       expect(token.authType, AuthType.anonymous);
+    });
+
+    test(
+      'rejects a raw value claiming a real user, so an anonymous token cannot '
+      'stand in for someone else',
+      () {
+        expect(
+          () => UserToken.anonymous(rawValue: _fakeJwt('alice')),
+          throwsArgumentError,
+        );
+      },
+    );
+
+    test('rejects a raw value that is not a JWT at all', () {
+      expect(
+        () => UserToken.anonymous(rawValue: 'not-a-jwt'),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects a raw value whose segments are not valid base64', () {
+      // Shaped like a JWT, so parsing gets further before failing.
+      expect(
+        () => UserToken.anonymous(rawValue: 'a.b.c'),
+        throwsFormatException,
+      );
     });
   });
 
   group('StaticTokenProvider', () {
     test('returns the token when the user ID matches', () async {
-      final token = UserToken.anonymous(userId: 'user-1');
+      final token = UserToken(_fakeJwt('user-1'));
       final provider = TokenProvider.static(token);
 
       expect(await provider.loadToken('user-1'), token);
     });
 
     test('throws when the user ID does not match', () {
-      final token = UserToken.anonymous(userId: 'user-1');
+      final token = UserToken(_fakeJwt('user-1'));
       final provider = TokenProvider.static(token);
 
       expect(() => provider.loadToken('user-2'), throwsArgumentError);
@@ -62,10 +89,22 @@ void main() {
 
     test('throws when the loader returns a non-JWT token', () {
       final provider = TokenProvider.dynamic(
-        (userId) async => UserToken.anonymous(userId: userId),
+        (_) async => UserToken.anonymous(),
       );
 
       expect(() => provider.loadToken('user-1'), throwsArgumentError);
     });
+
+    test(
+      'throws when the loader returns a token for a different user, which would '
+      'otherwise authenticate every later request as that user',
+      () {
+        final provider = TokenProvider.dynamic(
+          (_) async => UserToken(_fakeJwt('someone-else')),
+        );
+
+        expect(() => provider.loadToken('user-1'), throwsArgumentError);
+      },
+    );
   });
 }

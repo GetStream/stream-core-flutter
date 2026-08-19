@@ -1,24 +1,28 @@
 ## Upcoming
 
+### 💥 BREAKING CHANGES
+
+- Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `UserToken.anonymousUserId`
+- Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
+
 ### ✨ Features
 
-- Added `AuthInterceptor.withProvider`, which takes a `TokenManager Function()` getter instead of a fixed `TokenManager` instance. This lets callers swap the active `TokenManager` at runtime — e.g. after a guest token exchange resolves a server-assigned user id — and have the interceptor pick up the new instance (and its `userId`) on the next request. The existing `AuthInterceptor(dio, tokenManager)` constructor is unchanged.
-- Added `teams` field to `User` class.
-- Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful
-  token load.
-- Added optional `rawValue` parameter to `UserToken.anonymous` so anonymous tokens can carry
-  a JWT (e.g. call-restricted tokens for closed livestreams).
+- Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
+- Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
+- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access
+- Added `UserToken.anonymousUserId`, the user id used for anonymous authentication
+- Added `AuthInterceptor.withProvider`, which takes a `TokenManager Function()` getter instead of a fixed instance
+- Added `teams` field to `User` class
 
-### 🐞 Fixed
+### 🐛 Bug Fixes
 
-- `TokenManager.getToken()` now returns the cached token instead of contacting the
-  `TokenProvider` on every call.
-- The `TokenManager.tokenProvider` setter now stores the new provider, previously it only
-  expired the cached token.
+- Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
+- Fixed `AuthInterceptor` sending a `user_id` that could disagree with the token in the `Authorization` header
+- Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 
 ### 🔄 Changed
 
-- Raised the minimum Dart SDK to `^3.12.0`.
+- Raised the minimum Dart SDK to `^3.12.0`
 
 ## 0.4.0
 

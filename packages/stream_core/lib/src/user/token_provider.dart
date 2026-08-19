@@ -42,8 +42,8 @@ abstract interface class TokenProvider {
   /// Returns a [Future] that resolves to a [UserToken] configured for either
   /// JWT authentication or anonymous access, depending on the provider type.
   ///
-  /// Throws an [ArgumentError] if the loaded token is not valid (for JWT providers)
-  /// or if the 'user_id' claim is missing or empty (for JWT tokens).
+  /// Throws an [ArgumentError] if the token does not belong to [userId], or if
+  /// it is not valid for the provider's authentication type.
   Future<UserToken> loadToken(String userId);
 }
 
@@ -56,7 +56,7 @@ abstract interface class TokenProvider {
 /// Useful for scenarios where tokens don't expire, long-lived tokens,
 /// or for testing purposes.
 class StaticTokenProvider implements TokenProvider {
-  /// Creates a static token provider with the given [_rawToken].
+  /// Creates a static token provider with the given `token`.
   const StaticTokenProvider(this._rawToken);
 
   // The pre-configured token.
@@ -73,11 +73,13 @@ class StaticTokenProvider implements TokenProvider {
   @override
   Future<UserToken> loadToken(String userId) async {
     // Validate that the token's user_id matches the requested userId
-    if (_rawToken.userId == userId) return _rawToken;
+    if (_rawToken.userId != userId) {
+      throw ArgumentError(
+        'User ID mismatch: expected "${_rawToken.userId}", got "$userId"',
+      );
+    }
 
-    throw ArgumentError(
-      'User ID mismatch: expected "${_rawToken.userId}", got "$userId"',
-    );
+    return _rawToken;
   }
 }
 
@@ -87,7 +89,7 @@ class StaticTokenProvider implements TokenProvider {
 /// for users when needed. The loader function is called with the user ID
 /// and must return a fresh JWT token, typically used for token refresh scenarios.
 class DynamicTokenProvider implements TokenProvider {
-  /// Creates a dynamic token provider with the given [_loader] function.
+  /// Creates a dynamic token provider with the given `loader` function.
   const DynamicTokenProvider(this._loader);
 
   // The function used to load tokens for users.
@@ -95,21 +97,31 @@ class DynamicTokenProvider implements TokenProvider {
 
   /// Loads a fresh JWT token for the specified [userId] using the configured loader.
   ///
-  /// Calls the [_loader] function with the [userId] to fetch a fresh JWT token
-  /// and returns the [UserToken] instance from the result.
+  /// Calls the loader with [userId] to fetch a fresh JWT token and returns the
+  /// [UserToken] instance from the result.
   ///
   /// Returns a [Future] that resolves to a [UserToken] configured for JWT authentication.
   ///
-  /// Throws an [ArgumentError] if the token returned by the loader is not a JWT token
-  /// or if the 'user_id' claim is missing or empty.
+  /// Throws an [ArgumentError] if the token returned by the loader is not a JWT
+  /// token, or if its 'user_id' claim is not [userId].
   @override
   Future<UserToken> loadToken(String userId) async {
     final token = await _loader.call(userId);
-    // Validate that the returned token is a JWT token
-    if (token.authType == AuthType.jwt) return token;
 
-    throw ArgumentError(
-      'Token type mismatch: expected jwt, got ${token.authType.headerValue}',
-    );
+    // Validate that the token's user_id matches the requested userId
+    if (token.userId != userId) {
+      throw ArgumentError(
+        'User ID mismatch: expected "$userId", got "${token.userId}"',
+      );
+    }
+
+    // Validate that the returned token is a JWT token
+    if (token.authType != AuthType.jwt) {
+      throw ArgumentError(
+        'Token type mismatch: expected jwt, got ${token.authType.headerValue}',
+      );
+    }
+
+    return token;
   }
 }

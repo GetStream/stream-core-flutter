@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
@@ -19,7 +20,15 @@ class _CountingProvider implements TokenProvider {
   }
 }
 
-UserToken _token(String value) => UserToken.anonymous(userId: value);
+/// Builds a JWT [UserToken] with the given [userId] claim, sufficient for
+/// [UserToken]'s unverified parsing.
+UserToken _token(String userId) {
+  String encode(Map<String, dynamic> json) => base64Url.encode(utf8.encode(jsonEncode(json))).replaceAll('=', '');
+  final header = encode({'alg': 'HS256', 'typ': 'JWT'});
+  final payload = encode({'user_id': userId});
+  final signature = encode({'sig': 'fake'});
+  return UserToken('$header.$payload.$signature');
+}
 
 void main() {
   group('TokenManager', () {
@@ -112,39 +121,90 @@ void main() {
       });
     });
 
-    group('tokenProvider setter', () {
-      test('swaps the provider and expires the cached token', () async {
-        final oldProvider = _CountingProvider((_) async => _token('old'));
-        final newProvider = _CountingProvider((_) async => _token('new'));
+    group('setTokenProvider', () {
+      test('points the manager at another user', () async {
         final manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: oldProvider,
+          tokenProvider: TokenProvider.static(_token('user-1')),
         );
 
-        expect(await manager.getToken(), _token('old'));
+        expect((await manager.getToken()).userId, 'user-1');
 
-        manager.tokenProvider = newProvider;
+        manager.setTokenProvider(
+          'user-2',
+          tokenProvider: TokenProvider.static(_token('user-2')),
+        );
 
-        expect(manager.peekToken(), isNull);
-        expect(await manager.getToken(), _token('new'));
-        expect(oldProvider.loadCount, 1);
-        expect(newProvider.loadCount, 1);
+        expect(manager.userId, 'user-2');
+        expect((await manager.getToken()).userId, 'user-2');
       });
 
-      test('keeps the cached token when the provider is unchanged', () async {
-        final provider = _CountingProvider((_) async => _token('token-1'));
+      test('expires the token cached for the previous user', () async {
         final manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: provider,
+          tokenProvider: TokenProvider.static(_token('user-1')),
         );
 
         await manager.getToken();
-        manager.tokenProvider = provider;
+        expect(manager.peekToken(), _token('user-1'));
 
-        expect(manager.peekToken(), _token('token-1'));
+        manager.setTokenProvider(
+          'user-2',
+          tokenProvider: TokenProvider.static(_token('user-2')),
+        );
+
+        expect(manager.peekToken(), isNull);
       });
 
-      test('usesStaticProvider reflects the swapped provider', () {
+      test(
+        'supports a guest exchange, which is authenticated anonymously before '
+        'its user id and token are known',
+        () async {
+          const serverId = 'guest-abc-guest-123';
+
+          final manager = TokenManager(
+            userId: UserToken.anonymousUserId,
+            tokenProvider: TokenProvider.static(UserToken.anonymous()),
+          );
+
+          final anonymous = await manager.getToken();
+          expect(anonymous.authType, AuthType.anonymous);
+          expect(anonymous.rawValue, isEmpty);
+
+          manager.setTokenProvider(
+            serverId,
+            tokenProvider: TokenProvider.static(_token(serverId)),
+          );
+
+          final guest = await manager.getToken();
+          expect(manager.userId, serverId);
+          expect(guest.authType, AuthType.jwt);
+          expect(guest.userId, serverId);
+        },
+      );
+
+      test('a load in flight does not cache its token over the new user', () async {
+        final slowLoad = Completer<UserToken>();
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider((_) => slowLoad.future),
+        );
+
+        final pending = manager.getToken();
+
+        manager.setTokenProvider(
+          'user-2',
+          tokenProvider: TokenProvider.static(_token('user-2')),
+        );
+        slowLoad.complete(_token('user-1'));
+        await pending;
+
+        // user-1's token must not be waiting in the cache for user-2 to send.
+        expect(manager.peekToken(), isNull);
+        expect((await manager.getToken()).userId, 'user-2');
+      });
+
+      test('usesStaticProvider reflects the new provider', () {
         final manager = TokenManager(
           userId: 'user-1',
           tokenProvider: TokenProvider.static(_token('user-1')),
@@ -152,7 +212,10 @@ void main() {
 
         expect(manager.usesStaticProvider, isTrue);
 
-        manager.tokenProvider = _CountingProvider((_) async => _token('t'));
+        manager.setTokenProvider(
+          'user-1',
+          tokenProvider: _CountingProvider((_) async => _token('user-1')),
+        );
 
         expect(manager.usesStaticProvider, isFalse);
       });
