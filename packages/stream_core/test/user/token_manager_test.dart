@@ -112,8 +112,7 @@ void main() {
       });
 
       test(
-        'discards a load in flight, rather than caching the token it was told '
-        'to stop using',
+        'discards a load in flight',
         () async {
           final slowLoad = Completer<UserToken>();
           final manager = TokenManager(
@@ -168,8 +167,7 @@ void main() {
       });
 
       test(
-        'supports a guest exchange, which is authenticated anonymously before '
-        'its user id and token are known',
+        'adopts a user id and token that were not known up front',
         () async {
           const serverId = 'guest-abc-guest-123';
 
@@ -216,8 +214,7 @@ void main() {
       });
 
       test(
-        'discards a load in flight when only the provider changes, so the '
-        'replaced provider cannot cache its token for the same user',
+        'discards a load in flight when only the provider changes',
         () async {
           final slowLoad = Completer<UserToken>();
           final manager = TokenManager(

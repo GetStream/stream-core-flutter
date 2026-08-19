@@ -23,9 +23,9 @@ void main() {
     });
 
     test(
-      'rejects a raw value claiming a real user, so an anonymous token cannot '
-      'stand in for someone else',
+      'rejects a raw value claiming a real user',
       () {
+        // An anonymous token must not be able to stand in for someone else.
         expect(
           () => UserToken.anonymous(rawValue: generateTestJwt('alice')),
           throwsArgumentError,
@@ -91,9 +91,9 @@ void main() {
     });
 
     test(
-      'throws when the loader returns a token for a different user, which would '
-      'otherwise authenticate every later request as that user',
+      'throws when the loader returns a token for a different user',
       () {
+        // Caching it would authenticate every later request as that user.
         final provider = TokenProvider.dynamic(
           (_) async => generateTestUserToken('someone-else'),
         );
