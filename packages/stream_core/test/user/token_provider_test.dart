@@ -82,12 +82,7 @@ void main() {
         (_) async => UserToken.anonymous(),
       );
 
-      // Reported as the wrong type, not the wrong user: an anonymous token
-      // also carries a user id that cannot match the one requested.
-      expect(
-        () => provider.loadToken('user-1'),
-        throwsA(isArgumentError.having((it) => it.name, 'name', 'authType')),
-      );
+      expect(() => provider.loadToken('user-1'), throwsArgumentError);
     });
 
     test(

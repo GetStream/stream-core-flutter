@@ -76,7 +76,6 @@ class StaticTokenProvider implements TokenProvider {
     if (_rawToken.userId != userId) {
       throw ArgumentError(
         'User ID mismatch: expected "$userId", got "${_rawToken.userId}"',
-        'userId',
       );
     }
 
@@ -114,7 +113,6 @@ class DynamicTokenProvider implements TokenProvider {
     if (token.authType != AuthType.jwt) {
       throw ArgumentError(
         'Token type mismatch: expected ${AuthType.jwt.headerValue}, got ${token.authType.headerValue}',
-        'authType',
       );
     }
 
@@ -122,7 +120,6 @@ class DynamicTokenProvider implements TokenProvider {
     if (token.userId != userId) {
       throw ArgumentError(
         'User ID mismatch: expected "$userId", got "${token.userId}"',
-        'userId',
       );
     }
 
