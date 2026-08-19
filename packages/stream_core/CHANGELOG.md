@@ -1,6 +1,6 @@
 ## Upcoming
 
-### 🛑 Breaking / Removals
+### 💥 BREAKING CHANGES
 
 - Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `UserToken.anonymousUserId`
 - Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
