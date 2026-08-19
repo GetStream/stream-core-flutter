@@ -82,7 +82,12 @@ void main() {
         (_) async => UserToken.anonymous(),
       );
 
-      expect(() => provider.loadToken('user-1'), throwsArgumentError);
+      // Requested id matches the one an anonymous token carries, so this
+      // reaches the type check rather than failing the user id check first.
+      expect(
+        () => provider.loadToken(UserToken.anonymousUserId),
+        throwsArgumentError,
+      );
     });
 
     test(

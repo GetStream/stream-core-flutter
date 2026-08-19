@@ -108,17 +108,17 @@ class DynamicTokenProvider implements TokenProvider {
   Future<UserToken> loadToken(String userId) async {
     final token = await _loader.call(userId);
 
-    // Validate that the returned token is a JWT token
-    if (token.authType != AuthType.jwt) {
-      throw ArgumentError(
-        'Token type mismatch: expected ${AuthType.jwt.headerValue}, got ${token.authType.headerValue}',
-      );
-    }
-
     // Validate that the token's user_id matches the requested userId
     if (token.userId != userId) {
       throw ArgumentError(
         'User ID mismatch: expected "$userId", got "${token.userId}"',
+      );
+    }
+
+    // Validate that the returned token is a JWT token
+    if (token.authType != AuthType.jwt) {
+      throw ArgumentError(
+        'Token type mismatch: expected ${AuthType.jwt.headerValue}, got ${token.authType.headerValue}',
       );
     }
 
