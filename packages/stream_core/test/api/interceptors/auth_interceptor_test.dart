@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
+import '../../helpers/user_token.dart';
+
 // A minimal HttpClientAdapter that captures the outgoing RequestOptions and
 // always responds with an empty successful response.
 class _CapturingHttpClientAdapter implements HttpClientAdapter {
@@ -69,20 +71,6 @@ class _TokenExpiredHttpClientAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
-/// Builds a JWT [UserToken] carrying [userId] as its 'user_id' claim.
-UserToken _generateTestUserToken(String userId) {
-  String b64UrlNoPad(Object jsonObj) {
-    final bytes = utf8.encode(jsonEncode(jsonObj));
-    return base64Url.encode(bytes).replaceAll('=', '');
-  }
-
-  final header = {'alg': 'none', 'typ': 'JWT'};
-  final payload = {'user_id': userId};
-
-  // Trailing dot = empty signature, which is what alg=none means.
-  return UserToken('${b64UrlNoPad(header)}.${b64UrlNoPad(payload)}.');
-}
-
 void main() {
   group('AuthInterceptor', () {
     test(
@@ -92,7 +80,7 @@ void main() {
         final tokenManager = TokenManager(
           userId: 'user-123',
           tokenProvider: TokenProvider.static(
-            _generateTestUserToken('user-123'),
+            generateTestUserToken('user-123'),
           ),
         );
 
@@ -136,7 +124,7 @@ void main() {
 
         tokenManager.setTokenProvider(
           serverId,
-          tokenProvider: TokenProvider.static(_generateTestUserToken(serverId)),
+          tokenProvider: TokenProvider.static(generateTestUserToken(serverId)),
         );
 
         await dio.get<void>('/test');
@@ -180,7 +168,7 @@ void main() {
     test(
       'sends a restricted anonymous token as the Authorization header',
       () async {
-        final restricted = _generateTestUserToken(UserToken.anonymousUserId);
+        final restricted = generateTestUserToken(UserToken.anonymousUserId);
         final tokenManager = TokenManager(
           userId: UserToken.anonymousUserId,
           tokenProvider: TokenProvider.static(
@@ -224,12 +212,12 @@ void main() {
         await pumpEventQueue();
 
         // The load is already running for user-1 when the manager moves on.
-        final userTwoToken = _generateTestUserToken('user-2');
+        final userTwoToken = generateTestUserToken('user-2');
         tokenManager.setTokenProvider(
           'user-2',
           tokenProvider: TokenProvider.static(userTwoToken),
         );
-        slowLoad.complete(_generateTestUserToken('user-1'));
+        slowLoad.complete(generateTestUserToken('user-1'));
         await pending;
 
         expect(adapter.lastRequest?.queryParameters['user_id'], 'user-2');
@@ -247,7 +235,7 @@ void main() {
       () async {
         final tokenManager = TokenManager(
           userId: 'guest-1',
-          tokenProvider: TokenProvider.static(_generateTestUserToken('guest-1')),
+          tokenProvider: TokenProvider.static(generateTestUserToken('guest-1')),
         );
 
         final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
@@ -278,7 +266,7 @@ void main() {
         final tokenManager = TokenManager(
           userId: 'requested-id',
           tokenProvider: TokenProvider.dynamic(
-            (_) async => _generateTestUserToken('requested-id'),
+            (_) async => generateTestUserToken('requested-id'),
           ),
         );
 
@@ -288,7 +276,7 @@ void main() {
             tokenManager.setTokenProvider(
               'server-assigned-id',
               tokenProvider: TokenProvider.static(
-                _generateTestUserToken('server-assigned-id'),
+                generateTestUserToken('server-assigned-id'),
               ),
             );
           },
