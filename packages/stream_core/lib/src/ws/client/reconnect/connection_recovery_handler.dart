@@ -18,6 +18,10 @@ import 'retry_strategy.dart';
 /// when reconnection should occur, implementing exponential backoff with jitter for optimal
 /// retry behavior.
 ///
+/// It recovers connections that existed: until [StreamWebSocketClient.connect] has established
+/// one, connecting belongs to whoever called it and was handed the failure. A first attempt that
+/// fails is therefore not retried here, including when the network returns.
+///
 /// ## Built-in Policies
 ///
 /// The handler automatically includes several reconnection policies:
@@ -117,7 +121,19 @@ class ConnectionRecoveryHandler extends Disposable {
     _reconnectionTimer = null;
   }
 
-  bool _canBeReconnected() => _policies.every((it) => it.canBeReconnected());
+  // Set once a connection has been established, and never unset: it is what
+  // separates a drop this handler recovers from a first attempt it does not.
+  var _hasConnected = false;
+
+  bool _canBeReconnected() {
+    // Until a connection has existed, connecting belongs to whoever called
+    // `connect` and was handed the failure. Retrying here as well would work
+    // behind a caller already told the attempt failed — and would race the
+    // retry that caller makes in response.
+    if (!_hasConnected) return false;
+
+    return _policies.every((it) => it.canBeReconnected());
+  }
 
   bool _canBeDisconnected() {
     return switch (_client.connectionState.value) {
@@ -145,13 +161,18 @@ class ConnectionRecoveryHandler extends Disposable {
   }
 
   void _onConnectionStateChanged(WebSocketConnectionState state) {
-    return switch (state) {
-      Connecting() => _cancelReconnection(),
-      Connected() => _reconnectStrategy.resetConsecutiveFailures(),
-      Disconnected() => _scheduleReconnectionIfNeeded(),
+    switch (state) {
+      case Connecting():
+        _cancelReconnection();
+      case Connected():
+        _hasConnected = true;
+        _reconnectStrategy.resetConsecutiveFailures();
+      case Disconnected():
+        _scheduleReconnectionIfNeeded();
       // These states do not require any action.
-      Initialized() || Authenticating() || Disconnecting() => () {},
-    };
+      case Initialized() || Authenticating() || Disconnecting():
+        break;
+    }
   }
 
   @override
