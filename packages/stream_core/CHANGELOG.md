@@ -1,24 +1,37 @@
 ## Upcoming
 
+### 💥 BREAKING CHANGES
+
+- Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
+- Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
+- `TokenManager.userId` is now nullable, and is `null` until an identity is configured
+- `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. The constructor is `const`, so a mismatch in a const context fails to compile rather than throwing in debug mode
+
 ### ✨ Features
 
-- Added `AuthInterceptor.withProvider`, which takes a `TokenManager Function()` getter instead of a fixed `TokenManager` instance. This lets callers swap the active `TokenManager` at runtime — e.g. after a guest token exchange resolves a server-assigned user id — and have the interceptor pick up the new instance (and its `userId`) on the next request. The existing `AuthInterceptor(dio, tokenManager)` constructor is unchanged.
-- Added `teams` field to `User` class.
-- Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful
-  token load.
-- Added optional `rawValue` parameter to `UserToken.anonymous` so anonymous tokens can carry
-  a JWT (e.g. call-restricted tokens for closed livestreams).
+- Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
+- Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
+- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `User.anonymousUserId` (`!anon`), which the server also requires
+- Added `User.anonymousUserId`, the id every anonymous user has
+- Added `TokenManager.unconfigured`, for a client that exists before its user does
+- Added `TokenManager.reset`, which drops the configured identity and its cached token
+- Added `teams` field to `User` class
 
-### 🐞 Fixed
+### 🐛 Bug Fixes
 
-- `TokenManager.getToken()` now returns the cached token instead of contacting the
-  `TokenProvider` on every call.
-- The `TokenManager.tokenProvider` setter now stores the new provider, previously it only
-  expired the cached token.
+- Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
+- Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
+- Fixed `TokenManager` caching a token that finished loading after `expireToken` or `setTokenProvider` had invalidated it
 
 ### 🔄 Changed
 
-- Raised the minimum Dart SDK to `^3.12.0`.
+- Raised the minimum Dart SDK to `^3.12.0`
+- Anonymous requests now always send `user_id=!anon`. The value previously came from the `TokenManager`, so it was whatever the caller configured; the server requires the claim to be `!anon` and derives the anonymous session itself, so the parameter now matches
+- `DynamicTokenProvider` checks the token type before its user id, so a token of the wrong type is reported as such instead of as a mismatched user
+- `TokenManager.setTokenProvider` does nothing when handed the identity it already has, instead of expiring the cached token. The provider is compared with `==`, so one that defines value equality decides when a replacement counts as the same
+- `TokenManager.getToken` fails when `reset` runs while the token is loading, instead of returning a token for a user the manager no longer has. A `setTokenProvider` during a load still serves the caller that started it
+- `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for, which a custom `TokenProvider` is not obliged to check itself
+- `AuthInterceptor` no longer attempts a token refresh when the manager has no identity, so the original token-expired error is surfaced rather than a failure to load a token
 
 ## 0.4.0
 

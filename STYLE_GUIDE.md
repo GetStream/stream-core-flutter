@@ -842,6 +842,14 @@ debugging, and refactoring significantly harder. Instead of `setUp`, use local
 helper functions called inside each test block. For cleanup, prefer `addTearDown`
 over the global `tearDown` callback.
 
+The rule targets shared state, not pure construction. A deterministic fixture
+builder that holds no state — a signed token, an encoded payload, a fixed
+timestamp — may live under `test/helpers/` and be imported by several test files,
+so one correct definition serves all of them. Copies of a fixture builder tend to
+drift, and a subtly wrong fixture is harder to spot than a shared one. Anything
+that holds state between tests, or that arranges a scenario rather than building a
+value, stays local to the test file.
+
 ### Prefer more test files, avoid long test files
 
 Organize tests into smaller files grouped by feature, widget, or behavior. Split
