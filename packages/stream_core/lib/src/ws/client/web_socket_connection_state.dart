@@ -108,7 +108,7 @@ sealed class WebSocketConnectionState extends Equatable {
     return switch (this) {
       Disconnected(:final source) => switch (source) {
         // A deliberate stop rather than a failure to recover from.
-        ServerInitiated(:final error) when error?.code == WebSocketEngineException.stopErrorCode => false,
+        ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
         ServerInitiated(:final error) => switch (error?.apiError) {
           // Another token is refused for the same reason, so asking the provider
           // for one is futile.

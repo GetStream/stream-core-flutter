@@ -62,7 +62,7 @@ void main() {
       const state = Disconnected(
         source: ServerInitiated(
           error: WebSocketEngineException(
-            code: WebSocketEngineException.stopErrorCode,
+            code: CloseCode.normalClosure,
           ),
         ),
       );

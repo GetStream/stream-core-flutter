@@ -195,8 +195,6 @@ class WebSocketEngineException extends Equatable implements Exception {
     return null;
   }
 
-  static const stopErrorCode = 1000;
-
   @override
   List<Object?> get props => [reason, code, error];
 }
