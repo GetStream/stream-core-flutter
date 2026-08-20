@@ -121,8 +121,9 @@ class ConnectionRecoveryHandler extends Disposable {
     _reconnectionTimer = null;
   }
 
-  // Set once a connection has been established, and never unset: it is what
-  // separates a drop this handler recovers from a first attempt it does not.
+  // Whether a connection has been established since the caller last asked for
+  // one: it is what separates a drop this handler recovers from an attempt whose
+  // outcome the caller is waiting on.
   var _hasConnected = false;
 
   bool _canBeReconnected() {
@@ -167,7 +168,13 @@ class ConnectionRecoveryHandler extends Disposable {
       case Connected():
         _hasConnected = true;
         _reconnectStrategy.resetConsecutiveFailures();
-      case Disconnected():
+      case Disconnected(:final source):
+        // A disconnect the caller asked for hands connecting back to them, so
+        // the next `connect` is a fresh attempt they await rather than a drop to
+        // recover. A system-initiated one is the opposite: backgrounding and
+        // network loss are exactly what this handler exists to come back from.
+        if (source is UserInitiated) _hasConnected = false;
+
         _scheduleReconnectionIfNeeded();
       // These states do not require any action.
       case Initialized() || Authenticating() || Disconnecting():

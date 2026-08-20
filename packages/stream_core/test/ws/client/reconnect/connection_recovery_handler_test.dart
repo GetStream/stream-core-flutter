@@ -162,6 +162,29 @@ void main() {
       });
     });
 
+    test('hands connecting back after the caller disconnected', () {
+      fakeAsync((async) {
+        final (:client, :attempts) = _client();
+
+        client.connect().ignore();
+        async.flushMicrotasks();
+        client.onMessage(const _HealthCheckEvent());
+        client.disconnect().ignore();
+        async.flushMicrotasks();
+
+        // A fresh attempt, awaited by whoever made it, that never connects.
+        client.connect().ignore();
+        async.flushMicrotasks();
+        async.elapse(WebSocketOptions.defaultConnectTimeout);
+        async.flushMicrotasks();
+
+        // Having connected in the previous session does not make this failure
+        // the handler's to retry.
+        async.elapse(const Duration(minutes: 1));
+        expect(attempts(), 2);
+      });
+    });
+
     test('does not retry a disconnect the caller asked for', () {
       fakeAsync((async) {
         final (:client, :attempts) = _client();
