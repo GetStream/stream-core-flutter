@@ -83,6 +83,11 @@ class ConnectionRecoveryHandler extends Disposable {
 
   late final _subscriptions = CompositeSubscription();
 
+  // Whether a connection has been established since the caller last asked for
+  // one: it is what separates a drop this handler recovers from an attempt whose
+  // outcome the caller is waiting on.
+  var _hasConnected = false;
+
   /// Attempts reconnection if policies allow it.
   ///
   /// Evaluates all configured policies and initiates reconnection when conditions are met.
@@ -120,11 +125,6 @@ class ConnectionRecoveryHandler extends Disposable {
     _reconnectionTimer?.cancel();
     _reconnectionTimer = null;
   }
-
-  // Whether a connection has been established since the caller last asked for
-  // one: it is what separates a drop this handler recovers from an attempt whose
-  // outcome the caller is waiting on.
-  var _hasConnected = false;
 
   bool _canBeReconnected() {
     // Until a connection has existed, connecting belongs to whoever called
@@ -166,20 +166,30 @@ class ConnectionRecoveryHandler extends Disposable {
       case Connecting():
         _cancelReconnection();
       case Connected():
-        _hasConnected = true;
-        _reconnectStrategy.resetConsecutiveFailures();
+        _onConnectionEstablished();
       case Disconnected(:final source):
-        // A disconnect the caller asked for hands connecting back to them, so
-        // the next `connect` is a fresh attempt they await rather than a drop to
-        // recover. A system-initiated one is the opposite: backgrounding and
-        // network loss are exactly what this handler exists to come back from.
-        if (source is UserInitiated) _hasConnected = false;
-
-        _scheduleReconnectionIfNeeded();
-      // These states do not require any action.
+        _onConnectionLost(source);
+      // An attempt on its way up or down decides nothing on its own.
       case Initialized() || Authenticating() || Disconnecting():
         break;
     }
+  }
+
+  // A connection exists, so keeping it is this handler's job from here, and the
+  // failures the backoff had accumulated are behind us.
+  void _onConnectionEstablished() {
+    _hasConnected = true;
+    _reconnectStrategy.resetConsecutiveFailures();
+  }
+
+  // A disconnect the caller asked for hands connecting back to them, so the next
+  // `connect` is a fresh attempt they await rather than a drop to recover. A
+  // system-initiated one is the opposite: backgrounding and network loss are what
+  // this handler exists to come back from.
+  void _onConnectionLost(DisconnectionSource source) {
+    if (source is UserInitiated) _hasConnected = false;
+
+    _scheduleReconnectionIfNeeded();
   }
 
   @override
