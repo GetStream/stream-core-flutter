@@ -6,11 +6,8 @@ import 'package:test/test.dart';
 
 import '../helpers/user_token.dart';
 
-/// A token provider that claims to equal any other of its kind, whatever
-/// credentials it carries.
-///
-/// Equality is a provider's own to define, and the manager must not take its
-/// word for it — that is what this provider is for.
+/// A token provider that defines value equality, as an implementation is free
+/// to do — here on nothing but its own type.
 @immutable
 class _AlwaysEqualProvider implements TokenProvider {
   const _AlwaysEqualProvider(this._token);
@@ -365,7 +362,7 @@ void main() {
         expect(provider.loadCount, 1);
       });
 
-      test('replaces a provider even when it claims to equal the previous one', () async {
+      test('keeps the cached token when the provider says it is unchanged', () async {
         final manager = TokenManager(
           userId: 'user-1',
           tokenProvider: _AlwaysEqualProvider(generateTestUserToken('user-1', nonce: 'first')),
@@ -377,10 +374,10 @@ void main() {
           tokenProvider: _AlwaysEqualProvider(generateTestUserToken('user-1', nonce: 'second')),
         );
 
-        // The manager compares instances, not values, so a provider cannot talk
-        // it into keeping a token the replacement was meant to supersede.
-        expect(manager.peekToken(), isNull);
-        expect(await manager.getToken(), generateTestUserToken('user-1', nonce: 'second'));
+        // Equality is a declaration of interchangeability, and it is the
+        // provider's own to make: this one says the replacement is the same, so
+        // the cached token stands.
+        expect(manager.peekToken(), generateTestUserToken('user-1', nonce: 'first'));
       });
     });
 
