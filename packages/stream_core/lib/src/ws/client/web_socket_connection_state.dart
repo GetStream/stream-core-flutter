@@ -115,6 +115,8 @@ sealed class WebSocketConnectionState extends Equatable {
         UnHealthyConnection() => true,
         SystemInitiated() => true,
         UserInitiated() => false,
+        ConnectTimeout() => false,
+        AuthenticationFailed() => false,
       },
       _ => false, // No automatic reconnection for other states
     };
@@ -252,6 +254,18 @@ sealed class DisconnectionSource extends Equatable {
   /// typically when ping requests do not receive pong responses.
   const factory DisconnectionSource.unHealthyConnection() = UnHealthyConnection;
 
+  /// Creates a [ConnectTimeout] disconnection source.
+  ///
+  /// Indicates that the connection never became usable within the allotted
+  /// time, so it was abandoned before it was ever established.
+  const factory DisconnectionSource.connectTimeout() = ConnectTimeout;
+
+  /// Creates an [AuthenticationFailed] disconnection source.
+  ///
+  /// Indicates that the connection opened but could not be authenticated, so it
+  /// was closed without ever being usable.
+  const factory DisconnectionSource.authenticationFailed({Object? error}) = AuthenticationFailed;
+
   /// A human-readable description of the disconnection source.
   ///
   /// Provides a descriptive string that explains why the connection was closed.
@@ -264,6 +278,8 @@ sealed class DisconnectionSource extends Equatable {
       ServerInitiated() => 'Server initiated disconnection',
       SystemInitiated() => 'System initiated disconnection',
       UnHealthyConnection() => 'Unhealthy connection (no pong received)',
+      ConnectTimeout() => 'Timed out before the connection was established',
+      AuthenticationFailed() => 'Authentication failed',
     };
   }
 
@@ -319,4 +335,28 @@ final class SystemInitiated extends DisconnectionSource {
 final class UnHealthyConnection extends DisconnectionSource {
   /// Creates an [UnHealthyConnection] disconnection source.
   const UnHealthyConnection();
+}
+
+/// A disconnection caused by the connection not becoming usable in time.
+///
+/// This source indicates that the connection was abandoned while it was still
+/// being established, so it was never usable.
+final class ConnectTimeout extends DisconnectionSource {
+  /// Creates a [ConnectTimeout] disconnection source.
+  const ConnectTimeout();
+}
+
+/// A disconnection caused by the connection failing to authenticate.
+///
+/// This source indicates that the socket opened but authentication did not
+/// complete, so the connection was never usable.
+final class AuthenticationFailed extends DisconnectionSource {
+  /// Creates an [AuthenticationFailed] disconnection source.
+  const AuthenticationFailed({this.error});
+
+  /// The error that prevented the connection from authenticating.
+  final Object? error;
+
+  @override
+  List<Object?> get props => [error];
 }

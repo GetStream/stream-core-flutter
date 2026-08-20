@@ -4,6 +4,9 @@
 
 - Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
 - Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
+- `StreamWebSocketClient` now takes an `optionsBuilder` instead of `options`, and calls it for every connection attempt
+- Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, which is what it is called for and when
+- `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsSender` and returns a `Result`, so a failure to authenticate can be observed
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
 
 ### ✨ Features
@@ -14,6 +17,11 @@
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
+- Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before the connection is established
+- Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
+- `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`
+- Added `WsSender`, the send capability handed to a `WebSocketAuthenticator`
+- Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `teams` field to `User` class
 
 ### 🐛 Bug Fixes
@@ -21,6 +29,7 @@
 - Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 - Fixed `TokenManager` caching a token that finished loading after `expireToken` or `setTokenProvider` had invalidated it
+- Fixed a health check arriving while disconnecting reporting the connection as established again, which replaced the disconnection source and could turn a deliberate disconnect into an automatic reconnect
 
 ### 🔄 Changed
 

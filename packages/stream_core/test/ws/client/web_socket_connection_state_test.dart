@@ -40,5 +40,58 @@ void main() {
 
       expect(state.isAutomaticReconnectionEnabled, isTrue);
     });
+
+    test(
+      'is disabled when a connection attempt timed out, so a handshake that '
+      'never completes is not retried forever',
+      () {
+        const state = Disconnected(source: ConnectTimeout());
+
+        expect(state.isAutomaticReconnectionEnabled, isFalse);
+      },
+    );
+
+    test(
+      'is disabled when a connection could not be authenticated, since the '
+      'same credentials would fail again',
+      () {
+        const state = Disconnected(source: AuthenticationFailed(error: 'no token'));
+
+        expect(state.isAutomaticReconnectionEnabled, isFalse);
+      },
+    );
+
+    test('is enabled when a connected socket stops answering health checks', () {
+      const state = Disconnected(source: UnHealthyConnection());
+
+      expect(state.isAutomaticReconnectionEnabled, isTrue);
+    });
+  });
+
+  group('DisconnectionSource.closeReason', () {
+    test('reads differently for every source', () {
+      const sources = [
+        UserInitiated(),
+        ServerInitiated(),
+        SystemInitiated(),
+        UnHealthyConnection(),
+        ConnectTimeout(),
+        AuthenticationFailed(error: 'no token'),
+      ];
+
+      final reasons = sources.map((it) => it.closeReason).toSet();
+
+      // A shared reason would report two different outcomes identically.
+      expect(reasons, hasLength(sources.length));
+    });
+  });
+
+  group('WebSocketOptions.defaultConnectTimeout', () {
+    test('is the timeout used when the options do not say', () {
+      const options = WebSocketOptions(url: 'wss://example.com');
+
+      expect(options.connectTimeout, WebSocketOptions.defaultConnectTimeout);
+      expect(WebSocketOptions.defaultConnectTimeout, const Duration(seconds: 15));
+    });
   });
 }
