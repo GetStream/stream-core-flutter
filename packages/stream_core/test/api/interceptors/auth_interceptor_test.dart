@@ -113,7 +113,7 @@ void main() {
         const serverId = 'server-assigned-id';
 
         final tokenManager = TokenManager(
-          userId: UserToken.anonymousUserId,
+          userId: User.anonymousUserId,
           tokenProvider: TokenProvider.static(UserToken.anonymous()),
         );
 
@@ -142,7 +142,7 @@ void main() {
       'anonymous auth type',
       () async {
         final tokenManager = TokenManager(
-          userId: UserToken.anonymousUserId,
+          userId: User.anonymousUserId,
           tokenProvider: TokenProvider.static(UserToken.anonymous()),
         );
 
@@ -160,7 +160,7 @@ void main() {
         );
         expect(
           adapter.lastRequest?.queryParameters['user_id'],
-          UserToken.anonymousUserId,
+          User.anonymousUserId,
         );
       },
     );
@@ -168,9 +168,9 @@ void main() {
     test(
       'sends a restricted anonymous token as the Authorization header',
       () async {
-        final restricted = generateTestUserToken(UserToken.anonymousUserId);
+        final restricted = generateTestUserToken(User.anonymousUserId);
         final tokenManager = TokenManager(
-          userId: UserToken.anonymousUserId,
+          userId: User.anonymousUserId,
           tokenProvider: TokenProvider.static(
             UserToken.anonymous(rawValue: restricted.rawValue),
           ),
@@ -192,11 +192,13 @@ void main() {
     );
 
     test(
-      'sends the token manager user id, not the loaded token user id',
+      'sends the user id of the token it actually sent',
       () async {
-        // The mismatch is deliberate: a request carrying someone else's token
-        // is rejected, where deriving `user_id` from the token would make it
-        // self-consistent and silently act as the token's owner.
+        // The two can disagree: a load already running for one user finishes
+        // after the manager has moved to another, and that token is still
+        // handed to the request that triggered it. Deriving `user_id` from the
+        // token keeps the pair self-consistent, so the request is accepted as
+        // the token's owner rather than rejected for a mismatch.
         final slowLoad = Completer<UserToken>();
         final tokenManager = TokenManager(
           userId: 'user-1',
@@ -212,18 +214,18 @@ void main() {
         await pumpEventQueue();
 
         // The load is already running for user-1 when the manager moves on.
-        final userTwoToken = generateTestUserToken('user-2');
+        final userOneToken = generateTestUserToken('user-1');
         tokenManager.setTokenProvider(
           'user-2',
-          tokenProvider: TokenProvider.static(userTwoToken),
+          tokenProvider: TokenProvider.static(generateTestUserToken('user-2')),
         );
-        slowLoad.complete(generateTestUserToken('user-1'));
+        slowLoad.complete(userOneToken);
         await pending;
 
-        expect(adapter.lastRequest?.queryParameters['user_id'], 'user-2');
+        expect(adapter.lastRequest?.queryParameters['user_id'], 'user-1');
         expect(
           adapter.lastRequest?.headers['Authorization'],
-          isNot(userTwoToken.rawValue),
+          userOneToken.rawValue,
         );
       },
     );

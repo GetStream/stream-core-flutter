@@ -23,7 +23,7 @@ class AuthInterceptor extends QueuedInterceptor {
     try {
       final token = await _tokenManager.getToken();
 
-      options.queryParameters['user_id'] = _tokenManager.userId;
+      options.queryParameters['user_id'] = token.userId;
       options.headers['Authorization'] = token.rawValue;
       options.headers['stream-auth-type'] = token.authType.headerValue;
 

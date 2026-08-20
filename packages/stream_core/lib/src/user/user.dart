@@ -17,7 +17,11 @@ class User extends Equatable {
     this.type = UserType.regular,
     Map<String, Object?>? custom,
     this.teams = const [],
-  }) : originalName = name,
+  }) : assert(
+         type != UserType.anonymous || id == anonymousUserId,
+         'An anonymous user must use `User.anonymousUserId` as its id',
+       ),
+       originalName = name,
        custom = custom ?? const {};
 
   /// Creates a guest user with the provided id and an optional display name.
@@ -28,7 +32,13 @@ class User extends Equatable {
 
   /// Creates an anonymous user.
   /// - Returns: an anonymous `User`.
-  const User.anonymous() : this(id: '!anon', type: UserType.anonymous);
+  const User.anonymous() : this(id: anonymousUserId, type: UserType.anonymous);
+
+  /// The id every anonymous user has.
+  ///
+  /// Anonymous users are not distinguishable from one another, so this is the
+  /// only id a [User] of type [UserType.anonymous] can carry.
+  static const anonymousUserId = '!anon';
 
   /// The user's id.
   final String id;

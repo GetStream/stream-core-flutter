@@ -14,7 +14,7 @@ void main() {
     });
 
     test('carries an optional raw value for restricted access', () {
-      final restricted = generateTestJwt(UserToken.anonymousUserId);
+      final restricted = generateTestJwt(User.anonymousUserId);
       final token = UserToken.anonymous(rawValue: restricted);
 
       expect(token.userId, '!anon');
@@ -85,7 +85,7 @@ void main() {
       // Requested id matches the one an anonymous token carries, so this
       // reaches the type check rather than failing the user id check first.
       expect(
-        () => provider.loadToken(UserToken.anonymousUserId),
+        () => provider.loadToken(User.anonymousUserId),
         throwsArgumentError,
       );
     });

@@ -2,15 +2,18 @@
 
 ### 💥 BREAKING CHANGES
 
-- Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `UserToken.anonymousUserId`
+- Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
 - Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
+- `TokenManager.userId` is now nullable, and is `null` until an identity is configured
 
 ### ✨ Features
 
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
-- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `UserToken.anonymousUserId`
-- Added `UserToken.anonymousUserId`, the user id used for anonymous authentication
+- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `User.anonymousUserId`
+- Added `User.anonymousUserId`, the id every anonymous user has
+- Added `TokenManager.unconfigured`, for a client that exists before its user does
+- Added `TokenManager.reset`, which drops the configured identity and its cached token
 - Added `teams` field to `User` class
 
 ### 🐛 Bug Fixes
@@ -22,6 +25,7 @@
 ### 🔄 Changed
 
 - Raised the minimum Dart SDK to `^3.12.0`
+- `User` now asserts that a user of type `UserType.anonymous` carries `User.anonymousUserId` as its id
 
 ## 0.4.0
 

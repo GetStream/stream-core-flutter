@@ -172,7 +172,7 @@ void main() {
           const serverId = 'guest-abc-guest-123';
 
           final manager = TokenManager(
-            userId: UserToken.anonymousUserId,
+            userId: User.anonymousUserId,
             tokenProvider: TokenProvider.static(UserToken.anonymous()),
           );
 
@@ -251,6 +251,78 @@ void main() {
         );
 
         expect(manager.usesStaticProvider, isFalse);
+      });
+    });
+
+    group('unconfigured', () {
+      test('has no user and fails to load a token', () async {
+        final manager = TokenManager.unconfigured();
+
+        expect(manager.userId, isNull);
+        expect(manager.peekToken(), isNull);
+        expect(manager.usesStaticProvider, isFalse);
+        await expectLater(manager.getToken(), throwsA(isA<ClientException>()));
+      });
+
+      test('loads once an identity is supplied', () async {
+        final manager = TokenManager.unconfigured();
+
+        manager.setTokenProvider(
+          'user-1',
+          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+        );
+
+        expect(manager.userId, 'user-1');
+        expect((await manager.getToken()).userId, 'user-1');
+      });
+    });
+
+    group('reset', () {
+      test('drops the identity and the cached token', () async {
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+        );
+
+        await manager.getToken();
+        expect(manager.peekToken(), isNotNull);
+
+        manager.reset();
+
+        expect(manager.userId, isNull);
+        expect(manager.peekToken(), isNull);
+        await expectLater(manager.getToken(), throwsA(isA<ClientException>()));
+      });
+
+      test('leaves the manager reusable for another user', () async {
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+        )..reset();
+
+        manager.setTokenProvider(
+          'user-2',
+          tokenProvider: TokenProvider.static(generateTestUserToken('user-2')),
+        );
+
+        expect((await manager.getToken()).userId, 'user-2');
+      });
+
+      test('discards a load already in flight', () async {
+        final completer = Completer<UserToken>();
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider((_) => completer.future),
+        );
+
+        final inFlight = manager.getToken();
+        manager.reset();
+        completer.complete(generateTestUserToken('user-1'));
+
+        // The caller that started the load is still served, but its token is
+        // not cached over the reset.
+        expect((await inFlight).userId, 'user-1');
+        expect(manager.peekToken(), isNull);
       });
     });
 

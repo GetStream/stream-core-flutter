@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:jose/jose.dart';
 
+import 'user.dart';
+
 /// A function that loads user tokens.
 ///
 /// Takes a [userId] and returns a [Future] that resolves to a [UserToken].
@@ -58,7 +60,7 @@ class UserToken extends Equatable {
 
   /// Creates an anonymous user token.
   ///
-  /// Anonymous tokens always use [anonymousUserId] as their user id.
+  /// Anonymous tokens always use [User.anonymousUserId] as their user id.
   ///
   /// An optional [rawValue] can carry a JWT that is sent along with anonymous
   /// requests, granting the caller access to the specific resources its claims
@@ -68,24 +70,24 @@ class UserToken extends Equatable {
   /// Returns a [UserToken] configured for anonymous access.
   ///
   /// Throws an [ArgumentError] if [rawValue] is given and its 'user_id' claim
-  /// is not [anonymousUserId], and a [FormatException] if it cannot be parsed
+  /// is not [User.anonymousUserId], and a [FormatException] if it cannot be parsed
   /// as a JWT.
   factory UserToken.anonymous({String rawValue = ''}) {
     if (rawValue.isNotEmpty) {
       final jwtBody = JsonWebToken.unverified(rawValue);
       final claim = jwtBody.claims.getTyped<String>('user_id');
-      if (claim != anonymousUserId) {
+      if (claim != User.anonymousUserId) {
         throw ArgumentError.value(
           claim,
           'rawValue',
-          'Expected a JWT claiming user_id "$anonymousUserId"',
+          'Expected a JWT claiming user_id "${User.anonymousUserId}"',
         );
       }
     }
 
     return UserToken._(
       rawValue: rawValue,
-      userId: anonymousUserId,
+      userId: User.anonymousUserId,
       authType: AuthType.anonymous,
     );
   }
@@ -96,9 +98,6 @@ class UserToken extends Equatable {
     required this.authType,
   });
 
-  /// The user id used for anonymous authentication.
-  static const anonymousUserId = '!anon';
-
   /// The raw token value.
   ///
   /// For JWT tokens, contains the complete JWT string. For anonymous tokens,
@@ -108,7 +107,7 @@ class UserToken extends Equatable {
   /// The unique identifier of the user.
   ///
   /// For JWT tokens, this value is extracted from the 'user_id' claim.
-  /// For anonymous tokens, it is always [anonymousUserId].
+  /// For anonymous tokens, it is always [User.anonymousUserId].
   final String userId;
 
   /// The authentication type of this token.
