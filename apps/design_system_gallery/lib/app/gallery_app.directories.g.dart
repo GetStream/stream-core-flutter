@@ -36,6 +36,8 @@ import 'package:design_system_gallery/components/badge/stream_retry_badge.dart'
     as _design_system_gallery_components_badge_stream_retry_badge;
 import 'package:design_system_gallery/components/buttons/button.dart'
     as _design_system_gallery_components_buttons_button;
+import 'package:design_system_gallery/components/buttons/split_button.dart'
+    as _design_system_gallery_components_buttons_split_button;
 import 'package:design_system_gallery/components/buttons/stream_emoji_button.dart'
     as _design_system_gallery_components_buttons_stream_emoji_button;
 import 'package:design_system_gallery/components/buttons/stream_jump_to_unread_button.dart'
@@ -517,6 +519,21 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_buttons_stream_jump_to_unread_button
                         .buildStreamJumpToUnreadButtonShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSplitButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_buttons_split_button
+                    .buildStreamSplitButtonPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_buttons_split_button
+                    .buildStreamSplitButtonShowcase,
               ),
             ],
           ),
