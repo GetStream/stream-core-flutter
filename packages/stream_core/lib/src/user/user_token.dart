@@ -75,10 +75,10 @@ class UserToken extends Equatable {
   factory UserToken.anonymous({String rawValue = ''}) {
     if (rawValue.isNotEmpty) {
       final jwtBody = JsonWebToken.unverified(rawValue);
-      final claim = jwtBody.claims.getTyped<String>('user_id');
-      if (claim != User.anonymousUserId) {
+      final userId = jwtBody.claims.getTyped<String>('user_id');
+      if (userId != User.anonymousUserId) {
         throw ArgumentError.value(
-          claim,
+          userId,
           'rawValue',
           'Expected a JWT claiming user_id "${User.anonymousUserId}"',
         );
