@@ -91,9 +91,7 @@ extension StreamApiErrorExtension on StreamApiError {
   bool get isTokenExpiredError => code == _expiredTokenCode;
 
   /// Whether the token, or the key it was signed with, cannot be accepted.
-  bool get isInvalidTokenError {
-    return _invalidTokenCodes.contains(code) || code == _accessKeyErrorCode;
-  }
+  bool get isInvalidTokenError => _invalidTokenCodes.contains(code) || code == _accessKeyErrorCode;
 
   /// Whether this error is a client-side error (4xx status codes).
   bool get isClientError => _clientErrorStatusCodes.contains(statusCode);

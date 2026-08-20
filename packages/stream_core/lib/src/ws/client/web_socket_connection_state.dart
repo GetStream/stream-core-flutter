@@ -107,7 +107,17 @@ sealed class WebSocketConnectionState extends Equatable {
   bool get isAutomaticReconnectionEnabled {
     return switch (this) {
       Disconnected(:final source) => switch (source) {
-        ServerInitiated(:final error) => _canReconnectAfter(error),
+        // A deliberate stop rather than a failure to recover from.
+        ServerInitiated(:final error) when error?.code == WebSocketEngineException.stopErrorCode => false,
+        ServerInitiated(:final error) => switch (error?.apiError) {
+          // Another token is refused for the same reason, so asking the provider
+          // for one is futile.
+          final it? when it.isInvalidTokenError => false,
+          // Whatever else the client got wrong is the caller's to fix — except
+          // an expired token, which is replaced rather than corrected.
+          final it? when it.isClientError && !it.isTokenExpiredError => false,
+          _ => true, // Reconnect on other server initiated disconnections
+        },
         UnHealthyConnection() => true,
         SystemInitiated() => true,
         UserInitiated() => false,
@@ -362,26 +372,4 @@ final class AuthenticationFailed extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
-}
-
-// Whether a connection the server closed is worth opening again.
-//
-// Mirrors the rules the iOS SDK applies, which the ported version had drifted
-// from: it compared the API error's code against the close code 1000 and against
-// a 400..499 range that Stream's codes never occupy, so neither rule could fire.
-bool _canReconnectAfter(WebSocketEngineException? error) {
-  // A deliberate stop rather than a failure to recover from.
-  if (error?.code == WebSocketEngineException.stopErrorCode) return false;
-
-  final apiError = error?.apiError;
-  if (apiError == null) return true;
-
-  // Another token is refused for the same reason, so asking for one is futile.
-  if (apiError.isInvalidTokenError) return false;
-
-  // Whatever else the client got wrong is the caller's to fix — except an
-  // expired token, which is replaced rather than corrected.
-  if (apiError.isClientError && !apiError.isTokenExpiredError) return false;
-
-  return true;
 }
