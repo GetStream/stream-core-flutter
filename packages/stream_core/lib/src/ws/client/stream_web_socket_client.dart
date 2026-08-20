@@ -144,8 +144,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   /// Establishes a WebSocket connection.
   ///
   /// The connection state can be monitored through [connectionState] for real-time updates.
-  /// If the connection is already established or in progress, this method returns immediately.
-  /// It also does nothing once [dispose] has been called.
+  /// If the connection is already established or in progress, this method returns immediately,
+  /// as it does while a previous connection is still closing, and once [dispose] has been called.
   ///
   /// Returns a [Future] that completes once the socket is open — before the
   /// connection is authenticated, and well before it is [Connected]. Watch
@@ -159,6 +159,11 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     if (connectionState.value is Connecting) return;
     if (connectionState.value is Authenticating) return;
     if (connectionState.value is Connected) return;
+
+    // Nor while a previous connection is still closing: the socket it opened
+    // would be brought down by the old one's close event, which would also
+    // disarm the new attempt's timeout and leave it authenticating unwatched.
+    if (connectionState.value is Disconnecting) return;
 
     // Update the connection state to 'connecting'.
     _connectionState = const WebSocketConnectionState.connecting();

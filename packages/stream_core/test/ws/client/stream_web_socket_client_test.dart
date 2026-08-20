@@ -112,6 +112,24 @@ void main() {
       );
     });
 
+    test('does not open a socket while the previous one is still closing', () async {
+      final (:client, :sink, incoming: _, :optionsBuilt) = _client();
+      // Held open so the connection is still closing when connect is called.
+      final closing = Completer<void>();
+      when(() => sink.close(any(), any())).thenAnswer((_) => closing.future);
+      await client.connect();
+
+      client.disconnect().ignore();
+      expect(client.connectionState.value, isA<Disconnecting>());
+      await client.connect();
+
+      // The old socket's close event would otherwise bring the new connection
+      // down and disarm the timeout meant to be watching it.
+      expect(optionsBuilt(), 1);
+      expect(client.connectionState.value, isA<Disconnecting>());
+      closing.complete();
+    });
+
     test('can be followed by another connect', () async {
       final (:client, :sink, incoming: _, :optionsBuilt) = _client();
       await client.connect();
