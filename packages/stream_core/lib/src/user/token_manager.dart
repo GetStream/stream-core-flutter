@@ -42,9 +42,12 @@ class TokenManager {
   ///
   /// An optional `onTokenUpdated` callback is invoked after every successful
   /// token load. It is not invoked for callers served from the cache.
+  ///
+  /// `loadTimeout` bounds a single load; see [getToken].
   TokenManager({
     required String userId,
     required TokenProvider tokenProvider,
+    this.loadTimeout = defaultLoadTimeout,
     this._onTokenUpdated,
   }) : _identity = (userId: userId, provider: tokenProvider);
 
@@ -53,7 +56,18 @@ class TokenManager {
   /// [getToken] fails until [setTokenProvider] supplies one. Distinct from a
   /// manager holding an anonymous identity, which is a user that can load a
   /// token; this one has no user at all.
-  TokenManager.unconfigured({this._onTokenUpdated}) : _identity = null;
+  TokenManager.unconfigured({
+    this.loadTimeout = defaultLoadTimeout,
+    this._onTokenUpdated,
+  }) : _identity = null;
+
+  /// How long a single token load may take before it fails.
+  ///
+  /// Loads are serialised, so an unbounded one would block every later caller.
+  final Duration loadTimeout;
+
+  /// The [loadTimeout] used when none is given.
+  static const defaultLoadTimeout = Duration(seconds: 10);
 
   // The user being managed and the provider that loads their tokens.
   //
@@ -162,9 +176,11 @@ class TokenManager {
   /// because [reset] dropped the previous one, and when [reset] runs while the
   /// token is loading.
   ///
-  /// Loads are serialised, so a provider that never returns blocks every later
-  /// caller — including one for a different user configured by
-  /// [setTokenProvider] in the meantime.
+  /// Loads are serialised, so a load is given [loadTimeout] to finish and fails
+  /// with a [ClientException] once it elapses. Dart cannot cancel the provider,
+  /// so a slow one keeps running — but it no longer holds up the callers behind
+  /// it, including one for a different user configured by [setTokenProvider] in
+  /// the meantime, and whatever it eventually returns is discarded.
   Future<UserToken> getToken() {
     final cached = _cachedToken;
     if (cached != null) return Future.value(cached);
@@ -187,7 +203,20 @@ class TokenManager {
 
     final loadingFor = identity.userId;
     final loadingGeneration = _generation;
-    final updatedToken = await identity.provider.loadToken(loadingFor);
+    final updatedToken = await identity.provider
+        .loadToken(loadingFor)
+        .timeout(
+          loadTimeout,
+          onTimeout: () {
+            // Invalidates the cache as well as failing, so the load this gave up on
+            // cannot cache a token later on.
+            expireToken();
+
+            throw ClientException(
+              message: 'Timed out after $loadTimeout loading a token for "$loadingFor"',
+            );
+          },
+        );
 
     // Both built-in providers check this, but a custom one is under no
     // obligation to, and caching a token for another user would authenticate
