@@ -187,6 +187,9 @@ extension PatternMatching<T> on Result<T> {
   ///
   /// Note, that this function rethrows any error thrown by [transform] function.
   /// See [recoverCatching] for an alternative that encapsulates errors.
+  ///
+  /// [transform] returns this result's own type, so widening is done on the way
+  /// in rather than on the way out: widen the result first, then recover.
   Result<T> recover(
     T Function(Object error, StackTrace? stackTrace) transform,
   ) {
@@ -203,6 +206,9 @@ extension PatternMatching<T> on Result<T> {
   ///
   /// This function catches any error thrown by [transform] function and encapsulates it as a failure.
   /// See [recover] for an alternative that rethrows errors.
+  ///
+  /// [transform] returns this result's own type, so widening is done on the way
+  /// in rather than on the way out: widen the result first, then recover.
   Result<T> recoverCatching(
     T Function(Object error, StackTrace? stackTrace) transform,
   ) {
