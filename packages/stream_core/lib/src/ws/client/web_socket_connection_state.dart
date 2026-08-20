@@ -100,40 +100,26 @@ sealed class WebSocketConnectionState extends Equatable {
   /// - User-initiated disconnections (explicit disconnect calls)
   /// - A socket the server closed deliberately (close code 1000)
   /// - Tokens another token would not fix, and a wrong API key
-  /// - Client errors (4xx status codes), other than an expired token
+  /// - Client errors (4xx status codes), other than an expired token or a rate limit
   /// - A failure to load or send credentials
   ///
   /// Returns `true` if automatic reconnection should be attempted.
-  bool get isAutomaticReconnectionEnabled {
-    return switch (this) {
-      Disconnected(:final source) => switch (source) {
-        // A deliberate stop rather than a failure to recover from.
-        ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
-        ServerInitiated(:final error) => switch (error?.apiError) {
-          // Another token is refused for the same reason, so asking the provider
-          // for one is futile.
-          final it? when it.isInvalidTokenError => false,
-          // Whatever else the client got wrong is the caller's to fix — except
-          // an expired token, which is replaced rather than corrected.
-          final it? when it.isClientError && !it.isTokenExpiredError => false,
-          _ => true, // Reconnect on other server initiated disconnections
-        },
-        UnHealthyConnection() => true,
-        SystemInitiated() => true,
-        UserInitiated() => false,
-        // A handshake that did not complete in time is the same failure as one
-        // that stops answering health checks. A caller's own first attempt is
-        // kept out of this by the recovery handler, which recovers connections
-        // that existed rather than attempts that never landed.
-        ConnectTimeout() => true,
-        // Not the server refusing the credentials, which arrives as an error
-        // frame: this is the client failing to load or send them, and it will
-        // fail the same way on a retry.
-        AuthenticationFailed() => false,
+  bool get isAutomaticReconnectionEnabled => switch (this) {
+    Disconnected(:final source) => switch (source) {
+      ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
+      ServerInitiated(:final error) => switch (error?.apiError) {
+        final error? when error.isInvalidTokenError => false,
+        final error? when error.isClientError && !error.isTokenExpiredError && !error.isRateLimitError => false,
+        _ => true, // Reconnect on other server initiated disconnections
       },
-      _ => false, // No automatic reconnection for other states
-    };
-  }
+      UnHealthyConnection() => true,
+      SystemInitiated() => true,
+      ConnectTimeout() => true,
+      UserInitiated() => false,
+      AuthenticationFailed() => false,
+    },
+    _ => false, // No automatic reconnection for other states
+  };
 
   @override
   List<Object?> get props => [];

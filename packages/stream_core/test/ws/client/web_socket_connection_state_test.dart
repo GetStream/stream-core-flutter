@@ -43,6 +43,15 @@ void main() {
       }
     });
 
+    test('is enabled when the request was rate limited', () {
+      // 9 = rate limited, sent as 429. The server closes with the window's reset
+      // in the response headers, so the condition clears without the caller
+      // doing anything.
+      final state = _serverDisconnect(_apiError(9, statusCode: 429));
+
+      expect(state.isAutomaticReconnectionEnabled, isTrue);
+    });
+
     test('is disabled for any other client error', () {
       // 17 = not allowed. Nothing about retrying changes the answer.
       final state = _serverDisconnect(_apiError(17, statusCode: 403));
