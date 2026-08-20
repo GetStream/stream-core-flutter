@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fake_async/fake_async.dart';
 import 'package:meta/meta.dart';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
@@ -379,6 +380,63 @@ void main() {
         // previous provider issued.
         expect(manager.peekToken(), isNull);
         expect(await manager.getToken(), generateTestUserToken('user-1', nonce: 'second'));
+      });
+    });
+
+    group('loadTimeout', () {
+      test('fails a load that never returns and lets later callers through', () {
+        fakeAsync((async) {
+          final manager = TokenManager(
+            userId: 'user-1',
+            tokenProvider: _CountingProvider((_) => Completer<UserToken>().future),
+            loadTimeout: const Duration(seconds: 5),
+          );
+
+          Object? error;
+          manager.getToken().onError<Object>((it, _) {
+            error = it;
+            return generateTestUserToken('user-1');
+          });
+
+          async.elapse(const Duration(seconds: 5));
+          async.flushMicrotasks();
+
+          expect(error, isA<ClientException>());
+
+          // The point of failing rather than waiting: the lock is free, so a
+          // working provider can serve the next caller.
+          UserToken? served;
+          manager.setTokenProvider(
+            'user-1',
+            tokenProvider: _CountingProvider((userId) async => generateTestUserToken(userId)),
+          );
+          manager.getToken().then((it) => served = it);
+          async.flushMicrotasks();
+
+          expect(served, generateTestUserToken('user-1'));
+        });
+      });
+
+      test('discards a token the load it gave up on returns later', () {
+        fakeAsync((async) {
+          final slow = Completer<UserToken>();
+          final manager = TokenManager(
+            userId: 'user-1',
+            tokenProvider: _CountingProvider((_) => slow.future),
+            loadTimeout: const Duration(seconds: 5),
+          );
+
+          manager.getToken().ignore();
+          async.elapse(const Duration(seconds: 5));
+          async.flushMicrotasks();
+
+          slow.complete(generateTestUserToken('user-1'));
+          async.flushMicrotasks();
+
+          // Caching it would hand a caller a token from a load already reported
+          // as failed.
+          expect(manager.peekToken(), isNull);
+        });
       });
     });
 

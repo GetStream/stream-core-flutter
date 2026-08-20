@@ -15,6 +15,7 @@
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
+- Added `TokenManager.loadTimeout`, which bounds a single token load and defaults to `TokenManager.defaultLoadTimeout`. Loads are serialised, so a provider that never returned used to block every later caller indefinitely
 - Added `teams` field to `User` class
 
 ### 🐛 Bug Fixes
