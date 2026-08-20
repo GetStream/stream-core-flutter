@@ -100,16 +100,26 @@ sealed class WebSocketConnectionState extends Equatable {
   /// - User-initiated disconnections (explicit disconnect calls)
   /// - A socket the server closed deliberately (close code 1000)
   /// - Tokens another token would not fix, and a wrong API key
-  /// - Client errors (4xx status codes), other than an expired token or a rate limit
+  /// - Client errors (4xx status codes), other than a rate limit
   /// - A failure to load or send credentials
   ///
+  /// Whether the server closed this connection because the token had expired.
+  ///
+  /// Reported so a caller that can replace the token knows to, since a
+  /// reconnection cannot: [isAutomaticReconnectionEnabled] refuses this, because
+  /// whoever retries it here would present the token that was just refused.
+  bool get isExpiredTokenDisconnection => switch (this) {
+    Disconnected(source: ServerInitiated(:final error)) => error?.apiError?.isTokenExpiredError ?? false,
+    _ => false,
+  };
+
   /// Returns `true` if automatic reconnection should be attempted.
   bool get isAutomaticReconnectionEnabled => switch (this) {
     Disconnected(:final source) => switch (source) {
       ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
       ServerInitiated(:final error) => switch (error?.apiError) {
-        final error? when error.isInvalidTokenError => false,
-        final error? when error.isClientError && !error.isTokenExpiredError && !error.isRateLimitError => false,
+        final it? when it.isInvalidTokenError => false,
+        final it? when it.isClientError && !it.isRateLimitError => false,
         _ => true, // Reconnect on other server initiated disconnections
       },
       UnHealthyConnection() => true,

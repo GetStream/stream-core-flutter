@@ -21,11 +21,11 @@
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
-- Added `TokenRefreshReconnectionPolicy`, which stops a reconnection that would present a token the server has already refused. Whether another token exists is a property of the `TokenProvider`, not of the connection, so the connection state cannot decide it alone
 - Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before the connection is established; it is eligible for automatic reconnection, since a handshake that did not complete in time is the same failure as a connection that stops answering health checks
 - Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
 - `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`. This is a behaviour change as well as an API one: a connection previously waited indefinitely for its first health check, and is now abandoned — and reconnected — after 30 seconds, matching the wait the Swift SDK allows for the same handshake
 - Added `WsSender`, the send capability handed to a `WebSocketAuthenticator`
+- Added `WebSocketConnectionState.isExpiredTokenDisconnection`, so a caller that can replace the token knows when to. Automatic reconnection deliberately refuses this case: whoever retries it would present the token the server just refused, and only the caller can obtain another
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is `Disposable`, so `isDisposed` reports whether it has been called
 - Added `teams` field to `User` class
@@ -41,7 +41,6 @@
 - Fixed `StreamWebSocketClient.disconnect` replacing the source of a closure already under way, which could turn a reconnectable `ServerInitiated` error into a permanent `ConnectTimeout`
 - Fixed `isAutomaticReconnectionEnabled` neither refusing a deliberate server close nor refusing client errors: it compared the API error's code against the close code 1000, and against a 400..499 range that Stream codes never occupy, so both rules were dead. It now mirrors the iOS SDK — close code 1000, invalid tokens and 4xx all refuse, an expired token does not
 - A connection the server closed because the request was rate limited is now eligible for automatic reconnection. The backend closes it with the rate-limit window's reset in the response headers and a one-minute window, so the condition clears on its own — unlike every other 4xx it can close a socket with, which carry no reset
-- A connection the server closed because the token expired is now eligible for automatic reconnection, so a token expiring mid-session recovers instead of ending the session. Pair it with `TokenRefreshReconnectionPolicy` and something that expires the cached token, or the retry presents the same one
 - Fixed `ConnectionRecoveryHandler` retrying a first connection attempt, which failed the caller of `connect` and reconnected behind them at the same time — and made the caller's own retry fail with "connection already in progress". It now recovers only connections that have existed since the caller last asked for one, so a deliberate `disconnect` hands connecting back and the next `connect` is the caller's attempt again
 - Fixed a health check arriving while disconnecting reporting the connection as established again, which replaced the disconnection source and could turn a deliberate disconnect into an automatic reconnect
 

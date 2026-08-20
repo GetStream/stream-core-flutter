@@ -23,11 +23,15 @@ Disconnected _serverDisconnect(StreamApiError apiError) => Disconnected(
 void main() {
   group('WebSocketConnectionState.isAutomaticReconnectionEnabled', () {
     test(
-      'is enabled when the token has expired, which another token replaces',
+      'is disabled when the token has expired, since a retry here would present '
+      'the same one',
       () {
-        // 40 = expired; the server returns 401 with it, so the client-error rule
-        // has to make room for this one.
-        expect(_serverDisconnect(_apiError(40)).isAutomaticReconnectionEnabled, isTrue);
+        // 40 = expired. Replacing it is the caller's to do, and it is the caller
+        // that retries — `isExpiredTokenDisconnection` is how they are told.
+        final state = _serverDisconnect(_apiError(40));
+
+        expect(state.isAutomaticReconnectionEnabled, isFalse);
+        expect(state.isExpiredTokenDisconnection, isTrue);
       },
     );
 
