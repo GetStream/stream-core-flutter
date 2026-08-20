@@ -36,7 +36,7 @@
 - Fixed a failure to close the socket leaving `StreamWebSocketClient` reporting itself as disconnecting for good, since the engine reports such a failure rather than notifying its listener
 - Fixed a `WebSocketAuthenticator` that throws, rather than returning a failure, escaping as an unhandled error and leaving the connection authenticating until it timed out — losing the cause, which the timeout does not carry. The natural authenticator throws, since loading a token does
 - Fixed `StreamWebSocketClient.disconnect` replacing the source of a closure already under way, which could turn a reconnectable `ServerInitiated` error into a permanent `ConnectTimeout`
-- Fixed `ConnectionRecoveryHandler` retrying a first connection attempt, which failed the caller of `connect` and reconnected behind them at the same time — and made the caller's own retry fail with "connection already in progress". It now recovers connections that existed, matching the `hasConnectedBefore` gate in the Android SDK
+- Fixed `ConnectionRecoveryHandler` retrying a first connection attempt, which failed the caller of `connect` and reconnected behind them at the same time — and made the caller's own retry fail with "connection already in progress". It now recovers only connections that have existed since the caller last asked for one, so a deliberate `disconnect` hands connecting back and the next `connect` is the caller's attempt again
 - Fixed a health check arriving while disconnecting reporting the connection as established again, which replaced the disconnection source and could turn a deliberate disconnect into an automatic reconnect
 
 ### 🔄 Changed
