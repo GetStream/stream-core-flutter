@@ -8,6 +8,7 @@
 - Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, which is what it is called for and when
 - `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsSender` and returns a `Result`, so a failure to authenticate can be observed
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
+- `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` no longer take a type parameter of their own and return the result's own type. They previously cast the value to the callback's type, which failed on a successful result — most visibly for a callback that only throws. Use `fold` where the return type has to differ
 
 ### ✨ Features
 
@@ -17,11 +18,12 @@
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
-- Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before the connection is established
+- Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before the connection is established; it is eligible for automatic reconnection, since a handshake that did not complete in time is the same failure as a connection that stops answering health checks
 - Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
-- `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`
+- `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`. This is a behaviour change as well as an API one: a connection previously waited indefinitely for its first health check, and is now abandoned — and reconnected — after 15 seconds
 - Added `WsSender`, the send capability handed to a `WebSocketAuthenticator`
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
+- Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is `Disposable`, so `isDisposed` reports whether it has been called
 - Added `teams` field to `User` class
 
 ### 🐛 Bug Fixes
@@ -29,6 +31,10 @@
 - Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 - Fixed `TokenManager` caching a token that finished loading after `expireToken` or `setTokenProvider` had invalidated it
+- Fixed `StreamWebSocketClient.disconnect` completing before the socket was closed, so a `connect` straight afterwards raced the closure and saw the connection go down again
+- Fixed a failure to close the socket leaving `StreamWebSocketClient` reporting itself as disconnecting for good, since the engine reports such a failure rather than notifying its listener
+- Fixed a `WebSocketAuthenticator` that throws, rather than returning a failure, escaping as an unhandled error and leaving the connection authenticating until it timed out — losing the cause, which the timeout does not carry. The natural authenticator throws, since loading a token does
+- Fixed `StreamWebSocketClient.disconnect` replacing the source of a closure already under way, which could turn a reconnectable `ServerInitiated` error into a permanent `ConnectTimeout`
 - Fixed a health check arriving while disconnecting reporting the connection as established again, which replaced the disconnection source and could turn a deliberate disconnect into an automatic reconnect
 
 ### 🔄 Changed

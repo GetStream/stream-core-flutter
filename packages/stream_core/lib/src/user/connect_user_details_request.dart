@@ -15,6 +15,12 @@ class ConnectUserDetailsRequest {
     this.custom,
   });
 
+  /// Creates the details a client may send when connecting as [user].
+  ///
+  /// A user's role and teams are left out: the server assigns both and does not
+  /// accept them from a client.
+  ///
+  /// Pass [includeDetails] as `false` to send the id alone.
   factory ConnectUserDetailsRequest.fromUser(
     User user, {
     bool includeDetails = true,
