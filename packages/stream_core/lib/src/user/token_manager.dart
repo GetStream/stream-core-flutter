@@ -1,5 +1,6 @@
 import 'package:synchronized/extension.dart';
 
+import '../errors/client_exception.dart';
 import 'token_provider.dart';
 import 'user_token.dart';
 
@@ -42,20 +43,31 @@ class TokenManager {
   /// An optional `onTokenUpdated` callback is invoked after every successful
   /// token load. It is not invoked for callers served from the cache.
   TokenManager({
-    required this._userId,
-    required this._tokenProvider,
+    required String userId,
+    required TokenProvider tokenProvider,
     this._onTokenUpdated,
-  });
+  }) : _identity = (userId: userId, provider: tokenProvider);
 
-  /// The unique identifier of the user whose tokens are managed.
+  /// Creates a [TokenManager] that manages no user yet.
+  ///
+  /// [getToken] fails until [setTokenProvider] supplies one. Distinct from a
+  /// manager holding an anonymous identity, which is a user that can load a
+  /// token; this one has no user at all.
+  TokenManager.unconfigured({this._onTokenUpdated}) : _identity = null;
+
+  // The user being managed and the provider that loads their tokens.
+  //
+  // A single field rather than two, so the two can never disagree: a user
+  // without a provider cannot load, and a provider without a user has nothing
+  // to load for. `null` means no identity is configured.
+  ({String userId, TokenProvider provider})? _identity;
+
+  /// The unique identifier of the user whose tokens are managed, or `null` when
+  /// no identity is configured.
   ///
   /// Changes when the manager is pointed at another user with
-  /// [setTokenProvider].
-  String get userId => _userId;
-  String _userId;
-
-  // The provider used to load tokens when needed.
-  TokenProvider _tokenProvider;
+  /// [setTokenProvider], and returns to `null` after [reset].
+  String? get userId => _identity?.userId;
 
   // Invoked after every successful token load.
   final OnTokenUpdated? _onTokenUpdated;
@@ -74,7 +86,7 @@ class TokenManager {
   /// ```dart
   /// // Authenticate anonymously while the real identity is being obtained.
   /// final manager = TokenManager(
-  ///   userId: UserToken.anonymousUserId,
+  ///   userId: User.anonymousUserId,
   ///   tokenProvider: TokenProvider.static(UserToken.anonymous()),
   /// );
   ///
@@ -88,11 +100,21 @@ class TokenManager {
     String userId, {
     required TokenProvider tokenProvider,
   }) {
-    _userId = userId;
-    _tokenProvider = tokenProvider;
+    _identity = (userId: userId, provider: tokenProvider);
 
     // The cached token belongs to the previous user and provider, so drop it
     // and let the next `getToken` call load a fresh one.
+    expireToken();
+  }
+
+  /// Drops the configured identity, returning this manager to the state of
+  /// [TokenManager.unconfigured].
+  ///
+  /// [getToken] fails until [setTokenProvider] supplies an identity again. Use
+  /// this when the user is going away for good; to keep the identity and only
+  /// force a reload, use [expireToken].
+  void reset() {
+    _identity = null;
     expireToken();
   }
 
@@ -112,8 +134,9 @@ class TokenManager {
   /// Whether this manager uses a static token provider.
   ///
   /// Returns true if the token provider is static (doesn't refresh tokens),
-  /// false if it's dynamic (fetches fresh tokens on each call).
-  bool get usesStaticProvider => _tokenProvider is StaticTokenProvider;
+  /// false if it's dynamic (fetches fresh tokens on each call) or if no
+  /// identity is configured.
+  bool get usesStaticProvider => _identity?.provider is StaticTokenProvider;
 
   /// Gets a valid token for the user, loading one if necessary.
   ///
@@ -123,6 +146,10 @@ class TokenManager {
   /// at a time.
   ///
   /// Returns a [Future] that resolves to a [UserToken] for the user.
+  ///
+  /// Fails with a [ClientException] when no identity is configured, either
+  /// because the manager was created with [TokenManager.unconfigured] or
+  /// because [reset] dropped the previous one.
   Future<UserToken> getToken() {
     final cached = _cachedToken;
     if (cached != null) return Future.value(cached);
@@ -138,9 +165,14 @@ class TokenManager {
   // Loads a token from the provider and, unless the cached token was
   // invalidated while it loaded, caches it and notifies `onTokenUpdated`.
   Future<UserToken> _loadAndNotify() async {
-    final loadingFor = _userId;
+    final identity = _identity;
+    if (identity == null) {
+      throw ClientException(message: 'No user is configured, call setTokenProvider before loading a token');
+    }
+
+    final loadingFor = identity.userId;
     final loadingGeneration = _generation;
-    final updatedToken = await _tokenProvider.loadToken(loadingFor);
+    final updatedToken = await identity.provider.loadToken(loadingFor);
 
     // `setTokenProvider` or `expireToken` may have run while this loaded, in
     // which case the token is the one the caller asked to stop using.
