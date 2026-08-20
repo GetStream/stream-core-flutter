@@ -13,7 +13,7 @@
 
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
-- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `User.anonymousUserId`
+- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `User.anonymousUserId` (`!anon`), which the server also requires
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
@@ -35,6 +35,12 @@
 
 - Raised the minimum Dart SDK to `^3.12.0`
 - `User` now asserts that a user of type `UserType.anonymous` carries `User.anonymousUserId` as its id
+- Anonymous requests now always send `user_id=!anon`. The value previously came from the `TokenManager`, so it was whatever the caller configured; the server requires the claim to be `!anon` and derives the anonymous session itself, so the parameter now matches
+- `DynamicTokenProvider` checks the token type before its user id, so a token of the wrong type is reported as such instead of as a mismatched user
+- `TokenManager.setTokenProvider` does nothing when handed the identity it already has, instead of expiring the cached token
+- `TokenManager.getToken` fails when `reset` runs while the token is loading, instead of returning a token for a user the manager no longer has. A `setTokenProvider` during a load still serves the caller that started it
+- `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for, which a custom `TokenProvider` is not obliged to check itself
+- `AuthInterceptor` no longer attempts a token refresh when the manager has no identity, so the original token-expired error is surfaced rather than a failure to load a token
 
 ## 0.4.0
 
