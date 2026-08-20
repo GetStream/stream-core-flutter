@@ -1,13 +1,13 @@
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
-StreamApiError _apiError(int code) => StreamApiError(
+StreamApiError _apiError(int code, {int statusCode = 401}) => StreamApiError(
   code: code,
   details: const [],
   duration: '0ms',
   message: 'error $code',
   moreInfo: '',
-  statusCode: 401,
+  statusCode: statusCode,
 );
 
 Disconnected _serverDisconnect(StreamApiError apiError) => Disconnected(
@@ -23,22 +23,113 @@ Disconnected _serverDisconnect(StreamApiError apiError) => Disconnected(
 void main() {
   group('WebSocketConnectionState.isAutomaticReconnectionEnabled', () {
     test(
-      'is disabled when the server closes with a token-expired error, so an '
-      'expired (e.g. guest) token does not trigger a silent reconnect loop',
+      'is disabled when the token has expired, since a retry here would present '
+      'the same one',
       () {
-        // Token-invalid error codes are 40..42; 40 = token expired.
+        // 40 = expired. Replacing it is the caller's to do, and it is the caller
+        // that retries — `isExpiredTokenDisconnection` is how they are told.
         final state = _serverDisconnect(_apiError(40));
+
+        expect(state.isAutomaticReconnectionEnabled, isFalse);
+        expect(state.isExpiredTokenDisconnection, isTrue);
+      },
+    );
+
+    test('is disabled when another token would be refused too', () {
+      // 41 not valid yet, 42 used before issued, 43 signed with the wrong
+      // secret, 2 wrong API key — none of which a fresh token repairs.
+      for (final code in [41, 42, 43, 2]) {
+        expect(
+          _serverDisconnect(_apiError(code)).isAutomaticReconnectionEnabled,
+          isFalse,
+          reason: 'code $code',
+        );
+      }
+    });
+
+    test('is enabled when the request was rate limited', () {
+      // 9 = rate limited, sent as 429. The server closes with the window's reset
+      // in the response headers, so the condition clears without the caller
+      // doing anything.
+      final state = _serverDisconnect(_apiError(9, statusCode: 429));
+
+      expect(state.isAutomaticReconnectionEnabled, isTrue);
+    });
+
+    test('is disabled for any other client error', () {
+      // 17 = not allowed. Nothing about retrying changes the answer.
+      final state = _serverDisconnect(_apiError(17, statusCode: 403));
+
+      expect(state.isAutomaticReconnectionEnabled, isFalse);
+    });
+
+    test('is enabled for a server-side failure', () {
+      // Stream error codes never fall in 400..499, so this is classified by the
+      // status code alone — which is what the ported rule got wrong.
+      final state = _serverDisconnect(_apiError(9, statusCode: 500));
+
+      expect(state.isAutomaticReconnectionEnabled, isTrue);
+    });
+
+    test('is disabled when the socket was closed deliberately', () {
+      const state = Disconnected(
+        source: ServerInitiated(
+          error: WebSocketEngineException(
+            code: CloseCode.normalClosure,
+          ),
+        ),
+      );
+
+      expect(state.isAutomaticReconnectionEnabled, isFalse);
+    });
+
+    test('is enabled when the server closed without saying why', () {
+      const state = Disconnected(source: ServerInitiated());
+
+      expect(state.isAutomaticReconnectionEnabled, isTrue);
+    });
+
+    test(
+      'is disabled when a connection could not be authenticated, since the '
+      'same credentials would fail again',
+      () {
+        const state = Disconnected(source: AuthenticationFailed(error: 'no token'));
 
         expect(state.isAutomaticReconnectionEnabled, isFalse);
       },
     );
 
-    test('is enabled for a generic, retryable server-initiated disconnection', () {
-      // A server error that is neither a normal closure (1000), a token error
-      // (40..42), nor a client error (400..499) should still reconnect.
-      final state = _serverDisconnect(_apiError(43));
+    test('is enabled when a connected socket stops answering health checks', () {
+      const state = Disconnected(source: UnHealthyConnection());
 
       expect(state.isAutomaticReconnectionEnabled, isTrue);
+    });
+  });
+
+  group('DisconnectionSource.closeReason', () {
+    test('reads differently for every source', () {
+      const sources = [
+        UserInitiated(),
+        ServerInitiated(),
+        SystemInitiated(),
+        UnHealthyConnection(),
+        ConnectTimeout(),
+        AuthenticationFailed(error: 'no token'),
+      ];
+
+      final reasons = sources.map((it) => it.closeReason).toSet();
+
+      // A shared reason would report two different outcomes identically.
+      expect(reasons, hasLength(sources.length));
+    });
+  });
+
+  group('WebSocketOptions.defaultConnectTimeout', () {
+    test('is the timeout used when the options do not say', () {
+      const options = WebSocketOptions(url: 'wss://example.com');
+
+      expect(options.connectTimeout, WebSocketOptions.defaultConnectTimeout);
+      expect(WebSocketOptions.defaultConnectTimeout, const Duration(seconds: 30));
     });
   });
 }

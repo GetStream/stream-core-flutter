@@ -18,6 +18,10 @@ import 'retry_strategy.dart';
 /// when reconnection should occur, implementing exponential backoff with jitter for optimal
 /// retry behavior.
 ///
+/// It recovers connections that existed: until [StreamWebSocketClient.connect] has established
+/// one, connecting belongs to whoever called it and was handed the failure. A first attempt that
+/// fails is therefore not retried here, including when the network returns.
+///
 /// ## Built-in Policies
 ///
 /// The handler automatically includes several reconnection policies:
@@ -79,6 +83,11 @@ class ConnectionRecoveryHandler extends Disposable {
 
   late final _subscriptions = CompositeSubscription();
 
+  // Whether a connection has been established since the caller last asked for
+  // one: it is what separates a drop this handler recovers from an attempt whose
+  // outcome the caller is waiting on.
+  var _hasConnected = false;
+
   /// Attempts reconnection if policies allow it.
   ///
   /// Evaluates all configured policies and initiates reconnection when conditions are met.
@@ -117,7 +126,15 @@ class ConnectionRecoveryHandler extends Disposable {
     _reconnectionTimer = null;
   }
 
-  bool _canBeReconnected() => _policies.every((it) => it.canBeReconnected());
+  bool _canBeReconnected() {
+    // Until a connection has existed, connecting belongs to whoever called
+    // `connect` and was handed the failure. Retrying here as well would work
+    // behind a caller already told the attempt failed — and would race the
+    // retry that caller makes in response.
+    if (!_hasConnected) return false;
+
+    return _policies.every((it) => it.canBeReconnected());
+  }
 
   bool _canBeDisconnected() {
     return switch (_client.connectionState.value) {
@@ -147,11 +164,27 @@ class ConnectionRecoveryHandler extends Disposable {
   void _onConnectionStateChanged(WebSocketConnectionState state) {
     return switch (state) {
       Connecting() => _cancelReconnection(),
-      Connected() => _reconnectStrategy.resetConsecutiveFailures(),
-      Disconnected() => _scheduleReconnectionIfNeeded(),
+      Connected() => _onConnectionEstablished(),
+      Disconnected(:final source) => _onConnectionLost(source),
       // These states do not require any action.
       Initialized() || Authenticating() || Disconnecting() => () {},
     };
+  }
+
+  // A connection exists, so keeping it is this handler's job from here, and the
+  // failures the backoff had accumulated are behind us.
+  void _onConnectionEstablished() {
+    _hasConnected = true;
+    return _reconnectStrategy.resetConsecutiveFailures();
+  }
+
+  // A disconnect the caller asked for hands connecting back to them, so the next
+  // `connect` is a fresh attempt they await rather than a drop to recover. A
+  // system-initiated one is the opposite: backgrounding and network loss are what
+  // this handler exists to come back from.
+  void _onConnectionLost(DisconnectionSource source) {
+    if (source is UserInitiated) _hasConnected = false;
+    return _scheduleReconnectionIfNeeded();
   }
 
   @override

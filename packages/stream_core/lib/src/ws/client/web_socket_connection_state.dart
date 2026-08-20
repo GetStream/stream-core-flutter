@@ -98,27 +98,38 @@ sealed class WebSocketConnectionState extends Equatable {
   ///
   /// ## Reconnection is disabled for:
   /// - User-initiated disconnections (explicit disconnect calls)
-  /// - Server errors with code 1000 (normal closure)
-  /// - Token expired/invalid errors
-  /// - Client errors (4xx status codes)
+  /// - A socket the server closed deliberately (close code 1000)
+  /// - Tokens another token would not fix, and a wrong API key
+  /// - Client errors (4xx status codes), other than a rate limit
+  /// - A failure to load or send credentials
   ///
+  /// Whether the server closed this connection because the token had expired.
+  ///
+  /// Reported so a caller that can replace the token knows to, since a
+  /// reconnection cannot: [isAutomaticReconnectionEnabled] refuses this, because
+  /// whoever retries it here would present the token that was just refused.
+  bool get isExpiredTokenDisconnection => switch (this) {
+    Disconnected(source: ServerInitiated(:final error)) => error?.apiError?.isTokenExpiredError ?? false,
+    _ => false,
+  };
+
   /// Returns `true` if automatic reconnection should be attempted.
-  bool get isAutomaticReconnectionEnabled {
-    return switch (this) {
-      Disconnected(:final source) => switch (source) {
-        ServerInitiated() => switch (source.error?.apiError) {
-          final error? when error.code == 1000 => false,
-          final error? when error.isTokenExpiredError => false,
-          final error? when error.isClientError => false,
-          _ => true, // Reconnect on other server initiated disconnections
-        },
-        UnHealthyConnection() => true,
-        SystemInitiated() => true,
-        UserInitiated() => false,
+  bool get isAutomaticReconnectionEnabled => switch (this) {
+    Disconnected(:final source) => switch (source) {
+      ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
+      ServerInitiated(:final error) => switch (error?.apiError) {
+        final it? when it.isInvalidTokenError => false,
+        final it? when it.isClientError && !it.isRateLimitError => false,
+        _ => true, // Reconnect on other server initiated disconnections
       },
-      _ => false, // No automatic reconnection for other states
-    };
-  }
+      UnHealthyConnection() => true,
+      SystemInitiated() => true,
+      ConnectTimeout() => true,
+      UserInitiated() => false,
+      AuthenticationFailed() => false,
+    },
+    _ => false, // No automatic reconnection for other states
+  };
 
   @override
   List<Object?> get props => [];
@@ -252,6 +263,18 @@ sealed class DisconnectionSource extends Equatable {
   /// typically when ping requests do not receive pong responses.
   const factory DisconnectionSource.unHealthyConnection() = UnHealthyConnection;
 
+  /// Creates a [ConnectTimeout] disconnection source.
+  ///
+  /// Indicates that the connection never became usable within the allotted
+  /// time, so it was abandoned before it was ever established.
+  const factory DisconnectionSource.connectTimeout() = ConnectTimeout;
+
+  /// Creates an [AuthenticationFailed] disconnection source.
+  ///
+  /// Indicates that the connection opened but could not be authenticated, so it
+  /// was closed without ever being usable.
+  const factory DisconnectionSource.authenticationFailed({Object? error}) = AuthenticationFailed;
+
   /// A human-readable description of the disconnection source.
   ///
   /// Provides a descriptive string that explains why the connection was closed.
@@ -264,6 +287,8 @@ sealed class DisconnectionSource extends Equatable {
       ServerInitiated() => 'Server initiated disconnection',
       SystemInitiated() => 'System initiated disconnection',
       UnHealthyConnection() => 'Unhealthy connection (no pong received)',
+      ConnectTimeout() => 'Timed out before the connection was established',
+      AuthenticationFailed() => 'Authentication failed',
     };
   }
 
@@ -319,4 +344,28 @@ final class SystemInitiated extends DisconnectionSource {
 final class UnHealthyConnection extends DisconnectionSource {
   /// Creates an [UnHealthyConnection] disconnection source.
   const UnHealthyConnection();
+}
+
+/// A disconnection caused by the connection not becoming usable in time.
+///
+/// This source indicates that the connection was abandoned while it was still
+/// being established, so it was never usable.
+final class ConnectTimeout extends DisconnectionSource {
+  /// Creates a [ConnectTimeout] disconnection source.
+  const ConnectTimeout();
+}
+
+/// A disconnection caused by the connection failing to authenticate.
+///
+/// This source indicates that the socket opened but authentication did not
+/// complete, so the connection was never usable.
+final class AuthenticationFailed extends DisconnectionSource {
+  /// Creates an [AuthenticationFailed] disconnection source.
+  const AuthenticationFailed({this.error});
+
+  /// The error that prevented the connection from authenticating.
+  final Object? error;
+
+  @override
+  List<Object?> get props => [error];
 }

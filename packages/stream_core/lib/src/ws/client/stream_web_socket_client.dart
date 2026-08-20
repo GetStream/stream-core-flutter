@@ -18,6 +18,32 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
   return HealthCheckPingEvent(connectionId: info?.connectionId);
 }
 
+/// A function that builds the options for a connection attempt.
+///
+/// Called once per attempt, so the options may carry values that change over the
+/// client's lifetime.
+///
+/// Returns the [WebSocketOptions] to open the connection with.
+typedef WebSocketOptionsBuilder = WebSocketOptions Function();
+
+/// A function that sends a request over a connection that is not usable yet.
+///
+/// Handed to a [WebSocketAuthenticator], which runs while the connection is
+/// still being established and so cannot be given the client itself.
+///
+/// Returns a [Result] indicating whether the request was sent.
+typedef WsSender = Result<void> Function(WsRequest request);
+
+/// A function that authenticates a newly opened connection.
+///
+/// Called once the socket is open, while the state is [Authenticating]. Sending
+/// the credentials the server expects is this function's job.
+///
+/// Returns a [Result] that fails when the credentials could not be sent, in
+/// which case the connection is closed with [AuthenticationFailed] rather than
+/// left waiting for a reply that never comes.
+typedef WebSocketAuthenticator = Future<Result<void>> Function(WsSender send);
+
 /// A WebSocket client with connection management and event handling.
 ///
 /// The primary interface for WebSocket connections in the Stream Core SDK that provides
@@ -31,20 +57,18 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 /// ## Example
 /// ```dart
 /// final client = StreamWebSocketClient(
-///   options: WebSocketOptions(url: 'wss://api.example.com'),
+///   optionsBuilder: () => WebSocketOptions(url: 'wss://api.example.com'),
 ///   messageCodec: JsonMessageCodec(),
-///   onConnectionEstablished: () {
-///     client.send(AuthRequest(token: authToken));
-///   },
+///   onAuthenticate: (send) async => send(AuthRequest(token: authToken)),
 /// );
 ///
 /// await client.connect();
 /// ```
-class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
+class StreamWebSocketClient with Disposable implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
-    required this.options,
-    this.onConnectionEstablished,
+    required this.optionsBuilder,
+    this.onAuthenticate,
     WebSocketProvider? wsProvider,
     this.pingRequestBuilder = _defaultPingRequestBuilder,
     required WebSocketMessageCodec<WsEvent, WsRequest> messageCodec,
@@ -58,17 +82,33 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
     );
   }
 
-  /// The WebSocket connection options including URL and configuration.
-  final WebSocketOptions options;
+  /// The function used to build the connection options for each attempt.
+  final WebSocketOptionsBuilder optionsBuilder;
 
   /// The function used to build ping requests for health checks.
   final PingRequestBuilder pingRequestBuilder;
 
-  /// Called when the WebSocket connection is established and ready for authentication.
-  final void Function()? onConnectionEstablished;
+  /// The function used to authenticate a newly opened connection.
+  final WebSocketAuthenticator? onAuthenticate;
 
   late final StreamWebSocketEngine<WsEvent, WsRequest> _engine;
   late final _healthMonitor = WebSocketHealthMonitor(listener: this);
+
+  // Bounds a connection attempt that never reaches 'connected'.
+  Timer? _connectTimeoutTimer;
+
+  void _startConnectTimeout(Duration timeout) {
+    _connectTimeoutTimer?.cancel();
+    _connectTimeoutTimer = Timer(timeout, () {
+      const source = DisconnectionSource.connectTimeout();
+      unawaited(disconnect(source: source));
+    });
+  }
+
+  void _cancelConnectTimeout() {
+    _connectTimeoutTimer?.cancel();
+    _connectTimeoutTimer = null;
+  }
 
   /// The event emitter for WebSocket events.
   ///
@@ -80,11 +120,12 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
   ///
   /// Emits state changes as the WebSocket transitions through different connection states.
   ConnectionStateEmitter get connectionState => _connectionStateEmitter;
-  late final _connectionStateEmitter = MutableConnectionStateEmitter(
-    const WebSocketConnectionState.initialized(),
-  );
+  late final _connectionStateEmitter = MutableConnectionStateEmitter(const .initialized());
 
   set _connectionState(WebSocketConnectionState connectionState) {
+    // Return early if the emitter is closed.
+    if (_connectionStateEmitter.isClosed) return;
+
     // Return early if the state hasn't changed.
     if (_connectionStateEmitter.value == connectionState) return;
 
@@ -103,20 +144,35 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
   /// Establishes a WebSocket connection.
   ///
   /// The connection state can be monitored through [connectionState] for real-time updates.
-  /// If the connection is already established or in progress, this method returns immediately.
+  /// If the connection is already established or in progress, this method returns immediately,
+  /// as it does while a previous connection is still closing, and once [dispose] has been called.
   ///
-  /// Returns a [Future] that completes when the connection attempt finishes.
+  /// Returns a [Future] that completes once the socket is open — before the
+  /// connection is authenticated, and well before it is [Connected]. Watch
+  /// [connectionState] to know when it is usable.
   Future<void> connect() async {
+    assert(!isDisposed, 'Cannot connect a disposed StreamWebSocketClient');
+    if (isDisposed) return;
+
     // If the connection is already established or in the process of connecting,
     // do not initiate a new connection.
     if (connectionState.value is Connecting) return;
     if (connectionState.value is Authenticating) return;
     if (connectionState.value is Connected) return;
 
+    // Nor while a previous connection is still closing: the socket it opened
+    // would be brought down by the old one's close event, which would also
+    // disarm the new attempt's timeout and leave it authenticating unwatched.
+    if (connectionState.value is Disconnecting) return;
+
     // Update the connection state to 'connecting'.
     _connectionState = const WebSocketConnectionState.connecting();
 
-    // Open the connection using the engine.
+    // Open the connection using the engine, with options built for this attempt.
+    final options = optionsBuilder.call();
+
+    // Time the whole handshake: nothing else watches 'authenticating'.
+    _startConnectTimeout(options.connectTimeout);
     final result = await _engine.open(options);
 
     // If some failure occurs, disconnect and rethrow the error.
@@ -133,14 +189,45 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
     CloseCode closeCode = CloseCode.normalClosure,
     DisconnectionSource source = const UserInitiated(),
   }) async {
-    // If the connection is already disconnected, do nothing.
-    if (connectionState.value is Disconnected) return;
+    // A connection already going down keeps the source it started going down
+    // with: whoever asked first described why. Without this the connect
+    // timeout could replace a `ServerInitiated` closure, which is
+    // reconnectable, with one that is not.
+    if (connectionState.value case Disconnected() || Disconnecting()) return;
+
+    // Stop the timeout from firing later and replacing this source.
+    _cancelConnectTimeout();
 
     // Update the connection state to 'disconnecting'.
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
 
-    // Close the connection using the engine.
-    unawaited(_engine.close(closeCode, source.closeReason));
+    // Awaited so the connection is closed, rather than merely closing, once this
+    // returns: a reconnect straight afterwards would otherwise race the close
+    // and see the connection go down again.
+    final result = await _engine.close(closeCode, source.closeReason);
+
+    // The engine reports a failed close rather than throwing, and does not
+    // notify its listener on that path. The connection is unusable either way,
+    // so report it closed rather than leave it disconnecting for good.
+    if (result.isFailure) onClose(closeCode, source.closeReason);
+  }
+
+  /// Releases every resource held by this client.
+  ///
+  /// Closes the connection along with [events] and [connectionState], after which
+  /// this client cannot be connected again. Use [disconnect] for a connection that
+  /// may be opened again.
+  ///
+  /// Returns a [Future] that completes once everything has been released.
+  @override
+  Future<void> dispose() async {
+    await disconnect();
+    _healthMonitor.stop();
+
+    await _events.close();
+    await _connectionStateEmitter.close();
+
+    return super.dispose();
   }
 
   @override
@@ -148,13 +235,32 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
     // Update the connection state to 'authenticating'.
     _connectionState = const WebSocketConnectionState.authenticating();
 
-    // Notify that the connection has been established and we are ready
-    // to authenticate.
-    onConnectionEstablished?.call();
+    // The socket is open, so authenticate before the connection is usable.
+    unawaited(_authenticate());
+  }
+
+  Future<void> _authenticate() async {
+    final authenticate = onAuthenticate;
+    if (authenticate == null) return;
+
+    // Guarded rather than awaited directly: an authenticator that awaits a
+    // token throws rather than returning a failure, and nothing observes this
+    // future, so the error would escape and leave the connection
+    // authenticating until the timeout reported a cause it does not know.
+    final outcome = await runSafely(() => authenticate(send));
+    final result = outcome.flatten<void>();
+
+    // Close the connection rather than wait for a reply that cannot come.
+    if (result.exceptionOrNull() case final error?) {
+      final source = DisconnectionSource.authenticationFailed(error: error);
+      return disconnect(source: source);
+    }
   }
 
   @override
   void onClose([int? closeCode, String? closeReason]) {
+    _cancelConnectTimeout();
+
     final source = switch (connectionState.value) {
       // If we were already disconnecting, keep the caller-provided source.
       Disconnecting(:final source) => source,
@@ -216,6 +322,11 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
 
   void _handleHealthCheckEvent(WsEvent event, HealthCheckInfo info) {
     print('WebSocketClient: Health check pong received: $info');
+
+    // Ignore a pong that arrives once the connection is on its way down.
+    if (connectionState.value case Disconnecting() || Disconnected()) return;
+
+    _cancelConnectTimeout();
 
     // Update the connection state with health check info.
     _connectionState = WebSocketConnectionState.connected(healthCheck: info);
