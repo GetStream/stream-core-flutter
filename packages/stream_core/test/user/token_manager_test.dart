@@ -1,9 +1,28 @@
 import 'dart:async';
 
+import 'package:meta/meta.dart';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 import '../helpers/user_token.dart';
+
+/// A token provider that reports itself equal to any other of its kind, the way
+/// a provider with value equality can.
+@immutable
+class _EquatableProvider implements TokenProvider {
+  const _EquatableProvider(this._token);
+
+  final UserToken _token;
+
+  @override
+  Future<UserToken> loadToken(String userId) async => _token;
+
+  @override
+  bool operator ==(Object other) => other is _EquatableProvider;
+
+  @override
+  int get hashCode => 0;
+}
 
 /// A token provider that counts loads and delegates to a configurable loader.
 class _CountingProvider implements TokenProvider {
@@ -341,6 +360,25 @@ void main() {
         expect(manager.peekToken(), isNotNull);
         await manager.getToken();
         expect(provider.loadCount, 1);
+      });
+
+      test('replaces a provider that merely compares equal to the previous one', () async {
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _EquatableProvider(generateTestUserToken('user-1', nonce: 'first')),
+        );
+        expect(await manager.getToken(), generateTestUserToken('user-1', nonce: 'first'));
+
+        manager.setTokenProvider(
+          'user-1',
+          tokenProvider: _EquatableProvider(generateTestUserToken('user-1', nonce: 'second')),
+        );
+
+        // A provider defines its own equality, so keeping the cached token
+        // because the replacement called itself equal would serve a token the
+        // previous provider issued.
+        expect(manager.peekToken(), isNull);
+        expect(await manager.getToken(), generateTestUserToken('user-1', nonce: 'second'));
       });
     });
 
