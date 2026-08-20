@@ -8,6 +8,7 @@
 - Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, which is what it is called for and when
 - `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsSender` and returns a `Result`, so a failure to authenticate can be observed
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
+- `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. The constructor is `const`, so a mismatch in a const context fails to compile rather than throwing in debug mode
 - `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` no longer take a type parameter of their own and return the result's own type. They previously cast the value to the callback's type, which failed on a successful result — most visibly for a callback that only throws. Kotlin's equivalents widen through a `<R, T : R>` bound that Dart cannot express; to widen here, name the wider type on the result (`Result<num> widened = intResult`), which works because `Result` is covariant, or use `fold`
 
 ### ✨ Features
@@ -40,10 +41,9 @@
 ### 🔄 Changed
 
 - Raised the minimum Dart SDK to `^3.12.0`
-- `User` now asserts that a user of type `UserType.anonymous` carries `User.anonymousUserId` as its id
 - Anonymous requests now always send `user_id=!anon`. The value previously came from the `TokenManager`, so it was whatever the caller configured; the server requires the claim to be `!anon` and derives the anonymous session itself, so the parameter now matches
 - `DynamicTokenProvider` checks the token type before its user id, so a token of the wrong type is reported as such instead of as a mismatched user
-- `TokenManager.setTokenProvider` does nothing when handed the identity it already has, instead of expiring the cached token
+- `TokenManager.setTokenProvider` does nothing when handed the identity it already has — the same user id and the same provider instance — instead of expiring the cached token
 - `TokenManager.getToken` fails when `reset` runs while the token is loading, instead of returning a token for a user the manager no longer has. A `setTokenProvider` during a load still serves the caller that started it
 - `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for, which a custom `TokenProvider` is not obliged to check itself
 - `AuthInterceptor` no longer attempts a token refresh when the manager has no identity, so the original token-expired error is surfaced rather than a failure to load a token

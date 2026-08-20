@@ -98,16 +98,19 @@ class TokenManager {
   /// ```
   /// Re-setting the identity this manager already has does nothing: expiring
   /// the cached token would send the next caller to the provider for no reason.
-  /// Note that a [TokenProvider] compares by identity, so this only applies
-  /// when the same instance is passed again.
+  /// The provider is compared by instance, so this only applies when the same
+  /// one is passed again.
   void setTokenProvider(
     String userId, {
     required TokenProvider tokenProvider,
   }) {
-    final identity = (userId: userId, provider: tokenProvider);
-    if (_identity == identity) return;
+    // Compared with `identical` rather than `==`: a provider defines its own
+    // equality, and one that calls itself equal to another would keep the
+    // provider and the cached token this call means to replace.
+    final unchanged = userId == this.userId && identical(tokenProvider, _identity?.provider);
+    if (unchanged) return;
 
-    _identity = identity;
+    _identity = (userId: userId, provider: tokenProvider);
 
     // The cached token belongs to the previous user and provider, so drop it
     // and let the next `getToken` call load a fresh one.
