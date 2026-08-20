@@ -257,6 +257,39 @@ void main() {
     );
 
     test(
+      'forwards a token-expired error without retrying when the manager has no '
+      'identity left to load a token for',
+      () async {
+        final tokenManager = TokenManager(
+          userId: 'user-123',
+          tokenProvider: TokenProvider.dynamic(
+            (userId) async => generateTestUserToken(userId),
+          ),
+        );
+
+        final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+        final adapter = _TokenExpiredHttpClientAdapter(onFetch: tokenManager.reset);
+        dio.httpClientAdapter = adapter;
+        dio.interceptors.add(AuthInterceptor(dio, tokenManager));
+
+        await expectLater(
+          dio.get<void>('/test'),
+          throwsA(
+            // Retrying would replace this with the failure to load a token for
+            // a user the manager no longer has, which says less.
+            isA<DioException>().having(
+              (it) => (it.response?.data as Map?)?['code'],
+              'the original token-expired error',
+              40,
+            ),
+          ),
+        );
+
+        expect(adapter.requestCount, 1);
+      },
+    );
+
+    test(
       'forwards a token-expired error without retrying when the token manager '
       'is pointed at a static provider after the request was dispatched '
       '(guest exchange resolving mid-flight)',

@@ -57,8 +57,10 @@ class AuthInterceptor extends QueuedInterceptor {
 
     final error = StreamApiError.fromJson(data);
     if (error.isTokenExpiredError) {
-      // Don't try to refresh the token if we're using a static provider
-      if (_tokenManager.usesStaticProvider) return handler.next(err);
+      // Don't try to refresh the token when there is no user to load one for,
+      // or when the provider would return the same token again.
+      final canRefresh = _tokenManager.userId != null && !_tokenManager.usesStaticProvider;
+      if (!canRefresh) return handler.next(err);
       // Otherwise, mark the current token as expired.
       _tokenManager.expireToken();
 
