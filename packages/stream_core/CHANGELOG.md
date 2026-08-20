@@ -8,7 +8,7 @@
 - Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, which is what it is called for and when
 - `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsSender` and returns a `Result`, so a failure to authenticate can be observed
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
-- `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` no longer take a type parameter of their own and return the result's own type. They previously cast the value to the callback's type, which failed on a successful result — most visibly for a callback that only throws. Use `fold` where the return type has to differ
+- `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` no longer take a type parameter of their own and return the result's own type. They previously cast the value to the callback's type, which failed on a successful result — most visibly for a callback that only throws. Kotlin's equivalents widen through a `<R, T : R>` bound that Dart cannot express; to widen here, name the wider type on the result (`Result<num> widened = intResult`), which works because `Result` is covariant, or use `fold`
 
 ### ✨ Features
 

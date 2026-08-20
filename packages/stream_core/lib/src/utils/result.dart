@@ -107,6 +107,10 @@ extension PatternMatching<T> on Result<T> {
   /// Note, that this function rethrows any error thrown by [onFailure] function.
   ///
   /// This function is a shorthand for `fold(onSuccess: (it) => it, onFailure: onFailure)`.
+  ///
+  /// [onFailure] returns this result's own type. To fall back to a supertype,
+  /// widen the result first — `Result<num> widened = intResult` — or use [fold],
+  /// which takes its return type from both branches.
   T getOrElse(T Function(Object error, StackTrace? stackTrace) onFailure) {
     return switch (this) {
       Success<T>(:final data) => data,
@@ -118,6 +122,9 @@ extension PatternMatching<T> on Result<T> {
   /// [defaultValue] if it is [Failure].
   ///
   /// This function is a shorthand for `getOrElse((_, _) => defaultValue)`.
+  ///
+  /// [defaultValue] is of this result's own type; widen the result to fall back
+  /// to a supertype.
   T getOrDefault(T defaultValue) {
     return switch (this) {
       Success<T>(:final data) => data,

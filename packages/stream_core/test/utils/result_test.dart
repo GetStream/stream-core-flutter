@@ -45,6 +45,19 @@ void main() {
     });
   });
 
+  group('Result widening', () {
+    test('falls back to a supertype when the result is widened', () {
+      // Kotlin widens through a `<R, T : R>` bound Dart has no equivalent for.
+      // Naming the wider type on the result gets there instead, since `Result`
+      // is covariant.
+      final Result<num> widened = Result<int>.failure(Exception('failed'));
+
+      expect(widened.getOrElse((_, _) => 0.5), 0.5);
+      expect(widened.getOrDefault(0.5), 0.5);
+      expect(widened.recover((_, _) => 0.5).getOrNull(), 0.5);
+    });
+  });
+
   group('Result.getOrDefault', () {
     test('returns the value when there is one', () {
       const result = Result.success(42);
