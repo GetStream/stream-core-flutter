@@ -442,16 +442,19 @@ void main() {
 
     test('does not fire once the connection is established', () {
       fakeAsync((async) {
-        final (:client, :incoming, optionsBuilt: _, sink: _) = _client();
+        // A timeout of its own, well short of the health monitor: the default
+        // one outlives the monitor's first missed pong, so elapsing past it
+        // would report an unhealthy connection instead.
+        final (:client, :incoming, optionsBuilt: _, sink: _) = _client(
+          connectTimeout: const Duration(seconds: 5),
+        );
 
         client.connect().ignore();
         async.flushMicrotasks();
         client.onMessage(const _HealthCheckEvent());
         expect(client.connectionState.value, isA<Connected>());
 
-        // Past when the timeout would have fired, but before the health
-        // monitor's first ping is due.
-        async.elapse(WebSocketOptions.defaultConnectTimeout + const Duration(seconds: 1));
+        async.elapse(const Duration(seconds: 6));
 
         expect(client.connectionState.value, isA<Connected>());
       });

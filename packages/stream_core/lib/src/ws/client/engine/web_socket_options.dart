@@ -42,7 +42,10 @@ class WebSocketOptions {
   final Duration connectTimeout;
 
   /// The [connectTimeout] used when none is given.
-  static const defaultConnectTimeout = Duration(seconds: 15);
+  ///
+  /// Matches the wait the Swift SDK allows for the same handshake; the Android
+  /// one is stricter at ten seconds.
+  static const defaultConnectTimeout = Duration(seconds: 30);
 
   /// WebSocket sub-protocols to negotiate during the handshake.
   ///

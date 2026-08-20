@@ -91,7 +91,7 @@ void main() {
       const options = WebSocketOptions(url: 'wss://example.com');
 
       expect(options.connectTimeout, WebSocketOptions.defaultConnectTimeout);
-      expect(WebSocketOptions.defaultConnectTimeout, const Duration(seconds: 15));
+      expect(WebSocketOptions.defaultConnectTimeout, const Duration(seconds: 30));
     });
   });
 }

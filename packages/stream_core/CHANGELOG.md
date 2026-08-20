@@ -21,7 +21,7 @@
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
 - Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before the connection is established; it is eligible for automatic reconnection, since a handshake that did not complete in time is the same failure as a connection that stops answering health checks
 - Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
-- `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`. This is a behaviour change as well as an API one: a connection previously waited indefinitely for its first health check, and is now abandoned — and reconnected — after 15 seconds
+- `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`. This is a behaviour change as well as an API one: a connection previously waited indefinitely for its first health check, and is now abandoned — and reconnected — after 30 seconds, matching the wait the Swift SDK allows for the same handshake
 - Added `WsSender`, the send capability handed to a `WebSocketAuthenticator`
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is `Disposable`, so `isDisposed` reports whether it has been called
