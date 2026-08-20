@@ -6,11 +6,14 @@ import 'package:test/test.dart';
 
 import '../helpers/user_token.dart';
 
-/// A token provider that reports itself equal to any other of its kind, the way
-/// a provider with value equality can.
+/// A token provider that claims to equal any other of its kind, whatever
+/// credentials it carries.
+///
+/// Equality is a provider's own to define, and the manager must not take its
+/// word for it — that is what this provider is for.
 @immutable
-class _EquatableProvider implements TokenProvider {
-  const _EquatableProvider(this._token);
+class _AlwaysEqualProvider implements TokenProvider {
+  const _AlwaysEqualProvider(this._token);
 
   final UserToken _token;
 
@@ -18,7 +21,7 @@ class _EquatableProvider implements TokenProvider {
   Future<UserToken> loadToken(String userId) async => _token;
 
   @override
-  bool operator ==(Object other) => other is _EquatableProvider;
+  bool operator ==(Object other) => other is _AlwaysEqualProvider;
 
   @override
   int get hashCode => 0;
@@ -362,21 +365,20 @@ void main() {
         expect(provider.loadCount, 1);
       });
 
-      test('replaces a provider that merely compares equal to the previous one', () async {
+      test('replaces a provider even when it claims to equal the previous one', () async {
         final manager = TokenManager(
           userId: 'user-1',
-          tokenProvider: _EquatableProvider(generateTestUserToken('user-1', nonce: 'first')),
+          tokenProvider: _AlwaysEqualProvider(generateTestUserToken('user-1', nonce: 'first')),
         );
         expect(await manager.getToken(), generateTestUserToken('user-1', nonce: 'first'));
 
         manager.setTokenProvider(
           'user-1',
-          tokenProvider: _EquatableProvider(generateTestUserToken('user-1', nonce: 'second')),
+          tokenProvider: _AlwaysEqualProvider(generateTestUserToken('user-1', nonce: 'second')),
         );
 
-        // A provider defines its own equality, so keeping the cached token
-        // because the replacement called itself equal would serve a token the
-        // previous provider issued.
+        // The manager compares instances, not values, so a provider cannot talk
+        // it into keeping a token the replacement was meant to supersede.
         expect(manager.peekToken(), isNull);
         expect(await manager.getToken(), generateTestUserToken('user-1', nonce: 'second'));
       });

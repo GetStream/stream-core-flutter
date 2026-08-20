@@ -98,14 +98,15 @@ class TokenManager {
   /// ```
   /// Re-setting the identity this manager already has does nothing: expiring
   /// the cached token would send the next caller to the provider for no reason.
-  /// The provider is compared by instance, so this only applies when the same
-  /// one is passed again.
+  /// This applies only when the same provider instance is passed again — a
+  /// provider's own `==` is never consulted, so whether it defines equality
+  /// makes no difference here.
   void setTokenProvider(
     String userId, {
     required TokenProvider tokenProvider,
   }) {
-    // Compared with `identical` rather than `==`: a provider defines its own
-    // equality, and one that calls itself equal to another would keep the
+    // Compared with `identical` rather than `==`: equality is the provider's own
+    // to define, and one that called itself equal to another would keep the
     // provider and the cached token this call means to replace.
     final unchanged = userId == this.userId && identical(tokenProvider, _identity?.provider);
     if (unchanged) return;
