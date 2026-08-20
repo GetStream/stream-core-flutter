@@ -442,19 +442,25 @@ void main() {
 
     test('does not fire once the connection is established', () {
       fakeAsync((async) {
-        // A timeout of its own, well short of the health monitor: the default
-        // one outlives the monitor's first missed pong, so elapsing past it
-        // would report an unhealthy connection instead.
-        final (:client, :incoming, optionsBuilt: _, sink: _) = _client(
-          connectTimeout: const Duration(seconds: 5),
-        );
+        final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+
+        // A live connection answers its pings, which is what keeps the health
+        // monitor quiet across a connection that outlives this timeout. The
+        // answer arrives over the wire, so it lands after the monitor has armed
+        // its pong timeout rather than inside the send that triggered it.
+        when(() => sink.add(any<Object>())).thenAnswer((_) {
+          Timer(const Duration(milliseconds: 50), () {
+            client.onMessage(const _HealthCheckEvent());
+          });
+        });
 
         client.connect().ignore();
         async.flushMicrotasks();
         client.onMessage(const _HealthCheckEvent());
         expect(client.connectionState.value, isA<Connected>());
 
-        async.elapse(const Duration(seconds: 6));
+        // Past the timeout, and past a ping cycle with it.
+        async.elapse(WebSocketOptions.defaultConnectTimeout + const Duration(seconds: 10));
 
         expect(client.connectionState.value, isA<Connected>());
       });
