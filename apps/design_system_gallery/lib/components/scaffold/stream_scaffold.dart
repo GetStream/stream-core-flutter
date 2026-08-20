@@ -139,7 +139,7 @@ Widget buildStreamScaffoldDrawers(BuildContext context) {
       leading: showDrawer
           ? Builder(
               builder: (ctx) => StreamButton.icon(
-                icon: Icon(ctx.streamIcons.more),
+                icon: Icon(ctx.streamIcons.moreHorizontal),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.ghost,
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
@@ -250,7 +250,7 @@ PreferredSizeWidget _demoAppBar(
     leading: withDrawerButton
         ? Builder(
             builder: (context) => StreamButton.icon(
-              icon: Icon(context.streamIcons.more),
+              icon: Icon(context.streamIcons.moreHorizontal),
               style: StreamButtonStyle.secondary,
               type: floating ? StreamButtonType.outline : StreamButtonType.ghost,
               isFloating: floating,

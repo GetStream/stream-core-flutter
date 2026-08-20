@@ -324,7 +324,7 @@ class _PlaygroundMediaViewerState extends State<_PlaygroundMediaViewer> {
               title: const Text('You'),
               subtitle: const Text('14/01/2026, 16:06'),
               trailing: StreamButton.icon(
-                icon: Icon(icons.more),
+                icon: Icon(icons.moreHorizontal),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.ghost,
                 onPressed: () {},

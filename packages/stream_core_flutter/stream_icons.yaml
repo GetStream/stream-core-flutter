@@ -9,6 +9,11 @@
 input_svg_dir: assets_source/icons/
 input_svg_icon_dir: assets/icons/
 
+# Icons that are being retired, one `deprecated;replacement;included` per line.
+# Their glyph is kept in the font (drawn from the replacement) so that removing
+# an icon never shifts the code points of the icons that follow it.
+input_deprecated_file: assets_source/deprecated.txt
+
 # Output paths (relative to this config file)
 output_font_file: lib/fonts/stream_icons_font.otf
 output_file: lib/src/theme/primitives/stream_icons.dart
