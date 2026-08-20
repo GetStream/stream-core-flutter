@@ -42,12 +42,12 @@ void main() {
     });
 
     test(
-      'is disabled when a connection attempt timed out, so a handshake that '
-      'never completes is not retried forever',
+      'is enabled when a connection attempt timed out, since a handshake that '
+      'did not complete in time is the same failure as one that stopped',
       () {
         const state = Disconnected(source: ConnectTimeout());
 
-        expect(state.isAutomaticReconnectionEnabled, isFalse);
+        expect(state.isAutomaticReconnectionEnabled, isTrue);
       },
     );
 

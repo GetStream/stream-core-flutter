@@ -39,9 +39,9 @@ typedef WsSender = Result<void> Function(WsRequest request);
 /// Called once the socket is open, while the state is [Authenticating]. Sending
 /// the credentials the server expects is this function's job.
 ///
-/// Returns a [Future] that completes when the credentials have been sent, and
-/// fails if they could not be — in which case the connection is closed with
-/// [AuthenticationFailed] rather than left waiting for a reply that never comes.
+/// Returns a [Result] that fails when the credentials could not be sent, in
+/// which case the connection is closed with [AuthenticationFailed] rather than
+/// left waiting for a reply that never comes.
 typedef WebSocketAuthenticator = Future<Result<void>> Function(WsSender send);
 
 /// A WebSocket client with connection management and event handling.
@@ -64,7 +64,7 @@ typedef WebSocketAuthenticator = Future<Result<void>> Function(WsSender send);
 ///
 /// await client.connect();
 /// ```
-class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
+class StreamWebSocketClient with Disposable implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
     required this.optionsBuilder,
@@ -120,11 +120,12 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
   ///
   /// Emits state changes as the WebSocket transitions through different connection states.
   ConnectionStateEmitter get connectionState => _connectionStateEmitter;
-  late final _connectionStateEmitter = MutableConnectionStateEmitter(
-    const WebSocketConnectionState.initialized(),
-  );
+  late final _connectionStateEmitter = MutableConnectionStateEmitter(const .initialized());
 
   set _connectionState(WebSocketConnectionState connectionState) {
+    // Return early if the emitter is closed.
+    if (_connectionStateEmitter.isClosed) return;
+
     // Return early if the state hasn't changed.
     if (_connectionStateEmitter.value == connectionState) return;
 
@@ -144,9 +145,15 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
   ///
   /// The connection state can be monitored through [connectionState] for real-time updates.
   /// If the connection is already established or in progress, this method returns immediately.
+  /// It also does nothing once [dispose] has been called.
   ///
-  /// Returns a [Future] that completes when the connection attempt finishes.
+  /// Returns a [Future] that completes once the socket is open — before the
+  /// connection is authenticated, and well before it is [Connected]. Watch
+  /// [connectionState] to know when it is usable.
   Future<void> connect() async {
+    assert(!isDisposed, 'Cannot connect a disposed StreamWebSocketClient');
+    if (isDisposed) return;
+
     // If the connection is already established or in the process of connecting,
     // do not initiate a new connection.
     if (connectionState.value is Connecting) return;
@@ -177,8 +184,11 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
     CloseCode closeCode = CloseCode.normalClosure,
     DisconnectionSource source = const UserInitiated(),
   }) async {
-    // If the connection is already disconnected, do nothing.
-    if (connectionState.value is Disconnected) return;
+    // A connection already going down keeps the source it started going down
+    // with: whoever asked first described why. Without this the connect
+    // timeout could replace a `ServerInitiated` closure, which is
+    // reconnectable, with one that is not.
+    if (connectionState.value case Disconnected() || Disconnecting()) return;
 
     // Stop the timeout from firing later and replacing this source.
     _cancelConnectTimeout();
@@ -186,8 +196,33 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
     // Update the connection state to 'disconnecting'.
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
 
-    // Close the connection using the engine.
-    unawaited(_engine.close(closeCode, source.closeReason));
+    // Awaited so the connection is closed, rather than merely closing, once this
+    // returns: a reconnect straight afterwards would otherwise race the close
+    // and see the connection go down again.
+    final result = await _engine.close(closeCode, source.closeReason);
+
+    // The engine reports a failed close rather than throwing, and does not
+    // notify its listener on that path. The connection is unusable either way,
+    // so report it closed rather than leave it disconnecting for good.
+    if (result.isFailure) onClose(closeCode, source.closeReason);
+  }
+
+  /// Releases every resource held by this client.
+  ///
+  /// Closes the connection along with [events] and [connectionState], after which
+  /// this client cannot be connected again. Use [disconnect] for a connection that
+  /// may be opened again.
+  ///
+  /// Returns a [Future] that completes once everything has been released.
+  @override
+  Future<void> dispose() async {
+    await disconnect();
+    _healthMonitor.stop();
+
+    await _events.close();
+    await _connectionStateEmitter.close();
+
+    return super.dispose();
   }
 
   @override
@@ -200,10 +235,18 @@ class StreamWebSocketClient implements WebSocketHealthListener, WebSocketEngineL
   }
 
   Future<void> _authenticate() async {
-    final result = await onAuthenticate?.call(send);
+    final authenticate = onAuthenticate;
+    if (authenticate == null) return;
+
+    // Guarded rather than awaited directly: an authenticator that awaits a
+    // token throws rather than returning a failure, and nothing observes this
+    // future, so the error would escape and leave the connection
+    // authenticating until the timeout reported a cause it does not know.
+    final outcome = await runSafely(() => authenticate(send));
+    final result = outcome.flatten<void>();
 
     // Close the connection rather than wait for a reply that cannot come.
-    if (result?.exceptionOrNull() case final error?) {
+    if (result.exceptionOrNull() case final error?) {
       final source = DisconnectionSource.authenticationFailed(error: error);
       return disconnect(source: source);
     }

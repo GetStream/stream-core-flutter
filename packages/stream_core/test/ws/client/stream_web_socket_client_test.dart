@@ -63,6 +63,8 @@ _client({
   when(() => channel.stream).thenAnswer((_) => incoming.stream);
   final sink = _MockWebSocketSink();
   when(() => channel.sink).thenReturn(sink);
+  // A socket that closes cleanly; tests that need otherwise re-stub this.
+  when(() => sink.close(any(), any())).thenAnswer((_) async {});
 
   var built = 0;
   final client = StreamWebSocketClient(
@@ -83,6 +85,87 @@ _client({
 }
 
 void main() {
+  group('StreamWebSocketClient.disconnect', () {
+    test('leaves the connection closed, not closing, once it returns', () async {
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+      await client.connect();
+
+      await client.disconnect();
+
+      // A caller that reconnects straight away would otherwise race the close
+      // and see the connection go down again.
+      expect(client.connectionState.value, isA<Disconnected>());
+    });
+
+    test('reports the connection closed even when the socket close fails', () async {
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+      when(() => sink.close(any(), any())).thenThrow(Exception('close failed'));
+      await client.connect();
+
+      await client.disconnect();
+
+      // The engine swallows the failure and never notifies its listener, which
+      // used to leave the connection disconnecting for good.
+      expect(
+        client.connectionState.value,
+        isA<Disconnected>().having((it) => it.source, 'source', isA<UserInitiated>()),
+      );
+    });
+
+    test('can be followed by another connect', () async {
+      final (:client, :sink, incoming: _, :optionsBuilt) = _client();
+      await client.connect();
+      await client.disconnect();
+
+      await client.connect();
+
+      expect(client.connectionState.value, isA<Authenticating>());
+      expect(optionsBuilt(), 2);
+    });
+  });
+
+  group('StreamWebSocketClient.dispose', () {
+    test('closes the connection and both emitters', () async {
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+      await client.connect();
+
+      await client.dispose();
+
+      expect(client.isDisposed, isTrue);
+      expect(client.events.isClosed, isTrue);
+      expect(client.connectionState.isClosed, isTrue);
+    });
+
+    test('does nothing when called again', () async {
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+      await client.connect();
+      await client.dispose();
+
+      await expectLater(client.dispose(), completes);
+    });
+
+    test('refuses to connect again', () async {
+      final (:client, :sink, incoming: _, :optionsBuilt) = _client();
+      await client.connect();
+      await client.dispose();
+
+      // Asserts rather than throws: a reconnect can come from the recovery
+      // handler, which does not await it and cannot report an error.
+      await expectLater(client.connect(), throwsA(isA<AssertionError>()));
+      expect(optionsBuilt(), 1);
+    });
+
+    test('ignores a socket event arriving after it', () async {
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+      await client.connect();
+      await client.dispose();
+
+      // The state emitter is closed, so a late event must not be reported into
+      // it rather than throwing.
+      expect(() => client.onClose(1000, 'late'), returnsNormally);
+    });
+  });
+
   group('StreamWebSocketClient.optionsBuilder', () {
     test('is called for every connection attempt, not once per client', () async {
       final (:client, :incoming, :optionsBuilt, sink: _) = _client();
@@ -195,7 +278,28 @@ void main() {
       final state = client.connectionState.value;
       expect(
         state,
-        isA<Disconnecting>().having(
+        isA<Disconnected>().having(
+          (it) => it.source,
+          'source',
+          isA<AuthenticationFailed>().having((it) => it.error, 'error', isStateError),
+        ),
+      );
+    });
+
+    test('closes the connection when the authenticator throws', () async {
+      // The natural authenticator awaits a token, and loading one throws rather
+      // than returning a failure. Left unguarded the error escapes unhandled and
+      // the connection waits for the timeout, which knows no cause.
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client(
+        onAuthenticate: (_) async => throw StateError('token load failed'),
+      );
+
+      await client.connect();
+      await pumpEventQueue();
+
+      expect(
+        client.connectionState.value,
+        isA<Disconnected>().having(
           (it) => it.source,
           'source',
           isA<AuthenticationFailed>().having((it) => it.error, 'error', isStateError),
@@ -235,6 +339,10 @@ void main() {
         expect(client.connectionState.value, isA<Authenticating>());
 
         async.elapse(const Duration(seconds: 1));
+        // Only the source can be observed here: `disconnect` awaits the
+        // subscription cancel, which `fakeAsync` never completes, so the state
+        // settles at 'disconnecting'. The reached state is covered by the
+        // `StreamWebSocketClient.disconnect` group.
         expect(
           client.connectionState.value,
           isA<Disconnecting>().having((it) => it.source, 'source', isA<ConnectTimeout>()),
@@ -256,6 +364,10 @@ void main() {
 
         async.elapse(WebSocketOptions.defaultConnectTimeout);
 
+        // Only the source can be observed here: `disconnect` awaits the
+        // subscription cancel, which `fakeAsync` never completes, so the state
+        // settles at 'disconnecting'. The reached state is covered by the
+        // `StreamWebSocketClient.disconnect` group.
         expect(
           client.connectionState.value,
           isA<Disconnecting>().having((it) => it.source, 'source', isA<ConnectTimeout>()),
@@ -277,6 +389,10 @@ void main() {
         async.flushMicrotasks();
         async.elapse(WebSocketOptions.defaultConnectTimeout);
 
+        // Only the source can be observed here: `disconnect` awaits the
+        // subscription cancel, which `fakeAsync` never completes, so the state
+        // settles at 'disconnecting'. The reached state is covered by the
+        // `StreamWebSocketClient.disconnect` group.
         expect(
           client.connectionState.value,
           isA<Disconnecting>().having((it) => it.source, 'source', isA<ConnectTimeout>()),
@@ -295,6 +411,10 @@ void main() {
 
         async.elapse(const Duration(seconds: 2));
 
+        // Only the source can be observed here: `disconnect` awaits the
+        // subscription cancel, which `fakeAsync` never completes, so the state
+        // settles at 'disconnecting'. The reached state is covered by the
+        // `StreamWebSocketClient.disconnect` group.
         expect(
           client.connectionState.value,
           isA<Disconnecting>().having((it) => it.source, 'source', isA<ConnectTimeout>()),
@@ -319,6 +439,29 @@ void main() {
       });
     });
 
+    test('does not replace the source of a socket error that came first', () {
+      fakeAsync((async) {
+        final (:client, incoming: _, optionsBuilt: _, sink: _) = _client();
+
+        client.connect().ignore();
+        async.flushMicrotasks();
+
+        // A socket error closes the connection without cancelling the timer.
+        client.onError(StateError('socket died'));
+        expect(client.connectionState.value, isA<Disconnecting>());
+
+        async.elapse(WebSocketOptions.defaultConnectTimeout * 2);
+
+        // Replacing this with `ConnectTimeout` would have made a reconnectable
+        // failure permanent, since `ServerInitiated` is eligible and the
+        // timeout used not to be.
+        expect(
+          client.connectionState.value,
+          isA<Disconnecting>().having((it) => it.source, 'source', isA<ServerInitiated>()),
+        );
+      });
+    });
+
     test('does not replace the source of a disconnect that came first', () {
       fakeAsync((async) {
         final (:client, :incoming, optionsBuilt: _, sink: _) = _client();
@@ -332,6 +475,10 @@ void main() {
 
         // The timeout would otherwise report this deliberate disconnect as a
         // timed-out attempt, which reconnects differently.
+        // Only the source can be observed here: `disconnect` awaits the
+        // subscription cancel, which `fakeAsync` never completes, so the state
+        // settles at 'disconnecting'. The reached state is covered by the
+        // `StreamWebSocketClient.disconnect` group.
         expect(
           client.connectionState.value,
           isA<Disconnecting>().having((it) => it.source, 'source', isA<UserInitiated>()),
@@ -342,29 +489,37 @@ void main() {
 
   group('StreamWebSocketClient health check while disconnecting', () {
     test('does not report the connection as established again', () async {
-      final (:client, :incoming, optionsBuilt: _, sink: _) = _client();
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+      // Held open so the connection is still closing when the pong arrives.
+      final closing = Completer<void>();
+      when(() => sink.close(any(), any())).thenAnswer((_) => closing.future);
 
       await client.connect();
       client.onMessage(const _HealthCheckEvent());
       expect(client.connectionState.value, isA<Connected>());
 
-      await client.disconnect();
+      client.disconnect().ignore();
       expect(client.connectionState.value, isA<Disconnecting>());
 
       // Arrives before the socket finished closing.
       client.onMessage(const _HealthCheckEvent(connectionId: 'late'));
 
       expect(client.connectionState.value, isA<Disconnecting>());
+      closing.complete();
     });
 
     test('leaves the disconnection source intact once the socket closes', () async {
-      final (:client, :incoming, optionsBuilt: _, sink: _) = _client();
+      final (:client, :sink, incoming: _, optionsBuilt: _) = _client();
+      final closing = Completer<void>();
+      when(() => sink.close(any(), any())).thenAnswer((_) => closing.future);
 
       await client.connect();
       client.onMessage(const _HealthCheckEvent());
-      await client.disconnect();
+      client.disconnect().ignore();
       client.onMessage(const _HealthCheckEvent(connectionId: 'late'));
-      client.onClose();
+
+      closing.complete();
+      await pumpEventQueue();
 
       // Without the guard the late health check moves the state back to
       // connected, and `onClose` then reports a server-initiated disconnect,

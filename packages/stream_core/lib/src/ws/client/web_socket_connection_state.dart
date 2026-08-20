@@ -115,7 +115,12 @@ sealed class WebSocketConnectionState extends Equatable {
         UnHealthyConnection() => true,
         SystemInitiated() => true,
         UserInitiated() => false,
-        ConnectTimeout() => false,
+        // A handshake that did not complete in time is the same failure as a
+        // connection that stops answering health checks, at an earlier moment.
+        ConnectTimeout() => true,
+        // Not the server refusing the credentials, which arrives as an error
+        // frame: this is the client failing to load or send them, and it will
+        // fail the same way on a retry.
         AuthenticationFailed() => false,
       },
       _ => false, // No automatic reconnection for other states
