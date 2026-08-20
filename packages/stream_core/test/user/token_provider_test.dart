@@ -82,11 +82,17 @@ void main() {
         (_) async => UserToken.anonymous(),
       );
 
-      // Requested id matches the one an anonymous token carries, so this
-      // reaches the type check rather than failing the user id check first.
+      // The type is checked first, so this reports the wrong type rather than
+      // the id an anonymous token happens to carry.
       expect(
-        () => provider.loadToken(User.anonymousUserId),
-        throwsArgumentError,
+        () => provider.loadToken('user-1'),
+        throwsA(
+          isA<ArgumentError>().having(
+            (it) => it.message,
+            'message',
+            contains('Token type mismatch'),
+          ),
+        ),
       );
     });
 
