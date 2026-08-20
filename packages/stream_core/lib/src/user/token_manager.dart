@@ -96,11 +96,18 @@ class TokenManager {
   ///   tokenProvider: TokenProvider.static(UserToken(rawToken)),
   /// );
   /// ```
+  /// Re-setting the identity this manager already has does nothing: expiring
+  /// the cached token would send the next caller to the provider for no reason.
+  /// Note that a [TokenProvider] compares by identity, so this only applies
+  /// when the same instance is passed again.
   void setTokenProvider(
     String userId, {
     required TokenProvider tokenProvider,
   }) {
-    _identity = (userId: userId, provider: tokenProvider);
+    final identity = (userId: userId, provider: tokenProvider);
+    if (_identity == identity) return;
+
+    _identity = identity;
 
     // The cached token belongs to the previous user and provider, so drop it
     // and let the next `getToken` call load a fresh one.
@@ -149,7 +156,12 @@ class TokenManager {
   ///
   /// Fails with a [ClientException] when no identity is configured, either
   /// because the manager was created with [TokenManager.unconfigured] or
-  /// because [reset] dropped the previous one.
+  /// because [reset] dropped the previous one, and when [reset] runs while the
+  /// token is loading.
+  ///
+  /// Loads are serialised, so a provider that never returns blocks every later
+  /// caller — including one for a different user configured by
+  /// [setTokenProvider] in the meantime.
   Future<UserToken> getToken() {
     final cached = _cachedToken;
     if (cached != null) return Future.value(cached);
@@ -174,9 +186,27 @@ class TokenManager {
     final loadingGeneration = _generation;
     final updatedToken = await identity.provider.loadToken(loadingFor);
 
+    // Both built-in providers check this, but a custom one is under no
+    // obligation to, and caching a token for another user would authenticate
+    // every later request as them.
+    if (updatedToken.userId != loadingFor) {
+      throw ArgumentError(
+        'User ID mismatch: expected "$loadingFor", got "${updatedToken.userId}"',
+      );
+    }
+
     // `setTokenProvider` or `expireToken` may have run while this loaded, in
     // which case the token is the one the caller asked to stop using.
-    if (loadingGeneration != _generation) return updatedToken;
+    if (loadingGeneration != _generation) {
+      // A `reset` means the user is gone, so nothing may go out as them. A
+      // switch is different: the request that started as this user may finish
+      // as them.
+      if (_identity == null) {
+        throw ClientException(message: 'The user was reset while its token was loading');
+      }
+
+      return updatedToken;
+    }
 
     _cachedToken = updatedToken;
     _onTokenUpdated?.call(updatedToken);
