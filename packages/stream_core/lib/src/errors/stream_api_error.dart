@@ -69,16 +69,34 @@ class StreamApiError extends Equatable {
   ];
 }
 
-final _tokenInvalidErrorCodes = _range(40, 42);
-final _clientErrorCodes = _range(400, 499);
+// The token this was issued for has expired; another one is accepted.
+const _expiredTokenCode = 40;
+
+// The token cannot be accepted for a reason another token does not fix: not
+// valid yet, used before it was issued, or signed with the wrong secret.
+final _invalidTokenCodes = _range(41, 43);
+
+// The API key itself is wrong, which no token repairs either.
+const _accessKeyErrorCode = 2;
+
+final _clientErrorStatusCodes = _range(400, 499);
 
 /// Extension methods for [StreamApiError] to provide convenient error type checks.
 extension StreamApiErrorExtension on StreamApiError {
-  /// Whether this error indicates an expired or invalid token.
-  bool get isTokenExpiredError => _tokenInvalidErrorCodes.contains(code);
+  /// Whether the token has expired.
+  ///
+  /// Distinct from [isInvalidTokenError]: an expired token is replaced by asking
+  /// the provider for another, where an invalid one is a configuration problem
+  /// that a fresh token presents again.
+  bool get isTokenExpiredError => code == _expiredTokenCode;
+
+  /// Whether the token, or the key it was signed with, cannot be accepted.
+  bool get isInvalidTokenError {
+    return _invalidTokenCodes.contains(code) || code == _accessKeyErrorCode;
+  }
 
   /// Whether this error is a client-side error (4xx status codes).
-  bool get isClientError => _clientErrorCodes.contains(code);
+  bool get isClientError => _clientErrorStatusCodes.contains(statusCode);
 
   /// Whether this error indicates rate limiting (429 status code).
   bool get isRateLimitError => statusCode == 429;

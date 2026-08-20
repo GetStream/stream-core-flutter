@@ -98,28 +98,23 @@ sealed class WebSocketConnectionState extends Equatable {
   ///
   /// ## Reconnection is disabled for:
   /// - User-initiated disconnections (explicit disconnect calls)
-  /// - Server errors with code 1000 (normal closure)
-  /// - Token expired/invalid errors
-  /// - Client errors (4xx status codes)
+  /// - A socket the server closed deliberately (close code 1000)
+  /// - Tokens another token would not fix, and a wrong API key
+  /// - Client errors (4xx status codes), other than an expired token
+  /// - A failure to load or send credentials
   ///
   /// Returns `true` if automatic reconnection should be attempted.
   bool get isAutomaticReconnectionEnabled {
     return switch (this) {
       Disconnected(:final source) => switch (source) {
-        ServerInitiated() => switch (source.error?.apiError) {
-          final error? when error.code == 1000 => false,
-          // Worth retrying, but only once the credential has been replaced —
-          // which is the product's to do, since the token is theirs. A
-          // reconnect that presents the same one is refused the same way.
-          final error? when error.isTokenExpiredError => true,
-          final error? when error.isClientError => false,
-          _ => true, // Reconnect on other server initiated disconnections
-        },
+        ServerInitiated(:final error) => _canReconnectAfter(error),
         UnHealthyConnection() => true,
         SystemInitiated() => true,
         UserInitiated() => false,
-        // A handshake that did not complete in time is the same failure as a
-        // connection that stops answering health checks, at an earlier moment.
+        // A handshake that did not complete in time is the same failure as one
+        // that stops answering health checks. A caller's own first attempt is
+        // kept out of this by the recovery handler, which recovers connections
+        // that existed rather than attempts that never landed.
         ConnectTimeout() => true,
         // Not the server refusing the credentials, which arrives as an error
         // frame: this is the client failing to load or send them, and it will
@@ -367,4 +362,26 @@ final class AuthenticationFailed extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
+}
+
+// Whether a connection the server closed is worth opening again.
+//
+// Mirrors the rules the iOS SDK applies, which the ported version had drifted
+// from: it compared the API error's code against the close code 1000 and against
+// a 400..499 range that Stream's codes never occupy, so neither rule could fire.
+bool _canReconnectAfter(WebSocketEngineException? error) {
+  // A deliberate stop rather than a failure to recover from.
+  if (error?.code == WebSocketEngineException.stopErrorCode) return false;
+
+  final apiError = error?.apiError;
+  if (apiError == null) return true;
+
+  // Another token is refused for the same reason, so asking for one is futile.
+  if (apiError.isInvalidTokenError) return false;
+
+  // Whatever else the client got wrong is the caller's to fix — except an
+  // expired token, which is replaced rather than corrected.
+  if (apiError.isClientError && !apiError.isTokenExpiredError) return false;
+
+  return true;
 }

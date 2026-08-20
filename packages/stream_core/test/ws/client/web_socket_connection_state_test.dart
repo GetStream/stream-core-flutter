@@ -1,13 +1,13 @@
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
-StreamApiError _apiError(int code) => StreamApiError(
+StreamApiError _apiError(int code, {int statusCode = 401}) => StreamApiError(
   code: code,
   details: const [],
   duration: '0ms',
   message: 'error $code',
   moreInfo: '',
-  statusCode: 401,
+  statusCode: statusCode,
 );
 
 Disconnected _serverDisconnect(StreamApiError apiError) => Disconnected(
@@ -23,33 +23,58 @@ Disconnected _serverDisconnect(StreamApiError apiError) => Disconnected(
 void main() {
   group('WebSocketConnectionState.isAutomaticReconnectionEnabled', () {
     test(
-      'is enabled when the server closes with a token-expired error, since the '
-      'product replaces the credential before the attempt is made',
+      'is enabled when the token has expired, which another token replaces',
       () {
-        // Token-invalid error codes are 40..42; 40 = token expired.
-        final state = _serverDisconnect(_apiError(40));
-
-        expect(state.isAutomaticReconnectionEnabled, isTrue);
+        // 40 = expired; the server returns 401 with it, so the client-error rule
+        // has to make room for this one.
+        expect(_serverDisconnect(_apiError(40)).isAutomaticReconnectionEnabled, isTrue);
       },
     );
 
-    test('is enabled for a generic, retryable server-initiated disconnection', () {
-      // A server error that is neither a normal closure (1000), a token error
-      // (40..42), nor a client error (400..499) should still reconnect.
-      final state = _serverDisconnect(_apiError(43));
+    test('is disabled when another token would be refused too', () {
+      // 41 not valid yet, 42 used before issued, 43 signed with the wrong
+      // secret, 2 wrong API key — none of which a fresh token repairs.
+      for (final code in [41, 42, 43, 2]) {
+        expect(
+          _serverDisconnect(_apiError(code)).isAutomaticReconnectionEnabled,
+          isFalse,
+          reason: 'code $code',
+        );
+      }
+    });
+
+    test('is disabled for any other client error', () {
+      // 17 = not allowed. Nothing about retrying changes the answer.
+      final state = _serverDisconnect(_apiError(17, statusCode: 403));
+
+      expect(state.isAutomaticReconnectionEnabled, isFalse);
+    });
+
+    test('is enabled for a server-side failure', () {
+      // Stream error codes never fall in 400..499, so this is classified by the
+      // status code alone — which is what the ported rule got wrong.
+      final state = _serverDisconnect(_apiError(9, statusCode: 500));
 
       expect(state.isAutomaticReconnectionEnabled, isTrue);
     });
 
-    test(
-      'is enabled when a connection attempt timed out, since a handshake that '
-      'did not complete in time is the same failure as one that stopped',
-      () {
-        const state = Disconnected(source: ConnectTimeout());
+    test('is disabled when the socket was closed deliberately', () {
+      const state = Disconnected(
+        source: ServerInitiated(
+          error: WebSocketEngineException(
+            code: WebSocketEngineException.stopErrorCode,
+          ),
+        ),
+      );
 
-        expect(state.isAutomaticReconnectionEnabled, isTrue);
-      },
-    );
+      expect(state.isAutomaticReconnectionEnabled, isFalse);
+    });
+
+    test('is enabled when the server closed without saying why', () {
+      const state = Disconnected(source: ServerInitiated());
+
+      expect(state.isAutomaticReconnectionEnabled, isTrue);
+    });
 
     test(
       'is disabled when a connection could not be authenticated, since the '
