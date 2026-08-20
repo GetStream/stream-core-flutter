@@ -162,24 +162,20 @@ class ConnectionRecoveryHandler extends Disposable {
   }
 
   void _onConnectionStateChanged(WebSocketConnectionState state) {
-    switch (state) {
-      case Connecting():
-        _cancelReconnection();
-      case Connected():
-        _onConnectionEstablished();
-      case Disconnected(:final source):
-        _onConnectionLost(source);
-      // An attempt on its way up or down decides nothing on its own.
-      case Initialized() || Authenticating() || Disconnecting():
-        break;
-    }
+    return switch (state) {
+      Connecting() => _cancelReconnection(),
+      Connected() => _onConnectionEstablished(),
+      Disconnected(:final source) => _onConnectionLost(source),
+      // These states do not require any action.
+      Initialized() || Authenticating() || Disconnecting() => () {},
+    };
   }
 
   // A connection exists, so keeping it is this handler's job from here, and the
   // failures the backoff had accumulated are behind us.
   void _onConnectionEstablished() {
     _hasConnected = true;
-    _reconnectStrategy.resetConsecutiveFailures();
+    return _reconnectStrategy.resetConsecutiveFailures();
   }
 
   // A disconnect the caller asked for hands connecting back to them, so the next
@@ -188,8 +184,7 @@ class ConnectionRecoveryHandler extends Disposable {
   // this handler exists to come back from.
   void _onConnectionLost(DisconnectionSource source) {
     if (source is UserInitiated) _hasConnected = false;
-
-    _scheduleReconnectionIfNeeded();
+    return _scheduleReconnectionIfNeeded();
   }
 
   @override

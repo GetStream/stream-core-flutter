@@ -108,7 +108,10 @@ sealed class WebSocketConnectionState extends Equatable {
       Disconnected(:final source) => switch (source) {
         ServerInitiated() => switch (source.error?.apiError) {
           final error? when error.code == 1000 => false,
-          final error? when error.isTokenExpiredError => false,
+          // Worth retrying, but only once the credential has been replaced —
+          // which is the product's to do, since the token is theirs. A
+          // reconnect that presents the same one is refused the same way.
+          final error? when error.isTokenExpiredError => true,
           final error? when error.isClientError => false,
           _ => true, // Reconnect on other server initiated disconnections
         },

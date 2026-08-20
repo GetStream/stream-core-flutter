@@ -23,13 +23,13 @@ Disconnected _serverDisconnect(StreamApiError apiError) => Disconnected(
 void main() {
   group('WebSocketConnectionState.isAutomaticReconnectionEnabled', () {
     test(
-      'is disabled when the server closes with a token-expired error, so an '
-      'expired (e.g. guest) token does not trigger a silent reconnect loop',
+      'is enabled when the server closes with a token-expired error, since the '
+      'product replaces the credential before the attempt is made',
       () {
         // Token-invalid error codes are 40..42; 40 = token expired.
         final state = _serverDisconnect(_apiError(40));
 
-        expect(state.isAutomaticReconnectionEnabled, isFalse);
+        expect(state.isAutomaticReconnectionEnabled, isTrue);
       },
     );
 

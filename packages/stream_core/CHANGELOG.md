@@ -19,6 +19,7 @@
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
+- Added `TokenRefreshReconnectionPolicy`, which stops a reconnection that would present a token the server has already refused. Whether another token exists is a property of the `TokenProvider`, not of the connection, so the connection state cannot decide it alone
 - Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before the connection is established; it is eligible for automatic reconnection, since a handshake that did not complete in time is the same failure as a connection that stops answering health checks
 - Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
 - `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`. This is a behaviour change as well as an API one: a connection previously waited indefinitely for its first health check, and is now abandoned — and reconnected — after 30 seconds, matching the wait the Swift SDK allows for the same handshake
@@ -36,6 +37,7 @@
 - Fixed a failure to close the socket leaving `StreamWebSocketClient` reporting itself as disconnecting for good, since the engine reports such a failure rather than notifying its listener
 - Fixed a `WebSocketAuthenticator` that throws, rather than returning a failure, escaping as an unhandled error and leaving the connection authenticating until it timed out — losing the cause, which the timeout does not carry. The natural authenticator throws, since loading a token does
 - Fixed `StreamWebSocketClient.disconnect` replacing the source of a closure already under way, which could turn a reconnectable `ServerInitiated` error into a permanent `ConnectTimeout`
+- A connection the server closed because the token expired is now eligible for automatic reconnection, so a token expiring mid-session recovers instead of ending the session. Pair it with `TokenRefreshReconnectionPolicy` and something that expires the cached token, or the retry presents the same one
 - Fixed `ConnectionRecoveryHandler` retrying a first connection attempt, which failed the caller of `connect` and reconnected behind them at the same time — and made the caller's own retry fail with "connection already in progress". It now recovers only connections that have existed since the caller last asked for one, so a deliberate `disconnect` hands connecting back and the next `connect` is the caller's attempt again
 - Fixed a health check arriving while disconnecting reporting the connection as established again, which replaced the disconnection source and could turn a deliberate disconnect into an automatic reconnect
 

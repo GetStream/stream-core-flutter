@@ -1,3 +1,5 @@
+import '../../../errors.dart';
+import '../../../user/token_manager.dart';
 import '../../../utils.dart';
 import '../web_socket_connection_state.dart';
 
@@ -93,5 +95,42 @@ class CompositeReconnectionPolicy implements AutomaticReconnectionPolicy {
       Operator.and => policies.every((it) => it.canBeReconnected()),
       Operator.or => policies.any((it) => it.canBeReconnected()),
     };
+  }
+}
+
+/// A policy that only reconnects when the credential can be replaced.
+///
+/// A connection the server closed because the token expired is worth retrying,
+/// but only with a different token — and whether one can be obtained is a
+/// property of the [TokenProvider] rather than of the connection. A provider
+/// that always returns the same token has nothing else to offer, so reconnecting
+/// would present exactly what was just refused.
+///
+/// Pair it with whatever expires the cached token, so the attempt this permits
+/// loads a fresh one.
+class TokenRefreshReconnectionPolicy implements AutomaticReconnectionPolicy {
+  /// Creates a [TokenRefreshReconnectionPolicy].
+  const TokenRefreshReconnectionPolicy({
+    required this.connectionState,
+    required this.tokenManager,
+  });
+
+  /// The connection state to read the last disconnection from.
+  final ConnectionStateEmitter connectionState;
+
+  /// The manager whose provider decides whether another token is available.
+  final TokenManager tokenManager;
+
+  @override
+  bool canBeReconnected() {
+    final refusedTheToken = switch (connectionState.value) {
+      Disconnected(source: ServerInitiated(:final error)) => error?.apiError?.isTokenExpiredError ?? false,
+      _ => false,
+    };
+
+    // Every other disconnection is somebody else's call.
+    if (!refusedTheToken) return true;
+
+    return !tokenManager.usesStaticProvider;
   }
 }
