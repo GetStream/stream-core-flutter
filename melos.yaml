@@ -19,6 +19,7 @@ command:
     # List of all the dependencies used in the project.
     dependencies:
       cached_network_image_ce: ^4.9.0
+      clock: ^1.1.2
       collection: ^1.19.0
       cross_file: ^0.3.4+2
       dio: ^5.8.0+1

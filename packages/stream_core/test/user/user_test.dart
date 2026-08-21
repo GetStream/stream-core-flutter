@@ -14,10 +14,7 @@ void main() {
   group('User', () {
     test('rejects an anonymous user built with any other id', () {
       // Not `const`: a const context evaluates the assert at compile time.
-      expect(
-        () => User(id: 'someone-else', type: UserType.anonymous),
-        throwsA(isA<AssertionError>()),
-      );
+      expect(() => User(id: 'someone-else', type: UserType.anonymous), throwsA(isA<AssertionError>()));
     });
 
     test('allows the anonymous id for a user of another type', () {

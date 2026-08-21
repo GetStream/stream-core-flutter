@@ -5,13 +5,14 @@
 - Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
 - Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
-- `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. The constructor is `const`, so a mismatch in a const context fails to compile rather than throwing in debug mode
+- `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. A mismatch fails to compile in a const context, and throws in debug mode otherwise
 
 ### ✨ Features
 
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
-- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `User.anonymousUserId` (`!anon`), which the server also requires
+- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`
+- Added `UserToken.expiresAt`, from the token's `exp` claim, and `UserToken.isExpired`, which takes an optional `leeway`
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
@@ -26,11 +27,11 @@
 ### 🔄 Changed
 
 - Raised the minimum Dart SDK to `^3.12.0`
-- Anonymous requests now always send `user_id=!anon`. The value previously came from the `TokenManager`, so it was whatever the caller configured; the server requires the claim to be `!anon` and derives the anonymous session itself, so the parameter now matches
+- Anonymous requests now always send `user_id=!anon`, rather than whatever id the `TokenManager` was configured with
 - `DynamicTokenProvider` checks the token type before its user id, so a token of the wrong type is reported as such instead of as a mismatched user
-- `TokenManager.setTokenProvider` does nothing when handed the identity it already has, instead of expiring the cached token. The provider is compared with `==`, so one that defines value equality decides when a replacement counts as the same
-- `TokenManager.getToken` fails when `reset` runs while the token is loading, instead of returning a token for a user the manager no longer has. A `setTokenProvider` during a load still serves the caller that started it
-- `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for, which a custom `TokenProvider` is not obliged to check itself
+- `TokenManager.setTokenProvider` does nothing when handed the identity it already has; providers are compared with `==`
+- `TokenManager.getToken` fails when `reset` runs while the token is loading; a `setTokenProvider` during a load still serves the caller that started it
+- `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for
 - `AuthInterceptor` no longer attempts a token refresh when the manager has no identity, so the original token-expired error is surfaced rather than a failure to load a token
 
 ## 0.4.0
