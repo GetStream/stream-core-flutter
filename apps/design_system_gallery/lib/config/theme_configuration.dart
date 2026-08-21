@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:stream_core_flutter/core.dart';
 
+import 'component_theme_descriptors.dart';
+import 'theme_color_slot.dart';
+
 /// A notifier that manages the theme configuration for the design system gallery.
 ///
 /// Supports full customization of the Stream design system theme using the
-/// exact naming conventions from [StreamColorScheme].
+/// exact naming conventions from [StreamColorScheme]. Overrides for the 51
+/// plain-color parameters are keyed by [ThemeColorSlot] rather than
+/// hand-written per-color fields — see `theme_color_slot.dart` for why.
 class ThemeConfiguration extends ChangeNotifier {
   ThemeConfiguration({
     this._brightness = Brightness.light,
@@ -15,6 +20,21 @@ class ThemeConfiguration extends ChangeNotifier {
   factory ThemeConfiguration.light() => ThemeConfiguration();
   factory ThemeConfiguration.dark() => ThemeConfiguration(brightness: Brightness.dark);
 
+  /// Creates a [ThemeConfiguration] seeded with [source]'s current overrides.
+  ///
+  /// Used by the export page to derive independent light/dark configurations
+  /// from the (brightness-agnostic) theme studio state, without either side
+  /// writing back to [source].
+  factory ThemeConfiguration.seededFrom(ThemeConfiguration source, {required Brightness brightness}) {
+    return ThemeConfiguration(brightness: brightness)..applyOverrides(
+      source._overrides,
+      brandSeed: source._brandSeed,
+      chromeSeed: source._chromeSeed,
+      avatarPalette: source._avatarPalette,
+      componentOverrides: source._componentOverrides,
+    );
+  }
+
   // =========================================================================
   // Core State
   // =========================================================================
@@ -24,179 +44,140 @@ class ThemeConfiguration extends ChangeNotifier {
   Brightness _brightness;
   Brightness get brightness => _brightness;
 
-  // =========================================================================
-  // Accent Colors
-  // =========================================================================
-  Color? _accentPrimary;
-  Color? _accentSuccess;
-  Color? _accentWarning;
-  Color? _accentError;
-  Color? _accentNeutral;
+  // Overrides for every plain Color? parameter of StreamColorScheme, keyed by
+  // slot. Absence of a key means "use the SDK default".
+  final Map<ThemeColorSlot, Color> _overrides = {};
 
-  // =========================================================================
-  // Text Colors
-  // =========================================================================
-  Color? _textPrimary;
-  Color? _textSecondary;
-  Color? _textTertiary;
-  Color? _textDisabled;
-  Color? _textLink;
-  Color? _textOnAccent;
+  // Brand & chrome are StreamColorSwatch-valued, so they're seeded from a
+  // single Color and normalized via StreamColorSwatch.fromColor, not stored
+  // directly as overrides.
+  Color? _brandSeed;
+  Color? _chromeSeed;
 
-  // =========================================================================
-  // Background Colors
-  // =========================================================================
-  Color? _backgroundApp;
-  Color? _backgroundSurface;
-  Color? _backgroundSurfaceSubtle;
-  Color? _backgroundSurfaceStrong;
-  Color? _backgroundSurfaceCard;
-  Color? _backgroundOnAccent;
-  Color? _backgroundHighlight;
-  Color? _backgroundScrim;
-  Color? _backgroundOverlayLight;
-  Color? _backgroundOverlayDark;
-  Color? _backgroundDisabled;
-  Color? _backgroundHover;
-  Color? _backgroundPressed;
-  Color? _backgroundSelected;
-  Color? _backgroundInverse;
-  Color? _backgroundElevation0;
-  Color? _backgroundElevation1;
-  Color? _backgroundElevation2;
-  Color? _backgroundElevation3;
-
-  // =========================================================================
-  // Border Colors - Core
-  // =========================================================================
-  Color? _borderDefault;
-  Color? _borderSubtle;
-  Color? _borderStrong;
-  Color? _borderOnAccent;
-  Color? _borderOnSurface;
-  Color? _borderOpacitySubtle;
-  Color? _borderOpacityStrong;
-
-  // =========================================================================
-  // Border Colors - Utility
-  // =========================================================================
-  Color? _borderFocus;
-  Color? _borderDisabled;
-  Color? _borderHover;
-  Color? _borderPressed;
-  Color? _borderActive;
-  Color? _borderError;
-  Color? _borderWarning;
-  Color? _borderSuccess;
-  Color? _borderSelected;
-
-  // =========================================================================
-  // System Colors
-  // =========================================================================
-  Color? _systemText;
-  Color? _systemScrollbar;
-
-  // =========================================================================
-  // Avatar Palette
-  // =========================================================================
   List<StreamAvatarColorPair>? _avatarPalette;
 
-  // =========================================================================
-  // Brand Color
-  // =========================================================================
-  Color? _brandPrimaryColor;
+  // Component theme overrides, keyed by ComponentThemeDescriptor.name, then
+  // by property name (e.g. _componentOverrides['Avatar']['backgroundColor']).
+  // A component appears here (possibly with an empty inner map) once added
+  // via addComponentTheme, so the studio panel keeps showing its section
+  // even before any of its colors are customized.
+  final Map<String, Map<String, Color>> _componentOverrides = {};
 
   // =========================================================================
-  // Chrome Color
+  // Slot-based access
   // =========================================================================
-  Color? _chromePrimaryColor;
+
+  /// Resolves [slot] to its current value: the override if one is set,
+  /// otherwise the SDK default derived by [StreamColorScheme].
+  ///
+  /// Reads the raw override first rather than reading back through
+  /// [themeData] — necessary for [brandPrimaryColor]/[chromePrimaryColor]
+  /// (see below) but kept consistent here too.
+  Color resolve(ThemeColorSlot slot) => _overrides[slot] ?? slot.read(_themeData.colorScheme);
+
+  /// Whether [slot] has been overridden (vs. using the SDK default).
+  bool isCustom(ThemeColorSlot slot) => _overrides.containsKey(slot);
+
+  /// A read-only snapshot of every currently-overridden slot.
+  Map<ThemeColorSlot, Color> get overrides => Map.unmodifiable(_overrides);
+
+  void setOverride(ThemeColorSlot slot, Color color) => _update(() => _overrides[slot] = color);
+
+  void resetOverride(ThemeColorSlot slot) => _update(() => _overrides.remove(slot));
+
+  /// Replaces all overrides, brand/chrome seeds, the avatar palette, and
+  /// component theme overrides in one rebuild+notify. Used to seed a new
+  /// [ThemeConfiguration] from another (see [ThemeConfiguration.seededFrom]).
+  void applyOverrides(
+    Map<ThemeColorSlot, Color> overrides, {
+    Color? brandSeed,
+    Color? chromeSeed,
+    List<StreamAvatarColorPair>? avatarPalette,
+    Map<String, Map<String, Color>>? componentOverrides,
+  }) {
+    _overrides
+      ..clear()
+      ..addAll(overrides);
+    _brandSeed = brandSeed;
+    _chromeSeed = chromeSeed;
+    _avatarPalette = avatarPalette;
+    _componentOverrides
+      ..clear()
+      ..addAll(
+        componentOverrides?.map((component, values) => MapEntry(component, Map<String, Color>.from(values))) ?? {},
+      );
+    _rebuildTheme();
+    notifyListeners();
+  }
 
   // =========================================================================
-  // Getters - Accent
+  // Getters - Brand & Chrome
   // =========================================================================
-  Color get accentPrimary => _accentPrimary ?? _themeData.colorScheme.accentPrimary;
-  Color get accentSuccess => _accentSuccess ?? _themeData.colorScheme.accentSuccess;
-  Color get accentWarning => _accentWarning ?? _themeData.colorScheme.accentWarning;
-  Color get accentError => _accentError ?? _themeData.colorScheme.accentError;
-  Color get accentNeutral => _accentNeutral ?? _themeData.colorScheme.accentNeutral;
 
-  // =========================================================================
-  // Getters - Text
-  // =========================================================================
-  Color get textPrimary => _textPrimary ?? _themeData.colorScheme.textPrimary;
-  Color get textSecondary => _textSecondary ?? _themeData.colorScheme.textSecondary;
-  Color get textTertiary => _textTertiary ?? _themeData.colorScheme.textTertiary;
-  Color get textDisabled => _textDisabled ?? _themeData.colorScheme.textDisabled;
-  Color get textLink => _textLink ?? _themeData.colorScheme.textLink;
-  Color get textOnAccent => _textOnAccent ?? _themeData.colorScheme.textOnAccent;
+  // brand.shade500 is NOT the seed color the user picked - StreamColorSwatch
+  // normalizes the seed onto the HCT tone ladder - so the raw override must
+  // win here rather than reading back through the built scheme.
+  Color get brandPrimaryColor => _brandSeed ?? _themeData.colorScheme.brand.shade500;
+  Color get chromePrimaryColor => _chromeSeed ?? _themeData.colorScheme.chrome.shade500;
 
-  // =========================================================================
-  // Getters - Background
-  // =========================================================================
-  Color get backgroundApp => _backgroundApp ?? _themeData.colorScheme.backgroundApp;
-  Color get backgroundSurface => _backgroundSurface ?? _themeData.colorScheme.backgroundSurface;
-  Color get backgroundSurfaceSubtle => _backgroundSurfaceSubtle ?? _themeData.colorScheme.backgroundSurfaceSubtle;
-  Color get backgroundSurfaceStrong => _backgroundSurfaceStrong ?? _themeData.colorScheme.backgroundSurfaceStrong;
-  Color get backgroundSurfaceCard => _backgroundSurfaceCard ?? _themeData.colorScheme.backgroundSurfaceCard;
-  Color get backgroundOnAccent => _backgroundOnAccent ?? _themeData.colorScheme.backgroundOnAccent;
-  Color get backgroundHighlight => _backgroundHighlight ?? _themeData.colorScheme.backgroundHighlight;
-  Color get backgroundScrim => _backgroundScrim ?? _themeData.colorScheme.backgroundScrim;
-  Color get backgroundOverlayLight => _backgroundOverlayLight ?? _themeData.colorScheme.backgroundOverlayLight;
-  Color get backgroundOverlayDark => _backgroundOverlayDark ?? _themeData.colorScheme.backgroundOverlayDark;
-  Color get backgroundDisabled => _backgroundDisabled ?? _themeData.colorScheme.backgroundDisabled;
-  Color get backgroundHover => _backgroundHover ?? _themeData.colorScheme.backgroundHover;
-  Color get backgroundPressed => _backgroundPressed ?? _themeData.colorScheme.backgroundPressed;
-  Color get backgroundSelected => _backgroundSelected ?? _themeData.colorScheme.backgroundSelected;
-  Color get backgroundInverse => _backgroundInverse ?? _themeData.colorScheme.backgroundInverse;
-  Color get backgroundElevation0 => _backgroundElevation0 ?? _themeData.colorScheme.backgroundElevation0;
-  Color get backgroundElevation1 => _backgroundElevation1 ?? _themeData.colorScheme.backgroundElevation1;
-  Color get backgroundElevation2 => _backgroundElevation2 ?? _themeData.colorScheme.backgroundElevation2;
-  Color get backgroundElevation3 => _backgroundElevation3 ?? _themeData.colorScheme.backgroundElevation3;
-
-  // =========================================================================
-  // Getters - Border Core
-  // =========================================================================
-  Color get borderDefault => _borderDefault ?? _themeData.colorScheme.borderDefault;
-  Color get borderSubtle => _borderSubtle ?? _themeData.colorScheme.borderSubtle;
-  Color get borderStrong => _borderStrong ?? _themeData.colorScheme.borderStrong;
-  Color get borderOnAccent => _borderOnAccent ?? _themeData.colorScheme.borderOnAccent;
-  Color get borderOnSurface => _borderOnSurface ?? _themeData.colorScheme.borderOnSurface;
-  Color get borderOpacitySubtle => _borderOpacitySubtle ?? _themeData.colorScheme.borderOpacitySubtle;
-  Color get borderOpacityStrong => _borderOpacityStrong ?? _themeData.colorScheme.borderOpacityStrong;
-
-  // =========================================================================
-  // Getters - Border Utility
-  // =========================================================================
-  Color get borderFocus => _borderFocus ?? _themeData.colorScheme.borderFocus;
-  Color get borderDisabled => _borderDisabled ?? _themeData.colorScheme.borderDisabled;
-  Color get borderHover => _borderHover ?? _themeData.colorScheme.borderHover;
-  Color get borderPressed => _borderPressed ?? _themeData.colorScheme.borderPressed;
-  Color get borderActive => _borderActive ?? _themeData.colorScheme.borderActive;
-  Color get borderError => _borderError ?? _themeData.colorScheme.borderError;
-  Color get borderWarning => _borderWarning ?? _themeData.colorScheme.borderWarning;
-  Color get borderSuccess => _borderSuccess ?? _themeData.colorScheme.borderSuccess;
-  Color get borderSelected => _borderSelected ?? _themeData.colorScheme.borderSelected;
-
-  // =========================================================================
-  // Getters - System
-  // =========================================================================
-  Color get systemText => _systemText ?? _themeData.colorScheme.systemText;
-  Color get systemScrollbar => _systemScrollbar ?? _themeData.colorScheme.systemScrollbar;
+  bool get brandIsCustom => _brandSeed != null;
+  bool get chromeIsCustom => _chromeSeed != null;
 
   // =========================================================================
   // Getters - Avatar Palette
   // =========================================================================
   List<StreamAvatarColorPair> get avatarPalette => _avatarPalette ?? _themeData.colorScheme.avatarPalette;
+  bool get avatarPaletteIsCustom => _avatarPalette != null;
 
   // =========================================================================
-  // Getters - Brand
+  // Component theme overrides
   // =========================================================================
-  Color get brandPrimaryColor => _brandPrimaryColor ?? _themeData.colorScheme.brand.shade500;
+
+  /// Component themes currently shown in the studio (added via
+  /// [addComponentTheme]) — present even before any of their colors are
+  /// customized, so the panel keeps rendering an empty section for them.
+  Set<String> get activeComponentThemes => Set.unmodifiable(_componentOverrides.keys);
+
+  /// A read-only deep snapshot of every active component's overrides.
+  Map<String, Map<String, Color>> get componentOverrides => {
+    for (final entry in _componentOverrides.entries) entry.key: Map.unmodifiable(entry.value),
+  };
+
+  Color? resolveComponentColor(String component, String property) => _componentOverrides[component]?[property];
+
+  bool isComponentColorCustom(String component, String property) =>
+      _componentOverrides[component]?.containsKey(property) ?? false;
+
+  void addComponentTheme(String component) => _update(() => _componentOverrides.putIfAbsent(component, () => {}));
+
+  void removeComponentTheme(String component) => _update(() => _componentOverrides.remove(component));
+
+  void setComponentColor(String component, String property, Color color) =>
+      _update(() => _componentOverrides.putIfAbsent(component, () => {})[property] = color);
+
+  void resetComponentColor(String component, String property) =>
+      _update(() => _componentOverrides[component]?.remove(property));
 
   // =========================================================================
-  // Getters - Chrome
+  // Named getters used by buildMaterialTheme() (see AGENTS.md - "Use class
+  // getters directly"). Everything else is read via resolve(slot).
   // =========================================================================
-  Color get chromePrimaryColor => _chromePrimaryColor ?? _themeData.colorScheme.chrome.shade500;
+  Color get accentPrimary => resolve(ThemeColorSlot.accentPrimary);
+  Color get accentNeutral => resolve(ThemeColorSlot.accentNeutral);
+  Color get accentError => resolve(ThemeColorSlot.accentError);
+  Color get textPrimary => resolve(ThemeColorSlot.textPrimary);
+  Color get textSecondary => resolve(ThemeColorSlot.textSecondary);
+  Color get textTertiary => resolve(ThemeColorSlot.textTertiary);
+  Color get textDisabled => resolve(ThemeColorSlot.textDisabled);
+  Color get textOnAccent => resolve(ThemeColorSlot.textOnAccent);
+  Color get backgroundApp => resolve(ThemeColorSlot.backgroundApp);
+  Color get backgroundSurface => resolve(ThemeColorSlot.backgroundSurface);
+  Color get backgroundSurfaceSubtle => resolve(ThemeColorSlot.backgroundSurfaceSubtle);
+  Color get backgroundSurfaceStrong => resolve(ThemeColorSlot.backgroundSurfaceStrong);
+  Color get backgroundDisabled => resolve(ThemeColorSlot.backgroundDisabled);
+  Color get borderDefault => resolve(ThemeColorSlot.borderDefault);
+  Color get borderSubtle => resolve(ThemeColorSlot.borderSubtle);
+  Color get systemScrollbar => resolve(ThemeColorSlot.systemScrollbar);
 
   // =========================================================================
   // Setters
@@ -209,74 +190,14 @@ class ThemeConfiguration extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Accent
-  void setAccentPrimary(Color color) => _update(() => _accentPrimary = color);
-  void setAccentSuccess(Color color) => _update(() => _accentSuccess = color);
-  void setAccentWarning(Color color) => _update(() => _accentWarning = color);
-  void setAccentError(Color color) => _update(() => _accentError = color);
-  void setAccentNeutral(Color color) => _update(() => _accentNeutral = color);
+  void setBrandPrimaryColor(Color color) => _update(() => _brandSeed = color);
+  void setChromePrimaryColor(Color color) => _update(() => _chromeSeed = color);
 
-  // Text
-  void setTextPrimary(Color color) => _update(() => _textPrimary = color);
-  void setTextSecondary(Color color) => _update(() => _textSecondary = color);
-  void setTextTertiary(Color color) => _update(() => _textTertiary = color);
-  void setTextDisabled(Color color) => _update(() => _textDisabled = color);
-  void setTextLink(Color color) => _update(() => _textLink = color);
-  void setTextOnAccent(Color color) => _update(() => _textOnAccent = color);
+  void resetBrand() => _update(() => _brandSeed = null);
+  void resetChrome() => _update(() => _chromeSeed = null);
 
-  // Background
-  void setBackgroundApp(Color color) => _update(() => _backgroundApp = color);
-  void setBackgroundSurface(Color color) => _update(() => _backgroundSurface = color);
-  void setBackgroundSurfaceSubtle(Color color) => _update(() => _backgroundSurfaceSubtle = color);
-  void setBackgroundSurfaceStrong(Color color) => _update(() => _backgroundSurfaceStrong = color);
-  void setBackgroundSurfaceCard(Color color) => _update(() => _backgroundSurfaceCard = color);
-  void setBackgroundOnAccent(Color color) => _update(() => _backgroundOnAccent = color);
-  void setBackgroundHighlight(Color color) => _update(() => _backgroundHighlight = color);
-  void setBackgroundScrim(Color color) => _update(() => _backgroundScrim = color);
-  void setBackgroundOverlayLight(Color color) => _update(() => _backgroundOverlayLight = color);
-  void setBackgroundOverlayDark(Color color) => _update(() => _backgroundOverlayDark = color);
-  void setBackgroundDisabled(Color color) => _update(() => _backgroundDisabled = color);
-  void setBackgroundHover(Color color) => _update(() => _backgroundHover = color);
-  void setBackgroundPressed(Color color) => _update(() => _backgroundPressed = color);
-  void setBackgroundSelected(Color color) => _update(() => _backgroundSelected = color);
-  void setBackgroundInverse(Color color) => _update(() => _backgroundInverse = color);
-  void setBackgroundElevation0(Color color) => _update(() => _backgroundElevation0 = color);
-  void setBackgroundElevation1(Color color) => _update(() => _backgroundElevation1 = color);
-  void setBackgroundElevation2(Color color) => _update(() => _backgroundElevation2 = color);
-  void setBackgroundElevation3(Color color) => _update(() => _backgroundElevation3 = color);
-
-  // Border Core
-  void setBorderDefault(Color color) => _update(() => _borderDefault = color);
-  void setBorderSubtle(Color color) => _update(() => _borderSubtle = color);
-  void setBorderStrong(Color color) => _update(() => _borderStrong = color);
-  void setBorderOnAccent(Color color) => _update(() => _borderOnAccent = color);
-  void setBorderOnSurface(Color color) => _update(() => _borderOnSurface = color);
-  void setBorderOpacitySubtle(Color color) => _update(() => _borderOpacitySubtle = color);
-  void setBorderOpacityStrong(Color color) => _update(() => _borderOpacityStrong = color);
-
-  // Border Utility
-  void setBorderFocus(Color color) => _update(() => _borderFocus = color);
-  void setBorderDisabled(Color color) => _update(() => _borderDisabled = color);
-  void setBorderHover(Color color) => _update(() => _borderHover = color);
-  void setBorderPressed(Color color) => _update(() => _borderPressed = color);
-  void setBorderActive(Color color) => _update(() => _borderActive = color);
-  void setBorderError(Color color) => _update(() => _borderError = color);
-  void setBorderWarning(Color color) => _update(() => _borderWarning = color);
-  void setBorderSuccess(Color color) => _update(() => _borderSuccess = color);
-  void setBorderSelected(Color color) => _update(() => _borderSelected = color);
-
-  // System
-  void setSystemText(Color color) => _update(() => _systemText = color);
-  void setSystemScrollbar(Color color) => _update(() => _systemScrollbar = color);
-
-  // Avatar Palette
   void setAvatarPalette(List<StreamAvatarColorPair> palette) => _update(() => _avatarPalette = palette);
-
-  // Brand
-  void setBrandPrimaryColor(Color color) => _update(() => _brandPrimaryColor = color);
-
-  // Chrome
-  void setChromePrimaryColor(Color color) => _update(() => _chromePrimaryColor = color);
+  void resetAvatarPalette() => _update(() => _avatarPalette = null);
 
   void updateAvatarPaletteAt(int index, StreamAvatarColorPair pair) {
     final current = List<StreamAvatarColorPair>.from(avatarPalette);
@@ -300,149 +221,6 @@ class ThemeConfiguration extends ChangeNotifier {
     }
   }
 
-  // =========================================================================
-  // Is Customized - whether a color has been overridden (vs. using the
-  // SDK default derived by [StreamColorScheme]).
-  // =========================================================================
-
-  // Brand & Chrome
-  bool get brandIsCustom => _brandPrimaryColor != null;
-  bool get chromeIsCustom => _chromePrimaryColor != null;
-
-  // Accent
-  bool get accentPrimaryIsCustom => _accentPrimary != null;
-  bool get accentSuccessIsCustom => _accentSuccess != null;
-  bool get accentWarningIsCustom => _accentWarning != null;
-  bool get accentErrorIsCustom => _accentError != null;
-  bool get accentNeutralIsCustom => _accentNeutral != null;
-
-  // Text
-  bool get textPrimaryIsCustom => _textPrimary != null;
-  bool get textSecondaryIsCustom => _textSecondary != null;
-  bool get textTertiaryIsCustom => _textTertiary != null;
-  bool get textDisabledIsCustom => _textDisabled != null;
-  bool get textLinkIsCustom => _textLink != null;
-  bool get textOnAccentIsCustom => _textOnAccent != null;
-
-  // Background
-  bool get backgroundAppIsCustom => _backgroundApp != null;
-  bool get backgroundSurfaceIsCustom => _backgroundSurface != null;
-  bool get backgroundSurfaceSubtleIsCustom => _backgroundSurfaceSubtle != null;
-  bool get backgroundSurfaceStrongIsCustom => _backgroundSurfaceStrong != null;
-  bool get backgroundSurfaceCardIsCustom => _backgroundSurfaceCard != null;
-  bool get backgroundOnAccentIsCustom => _backgroundOnAccent != null;
-  bool get backgroundHighlightIsCustom => _backgroundHighlight != null;
-  bool get backgroundScrimIsCustom => _backgroundScrim != null;
-  bool get backgroundOverlayLightIsCustom => _backgroundOverlayLight != null;
-  bool get backgroundOverlayDarkIsCustom => _backgroundOverlayDark != null;
-  bool get backgroundDisabledIsCustom => _backgroundDisabled != null;
-  bool get backgroundHoverIsCustom => _backgroundHover != null;
-  bool get backgroundPressedIsCustom => _backgroundPressed != null;
-  bool get backgroundSelectedIsCustom => _backgroundSelected != null;
-  bool get backgroundInverseIsCustom => _backgroundInverse != null;
-  bool get backgroundElevation0IsCustom => _backgroundElevation0 != null;
-  bool get backgroundElevation1IsCustom => _backgroundElevation1 != null;
-  bool get backgroundElevation2IsCustom => _backgroundElevation2 != null;
-  bool get backgroundElevation3IsCustom => _backgroundElevation3 != null;
-
-  // Border Core
-  bool get borderDefaultIsCustom => _borderDefault != null;
-  bool get borderSubtleIsCustom => _borderSubtle != null;
-  bool get borderStrongIsCustom => _borderStrong != null;
-  bool get borderOnAccentIsCustom => _borderOnAccent != null;
-  bool get borderOnSurfaceIsCustom => _borderOnSurface != null;
-  bool get borderOpacitySubtleIsCustom => _borderOpacitySubtle != null;
-  bool get borderOpacityStrongIsCustom => _borderOpacityStrong != null;
-
-  // Border Utility
-  bool get borderFocusIsCustom => _borderFocus != null;
-  bool get borderDisabledIsCustom => _borderDisabled != null;
-  bool get borderHoverIsCustom => _borderHover != null;
-  bool get borderPressedIsCustom => _borderPressed != null;
-  bool get borderActiveIsCustom => _borderActive != null;
-  bool get borderErrorIsCustom => _borderError != null;
-  bool get borderWarningIsCustom => _borderWarning != null;
-  bool get borderSuccessIsCustom => _borderSuccess != null;
-  bool get borderSelectedIsCustom => _borderSelected != null;
-
-  // System
-  bool get systemTextIsCustom => _systemText != null;
-  bool get systemScrollbarIsCustom => _systemScrollbar != null;
-
-  // Avatar Palette
-  bool get avatarPaletteIsCustom => _avatarPalette != null;
-
-  // =========================================================================
-  // Per-field Reset - reverts a single color back to the SDK default.
-  // =========================================================================
-
-  // Brand & Chrome
-  void resetBrand() => _update(() => _brandPrimaryColor = null);
-  void resetChrome() => _update(() => _chromePrimaryColor = null);
-
-  // Accent
-  void resetAccentPrimary() => _update(() => _accentPrimary = null);
-  void resetAccentSuccess() => _update(() => _accentSuccess = null);
-  void resetAccentWarning() => _update(() => _accentWarning = null);
-  void resetAccentError() => _update(() => _accentError = null);
-  void resetAccentNeutral() => _update(() => _accentNeutral = null);
-
-  // Text
-  void resetTextPrimary() => _update(() => _textPrimary = null);
-  void resetTextSecondary() => _update(() => _textSecondary = null);
-  void resetTextTertiary() => _update(() => _textTertiary = null);
-  void resetTextDisabled() => _update(() => _textDisabled = null);
-  void resetTextLink() => _update(() => _textLink = null);
-  void resetTextOnAccent() => _update(() => _textOnAccent = null);
-
-  // Background
-  void resetBackgroundApp() => _update(() => _backgroundApp = null);
-  void resetBackgroundSurface() => _update(() => _backgroundSurface = null);
-  void resetBackgroundSurfaceSubtle() => _update(() => _backgroundSurfaceSubtle = null);
-  void resetBackgroundSurfaceStrong() => _update(() => _backgroundSurfaceStrong = null);
-  void resetBackgroundSurfaceCard() => _update(() => _backgroundSurfaceCard = null);
-  void resetBackgroundOnAccent() => _update(() => _backgroundOnAccent = null);
-  void resetBackgroundHighlight() => _update(() => _backgroundHighlight = null);
-  void resetBackgroundScrim() => _update(() => _backgroundScrim = null);
-  void resetBackgroundOverlayLight() => _update(() => _backgroundOverlayLight = null);
-  void resetBackgroundOverlayDark() => _update(() => _backgroundOverlayDark = null);
-  void resetBackgroundDisabled() => _update(() => _backgroundDisabled = null);
-  void resetBackgroundHover() => _update(() => _backgroundHover = null);
-  void resetBackgroundPressed() => _update(() => _backgroundPressed = null);
-  void resetBackgroundSelected() => _update(() => _backgroundSelected = null);
-  void resetBackgroundInverse() => _update(() => _backgroundInverse = null);
-  void resetBackgroundElevation0() => _update(() => _backgroundElevation0 = null);
-  void resetBackgroundElevation1() => _update(() => _backgroundElevation1 = null);
-  void resetBackgroundElevation2() => _update(() => _backgroundElevation2 = null);
-  void resetBackgroundElevation3() => _update(() => _backgroundElevation3 = null);
-
-  // Border Core
-  void resetBorderDefault() => _update(() => _borderDefault = null);
-  void resetBorderSubtle() => _update(() => _borderSubtle = null);
-  void resetBorderStrong() => _update(() => _borderStrong = null);
-  void resetBorderOnAccent() => _update(() => _borderOnAccent = null);
-  void resetBorderOnSurface() => _update(() => _borderOnSurface = null);
-  void resetBorderOpacitySubtle() => _update(() => _borderOpacitySubtle = null);
-  void resetBorderOpacityStrong() => _update(() => _borderOpacityStrong = null);
-
-  // Border Utility
-  void resetBorderFocus() => _update(() => _borderFocus = null);
-  void resetBorderDisabled() => _update(() => _borderDisabled = null);
-  void resetBorderHover() => _update(() => _borderHover = null);
-  void resetBorderPressed() => _update(() => _borderPressed = null);
-  void resetBorderActive() => _update(() => _borderActive = null);
-  void resetBorderError() => _update(() => _borderError = null);
-  void resetBorderWarning() => _update(() => _borderWarning = null);
-  void resetBorderSuccess() => _update(() => _borderSuccess = null);
-  void resetBorderSelected() => _update(() => _borderSelected = null);
-
-  // System
-  void resetSystemText() => _update(() => _systemText = null);
-  void resetSystemScrollbar() => _update(() => _systemScrollbar = null);
-
-  // Avatar Palette
-  void resetAvatarPalette() => _update(() => _avatarPalette = null);
-
   void _update(VoidCallback setter) {
     setter();
     _rebuildTheme();
@@ -450,86 +228,42 @@ class ThemeConfiguration extends ChangeNotifier {
   }
 
   void resetToDefaults() {
-    // Brand
-    _brandPrimaryColor = null;
-    // Chrome
-    _chromePrimaryColor = null;
-
-    // Accent
-    _accentPrimary = null;
-    _accentSuccess = null;
-    _accentWarning = null;
-    _accentError = null;
-    _accentNeutral = null;
-    // Text
-    _textPrimary = null;
-    _textSecondary = null;
-    _textTertiary = null;
-    _textDisabled = null;
-    _textLink = null;
-    _textOnAccent = null;
-    // Background
-    _backgroundApp = null;
-    _backgroundSurface = null;
-    _backgroundSurfaceSubtle = null;
-    _backgroundSurfaceStrong = null;
-    _backgroundSurfaceCard = null;
-    _backgroundOnAccent = null;
-    _backgroundHighlight = null;
-    _backgroundScrim = null;
-    _backgroundOverlayLight = null;
-    _backgroundOverlayDark = null;
-    _backgroundDisabled = null;
-    _backgroundHover = null;
-    _backgroundPressed = null;
-    _backgroundSelected = null;
-    _backgroundInverse = null;
-    _backgroundElevation0 = null;
-    _backgroundElevation1 = null;
-    _backgroundElevation2 = null;
-    _backgroundElevation3 = null;
-    // Border Core
-    _borderDefault = null;
-    _borderSubtle = null;
-    _borderStrong = null;
-    _borderOnAccent = null;
-    _borderOnSurface = null;
-    _borderOpacitySubtle = null;
-    _borderOpacityStrong = null;
-    // Border Utility
-    _borderFocus = null;
-    _borderDisabled = null;
-    _borderHover = null;
-    _borderPressed = null;
-    _borderActive = null;
-    _borderError = null;
-    _borderWarning = null;
-    _borderSuccess = null;
-    _borderSelected = null;
-    // System
-    _systemText = null;
-    _systemScrollbar = null;
-    // Avatar
+    _overrides.clear();
+    _brandSeed = null;
+    _chromeSeed = null;
     _avatarPalette = null;
+    _componentOverrides.clear();
 
     _rebuildTheme();
     notifyListeners();
   }
 
+  /// Builds [name]'s component theme-data object from its current overrides,
+  /// or `null` if it hasn't been added or has no colors set yet (in which
+  /// case [StreamTheme] falls back to that component's own SDK default).
+  Object? _buildComponentTheme(String name) {
+    final values = _componentOverrides[name];
+    if (values == null || values.isEmpty) return null;
+    final descriptor = componentThemeDescriptorOrNull(name);
+    assert(descriptor != null, 'No ComponentThemeDescriptor named "$name"');
+    if (descriptor == null) return null;
+    return descriptor.build(values);
+  }
+
   void _rebuildTheme() {
     // Brand swatch, if the brand ("primary") color is customized.
-    final effectiveBrand = _brandPrimaryColor != null
-        ? StreamColorSwatch.fromColor(_brandPrimaryColor!, brightness: _brightness)
+    final effectiveBrand = _brandSeed != null
+        ? StreamColorSwatch.fromColor(_brandSeed!, brightness: _brightness)
         : null;
 
     // Chrome swatch. Mirrors StreamColorScheme.fromSeed: an explicit chrome color wins;
     // otherwise, when a brand color is set but chrome isn't, derive chrome from brand at
     // neutral chroma so chrome-dependent colors still pick up the brand's hue.
-    final effectiveChrome = _chromePrimaryColor != null
-        ? StreamColorSwatch.fromColor(_chromePrimaryColor!, brightness: _brightness)
-        : _brandPrimaryColor != null
+    final effectiveChrome = _chromeSeed != null
+        ? StreamColorSwatch.fromColor(_chromeSeed!, brightness: _brightness)
+        : _brandSeed != null
         ? StreamColorSwatch.fromColor(
-            _brandPrimaryColor!,
+            _brandSeed!,
             brightness: _brightness,
             chroma: StreamColorScheme.neutralChroma,
           )
@@ -544,59 +278,63 @@ class ThemeConfiguration extends ChangeNotifier {
       // Chrome
       chrome: effectiveChrome,
       // Accent
-      accentPrimary: _accentPrimary,
-      accentSuccess: _accentSuccess,
-      accentWarning: _accentWarning,
-      accentError: _accentError,
-      accentNeutral: _accentNeutral,
+      accentPrimary: _overrides[ThemeColorSlot.accentPrimary],
+      accentSuccess: _overrides[ThemeColorSlot.accentSuccess],
+      accentWarning: _overrides[ThemeColorSlot.accentWarning],
+      accentError: _overrides[ThemeColorSlot.accentError],
+      accentNeutral: _overrides[ThemeColorSlot.accentNeutral],
       // Text
-      textPrimary: _textPrimary,
-      textSecondary: _textSecondary,
-      textTertiary: _textTertiary,
-      textDisabled: _textDisabled,
-      textLink: _textLink,
-      textOnAccent: _textOnAccent,
+      textPrimary: _overrides[ThemeColorSlot.textPrimary],
+      textSecondary: _overrides[ThemeColorSlot.textSecondary],
+      textTertiary: _overrides[ThemeColorSlot.textTertiary],
+      textDisabled: _overrides[ThemeColorSlot.textDisabled],
+      textLink: _overrides[ThemeColorSlot.textLink],
+      textOnAccent: _overrides[ThemeColorSlot.textOnAccent],
+      textOnInverse: _overrides[ThemeColorSlot.textOnInverse],
       // Background
-      backgroundApp: _backgroundApp,
-      backgroundSurface: _backgroundSurface,
-      backgroundSurfaceSubtle: _backgroundSurfaceSubtle,
-      backgroundSurfaceStrong: _backgroundSurfaceStrong,
-      backgroundSurfaceCard: _backgroundSurfaceCard,
-      backgroundOnAccent: _backgroundOnAccent,
-      backgroundHighlight: _backgroundHighlight,
-      backgroundScrim: _backgroundScrim,
-      backgroundOverlayLight: _backgroundOverlayLight,
-      backgroundOverlayDark: _backgroundOverlayDark,
-      backgroundDisabled: _backgroundDisabled,
-      backgroundHover: _backgroundHover,
-      backgroundPressed: _backgroundPressed,
-      backgroundSelected: _backgroundSelected,
-      backgroundInverse: _backgroundInverse,
-      backgroundElevation0: _backgroundElevation0,
-      backgroundElevation1: _backgroundElevation1,
-      backgroundElevation2: _backgroundElevation2,
-      backgroundElevation3: _backgroundElevation3,
-      // Border Core
-      borderDefault: _borderDefault,
-      borderSubtle: _borderSubtle,
-      borderStrong: _borderStrong,
-      borderOnAccent: _borderOnAccent,
-      borderOnSurface: _borderOnSurface,
-      borderOpacitySubtle: _borderOpacitySubtle,
-      borderOpacityStrong: _borderOpacityStrong,
-      // Border Utility
-      borderFocus: _borderFocus,
-      borderDisabled: _borderDisabled,
-      borderHover: _borderHover,
-      borderPressed: _borderPressed,
-      borderActive: _borderActive,
-      borderError: _borderError,
-      borderWarning: _borderWarning,
-      borderSuccess: _borderSuccess,
-      borderSelected: _borderSelected,
+      backgroundApp: _overrides[ThemeColorSlot.backgroundApp],
+      backgroundSurface: _overrides[ThemeColorSlot.backgroundSurface],
+      backgroundSurfaceSubtle: _overrides[ThemeColorSlot.backgroundSurfaceSubtle],
+      backgroundSurfaceStrong: _overrides[ThemeColorSlot.backgroundSurfaceStrong],
+      backgroundSurfaceCard: _overrides[ThemeColorSlot.backgroundSurfaceCard],
+      backgroundOnAccent: _overrides[ThemeColorSlot.backgroundOnAccent],
+      backgroundHighlight: _overrides[ThemeColorSlot.backgroundHighlight],
+      backgroundScrim: _overrides[ThemeColorSlot.backgroundScrim],
+      backgroundOverlayLight: _overrides[ThemeColorSlot.backgroundOverlayLight],
+      backgroundOverlayDark: _overrides[ThemeColorSlot.backgroundOverlayDark],
+      backgroundDisabled: _overrides[ThemeColorSlot.backgroundDisabled],
+      backgroundInverse: _overrides[ThemeColorSlot.backgroundInverse],
+      backgroundElevation0: _overrides[ThemeColorSlot.backgroundElevation0],
+      backgroundElevation1: _overrides[ThemeColorSlot.backgroundElevation1],
+      backgroundElevation2: _overrides[ThemeColorSlot.backgroundElevation2],
+      backgroundElevation3: _overrides[ThemeColorSlot.backgroundElevation3],
+      // Border - Core
+      borderDefault: _overrides[ThemeColorSlot.borderDefault],
+      borderSubtle: _overrides[ThemeColorSlot.borderSubtle],
+      borderStrong: _overrides[ThemeColorSlot.borderStrong],
+      borderOnAccent: _overrides[ThemeColorSlot.borderOnAccent],
+      borderOnInverse: _overrides[ThemeColorSlot.borderOnInverse],
+      borderOnSurface: _overrides[ThemeColorSlot.borderOnSurface],
+      borderOpacitySubtle: _overrides[ThemeColorSlot.borderOpacitySubtle],
+      borderOpacityStrong: _overrides[ThemeColorSlot.borderOpacityStrong],
+      // Border - Utility
+      borderFocus: _overrides[ThemeColorSlot.borderFocus],
+      borderDisabled: _overrides[ThemeColorSlot.borderDisabled],
+      borderDisabledOnSurface: _overrides[ThemeColorSlot.borderDisabledOnSurface],
+      borderHover: _overrides[ThemeColorSlot.borderHover],
+      borderPressed: _overrides[ThemeColorSlot.borderPressed],
+      borderActive: _overrides[ThemeColorSlot.borderActive],
+      borderError: _overrides[ThemeColorSlot.borderError],
+      borderWarning: _overrides[ThemeColorSlot.borderWarning],
+      borderSuccess: _overrides[ThemeColorSlot.borderSuccess],
+      borderSelected: _overrides[ThemeColorSlot.borderSelected],
+      // State
+      backgroundHover: _overrides[ThemeColorSlot.backgroundHover],
+      backgroundPressed: _overrides[ThemeColorSlot.backgroundPressed],
+      backgroundSelected: _overrides[ThemeColorSlot.backgroundSelected],
       // System
-      systemText: _systemText,
-      systemScrollbar: _systemScrollbar,
+      systemText: _overrides[ThemeColorSlot.systemText],
+      systemScrollbar: _overrides[ThemeColorSlot.systemScrollbar],
       // Avatar
       avatarPalette: _avatarPalette,
     );
@@ -604,6 +342,10 @@ class ThemeConfiguration extends ChangeNotifier {
     _themeData = StreamTheme(
       brightness: _brightness,
       colorScheme: colorScheme,
+      avatarTheme: _buildComponentTheme('Avatar') as StreamAvatarThemeData?,
+      badgeCountTheme: _buildComponentTheme('Badge Count') as StreamBadgeCountThemeData?,
+      badgeNotificationTheme: _buildComponentTheme('Badge Notification') as StreamBadgeNotificationThemeData?,
+      onlineIndicatorTheme: _buildComponentTheme('Online Indicator') as StreamOnlineIndicatorThemeData?,
     );
   }
 

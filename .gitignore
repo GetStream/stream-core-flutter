@@ -146,3 +146,8 @@ env.g.dart
 **/test/**/goldens/**/*.*
 **/test/**/failures/**/*.*
 !**/test/**/goldens/ci/*.*
+
+# Transient Dart file written, analyzed and deleted by
+# theme_code_generator_compiles_test.dart - only left behind if that test
+# crashes mid-run.
+apps/design_system_gallery/test/core/generated/
