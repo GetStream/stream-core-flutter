@@ -56,7 +56,7 @@ class UserToken extends Equatable {
       rawValue: rawValue,
       userId: userId,
       authType: AuthType.jwt,
-      expiresAt: _expiresAtOf(claims),
+      expiresAt: claims.expiry?.toUtc(),
     );
   }
 
@@ -77,7 +77,7 @@ class UserToken extends Equatable {
     DateTime? expiresAt;
     if (rawValue.isNotEmpty) {
       final claims = JsonWebToken.unverified(rawValue).claims;
-      expiresAt = _expiresAtOf(claims);
+      expiresAt = claims.expiry?.toUtc();
       final userId = claims.getTyped<String>('user_id');
       if (userId != User.anonymousUserId) {
         throw ArgumentError.value(
@@ -168,14 +168,4 @@ enum AuthType {
   /// This value is sent in HTTP headers to identify the authentication
   /// method being used for API requests.
   final String headerValue;
-}
-
-// The moment the token stops being valid, or null when it names none.
-//
-// A claim that is present but not a number is read as no expiry rather than thrown from a
-// constructor: the expiry is not what identifies a token, and a token the client cannot read the
-// expiry of is still one the server can accept or refuse on its own terms.
-DateTime? _expiresAtOf(JsonWebTokenClaims claims) {
-  if (claims['exp'] is! num) return null;
-  return claims.expiry?.toUtc();
 }
