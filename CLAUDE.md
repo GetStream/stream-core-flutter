@@ -40,15 +40,51 @@ melos run generate:icons    # regenerate icon font from SVGs
 melos run gen-l10n          # regenerate localizations
 ```
 
+**Line width:** 120 characters (set in `analysis_options.yaml`).
+
 ### Icons
 
 Source SVGs in `packages/stream_core_flutter/assets_source/icons/` come from the [design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons) repository. When adding or updating icons, pull the latest SVGs from that repo first, then run `melos run generate:icons` to regenerate the icon font and Dart classes.
 
-**Line width:** 120 characters (set in `analysis_options.yaml`).
+Upstream names carry a size suffix that this repo strips or rewrites: everything in `20/` keeps its bare name (`account-20.svg` → `account.svg`), `16/` currently holds only `xmark-small.svg`, and `32/` uses a `-large` suffix (`camera-32.svg` → `camera-large.svg`).
+
+**Names must be unique across the size folders.** Glyphs are keyed by bare filename, so copying a whole upstream size folder is how you accidentally end up with e.g. `16/xmark-small.svg` and `20/xmark-small.svg` competing for one glyph. The generator fails on a duplicate rather than letting directory-listing order pick a winner.
+
+**Code points are append-only.** `assets_source/icon_log.g.txt` records the date each icon was first seen, and the generator orders glyphs by that date so every icon keeps its code point across runs. The font ships as `lib/fonts/stream_icons_font.otf`, so a shifted code point silently repoints every icon after it in any app that has not rebuilt. Never reorder or hand-edit the log.
+
+**Deleting an icon therefore requires a deprecation entry** in `assets_source/deprecated.txt` — one `deprecated;replacement;included` line per icon:
+
+```
+more;more-horizontal;true
+```
+
+- `replacement` — the icon whose SVG draws the glyph. A deprecated icon always keeps its glyph, and with it its code point; pointing at a replacement is what lets you delete the retired SVG and still render something sensible. Naming itself (`more;more;true`) keeps the original artwork while retiring the name.
+- `included` — whether the name survives in the generated Dart. `true` emits `StreamIcons.more` and `StreamIconData.more` annotated with `@Deprecated('Use moreHorizontal instead.')`; `false` drops both while the glyph stays in the font.
+
+Entries are effectively permanent — removing one releases its glyph and shifts every later code point. The generator fails if a replacement has no SVG file, or if a deprecated name has neither an SVG file nor a logged code point (which means a typo).
+
+Deprecating an icon also means adding transforms to `lib/fix_data.yaml`; see [Deprecations](#deprecations).
 
 ## Design
 
 UI components are designed in **Figma**. When implementing or modifying components, use the **Figma MCP** to inspect designs directly — check spacing, colors, typography, and component structure from the source rather than guessing.
+
+## Deprecations
+
+The policy itself lives in [`STYLE_GUIDE.md`](STYLE_GUIDE.md#clearly-mark-deprecated-apis): annotate with `@Deprecated('Use X instead.')`, add a `### 🛑 Breaking / Removals` CHANGELOG entry pointing at the replacement, and keep the deprecated API for at least one minor release.
+
+On top of that, give every deprecated member a migration in `packages/stream_core_flutter/lib/fix_data.yaml` ([format docs](https://dart.dev/tools/dart-fix)) so consumers can move off it with:
+
+```bash
+dart fix --apply
+```
+
+Things worth knowing about that file:
+
+- Dart only reads it at `lib/fix_data.yaml` or `lib/fix_data/*.yaml`. `element.uris` must list the library that declares the member **and** every barrel it is exported from (`core.dart`, `chat.dart`, `stream_core_flutter.dart`) — a transform whose uris miss the barrel the consumer actually imported never fires.
+- Treat it as **append-only**. A transform's real value is carrying someone across the release that finally deletes the member, so it has to outlive the deprecation that motivated it. Never drop an entry just because the member is gone.
+- A member reached only through generated code needs its own transform, and may not warn at all. `StreamIcons.copyWith(more: ...)` is the worked example: `copyWith` is generated onto the private `_$StreamIcons` mixin, which does not inherit the field's `@Deprecated`, so the call raises no warning while the field exists — its transform (`inMixin: "_$StreamIcons"`) only fires once the field is deleted and the call becomes an `undefined_named_parameter` error.
+- **Verify a transform by running it, not by reading the YAML.** Write a throwaway file exercising each call shape (bare constant, instance field, constructor argument, `copyWith`), run `dart fix --dry-run`, then re-run with the transform removed to confirm the fix disappears — the analyzer offers generic "did you mean" fixes that are easy to mistake for your own.
 
 ## Architecture
 
