@@ -5,54 +5,65 @@
 - Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
 - Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
 - `StreamWebSocketClient` now takes an `optionsBuilder` instead of `options`, and calls it for every connection attempt
-- Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, which is what it is called for and when
-- `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsSender` and returns a `Result`, so a failure to authenticate can be observed
+- Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`
+- `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsRequestSender` and returns a `Result`, so a failure to authenticate can be observed
+- `WsRequestSender` and `WebSocketAuthenticator` now live in `web_socket_authentication_handler.dart` and are exported as before. The handler that runs them, and remembers what the server refused, is internal
+- `WebSocketAuthenticator` returns `Future<void>` rather than `Future<Result<void>>`: it throws to say the credentials did not go out, whether that is a failure or a deliberate refusal to send them. Returning a result described the same thing a second way, and both were funnelled into the same closure regardless
+- `WebSocketAuthenticator` is handed the error the server closed the previous attempt with, as `previousError`, and null once a connection has been established. It says whether the credentials it last sent are the reason the attempt failed, so it can replace them — or return a failure when there is nothing to replace them with, which closes the connection as `AuthenticationFailed` and is not retried, rather than offering refused credentials for the life of the client
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
-- `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. The constructor is `const`, so a mismatch in a const context fails to compile rather than throwing in debug mode
-- `StreamApiError.isTokenExpiredError` now means the token expired (code 40) rather than any invalid-token code. The rest — not yet valid, used before issued, wrong signature — are `isInvalidTokenError`, along with a wrong API key, since another token does not fix any of them
-- `StreamApiError.isClientError` compares the HTTP `statusCode` against 400..499 rather than the Stream error `code`, which never falls in that range and so never matched
-- `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` no longer take a type parameter of their own and return the result's own type. They previously cast the value to the callback's type, which failed on a successful result — most visibly for a callback that only throws. Kotlin's equivalents widen through a `<R, T : R>` bound that Dart cannot express; to widen here, name the wider type on the result (`Result<num> widened = intResult`), which works because `Result` is covariant, or use `fold`
+- `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. A mismatch fails to compile in a const context, and throws in debug mode otherwise
+- `WebSocketConnectionState.isAutomaticReconnectionEnabled` is now `true` for an expired token, and remains `false` for token errors a fresh token cannot fix
+- `StreamApiError.isTokenExpiredError` now means code 40 only; the other token codes and a wrong API key are `isInvalidTokenError`
+- `StreamApiError.isClientError` compares the HTTP `statusCode` against 400..499 rather than the Stream error `code`, which never falls in that range
+- `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` return the result's own type and no longer take a type parameter. To widen, widen the result (`Result<num> widened = intResult`) or use `fold`
 
 ### ✨ Features
 
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
-- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access, provided its `user_id` claim is `User.anonymousUserId` (`!anon`), which the server also requires
+- Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`
+- Added `UserToken.expiresAt`, from the token's `exp` claim, and `UserToken.isExpired`, which takes an optional `leeway`
 - Added `User.anonymousUserId`, the id every anonymous user has
 - Added `TokenManager.unconfigured`, for a client that exists before its user does
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
-- Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before the connection is established; it is eligible for automatic reconnection, since a handshake that did not complete in time is the same failure as a connection that stops answering health checks
+- Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before it is established, and eligible for automatic reconnection
 - Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
-- `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, which is no longer nullable and defaults to `WebSocketOptions.defaultConnectTimeout`. This is a behaviour change as well as an API one: a connection previously waited indefinitely for its first health check, and is now abandoned — and reconnected — after 30 seconds, matching the wait the Swift SDK allows for the same handshake
-- Added `WsSender`, the send capability handed to a `WebSocketAuthenticator`
-- Added `WebSocketConnectionState.isExpiredTokenDisconnection`, so a caller that can replace the token knows when to. Automatic reconnection deliberately refuses this case: whoever retries it would present the token the server just refused, and only the caller can obtain another
+- Added `WsRequestSender`, the send capability handed to a `WebSocketAuthenticator`
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
-- Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is `Disposable`, so `isDisposed` reports whether it has been called
+- Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`
+- `StreamWebSocketClient.connect` now throws a `StateError` once the client has been disposed, in release builds as well as debug. It previously asserted and then returned, so a release build opened a socket nothing could observe or close: the emitters are shut, so no state change is reported, and the health monitor that would tear an idle connection down is stopped
+- `StreamWebSocketClient.disconnect` records the request without going through `disconnecting` when there is no connection to close, so a `connect` made straight afterwards is not refused for racing a close that is not happening. An explicit disconnect also now takes effect on a connection that is already down, which is what calls off a scheduled reconnection
 - Added `teams` field to `User` class
+- `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, no longer nullable and 30 seconds by default, so an attempt that never becomes usable is abandoned and reconnected rather than waited on indefinitely
 
 ### 🐛 Bug Fixes
 
+- Fixed `StreamWebSocketClient.connect` leaking the socket of a connection whose handshake failed. The socket is opened before the handshake it fails, and the client reported the connection closed without closing it, so the socket stayed open and unreachable — `dispose` did not close it either, and the next attempt closed it instead, reporting a closure while that attempt was still connecting
+- Fixed a WebSocket engine that reported a closure to its listener only when the close succeeded. It now reports one however the close went, and even when there was no socket to close, so a client waiting to hear the connection is down is no longer left waiting on a socket it can never use. It also lets go of a socket that failed to close, rather than holding one it cannot use, and reports a closure once rather than again when the socket's stream ends
+- Fixed a request that met a second token-expired response never completing at all. A request is now retried at most once
+- Fixed a retried request re-sending a multipart body whose streams the refused attempt had already consumed
+- Fixed a rejected request expiring a token that another request had already replaced; only the token a request actually carried is expired now
 - Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 - Fixed `TokenManager` caching a token that finished loading after `expireToken` or `setTokenProvider` had invalidated it
-- Fixed `StreamWebSocketClient.disconnect` completing before the socket was closed, so a `connect` straight afterwards raced the closure and saw the connection go down again
-- Fixed a failure to close the socket leaving `StreamWebSocketClient` reporting itself as disconnecting for good, since the engine reports such a failure rather than notifying its listener
-- Fixed a `WebSocketAuthenticator` that throws, rather than returning a failure, escaping as an unhandled error and leaving the connection authenticating until it timed out — losing the cause, which the timeout does not carry. The natural authenticator throws, since loading a token does
-- Fixed `StreamWebSocketClient.disconnect` replacing the source of a closure already under way, which could turn a reconnectable `ServerInitiated` error into a permanent `ConnectTimeout`
-- Fixed `isAutomaticReconnectionEnabled` neither refusing a deliberate server close nor refusing client errors: it compared the API error's code against the close code 1000, and against a 400..499 range that Stream codes never occupy, so both rules were dead. It now mirrors the iOS SDK — close code 1000, invalid tokens and 4xx all refuse, an expired token does not
-- A connection the server closed because the request was rate limited is now eligible for automatic reconnection. The backend closes it with the rate-limit window's reset in the response headers and a one-minute window, so the condition clears on its own — unlike every other 4xx it can close a socket with, which carry no reset
-- Fixed `ConnectionRecoveryHandler` retrying a first connection attempt, which failed the caller of `connect` and reconnected behind them at the same time — and made the caller's own retry fail with "connection already in progress". It now recovers only connections that have existed since the caller last asked for one, so a deliberate `disconnect` hands connecting back and the next `connect` is the caller's attempt again
-- Fixed a health check arriving while disconnecting reporting the connection as established again, which replaced the disconnection source and could turn a deliberate disconnect into an automatic reconnect
+- Fixed `StreamWebSocketClient.disconnect` completing before the socket was closed, so a `connect` straight afterwards raced the closure
+- Fixed a failure to close the socket leaving `StreamWebSocketClient` reporting itself as disconnecting for good
+- Fixed a `WebSocketAuthenticator` that throws rather than returning a failure escaping as an unhandled error and leaving the connection authenticating
+- Fixed `StreamWebSocketClient.disconnect` replacing the source of a closure already under way, turning a reconnectable error into a permanent `ConnectTimeout`
+- Fixed `isAutomaticReconnectionEnabled` refusing neither a deliberate close (code 1000) nor client errors, neither of which ever matched
+- Fixed a connection closed for a rate limit not being eligible for automatic reconnection, since a rate limit clears on its own
+- Fixed `ConnectionRecoveryHandler` retrying a first connection attempt, which reconnected behind the caller of `connect`; only established connections are recovered now
+- Fixed a health check arriving while disconnecting reporting the connection as established again, turning a deliberate disconnect into a reconnect
 
 ### 🔄 Changed
 
 - Raised the minimum Dart SDK to `^3.12.0`
-- Anonymous requests now always send `user_id=!anon`. The value previously came from the `TokenManager`, so it was whatever the caller configured; the server requires the claim to be `!anon` and derives the anonymous session itself, so the parameter now matches
+- Anonymous requests now always send `user_id=!anon`, rather than whatever id the `TokenManager` was configured with
 - `DynamicTokenProvider` checks the token type before its user id, so a token of the wrong type is reported as such instead of as a mismatched user
-- `TokenManager.setTokenProvider` does nothing when handed the identity it already has, instead of expiring the cached token. The provider is compared with `==`, so one that defines value equality decides when a replacement counts as the same
-- `TokenManager.getToken` fails when `reset` runs while the token is loading, instead of returning a token for a user the manager no longer has. A `setTokenProvider` during a load still serves the caller that started it
-- `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for, which a custom `TokenProvider` is not obliged to check itself
-- `AuthInterceptor` no longer attempts a token refresh when the manager has no identity, so the original token-expired error is surfaced rather than a failure to load a token
+- `TokenManager.setTokenProvider` does nothing when handed the identity it already has; providers are compared with `==`
+- `TokenManager.getToken` fails when `reset` runs while the token is loading; a `setTokenProvider` during a load still serves the caller that started it
+- `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for
+- `AuthInterceptor` no longer attempts a token refresh when the manager has no identity, so the original token-expired error is surfaced
 
 ## 0.4.0
 
