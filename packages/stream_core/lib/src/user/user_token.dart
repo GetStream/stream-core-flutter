@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:equatable/equatable.dart';
 import 'package:jose/jose.dart';
 
@@ -41,8 +42,8 @@ class UserToken extends Equatable {
   /// Throws an [ArgumentError] if the 'user_id' claim is missing or empty, and
   /// a [FormatException] if [rawValue] cannot be parsed as a JWT.
   factory UserToken(String rawValue) {
-    final jwtBody = JsonWebToken.unverified(rawValue);
-    final userId = jwtBody.claims.getTyped<String>('user_id');
+    final claims = JsonWebToken.unverified(rawValue).claims;
+    final userId = claims.getTyped<String>('user_id');
     if (userId == null || userId.isEmpty) {
       throw ArgumentError.value(
         rawValue,
@@ -55,6 +56,7 @@ class UserToken extends Equatable {
       rawValue: rawValue,
       userId: userId,
       authType: AuthType.jwt,
+      expiresAt: _expiresAtOf(claims),
     );
   }
 
@@ -63,9 +65,8 @@ class UserToken extends Equatable {
   /// Anonymous tokens always use [User.anonymousUserId] as their user id.
   ///
   /// An optional [rawValue] can carry a JWT that is sent along with anonymous
-  /// requests, granting the caller access to the specific resources its claims
-  /// name. When omitted, the token carries no raw value and requests are sent
-  /// without credentials.
+  /// requests, granting access to the specific resources its claims name. When omitted, the token
+  /// carries no raw value and requests are sent without credentials.
   ///
   /// Returns a [UserToken] configured for anonymous access.
   ///
@@ -73,9 +74,11 @@ class UserToken extends Equatable {
   /// is not [User.anonymousUserId], and a [FormatException] if it cannot be parsed
   /// as a JWT.
   factory UserToken.anonymous({String rawValue = ''}) {
+    DateTime? expiresAt;
     if (rawValue.isNotEmpty) {
-      final jwtBody = JsonWebToken.unverified(rawValue);
-      final userId = jwtBody.claims.getTyped<String>('user_id');
+      final claims = JsonWebToken.unverified(rawValue).claims;
+      expiresAt = _expiresAtOf(claims);
+      final userId = claims.getTyped<String>('user_id');
       if (userId != User.anonymousUserId) {
         throw ArgumentError.value(
           userId,
@@ -89,6 +92,7 @@ class UserToken extends Equatable {
       rawValue: rawValue,
       userId: User.anonymousUserId,
       authType: AuthType.anonymous,
+      expiresAt: expiresAt,
     );
   }
 
@@ -96,6 +100,7 @@ class UserToken extends Equatable {
     required this.rawValue,
     required this.userId,
     required this.authType,
+    this.expiresAt,
   });
 
   /// The raw token value.
@@ -114,6 +119,25 @@ class UserToken extends Equatable {
   ///
   /// Indicates whether this token uses JWT authentication or anonymous access.
   final AuthType authType;
+
+  /// The moment this token stops being valid, from its 'exp' claim, in UTC.
+  ///
+  /// `null` when the token names no expiry, including an anonymous token carrying no raw value.
+  /// Such a token is never considered expired.
+  final DateTime? expiresAt;
+
+  /// Whether this token has expired, or expires within [leeway].
+  ///
+  /// A [leeway] covers the gap between the check and the token being used, so one that would run
+  /// out mid-request counts as expired before it is sent. It also absorbs a client clock running
+  /// behind.
+  bool isExpired({Duration leeway = Duration.zero}) {
+    final expiresAt = this.expiresAt;
+    if (expiresAt == null) return false;
+
+    // Not `isAfter`: a token expiring at exactly this moment has expired.
+    return !clock.now().add(leeway).isBefore(expiresAt);
+  }
 
   @override
   List<Object?> get props => [rawValue, userId, authType];
@@ -144,4 +168,14 @@ enum AuthType {
   /// This value is sent in HTTP headers to identify the authentication
   /// method being used for API requests.
   final String headerValue;
+}
+
+// The moment the token stops being valid, or null when it names none.
+//
+// A claim that is present but not a number is read as no expiry rather than thrown from a
+// constructor: the expiry is not what identifies a token, and a token the client cannot read the
+// expiry of is still one the server can accept or refuse on its own terms.
+DateTime? _expiresAtOf(JsonWebTokenClaims claims) {
+  if (claims['exp'] is! num) return null;
+  return claims.expiry?.toUtc();
 }
