@@ -80,4 +80,54 @@ void main() {
       expect(mine.records, isEmpty);
     });
   });
+
+  group('two Stream SDKs in one app', () {
+    const feeds = StreamLogger('SF:Ws');
+    const video = StreamLogger('SV:Call');
+
+    tearDown(StreamLogger.reset);
+
+    test('report together once either of them is configured', () {
+      final mine = RecordingLogHandler();
+
+      StreamLogger.configure(StreamLogConfig(priority: StreamLogPriority.debug, handler: mine));
+      feeds.d(() => 'feeds');
+      video.d(() => 'video');
+
+      // One logger serves the process, so configuring a client turns logging on for the SDK beside
+      // it too. The tags are what tell them apart afterwards.
+      expect(mine.messages, ['feeds', 'video']);
+    });
+
+    test('settle on whichever was configured last, rather than merging', () {
+      final first = RecordingLogHandler();
+      final second = RecordingLogHandler();
+
+      StreamLogger.configure(StreamLogConfig(handler: first));
+      StreamLogger.configure(StreamLogConfig(handler: second));
+      feeds.w(() => 'a warning');
+
+      expect(first.records, isEmpty);
+      expect(second.messages, ['a warning']);
+    });
+
+    test('can be held to one SDK by the prefix its tags carry', () {
+      final mine = RecordingLogHandler();
+
+      StreamLogger.configure(
+        StreamLogConfig(
+          handler: mine,
+          filter: const StreamLogFilter.prefix(
+            {'SF:': StreamLogPriority.debug},
+            otherwise: StreamLogPriority.none,
+          ),
+        ),
+      );
+      feeds.d(() => 'feeds');
+      video.e(() => 'video, not asked for');
+
+      // What an app reaches for when it wants one SDK's records and not the other's.
+      expect(mine.messages, ['feeds']);
+    });
+  });
 }

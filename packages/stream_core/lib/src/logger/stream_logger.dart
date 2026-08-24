@@ -132,6 +132,20 @@ final class StreamLogger {
   /// A config replaces both settings outright, so anything installed through [filter] before this
   /// is lost — including to a config that named only a [priority]. Put the rule in
   /// [StreamLogConfig.filter] instead, where a client carries it rather than flattening it.
+  ///
+  /// One logger serves the process, so this decides logging for every Stream SDK in it, not only
+  /// the one whose config it came from, and two clients configured differently settle on whichever
+  /// was constructed last. An app wanting one SDK's records and not another's says so by the prefix
+  /// their tags carry:
+  ///
+  /// ```dart
+  /// StreamLogConfig(
+  ///   filter: StreamLogFilter.prefix(
+  ///     {'SF:': StreamLogPriority.debug},
+  ///     otherwise: StreamLogPriority.none,
+  ///   ),
+  /// )
+  /// ```
   static void configure(StreamLogConfig? config) {
     if (config == null) return;
 
