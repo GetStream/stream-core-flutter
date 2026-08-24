@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import '../stream_core_dio_error.dart';
 
 class ApiErrorInterceptor extends Interceptor {
-  /// Initializes a new instance of [ApiErrorInterceptor].
+  /// Creates a new [ApiErrorInterceptor].
   const ApiErrorInterceptor();
 
   @override

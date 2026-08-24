@@ -8,7 +8,7 @@ import '../stream_core_dio_error.dart';
 ///
 /// A request the server refuses for an expired token is retried once, carrying a replacement.
 class AuthInterceptor extends Interceptor {
-  /// Initialize a new [AuthInterceptor].
+  /// Creates a new [AuthInterceptor].
   AuthInterceptor(this._dio, this._tokenManager);
 
   final Dio _dio;

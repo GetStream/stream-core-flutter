@@ -88,27 +88,8 @@ sealed class WebSocketConnectionState extends Equatable {
 
   /// Whether automatic reconnection is enabled for this connection state.
   ///
-  /// Determines if the connection should automatically attempt to reconnect based on
-  /// the current state and disconnection source. Only applies to [Disconnected] states.
-  ///
-  /// ## Reconnection is enabled for:
-  /// - Server-initiated disconnections, other than the cases listed below
-  /// - An expired token, and a rate limit, both of which a later attempt can get past
-  /// - System-initiated disconnections (network changes, app lifecycle, etc.)
-  /// - Unhealthy connection disconnections (missing pong responses)
-  /// - A connection attempt abandoned for taking too long ([ConnectTimeout])
-  ///
-  /// ## Reconnection is disabled for:
-  /// - User-initiated disconnections (explicit disconnect calls)
-  /// - A connection closed deliberately (close code 1000)
-  /// - Token errors a fresh token would not fix, and a wrong API key
-  /// - Client errors (4xx status codes), other than a rate limit or an expired token
-  /// - A failure to load or send credentials ([AuthenticationFailed])
-  ///
-  /// Necessary, but not on its own sufficient: `ConnectionRecoveryHandler` recovers only a
-  /// connection that was established, and only while the network and the app lifecycle allow it. An
-  /// attempt that never landed is not retried for whoever made it, whatever this reports — so a
-  /// first connection that times out stays down, where one that times out on the way back does not.
+  /// `false` for every state but [Disconnected], where it is the source's
+  /// [DisconnectionSource.isReconnectable] and nothing more — see that for which sources reconnect.
   bool get isAutomaticReconnectionEnabled => switch (this) {
     Disconnected(:final source) => source.isReconnectable,
     _ => false, // No automatic reconnection for other states
@@ -279,9 +260,17 @@ sealed class DisconnectionSource extends Equatable {
 
   /// Whether a connection closed for this reason is worth opening again.
   ///
-  /// This is the whole of [WebSocketConnectionState.isAutomaticReconnectionEnabled], which lists
-  /// what is and is not reconnected. Whether a reconnection is then actually made is decided by
-  /// `ConnectionRecoveryHandler` on top of this.
+  /// - [UserInitiated] — no, the caller asked for the connection to close.
+  /// - [AuthenticationFailed] — no, credentials that never went out will not go out on a retry.
+  /// - [ServerInitiated] — no for a deliberate close (code 1000), for a token error a fresh token
+  ///   would not fix, and for a client error that is neither a rate limit nor an expired token. Yes
+  ///   otherwise, including an expired token and a rate limit, which a later attempt can get past.
+  /// - [SystemInitiated], [UnHealthyConnection], [ConnectTimeout] — yes.
+  ///
+  /// Necessary, but not on its own sufficient. Whether a reconnection is then actually made is
+  /// decided by `ConnectionRecoveryHandler`, which recovers only a connection that was established,
+  /// and only while the network and the app lifecycle allow it — so a first connection that times
+  /// out stays down, where one that times out on the way back does not.
   bool get isReconnectable => switch (this) {
     ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
     ServerInitiated(:final error) => switch (error?.apiError) {

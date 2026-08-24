@@ -4,7 +4,7 @@ import '../system_environment_manager.dart';
 
 /// Interceptor that sets additional headers for all requests.
 class HeadersInterceptor extends Interceptor {
-  /// Initialize a new [HeadersInterceptor].
+  /// Creates a new [HeadersInterceptor].
   const HeadersInterceptor(this._systemEnvironmentManager);
 
   final SystemEnvironmentManager _systemEnvironmentManager;

@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import '../../stream_core.dart';
 
-/// Error class specific to StreamChat and Dio
+/// A [DioException] carrying the Stream [ClientException] that caused it.
 class StreamDioException extends DioException {
-  /// Initialize a stream chat dio error
+  /// Creates a [StreamDioException] for [exception].
   StreamDioException({
     required this.exception,
     required super.requestOptions,
