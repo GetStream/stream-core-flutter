@@ -95,9 +95,9 @@ class WebSocketAuthenticationHandler {
     // as `AuthenticationFailed`, which never reconnects. The refusal stays armed for that one.
     if (attempt != _attempt) return;
 
-    // This attempt answered it, so it is spent — unless the server refused something newer while the
-    // authenticator ran, which the next attempt still needs to see.
-    if (_previousError == previousError) _previousError = null;
+    // Spent, unless the server refused something newer while the authenticator ran. By identity,
+    // not equality: a newer refusal of the same kind compares equal to this one.
+    if (identical(_previousError, previousError)) _previousError = null;
 
     if (result case Failure(:final error)) return _onFailure(error);
   }

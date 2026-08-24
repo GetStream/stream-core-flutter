@@ -88,6 +88,27 @@ void main() {
     expect(authentication.previousError, isNull);
   });
 
+  test('previousError survives a newer refusal equal to the one being answered', () async {
+    // `StreamApiError` compares by value, so a second refusal of the same kind cannot be told from
+    // the first by comparing them. Spent on the strength of that, it would leave the attempt after
+    // this one with nothing to answer, and it would present the same refused credentials again.
+    final held = Completer<void>();
+    final (:authentication, asked: _, failures: _) = _subject(
+      authenticator: (send, previousError) => held.future,
+    );
+
+    authentication.onConnectionStateChanged(_serverClosure(_expiredToken));
+    authentication.onConnectionStateChanged(const Connecting());
+    final running = authentication.authenticate();
+
+    // The server refuses again while this attempt is still awaiting its credentials.
+    authentication.onConnectionStateChanged(_serverClosure(_apiError(code: 40)));
+    held.complete();
+    await running;
+
+    expect(authentication.previousError, _expiredToken);
+  });
+
   test('previousError is forgotten once the caller has disconnected', () {
     final (:authentication, asked: _, failures: _) = _subject();
     authentication.onConnectionStateChanged(_serverClosure(_expiredToken));
