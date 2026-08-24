@@ -26,15 +26,13 @@ extension StreamDioExceptionExtension on DioException {
   /// A Stream error is recognised whether the server sent it as JSON or as plain text. A body that is
   /// not one — a proxy or gateway answering with an error of its own — reads as `null` rather than
   /// throwing.
-  StreamApiError? get apiError {
-    return runSafelySync(() {
-      return switch (response?.data) {
-        final Map<String, Object?> data => StreamApiError.fromJson(data),
-        final String data => StreamApiError.fromJson(jsonDecode(data) as Map<String, Object?>),
-        _ => null,
-      };
-    }).getOrNull();
-  }
+  StreamApiError? get apiError => runSafelySync(() {
+    final data = response?.data;
+    final json = data is String ? jsonDecode(data) : data;
+    if (json is! Map<String, Object?>) return null;
+
+    return StreamApiError.fromJson(json);
+  }).getOrNull();
 
   /// This exception as an [HttpClientException].
   ///
