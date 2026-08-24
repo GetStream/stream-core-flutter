@@ -47,6 +47,22 @@ void main() {
     );
 
     wsClientTest(
+      'reports the closure when the socket of a failed handshake refuses to close',
+      handshakeFails: true,
+      closeError: Exception('close failed'),
+      connect: _justConnect,
+      body: (tester) async {
+        // The engine announces nothing when a close fails, and the connect timeout cannot rescue a
+        // state that is already `Disconnecting`, so this would stay there for good.
+        expect(tester.connectionState, isA<Disconnected>());
+
+        await tester.client.connect();
+        await tester.pumpEventQueue();
+        expect(tester.attempts, 2);
+      },
+    );
+
+    wsClientTest(
       'closes a socket whose handshake failed',
       handshakeFails: true,
       connect: _justConnect,
