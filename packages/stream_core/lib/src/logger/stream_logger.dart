@@ -34,9 +34,10 @@ typedef StreamLogMessage = String Function();
 /// StreamLogger.priority = StreamLogPriority.debug;
 /// ```
 ///
-/// Records go to one place, so routing two SDKs apart is a matter of a [StreamLogHandler] reading
-/// [StreamLogRecord.tag] rather than of finding every component that had to be handed something.
-/// For the exception, see [StreamLogger.detached].
+/// A tag is a path: `SF:Ws:Engine` sits under `SF:Ws`, which sits under `SF:`. A product settles
+/// its own branch through [configure], so two Stream SDKs in one app each report on their own
+/// terms without either being handed a logger to pass around. For the exception, see
+/// [StreamLogger.detached].
 final class StreamLogger {
   /// Creates a [StreamLogger] writing under [tag] to whatever the app has installed.
   const StreamLogger(this.tag) : _handler = null, _filter = null;
@@ -83,17 +84,17 @@ final class StreamLogger {
   static StreamLogFilter _filterOrDefault = const .minPriority(.warning);
   static var _handlerInstalled = false;
 
-  // Keyed by the tag prefix a product's records carry, so one product's config governs its own
-  // records and no one else's.
-  static final _scopes = <String, StreamLogConfig>{};
+  // Keyed by the tag prefix a product's records share, so one product's config settles its own
+  // branch and no one else's.
+  static final _parents = <String, StreamLogConfig>{};
 
-  static StreamLogConfig? _scopeFor(String tag) {
-    if (_scopes.isEmpty) return null;
+  static StreamLogConfig? _parentOf(String tag) {
+    if (_parents.isEmpty) return null;
 
     StreamLogConfig? matched;
     var matchedLength = -1;
 
-    for (final MapEntry(key: prefix, value: config) in _scopes.entries) {
+    for (final MapEntry(key: prefix, value: config) in _parents.entries) {
       if (prefix.length <= matchedLength) continue;
       if (!tag.startsWith(prefix)) continue;
 
@@ -104,16 +105,16 @@ final class StreamLogger {
     return matched;
   }
 
-  static StreamLogFilter _filterFor(StreamLogConfig? scope) {
-    if (scope == null) return _filterOrDefault;
-    return scope.filter ?? .minPriority(scope.priority);
+  static StreamLogFilter _filterFor(StreamLogConfig? parent) {
+    if (parent == null) return _filterOrDefault;
+    return parent.filter ?? .minPriority(parent.priority);
   }
 
-  static StreamLogHandler _handlerFor(StreamLogConfig? scope) {
-    if (scope?.handler case final handler?) return handler;
+  static StreamLogHandler _handlerFor(StreamLogConfig? parent) {
+    if (parent?.handler case final handler?) return handler;
     if (_handlerInstalled) return _handlerOrDefault;
-    // A scope asked for records with nowhere to put them, which would otherwise be silence.
-    return scope != null ? StreamLogConfig.defaultHandler : _handlerOrDefault;
+    // A branch asked for records with nowhere to put them, which would otherwise be silence.
+    return parent != null ? StreamLogConfig.defaultHandler : _handlerOrDefault;
   }
 
   /// Installs where every record goes, other than those from a [StreamLogger.detached] logger.
@@ -166,26 +167,27 @@ final class StreamLogger {
   /// StreamLogger.configure(config.logging);
   /// ```
   ///
-  /// Given a [scope], the config governs only the records whose tag starts with it, and the rest
-  /// of the process is left alone. A product client passes the prefix its own records carry, so
-  /// two Stream SDKs configured differently each get what they asked for rather than the one built
-  /// last deciding for both:
+  /// Given a [parent], the config settles that branch of the tag tree and leaves the rest of the
+  /// process alone. A product client names the prefix its own records share, so two Stream SDKs
+  /// configured differently each get what they asked for rather than the one built last deciding
+  /// for both:
   ///
   /// ```dart
-  /// StreamLogger.configure(config.logging, scope: 'SF:');
+  /// StreamLogger.configure(config.logging, parent: 'SF:');
   /// ```
   ///
-  /// Without a scope the config governs everything, replacing both settings outright — including a
-  /// rule installed through [filter], since [StreamLogConfig.priority] sets the same thing.
+  /// A branch is the narrower statement, so it decides its own tags over anything installed through
+  /// [filter] or [priority], which keep the tags no branch claimed. Without a [parent] the config
+  /// governs everything, replacing both outright.
   ///
   /// A config naming no handler writes wherever the app already installed one, or to
   /// [StreamLogConfig.defaultHandler] if it installed none, so asking for records never redirects
   /// them away from a destination the app chose.
-  static void configure(StreamLogConfig? config, {String? scope}) {
+  static void configure(StreamLogConfig? config, {String? parent}) {
     if (config == null) return;
 
-    if (scope != null) {
-      _scopes[scope] = config;
+    if (parent != null) {
+      _parents[parent] = config;
       return;
     }
 
@@ -214,7 +216,7 @@ final class StreamLogger {
     _handlerOrDefault = StreamLogHandler.silent;
     _filterOrDefault = const .minPriority(.warning);
     _handlerInstalled = false;
-    _scopes.clear();
+    _parents.clear();
   }
 
   /// Whether a record at [priority] would be kept by both the filter and the handler.
@@ -231,9 +233,9 @@ final class StreamLogger {
       return handler.isLoggable(priority, tag);
     }
 
-    final scope = _scopeFor(tag);
-    if (!_filterFor(scope).isLoggable(priority, tag)) return false;
-    return _handlerFor(scope).isLoggable(priority, tag);
+    final parent = _parentOf(tag);
+    if (!_filterFor(parent).isLoggable(priority, tag)) return false;
+    return _handlerFor(parent).isLoggable(priority, tag);
   }
 
   /// Writes a [StreamLogPriority.verbose] record.
@@ -306,7 +308,7 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    final handler = _handler ?? _handlerFor(_scopeFor(tag));
+    final handler = _handler ?? _handlerFor(_parentOf(tag));
     if (!isLoggable(priority)) return;
 
     final record = StreamLogRecord(

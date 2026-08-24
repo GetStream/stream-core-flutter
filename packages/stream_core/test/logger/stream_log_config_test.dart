@@ -87,15 +87,15 @@ void main() {
 
     tearDown(StreamLogger.reset);
 
-    test('keep to their own records, each given a scope', () {
+    test('keep to their own records, each given a parent', () {
       final theirs = RecordingLogHandler();
       final mine = RecordingLogHandler();
 
       StreamLogger.configure(
         StreamLogConfig(priority: StreamLogPriority.debug, handler: mine),
-        scope: 'SF:',
+        parent: 'SF:',
       );
-      StreamLogger.configure(StreamLogConfig(handler: theirs), scope: 'SV:');
+      StreamLogger.configure(StreamLogConfig(handler: theirs), parent: 'SV:');
       feeds.d(() => 'feeds debug');
       video
         ..d(() => 'video debug')
@@ -111,8 +111,8 @@ void main() {
       final first = RecordingLogHandler();
       final second = RecordingLogHandler();
 
-      StreamLogger.configure(StreamLogConfig(handler: first), scope: 'SF:');
-      StreamLogger.configure(StreamLogConfig(handler: second), scope: 'SV:');
+      StreamLogger.configure(StreamLogConfig(handler: first), parent: 'SF:');
+      StreamLogger.configure(StreamLogConfig(handler: second), parent: 'SV:');
       feeds.w(() => 'feeds');
       video.w(() => 'video');
 
@@ -122,8 +122,8 @@ void main() {
       expect(second.messages, ['video']);
     });
 
-    test('leave a scope alone that no config named', () {
-      StreamLogger.configure(const StreamLogConfig(priority: StreamLogPriority.debug), scope: 'SF:');
+    test('leave a branch alone that no config named', () {
+      StreamLogger.configure(const StreamLogConfig(priority: StreamLogPriority.debug), parent: 'SF:');
       final printed = capturePrints(() {
         feeds.d(() => 'feeds');
         video.e(() => 'video, never asked for');
@@ -137,7 +137,7 @@ void main() {
       final appWide = RecordingLogHandler();
       StreamLogger.handler = appWide;
 
-      StreamLogger.configure(const StreamLogConfig(priority: StreamLogPriority.debug), scope: 'SF:');
+      StreamLogger.configure(const StreamLogConfig(priority: StreamLogPriority.debug), parent: 'SF:');
       feeds.d(() => 'feeds');
 
       // A config naming only a priority must not take the records away from the destination the
@@ -145,7 +145,7 @@ void main() {
       expect(appWide.messages, ['feeds']);
     });
 
-    test('govern everything, given no scope at all', () {
+    test('govern everything, given no parent at all', () {
       final mine = RecordingLogHandler();
 
       StreamLogger.configure(StreamLogConfig(priority: StreamLogPriority.debug, handler: mine));
@@ -160,11 +160,11 @@ void main() {
       StreamLogger.handler = mine;
       StreamLogger.filter = const StreamLogFilter.always();
 
-      StreamLogger.configure(const StreamLogConfig(), scope: 'SF:');
+      StreamLogger.configure(const StreamLogConfig(), parent: 'SF:');
       feeds.v(() => 'below what the scope admits');
       video.v(() => 'still what the app asked for');
 
-      // A scope is the narrower statement, so it settles its own tags. The app's rule keeps the
+      // A branch is the narrower statement, so it settles its own tags. The app's rule keeps the
       // ones no scope claimed.
       expect(mine.messages, ['still what the app asked for']);
     });
