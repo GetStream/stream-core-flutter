@@ -60,6 +60,38 @@ _subject({bool closeFails = false}) {
   return (engine: engine, listener: listener, socket: socket);
 }
 
+/// Builds an engine that opens a fresh socket each time, for a test about more than one of them.
+///
+/// [_subject] reuses one socket, so a second `open` there fails on a stream already listened to
+/// rather than on anything the engine decided.
+({
+  StreamWebSocketEngine<String, String> engine,
+  _RecordingListener listener,
+  List<FakeWebSocketChannel> sockets,
+})
+_subjectWithFreshSockets({bool holdFirstClose = false}) {
+  final sockets = <FakeWebSocketChannel>[];
+  final listener = _RecordingListener();
+
+  final engine = StreamWebSocketEngine<String, String>(
+    listener: listener,
+    messageCodec: const _StringCodec(),
+    wsProvider: (_) {
+      final socket = FakeWebSocketChannel(holdClose: holdFirstClose && sockets.isEmpty);
+      sockets.add(socket);
+      return socket;
+    },
+  );
+
+  addTearDown(() {
+    for (final socket in sockets) {
+      socket.endStream();
+    }
+  });
+
+  return (engine: engine, listener: listener, sockets: sockets);
+}
+
 const _options = WebSocketOptions(url: 'wss://example.com');
 
 void main() {
@@ -143,6 +175,25 @@ void main() {
     expect(listener.closures, [(code: CloseCode.normalClosure, reason: 'done')]);
   });
 
+  test('does not report the closure of a socket that has already been replaced', () async {
+    // Only the first socket holds its close, so it is still closing when the next one opens.
+    final (:engine, :listener, :sockets) = _subjectWithFreshSockets(holdFirstClose: true);
+
+    await engine.open(_options);
+    final closing = engine.close();
+    await pumpEventQueue();
+    await engine.open(_options);
+
+    sockets.first.sink.completeClose();
+    await closing;
+    await pumpEventQueue();
+
+    // Closing yields, so the second socket is already open by the time the first one finishes.
+    // Reported now, its closure would bring down a connection that is being established.
+    expect(listener.opened, 2);
+    expect(listener.closures, isEmpty);
+  });
+
   test('reports the closure for every close it is asked for', () async {
     final (:engine, :listener, socket: _) = _subject();
     await engine.open(_options);
@@ -166,15 +217,16 @@ void main() {
   });
 
   test('refuses to open a socket while one is still open', () async {
-    final (:engine, :listener, :socket) = _subject();
+    final (:engine, :listener, :sockets) = _subjectWithFreshSockets();
     await engine.open(_options);
 
     final result = await engine.open(_options);
 
     // Closing the live socket to make room would hide a caller opening a second connection over a
-    // connection it still has.
+    // connection it still has. Refused before a second socket is even created.
     expect(result.isFailure, isTrue);
-    expect(socket.sink.closedWith, isNull);
+    expect(sockets, hasLength(1));
+    expect(sockets.single.sink.closedWith, isNull);
     expect(listener.closures, isEmpty);
   });
 

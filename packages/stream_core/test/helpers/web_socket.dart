@@ -120,10 +120,17 @@ class FakeWebSocketChannel extends StreamChannelMixin<Object?> implements WebSoc
   @override
   Stream<Object?> get stream => _incoming.stream;
 
+  final _ready = Completer<void>();
+
+  /// Lets a handshake held by `holdReady` finish, for one that lands late.
+  void completeReady() {
+    if (!_ready.isCompleted) _ready.complete();
+  }
+
   @override
   Future<void> get ready {
     if (readyError case final error?) return Future.error(error);
-    if (holdReady) return Completer<void>().future;
+    if (holdReady) return _ready.future;
     return Future.value();
   }
 

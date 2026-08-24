@@ -78,6 +78,29 @@ void main() {
     );
 
     wsClientTest(
+      'ignores a handshake that finishes after the connection was closed',
+      handshakeHangs: true,
+      connect: (_) {},
+      body: (tester) async {
+        tester.client.connect().ignore();
+        await tester.pumpEventQueue();
+
+        await tester.client.disconnect();
+        await tester.pumpEventQueue();
+        expect(tester.connectionState, isA<Disconnected>().having((it) => it.source, 'source', isA<UserInitiated>()));
+
+        // Acted on, it would authenticate a socket the client has let go of, and failing to send
+        // would relabel the closure as `AuthenticationFailed`. That costs a caller their own reason
+        // here; on the connect-timeout path it turns a reconnectable `ConnectTimeout` into a state
+        // that never reconnects.
+        tester.server.sockets.last.completeReady();
+        await tester.pumpEventQueue();
+
+        expect(tester.connectionState, isA<Disconnected>().having((it) => it.source, 'source', isA<UserInitiated>()));
+      },
+    );
+
+    wsClientTest(
       'closes a socket whose handshake failed',
       handshakeFails: true,
       connect: _justConnect,
