@@ -208,6 +208,25 @@ void main() {
         expect(seen, [null, isA<StreamApiError>().having((it) => it.code, 'code', 40)]);
       });
 
+      test('is handed on even when the closure is not one to reconnect from', () async {
+        final (:authenticator, :seen) = watching();
+        final tester = buildTester(authenticator: authenticator);
+
+        await tester.client.connect();
+        await tester.pumpEventQueue();
+
+        // A refusal no other token repairs, so nothing reconnects on the client's own initiative.
+        await tester.emit(invalidSignatureFrame());
+        expect(tester.connectionState.isAutomaticReconnectionEnabled, isFalse);
+
+        await tester.client.connect();
+        await tester.pumpEventQueue();
+
+        // A caller who connects again is presenting credentials of their own, and needs to be told
+        // what the last ones were refused for however the closure was classified.
+        expect(seen, [null, isA<StreamApiError>().having((it) => it.code, 'code', 43)]);
+      });
+
       test('is absent once a connection has been established', () async {
         final (:authenticator, :seen) = watching();
         final tester = buildTester(authenticator: authenticator);
