@@ -19,6 +19,8 @@
 ### 🔄 Changed
 
 - Raised the minimum Dart SDK to `^3.12.0`.
+- `SystemEnvironmentManager.updateEnvironment` now sanitizes the passed `SystemEnvironment`, so an integrator can
+  enrich the Stream client header without changing the SDK identity it reports.
 
 ## 0.4.0
 
