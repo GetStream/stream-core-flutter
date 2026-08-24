@@ -166,16 +166,13 @@ class ConnectionRecoveryHandler extends Disposable {
     };
   }
 
-  // Keeping the connection is this handler's job from here,
-  // and the accumulated backoff failures no longer apply.
   void _onConnectionEstablished() {
     _hasEstablishedConnection = true;
     return _reconnectStrategy.resetConsecutiveFailures();
   }
 
-  // A closure this handler will never act on leaves the next `connect` to whoever makes it. Only the
-  // source is consulted here; the network and lifecycle are checked when a reconnection is actually
-  // attempted, so a drop that lands while either is down is still one to recover once it is back.
+  // Only the source is consulted here; the network and lifecycle are checked when a reconnection is
+  // attempted, so a drop during an outage is still one to recover once it clears.
   void _onConnectionLost(DisconnectionSource source) {
     if (!source.isReconnectable) {
       _hasEstablishedConnection = false;
