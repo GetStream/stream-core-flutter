@@ -23,9 +23,8 @@ class StreamDioException extends DioException {
 extension StreamDioExceptionExtension on DioException {
   /// The Stream API error the response carried, or `null` when it carried something else.
   ///
-  /// Read whether or not the response was typed as JSON, so an error sent as plain text is still
-  /// recognised. Anything that is not a Stream error payload reads as `null` rather than throwing:
-  /// a proxy or gateway can answer with a JSON body of its own.
+  /// Recognised whether the server sent it as JSON or as plain text. A body that is not a Stream
+  /// error — a proxy or gateway answering with one of its own — reads as `null` rather than throwing.
   StreamApiError? get apiError {
     return runSafelySync(() {
       return switch (response?.data) {
@@ -36,6 +35,11 @@ extension StreamDioExceptionExtension on DioException {
     }).getOrNull();
   }
 
+  /// This exception as an [HttpClientException].
+  ///
+  /// The message and status code come from the [apiError] the response carried, falling back to what
+  /// the transport reported when there was none. The cause is that error, or this exception when the
+  /// response carried none. A request the caller cancelled is marked as such.
   HttpClientException toClientException() {
     final apiError = this.apiError;
 
