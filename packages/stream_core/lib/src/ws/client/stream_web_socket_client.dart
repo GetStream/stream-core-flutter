@@ -163,12 +163,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Bound the attempt, so one that never becomes usable is not waited on forever.
     _startConnectTimeout(options.connectTimeout);
     final result = await _engine.open(options);
-    if (result case Failure(:final error, :final stackTrace)) {
-      // Report the failure before closing the socket. Close it first and the engine's default close
-      // code makes this look deliberate, which never reconnects and ends any recovery in progress.
-      onError(error, stackTrace);
-      await _engine.close();
-    }
+    // Report the failure first; closing without a reason looks deliberate, and that never reconnects.
+    result.onFailure(onError).recover((_, _) => _engine.close());
   }
 
   /// Closes the WebSocket connection.
