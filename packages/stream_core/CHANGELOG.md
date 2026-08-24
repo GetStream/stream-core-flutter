@@ -6,10 +6,10 @@
 - Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
 - `StreamWebSocketClient` now takes an `optionsBuilder` instead of `options`, and calls it for every connection attempt
 - Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`
-- `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsRequestSender` and returns a `Result`, so a failure to authenticate can be observed
+- `StreamWebSocketClient.onAuthenticate` is now a `WebSocketAuthenticator`: it is handed a `WsRequestSender` and throws to say the credentials did not go out, whether sending failed or it chose not to send them. That closes the connection as `AuthenticationFailed`, which is not retried
 - `WsRequestSender` and `WebSocketAuthenticator` now live in `web_socket_authentication_handler.dart` and are exported as before. The handler that runs them, and remembers what the server refused, is internal
-- `WebSocketAuthenticator` returns `Future<void>` rather than `Future<Result<void>>`: it throws to say the credentials did not go out, whether that is a failure or a deliberate refusal to send them. Returning a result described the same thing a second way, and both were funnelled into the same closure regardless
-- `WebSocketAuthenticator` is handed the error the server closed the previous attempt with, as `previousError`, and null once a connection has been established. It says whether the credentials it last sent are the reason the attempt failed, so it can replace them — or return a failure when there is nothing to replace them with, which closes the connection as `AuthenticationFailed` and is not retried, rather than offering refused credentials for the life of the client
+- `WebSocketAuthenticator` is also handed `previousError`, the error the server closed the previous attempt with, and null on a first attempt and once a connection has been established. It tells the authenticator whether the credentials it last sent are why the attempt failed, so it can replace them rather than offer refused ones for the life of the client. An attempt abandoned before its authenticator finished leaves the refusal behind for the attempt that replaces it, which has yet to answer it
+- The `previousError` handed to a `WebSocketAuthenticator` is now forgotten when the caller disconnects, as well as when a connection is established. A caller that disconnects takes connecting back, and what they connect with next is theirs to decide — another user, whose credentials the refusal says nothing about. A connect made straight after a disconnect with credentials that are still spent is refused once, and the connect after that is told and succeeds
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
 - `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. A mismatch fails to compile in a const context, and throws in debug mode otherwise
 - `WebSocketConnectionState.isAutomaticReconnectionEnabled` is now `true` for an expired token, and remains `false` for token errors a fresh token cannot fix
@@ -19,6 +19,7 @@
 
 ### ✨ Features
 
+- Added `DioException.apiError`, the Stream API error a response carried, read from a decoded body or from a string one, and `null` for anything that is not a Stream error payload
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
 - Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`
@@ -28,16 +29,18 @@
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
 - Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before it is established, and eligible for automatic reconnection
 - Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
-- Added `WsRequestSender`, the send capability handed to a `WebSocketAuthenticator`
+- Added `WsRequestSender`, the send capability handed to a `WebSocketAuthenticator`. It belongs to the connection attempt it was handed to and fails once that attempt is no longer the one in flight, so an authenticator still awaiting credentials for an abandoned attempt cannot send them over the connection that replaced it, nor close it as `AuthenticationFailed`
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`
 - `StreamWebSocketClient.connect` now throws a `StateError` once the client has been disposed, in release builds as well as debug. It previously asserted and then returned, so a release build opened a socket nothing could observe or close: the emitters are shut, so no state change is reported, and the health monitor that would tear an idle connection down is stopped
-- `StreamWebSocketClient.disconnect` records the request without going through `disconnecting` when there is no connection to close, so a `connect` made straight afterwards is not refused for racing a close that is not happening. An explicit disconnect also now takes effect on a connection that is already down, which is what calls off a scheduled reconnection
+- `StreamWebSocketClient.disconnect` returns without reporting a closure when no connection was ever opened, so a `connect` made straight afterwards is not refused for racing a close that is not happening. An explicit disconnect also now takes over a closure already recorded or under way, which is what calls off a scheduled reconnection
 - Added `teams` field to `User` class
 - `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, no longer nullable and 30 seconds by default, so an attempt that never becomes usable is abandoned and reconnected rather than waited on indefinitely
 
 ### 🐛 Bug Fixes
 
+- Fixed a token-expired response never being retried when the server sent it without a JSON content type, so Dio handed the body over as a string. The same body was already read that way when the error was surfaced to the caller, so a request was reported as refused for an expired token without the token ever being replaced
+- `StreamWebSocketClient` no longer prints to the console. It announced every connection state change, every pong and every ping, which is noise a consumer cannot turn off and cannot act on
 - Fixed `StreamWebSocketClient.connect` leaking the socket of a connection whose handshake failed. The socket is opened before the handshake it fails, and the client reported the connection closed without closing it, so the socket stayed open and unreachable — `dispose` did not close it either, and the next attempt closed it instead, reporting a closure while that attempt was still connecting
 - Fixed a WebSocket engine that reported a closure to its listener only when the close succeeded. It now reports one however the close went, and even when there was no socket to close, so a client waiting to hear the connection is down is no longer left waiting on a socket it can never use. It also lets go of a socket that failed to close, rather than holding one it cannot use, and reports a closure once rather than again when the socket's stream ends
 - Fixed a request that met a second token-expired response never completing at all. A request is now retried at most once
@@ -48,7 +51,7 @@
 - Fixed `TokenManager` caching a token that finished loading after `expireToken` or `setTokenProvider` had invalidated it
 - Fixed `StreamWebSocketClient.disconnect` completing before the socket was closed, so a `connect` straight afterwards raced the closure
 - Fixed a failure to close the socket leaving `StreamWebSocketClient` reporting itself as disconnecting for good
-- Fixed a `WebSocketAuthenticator` that throws rather than returning a failure escaping as an unhandled error and leaving the connection authenticating
+- Fixed an error thrown by a `WebSocketAuthenticator` escaping unhandled and leaving the connection authenticating
 - Fixed `StreamWebSocketClient.disconnect` replacing the source of a closure already under way, turning a reconnectable error into a permanent `ConnectTimeout`
 - Fixed `isAutomaticReconnectionEnabled` refusing neither a deliberate close (code 1000) nor client errors, neither of which ever matched
 - Fixed a connection closed for a rate limit not being eligible for automatic reconnection, since a rate limit clears on its own
