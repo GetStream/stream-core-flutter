@@ -16,6 +16,7 @@
 - `StreamApiError.isTokenExpiredError` now means code 40 only; the other token codes and a wrong API key are `isInvalidTokenError`. `isClientError` compares the HTTP `statusCode` against 400..499, rather than the Stream error `code`, which never falls in that range
 - `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` return the result's own type and no longer take a type parameter. To widen, widen the result (`Result<num> widened = intResult`) or use `fold`
 - Replaced the logger: `StreamLogger` is the handle you write with and a `StreamLogHandler` is where records go, so `Priority`, `MessageBuilder`, `Tag`, `IsLoggableValidator` and `Finder` are renamed or gone
+- `LoggingInterceptor` writes through the logger rather than printing, so it is silent until an app installs a handler. Its `logPrint` is now optional, and it takes a `tag`
 
 ### ✨ Features
 
