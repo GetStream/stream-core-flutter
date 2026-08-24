@@ -83,8 +83,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   late final WebSocketAuthenticationHandler _authenticationHandler;
   late final _healthMonitor = WebSocketHealthMonitor(listener: this);
 
-  // Bounds an attempt while it is `Connecting` or `Authenticating`; the health monitor takes over
-  // once it is established.
+  // Bounds an attempt while it is `Connecting` or `Authenticating`. Once the connection is
+  // established, the health monitor takes over.
   Timer? _connectTimeoutTimer;
 
   void _startConnectTimeout(Duration timeout) {
@@ -143,8 +143,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   ///
   /// Throws a [StateError] once [dispose] has been called.
   Future<void> connect() async {
-    // A disposed client cannot report a state change or tear an idle connection down, so a socket
-    // opened here would be unobservable.
+    // A disposed client cannot report a state change or close an idle connection, so a socket opened
+    // here would be invisible to everyone.
     if (isDisposed) throw StateError('Cannot connect a disposed StreamWebSocketClient');
 
     // If the connection is already established or in the process of connecting,
@@ -160,12 +160,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Open the connection using the engine, with options built for this attempt.
     final options = optionsBuilder.call();
 
-    // Bound the attempt, so one that never becomes usable is not waited on indefinitely.
+    // Bound the attempt, so one that never becomes usable is not waited on forever.
     _startConnectTimeout(options.connectTimeout);
     final result = await _engine.open(options);
     if (result case Failure(:final error, :final stackTrace)) {
-      // Report the failure before letting go of the socket. Closed first, it would read as the
-      // deliberate close the engine defaults to, which is never reconnected — ending any recovery.
+      // Report the failure before closing the socket. Close it first and the engine's default close
+      // code makes this look deliberate, which never reconnects and ends any recovery in progress.
       onError(error, stackTrace);
       await _engine.close();
     }
@@ -189,8 +189,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     if (connectionState.value case Initialized()) return;
 
-    // A source that rules a reconnection out takes over a closure already recorded or under way, or
-    // something already pending would reconnect past it. Every other source leaves that closure be.
+    // A source that blocks reconnection overwrites a closure already recorded or underway, or a
+    // pending reconnect could fire past it. Any other source leaves the existing closure alone.
     final forceDisconnect = source is UserInitiated || source is AuthenticationFailed;
     if (connectionState.value case Disconnecting() when !forceDisconnect) return;
     if (connectionState.value case Disconnected() when !forceDisconnect) return;
@@ -201,8 +201,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Close the connection using the engine.
     final result = await _engine.close(closeCode, source.closeReason);
 
-    // The engine announces a closure only when the socket actually closed, so a close that failed is
-    // reported here instead, leaving nothing stuck disconnecting.
+    // The engine only announces a closure when the socket really closed, so report it here when the
+    // close failed. Otherwise the connection stays stuck disconnecting.
     if (result.isFailure) onClose(closeCode, source.closeReason);
   }
 
@@ -275,8 +275,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   }
 
   void _handleHealthCheckEvent(WsEvent event, HealthCheckInfo info) {
-    // Handled, a late pong would report the connection established again and replace the source of
-    // the disconnection, turning one the caller asked for into a server close that is reconnected.
+    // A late pong would set the state back to connected and overwrite the disconnection's source,
+    // turning a deliberate disconnect into a server close that gets reconnected.
     if (connectionState.value case Disconnecting()) return;
     if (connectionState.value case Disconnected()) return;
 

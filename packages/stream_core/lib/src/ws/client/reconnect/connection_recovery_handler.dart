@@ -84,8 +84,8 @@ class ConnectionRecoveryHandler extends Disposable {
 
   late final _subscriptions = CompositeSubscription();
 
-  // Whether a connection has been established and has not since closed for a reason this handler
-  // will never act on. Separates a drop this handler recovers from an attempt that never landed.
+  // True once a connection has been established, and false again if one closes for a reason this
+  // handler will not act on. Tells a drop worth recovering apart from an attempt that never landed.
   var _hasEstablishedConnection = false;
 
   /// Attempts reconnection if policies allow it.
@@ -171,8 +171,8 @@ class ConnectionRecoveryHandler extends Disposable {
     return _reconnectStrategy.resetConsecutiveFailures();
   }
 
-  // Only the source is consulted here; the network and lifecycle are checked when a reconnection is
-  // attempted, so a drop during an outage is still one to recover once it clears.
+  // Only the source matters here. The network and lifecycle are checked later, when a reconnect is
+  // actually attempted, so a drop during an outage still counts as one worth recovering.
   void _onConnectionLost(DisconnectionSource source) {
     if (!source.isReconnectable) {
       _hasEstablishedConnection = false;

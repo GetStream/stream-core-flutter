@@ -41,8 +41,8 @@ class WebSocketAuthenticationHandler {
   final WsRequestSender _send;
   final void Function(Object error) _onFailure;
 
-  // Identifies the attempt in flight. An authenticator can outlive the attempt that started it, and
-  // holds a sender and a failure path that would otherwise reach whichever connection is current.
+  // Identifies the attempt in flight, because an authenticator can outlive the attempt that started
+  // it and still hold a sender and a failure path aimed at whatever connection is current by then.
   var _attempt = 0;
 
   /// The error the server closed the previous attempt with, if it sent one.
@@ -91,19 +91,19 @@ class WebSocketAuthenticationHandler {
     // Guarded because nothing awaits this: an error thrown here would go unhandled.
     final result = await runSafely(() => authenticate(_senderFor(attempt), previousError));
 
-    // A stale attempt. Reported now, its failure would close the connection that replaced it as
-    // `AuthenticationFailed`, which is never reconnected; the refusal stays armed for that one.
+    // This attempt is stale. Reporting its failure now would close the connection that replaced it
+    // as `AuthenticationFailed`, which never reconnects. The refusal stays armed for that one.
     if (attempt != _attempt) return;
 
-    // Answered by this attempt, so it is spent — unless the server refused something newer while it
-    // ran, which the attempt after this one still has to see.
+    // This attempt answered it, so it is spent — unless the server refused something newer while the
+    // authenticator ran, which the next attempt still needs to see.
     if (_previousError == previousError) _previousError = null;
 
     if (result case Failure(:final error)) return _onFailure(error);
   }
 
-  // An authenticator holds its sender across its own awaits, so the attempt is checked when a
-  // request is sent rather than once before the authenticator is called.
+  // An authenticator holds its sender across its own awaits, so check the attempt when a request is
+  // actually sent rather than once up front.
   WsRequestSender _senderFor(int attempt) => (request) {
     if (attempt == _attempt) return _send(request);
 
