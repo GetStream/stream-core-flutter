@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:clock/clock.dart';
 import 'package:meta/meta.dart';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
@@ -53,6 +54,90 @@ void main() {
         expect(second, generateTestUserToken('user-1'));
         expect(provider.loadCount, 1);
         expect(manager.peekToken(), generateTestUserToken('user-1'));
+      });
+
+      test('replaces a cached token that has expired', () async {
+        final expiry = DateTime.utc(2030);
+        final provider = _CountingProvider((id) async => generateTestUserToken(id, expiresAt: expiry));
+        final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
+
+        await withClock(Clock.fixed(expiry.subtract(const Duration(hours: 1))), manager.getToken);
+        expect(provider.loadCount, 1);
+
+        // Past its expiry the server would refuse it, so presenting it costs a request to find out
+        // what the token already said.
+        await withClock(Clock.fixed(expiry.add(const Duration(seconds: 1))), manager.getToken);
+
+        expect(provider.loadCount, 2);
+      });
+
+      test('keeps a cached token that has not expired yet', () async {
+        final expiry = DateTime.utc(2030);
+        final provider = _CountingProvider((id) async => generateTestUserToken(id, expiresAt: expiry));
+        final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
+
+        await withClock(Clock.fixed(expiry.subtract(const Duration(hours: 1))), manager.getToken);
+        await withClock(Clock.fixed(expiry.subtract(const Duration(seconds: 1))), manager.getToken);
+
+        // A second of life left is still life: a margin ahead of the expiry would throw it away.
+        expect(provider.loadCount, 1);
+      });
+
+      test('contacts the provider once for a token that is short-lived, not once per call', () async {
+        // A backend issuing tokens that live for seconds. Treating anything near its expiry as spent
+        // makes every call a load, which is the caching this manager exists for, undone.
+        final issued = DateTime.utc(2030);
+        var loads = 0;
+        final provider = _CountingProvider(
+          (id) async => generateTestUserToken(id, expiresAt: issued.add(Duration(seconds: 30 + ++loads))),
+        );
+        final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
+
+        await withClock(Clock.fixed(issued), () async {
+          for (var i = 0; i < 5; i++) {
+            await manager.getToken();
+          }
+        });
+
+        expect(provider.loadCount, 1);
+      });
+
+      test('hands out a static provider token that has expired, rather than asking again', () async {
+        final expiry = DateTime.utc(2030);
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: TokenProvider.static(generateTestUserToken('user-1', expiresAt: expiry)),
+        );
+
+        // A static provider has nothing fresher to give. The server refusing it is what tells a
+        // guest to exchange for a new identity, and asking again only produces the same token.
+        final token = await withClock(
+          Clock.fixed(expiry.add(const Duration(hours: 1))),
+          manager.getToken,
+        );
+
+        expect(token.expiresAt, expiry);
+        expect(manager.peekToken(), isNotNull);
+      });
+
+      test('notifies once per load, not once per call for a token near its expiry', () async {
+        final expiry = DateTime.utc(2030);
+        final updated = <UserToken>[];
+        final provider = _CountingProvider((id) async => generateTestUserToken(id, expiresAt: expiry));
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: provider,
+          onTokenUpdated: updated.add,
+        );
+
+        await withClock(Clock.fixed(expiry.subtract(const Duration(seconds: 1))), () async {
+          for (var i = 0; i < 4; i++) {
+            await manager.getToken();
+          }
+        });
+
+        // A notification per call would have every listener re-running for a token that never moved.
+        expect(updated, hasLength(1));
       });
 
       test('passes the manager userId to the provider', () async {

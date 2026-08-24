@@ -128,11 +128,9 @@ class TokenManager {
   /// `null` when nothing is cached, or when the cache was expired.
   UserToken? peekToken() => _cachedToken;
 
-  /// Whether this manager uses a static token provider.
+  /// Whether tokens come from a provider that always returns the same one.
   ///
-  /// Returns true if the token provider is static (doesn't refresh tokens),
-  /// false if it's dynamic (fetches fresh tokens on each call) or if no
-  /// identity is configured.
+  /// `false` when no identity is configured.
   bool get usesStaticProvider => _identity?.provider is StaticTokenProvider;
 
   /// Returns the cached token, loading one from the [TokenProvider] when nothing is cached.
@@ -142,16 +140,22 @@ class TokenManager {
   ///
   /// Fails with a [ClientException] when no identity is configured, or when [reset] runs while the
   /// token is loading.
-  Future<UserToken> getToken() {
+  Future<UserToken> getToken() async {
     final cached = peekToken();
-    if (cached != null) return Future.value(cached);
+    if (cached != null && !_isSpent(cached)) return cached;
 
     return synchronized(() {
       final currentToken = peekToken();
-      if (currentToken != null) return Future.value(currentToken);
+      if (currentToken != null && !_isSpent(currentToken)) return currentToken;
 
       return _loadAndNotify();
     });
+  }
+
+  bool _isSpent(UserToken token) {
+    // A static provider has nothing fresher to replace it with.
+    if (usesStaticProvider) return false;
+    return token.isExpired();
   }
 
   // Loads a token from the provider and, unless the cached token was
