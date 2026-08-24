@@ -14,6 +14,16 @@ void main() {
       expect(details.custom, {'plan': 'pro'});
     });
 
+    test('sends nothing but the id when the details are excluded', () {
+      const user = User(id: 'user-1', name: 'Bob', image: 'https://example.com/bob.png', custom: {'plan': 'pro'});
+
+      final json = ConnectUserDetailsRequest.fromUser(user, includeDetails: false).toJson();
+
+      // An unset field is left out rather than sent as a null, so the server is not asked to
+      // distinguish "no opinion" from "clear this".
+      expect(json, {'id': 'user-1'});
+    });
+
     test('leaves out the fields the server decides itself', () {
       const user = User(id: 'user-1', role: 'admin', teams: ['red']);
 

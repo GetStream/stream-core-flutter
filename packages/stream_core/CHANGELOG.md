@@ -43,6 +43,7 @@
 
 ### 🔄 Changed
 
+- `ConnectUserDetailsRequest` leaves its unset fields out of the JSON it serialises, rather than sending them as nulls
 - Anonymous requests now always send `user_id=!anon`, rather than whatever id the `TokenManager` was configured with
 - `DynamicTokenProvider` checks the token type before its user id, so a token of the wrong type is reported as such instead of as a mismatched user
 - `TokenManager.getToken` fails when `reset` runs while the token is loading, and rejects a token whose `user_id` is not the user it was loading for; a `setTokenProvider` during a load still serves the caller that started it

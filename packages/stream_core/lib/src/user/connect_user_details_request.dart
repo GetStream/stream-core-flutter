@@ -5,7 +5,7 @@ import 'user.dart';
 
 part 'connect_user_details_request.g.dart';
 
-@JsonSerializable(createFactory: false)
+@JsonSerializable(createFactory: false, includeIfNull: false)
 class ConnectUserDetailsRequest {
   const ConnectUserDetailsRequest({
     required this.id,
