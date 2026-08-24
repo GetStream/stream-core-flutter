@@ -26,6 +26,7 @@
 - Added `teams` field to `User` class
 - Added `DioException.apiError`, the Stream API error a response carried, or `null` for anything else
 - Added `DisconnectionSource.connectTimeout` and `authenticationFailed`, and `isReconnectable`, whether a connection closed for that reason is worth opening again
+- Added `DisconnectionSource.cause`, what closed the connection, so an SDK reporting a failed `connect` no longer enumerates the sources itself; a `ServerInitiated` closure reports the error the socket failed with rather than the `WebSocketEngineException` wrapping it
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`, and `connect` throws a `StateError` afterwards
 - `StreamWebSocketClient` now honours `WebSocketOptions.connectTimeout`, no longer nullable and 30 seconds by default, so an attempt that never becomes usable is abandoned

@@ -127,4 +127,44 @@ void main() {
       expect(state.isConnected, isFalse, reason: '$state');
     }
   });
+
+  group('cause', () {
+    test('is what the socket failed with, not the exception carrying it', () {
+      final apiError = _apiError(40);
+      final source = ServerInitiated(
+        error: WebSocketEngineException(reason: apiError.message, code: 4001, error: apiError),
+      );
+
+      // Reported unwrapped so a caller can match on the error itself. Handed the exception, a
+      // caller checking for a `StreamApiError` would find none and report the closure as unexplained.
+      expect(source.cause, same(apiError));
+    });
+
+    test('is the exception itself when it carries nothing but a close code', () {
+      const exception = WebSocketEngineException(reason: 'gone', code: 4001);
+      const source = ServerInitiated(error: exception);
+
+      // The close code is the only account of the closure there is, so it stands in.
+      expect(source.cause, same(exception));
+    });
+
+    test('is null for a server closure that named no reason at all', () {
+      expect(const ServerInitiated().cause, isNull);
+    });
+
+    test('is what authentication failed with', () {
+      final error = Exception('the token was refused');
+      final source = AuthenticationFailed(error: error);
+
+      expect(source.cause, same(error));
+    });
+
+    test('is null for the sources that carry none', () {
+      // Nothing went wrong in these, or nothing that the source was told about.
+      expect(const UserInitiated().cause, isNull);
+      expect(const SystemInitiated().cause, isNull);
+      expect(const UnHealthyConnection().cause, isNull);
+      expect(const ConnectTimeout().cause, isNull);
+    });
+  });
 }

@@ -260,6 +260,18 @@ sealed class DisconnectionSource extends Equatable {
     };
   }
 
+  /// What closed the connection, or `null` when this source carries no cause.
+  ///
+  /// A [ServerInitiated] closure reports the error the socket failed with, not the
+  /// [WebSocketEngineException] wrapping it — that stands in only when it wraps nothing.
+  Object? get cause {
+    return switch (this) {
+      ServerInitiated(:final error) => error?.error ?? error,
+      AuthenticationFailed(:final error) => error,
+      UserInitiated() || SystemInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
+    };
+  }
+
   /// Whether a connection closed for this reason is worth opening again.
   ///
   /// {@template webSocketReconnectionRules}
