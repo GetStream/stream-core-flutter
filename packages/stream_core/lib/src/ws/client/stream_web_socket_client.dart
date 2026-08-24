@@ -186,9 +186,9 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // If no connection was ever opened, there is nothing to close.
     if (connectionState.value case Initialized()) return;
 
-    // A disconnection the client decided on does not relabel one already recorded or under way,
-    // while one the caller asked for does, so nothing reconnects after it.
-    final forceDisconnect = source is UserInitiated;
+    // A disconnection the client decided on does not relabel one already recorded or under way. A
+    // reason that rules a reconnection out does, or something pending would reconnect past it.
+    final forceDisconnect = source is UserInitiated || source is AuthenticationFailed;
     if (connectionState.value case Disconnecting() when !forceDisconnect) return;
     if (connectionState.value case Disconnected() when !forceDisconnect) return;
 

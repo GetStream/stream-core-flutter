@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:fake_async/fake_async.dart';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
+import '../../../helpers/user_token.dart';
 import '../../../helpers/ws_client_tester.dart';
 
 /// Long enough for a health check to go unanswered, which is the drop this handler recovers from.
@@ -111,6 +114,49 @@ void main() {
       // Nothing is left armed. A timer that outlives the caller's disconnect fires against a client
       // they have closed, and reconnects it behind them.
       expect(async.pendingTimers, isEmpty);
+    });
+  });
+
+  test('stops retrying once an authenticator gives up', () {
+    fakeAsync((async) {
+      final loaded = Completer<void>();
+      var attempts = 0;
+      final tester = buildTester(
+        recover: true,
+        // The first attempt authenticates. Every one after it waits on credentials that never
+        // arrive, and then reports that there are none to send.
+        authenticator: (send, _) async {
+          if (++attempts > 1) {
+            await loaded.future;
+            throw StateError('nothing left to offer');
+          }
+          send(WsAuthMessageRequest(token: generateTestUserToken('luke_skywalker').rawValue)).getOrThrow();
+        },
+      );
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      expect(tester.connectionState, isA<Connected>());
+
+      // Dropped, so this handler retries. That attempt hangs and is abandoned by the connect
+      // timeout, which schedules another.
+      tester.server.hangUp();
+      async.flushMicrotasks();
+      async.elapse(WebSocketOptions.defaultConnectTimeout);
+      final retried = tester.attempts;
+
+      loaded.complete();
+      async.flushMicrotasks();
+      expect(
+        tester.connectionState,
+        isA<Disconnected>().having((it) => it.source, 'source', isA<AuthenticationFailed>()),
+      );
+
+      async.elapse(const Duration(minutes: 2));
+
+      // Credentials the authenticator has given up on cannot be repaired by trying again, so a
+      // retry already scheduled must not go ahead either.
+      expect(tester.attempts, retried);
     });
   });
 

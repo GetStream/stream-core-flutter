@@ -366,6 +366,35 @@ void main() {
         });
       });
 
+      test('records the failure when nothing replaced it, so it is not reconnected', () {
+        fakeAsync((async) {
+          // A token load that outlives the attempt the timeout abandoned and then fails. Nothing has
+          // replaced that attempt, so this failure is the last word on it.
+          final loaded = Completer<void>();
+          final tester = buildTester(
+            authenticator: (_, _) async {
+              await loaded.future;
+              throw StateError('token load failed');
+            },
+          );
+
+          tester.client.connect().ignore();
+          async.flushMicrotasks();
+
+          async.elapse(WebSocketOptions.defaultConnectTimeout);
+          expect(tester.connectionState, isA<Disconnected>());
+
+          loaded.complete();
+          async.flushMicrotasks();
+
+          // Nothing can repair credentials the authenticator has given up on, so an attempt left
+          // eligible for a reconnection would be refused the same way.
+          final state = tester.connectionState;
+          expect(state, isA<Disconnected>().having((it) => it.source, 'source', isA<AuthenticationFailed>()));
+          expect(state.isAutomaticReconnectionEnabled, isFalse);
+        });
+      });
+
       test('does not close the connection that replaced it when its credentials fail', () {
         fakeAsync((async) {
           final loaded = Completer<void>();
