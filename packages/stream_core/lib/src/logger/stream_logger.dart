@@ -1,63 +1,231 @@
-final _priorityEmojiMapper = {
-  Priority.error: '🚨',
-  Priority.warning: '⚠️',
-  Priority.info: 'ℹ️',
-  Priority.debug: '🔧',
-  Priority.verbose: '🔍',
-};
+import 'package:meta/meta.dart';
 
-final _priorityNameMapper = {
-  Priority.error: 'E',
-  Priority.warning: 'W',
-  Priority.info: 'I',
-  Priority.debug: 'D',
-  Priority.verbose: 'V',
-};
+import 'stream_log_filter.dart';
+import 'stream_log_handler.dart';
+import 'stream_log_priority.dart';
+import 'stream_log_record.dart';
 
-abstract class StreamLogger {
-  const StreamLogger();
+/// Builds a log message on demand.
+///
+/// Called only once a record is known to be wanted, so an interpolation this expensive is never
+/// paid for by a record that is dropped.
+typedef StreamLogMessage = String Function();
 
-  String emoji(Priority priority) => _priorityEmojiMapper[priority] ?? '📣';
+/// Writes log records under a tag.
+///
+/// Holding one costs nothing and it can be created anywhere — a field, a constructor, or a
+/// top-level `final` in a file with no class at all:
+///
+/// ```dart
+/// final _log = StreamLogger('SF:SdpEditor');
+///
+/// String editSdp(String sdp) {
+///   _log.d(() => 'rewriting $sdp');
+///   ...
+/// }
+/// ```
+///
+/// Where records go is resolved when a record is written, not when the logger is created, so a
+/// logger built at class-load picks up whatever the app installs later:
+///
+/// ```dart
+/// StreamLogger.handler = const StreamLogHandler.console();
+/// StreamLogger.priority = StreamLogPriority.debug;
+/// ```
+///
+/// Records go to one place, so routing two SDKs apart is a matter of a [StreamLogHandler] reading
+/// [StreamLogRecord.tag] rather than of finding every component that had to be handed something.
+/// For the exception, see [StreamLogger.detached].
+final class StreamLogger {
+  /// Creates a [StreamLogger] writing under [tag] to whatever the app has installed.
+  const StreamLogger(this.tag) : _handler = null, _filter = null;
 
-  String name(Priority priority) => _priorityNameMapper[priority] ?? '*';
+  /// Creates a [StreamLogger] that ignores what the app has installed.
+  ///
+  /// Records go to the given handler and are gated by the given filter alone, so a detached logger
+  /// neither reads nor disturbs [StreamLogger.handler]. Use one to capture a component's records in
+  /// a test, or to hold a subsystem to its own threshold and destination:
+  ///
+  /// ```dart
+  /// final _log = StreamLogger.detached(
+  ///   'SF:Upload',
+  ///   handler: const StreamLogHandler.console(),
+  ///   filter: const StreamLogFilter.minPriority(StreamLogPriority.debug),
+  /// );
+  /// ```
+  ///
+  /// A priority of its own is a [StreamLogFilter.minPriority], which is why there is no separate one.
+  /// [filter] defaults to the same threshold [StreamLogger.priority] starts at, so detaching a logger
+  /// changes where its records go without also changing how many there are. Pass
+  /// [StreamLogFilter.always] to leave the decision entirely to the handler.
+  const StreamLogger.detached(
+    this.tag, {
+    required StreamLogHandler this._handler,
+    StreamLogFilter this._filter = const .minPriority(.warning),
+  });
 
-  void log(
-    Priority priority,
-    String tag,
-    MessageBuilder message, [
+  // Null means the ambient one, read when a record is written rather than when this was built.
+  final StreamLogHandler? _handler;
+  final StreamLogFilter? _filter;
+
+  /// The name records from this logger carry.
+  ///
+  /// Conventionally an SDK prefix and a component, such as `SC:WsClient`, so records from several
+  /// Stream SDKs stay apart in one log and a prefix can select a subsystem.
+  ///
+  /// See also:
+  ///
+  ///  * [StreamLogFilter.prefix], which turns this convention into a threshold per subsystem.
+  final String tag;
+
+  static StreamLogHandler _handlerOrDefault = StreamLogHandler.silent;
+  static StreamLogFilter _filterOrDefault = const .minPriority(.warning);
+
+  /// Installs where every record goes, other than those from a [StreamLogger.detached] logger.
+  ///
+  /// Everything is discarded until this is set, so an SDK is silent in an app that has not asked
+  /// for records. Setting it applies to loggers that already exist, including any built at
+  /// class-load, because a logger resolves this when it writes rather than when it was created.
+  ///
+  /// ```dart
+  /// StreamLogger.handler = const StreamLogHandler.console();
+  /// ```
+  ///
+  /// Write-only, so nothing can come to depend on what happens to be installed. Consider
+  /// [StreamLogHandler.composite] to send records to more than one place.
+  static set handler(StreamLogHandler handler) => _handlerOrDefault = handler;
+
+  /// Installs the lowest priority worth building a record for.
+  ///
+  /// Defaults to [StreamLogPriority.warning], so an app that installs a handler and nothing else
+  /// hears about failures and not the running commentary:
+  ///
+  /// ```dart
+  /// StreamLogger.priority = StreamLogPriority.debug;
+  /// ```
+  ///
+  /// Shorthand for a [StreamLogFilter.minPriority], so this and [filter] are one setting: whichever
+  /// is written last decides.
+  static set priority(StreamLogPriority priority) => _filterOrDefault = .minPriority(priority);
+
+  /// Installs which records are built at all, for a rule [priority] cannot express.
+  ///
+  /// ```dart
+  /// StreamLogger.filter = const StreamLogFilter.prefix(
+  ///   {'SC:Ws': StreamLogPriority.verbose},
+  ///   otherwise: StreamLogPriority.warning,
+  /// );
+  /// ```
+  static set filter(StreamLogFilter filter) => _filterOrDefault = filter;
+
+  /// Puts [handler] and [priority] back to what they were before anything was installed.
+  ///
+  /// What an app installs is process-wide, so a test that installs a handler and leaves it there
+  /// changes what every later test sees. Restoring by hand means naming the defaults, which a
+  /// write-only setter gives no way to read:
+  ///
+  /// ```dart
+  /// tearDown(StreamLogger.reset);
+  /// ```
+  @visibleForTesting
+  static void reset() {
+    _handlerOrDefault = StreamLogHandler.silent;
+    _filterOrDefault = const .minPriority(.warning);
+  }
+
+  /// Whether a record at [priority] would be kept by both the filter and the handler.
+  ///
+  /// Records are already gated, so this is only worth calling to guard a message that is
+  /// expensive to build beyond its interpolation:
+  ///
+  /// ```dart
+  /// if (_log.isLoggable(StreamLogPriority.verbose)) _log.v(() => describe(everyParticipant));
+  /// ```
+  bool isLoggable(StreamLogPriority priority) {
+    if (!(_filter ?? _filterOrDefault).isLoggable(priority, tag)) return false;
+    return (_handler ?? _handlerOrDefault).isLoggable(priority, tag);
+  }
+
+  /// Writes a [StreamLogPriority.verbose] record.
+  void v(
+    StreamLogMessage message, {
     Object? error,
-    StackTrace? stk,
-  ]);
-}
+    StackTrace? stackTrace,
+  }) => log(
+    StreamLogPriority.verbose,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
 
-typedef MessageBuilder = String Function();
-typedef Tag = String;
-typedef IsLoggableValidator = bool Function(Priority, Tag);
-typedef Finder = T? Function<T extends StreamLogger>([dynamic criteria]);
+  /// Writes a [StreamLogPriority.debug] record.
+  void d(
+    StreamLogMessage message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => log(
+    StreamLogPriority.debug,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
 
-enum Priority implements Comparable<Priority> {
-  verbose(level: 2),
-  debug(level: 3),
-  info(level: 4),
-  warning(level: 5),
-  error(level: 6),
-  none(level: 7);
+  /// Writes a [StreamLogPriority.info] record.
+  void i(
+    StreamLogMessage message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => log(
+    StreamLogPriority.info,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
 
-  const Priority({required this.level});
+  /// Writes a [StreamLogPriority.warning] record.
+  void w(
+    StreamLogMessage message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => log(
+    StreamLogPriority.warning,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
 
-  final int level;
+  /// Writes a [StreamLogPriority.error] record.
+  void e(
+    StreamLogMessage message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => log(
+    StreamLogPriority.error,
+    message,
+    error: error,
+    stackTrace: stackTrace,
+  );
 
-  @override
-  String toString() => name;
+  /// Writes a record at [priority].
+  ///
+  /// [message] is called only if the record is kept. [error] and [stackTrace] carry the cause
+  /// when the record describes a failure.
+  void log(
+    StreamLogPriority priority,
+    StreamLogMessage message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    if (!isLoggable(priority)) return;
 
-  @override
-  int compareTo(Priority other) => level.compareTo(other.level);
+    final record = StreamLogRecord(
+      priority: priority,
+      tag: tag,
+      message: message(),
+      error: error,
+      stackTrace: stackTrace,
+    );
 
-  bool operator <(Priority other) => level < other.level;
-
-  bool operator <=(Priority other) => level <= other.level;
-
-  bool operator >(Priority other) => level > other.level;
-
-  bool operator >=(Priority other) => level >= other.level;
+    return (_handler ?? _handlerOrDefault).handle(record);
+  }
 }
