@@ -1,0 +1,14 @@
+include: ../../analysis_options.yaml
+
+analyzer:
+  exclude:
+    # The repository excludes generated files by a path relative to its own options file, which
+    # stops matching once that file is included from here.
+    - lib/**/*.*.dart
+
+linter:
+  rules:
+    # Dangling dartdoc links are invisible to the analyzer everywhere else in the repo, so a rename
+    # leaves references pointing at members that no longer exist. Kept on here, where the public
+    # API is documented heavily enough for that to matter.
+    comment_references: true

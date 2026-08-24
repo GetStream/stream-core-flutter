@@ -1,6 +1,7 @@
 import 'stream_log_filter.dart';
 import 'stream_log_priority.dart';
 import 'stream_log_record.dart';
+import 'stream_logger.dart';
 
 /// Receives a log record on behalf of a [StreamLogHandler.from] handler.
 typedef StreamLogCallback = void Function(StreamLogRecord record);

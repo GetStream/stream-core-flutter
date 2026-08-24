@@ -303,4 +303,45 @@ void main() {
       expect(second.sequenceNumber, first.sequenceNumber + 1);
     });
   });
+  group('StreamLogPriority.none', () {
+    test('is refused as a record priority, whatever the level admits', () {
+      final handler = RecordingLogHandler();
+
+      final printed = withStreamLogger(
+        handler: handler,
+        filter: const StreamLogFilter.always(),
+        () => capturePrints(
+          () => const StreamLogger('SC:Component').log(StreamLogPriority.none, () => 'no severity'),
+        ),
+      );
+
+      // `none` outranks every severity, so a filter comparing against it would admit the one record
+      // that shutting logging down cannot silence.
+      expect(handler.records, isEmpty);
+      expect(printed, isEmpty);
+    });
+
+    test('reports itself as not loggable', () {
+      withStreamLogger(
+        handler: RecordingLogHandler(),
+        filter: const StreamLogFilter.always(),
+        () => expect(const StreamLogger('SC:Component').isLoggable(StreamLogPriority.none), isFalse),
+      );
+    });
+
+    test('does not build the message it was given', () {
+      var built = 0;
+
+      withStreamLogger(
+        handler: RecordingLogHandler(),
+        filter: const StreamLogFilter.always(),
+        () => const StreamLogger('SC:Component').log(StreamLogPriority.none, () {
+          built++;
+          return 'never built';
+        }),
+      );
+
+      expect(built, isZero);
+    });
+  });
 }
