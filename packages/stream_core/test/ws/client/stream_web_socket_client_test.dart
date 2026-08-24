@@ -32,14 +32,14 @@ void main() {
       handshakeFails: true,
       connect: _justConnect,
       body: (tester) {
-        // Not `ServerInitiated`: nothing was ever open for the server to close, and the cause may
-        // just as well have been local.
+        // Closed without saying why, the attempt reads as the deliberate close the engine defaults
+        // to, and a closure with that code is never reconnected.
         expect(
           tester.connectionState,
           isA<Disconnected>().having(
             (it) => it.source,
             'source',
-            isA<ConnectionFailed>().having((it) => it.error, 'error', isNotNull),
+            isA<ServerInitiated>().having((it) => it.error?.error, 'error', isNotNull),
           ),
         );
         expect(tester.connectionState.isAutomaticReconnectionEnabled, isTrue);
