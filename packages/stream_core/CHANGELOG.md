@@ -2,6 +2,7 @@
 
 ### 💥 BREAKING CHANGES
 
+- Raised the minimum Dart SDK to `^3.12.0`
 - Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
 - Removed the `TokenManager.tokenProvider` setter, use `setTokenProvider` instead
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
@@ -42,7 +43,6 @@
 
 ### 🔄 Changed
 
-- Raised the minimum Dart SDK to `^3.12.0`
 - Anonymous requests now always send `user_id=!anon`, rather than whatever id the `TokenManager` was configured with
 - `DynamicTokenProvider` checks the token type before its user id, so a token of the wrong type is reported as such instead of as a mismatched user
 - `TokenManager.getToken` fails when `reset` runs while the token is loading, and rejects a token whose `user_id` is not the user it was loading for; a `setTokenProvider` during a load still serves the caller that started it
