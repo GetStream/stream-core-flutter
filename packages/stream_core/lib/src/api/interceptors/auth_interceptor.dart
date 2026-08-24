@@ -1,18 +1,23 @@
 import 'package:dio/dio.dart';
 
 import '../../errors.dart';
+import '../../logger.dart';
 import '../../user.dart';
 import '../stream_core_dio_error.dart';
 
 /// Interceptor that signs every request with the caller's token.
 ///
 /// A request the server refuses for an expired token is retried once, carrying a replacement.
+///
+/// Reports what it decided under `SC:HttpAuth`, including every reason it left a refused request
+/// refused. Nothing is written until an app installs a [StreamLogHandler].
 class AuthInterceptor extends Interceptor {
   /// Creates a new [AuthInterceptor].
-  AuthInterceptor(this._dio, this._tokenManager);
+  AuthInterceptor(this._dio, this._tokenManager, {String tag = 'SC:HttpAuth'}) : _logger = StreamLogger(tag);
 
   final Dio _dio;
   final TokenManager _tokenManager;
+  final StreamLogger _logger;
 
   // Not a `QueuedInterceptor`: it frees a slot only once a handler completes, so the retry sent from
   // `onError` would wait behind the request holding it. `TokenManager` serialises the token loads.
@@ -33,6 +38,8 @@ class AuthInterceptor extends Interceptor {
 
       return handler.next(options);
     } catch (e, stackTrace) {
+      _logger.w(() => 'no token to sign ${options.uri} with', error: e, stackTrace: stackTrace);
+
       final error = ClientException(
         message: 'Failed to load auth token',
         stackTrace: stackTrace,
@@ -62,9 +69,23 @@ class AuthInterceptor extends Interceptor {
     // A retry after a user switch would perform this request as the new user.
     final signedFor = options.queryParameters['user_id'];
     final canRefresh = signedFor == _tokenManager.userId && !_tokenManager.usesStaticProvider;
-    if (!canRefresh) return handler.next(err);
+    if (!canRefresh) {
+      _logger.d(() {
+        final reason = switch (_tokenManager.usesStaticProvider) {
+          true => 'the token provider is static and has nothing fresher to give',
+          false => 'it was signed for $signedFor, and the user is now ${_tokenManager.userId}',
+        };
 
-    if (options.extra[_retriedKey] == true) return handler.next(err);
+        return 'not refreshing the token behind ${options.uri}: $reason';
+      });
+
+      return handler.next(err);
+    }
+
+    if (options.extra[_retriedKey] == true) {
+      _logger.w(() => 'the replacement token was refused too, leaving ${options.uri} failed');
+      return handler.next(err);
+    }
 
     // Another request may have replaced it already, and expiring that would discard a valid token.
     if (options.headers['Authorization'] == _tokenManager.peekToken()?.rawValue) {
@@ -78,11 +99,14 @@ class AuthInterceptor extends Interceptor {
       data: data is FormData ? data.clone() : data,
     );
 
+    _logger.d(() => 'retrying ${options.uri} with a replacement token');
+
     try {
       // ignore: inference_failure_on_function_invocation
       final response = await _dio.fetch(retry);
       return handler.resolve(response);
     } on DioException catch (exception) {
+      _logger.w(() => 'the retry of ${options.uri} failed too', error: exception);
       return handler.reject(exception);
     }
   }

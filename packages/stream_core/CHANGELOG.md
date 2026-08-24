@@ -15,9 +15,11 @@
 - `WebSocketConnectionState.isAutomaticReconnectionEnabled` is now `true` for an expired token, and remains `false` for token errors a fresh token cannot fix
 - `StreamApiError.isTokenExpiredError` now means code 40 only; the other token codes and a wrong API key are `isInvalidTokenError`. `isClientError` compares the HTTP `statusCode` against 400..499, rather than the Stream error `code`, which never falls in that range
 - `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` return the result's own type and no longer take a type parameter. To widen, widen the result (`Result<num> widened = intResult`) or use `fold`
+- Replaced the logger: `StreamLogger` is the handle you write with and a `StreamLogHandler` is where records go, so `Priority`, `MessageBuilder`, `Tag`, `IsLoggableValidator` and `Finder` are renamed or gone
 
 ### ✨ Features
 
+- Added a logger the SDK now reports itself through, silent until an app installs a `StreamLogHandler`
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token; handed the identity it already has, it does nothing
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
 - Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`
