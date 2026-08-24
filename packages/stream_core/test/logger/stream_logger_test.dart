@@ -132,8 +132,8 @@ void main() {
   group('StreamLogger.reset', () {
     test('puts back both the handler and the priority', () {
       final installed = RecordingLogHandler();
-      StreamLogger.handler = installed;
-      StreamLogger.priority = StreamLogPriority.verbose;
+      StreamLogger.root.handler = installed;
+      StreamLogger.root.priority = StreamLogPriority.verbose;
 
       StreamLogger.reset();
 
@@ -232,15 +232,15 @@ void main() {
       final logger = StreamLogger.detached('SC:Detached', handler: mine);
 
       addTearDown(() {
-        StreamLogger.handler = StreamLogHandler.silent;
-        StreamLogger.priority = StreamLogPriority.warning;
+        StreamLogger.root.handler = StreamLogHandler.silent;
+        StreamLogger.root.priority = StreamLogPriority.warning;
       });
 
       // An attached logger resolves both of these every time it writes, so a detached one reading
       // either would drift as an app reconfigured itself.
       for (final installed in [RecordingLogHandler(), RecordingLogHandler()]) {
-        StreamLogger.handler = installed;
-        StreamLogger.priority = StreamLogPriority.verbose;
+        StreamLogger.root.handler = installed;
+        StreamLogger.root.priority = StreamLogPriority.verbose;
 
         logger
           ..d(() => 'still below its own threshold')

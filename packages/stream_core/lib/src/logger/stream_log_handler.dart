@@ -37,7 +37,7 @@ abstract class StreamLogHandler {
   /// handing records to `debugPrint`, which paces them to stay under the limit:
   ///
   /// ```dart
-  /// StreamLogger.handler = StreamLogHandler.from((record) => debugPrint('$record'));
+  /// StreamLogger.root.handler = StreamLogHandler.from((record) => debugPrint('$record'));
   /// ```
   ///
   /// Emits whatever [StreamLogger.priority] admits. Pass [minPriority] to hold this handler
@@ -62,7 +62,7 @@ abstract class StreamLogHandler {
   /// build a user runs:
   ///
   /// ```dart
-  /// StreamLogger.handler = const StreamLogHandler.debugOnly(StreamLogHandler.console());
+  /// StreamLogger.root.handler = const StreamLogHandler.debugOnly(StreamLogHandler.console());
   /// ```
   ///
   /// Consider wrapping only what writes somewhere a user could see, and leaving a crash reporter

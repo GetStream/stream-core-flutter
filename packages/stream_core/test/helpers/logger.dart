@@ -16,11 +16,11 @@ final class RecordingLogHandler extends StreamLogHandler {
   void handle(StreamLogRecord record) => records.add(record);
 }
 
-/// Runs [body] with [handler] and [filter] installed as the ambient ones, restoring both after.
+/// Runs [body] with [handler] and [filter] installed on the root, restoring both after.
 ///
 /// What an app installs is process-wide, so a test that sets it without clearing up changes what
-/// every later test sees. The defaults are put back rather than whatever was there before, which
-/// a write-only setter cannot read.
+/// every later test sees. Whatever was there before is put back, rather than the defaults, so this
+/// nests inside a test that had already installed something.
 ///
 /// An asynchronous [body] is awaited before either is put back, so a handler stays installed for
 /// the work it was meant to capture rather than only up to the first `await`.
@@ -32,22 +32,29 @@ T withStreamLogger<T>(
   StreamLogHandler? handler,
   StreamLogFilter? filter,
 }) {
-  if (handler != null) StreamLogger.handler = handler;
+  final root = StreamLogger.root;
+  final previousHandler = root.handler;
+  final previousFilter = root.filter;
+  void restore() => root
+    ..handler = previousHandler
+    ..filter = previousFilter;
+
+  if (handler != null) root.handler = handler;
   // A test installing a handler wants to see what reached it, so nothing is held back unless the
   // test says so.
-  StreamLogger.filter = filter ?? const StreamLogFilter.always();
+  root.filter = filter ?? const StreamLogFilter.always();
 
   final T result;
   try {
     result = body();
   } catch (_) {
-    StreamLogger.reset();
+    restore();
     rethrow;
   }
 
-  if (result is Future) return result.whenComplete(StreamLogger.reset) as T;
+  if (result is Future) return result.whenComplete(restore) as T;
 
-  StreamLogger.reset();
+  restore();
   return result;
 }
 
