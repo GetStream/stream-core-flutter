@@ -1,207 +1,272 @@
-import 'dart:async';
-
 import 'package:fake_async/fake_async.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
-class _MockWebSocketChannel extends Mock implements WebSocketChannel {}
+import '../../../helpers/ws_client_tester.dart';
 
-class _MockWebSocketSink extends Mock implements WebSocketSink {}
-
-/// A stream whose subscription cancels without going through the event loop, so
-/// a close under `fakeAsync` runs to completion as it does in production.
-class _CancellableStream<T> extends Stream<T> {
-  _CancellableStream(this._source);
-
-  final Stream<T> _source;
-
-  @override
-  StreamSubscription<T> listen(
-    void Function(T event)? onData, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  }) {
-    return _CancellableSubscription(
-      _source.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError),
-    );
-  }
-}
-
-class _CancellableSubscription<T> implements StreamSubscription<T> {
-  _CancellableSubscription(this._delegate);
-
-  final StreamSubscription<T> _delegate;
-
-  @override
-  Future<void> cancel() {
-    _delegate.cancel().ignore();
-    return Future.value();
-  }
-
-  @override
-  void onData(void Function(T data)? handleData) => _delegate.onData(handleData);
-
-  @override
-  void onError(Function? handleError) => _delegate.onError(handleError);
-
-  @override
-  void onDone(void Function()? handleDone) => _delegate.onDone(handleDone);
-
-  @override
-  void pause([Future<void>? resumeSignal]) => _delegate.pause(resumeSignal);
-
-  @override
-  void resume() => _delegate.resume();
-
-  @override
-  bool get isPaused => _delegate.isPaused;
-
-  @override
-  Future<E> asFuture<E>([E? futureValue]) => _delegate.asFuture(futureValue);
-}
-
-class _NoopCodec implements WebSocketMessageCodec<WsEvent, WsRequest> {
-  const _NoopCodec();
-
-  @override
-  Object encode(WsRequest message) => '';
-
-  @override
-  WsEvent decode(Object message) => const _HealthCheckEvent();
-}
-
-final class _HealthCheckEvent extends WsEvent {
-  const _HealthCheckEvent();
-
-  @override
-  HealthCheckInfo? get healthCheckInfo => const HealthCheckInfo(connectionId: 'connection-id');
-}
-
-final class _PingRequest extends WsRequest {
-  const _PingRequest();
-
-  @override
-  Map<String, Object?> toJson() => const {};
-
-  @override
-  List<Object?> get props => const [];
-}
-
-/// A client whose socket opens but answers nothing, with a handler attached and
-/// a count of the attempts it has made.
-({StreamWebSocketClient client, int Function() attempts}) _client() {
-  final incoming = StreamController<Object?>.broadcast();
-  addTearDown(incoming.close);
-
-  final channel = _MockWebSocketChannel();
-  when(() => channel.ready).thenAnswer((_) async {});
-  when(() => channel.stream).thenAnswer((_) => _CancellableStream(incoming.stream));
-  final sink = _MockWebSocketSink();
-  when(() => channel.sink).thenReturn(sink);
-  when(() => sink.close(any(), any())).thenAnswer((_) async {});
-
-  var attempts = 0;
-  final client = StreamWebSocketClient(
-    optionsBuilder: () {
-      attempts++;
-      return const WebSocketOptions(url: 'wss://example.com');
-    },
-    wsProvider: (_) => channel,
-    pingRequestBuilder: ([_]) => const _PingRequest(),
-    messageCodec: const _NoopCodec(),
-  );
-
-  final handler = ConnectionRecoveryHandler(client: client);
-  addTearDown(handler.dispose);
-
-  return (client: client, attempts: () => attempts);
-}
+/// Long enough for a health check to go unanswered, which is the drop this handler recovers from.
+///
+/// The monitor pings every 25 seconds and gives the peer 3 to answer.
+const _untilUnhealthy = Duration(seconds: 29);
 
 void main() {
-  group('ConnectionRecoveryHandler', () {
-    test('does not retry a first attempt that never connected', () {
+  test('does not retry a first attempt that never connected', () {
+    fakeAsync((async) {
+      final tester = buildTester(recover: true);
+      // A server that takes the credentials and never answers, so the attempt is abandoned.
+      tester.server.onFrame = (_) => [];
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+
+      async.elapse(WebSocketOptions.defaultConnectTimeout);
+      async.flushMicrotasks();
+      expect(tester.connectionState, isA<Disconnected>());
+
+      // Retrying here would work behind a caller already told it failed.
+      async.elapse(const Duration(minutes: 1));
+      expect(tester.attempts, 1);
+    });
+  });
+
+  test('retries a connection that dropped after being established', () {
+    fakeAsync((async) {
+      final tester = buildTester(recover: true);
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      expect(tester.connectionState, isA<Connected>());
+
+      // The server stops answering health checks, which is a drop rather than a failed attempt, so
+      // recovering it is this handler's job. The first retry carries no delay.
+      tester.server.onFrame = (_) => [];
+      async.elapse(_untilUnhealthy);
+      async.flushMicrotasks();
+
+      expect(tester.attempts, 2);
+      expect(tester.states.whereType<Connecting>(), hasLength(2));
+    });
+  });
+
+  test('hands connecting back after the caller disconnected', () {
+    fakeAsync((async) {
+      final tester = buildTester(recover: true);
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      tester.client.disconnect().ignore();
+      async.flushMicrotasks();
+
+      // A fresh attempt, awaited by whoever made it, that never connects.
+      tester.server.onFrame = (_) => [];
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      async.elapse(WebSocketOptions.defaultConnectTimeout);
+      async.flushMicrotasks();
+
+      // Having connected in a previous session does not make this failure the handler's to retry.
+      async.elapse(const Duration(minutes: 1));
+      expect(tester.attempts, 2);
+    });
+  });
+
+  test('stops a retry the caller called off while it was pending', () {
+    fakeAsync((async) {
+      final tester = buildTester(recover: true);
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+
+      // A closure worth retrying, so one is scheduled.
+      tester.server.hangUp();
+      async.flushMicrotasks();
+
+      // The caller says stop while that retry is still pending. Asking to disconnect a connection
+      // that is already down is asking for whatever is pending on its behalf to stop too.
+      tester.client.disconnect().ignore();
+      async.flushMicrotasks();
+
+      async.elapse(const Duration(minutes: 1));
+
+      expect(tester.attempts, 1);
+    });
+  });
+
+  test('cancels a retry it had already scheduled when the caller disconnects', () {
+    fakeAsync((async) {
+      final tester = buildTester(recover: true);
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      expect(tester.connectionState, isA<Connected>());
+
+      // The server hangs up, which schedules a retry.
+      tester.server.hangUp();
+      async.flushMicrotasks();
+      expect(async.pendingTimers, isNotEmpty);
+
+      tester.client.disconnect().ignore();
+      async.flushMicrotasks();
+
+      // Nothing is left armed. A timer that outlives the caller's disconnect fires against a client
+      // they have closed, and reconnects it behind them.
+      expect(async.pendingTimers, isEmpty);
+    });
+  });
+
+  test('does not retry a disconnect the caller asked for', () {
+    fakeAsync((async) {
+      final tester = buildTester(recover: true);
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+
+      tester.client.disconnect().ignore();
+      async.flushMicrotasks();
+      expect(tester.connectionState, isA<Disconnected>());
+
+      // Having been connected is not enough on its own: the source says this was deliberate.
+      async.elapse(const Duration(minutes: 1));
+      expect(tester.attempts, 1);
+    });
+  });
+
+  group('while the network is down', () {
+    test('does not retry a drop', () {
       fakeAsync((async) {
-        final (:client, :attempts) = _client();
+        final tester = buildTester(recover: true);
 
-        client.connect().ignore();
+        tester.client.connect().ignore();
         async.flushMicrotasks();
 
-        // The socket opened but the server never answers, so the attempt is
-        // abandoned — the failure the caller of `connect` is handed.
-        async.elapse(WebSocketOptions.defaultConnectTimeout);
+        tester.network.disconnect();
         async.flushMicrotasks();
-        expect(client.connectionState.value, isA<Disconnected>());
 
-        // Retrying here would work behind a caller already told it failed, and
-        // would race the retry that caller makes in response.
+        // Losing the network takes the connection down, and there is nothing to reconnect to.
         async.elapse(const Duration(minutes: 1));
-        expect(attempts(), 1);
+        expect(tester.attempts, 1);
       });
     });
 
-    test('retries a connection that dropped after being established', () {
+    test('retries as soon as it comes back', () {
       fakeAsync((async) {
-        final (:client, :attempts) = _client();
+        final tester = buildTester(recover: true);
 
-        client.connect().ignore();
-        async.flushMicrotasks();
-        client.onMessage(const _HealthCheckEvent());
-        expect(client.connectionState.value, isA<Connected>());
-
-        // The connection stops answering health checks — a drop rather than a
-        // failure to connect, so recovering it is this handler's job. The first
-        // retry carries no delay, so it is under way by the time this returns.
-        async.elapse(const Duration(seconds: 29));
+        tester.client.connect().ignore();
         async.flushMicrotasks();
 
-        expect(attempts(), 2);
-        expect(client.connectionState.value, isA<Authenticating>());
-      });
-    });
-
-    test('hands connecting back after the caller disconnected', () {
-      fakeAsync((async) {
-        final (:client, :attempts) = _client();
-
-        client.connect().ignore();
+        tester.network.disconnect();
         async.flushMicrotasks();
-        client.onMessage(const _HealthCheckEvent());
-        client.disconnect().ignore();
+        expect(tester.connectionState, isA<Disconnected>());
+
+        tester.network.connect();
         async.flushMicrotasks();
 
-        // A fresh attempt, awaited by whoever made it, that never connects.
-        client.connect().ignore();
-        async.flushMicrotasks();
-        async.elapse(WebSocketOptions.defaultConnectTimeout);
-        async.flushMicrotasks();
-
-        // Having connected in the previous session does not make this failure
-        // the handler's to retry.
-        async.elapse(const Duration(minutes: 1));
-        expect(attempts(), 2);
-      });
-    });
-
-    test('does not retry a disconnect the caller asked for', () {
-      fakeAsync((async) {
-        final (:client, :attempts) = _client();
-
-        client.connect().ignore();
-        async.flushMicrotasks();
-        client.onMessage(const _HealthCheckEvent());
-
-        client.disconnect().ignore();
-        async.flushMicrotasks();
-        expect(client.connectionState.value, isA<Disconnected>());
-
-        // Having been connected is not enough on its own: the source still says
-        // this was deliberate.
-        async.elapse(const Duration(minutes: 1));
-        expect(attempts(), 1);
+        // The network returning is the triggering event, so nothing waits out a backoff for it.
+        expect(tester.attempts, 2);
+        expect(tester.connectionState, isA<Connected>());
       });
     });
   });
+
+  group('while the app is in the background', () {
+    test('takes the connection down and leaves it down', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.lifecycle.background();
+        async.flushMicrotasks();
+
+        // A connection nobody is looking at costs battery for nothing.
+        expect(tester.connectionState, isA<Disconnected>());
+
+        async.elapse(const Duration(minutes: 1));
+        expect(tester.attempts, 1);
+      });
+    });
+
+    test('reconnects when the app is opened again', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.lifecycle.background();
+        async.flushMicrotasks();
+
+        tester.lifecycle.foreground();
+        async.flushMicrotasks();
+
+        expect(tester.attempts, 2);
+        expect(tester.connectionState, isA<Connected>());
+      });
+    });
+  });
+
+  group('a policy the app supplied', () {
+    test('can refuse a reconnection the built-in policies would allow', () {
+      fakeAsync((async) {
+        // No handler of its own, so this test owns the one it is testing.
+        final tester = buildTester();
+        ConnectionRecoveryHandler(
+          client: tester.client,
+          policies: [const _Refuses()],
+        );
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connected>());
+
+        // A drop that would otherwise be recovered from.
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        async.elapse(const Duration(minutes: 1));
+
+        // Policies are combined with `and`, so an app can veto a reconnection the client is
+        // otherwise happy to make.
+        expect(tester.attempts, 1);
+      });
+    });
+
+    test('is consulted alongside them rather than replacing them', () {
+      fakeAsync((async) {
+        final tester = buildTester();
+        ConnectionRecoveryHandler(
+          client: tester.client,
+          policies: [const _Allows()],
+        );
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        // A disconnect the caller asked for, which a built-in policy refuses. An app policy that
+        // allows must not override that.
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+        async.elapse(const Duration(minutes: 1));
+
+        expect(tester.attempts, 1);
+      });
+    });
+  });
+}
+
+/// An app policy that never wants a reconnection.
+class _Refuses implements AutomaticReconnectionPolicy {
+  const _Refuses();
+
+  @override
+  bool canBeReconnected() => false;
+}
+
+/// An app policy that always wants one.
+class _Allows implements AutomaticReconnectionPolicy {
+  const _Allows();
+
+  @override
+  bool canBeReconnected() => true;
 }
