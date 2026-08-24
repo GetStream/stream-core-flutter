@@ -15,10 +15,7 @@ void main() {
     test('throws what the fallback throws, so an error can be reworded', () {
       final result = Result<int>.failure(Exception('original'));
 
-      expect(
-        () => result.getOrElse((error, _) => throw StateError('$error')),
-        throwsA(isA<StateError>()),
-      );
+      expect(() => result.getOrElse((error, _) => throw StateError('$error')), throwsA(isA<StateError>()));
     });
 
     test('returns what the fallback returns', () {
@@ -47,9 +44,8 @@ void main() {
 
   group('Result widening', () {
     test('falls back to a supertype when the result is widened', () {
-      // Kotlin widens through a `<R, T : R>` bound Dart has no equivalent for.
-      // Naming the wider type on the result gets there instead, since `Result`
-      // is covariant.
+      // Naming the wider type on the result widens the fallback with it, because `Result` is
+      // covariant.
       final Result<num> widened = Result<int>.failure(Exception('failed'));
 
       expect(widened.getOrElse((_, _) => 0.5), 0.5);
@@ -91,10 +87,7 @@ void main() {
     test('rethrows an error from the transform', () {
       final result = Result<int>.failure(Exception('failed'));
 
-      expect(
-        () => result.recover((_, _) => throw StateError('while recovering')),
-        throwsA(isA<StateError>()),
-      );
+      expect(() => result.recover((_, _) => throw StateError('while recovering')), throwsA(isA<StateError>()));
     });
   });
 
@@ -102,9 +95,7 @@ void main() {
     test('keeps the value when the transform only throws', () {
       const result = Result.success(42);
 
-      final recovered = result.recoverCatching(
-        (_, _) => throw StateError('unreachable'),
-      );
+      final recovered = result.recoverCatching((_, _) => throw StateError('unreachable'));
 
       expect(recovered.getOrNull(), 42);
     });
@@ -112,9 +103,7 @@ void main() {
     test('reports an error from the transform as a failure', () {
       final result = Result<int>.failure(Exception('failed'));
 
-      final recovered = result.recoverCatching(
-        (_, _) => throw StateError('while recovering'),
-      );
+      final recovered = result.recoverCatching((_, _) => throw StateError('while recovering'));
 
       // Unlike `recover`, the error replaces the original rather than escaping.
       expect(recovered.exceptionOrNull(), isA<StateError>());
