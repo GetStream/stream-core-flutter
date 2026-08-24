@@ -89,7 +89,9 @@ sealed class WebSocketConnectionState extends Equatable {
   /// Whether automatic reconnection is enabled for this connection state.
   ///
   /// `false` for every state but [Disconnected], where it is the source's
-  /// [DisconnectionSource.isReconnectable] and nothing more — see that for which sources reconnect.
+  /// [DisconnectionSource.isReconnectable] and nothing more.
+  ///
+  /// {@macro webSocketReconnectionRules}
   bool get isAutomaticReconnectionEnabled => switch (this) {
     Disconnected(:final source) => source.isReconnectable,
     _ => false, // No automatic reconnection for other states
@@ -260,6 +262,7 @@ sealed class DisconnectionSource extends Equatable {
 
   /// Whether a connection closed for this reason is worth opening again.
   ///
+  /// {@template webSocketReconnectionRules}
   /// - [UserInitiated] — no, the caller asked for the connection to close.
   /// - [AuthenticationFailed] — no, credentials that never went out will not go out on a retry.
   /// - [ServerInitiated] — no for a deliberate close (code 1000), for a token error a fresh token
@@ -271,6 +274,7 @@ sealed class DisconnectionSource extends Equatable {
   /// decided by `ConnectionRecoveryHandler`, which recovers only a connection that was established,
   /// and only while the network and the app lifecycle allow it — so a first connection that times
   /// out stays down, where one that times out on the way back does not.
+  /// {@endtemplate}
   bool get isReconnectable => switch (this) {
     ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
     ServerInitiated(:final error) => switch (error?.apiError) {
