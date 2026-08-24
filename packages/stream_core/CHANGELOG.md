@@ -21,6 +21,7 @@
 ### 🐛 Bug Fixes
 
 - Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
+- `TokenManager.getToken` now replaces a cached token that has expired, rather than handing it out and learning the same thing from a refused request. Judged on the expiry alone, so a token with life left in it is still cached. A static provider is left alone: it has nothing fresher to give, and the server refusing its token is what tells a guest to exchange for a new identity
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 - Fixed `TokenManager` caching a token that finished loading after `expireToken` or `setTokenProvider` had invalidated it
 
