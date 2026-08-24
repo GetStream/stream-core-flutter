@@ -81,6 +81,40 @@ final class StreamLogger {
 
   static StreamLogHandler _handlerOrDefault = StreamLogHandler.silent;
   static StreamLogFilter _filterOrDefault = const .minPriority(.warning);
+  static var _handlerInstalled = false;
+
+  // Keyed by the tag prefix a product's records carry, so one product's config governs its own
+  // records and no one else's.
+  static final _scopes = <String, StreamLogConfig>{};
+
+  static StreamLogConfig? _scopeFor(String tag) {
+    if (_scopes.isEmpty) return null;
+
+    StreamLogConfig? matched;
+    var matchedLength = -1;
+
+    for (final MapEntry(key: prefix, value: config) in _scopes.entries) {
+      if (prefix.length <= matchedLength) continue;
+      if (!tag.startsWith(prefix)) continue;
+
+      matched = config;
+      matchedLength = prefix.length;
+    }
+
+    return matched;
+  }
+
+  static StreamLogFilter _filterFor(StreamLogConfig? scope) {
+    if (scope == null) return _filterOrDefault;
+    return scope.filter ?? .minPriority(scope.priority);
+  }
+
+  static StreamLogHandler _handlerFor(StreamLogConfig? scope) {
+    if (scope?.handler case final handler?) return handler;
+    if (_handlerInstalled) return _handlerOrDefault;
+    // A scope asked for records with nowhere to put them, which would otherwise be silence.
+    return scope != null ? StreamLogConfig.defaultHandler : _handlerOrDefault;
+  }
 
   /// Installs where every record goes, other than those from a [StreamLogger.detached] logger.
   ///
@@ -94,7 +128,10 @@ final class StreamLogger {
   ///
   /// Write-only, so nothing can come to depend on what happens to be installed. Consider
   /// [StreamLogHandler.composite] to send records to more than one place.
-  static set handler(StreamLogHandler handler) => _handlerOrDefault = handler;
+  static set handler(StreamLogHandler handler) {
+    _handlerOrDefault = handler;
+    _handlerInstalled = true;
+  }
 
   /// Installs the lowest priority worth building a record for.
   ///
@@ -129,27 +166,37 @@ final class StreamLogger {
   /// StreamLogger.configure(config.logging);
   /// ```
   ///
-  /// A config replaces both settings outright, so anything installed through [filter] before this
-  /// is lost — including to a config that named only a [priority]. Put the rule in
-  /// [StreamLogConfig.filter] instead, where a client carries it rather than flattening it.
-  ///
-  /// One logger serves the process, so this decides logging for every Stream SDK in it, not only
-  /// the one whose config it came from, and two clients configured differently settle on whichever
-  /// was constructed last. An app wanting one SDK's records and not another's says so by the prefix
-  /// their tags carry:
+  /// Given a [scope], the config governs only the records whose tag starts with it, and the rest
+  /// of the process is left alone. A product client passes the prefix its own records carry, so
+  /// two Stream SDKs configured differently each get what they asked for rather than the one built
+  /// last deciding for both:
   ///
   /// ```dart
-  /// StreamLogConfig(
-  ///   filter: StreamLogFilter.prefix(
-  ///     {'SF:': StreamLogPriority.debug},
-  ///     otherwise: StreamLogPriority.none,
-  ///   ),
-  /// )
+  /// StreamLogger.configure(config.logging, scope: 'SF:');
   /// ```
-  static void configure(StreamLogConfig? config) {
+  ///
+  /// Without a scope the config governs everything, replacing both settings outright — including a
+  /// rule installed through [filter], since [StreamLogConfig.priority] sets the same thing.
+  ///
+  /// A config naming no handler writes wherever the app already installed one, or to
+  /// [StreamLogConfig.defaultHandler] if it installed none, so asking for records never redirects
+  /// them away from a destination the app chose.
+  static void configure(StreamLogConfig? config, {String? scope}) {
     if (config == null) return;
 
-    _handlerOrDefault = config.handler;
+    if (scope != null) {
+      _scopes[scope] = config;
+      return;
+    }
+
+    if (config.handler case final handler?) {
+      _handlerOrDefault = handler;
+      _handlerInstalled = true;
+    } else if (!_handlerInstalled) {
+      _handlerOrDefault = StreamLogConfig.defaultHandler;
+      _handlerInstalled = true;
+    }
+
     _filterOrDefault = config.filter ?? .minPriority(config.priority);
   }
 
@@ -166,6 +213,8 @@ final class StreamLogger {
   static void reset() {
     _handlerOrDefault = StreamLogHandler.silent;
     _filterOrDefault = const .minPriority(.warning);
+    _handlerInstalled = false;
+    _scopes.clear();
   }
 
   /// Whether a record at [priority] would be kept by both the filter and the handler.
@@ -177,8 +226,14 @@ final class StreamLogger {
   /// if (_log.isLoggable(StreamLogPriority.verbose)) _log.v(() => describe(everyParticipant));
   /// ```
   bool isLoggable(StreamLogPriority priority) {
-    if (!(_filter ?? _filterOrDefault).isLoggable(priority, tag)) return false;
-    return (_handler ?? _handlerOrDefault).isLoggable(priority, tag);
+    if (_handler case final handler?) {
+      if (!_filter!.isLoggable(priority, tag)) return false;
+      return handler.isLoggable(priority, tag);
+    }
+
+    final scope = _scopeFor(tag);
+    if (!_filterFor(scope).isLoggable(priority, tag)) return false;
+    return _handlerFor(scope).isLoggable(priority, tag);
   }
 
   /// Writes a [StreamLogPriority.verbose] record.
@@ -251,6 +306,7 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) {
+    final handler = _handler ?? _handlerFor(_scopeFor(tag));
     if (!isLoggable(priority)) return;
 
     final record = StreamLogRecord(
@@ -261,6 +317,6 @@ final class StreamLogger {
       stackTrace: stackTrace,
     );
 
-    return (_handler ?? _handlerOrDefault).handle(record);
+    return handler.handle(record);
   }
 }
