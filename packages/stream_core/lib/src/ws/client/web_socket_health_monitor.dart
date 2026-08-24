@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../logger.dart';
 import 'web_socket_connection_state.dart';
 
 /// Interface for receiving WebSocket health monitoring events.
@@ -44,7 +45,10 @@ class WebSocketHealthMonitor {
     required this._listener,
     this.pingInterval = const Duration(seconds: 25),
     this.timeoutThreshold = const Duration(seconds: 3),
-  });
+    String tag = 'SC:WsHealth',
+  }) : _logger = StreamLogger(tag);
+
+  final StreamLogger _logger;
 
   /// The interval between ping requests for health checking.
   final Duration pingInterval;
@@ -72,7 +76,10 @@ class WebSocketHealthMonitor {
   ///
   /// Cancels the current pong timeout timer, indicating the connection is healthy.
   /// Called automatically when pong events are received from the WebSocket.
-  void onPongReceived() => _pongTimer?.cancel();
+  void onPongReceived() {
+    _logger.v(() => 'pong');
+    return _pongTimer?.cancel();
+  }
 
   /// Handles connection state changes.
   ///
@@ -91,10 +98,16 @@ class WebSocketHealthMonitor {
   void _sendPing(Timer pingTimer) {
     if (!pingTimer.isActive) return;
 
+    _logger.v(() => 'ping');
     _listener.onPingRequested();
 
     _pongTimer?.cancel();
-    _pongTimer = Timer(timeoutThreshold, _listener.onUnhealthy);
+    _pongTimer = Timer(timeoutThreshold, _onPongTimeout);
+  }
+
+  void _onPongTimeout() {
+    _logger.w(() => 'no pong within $timeoutThreshold, connection is unhealthy');
+    return _listener.onUnhealthy();
   }
 
   /// Stops health monitoring and cancels all timers.

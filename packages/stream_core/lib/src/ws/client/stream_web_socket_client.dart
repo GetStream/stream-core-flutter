@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_event.dart';
 import '../events/ws_request.dart';
@@ -48,6 +49,22 @@ typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 ///
 /// await client.connect();
 /// ```
+///
+/// This client reports what it is doing under `SC:WsClient`, and the engine, health monitor and
+/// authentication handler it owns under `SC:WsClient:Engine`, `:Health` and `:Auth`. Nothing is
+/// written until an app installs a [StreamLogHandler]:
+///
+/// ```dart
+/// StreamLogger.handler = const StreamLogHandler.console(minPriority: StreamLogPriority.debug);
+/// ```
+///
+/// Give a second client its own `tag` to tell the two apart. Its collaborators are tagged from
+/// it, so one prefix still selects the whole family:
+///
+/// ```dart
+/// StreamWebSocketClient(tag: 'SC:Ws2', ...);
+/// StreamLogger.filter = const StreamLogFilter.prefix({'SC:Ws2': StreamLogPriority.verbose});
+/// ```
 class StreamWebSocketClient with Disposable implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
@@ -57,17 +74,22 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     this.pingRequestBuilder = _defaultPingRequestBuilder,
     required WebSocketMessageCodec<WsEvent, WsRequest> messageCodec,
     Iterable<EventResolver<WsEvent>>? eventResolvers,
-  }) {
+    String tag = 'SC:WsClient',
+  }) : _logger = StreamLogger(tag) {
     _events = MutableEventEmitter(resolvers: eventResolvers);
     _engine = StreamWebSocketEngine(
       listener: this,
       wsProvider: wsProvider,
       messageCodec: messageCodec,
+      tag: '$tag:Engine',
     );
+
+    _healthMonitor = WebSocketHealthMonitor(listener: this, tag: '$tag:Health');
 
     _authenticationHandler = WebSocketAuthenticationHandler(
       send: send,
       authenticator: onAuthenticate,
+      tag: '$tag:Auth',
       onFailure: (error) => disconnect(
         source: .authenticationFailed(error: error),
       ),
@@ -80,9 +102,11 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   /// The function used to build ping requests for health checks.
   final PingRequestBuilder pingRequestBuilder;
 
+  final StreamLogger _logger;
+
   late final StreamWebSocketEngine<WsEvent, WsRequest> _engine;
   late final WebSocketAuthenticationHandler _authenticationHandler;
-  late final _healthMonitor = WebSocketHealthMonitor(listener: this);
+  late final WebSocketHealthMonitor _healthMonitor;
 
   // Bounds an attempt while `Connecting` or `Authenticating`; the health monitor takes over after.
   Timer? _connectTimeoutTimer;
@@ -118,7 +142,10 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Return early if the state hasn't changed.
     if (_connectionStateEmitter.value == connectionState) return;
 
+    final previous = _connectionStateEmitter.value;
     _connectionStateEmitter.value = connectionState;
+    _logger.d(() => 'state: $previous -> $connectionState');
+
     _healthMonitor.onConnectionStateChanged(connectionState);
     _authenticationHandler.onConnectionStateChanged(connectionState);
   }
@@ -157,6 +184,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // Open the connection using the engine, with options built for this attempt.
     final options = optionsBuilder.call();
+    _logger.d(() => 'connect to ${options.url}');
 
     // Bound the attempt, so one that never becomes usable is not waited on forever.
     _startConnectTimeout(options.connectTimeout);
@@ -194,6 +222,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     final forceDisconnect = source is UserInitiated || source is AuthenticationFailed;
     if (connectionState.value case Disconnecting() when !forceDisconnect) return;
     if (connectionState.value case Disconnected() when !forceDisconnect) return;
+
+    _logger.d(() => 'disconnect with $closeCode, source: $source');
 
     // Update the connection state to 'disconnecting'.
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
@@ -238,6 +268,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
   @override
   void onError(Object error, [StackTrace? stackTrace]) {
+    _logger.e(() => 'socket failed', error: error, stackTrace: stackTrace);
+
     final source = ServerInitiated(
       error: WebSocketEngineException(error: error),
     );
@@ -265,6 +297,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   }
 
   void _handleErrorEvent(WsEvent event, Object error) {
+    _logger.w(() => 'server sent an error event', error: error);
+
     final source = ServerInitiated(
       error: WebSocketEngineException(error: error),
     );

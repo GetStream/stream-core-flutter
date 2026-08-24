@@ -1,4 +1,5 @@
 import '../../errors.dart' show StreamApiError;
+import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_request.dart';
 import 'web_socket_connection_state.dart';
@@ -34,7 +35,10 @@ class WebSocketAuthenticationHandler {
     required this._authenticator,
     required this._send,
     required this._onFailure,
-  });
+    String tag = 'SC:WsAuth',
+  }) : _logger = StreamLogger(tag);
+
+  final StreamLogger _logger;
 
   final WebSocketAuthenticator? _authenticator;
   final WsRequestSender _send;
@@ -83,18 +87,24 @@ class WebSocketAuthenticationHandler {
 
     final attempt = _attempt;
     final previousError = _previousError;
+    _logger.d(() => 'authenticate attempt #$attempt, previousError: $previousError');
 
     // Guarded because nothing awaits this: an error thrown here would go unhandled.
     final result = await runSafely(() => authenticate(_senderFor(attempt), previousError));
 
     // Stale: its failure would close the connection that replaced it, and never be reconnected.
-    if (attempt != _attempt) return;
+    if (attempt != _attempt) {
+      return _logger.d(() => 'attempt #$attempt is stale, dropping its outcome: $result');
+    }
 
     // Spent, unless the server refused something newer while the authenticator ran. By identity,
     // not equality: a newer refusal of the same kind compares equal to this one.
     if (identical(_previousError, previousError)) _previousError = null;
 
-    if (result case Failure(:final error)) return _onFailure(error);
+    if (result case Failure(:final error, :final stackTrace)) {
+      _logger.w(() => 'attempt #$attempt could not be authenticated', error: error, stackTrace: stackTrace);
+      return _onFailure(error);
+    }
   }
 
   // The sender is held across the authenticator's own awaits, so the attempt is checked on each send.
