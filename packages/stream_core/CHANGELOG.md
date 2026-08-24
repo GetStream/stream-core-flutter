@@ -20,7 +20,7 @@
 
 ### ✨ Features
 
-- Added a logger the SDK now reports itself through, silent until an app installs a `StreamLogHandler`. Tags are paths, so a product client settles its own branch with `StreamLogger.configure(config, parent: 'SF:')` and two Stream SDKs in one app each report on their own terms
+- Added a logger the SDK now reports itself through, silent until an app installs a `StreamLogHandler` or a product client passes `StreamLogger.configure` the `StreamLogConfig` it was given
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token; handed the identity it already has, it does nothing
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
 - Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`

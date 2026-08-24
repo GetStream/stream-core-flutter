@@ -87,86 +87,47 @@ void main() {
 
     tearDown(StreamLogger.reset);
 
-    test('keep to their own records, each given a parent', () {
-      final theirs = RecordingLogHandler();
-      final mine = RecordingLogHandler();
-
-      StreamLogger.configure(
-        StreamLogConfig(priority: StreamLogPriority.debug, handler: mine),
-        parent: 'SF:',
-      );
-      StreamLogger.configure(StreamLogConfig(handler: theirs), parent: 'SV:');
-      feeds.d(() => 'feeds debug');
-      video
-        ..d(() => 'video debug')
-        ..w(() => 'video warning');
-
-      // Neither client decides for the other: feeds asked for debug and video did not, so video's
-      // commentary stays out even though both were configured.
-      expect(mine.messages, ['feeds debug']);
-      expect(theirs.messages, ['video warning']);
-    });
-
-    test('do not silence one another, whichever was built last', () {
-      final first = RecordingLogHandler();
-      final second = RecordingLogHandler();
-
-      StreamLogger.configure(StreamLogConfig(handler: first), parent: 'SF:');
-      StreamLogger.configure(StreamLogConfig(handler: second), parent: 'SV:');
-      feeds.w(() => 'feeds');
-      video.w(() => 'video');
-
-      // The complaint this scoping answers: configuring one client used to discard what the other
-      // had installed, silently and by construction order.
-      expect(first.messages, ['feeds']);
-      expect(second.messages, ['video']);
-    });
-
-    test('leave a branch alone that no config named', () {
-      StreamLogger.configure(const StreamLogConfig(priority: StreamLogPriority.debug), parent: 'SF:');
-      final printed = capturePrints(() {
-        feeds.d(() => 'feeds');
-        video.e(() => 'video, never asked for');
-      });
-
-      // Video's error is louder than the threshold feeds asked for, and still goes nowhere.
-      expect(printed.single, contains('feeds'));
-    });
-
-    test('write where the app installed a handler, rather than replacing it', () {
-      final appWide = RecordingLogHandler();
-      StreamLogger.handler = appWide;
-
-      StreamLogger.configure(const StreamLogConfig(priority: StreamLogPriority.debug), parent: 'SF:');
-      feeds.d(() => 'feeds');
-
-      // A config naming only a priority must not take the records away from the destination the
-      // app chose for everything.
-      expect(appWide.messages, ['feeds']);
-    });
-
-    test('govern everything, given no parent at all', () {
+    test('report together once either of them is configured', () {
       final mine = RecordingLogHandler();
 
       StreamLogger.configure(StreamLogConfig(priority: StreamLogPriority.debug, handler: mine));
       feeds.d(() => 'feeds');
       video.d(() => 'video');
 
+      // One logger serves the process, so configuring a client turns logging on for the SDK beside
+      // it too. The tags are what tell them apart afterwards.
       expect(mine.messages, ['feeds', 'video']);
     });
 
-    test('decide their own records, over a rule the app set for everything', () {
+    test('settle on whichever was configured last, rather than merging', () {
+      final first = RecordingLogHandler();
+      final second = RecordingLogHandler();
+
+      StreamLogger.configure(StreamLogConfig(handler: first));
+      StreamLogger.configure(StreamLogConfig(handler: second));
+      feeds.w(() => 'a warning');
+
+      expect(first.records, isEmpty);
+      expect(second.messages, ['a warning']);
+    });
+
+    test('can be held to one SDK by the prefix its tags carry', () {
       final mine = RecordingLogHandler();
-      StreamLogger.handler = mine;
-      StreamLogger.filter = const StreamLogFilter.always();
 
-      StreamLogger.configure(const StreamLogConfig(), parent: 'SF:');
-      feeds.v(() => 'below what the scope admits');
-      video.v(() => 'still what the app asked for');
+      StreamLogger.configure(
+        StreamLogConfig(
+          handler: mine,
+          filter: const StreamLogFilter.prefix(
+            {'SF:': StreamLogPriority.debug},
+            otherwise: StreamLogPriority.none,
+          ),
+        ),
+      );
+      feeds.d(() => 'feeds');
+      video.e(() => 'video, not asked for');
 
-      // A branch is the narrower statement, so it settles its own tags. The app's rule keeps the
-      // ones no scope claimed.
-      expect(mine.messages, ['still what the app asked for']);
+      // What an app reaches for when it wants one SDK's records and not the other's.
+      expect(mine.messages, ['feeds']);
     });
   });
 }

@@ -24,11 +24,11 @@ class StreamLogConfig {
   /// Creates a [StreamLogConfig].
   const StreamLogConfig({
     this.priority = StreamLogPriority.warning,
-    this.handler,
+    this.handler = defaultHandler,
     this.filter,
   });
 
-  /// Where records go when a config names no handler and the app installed none.
+  /// Where records go when a config names no handler of its own.
   static const defaultHandler = StreamLogHandler.console();
 
   /// The lowest priority worth reporting.
@@ -39,10 +39,8 @@ class StreamLogConfig {
 
   /// Where records go.
   ///
-  /// Left out, records go wherever the app already installed a handler, or to [defaultHandler] if
-  /// it installed none — so asking for records never takes them away from a destination the app
-  /// chose. Compose with [defaultHandler] to keep the console alongside a handler of your own.
-  final StreamLogHandler? handler;
+  /// Compose with [defaultHandler] to keep the console alongside a handler of your own.
+  final StreamLogHandler handler;
 
   /// Which records are built at all, for a rule [priority] cannot express.
   ///

@@ -34,10 +34,9 @@ typedef StreamLogMessage = String Function();
 /// StreamLogger.priority = StreamLogPriority.debug;
 /// ```
 ///
-/// A tag is a path: `SF:Ws:Engine` sits under `SF:Ws`, which sits under `SF:`. A product settles
-/// its own branch through [configure], so two Stream SDKs in one app each report on their own
-/// terms without either being handed a logger to pass around. For the exception, see
-/// [StreamLogger.detached].
+/// Records go to one place, so routing two SDKs apart is a matter of a [StreamLogHandler] reading
+/// [StreamLogRecord.tag] rather than of finding every component that had to be handed something.
+/// For the exception, see [StreamLogger.detached].
 final class StreamLogger {
   /// Creates a [StreamLogger] writing under [tag] to whatever the app has installed.
   const StreamLogger(this.tag) : _handler = null, _filter = null;
@@ -82,40 +81,6 @@ final class StreamLogger {
 
   static StreamLogHandler _handlerOrDefault = StreamLogHandler.silent;
   static StreamLogFilter _filterOrDefault = const .minPriority(.warning);
-  static var _handlerInstalled = false;
-
-  // Keyed by the tag prefix a product's records share, so one product's config settles its own
-  // branch and no one else's.
-  static final _parents = <String, StreamLogConfig>{};
-
-  static StreamLogConfig? _parentOf(String tag) {
-    if (_parents.isEmpty) return null;
-
-    StreamLogConfig? matched;
-    var matchedLength = -1;
-
-    for (final MapEntry(key: prefix, value: config) in _parents.entries) {
-      if (prefix.length <= matchedLength) continue;
-      if (!tag.startsWith(prefix)) continue;
-
-      matched = config;
-      matchedLength = prefix.length;
-    }
-
-    return matched;
-  }
-
-  static StreamLogFilter _filterFor(StreamLogConfig? parent) {
-    if (parent == null) return _filterOrDefault;
-    return parent.filter ?? .minPriority(parent.priority);
-  }
-
-  static StreamLogHandler _handlerFor(StreamLogConfig? parent) {
-    if (parent?.handler case final handler?) return handler;
-    if (_handlerInstalled) return _handlerOrDefault;
-    // A branch asked for records with nowhere to put them, which would otherwise be silence.
-    return parent != null ? StreamLogConfig.defaultHandler : _handlerOrDefault;
-  }
 
   /// Installs where every record goes, other than those from a [StreamLogger.detached] logger.
   ///
@@ -129,10 +94,7 @@ final class StreamLogger {
   ///
   /// Write-only, so nothing can come to depend on what happens to be installed. Consider
   /// [StreamLogHandler.composite] to send records to more than one place.
-  static set handler(StreamLogHandler handler) {
-    _handlerOrDefault = handler;
-    _handlerInstalled = true;
-  }
+  static set handler(StreamLogHandler handler) => _handlerOrDefault = handler;
 
   /// Installs the lowest priority worth building a record for.
   ///
@@ -167,38 +129,27 @@ final class StreamLogger {
   /// StreamLogger.configure(config.logging);
   /// ```
   ///
-  /// Given a [parent], the config settles that branch of the tag tree and leaves the rest of the
-  /// process alone. A product client names the prefix its own records share, so two Stream SDKs
-  /// configured differently each get what they asked for rather than the one built last deciding
-  /// for both:
+  /// A config replaces both settings outright, so anything installed through [filter] before this
+  /// is lost — including to a config that named only a [priority]. Put the rule in
+  /// [StreamLogConfig.filter] instead, where a client carries it rather than flattening it.
+  ///
+  /// One logger serves the process, so this decides logging for every Stream SDK in it, not only
+  /// the one whose config it came from, and two clients configured differently settle on whichever
+  /// was constructed last. An app wanting one SDK's records and not another's says so by the prefix
+  /// their tags carry:
   ///
   /// ```dart
-  /// StreamLogger.configure(config.logging, parent: 'SF:');
+  /// StreamLogConfig(
+  ///   filter: StreamLogFilter.prefix(
+  ///     {'SF:': StreamLogPriority.debug},
+  ///     otherwise: StreamLogPriority.none,
+  ///   ),
+  /// )
   /// ```
-  ///
-  /// A branch is the narrower statement, so it decides its own tags over anything installed through
-  /// [filter] or [priority], which keep the tags no branch claimed. Without a [parent] the config
-  /// governs everything, replacing both outright.
-  ///
-  /// A config naming no handler writes wherever the app already installed one, or to
-  /// [StreamLogConfig.defaultHandler] if it installed none, so asking for records never redirects
-  /// them away from a destination the app chose.
-  static void configure(StreamLogConfig? config, {String? parent}) {
+  static void configure(StreamLogConfig? config) {
     if (config == null) return;
 
-    if (parent != null) {
-      _parents[parent] = config;
-      return;
-    }
-
-    if (config.handler case final handler?) {
-      _handlerOrDefault = handler;
-      _handlerInstalled = true;
-    } else if (!_handlerInstalled) {
-      _handlerOrDefault = StreamLogConfig.defaultHandler;
-      _handlerInstalled = true;
-    }
-
+    _handlerOrDefault = config.handler;
     _filterOrDefault = config.filter ?? .minPriority(config.priority);
   }
 
@@ -215,8 +166,6 @@ final class StreamLogger {
   static void reset() {
     _handlerOrDefault = StreamLogHandler.silent;
     _filterOrDefault = const .minPriority(.warning);
-    _handlerInstalled = false;
-    _parents.clear();
   }
 
   /// Whether a record at [priority] would be kept by both the filter and the handler.
@@ -228,14 +177,8 @@ final class StreamLogger {
   /// if (_log.isLoggable(StreamLogPriority.verbose)) _log.v(() => describe(everyParticipant));
   /// ```
   bool isLoggable(StreamLogPriority priority) {
-    if (_handler case final handler?) {
-      if (!_filter!.isLoggable(priority, tag)) return false;
-      return handler.isLoggable(priority, tag);
-    }
-
-    final parent = _parentOf(tag);
-    if (!_filterFor(parent).isLoggable(priority, tag)) return false;
-    return _handlerFor(parent).isLoggable(priority, tag);
+    if (!(_filter ?? _filterOrDefault).isLoggable(priority, tag)) return false;
+    return (_handler ?? _handlerOrDefault).isLoggable(priority, tag);
   }
 
   /// Writes a [StreamLogPriority.verbose] record.
@@ -308,7 +251,6 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    final handler = _handler ?? _handlerFor(_parentOf(tag));
     if (!isLoggable(priority)) return;
 
     final record = StreamLogRecord(
@@ -319,6 +261,6 @@ final class StreamLogger {
       stackTrace: stackTrace,
     );
 
-    return handler.handle(record);
+    return (_handler ?? _handlerOrDefault).handle(record);
   }
 }
