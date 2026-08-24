@@ -1,6 +1,7 @@
 import 'stream_log_filter.dart';
 import 'stream_log_handler.dart';
 import 'stream_log_priority.dart';
+import 'stream_logger.dart';
 
 /// How much a Stream SDK reports, and where those records go.
 ///

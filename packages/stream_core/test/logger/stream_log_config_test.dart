@@ -68,5 +68,16 @@ void main() {
       // config applying both would flatten the rule it was given.
       expect(mine.messages, ['the subsystem I turned up']);
     });
+    test('replaces a filter installed before it, even naming only a priority', () {
+      final mine = RecordingLogHandler();
+      StreamLogger.filter = const StreamLogFilter.prefix({'SF:Ws': StreamLogPriority.verbose});
+
+      StreamLogger.configure(StreamLogConfig(priority: StreamLogPriority.debug, handler: mine));
+      const StreamLogger('SF:Ws').v(() => 'below what the config asked for');
+
+      // A config is the whole story: its priority and filter are one field underneath, so there is
+      // no reading of it that keeps an earlier rule and the new threshold both.
+      expect(mine.records, isEmpty);
+    });
   });
 }

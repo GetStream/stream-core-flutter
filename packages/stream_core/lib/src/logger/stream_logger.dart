@@ -128,6 +128,10 @@ final class StreamLogger {
   /// ```dart
   /// StreamLogger.configure(config.logging);
   /// ```
+  ///
+  /// A config replaces both settings outright, so anything installed through [filter] before this
+  /// is lost — including to a config that named only a [priority]. Put the rule in
+  /// [StreamLogConfig.filter] instead, where a client carries it rather than flattening it.
   static void configure(StreamLogConfig? config) {
     if (config == null) return;
 
