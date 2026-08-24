@@ -163,7 +163,9 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Bound the attempt, so one that never becomes usable is not waited on forever.
     _startConnectTimeout(options.connectTimeout);
     final result = await _engine.open(options);
-    // Report the failure first; closing without a reason looks deliberate, and that never reconnects.
+
+    // Report the failure first; closing without a reason looks deliberate,
+    // and that never reconnects.
     result.onFailure(onError).recover((_, _) => _engine.close());
   }
 
@@ -197,9 +199,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Close the connection using the engine.
     final result = await _engine.close(closeCode, source.closeReason);
 
-    // The engine only announces a closure when the socket really closed, so report it here when the
-    // close failed. Otherwise the connection stays stuck disconnecting.
-    if (result.isFailure) onClose(closeCode, source.closeReason);
+    // The engine announces nothing when a close fails, which would leave this stuck disconnecting.
+    result.onFailure((_, _) => onClose(closeCode, source.closeReason));
   }
 
   @override
