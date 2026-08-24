@@ -170,7 +170,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // connects again straight away would otherwise be refused for racing a close still under way.
     return result.getOrElse(
       (error, _) => disconnect(
-        source: .serverInitiated(error: WebSocketEngineException(error: error)),
+        source: .serverInitiated(error: .new(error: error)),
       ),
     );
   }
