@@ -20,7 +20,7 @@ typedef OnTokenUpdated = void Function(UserToken token);
 /// ```dart
 /// final manager = TokenManager(
 ///   userId: 'user-123',
-///   tokenProvider: TokenProvider.static(UserToken('jwt-token')),
+///   tokenProvider: TokenProvider.static(UserToken(rawJwt)),
 /// );
 ///
 /// // Get a token (loads and caches if needed)
@@ -139,7 +139,8 @@ class TokenManager {
   /// for a different user configured by [setTokenProvider] in the meantime.
   ///
   /// Fails with a [ClientException] when no identity is configured, or when [reset] runs while the
-  /// token is loading.
+  /// token is loading, and with an [ArgumentError] when the provider returns a token that does not
+  /// belong to the user it was loading for.
   Future<UserToken> getToken() async {
     final cached = peekToken();
     if (cached != null && !_isSpent(cached)) return cached;

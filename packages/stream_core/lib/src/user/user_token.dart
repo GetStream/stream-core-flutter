@@ -39,8 +39,9 @@ class UserToken extends Equatable {
   ///
   /// Returns a [UserToken] configured for JWT authentication.
   ///
-  /// Throws an [ArgumentError] if the 'user_id' claim is missing or empty, and
-  /// a [FormatException] if [rawValue] cannot be parsed as a JWT.
+  /// Throws an [ArgumentError] if the 'user_id' claim is missing or empty, and either an
+  /// [ArgumentError] or a [FormatException] if [rawValue] cannot be parsed as a JWT at all —
+  /// which of the two depends on how it is malformed.
   factory UserToken(String rawValue) {
     final claims = JsonWebToken.unverified(rawValue).claims;
     final userId = claims.getTyped<String>('user_id');
@@ -70,9 +71,9 @@ class UserToken extends Equatable {
   ///
   /// Returns a [UserToken] configured for anonymous access.
   ///
-  /// Throws an [ArgumentError] if [rawValue] is given and its 'user_id' claim
-  /// is not [User.anonymousUserId], and a [FormatException] if it cannot be parsed
-  /// as a JWT.
+  /// Throws an [ArgumentError] if [rawValue] is given and its 'user_id' claim is not
+  /// [User.anonymousUserId], and either an [ArgumentError] or a [FormatException] if it cannot be
+  /// parsed as a JWT at all — which of the two depends on how it is malformed.
   factory UserToken.anonymous({String rawValue = ''}) {
     DateTime? expiresAt;
     if (rawValue.isNotEmpty) {
@@ -140,7 +141,7 @@ class UserToken extends Equatable {
   }
 
   @override
-  List<Object?> get props => [rawValue, userId, authType];
+  List<Object?> get props => [rawValue, userId, authType, expiresAt];
 }
 
 /// Represents the types of authentication available for API access.

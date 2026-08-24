@@ -3,10 +3,30 @@
 ### ✨ Features
 
 - Added `StreamReactions.onReactionLongPressed`, reporting the long-pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip. When null, the chips register no long-press gesture, leaving it to an ancestor.
+- Refreshed the icon set from the design tokens and added 44 icons, including a
+  filled variant for many existing icons: `blurFill`, `boltFill`,
+  `cameraFlipFill`, `captionFill`, `caretDown`, `caretUp`, `copyFill`,
+  `darkMode`, `emojiAddFill`, `fullBlurFill`, `fullscreenFill`, `gridFill`,
+  `gridPixelFill`, `language`, `leftToRight`, `lightMode`, `menu`,
+  `messageBubblesFill`, `moreHorizontal`, `moreVerticalFill`, `noSignFill`,
+  `phoneDownFill`, `pinFill`, `pipFill`, `presentDesktopFill`,
+  `presentMobileFill`, `questionCircleFill`, `raiseHandFill`,
+  `recordLibraryFill`, `recordingFill`, `recordingStopFill`, `settings`,
+  `settingsFill`, `slidersFill`, `starFill`, `statsFill`, `unpinFill`,
+  `userAddFill`, `userRemoveFill`, `usersFill`, `verifiedFill`, `videoOffFill`,
+  `voiceOffFill`, and `xmarkSmall`.
+- Added a `fix_data.yaml`, so deprecated members can be migrated with
+  `dart fix --apply`.
 
 ### 🔄 Changed
 
 - Raised the minimum Flutter version to `>=3.44.0` and the Dart SDK to `^3.12.0`.
+
+### 🛑 Breaking / Removals
+
+- Deprecated `StreamIcons.more` / `StreamIconData.more` in favour of
+  `moreHorizontal`, which keeps the original artwork. A vertical variant is now
+  available as `moreVerticalFill`. Run `dart fix --apply` to migrate.
 
 ## 0.5.0
 

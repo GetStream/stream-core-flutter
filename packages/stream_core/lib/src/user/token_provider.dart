@@ -56,7 +56,7 @@ abstract interface class TokenProvider {
 /// Useful for scenarios where tokens don't expire, long-lived tokens,
 /// or for testing purposes.
 class StaticTokenProvider implements TokenProvider {
-  /// Creates a static token provider with the given `token`.
+  /// Creates a provider that hands out the same token for every load.
   const StaticTokenProvider(this._rawToken);
 
   // The pre-configured token.
@@ -89,7 +89,7 @@ class StaticTokenProvider implements TokenProvider {
 /// for users when needed. The loader function is called with the user ID
 /// and must return a fresh JWT token, typically used for token refresh scenarios.
 class DynamicTokenProvider implements TokenProvider {
-  /// Creates a dynamic token provider with the given `loader` function.
+  /// Creates a provider that calls a loader for each token it hands out.
   const DynamicTokenProvider(this._loader);
 
   // The function used to load tokens for users.
@@ -116,7 +116,6 @@ class DynamicTokenProvider implements TokenProvider {
       );
     }
 
-    // Validate that the token's user_id matches the requested userId
     if (token.userId != userId) {
       throw ArgumentError(
         'User ID mismatch: expected "$userId", got "${token.userId}"',
