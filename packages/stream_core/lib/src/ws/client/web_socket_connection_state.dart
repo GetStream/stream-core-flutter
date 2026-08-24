@@ -93,33 +93,23 @@ sealed class WebSocketConnectionState extends Equatable {
   ///
   /// ## Reconnection is enabled for:
   /// - Server-initiated disconnections (except authentication and client errors)
+  /// - An expired token, since a fresh one is loaded before the next attempt
   /// - System-initiated disconnections (network changes, app lifecycle, etc.)
   /// - Unhealthy connection disconnections (missing pong responses)
+  /// - A connection attempt abandoned for taking too long ([ConnectTimeout])
   ///
   /// ## Reconnection is disabled for:
   /// - User-initiated disconnections (explicit disconnect calls)
-  /// - A socket the server closed deliberately (close code 1000)
-  /// - Tokens another token would not fix, and a wrong API key
-  /// - Client errors (4xx status codes), other than a rate limit
-  /// - A failure to load or send credentials
-  ///
-  /// Whether the server closed this connection because the token had expired.
-  ///
-  /// Reported so a caller that can replace the token knows to, since a
-  /// reconnection cannot: [isAutomaticReconnectionEnabled] refuses this, because
-  /// whoever retries it here would present the token that was just refused.
-  bool get isExpiredTokenDisconnection => switch (this) {
-    Disconnected(source: ServerInitiated(:final error)) => error?.apiError?.isTokenExpiredError ?? false,
-    _ => false,
-  };
-
-  /// Returns `true` if automatic reconnection should be attempted.
+  /// - A connection closed deliberately (close code 1000)
+  /// - Token errors a fresh token would not fix, and a wrong API key
+  /// - Client errors (4xx status codes), other than a rate limit or an expired token
+  /// - A failure to load or send credentials ([AuthenticationFailed])
   bool get isAutomaticReconnectionEnabled => switch (this) {
     Disconnected(:final source) => switch (source) {
       ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
       ServerInitiated(:final error) => switch (error?.apiError) {
         final it? when it.isInvalidTokenError => false,
-        final it? when it.isClientError && !it.isRateLimitError => false,
+        final it? when it.isClientError && !it.isRateLimitError && !it.isTokenExpiredError => false,
         _ => true, // Reconnect on other server initiated disconnections
       },
       UnHealthyConnection() => true,
@@ -357,8 +347,9 @@ final class ConnectTimeout extends DisconnectionSource {
 
 /// A disconnection caused by the connection failing to authenticate.
 ///
-/// This source indicates that the socket opened but authentication did not
-/// complete, so the connection was never usable.
+/// This source indicates that the socket opened but the credentials could not be loaded or sent, so
+/// the connection was never usable. A server rejecting credentials it did receive is reported as an
+/// error event instead.
 final class AuthenticationFailed extends DisconnectionSource {
   /// Creates an [AuthenticationFailed] disconnection source.
   const AuthenticationFailed({this.error});

@@ -48,13 +48,15 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   WebSocketEngineListener<Inc>? _listener;
 
   WebSocketChannel? _ws;
+  // ignore: cancel_subscriptions
   StreamSubscription<Object?>? _wsSubscription;
 
   @override
   Future<Result<void>> open(WebSocketOptions options) {
-    return runSafely(() async {
-      // Close any existing connection first.
-      if (_ws != null) await close();
+    return runSafely(() {
+      if (_ws != null) {
+        throw StateError('WebSocket is already open. Call close() first.');
+      }
 
       // Create a new WebSocket connection.
       _ws = _wsProvider.call(options);
@@ -98,15 +100,15 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     String? closeReason = 'Closed by client',
   ]) {
     return runSafely(() async {
-      if (_ws == null) return;
+      final ws = _ws;
+      final subscription = _wsSubscription;
 
-      await _ws?.sink.close(closeCode, closeReason);
       _ws = null;
-
-      await _wsSubscription?.cancel();
       _wsSubscription = null;
 
-      // Notify the listener about the closure.
+      await subscription?.cancel();
+      await ws?.sink.close(closeCode, closeReason);
+
       _listener?.onClose(closeCode, closeReason);
     });
   }

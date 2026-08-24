@@ -26,6 +26,10 @@ abstract interface class WebSocketEngine<Outgoing> {
   ///
   /// Closes the active WebSocket connection with the specified [closeCode] and [closeReason].
   ///
+  /// The listener is told the connection closed before this completes — however the close went, and
+  /// even when there was no connection to close. Callers may rely on that, rather than reporting the
+  /// closure themselves.
+  ///
   /// Returns a [Result] indicating success or failure of the close operation.
   Future<Result<void>> close([int? closeCode, String? closeReason]);
 

@@ -18,9 +18,9 @@ import 'retry_strategy.dart';
 /// when reconnection should occur, implementing exponential backoff with jitter for optimal
 /// retry behavior.
 ///
-/// It recovers connections that existed: until [StreamWebSocketClient.connect] has established
-/// one, connecting belongs to whoever called it and was handed the failure. A first attempt that
-/// fails is therefore not retried here, including when the network returns.
+/// Only connections that were established are recovered. A first attempt that fails is left to
+/// whoever called [StreamWebSocketClient.connect] and was handed the failure, so it is not retried
+/// here, not even when the network returns.
 ///
 /// ## Built-in Policies
 ///
@@ -83,10 +83,9 @@ class ConnectionRecoveryHandler extends Disposable {
 
   late final _subscriptions = CompositeSubscription();
 
-  // Whether a connection has been established since the caller last asked for
-  // one: it is what separates a drop this handler recovers from an attempt whose
-  // outcome the caller is waiting on.
-  var _hasConnected = false;
+  // Whether a connection has been established since the caller last asked for one. Separates a drop
+  // this handler recovers from an attempt whose outcome the caller is still waiting on.
+  var _hasEstablishedConnection = false;
 
   /// Attempts reconnection if policies allow it.
   ///
@@ -127,12 +126,7 @@ class ConnectionRecoveryHandler extends Disposable {
   }
 
   bool _canBeReconnected() {
-    // Until a connection has existed, connecting belongs to whoever called
-    // `connect` and was handed the failure. Retrying here as well would work
-    // behind a caller already told the attempt failed — and would race the
-    // retry that caller makes in response.
-    if (!_hasConnected) return false;
-
+    if (!_hasEstablishedConnection) return false;
     return _policies.every((it) => it.canBeReconnected());
   }
 
@@ -171,19 +165,21 @@ class ConnectionRecoveryHandler extends Disposable {
     };
   }
 
-  // A connection exists, so keeping it is this handler's job from here, and the
-  // failures the backoff had accumulated are behind us.
+  // Keeping the connection is this handler's job from here,
+  // and the accumulated backoff failures no longer apply.
   void _onConnectionEstablished() {
-    _hasConnected = true;
+    _hasEstablishedConnection = true; // Remember that a connection was established.
     return _reconnectStrategy.resetConsecutiveFailures();
   }
 
-  // A disconnect the caller asked for hands connecting back to them, so the next
-  // `connect` is a fresh attempt they await rather than a drop to recover. A
-  // system-initiated one is the opposite: backgrounding and network loss are what
-  // this handler exists to come back from.
+  // A disconnect the caller asked for hands connecting back to them,
+  // so the next `connect` is a fresh attempt they await rather than a drop to recover.
   void _onConnectionLost(DisconnectionSource source) {
-    if (source is UserInitiated) _hasConnected = false;
+    if (source is UserInitiated) {
+      _hasEstablishedConnection = false;
+      return _cancelReconnection();
+    }
+
     return _scheduleReconnectionIfNeeded();
   }
 
