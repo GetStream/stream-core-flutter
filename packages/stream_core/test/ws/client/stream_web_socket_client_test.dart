@@ -1021,6 +1021,42 @@ void main() {
       );
 
       wsClientTest(
+        'ignores one that arrives before the credentials have gone out',
+        handshakeHangs: true,
+        connect: (tester) async {
+          tester.client.connect().ignore();
+          await tester.pumpEventQueue();
+        },
+        body: (tester) {
+          // The engine subscribes before the handshake completes, so a frame can reach the client
+          // while it is still connecting. Acted on, it would report a connection established that
+          // has never presented credentials.
+          expect(tester.connectionState, isA<Connecting>());
+
+          tester.client.onMessage(const HealthCheck(connectionId: 'early'));
+
+          expect(tester.connectionState, isA<Connecting>());
+        },
+      );
+
+      wsClientTest(
+        'ignores one the engine delivers after the state has moved on',
+        holdClose: true,
+        body: (tester) {
+          tester.client.disconnect().ignore();
+          expect(tester.connectionState, isA<Disconnecting>());
+
+          // Delivered straight to the listener, as the engine does for a frame already in its queue
+          // when the state flipped. Closing cancels the subscription, so a frame sent through the
+          // socket is dropped before it gets here and cannot reach this guard.
+          tester.client.onMessage(const HealthCheck(connectionId: 'late'));
+
+          expect(tester.connectionState, isA<Disconnecting>());
+          tester.server.socket.sink.completeClose();
+        },
+      );
+
+      wsClientTest(
         'leaves the disconnection source intact once the socket closes',
         holdClose: true,
         body: (tester) async {

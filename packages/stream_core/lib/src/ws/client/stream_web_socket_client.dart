@@ -278,8 +278,9 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   }
 
   void _handleHealthCheckEvent(WsEvent event, HealthCheckInfo info) {
-    // A late pong would set the state back to connected and overwrite the disconnection's source,
-    // turning a deliberate disconnect into a server close that gets reconnected.
+    // A pong counts only once credentials have gone out. Earlier it would report a connection
+    // established before it was authenticated; later it would overwrite why the connection closed.
+    if (connectionState.value case Connecting()) return;
     if (connectionState.value case Disconnecting()) return;
     if (connectionState.value case Disconnected()) return;
 
