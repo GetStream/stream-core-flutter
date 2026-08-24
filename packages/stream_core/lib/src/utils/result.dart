@@ -108,9 +108,9 @@ extension PatternMatching<T> on Result<T> {
   ///
   /// This function is a shorthand for `fold(onSuccess: (it) => it, onFailure: onFailure)`.
   ///
-  /// [onFailure] returns this result's own type. To fall back to a supertype,
-  /// widen the result first — `Result<num> widened = intResult` — or use [fold],
-  /// which takes its return type from both branches.
+  /// [onFailure] returns this result's own type. To fall back to a supertype, widen the result first
+  /// (`Result<num> widened = intResult`), or use [fold], which takes its return type from both
+  /// branches.
   T getOrElse(T Function(Object error, StackTrace? stackTrace) onFailure) {
     return switch (this) {
       Success<T>(:final data) => data,
@@ -188,8 +188,7 @@ extension PatternMatching<T> on Result<T> {
   /// Note, that this function rethrows any error thrown by [transform] function.
   /// See [recoverCatching] for an alternative that encapsulates errors.
   ///
-  /// [transform] returns this result's own type, so widening is done on the way
-  /// in rather than on the way out: widen the result first, then recover.
+  /// [transform] returns this result's own type. To recover to a supertype, widen the result first.
   Result<T> recover(
     T Function(Object error, StackTrace? stackTrace) transform,
   ) {
@@ -207,8 +206,7 @@ extension PatternMatching<T> on Result<T> {
   /// This function catches any error thrown by [transform] function and encapsulates it as a failure.
   /// See [recover] for an alternative that rethrows errors.
   ///
-  /// [transform] returns this result's own type, so widening is done on the way
-  /// in rather than on the way out: widen the result first, then recover.
+  /// [transform] returns this result's own type. To recover to a supertype, widen the result first.
   Result<T> recoverCatching(
     T Function(Object error, StackTrace? stackTrace) transform,
   ) {

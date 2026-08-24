@@ -83,14 +83,14 @@ final _clientErrorStatusCodes = _range(400, 499);
 
 /// Extension methods for [StreamApiError] to provide convenient error type checks.
 extension StreamApiErrorExtension on StreamApiError {
-  /// Whether the token has expired.
+  /// Whether the token has expired (error code 40).
   ///
-  /// Distinct from [isInvalidTokenError]: an expired token is replaced by asking
-  /// the provider for another, where an invalid one is a configuration problem
-  /// that a fresh token presents again.
+  /// Distinct from [isInvalidTokenError]: an expired token is fixed by loading another one, whereas
+  /// an invalid token is a configuration problem that a fresh token reproduces.
   bool get isTokenExpiredError => code == _expiredTokenCode;
 
-  /// Whether the token, or the key it was signed with, cannot be accepted.
+  /// Whether the token, or the API key it was signed with, cannot be accepted
+  /// (error codes 41 to 43, and 2).
   bool get isInvalidTokenError => _invalidTokenCodes.contains(code) || code == _accessKeyErrorCode;
 
   /// Whether this error is a client-side error (4xx status codes).

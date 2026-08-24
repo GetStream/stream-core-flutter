@@ -35,16 +35,13 @@ class WebSocketOptions {
 
   /// Maximum time allowed for establishing the WebSocket connection.
   ///
-  /// Covers the whole attempt, not just opening the socket: a connection that
-  /// opens but is never established is abandoned once this elapses.
+  /// Covers the whole attempt, not just opening the socket: a connection that opens but is never
+  /// established is abandoned once this elapses.
   ///
   /// Defaults to [defaultConnectTimeout].
   final Duration connectTimeout;
 
-  /// The [connectTimeout] used when none is given.
-  ///
-  /// Matches the wait the Swift SDK allows for the same handshake; the Android
-  /// one is stricter at ten seconds.
+  /// The [connectTimeout] used when none is given, thirty seconds.
   static const defaultConnectTimeout = Duration(seconds: 30);
 
   /// WebSocket sub-protocols to negotiate during the handshake.

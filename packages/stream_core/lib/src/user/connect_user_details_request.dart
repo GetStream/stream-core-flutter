@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../utils/standard.dart';
 import 'user.dart';
 
 part 'connect_user_details_request.g.dart';
@@ -15,21 +16,21 @@ class ConnectUserDetailsRequest {
     this.custom,
   });
 
-  /// Creates the details a client may send when connecting as [user].
-  ///
-  /// A user's role and teams are left out: the server assigns both and does not
-  /// accept them from a client.
+  /// Creates the details to send when connecting as [user].
   ///
   /// Pass [includeDetails] as `false` to send the id alone.
   factory ConnectUserDetailsRequest.fromUser(
     User user, {
     bool includeDetails = true,
   }) {
+    // Only the id is sent when the details are not wanted.
+    final details = user.takeIf((_) => includeDetails);
+
     return ConnectUserDetailsRequest(
       id: user.id,
-      name: includeDetails ? user.originalName : null,
-      image: includeDetails ? user.image : null,
-      custom: includeDetails ? user.custom : null,
+      name: details?.originalName,
+      image: details?.image,
+      custom: details?.custom,
     );
   }
 
