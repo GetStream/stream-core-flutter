@@ -38,7 +38,8 @@ typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 /// ```dart
 /// final client = StreamWebSocketClient(
 ///   optionsBuilder: () => const WebSocketOptions(url: 'wss://api.example.com'),
-///   messageCodec: const JsonCodec(),
+///   // A WebSocketMessageCodec for the event and request types this SDK puts on the wire.
+///   messageCodec: const AppWsCodec(),
 ///   onAuthenticate: (send, _) async {
 ///     final token = await tokenManager.getToken();
 ///     send(WsAuthMessageRequest(token: token.rawValue)).getOrThrow();
