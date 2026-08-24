@@ -13,9 +13,9 @@ typedef WsRequestSender = Result<void> Function(WsRequest request);
 ///
 /// Called while the state is [Authenticating], to send the credentials the connection requires.
 ///
-/// `previousError` is the error the server closed the previous attempt with, or null if there was
-/// none. Only the next attempt after a refusal sees it; later ones see null. Use it to replace
-/// credentials that were refused.
+/// `previousError` is the error the server closed the previous attempt with, and null when there was
+/// none, once a connection has been established, or once the caller has disconnected. Only the next
+/// attempt after a refusal sees it. Use it to replace credentials that were refused.
 ///
 /// Throw when the credentials did not go out, whether because sending failed or because this
 /// function chose not to send them. The connection is then closed with [AuthenticationFailed], and
@@ -41,9 +41,8 @@ class WebSocketAuthenticationHandler {
   final WsRequestSender _send;
   final void Function(Object error) _onFailure;
 
-  // Identifies the attempt in flight. An authenticator awaiting credentials can outlive the attempt
-  // that started it, and holds a sender and a failure path that would otherwise reach whichever
-  // connection is current by then.
+  // Identifies the attempt in flight. An authenticator can outlive the attempt that started it, and
+  // holds a sender and a failure path that would otherwise reach whichever connection is current.
   var _attempt = 0;
 
   /// The error the server closed the previous attempt with, if it sent one.
@@ -66,8 +65,7 @@ class WebSocketAuthenticationHandler {
 
     _previousError = switch (state) {
       Connected() => null,
-      // The caller took control, so whatever they connect with next is a decision of their own and
-      // may have nothing to do with the credentials that were refused.
+      // The caller took control; what they connect with next may have nothing to do with the refusal.
       Disconnected(source: UserInitiated()) => null,
       // The server closed without sending an error, so the last one still applies.
       Disconnected(source: ServerInitiated(:final error)) => error?.apiError ?? _previousError,
@@ -93,15 +91,12 @@ class WebSocketAuthenticationHandler {
     // Guarded because nothing awaits this: an error thrown here would go unhandled.
     final result = await runSafely(() => authenticate(_senderFor(attempt), previousError));
 
-    // The connection this failure belongs to is already closed, and the one that replaced it did
-    // not fail: reported against that one it would close a usable connection as
-    // `AuthenticationFailed`, which is never reconnected. The refusal is left behind with it, for
-    // the attempt that replaced it and has yet to answer it.
+    // A stale attempt. Reported now, its failure would close the connection that replaced it as
+    // `AuthenticationFailed`, which is never reconnected; the refusal stays armed for that one.
     if (attempt != _attempt) return;
 
-    // Spent, unless the server has refused something newer since: either the credentials went out,
-    // or the authenticator saw the refusal and had nothing else to offer, and one left armed would
-    // be declined again without anything being sent.
+    // Answered by this attempt, so it is spent — unless the server refused something newer while it
+    // ran, which the attempt after this one still has to see.
     if (_previousError == previousError) _previousError = null;
 
     if (result case Failure(:final error)) return _onFailure(error);

@@ -19,6 +19,9 @@ abstract interface class WebSocketEngine<Outgoing> {
   /// Creates a new WebSocket connection using the provided [options] and sets up
   /// event listeners.
   ///
+  /// Fails when a connection is already open; [close] it first. An implementation does not close one
+  /// to make room, so a caller never has a closure announced against an attempt it is still making.
+  ///
   /// Returns a [Result] indicating success or failure of the connection attempt.
   Future<Result<void>> open(WebSocketOptions options);
 
@@ -26,9 +29,9 @@ abstract interface class WebSocketEngine<Outgoing> {
   ///
   /// Closes the active WebSocket connection with the specified [closeCode] and [closeReason].
   ///
-  /// The listener is told the connection closed before this completes — however the close went, and
-  /// even when there was no connection to close. Callers may rely on that, rather than reporting the
-  /// closure themselves.
+  /// The listener is told the connection closed before this completes, including when there was no
+  /// connection to close. A close that fails announces nothing and is reported as a failure instead,
+  /// leaving the caller to tell anyone waiting what became of the connection.
   ///
   /// Returns a [Result] indicating success or failure of the close operation.
   Future<Result<void>> close([int? closeCode, String? closeReason]);

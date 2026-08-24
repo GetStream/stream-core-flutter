@@ -23,9 +23,9 @@ class StreamDioException extends DioException {
 extension StreamDioExceptionExtension on DioException {
   /// The Stream API error the response carried, or `null` when it carried something else.
   ///
-  /// The body arrives decoded when the response was typed as JSON, and as a string when it was
-  /// not, so both are read. Anything that is not a Stream error payload reads as `null` rather
-  /// than throwing: a proxy or gateway can answer with a JSON body of its own.
+  /// Read whether or not the response was typed as JSON, so an error sent as plain text is still
+  /// recognised. Anything that is not a Stream error payload reads as `null` rather than throwing:
+  /// a proxy or gateway can answer with a JSON body of its own.
   StreamApiError? get apiError {
     return runSafelySync(() {
       return switch (response?.data) {

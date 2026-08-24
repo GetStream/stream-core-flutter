@@ -4,23 +4,20 @@ import '../../errors.dart';
 import '../../user.dart';
 import '../stream_core_dio_error.dart';
 
-/// Signs every request with the caller's token, and replaces one the server refused for having
-/// expired before retrying the request once.
+/// Interceptor that signs every request with the caller's token.
+///
+/// A request the server refuses for an expired token is retried once, carrying a replacement.
 class AuthInterceptor extends Interceptor {
-  /// Creates an [AuthInterceptor] that signs requests with the tokens `tokenManager` holds, and
-  /// retries a refused one through `dio`.
+  /// Initialize a new [AuthInterceptor].
   AuthInterceptor(this._dio, this._tokenManager);
 
-  // Not a `QueuedInterceptor`: that frees a queue slot only once a handler completes, so the retry
-  // sent from `onError` would wait behind the request still holding it and neither would finish.
-  // `TokenManager` serialises the token loads, which is the part that needs serialising.
-
-  // Marks a request that has already been retried with a replaced token.
-  static const _retriedKey = 'stream_core.auth_token_retried';
-
   final Dio _dio;
-
   final TokenManager _tokenManager;
+
+  // Not a `QueuedInterceptor`: it frees a slot only once a handler completes, so the retry sent from
+  // `onError` would wait behind the request holding it. `TokenManager` serialises the token loads.
+
+  static const _retriedKey = 'stream_core.auth_token_retried';
 
   @override
   Future<void> onRequest(
@@ -57,32 +54,24 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    // Only an expired token is worth replacing.
     final error = err.apiError;
     if (error == null || !error.isTokenExpiredError) return handler.next(err);
 
     final options = err.requestOptions;
 
-    // Nothing to refresh with when the provider would only return the same token again, and nobody
-    // to refresh for when the manager has since been pointed at another user: the retry would carry
-    // their credentials and perform this request as them.
+    // A retry after a user switch would perform this request as the new user.
     final signedFor = options.queryParameters['user_id'];
     final canRefresh = signedFor == _tokenManager.userId && !_tokenManager.usesStaticProvider;
     if (!canRefresh) return handler.next(err);
 
-    // And only once per request: if the replacement token is refused too, the error is surfaced to
-    // the caller.
     if (options.extra[_retriedKey] == true) return handler.next(err);
 
-    // Expire only the token this request actually carried. Another request may have replaced it
-    // already, and expiring the replacement would discard a valid token.
+    // Another request may have replaced it already, and expiring that would discard a valid token.
     if (options.headers['Authorization'] == _tokenManager.peekToken()?.rawValue) {
       _tokenManager.expireToken();
     }
 
-    // The retry is a new request rather than the refused one modified, so the options the caller
-    // holds are left as they were. A multipart body is cloned because the refused attempt has
-    // already consumed its streams.
+    // The multipart body is cloned because the refused attempt already consumed its streams.
     final data = options.data;
     final retry = options.copyWith(
       extra: {...options.extra, _retriedKey: true},

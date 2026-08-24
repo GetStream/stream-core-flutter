@@ -92,8 +92,8 @@ sealed class WebSocketConnectionState extends Equatable {
   /// the current state and disconnection source. Only applies to [Disconnected] states.
   ///
   /// ## Reconnection is enabled for:
-  /// - Server-initiated disconnections (except authentication and client errors)
-  /// - An expired token, since a fresh one is loaded before the next attempt
+  /// - Server-initiated disconnections, other than the cases listed below
+  /// - An expired token, and a rate limit, both of which a later attempt can get past
   /// - System-initiated disconnections (network changes, app lifecycle, etc.)
   /// - Unhealthy connection disconnections (missing pong responses)
   /// - A connection attempt abandoned for taking too long ([ConnectTimeout])
@@ -104,6 +104,11 @@ sealed class WebSocketConnectionState extends Equatable {
   /// - Token errors a fresh token would not fix, and a wrong API key
   /// - Client errors (4xx status codes), other than a rate limit or an expired token
   /// - A failure to load or send credentials ([AuthenticationFailed])
+  ///
+  /// Necessary, but not on its own sufficient: `ConnectionRecoveryHandler` recovers only a
+  /// connection that was established, and only while the network and the app lifecycle allow it. An
+  /// attempt that never landed is not retried for whoever made it, whatever this reports — so a
+  /// first connection that times out stays down, where one that times out on the way back does not.
   bool get isAutomaticReconnectionEnabled => switch (this) {
     Disconnected(:final source) => source.isReconnectable,
     _ => false, // No automatic reconnection for other states
@@ -212,6 +217,8 @@ final class Disconnected extends WebSocketConnectionState {
 /// - [ServerInitiated]: Server closed the connection, possibly with an error
 /// - [SystemInitiated]: System-level disconnection (network, app lifecycle)
 /// - [UnHealthyConnection]: Connection closed due to failed health checks
+/// - [ConnectTimeout]: Attempt abandoned before the connection was established
+/// - [AuthenticationFailed]: Socket opened, but its credentials never went out
 sealed class DisconnectionSource extends Equatable {
   const DisconnectionSource();
 
@@ -272,8 +279,9 @@ sealed class DisconnectionSource extends Equatable {
 
   /// Whether a connection closed for this reason is worth opening again.
   ///
-  /// See [WebSocketConnectionState.isAutomaticReconnectionEnabled] for what is and is not
-  /// reconnected, which is decided by this alone.
+  /// This is the whole of [WebSocketConnectionState.isAutomaticReconnectionEnabled], which lists
+  /// what is and is not reconnected. Whether a reconnection is then actually made is decided by
+  /// `ConnectionRecoveryHandler` on top of this.
   bool get isReconnectable => switch (this) {
     ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
     ServerInitiated(:final error) => switch (error?.apiError) {

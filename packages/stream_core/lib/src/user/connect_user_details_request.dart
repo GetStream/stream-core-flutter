@@ -19,11 +19,14 @@ class ConnectUserDetailsRequest {
   /// Creates the details to send when connecting as [user].
   ///
   /// Pass [includeDetails] as `false` to send the id alone.
+  ///
+  /// The name comes from [User.originalName] rather than [User.name], so a user who was never given
+  /// one does not have their id sent as their name. [User.role] and [User.teams] are left out
+  /// deliberately: the server assigns both and ignores whatever a client claims for them.
   factory ConnectUserDetailsRequest.fromUser(
     User user, {
     bool includeDetails = true,
   }) {
-    // Only the id is sent when the details are not wanted.
     final details = user.takeIf((_) => includeDetails);
 
     return ConnectUserDetailsRequest(
