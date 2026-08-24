@@ -172,10 +172,12 @@ class ConnectionRecoveryHandler extends Disposable {
     return _reconnectStrategy.resetConsecutiveFailures();
   }
 
-  // A disconnect the caller asked for hands connecting back to them,
-  // so the next `connect` is a fresh attempt they await rather than a drop to recover.
+  // A closure this handler will never act on hands connecting back to the caller, so the next
+  // `connect` is a fresh attempt they await rather than a drop to recover. Only the source is
+  // consulted: the network and the lifecycle are checked when a reconnection is attempted, and a
+  // drop while either is against us is still one to recover once it is not.
   void _onConnectionLost(DisconnectionSource source) {
-    if (source is UserInitiated) {
+    if (!source.isReconnectable) {
       _hasEstablishedConnection = false;
       return _cancelReconnection();
     }

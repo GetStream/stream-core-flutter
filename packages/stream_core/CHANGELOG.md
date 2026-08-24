@@ -29,6 +29,7 @@
 - Added `TokenManager.reset`, which drops the configured identity and its cached token
 - Added `DisconnectionSource.connectTimeout`, reported when a connection attempt is abandoned before it is established, and eligible for automatic reconnection
 - Added `DisconnectionSource.authenticationFailed`, reported with its cause when a connection opens but cannot be authenticated
+- Added `DisconnectionSource.isReconnectable`, whether a connection closed for that reason is worth opening again. `WebSocketConnectionState.isAutomaticReconnectionEnabled` is this and nothing else, for a `Disconnected` state
 - Added `WsRequestSender`, the send capability handed to a `WebSocketAuthenticator`. It belongs to the connection attempt it was handed to and fails once that attempt is no longer the one in flight, so an authenticator still awaiting credentials for an abandoned attempt cannot send them over the connection that replaced it, nor close it as `AuthenticationFailed`
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`
@@ -43,6 +44,7 @@
 - `StreamWebSocketClient` no longer prints to the console. It announced every connection state change, every pong and every ping, which is noise a consumer cannot turn off and cannot act on
 - Fixed `StreamWebSocketClient.connect` leaking the socket of a connection whose handshake failed. The socket is opened before the handshake it fails, and the client reported the connection closed without closing it, so the socket stayed open and unreachable — `dispose` did not close it either, and the next attempt closed it instead, reporting a closure while that attempt was still connecting
 - Fixed a WebSocket engine that reported a closure to its listener only when the close succeeded. It now reports one however the close went, and even when there was no socket to close, so a client waiting to hear the connection is down is no longer left waiting on a socket it can never use. It also lets go of a socket that failed to close, rather than holding one it cannot use, and reports a closure once rather than again when the socket's stream ends
+- Fixed `ConnectionRecoveryHandler` retrying an attempt the caller made and was handed the outcome of, when it followed a closure the handler had stopped at. Only a disconnect the caller asked for handed connecting back to them; any other reason that rules a reconnection out now does too
 - Fixed an authentication failure being discarded when it landed on a connection already recorded as closed for a reason worth retrying, leaving the connection eligible for a reconnection that would present the credentials the authenticator had just given up on
 - Fixed a request that met a second token-expired response never completing at all. A request is now retried at most once
 - Fixed a retried request re-sending a multipart body whose streams the refused attempt had already consumed

@@ -160,6 +160,46 @@ void main() {
     });
   });
 
+  test('hands connecting back after a closure it will not act on', () {
+    fakeAsync((async) {
+      var calls = 0;
+      final tester = buildTester(
+        recover: true,
+        // The retry this handler makes gives up on authentication, which is not reconnected.
+        authenticator: (send, _) async {
+          if (++calls == 2) throw StateError('nothing left to offer');
+          send(WsAuthMessageRequest(token: generateTestUserToken('luke_skywalker').rawValue)).getOrThrow();
+        },
+      );
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      expect(tester.connectionState, isA<Connected>());
+
+      tester.server.hangUp();
+      async.flushMicrotasks();
+      async.elapse(const Duration(seconds: 1));
+      async.flushMicrotasks();
+      expect(
+        tester.connectionState,
+        isA<Disconnected>().having((it) => it.source, 'source', isA<AuthenticationFailed>()),
+      );
+
+      // A fresh attempt, awaited by whoever made it, that never connects.
+      tester.server.onFrame = (_) => [];
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      final made = tester.attempts;
+      async.elapse(WebSocketOptions.defaultConnectTimeout);
+      async.flushMicrotasks();
+
+      // Having connected before the closure this handler stopped at does not make this failure its
+      // to retry: the caller made this attempt and was handed the outcome.
+      async.elapse(const Duration(minutes: 2));
+      expect(tester.attempts, made);
+    });
+  });
+
   test('does not retry a disconnect the caller asked for', () {
     fakeAsync((async) {
       final tester = buildTester(recover: true);

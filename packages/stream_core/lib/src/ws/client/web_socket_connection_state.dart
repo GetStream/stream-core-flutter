@@ -105,19 +105,7 @@ sealed class WebSocketConnectionState extends Equatable {
   /// - Client errors (4xx status codes), other than a rate limit or an expired token
   /// - A failure to load or send credentials ([AuthenticationFailed])
   bool get isAutomaticReconnectionEnabled => switch (this) {
-    Disconnected(:final source) => switch (source) {
-      ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
-      ServerInitiated(:final error) => switch (error?.apiError) {
-        final it? when it.isInvalidTokenError => false,
-        final it? when it.isClientError && !it.isRateLimitError && !it.isTokenExpiredError => false,
-        _ => true, // Reconnect on other server initiated disconnections
-      },
-      UnHealthyConnection() => true,
-      SystemInitiated() => true,
-      ConnectTimeout() => true,
-      UserInitiated() => false,
-      AuthenticationFailed() => false,
-    },
+    Disconnected(:final source) => source.isReconnectable,
     _ => false, // No automatic reconnection for other states
   };
 
@@ -281,6 +269,24 @@ sealed class DisconnectionSource extends Equatable {
       AuthenticationFailed() => 'Authentication failed',
     };
   }
+
+  /// Whether a connection closed for this reason is worth opening again.
+  ///
+  /// See [WebSocketConnectionState.isAutomaticReconnectionEnabled] for what is and is not
+  /// reconnected, which is decided by this alone.
+  bool get isReconnectable => switch (this) {
+    ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
+    ServerInitiated(:final error) => switch (error?.apiError) {
+      final it? when it.isInvalidTokenError => false,
+      final it? when it.isClientError && !it.isRateLimitError && !it.isTokenExpiredError => false,
+      _ => true, // Reconnect on other server initiated disconnections
+    },
+    UnHealthyConnection() => true,
+    SystemInitiated() => true,
+    ConnectTimeout() => true,
+    UserInitiated() => false,
+    AuthenticationFailed() => false,
+  };
 
   @override
   List<Object?> get props => [];
