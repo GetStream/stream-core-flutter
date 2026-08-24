@@ -55,7 +55,10 @@ void main() {
 
     test('can be held quieter than the level, but never louder', () {
       final printed = withStreamLogger(
-        handler: const StreamLogHandler.console(minPriority: StreamLogPriority.error),
+        handler: const StreamLogHandler.filtered(
+          StreamLogFilter.minPriority(StreamLogPriority.error),
+          StreamLogHandler.console(),
+        ),
         filter: const StreamLogFilter.minPriority(StreamLogPriority.debug),
         () => capturePrints(() {
           _logger
@@ -101,7 +104,10 @@ void main() {
       final printed = withStreamLogger(
         handler: StreamLogHandler.composite([
           everything,
-          const StreamLogHandler.console(minPriority: StreamLogPriority.error),
+          const StreamLogHandler.filtered(
+            StreamLogFilter.minPriority(StreamLogPriority.error),
+            StreamLogHandler.console(),
+          ),
         ]),
         () => capturePrints(() {
           _logger
@@ -117,7 +123,10 @@ void main() {
     test('builds a record any one of them wants', () {
       withStreamLogger(
         handler: StreamLogHandler.composite([
-          const StreamLogHandler.console(minPriority: StreamLogPriority.none),
+          const StreamLogHandler.filtered(
+            StreamLogFilter.minPriority(StreamLogPriority.none),
+            StreamLogHandler.console(),
+          ),
           RecordingLogHandler(),
         ]),
         () => expect(_logger.isLoggable(StreamLogPriority.verbose), isTrue),
@@ -169,7 +178,7 @@ void main() {
     test('still lets the handler it wraps keep only what it wants', () {
       final printed = withStreamLogger(
         handler: const StreamLogHandler.debugOnly(
-          StreamLogHandler.console(minPriority: StreamLogPriority.error),
+          StreamLogHandler.filtered(StreamLogFilter.minPriority(StreamLogPriority.error), StreamLogHandler.console()),
         ),
         () => capturePrints(() {
           _logger
@@ -185,6 +194,62 @@ void main() {
       const handler = StreamLogHandler.debugOnly(StreamLogHandler.console());
 
       expect(handler, isA<StreamLogHandler>());
+    });
+  });
+
+  group('StreamLogHandler.filtered', () {
+    test('sends one SDK somewhere the rest do not go', () {
+      final feedsOnly = RecordingLogHandler();
+
+      final printed = withStreamLogger(
+        handler: StreamLogHandler.composite([
+          StreamLogHandler.filtered(
+            const StreamLogFilter.prefix({'SF:': StreamLogPriority.verbose}, otherwise: StreamLogPriority.none),
+            feedsOnly,
+          ),
+          const StreamLogHandler.console(),
+        ]),
+        () => capturePrints(() {
+          const StreamLogger('SF:Ws').d(() => 'from feeds');
+          const StreamLogger('SV:Call').d(() => 'from video');
+        }),
+      );
+
+      // Routing by tag rather than by priority, which a threshold on the handler could not express.
+      expect(feedsOnly.messages, ['from feeds']);
+      expect(printed, hasLength(2));
+    });
+
+    test('respects a threshold held by the handler it wraps', () {
+      final inner = RecordingLogHandler();
+
+      withStreamLogger(
+        handler: StreamLogHandler.filtered(
+          const StreamLogFilter.always(),
+          StreamLogHandler.filtered(const StreamLogFilter.minPriority(StreamLogPriority.error), inner),
+        ),
+        () => const StreamLogger('SC:Component')
+          ..d(() => 'debug')
+          ..e(() => 'error'),
+      );
+
+      // Handing a record on does not re-apply the filter, so the whole chain has to be consulted
+      // before the record is built rather than as it is delivered.
+      expect(inner.messages, ['error']);
+    });
+
+    test('never widens what the level already admitted', () {
+      final everything = RecordingLogHandler();
+
+      withStreamLogger(
+        handler: StreamLogHandler.filtered(const StreamLogFilter.always(), everything),
+        filter: const StreamLogFilter.minPriority(StreamLogPriority.error),
+        () => const StreamLogger('SC:Component')
+          ..d(() => 'debug')
+          ..e(() => 'error'),
+      );
+
+      expect(everything.messages, ['error']);
     });
   });
 

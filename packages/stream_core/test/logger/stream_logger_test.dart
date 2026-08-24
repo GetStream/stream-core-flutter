@@ -109,7 +109,10 @@ void main() {
       var built = 0;
 
       withStreamLogger(
-        handler: const StreamLogHandler.console(minPriority: StreamLogPriority.error),
+        handler: const StreamLogHandler.filtered(
+          StreamLogFilter.minPriority(StreamLogPriority.error),
+          StreamLogHandler.console(),
+        ),
         () => capturePrints(() => _logger.v(() => 'expensive ${built++}')),
       );
 
@@ -118,7 +121,10 @@ void main() {
 
     test('isLoggable answers for the filter and the handler together', () {
       withStreamLogger(
-        handler: const StreamLogHandler.console(minPriority: StreamLogPriority.warning),
+        handler: const StreamLogHandler.filtered(
+          StreamLogFilter.minPriority(StreamLogPriority.warning),
+          StreamLogHandler.console(),
+        ),
         filter: const StreamLogFilter.minPriority(StreamLogPriority.debug),
         () {
           expect(_logger.isLoggable(StreamLogPriority.verbose), isFalse, reason: 'the filter rejects it');

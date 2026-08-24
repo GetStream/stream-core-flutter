@@ -55,7 +55,7 @@ typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 /// written until an app installs a [StreamLogHandler]:
 ///
 /// ```dart
-/// StreamLogger.handler = const StreamLogHandler.console(minPriority: StreamLogPriority.debug);
+/// StreamLogger.handler = const StreamLogHandler.filtered(StreamLogFilter.minPriority(StreamLogPriority.debug), StreamLogHandler.console());
 /// ```
 ///
 /// Give a second client its own `tag` to tell the two apart. Its collaborators are tagged from

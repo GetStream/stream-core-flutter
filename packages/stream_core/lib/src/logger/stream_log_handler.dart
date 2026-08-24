@@ -1,3 +1,4 @@
+import 'stream_log_filter.dart';
 import 'stream_log_priority.dart';
 import 'stream_log_record.dart';
 
@@ -17,12 +18,12 @@ typedef StreamLogCallback = void Function(StreamLogRecord record);
 ///   const CrashReporterHandler();
 ///
 ///   @override
-///   bool isLoggable(StreamLogPriority priority, String tag) => priority >= StreamLogPriority.warning;
-///
-///   @override
 ///   void handle(StreamLogRecord record) => Crashlytics.instance.log('$record');
 /// }
 /// ```
+///
+/// Wrap it in [StreamLogHandler.filtered] to hold it to a threshold, rather than comparing
+/// priorities inside it.
 abstract class StreamLogHandler {
   /// Creates a [StreamLogHandler].
   const StreamLogHandler();
@@ -40,15 +41,35 @@ abstract class StreamLogHandler {
   /// StreamLogger.handler = StreamLogHandler.from((record) => debugPrint('$record'));
   /// ```
   ///
-  /// Emits whatever [StreamLogger.priority] admits. Pass [minPriority] to hold this handler
-  /// quieter than the rest, which is the only direction a handler can move it.
-  const factory StreamLogHandler.console({StreamLogPriority? minPriority}) = _ConsoleHandler;
+  /// Emits whatever [StreamLogger.priority] admits. Wrap in [StreamLogHandler.filtered] to hold
+  /// this destination quieter than the rest.
+  const factory StreamLogHandler.console() = _ConsoleHandler;
 
   /// A handler giving every record to each of [handlers], in order.
   ///
   /// Each decides for itself what to keep, so one composite can serve a verbose console during
   /// development and a crash reporter that only wants failures.
   const factory StreamLogHandler.composite(List<StreamLogHandler> handlers) = _CompositeHandler;
+
+  /// A handler giving [handler] only the records [filter] admits.
+  ///
+  /// The way one destination is held to a threshold of its own, which is the only direction a
+  /// handler can move: a filter here narrows what `StreamLogger.filter` already admitted, and
+  /// cannot widen it.
+  ///
+  /// ```dart
+  /// StreamLogHandler.composite([
+  ///   fileLogger,
+  ///   StreamLogHandler.filtered(
+  ///     const StreamLogFilter.minPriority(StreamLogPriority.error),
+  ///     const StreamLogHandler.console(),
+  ///   ),
+  /// ]);
+  /// ```
+  ///
+  /// [StreamLogFilter.prefix] narrows by tag rather than priority, which is how one SDK's records
+  /// are sent somewhere the rest are not.
+  const factory StreamLogHandler.filtered(StreamLogFilter filter, StreamLogHandler handler) = _FilteredHandler;
 
   /// A handler passing every record to [callback].
   ///
@@ -98,12 +119,7 @@ final class _SilentHandler extends StreamLogHandler {
 }
 
 final class _ConsoleHandler extends StreamLogHandler {
-  const _ConsoleHandler({this.minPriority});
-
-  final StreamLogPriority? minPriority;
-
-  @override
-  bool isLoggable(StreamLogPriority priority, String tag) => minPriority == null || priority >= minPriority!;
+  const _ConsoleHandler();
 
   @override
   void handle(StreamLogRecord record) {
@@ -148,6 +164,21 @@ final class _DebugOnlyHandler extends StreamLogHandler {
   @override
   bool isLoggable(StreamLogPriority priority, String tag) {
     return _assertionsEnabled && handler.isLoggable(priority, tag);
+  }
+
+  @override
+  void handle(StreamLogRecord record) => handler.handle(record);
+}
+
+final class _FilteredHandler extends StreamLogHandler {
+  const _FilteredHandler(this.filter, this.handler);
+
+  final StreamLogFilter filter;
+  final StreamLogHandler handler;
+
+  @override
+  bool isLoggable(StreamLogPriority priority, String tag) {
+    return filter.isLoggable(priority, tag) && handler.isLoggable(priority, tag);
   }
 
   @override
