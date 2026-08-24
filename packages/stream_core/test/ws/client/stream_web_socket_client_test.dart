@@ -47,6 +47,21 @@ void main() {
     );
 
     wsClientTest(
+      'lets a caller connect again straight after a failed handshake',
+      handshakeFails: true,
+      connect: (_) {},
+      body: (tester) async {
+        // Nothing is pumped between the two calls, so `connect` has to finish abandoning the first
+        // attempt before it returns; otherwise the second is refused for racing a close still
+        // under way, and the caller is left with a connection nobody is trying to make.
+        await tester.client.connect();
+        await tester.client.connect();
+
+        expect(tester.attempts, 2);
+      },
+    );
+
+    wsClientTest(
       'reports the closure when the socket of a failed handshake refuses to close',
       handshakeFails: true,
       closeError: Exception('close failed'),

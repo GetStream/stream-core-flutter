@@ -136,7 +136,7 @@ class WsClientTester {
 ///
 /// [connect] runs before [body] and defaults to connecting and asserting the connection was
 /// established. Pass a callback of your own for a test that starts from somewhere else, or
-/// `(_) async {}` to start from a client that has never connected.
+/// `(_) {}` to start from a client that has never connected.
 @isTest
 void wsClientTest(
   String description, {

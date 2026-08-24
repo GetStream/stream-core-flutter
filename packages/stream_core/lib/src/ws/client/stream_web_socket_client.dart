@@ -164,13 +164,13 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _startConnectTimeout(options.connectTimeout);
     final result = await _engine.open(options);
 
-    final error = result.exceptionOrNull();
-    if (error == null) return;
-
     // Hand a failed attempt to `disconnect`, which already reports the reason, closes the socket, and
-    // records the closure even when the close itself fails.
-    return disconnect(
-      source: .serverInitiated(error: WebSocketEngineException(error: error)),
+    // records the closure even when the close itself fails. Returned, not discarded: a caller that
+    // connects again straight away would otherwise be refused for racing a close still under way.
+    return result.getOrElse(
+      (error, _) => disconnect(
+        source: .serverInitiated(error: WebSocketEngineException(error: error)),
+      ),
     );
   }
 
