@@ -32,8 +32,8 @@ void main() {
       handshakeFails: true,
       connect: _justConnect,
       body: (tester) {
-        // Closed without saying why, the attempt reads as the deliberate close the engine defaults
-        // to, and a closure with that code is never reconnected.
+        // Reported with its cause, so the closure stays reconnectable. Closed without one it would
+        // read as the deliberate close the engine defaults to, which never is.
         expect(
           tester.connectionState,
           isA<Disconnected>().having(

@@ -84,8 +84,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   late final WebSocketAuthenticationHandler _authenticationHandler;
   late final _healthMonitor = WebSocketHealthMonitor(listener: this);
 
-  // Bounds an attempt while it is `Connecting` or `Authenticating`. Once the connection is
-  // established, the health monitor takes over.
+  // Bounds an attempt while `Connecting` or `Authenticating`; the health monitor takes over after.
   Timer? _connectTimeoutTimer;
 
   void _startConnectTimeout(Duration timeout) {
@@ -114,7 +113,6 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   late final _connectionStateEmitter = MutableConnectionStateEmitter(const .initialized());
 
   set _connectionState(WebSocketConnectionState connectionState) {
-    // Return early if the emitter is closed.
     if (_connectionStateEmitter.isClosed) return;
 
     // Return early if the state hasn't changed.
@@ -144,8 +142,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   ///
   /// Throws a [StateError] once [dispose] has been called.
   Future<void> connect() async {
-    // A disposed client cannot report a state change or close an idle connection, so a socket opened
-    // here would be invisible to everyone.
+    // A socket opened here would be invisible: a disposed client reports no state and closes nothing.
     if (isDisposed) throw StateError('Cannot connect a disposed StreamWebSocketClient');
 
     // If the connection is already established or in the process of connecting,
@@ -165,9 +162,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _startConnectTimeout(options.connectTimeout);
     final result = await _engine.open(options);
 
-    // Hand a failed attempt to `disconnect`, which already reports the reason, closes the socket, and
-    // records the closure even when the close itself fails. Returned, not discarded: a caller that
-    // connects again straight away would otherwise be refused for racing a close still under way.
+    // Handed to `disconnect`, which reports the reason, closes the socket, and records the closure
+    // even when the close fails. Returned, so a caller connecting again is not refused for the race.
     return result.getOrElse(
       (error, _) => disconnect(
         source: .serverInitiated(error: .new(error: error)),
@@ -193,8 +189,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     if (connectionState.value case Initialized()) return;
 
-    // A source that blocks reconnection overwrites a closure already recorded or underway, or a
-    // pending reconnect could fire past it. Any other source leaves the existing closure alone.
+    // A source that blocks reconnection overwrites one already recorded, or a pending reconnect
+    // fires past it.
     final forceDisconnect = source is UserInitiated || source is AuthenticationFailed;
     if (connectionState.value case Disconnecting() when !forceDisconnect) return;
     if (connectionState.value case Disconnected() when !forceDisconnect) return;
@@ -248,8 +244,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // Update the connection state to 'disconnecting' with the source.
     //
-    // The socket closes itself after reporting an error, so the closure that follows is what records
-    // the disconnection.
+    // The socket closes itself after an error, so the closure that follows records the disconnection.
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
   }
 

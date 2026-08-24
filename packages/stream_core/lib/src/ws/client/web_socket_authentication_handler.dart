@@ -29,8 +29,7 @@ typedef WebSocketAuthenticator = Future<void> Function(WsRequestSender send, Str
 class WebSocketAuthenticationHandler {
   /// Creates a [WebSocketAuthenticationHandler].
   ///
-  /// `authenticator` may be null, for a connection that needs nothing sent. `onFailure` receives
-  /// the cause when authentication fails.
+  /// `authenticator` may be null, for a connection that needs nothing sent.
   WebSocketAuthenticationHandler({
     required this._authenticator,
     required this._send,
@@ -41,8 +40,7 @@ class WebSocketAuthenticationHandler {
   final WsRequestSender _send;
   final void Function(Object error) _onFailure;
 
-  // Identifies the attempt in flight, because an authenticator can outlive the attempt that started
-  // it and still hold a sender and a failure path aimed at whatever connection is current by then.
+  // Identifies the attempt in flight: an authenticator can outlive the one that started it.
   var _attempt = 0;
 
   /// The error the server closed the previous attempt with, if it sent one.
@@ -55,11 +53,8 @@ class WebSocketAuthenticationHandler {
   /// Takes in a connection state change.
   ///
   /// A [Connecting] state begins an attempt, after which an authenticator still running for an
-  /// earlier one can neither send nor report a failure.
-  ///
-  /// [previousError] is set when the server closes the connection with an error, and cleared when a
-  /// connection is established or the caller disconnects. It is otherwise left alone, so a refusal
-  /// outlives the states an attempt passes through.
+  /// earlier one can neither send nor report a failure. Every other state only updates
+  /// [previousError], which is left alone unless the server refused or the caller took over.
   void onConnectionStateChanged(WebSocketConnectionState state) {
     if (state case Connecting()) _attempt++;
 
@@ -91,8 +86,7 @@ class WebSocketAuthenticationHandler {
     // Guarded because nothing awaits this: an error thrown here would go unhandled.
     final result = await runSafely(() => authenticate(_senderFor(attempt), previousError));
 
-    // This attempt is stale. Reporting its failure now would close the connection that replaced it
-    // as `AuthenticationFailed`, which never reconnects. The refusal stays armed for that one.
+    // Stale: its failure would close the connection that replaced it, and never be reconnected.
     if (attempt != _attempt) return;
 
     // Spent, unless the server refused something newer while the authenticator ran. By identity,
@@ -102,8 +96,7 @@ class WebSocketAuthenticationHandler {
     if (result case Failure(:final error)) return _onFailure(error);
   }
 
-  // An authenticator holds its sender across its own awaits, so check the attempt when a request is
-  // actually sent rather than once up front.
+  // The sender is held across the authenticator's own awaits, so the attempt is checked on each send.
   WsRequestSender _senderFor(int attempt) => (request) {
     if (attempt == _attempt) return _send(request);
 
