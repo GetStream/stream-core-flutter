@@ -262,8 +262,8 @@ sealed class DisconnectionSource extends Equatable {
 
   /// What closed the connection, or `null` when this source carries no cause.
   ///
-  /// A [ServerInitiated] closure reports the error the socket failed with, not the
-  /// [WebSocketEngineException] wrapping it — that stands in only when it wraps nothing.
+  /// For a [ServerInitiated] closure this is the error that was reported, or a
+  /// [WebSocketEngineException] describing the close when nothing else was.
   Object? get cause {
     return switch (this) {
       ServerInitiated(:final error) => error?.error ?? error,
