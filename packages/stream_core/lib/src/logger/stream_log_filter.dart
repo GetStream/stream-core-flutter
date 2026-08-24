@@ -9,7 +9,7 @@ import 'stream_log_priority.dart';
 /// app wants one subsystem louder than the rest:
 ///
 /// ```dart
-/// StreamLogger.root.filter = const StreamLogFilter.prefix(
+/// StreamLogger.filter = const StreamLogFilter.prefix(
 ///   {'SC:Ws': StreamLogPriority.verbose},
 ///   otherwise: StreamLogPriority.warning,
 /// );

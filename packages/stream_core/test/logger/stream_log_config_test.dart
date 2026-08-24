@@ -11,8 +11,8 @@ void main() {
 
     test('leaves the logger alone when there is no config', () {
       final installed = RecordingLogHandler();
-      StreamLogger.root.handler = installed;
-      StreamLogger.root.priority = StreamLogPriority.verbose;
+      StreamLogger.handler = installed;
+      StreamLogger.priority = StreamLogPriority.verbose;
 
       StreamLogger.configure(null);
       _logger.d(() => 'another SDK, still heard');
@@ -70,7 +70,7 @@ void main() {
     });
     test('replaces a filter installed before it, even naming only a priority', () {
       final mine = RecordingLogHandler();
-      StreamLogger.root.filter = const StreamLogFilter.prefix({'SF:Ws': StreamLogPriority.verbose});
+      StreamLogger.filter = const StreamLogFilter.prefix({'SF:Ws': StreamLogPriority.verbose});
 
       StreamLogger.configure(StreamLogConfig(priority: StreamLogPriority.debug, handler: mine));
       const StreamLogger('SF:Ws').v(() => 'below what the config asked for');

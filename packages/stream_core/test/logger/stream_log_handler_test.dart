@@ -19,10 +19,10 @@ void main() {
     test('reports failures and stays quiet about the rest, having been given only a handler', () {
       // Deliberately not `withStreamLogger`, which opens the level up: this is about what an app
       // gets from installing a handler and nothing else.
-      StreamLogger.root.handler = const StreamLogHandler.console();
+      StreamLogger.handler = const StreamLogHandler.console();
       addTearDown(() {
-        StreamLogger.root.handler = StreamLogHandler.silent;
-        StreamLogger.root.priority = StreamLogPriority.warning;
+        StreamLogger.handler = StreamLogHandler.silent;
+        StreamLogger.priority = StreamLogPriority.warning;
       });
 
       final printed = capturePrints(() {
@@ -41,11 +41,11 @@ void main() {
     test('writes whatever the level admits, once it has been opened up', () {
       // The setup every migration guide shows, which silently dropped debug when the handler
       // carried a competing threshold of its own.
-      StreamLogger.root.handler = const StreamLogHandler.console();
-      StreamLogger.root.priority = StreamLogPriority.debug;
+      StreamLogger.handler = const StreamLogHandler.console();
+      StreamLogger.priority = StreamLogPriority.debug;
       addTearDown(() {
-        StreamLogger.root.handler = StreamLogHandler.silent;
-        StreamLogger.root.priority = StreamLogPriority.warning;
+        StreamLogger.handler = StreamLogHandler.silent;
+        StreamLogger.priority = StreamLogPriority.warning;
       });
 
       final printed = capturePrints(() => _logger.d(() => 'a debug line'));
