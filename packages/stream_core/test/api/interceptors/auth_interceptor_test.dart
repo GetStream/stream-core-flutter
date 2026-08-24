@@ -442,6 +442,29 @@ void main() {
         expect(subject.api.count, 1);
       });
 
+      test('does not retry a request signed for a user the manager has moved on from', () async {
+        // The manager is pointed at another user while the request is in flight. Retrying would sign
+        // it with their token and perform one user's request as another, and answer the caller as
+        // though their own had succeeded.
+        late TokenManager tokens;
+        final subject = _subject(
+          userId: 'user-a',
+          api: _FakeApi(
+            refusals: 10,
+            onRequest: () => tokens.setTokenProvider(
+              'user-b',
+              tokenProvider: TokenProvider.dynamic((id) async => generateTestUserToken(id)),
+            ),
+          ),
+        );
+        tokens = subject.tokens;
+
+        await expectLater(subject.dio.get<void>('/test'), throwsA(_expiredTokenError));
+
+        expect(subject.api.count, 1);
+        expect(subject.api.sentTokens.single, isNot(contains('user-b')));
+      });
+
       test('forwards the error when the manager has no identity left to load a token for', () async {
         late TokenManager tokens;
         final subject = _subject(api: _FakeApi(refusals: 10, onRequest: () => tokens.reset()));

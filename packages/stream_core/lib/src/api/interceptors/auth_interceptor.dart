@@ -45,7 +45,7 @@ class AuthInterceptor extends Interceptor {
       final dioError = StreamDioException(
         exception: error,
         requestOptions: options,
-        stackTrace: StackTrace.current,
+        stackTrace: stackTrace,
       );
 
       return handler.reject(dioError, true);
@@ -63,9 +63,11 @@ class AuthInterceptor extends Interceptor {
 
     final options = err.requestOptions;
 
-    // Nothing to refresh with when there is no user to load a token for, or when the provider
-    // would only return the same one again.
-    final canRefresh = _tokenManager.userId != null && !_tokenManager.usesStaticProvider;
+    // Nothing to refresh with when the provider would only return the same token again, and nobody
+    // to refresh for when the manager has since been pointed at another user: the retry would carry
+    // their credentials and perform this request as them.
+    final signedFor = options.queryParameters['user_id'];
+    final canRefresh = signedFor == _tokenManager.userId && !_tokenManager.usesStaticProvider;
     if (!canRefresh) return handler.next(err);
 
     // And only once per request: if the replacement token is refused too, the error is surfaced to
@@ -92,7 +94,7 @@ class AuthInterceptor extends Interceptor {
       final response = await _dio.fetch(retry);
       return handler.resolve(response);
     } on DioException catch (exception) {
-      return handler.next(exception);
+      return handler.reject(exception);
     }
   }
 }

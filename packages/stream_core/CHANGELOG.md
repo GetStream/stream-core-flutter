@@ -45,6 +45,7 @@
 - Fixed a WebSocket engine that reported a closure to its listener only when the close succeeded. It now reports one however the close went, and even when there was no socket to close, so a client waiting to hear the connection is down is no longer left waiting on a socket it can never use. It also lets go of a socket that failed to close, rather than holding one it cannot use, and reports a closure once rather than again when the socket's stream ends
 - Fixed a request that met a second token-expired response never completing at all. A request is now retried at most once
 - Fixed a retried request re-sending a multipart body whose streams the refused attempt had already consumed
+- Fixed the failure to load a token reporting the stack trace of where it was caught rather than where the load failed
 - Fixed a rejected request expiring a token that another request had already replaced; only the token a request actually carried is expired now
 - Fixed `TokenManager.getToken()` contacting the `TokenProvider` on every call instead of returning the cached token
 - `TokenManager.getToken` now replaces a cached token that has expired, rather than handing it out and learning the same thing from a refused request. Judged on the expiry alone, so a token with life left in it is still cached. A static provider is left alone: it has nothing fresher to give, and the server refusing its token is what tells a guest to exchange for a new identity
@@ -68,6 +69,8 @@
 - `TokenManager.getToken` fails when `reset` runs while the token is loading; a `setTokenProvider` during a load still serves the caller that started it
 - `TokenManager.getToken` rejects a token whose `user_id` is not the user it was loading for
 - `AuthInterceptor` no longer attempts a token refresh when the manager has no identity, so the original token-expired error is surfaced
+- `AuthInterceptor` no longer retries a request signed for a user the `TokenManager` has since been pointed away from. The retry would have carried the new user's credentials and performed one user's request as another, answering the caller as though their own had succeeded
+- `StreamWebSocketEngine.open` throws when a connection is already open, rather than closing it to make room. Closing it reported a closure from inside `connect`, which brought the new connection down as it was being established
 
 ## 0.4.0
 
