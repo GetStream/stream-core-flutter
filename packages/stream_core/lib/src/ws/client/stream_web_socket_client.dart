@@ -205,7 +205,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     final result = await _engine.close(closeCode, source.closeReason);
 
     // The engine announces nothing when a close fails, which would leave this stuck disconnecting.
-    result.onFailure((_, _) => onClose(closeCode, source.closeReason));
+    return result.getOrElse((_, _) => onClose(closeCode, source.closeReason));
   }
 
   @override
