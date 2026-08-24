@@ -23,7 +23,7 @@ class _FakeApi implements HttpClientAdapter {
 }
 
 /// Builds the interceptor stack a Stream SDK puts on its client, in the same order.
-Dio _subject({LogPrint? logPrint}) {
+Dio _subject({LogPrint? logPrint, bool requestHeader = true}) {
   final tokens = TokenManager(
     userId: 'user-1',
     tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
@@ -33,7 +33,7 @@ Dio _subject({LogPrint? logPrint}) {
   return dio
     ..interceptors.addAll([
       AuthInterceptor(dio, tokens),
-      LoggingInterceptor(requestHeader: true, logPrint: logPrint),
+      LoggingInterceptor(requestHeader: requestHeader, logPrint: logPrint),
     ]);
 }
 
@@ -59,6 +59,26 @@ void main() {
       // `requestHeader` puts `Authorization` in the record, and the request is signed before this
       // interceptor sees it, so a log written unasked carries the user's token.
       expect(printed.join(), isNot(contains(token)));
+    });
+
+    test('keeps the credentials out of a log that was asked for, left at its defaults', () async {
+      final handler = RecordingLogHandler();
+      final dio = _subject(requestHeader: false);
+      final token = generateTestUserToken('user-1').rawValue;
+
+      await withStreamLogger(
+        handler: handler,
+        filter: const StreamLogFilter.always(),
+        () async {
+          await dio.get<void>('/test');
+          await pumpEventQueue();
+        },
+      );
+
+      // What a product gets by constructing the interceptor without arguments: turning `requestHeader`
+      // on is what puts the signed `Authorization` in a record, and nothing else does.
+      expect(handler.records, isNotEmpty, reason: 'the request was reported');
+      expect(handler.messages.join(), isNot(contains(token)));
     });
 
     test('reports the request once a handler wants it', () async {

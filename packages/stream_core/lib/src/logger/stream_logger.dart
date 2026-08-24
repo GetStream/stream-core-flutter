@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 
+import 'stream_log_config.dart';
 import 'stream_log_filter.dart';
 import 'stream_log_handler.dart';
 import 'stream_log_priority.dart';
@@ -117,6 +118,22 @@ final class StreamLogger {
   /// );
   /// ```
   static set filter(StreamLogFilter filter) => _filterOrDefault = filter;
+
+  /// Installs [config] in one step, or leaves the logger untouched where it is null.
+  ///
+  /// What a product client calls with whatever its own config was given, so that an app running
+  /// two Stream SDKs gets the same answer from both, and neither decides logging for an app that
+  /// never asked:
+  ///
+  /// ```dart
+  /// StreamLogger.configure(config.logging);
+  /// ```
+  static void configure(StreamLogConfig? config) {
+    if (config == null) return;
+
+    _handlerOrDefault = config.handler;
+    _filterOrDefault = config.filter ?? .minPriority(config.priority);
+  }
 
   /// Puts [handler] and [priority] back to what they were before anything was installed.
   ///
