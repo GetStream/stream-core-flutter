@@ -89,6 +89,13 @@ void main() {
     expect(state.isAutomaticReconnectionEnabled, isFalse);
   });
 
+  test('automatic reconnection is enabled when an attempt never opened a socket, since the cause is '
+      'usually a network that clears', () {
+    const state = Disconnected(source: ConnectionFailed(error: 'no route to host'));
+
+    expect(state.isAutomaticReconnectionEnabled, isTrue);
+  });
+
   test('automatic reconnection is enabled when a connected socket stops answering health checks', () {
     const state = Disconnected(source: UnHealthyConnection());
 
@@ -103,6 +110,7 @@ void main() {
       UnHealthyConnection(),
       ConnectTimeout(),
       AuthenticationFailed(error: 'no token'),
+      ConnectionFailed(error: 'no socket'),
     ];
 
     final reasons = sources.map((it) => it.closeReason).toSet();

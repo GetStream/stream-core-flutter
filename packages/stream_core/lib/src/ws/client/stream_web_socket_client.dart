@@ -168,9 +168,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // records the closure even when the close itself fails. Returned, not discarded: a caller that
     // connects again straight away would otherwise be refused for racing a close still under way.
     return result.getOrElse(
-      (error, _) => disconnect(
-        source: .serverInitiated(error: WebSocketEngineException(error: error)),
-      ),
+      (error, _) => disconnect(source: .connectionFailed(error: error)),
     );
   }
 

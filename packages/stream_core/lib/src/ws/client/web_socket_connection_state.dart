@@ -97,6 +97,8 @@ sealed class WebSocketConnectionState extends Equatable {
   /// - System-initiated disconnections (network changes, app lifecycle, etc.)
   /// - Unhealthy connection disconnections (missing pong responses)
   /// - A connection attempt abandoned for taking too long ([ConnectTimeout])
+  /// - An attempt that never opened a socket ([ConnectionFailed]), since the cause is usually a
+  ///   network that clears
   ///
   /// ## Reconnection is disabled for:
   /// - User-initiated disconnections (explicit disconnect calls)
@@ -219,6 +221,7 @@ final class Disconnected extends WebSocketConnectionState {
 /// - [UnHealthyConnection]: Connection closed due to failed health checks
 /// - [ConnectTimeout]: Attempt abandoned before the connection was established
 /// - [AuthenticationFailed]: Socket opened, but its credentials never went out
+/// - [ConnectionFailed]: Attempt never got a socket open
 sealed class DisconnectionSource extends Equatable {
   const DisconnectionSource();
 
@@ -260,6 +263,12 @@ sealed class DisconnectionSource extends Equatable {
   /// was closed without ever being usable.
   const factory DisconnectionSource.authenticationFailed({Object? error}) = AuthenticationFailed;
 
+  /// Creates a [ConnectionFailed] disconnection source.
+  ///
+  /// Indicates that the attempt never got a connection open, so there was never
+  /// anything to close.
+  const factory DisconnectionSource.connectionFailed({Object? error}) = ConnectionFailed;
+
   /// A human-readable description of the disconnection source.
   ///
   /// Provides a descriptive string that explains why the connection was closed.
@@ -274,6 +283,7 @@ sealed class DisconnectionSource extends Equatable {
       UnHealthyConnection() => 'Unhealthy connection (no pong received)',
       ConnectTimeout() => 'Timed out before the connection was established',
       AuthenticationFailed() => 'Authentication failed',
+      ConnectionFailed() => 'Connection could not be opened',
     };
   }
 
@@ -294,6 +304,9 @@ sealed class DisconnectionSource extends Equatable {
     ConnectTimeout() => true,
     UserInitiated() => false,
     AuthenticationFailed() => false,
+    // The cause may be local and permanent, such as options a socket cannot be opened with, but
+    // it is more often a network that is down, and that clears.
+    ConnectionFailed() => true,
   };
 
   @override
@@ -369,6 +382,22 @@ final class AuthenticationFailed extends DisconnectionSource {
   const AuthenticationFailed({this.error});
 
   /// The error that prevented the connection from authenticating.
+  final Object? error;
+
+  @override
+  List<Object?> get props => [error];
+}
+
+/// A disconnection caused by an attempt that never opened a socket.
+///
+/// Distinct from [ServerInitiated], which closes a connection that was open. The cause may be the
+/// server refusing the handshake, but it may equally be local: a network that is down, or options a
+/// socket cannot be opened with.
+final class ConnectionFailed extends DisconnectionSource {
+  /// Creates a [ConnectionFailed] disconnection source.
+  const ConnectionFailed({this.error});
+
+  /// The error that prevented the socket from opening.
   final Object? error;
 
   @override
