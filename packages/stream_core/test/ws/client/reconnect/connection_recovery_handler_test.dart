@@ -51,6 +51,32 @@ void main() {
     });
   });
 
+  test('keeps recovering after a retry fails its handshake', () {
+    fakeAsync((async) {
+      var handshakeFails = false;
+      final tester = buildTester(recover: true, handshakeFailsWhen: () => handshakeFails);
+
+      tester.client.connect().ignore();
+      async.flushMicrotasks();
+      expect(tester.connectionState, isA<Connected>());
+
+      // The connection drops, and no retry can upgrade from here.
+      handshakeFails = true;
+      tester.server.onFrame = (_) => [];
+      async.elapse(_untilUnhealthy);
+      async.flushMicrotasks();
+
+      final afterDrop = tester.attempts;
+      expect(afterDrop, greaterThan(1));
+
+      // Recorded as the deliberate close the engine defaults to, a retry that failed to upgrade
+      // would have ended the recovery it was part of, leaving the connection down for good.
+      async.elapse(const Duration(minutes: 1));
+      async.flushMicrotasks();
+      expect(tester.attempts, greaterThan(afterDrop));
+    });
+  });
+
   test('hands connecting back after the caller disconnected', () {
     fakeAsync((async) {
       final tester = buildTester(recover: true);

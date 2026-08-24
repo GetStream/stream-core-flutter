@@ -18,9 +18,10 @@ import 'retry_strategy.dart';
 /// when reconnection should occur, implementing exponential backoff with jitter for optimal
 /// retry behavior.
 ///
-/// Only connections that were established are recovered. A first attempt that fails is left to
-/// whoever called [StreamWebSocketClient.connect] and was handed the failure, so it is not retried
-/// here, not even when the network returns.
+/// Only connections that were established are recovered. A first attempt that fails is reported
+/// through [StreamWebSocketClient.connectionState] and left there, so it is not retried here, not
+/// even when the network returns; making another belongs to whoever called
+/// [StreamWebSocketClient.connect].
 ///
 /// ## Built-in Policies
 ///
@@ -83,8 +84,8 @@ class ConnectionRecoveryHandler extends Disposable {
 
   late final _subscriptions = CompositeSubscription();
 
-  // Whether a connection has been established since the caller last asked for one. Separates a drop
-  // this handler recovers from an attempt whose outcome the caller is still waiting on.
+  // Whether a connection has been established and has not since closed for a reason this handler
+  // will never act on. Separates a drop this handler recovers from an attempt that never landed.
   var _hasEstablishedConnection = false;
 
   /// Attempts reconnection if policies allow it.
@@ -168,14 +169,13 @@ class ConnectionRecoveryHandler extends Disposable {
   // Keeping the connection is this handler's job from here,
   // and the accumulated backoff failures no longer apply.
   void _onConnectionEstablished() {
-    _hasEstablishedConnection = true; // Remember that a connection was established.
+    _hasEstablishedConnection = true;
     return _reconnectStrategy.resetConsecutiveFailures();
   }
 
-  // A closure this handler will never act on hands connecting back to the caller, so the next
-  // `connect` is a fresh attempt they await rather than a drop to recover. Only the source is
-  // consulted: the network and the lifecycle are checked when a reconnection is attempted, and a
-  // drop while either is against us is still one to recover once it is not.
+  // A closure this handler will never act on leaves the next `connect` to whoever makes it. Only the
+  // source is consulted here; the network and lifecycle are checked when a reconnection is actually
+  // attempted, so a drop that lands while either is down is still one to recover once it is back.
   void _onConnectionLost(DisconnectionSource source) {
     if (!source.isReconnectable) {
       _hasEstablishedConnection = false;

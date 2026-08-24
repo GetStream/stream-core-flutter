@@ -107,7 +107,7 @@ class WsClientTester {
 
   /// Releases everything this tester holds.
   ///
-  /// [wsClientTest] calls this for you. A test driving `fakeAsync` must not: these futures were
+  /// [wsClientTest] calls this. A test driving `fakeAsync` must not: these futures were
   /// created inside the fake zone, and awaiting them once it has been discarded never returns.
   /// Nothing outlives that zone, so there is nothing left to release.
   Future<void> dispose() async {
@@ -164,6 +164,7 @@ void wsClientTest(
         tokenLoader: tokenLoader,
         authenticator: authenticator,
         authenticates: authenticates,
+        tokens: tokens,
         recover: recover,
         connectTimeout: connectTimeout,
         handshakeFails: handshakeFails,
@@ -192,6 +193,9 @@ Future<void> _defaultConnect(WsClientTester tester) async {
 ///
 /// A test that drives timers wraps its own `fakeAsync` and cannot await a connect across it, so it
 /// calls this and connects by hand. Everything else should use [wsClientTest].
+///
+/// [handshakeFailsWhen] is asked before each attempt, for a test where only some of them fail. It
+/// takes precedence over [handshakeFails], which applies to every attempt alike.
 WsClientTester buildTester({
   String user = 'luke_skywalker',
   Future<UserToken> Function(String userId)? tokenLoader,
@@ -201,6 +205,7 @@ WsClientTester buildTester({
   bool recover = false,
   Duration? connectTimeout,
   bool handshakeFails = false,
+  bool Function()? handshakeFailsWhen,
   bool handshakeHangs = false,
   bool holdClose = false,
   Object? closeError,
@@ -229,7 +234,7 @@ WsClientTester buildTester({
       };
     },
     wsProvider: (_) => server.connect(
-      handshakeFails: handshakeFails,
+      handshakeFails: handshakeFailsWhen?.call() ?? handshakeFails,
       handshakeHangs: handshakeHangs,
       holdClose: holdClose,
       closeError: closeError,

@@ -28,6 +28,25 @@ void main() {
     );
 
     wsClientTest(
+      'reports a handshake that failed with the reason it failed',
+      handshakeFails: true,
+      connect: _justConnect,
+      body: (tester) {
+        // Closed without saying why, the attempt reads as the deliberate close the engine defaults
+        // to, and a closure with that code is never reconnected.
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having(
+            (it) => it.source,
+            'source',
+            isA<ServerInitiated>().having((it) => it.error?.error, 'error', isNotNull),
+          ),
+        );
+        expect(tester.connectionState.isAutomaticReconnectionEnabled, isTrue);
+      },
+    );
+
+    wsClientTest(
       'closes a socket whose handshake failed',
       handshakeFails: true,
       connect: _justConnect,
