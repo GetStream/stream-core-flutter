@@ -21,16 +21,23 @@ class StreamDioException extends DioException {
 }
 
 extension StreamDioExceptionExtension on DioException {
-  HttpClientException toClientException() {
-    final apiErrorResult = runSafelySync(
-      () => switch (response?.data) {
+  /// The Stream API error the response carried, or `null` when it carried something else.
+  ///
+  /// The body arrives decoded when the response was typed as JSON, and as a string when it was
+  /// not, so both are read. Anything that is not a Stream error payload reads as `null` rather
+  /// than throwing: a proxy or gateway can answer with a JSON body of its own.
+  StreamApiError? get apiError {
+    return runSafelySync(() {
+      return switch (response?.data) {
         final Map<String, Object?> data => StreamApiError.fromJson(data),
         final String data => StreamApiError.fromJson(jsonDecode(data) as Map<String, Object?>),
         _ => null,
-      },
-    );
+      };
+    }).getOrNull();
+  }
 
-    final apiError = apiErrorResult.getOrNull();
+  HttpClientException toClientException() {
+    final apiError = this.apiError;
 
     return HttpClientException(
       message: apiError?.message ?? response?.statusMessage ?? message ?? '',
