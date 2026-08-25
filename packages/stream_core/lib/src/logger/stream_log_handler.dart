@@ -23,7 +23,7 @@ typedef StreamLogCallback = void Function(StreamLogRecord record);
 /// ```
 ///
 /// Wrap it in [StreamLogHandler.filtered] to hold it to a threshold, rather than comparing
-/// priorities inside it.
+/// levels inside it.
 abstract class StreamLogHandler {
   /// Creates a [StreamLogHandler].
   const StreamLogHandler();
@@ -41,7 +41,7 @@ abstract class StreamLogHandler {
   /// StreamLogger.handler = StreamLogHandler.from((record) => debugPrint('$record'));
   /// ```
   ///
-  /// Emits whatever [StreamLogger.priority] admits. Wrap in [StreamLogHandler.filtered] to hold
+  /// Emits whatever [StreamLogger.level] admits. Wrap in [StreamLogHandler.filtered] to hold
   /// this destination quieter than the rest.
   const factory StreamLogHandler.console() = _ConsoleHandler;
 
@@ -62,13 +62,13 @@ abstract class StreamLogHandler {
   /// StreamLogHandler.composite([
   ///   fileLogger,
   ///   StreamLogHandler.filtered(
-  ///     const StreamLogFilter.minPriority(StreamLogPriority.error),
+  ///     const StreamLogFilter.minLevel(StreamLogLevel.error),
   ///     const StreamLogHandler.console(),
   ///   ),
   /// ]);
   /// ```
   ///
-  /// [StreamLogFilter.prefix] narrows by tag rather than priority, which is how one SDK's records
+  /// [StreamLogFilter.prefix] narrows by tag rather than level, which is how one SDK's records
   /// are sent somewhere the rest are not.
   const factory StreamLogHandler.filtered(StreamLogFilter filter, StreamLogHandler handler) = _FilteredHandler;
 
@@ -131,7 +131,7 @@ final class _FilteredHandler extends StreamLogHandler {
 
   @override
   void handle(StreamLogRecord record) {
-    if (filter.isLoggable(record.priority, record.tag)) handler.handle(record);
+    if (filter.isLoggable(record.level, record.tag)) handler.handle(record);
   }
 }
 

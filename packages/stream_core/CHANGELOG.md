@@ -15,12 +15,12 @@
 - `WebSocketConnectionState.isAutomaticReconnectionEnabled` is now `true` for an expired token, and remains `false` for token errors a fresh token cannot fix
 - `StreamApiError.isTokenExpiredError` now means code 40 only; the other token codes and a wrong API key are `isInvalidTokenError`. `isClientError` compares the HTTP `statusCode` against 400..499, rather than the Stream error `code`, which never falls in that range
 - `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` return the result's own type and no longer take a type parameter. To widen, widen the result (`Result<num> widened = intResult`) or use `fold`
-- Replaced the logger: `StreamLogger` is the handle you write with and a `StreamLogHandler` is where records go, so `Priority`, `MessageBuilder`, `Tag`, `IsLoggableValidator` and `Finder` are renamed or gone
+- Replaced the logger: `StreamLogger` is the handle you write with and a `StreamLogHandler` is where records go, so `Level`, `MessageBuilder`, `Tag`, `IsLoggableValidator` and `Finder` are renamed or gone
 - `LoggingInterceptor` writes through the logger rather than printing, so it is silent until an app installs a handler. Its `logPrint` is now optional, and it takes a `tag`
 
 ### ✨ Features
 
-- Added a logger the SDK now reports itself through, silent until an app names both a destination and a priority on `StreamLogger`, or hands a product client a `StreamLogConfig` carrying both
+- Added a logger the SDK now reports itself through, silent until an app names both a destination and a level on `StreamLogger`, or hands a product client a `StreamLogConfig` carrying both
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token; handed the identity it already has, it does nothing
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
 - Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`

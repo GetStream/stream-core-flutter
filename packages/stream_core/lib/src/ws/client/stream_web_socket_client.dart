@@ -55,7 +55,7 @@ typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 /// written until an app installs a [StreamLogHandler]:
 ///
 /// ```dart
-/// StreamLogger.handler = const StreamLogHandler.filtered(StreamLogFilter.minPriority(StreamLogPriority.debug), StreamLogHandler.console());
+/// StreamLogger.handler = const StreamLogHandler.filtered(StreamLogFilter.minLevel(StreamLogLevel.debug), StreamLogHandler.console());
 /// ```
 ///
 /// Give a second client its own `tag` to tell the two apart. Its collaborators are tagged from
@@ -63,7 +63,7 @@ typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 ///
 /// ```dart
 /// StreamWebSocketClient(tag: 'SC:Ws2', ...);
-/// StreamLogger.filter = const StreamLogFilter.prefix({'SC:Ws2': StreamLogPriority.verbose});
+/// StreamLogger.filter = const StreamLogFilter.prefix({'SC:Ws2': StreamLogLevel.verbose});
 /// ```
 class StreamWebSocketClient with Disposable implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].

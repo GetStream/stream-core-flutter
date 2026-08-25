@@ -10,11 +10,11 @@ import 'package:test/test.dart';
 /// change to the field initialisers would otherwise go unnoticed. `dart test` gives each file its
 /// own isolate, which is what keeps these statics pristine.
 void main() {
-  test('an untouched logger admits nothing, at any priority', () {
+  test('an untouched logger admits nothing, at any level', () {
     const logger = StreamLogger('SC:Component');
 
-    for (final priority in StreamLogPriority.values) {
-      expect(logger.isLoggable(priority), isFalse, reason: '$priority');
+    for (final level in StreamLogLevel.values) {
+      expect(logger.isLoggable(level), isFalse, reason: '$level');
     }
 
     expect(

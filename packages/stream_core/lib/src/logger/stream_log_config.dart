@@ -1,6 +1,6 @@
 import 'stream_log_filter.dart';
 import 'stream_log_handler.dart';
-import 'stream_log_priority.dart';
+import 'stream_log_level.dart';
 import 'stream_logger.dart';
 
 /// How much a Stream SDK reports, and where those records go.
@@ -13,7 +13,7 @@ import 'stream_logger.dart';
 ///   apiKey: 'your-api-key',
 ///   user: user,
 ///   config: const FeedsConfig(
-///     logging: StreamLogConfig(priority: StreamLogPriority.debug),
+///     logging: StreamLogConfig(level: StreamLogLevel.debug),
 ///   ),
 /// );
 /// ```
@@ -23,7 +23,7 @@ import 'stream_logger.dart';
 class StreamLogConfig {
   /// Creates a [StreamLogConfig].
   const StreamLogConfig({
-    this.priority = StreamLogPriority.warning,
+    this.level = StreamLogLevel.warning,
     this.handler = defaultHandler,
     this.filter,
   });
@@ -31,11 +31,11 @@ class StreamLogConfig {
   /// Where records go when a config names no handler of its own.
   static const defaultHandler = StreamLogHandler.console();
 
-  /// The lowest priority worth reporting.
+  /// The lowest level worth reporting.
   ///
-  /// [StreamLogPriority.none] silences a logger another SDK configured. Ignored where [filter] is
+  /// [StreamLogLevel.none] silences a logger another SDK configured. Ignored where [filter] is
   /// given, which decides the same thing in more detail.
-  final StreamLogPriority priority;
+  final StreamLogLevel level;
 
   /// Where records go.
   ///
@@ -50,15 +50,15 @@ class StreamLogConfig {
   /// ```
   final StreamLogHandler handler;
 
-  /// Which records are built at all, for a rule [priority] cannot express.
+  /// Which records are built at all, for a rule [level] cannot express.
   ///
   /// Holds one subsystem to a different threshold than the rest:
   ///
   /// ```dart
   /// StreamLogConfig(
   ///   filter: StreamLogFilter.prefix(
-  ///     {'SF:Ws': StreamLogPriority.verbose},
-  ///     otherwise: StreamLogPriority.warning,
+  ///     {'SF:Ws': StreamLogLevel.verbose},
+  ///     otherwise: StreamLogLevel.warning,
   ///   ),
   /// )
   /// ```

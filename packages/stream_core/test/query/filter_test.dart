@@ -676,7 +676,7 @@ void main() {
         final itemWithMatchingNestedData = TestModel(
           metadata: {
             'category': 'test',
-            'priority': 1,
+            'level': 1,
             'config': {'enabled': true, 'timeout': 30},
           },
         );
@@ -687,7 +687,7 @@ void main() {
           },
         );
         final itemWithoutNestedMap = TestModel(
-          metadata: {'category': 'test', 'priority': 1},
+          metadata: {'category': 'test', 'level': 1},
         );
 
         expect(filter.matches(itemWithMatchingNestedData), isTrue);

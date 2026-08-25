@@ -21,12 +21,12 @@ void main() {
       });
 
       expect(handler.tags, everyElement('SC:Component'));
-      expect(handler.records.map((it) => it.priority), [
-        StreamLogPriority.verbose,
-        StreamLogPriority.debug,
-        StreamLogPriority.info,
-        StreamLogPriority.warning,
-        StreamLogPriority.error,
+      expect(handler.records.map((it) => it.level), [
+        StreamLogLevel.verbose,
+        StreamLogLevel.debug,
+        StreamLogLevel.info,
+        StreamLogLevel.warning,
+        StreamLogLevel.error,
       ]);
     });
 
@@ -75,7 +75,7 @@ void main() {
           ..i(() => 'i', error: error, stackTrace: stackTrace)
           ..w(() => 'w', error: error, stackTrace: stackTrace)
           ..e(() => 'e', error: error, stackTrace: stackTrace)
-          ..log(StreamLogPriority.error, () => 'log', error: error, stackTrace: stackTrace);
+          ..log(StreamLogLevel.error, () => 'log', error: error, stackTrace: stackTrace);
       });
 
       // Each of these forwards to `log` separately, so one that dropped an argument would go
@@ -95,7 +95,7 @@ void main() {
           ..i(() => 'i')
           ..w(() => 'w')
           ..e(() => 'e')
-          ..log(StreamLogPriority.error, () => 'log');
+          ..log(StreamLogLevel.error, () => 'log');
       });
 
       // A handler forwarding to a crash reporter decides what to report on whether there is a
@@ -120,7 +120,7 @@ void main() {
 
       final printed = withStreamLogger(
         handler: const StreamLogHandler.filtered(
-          StreamLogFilter.minPriority(StreamLogPriority.error),
+          StreamLogFilter.minLevel(StreamLogLevel.error),
           StreamLogHandler.console(),
         ),
         () => capturePrints(() => _logger.v(() => 'expensive ${built++}')),
@@ -135,24 +135,24 @@ void main() {
     test('isLoggable answers for the filter, whatever the destination goes on to keep', () {
       withStreamLogger(
         handler: const StreamLogHandler.filtered(
-          StreamLogFilter.minPriority(StreamLogPriority.warning),
+          StreamLogFilter.minLevel(StreamLogLevel.warning),
           StreamLogHandler.console(),
         ),
-        filter: const StreamLogFilter.minPriority(StreamLogPriority.debug),
+        filter: const StreamLogFilter.minLevel(StreamLogLevel.debug),
         () {
-          expect(_logger.isLoggable(StreamLogPriority.verbose), isFalse, reason: 'the filter rejects it');
-          expect(_logger.isLoggable(StreamLogPriority.debug), isTrue, reason: 'the filter admits it');
-          expect(_logger.isLoggable(StreamLogPriority.warning), isTrue);
+          expect(_logger.isLoggable(StreamLogLevel.verbose), isFalse, reason: 'the filter rejects it');
+          expect(_logger.isLoggable(StreamLogLevel.debug), isTrue, reason: 'the filter admits it');
+          expect(_logger.isLoggable(StreamLogLevel.warning), isTrue);
         },
       );
     });
   });
 
   group('StreamLogger.reset', () {
-    test('puts back both the handler and the priority', () {
+    test('puts back both the handler and the level', () {
       final installed = RecordingLogHandler();
       StreamLogger.handler = installed;
-      StreamLogger.priority = StreamLogPriority.verbose;
+      StreamLogger.level = StreamLogLevel.verbose;
 
       StreamLogger.reset();
 
@@ -166,7 +166,7 @@ void main() {
 
       expect(installed.records, isEmpty, reason: 'the handler was put back');
       expect(printed, isEmpty, reason: 'nothing is installed to print with');
-      expect(_logger.isLoggable(StreamLogPriority.debug), isFalse, reason: 'the priority was put back');
+      expect(_logger.isLoggable(StreamLogLevel.debug), isFalse, reason: 'the level was put back');
     });
   });
 
@@ -196,7 +196,7 @@ void main() {
       final logger = StreamLogger.detached(
         'SC:Detached',
         handler: mine,
-        filter: const StreamLogFilter.minPriority(StreamLogPriority.error),
+        filter: const StreamLogFilter.minLevel(StreamLogLevel.error),
       );
 
       withStreamLogger(filter: const StreamLogFilter.always(), () {
@@ -246,20 +246,20 @@ void main() {
       expect(mine.messages, ['the quietest record there is']);
     });
 
-    test('is unmoved by the installed handler and priority changing after it was built', () {
+    test('is unmoved by the installed handler and level changing after it was built', () {
       final mine = RecordingLogHandler();
       final logger = StreamLogger.detached('SC:Detached', handler: mine);
 
       addTearDown(() {
         StreamLogger.handler = StreamLogHandler.silent;
-        StreamLogger.priority = StreamLogPriority.warning;
+        StreamLogger.level = StreamLogLevel.warning;
       });
 
       // An attached logger resolves both of these every time it writes, so a detached one reading
       // either would drift as an app reconfigured itself.
       for (final installed in [RecordingLogHandler(), RecordingLogHandler()]) {
         StreamLogger.handler = installed;
-        StreamLogger.priority = StreamLogPriority.verbose;
+        StreamLogger.level = StreamLogLevel.verbose;
 
         logger
           ..d(() => 'still below its own threshold')
@@ -316,16 +316,16 @@ void main() {
       expect(second.sequenceNumber, first.sequenceNumber + 1);
     });
   });
-  group('StreamLogPriority.none', () {
+  group('StreamLogLevel.none', () {
     test('admits nothing when a filter is held to it', () {
       final handler = RecordingLogHandler();
 
       withStreamLogger(
         handler: handler,
-        filter: const StreamLogFilter.minPriority(StreamLogPriority.none),
+        filter: const StreamLogFilter.minLevel(StreamLogLevel.none),
         () {
-          for (final priority in StreamLogPriority.values) {
-            expect(const StreamLogger('SC:Component').isLoggable(priority), isFalse, reason: '$priority');
+          for (final level in StreamLogLevel.values) {
+            expect(const StreamLogger('SC:Component').isLoggable(level), isFalse, reason: '$level');
           }
           const StreamLogger('SC:Component').e(() => 'a failure, while shut down');
         },
@@ -342,8 +342,8 @@ void main() {
       withStreamLogger(
         handler: handler,
         filter: const StreamLogFilter.prefix(
-          {'SV:': StreamLogPriority.none},
-          otherwise: StreamLogPriority.debug,
+          {'SV:': StreamLogLevel.none},
+          otherwise: StreamLogLevel.debug,
         ),
         () {
           const StreamLogger('SV:Call').e(() => 'silenced');
@@ -359,7 +359,7 @@ void main() {
 
       withStreamLogger(
         handler: RecordingLogHandler(),
-        filter: const StreamLogFilter.minPriority(StreamLogPriority.none),
+        filter: const StreamLogFilter.minLevel(StreamLogLevel.none),
         () => const StreamLogger('SC:Component').e(() {
           built++;
           return 'never built';

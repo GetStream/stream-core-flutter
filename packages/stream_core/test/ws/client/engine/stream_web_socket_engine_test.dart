@@ -306,7 +306,7 @@ void main() {
       await pumpEventQueue();
     });
 
-    expect(handler.records.single.priority, StreamLogPriority.warning);
+    expect(handler.records.single.level, StreamLogLevel.warning);
     expect(handler.records.single.tag, 'SC:WsEngine');
     expect(handler.records.single.error, isA<FormatException>());
   });
