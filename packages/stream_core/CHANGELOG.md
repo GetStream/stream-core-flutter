@@ -41,7 +41,6 @@
 - Fixed reconnection eligibility: the deliberate-close and client-error checks never matched, and a rate limit was treated as permanent when it clears on its own
 - Fixed `ConnectionRecoveryHandler` retrying a first connection attempt, which reconnected behind the caller of `connect`; only established connections are recovered now
 - Fixed a health check arriving while disconnecting reporting the connection as established again, turning a deliberate disconnect into a reconnect
-- Fixed a token that arrives after its connection attempt was abandoned reporting an authentication failure against whatever closed it. That replaced a closure worth reconnecting for with one that never is, and cleared the record of ever having connected, so nothing recovered afterwards — not even the network returning
 
 ### 🔄 Changed
 
