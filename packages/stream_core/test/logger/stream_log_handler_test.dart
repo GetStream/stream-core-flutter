@@ -16,15 +16,16 @@ void main() {
       expect(printed.single, allOf(contains('a visible line'), contains('SC:Component')));
     });
 
-    test('reports failures and stays quiet about the rest, having been given only a handler', () {
+    test('stays quiet until a level is named beside it', () {
       // Deliberately not `withStreamLogger`, which opens the level up: this is about what an app
       // gets from installing a handler and nothing else.
       StreamLogger.handler = const StreamLogHandler.console();
-      addTearDown(() {
-        StreamLogger.handler = StreamLogHandler.silent;
-        StreamLogger.priority = StreamLogPriority.warning;
-      });
+      addTearDown(StreamLogger.reset);
 
+      // A destination with no level is as silent as a level with no destination: records need both.
+      expect(capturePrints(() => _logger.e(() => 'error')), isEmpty);
+
+      StreamLogger.priority = StreamLogPriority.warning;
       final printed = capturePrints(() {
         _logger
           ..v(() => 'verbose')
@@ -160,12 +161,14 @@ void main() {
   });
 
   group('StreamLogHandler.silent', () {
-    test('discards every record and admits none', () {
+    test('discards every record it is given', () {
       withStreamLogger(
         handler: StreamLogHandler.silent,
         () {
           expect(capturePrints(() => _logger.e(() => 'discarded')), isEmpty);
-          expect(_logger.isLoggable(StreamLogPriority.error), isFalse);
+          // The filter decides what is built; where it goes afterwards is this handler's business,
+          // so it no longer has a say in what `isLoggable` answers.
+          expect(_logger.isLoggable(StreamLogPriority.error), isTrue);
         },
       );
     });

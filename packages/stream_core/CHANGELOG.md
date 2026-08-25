@@ -20,7 +20,7 @@
 
 ### ✨ Features
 
-- Added a logger the SDK now reports itself through, silent until an app installs a `StreamLogHandler` or a product client passes `StreamLogger.configure` the `StreamLogConfig` it was given
+- Added a logger the SDK now reports itself through, silent until an app names both a destination and a priority on `StreamLogger`, or hands a product client a `StreamLogConfig` carrying both
 - Added `TokenManager.setTokenProvider`, which points an existing manager at another user and expires the cached token; handed the identity it already has, it does nothing
 - Added optional `onTokenUpdated` callback to `TokenManager`, invoked after every successful token load
 - Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`

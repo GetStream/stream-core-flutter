@@ -86,46 +86,45 @@ final class StreamLogger {
   final String tag;
 
   static StreamLogHandler _handlerOrDefault = StreamLogHandler.silent;
-  static StreamLogFilter _filterOrDefault = const .minPriority(.warning);
-  static _StreamLogValidator _validator = _compile(_filterOrDefault, _handlerOrDefault);
+  static StreamLogFilter _filterOrDefault = _closed;
+  static _StreamLogValidator _validator = _compile(_filterOrDefault);
 
-  // The one question the write path asks. `priority` and `filter` are two ways of describing the
-  // same half of it, which is why installing either replaces what the other left behind.
-  static _StreamLogValidator _compile(StreamLogFilter filter, StreamLogHandler handler) {
-    return (priority, tag) => _decide(filter, handler, priority, tag);
-  }
+  // Admits nothing, which is where an app that has not asked for records starts.
+  static const _closed = StreamLogFilter.minPriority(StreamLogPriority.none);
 
-  static bool _decide(StreamLogFilter filter, StreamLogHandler handler, StreamLogPriority priority, String tag) {
+  // The one question the write path asks. `priority` and `filter` are two ways of describing it,
+  // which is why installing either replaces what the other left behind.
+  static _StreamLogValidator _compile(StreamLogFilter filter) =>
+      (priority, tag) => _decide(filter, priority, tag);
+
+  static bool _decide(StreamLogFilter filter, StreamLogPriority priority, String tag) {
     // A threshold rather than a severity: comparing it against itself would otherwise admit the one
     // record that shutting logging down cannot silence.
     if (priority == StreamLogPriority.none) return false;
-    // Nowhere to write is not a decision a handler makes about a record, so it is settled here
-    // rather than by asking every destination what it wants.
-    if (identical(handler, StreamLogHandler.silent)) return false;
     return filter.isLoggable(priority, tag);
   }
 
   /// Installs where every record goes, other than those from a [StreamLogger.detached] logger.
   ///
-  /// Everything is discarded until this is set, so an SDK is silent in an app that has not asked
-  /// for records. Setting it applies to loggers that already exist, including any built at
+  /// A destination on its own reports nothing: name a [priority] beside it, or hand both to
+  /// [configure] at once. Setting it applies to loggers that already exist, including any built at
   /// class-load, because a logger resolves this when it writes rather than when it was created.
   ///
   /// ```dart
   /// StreamLogger.handler = const StreamLogHandler.console();
+  /// StreamLogger.priority = StreamLogPriority.warning;
   /// ```
   ///
   /// Write-only, so nothing can come to depend on what happens to be installed. Consider
   /// [StreamLogHandler.composite] to send records to more than one place.
   static set handler(StreamLogHandler handler) {
     _handlerOrDefault = handler;
-    _validator = _compile(_filterOrDefault, handler);
   }
 
   /// Installs the lowest priority worth building a record for.
   ///
-  /// Defaults to [StreamLogPriority.warning], so an app that installs a handler and nothing else
-  /// hears about failures and not the running commentary:
+  /// Nothing is admitted until this is named, so an SDK stays silent in an app that has not asked
+  /// for records, and a record it rejects is never built:
   ///
   /// ```dart
   /// StreamLogger.priority = StreamLogPriority.debug;
@@ -145,7 +144,7 @@ final class StreamLogger {
   /// ```
   static set filter(StreamLogFilter filter) {
     _filterOrDefault = filter;
-    _validator = _compile(filter, _handlerOrDefault);
+    _validator = _compile(filter);
   }
 
   /// Installs [config] in one step, or leaves the logger untouched where it is null.
@@ -180,7 +179,7 @@ final class StreamLogger {
 
     _handlerOrDefault = config.handler;
     _filterOrDefault = config.filter ?? .minPriority(config.priority);
-    _validator = _compile(_filterOrDefault, _handlerOrDefault);
+    _validator = _compile(_filterOrDefault);
   }
 
   /// Puts [handler] and [priority] back to what they were before anything was installed.
@@ -195,8 +194,8 @@ final class StreamLogger {
   @visibleForTesting
   static void reset() {
     _handlerOrDefault = StreamLogHandler.silent;
-    _filterOrDefault = const .minPriority(.warning);
-    _validator = _compile(_filterOrDefault, _handlerOrDefault);
+    _filterOrDefault = _closed;
+    _validator = _compile(_filterOrDefault);
   }
 
   /// Whether a record at [priority] would be kept by both the filter and the handler.
@@ -208,8 +207,8 @@ final class StreamLogger {
   /// if (_log.isLoggable(StreamLogPriority.verbose)) _log.v(() => describe(everyParticipant));
   /// ```
   bool isLoggable(StreamLogPriority priority) {
-    // A detached logger carries its own pair, and so cannot share the compiled one.
-    if (_handler case final handler?) return _decide(_filter!, handler, priority, tag);
+    // A detached logger carries its own filter, and so cannot share the compiled one.
+    if (_filter case final filter?) return _decide(filter, priority, tag);
     return _validator(priority, tag);
   }
 
