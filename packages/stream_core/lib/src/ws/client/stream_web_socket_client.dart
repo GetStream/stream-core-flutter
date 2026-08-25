@@ -273,8 +273,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   }
 
   void _handleHealthCheckEvent(WsEvent event, HealthCheckInfo info) {
-    // A pong counts only once credentials have gone out. Earlier it would report a connection
-    // established before it was authenticated; later it would overwrite why the connection closed.
+    // `Authenticating` stays in: with no authenticator there is nothing to send, so the server's
+    // first pong is what establishes the connection.
     if (connectionState.value case Connecting()) return;
     if (connectionState.value case Disconnecting()) return;
     if (connectionState.value case Disconnected()) return;
