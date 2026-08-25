@@ -26,6 +26,7 @@
 - Added optional `rawValue` to `UserToken.anonymous`, so an anonymous token can carry a JWT granting restricted access; its `user_id` claim must be `!anon`
 - Added `UserToken.expiresAt`, from the token's `exp` claim, and `UserToken.isExpired`, which takes an optional `leeway`
 - Added `User.anonymousUserId`, the id every anonymous user has
+- `User.guest` takes an `image`, which it previously dropped
 - Added `TokenManager.unconfigured`, for a client that exists before its user does, and `TokenManager.reset`, which drops the configured identity and its cached token
 - Added `teams` field to `User` class
 - Added `DioException.apiError`, the Stream API error a response carried, or `null` for anything else
