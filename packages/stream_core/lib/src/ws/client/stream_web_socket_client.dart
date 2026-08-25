@@ -257,9 +257,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // If the event is a health check event, handle it.
     if (event.healthCheckInfo case final healthCheckInfo?) {
-      if (connectionState.value case Authenticating() || Connected()) {
-        return _handleHealthCheckEvent(event, healthCheckInfo);
-      }
+      return _handleHealthCheckEvent(event, healthCheckInfo);
     }
 
     // Emit the decoded event.
@@ -275,19 +273,23 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   }
 
   void _handleHealthCheckEvent(WsEvent event, HealthCheckInfo info) {
-    // The connection is established, so the attempt is no longer being timed.
-    _cancelConnectTimeout();
+    // Still authenticating counts too: with no authenticator we never send anything, so this pong
+    // is the only sign we get that the connection works.
+    if (connectionState.value case Authenticating() || Connected()) {
+      // The connection is established, so the attempt is no longer being timed.
+      _cancelConnectTimeout();
 
-    // Update the connection state with health check info.
-    _connectionState = WebSocketConnectionState.connected(healthCheck: info);
+      // Update the connection state with health check info.
+      _connectionState = WebSocketConnectionState.connected(healthCheck: info);
 
-    // Notify the health monitor that a pong has been received.
-    _healthMonitor.onPongReceived();
+      // Notify the health monitor that a pong has been received.
+      _healthMonitor.onPongReceived();
 
-    // Emit the health check event.
-    //
-    // Emitted as well as handled, so a listener can react to it too.
-    _events.emit(event);
+      // Emit the health check event.
+      //
+      // Emitted as well as handled, so a listener can react to it too.
+      _events.emit(event);
+    }
   }
 
   @override

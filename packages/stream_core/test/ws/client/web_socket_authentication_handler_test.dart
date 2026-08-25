@@ -202,7 +202,66 @@ void main() {
     expect(authentication.previousError, _expiredToken);
   });
 
-  group('when another attempt has begun', () {
+  group('when the attempt it belongs to has ended', () {
+    test('sends nothing once the connection it belongs to has closed', () async {
+      final loaded = Completer<void>();
+      final sent = <WsRequest>[];
+      Result<void>? outcome;
+
+      final authentication = WebSocketAuthenticationHandler(
+        authenticator: (send, _) async {
+          await loaded.future;
+          outcome = send(const _PingRequest());
+        },
+        send: (request) {
+          sent.add(request);
+          return const Result.success(null);
+        },
+        onFailure: (_) => fail('the credentials were never offered, so nothing failed to go out'),
+      );
+
+      authentication.onConnectionStateChanged(const Connecting());
+      final authenticating = authentication.authenticate();
+
+      // Closed, and nothing has begun in its place. The credentials still belong to the attempt
+      // that closure ended, so the socket they would reach is not the one that asked for them.
+      authentication.onConnectionStateChanged(
+        const Disconnected(source: DisconnectionSource.connectTimeout()),
+      );
+
+      loaded.complete();
+      await authenticating;
+
+      expect(sent, isEmpty);
+      expect(outcome, isA<Failure>());
+    });
+
+    test('reports no failure once the connection it belongs to has closed', () async {
+      final loaded = Completer<void>();
+
+      final authentication = WebSocketAuthenticationHandler(
+        authenticator: (_, _) async {
+          await loaded.future;
+          throw StateError('token load failed');
+        },
+        send: (_) => const Result.success(null),
+        onFailure: (_) => fail('the attempt this failure belongs to had already been closed'),
+      );
+
+      authentication.onConnectionStateChanged(const Connecting());
+      final authenticating = authentication.authenticate();
+
+      // Reported, this would replace the reason the connection closed with one that is never
+      // reconnected, on an attempt nothing has taken over from.
+      authentication.onConnectionStateChanged(
+        const Disconnected(source: DisconnectionSource.connectTimeout()),
+      );
+
+      loaded.complete();
+      await authenticating;
+    });
+
+
     test('sends nothing over the connection that replaced the one it belongs to', () async {
       final loaded = Completer<void>();
       final sent = <WsRequest>[];
