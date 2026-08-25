@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import '../../stream_core.dart';
 
-/// Error class specific to StreamChat and Dio
+/// A [DioException] carrying the Stream [ClientException] that caused it.
 class StreamDioException extends DioException {
-  /// Initialize a stream chat dio error
+  /// Creates a [StreamDioException] for [exception].
   StreamDioException({
     required this.exception,
     required super.requestOptions,
@@ -21,16 +21,25 @@ class StreamDioException extends DioException {
 }
 
 extension StreamDioExceptionExtension on DioException {
-  HttpClientException toClientException() {
-    final apiErrorResult = runSafelySync(
-      () => switch (response?.data) {
-        final Map<String, Object?> data => StreamApiError.fromJson(data),
-        final String data => StreamApiError.fromJson(jsonDecode(data) as Map<String, Object?>),
-        _ => null,
-      },
-    );
+  /// The Stream API error this exception's response carried, or `null` when it carried something else.
+  ///
+  /// A Stream error is recognised whether the server sent it as JSON or as plain text. A body that is
+  /// not one — a proxy or gateway answering with an error of its own — reads as `null` rather than
+  /// throwing.
+  StreamApiError? get apiError => runSafelySync(() {
+    final data = response?.data;
+    final json = data is String ? jsonDecode(data) : data;
+    if (json is! Map<String, Object?>) return null;
 
-    final apiError = apiErrorResult.getOrNull();
+    return StreamApiError.fromJson(json);
+  }).getOrNull();
+
+  /// This exception as an [HttpClientException].
+  ///
+  /// Takes its message, status code and cause from [apiError] when the response carried one, and
+  /// from what the transport reported otherwise. A request the caller cancelled is marked as such.
+  HttpClientException toClientException() {
+    final apiError = this.apiError;
 
     return HttpClientException(
       message: apiError?.message ?? response?.statusMessage ?? message ?? '',

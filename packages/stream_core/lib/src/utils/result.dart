@@ -58,8 +58,8 @@ extension PatternMatching<T> on Result<T> {
   /// Returns the encapsulated value if this instance represents [Success] or `null`
   /// if it is [Failure].
   ///
-  /// This function is a shorthand for `getOrElse(() => null)` or
-  /// `fold(onSuccess: (it) => it, onFailure: (_) => null)`.
+  /// This function is a shorthand for
+  /// `fold(onSuccess: (it) => it, onFailure: (_, _) => null)`.
   T? getOrNull() {
     return switch (this) {
       Success<T>(:final data) => data,
@@ -90,7 +90,7 @@ extension PatternMatching<T> on Result<T> {
   /// Returns the encapsulated value if this instance represents [Success] or throws the encapsulated error
   /// if it is [Failure].
   ///
-  /// This function is a shorthand for `getOrElse((error) => throw error)`.
+  /// This function is a shorthand for `getOrElse((error, _) => throw error)`.
   T getOrThrow() {
     return switch (this) {
       Success<T>(:final data) => data,
@@ -107,9 +107,13 @@ extension PatternMatching<T> on Result<T> {
   /// Note, that this function rethrows any error thrown by [onFailure] function.
   ///
   /// This function is a shorthand for `fold(onSuccess: (it) => it, onFailure: onFailure)`.
-  R getOrElse<R>(R Function(Object error, StackTrace? stackTrace) onFailure) {
+  ///
+  /// [onFailure] returns this result's own type. To fall back to a supertype, widen the result first
+  /// (`Result<num> widened = intResult`), or use [fold], which takes its return type from both
+  /// branches.
+  T getOrElse(T Function(Object error, StackTrace? stackTrace) onFailure) {
     return switch (this) {
-      Success<T>(:final data) => data as R,
+      Success<T>(:final data) => data,
       Failure(:final error, :final stackTrace) => onFailure(error, stackTrace),
     };
   }
@@ -117,10 +121,13 @@ extension PatternMatching<T> on Result<T> {
   /// Returns the encapsulated value if this instance represents [Success] or the
   /// [defaultValue] if it is [Failure].
   ///
-  /// This function is a shorthand for `getOrElse((_) => defaultValue)`.
-  R getOrDefault<R>(R defaultValue) {
+  /// This function is a shorthand for `getOrElse((_, _) => defaultValue)`.
+  ///
+  /// [defaultValue] is of this result's own type; widen the result to fall back
+  /// to a supertype.
+  T getOrDefault(T defaultValue) {
     return switch (this) {
-      Success<T>(:final data) => data as R,
+      Success<T>(:final data) => data,
       Failure() => defaultValue,
     };
   }
@@ -180,11 +187,13 @@ extension PatternMatching<T> on Result<T> {
   ///
   /// Note, that this function rethrows any error thrown by [transform] function.
   /// See [recoverCatching] for an alternative that encapsulates errors.
-  Result<R> recover<R>(
-    R Function(Object error, StackTrace? stackTrace) transform,
+  ///
+  /// [transform] returns this result's own type. To recover to a supertype, widen the result first.
+  Result<T> recover(
+    T Function(Object error, StackTrace? stackTrace) transform,
   ) {
     return switch (this) {
-      Success<T>(:final data) => Result.success(data as R),
+      Success<T>() => this,
       Failure(:final error, :final stackTrace) => Result.success(
         transform(error, stackTrace),
       ),
@@ -196,11 +205,13 @@ extension PatternMatching<T> on Result<T> {
   ///
   /// This function catches any error thrown by [transform] function and encapsulates it as a failure.
   /// See [recover] for an alternative that rethrows errors.
-  Result<R> recoverCatching<R>(
-    R Function(Object error, StackTrace? stackTrace) transform,
+  ///
+  /// [transform] returns this result's own type. To recover to a supertype, widen the result first.
+  Result<T> recoverCatching(
+    T Function(Object error, StackTrace? stackTrace) transform,
   ) {
     return switch (this) {
-      Success<T>(:final data) => Result.success(data as R),
+      Success<T>() => this,
       Failure(:final error, :final stackTrace) => runSafelySync(
         () => transform(error, stackTrace),
       ),

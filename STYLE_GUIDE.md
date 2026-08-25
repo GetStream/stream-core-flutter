@@ -528,8 +528,12 @@ explaining the purpose of the item. Subsequent paragraphs elaborate. Avoid multi
 sentence first paragraphs — the first paragraph gets extracted for tables of
 contents.
 
-When referencing a parameter, use backticks. When referencing a parameter that also
-corresponds to a property, use square brackets instead.
+When referencing a parameter, use square brackets, as
+[Effective Dart](https://dart.dev/effective-dart/documentation#do-use-square-brackets-in-doc-comments-to-refer-to-in-scope-identifiers)
+does — `dart doc` resolves them and links to the declaration.
+
+Reserve backticks for names that are *not* in scope where the comment sits: a private
+constructor argument named from a class-level doc, or a type from another package.
 
 Avoid using "above" or "below" to reference other dartdoc sections. Dartdoc pages
 are often viewed in isolation.

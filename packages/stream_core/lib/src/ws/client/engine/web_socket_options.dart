@@ -22,7 +22,7 @@ class WebSocketOptions {
   /// Creates a new instance of [WebSocketOptions].
   const WebSocketOptions({
     required this.url,
-    this.connectTimeout,
+    this.connectTimeout = defaultConnectTimeout,
     this.protocols,
     this.queryParameters,
   });
@@ -35,9 +35,14 @@ class WebSocketOptions {
 
   /// Maximum time allowed for establishing the WebSocket connection.
   ///
-  /// When specified, the connection attempt will timeout if not completed
-  /// within this duration. If `null`, uses the platform default timeout.
-  final Duration? connectTimeout;
+  /// Covers the whole attempt, not just opening the socket: a connection that opens but is never
+  /// established is abandoned once this elapses.
+  ///
+  /// Defaults to [defaultConnectTimeout].
+  final Duration connectTimeout;
+
+  /// The [connectTimeout] used when none is given, thirty seconds.
+  static const defaultConnectTimeout = Duration(seconds: 30);
 
   /// WebSocket sub-protocols to negotiate during the handshake.
   ///

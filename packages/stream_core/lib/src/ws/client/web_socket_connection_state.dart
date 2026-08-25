@@ -88,37 +88,14 @@ sealed class WebSocketConnectionState extends Equatable {
 
   /// Whether automatic reconnection is enabled for this connection state.
   ///
-  /// Determines if the connection should automatically attempt to reconnect based on
-  /// the current state and disconnection source. Only applies to [Disconnected] states.
+  /// `false` for every state but [Disconnected], where it is the source's
+  /// [DisconnectionSource.isReconnectable] and nothing more.
   ///
-  /// ## Reconnection is enabled for:
-  /// - Server-initiated disconnections (except authentication and client errors)
-  /// - System-initiated disconnections (network changes, app lifecycle, etc.)
-  /// - Unhealthy connection disconnections (missing pong responses)
-  ///
-  /// ## Reconnection is disabled for:
-  /// - User-initiated disconnections (explicit disconnect calls)
-  /// - Server errors with code 1000 (normal closure)
-  /// - Token expired/invalid errors
-  /// - Client errors (4xx status codes)
-  ///
-  /// Returns `true` if automatic reconnection should be attempted.
-  bool get isAutomaticReconnectionEnabled {
-    return switch (this) {
-      Disconnected(:final source) => switch (source) {
-        ServerInitiated() => switch (source.error?.apiError) {
-          final error? when error.code == 1000 => false,
-          final error? when error.isTokenExpiredError => false,
-          final error? when error.isClientError => false,
-          _ => true, // Reconnect on other server initiated disconnections
-        },
-        UnHealthyConnection() => true,
-        SystemInitiated() => true,
-        UserInitiated() => false,
-      },
-      _ => false, // No automatic reconnection for other states
-    };
-  }
+  /// {@macro webSocketReconnectionRules}
+  bool get isAutomaticReconnectionEnabled => switch (this) {
+    Disconnected(:final source) => source.isReconnectable,
+    _ => false, // No automatic reconnection for other states
+  };
 
   @override
   List<Object?> get props => [];
@@ -223,6 +200,8 @@ final class Disconnected extends WebSocketConnectionState {
 /// - [ServerInitiated]: Server closed the connection, possibly with an error
 /// - [SystemInitiated]: System-level disconnection (network, app lifecycle)
 /// - [UnHealthyConnection]: Connection closed due to failed health checks
+/// - [ConnectTimeout]: Attempt abandoned before the connection was established
+/// - [AuthenticationFailed]: Socket opened, but its credentials never went out
 sealed class DisconnectionSource extends Equatable {
   const DisconnectionSource();
 
@@ -252,20 +231,71 @@ sealed class DisconnectionSource extends Equatable {
   /// typically when ping requests do not receive pong responses.
   const factory DisconnectionSource.unHealthyConnection() = UnHealthyConnection;
 
+  /// Creates a [ConnectTimeout] disconnection source.
+  ///
+  /// Indicates that the connection never became usable within the allotted
+  /// time, so it was abandoned before it was ever established.
+  const factory DisconnectionSource.connectTimeout() = ConnectTimeout;
+
+  /// Creates an [AuthenticationFailed] disconnection source.
+  ///
+  /// Indicates that the connection opened but could not be authenticated, so it
+  /// was closed without ever being usable.
+  const factory DisconnectionSource.authenticationFailed({Object? error}) = AuthenticationFailed;
+
   /// A human-readable description of the disconnection source.
   ///
   /// Provides a descriptive string that explains why the connection was closed.
   /// This is typically used for logging and debugging purposes.
   ///
   /// Returns a descriptive string for the disconnection cause.
-  String get closeReason {
-    return switch (this) {
-      UserInitiated() => 'User initiated disconnection',
-      ServerInitiated() => 'Server initiated disconnection',
-      SystemInitiated() => 'System initiated disconnection',
-      UnHealthyConnection() => 'Unhealthy connection (no pong received)',
-    };
-  }
+  String get closeReason => switch (this) {
+    UserInitiated() => 'User initiated disconnection',
+    ServerInitiated() => 'Server initiated disconnection',
+    SystemInitiated() => 'System initiated disconnection',
+    UnHealthyConnection() => 'Unhealthy connection (no pong received)',
+    ConnectTimeout() => 'Timed out before the connection was established',
+    AuthenticationFailed() => 'Authentication failed',
+  };
+
+  /// What closed the connection, or `null` when this source carries no cause.
+  ///
+  /// For a [ServerInitiated] closure this is the error that was reported, or a
+  /// [WebSocketEngineException] describing the close when nothing else was.
+  Object? get cause => switch (this) {
+    ServerInitiated(:final error) => error?.error ?? error,
+    AuthenticationFailed(:final error) => error,
+    UserInitiated() || SystemInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
+  };
+
+  /// Whether a connection closed for this reason is worth opening again.
+  ///
+  /// {@template webSocketReconnectionRules}
+  /// - [UserInitiated] — no, the caller asked for the connection to close.
+  /// - [AuthenticationFailed] — no, credentials that never went out will not go out on a retry.
+  /// - [ServerInitiated] — no for a deliberate close (code 1000), for a token error a fresh token
+  ///   would not fix, and for a client error that is neither a rate limit nor an expired token. Yes
+  ///   otherwise, including an expired token and a rate limit, which a later attempt can get past.
+  /// - [SystemInitiated], [UnHealthyConnection], [ConnectTimeout] — yes.
+  ///
+  /// Necessary, but not on its own sufficient. Whether a reconnection is then actually made is
+  /// decided by `ConnectionRecoveryHandler`, which recovers only a connection that was established,
+  /// and only while the network and the app lifecycle allow it — so a first connection that times
+  /// out stays down, where one that times out on the way back does not.
+  /// {@endtemplate}
+  bool get isReconnectable => switch (this) {
+    ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
+    ServerInitiated(:final error) => switch (error?.apiError) {
+      final it? when it.isInvalidTokenError => false,
+      final it? when it.isClientError && !it.isRateLimitError && !it.isTokenExpiredError => false,
+      _ => true, // Reconnect on other server initiated disconnections
+    },
+    UnHealthyConnection() => true,
+    SystemInitiated() => true,
+    ConnectTimeout() => true,
+    UserInitiated() => false,
+    AuthenticationFailed() => false,
+  };
 
   @override
   List<Object?> get props => [];
@@ -319,4 +349,29 @@ final class SystemInitiated extends DisconnectionSource {
 final class UnHealthyConnection extends DisconnectionSource {
   /// Creates an [UnHealthyConnection] disconnection source.
   const UnHealthyConnection();
+}
+
+/// A disconnection caused by the connection not becoming usable in time.
+///
+/// This source indicates that the connection was abandoned while it was still
+/// being established, so it was never usable.
+final class ConnectTimeout extends DisconnectionSource {
+  /// Creates a [ConnectTimeout] disconnection source.
+  const ConnectTimeout();
+}
+
+/// A disconnection caused by the connection failing to authenticate.
+///
+/// This source indicates that the socket opened but the credentials could not be loaded or sent, so
+/// the connection was never usable. A server rejecting credentials it did receive is reported as an
+/// error event instead.
+final class AuthenticationFailed extends DisconnectionSource {
+  /// Creates an [AuthenticationFailed] disconnection source.
+  const AuthenticationFailed({this.error});
+
+  /// The error that prevented the connection from authenticating.
+  final Object? error;
+
+  @override
+  List<Object?> get props => [error];
 }

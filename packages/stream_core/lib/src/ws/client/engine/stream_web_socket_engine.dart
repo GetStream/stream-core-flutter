@@ -48,24 +48,29 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   WebSocketEngineListener<Inc>? _listener;
 
   WebSocketChannel? _ws;
+  // ignore: cancel_subscriptions
   StreamSubscription<Object?>? _wsSubscription;
 
   @override
   Future<Result<void>> open(WebSocketOptions options) {
     return runSafely(() async {
-      // Close any existing connection first.
-      if (_ws != null) await close();
+      if (_ws != null) {
+        throw StateError('WebSocket is already open. Call close() first.');
+      }
 
       // Create a new WebSocket connection.
-      _ws = _wsProvider.call(options);
-      _wsSubscription = _ws?.stream.listen(
+      final ws = _ws = _wsProvider.call(options);
+      _wsSubscription = ws.stream.listen(
         _onData,
         onDone: _onDone,
         cancelOnError: false,
         onError: _listener?.onError,
       );
 
-      return _ws?.ready.then((_) => _listener?.onOpen());
+      await ws.ready;
+
+      // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
+      if (_ws == ws) _listener?.onOpen();
     });
   }
 
@@ -98,16 +103,17 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     String? closeReason = 'Closed by client',
   ]) {
     return runSafely(() async {
-      if (_ws == null) return;
+      final ws = _ws;
+      final subscription = _wsSubscription;
 
-      await _ws?.sink.close(closeCode, closeReason);
       _ws = null;
-
-      await _wsSubscription?.cancel();
       _wsSubscription = null;
 
-      // Notify the listener about the closure.
-      _listener?.onClose(closeCode, closeReason);
+      await subscription?.cancel();
+      await ws?.sink.close(closeCode, closeReason);
+
+      // A new socket can open while this one closes, and must not be brought down by its closure.
+      if (_ws == null) _listener?.onClose(closeCode, closeReason);
     });
   }
 
