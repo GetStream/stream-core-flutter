@@ -87,7 +87,7 @@ void main() {
 
       await withStreamLogger(
         handler: handler,
-        filter: const StreamLogFilter.minLevel(StreamLogLevel.debug),
+        filter: const StreamLogFilter.minPriority(StreamLogPriority.debug),
         () async {
           await dio.get<void>('/test');
           await pumpEventQueue();

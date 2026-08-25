@@ -4,58 +4,58 @@ import 'package:test/test.dart';
 import '../helpers/logger.dart';
 
 void main() {
-  group('StreamLogFilter.minLevel', () {
+  group('StreamLogFilter.minPriority', () {
     test('admits records at the level or above, whatever the tag', () {
-      const filter = StreamLogFilter.minLevel(StreamLogLevel.warning);
+      const filter = StreamLogFilter.minPriority(StreamLogPriority.warning);
 
-      expect(filter.isLoggable(StreamLogLevel.debug, 'SC:Anything'), isFalse);
-      expect(filter.isLoggable(StreamLogLevel.warning, 'SC:Anything'), isTrue);
-      expect(filter.isLoggable(StreamLogLevel.error, 'SF:Something'), isTrue);
+      expect(filter.isLoggable(StreamLogPriority.debug, 'SC:Anything'), isFalse);
+      expect(filter.isLoggable(StreamLogPriority.warning, 'SC:Anything'), isTrue);
+      expect(filter.isLoggable(StreamLogPriority.error, 'SF:Something'), isTrue);
     });
   });
 
   group('StreamLogFilter.prefix', () {
     test('holds a matching tag to its own threshold', () {
-      const filter = StreamLogFilter.prefix({'SC:Ws': StreamLogLevel.verbose});
+      const filter = StreamLogFilter.prefix({'SC:Ws': StreamLogPriority.verbose});
 
-      expect(filter.isLoggable(StreamLogLevel.verbose, 'SC:WsClient'), isTrue);
-      expect(filter.isLoggable(StreamLogLevel.verbose, 'SC:Http'), isFalse);
+      expect(filter.isLoggable(StreamLogPriority.verbose, 'SC:WsClient'), isTrue);
+      expect(filter.isLoggable(StreamLogPriority.verbose, 'SC:Http'), isFalse);
     });
 
     test('holds everything else to `otherwise`', () {
       const filter = StreamLogFilter.prefix(
-        {'SC:Ws': StreamLogLevel.verbose},
-        otherwise: StreamLogLevel.error,
+        {'SC:Ws': StreamLogPriority.verbose},
+        otherwise: StreamLogPriority.error,
       );
 
-      expect(filter.isLoggable(StreamLogLevel.warning, 'SC:Http'), isFalse);
-      expect(filter.isLoggable(StreamLogLevel.error, 'SC:Http'), isTrue);
+      expect(filter.isLoggable(StreamLogPriority.warning, 'SC:Http'), isFalse);
+      expect(filter.isLoggable(StreamLogPriority.error, 'SC:Http'), isTrue);
     });
 
     test('lets the longest prefix win, so a broad rule can be narrowed', () {
       const filter = StreamLogFilter.prefix({
-        'SC:': StreamLogLevel.verbose,
-        'SC:WsHealth': StreamLogLevel.warning,
+        'SC:': StreamLogPriority.verbose,
+        'SC:WsHealth': StreamLogPriority.warning,
       });
 
-      expect(filter.isLoggable(StreamLogLevel.verbose, 'SC:WsClient'), isTrue);
-      expect(filter.isLoggable(StreamLogLevel.verbose, 'SC:WsHealth'), isFalse);
-      expect(filter.isLoggable(StreamLogLevel.warning, 'SC:WsHealth'), isTrue);
+      expect(filter.isLoggable(StreamLogPriority.verbose, 'SC:WsClient'), isTrue);
+      expect(filter.isLoggable(StreamLogPriority.verbose, 'SC:WsHealth'), isFalse);
+      expect(filter.isLoggable(StreamLogPriority.warning, 'SC:WsHealth'), isTrue);
     });
 
     test('is independent of the order the rules were written in', () {
       const broadFirst = StreamLogFilter.prefix({
-        'SC:': StreamLogLevel.verbose,
-        'SC:WsHealth': StreamLogLevel.warning,
+        'SC:': StreamLogPriority.verbose,
+        'SC:WsHealth': StreamLogPriority.warning,
       });
       const narrowFirst = StreamLogFilter.prefix({
-        'SC:WsHealth': StreamLogLevel.warning,
-        'SC:': StreamLogLevel.verbose,
+        'SC:WsHealth': StreamLogPriority.warning,
+        'SC:': StreamLogPriority.verbose,
       });
 
       expect(
-        broadFirst.isLoggable(StreamLogLevel.verbose, 'SC:WsHealth'),
-        narrowFirst.isLoggable(StreamLogLevel.verbose, 'SC:WsHealth'),
+        broadFirst.isLoggable(StreamLogPriority.verbose, 'SC:WsHealth'),
+        narrowFirst.isLoggable(StreamLogPriority.verbose, 'SC:WsHealth'),
       );
     });
 
@@ -66,7 +66,7 @@ void main() {
 
       withStreamLogger(
         handler: handler,
-        filter: const StreamLogFilter.prefix({'SC:WsHealth': StreamLogLevel.warning}),
+        filter: const StreamLogFilter.prefix({'SC:WsHealth': StreamLogPriority.warning}),
         () => logger.v(() => 'ping ${built++}'),
       );
 
@@ -79,7 +79,7 @@ void main() {
     test('leaves the decision to the handler', () {
       const filter = StreamLogFilter.always();
 
-      expect(filter.isLoggable(StreamLogLevel.verbose, 'SC:Anything'), isTrue);
+      expect(filter.isLoggable(StreamLogPriority.verbose, 'SC:Anything'), isTrue);
     });
   });
 }

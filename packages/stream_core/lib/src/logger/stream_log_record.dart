@@ -1,6 +1,6 @@
 import 'package:clock/clock.dart';
 
-import 'stream_log_level.dart';
+import 'stream_log_priority.dart';
 
 /// A single log record, as a handler receives it.
 ///
@@ -13,7 +13,7 @@ final class StreamLogRecord {
   /// Creates a [StreamLogRecord], stamping it with the current [time] and the next
   /// [sequenceNumber].
   StreamLogRecord({
-    required this.level,
+    required this.priority,
     required this.tag,
     required this.message,
     this.error,
@@ -24,7 +24,7 @@ final class StreamLogRecord {
   static var _sequence = 0;
 
   /// The severity of this record.
-  final StreamLogLevel level;
+  final StreamLogPriority priority;
 
   /// The component this record came from.
   final String tag;
@@ -50,5 +50,5 @@ final class StreamLogRecord {
   final StackTrace? stackTrace;
 
   @override
-  String toString() => '${level.emoji} ${level.label}/$tag: $message';
+  String toString() => '${priority.emoji} ${priority.label}/$tag: $message';
 }

@@ -12,7 +12,7 @@ void main() {
     test('leaves the logger alone when there is no config', () {
       final installed = RecordingLogHandler();
       StreamLogger.handler = installed;
-      StreamLogger.level = StreamLogLevel.verbose;
+      StreamLogger.priority = StreamLogPriority.verbose;
 
       StreamLogger.configure(null);
       _logger.d(() => 'another SDK, still heard');
@@ -21,16 +21,16 @@ void main() {
       expect(installed.messages, ['another SDK, still heard']);
     });
 
-    test('writes to the console, given a level and nowhere to put it', () {
+    test('writes to the console, given a priority and nowhere to put it', () {
       final printed = capturePrints(() {
-        StreamLogger.configure(const StreamLogConfig(level: StreamLogLevel.debug));
+        StreamLogger.configure(const StreamLogConfig(priority: StreamLogPriority.debug));
         _logger.d(() => 'to the console');
       });
 
       expect(printed.single, contains('to the console'));
     });
 
-    test('hears warnings, given a handler and no level', () {
+    test('hears warnings, given a handler and no priority', () {
       final mine = RecordingLogHandler();
 
       StreamLogger.configure(StreamLogConfig(handler: mine));
@@ -45,7 +45,7 @@ void main() {
       final mine = RecordingLogHandler();
 
       StreamLogger.configure(
-        StreamLogConfig(level: StreamLogLevel.none, handler: mine),
+        StreamLogConfig(priority: StreamLogPriority.none, handler: mine),
       );
       _logger.e(() => 'not even an error');
 
@@ -58,24 +58,24 @@ void main() {
       StreamLogger.configure(
         StreamLogConfig(
           handler: mine,
-          filter: const StreamLogFilter.prefix({'SF:Ws': StreamLogLevel.verbose}),
+          filter: const StreamLogFilter.prefix({'SF:Ws': StreamLogPriority.verbose}),
         ),
       );
       const StreamLogger('SF:Ws').v(() => 'the subsystem I turned up');
       _logger.d(() => 'the commentary I did not');
 
-      // The filter has to survive the config that carries it: `level` sets the same field, so a
+      // The filter has to survive the config that carries it: `priority` sets the same field, so a
       // config applying both would flatten the rule it was given.
       expect(mine.messages, ['the subsystem I turned up']);
     });
-    test('replaces a filter installed before it, even naming only a level', () {
+    test('replaces a filter installed before it, even naming only a priority', () {
       final mine = RecordingLogHandler();
-      StreamLogger.filter = const StreamLogFilter.prefix({'SF:Ws': StreamLogLevel.verbose});
+      StreamLogger.filter = const StreamLogFilter.prefix({'SF:Ws': StreamLogPriority.verbose});
 
-      StreamLogger.configure(StreamLogConfig(level: StreamLogLevel.debug, handler: mine));
+      StreamLogger.configure(StreamLogConfig(priority: StreamLogPriority.debug, handler: mine));
       const StreamLogger('SF:Ws').v(() => 'below what the config asked for');
 
-      // A config is the whole story: its level and filter are one field underneath, so there is
+      // A config is the whole story: its priority and filter are one field underneath, so there is
       // no reading of it that keeps an earlier rule and the new threshold both.
       expect(mine.records, isEmpty);
     });
@@ -90,7 +90,7 @@ void main() {
     test('report together once either of them is configured', () {
       final mine = RecordingLogHandler();
 
-      StreamLogger.configure(StreamLogConfig(level: StreamLogLevel.debug, handler: mine));
+      StreamLogger.configure(StreamLogConfig(priority: StreamLogPriority.debug, handler: mine));
       feeds.d(() => 'feeds');
       video.d(() => 'video');
 
@@ -118,8 +118,8 @@ void main() {
         StreamLogConfig(
           handler: mine,
           filter: const StreamLogFilter.prefix(
-            {'SF:': StreamLogLevel.debug},
-            otherwise: StreamLogLevel.none,
+            {'SF:': StreamLogPriority.debug},
+            otherwise: StreamLogPriority.none,
           ),
         ),
       );

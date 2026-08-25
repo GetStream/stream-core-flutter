@@ -25,7 +25,7 @@ void main() {
       // A destination with no level is as silent as a level with no destination: records need both.
       expect(capturePrints(() => _logger.e(() => 'error')), isEmpty);
 
-      StreamLogger.level = StreamLogLevel.warning;
+      StreamLogger.priority = StreamLogPriority.warning;
       final printed = capturePrints(() {
         _logger
           ..v(() => 'verbose')
@@ -43,10 +43,10 @@ void main() {
       // The setup every migration guide shows, which silently dropped debug when the handler
       // carried a competing threshold of its own.
       StreamLogger.handler = const StreamLogHandler.console();
-      StreamLogger.level = StreamLogLevel.debug;
+      StreamLogger.priority = StreamLogPriority.debug;
       addTearDown(() {
         StreamLogger.handler = StreamLogHandler.silent;
-        StreamLogger.level = StreamLogLevel.warning;
+        StreamLogger.priority = StreamLogPriority.warning;
       });
 
       final printed = capturePrints(() => _logger.d(() => 'a debug line'));
@@ -57,10 +57,10 @@ void main() {
     test('can be held quieter than the level, but never louder', () {
       final printed = withStreamLogger(
         handler: const StreamLogHandler.filtered(
-          StreamLogFilter.minLevel(StreamLogLevel.error),
+          StreamLogFilter.minPriority(StreamLogPriority.error),
           StreamLogHandler.console(),
         ),
-        filter: const StreamLogFilter.minLevel(StreamLogLevel.debug),
+        filter: const StreamLogFilter.minPriority(StreamLogPriority.debug),
         () => capturePrints(() {
           _logger
             ..d(() => 'debug')
@@ -106,7 +106,7 @@ void main() {
         handler: StreamLogHandler.composite([
           everything,
           const StreamLogHandler.filtered(
-            StreamLogFilter.minLevel(StreamLogLevel.error),
+            StreamLogFilter.minPriority(StreamLogPriority.error),
             StreamLogHandler.console(),
           ),
         ]),
@@ -125,12 +125,12 @@ void main() {
       withStreamLogger(
         handler: StreamLogHandler.composite([
           const StreamLogHandler.filtered(
-            StreamLogFilter.minLevel(StreamLogLevel.none),
+            StreamLogFilter.minPriority(StreamLogPriority.none),
             StreamLogHandler.console(),
           ),
           RecordingLogHandler(),
         ]),
-        () => expect(_logger.isLoggable(StreamLogLevel.verbose), isTrue),
+        () => expect(_logger.isLoggable(StreamLogPriority.verbose), isTrue),
       );
     });
 
@@ -150,7 +150,7 @@ void main() {
       final seen = <String>[];
 
       withStreamLogger(
-        handler: StreamLogHandler.from((it) => seen.add('${it.level} ${it.tag} ${it.message}')),
+        handler: StreamLogHandler.from((it) => seen.add('${it.priority} ${it.tag} ${it.message}')),
         () => _logger
           ..v(() => 'verbose')
           ..e(() => 'error'),
@@ -168,7 +168,7 @@ void main() {
           expect(capturePrints(() => _logger.e(() => 'discarded')), isEmpty);
           // The filter decides what is built; where it goes afterwards is this handler's business,
           // so it no longer has a say in what `isLoggable` answers.
-          expect(_logger.isLoggable(StreamLogLevel.error), isTrue);
+          expect(_logger.isLoggable(StreamLogPriority.error), isTrue);
         },
       );
     });

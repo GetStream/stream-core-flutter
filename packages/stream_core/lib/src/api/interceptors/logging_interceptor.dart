@@ -23,7 +23,7 @@ typedef LogPrint = void Function(InterceptStep step, Object object);
 
 /// An interceptor that reports each request and the response it gets.
 ///
-/// Records go out under `SC:Http`, at [StreamLogLevel.debug], or [StreamLogLevel.warning]
+/// Records go out under `SC:Http`, at [StreamLogPriority.debug], or [StreamLogPriority.warning]
 /// for a request that failed. Nothing is written, or even formatted, until an app installs a
 /// [StreamLogHandler].
 ///
@@ -82,19 +82,19 @@ class LoggingInterceptor extends Interceptor {
   // Consulted before a line is formatted, so a request costs nothing while nothing wants it.
   bool _wants(InterceptStep step) {
     if (logPrint != null) return true;
-    return _logger.isLoggable(_levelOf(step));
+    return _logger.isLoggable(_priorityOf(step));
   }
 
-  StreamLogLevel _levelOf(InterceptStep step) {
+  StreamLogPriority _priorityOf(InterceptStep step) {
     return switch (step) {
-      InterceptStep.error => StreamLogLevel.warning,
-      InterceptStep.request || InterceptStep.response => StreamLogLevel.debug,
+      InterceptStep.error => StreamLogPriority.warning,
+      InterceptStep.request || InterceptStep.response => StreamLogPriority.debug,
     };
   }
 
   void _write(InterceptStep step, Object object) {
     if (logPrint case final logPrint?) return logPrint(step, object);
-    return _logger.log(_levelOf(step), () => '$object');
+    return _logger.log(_priorityOf(step), () => '$object');
   }
 
   @override

@@ -1,4 +1,4 @@
-import 'stream_log_level.dart';
+import 'stream_log_priority.dart';
 
 /// Decides which records are worth building, independently of where they end up.
 ///
@@ -10,8 +10,8 @@ import 'stream_log_level.dart';
 ///
 /// ```dart
 /// StreamLogger.filter = const StreamLogFilter.prefix(
-///   {'SC:Ws': StreamLogLevel.verbose},
-///   otherwise: StreamLogLevel.warning,
+///   {'SC:Ws': StreamLogPriority.verbose},
+///   otherwise: StreamLogPriority.warning,
 /// );
 /// ```
 abstract class StreamLogFilter {
@@ -21,58 +21,58 @@ abstract class StreamLogFilter {
   /// A filter admitting every record, leaving the decision to the handler.
   const factory StreamLogFilter.always() = _AlwaysFilter;
 
-  /// A filter admitting records at [level] or above, whatever their tag.
-  const factory StreamLogFilter.minLevel(StreamLogLevel level) = _MinLevelFilter;
+  /// A filter admitting records at [priority] or above, whatever their tag.
+  const factory StreamLogFilter.minPriority(StreamLogPriority priority) = _MinPriorityFilter;
 
   /// A filter admitting records by the prefix of their tag.
   ///
-  /// The longest prefix in [levels] matching a tag decides it, so a broad rule can be narrowed by
+  /// The longest prefix in [priorities] matching a tag decides it, so a broad rule can be narrowed by
   /// a longer one. A tag matching no prefix is held to [otherwise].
   ///
-  /// What a record costs grows with the number of rules, so consider keeping [levels] to the
+  /// What a record costs grows with the number of rules, so consider keeping [priorities] to the
   /// subsystems actually being tuned.
   const factory StreamLogFilter.prefix(
-    Map<String, StreamLogLevel> levels, {
-    StreamLogLevel otherwise,
+    Map<String, StreamLogPriority> priorities, {
+    StreamLogPriority otherwise,
   }) = _PrefixFilter;
 
-  /// Whether a record at [level] from [tag] is worth building.
-  bool isLoggable(StreamLogLevel level, String tag);
+  /// Whether a record at [priority] from [tag] is worth building.
+  bool isLoggable(StreamLogPriority priority, String tag);
 }
 
 final class _AlwaysFilter extends StreamLogFilter {
   const _AlwaysFilter();
 
   @override
-  bool isLoggable(StreamLogLevel level, String tag) => true;
+  bool isLoggable(StreamLogPriority priority, String tag) => true;
 }
 
-final class _MinLevelFilter extends StreamLogFilter {
-  const _MinLevelFilter(this.level);
+final class _MinPriorityFilter extends StreamLogFilter {
+  const _MinPriorityFilter(this.priority);
 
-  final StreamLogLevel level;
+  final StreamLogPriority priority;
 
   @override
-  bool isLoggable(StreamLogLevel level, String tag) {
+  bool isLoggable(StreamLogPriority priority, String tag) {
     // `none` outranks every severity, so comparing against it would admit the records a threshold
     // of `none` exists to reject.
-    if (this.level == StreamLogLevel.none) return false;
-    return level >= this.level;
+    if (this.priority == StreamLogPriority.none) return false;
+    return priority >= this.priority;
   }
 }
 
 final class _PrefixFilter extends StreamLogFilter {
-  const _PrefixFilter(this.levels, {this.otherwise = StreamLogLevel.warning});
+  const _PrefixFilter(this.priorities, {this.otherwise = StreamLogPriority.warning});
 
-  final Map<String, StreamLogLevel> levels;
-  final StreamLogLevel otherwise;
+  final Map<String, StreamLogPriority> priorities;
+  final StreamLogPriority otherwise;
 
   @override
-  bool isLoggable(StreamLogLevel level, String tag) {
+  bool isLoggable(StreamLogPriority priority, String tag) {
     var matched = otherwise;
     var matchedLength = -1;
 
-    for (final MapEntry(key: prefix, value: threshold) in levels.entries) {
+    for (final MapEntry(key: prefix, value: threshold) in priorities.entries) {
       if (prefix.length <= matchedLength) continue;
       if (!tag.startsWith(prefix)) continue;
 
@@ -80,7 +80,7 @@ final class _PrefixFilter extends StreamLogFilter {
       matchedLength = prefix.length;
     }
 
-    if (matched == StreamLogLevel.none) return false;
-    return level >= matched;
+    if (matched == StreamLogPriority.none) return false;
+    return priority >= matched;
   }
 }
