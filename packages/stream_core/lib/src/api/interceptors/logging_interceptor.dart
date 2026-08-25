@@ -162,7 +162,6 @@ class LoggingInterceptor extends Interceptor {
           _printResponse(_logPrintError, err.response!);
         }
         _printLine(_logPrintError, '╚');
-        _logPrintError('');
       } else {
         _printBoxed(
           _logPrintError,
@@ -191,9 +190,7 @@ class LoggingInterceptor extends Interceptor {
 
     if (responseBody) {
       _logPrintResponse('╔ Body');
-      _logPrintResponse('║');
       _printResponse(_logPrintResponse, response);
-      _logPrintResponse('║');
       _printLine(_logPrintResponse, '╚');
     }
     super.onResponse(response, handler);
@@ -204,7 +201,8 @@ class LoggingInterceptor extends Interceptor {
     String? header,
     String? text,
   }) {
-    logPrint('');
+    // No blank line before the box: each one is a record of its own, carrying a timestamp and a
+    // tag, so what separated boxes on a console only pads the log here.
     logPrint('╔╣ $header');
     logPrint('║  $text');
     _printLine(logPrint, '╚');
