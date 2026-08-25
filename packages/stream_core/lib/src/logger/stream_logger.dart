@@ -12,12 +12,6 @@ import 'stream_log_record.dart';
 /// paid for by a record that is dropped.
 typedef StreamLogMessage = String Function();
 
-/// Decides whether a record at [priority] from [tag] is worth building.
-///
-/// A filter and a handler are folded into one of these when either is installed, so writing a
-/// record asks a single question rather than walking the pieces that answered it.
-typedef _StreamLogValidator = bool Function(StreamLogPriority priority, String tag);
-
 /// Writes log records under a tag.
 ///
 /// Holding one costs nothing and it can be created anywhere — a field, a constructor, or a
@@ -62,9 +56,10 @@ final class StreamLogger {
   /// ```
   ///
   /// A priority of its own is a [StreamLogFilter.minPriority], which is why there is no separate one.
-  /// [filter] defaults to the same threshold [StreamLogger.priority] starts at, so detaching a logger
-  /// changes where its records go without also changing how many there are. Pass
-  /// [StreamLogFilter.always] to leave the decision entirely to the handler.
+  /// [filter] defaults to admitting [StreamLogPriority.warning] and above — unlike the ambient one,
+  /// which admits nothing until an app names a priority, since a detached logger was handed its
+  /// destination and so has already been asked for. Pass [StreamLogFilter.always] to leave the
+  /// decision entirely to the handler.
   const StreamLogger.detached(
     this.tag, {
     required StreamLogHandler this._handler,
@@ -87,16 +82,11 @@ final class StreamLogger {
 
   static StreamLogHandler _handlerOrDefault = StreamLogHandler.silent;
   static StreamLogFilter _filterOrDefault = _closed;
-  static _StreamLogValidator _validator = _compile(_filterOrDefault);
-
   // Admits nothing, which is where an app that has not asked for records starts.
   static const _closed = StreamLogFilter.minPriority(StreamLogPriority.none);
 
   // The one question the write path asks. `priority` and `filter` are two ways of describing it,
   // which is why installing either replaces what the other left behind.
-  static _StreamLogValidator _compile(StreamLogFilter filter) =>
-      (priority, tag) => _decide(filter, priority, tag);
-
   static bool _decide(StreamLogFilter filter, StreamLogPriority priority, String tag) {
     // A threshold rather than a severity: comparing it against itself would otherwise admit the one
     // record that shutting logging down cannot silence.
@@ -117,9 +107,7 @@ final class StreamLogger {
   ///
   /// Write-only, so nothing can come to depend on what happens to be installed. Consider
   /// [StreamLogHandler.composite] to send records to more than one place.
-  static set handler(StreamLogHandler handler) {
-    _handlerOrDefault = handler;
-  }
+  static set handler(StreamLogHandler handler) => _handlerOrDefault = handler;
 
   /// Installs the lowest priority worth building a record for.
   ///
@@ -142,10 +130,7 @@ final class StreamLogger {
   ///   otherwise: StreamLogPriority.warning,
   /// );
   /// ```
-  static set filter(StreamLogFilter filter) {
-    _filterOrDefault = filter;
-    _validator = _compile(filter);
-  }
+  static set filter(StreamLogFilter filter) => _filterOrDefault = filter;
 
   /// Installs [config] in one step, or leaves the logger untouched where it is null.
   ///
@@ -179,7 +164,6 @@ final class StreamLogger {
 
     _handlerOrDefault = config.handler;
     _filterOrDefault = config.filter ?? .minPriority(config.priority);
-    _validator = _compile(_filterOrDefault);
   }
 
   /// Puts [handler] and [priority] back to what they were before anything was installed.
@@ -195,7 +179,6 @@ final class StreamLogger {
   static void reset() {
     _handlerOrDefault = StreamLogHandler.silent;
     _filterOrDefault = _closed;
-    _validator = _compile(_filterOrDefault);
   }
 
   /// Whether a record at [priority] would be kept by both the filter and the handler.
@@ -206,11 +189,7 @@ final class StreamLogger {
   /// ```dart
   /// if (_log.isLoggable(StreamLogPriority.verbose)) _log.v(() => describe(everyParticipant));
   /// ```
-  bool isLoggable(StreamLogPriority priority) {
-    // A detached logger carries its own filter, and so cannot share the compiled one.
-    if (_filter case final filter?) return _decide(filter, priority, tag);
-    return _validator(priority, tag);
-  }
+  bool isLoggable(StreamLogPriority priority) => _decide(_filter ?? _filterOrDefault, priority, tag);
 
   /// Writes a [StreamLogPriority.verbose] record.
   void v(
