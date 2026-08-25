@@ -8,7 +8,7 @@
 - `TokenManager.userId` is now nullable, and is `null` until an identity is configured
 - `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. A mismatch fails to compile in a const context, and throws in debug mode otherwise
 - `StreamWebSocketClient` now takes an `optionsBuilder` instead of `options`, called once per connection attempt
-- `WebSocketOptions.connectTimeout` is now a non-nullable `Duration`, 30 seconds by default, and is honoured: an attempt that never becomes usable is abandoned rather than waited on forever
+- `WebSocketOptions.connectTimeout` is now a non-nullable `Duration`, 30 seconds by default, and is honoured: a connection that does not come up is given up on instead of waited on indefinitely. A connection that drops later is retried for you; a `connect` that times out is not, so call it again
 - Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, now a `WebSocketAuthenticator`. It is handed a `WsRequestSender` and the error the server closed the previous attempt with, and throws to say the credentials did not go out
 - Removed `WebSocketEngineException.stopErrorCode`, use `CloseCode.normalClosure`
 - `AuthInterceptor` extends `Interceptor` rather than `QueuedInterceptor`, so requests are no longer serialised against one another
