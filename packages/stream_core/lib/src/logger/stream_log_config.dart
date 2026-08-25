@@ -39,13 +39,14 @@ class StreamLogConfig {
 
   /// Where records go.
   ///
-  /// Compose with [defaultHandler] to keep the console alongside a handler of your own. To leave
-  /// the console out of the build your users run, name it only where the app says it is developing:
+  /// Compose with [defaultHandler] to keep the console alongside a handler of your own, and leave
+  /// it out of the build your users run by naming it only where the app says it is developing:
   ///
   /// ```dart
-  /// handler: kDebugMode
-  ///     ? StreamLogHandler.composite([StreamLogConfig.defaultHandler, myCrashReporterHandler])
-  ///     : myCrashReporterHandler,
+  /// handler: StreamLogHandler.composite([
+  ///   if (kDebugMode) StreamLogConfig.defaultHandler,
+  ///   myCrashReporterHandler,
+  /// ]),
   /// ```
   final StreamLogHandler handler;
 
