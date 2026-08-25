@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 class ApiKeyInterceptor extends Interceptor {
-  /// Initialize a new API key interceptor
+  /// Creates a new [ApiKeyInterceptor].
   const ApiKeyInterceptor(this.apiKey);
 
   /// The API key to be added to the request headers

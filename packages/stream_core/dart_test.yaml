@@ -1,0 +1,3 @@
+tags:
+  # Tests that drive a fully wired `StreamWebSocketClient` against a fake server.
+  ws-client:

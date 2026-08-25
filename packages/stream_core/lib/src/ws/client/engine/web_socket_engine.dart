@@ -19,12 +19,17 @@ abstract interface class WebSocketEngine<Outgoing> {
   /// Creates a new WebSocket connection using the provided [options] and sets up
   /// event listeners.
   ///
+  /// Fails when a connection is already open. Call [close] before opening another.
+  ///
   /// Returns a [Result] indicating success or failure of the connection attempt.
   Future<Result<void>> open(WebSocketOptions options);
 
   /// Closes the WebSocket connection.
   ///
   /// Closes the active WebSocket connection with the specified [closeCode] and [closeReason].
+  ///
+  /// Notifies the listener that the connection closed before completing, including when there was no
+  /// connection to close. A close that fails notifies nothing and reports the failure instead.
   ///
   /// Returns a [Result] indicating success or failure of the close operation.
   Future<Result<void>> close([int? closeCode, String? closeReason]);
@@ -194,8 +199,6 @@ class WebSocketEngineException extends Equatable implements Exception {
     if (error case final StreamApiError error) return error;
     return null;
   }
-
-  static const stopErrorCode = 1000;
 
   @override
   List<Object?> get props => [reason, code, error];

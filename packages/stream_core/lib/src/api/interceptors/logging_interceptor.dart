@@ -23,7 +23,7 @@ void _defaultLogPrint(InterceptStep step, Object object) => print(object);
 
 /// Interceptor dedicated to logging
 class LoggingInterceptor extends Interceptor {
-  /// Initialize a new logging interceptor
+  /// Creates a new [LoggingInterceptor].
   LoggingInterceptor({
     this.request = true,
     this.requestHeader = false,

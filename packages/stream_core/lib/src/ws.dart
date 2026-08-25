@@ -5,6 +5,7 @@ export 'ws/client/reconnect/automatic_reconnection_policy.dart';
 export 'ws/client/reconnect/connection_recovery_handler.dart';
 export 'ws/client/reconnect/retry_strategy.dart';
 export 'ws/client/stream_web_socket_client.dart';
+export 'ws/client/web_socket_authentication_handler.dart' show WebSocketAuthenticator, WsRequestSender;
 export 'ws/client/web_socket_connection_state.dart';
 export 'ws/client/web_socket_health_monitor.dart';
 export 'ws/events/ws_event.dart';
