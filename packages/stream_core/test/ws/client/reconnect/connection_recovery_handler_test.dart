@@ -143,20 +143,27 @@ void main() {
     });
   });
 
-  test('stops retrying once an authenticator gives up', () {
+  test('carries on after credentials fail for an attempt it had already abandoned', () {
     fakeAsync((async) {
       final loaded = Completer<void>();
       var attempts = 0;
       final tester = buildTester(
         recover: true,
-        // The first attempt authenticates. Every one after it waits on credentials that never
-        // arrive, and then reports that there are none to send.
+        // The first attempt authenticates. The second stalls on credentials that arrive only
+        // after it has been abandoned. Every one after that reports there are none to send.
         authenticator: (send, _) async {
-          if (++attempts > 1) {
-            await loaded.future;
-            throw StateError('nothing left to offer');
+          final attempt = ++attempts;
+          if (attempt == 1) {
+            send(WsAuthMessageRequest(token: generateTestUserToken('luke_skywalker').rawValue)).getOrThrow();
+            return;
           }
-          send(WsAuthMessageRequest(token: generateTestUserToken('luke_skywalker').rawValue)).getOrThrow();
+
+          if (attempt == 2) {
+            await loaded.future;
+            throw StateError('credentials for an attempt already abandoned');
+          }
+
+          throw StateError('nothing left to offer');
         },
       );
 
@@ -171,17 +178,16 @@ void main() {
       async.elapse(WebSocketOptions.defaultConnectTimeout);
       final retried = tester.attempts;
 
+      // Whatever the handler has got to by now is what the abandoned attempt must not disturb.
+      // How far it has got depends on the jitter in the backoff, so it is read rather than assumed.
+      final reached = tester.connectionState;
+
       loaded.complete();
       async.flushMicrotasks();
-      expect(
-        tester.connectionState,
-        isA<Disconnected>().having((it) => it.source, 'source', isA<AuthenticationFailed>()),
-      );
 
-      async.elapse(const Duration(minutes: 2));
-
-      // Credentials the authenticator has given up on cannot be repaired by trying again, so a
-      // retry already scheduled must not go ahead either.
+      // The credentials belong to an attempt that was abandoned, so their failure says nothing
+      // about the connection that stands in its place.
+      expect(tester.connectionState, reached);
       expect(tester.attempts, retried);
     });
   });

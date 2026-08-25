@@ -52,11 +52,12 @@ class WebSocketAuthenticationHandler {
 
   /// Takes in a connection state change.
   ///
-  /// A [Connecting] state begins an attempt, after which an authenticator still running for an
-  /// earlier one can neither send nor report a failure. Every other state only updates
-  /// [previousError], which is left alone unless the server refused or the caller took over.
+  /// A [Connecting] state begins an attempt and a closure ends one, after which an authenticator
+  /// still running for it can neither send nor report a failure: whatever it comes back with
+  /// describes a connection that is already gone. Every other state only updates [previousError],
+  /// which is left alone unless the server refused or the caller took over.
   void onConnectionStateChanged(WebSocketConnectionState state) {
-    if (state case Connecting()) _attempt++;
+    if (state case Connecting() || Disconnecting() || Disconnected()) _attempt++;
 
     _previousError = switch (state) {
       Connected() => null,

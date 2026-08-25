@@ -458,10 +458,10 @@ void main() {
         });
       });
 
-      test('records the failure when nothing replaced it, so it is not reconnected', () {
+      test('leaves the reason a closed attempt was abandoned for alone', () {
         fakeAsync((async) {
-          // A token load that outlives the attempt the timeout abandoned and then fails. Nothing has
-          // replaced that attempt, so this failure is the last word on it.
+          // A token load that outlives the attempt the timeout abandoned and then fails. The attempt
+          // it belonged to is gone, so its failure describes a connection that no longer exists.
           final loaded = Completer<void>();
           final tester = buildTester(
             authenticator: (_, _) async {
@@ -479,11 +479,11 @@ void main() {
           loaded.complete();
           async.flushMicrotasks();
 
-          // Nothing can repair credentials the authenticator has given up on, so an attempt left
-          // eligible for a reconnection would be refused the same way.
+          // Recorded, it would replace a reason worth reconnecting for with one that never is, and
+          // an established connection would stop recovering for the life of the client.
           final state = tester.connectionState;
-          expect(state, isA<Disconnected>().having((it) => it.source, 'source', isA<AuthenticationFailed>()));
-          expect(state.isAutomaticReconnectionEnabled, isFalse);
+          expect(state, isA<Disconnected>().having((it) => it.source, 'source', isA<ConnectTimeout>()));
+          expect(state.isAutomaticReconnectionEnabled, isTrue);
         });
       });
 
