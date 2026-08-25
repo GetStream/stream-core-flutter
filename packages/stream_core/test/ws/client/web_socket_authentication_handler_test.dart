@@ -261,7 +261,6 @@ void main() {
       await authenticating;
     });
 
-
     test('sends nothing over the connection that replaced the one it belongs to', () async {
       final loaded = Completer<void>();
       final sent = <WsRequest>[];
