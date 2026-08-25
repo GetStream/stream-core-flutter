@@ -179,12 +179,7 @@ final class StreamLogger {
   /// ```dart
   /// if (_log.isLoggable(StreamLogPriority.verbose)) _log.v(() => describe(everyParticipant));
   /// ```
-  bool isLoggable(StreamLogPriority priority) {
-    // A threshold rather than a severity: `none >= none` would otherwise admit the one record that
-    // shutting logging down cannot silence.
-    if (priority == StreamLogPriority.none) return false;
-    return _effectiveFilter.isLoggable(priority, tag);
-  }
+  bool isLoggable(StreamLogPriority priority) => _effectiveFilter.isLoggable(priority, tag);
 
   /// Writes a [StreamLogPriority.verbose] record.
   void v(
@@ -192,7 +187,7 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) => log(
-    StreamLogPriority.verbose,
+    .verbose,
     message,
     error: error,
     stackTrace: stackTrace,
@@ -204,7 +199,7 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) => log(
-    StreamLogPriority.debug,
+    .debug,
     message,
     error: error,
     stackTrace: stackTrace,
@@ -216,7 +211,7 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) => log(
-    StreamLogPriority.info,
+    .info,
     message,
     error: error,
     stackTrace: stackTrace,
@@ -228,7 +223,7 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) => log(
-    StreamLogPriority.warning,
+    .warning,
     message,
     error: error,
     stackTrace: stackTrace,
@@ -240,7 +235,7 @@ final class StreamLogger {
     Object? error,
     StackTrace? stackTrace,
   }) => log(
-    StreamLogPriority.error,
+    .error,
     message,
     error: error,
     stackTrace: stackTrace,

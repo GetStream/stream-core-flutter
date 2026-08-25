@@ -317,38 +317,50 @@ void main() {
     });
   });
   group('StreamLogPriority.none', () {
-    test('is refused as a record priority, whatever the level admits', () {
+    test('admits nothing when a filter is held to it', () {
       final handler = RecordingLogHandler();
 
-      final printed = withStreamLogger(
-        handler: handler,
-        filter: const StreamLogFilter.always(),
-        () => capturePrints(
-          () => const StreamLogger('SC:Component').log(StreamLogPriority.none, () => 'no severity'),
-        ),
-      );
-
-      // `none` outranks every severity, so a filter comparing against it would admit the one record
-      // that shutting logging down cannot silence.
-      expect(handler.records, isEmpty);
-      expect(printed, isEmpty);
-    });
-
-    test('reports itself as not loggable', () {
       withStreamLogger(
-        handler: RecordingLogHandler(),
-        filter: const StreamLogFilter.always(),
-        () => expect(const StreamLogger('SC:Component').isLoggable(StreamLogPriority.none), isFalse),
+        handler: handler,
+        filter: const StreamLogFilter.minPriority(StreamLogPriority.none),
+        () {
+          for (final priority in StreamLogPriority.values) {
+            expect(const StreamLogger('SC:Component').isLoggable(priority), isFalse, reason: '$priority');
+          }
+          const StreamLogger('SC:Component').e(() => 'a failure, while shut down');
+        },
       );
+
+      // `none` outranks every severity, so a threshold comparing against it would admit the records
+      // it exists to reject.
+      expect(handler.records, isEmpty);
     });
 
-    test('does not build the message it was given', () {
+    test('admits nothing on the branch of a prefix rule held to it', () {
+      final handler = RecordingLogHandler();
+
+      withStreamLogger(
+        handler: handler,
+        filter: const StreamLogFilter.prefix(
+          {'SV:': StreamLogPriority.none},
+          otherwise: StreamLogPriority.debug,
+        ),
+        () {
+          const StreamLogger('SV:Call').e(() => 'silenced');
+          const StreamLogger('SF:Ws').d(() => 'still heard');
+        },
+      );
+
+      expect(handler.messages, ['still heard']);
+    });
+
+    test('does not build a message the threshold rejects', () {
       var built = 0;
 
       withStreamLogger(
         handler: RecordingLogHandler(),
-        filter: const StreamLogFilter.always(),
-        () => const StreamLogger('SC:Component').log(StreamLogPriority.none, () {
+        filter: const StreamLogFilter.minPriority(StreamLogPriority.none),
+        () => const StreamLogger('SC:Component').e(() {
           built++;
           return 'never built';
         }),

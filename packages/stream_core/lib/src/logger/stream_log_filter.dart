@@ -53,7 +53,12 @@ final class _MinPriorityFilter extends StreamLogFilter {
   final StreamLogPriority priority;
 
   @override
-  bool isLoggable(StreamLogPriority priority, String tag) => priority >= this.priority;
+  bool isLoggable(StreamLogPriority priority, String tag) {
+    // `none` outranks every severity, so comparing against it would admit the records a threshold
+    // of `none` exists to reject.
+    if (this.priority == StreamLogPriority.none) return false;
+    return priority >= this.priority;
+  }
 }
 
 final class _PrefixFilter extends StreamLogFilter {
@@ -75,6 +80,7 @@ final class _PrefixFilter extends StreamLogFilter {
       matchedLength = prefix.length;
     }
 
+    if (matched == StreamLogPriority.none) return false;
     return priority >= matched;
   }
 }
