@@ -51,6 +51,7 @@
 - `TokenManager.getToken` fails when `reset` runs while the token is loading, and rejects a token whose `user_id` is not the user it was loading for; a `setTokenProvider` during a load still serves the caller that started it
 - `AuthInterceptor` no longer refreshes a token when the manager has no identity, so the original error is surfaced, and no longer retries a request signed for a user it has since been pointed away from, which would have performed one user's request as another
 - `StreamWebSocketEngine.open` fails when a connection is already open, rather than closing it to make room
+- `SystemEnvironmentManager.updateEnvironment` now sanitizes the passed `SystemEnvironment`, so an integrator can enrich the Stream client header without changing the SDK identity it reports
 
 ## 0.4.0
 
