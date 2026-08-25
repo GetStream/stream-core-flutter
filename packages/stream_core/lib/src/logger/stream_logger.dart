@@ -56,9 +56,8 @@ final class StreamLogger {
   /// ```
   ///
   /// A priority of its own is a [StreamLogFilter.minPriority], which is why there is no separate one.
-  /// [filter] defaults to admitting [StreamLogPriority.warning] and above — unlike the ambient one,
-  /// which admits nothing until an app names a priority, since a detached logger was handed its
-  /// destination and so has already been asked for. Pass [StreamLogFilter.always] to leave the
+  /// [filter] defaults to admitting [StreamLogPriority.warning] and above, so a detached logger
+  /// reports without an app naming a priority for it. Pass [StreamLogFilter.always] to leave the
   /// decision entirely to the handler.
   const StreamLogger.detached(
     this.tag, {
@@ -66,9 +65,8 @@ final class StreamLogger {
     StreamLogFilter this._filter = const .minPriority(.warning),
   });
 
-  // Null means the ambient one, read when a record is written rather than when this was built.
-  final StreamLogHandler? _handler;
   final StreamLogFilter? _filter;
+  final StreamLogHandler? _handler;
 
   /// The name records from this logger carry.
   ///
@@ -80,19 +78,11 @@ final class StreamLogger {
   ///  * [StreamLogFilter.prefix], which turns this convention into a threshold per subsystem.
   final String tag;
 
+  static StreamLogFilter _filterOrDefault = const .minPriority(.none);
   static StreamLogHandler _handlerOrDefault = StreamLogHandler.silent;
-  static StreamLogFilter _filterOrDefault = _closed;
-  // Admits nothing, which is where an app that has not asked for records starts.
-  static const _closed = StreamLogFilter.minPriority(StreamLogPriority.none);
 
-  // The one question the write path asks. `priority` and `filter` are two ways of describing it,
-  // which is why installing either replaces what the other left behind.
-  static bool _decide(StreamLogFilter filter, StreamLogPriority priority, String tag) {
-    // A threshold rather than a severity: comparing it against itself would otherwise admit the one
-    // record that shutting logging down cannot silence.
-    if (priority == StreamLogPriority.none) return false;
-    return filter.isLoggable(priority, tag);
-  }
+  StreamLogFilter get _effectiveFilter => _filter ?? _filterOrDefault;
+  StreamLogHandler get _effectiveHandler => _handler ?? _handlerOrDefault;
 
   /// Installs where every record goes, other than those from a [StreamLogger.detached] logger.
   ///
@@ -178,7 +168,7 @@ final class StreamLogger {
   @visibleForTesting
   static void reset() {
     _handlerOrDefault = StreamLogHandler.silent;
-    _filterOrDefault = _closed;
+    _filterOrDefault = const .minPriority(.none);
   }
 
   /// Whether a record at [priority] would be kept by both the filter and the handler.
@@ -189,7 +179,12 @@ final class StreamLogger {
   /// ```dart
   /// if (_log.isLoggable(StreamLogPriority.verbose)) _log.v(() => describe(everyParticipant));
   /// ```
-  bool isLoggable(StreamLogPriority priority) => _decide(_filter ?? _filterOrDefault, priority, tag);
+  bool isLoggable(StreamLogPriority priority) {
+    // A threshold rather than a severity: `none >= none` would otherwise admit the one record that
+    // shutting logging down cannot silence.
+    if (priority == StreamLogPriority.none) return false;
+    return _effectiveFilter.isLoggable(priority, tag);
+  }
 
   /// Writes a [StreamLogPriority.verbose] record.
   void v(
@@ -271,6 +266,6 @@ final class StreamLogger {
       stackTrace: stackTrace,
     );
 
-    return (_handler ?? _handlerOrDefault).handle(record);
+    return _effectiveHandler.handle(record);
   }
 }
