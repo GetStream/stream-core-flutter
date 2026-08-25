@@ -4,24 +4,31 @@ import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
 
-/// Step where we're logging
+import '../../logger.dart';
+
+/// The stage of a request a record came from.
 enum InterceptStep {
-  /// Request
+  /// A request on its way out.
   request,
 
-  /// Response
+  /// A response that came back.
   response,
 
-  /// Error
+  /// A request that failed.
   error,
 }
 
-/// Function used to print the log
+/// Takes one line of the log, in place of the logger.
 typedef LogPrint = void Function(InterceptStep step, Object object);
 
-void _defaultLogPrint(InterceptStep step, Object object) => print(object);
-
-/// Interceptor dedicated to logging
+/// An interceptor that reports each request and the response it gets.
+///
+/// Records go out under `SC:Http`, at [StreamLogPriority.debug], or [StreamLogPriority.warning]
+/// for a request that failed. Nothing is written, or even formatted, until an app installs a
+/// [StreamLogHandler].
+///
+/// [requestHeader] puts the `Authorization` header in the record along with the rest, so consider
+/// what reads these before turning it on.
 class LoggingInterceptor extends Interceptor {
   /// Creates a new [LoggingInterceptor].
   LoggingInterceptor({
@@ -33,46 +40,67 @@ class LoggingInterceptor extends Interceptor {
     this.error = true,
     this.maxWidth = 120,
     this.compact = true,
-    this.logPrint = _defaultLogPrint,
-  });
+    this.logPrint,
+    String tag = 'SC:Http',
+  }) : _logger = StreamLogger(tag);
 
-  /// Print request [Options]
+  final StreamLogger _logger;
+
+  /// Whether to report the request line.
   final bool request;
 
-  /// Print request header [Options.headers]
+  /// Whether to report the request's headers, query parameters and extras.
   final bool requestHeader;
 
-  /// Print request data [RequestOptions.data]
+  /// Whether to report the request body.
   final bool requestBody;
 
-  /// Print [Response.data]
+  /// Whether to report the response body.
   final bool responseBody;
 
-  /// Print [Response.headers]
+  /// Whether to report the response headers.
   final bool responseHeader;
 
-  /// Print error message
+  /// Whether to report a request that failed.
   final bool error;
 
-  /// InitialTab count to logPrint json response
+  /// The indent a nested value starts at.
   static const initialTab = 1;
 
-  /// 1 tab length
+  /// One level of indent.
   static const tabStep = '    ';
 
-  /// Print compact json response
+  /// Whether to report a nested map on one line, rather than one key per line.
   final bool compact;
 
-  /// Width size per logPrint
+  /// The width a line is wrapped at.
   final int maxWidth;
 
-  /// Log printer; defaults logPrint log to console.
-  /// In flutter, you'd better use debugPrint.
-  /// you can also write log in a file.
-  void Function(InterceptStep step, Object object) logPrint;
+  /// Takes each line instead of the logger, for a caller routing them somewhere of its own.
+  final LogPrint? logPrint;
+
+  // Consulted before a line is formatted, so a request costs nothing while nothing wants it.
+  bool _wants(InterceptStep step) {
+    if (logPrint != null) return true;
+    return _logger.isLoggable(_priorityOf(step));
+  }
+
+  StreamLogPriority _priorityOf(InterceptStep step) {
+    return switch (step) {
+      InterceptStep.error => StreamLogPriority.warning,
+      InterceptStep.request || InterceptStep.response => StreamLogPriority.debug,
+    };
+  }
+
+  void _write(InterceptStep step, Object object) {
+    if (logPrint case final logPrint?) return logPrint(step, object);
+    return _logger.log(_priorityOf(step), () => '$object');
+  }
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    if (!_wants(InterceptStep.request)) return super.onRequest(options, handler);
+
     if (request) {
       _printRequestHeader(_logPrintRequest, options);
     }
@@ -119,6 +147,8 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (!_wants(InterceptStep.error)) return super.onError(err, handler);
+
     if (error) {
       if (err.type == DioExceptionType.badResponse) {
         final uri = err.response?.requestOptions.uri;
@@ -150,6 +180,8 @@ class LoggingInterceptor extends Interceptor {
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) {
+    if (!_wants(InterceptStep.response)) return super.onResponse(response, handler);
+
     _printResponseHeader(_logPrintResponse, response);
     if (responseHeader) {
       final responseHeaders = <String, String>{};
@@ -348,9 +380,9 @@ class LoggingInterceptor extends Interceptor {
     _printLine(logPrint, '╚');
   }
 
-  void _logPrintRequest(Object object) => logPrint(InterceptStep.request, object);
+  void _logPrintRequest(Object object) => _write(InterceptStep.request, object);
 
-  void _logPrintResponse(Object object) => logPrint(InterceptStep.response, object);
+  void _logPrintResponse(Object object) => _write(InterceptStep.response, object);
 
-  void _logPrintError(Object object) => logPrint(InterceptStep.error, object);
+  void _logPrintError(Object object) => _write(InterceptStep.error, object);
 }

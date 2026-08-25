@@ -27,8 +27,14 @@ class User extends Equatable {
   /// Creates a guest user with the provided id and an optional display name.
   /// - Parameter userId: the id of the user.
   /// - Parameter name: the display name of the user. Defaults to [userId] when not provided.
+  /// - Parameter image: the avatar of the user.
   /// - Returns: a guest `User`.
-  const User.guest(String userId, {String? name}) : this(id: userId, name: name, type: UserType.guest);
+  ///
+  /// The server assigns a guest its own id during `connect`, of the form `guest-<uuid>-<userId>`,
+  /// so [userId] survives only as the tail of it. Read `client.user` afterwards for the id that
+  /// identifies the session.
+  const User.guest(String userId, {String? name, String? image})
+    : this(id: userId, name: name, image: image, type: UserType.guest);
 
   /// Creates an anonymous user.
   /// - Returns: an anonymous `User`.

@@ -51,7 +51,7 @@ class AttachmentUploadException implements Exception {
 /// );
 /// ```
 class StreamAttachmentUploader {
-  /// Creates a [StreamAttachmentUploader] with the specified [cdn] client.
+  /// Creates a [StreamAttachmentUploader] uploading through the given [CdnClient].
   const StreamAttachmentUploader({
     required this._cdn,
   });

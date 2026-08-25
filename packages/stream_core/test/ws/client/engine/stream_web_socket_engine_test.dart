@@ -1,6 +1,7 @@
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
+import '../../../helpers/logger.dart';
 import '../../../helpers/web_socket.dart';
 
 /// A codec that passes strings through untouched.
@@ -286,6 +287,45 @@ void main() {
     // over.
     expect(listener.messages, isEmpty);
     expect(listener.closures, isEmpty);
+  });
+
+  test('reports a message it cannot decode to the logger, which is the only trace it arrived', () async {
+    final socket = FakeWebSocketChannel();
+    addTearDown(socket.endStream);
+
+    final handler = RecordingLogHandler();
+    final engine = StreamWebSocketEngine<String, String>(
+      wsProvider: (_) => socket,
+      listener: _RecordingListener(),
+      messageCodec: const _ThrowingCodec(),
+    );
+    await engine.open(_options);
+
+    await withStreamLogger(handler: handler, () async {
+      socket.emit('garbage');
+      await pumpEventQueue();
+    });
+
+    expect(handler.records.single.priority, StreamLogPriority.warning);
+    expect(handler.records.single.tag, 'SC:WsEngine');
+    expect(handler.records.single.error, isA<FormatException>());
+  });
+
+  test('says nothing when no handler is installed', () async {
+    final socket = FakeWebSocketChannel();
+    addTearDown(socket.endStream);
+
+    final engine = StreamWebSocketEngine<String, String>(
+      wsProvider: (_) => socket,
+      listener: _RecordingListener(),
+      messageCodec: const _ThrowingCodec(),
+    );
+    await engine.open(_options);
+
+    final printed = capturePrints(() => socket.emit('garbage'));
+    await pumpEventQueue();
+
+    expect(printed, isEmpty);
   });
 }
 

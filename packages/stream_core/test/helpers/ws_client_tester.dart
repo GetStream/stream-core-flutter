@@ -209,6 +209,7 @@ WsClientTester buildTester({
   bool handshakeHangs = false,
   bool holdClose = false,
   Object? closeError,
+  String tag = 'SC:WsClient',
 }) {
   final server = FakeServer(user: user);
 
@@ -244,6 +245,7 @@ WsClientTester buildTester({
       false => null,
     },
     messageCodec: const JsonCodec(),
+    tag: tag,
   );
 
   final network = TestNetworkStateProvider();

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
+import '../../helpers/logger.dart';
 import '../../helpers/user_token.dart';
 
 /// The body the API returns when the token it was given has run out.
@@ -543,6 +544,56 @@ void main() {
         // Nothing here says the token is spent, so it is neither expired nor reloaded.
         expect(api.count, 1);
         expect(loads(), 1);
+      });
+    });
+
+    group('what the logger sees', () {
+      test('reports the retry and the token behind it', () async {
+        final handler = RecordingLogHandler();
+        final (:dio, api: _, tokens: _, loads: _) = _subject(api: _FakeApi(refusals: 1));
+
+        await withStreamLogger(handler: handler, () => dio.get<void>('/test'));
+
+        expect(handler.tags, everyElement('SC:HttpAuth'));
+        expect(handler.messages.join(), contains('retrying'));
+      });
+
+      test('reports a refusal it will not retry, and why', () async {
+        final handler = RecordingLogHandler();
+        final (:dio, api: _, tokens: _, loads: _) = _subject(
+          tokenProvider: TokenProvider.static(generateTestUserToken('user-1')),
+          api: _FakeApi(refusals: 1),
+        );
+
+        await withStreamLogger(
+          handler: handler,
+          () => expectLater(dio.get<void>('/test'), throwsA(_expiredTokenError)),
+        );
+
+        // A refused request left refused is what someone debugging a stuck login is looking at, so
+        // the reason it was not retried has to be somewhere.
+        expect(handler.messages.join(), contains('static'));
+      });
+
+      test('reports a replacement that was refused too', () async {
+        final handler = RecordingLogHandler();
+        final (:dio, api: _, tokens: _, loads: _) = _subject(api: _FakeApi(refusals: 2));
+
+        await withStreamLogger(
+          handler: handler,
+          () => expectLater(dio.get<void>('/test'), throwsA(_expiredTokenError)),
+        );
+
+        expect(handler.messages.join(), contains('refused too'));
+      });
+
+      test('says nothing when no handler is installed', () async {
+        final (:dio, api: _, tokens: _, loads: _) = _subject(api: _FakeApi(refusals: 1));
+
+        final printed = capturePrints(() => dio.get<void>('/test'));
+        await pumpEventQueue();
+
+        expect(printed, isEmpty);
       });
     });
   });

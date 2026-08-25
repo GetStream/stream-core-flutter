@@ -36,7 +36,7 @@ class TokenManager {
   /// Creates a [TokenManager] for the specified [userId] with the given
   /// [tokenProvider].
   ///
-  /// An optional [onTokenUpdated] callback is invoked whenever a loaded token is cached. Not for a
+  /// An optional `onTokenUpdated` callback is invoked whenever a loaded token is cached. Not for a
   /// caller served from the cache, and not for a load that [expireToken] or [setTokenProvider]
   /// invalidated while it ran: that token reaches its caller but is never cached.
   TokenManager({

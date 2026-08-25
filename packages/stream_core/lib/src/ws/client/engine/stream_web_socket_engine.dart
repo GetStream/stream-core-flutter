@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
 
@@ -36,8 +37,11 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     WebSocketProvider? wsProvider,
     this._listener,
     required this._messageCodec,
-  }) : _wsProvider = wsProvider ?? _createWebSocket;
+    String tag = 'SC:WsEngine',
+  }) : _logger = StreamLogger(tag),
+       _wsProvider = wsProvider ?? _createWebSocket;
 
+  final StreamLogger _logger;
   final WebSocketProvider _wsProvider;
   final WebSocketMessageCodec<Inc, Out> _messageCodec;
 
@@ -88,6 +92,10 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     if (data == null) return;
 
     final result = runSafelySync(() => _messageCodec.decode(data));
+    if (result case Failure(:final error, :final stackTrace)) {
+      return _logger.w(() => 'dropped an undecodable message', error: error, stackTrace: stackTrace);
+    }
+
     final message = result.getOrNull();
 
     // If decoding failed, we ignore the message.

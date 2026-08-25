@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:rxdart/utils.dart';
 
+import '../../../logger.dart';
 import '../../../utils.dart';
 import '../stream_web_socket_client.dart';
 import '../web_socket_connection_state.dart';
@@ -47,7 +48,9 @@ class ConnectionRecoveryHandler extends Disposable {
     this._keepConnectionAliveInBackground = false,
     List<AutomaticReconnectionPolicy>? policies,
     RetryStrategy? retryStrategy,
+    String tag = 'SC:WsRecovery',
   }) : _client = client,
+       _logger = StreamLogger(tag),
        _reconnectStrategy = retryStrategy ?? RetryStrategy(),
        _policies = <AutomaticReconnectionPolicy>[
          ...?policies,
@@ -78,6 +81,7 @@ class ConnectionRecoveryHandler extends Disposable {
   }
 
   final StreamWebSocketClient _client;
+  final StreamLogger _logger;
   final RetryStrategy _reconnectStrategy;
   final bool _keepConnectionAliveInBackground;
   final List<AutomaticReconnectionPolicy> _policies;
@@ -114,6 +118,9 @@ class ConnectionRecoveryHandler extends Disposable {
   Timer? _reconnectionTimer;
   void _scheduleReconnection() {
     final delay = _reconnectStrategy.getDelayAfterTheFailure();
+    _logger.d(
+      () => 'reconnect #${_reconnectStrategy.consecutiveFailuresCount} scheduled in ${delay.inMilliseconds}ms',
+    );
 
     _reconnectionTimer?.cancel();
     _reconnectionTimer = Timer(delay, reconnectIfNeeded);
