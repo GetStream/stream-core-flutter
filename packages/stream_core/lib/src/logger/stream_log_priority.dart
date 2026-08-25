@@ -18,11 +18,9 @@ enum StreamLogPriority implements Comparable<StreamLogPriority> {
   /// A failure.
   error(level: 6, emoji: '🚨', label: 'E'),
 
-  /// No severity, used as a threshold that admits nothing.
+  /// A threshold that admits nothing, not a severity a record can carry.
   ///
-  /// Outranks every real severity, so a filter held to this admits no record. It is not a severity
-  /// a record can carry: `StreamLogger.log` discards one written at this priority, which would
-  /// otherwise be the only record that no threshold could suppress.
+  /// Outranks every real severity, so a record written at it is discarded.
   none(level: 7, emoji: '📣', label: '*');
 
   const StreamLogPriority({required this.level, required this.emoji, required this.label});
