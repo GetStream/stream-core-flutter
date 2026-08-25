@@ -1,5 +1,4 @@
 import 'stream_log_filter.dart';
-import 'stream_log_priority.dart';
 import 'stream_log_record.dart';
 import 'stream_logger.dart';
 
@@ -48,7 +47,8 @@ abstract class StreamLogHandler {
 
   /// A handler giving every record to each of [handlers], in order.
   ///
-  /// Each decides for itself what to keep, so one composite can serve a verbose console during
+  /// Every record reaches every one of them, so wrap any that should see less in
+  /// [StreamLogHandler.filtered] — that is how one composite serves a verbose console during
   /// development and a crash reporter that only wants failures.
   const factory StreamLogHandler.composite(List<StreamLogHandler> handlers) = _CompositeHandler;
 
@@ -77,41 +77,21 @@ abstract class StreamLogHandler {
   /// The shortest route into a logging facility an app already has.
   const factory StreamLogHandler.from(StreamLogCallback callback) = _CallbackHandler;
 
-  /// A handler giving records to [handler] only in a build that runs assertions.
-  ///
-  /// A Flutter debug build runs them; release and profile builds do not, and neither does a
-  /// plain `dart run`. Keeps a console for whoever is developing without leaving one in the
-  /// build a user runs:
-  ///
-  /// ```dart
-  /// StreamLogger.handler = const StreamLogHandler.debugOnly(StreamLogHandler.console());
-  /// ```
-  ///
-  /// Consider wrapping only what writes somewhere a user could see, and leaving a crash reporter
-  /// to receive records in every build.
-  const factory StreamLogHandler.debugOnly(StreamLogHandler handler) = _DebugOnlyHandler;
-
   /// A handler that discards every record.
   ///
   /// What [StreamLogger.handler] is until an app installs something else.
   static const StreamLogHandler silent = _SilentHandler();
 
-  /// Whether this handler wants a record at [priority] from [tag].
+  /// Takes a record the filter admitted.
   ///
-  /// Consulted before the record is built, so a handler that gates here never pays for a message
-  /// it would discard. Defaults to accepting everything `StreamLogger.priority` already admitted —
-  /// a handler narrows what reaches it, and cannot widen it.
-  bool isLoggable(StreamLogPriority priority, String tag) => true;
-
-  /// Takes a record this handler has accepted.
+  /// Whether a record is worth building at all is `StreamLogger.filter`'s decision, so a handler
+  /// receives whatever that admitted and discards here what it does not want. See
+  /// [StreamLogHandler.filtered] for holding one destination to less than the rest.
   void handle(StreamLogRecord record);
 }
 
 final class _SilentHandler extends StreamLogHandler {
   const _SilentHandler();
-
-  @override
-  bool isLoggable(StreamLogPriority priority, String tag) => false;
 
   @override
   void handle(StreamLogRecord record) {
@@ -136,39 +116,11 @@ final class _CompositeHandler extends StreamLogHandler {
   final List<StreamLogHandler> handlers;
 
   @override
-  bool isLoggable(StreamLogPriority priority, String tag) {
-    return handlers.any((it) => it.isLoggable(priority, tag));
-  }
-
-  @override
   void handle(StreamLogRecord record) {
     for (final handler in handlers) {
-      // Asked again, because the record only had to interest one of them to be built.
-      if (handler.isLoggable(record.priority, record.tag)) handler.handle(record);
+      handler.handle(record);
     }
   }
-}
-
-final class _DebugOnlyHandler extends StreamLogHandler {
-  const _DebugOnlyHandler(this.handler);
-
-  final StreamLogHandler handler;
-
-  // The one thing a release build can be asked about itself without depending on Flutter: an
-  // assertion that runs is a build that kept them.
-  static bool get _assertionsEnabled {
-    var enabled = false;
-    assert(enabled = true);
-    return enabled;
-  }
-
-  @override
-  bool isLoggable(StreamLogPriority priority, String tag) {
-    return _assertionsEnabled && handler.isLoggable(priority, tag);
-  }
-
-  @override
-  void handle(StreamLogRecord record) => handler.handle(record);
 }
 
 final class _FilteredHandler extends StreamLogHandler {
@@ -178,12 +130,9 @@ final class _FilteredHandler extends StreamLogHandler {
   final StreamLogHandler handler;
 
   @override
-  bool isLoggable(StreamLogPriority priority, String tag) {
-    return filter.isLoggable(priority, tag) && handler.isLoggable(priority, tag);
+  void handle(StreamLogRecord record) {
+    if (filter.isLoggable(record.priority, record.tag)) handler.handle(record);
   }
-
-  @override
-  void handle(StreamLogRecord record) => handler.handle(record);
 }
 
 final class _CallbackHandler extends StreamLogHandler {

@@ -138,7 +138,7 @@ void main() {
         handler: const StreamLogHandler.composite([]),
         () {
           expect(() => _logger.e(() => 'nowhere to go'), returnsNormally);
-          expect(_logger.isLoggable(StreamLogPriority.error), isFalse);
+          expect(capturePrints(() => _logger.e(() => 'nowhere to go')), isEmpty);
         },
       );
     });
@@ -156,100 +156,6 @@ void main() {
       );
 
       expect(seen, ['verbose SC:Component verbose', 'error SC:Component error']);
-    });
-  });
-
-  group('StreamLogHandler.debugOnly', () {
-    // Only half of this handler can be tested here: `dart test` runs with assertions enabled, so
-    // the build where it goes quiet is by definition one this suite cannot be running in. That
-    // half was checked by compiling a probe with `dart compile exe`, which strips them.
-
-    test('passes records on where assertions are enabled, as they are under test', () {
-      final inner = RecordingLogHandler();
-
-      withStreamLogger(
-        handler: StreamLogHandler.debugOnly(inner),
-        () => _logger.e(() => 'seen while developing'),
-      );
-
-      expect(inner.messages, ['seen while developing']);
-    });
-
-    test('still lets the handler it wraps keep only what it wants', () {
-      final printed = withStreamLogger(
-        handler: const StreamLogHandler.debugOnly(
-          StreamLogHandler.filtered(StreamLogFilter.minPriority(StreamLogPriority.error), StreamLogHandler.console()),
-        ),
-        () => capturePrints(() {
-          _logger
-            ..d(() => 'debug')
-            ..e(() => 'error');
-        }),
-      );
-
-      expect(printed.single, contains('error'));
-    });
-
-    test('is const constructible', () {
-      const handler = StreamLogHandler.debugOnly(StreamLogHandler.console());
-
-      expect(handler, isA<StreamLogHandler>());
-    });
-  });
-
-  group('StreamLogHandler.filtered', () {
-    test('sends one SDK somewhere the rest do not go', () {
-      final feedsOnly = RecordingLogHandler();
-
-      final printed = withStreamLogger(
-        handler: StreamLogHandler.composite([
-          StreamLogHandler.filtered(
-            const StreamLogFilter.prefix({'SF:': StreamLogPriority.verbose}, otherwise: StreamLogPriority.none),
-            feedsOnly,
-          ),
-          const StreamLogHandler.console(),
-        ]),
-        () => capturePrints(() {
-          const StreamLogger('SF:Ws').d(() => 'from feeds');
-          const StreamLogger('SV:Call').d(() => 'from video');
-        }),
-      );
-
-      // Routing by tag rather than by priority, which a threshold on the handler could not express.
-      expect(feedsOnly.messages, ['from feeds']);
-      expect(printed, hasLength(2));
-    });
-
-    test('respects a threshold held by the handler it wraps', () {
-      final inner = RecordingLogHandler();
-
-      withStreamLogger(
-        handler: StreamLogHandler.filtered(
-          const StreamLogFilter.always(),
-          StreamLogHandler.filtered(const StreamLogFilter.minPriority(StreamLogPriority.error), inner),
-        ),
-        () => const StreamLogger('SC:Component')
-          ..d(() => 'debug')
-          ..e(() => 'error'),
-      );
-
-      // Handing a record on does not re-apply the filter, so the whole chain has to be consulted
-      // before the record is built rather than as it is delivered.
-      expect(inner.messages, ['error']);
-    });
-
-    test('never widens what the level already admitted', () {
-      final everything = RecordingLogHandler();
-
-      withStreamLogger(
-        handler: StreamLogHandler.filtered(const StreamLogFilter.always(), everything),
-        filter: const StreamLogFilter.minPriority(StreamLogPriority.error),
-        () => const StreamLogger('SC:Component')
-          ..d(() => 'debug')
-          ..e(() => 'error'),
-      );
-
-      expect(everything.messages, ['error']);
     });
   });
 

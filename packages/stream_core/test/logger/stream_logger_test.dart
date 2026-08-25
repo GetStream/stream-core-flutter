@@ -105,10 +105,20 @@ void main() {
       expect(handler.records.map((it) => it.stackTrace), everyElement(isNull));
     });
 
-    test('never builds a message no handler wants', () {
+    test('never builds a message while nothing is installed to receive one', () {
       var built = 0;
 
-      withStreamLogger(
+      // Deliberately not `withStreamLogger`, which installs a handler: this is what an app that
+      // has not asked for logging pays.
+      capturePrints(() => _logger.e(() => 'expensive ${built++}'));
+
+      expect(built, isZero);
+    });
+
+    test('builds a message a narrower destination goes on to discard', () {
+      var built = 0;
+
+      final printed = withStreamLogger(
         handler: const StreamLogHandler.filtered(
           StreamLogFilter.minPriority(StreamLogPriority.error),
           StreamLogHandler.console(),
@@ -116,10 +126,13 @@ void main() {
         () => capturePrints(() => _logger.v(() => 'expensive ${built++}')),
       );
 
-      expect(built, 0);
+      // The filter is the only gate, so a destination narrower than it declines on delivery rather
+      // than before the message was built.
+      expect(built, 1);
+      expect(printed, isEmpty);
     });
 
-    test('isLoggable answers for the filter and the handler together', () {
+    test('isLoggable answers for the filter, whatever the destination goes on to keep', () {
       withStreamLogger(
         handler: const StreamLogHandler.filtered(
           StreamLogFilter.minPriority(StreamLogPriority.warning),
@@ -128,7 +141,7 @@ void main() {
         filter: const StreamLogFilter.minPriority(StreamLogPriority.debug),
         () {
           expect(_logger.isLoggable(StreamLogPriority.verbose), isFalse, reason: 'the filter rejects it');
-          expect(_logger.isLoggable(StreamLogPriority.debug), isFalse, reason: 'the handler rejects it');
+          expect(_logger.isLoggable(StreamLogPriority.debug), isTrue, reason: 'the filter admits it');
           expect(_logger.isLoggable(StreamLogPriority.warning), isTrue);
         },
       );

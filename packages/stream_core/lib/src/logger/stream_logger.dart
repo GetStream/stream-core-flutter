@@ -99,8 +99,10 @@ final class StreamLogger {
     // A threshold rather than a severity: comparing it against itself would otherwise admit the one
     // record that shutting logging down cannot silence.
     if (priority == StreamLogPriority.none) return false;
-    if (!filter.isLoggable(priority, tag)) return false;
-    return handler.isLoggable(priority, tag);
+    // Nowhere to write is not a decision a handler makes about a record, so it is settled here
+    // rather than by asking every destination what it wants.
+    if (identical(handler, StreamLogHandler.silent)) return false;
+    return filter.isLoggable(priority, tag);
   }
 
   /// Installs where every record goes, other than those from a [StreamLogger.detached] logger.
