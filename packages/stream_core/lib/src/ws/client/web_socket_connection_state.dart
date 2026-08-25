@@ -249,28 +249,24 @@ sealed class DisconnectionSource extends Equatable {
   /// This is typically used for logging and debugging purposes.
   ///
   /// Returns a descriptive string for the disconnection cause.
-  String get closeReason {
-    return switch (this) {
-      UserInitiated() => 'User initiated disconnection',
-      ServerInitiated() => 'Server initiated disconnection',
-      SystemInitiated() => 'System initiated disconnection',
-      UnHealthyConnection() => 'Unhealthy connection (no pong received)',
-      ConnectTimeout() => 'Timed out before the connection was established',
-      AuthenticationFailed() => 'Authentication failed',
-    };
-  }
+  String get closeReason => switch (this) {
+    UserInitiated() => 'User initiated disconnection',
+    ServerInitiated() => 'Server initiated disconnection',
+    SystemInitiated() => 'System initiated disconnection',
+    UnHealthyConnection() => 'Unhealthy connection (no pong received)',
+    ConnectTimeout() => 'Timed out before the connection was established',
+    AuthenticationFailed() => 'Authentication failed',
+  };
 
   /// What closed the connection, or `null` when this source carries no cause.
   ///
   /// For a [ServerInitiated] closure this is the error that was reported, or a
   /// [WebSocketEngineException] describing the close when nothing else was.
-  Object? get cause {
-    return switch (this) {
-      ServerInitiated(:final error) => error?.error ?? error,
-      AuthenticationFailed(:final error) => error,
-      UserInitiated() || SystemInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
-    };
-  }
+  Object? get cause => switch (this) {
+    ServerInitiated(:final error) => error?.error ?? error,
+    AuthenticationFailed(:final error) => error,
+    UserInitiated() || SystemInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
+  };
 
   /// Whether a connection closed for this reason is worth opening again.
   ///
