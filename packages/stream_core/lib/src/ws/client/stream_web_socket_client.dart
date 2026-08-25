@@ -273,11 +273,9 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   }
 
   void _handleHealthCheckEvent(WsEvent event, HealthCheckInfo info) {
-    // The two states a pong means something in. `Authenticating` is one of them because a
-    // connection with no authenticator has nothing to send, so the server's first pong is what
-    // establishes it.
-    final state = connectionState.value;
-    if (state is! Authenticating && state is! Connected) return;
+    // `Authenticating` counts because a connection with no authenticator has nothing to send, so
+    // the server's first pong is what establishes it.
+    if (connectionState.value is! Authenticating && connectionState.value is! Connected) return;
 
     // The connection is established, so the attempt is no longer being timed.
     _cancelConnectTimeout();
