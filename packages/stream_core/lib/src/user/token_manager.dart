@@ -1,6 +1,5 @@
-import 'package:synchronized/extension.dart';
-
 import '../errors/client_exception.dart';
+import '../utils/in_flight_cache.dart';
 import 'token_provider.dart';
 import 'user_token.dart';
 
@@ -10,10 +9,10 @@ import 'user_token.dart';
 /// the caller that triggered the load.
 typedef OnTokenUpdated = void Function(UserToken token);
 
-/// Manages user authentication tokens with caching and thread-safe access.
+/// Loads user authentication tokens from a [TokenProvider], and caches the one in use.
 ///
-/// Provides token caching and automatic loading for user authentication tokens.
-/// Ensures thread-safe access to tokens and handles token lifecycle efficiently.
+/// A token is loaded when nothing usable is cached, and reused until it expires or [expireToken],
+/// [setTokenProvider] or [reset] invalidates it. Concurrent callers of [getToken] share one load.
 ///
 /// ## Usage
 ///
@@ -123,6 +122,9 @@ class TokenManager {
   // before that point can tell its result is no longer wanted.
   var _generation = 0;
 
+  // Keyed by generation, so an invalidated load is never joined by a later caller.
+  final _loads = InFlightCache<int, UserToken>();
+
   /// Returns the cached token, without loading a new one.
   ///
   /// `null` when nothing is cached, or when the cache was expired.
@@ -135,8 +137,10 @@ class TokenManager {
 
   /// Returns the cached token, loading one from the [TokenProvider] when nothing is cached.
   ///
-  /// Loads are serialised, so a provider that never returns blocks every later caller, including one
-  /// for a different user configured by [setTokenProvider] in the meantime.
+  /// Concurrent callers share one load, and its outcome, success or failure alike. A caller arriving
+  /// after [expireToken], [setTokenProvider] or [reset] starts its own load rather than joining the
+  /// one those invalidated, so a provider that never returns cannot hold up a caller for the
+  /// identity that replaced it.
   ///
   /// Fails with a [ClientException] when no identity is configured, or when [reset] runs while the
   /// token is loading, and with an [ArgumentError] when the provider returns a token that does not
@@ -145,12 +149,7 @@ class TokenManager {
     final cached = peekToken();
     if (cached != null && !_isSpent(cached)) return cached;
 
-    return synchronized(() {
-      final currentToken = peekToken();
-      if (currentToken != null && !_isSpent(currentToken)) return currentToken;
-
-      return _loadAndNotify();
-    });
+    return _loads.run(_generation, _loadAndNotify);
   }
 
   bool _isSpent(UserToken token) {
