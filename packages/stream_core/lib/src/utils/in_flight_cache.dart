@@ -13,6 +13,10 @@ import 'dart:async';
 /// Sharing failures is intentional: falling through to a fresh call on
 /// error would defeat the dedup precisely when it matters most (e.g., a
 /// rate-limit storm), turning one rejected request into N.
+///
+/// This is the single-flight pattern, after Go's `golang.org/x/sync/singleflight`.
+/// `AsyncCache.ephemeral` from `package:async` covers the single-key case, without
+/// the keying or the capture of a synchronous throw.
 class InFlightCache<K, V> {
   final _inFlight = <K, Future<V>>{};
 
