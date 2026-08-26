@@ -35,6 +35,7 @@
 - Added `DisconnectionSource.cause`, the error that closed the connection, or `null` when the source carries none
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`, and `connect` throws a `StateError` afterwards
+- Added `InFlightCache`, which hands concurrent callers asking for the same key the one call already in flight, and its outcome, success or failure alike
 
 ### 🐛 Bug Fixes
 
