@@ -166,6 +166,43 @@ void main() {
         expect(provider.loadCount, 1);
       });
 
+      test('concurrent calls share a failed load', () async {
+        final failedLoad = Completer<UserToken>();
+        final provider = _CountingProvider((_) => failedLoad.future);
+        final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
+
+        final futures = List.generate(5, (_) => manager.getToken());
+        failedLoad.completeError(StateError('load failed'));
+
+        // A provider refusing one caller refuses all five, so asking it five times over would
+        // hammer a token endpoint that has already said no.
+        for (final future in futures) {
+          await expectLater(future, throwsStateError);
+        }
+
+        expect(provider.loadCount, 1);
+      });
+
+      test('a caller arriving after the load is invalidated does not join it', () async {
+        final slowLoad = Completer<UserToken>();
+        var loads = 0;
+        final provider = _CountingProvider((userId) {
+          if (++loads == 1) return slowLoad.future;
+          return Future.value(generateTestUserToken(userId, nonce: 'fresh'));
+        });
+        final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
+
+        final stale = manager.getToken();
+        manager.expireToken();
+
+        // The load `expireToken` discarded must not be the one this caller is served from.
+        expect(await manager.getToken(), generateTestUserToken('user-1', nonce: 'fresh'));
+
+        slowLoad.complete(generateTestUserToken('user-1', nonce: 'stale'));
+        await stale;
+        expect(provider.loadCount, 2);
+      });
+
       test('does not cache a failed load', () async {
         var attempts = 0;
         final provider = _CountingProvider((_) async {
