@@ -230,9 +230,9 @@ void main() {
           isA<DioException>().having(
             (it) => it.error,
             'error',
-            isA<ClientException>()
-                .having((it) => it.message, 'message', 'Failed to load auth token')
-                .having((it) => it.underlyingError, 'underlyingError', isStateError),
+            isA<StreamAuthenticationException>()
+                .having((it) => it.message, 'message', 'Failed to load an auth token')
+                .having((it) => it.cause, 'cause', isStateError),
           ),
         ),
       );

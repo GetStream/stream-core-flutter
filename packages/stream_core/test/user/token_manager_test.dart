@@ -353,7 +353,7 @@ void main() {
         expect(manager.userId, isNull);
         expect(manager.peekToken(), isNull);
         expect(manager.usesStaticProvider, isFalse);
-        await expectLater(manager.getToken(), throwsA(isA<ClientException>()));
+        await expectLater(manager.getToken(), throwsA(isA<StreamAuthenticationException>()));
       });
 
       test('loads once an identity is supplied', () async {
@@ -380,7 +380,7 @@ void main() {
 
         expect(manager.userId, isNull);
         expect(manager.peekToken(), isNull);
-        await expectLater(manager.getToken(), throwsA(isA<ClientException>()));
+        await expectLater(manager.getToken(), throwsA(isA<StreamAuthenticationException>()));
       });
 
       test('leaves the manager reusable for another user', () async {
@@ -403,7 +403,7 @@ void main() {
         completer.complete(generateTestUserToken('user-1'));
 
         // A reset is a logout, so the token is neither cached nor handed to the caller.
-        await expectLater(inFlight, throwsA(isA<ClientException>()));
+        await expectLater(inFlight, throwsA(isA<StreamAuthenticationException>()));
         expect(manager.peekToken(), isNull);
       });
     });

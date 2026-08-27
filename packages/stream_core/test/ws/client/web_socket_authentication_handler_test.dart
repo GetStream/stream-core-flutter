@@ -26,20 +26,20 @@ StreamApiError _apiError({
   statusCode: statusCode,
 );
 
-final _expiredToken = _apiError(code: 40);
+final _expiredToken = StreamApiException.fromApiError(_apiError(code: 40));
 
-Disconnected _serverClosure(StreamApiError? apiError) => Disconnected(
-  source: ServerInitiated(error: WebSocketEngineException(error: apiError)),
+Disconnected _serverClosure(StreamApiException? error) => Disconnected(
+  source: ServerInitiated(error: error),
 );
 
 /// Builds a handler, along with the errors it handed the authenticator and the failures it reported.
 ({
   WebSocketAuthenticationHandler authentication,
-  List<StreamApiError?> asked,
+  List<StreamApiException?> asked,
   List<Object> failures,
 })
 _subject({WebSocketAuthenticator? authenticator}) {
-  final asked = <StreamApiError?>[];
+  final asked = <StreamApiException?>[];
   final failures = <Object>[];
 
   final authentication = WebSocketAuthenticationHandler(
@@ -102,7 +102,7 @@ void main() {
     final running = authentication.authenticate();
 
     // The server refuses again while this attempt is still awaiting its credentials.
-    authentication.onConnectionStateChanged(_serverClosure(_apiError(code: 40)));
+    authentication.onConnectionStateChanged(_serverClosure(StreamApiException.fromApiError(_apiError(code: 40))));
     held.complete();
     await running;
 
@@ -325,7 +325,7 @@ void main() {
 
     test('leaves the refusal for the attempt that replaces it', () async {
       final loaded = Completer<void>();
-      final asked = <StreamApiError?>[];
+      final asked = <StreamApiException?>[];
       var calls = 0;
 
       final authentication = WebSocketAuthenticationHandler(

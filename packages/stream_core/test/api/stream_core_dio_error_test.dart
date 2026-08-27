@@ -4,9 +4,14 @@ import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 /// The body the API returns when it refuses a request.
-Map<String, Object?> _errorBody({int code = 40, int statusCode = 401, String message = 'token expired'}) => {
+Map<String, Object?> _errorBody({
+  int code = 40,
+  int statusCode = 401,
+  String message = 'token expired',
+  Object? details = const <int>[],
+}) => {
   'code': code,
-  'details': <int>[],
+  'details': details,
   'duration': '0ms',
   'message': message,
   'more_info': '',
@@ -18,6 +23,7 @@ DioException _failure({
   int? statusCode,
   String? statusMessage,
   String? message,
+  Map<String, List<String>>? headers,
   DioExceptionType type = DioExceptionType.badResponse,
 }) {
   final options = RequestOptions(path: '/test');
@@ -31,89 +37,129 @@ DioException _failure({
             requestOptions: options,
             statusCode: statusCode,
             statusMessage: statusMessage,
+            headers: Headers.fromMap(headers ?? const {}),
             data: body,
           ),
   );
 }
 
 void main() {
-  group('DioException.apiError', () {
+  group('DioException.toStreamException', () {
     test('reads the Stream error from a decoded body', () {
-      final error = _failure(body: _errorBody(), statusCode: 401).apiError;
+      final exception = _failure(body: _errorBody(), statusCode: 401).toStreamException();
 
-      expect(error?.code, 40);
-      expect(error?.statusCode, 401);
+      expect(
+        exception,
+        isA<StreamApiException>()
+            .having((it) => it.code, 'code', 40)
+            .having((it) => it.statusCode, 'statusCode', 401)
+            .having((it) => it.message, 'message', 'token expired')
+            .having((it) => it.isTokenExpired, 'isTokenExpired', isTrue),
+      );
     });
 
     test('reads the Stream error from a body the server sent as text', () {
       // Without a JSON content type Dio hands the body over as a string, and the refusal is the
       // same one either way.
-      final error = _failure(body: jsonEncode(_errorBody()), statusCode: 401).apiError;
+      final exception = _failure(body: jsonEncode(_errorBody()), statusCode: 401).toStreamException();
 
-      expect(error?.code, 40);
+      expect(exception, isA<StreamApiException>().having((it) => it.code, 'code', 40));
     });
 
-    test('reads null from a body that is not a Stream error', () {
-      // A proxy or gateway can answer with JSON of its own, which must not throw on the way out.
-      expect(_failure(body: {'error': 'gateway timeout'}, statusCode: 504).apiError, isNull);
-      expect(_failure(body: 'not json at all', statusCode: 502).apiError, isNull);
-      expect(_failure(statusCode: 500).apiError, isNull);
-      expect(_failure().apiError, isNull);
-    });
-  });
+    test('survives a body whose details is an object rather than a list', () {
+      // The backend serializes `details` as either a list or an object; the object variant must
+      // not fail the whole error on the way out.
+      final body = _errorBody(details: {'test': true});
+      final exception = _failure(body: body, statusCode: 401).toStreamException();
 
-  group('DioException.toClientException', () {
-    test('takes its message, status code and cause from the Stream error', () {
-      // The error and the response deliberately disagree, so each assertion says which one won.
-      // Given the same values, either source would satisfy them.
-      final exception = _failure(
-        body: _errorBody(statusCode: 429),
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-      ).toClientException();
-
-      // The API's own account of the failure says more than the transport's, so it wins.
-      expect(exception.message, 'token expired');
-      expect(exception.statusCode, 429);
-      expect(exception.apiError?.code, 40);
+      expect(
+        exception,
+        isA<StreamApiException>()
+            .having((it) => it.code, 'code', 40)
+            .having((it) => it.apiError?.details, 'apiError.details', isEmpty),
+      );
     });
 
-    test('falls back to what the transport reported when the response carried no Stream error', () {
+    test('reports a verdict even when the body is not a Stream error', () {
+      // A proxy or gateway can answer with an error of its own: still a verdict, just one without
+      // a Stream code.
       final dioException = _failure(
         body: {'error': 'gateway timeout'},
         statusCode: 504,
         statusMessage: 'Gateway Timeout',
       );
 
-      final exception = dioException.toClientException();
+      final exception = dioException.toStreamException();
 
-      expect(exception.message, 'Gateway Timeout');
-      expect(exception.statusCode, 504);
-      // Nothing better to blame, so the transport failure is the cause.
-      expect(exception.underlyingError, same(dioException));
-      expect(exception.apiError, isNull);
+      expect(
+        exception,
+        isA<StreamApiException>()
+            .having((it) => it.message, 'message', 'Gateway Timeout')
+            .having((it) => it.statusCode, 'statusCode', 504)
+            .having((it) => it.code, 'code', isNull)
+            .having((it) => it.apiError, 'apiError', isNull)
+            // Nothing better to blame, so the transport failure is the cause.
+            .having((it) => it.cause, 'cause', same(dioException)),
+      );
     });
 
-    test('falls back to the exception message when there is no response at all', () {
-      final exception = _failure(message: 'connection refused').toClientException();
+    test('reads the Retry-After header on a rate limited response', () {
+      final rateLimited = _failure(
+        body: _errorBody(code: 9, statusCode: 429, message: 'Too many requests'),
+        statusCode: 429,
+        headers: {
+          'retry-after': ['7'],
+        },
+      ).toStreamException();
 
-      expect(exception.message, 'connection refused');
-      expect(exception.statusCode, isNull);
+      expect(
+        rateLimited,
+        isA<StreamApiException>()
+            .having((it) => it.isRateLimited, 'isRateLimited', isTrue)
+            .having((it) => it.retryAfter, 'retryAfter', const Duration(seconds: 7)),
+      );
     });
 
-    test('never leaves the message null, so a caller always has something to show', () {
-      final exception = _failure().toClientException();
+    test('reports no verdict when there is no response at all', () {
+      final exception = _failure(message: 'connection refused').toStreamException();
 
-      expect(exception.message, isEmpty);
+      expect(
+        exception,
+        isA<StreamNetworkException>()
+            .having((it) => it.message, 'message', 'connection refused')
+            .having((it) => it.isCancelled, 'isCancelled', isFalse),
+      );
+    });
+
+    test('marks a timeout as such', () {
+      final exception = _failure(type: DioExceptionType.receiveTimeout).toStreamException();
+
+      expect(exception, isA<StreamNetworkException>().having((it) => it.isTimeout, 'isTimeout', isTrue));
     });
 
     test('marks a request the caller cancelled as such', () {
-      final cancelled = _failure(type: DioExceptionType.cancel).toClientException();
-      final refused = _failure(body: _errorBody(), statusCode: 401).toClientException();
+      final cancelled = _failure(type: DioExceptionType.cancel).toStreamException();
+      final refused = _failure(body: _errorBody(), statusCode: 401).toStreamException();
 
       // A caller that called the request off should not be shown it as a failure.
-      expect(cancelled.isRequestCancelledError, isTrue);
-      expect(refused.isRequestCancelledError, isFalse);
+      expect(cancelled, isA<StreamNetworkException>().having((it) => it.isCancelled, 'isCancelled', isTrue));
+      expect(refused, isA<StreamApiException>());
+    });
+
+    test('never leaves the message empty of meaning, so a caller always has something to show', () {
+      final exception = _failure().toStreamException();
+
+      expect(exception.message, isNotEmpty);
+    });
+
+    test('passes an already mapped exception through untouched', () {
+      const mapped = StreamAuthenticationException(message: 'no token');
+      final dioException = StreamDioException(
+        exception: mapped,
+        requestOptions: RequestOptions(path: '/test'),
+      );
+
+      expect(dioException.toStreamException(), same(mapped));
     });
   });
 }

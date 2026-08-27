@@ -37,12 +37,13 @@ class AuthInterceptor extends Interceptor {
       options.headers['stream-auth-type'] = token.authType.headerValue;
 
       return handler.next(options);
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       _logger.w(() => 'no token to sign ${options.uri} with', error: e, stackTrace: stackTrace);
 
       // Credentials never went out, so this is an authentication failure —
       // unless the token manager already said so, in which case its report
-      // is kept as is.
+      // is kept as is. Caught in full: a rejection must deliver a
+      // StreamException whatever the app's token code threw.
       final exception = switch (e) {
         final StreamException exception => exception,
         _ => StreamAuthenticationException(

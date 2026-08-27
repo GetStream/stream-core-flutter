@@ -177,4 +177,3 @@ extension type const CloseCode(int code) implements int {
   /// This **must not** be set explicitly by an endpoint.
   static const tlsHandshakeFailure = CloseCode(1015);
 }
-

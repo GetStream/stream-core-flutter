@@ -40,7 +40,7 @@ void main() {
           isA<Disconnected>().having(
             (it) => it.source,
             'source',
-            isA<ServerInitiated>().having((it) => it.error?.error, 'error', isNotNull),
+            isA<ServerInitiated>().having((it) => it.error, 'error', isA<StreamNetworkException>()),
           ),
         );
         expect(tester.connectionState.isAutomaticReconnectionEnabled, isTrue);
@@ -256,8 +256,8 @@ void main() {
 
     group('the refusal handed to the next attempt', () {
       /// Records what each attempt was told about the previous one.
-      ({WebSocketAuthenticator authenticator, List<StreamApiError?> seen}) watching() {
-        final seen = <StreamApiError?>[];
+      ({WebSocketAuthenticator authenticator, List<StreamApiException?> seen}) watching() {
+        final seen = <StreamApiException?>[];
         return (
           authenticator: (send, previousError) async {
             seen.add(previousError);
@@ -279,7 +279,7 @@ void main() {
         await tester.pumpEventQueue();
 
         // The second attempt is told why the first ended, so it can present something else.
-        expect(seen, [null, isA<StreamApiError>().having((it) => it.code, 'code', 40)]);
+        expect(seen, [null, isA<StreamApiException>().having((it) => it.code, 'code', 40)]);
       });
 
       test('is handed on even when the closure is not one to reconnect from', () async {
@@ -298,7 +298,7 @@ void main() {
 
         // A caller who connects again is presenting credentials of their own, and needs to be told
         // what the last ones were refused for however the closure was classified.
-        expect(seen, [null, isA<StreamApiError>().having((it) => it.code, 'code', 43)]);
+        expect(seen, [null, isA<StreamApiException>().having((it) => it.code, 'code', 43)]);
       });
 
       test('is absent once a connection has been established', () async {
@@ -318,11 +318,11 @@ void main() {
         await tester.client.connect();
         await tester.pumpEventQueue();
 
-        expect(seen, [null, isA<StreamApiError>(), null]);
+        expect(seen, [null, isA<StreamApiException>(), null]);
       });
 
       test('is absent after a closure the server did not cause', () async {
-        final seen = <StreamApiError?>[];
+        final seen = <StreamApiException?>[];
         final tester = buildTester(
           // Declines, the way an authenticator with nothing left to offer does, which closes the
           // connection as `AuthenticationFailed`.
@@ -349,7 +349,7 @@ void main() {
         await tester.client.connect();
         await tester.pumpEventQueue();
 
-        expect(seen, [null, isA<StreamApiError>(), null]);
+        expect(seen, [null, isA<StreamApiException>(), null]);
       });
     });
 
@@ -367,7 +367,13 @@ void main() {
             isA<Disconnected>().having(
               (it) => it.source,
               'source',
-              isA<AuthenticationFailed>().having((it) => it.error, 'error', isStateError),
+              isA<AuthenticationFailed>().having(
+                (it) => it.error,
+                'error',
+                // Whatever the authenticator threw arrives as an authentication
+                // failure, with the original error preserved as its cause.
+                isA<StreamAuthenticationException>().having((it) => it.cause, 'cause', isStateError),
+              ),
             ),
           );
         },
@@ -410,9 +416,9 @@ void main() {
               (it) => it.source,
               'source',
               isA<ServerInitiated>().having(
-                (it) => it.error?.apiError?.code,
-                'apiError.code',
-                43,
+                (it) => it.error,
+                'error',
+                isA<StreamApiException>().having((it) => it.code, 'code', 43),
               ),
             ),
           );
@@ -785,7 +791,11 @@ void main() {
             isA<Disconnected>().having(
               (it) => it.source,
               'source',
-              isA<ServerInitiated>().having((it) => it.error?.error, 'error.error', isStateError),
+              isA<ServerInitiated>().having(
+                (it) => it.error,
+                'error',
+                isA<StreamNetworkException>().having((it) => it.cause, 'cause', isStateError),
+              ),
             ),
           );
         },
@@ -1087,10 +1097,12 @@ void main() {
     // rather than presenting the same token again.
     WebSocketAuthenticator authenticatorFor(TokenManager tokens) {
       return (send, previousError) async {
-        if (previousError?.isTokenExpiredError ?? false) {
+        if (previousError?.isTokenExpired ?? false) {
           tokens.expireToken();
           if (tokens.usesStaticProvider) {
-            throw ClientException(message: 'The token was refused and the provider has no other to give');
+            throw const StreamAuthenticationException(
+              message: 'The token was refused and the provider has no other to give',
+            );
           }
         }
 
@@ -1101,7 +1113,7 @@ void main() {
 
     test('is still answered for by the attempt after it, when the user has not changed', () {
       fakeAsync((async) {
-        final asked = <StreamApiError?>[];
+        final asked = <StreamApiException?>[];
         final tokens = TokenManager(
           userId: 'user-1',
           tokenProvider: TokenProvider.dynamic((id) async => generateTestUserToken(id)),
@@ -1128,7 +1140,7 @@ void main() {
 
         // Nothing replaced the credentials, so the refusal still describes what this attempt holds
         // and forgetting it would leave the same token offered again.
-        expect(asked, [null, isA<StreamApiError>().having((it) => it.code, 'code', 40)]);
+        expect(asked, [null, isA<StreamApiException>().having((it) => it.code, 'code', 40)]);
       });
     });
 

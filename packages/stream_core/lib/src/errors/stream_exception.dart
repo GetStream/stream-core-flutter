@@ -48,6 +48,9 @@ sealed class StreamException extends Equatable implements Exception {
 
   @override
   String toString() {
+    // The runtime type is the point here: it names the category (or the
+    // product subclass) in logs and crash reports.
+    // ignore: no_runtimetype_tostring
     final buffer = StringBuffer('$runtimeType: $message');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');
     return buffer.toString();
@@ -174,6 +177,7 @@ base class StreamApiException extends StreamException {
   @override
   String toString() {
     final code = this.code?.toString() ?? 'none';
+    // ignore: no_runtimetype_tostring
     final buffer = StringBuffer('$runtimeType(code: $code, statusCode: $statusCode): $message');
     if (moreInfo case final moreInfo?) buffer.write('\n  more info: $moreInfo');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');

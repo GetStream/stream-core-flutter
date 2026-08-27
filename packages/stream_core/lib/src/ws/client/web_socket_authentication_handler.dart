@@ -1,4 +1,4 @@
-import '../../errors.dart' show StreamApiError;
+import '../../errors.dart' show StreamApiException;
 import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_request.dart';
@@ -21,7 +21,7 @@ typedef WsRequestSender = Result<void> Function(WsRequest request);
 /// Throw when the credentials did not go out, whether because sending failed or because this
 /// function chose not to send them. The connection is then closed with [AuthenticationFailed], and
 /// is not reconnected.
-typedef WebSocketAuthenticator = Future<void> Function(WsRequestSender send, StreamApiError? previousError);
+typedef WebSocketAuthenticator = Future<void> Function(WsRequestSender send, StreamApiException? previousError);
 
 /// A handler that authenticates newly opened connections and remembers why the server refused the
 /// last one.
@@ -51,8 +51,8 @@ class WebSocketAuthenticationHandler {
   ///
   /// Becomes null once the attempt that read it finishes, or once a connection is established. An
   /// attempt abandoned before it finishes leaves it behind, for the attempt that replaces it.
-  StreamApiError? get previousError => _previousError;
-  StreamApiError? _previousError;
+  StreamApiException? get previousError => _previousError;
+  StreamApiException? _previousError;
 
   /// Takes in a connection state change.
   ///
@@ -67,8 +67,9 @@ class WebSocketAuthenticationHandler {
       Connected() => null,
       // The caller took control; what they connect with next may have nothing to do with the refusal.
       Disconnected(source: UserInitiated()) => null,
-      // The server closed without sending an error, so the last one still applies.
-      Disconnected(source: ServerInitiated(:final error)) => error?.apiError ?? _previousError,
+      // The server closed without sending an error, so the last one still applies. Only a verdict
+      // counts: a transport failure says nothing about the credentials.
+      Disconnected(source: ServerInitiated(:final StreamApiException error)) => error,
       _ => _previousError,
     };
   }
