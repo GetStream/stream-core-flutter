@@ -221,7 +221,7 @@ base class StreamNetworkException extends StreamException {
 
 /// Credentials that could not be produced or sent.
 ///
-/// Fires before anything reached the server: the token provider failed (its
+/// Raised before anything reaches the server: the token provider failed (its
 /// error is preserved in [cause]), no user is configured, or the WebSocket
 /// authentication message could not go out. A server that *rejected*
 /// credentials has answered — that is a [StreamApiException], see
