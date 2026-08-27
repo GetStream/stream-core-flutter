@@ -108,6 +108,21 @@ void main() {
       expect(result.exceptionOrNull(), same(_refused));
     });
 
+    test('maps an image upload without a thumbnail, the way the image endpoint responds', () async {
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({fileA: _succeeds(const UploadedFile(fileUrl: 'https://cdn/image'))}),
+      );
+
+      final result = await uploader.upload(_attachment('a', fileA, type: AttachmentType.image));
+
+      expect(
+        result.getOrNull(),
+        isA<UploadedAttachment>()
+            .having((it) => it.remoteUrl, 'remoteUrl', 'https://cdn/image')
+            .having((it) => it.thumbnailUrl, 'thumbnailUrl', isNull),
+      );
+    });
+
     test('routes an image through the image upload and everything else through the file one', () async {
       final cdn = _FakeCdn({fileA: _succeeds(), fileB: _succeeds()});
       final uploader = StreamAttachmentUploader(cdn: cdn);
@@ -160,6 +175,29 @@ void main() {
       expect(
         (await untouched).getOrNull(),
         isA<UploadedAttachment>().having((it) => it.id, 'id', 'b'),
+      );
+    });
+
+    test('a failed upload can be retried, the fresh attempt succeeding', () async {
+      var attempts = 0;
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({
+          fileA: () {
+            attempts += 1;
+            if (attempts == 1) return _fails()();
+            return _succeeds()();
+          },
+        }),
+      );
+      final attachment = _attachment('a', fileA);
+
+      final first = await uploader.upload(attachment);
+      expect(first.exceptionOrNull(), same(_refused));
+
+      final retried = await uploader.upload(attachment);
+      expect(
+        retried.getOrNull(),
+        isA<UploadedAttachment>().having((it) => it.remoteUrl, 'remoteUrl', 'https://cdn/file'),
       );
     });
 
@@ -234,6 +272,35 @@ void main() {
       });
 
       expect(order, ['b', 'a']);
+    });
+
+    test('holds uploads back until a slot frees up under maxConcurrent', () async {
+      final gate = Completer<Result<UploadedFile>>();
+      final started = <String>[];
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({
+          fileA: () {
+            started.add('a');
+            return gate.future;
+          },
+          fileB: () {
+            started.add('b');
+            return _succeeds()();
+          },
+        }),
+      );
+
+      final outcomes = uploader.uploadBatch(
+        [_attachment('a', fileA), _attachment('b', fileB)],
+        maxConcurrent: 1,
+      ).toList();
+
+      await pumpEventQueue();
+      expect(started, ['a']);
+
+      gate.complete(const Result.success(_uploadedFile));
+      await outcomes;
+      expect(started, ['a', 'b']);
     });
 
     test('reports the per-attachment progress under its id', () async {
