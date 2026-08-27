@@ -77,10 +77,12 @@ extension type const StreamErrorCode(int code) implements int {
   /// `48` – The server timed the request out.
   static const requestTimeout = StreamErrorCode(48);
 
-  /// `60` – The user is in a cooldown period.
+  /// `60` – The user must wait out the channel's cooldown before sending
+  /// another message.
   static const cooldown = StreamErrorCode(60);
 
-  /// `70` – The channel query's permission filters do not match.
+  /// `70` – Channels matching the query were withheld because the user lacks
+  /// access to them.
   static const queryChannelPermissionsMismatch = StreamErrorCode(70);
 
   /// `71` – The client has too many concurrent connections.
@@ -110,13 +112,15 @@ extension type const StreamErrorCode(int code) implements int {
   /// `101` – Joining the call failed.
   static const videoJoinCallFailure = StreamErrorCode(101);
 
-  /// `102` – The call query's permission filters do not match.
+  /// `102` – Calls matching the query were withheld because the user lacks
+  /// access to them.
   static const queryCallsPermissionsMismatch = StreamErrorCode(102);
 
   /// `103` – The call being accepted or rejected is gone.
   static const acceptRejectCallIsGone = StreamErrorCode(103);
 
-  /// `104` – The call-stats query's permission filters do not match.
+  /// `104` – Call stats matching the query were withheld because the user
+  /// lacks access to them.
   static const queryCallStatsPermissionsMismatch = StreamErrorCode(104);
 
   /// `105` – The operation is supported only in push v3.
