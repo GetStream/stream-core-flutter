@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -116,37 +117,29 @@ Duration? _parseRetryAfter(Response<Object?> response) {
   return Duration(seconds: seconds);
 }
 
-/// Runs an API [call] and returns its outcome, every failure a
-/// [StreamException].
+/// Runs a block of API code and returns a [Result] containing the outcome.
 ///
-/// The seam an API call crosses on its way to a caller: transport failures
-/// are unwrapped or mapped through [DioExceptionMapping.toStreamException],
-/// and anything else the call throws — a response body that would not decode
-/// included — becomes a [StreamClientException] with the original error
-/// preserved as its cause.
-///
-/// ```dart
-/// Future<Result<Channel>> queryChannel(String cid) {
-///   return runApiSafely(() async {
-///     final response = await _client.get('/channels/$cid');
-///     return Channel.fromJson(response.data);
-///   });
-/// }
-/// ```
-Future<Result<T>> runApiSafely<T>(Future<T> Function() call) async {
+/// If the block completes successfully, the result is a success with the value
+/// returned by the block. Otherwise, the failure is always a [StreamException]:
+/// a [DioException] is mapped through [DioExceptionMapping.toStreamException],
+/// a [StreamException] is kept as it was raised, and anything else — a
+/// response body that would not decode included — is wrapped in a
+/// [StreamClientException] with the original error preserved as its cause.
+Future<Result<R>> runApiSafely<R>(FutureOr<R> Function() block) async {
   try {
-    return Result.success(await call());
+    final result = await block();
+    return Result.success(result);
   } on DioException catch (e, stackTrace) {
     return Result.failure(e.toStreamException(), stackTrace);
   } on StreamException catch (e, stackTrace) {
     return Result.failure(e, stackTrace);
   } catch (e, stackTrace) {
-    // An interpretation seam: the call closure decodes wire data, where a
-    // thrown `TypeError` indicts the response rather than the program — a
-    // server that renamed a field must surface as a handleable failure.
-    return Result.failure(
-      StreamClientException(message: 'The API call failed unexpectedly', cause: e, stackTrace: stackTrace),
-      stackTrace,
+    final exception = StreamClientException(
+      message: 'The API call failed unexpectedly',
+      cause: e,
+      stackTrace: stackTrace,
     );
+
+    return Result.failure(exception, stackTrace);
   }
 }
