@@ -137,6 +137,10 @@ Stream.
 disposed client, passing another user's token — throws Dart's own `StateError`/`ArgumentError`.
 Those mean *fix your code*, not *handle at runtime*, and they never appear inside a `Result`.
 
+The naming follows the same line, and it is a signal to the catcher: a `…Exception` is a condition
+that catching is the right response to; the `Error` suffix is reserved for Dart's bug hierarchy and
+for non-throwable data models (`StreamApiError` is the server's wire payload, not a throwable).
+
 ## For SDK developers: you rarely construct one
 
 Only **boundaries** create `StreamException`s. Everything above a boundary propagates `Result`s that
