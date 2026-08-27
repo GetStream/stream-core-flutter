@@ -16,10 +16,9 @@ abstract interface class WebSocketEngine<Outgoing> {
   /// Creates a new WebSocket connection using the provided [options] and sets up
   /// event listeners.
   ///
-  /// Returns a [Result] indicating success or failure of the connection attempt.
+  /// Fails when a connection is already open. Call [close] before opening another.
   ///
-  /// Throws a [StateError] when a connection is already open — misuse rather
-  /// than a failed attempt. Call [close] before opening another.
+  /// Returns a [Result] indicating success or failure of the connection attempt.
   Future<Result<void>> open(WebSocketOptions options);
 
   /// Closes the WebSocket connection.

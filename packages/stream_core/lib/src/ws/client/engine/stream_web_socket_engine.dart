@@ -57,13 +57,11 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
 
   @override
   Future<Result<void>> open(WebSocketOptions options) {
-    // Misuse rather than a condition: opening over a live socket is a bug in
-    // the caller, so it fails loudly instead of dissolving into a failure.
-    if (_ws != null) {
-      throw StateError('WebSocket is already open. Call close() first.');
-    }
-
     return runSafely(() async {
+      if (_ws != null) {
+        throw StateError('WebSocket is already open. Call close() first.');
+      }
+
       // Create a new WebSocket connection.
       final ws = _ws = _wsProvider.call(options);
       _wsSubscription = ws.stream.listen(
