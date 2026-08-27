@@ -226,8 +226,11 @@ abstract interface class RetryPolicy {
 }
 ```
 
-Core ships `RetryPolicy.standard()` — honors `unrecoverable`, waits `retryAfter` on rate limits,
-exponential backoff with jitter on network failures — so most callers configure, not implement.
+Core ships two pieces of this: `StreamException.isRetriable`, the fact-level judgment (steps 1–2's
+error-only rows — necessary, but not sufficient, since it cannot know the operation's idempotency),
+and `RetryPolicy.standard()`, which composes it with an attempt budget. The policy answers
+*whether*; *when* comes from `retryAfter` where the server named a wait, and from the caller's
+backoff otherwise.
 
 One honesty rule about retrying writes: a `StreamNetworkException` means the outcome is **unknown**
 — the server may have performed the operation. Retry a write only through an idempotent path
