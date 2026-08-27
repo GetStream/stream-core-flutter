@@ -32,6 +32,22 @@ sealed class StreamException extends Equatable implements Exception {
     this.stackTrace,
   });
 
+  /// The [StreamException] that [error] represents.
+  ///
+  /// Kept as it is when [error] is one already, read out of a server error
+  /// payload when it is a [StreamApiError], and built by [orElse] otherwise —
+  /// the one judgment that differs per boundary.
+  factory StreamException.from(
+    Object error, {
+    required StreamException Function() orElse,
+  }) {
+    return switch (error) {
+      final StreamException exception => exception,
+      final StreamApiError apiError => StreamApiException.fromApiError(apiError),
+      _ => orElse(),
+    };
+  }
+
   /// What went wrong.
   ///
   /// Always present and developer-readable, but not localized and possibly

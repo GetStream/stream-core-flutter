@@ -93,7 +93,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       tag: '$tag:Auth',
       onFailure: (error) => disconnect(
         source: .authenticationFailed(
-          error: error.toStreamException(
+          error: StreamException.from(
+            error,
             orElse: () => StreamAuthenticationException(
               message: 'The connection could not be authenticated',
               cause: error,
@@ -203,7 +204,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     return result.getOrElse(
       (error, stackTrace) => disconnect(
         source: .serverInitiated(
-          error: error.toStreamException(
+          error: StreamException.from(
+            error,
             orElse: () => StreamNetworkException(
               message: 'Failed to open the connection',
               cause: error,
@@ -322,7 +324,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   void _handleErrorEvent(WsEvent event, Object error) {
     _logger.w(() => 'server sent an error event', error: error);
 
-    final exception = error.toStreamException(
+    final exception = StreamException.from(
+      error,
       orElse: () => StreamClientException(
         message: 'The server reported an error the client could not interpret',
         cause: error,
@@ -388,20 +391,5 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     await _connectionStateEmitter.close();
 
     return super.dispose();
-  }
-}
-
-// Maps what the engine, the server, or the authenticator reported onto the
-// exception it represents.
-extension on Object {
-  // This failure as the [StreamException] it represents: kept when it is one
-  // already, read out of a server error payload, and [orElse] otherwise —
-  // the one judgment that differs per boundary.
-  StreamException toStreamException({required StreamException Function() orElse}) {
-    return switch (this) {
-      final StreamException exception => exception,
-      final StreamApiError apiError => StreamApiException.fromApiError(apiError),
-      _ => orElse(),
-    };
   }
 }

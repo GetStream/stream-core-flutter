@@ -47,6 +47,19 @@ void main() {
       );
     });
 
+    test('from keeps one of ours, lifts a payload, and falls back otherwise', () {
+      const ours = StreamAuthenticationException(message: 'no token');
+      final payload = _apiError();
+      StreamException fallback() => const StreamClientException(message: 'unexpected');
+
+      expect(StreamException.from(ours, orElse: fallback), same(ours));
+      expect(
+        StreamException.from(payload, orElse: fallback),
+        isA<StreamApiException>().having((it) => it.apiError, 'apiError', same(payload)),
+      );
+      expect(StreamException.from(StateError('bug'), orElse: fallback), isA<StreamClientException>());
+    });
+
     test('prints its kind, its message and its cause', () {
       const exception = StreamClientException(
         message: 'the event would not decode',
