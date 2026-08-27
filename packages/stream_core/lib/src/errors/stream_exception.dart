@@ -43,13 +43,11 @@ sealed class StreamException extends Equatable implements Exception {
   /// final exception = StreamException.tryFrom(error) ??
   ///     StreamNetworkException(message: 'Failed to open the connection', cause: error);
   /// ```
-  static StreamException? tryFrom(Object error) {
-    return switch (error) {
-      final StreamException exception => exception,
-      final StreamApiError apiError => StreamApiException.fromApiError(apiError),
-      _ => null,
-    };
-  }
+  static StreamException? tryFrom(Object? error) => switch (error) {
+    final StreamException exception => exception,
+    final StreamApiError apiError => StreamApiException.fromApiError(apiError),
+    _ => null,
+  };
 
   /// What went wrong.
   ///
