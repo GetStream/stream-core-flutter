@@ -42,7 +42,7 @@ class WebSocketAuthenticationHandler {
 
   final WebSocketAuthenticator? _authenticator;
   final WsRequestSender _send;
-  final void Function(Object error) _onFailure;
+  final void Function(Object error, StackTrace? stackTrace) _onFailure;
 
   // Identifies the attempt in flight: an authenticator can outlive the one that started it.
   var _attempt = 0;
@@ -104,7 +104,7 @@ class WebSocketAuthenticationHandler {
 
     if (result case Failure(:final error, :final stackTrace)) {
       _logger.w(() => 'attempt #$attempt could not be authenticated', error: error, stackTrace: stackTrace);
-      return _onFailure(error);
+      return _onFailure(error, stackTrace);
     }
   }
 
