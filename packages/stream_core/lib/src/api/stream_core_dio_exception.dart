@@ -130,7 +130,8 @@ Future<Result<R>> runApiSafely<R>(FutureOr<R> Function() block) async {
     final result = await block();
     return Result.success(result);
   } on DioException catch (e, stackTrace) {
-    return Result.failure(e.toStreamException(), stackTrace);
+    final exception = e.toStreamException();
+    return Result.failure(exception, stackTrace);
   } on StreamException catch (e, stackTrace) {
     return Result.failure(e, stackTrace);
   } catch (e, stackTrace) {

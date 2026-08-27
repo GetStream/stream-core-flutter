@@ -92,7 +92,14 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       authenticator: onAuthenticate,
       tag: '$tag:Auth',
       onFailure: (error) => disconnect(
-        source: .authenticationFailed(error: _asAuthenticationFailure(error)),
+        source: .authenticationFailed(
+          error: error.toStreamException(
+            orElse: () => StreamAuthenticationException(
+              message: 'The connection could not be authenticated',
+              cause: error,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -195,34 +202,17 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // even when the close fails. Returned, so a caller connecting again is not refused for the race.
     return result.getOrElse(
       (error, stackTrace) => disconnect(
-        source: .serverInitiated(error: _asOpenFailure(error, stackTrace)),
+        source: .serverInitiated(
+          error: error.toStreamException(
+            orElse: () => StreamNetworkException(
+              message: 'Failed to open the connection',
+              cause: error,
+              stackTrace: stackTrace,
+            ),
+          ),
+        ),
       ),
     );
-  }
-
-  // The engine reports whatever the transport threw; an attempt that never
-  // became usable is a network failure unless it already speaks for itself.
-  StreamException _asOpenFailure(Object error, StackTrace? stackTrace) {
-    return switch (error) {
-      final StreamException exception => exception,
-      _ => StreamNetworkException(
-        message: 'Failed to open the connection',
-        cause: error,
-        stackTrace: stackTrace,
-      ),
-    };
-  }
-
-  // Credentials never went out — an authentication failure, unless the
-  // authenticator already reported one of our own.
-  StreamException _asAuthenticationFailure(Object error) {
-    return switch (error) {
-      final StreamException exception => exception,
-      _ => StreamAuthenticationException(
-        message: 'The connection could not be authenticated',
-        cause: error,
-      ),
-    };
   }
 
   /// Closes the WebSocket connection.
@@ -332,16 +322,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   void _handleErrorEvent(WsEvent event, Object error) {
     _logger.w(() => 'server sent an error event', error: error);
 
-    // A server error event is a verdict — the same payload a rejected REST
-    // call carries, delivered over the socket instead.
-    final exception = switch (error) {
-      final StreamException exception => exception,
-      final StreamApiError apiError => StreamApiException.fromApiError(apiError),
-      _ => StreamClientException(
+    final exception = error.toStreamException(
+      orElse: () => StreamClientException(
         message: 'The server reported an error the client could not interpret',
         cause: error,
       ),
-    };
+    );
 
     final source = ServerInitiated(error: exception);
     return unawaited(disconnect(source: source));
@@ -402,5 +388,20 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     await _connectionStateEmitter.close();
 
     return super.dispose();
+  }
+}
+
+// Maps what the engine, the server, or the authenticator reported onto the
+// exception it represents.
+extension on Object {
+  // This failure as the [StreamException] it represents: kept when it is one
+  // already, read out of a server error payload, and [orElse] otherwise —
+  // the one judgment that differs per boundary.
+  StreamException toStreamException({required StreamException Function() orElse}) {
+    return switch (this) {
+      final StreamException exception => exception,
+      final StreamApiError apiError => StreamApiException.fromApiError(apiError),
+      _ => orElse(),
+    };
   }
 }
