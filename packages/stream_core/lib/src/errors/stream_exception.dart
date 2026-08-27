@@ -122,8 +122,9 @@ base class StreamApiException extends StreamException {
 
   /// Whether the server declared that retrying will not help.
   ///
-  /// Authoritative when `true`. `false` only means the server said nothing —
-  /// it must not be read as "retrying will help".
+  /// Only Video sets this as a deliberate retry signal, so it is only worth
+  /// consulting there. Authoritative when `true`; `false` only means the
+  /// server said nothing — it must not be read as "retrying will help".
   final bool unrecoverable;
 
   /// How long the server asked to wait before retrying, when it named a wait.

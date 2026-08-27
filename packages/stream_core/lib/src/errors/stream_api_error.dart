@@ -59,6 +59,11 @@ class StreamApiError extends Equatable {
   final int statusCode;
 
   /// Whether this error is unrecoverable and should not be retried.
+  ///
+  /// Only Video sets this as a deliberate retry signal, so it is only worth
+  /// consulting there. Absence means nothing anywhere: most errors never
+  /// carry it, and `null` or `false` must not be read as "retrying will
+  /// help".
   final bool? unrecoverable;
 
   Map<String, dynamic> toJson() => _$StreamApiErrorToJson(this);
