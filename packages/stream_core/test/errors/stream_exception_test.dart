@@ -124,7 +124,23 @@ void main() {
 
       expect(exception.code, isNull);
       expect(exception.apiError, isNull);
-      expect(exception.toString(), contains('code: none'));
+      expect(exception.toString(), isNot(contains('code:')));
+      expect(exception.toString(), contains('(statusCode: 504)'));
+    });
+
+    test('prints the facts that change what a caller does next', () {
+      const exception = StreamApiException(
+        message: 'Too many requests',
+        statusCode: 429,
+        code: StreamErrorCode.rateLimited,
+        unrecoverable: true,
+        retryAfter: Duration(seconds: 7),
+      );
+
+      final printed = exception.toString();
+
+      expect(printed, contains('unrecoverable'));
+      expect(printed, contains('retryAfter: 7s'));
     });
 
     test('prints the facts a support ticket needs', () {
@@ -148,6 +164,16 @@ void main() {
       expect(exception.isCancelled, isFalse);
       expect(exception.isTimeout, isFalse);
       expect(exception.closeCode, isNull);
+    });
+
+    test('prints the close code when the failure was a socket closure', () {
+      const closed = StreamNetworkException(
+        message: 'The connection was closed unexpectedly',
+        closeCode: CloseCode.abnormalClosure,
+      );
+
+      expect(closed.toString(), contains('(closeCode: 1006)'));
+      expect(const StreamNetworkException(message: 'offline').toString(), isNot(contains('closeCode')));
     });
 
     test('a different fact is a different failure', () {

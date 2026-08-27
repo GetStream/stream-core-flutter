@@ -94,22 +94,24 @@ base class StreamApiException extends StreamException {
   });
 
   /// Creates a [StreamApiException] from the server's error payload.
-  StreamApiException.fromApiError(
+  factory StreamApiException.fromApiError(
     StreamApiError error, {
     Duration? retryAfter,
     Object? cause,
     StackTrace? stackTrace,
-  }) : this(
-         message: error.message,
-         statusCode: error.statusCode,
-         code: error.code,
-         moreInfo: error.moreInfo.isEmpty ? null : error.moreInfo,
-         unrecoverable: error.unrecoverable ?? false,
-         retryAfter: retryAfter,
-         apiError: error,
-         cause: cause,
-         stackTrace: stackTrace,
-       );
+  }) {
+    return StreamApiException(
+      message: error.message,
+      statusCode: error.statusCode,
+      code: error.code,
+      moreInfo: error.moreInfo.isEmpty ? null : error.moreInfo,
+      unrecoverable: error.unrecoverable ?? false,
+      retryAfter: retryAfter,
+      apiError: error,
+      cause: cause,
+      stackTrace: stackTrace,
+    );
+  }
 
   /// The HTTP status the server answered with.
   ///
@@ -188,9 +190,15 @@ base class StreamApiException extends StreamException {
 
   @override
   String toString() {
-    final code = this.code?.toString() ?? 'none';
+    final facts = [
+      if (code case final code?) 'code: $code',
+      'statusCode: $statusCode',
+      if (unrecoverable) 'unrecoverable',
+      if (retryAfter case final retryAfter?) 'retryAfter: ${retryAfter.inSeconds}s',
+    ];
+
     final name = _typeName(this, 'StreamApiException');
-    final buffer = StringBuffer('$name(code: $code, statusCode: $statusCode): $message');
+    final buffer = StringBuffer('$name(${facts.join(', ')}): $message');
     if (moreInfo case final moreInfo?) buffer.write('\n  more info: $moreInfo');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');
     return buffer.toString();
@@ -234,7 +242,17 @@ base class StreamNetworkException extends StreamException {
   List<Object?> get props => [...super.props, isCancelled, isTimeout, closeCode];
 
   @override
-  String toString() => _toString('StreamNetworkException');
+  String toString() {
+    final name = _typeName(this, 'StreamNetworkException');
+    final closure = switch (closeCode) {
+      final closeCode? => '(closeCode: $closeCode)',
+      _ => '',
+    };
+
+    final buffer = StringBuffer('$name$closure: $message');
+    if (cause case final cause?) buffer.write('\n  caused by: $cause');
+    return buffer.toString();
+  }
 }
 
 /// Credentials that could not be produced or sent.
