@@ -20,7 +20,7 @@ StreamApiError _$StreamApiErrorFromJson(Map<String, dynamic> json) => StreamApiE
 );
 
 Map<String, dynamic> _$StreamApiErrorToJson(StreamApiError instance) => <String, dynamic>{
-  'code': instance.code.toJson(),
+  'code': StreamErrorCode.toJson(instance.code),
   'details': instance.details,
   'duration': instance.duration,
   'exception_fields': instance.exceptionFields,

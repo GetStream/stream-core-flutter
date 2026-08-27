@@ -9,14 +9,14 @@
 /// A code identifies the *condition*; the HTTP status it arrives with can
 /// vary, so neither is derivable from the other.
 extension type const StreamErrorCode(int code) implements int {
-  /// Creates a [StreamErrorCode] from a JSON number.
+  /// Create a new instance from a json number.
   ///
   /// Accepts any [num] the way every int field does, so an integral double
   /// reads as its number instead of failing the whole error.
-  factory StreamErrorCode.fromJson(num json) => StreamErrorCode(json.toInt());
+  static StreamErrorCode fromJson(num code) => StreamErrorCode(code.toInt());
 
-  /// This code as a JSON number.
-  int toJson() => this;
+  /// Serialize to json number.
+  static int toJson(StreamErrorCode code) => code;
 
   /// `-1` – An unexpected server-side failure.
   static const internalError = StreamErrorCode(-1);
@@ -155,29 +155,35 @@ extension type const StreamErrorCode(int code) implements int {
 
   /// `112` – Feeds storage is unavailable.
   static const feedsStorageUnavailable = StreamErrorCode(112);
+}
 
-  /// Whether this code says the token has expired ([tokenExpired]).
+/// Convenience predicates grouping the codes that share a remedy.
+extension StreamErrorCodePredicates on StreamErrorCode {
+  /// Whether this code says the token has expired
+  /// ([StreamErrorCode.tokenExpired]).
   ///
   /// A fresh token fixes it.
-  bool get isTokenExpired => this == tokenExpired;
+  bool get isTokenExpired => this == .tokenExpired;
 
-  /// Whether this code says the token is not valid yet ([tokenNotValidYet]
-  /// and [tokenUsedBeforeIssuedAt]).
+  /// Whether this code says the token is not valid yet
+  /// ([StreamErrorCode.tokenNotValidYet] and
+  /// [StreamErrorCode.tokenUsedBeforeIssuedAt]).
   ///
   /// A clock-skew condition on the token's `nbf`/`iat` claims: waiting fixes
   /// it, a fresh token minted by the same skewed clock does not.
-  bool get isTokenNotYetValid => this == tokenNotValidYet || this == tokenUsedBeforeIssuedAt;
+  bool get isTokenNotYetValid => this == .tokenNotValidYet || this == .tokenUsedBeforeIssuedAt;
 
   /// Whether this code says the token's signature cannot be accepted
-  /// ([tokenSignatureInvalid]).
+  /// ([StreamErrorCode.tokenSignatureInvalid]).
   ///
   /// A configuration problem — signed with the wrong secret. Neither waiting
   /// nor a fresh token from the same signer fixes it.
-  bool get isTokenSignatureInvalid => this == tokenSignatureInvalid;
+  bool get isTokenSignatureInvalid => this == .tokenSignatureInvalid;
 
-  /// Whether this code says the API key cannot be accepted ([apiKeyInvalid]).
+  /// Whether this code says the API key cannot be accepted
+  /// ([StreamErrorCode.apiKeyInvalid]).
   ///
   /// The key is unknown, or the product it addresses is not enabled for the
   /// app. A configuration problem no token fixes.
-  bool get isApiKeyInvalid => this == apiKeyInvalid;
+  bool get isApiKeyInvalid => this == .apiKeyInvalid;
 }

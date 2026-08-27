@@ -32,6 +32,7 @@ class StreamApiError extends Equatable {
   ///
   /// [StreamErrorCode] names the known values; a code without a named
   /// constant still carries its number.
+  @JsonKey(fromJson: StreamErrorCode.fromJson, toJson: StreamErrorCode.toJson)
   final StreamErrorCode code;
 
   /// Additional error detail codes providing more context.
