@@ -152,12 +152,15 @@ void main() {
   });
 
   group('StreamSplitButton layout', () {
-    testWidgets('matches the design: 81x48 control over an 81x40 surface', (tester) async {
+    testWidgets('matches the design: 89x48 control over an 81x40 surface', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(_splitButton(style: .secondary, onPressed: () {}, onTrailingPressed: () {})),
       );
 
-      expect(tester.getSize(find.byType(StreamSplitButton)), const Size(81, 48));
+      // The control is wider than the surface it paints: the same 4pt inset
+      // that lets the tap targets overhang the surface vertically is mirrored
+      // horizontally, so neighbouring widgets do not butt against the ends.
+      expect(tester.getSize(find.byType(StreamSplitButton)), const Size(89, 48));
       expect(tester.getSize(_surfaceFinder()), const Size(81, 40));
 
       final halves = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(StreamButton));
