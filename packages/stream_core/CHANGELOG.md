@@ -1,6 +1,6 @@
 ## Upcoming
 
-### 💥 BREAKING CHANGES
+### 🛑 Breaking / Removals
 
 - Raised the minimum Dart SDK to `^3.12.0`
 - Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
@@ -43,7 +43,7 @@
 
 ### 🐛 Bug Fixes
 
-- Fixed `StreamApiError` failing to decode when the backend serializes `details` as an object rather than a list, which it does on some errors for compatibility reasons; anything that is not a list of numbers now reads as empty instead of failing the whole error
+- Fixed `StreamApiError` failing to decode when `details` carries anything other than a list of numbers, as a moderation rejection's does; such values now read as empty instead of failing the whole error
 - Fixed three faults in `TokenManager`'s token cache: `getToken` contacted the provider on every call instead of returning the cached token, handed out a token that had already expired rather than replacing it, and cached one that finished loading after `expireToken` or `setTokenProvider` had invalidated it. A static provider is left alone, having nothing fresher to give
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 - Fixed several faults in the token-expired retry: it was skipped when the response carried no JSON content type, never completed at all when the replacement was refused too, re-sent a multipart body whose streams the refused attempt had consumed, and expired a token another request had already replaced

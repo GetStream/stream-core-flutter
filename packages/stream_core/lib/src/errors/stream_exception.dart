@@ -20,8 +20,8 @@ import 'stream_api_error.dart';
 ///
 /// Programmer mistakes are not part of this hierarchy: misusing the SDK —
 /// sending before connecting, using a disposed client — throws Dart's own
-/// [StateError] or [ArgumentError], which mean *fix your code*, not *handle at
-/// runtime*.
+/// [StateError] or [ArgumentError], which signal a programming error rather
+/// than a condition to handle at runtime.
 sealed class StreamException extends Equatable implements Exception {
   /// Creates a [StreamException].
   const StreamException({
@@ -32,9 +32,10 @@ sealed class StreamException extends Equatable implements Exception {
 
   /// What went wrong.
   ///
-  /// Always present and developer-readable. It is not localized and may
-  /// contain server-internal detail — for user-facing UI, key your own
-  /// strings off [StreamApiException.code] instead of displaying it verbatim.
+  /// Always present and developer-readable, but not localized and possibly
+  /// carrying server-internal detail. For user-facing UI, consider keying
+  /// localized strings off [StreamApiException.code] rather than displaying
+  /// this verbatim.
   final String message;
 
   /// The failure underneath this one, when this exception wraps another.
@@ -99,12 +100,13 @@ base class StreamApiException extends StreamException {
   /// The HTTP status the server answered with.
   ///
   /// Independent of [code]: the same code can arrive with different statuses,
-  /// so never derive one from the other.
+  /// so neither can be derived from the other.
   final int statusCode;
 
   /// Stream's stable error code.
   ///
-  /// The machine-readable discriminator — branch on this, never on [message].
+  /// The machine-readable discriminator — the value to branch on, where
+  /// [message] is not stable.
   ///
   /// `null` when the response carried no Stream error payload, as when an
   /// intermediary answered with an error of its own.
@@ -132,6 +134,12 @@ base class StreamApiException extends StreamException {
   /// `null` when only a bare status was available, as when an intermediary
   /// answered with an error of its own.
   final StreamApiError? apiError;
+
+  static const _codeApiKeyInvalid = 2;
+  static const _codeTokenExpired = 40;
+  static const _codeTokenNotValidYet = 41;
+  static const _codeTokenUsedBeforeIssuedAt = 42;
+  static const _codeTokenSignatureInvalid = 43;
 
   /// Whether the token this request carried has expired (code 40).
   ///
@@ -162,12 +170,6 @@ base class StreamApiException extends StreamException {
   /// [retryAfter] carries the server's suggested wait when one was sent.
   bool get isRateLimited => statusCode == 429;
 
-  static const _codeApiKeyInvalid = 2;
-  static const _codeTokenExpired = 40;
-  static const _codeTokenNotValidYet = 41;
-  static const _codeTokenUsedBeforeIssuedAt = 42;
-  static const _codeTokenSignatureInvalid = 43;
-
   @override
   List<Object?> get props => [...super.props, statusCode, code, moreInfo, unrecoverable, retryAfter];
 
@@ -185,8 +187,8 @@ base class StreamApiException extends StreamException {
 /// A request or connection that never got a verdict from the server.
 ///
 /// The outcome is **unknown**: the server may have received and performed the
-/// operation before the connection failed. Retry a write only through an
-/// idempotent path.
+/// operation before the connection failed. Consider retrying a write only
+/// through an idempotent path.
 base class StreamNetworkException extends StreamException {
   /// Creates a [StreamNetworkException].
   const StreamNetworkException({
@@ -211,8 +213,8 @@ base class StreamNetworkException extends StreamException {
   ///
   /// Carries little signal on its own: a connection can close with a normal
   /// code even when something went wrong, with the reason reported separately
-  /// as a [StreamApiException]. Classify by the exception kind and its code
-  /// rather than by the close code.
+  /// as a [StreamApiException]. The exception kind and its code are the
+  /// reliable classifiers; the close code is not.
   final int? closeCode;
 
   @override
@@ -239,7 +241,8 @@ base class StreamAuthenticationException extends StreamException {
 ///
 /// Wire data that would not decode, an invariant that did not hold, or an
 /// error thrown by app-supplied code the SDK ran on the caller's behalf. Not
-/// the end user's problem — report it to a crash tracker.
+/// the end user's problem — worth reporting to a crash tracker rather than
+/// showing in UI.
 base class StreamClientException extends StreamException {
   /// Creates a [StreamClientException].
   const StreamClientException({

@@ -144,8 +144,8 @@ class TokenManager {
   ///
   /// Fails with a [StreamAuthenticationException] when no identity is configured, when [reset] runs
   /// while the token is loading, or when the [TokenProvider] fails — whatever the provider threw is
-  /// preserved as the exception's `cause`. Fails with an [ArgumentError] when the provider returns
-  /// a token that does not belong to the user it was loading for.
+  /// preserved as the exception's [StreamException.cause]. Fails with an [ArgumentError] when the
+  /// provider returns a token that does not belong to the user it was loading for.
   Future<UserToken> getToken() async {
     final cached = peekToken();
     if (cached != null && !_isSpent(cached)) return cached;

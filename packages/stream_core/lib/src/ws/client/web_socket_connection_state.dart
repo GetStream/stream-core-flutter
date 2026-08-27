@@ -278,7 +278,7 @@ sealed class DisconnectionSource extends Equatable {
   /// - [ServerInitiated] — decided by the error it carries:
   ///   - no error — yes, the closure said nothing against trying again.
   ///   - a server verdict ([StreamApiException]) — no when the server said retrying will not help
-  ///     (`unrecoverable`), when the token's signature or the API key is refused (configuration a
+  ///     ([StreamApiException.unrecoverable]), when the token's signature or the API key is refused (configuration a
   ///     retry reproduces), or for any other 4xx. Yes for an expired token (the reconnect
   ///     authenticates with a fresh one), a token not valid yet (clock skew a later attempt can get
   ///     past), a rate limit, and 5xx.
@@ -389,8 +389,8 @@ final class AuthenticationFailed extends DisconnectionSource {
 
   /// The error that prevented the connection from authenticating.
   ///
-  /// Usually a [StreamAuthenticationException] whose `cause` is whatever the
-  /// authenticator threw.
+  /// Usually a [StreamAuthenticationException] whose [StreamException.cause]
+  /// is whatever the authenticator threw.
   final StreamException? error;
 
   @override
