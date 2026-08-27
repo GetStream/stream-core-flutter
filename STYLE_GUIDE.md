@@ -374,7 +374,7 @@ Public dartdocs are encouraged but currently **not lint-enforced**
 while the repo catches up). New public code should still ship with dartdocs.
 
 In general, follow the Effective Dart documentation guide — vendored in this repo as
-[`EFFECTIVE_DART_DOCUMENTATION.md`](EFFECTIVE_DART_DOCUMENTATION.md) so it is readable offline
+[`EFFECTIVE_DART_DOC.md`](EFFECTIVE_DART_DOC.md) so it is readable offline
 (canonical version at [dart.dev](https://dart.dev/effective-dart/documentation)) — except where
 this page contradicts it. Read it before writing or reviewing dartdoc: the rules most often
 missed are single-sentence first paragraphs, "Whether…" for booleans, noun phrases for
