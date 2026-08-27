@@ -175,4 +175,44 @@ void main() {
       expect(wrapped.toStreamException(), same(loose));
     });
   });
+
+  group('runApiSafely', () {
+    test('returns the call result on success', () async {
+      final result = await runApiSafely(() async => 'ok');
+
+      expect(result, const Result.success('ok'));
+    });
+
+    test('maps a transport failure onto the exception it represents', () async {
+      final result = await runApiSafely<void>(
+        () async => throw _failure(body: _errorBody(), statusCode: 401),
+      );
+
+      expect(
+        result.exceptionOrNull(),
+        isA<StreamApiException>().having((it) => it.code, 'code', 40),
+      );
+    });
+
+    test('keeps a Stream exception as it was raised', () async {
+      const raised = StreamAuthenticationException(message: 'no token');
+      final result = await runApiSafely<void>(() async => throw raised);
+
+      expect(result.exceptionOrNull(), same(raised));
+    });
+
+    test('reports a response that would not decode as an SDK failure', () async {
+      // The call closure decodes wire data; a server that renamed a field
+      // throws a TypeError there, which must surface as a handleable failure.
+      final result = await runApiSafely<int>(() async {
+        const Object renamed = 'not an int';
+        return renamed as int;
+      });
+
+      expect(
+        result.exceptionOrNull(),
+        isA<StreamClientException>().having((it) => it.cause, 'cause', isA<TypeError>()),
+      );
+    });
+  });
 }
