@@ -392,6 +392,19 @@ void main() {
       expect(result.exceptionOrNull(), same(_refused));
     });
 
+    test('without eagerError, succeeds with only what uploaded, skipping the failures', () async {
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({fileA: _succeeds(), fileB: _fails()}),
+      );
+
+      final result = await uploader.uploadAll(
+        [_attachment('a', fileA), _attachment('b', fileB)],
+        eagerError: false,
+      );
+
+      expect(result.getOrNull()?.map((it) => it.id), ['a']);
+    });
+
     test('fails as one with the cancelled failure when an upload is called off', () async {
       final cancelToken = CancelToken();
       final uploader = StreamAttachmentUploader(

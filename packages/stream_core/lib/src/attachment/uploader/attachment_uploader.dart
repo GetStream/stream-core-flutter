@@ -150,14 +150,17 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
 
   /// Uploads multiple attachments and returns every outcome as one [Result].
   ///
-  /// A success carries every [UploadedAttachment]; the first failure to
-  /// complete becomes the result's, and uploads already in flight are not
-  /// awaited further. Progress updates are provided through the optional
-  /// [onProgress] callback.
+  /// When [eagerError] is true (default), the first failure to complete
+  /// becomes the result's, and uploads already in flight are not awaited
+  /// further. When false, failed uploads are skipped and the success carries
+  /// only the attachments that made it, leaving the rest to a later attempt.
+  ///
+  /// Progress updates are provided through the optional [onProgress] callback.
   Future<Result<List<UploadedAttachment>>> uploadAll(
     Iterable<StreamAttachment> attachments, {
     OnBatchUploadProgress? onProgress,
     int maxConcurrent = 5,
+    bool eagerError = true,
   }) async {
     final uploaded = <UploadedAttachment>[];
 
@@ -168,12 +171,10 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
     );
 
     await for (final (attachmentId: _, :result) in outcomes) {
-      switch (result) {
-        case Success(:final data):
-          uploaded.add(data);
-        case final Failure failure:
-          return failure;
-      }
+      // If eagerError is enabled, fail as one with the first failure
+      if (result case Failure() when eagerError) return result;
+
+      result.onSuccess(uploaded.add);
     }
 
     return Result.success(uploaded);
