@@ -1,4 +1,4 @@
-import '../../errors.dart' show StreamApiException;
+import '../../errors.dart' show StreamApiException, StreamNetworkException;
 import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_request.dart';
@@ -112,7 +112,9 @@ class WebSocketAuthenticationHandler {
   WsRequestSender _senderFor(int attempt) => (request) {
     if (attempt == _attempt) return _send(request);
 
-    final error = StateError('Connection attempt was abandoned before its credentials were sent');
-    return Result.failure(error);
+    const error = StreamNetworkException(
+      message: 'The connection attempt was abandoned before its credentials were sent',
+    );
+    return const Result.failure(error);
   };
 }

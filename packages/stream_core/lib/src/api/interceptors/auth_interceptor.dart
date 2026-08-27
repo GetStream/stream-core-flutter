@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import '../../errors.dart';
 import '../../logger.dart';
 import '../../user.dart';
-import '../stream_core_dio_error.dart';
+import '../stream_core_dio_exception.dart';
 
 /// Interceptor that signs every request with the caller's token.
 ///

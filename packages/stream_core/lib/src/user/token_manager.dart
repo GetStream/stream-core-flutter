@@ -144,9 +144,9 @@ class TokenManager {
   /// identity that replaced it.
   ///
   /// Fails with a [StreamAuthenticationException] when no identity is configured, when [reset] runs
-  /// while the token is loading, or when the [TokenProvider] fails — whatever the provider threw is
-  /// preserved as the exception's [StreamException.cause]. Fails with an [ArgumentError] when the
-  /// provider returns a token that does not belong to the user it was loading for.
+  /// while the token is loading, and when the [TokenProvider] fails — whatever the provider threw is
+  /// preserved as the exception's [StreamException.cause] — or returns a token that does not belong
+  /// to the user it was loading for.
   Future<UserToken> getToken() async {
     final cached = peekToken();
     if (cached != null && !_isSpent(cached)) return cached;
@@ -177,7 +177,11 @@ class TokenManager {
     // Both built-in providers check this, but a custom one need not: caching another user's token
     // would authenticate every later request as them.
     if (updatedToken.userId != loadingFor) {
-      throw ArgumentError('User ID mismatch: expected "$loadingFor", got "${updatedToken.userId}"');
+      throw StreamAuthenticationException(
+        message:
+            'The token provider returned a token for user "${updatedToken.userId}" '
+            'while loading one for user "$loadingFor"',
+      );
     }
 
     // `setTokenProvider` or `expireToken` may have run while this loaded, in which case the token

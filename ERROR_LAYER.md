@@ -134,7 +134,7 @@ branch, `error.message` is always displayable and `on StreamException` always ca
 Stream.
 
 **Bugs are not in this hierarchy.** Misusing the SDK — calling `send()` before `connect()`, using a
-disposed client, passing another user's token — throws Dart's own `StateError`/`ArgumentError`.
+disposed client — throws Dart's own `StateError`/`ArgumentError`.
 Those mean *fix your code*, not *handle at runtime*, and they never appear inside a `Result`.
 
 The naming follows the same line, and it is a signal to the catcher: a `…Exception` is a condition

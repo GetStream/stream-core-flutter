@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../stream_core_dio_error.dart';
+import '../stream_core_dio_exception.dart';
 
 /// Interceptor that maps every failed request onto a [StreamDioException]
 /// carrying the `StreamException` it represents.

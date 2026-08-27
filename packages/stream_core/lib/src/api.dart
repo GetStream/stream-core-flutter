@@ -4,7 +4,7 @@ export 'api/interceptors/auth_interceptor.dart';
 export 'api/interceptors/connection_id_interceptor.dart';
 export 'api/interceptors/headers_interceptor.dart';
 export 'api/interceptors/logging_interceptor.dart';
-export 'api/stream_core_dio_error.dart';
+export 'api/stream_core_dio_exception.dart';
 export 'api/stream_core_http_client.dart';
 export 'api/stream_datetime_converter.dart';
 export 'api/system_environment.dart';

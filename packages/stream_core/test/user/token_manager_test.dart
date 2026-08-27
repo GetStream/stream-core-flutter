@@ -453,7 +453,7 @@ void main() {
           tokenProvider: _CountingProvider((_) async => generateTestUserToken('someone-else')),
         );
 
-        await expectLater(manager.getToken(), throwsArgumentError);
+        await expectLater(manager.getToken(), throwsA(isA<StreamAuthenticationException>()));
         expect(manager.peekToken(), isNull);
       });
     });

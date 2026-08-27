@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../errors.dart' show StreamNetworkException;
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -130,7 +131,9 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     return runSafelySync(() {
       final ws = _ws;
       if (ws == null) {
-        throw StateError('WebSocket is not open. Call open() first.');
+        // A condition, not misuse: a correct caller can race a connection
+        // that dropped between deciding to send and sending.
+        throw const StreamNetworkException(message: 'The connection is not open, so nothing was sent');
       }
 
       final data = _messageCodec.encode(message);

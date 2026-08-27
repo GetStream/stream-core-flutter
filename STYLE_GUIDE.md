@@ -591,7 +591,7 @@ runtime?*
 
 | Answer | Raise | Examples |
 |---|---|---|
-| No — the caller misused the API | `StateError` / `ArgumentError`, never wrapped, never inside a `Result` | `connect()` on a disposed client, a token issued for another user |
+| No — the caller misused the API | `StateError` / `ArgumentError`, never wrapped, never inside a `Result` | `connect()` on a disposed client, a negative replay count |
 | Yes — it is a condition to handle | the fitting `StreamException` kind | a refused request, a dropped socket, a failed token load |
 
 Which of the four `StreamException` kinds fits — and which layer produces which — is

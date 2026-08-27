@@ -13,26 +13,14 @@ import 'uploaded_attachment.dart';
 /// Receives the upload [progress] as a value between 0.0 and 1.0.
 typedef OnUploadProgress = void Function(double progress);
 
-/// Exception thrown when an attachment upload fails.
+/// The outcome of one attachment's upload within a batch, paired with the
+/// attachment it belongs to.
 ///
-/// Provides context about which specific attachment failed and the underlying
-/// cause for debugging upload issues.
-class AttachmentUploadException implements Exception {
-  /// Creates an [AttachmentUploadException] with the specified [id] and [cause].
-  const AttachmentUploadException({
-    required this.id,
-    required this.cause,
-  });
-
-  /// The ID of the attachment that failed to upload.
-  final String id;
-
-  /// The underlying cause of the upload failure.
-  final Object cause;
-
-  @override
-  String toString() => 'AttachmentUploadException(id: $id, cause: $cause)';
-}
+/// The failure inside the result is the upload's own error, unwrapped — an
+/// upload refused by the server reads as the same exception kind a refused
+/// request does. Which attachment it concerns travels here, beside the
+/// outcome, rather than inside it.
+typedef AttachmentUploadResult = ({String attachmentId, Result<UploadedAttachment> result});
 
 /// Uploads [StreamAttachment] objects to remote storage.
 ///
@@ -61,8 +49,8 @@ class StreamAttachmentUploader {
 
   /// Uploads a single attachment to remote storage.
   ///
-  /// Returns a [Result] containing the [UploadedAttachment] on success or
-  /// an [AttachmentUploadException] on failure. Progress updates are provided
+  /// Returns a [Result] containing the [UploadedAttachment] on success, or
+  /// the upload's own failure otherwise. Progress updates are provided
   /// through the optional [onProgress] callback.
   Future<Result<UploadedAttachment>> upload(
     StreamAttachment attachment, {
@@ -84,26 +72,14 @@ class StreamAttachmentUploader {
       ),
     );
 
-    return result.fold(
-      onSuccess: (data) {
-        final uploaded = UploadedAttachment(
-          id: attachment.id,
-          type: attachment.type,
-          custom: attachment.custom,
-          remoteUrl: data.fileUrl,
-          thumbnailUrl: data.thumbUrl,
-        );
-
-        return Result.success(uploaded);
-      },
-      onFailure: (cause, stackTrace) {
-        final ex = AttachmentUploadException(
-          id: attachment.id,
-          cause: cause,
-        );
-
-        return Result.failure(ex, stackTrace);
-      },
+    return result.map(
+      (data) => UploadedAttachment(
+        id: attachment.id,
+        type: attachment.type,
+        custom: attachment.custom,
+        remoteUrl: data.fileUrl,
+        thumbnailUrl: data.thumbUrl,
+      ),
     );
   }
 }
@@ -120,18 +96,18 @@ typedef OnBatchUploadProgress = void Function(String attachmentId, double progre
 /// as individual uploads complete, enabling immediate UI updates and partial
 /// success handling.
 extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
-  /// Uploads multiple attachments as a stream of results.
+  /// Uploads multiple attachments as a stream of per-attachment outcomes.
   ///
   /// Processes [attachments] concurrently with [maxConcurrent] limit, emitting
-  /// [Result] objects as each upload completes. Progress updates are provided
-  /// through the optional [onProgress] callback.
+  /// an [AttachmentUploadResult] as each upload completes. Progress updates
+  /// are provided through the optional [onProgress] callback.
   ///
   /// When [eagerError] is true, the stream throws an exception and closes
   /// immediately on the first upload failure. When false (default), failed
-  /// uploads are emitted as [Result.failure] and processing continues.
+  /// uploads are emitted as failures and processing continues.
   ///
-  /// Returns a [Stream] of [Result] objects in completion order, not input order.
-  Stream<Result<UploadedAttachment>> uploadBatch(
+  /// Returns a [Stream] of outcomes in completion order, not input order.
+  Stream<AttachmentUploadResult> uploadBatch(
     Iterable<StreamAttachment> attachments, {
     OnBatchUploadProgress? onProgress,
     int maxConcurrent = 5,
@@ -150,19 +126,19 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
             (f) =>
                 (progress) => f(attachment.id, progress),
           ),
-        ),
+        ).then((result) => (attachmentId: attachment.id, result: result)),
       ),
     );
 
-    // Yield results as they complete
-    await for (final result in uploadStream) {
+    // Yield outcomes as they complete
+    await for (final outcome in uploadStream) {
       // If eagerError is enabled, throw on first failure
-      if (result.exceptionOrNull() case final error? when eagerError) {
-        final stackTrace = result.stackTraceOrNull();
+      if (outcome.result.exceptionOrNull() case final error? when eagerError) {
+        final stackTrace = outcome.result.stackTraceOrNull();
         Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
       }
 
-      yield result;
+      yield outcome;
     }
   }
 }
