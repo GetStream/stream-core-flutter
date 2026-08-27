@@ -42,13 +42,12 @@ class AuthInterceptor extends Interceptor {
 
       // Caught in full: a rejection must deliver a StreamException whatever
       // the app's token code threw.
-      final exception =
-          StreamException.tryFrom(e) ??
-          StreamAuthenticationException(
-            message: 'Failed to load an auth token',
-            cause: e,
-            stackTrace: stackTrace,
-          );
+      var exception = StreamException.tryFrom(e);
+      exception ??= StreamAuthenticationException(
+        message: 'Failed to load an auth token',
+        cause: e,
+        stackTrace: stackTrace,
+      );
 
       final dioError = StreamDioException(
         exception: exception,

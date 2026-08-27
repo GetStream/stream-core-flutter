@@ -91,16 +91,15 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       send: send,
       authenticator: onAuthenticate,
       tag: '$tag:Auth',
-      onFailure: (error) => disconnect(
-        source: .authenticationFailed(
-          error:
-              StreamException.tryFrom(error) ??
-              StreamAuthenticationException(
-                message: 'The connection could not be authenticated',
-                cause: error,
-              ),
-        ),
-      ),
+      onFailure: (error) {
+        var exception = StreamException.tryFrom(error);
+        exception ??= StreamAuthenticationException(
+          message: 'The connection could not be authenticated',
+          cause: error,
+        );
+
+        unawaited(disconnect(source: .authenticationFailed(error: exception)));
+      },
     );
   }
 
@@ -200,19 +199,16 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // Handed to `disconnect`, which reports the reason, closes the socket, and records the closure
     // even when the close fails. Returned, so a caller connecting again is not refused for the race.
-    return result.getOrElse(
-      (error, stackTrace) => disconnect(
-        source: .serverInitiated(
-          error:
-              StreamException.tryFrom(error) ??
-              StreamNetworkException(
-                message: 'Failed to open the connection',
-                cause: error,
-                stackTrace: stackTrace,
-              ),
-        ),
-      ),
-    );
+    return result.getOrElse((error, stackTrace) {
+      var exception = StreamException.tryFrom(error);
+      exception ??= StreamNetworkException(
+        message: 'Failed to open the connection',
+        cause: error,
+        stackTrace: stackTrace,
+      );
+
+      return disconnect(source: .serverInitiated(error: exception));
+    });
   }
 
   /// Closes the WebSocket connection.

@@ -206,12 +206,14 @@ class TokenManager {
     final result = await runSafely(() => provider.loadToken(userId));
 
     return result.getOrElse((error, stackTrace) {
-      throw StreamException.tryFrom(error) ??
-          StreamAuthenticationException(
-            message: 'The token provider failed to load a token for user "$userId"',
-            cause: error,
-            stackTrace: stackTrace,
-          );
+      var exception = StreamException.tryFrom(error);
+      exception ??= StreamAuthenticationException(
+        message: 'The token provider failed to load a token for user "$userId"',
+        cause: error,
+        stackTrace: stackTrace,
+      );
+
+      throw exception;
     });
   }
 
