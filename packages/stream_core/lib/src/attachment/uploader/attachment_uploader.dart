@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart' show CancelToken;
 import 'package:rxdart/rxdart.dart';
 
 import '../../utils.dart';
@@ -51,10 +52,12 @@ class StreamAttachmentUploader {
   ///
   /// Returns a [Result] containing the [UploadedAttachment] on success, or
   /// the upload's own failure otherwise. Progress updates are provided
-  /// through the optional [onProgress] callback.
+  /// through the optional [onProgress] callback, and the upload can be called
+  /// off through [cancelToken], which reads as a cancelled failure.
   Future<Result<UploadedAttachment>> upload(
     StreamAttachment attachment, {
     OnUploadProgress? onProgress,
+    CancelToken? cancelToken,
   }) async {
     final uploadFn = switch (attachment.type) {
       AttachmentType.image => _cdn.uploadImage,
@@ -63,6 +66,7 @@ class StreamAttachmentUploader {
 
     final result = await uploadFn(
       attachment.file,
+      cancelToken: cancelToken,
       onProgress: onProgress?.let(
         (f) => (uploaded, total) {
           if (total == 0) return f(0);
@@ -99,25 +103,23 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
   /// Uploads multiple attachments as a stream of per-attachment outcomes.
   ///
   /// Processes [attachments] concurrently with [maxConcurrent] limit, emitting
-  /// an [AttachmentUploadResult] as each upload completes. Progress updates
-  /// are provided through the optional [onProgress] callback.
+  /// an [AttachmentUploadResult] as each upload completes — a failed upload is
+  /// emitted as a failure and processing continues, so each attachment's
+  /// outcome can be acted on the moment it lands. Progress updates are
+  /// provided through the optional [onProgress] callback.
   ///
-  /// When [eagerError] is true, the stream throws an exception and closes
-  /// immediately on the first upload failure. When false (default), failed
-  /// uploads are emitted as failures and processing continues.
-  ///
-  /// Returns a [Stream] of outcomes in completion order, not input order.
+  /// Returns a [Stream] of outcomes in completion order, not input order. For
+  /// all the outcomes as one all-or-nothing result, consider [uploadAll].
   Stream<AttachmentUploadResult> uploadBatch(
     Iterable<StreamAttachment> attachments, {
     OnBatchUploadProgress? onProgress,
     int maxConcurrent = 5,
-    bool eagerError = false,
-  }) async* {
+  }) {
     // Early return for empty list
-    if (attachments.isEmpty) return;
+    if (attachments.isEmpty) return const Stream.empty();
 
     // Create a stream that uploads attachments with controlled concurrency
-    final uploadStream = Stream.fromIterable(attachments).flatMap(
+    return Stream.fromIterable(attachments).flatMap(
       maxConcurrent: maxConcurrent,
       (attachment) => Stream.fromFuture(
         upload(
@@ -129,16 +131,36 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
         ).then((result) => (attachmentId: attachment.id, result: result)),
       ),
     );
+  }
 
-    // Yield outcomes as they complete
-    await for (final outcome in uploadStream) {
-      // If eagerError is enabled, throw on first failure
-      if (outcome.result.exceptionOrNull() case final error? when eagerError) {
-        final stackTrace = outcome.result.stackTraceOrNull();
-        Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
+  /// Uploads multiple attachments and returns every outcome as one [Result].
+  ///
+  /// A success carries every [UploadedAttachment]; the first failure to
+  /// complete becomes the result's, and uploads already in flight are not
+  /// awaited further. Progress updates are provided through the optional
+  /// [onProgress] callback.
+  Future<Result<List<UploadedAttachment>>> uploadAll(
+    Iterable<StreamAttachment> attachments, {
+    OnBatchUploadProgress? onProgress,
+    int maxConcurrent = 5,
+  }) async {
+    final uploaded = <UploadedAttachment>[];
+
+    final outcomes = uploadBatch(
+      attachments,
+      onProgress: onProgress,
+      maxConcurrent: maxConcurrent,
+    );
+
+    await for (final (attachmentId: _, :result) in outcomes) {
+      switch (result) {
+        case Success(:final data):
+          uploaded.add(data);
+        case final Failure failure:
+          return failure;
       }
-
-      yield outcome;
     }
+
+    return Result.success(uploaded);
   }
 }
