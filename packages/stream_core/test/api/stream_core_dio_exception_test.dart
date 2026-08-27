@@ -161,5 +161,18 @@ void main() {
 
       expect(dioException.toStreamException(), same(mapped));
     });
+
+    test('keeps the classification of a Stream exception thrown loose in the chain', () {
+      // An exception thrown inside an interceptor arrives wrapped in a plain
+      // DioException; re-diagnosing it from the wrapper would read an
+      // authentication failure as a network one.
+      const loose = StreamAuthenticationException(message: 'no token');
+      final wrapped = DioException(
+        requestOptions: RequestOptions(path: '/test'),
+        error: loose,
+      );
+
+      expect(wrapped.toStreamException(), same(loose));
+    });
   });
 }

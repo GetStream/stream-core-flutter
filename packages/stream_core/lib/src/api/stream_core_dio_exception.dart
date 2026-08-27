@@ -39,6 +39,11 @@ extension DioExceptionMapping on DioException {
   StreamException toStreamException() {
     if (this case StreamDioException(:final exception)) return exception;
 
+    // A Stream exception thrown loose inside the interceptor chain arrives
+    // wrapped in a plain DioException; its classification is kept rather
+    // than re-diagnosed from a wrapper that has no response to read.
+    if (error case final StreamException exception) return exception;
+
     if (type == DioExceptionType.cancel) {
       return StreamNetworkException(
         message: 'The request was cancelled',
