@@ -203,7 +203,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     if (result case Failure(:final error, :final stackTrace)) {
       var exception = StreamException.tryFrom(error);
       exception ??= StreamNetworkException(
-        message: 'Failed to open the connection',
+        message: 'Failed to open the connection to ${options.url}',
         cause: error,
         stackTrace: stackTrace,
       );

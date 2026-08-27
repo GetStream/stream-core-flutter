@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../errors.dart' show StreamClientException, StreamException, StreamNetworkException;
+import '../../../errors.dart' show StreamClientException, StreamNetworkException;
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -65,30 +65,19 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     }
 
     return runSafely(() async {
-      try {
-        // Create a new WebSocket connection.
-        final ws = _ws = _wsProvider.call(options);
-        _wsSubscription = ws.stream.listen(
-          _onData,
-          onDone: _onDone,
-          cancelOnError: false,
-          onError: _listener?.onError,
-        );
+      // Create a new WebSocket connection.
+      final ws = _ws = _wsProvider.call(options);
+      _wsSubscription = ws.stream.listen(
+        _onData,
+        onDone: _onDone,
+        cancelOnError: false,
+        onError: _listener?.onError,
+      );
 
-        await ws.ready;
+      await ws.ready;
 
-        // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
-        if (_ws == ws) _listener?.onOpen();
-      } catch (e, stackTrace) {
-        var exception = StreamException.tryFrom(e);
-        exception ??= StreamNetworkException(
-          message: 'Failed to open the connection to ${options.url}',
-          cause: e,
-          stackTrace: stackTrace,
-        );
-
-        throw exception;
-      }
+      // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
+      if (_ws == ws) _listener?.onOpen();
     });
   }
 
@@ -131,19 +120,8 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
       _ws = null;
       _wsSubscription = null;
 
-      try {
-        await subscription?.cancel();
-        await ws?.sink.close(closeCode, closeReason);
-      } catch (e, stackTrace) {
-        var exception = StreamException.tryFrom(e);
-        exception ??= StreamNetworkException(
-          message: 'Failed to close the connection',
-          cause: e,
-          stackTrace: stackTrace,
-        );
-
-        throw exception;
-      }
+      await subscription?.cancel();
+      await ws?.sink.close(closeCode, closeReason);
 
       // A new socket can open while this one closes, and must not be brought down by its closure.
       if (_ws == null) _listener?.onClose(closeCode, closeReason);
@@ -164,14 +142,11 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
       try {
         data = _messageCodec.encode(message);
       } catch (e, stackTrace) {
-        var exception = StreamException.tryFrom(e);
-        exception ??= StreamClientException(
+        throw StreamClientException(
           message: 'The message could not be encoded',
           cause: e,
           stackTrace: stackTrace,
         );
-
-        throw exception;
       }
 
       return ws.sink.add(data);
