@@ -103,10 +103,13 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
   /// Uploads multiple attachments as a stream of per-attachment outcomes.
   ///
   /// Processes [attachments] concurrently with [maxConcurrent] limit, emitting
-  /// an [AttachmentUploadResult] as each upload completes — a failed upload is
-  /// emitted as a failure and processing continues, so each attachment's
-  /// outcome can be acted on the moment it lands. Progress updates are
-  /// provided through the optional [onProgress] callback.
+  /// an [AttachmentUploadResult] as each upload completes, so each
+  /// attachment's outcome can be acted on the moment it lands. Progress
+  /// updates are provided through the optional [onProgress] callback.
+  ///
+  /// When [eagerError] is true, the stream throws the first upload's failure
+  /// and closes. When false (default), failed uploads are emitted as failures
+  /// and processing continues.
   ///
   /// Returns a [Stream] of outcomes in completion order, not input order. For
   /// all the outcomes as one all-or-nothing result, consider [uploadAll].
@@ -114,12 +117,13 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
     Iterable<StreamAttachment> attachments, {
     OnBatchUploadProgress? onProgress,
     int maxConcurrent = 5,
-  }) {
+    bool eagerError = false,
+  }) async* {
     // Early return for empty list
-    if (attachments.isEmpty) return const Stream.empty();
+    if (attachments.isEmpty) return;
 
     // Create a stream that uploads attachments with controlled concurrency
-    return Stream.fromIterable(attachments).flatMap(
+    final uploadStream = Stream.fromIterable(attachments).flatMap(
       maxConcurrent: maxConcurrent,
       (attachment) => Stream.fromFuture(
         upload(
@@ -131,6 +135,17 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
         ).then((result) => (attachmentId: attachment.id, result: result)),
       ),
     );
+
+    // Yield outcomes as they complete
+    await for (final outcome in uploadStream) {
+      // If eagerError is enabled, throw on first failure
+      if (outcome.result.exceptionOrNull() case final error? when eagerError) {
+        final stackTrace = outcome.result.stackTraceOrNull();
+        Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
+      }
+
+      yield outcome;
+    }
   }
 
   /// Uploads multiple attachments and returns every outcome as one [Result].
