@@ -189,8 +189,35 @@ unrelated type.
 ## Retrying
 
 The exception carries **facts** (`statusCode`, `code`, `unrecoverable`, `retryAfter`, `isTimeout`,
-`closeCode`); whether to retry is **policy** the caller owns. Honor `unrecoverable` first — it is
-the server saying retrying will not help — then apply your own rules:
+`closeCode`); whether to retry is **policy** the caller owns. Retryability is a function of three
+inputs — what happened (the exception), what the caller was doing (idempotent or not), and how many
+attempts have been spent — which is why no `isRetryable` lives on the exception: it only knows the
+first input.
+
+The decision runs in order:
+
+1. **Honor the server's explicit verdicts.** `unrecoverable: true` → never retry. `retryAfter` →
+   retry, but only after that wait.
+2. **Decide by kind and facts.** Retry what is about *the moment*; never what is about *the request
+   or the setup*:
+
+   | Failure | Retry? |
+   |---|---|
+   | `StreamNetworkException(isCancelled: true)` | No — the caller stopped it. |
+   | `StreamNetworkException` otherwise | Yes for reads; writes only through an idempotent path. Prefer a connectivity signal over blind backoff. |
+   | `StreamApiException(isRateLimited: true)` | Yes, after `retryAfter` (backoff when absent). |
+   | `StreamApiException`, 5xx | Yes, with backoff. |
+   | `StreamApiException(isTokenExpired: true)` | No — the SDK already refreshed and retried once; seeing it means refresh could not help. |
+   | `StreamApiException(isTokenNotYetValid: true)` | Yes, after waiting — clock skew heals, bounded. |
+   | `StreamApiException`, any other 4xx | No — the same request gets the same verdict. |
+   | `StreamAuthenticationException` | No — fix credentials first, then re-attempt the operation. |
+   | `StreamClientException` | No — a bug does not heal on resend; report it. |
+
+3. **Apply the budget**: max attempts, exponential backoff with jitter, a delay cap.
+
+`DisconnectionSource.isReconnectable` is this procedure specialized for the connection (reconnecting
+is inherently idempotent), and the interceptor's one-shot token refresh is the code-40 row. What
+remains for callers is operation retry, expressed as a policy:
 
 ```dart
 abstract interface class RetryPolicy {
