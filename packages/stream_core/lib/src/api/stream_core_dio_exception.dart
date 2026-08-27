@@ -11,17 +11,18 @@ import '../utils/standard.dart';
 /// rides in [exception] until the call layer unwraps it.
 class StreamDioException extends DioException {
   /// Creates a [StreamDioException] carrying [exception].
+  ///
+  /// A null [stackTrace] is left for Dio to fill in, which substitutes the
+  /// stack captured where the request was made — more useful than one
+  /// captured here.
   StreamDioException({
     required this.exception,
     required super.requestOptions,
     super.response,
     super.type,
-    StackTrace? stackTrace,
+    super.stackTrace,
     super.message,
-  }) : super(
-         error: exception,
-         stackTrace: stackTrace ?? StackTrace.current,
-       );
+  }) : super(error: exception);
 
   /// The Stream exception this Dio exception delivers.
   final StreamException exception;
