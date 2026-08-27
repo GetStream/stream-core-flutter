@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../errors.dart' show StreamNetworkException;
+import '../../../errors.dart' show StreamClientException, StreamException, StreamNetworkException;
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -58,24 +58,37 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
 
   @override
   Future<Result<void>> open(WebSocketOptions options) {
+    // Misuse rather than a condition: opening over a live socket is a bug in
+    // the caller, so it fails loudly instead of dissolving into a failure.
+    if (_ws != null) {
+      throw StateError('WebSocket is already open. Call close() first.');
+    }
+
     return runSafely(() async {
-      if (_ws != null) {
-        throw StateError('WebSocket is already open. Call close() first.');
+      try {
+        // Create a new WebSocket connection.
+        final ws = _ws = _wsProvider.call(options);
+        _wsSubscription = ws.stream.listen(
+          _onData,
+          onDone: _onDone,
+          cancelOnError: false,
+          onError: _listener?.onError,
+        );
+
+        await ws.ready;
+
+        // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
+        if (_ws == ws) _listener?.onOpen();
+      } catch (e, stackTrace) {
+        var exception = StreamException.tryFrom(e);
+        exception ??= StreamNetworkException(
+          message: 'Failed to open the connection to ${options.url}',
+          cause: e,
+          stackTrace: stackTrace,
+        );
+
+        throw exception;
       }
-
-      // Create a new WebSocket connection.
-      final ws = _ws = _wsProvider.call(options);
-      _wsSubscription = ws.stream.listen(
-        _onData,
-        onDone: _onDone,
-        cancelOnError: false,
-        onError: _listener?.onError,
-      );
-
-      await ws.ready;
-
-      // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
-      if (_ws == ws) _listener?.onOpen();
     });
   }
 
@@ -118,8 +131,19 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
       _ws = null;
       _wsSubscription = null;
 
-      await subscription?.cancel();
-      await ws?.sink.close(closeCode, closeReason);
+      try {
+        await subscription?.cancel();
+        await ws?.sink.close(closeCode, closeReason);
+      } catch (e, stackTrace) {
+        var exception = StreamException.tryFrom(e);
+        exception ??= StreamNetworkException(
+          message: 'Failed to close the connection',
+          cause: e,
+          stackTrace: stackTrace,
+        );
+
+        throw exception;
+      }
 
       // A new socket can open while this one closes, and must not be brought down by its closure.
       if (_ws == null) _listener?.onClose(closeCode, closeReason);
@@ -136,7 +160,20 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
         throw const StreamNetworkException(message: 'The connection is not open, so nothing was sent');
       }
 
-      final data = _messageCodec.encode(message);
+      final Object data;
+      try {
+        data = _messageCodec.encode(message);
+      } catch (e, stackTrace) {
+        var exception = StreamException.tryFrom(e);
+        exception ??= StreamClientException(
+          message: 'The message could not be encoded',
+          cause: e,
+          stackTrace: stackTrace,
+        );
+
+        throw exception;
+      }
+
       return ws.sink.add(data);
     });
   }

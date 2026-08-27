@@ -221,11 +221,10 @@ void main() {
     final (:engine, :listener, :sockets) = _subjectWithFreshSockets();
     await engine.open(_options);
 
-    final result = await engine.open(_options);
-
     // Closing the live socket to make room would hide a caller opening a second connection over a
-    // connection it still has. Refused before a second socket is even created.
-    expect(result.isFailure, isTrue);
+    // connection it still has. Misuse rather than a failed attempt, so it throws before a second
+    // socket is even created.
+    expect(() => engine.open(_options), throwsStateError);
     expect(sockets, hasLength(1));
     expect(sockets.single.sink.closedWith, isNull);
     expect(listener.closures, isEmpty);
