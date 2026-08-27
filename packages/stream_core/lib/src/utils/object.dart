@@ -1,7 +1,3 @@
-// The one sanctioned home for runtimeType-to-string: everywhere else the lint
-// stands, and this helper is the alternative it pushes toward.
-// ignore_for_file: no_runtimetype_tostring
-
 /// A [Object.runtimeType] that is constant in release mode.
 ///
 /// Returns the runtime type of [object] in debug mode, and [optimizedValue]
@@ -12,9 +8,10 @@
 /// name their exact type where it helps — a debug log — and a stable name
 /// where it would not.
 String objectRuntimeType(Object? object, String optimizedValue) {
+  var value = optimizedValue;
   assert(() {
-    optimizedValue = object.runtimeType.toString();
+    value = object.runtimeType.toString();
     return true;
   }());
-  return optimizedValue;
+  return value;
 }
