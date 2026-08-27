@@ -28,8 +28,8 @@ base class StreamApiException extends StreamException {
   final int code;              // Stream's stable error code — branch on this, never on message
   final String? moreInfo;      // docs URL; populated on REST errors, empty on WebSocket errors
   final bool unrecoverable;    // when true, the server says retrying will not help — authoritative.
-                               // Absence means nothing: today only Video endpoints set it; Chat and
-                               // Feeds errors never carry it.
+                               // Absence means nothing: only Video sets it deliberately (plus the
+                               // shared permission-denied path); most errors never carry it.
   final Duration? retryAfter;  // from the Retry-After header on HTTP 429; absent on WS rate limits
 
   bool get isTokenExpired;       // code 40 — a fresh token fixes it
