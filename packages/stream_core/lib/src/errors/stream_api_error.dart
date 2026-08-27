@@ -87,30 +87,11 @@ List<int> _detailsFromJson(Object? json) {
   return [for (final entry in json.whereType<num>()) entry.toInt()];
 }
 
-/// Convenience predicates over the payload's [StreamApiError.code] and
-/// [StreamApiError.statusCode].
+/// Convenience predicates over the payload's [StreamApiError.statusCode].
 ///
-/// Same semantics as the `StreamApiException` getters of the same names, for
-/// code that holds the raw payload rather than the exception.
+/// The code-based predicates live on [StreamErrorCode] itself — consider
+/// `error.code.isTokenExpired` and its siblings.
 extension StreamApiErrorPredicates on StreamApiError {
-  /// Whether the token has expired ([StreamErrorCode.tokenExpired]).
-  ///
-  /// A fresh token fixes it.
-  bool get isTokenExpired => code == .tokenExpired;
-
-  /// Whether the token is not valid yet ([StreamErrorCode.tokenNotValidYet]
-  /// and [StreamErrorCode.tokenUsedBeforeIssuedAt]) — clock skew that waiting
-  /// fixes and a fresh token does not.
-  bool get isTokenNotYetValid => code == .tokenNotValidYet || code == .tokenUsedBeforeIssuedAt;
-
-  /// Whether the token's signature cannot be accepted
-  /// ([StreamErrorCode.tokenSignatureInvalid]) — a configuration problem no
-  /// token or wait fixes.
-  bool get isTokenSignatureInvalid => code == .tokenSignatureInvalid;
-
-  /// Whether the API key cannot be accepted ([StreamErrorCode.apiKeyInvalid]).
-  bool get isApiKeyInvalid => code == .apiKeyInvalid;
-
   /// Whether the request was rate limited (HTTP 429).
   bool get isRateLimited => statusCode == 429;
 }

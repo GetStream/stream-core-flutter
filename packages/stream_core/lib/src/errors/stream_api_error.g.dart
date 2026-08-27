@@ -7,7 +7,7 @@ part of 'stream_api_error.dart';
 // **************************************************************************
 
 StreamApiError _$StreamApiErrorFromJson(Map<String, dynamic> json) => StreamApiError(
-  code: json['code'] as StreamErrorCode,
+  code: StreamErrorCode.fromJson(json['code'] as num),
   details: _detailsFromJson(json['details']),
   duration: json['duration'] as String,
   exceptionFields: (json['exception_fields'] as Map<String, dynamic>?)?.map(
@@ -20,7 +20,7 @@ StreamApiError _$StreamApiErrorFromJson(Map<String, dynamic> json) => StreamApiE
 );
 
 Map<String, dynamic> _$StreamApiErrorToJson(StreamApiError instance) => <String, dynamic>{
-  'code': instance.code,
+  'code': instance.code.toJson(),
   'details': instance.details,
   'duration': instance.duration,
   'exception_fields': instance.exceptionFields,

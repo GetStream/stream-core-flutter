@@ -138,31 +138,31 @@ base class StreamApiException extends StreamException {
   final StreamApiError? apiError;
 
   /// Whether the token this request carried has expired
-  /// ([StreamErrorCode.tokenExpired]).
+  /// ([StreamErrorCode.isTokenExpired]).
   ///
   /// A freshly issued token fixes it. The SDK refreshes expired tokens
   /// automatically, so this surfaces only when a refresh could not help.
-  bool get isTokenExpired => code == .tokenExpired;
+  bool get isTokenExpired => code?.isTokenExpired ?? false;
 
-  /// Whether the token is not valid yet ([StreamErrorCode.tokenNotValidYet]
-  /// and [StreamErrorCode.tokenUsedBeforeIssuedAt]).
+  /// Whether the token is not valid yet ([StreamErrorCode.isTokenNotYetValid]).
   ///
   /// A clock-skew condition on the token's `nbf`/`iat` claims: waiting fixes
   /// it, a fresh token minted by the same skewed clock does not.
-  bool get isTokenNotYetValid => code == .tokenNotValidYet || code == .tokenUsedBeforeIssuedAt;
+  bool get isTokenNotYetValid => code?.isTokenNotYetValid ?? false;
 
   /// Whether the token's signature cannot be accepted
-  /// ([StreamErrorCode.tokenSignatureInvalid]).
+  /// ([StreamErrorCode.isTokenSignatureInvalid]).
   ///
   /// A configuration problem — signed with the wrong secret. Neither waiting
   /// nor a fresh token from the same signer fixes it.
-  bool get isTokenSignatureInvalid => code == .tokenSignatureInvalid;
+  bool get isTokenSignatureInvalid => code?.isTokenSignatureInvalid ?? false;
 
-  /// Whether the API key cannot be accepted ([StreamErrorCode.apiKeyInvalid]).
+  /// Whether the API key cannot be accepted
+  /// ([StreamErrorCode.isApiKeyInvalid]).
   ///
   /// The key is unknown, or the product it addresses is not enabled for the
   /// app. A configuration problem no token fixes.
-  bool get isApiKeyInvalid => code == .apiKeyInvalid;
+  bool get isApiKeyInvalid => code?.isApiKeyInvalid ?? false;
 
   /// Whether the request was rate limited (HTTP 429).
   ///
