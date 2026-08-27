@@ -31,10 +31,8 @@ class StreamApiError extends Equatable {
 
   /// Additional error detail codes providing more context.
   ///
-  /// The wire field is not always a list of codes: a moderation rejection
-  /// (code 73) carries a list of objects here, and the backend can serialize
-  /// the field as an object outright. Decoding tolerates every shape — what
-  /// is not a number reads as absent rather than failing the whole error.
+  /// Not every error carries numeric detail codes; anything else in the wire
+  /// value reads as absent rather than failing the whole error.
   @JsonKey(fromJson: _detailsFromJson)
   final List<int> details;
 
@@ -75,16 +73,20 @@ class StreamApiError extends Equatable {
   ];
 }
 
+// The wire value is not guaranteed to be a list of ints: a moderation
+// rejection (code 73) sends a list of objects, and the field can arrive as an
+// object outright. Tolerating every shape keeps error decoding from failing
+// exactly when an app needs the error.
 List<int> _detailsFromJson(Object? json) {
   if (json is! List) return const [];
   return [for (final entry in json.whereType<num>()) entry.toInt()];
 }
 
-/// The token this payload carries has expired (code 40).
+/// Convenience predicates over the payload's [StreamApiError.code] and
+/// [StreamApiError.statusCode].
 ///
-/// Same semantics as `StreamApiException.isTokenExpired`, for code that holds
-/// the raw payload — an interceptor reading a response body, or a WebSocket
-/// error event.
+/// Same semantics as the `StreamApiException` getters of the same names, for
+/// code that holds the raw payload rather than the exception.
 extension StreamApiErrorPredicates on StreamApiError {
   /// Whether the token has expired (code 40). A fresh token fixes it.
   bool get isTokenExpired => code == 40;

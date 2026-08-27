@@ -98,18 +98,16 @@ base class StreamApiException extends StreamException {
 
   /// The HTTP status the server answered with.
   ///
-  /// Independent of [code]: the backend maps some codes to more than one
-  /// status, so never derive one from the other.
+  /// Independent of [code]: the same code can arrive with different statuses,
+  /// so never derive one from the other.
   final int statusCode;
 
   /// Stream's stable error code.
   ///
   /// The machine-readable discriminator — branch on this, never on [message].
   ///
-  /// `null` when the response carried no Stream error payload — an edge or
-  /// proxy answering with an error of its own. Deliberately not a sentinel
-  /// value: the backend's registry includes low and negative codes, so any
-  /// stand-in number would collide with a real one.
+  /// `null` when the response carried no Stream error payload, as when an
+  /// intermediary answered with an error of its own.
   final int? code;
 
   /// A documentation URL for this error, when the server sent one.
@@ -119,21 +117,20 @@ base class StreamApiException extends StreamException {
 
   /// Whether the server declared that retrying will not help.
   ///
-  /// Authoritative when `true`. Absence means nothing: today only Video
-  /// endpoints set it — Chat and Feeds errors never carry it — so `false`
-  /// must not be read as "retryable".
+  /// Authoritative when `true`. `false` only means the server said nothing —
+  /// it must not be read as "retrying will help".
   final bool unrecoverable;
 
-  /// How long the server asked to wait before retrying, when it said.
+  /// How long the server asked to wait before retrying, when it named a wait.
   ///
-  /// Parsed from the `Retry-After` header on rate-limited REST calls; absent
-  /// on WebSocket rate limits, which send no headers.
+  /// Rate-limited requests can carry one; errors reported over a WebSocket
+  /// never do.
   final Duration? retryAfter;
 
   /// The server's error payload, when the failure carried a parseable one.
   ///
-  /// `null` when only a bare status was available — an edge or proxy
-  /// answering with an error of its own.
+  /// `null` when only a bare status was available, as when an intermediary
+  /// answered with an error of its own.
   final StreamApiError? apiError;
 
   /// Whether the token this request carried has expired (code 40).
@@ -212,9 +209,10 @@ base class StreamNetworkException extends StreamException {
 
   /// The WebSocket close code, when the failure was a socket closure.
   ///
-  /// Carries little signal on its own — the server closes with 1000 even for
-  /// refused credentials, and the reason travels in an error event sent
-  /// before the close. Classify from that event's code where one exists.
+  /// Carries little signal on its own: a connection can close with a normal
+  /// code even when something went wrong, with the reason reported separately
+  /// as a [StreamApiException]. Classify by the exception kind and its code
+  /// rather than by the close code.
   final int? closeCode;
 
   @override

@@ -7,10 +7,8 @@ import '../utils/standard.dart';
 
 /// A [DioException] carrying the [StreamException] that caused it.
 ///
-/// Internal plumbing: Dio's interceptor contract requires rejections to be
-/// [DioException]s, so the mapped exception rides in [exception] until the
-/// call layer unwraps it. Consumers never see this type — they see the
-/// [StreamException] it carries.
+/// Dio requires rejections to be [DioException]s, so the mapped exception
+/// rides in [exception] until the call layer unwraps it.
 class StreamDioException extends DioException {
   /// Creates a [StreamDioException] carrying [exception].
   StreamDioException({
@@ -29,10 +27,7 @@ class StreamDioException extends DioException {
   final StreamException exception;
 }
 
-/// Maps transport failures reported by Dio onto the Stream exception kinds.
-///
-/// This is the HTTP error boundary: the only place that reads
-/// [DioExceptionType] and response bodies to decide what actually happened.
+/// Maps failures reported by Dio onto the Stream exception kinds.
 extension DioExceptionMapping on DioException {
   /// This failure as the [StreamException] it represents.
   ///
