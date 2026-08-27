@@ -1,10 +1,18 @@
 import 'dart:convert';
 
-import '../../stream_core.dart';
+import 'package:dio/dio.dart';
 
-/// A [DioException] carrying the Stream [ClientException] that caused it.
+import '../errors.dart';
+import '../utils/standard.dart';
+
+/// A [DioException] carrying the [StreamException] that caused it.
+///
+/// Internal plumbing: Dio's interceptor contract requires rejections to be
+/// [DioException]s, so the mapped exception rides in [exception] until the
+/// call layer unwraps it. Consumers never see this type — they see the
+/// [StreamException] it carries.
 class StreamDioException extends DioException {
-  /// Creates a [StreamDioException] for [exception].
+  /// Creates a [StreamDioException] carrying [exception].
   StreamDioException({
     required this.exception,
     required super.requestOptions,
@@ -17,36 +25,91 @@ class StreamDioException extends DioException {
          stackTrace: stackTrace ?? StackTrace.current,
        );
 
-  final ClientException exception;
+  /// The Stream exception this Dio exception delivers.
+  final StreamException exception;
 }
 
-extension StreamDioExceptionExtension on DioException {
-  /// The Stream API error this exception's response carried, or `null` when it carried something else.
+/// Maps transport failures reported by Dio onto the Stream exception kinds.
+///
+/// This is the HTTP error boundary: the only place that reads
+/// [DioExceptionType] and response bodies to decide what actually happened.
+extension DioExceptionMapping on DioException {
+  /// This failure as the [StreamException] it represents.
   ///
-  /// A Stream error is recognised whether the server sent it as JSON or as plain text. A body that is
-  /// not one — a proxy or gateway answering with an error of its own — reads as `null` rather than
-  /// throwing.
-  StreamApiError? get apiError => runSafelySync(() {
-    final data = response?.data;
-    final json = data is String ? jsonDecode(data) : data;
-    if (json is! Map<String, Object?>) return null;
+  /// A response from the server — parseable Stream error payload or bare
+  /// status — becomes a [StreamApiException]. Everything that ended before a
+  /// verdict (timeout, cancellation, socket failure) becomes a
+  /// [StreamNetworkException].
+  StreamException toStreamException() {
+    if (this case StreamDioException(:final exception)) return exception;
 
-    return StreamApiError.fromJson(json);
-  }).getOrNull();
+    if (type == DioExceptionType.cancel) {
+      return StreamNetworkException(
+        message: 'The request was cancelled',
+        isCancelled: true,
+        cause: this,
+        stackTrace: stackTrace,
+      );
+    }
 
-  /// This exception as an [HttpClientException].
-  ///
-  /// Takes its message, status code and cause from [apiError] when the response carried one, and
-  /// from what the transport reported otherwise. A request the caller cancelled is marked as such.
-  HttpClientException toClientException() {
-    final apiError = this.apiError;
+    if (_isTimeout) {
+      return StreamNetworkException(
+        message: 'The request timed out before the server answered',
+        isTimeout: true,
+        cause: this,
+        stackTrace: stackTrace,
+      );
+    }
 
-    return HttpClientException(
-      message: apiError?.message ?? response?.statusMessage ?? message ?? '',
-      error: apiError ?? this,
-      statusCode: apiError?.statusCode ?? response?.statusCode,
+    // A response means the server reached a verdict, even when its body is
+    // not a Stream error payload — an edge or proxy answering on its own.
+    if (response case final response?) {
+      if (_parseApiError(response.data) case final apiError?) {
+        return StreamApiException.fromApiError(
+          apiError,
+          retryAfter: _parseRetryAfter(response),
+          cause: this,
+          stackTrace: stackTrace,
+        );
+      }
+
+      return StreamApiException(
+        message: response.statusMessage ?? message ?? 'The server responded with an error',
+        statusCode: response.statusCode ?? 0,
+        retryAfter: _parseRetryAfter(response),
+        cause: this,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return StreamNetworkException(
+      message: message ?? 'The request failed before the server answered',
+      cause: this,
       stackTrace: stackTrace,
-      isRequestCancelledError: type == DioExceptionType.cancel,
     );
   }
+
+  bool get _isTimeout => switch (type) {
+    DioExceptionType.connectionTimeout || DioExceptionType.sendTimeout || DioExceptionType.receiveTimeout => true,
+    _ => false,
+  };
+}
+
+// An interpretation seam: decoding wire data catches everything, `Error`
+// included — a `TypeError` thrown while reading a response body indicts the
+// data, not the program.
+StreamApiError? _parseApiError(Object? data) {
+  try {
+    final json = data is String ? jsonDecode(data) : data;
+    if (json is! Map<String, Object?>) return null;
+    return StreamApiError.fromJson(json);
+  } catch (_) {
+    return null;
+  }
+}
+
+Duration? _parseRetryAfter(Response<Object?> response) {
+  final seconds = response.headers.value('retry-after')?.let(int.tryParse);
+  if (seconds == null || seconds < 0) return null;
+  return Duration(seconds: seconds);
 }

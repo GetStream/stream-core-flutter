@@ -1,4 +1,4 @@
-import '../errors/client_exception.dart';
+import '../errors/stream_exception.dart';
 import '../utils/in_flight_cache.dart';
 import 'token_provider.dart';
 import 'user_token.dart';
@@ -142,9 +142,10 @@ class TokenManager {
   /// one those invalidated, so a provider that never returns cannot hold up a caller for the
   /// identity that replaced it.
   ///
-  /// Fails with a [ClientException] when no identity is configured, or when [reset] runs while the
-  /// token is loading, and with an [ArgumentError] when the provider returns a token that does not
-  /// belong to the user it was loading for.
+  /// Fails with a [StreamAuthenticationException] when no identity is configured, when [reset] runs
+  /// while the token is loading, or when the [TokenProvider] fails — whatever the provider threw is
+  /// preserved as the exception's `cause`. Fails with an [ArgumentError] when the provider returns
+  /// a token that does not belong to the user it was loading for.
   Future<UserToken> getToken() async {
     final cached = peekToken();
     if (cached != null && !_isSpent(cached)) return cached;
@@ -163,12 +164,14 @@ class TokenManager {
   Future<UserToken> _loadAndNotify() async {
     final identity = _identity;
     if (identity == null) {
-      throw ClientException(message: 'No user is configured, call setTokenProvider before loading a token');
+      throw const StreamAuthenticationException(
+        message: 'No user is configured, call setTokenProvider before loading a token',
+      );
     }
 
     final loadingFor = identity.userId;
     final loadingGeneration = _generation;
-    final updatedToken = await identity.provider.loadToken(loadingFor);
+    final updatedToken = await _loadFrom(identity.provider, loadingFor);
 
     // Both built-in providers check this, but a custom one need not: caching another user's token
     // would authenticate every later request as them.
@@ -182,7 +185,7 @@ class TokenManager {
       // After a `reset` the user is gone, so the token is not returned. After a switch it is: the
       // caller that started as this user may finish as them.
       if (_identity == null) {
-        throw ClientException(message: 'The user was reset while its token was loading');
+        throw const StreamAuthenticationException(message: 'The user was reset while its token was loading');
       }
 
       return updatedToken;
@@ -192,6 +195,18 @@ class TokenManager {
     _onTokenUpdated?.call(updatedToken);
 
     return updatedToken;
+  }
+
+  Future<UserToken> _loadFrom(TokenProvider provider, String userId) async {
+    try {
+      return await provider.loadToken(userId);
+    } on Exception catch (e, stackTrace) {
+      throw StreamAuthenticationException(
+        message: 'The token provider failed to load a token for user "$userId"',
+        cause: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   /// Expires the currently cached token.

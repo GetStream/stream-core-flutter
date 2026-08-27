@@ -30,6 +30,12 @@ class StreamApiError extends Equatable {
   final int code;
 
   /// Additional error detail codes providing more context.
+  ///
+  /// The backend serializes this field as either a list or an object (a
+  /// long-lived compatibility quirk), so decoding tolerates both: anything
+  /// that is not a list of numbers reads as empty rather than failing the
+  /// whole error.
+  @JsonKey(fromJson: _detailsFromJson)
   final List<int> details;
 
   /// The processing duration before the error occurred.
@@ -69,38 +75,31 @@ class StreamApiError extends Equatable {
   ];
 }
 
-// The token this was issued for has expired; another one is accepted.
-const _expiredTokenCode = 40;
-
-// The token cannot be accepted for a reason another token does not fix: not
-// valid yet, used before it was issued, or signed with the wrong secret.
-final _invalidTokenCodes = _range(41, 43);
-
-// The API key itself is wrong, which no token repairs either.
-const _accessKeyErrorCode = 2;
-
-final _clientErrorStatusCodes = _range(400, 499);
-
-/// Extension methods for [StreamApiError] to provide convenient error type checks.
-extension StreamApiErrorExtension on StreamApiError {
-  /// Whether the token has expired (error code 40).
-  ///
-  /// Distinct from [isInvalidTokenError]: an expired token is fixed by loading another one, whereas
-  /// an invalid token is a configuration problem that a fresh token reproduces.
-  bool get isTokenExpiredError => code == _expiredTokenCode;
-
-  /// Whether the token, or the API key it was signed with, cannot be accepted
-  /// (error codes 41 to 43, and 2).
-  bool get isInvalidTokenError => _invalidTokenCodes.contains(code) || code == _accessKeyErrorCode;
-
-  /// Whether this error is a client-side error (4xx status codes).
-  bool get isClientError => _clientErrorStatusCodes.contains(statusCode);
-
-  /// Whether this error indicates rate limiting (429 status code).
-  bool get isRateLimitError => statusCode == 429;
+List<int> _detailsFromJson(Object? json) {
+  if (json is! List) return const [];
+  return [for (final entry in json.whereType<num>()) entry.toInt()];
 }
 
-// Helper function to generate a range of integers from [from] to [to] inclusive.
-List<int> _range(int from, int to) {
-  return List.generate(to - from + 1, (i) => i + from);
+/// The token this payload carries has expired (code 40).
+///
+/// Same semantics as `StreamApiException.isTokenExpired`, for code that holds
+/// the raw payload — an interceptor reading a response body, or a WebSocket
+/// error event.
+extension StreamApiErrorPredicates on StreamApiError {
+  /// Whether the token has expired (code 40). A fresh token fixes it.
+  bool get isTokenExpired => code == 40;
+
+  /// Whether the token is not valid yet (codes 41 and 42) — clock skew that
+  /// waiting fixes and a fresh token does not.
+  bool get isTokenNotYetValid => code == 41 || code == 42;
+
+  /// Whether the token's signature cannot be accepted (code 43) — a
+  /// configuration problem no token or wait fixes.
+  bool get isTokenSignatureInvalid => code == 43;
+
+  /// Whether the API key cannot be accepted (code 2).
+  bool get isApiKeyInvalid => code == 2;
+
+  /// Whether the request was rate limited (HTTP 429).
+  bool get isRateLimited => statusCode == 429;
 }

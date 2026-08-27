@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../errors.dart';
 import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_event.dart';
@@ -91,7 +92,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       authenticator: onAuthenticate,
       tag: '$tag:Auth',
       onFailure: (error) => disconnect(
-        source: .authenticationFailed(error: error),
+        source: .authenticationFailed(error: _asAuthenticationFailure(error)),
       ),
     );
   }
@@ -193,10 +194,35 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Handed to `disconnect`, which reports the reason, closes the socket, and records the closure
     // even when the close fails. Returned, so a caller connecting again is not refused for the race.
     return result.getOrElse(
-      (error, _) => disconnect(
-        source: .serverInitiated(error: .new(error: error)),
+      (error, stackTrace) => disconnect(
+        source: .serverInitiated(error: _asOpenFailure(error, stackTrace)),
       ),
     );
+  }
+
+  // The engine reports whatever the transport threw; an attempt that never
+  // became usable is a network failure unless it already speaks for itself.
+  StreamException _asOpenFailure(Object error, StackTrace? stackTrace) {
+    return switch (error) {
+      final StreamException exception => exception,
+      _ => StreamNetworkException(
+        message: 'Failed to open the connection',
+        cause: error,
+        stackTrace: stackTrace,
+      ),
+    };
+  }
+
+  // Credentials never went out — an authentication failure, unless the
+  // authenticator already reported one of our own.
+  StreamException _asAuthenticationFailure(Object error) {
+    return switch (error) {
+      final StreamException exception => exception,
+      _ => StreamAuthenticationException(
+        message: 'The connection could not be authenticated',
+        cause: error,
+      ),
+    };
   }
 
   /// Closes the WebSocket connection.
@@ -252,7 +278,10 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
       // Any active state that wasn’t user/system initiated becomes server initiated.
       Connecting() || Authenticating() || Connected() => ServerInitiated(
-        error: WebSocketEngineException(code: closeCode, reason: closeReason),
+        error: StreamNetworkException(
+          message: closeReason ?? 'The connection was closed unexpectedly',
+          closeCode: closeCode,
+        ),
       ),
 
       // Not meaningful to transition from these.
@@ -271,7 +300,11 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _logger.e(() => 'socket failed', error: error, stackTrace: stackTrace);
 
     final source = ServerInitiated(
-      error: WebSocketEngineException(error: error),
+      error: StreamNetworkException(
+        message: 'The connection reported an error',
+        cause: error,
+        stackTrace: stackTrace,
+      ),
     );
 
     // Update the connection state to 'disconnecting' with the source.
@@ -299,10 +332,18 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   void _handleErrorEvent(WsEvent event, Object error) {
     _logger.w(() => 'server sent an error event', error: error);
 
-    final source = ServerInitiated(
-      error: WebSocketEngineException(error: error),
-    );
+    // A server error event is a verdict — the same payload a rejected REST
+    // call carries, delivered over the socket instead.
+    final exception = switch (error) {
+      final StreamException exception => exception,
+      final StreamApiError apiError => StreamApiException.fromApiError(apiError),
+      _ => StreamClientException(
+        message: 'The server reported an error the client could not interpret',
+        cause: error,
+      ),
+    };
 
+    final source = ServerInitiated(error: exception);
     return unawaited(disconnect(source: source));
   }
 

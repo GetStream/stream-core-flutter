@@ -1,8 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:equatable/equatable.dart';
-
-import '../../../errors.dart';
 import '../../../utils.dart';
 import 'web_socket_options.dart';
 
@@ -181,25 +178,3 @@ extension type const CloseCode(int code) implements int {
   static const tlsHandshakeFailure = CloseCode(1015);
 }
 
-class WebSocketEngineException extends Equatable implements Exception {
-  const WebSocketEngineException({
-    String? reason,
-    int? code = 0,
-    this.error,
-  }) : reason = reason ?? 'Unknown',
-       code = code ?? 0;
-
-  final String reason;
-  final int code;
-  final Object? error;
-
-  /// Returns the error as a StreamApiError if it is of that type or
-  /// null otherwise.
-  StreamApiError? get apiError {
-    if (error case final StreamApiError error) return error;
-    return null;
-  }
-
-  @override
-  List<Object?> get props => [reason, code, error];
-}

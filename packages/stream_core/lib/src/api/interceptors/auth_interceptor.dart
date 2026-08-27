@@ -37,17 +37,23 @@ class AuthInterceptor extends Interceptor {
       options.headers['stream-auth-type'] = token.authType.headerValue;
 
       return handler.next(options);
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       _logger.w(() => 'no token to sign ${options.uri} with', error: e, stackTrace: stackTrace);
 
-      final error = ClientException(
-        message: 'Failed to load auth token',
-        stackTrace: stackTrace,
-        error: e,
-      );
+      // Credentials never went out, so this is an authentication failure —
+      // unless the token manager already said so, in which case its report
+      // is kept as is.
+      final exception = switch (e) {
+        final StreamException exception => exception,
+        _ => StreamAuthenticationException(
+          message: 'Failed to load an auth token',
+          cause: e,
+          stackTrace: stackTrace,
+        ),
+      };
 
       final dioError = StreamDioException(
-        exception: error,
+        exception: exception,
         requestOptions: options,
         stackTrace: stackTrace,
       );
@@ -61,8 +67,11 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    final error = err.apiError;
-    if (error == null || !error.isTokenExpiredError) return handler.next(err);
+    // Only an expired token (code 40) is fixed by loading another one; the
+    // other token codes are clock or configuration problems a refresh cannot
+    // help.
+    final error = err.toStreamException();
+    if (error is! StreamApiException || !error.isTokenExpired) return handler.next(err);
 
     final options = err.requestOptions;
 
