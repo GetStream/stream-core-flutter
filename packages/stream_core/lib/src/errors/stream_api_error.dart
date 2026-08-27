@@ -31,10 +31,10 @@ class StreamApiError extends Equatable {
 
   /// Additional error detail codes providing more context.
   ///
-  /// The backend serializes this field as either a list or an object (a
-  /// long-lived compatibility quirk), so decoding tolerates both: anything
-  /// that is not a list of numbers reads as empty rather than failing the
-  /// whole error.
+  /// The wire field is not always a list of codes: a moderation rejection
+  /// (code 73) carries a list of objects here, and the backend can serialize
+  /// the field as an object outright. Decoding tolerates every shape — what
+  /// is not a number reads as absent rather than failing the whole error.
   @JsonKey(fromJson: _detailsFromJson)
   final List<int> details;
 
