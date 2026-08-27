@@ -49,14 +49,27 @@ sealed class StreamException extends Equatable implements Exception {
   List<Object?> get props => [message, cause];
 
   @override
-  String toString() {
-    // The runtime type is the point here: it names the category (or the
-    // product subclass) in logs and crash reports.
-    // ignore: no_runtimetype_tostring
-    final buffer = StringBuffer('$runtimeType: $message');
+  String toString() => _toString('StreamException');
+
+  // Builds the log line, headed by the exact runtime type in debug mode and
+  // by [fallbackName] in release mode, where type names may be minified.
+  String _toString(String fallbackName) {
+    final buffer = StringBuffer('${_typeName(this, fallbackName)}: $message');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');
     return buffer.toString();
   }
+}
+
+// The pattern behind Flutter's `objectRuntimeType`: asserts run only in debug
+// mode, so release builds pay nothing and print [fallbackName] instead of a
+// possibly minified type name.
+String _typeName(Object object, String fallbackName) {
+  var name = fallbackName;
+  assert(() {
+    name = object.runtimeType.toString();
+    return true;
+  }());
+  return name;
 }
 
 /// A request that reached a Stream server and was answered with an error.
@@ -144,7 +157,8 @@ base class StreamApiException extends StreamException {
   /// automatically, so this surfaces only when a refresh could not help.
   bool get isTokenExpired => code?.isTokenExpired ?? false;
 
-  /// Whether the token is not valid yet ([StreamErrorCode.tokenNotValidYet] and [StreamErrorCode.tokenUsedBeforeIssuedAt]).
+  /// Whether the token is not valid yet ([StreamErrorCode.tokenNotValidYet] and
+  /// [StreamErrorCode.tokenUsedBeforeIssuedAt]).
   ///
   /// A clock-skew condition on the token's `nbf`/`iat` claims: waiting fixes
   /// it, a fresh token minted by the same skewed clock does not.
@@ -175,8 +189,8 @@ base class StreamApiException extends StreamException {
   @override
   String toString() {
     final code = this.code?.toString() ?? 'none';
-    // ignore: no_runtimetype_tostring
-    final buffer = StringBuffer('$runtimeType(code: $code, statusCode: $statusCode): $message');
+    final name = _typeName(this, 'StreamApiException');
+    final buffer = StringBuffer('$name(code: $code, statusCode: $statusCode): $message');
     if (moreInfo case final moreInfo?) buffer.write('\n  more info: $moreInfo');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');
     return buffer.toString();
@@ -218,6 +232,9 @@ base class StreamNetworkException extends StreamException {
 
   @override
   List<Object?> get props => [...super.props, isCancelled, isTimeout, closeCode];
+
+  @override
+  String toString() => _toString('StreamNetworkException');
 }
 
 /// Credentials that could not be produced or sent.
@@ -234,6 +251,9 @@ base class StreamAuthenticationException extends StreamException {
     super.cause,
     super.stackTrace,
   });
+
+  @override
+  String toString() => _toString('StreamAuthenticationException');
 }
 
 /// A failure inside the SDK itself.
@@ -249,4 +269,7 @@ base class StreamClientException extends StreamException {
     super.cause,
     super.stackTrace,
   });
+
+  @override
+  String toString() => _toString('StreamClientException');
 }
