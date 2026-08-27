@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../errors.dart' show StreamClientException, StreamNetworkException;
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -133,22 +132,10 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     return runSafelySync(() {
       final ws = _ws;
       if (ws == null) {
-        // A condition, not misuse: a correct caller can race a connection
-        // that dropped between deciding to send and sending.
-        throw const StreamNetworkException(message: 'The connection is not open, so nothing was sent');
+        throw StateError('WebSocket is not open. Call open() first.');
       }
 
-      final Object data;
-      try {
-        data = _messageCodec.encode(message);
-      } catch (e, stackTrace) {
-        throw StreamClientException(
-          message: 'The message could not be encoded',
-          cause: e,
-          stackTrace: stackTrace,
-        );
-      }
-
+      final data = _messageCodec.encode(message);
       return ws.sink.add(data);
     });
   }
