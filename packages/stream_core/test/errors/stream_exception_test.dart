@@ -21,7 +21,7 @@ void main() {
   group('StreamException', () {
     test('every kind can be caught as one', () {
       const exceptions = <StreamException>[
-        StreamApiException(message: 'refused', statusCode: 400, code: 4),
+        StreamApiException(message: 'refused', statusCode: 400, code: StreamErrorCode.inputError),
         StreamNetworkException(message: 'offline'),
         StreamAuthenticationException(message: 'no token'),
         StreamClientException(message: 'broken'),
@@ -101,6 +101,15 @@ void main() {
         final holds = [it.isTokenExpired, it.isTokenNotYetValid, it.isTokenSignatureInvalid, it.isApiKeyInvalid];
         expect(holds.where((held) => held), hasLength(1), reason: 'code $code');
       }
+    });
+
+    test('carries a code the SDK does not know as its number', () {
+      // The registry grows server-side; an unnamed code must survive decoding
+      // and compare as a plain number.
+      final exception = StreamApiException.fromApiError(_apiError(code: 999));
+
+      expect(exception.code, 999);
+      expect(exception.isTokenExpired, isFalse);
     });
 
     test('reads a rate limit off the status, not the code', () {

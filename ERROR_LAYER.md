@@ -85,8 +85,10 @@ your provider is static, or the fresh token was refused too.
 
 `message` always describes the failure, but it is developer-facing English straight from the server
 (REST errors even carry an internal controller-name prefix) — never show it verbatim as product UI.
-For localized, user-worthy text, key your own strings off `code`; product SDKs ship a typed code
-enum on top of the raw `int`. `statusCode` and `code` are independent facts: the backend maps some
+For localized, user-worthy text, key your own strings off `code`. Core owns the code registry as
+`StreamErrorCode` — an extension type over `int` with a named constant per known code, shared by
+every product because the backend's registry is one shared space; a code the SDK does not know yet
+still carries its number. `statusCode` and `code` are independent facts: the backend maps some
 codes to more than one status, so never infer one from the other.
 
 Failures arrive on two channels, carrying the same four types:

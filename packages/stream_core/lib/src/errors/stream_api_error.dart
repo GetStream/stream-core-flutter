@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'stream_error_code.dart';
+
 part 'stream_api_error.g.dart';
 
 /// An API error response from the Stream API.
@@ -88,21 +90,24 @@ List<int> _detailsFromJson(Object? json) {
 /// Same semantics as the `StreamApiException` getters of the same names, for
 /// code that holds the raw payload rather than the exception.
 extension StreamApiErrorPredicates on StreamApiError {
-  /// Whether the token has expired (code 40).
+  /// Whether the token has expired ([StreamErrorCode.tokenExpired]).
   ///
   /// A fresh token fixes it.
-  bool get isTokenExpired => code == 40;
+  bool get isTokenExpired => code == StreamErrorCode.tokenExpired;
 
-  /// Whether the token is not valid yet (codes 41 and 42) — clock skew that
-  /// waiting fixes and a fresh token does not.
-  bool get isTokenNotYetValid => code == 41 || code == 42;
+  /// Whether the token is not valid yet ([StreamErrorCode.tokenNotValidYet]
+  /// and [StreamErrorCode.tokenUsedBeforeIssuedAt]) — clock skew that waiting
+  /// fixes and a fresh token does not.
+  bool get isTokenNotYetValid =>
+      code == StreamErrorCode.tokenNotValidYet || code == StreamErrorCode.tokenUsedBeforeIssuedAt;
 
-  /// Whether the token's signature cannot be accepted (code 43) — a
-  /// configuration problem no token or wait fixes.
-  bool get isTokenSignatureInvalid => code == 43;
+  /// Whether the token's signature cannot be accepted
+  /// ([StreamErrorCode.tokenSignatureInvalid]) — a configuration problem no
+  /// token or wait fixes.
+  bool get isTokenSignatureInvalid => code == StreamErrorCode.tokenSignatureInvalid;
 
-  /// Whether the API key cannot be accepted (code 2).
-  bool get isApiKeyInvalid => code == 2;
+  /// Whether the API key cannot be accepted ([StreamErrorCode.apiKeyInvalid]).
+  bool get isApiKeyInvalid => code == StreamErrorCode.apiKeyInvalid;
 
   /// Whether the request was rate limited (HTTP 429).
   bool get isRateLimited => statusCode == 429;

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'stream_api_error.dart';
+import 'stream_error_code.dart';
 
 /// The root of every failure a Stream SDK reports.
 ///
@@ -88,7 +89,7 @@ base class StreamApiException extends StreamException {
   }) : this(
          message: error.message,
          statusCode: error.statusCode,
-         code: error.code,
+         code: StreamErrorCode(error.code),
          moreInfo: error.moreInfo.isEmpty ? null : error.moreInfo,
          unrecoverable: error.unrecoverable ?? false,
          retryAfter: retryAfter,
@@ -106,11 +107,12 @@ base class StreamApiException extends StreamException {
   /// Stream's stable error code.
   ///
   /// The machine-readable discriminator — the value to branch on, where
-  /// [message] is not stable.
+  /// [message] is not stable. [StreamErrorCode] names the known values;
+  /// a code without a named constant still carries its number.
   ///
   /// `null` when the response carried no Stream error payload, as when an
   /// intermediary answered with an error of its own.
-  final int? code;
+  final StreamErrorCode? code;
 
   /// A documentation URL for this error, when the server sent one.
   ///
@@ -135,35 +137,33 @@ base class StreamApiException extends StreamException {
   /// answered with an error of its own.
   final StreamApiError? apiError;
 
-  static const _codeApiKeyInvalid = 2;
-  static const _codeTokenExpired = 40;
-  static const _codeTokenNotValidYet = 41;
-  static const _codeTokenUsedBeforeIssuedAt = 42;
-  static const _codeTokenSignatureInvalid = 43;
-
-  /// Whether the token this request carried has expired (code 40).
+  /// Whether the token this request carried has expired
+  /// ([StreamErrorCode.tokenExpired]).
   ///
   /// A freshly issued token fixes it. The SDK refreshes expired tokens
   /// automatically, so this surfaces only when a refresh could not help.
-  bool get isTokenExpired => code == _codeTokenExpired;
+  bool get isTokenExpired => code == StreamErrorCode.tokenExpired;
 
-  /// Whether the token is not valid yet (codes 41 and 42).
+  /// Whether the token is not valid yet ([StreamErrorCode.tokenNotValidYet]
+  /// and [StreamErrorCode.tokenUsedBeforeIssuedAt]).
   ///
   /// A clock-skew condition on the token's `nbf`/`iat` claims: waiting fixes
   /// it, a fresh token minted by the same skewed clock does not.
-  bool get isTokenNotYetValid => code == _codeTokenNotValidYet || code == _codeTokenUsedBeforeIssuedAt;
+  bool get isTokenNotYetValid =>
+      code == StreamErrorCode.tokenNotValidYet || code == StreamErrorCode.tokenUsedBeforeIssuedAt;
 
-  /// Whether the token's signature cannot be accepted (code 43).
+  /// Whether the token's signature cannot be accepted
+  /// ([StreamErrorCode.tokenSignatureInvalid]).
   ///
   /// A configuration problem — signed with the wrong secret. Neither waiting
   /// nor a fresh token from the same signer fixes it.
-  bool get isTokenSignatureInvalid => code == _codeTokenSignatureInvalid;
+  bool get isTokenSignatureInvalid => code == StreamErrorCode.tokenSignatureInvalid;
 
-  /// Whether the API key cannot be accepted (code 2).
+  /// Whether the API key cannot be accepted ([StreamErrorCode.apiKeyInvalid]).
   ///
   /// The key is unknown, or the product it addresses is not enabled for the
   /// app. A configuration problem no token fixes.
-  bool get isApiKeyInvalid => code == _codeApiKeyInvalid;
+  bool get isApiKeyInvalid => code == StreamErrorCode.apiKeyInvalid;
 
   /// Whether the request was rate limited (HTTP 429).
   ///
