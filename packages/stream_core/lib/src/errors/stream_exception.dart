@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../utils/object.dart';
 import 'stream_api_error.dart';
 import 'stream_error_code.dart';
 
@@ -54,22 +55,10 @@ sealed class StreamException extends Equatable implements Exception {
   // Builds the log line, headed by the exact runtime type in debug mode and
   // by [fallbackName] in release mode, where type names may be minified.
   String _toString(String fallbackName) {
-    final buffer = StringBuffer('${_typeName(this, fallbackName)}: $message');
+    final buffer = StringBuffer('${objectRuntimeType(this, fallbackName)}: $message');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');
     return buffer.toString();
   }
-}
-
-// The pattern behind Flutter's `objectRuntimeType`: asserts run only in debug
-// mode, so release builds pay nothing and print [fallbackName] instead of a
-// possibly minified type name.
-String _typeName(Object object, String fallbackName) {
-  var name = fallbackName;
-  assert(() {
-    name = object.runtimeType.toString();
-    return true;
-  }());
-  return name;
 }
 
 /// A request that reached a Stream server and was answered with an error.
@@ -197,7 +186,7 @@ base class StreamApiException extends StreamException {
       if (retryAfter case final retryAfter?) 'retryAfter: ${retryAfter.inSeconds}s',
     ];
 
-    final name = _typeName(this, 'StreamApiException');
+    final name = objectRuntimeType(this, 'StreamApiException');
     final buffer = StringBuffer('$name(${facts.join(', ')}): $message');
     if (moreInfo case final moreInfo?) buffer.write('\n  more info: $moreInfo');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');
@@ -243,7 +232,7 @@ base class StreamNetworkException extends StreamException {
 
   @override
   String toString() {
-    final name = _typeName(this, 'StreamNetworkException');
+    final name = objectRuntimeType(this, 'StreamNetworkException');
     final closure = switch (closeCode) {
       final closeCode? => '(closeCode: $closeCode)',
       _ => '',

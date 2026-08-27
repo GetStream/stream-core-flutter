@@ -6,6 +6,7 @@ export 'utils/in_flight_cache.dart';
 export 'utils/lifecycle_state_provider.dart';
 export 'utils/list_extensions.dart';
 export 'utils/network_state_provider.dart';
+export 'utils/object.dart';
 export 'utils/result.dart';
 export 'utils/shared_emitter.dart';
 export 'utils/standard.dart';
