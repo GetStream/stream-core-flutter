@@ -341,18 +341,23 @@ void main() {
       expect(await uploader.uploadBatch(const []).toList(), isEmpty);
     });
 
-    test('with eagerError, throws the first failure and closes', () async {
-      final uploader = StreamAttachmentUploader(
-        cdn: _FakeCdn({fileA: _fails(), fileB: _succeeds()}),
-      );
+    test('with eagerError, emits the first failure and closes, never starting the rest', () async {
+      final cdn = _FakeCdn({fileA: _fails(), fileB: _succeeds()});
+      final uploader = StreamAttachmentUploader(cdn: cdn);
 
-      final outcomes = uploader.uploadBatch(
-        [_attachment('a', fileA), _attachment('b', fileB)],
-        maxConcurrent: 1,
-        eagerError: true,
-      );
+      final outcomes = await uploader
+          .uploadBatch(
+            [_attachment('a', fileA), _attachment('b', fileB)],
+            maxConcurrent: 1,
+            eagerError: true,
+          )
+          .toList();
 
-      await expectLater(outcomes, emitsError(same(_refused)));
+      // The failure arrives as an outcome like any other, still paired with
+      // the attachment it belongs to.
+      expect(outcomes.map((it) => it.attachmentId), ['a']);
+      expect(outcomes.single.result.exceptionOrNull(), same(_refused));
+      expect(cdn.methods.keys, isNot(contains(fileB)));
     });
 
     test('without eagerError, emits the failure and continues', () async {

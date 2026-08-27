@@ -107,9 +107,10 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
   /// attachment's outcome can be acted on the moment it lands. Progress
   /// updates are provided through the optional [onProgress] callback.
   ///
-  /// When [eagerError] is true, the stream throws the first upload's failure
-  /// and closes. When false (default), failed uploads are emitted as failures
-  /// and processing continues.
+  /// When [eagerError] is true, the stream closes right after the first
+  /// failed upload's outcome, and uploads not yet started never run. When
+  /// false (default), failed uploads are emitted as failures and processing
+  /// continues.
   ///
   /// Returns a [Stream] of outcomes in completion order, not input order. For
   /// all the outcomes as one all-or-nothing result, consider [uploadAll].
@@ -138,13 +139,10 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
 
     // Yield outcomes as they complete
     await for (final outcome in uploadStream) {
-      // If eagerError is enabled, throw on first failure
-      if (outcome.result.exceptionOrNull() case final error? when eagerError) {
-        final stackTrace = outcome.result.stackTraceOrNull();
-        Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
-      }
-
       yield outcome;
+
+      // If eagerError is enabled, close after the first failure
+      if (outcome.result case Failure() when eagerError) return;
     }
   }
 
@@ -162,14 +160,14 @@ extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
     int maxConcurrent = 5,
     bool eagerError = true,
   }) async {
-    final uploaded = <UploadedAttachment>[];
-
     final outcomes = uploadBatch(
       attachments,
       onProgress: onProgress,
       maxConcurrent: maxConcurrent,
+      eagerError: eagerError,
     );
 
+    final uploaded = <UploadedAttachment>[];
     await for (final (attachmentId: _, :result) in outcomes) {
       // If eagerError is enabled, fail as one with the first failure
       if (result case Failure() when eagerError) return result;
