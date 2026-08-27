@@ -5,20 +5,17 @@ class ClientException implements Exception {
     this.message,
     Object? error,
     this.stackTrace,
-  }) {
-    underlyingError = error;
-    if (error is StreamApiError) {
-      apiError = error;
-    } else {
-      apiError = null;
-    }
-  }
+  }) : underlyingError = error;
 
   final String? message;
 
-  late final Object? underlyingError;
-  late final StreamApiError? apiError;
+  final Object? underlyingError;
   final StackTrace? stackTrace;
+
+  StreamApiError? get apiError {
+    if (underlyingError case final StreamApiError error) return error;
+    return null;
+  }
 }
 
 class HttpClientException extends ClientException {
