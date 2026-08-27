@@ -89,7 +89,7 @@ base class StreamApiException extends StreamException {
   }) : this(
          message: error.message,
          statusCode: error.statusCode,
-         code: StreamErrorCode(error.code),
+         code: error.code,
          moreInfo: error.moreInfo.isEmpty ? null : error.moreInfo,
          unrecoverable: error.unrecoverable ?? false,
          retryAfter: retryAfter,

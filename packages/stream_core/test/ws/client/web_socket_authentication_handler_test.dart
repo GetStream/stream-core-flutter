@@ -18,7 +18,7 @@ StreamApiError _apiError({
   required int code,
   int statusCode = 401,
 }) => StreamApiError(
-  code: code,
+  code: StreamErrorCode(code),
   details: const [],
   duration: '0ms',
   message: 'error $code',

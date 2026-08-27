@@ -2,7 +2,7 @@ import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 StreamApiError _apiError(int code, {int statusCode = 401}) => StreamApiError(
-  code: code,
+  code: StreamErrorCode(code),
   details: const [],
   duration: '0ms',
   message: 'error $code',
@@ -68,7 +68,7 @@ void main() {
 
   test('automatic reconnection is disabled when the server said retrying will not help', () {
     const unrecoverable = StreamApiError(
-      code: 17,
+      code: StreamErrorCode.notAllowed,
       details: [],
       duration: '0ms',
       message: 'not allowed',

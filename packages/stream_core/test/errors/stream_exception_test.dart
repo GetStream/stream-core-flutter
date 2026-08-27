@@ -8,7 +8,7 @@ StreamApiError _apiError({
   String moreInfo = '',
   bool? unrecoverable,
 }) => StreamApiError(
-  code: code,
+  code: StreamErrorCode(code),
   details: const [],
   duration: '0ms',
   message: message,

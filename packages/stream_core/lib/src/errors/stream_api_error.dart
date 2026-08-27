@@ -29,7 +29,10 @@ class StreamApiError extends Equatable {
   });
 
   /// The specific error code identifying the type of error.
-  final int code;
+  ///
+  /// [StreamErrorCode] names the known values; a code without a named
+  /// constant still carries its number.
+  final StreamErrorCode code;
 
   /// Additional error detail codes providing more context.
   ///
@@ -93,21 +96,20 @@ extension StreamApiErrorPredicates on StreamApiError {
   /// Whether the token has expired ([StreamErrorCode.tokenExpired]).
   ///
   /// A fresh token fixes it.
-  bool get isTokenExpired => code == StreamErrorCode.tokenExpired;
+  bool get isTokenExpired => code == .tokenExpired;
 
   /// Whether the token is not valid yet ([StreamErrorCode.tokenNotValidYet]
   /// and [StreamErrorCode.tokenUsedBeforeIssuedAt]) — clock skew that waiting
   /// fixes and a fresh token does not.
-  bool get isTokenNotYetValid =>
-      code == StreamErrorCode.tokenNotValidYet || code == StreamErrorCode.tokenUsedBeforeIssuedAt;
+  bool get isTokenNotYetValid => code == .tokenNotValidYet || code == .tokenUsedBeforeIssuedAt;
 
   /// Whether the token's signature cannot be accepted
   /// ([StreamErrorCode.tokenSignatureInvalid]) — a configuration problem no
   /// token or wait fixes.
-  bool get isTokenSignatureInvalid => code == StreamErrorCode.tokenSignatureInvalid;
+  bool get isTokenSignatureInvalid => code == .tokenSignatureInvalid;
 
   /// Whether the API key cannot be accepted ([StreamErrorCode.apiKeyInvalid]).
-  bool get isApiKeyInvalid => code == StreamErrorCode.apiKeyInvalid;
+  bool get isApiKeyInvalid => code == .apiKeyInvalid;
 
   /// Whether the request was rate limited (HTTP 429).
   bool get isRateLimited => statusCode == 429;
