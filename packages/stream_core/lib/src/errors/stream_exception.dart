@@ -32,19 +32,22 @@ sealed class StreamException extends Equatable implements Exception {
     this.stackTrace,
   });
 
-  /// The [StreamException] that [error] represents.
+  /// The [StreamException] that [error] represents, or `null` when it does
+  /// not represent one.
   ///
-  /// Kept as it is when [error] is one already, read out of a server error
-  /// payload when it is a [StreamApiError], and built by [orElse] otherwise —
-  /// the one judgment that differs per boundary.
-  factory StreamException.from(
-    Object error, {
-    required StreamException Function() orElse,
-  }) {
+  /// Kept as it is when [error] is one already, and read out of a server
+  /// error payload when it is a [StreamApiError]. A boundary supplies its own
+  /// fallback for everything else:
+  ///
+  /// ```dart
+  /// final exception = StreamException.tryFrom(error) ??
+  ///     StreamNetworkException(message: 'Failed to open the connection', cause: error);
+  /// ```
+  static StreamException? tryFrom(Object error) {
     return switch (error) {
       final StreamException exception => exception,
       final StreamApiError apiError => StreamApiException.fromApiError(apiError),
-      _ => orElse(),
+      _ => null,
     };
   }
 

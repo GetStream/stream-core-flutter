@@ -47,17 +47,16 @@ void main() {
       );
     });
 
-    test('from keeps one of ours, lifts a payload, and falls back otherwise', () {
+    test('tryFrom keeps one of ours, lifts a payload, and reads null otherwise', () {
       const ours = StreamAuthenticationException(message: 'no token');
       final payload = _apiError();
-      StreamException fallback() => const StreamClientException(message: 'unexpected');
 
-      expect(StreamException.from(ours, orElse: fallback), same(ours));
+      expect(StreamException.tryFrom(ours), same(ours));
       expect(
-        StreamException.from(payload, orElse: fallback),
+        StreamException.tryFrom(payload),
         isA<StreamApiException>().having((it) => it.apiError, 'apiError', same(payload)),
       );
-      expect(StreamException.from(StateError('bug'), orElse: fallback), isA<StreamClientException>());
+      expect(StreamException.tryFrom(StateError('bug')), isNull);
     });
 
     test('prints its kind, its message and its cause', () {

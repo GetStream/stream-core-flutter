@@ -93,13 +93,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       tag: '$tag:Auth',
       onFailure: (error) => disconnect(
         source: .authenticationFailed(
-          error: StreamException.from(
-            error,
-            orElse: () => StreamAuthenticationException(
-              message: 'The connection could not be authenticated',
-              cause: error,
-            ),
-          ),
+          error:
+              StreamException.tryFrom(error) ??
+              StreamAuthenticationException(
+                message: 'The connection could not be authenticated',
+                cause: error,
+              ),
         ),
       ),
     );
@@ -204,14 +203,13 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     return result.getOrElse(
       (error, stackTrace) => disconnect(
         source: .serverInitiated(
-          error: StreamException.from(
-            error,
-            orElse: () => StreamNetworkException(
-              message: 'Failed to open the connection',
-              cause: error,
-              stackTrace: stackTrace,
-            ),
-          ),
+          error:
+              StreamException.tryFrom(error) ??
+              StreamNetworkException(
+                message: 'Failed to open the connection',
+                cause: error,
+                stackTrace: stackTrace,
+              ),
         ),
       ),
     );
@@ -324,13 +322,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   void _handleErrorEvent(WsEvent event, Object error) {
     _logger.w(() => 'server sent an error event', error: error);
 
-    final exception = StreamException.from(
-      error,
-      orElse: () => StreamClientException(
-        message: 'The server reported an error the client could not interpret',
-        cause: error,
-      ),
-    );
+    final exception =
+        StreamException.tryFrom(error) ??
+        StreamClientException(
+          message: 'The server reported an error the client could not interpret',
+          cause: error,
+        );
 
     final source = ServerInitiated(error: exception);
     return unawaited(disconnect(source: source));
