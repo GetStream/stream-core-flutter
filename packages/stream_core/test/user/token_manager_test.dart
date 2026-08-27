@@ -177,7 +177,7 @@ void main() {
         // A provider refusing one caller refuses all five, so asking it five times over would
         // hammer a token endpoint that has already said no.
         for (final future in futures) {
-          await expectLater(future, throwsStateError);
+          await expectLater(future, throwsA(isA<StreamAuthenticationException>()));
         }
 
         expect(provider.loadCount, 1);
@@ -212,7 +212,12 @@ void main() {
         });
         final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
 
-        await expectLater(manager.getToken(), throwsStateError);
+        // Whatever the provider threw arrives as an authentication failure,
+        // with the original error preserved as its cause.
+        await expectLater(
+          manager.getToken(),
+          throwsA(isA<StreamAuthenticationException>().having((it) => it.cause, 'cause', isStateError)),
+        );
         expect(manager.peekToken(), isNull);
 
         final token = await manager.getToken();

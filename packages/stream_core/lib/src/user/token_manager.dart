@@ -1,5 +1,6 @@
 import '../errors/stream_exception.dart';
 import '../utils/in_flight_cache.dart';
+import '../utils/result.dart';
 import 'token_provider.dart';
 import 'user_token.dart';
 
@@ -198,15 +199,15 @@ class TokenManager {
   }
 
   Future<UserToken> _loadFrom(TokenProvider provider, String userId) async {
-    try {
-      return await provider.loadToken(userId);
-    } on Exception catch (e, stackTrace) {
+    final result = await runSafely(() => provider.loadToken(userId));
+
+    return result.getOrElse((error, stackTrace) {
       throw StreamAuthenticationException(
         message: 'The token provider failed to load a token for user "$userId"',
-        cause: e,
+        cause: error,
         stackTrace: stackTrace,
       );
-    }
+    });
   }
 
   /// Expires the currently cached token.

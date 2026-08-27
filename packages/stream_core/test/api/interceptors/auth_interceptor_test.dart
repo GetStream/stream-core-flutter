@@ -230,9 +230,9 @@ void main() {
           isA<DioException>().having(
             (it) => it.error,
             'error',
-            isA<StreamAuthenticationException>()
-                .having((it) => it.message, 'message', 'Failed to load an auth token')
-                .having((it) => it.cause, 'cause', isStateError),
+            // The token manager reports the load failure itself; the
+            // interceptor passes its report through untouched.
+            isA<StreamAuthenticationException>().having((it) => it.cause, 'cause', isStateError),
           ),
         ),
       );

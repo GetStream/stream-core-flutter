@@ -300,7 +300,6 @@ sealed class DisconnectionSource extends Equatable {
     UnHealthyConnection() => true,
     ConnectTimeout() => true,
     ServerInitiated(:final error) => switch (error) {
-      null => true,
       StreamApiException(unrecoverable: true) => false,
       StreamApiException(isTokenSignatureInvalid: true) => false,
       StreamApiException(isApiKeyInvalid: true) => false,
@@ -312,6 +311,7 @@ sealed class DisconnectionSource extends Equatable {
       StreamNetworkException() => true,
       StreamAuthenticationException() => false,
       StreamClientException() => true,
+      _ => true,
     },
   };
 
