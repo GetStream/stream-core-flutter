@@ -209,7 +209,8 @@ The decision runs in order:
    | `StreamApiException`, 5xx | Yes, with backoff. |
    | `StreamApiException(isTokenExpired: true)` | No — the SDK already refreshed and retried once; seeing it means refresh could not help. |
    | `StreamApiException(isTokenNotYetValid: true)` | Yes, after waiting — clock skew heals, bounded. |
-   | `StreamApiException`, any other 4xx | No — the same request gets the same verdict. |
+   | `StreamApiException`, 408 (code 48) | Yes, with backoff — a server-side processing timeout, not a verdict on the request. |
+   | `StreamApiException`, any other 4xx | No — the same request gets the same verdict. (A channel cooldown, code 60, does clear on its own, but its wait is not machine-readable — surface it rather than auto-retry.) |
    | `StreamAuthenticationException` | No — fix credentials first, then re-attempt the operation. |
    | `StreamClientException` | No — a bug does not heal on resend; report it. |
 

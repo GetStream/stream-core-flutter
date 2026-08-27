@@ -59,7 +59,8 @@ extension type const StreamErrorCode(int code) implements int {
   /// `22` – The request payload is too big.
   static const payloadTooBig = StreamErrorCode(22);
 
-  /// `40` – The token has expired. A fresh token fixes it.
+  /// `40` – The token has expired, or has been revoked. Either way a fresh
+  /// token fixes it.
   static const tokenExpired = StreamErrorCode(40);
 
   /// `41` – The token is not valid yet (its `nbf` claim is in the future).
