@@ -88,7 +88,9 @@ List<int> _detailsFromJson(Object? json) {
 /// Same semantics as the `StreamApiException` getters of the same names, for
 /// code that holds the raw payload rather than the exception.
 extension StreamApiErrorPredicates on StreamApiError {
-  /// Whether the token has expired (code 40). A fresh token fixes it.
+  /// Whether the token has expired (code 40).
+  ///
+  /// A fresh token fixes it.
   bool get isTokenExpired => code == 40;
 
   /// Whether the token is not valid yet (codes 41 and 42) — clock skew that
