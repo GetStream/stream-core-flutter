@@ -62,8 +62,18 @@ Future<Result<UploadedFile>> Function() _succeeds([UploadedFile file = _uploaded
 Future<Result<UploadedFile>> Function() _fails() =>
     () async => const Result.failure(_refused);
 
+/// An upload that stays in flight until [token] is cancelled, then settles the
+/// way a cancelled CDN request does.
+Future<Result<UploadedFile>> Function() _cancelsWith(CancelToken token) => () async {
+  await token.whenCancel;
+  return const Result.failure(_cancelled);
+};
+
 const _uploadedFile = UploadedFile(fileUrl: 'https://cdn/file', thumbUrl: 'https://cdn/thumb');
 const _refused = StreamApiException(message: 'too large', statusCode: 413, code: StreamErrorCode.payloadTooBig);
+const _cancelled = StreamNetworkException(message: 'The upload was cancelled', isCancelled: true);
+
+final Matcher _isCancelledFailure = isA<StreamNetworkException>().having((it) => it.isCancelled, 'isCancelled', isTrue);
 
 void main() {
   final fileA = AttachmentFile.fromData(Uint8List(0));
@@ -117,6 +127,65 @@ void main() {
       await uploader.upload(_attachment('a', fileA), cancelToken: cancelToken);
 
       expect(cdn.cancelTokens[fileA], same(cancelToken));
+    });
+
+    test('cancelling mid-upload settles it as a cancelled failure', () async {
+      final cancelToken = CancelToken();
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({fileA: _cancelsWith(cancelToken)}),
+      );
+
+      final pending = uploader.upload(_attachment('a', fileA), cancelToken: cancelToken);
+      cancelToken.cancel();
+
+      final result = await pending;
+      expect(result.exceptionOrNull(), _isCancelledFailure);
+    });
+
+    test('cancelling one upload leaves another in flight untouched', () async {
+      final cancelToken = CancelToken();
+      final slow = Completer<Result<UploadedFile>>();
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({fileA: _cancelsWith(cancelToken), fileB: () => slow.future}),
+      );
+
+      final cancelled = uploader.upload(_attachment('a', fileA), cancelToken: cancelToken);
+      final untouched = uploader.upload(_attachment('b', fileB), cancelToken: CancelToken());
+
+      cancelToken.cancel();
+      expect((await cancelled).exceptionOrNull(), _isCancelledFailure);
+
+      // The other upload is still in flight and completes on its own terms.
+      slow.complete(const Result.success(_uploadedFile));
+      expect(
+        (await untouched).getOrNull(),
+        isA<UploadedAttachment>().having((it) => it.id, 'id', 'b'),
+      );
+    });
+
+    test('a cancelled attachment can be retried with a fresh token', () async {
+      final cancelToken = CancelToken();
+      var attempts = 0;
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({
+          fileA: () {
+            attempts += 1;
+            if (attempts == 1) return _cancelsWith(cancelToken)();
+            return _succeeds()();
+          },
+        }),
+      );
+      final attachment = _attachment('a', fileA);
+
+      final first = uploader.upload(attachment, cancelToken: cancelToken);
+      cancelToken.cancel();
+      expect((await first).exceptionOrNull(), _isCancelledFailure);
+
+      final retried = await uploader.upload(attachment, cancelToken: CancelToken());
+      expect(
+        retried.getOrNull(),
+        isA<UploadedAttachment>().having((it) => it.remoteUrl, 'remoteUrl', 'https://cdn/file'),
+      );
     });
 
     test('normalizes progress to a fraction, clamped, with an empty total as zero', () async {
@@ -185,6 +254,20 @@ void main() {
       expect(seen, [('a', 0.5)]);
     });
 
+    test('a cancelled upload reads as cancelled while the rest of the batch lands', () async {
+      final cancelToken = CancelToken();
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({fileA: _cancelsWith(cancelToken), fileB: _succeeds()}),
+      );
+
+      final outcomes = uploader.uploadBatch([_attachment('a', fileA), _attachment('b', fileB)]).toList();
+      cancelToken.cancel();
+
+      final byId = {for (final (:attachmentId, :result) in await outcomes) attachmentId: result};
+      expect(byId['a']?.exceptionOrNull(), _isCancelledFailure);
+      expect(byId['b'], isA<Success<UploadedAttachment>>());
+    });
+
     test('emits nothing for an empty batch', () async {
       final uploader = StreamAttachmentUploader(cdn: _FakeCdn({}));
 
@@ -240,6 +323,18 @@ void main() {
       final result = await uploader.uploadAll([_attachment('a', fileA), _attachment('b', fileB)]);
 
       expect(result.exceptionOrNull(), same(_refused));
+    });
+
+    test('fails as one with the cancelled failure when an upload is called off', () async {
+      final cancelToken = CancelToken();
+      final uploader = StreamAttachmentUploader(
+        cdn: _FakeCdn({fileA: _cancelsWith(cancelToken), fileB: _succeeds()}),
+      );
+
+      final pending = uploader.uploadAll([_attachment('a', fileA), _attachment('b', fileB)]);
+      cancelToken.cancel();
+
+      expect((await pending).exceptionOrNull(), _isCancelledFailure);
     });
 
     test('succeeds empty for an empty batch', () async {
