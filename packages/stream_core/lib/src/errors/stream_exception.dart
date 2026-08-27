@@ -50,12 +50,9 @@ sealed class StreamException extends Equatable implements Exception {
   List<Object?> get props => [message, cause];
 
   @override
-  String toString() => _toString('StreamException');
-
-  // Builds the log line, headed by the exact runtime type in debug mode and
-  // by [fallbackName] in release mode, where type names may be minified.
-  String _toString(String fallbackName) {
-    final buffer = StringBuffer('${objectRuntimeType(this, fallbackName)}: $message');
+  String toString() {
+    final name = objectRuntimeType(this, 'StreamException');
+    final buffer = StringBuffer('$name: $message');
     if (cause case final cause?) buffer.write('\n  caused by: $cause');
     return buffer.toString();
   }
@@ -260,7 +257,12 @@ base class StreamAuthenticationException extends StreamException {
   });
 
   @override
-  String toString() => _toString('StreamAuthenticationException');
+  String toString() {
+    final name = objectRuntimeType(this, 'StreamAuthenticationException');
+    final buffer = StringBuffer('$name: $message');
+    if (cause case final cause?) buffer.write('\n  caused by: $cause');
+    return buffer.toString();
+  }
 }
 
 /// A failure inside the SDK itself.
@@ -278,5 +280,10 @@ base class StreamClientException extends StreamException {
   });
 
   @override
-  String toString() => _toString('StreamClientException');
+  String toString() {
+    final name = objectRuntimeType(this, 'StreamClientException');
+    final buffer = StringBuffer('$name: $message');
+    if (cause case final cause?) buffer.write('\n  caused by: $cause');
+    return buffer.toString();
+  }
 }
