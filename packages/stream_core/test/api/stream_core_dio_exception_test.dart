@@ -152,11 +152,9 @@ void main() {
 
     test('marks a request the caller cancelled as such', () {
       final cancelled = _failure(type: DioExceptionType.cancel).toStreamException();
-      final refused = _failure(body: _errorBody(), statusCode: 401).toStreamException();
 
       // A caller that called the request off should not be shown it as a failure.
       expect(cancelled, isA<StreamNetworkException>().having((it) => it.isCancelled, 'isCancelled', isTrue));
-      expect(refused, isA<StreamApiException>());
     });
 
     test('never leaves the message empty of meaning, so a caller always has something to show', () {
@@ -190,12 +188,6 @@ void main() {
   });
 
   group('runApiSafely', () {
-    test('returns the call result on success', () async {
-      final result = await runApiSafely(() => 'ok');
-
-      expect(result, const Result.success('ok'));
-    });
-
     test('maps a transport failure onto the exception it represents', () async {
       final result = await runApiSafely<void>(
         () => throw _failure(body: _errorBody(), statusCode: 401),

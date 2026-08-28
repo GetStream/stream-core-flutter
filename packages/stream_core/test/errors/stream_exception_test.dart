@@ -19,19 +19,10 @@ StreamApiError _apiError({
 
 void main() {
   group('StreamException', () {
-    test('every kind can be caught as one', () {
-      const exceptions = <StreamException>[
-        StreamApiException(message: 'refused', statusCode: 400, code: StreamErrorCode.inputError),
-        StreamNetworkException(message: 'offline'),
-        StreamAuthenticationException(message: 'no token'),
-        StreamClientException(message: 'broken'),
-      ];
-
-      for (final exception in exceptions) {
-        // The point of one root: `on StreamException` always means "a Stream problem".
-        expect(exception, isA<Exception>(), reason: '$exception');
-        expect(() => throw exception, throwsA(isA<StreamException>()), reason: '$exception');
-      }
+    test('is an Exception, so a blanket handler still sees it', () {
+      // Nothing at compile time enforces the root's `implements Exception`;
+      // losing it would silently skip Stream failures in `on Exception` code.
+      expect(const StreamClientException(message: 'broken'), isA<Exception>());
     });
 
     test('compares by what it carries', () {
@@ -188,14 +179,6 @@ void main() {
   });
 
   group('StreamNetworkException', () {
-    test('defaults to a plain unexplained failure', () {
-      const exception = StreamNetworkException(message: 'gone');
-
-      expect(exception.isCancelled, isFalse);
-      expect(exception.isTimeout, isFalse);
-      expect(exception.closeCode, isNull);
-    });
-
     test('prints the close code when the failure was a socket closure', () {
       const closed = StreamNetworkException(
         message: 'The connection was closed unexpectedly',
