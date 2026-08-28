@@ -1429,9 +1429,10 @@ entries are acceptable for user-visible multi-facet features where the extra
 context matters to someone deciding whether to upgrade — but avoid sub-bullets,
 per-method enumeration, and internal implementation notes.
 
-Older entries in the changelog use `### 🐞 Fixed` and `### 💥 Breaking Changes` /
-`### 💥 BREAKING CHANGES` — those forms are grandfathered but new entries should
-use the labels above.
+Some changelogs use older labels — `### 🐞 Fixed`, `### 💥 Breaking Changes` /
+`### 💥 BREAKING CHANGES`. Match the header style the package's changelog already
+uses rather than mixing forms within one file; a new package starts on the labels
+above.
 
 ### Cross-package PRs
 

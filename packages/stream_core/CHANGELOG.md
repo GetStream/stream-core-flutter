@@ -1,6 +1,6 @@
 ## Upcoming
 
-### 🛑 Breaking / Removals
+### 💥 BREAKING CHANGES
 
 - Raised the minimum Dart SDK to `^3.12.0`
 - Removed the `userId` parameter from `UserToken.anonymous`, anonymous tokens always use `User.anonymousUserId`
@@ -12,11 +12,10 @@
 - Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, now a `WebSocketAuthenticator`. It is handed a `WsRequestSender` and the `StreamApiException` the server closed the previous attempt with, and throws to say the credentials did not go out
 - Reworked the error layer around one sealed root: every failure the SDK reports is a `StreamException` of four kinds — `StreamApiException`, `StreamNetworkException`, `StreamAuthenticationException` or `StreamClientException`. See `ERROR_LAYER.md` for the contract
 - Removed `ClientException`, `HttpClientException` and `WebSocketEngineException`, replaced by the kinds above. `StreamDioException.exception` is a `StreamException`, and `DioException.toClientException()` is now `toStreamException()`
-- `ServerInitiated.error` and `AuthenticationFailed.error` are typed `StreamException?`
+- `ServerInitiated.error` is typed `StreamException?` rather than `WebSocketEngineException?`
 - `TokenManager.getToken` fails with a `StreamAuthenticationException` rather than raw errors; a failed provider's own error is preserved as `cause`
-- Replaced the `StreamApiError` predicates with `isTokenExpired`, `isTokenNotYetValid`, `isTokenSignatureInvalid` and `isApiKeyInvalid` on `StreamErrorCode` and `StreamApiException`; `StreamApiError` keeps only `isRateLimited`
+- Replaced `StreamApiError.isTokenExpiredError`, `isClientError` and `isRateLimitError`: the conditions live on `StreamErrorCode` and `StreamApiException` as `isTokenExpired`, `isTokenNotYetValid`, `isTokenSignatureInvalid`, `isApiKeyInvalid` and `isRateLimited`; `StreamApiError` keeps only `isRateLimited`
 - `StreamApiError.code` is typed `StreamErrorCode` rather than `int`; construction takes `StreamErrorCode(40)` in place of `40`, reads are unchanged
-- A `WsRequestSender` whose connection attempt was abandoned fails with a `StreamNetworkException` rather than a `StateError`
 - `AuthInterceptor` extends `Interceptor` rather than `QueuedInterceptor`, so requests are no longer serialised against one another
 - `WebSocketConnectionState.isAutomaticReconnectionEnabled` reads the error's facts: token conditions that heal and transient network failures reconnect; refused signatures or API keys, other 4xx and `unrecoverable` verdicts do not
 - `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` return the result's own type and no longer take a type parameter. To widen, widen the result (`Result<num> widened = intResult`) or use `fold`
