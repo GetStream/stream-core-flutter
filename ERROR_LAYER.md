@@ -24,8 +24,9 @@ sealed class StreamException implements Exception {
 }
 
 base class StreamApiException extends StreamException {
-  final int statusCode;        // HTTP status — independent of `code`; never derive one from the other
-  final int code;              // Stream's stable error code — branch on this, never on message
+  final int statusCode;         // HTTP status — independent of `code`; never derive one from the other
+  final StreamErrorCode? code;  // Stream's stable error code — branch on this, never on message.
+                                // Null when the verdict never reached Stream (a proxy's bare status)
   final String? moreInfo;      // docs URL; populated on REST errors, empty on WebSocket errors
   final bool unrecoverable;    // when true, the server says retrying will not help — authoritative.
                                // Absence means nothing: only Video sets it deliberately (plus the
@@ -64,7 +65,7 @@ It's our own code's fault                              → StreamClientException
 ```
 
 One rule resolves the classic overlap: **a server that rejects your token has answered** — that is a
-`StreamApiException` (check `isTokenExpired` / `isTokenInvalid`). `StreamAuthenticationException` is
+`StreamApiException` (check `isTokenExpired` / `isTokenSignatureInvalid`). `StreamAuthenticationException` is
 only for credentials that never went out: the `TokenProvider` threw or returned nothing usable, no
 user is configured, or the WebSocket auth message could not be sent. Whatever the provider threw is
 preserved in `cause`.
@@ -104,10 +105,10 @@ Failures arrive on two channels, carrying the same four types:
 client.connectionState.listen((state) {
   if (state case Disconnected(:final source)) {
     switch (source) {
-      case UserInitiated():            break;               // you called disconnect()
-      case ServerRefused(:final error): _onError(error);    // StreamApiException — server said no
-      case ConnectionLost(:final error): _showReconnecting(); // StreamNetworkException — SDK retries
-      case AuthenticationFailed(:final error): _reLogin();  // StreamAuthenticationException
+      case UserInitiated():               break;                   // you called disconnect()
+      case AuthenticationFailed():        _reLogin();              // credentials could not be produced or sent
+      case ServerInitiated(:final error): _onServerClosed(error);  // the server ended it; the error (if any) says why
+      case _:                             _showReconnecting();     // transport trouble — the SDK retries
     }
   }
 });

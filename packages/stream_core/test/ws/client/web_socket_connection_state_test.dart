@@ -127,6 +127,21 @@ void main() {
     expect(state.isAutomaticReconnectionEnabled, isFalse);
   });
 
+  test('automatic reconnection is enabled when authentication failed on the network, since the '
+      'moment is at fault rather than the credentials', () {
+    // A token endpoint that was briefly unreachable classifies as a network
+    // failure and passes through the token manager as itself.
+    const transient = Disconnected(
+      source: AuthenticationFailed(error: StreamNetworkException(message: 'endpoint unreachable')),
+    );
+    const cancelled = Disconnected(
+      source: AuthenticationFailed(error: StreamNetworkException(message: 'stopped', isCancelled: true)),
+    );
+
+    expect(transient.isAutomaticReconnectionEnabled, isTrue);
+    expect(cancelled.isAutomaticReconnectionEnabled, isFalse);
+  });
+
   test('automatic reconnection is enabled when a connected socket stops answering health checks', () {
     const state = Disconnected(source: UnHealthyConnection());
 

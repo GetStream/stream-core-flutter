@@ -120,6 +120,19 @@ void main() {
       );
     });
 
+    test('drops a Retry-After that is not a non-negative number of seconds', () {
+      StreamException withHeader(String value) => _failure(
+        body: _errorBody(code: 9, statusCode: 429, message: 'Too many requests'),
+        statusCode: 429,
+        headers: {
+          'retry-after': [value],
+        },
+      ).toStreamException();
+
+      expect(withHeader('-7'), isA<StreamApiException>().having((it) => it.retryAfter, 'retryAfter', isNull));
+      expect(withHeader('soon'), isA<StreamApiException>().having((it) => it.retryAfter, 'retryAfter', isNull));
+    });
+
     test('reports no verdict when there is no response at all', () {
       final exception = _failure(message: 'connection refused').toStreamException();
 

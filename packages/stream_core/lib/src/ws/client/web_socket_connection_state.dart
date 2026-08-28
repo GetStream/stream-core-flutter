@@ -273,7 +273,10 @@ sealed class DisconnectionSource extends Equatable {
   ///
   /// {@template webSocketReconnectionRules}
   /// - [UserInitiated] — no, the caller asked for the connection to close.
-  /// - [AuthenticationFailed] — no, credentials that never went out will not go out on a retry.
+  /// - [AuthenticationFailed] — no, credentials that could not be produced or sent will not fare
+  ///   better on a retry — unless the failure it carries is a non-cancelled
+  ///   [StreamNetworkException], which indicts the moment rather than the credentials (a token
+  ///   endpoint that was briefly unreachable), and reconnects.
   /// - [SystemInitiated], [UnHealthyConnection], [ConnectTimeout] — yes.
   /// - [ServerInitiated] — decided by the error it carries:
   ///   - no error — yes, the closure said nothing against trying again.
@@ -295,7 +298,13 @@ sealed class DisconnectionSource extends Equatable {
   /// {@endtemplate}
   bool get isReconnectable => switch (this) {
     UserInitiated() => false,
-    AuthenticationFailed() => false,
+    // Credentials that could not be produced or sent will not fare better on
+    // a retry — unless what stopped them was the network itself, which is
+    // about the moment, not the credentials.
+    AuthenticationFailed(:final error) => switch (error) {
+      StreamNetworkException(isCancelled: false) => true,
+      _ => false,
+    },
     SystemInitiated() => true,
     UnHealthyConnection() => true,
     ConnectTimeout() => true,

@@ -163,7 +163,31 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   /// The [request] is encoded using the configured message codec and sent to the server.
   ///
   /// Returns a [Result] indicating success or failure of the send operation.
-  Result<void> send(WsRequest request) => _engine.sendMessage(request);
+  /// A failure holds a [StreamException]: a [StreamNetworkException] when the
+  /// connection is not open — a drop can race any send — or a
+  /// [StreamClientException] when the request could not be encoded.
+  Result<void> send(WsRequest request) {
+    final result = _engine.sendMessage(request);
+    if (result case Failure(:final error, :final stackTrace)) {
+      var exception = StreamException.tryFrom(error);
+      exception ??= switch (error) {
+        StateError() => StreamNetworkException(
+          message: 'The connection is not open',
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+        _ => StreamClientException(
+          message: 'The request could not be sent',
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+      };
+
+      return Result.failure(exception, stackTrace);
+    }
+
+    return result;
+  }
 
   /// Establishes a WebSocket connection.
   ///

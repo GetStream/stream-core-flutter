@@ -605,12 +605,13 @@ models (`StreamApiError` is the server's wire payload, not a throwable). "Error"
 remains fine as a domain word in prose, fields, and codes (`StreamErrorCode`,
 `errorBuilder`).
 
-Two seams deliberately cross the don't-catch-`Error` line, each with a stated
-reason: decoding wire data catches everything, because a `TypeError` there indicts
-the data rather than the program; and the auth boundaries catch everything thrown
-by app-supplied token code, because a rejection must always deliver a
-`StreamException` (the original error stays visible in `cause`). Everywhere else,
-an `Error` propagates to the crash reporter where it belongs.
+The capture seams deliberately cross the don't-catch-`Error` line, each with a
+stated reason: `runApiSafely` and wire decoding catch everything, because a
+`TypeError` there indicts the data rather than the program; the auth boundaries
+catch everything thrown by app-supplied token code, because a rejection must
+always deliver a `StreamException` (the original error stays visible in `cause`);
+and `runSafely` captures raw truth for the boundary above it to classify. Outside
+a seam, an `Error` propagates to the crash reporter where it belongs.
 
 ### Prefer specialized functions, methods, and constructors
 
