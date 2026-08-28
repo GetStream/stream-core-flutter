@@ -36,6 +36,7 @@ import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
 import 'components/stream_snackbar_theme.dart';
+import 'components/stream_split_button_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
@@ -153,6 +154,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamSnackbarThemeData? snackbarTheme,
+    StreamSplitButtonThemeData? splitButtonTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
   }) {
@@ -214,6 +216,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     sheetTheme ??= const StreamSheetThemeData();
     skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
     snackbarTheme ??= const StreamSnackbarThemeData();
+    splitButtonTheme ??= const StreamSplitButtonThemeData();
     stepperTheme ??= const StreamStepperThemeData();
     switchTheme ??= const StreamSwitchThemeData();
 
@@ -263,6 +266,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
       snackbarTheme: snackbarTheme,
+      splitButtonTheme: splitButtonTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
     );
@@ -326,6 +330,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.sheetTheme,
     required this.skeletonLoadingTheme,
     required this.snackbarTheme,
+    required this.splitButtonTheme,
     required this.stepperTheme,
     required this.switchTheme,
   });
@@ -508,6 +513,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The snackbar theme for this theme.
   final StreamSnackbarThemeData snackbarTheme;
 
+  /// The split button theme for this theme.
+  final StreamSplitButtonThemeData splitButtonTheme;
+
   /// The stepper theme for this theme.
   final StreamStepperThemeData stepperTheme;
 
@@ -580,6 +588,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
       snackbarTheme: snackbarTheme,
+      splitButtonTheme: splitButtonTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
     );

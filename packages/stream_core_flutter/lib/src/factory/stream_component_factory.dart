@@ -15,6 +15,7 @@ import '../components/badge/stream_retry_badge.dart';
 import '../components/buttons/stream_button.dart';
 import '../components/buttons/stream_emoji_button.dart';
 import '../components/buttons/stream_jump_to_unread_button.dart';
+import '../components/buttons/stream_split_button.dart';
 import '../components/common/stream_checkbox.dart';
 import '../components/common/stream_loading_spinner.dart';
 import '../components/common/stream_network_image.dart';
@@ -223,6 +224,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamSheetHeaderProps>? sheetHeader,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     StreamComponentBuilder<StreamSnackbarProps>? snackbar,
+    StreamComponentBuilder<StreamSplitButtonProps>? splitButton,
     StreamComponentBuilder<StreamStepperProps>? stepper,
     StreamComponentBuilder<StreamTextInputProps>? textInput,
     StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
@@ -277,6 +279,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       sheetHeader: sheetHeader,
       skeletonLoading: skeletonLoading,
       snackbar: snackbar,
+      splitButton: splitButton,
       stepper: stepper,
       textInput: textInput,
       toggleSwitch: toggleSwitch,
@@ -332,6 +335,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.sheetHeader,
     required this.skeletonLoading,
     required this.snackbar,
+    required this.splitButton,
     required this.stepper,
     required this.textInput,
     required this.toggleSwitch,
@@ -590,6 +594,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// this slot, so embedders can restyle SDK-fired snackbars (or suppress
   /// them by returning `const SizedBox.shrink()`).
   final StreamComponentBuilder<StreamSnackbarProps>? snackbar;
+
+  /// Custom builder for split button widgets.
+  ///
+  /// When null, [StreamSplitButton] uses [DefaultStreamSplitButton].
+  final StreamComponentBuilder<StreamSplitButtonProps>? splitButton;
 
   /// Custom builder for stepper widgets.
   ///
