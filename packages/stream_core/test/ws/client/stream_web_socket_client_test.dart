@@ -190,7 +190,7 @@ void main() {
   group('send', () {
     wsClientTest(
       'fails as a network problem when the connection is not open',
-      connect: (_) async {}, // never connected
+      connect: (_) {}, // never connected
       body: (tester) {
         // A drop can race any send, so a correct caller can hit this: it
         // reads as the moment's failure, classified like every other one.
