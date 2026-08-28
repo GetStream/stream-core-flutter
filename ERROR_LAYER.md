@@ -181,10 +181,8 @@ The two rules you actually need:
    three-question tree above says which exception.
 2. **A new exception type needs a new reaction to justify it.** If the catcher of your proposed type
    would do the same thing they'd do for an existing category, it is not a new type — it is a field
-   or a `code`. Context (like "which attachment failed") travels in the data channel
-   (`(attachmentId, Result)`), never by wrapping one category inside another. When a whole batch
-   fails before any item starts, every item reports the same failure — per-item results are the
-   contract, and a pre-flight failure is every item failing the same way.
+   or a `code`. Context (like "which item of a batch failed") travels in the data channel, beside
+   the outcome, never by wrapping one category inside another.
 
 Product SDKs (Chat, Video, Feeds) may extend a category — `StreamChatApiException extends
 StreamApiException` — but never add a fifth top-level kind and never re-map a core exception into an
