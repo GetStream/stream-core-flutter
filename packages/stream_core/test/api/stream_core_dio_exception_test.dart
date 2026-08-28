@@ -214,5 +214,14 @@ void main() {
         isA<StreamClientException>().having((it) => it.cause, 'cause', isA<TypeError>()),
       );
     });
+
+    test('reports a bug under the seam as an SDK failure carrying the Error', () async {
+      final result = await runApiSafely<void>(() => throw StateError('misuse under the seam'));
+
+      expect(
+        result.exceptionOrNull(),
+        isA<StreamClientException>().having((it) => it.cause, 'cause', isA<StateError>()),
+      );
+    });
   });
 }

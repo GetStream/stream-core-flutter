@@ -109,4 +109,15 @@ void main() {
       expect(recovered.exceptionOrNull(), isA<StateError>());
     });
   });
+
+  group('runSafely', () {
+    test('captures whatever was thrown untouched, Error included', () async {
+      // The generic capture stores raw truth; classification belongs to the
+      // boundary above it.
+      final bug = StateError('a bug under the capture');
+      final result = await runSafely<void>(() => throw bug);
+
+      expect(result.exceptionOrNull(), same(bug));
+    });
+  });
 }

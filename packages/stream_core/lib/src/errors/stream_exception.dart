@@ -190,7 +190,7 @@ base class StreamApiException extends StreamException {
   bool get isRateLimited => statusCode == 429;
 
   @override
-  List<Object?> get props => [...super.props, statusCode, code, moreInfo, unrecoverable, retryAfter];
+  List<Object?> get props => [...super.props, statusCode, code, moreInfo, unrecoverable, retryAfter, apiError];
 
   @override
   String toString() {

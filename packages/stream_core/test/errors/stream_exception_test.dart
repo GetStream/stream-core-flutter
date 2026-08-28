@@ -203,5 +203,23 @@ void main() {
         isNot(const StreamNetworkException(message: 'gone')),
       );
     });
+
+    test('a different retained payload is a different failure', () {
+      // Two refusals equal in every fact can still differ in what the server
+      // sent — `apiError` is state, so it must count.
+      StreamApiException withDetails(List<int> details) => StreamApiException.fromApiError(
+        StreamApiError(
+          code: StreamErrorCode.inputError,
+          details: details,
+          duration: '0ms',
+          message: 'refused',
+          moreInfo: '',
+          statusCode: 400,
+        ),
+      );
+
+      expect(withDetails(const [1]), isNot(withDetails(const [2])));
+      expect(withDetails(const [1]), withDetails(const [1]));
+    });
   });
 }
