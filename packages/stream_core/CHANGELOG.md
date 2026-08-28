@@ -37,7 +37,6 @@
 - Added `DioException.toStreamException()`, the failure a Dio error represents: a response — Stream error payload or bare status — reads as a `StreamApiException`, and anything that ended before a verdict as a `StreamNetworkException`, with cancellations and timeouts marked as such
 - Added `StreamApiException.retryAfter`, the wait the server asked for, read from the `Retry-After` header on rate-limited responses
 - Added `StreamErrorCode`, the API's error-code registry as named constants over `int` — one shared vocabulary for every Stream product, tolerant of codes the SDK does not know yet. `StreamApiException.code` is typed with it
-- Added `StreamException.isRetriable`, whether a failure is about the moment rather than the request — necessary but not sufficient, since re-sending safely also depends on the operation — and `RetryPolicy`, with `RetryPolicy.standard()` composing that judgment with an attempt budget
 - Added `runApiSafely`, the seam an API call crosses on its way to a caller: every failure it reports is a `StreamException` — transport failures mapped, a response that would not decode included
 - Added `DisconnectionSource.connectTimeout` and `authenticationFailed`, and `isReconnectable`, whether a connection closed for that reason is worth opening again
 - Added `DisconnectionSource.cause`, the error that closed the connection, or `null` when the source carries none

@@ -78,7 +78,7 @@ your provider is static, or the fresh token was refused too.
 
 | You caught | It means | You typically... |
 |---|---|---|
-| `StreamApiException` | the server said no; `message`/`code`/`moreInfo` say why | show `message`; branch on `code` for special cases |
+| `StreamApiException` | the server said no; `message`/`code`/`moreInfo` say why | show your own copy keyed off `code`; branch on it for special cases |
 | `StreamNetworkException` | the server was never heard from — the outcome is **unknown** | show offline UI, retry on connectivity; ignore if `isCancelled` |
 | `StreamAuthenticationException` | your token provider / login setup is broken | send the user through your auth flow again |
 | `StreamClientException` | the SDK (or a callback you gave it) hit an unexpected error | report to your crash tracker — not the end user's problem |
@@ -93,8 +93,9 @@ codes to more than one status, so never infer one from the other.
 
 Failures arrive on two channels, carrying the same four types:
 
-- **Operations** return `Result<T>`; a `Failure` always holds a `StreamException` — enforced by the
-  type system (`Failure.error` is typed `StreamException`), not by convention. Nothing is thrown.
+- **Operations** return `Result<T>`; a `Failure` from an SDK operation always holds a
+  `StreamException` — every call runs through the seam that guarantees it (`runApiSafely`, below).
+  Nothing is thrown.
 - **Connection lifecycle** failures arrive as state: `connectionState` emits
   `Disconnected(source)`, where `source` says who ended the connection and carries the error when
   there was one:
@@ -120,7 +121,7 @@ switch (result) {
   case Failure(:final error):
     switch (error) {
       case StreamApiException(isRateLimited: true): scheduleRetry();
-      case StreamApiException(:final message):     showError(message);
+      case StreamApiException(:final code):        showError(copyFor(code));
       case StreamNetworkException(isCancelled: true): break; // user navigated away
       case StreamNetworkException():               showOfflineBanner();
       case StreamAuthenticationException():        redirectToLogin();
@@ -151,17 +152,23 @@ already carry the right type — if you are not writing a boundary, you never pi
 | HTTP error mapper (the only file that reads Dio) | `StreamApiException` from a server error body or bare status; `StreamNetworkException` from timeout / cancel / socket errors |
 | Response/event decoding | `StreamClientException` when wire data will not decode, whatever the decoder threw (see the seam rule below) |
 | WebSocket engine + auth handler | `StreamNetworkException` for transport failures; `StreamAuthenticationException` when credentials couldn't be sent; server error events become `StreamApiException` — the inner error object is the same as REST, but it arrives in two envelopes (`{"type":"connection.error",...}` from the monolith, bare `{"error":{...}}` from the edge) and the decoder must accept both |
-| `TokenManager` | `StreamAuthenticationException` when the `TokenProvider` fails (its error preserved as `cause`), when no user is configured, or when a reset raced the load |
-| `runSafely` (the normalization seam) | passes an existing `StreamException` through untouched; wraps any other `Exception` (an app callback no boundary owns) into `StreamClientException`, preserving `cause`. Does **not** catch `Error` — bugs propagate and crash loudly |
+| `TokenManager` | `StreamAuthenticationException` when no user is configured, when a reset raced the load, or when the `TokenProvider` fails with something unclassified (preserved as `cause`); a provider failure that is already a `StreamException` passes through as itself, so a transient network failure stays retriable |
+| `runApiSafely` (the API call seam) | passes an existing `StreamException` through untouched; maps Dio failures to `StreamApiException`/`StreamNetworkException`; wraps anything else — `Exception` or `Error` alike — into `StreamClientException`, preserving `cause` |
 
-There are two kinds of seams, and they treat `Error` differently:
+Both capture helpers catch **everything**, `Error` included — they differ in what they hand back:
 
-- **Propagation seams** (`runSafely`, everything that moves `Result`s around) never catch `Error` —
-  a `StateError` or `TypeError` there is a bug in the program, and it should crash loudly.
-- **Interpretation seams** (decoding a response body, decoding a WS event) catch **everything**,
-  `Error` included, and wrap it into `StreamClientException`. A `TypeError` thrown while decoding
-  wire data indicts the data, not the program — a server that renamed a field must surface as a
-  handleable failure, not a crash.
+- **`runSafely`** (the generic capture) stores whatever was thrown in the `Failure` untouched — raw
+  truth, classified by the boundary above it via `StreamException.tryFrom` plus a kind-specific
+  fallback.
+- **`runApiSafely`** (the API boundary) delivers only `StreamException`s. A `TypeError` thrown while
+  decoding wire data indicts the data, not the program — a server that renamed a field must surface
+  as a handleable failure, not a crash — so it arrives as a `StreamClientException` with the
+  original `Error` as `cause`. A `StateError` from a bug under the seam arrives the same way; it is
+  still a bug, so treat that `StreamClientException` as a crash report, not a condition to handle.
+
+The errors-vs-exceptions rule governs the throw site, not the catch site: SDK guards still throw
+`StateError`/`ArgumentError` for misuse. A guard above any seam crashes loudly; one that fires under
+a seam surfaces as the `cause` of a `StreamClientException`.
 
 A decode failure on a **live event stream** is the one failure with no operation to fail and no
 reason to kill a healthy connection: drop the event, log it through the SDK logger, and count it —
@@ -220,19 +227,10 @@ The decision runs in order:
 
 `DisconnectionSource.isReconnectable` is this procedure specialized for the connection (reconnecting
 is inherently idempotent), and the interceptor's one-shot token refresh is the code-40 row. What
-remains for callers is operation retry, expressed as a policy:
-
-```dart
-abstract interface class RetryPolicy {
-  bool shouldRetry(StreamException error, int attempt);
-}
-```
-
-Core ships two pieces of this: `StreamException.isRetriable`, the fact-level judgment (steps 1–2's
-error-only rows — necessary, but not sufficient, since it cannot know the operation's idempotency),
-and `RetryPolicy.standard()`, which composes it with an attempt budget. The policy answers
-*whether*; *when* comes from `retryAfter` where the server named a wait, and from the caller's
-backoff otherwise.
+remains for callers is operation retry: steps 1–2 answer *whether* from the error alone (necessary,
+but not sufficient, since the error cannot know the operation's idempotency), *when* comes from
+`retryAfter` where the server named a wait and from the caller's backoff otherwise, and the budget
+is the caller's. Product SDKs compose this into their retry queues.
 
 One honesty rule about retrying writes: a `StreamNetworkException` means the outcome is **unknown**
 — the server may have performed the operation. Retry a write only through an idempotent path
