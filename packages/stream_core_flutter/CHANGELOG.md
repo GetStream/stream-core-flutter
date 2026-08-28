@@ -16,6 +16,9 @@
   `settingsFill`, `slidersFill`, `starFill`, `statsFill`, `unpinFill`,
   `userAddFill`, `userRemoveFill`, `usersFill`, `verifiedFill`, `videoOffFill`,
   `voiceOffFill`, and `xmarkSmall`.
+- Added 7 more icons from the design tokens: `gridDefaultFill`,
+  `livestreamFill`, `phoneFill`, `speakerBottomFill`, `speakerLeftFill`,
+  `speakerRightFill`, and `speakerTopFill`.
 - Added a `fix_data.yaml`, so deprecated members can be migrated with
   `dart fix --apply`.
 

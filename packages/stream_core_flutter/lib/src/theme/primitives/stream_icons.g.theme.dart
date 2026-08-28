@@ -83,6 +83,7 @@ mixin _$StreamIcons {
       fullBlurFill: t < 0.5 ? a.fullBlurFill : b.fullBlurFill,
       fullscreenFill: t < 0.5 ? a.fullscreenFill : b.fullscreenFill,
       gallery: t < 0.5 ? a.gallery : b.gallery,
+      gridDefaultFill: t < 0.5 ? a.gridDefaultFill : b.gridDefaultFill,
       gridFill: t < 0.5 ? a.gridFill : b.gridFill,
       gridPixelFill: t < 0.5 ? a.gridPixelFill : b.gridPixelFill,
       image: t < 0.5 ? a.image : b.image,
@@ -93,6 +94,7 @@ mixin _$StreamIcons {
       leftToRight: t < 0.5 ? a.leftToRight : b.leftToRight,
       lightMode: t < 0.5 ? a.lightMode : b.lightMode,
       link: t < 0.5 ? a.link : b.link,
+      livestreamFill: t < 0.5 ? a.livestreamFill : b.livestreamFill,
       location: t < 0.5 ? a.location : b.location,
       lock: t < 0.5 ? a.lock : b.lock,
       megaphone: t < 0.5 ? a.megaphone : b.megaphone,
@@ -117,6 +119,7 @@ mixin _$StreamIcons {
       notification: t < 0.5 ? a.notification : b.notification,
       pauseFill: t < 0.5 ? a.pauseFill : b.pauseFill,
       phoneDownFill: t < 0.5 ? a.phoneDownFill : b.phoneDownFill,
+      phoneFill: t < 0.5 ? a.phoneFill : b.phoneFill,
       pin: t < 0.5 ? a.pin : b.pin,
       pinFill: t < 0.5 ? a.pinFill : b.pinFill,
       pinLarge: t < 0.5 ? a.pinLarge : b.pinLarge,
@@ -146,6 +149,10 @@ mixin _$StreamIcons {
       shield: t < 0.5 ? a.shield : b.shield,
       sidebar: t < 0.5 ? a.sidebar : b.sidebar,
       slidersFill: t < 0.5 ? a.slidersFill : b.slidersFill,
+      speakerBottomFill: t < 0.5 ? a.speakerBottomFill : b.speakerBottomFill,
+      speakerLeftFill: t < 0.5 ? a.speakerLeftFill : b.speakerLeftFill,
+      speakerRightFill: t < 0.5 ? a.speakerRightFill : b.speakerRightFill,
+      speakerTopFill: t < 0.5 ? a.speakerTopFill : b.speakerTopFill,
       starFill: t < 0.5 ? a.starFill : b.starFill,
       statsFill: t < 0.5 ? a.statsFill : b.statsFill,
       stopFill: t < 0.5 ? a.stopFill : b.stopFill,
@@ -236,6 +243,7 @@ mixin _$StreamIcons {
     IconData? fullBlurFill,
     IconData? fullscreenFill,
     IconData? gallery,
+    IconData? gridDefaultFill,
     IconData? gridFill,
     IconData? gridPixelFill,
     IconData? image,
@@ -246,6 +254,7 @@ mixin _$StreamIcons {
     IconData? leftToRight,
     IconData? lightMode,
     IconData? link,
+    IconData? livestreamFill,
     IconData? location,
     IconData? lock,
     IconData? megaphone,
@@ -268,6 +277,7 @@ mixin _$StreamIcons {
     IconData? notification,
     IconData? pauseFill,
     IconData? phoneDownFill,
+    IconData? phoneFill,
     IconData? pin,
     IconData? pinFill,
     IconData? pinLarge,
@@ -297,6 +307,10 @@ mixin _$StreamIcons {
     IconData? shield,
     IconData? sidebar,
     IconData? slidersFill,
+    IconData? speakerBottomFill,
+    IconData? speakerLeftFill,
+    IconData? speakerRightFill,
+    IconData? speakerTopFill,
     IconData? starFill,
     IconData? statsFill,
     IconData? stopFill,
@@ -387,6 +401,7 @@ mixin _$StreamIcons {
       fullBlurFill: fullBlurFill ?? _this.fullBlurFill,
       fullscreenFill: fullscreenFill ?? _this.fullscreenFill,
       gallery: gallery ?? _this.gallery,
+      gridDefaultFill: gridDefaultFill ?? _this.gridDefaultFill,
       gridFill: gridFill ?? _this.gridFill,
       gridPixelFill: gridPixelFill ?? _this.gridPixelFill,
       image: image ?? _this.image,
@@ -397,6 +412,7 @@ mixin _$StreamIcons {
       leftToRight: leftToRight ?? _this.leftToRight,
       lightMode: lightMode ?? _this.lightMode,
       link: link ?? _this.link,
+      livestreamFill: livestreamFill ?? _this.livestreamFill,
       location: location ?? _this.location,
       lock: lock ?? _this.lock,
       megaphone: megaphone ?? _this.megaphone,
@@ -419,6 +435,7 @@ mixin _$StreamIcons {
       notification: notification ?? _this.notification,
       pauseFill: pauseFill ?? _this.pauseFill,
       phoneDownFill: phoneDownFill ?? _this.phoneDownFill,
+      phoneFill: phoneFill ?? _this.phoneFill,
       pin: pin ?? _this.pin,
       pinFill: pinFill ?? _this.pinFill,
       pinLarge: pinLarge ?? _this.pinLarge,
@@ -448,6 +465,10 @@ mixin _$StreamIcons {
       shield: shield ?? _this.shield,
       sidebar: sidebar ?? _this.sidebar,
       slidersFill: slidersFill ?? _this.slidersFill,
+      speakerBottomFill: speakerBottomFill ?? _this.speakerBottomFill,
+      speakerLeftFill: speakerLeftFill ?? _this.speakerLeftFill,
+      speakerRightFill: speakerRightFill ?? _this.speakerRightFill,
+      speakerTopFill: speakerTopFill ?? _this.speakerTopFill,
       starFill: starFill ?? _this.starFill,
       statsFill: statsFill ?? _this.statsFill,
       stopFill: stopFill ?? _this.stopFill,
@@ -548,6 +569,7 @@ mixin _$StreamIcons {
       fullBlurFill: other.fullBlurFill,
       fullscreenFill: other.fullscreenFill,
       gallery: other.gallery,
+      gridDefaultFill: other.gridDefaultFill,
       gridFill: other.gridFill,
       gridPixelFill: other.gridPixelFill,
       image: other.image,
@@ -558,6 +580,7 @@ mixin _$StreamIcons {
       leftToRight: other.leftToRight,
       lightMode: other.lightMode,
       link: other.link,
+      livestreamFill: other.livestreamFill,
       location: other.location,
       lock: other.lock,
       megaphone: other.megaphone,
@@ -580,6 +603,7 @@ mixin _$StreamIcons {
       notification: other.notification,
       pauseFill: other.pauseFill,
       phoneDownFill: other.phoneDownFill,
+      phoneFill: other.phoneFill,
       pin: other.pin,
       pinFill: other.pinFill,
       pinLarge: other.pinLarge,
@@ -609,6 +633,10 @@ mixin _$StreamIcons {
       shield: other.shield,
       sidebar: other.sidebar,
       slidersFill: other.slidersFill,
+      speakerBottomFill: other.speakerBottomFill,
+      speakerLeftFill: other.speakerLeftFill,
+      speakerRightFill: other.speakerRightFill,
+      speakerTopFill: other.speakerTopFill,
       starFill: other.starFill,
       statsFill: other.statsFill,
       stopFill: other.stopFill,
@@ -709,6 +737,7 @@ mixin _$StreamIcons {
         _other.fullBlurFill == _this.fullBlurFill &&
         _other.fullscreenFill == _this.fullscreenFill &&
         _other.gallery == _this.gallery &&
+        _other.gridDefaultFill == _this.gridDefaultFill &&
         _other.gridFill == _this.gridFill &&
         _other.gridPixelFill == _this.gridPixelFill &&
         _other.image == _this.image &&
@@ -719,6 +748,7 @@ mixin _$StreamIcons {
         _other.leftToRight == _this.leftToRight &&
         _other.lightMode == _this.lightMode &&
         _other.link == _this.link &&
+        _other.livestreamFill == _this.livestreamFill &&
         _other.location == _this.location &&
         _other.lock == _this.lock &&
         _other.megaphone == _this.megaphone &&
@@ -741,6 +771,7 @@ mixin _$StreamIcons {
         _other.notification == _this.notification &&
         _other.pauseFill == _this.pauseFill &&
         _other.phoneDownFill == _this.phoneDownFill &&
+        _other.phoneFill == _this.phoneFill &&
         _other.pin == _this.pin &&
         _other.pinFill == _this.pinFill &&
         _other.pinLarge == _this.pinLarge &&
@@ -770,6 +801,10 @@ mixin _$StreamIcons {
         _other.shield == _this.shield &&
         _other.sidebar == _this.sidebar &&
         _other.slidersFill == _this.slidersFill &&
+        _other.speakerBottomFill == _this.speakerBottomFill &&
+        _other.speakerLeftFill == _this.speakerLeftFill &&
+        _other.speakerRightFill == _this.speakerRightFill &&
+        _other.speakerTopFill == _this.speakerTopFill &&
         _other.starFill == _this.starFill &&
         _other.statsFill == _this.statsFill &&
         _other.stopFill == _this.stopFill &&
@@ -862,6 +897,7 @@ mixin _$StreamIcons {
       _this.fullBlurFill,
       _this.fullscreenFill,
       _this.gallery,
+      _this.gridDefaultFill,
       _this.gridFill,
       _this.gridPixelFill,
       _this.image,
@@ -872,6 +908,7 @@ mixin _$StreamIcons {
       _this.leftToRight,
       _this.lightMode,
       _this.link,
+      _this.livestreamFill,
       _this.location,
       _this.lock,
       _this.megaphone,
@@ -894,6 +931,7 @@ mixin _$StreamIcons {
       _this.notification,
       _this.pauseFill,
       _this.phoneDownFill,
+      _this.phoneFill,
       _this.pin,
       _this.pinFill,
       _this.pinLarge,
@@ -923,6 +961,10 @@ mixin _$StreamIcons {
       _this.shield,
       _this.sidebar,
       _this.slidersFill,
+      _this.speakerBottomFill,
+      _this.speakerLeftFill,
+      _this.speakerRightFill,
+      _this.speakerTopFill,
       _this.starFill,
       _this.statsFill,
       _this.stopFill,

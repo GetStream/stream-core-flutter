@@ -111,6 +111,7 @@ class StreamIcons with _$StreamIcons {
     this.fullBlurFill = StreamIconData.fullBlurFill,
     this.fullscreenFill = StreamIconData.fullscreenFill,
     this.gallery = StreamIconData.gallery,
+    this.gridDefaultFill = StreamIconData.gridDefaultFill,
     this.gridFill = StreamIconData.gridFill,
     this.gridPixelFill = StreamIconData.gridPixelFill,
     this.image = StreamIconData.image,
@@ -121,6 +122,7 @@ class StreamIcons with _$StreamIcons {
     this.leftToRight = StreamIconData.leftToRight,
     this.lightMode = StreamIconData.lightMode,
     this.link = StreamIconData.link,
+    this.livestreamFill = StreamIconData.livestreamFill,
     this.location = StreamIconData.location,
     this.lock = StreamIconData.lock,
     this.megaphone = StreamIconData.megaphone,
@@ -143,6 +145,7 @@ class StreamIcons with _$StreamIcons {
     this.notification = StreamIconData.notification,
     this.pauseFill = StreamIconData.pauseFill,
     this.phoneDownFill = StreamIconData.phoneDownFill,
+    this.phoneFill = StreamIconData.phoneFill,
     this.pin = StreamIconData.pin,
     this.pinFill = StreamIconData.pinFill,
     this.pinLarge = StreamIconData.pinLarge,
@@ -172,6 +175,10 @@ class StreamIcons with _$StreamIcons {
     this.shield = StreamIconData.shield,
     this.sidebar = StreamIconData.sidebar,
     this.slidersFill = StreamIconData.slidersFill,
+    this.speakerBottomFill = StreamIconData.speakerBottomFill,
+    this.speakerLeftFill = StreamIconData.speakerLeftFill,
+    this.speakerRightFill = StreamIconData.speakerRightFill,
+    this.speakerTopFill = StreamIconData.speakerTopFill,
     this.starFill = StreamIconData.starFill,
     this.statsFill = StreamIconData.statsFill,
     this.stopFill = StreamIconData.stopFill,
@@ -360,6 +367,9 @@ class StreamIcons with _$StreamIcons {
   /// The gallery icon.
   final IconData gallery;
 
+  /// The grid default fill icon.
+  final IconData gridDefaultFill;
+
   /// The grid fill icon.
   final IconData gridFill;
 
@@ -389,6 +399,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The link icon.
   final IconData link;
+
+  /// The livestream fill icon.
+  final IconData livestreamFill;
 
   /// The location icon.
   final IconData location;
@@ -456,6 +469,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The phone down fill icon.
   final IconData phoneDownFill;
+
+  /// The phone fill icon.
+  final IconData phoneFill;
 
   /// The pin icon.
   final IconData pin;
@@ -543,6 +559,18 @@ class StreamIcons with _$StreamIcons {
 
   /// The sliders fill icon.
   final IconData slidersFill;
+
+  /// The speaker bottom fill icon.
+  final IconData speakerBottomFill;
+
+  /// The speaker left fill icon.
+  final IconData speakerLeftFill;
+
+  /// The speaker right fill icon.
+  final IconData speakerRightFill;
+
+  /// The speaker top fill icon.
+  final IconData speakerTopFill;
 
   /// The star fill icon.
   final IconData starFill;
@@ -706,6 +734,7 @@ class StreamIcons with _$StreamIcons {
     'fullBlurFill': fullBlurFill,
     'fullscreenFill': fullscreenFill,
     'gallery': gallery,
+    'gridDefaultFill': gridDefaultFill,
     'gridFill': gridFill,
     'gridPixelFill': gridPixelFill,
     'image': image,
@@ -716,6 +745,7 @@ class StreamIcons with _$StreamIcons {
     'leftToRight': leftToRight,
     'lightMode': lightMode,
     'link': link,
+    'livestreamFill': livestreamFill,
     'location': location,
     'lock': lock,
     'megaphone': megaphone,
@@ -738,6 +768,7 @@ class StreamIcons with _$StreamIcons {
     'notification': notification,
     'pauseFill': pauseFill,
     'phoneDownFill': phoneDownFill,
+    'phoneFill': phoneFill,
     'pin': pin,
     'pinFill': pinFill,
     'pinLarge': pinLarge,
@@ -767,6 +798,10 @@ class StreamIcons with _$StreamIcons {
     'shield': shield,
     'sidebar': sidebar,
     'slidersFill': slidersFill,
+    'speakerBottomFill': speakerBottomFill,
+    'speakerLeftFill': speakerLeftFill,
+    'speakerRightFill': speakerRightFill,
+    'speakerTopFill': speakerTopFill,
     'starFill': starFill,
     'statsFill': statsFill,
     'stopFill': stopFill,

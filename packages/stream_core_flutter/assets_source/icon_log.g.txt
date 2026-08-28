@@ -142,3 +142,10 @@ language;2026818
 verified-fill;2026818
 unpin-fill;2026818
 recording-fill;2026818
+speaker-top-fill;2026827
+speaker-right-fill;2026827
+speaker-left-fill;2026827
+speaker-bottom-fill;2026827
+grid-default-fill;2026827
+phone-fill;2026827
+livestream-fill;2026827
