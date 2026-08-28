@@ -122,7 +122,8 @@ switch (result) {
   case Failure(:final error):
     switch (error) {
       case StreamApiException(isRateLimited: true): scheduleRetry();
-      case StreamApiException(:final code):        showError(copyFor(code));
+      case StreamApiException(:final code?):       showError(copyFor(code));
+      case StreamApiException():                   showError(genericFailureCopy); // no Stream code: a proxy's bare status
       case StreamNetworkException(isCancelled: true): break; // user navigated away
       case StreamNetworkException():               showOfflineBanner();
       case StreamAuthenticationException():        redirectToLogin();
