@@ -87,6 +87,11 @@ mixin _$StreamColorScheme {
         b.backgroundOverlayDark,
         t,
       )!,
+      backgroundOverlayDarkStrong: Color.lerp(
+        a.backgroundOverlayDarkStrong,
+        b.backgroundOverlayDarkStrong,
+        t,
+      )!,
       backgroundDisabled: Color.lerp(
         a.backgroundDisabled,
         b.backgroundDisabled,
@@ -190,6 +195,7 @@ mixin _$StreamColorScheme {
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
+    Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundHover,
     Color? backgroundPressed,
@@ -254,6 +260,8 @@ mixin _$StreamColorScheme {
           backgroundOverlayLight ?? _this.backgroundOverlayLight,
       backgroundOverlayDark:
           backgroundOverlayDark ?? _this.backgroundOverlayDark,
+      backgroundOverlayDarkStrong:
+          backgroundOverlayDarkStrong ?? _this.backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
       backgroundHover: backgroundHover ?? _this.backgroundHover,
       backgroundPressed: backgroundPressed ?? _this.backgroundPressed,
@@ -325,6 +333,7 @@ mixin _$StreamColorScheme {
       backgroundScrim: other.backgroundScrim,
       backgroundOverlayLight: other.backgroundOverlayLight,
       backgroundOverlayDark: other.backgroundOverlayDark,
+      backgroundOverlayDarkStrong: other.backgroundOverlayDarkStrong,
       backgroundDisabled: other.backgroundDisabled,
       backgroundHover: other.backgroundHover,
       backgroundPressed: other.backgroundPressed,
@@ -396,6 +405,8 @@ mixin _$StreamColorScheme {
         _other.backgroundScrim == _this.backgroundScrim &&
         _other.backgroundOverlayLight == _this.backgroundOverlayLight &&
         _other.backgroundOverlayDark == _this.backgroundOverlayDark &&
+        _other.backgroundOverlayDarkStrong ==
+            _this.backgroundOverlayDarkStrong &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
         _other.backgroundHover == _this.backgroundHover &&
         _other.backgroundPressed == _this.backgroundPressed &&
@@ -459,6 +470,7 @@ mixin _$StreamColorScheme {
       _this.backgroundScrim,
       _this.backgroundOverlayLight,
       _this.backgroundOverlayDark,
+      _this.backgroundOverlayDarkStrong,
       _this.backgroundDisabled,
       _this.backgroundHover,
       _this.backgroundPressed,

@@ -74,6 +74,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
+    Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundInverse,
 
@@ -142,6 +143,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundScrim ??= light_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= light_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= light_tokens.StreamTokens.backgroundCoreOverlayDark;
+    backgroundOverlayDarkStrong ??= light_tokens.StreamTokens.backgroundCoreOverlayDarkStrong;
     backgroundDisabled ??= chrome.shade100;
     backgroundInverse ??= chrome[1000] ?? StreamColors.black;
 
@@ -233,6 +235,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
       backgroundOverlayDark: backgroundOverlayDark,
+      backgroundOverlayDarkStrong: backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
@@ -296,6 +299,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
+    Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundInverse,
     // Background - Elevation
@@ -363,6 +367,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundScrim ??= dark_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= dark_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= dark_tokens.StreamTokens.backgroundCoreOverlayDark;
+    backgroundOverlayDarkStrong ??= dark_tokens.StreamTokens.backgroundCoreOverlayDarkStrong;
     backgroundDisabled ??= chrome.shade100;
     backgroundInverse ??= chrome[1000] ?? StreamColors.white;
 
@@ -454,6 +459,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
       backgroundOverlayDark: backgroundOverlayDark,
+      backgroundOverlayDarkStrong: backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
@@ -542,6 +548,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundScrim,
     required this.backgroundOverlayLight,
     required this.backgroundOverlayDark,
+    required this.backgroundOverlayDarkStrong,
     required this.backgroundDisabled,
     required this.backgroundInverse,
     // Background - Elevation
@@ -670,6 +677,12 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The dark overlay background color.
   final Color backgroundOverlayDark;
+
+  /// A stronger dark overlay background color.
+  ///
+  /// Used where content has to stay legible on top of arbitrary imagery or
+  /// video, such as the name pill on a call participant tile.
+  final Color backgroundOverlayDarkStrong;
 
   /// Disabled backgrounds for inputs, buttons, or chips.
   final Color backgroundDisabled;
