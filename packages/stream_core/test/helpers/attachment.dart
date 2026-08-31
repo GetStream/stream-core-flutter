@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:stream_core/stream_core.dart';
 
 /// An attachment of exactly [bytes] bytes.

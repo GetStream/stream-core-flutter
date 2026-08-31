@@ -8,6 +8,8 @@ import 'package:mime/mime.dart';
 import '../platform.dart';
 import '../utils.dart';
 
+export 'dart:typed_data' show Uint8List;
+
 /// Cross-platform file wrapper for Stream attachments.
 ///
 /// Provides a unified interface for working with files across different platforms
