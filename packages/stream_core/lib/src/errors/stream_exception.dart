@@ -231,7 +231,7 @@ base class StreamNetworkException extends StreamException {
   /// not to surface.
   final bool isCancelled;
 
-  /// Whether the request or connection attempt timed out.
+  /// Whether the request timed out before the server answered.
   final bool isTimeout;
 
   /// The WebSocket close code, when the failure was a socket closure.

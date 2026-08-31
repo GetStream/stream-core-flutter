@@ -320,7 +320,7 @@ sealed class DisconnectionSource extends Equatable {
       StreamNetworkException() => true,
       StreamAuthenticationException() => false,
       StreamClientException() => true,
-      _ => true,
+      null => true,
     },
   };
 

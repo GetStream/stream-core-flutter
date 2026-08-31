@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
