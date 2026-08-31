@@ -37,7 +37,6 @@
 - Added `StreamDateTimeConverter`, a `JsonConverter` for the API's `DateTime` fields. Accepts either an RFC3339 string (v1) or epoch nanoseconds (v2) when deserializing, and always serializes to RFC3339. Values are normalized to UTC with microsecond precision
 - Added `DioException.toStreamException()`, mapping a Dio failure to the `StreamException` it represents
 - Added `StreamApiException.retryAfter`, the wait the server asked for, read from the `Retry-After` header on rate-limited responses
-- Added `StreamApiException.isRequestTimeout`, true when the request did not complete in time (HTTP 408) — about the moment rather than the request, so the same call is worth retrying
 - Added `StreamErrorCode`, the API's error-code registry as named constants over `int`, tolerant of codes the SDK does not know yet
 - Added `runApiSafely`, which runs an API call and reports every failure as a `StreamException`
 - Added `DisconnectionSource.connectTimeout` and `authenticationFailed`, and `isReconnectable`, whether a connection closed for that reason is worth opening again

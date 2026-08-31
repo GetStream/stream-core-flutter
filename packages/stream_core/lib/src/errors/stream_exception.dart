@@ -189,18 +189,6 @@ base class StreamApiException extends StreamException {
   /// [retryAfter] carries the server's suggested wait when one was sent.
   bool get isRateLimited => statusCode == 429;
 
-  /// Whether the request did not complete in time
-  /// ([StreamErrorCode.requestTimeout], HTTP 408).
-  ///
-  /// About the moment rather than the request, so the same call is worth
-  /// retrying — unlike the rest of the 4xx range, which answers the same way
-  /// however often it is asked.
-  ///
-  /// The server answered, so this is a verdict that a retry can change.
-  /// [StreamNetworkException.isTimeout] is the other timeout: the caller gave
-  /// up before any answer arrived, leaving the outcome unknown.
-  bool get isRequestTimeout => statusCode == 408;
-
   @override
   List<Object?> get props => [...super.props, statusCode, code, moreInfo, unrecoverable, retryAfter, apiError];
 
@@ -243,7 +231,7 @@ base class StreamNetworkException extends StreamException {
   /// not to surface.
   final bool isCancelled;
 
-  /// Whether the request or connection attempt timed out.
+  /// Whether the request timed out before the server answered.
   final bool isTimeout;
 
   /// The WebSocket close code, when the failure was a socket closure.
