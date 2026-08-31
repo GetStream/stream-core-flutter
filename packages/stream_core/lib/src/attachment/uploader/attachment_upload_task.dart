@@ -11,13 +11,14 @@ import '../cdn/cdn_client.dart';
 import '../cdn/uploaded_file.dart';
 import 'attachment_upload_batch.dart';
 import 'attachment_upload_state.dart';
+import 'attachment_uploader.dart';
 import 'uploaded_attachment.dart';
 
 /// One attachment upload, as a handle on the operation itself.
 ///
-/// The upload's lifecycle is on [state], its outcome on [result], and [cancel]
-/// calls it off. Nothing needs disposing: [state] closes itself once the
-/// upload settles.
+/// The upload is already running: the lifecycle is on [state], the outcome on
+/// [result], and [cancel] calls it off. Watching is optional — a task that
+/// nobody listens to runs to completion just the same.
 ///
 /// ```dart
 /// final task = uploader.upload(attachment);
@@ -27,6 +28,13 @@ import 'uploaded_attachment.dart';
 ///
 /// final result = await task.result;
 /// ```
+///
+/// Obtained from [AttachmentUploader.upload], or from an
+/// [AttachmentUploadBatch] through [AttachmentUploadBatch.task]. Nothing needs
+/// disposing: [state] settles and stops once the upload has.
+///
+/// A task runs once and is never reset. Retrying means asking the uploader for
+/// a new one, which is why [attachment] is kept.
 ///
 /// See also:
 ///
@@ -47,9 +55,13 @@ abstract interface class AttachmentUploadTask {
   /// The upload's live state, its single canonical channel.
   ///
   /// Progress is part of the state rather than a source of its own, so a
-  /// progress update and a lifecycle update can never disagree. An upload
-  /// settles on exactly one final state, delivered as a value — a failure or a
-  /// cancellation never arrives as a stream error.
+  /// progress update and a lifecycle update can never disagree. The current
+  /// state is always available synchronously, and is the first thing a new
+  /// listener is given.
+  ///
+  /// An upload settles on exactly one of [UploadSuccess], [UploadFailed] or
+  /// [UploadCancelled], delivered as a value — a failure or a cancellation
+  /// never arrives as an error, so there is nothing to catch here either.
   StateEmitter<AttachmentUploadState> get state;
 
   /// The upload's outcome, which never throws.
@@ -73,12 +85,7 @@ abstract interface class AttachmentUploadTask {
   void cancel();
 }
 
-/// The [AttachmentUploadTask] implementation, driving one upload through a
-/// [CdnClient].
-///
-/// Created queued: nothing is read and nothing is sent until [start] is
-/// called, which is what lets a batch hold tasks back to honour its
-/// concurrency limit.
+/// The [AttachmentUploadTask] implementation.
 @internal
 final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
   /// Creates an [AttachmentUploadTaskImpl] for [attachment], queued.
@@ -99,7 +106,9 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
 
   // Read once and shared with the batch, which needs every length up front to
   // aggregate progress — without this the file would be measured twice.
-  late final Future<int?> _measuredLength = runSafely(() => attachment.file.size).then((it) => it.getOrNull());
+  late final Future<int?> _measuredLength = runSafely(
+    () => attachment.file.size,
+  ).then((it) => it.getOrNull());
 
   /// The attachment's length in bytes, or `null` if it could not be read.
   Future<int?> get measuredLength => _measuredLength;

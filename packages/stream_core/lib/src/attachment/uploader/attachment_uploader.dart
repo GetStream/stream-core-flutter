@@ -6,14 +6,46 @@ import 'attachment_upload_task.dart';
 /// Uploads [StreamAttachment]s to remote storage.
 ///
 /// Both methods return at once, handing back the running operation rather than
-/// a future to wait on: an upload has a lifecycle to watch and a way to be
-/// called off, and both belong to the object that represents it.
+/// a future to wait on: an upload has a lifecycle worth watching and a way to
+/// be called off, and both belong to the object that represents it.
+///
+/// An upload that fails does not throw. It carries its error, so the outcome is
+/// read rather than caught, and one attachment failing never interrupts the
+/// caller. Arguments that could not describe an upload at all are the exception
+/// and do throw, as documented per method.
+///
+/// Consider [StreamAttachmentUploader] for the implementation that uploads
+/// through a [CdnClient]. Implementing this interface is how an app uploads
+/// somewhere else without changing anything built on top.
+///
+/// See also:
+///
+///  * [AttachmentUploadTask], which represents one upload.
+///  * [AttachmentUploadBatch], which represents several run as one operation.
 abstract interface class AttachmentUploader {
   /// Starts uploading [attachment], and returns the task running it.
+  ///
+  /// The upload's whole lifecycle plays out on [AttachmentUploadTask.state], it
+  /// can be called off through [AttachmentUploadTask.cancel], and its outcome
+  /// awaited through [AttachmentUploadTask.result].
+  ///
+  /// Each call starts a new upload and a task is never reused, which is what
+  /// makes retrying an attachment a matter of asking again.
   AttachmentUploadTask upload(StreamAttachment attachment);
 
   /// Starts uploading every attachment in [attachments], and returns the batch
   /// orchestrating them.
+  ///
+  /// At most [maxConcurrent] uploads are in flight at any moment; the rest wait
+  /// their turn in the order they were given. When [eagerError] is true the
+  /// batch gives up on the first failure, calling off the uploads that have not
+  /// settled and never starting the ones that have not begun; when false every
+  /// attachment is attempted whatever the others do. An empty batch is valid,
+  /// and finishes at once with no items.
+  ///
+  /// Throws an [ArgumentError] if [maxConcurrent] is not greater than zero, or
+  /// if two attachments share an id — a batch addresses its uploads by id, so
+  /// ids must be unique within one.
   AttachmentUploadBatch uploadBatch(
     Iterable<StreamAttachment> attachments, {
     int maxConcurrent = 3,
@@ -22,6 +54,10 @@ abstract interface class AttachmentUploader {
 }
 
 /// The [AttachmentUploader] that uploads through a [CdnClient].
+///
+/// Where the bytes go is the [CdnClient]'s business; this decides which
+/// endpoint an attachment belongs to, tracks how far it has got, and answers
+/// for it.
 ///
 /// ```dart
 /// final uploader = StreamAttachmentUploader(cdn: cdnClient);
@@ -35,6 +71,9 @@ abstract interface class AttachmentUploader {
 ///   onFailure: (error, _) => print('Upload failed: $error'),
 /// );
 /// ```
+///
+/// Stateless, so one uploader serves any number of concurrent uploads and
+/// batches; nothing is shared between them.
 class StreamAttachmentUploader implements AttachmentUploader {
   /// Creates a [StreamAttachmentUploader] uploading through the given
   /// [CdnClient].
@@ -44,15 +83,6 @@ class StreamAttachmentUploader implements AttachmentUploader {
 
   final CdnClient _cdn;
 
-  /// Starts uploading [attachment], and returns the task running it.
-  ///
-  /// The upload's whole lifecycle plays out on
-  /// [AttachmentUploadTask.state], it can be called off through
-  /// [AttachmentUploadTask.cancel], and its outcome awaited through
-  /// [AttachmentUploadTask.result].
-  ///
-  /// Each call starts a new upload; a task is never reused, which is what
-  /// makes retrying an attachment a matter of asking again.
   @override
   AttachmentUploadTask upload(StreamAttachment attachment) {
     return AttachmentUploadTaskImpl(
@@ -61,18 +91,6 @@ class StreamAttachmentUploader implements AttachmentUploader {
     )..start();
   }
 
-  /// Starts uploading every attachment in [attachments], and returns the batch
-  /// orchestrating them.
-  ///
-  /// At most [maxConcurrent] uploads are in flight at any moment. When
-  /// [eagerError] is true the batch gives up on the first failure, calling off
-  /// the uploads that have not settled and never starting the ones that have
-  /// not begun; when false every attachment is attempted whatever the others
-  /// do. An empty batch is valid, and finishes at once with no items.
-  ///
-  /// Throws an [ArgumentError] if [maxConcurrent] is not greater than zero, or
-  /// if two attachments share an id — a batch addresses its uploads by id, so
-  /// ids must be unique within one.
   @override
   AttachmentUploadBatch uploadBatch(
     Iterable<StreamAttachment> attachments, {

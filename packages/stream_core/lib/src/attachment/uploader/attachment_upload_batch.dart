@@ -10,64 +10,95 @@ import '../attachment.dart';
 import '../cdn/cdn_client.dart';
 import 'attachment_upload_state.dart';
 import 'attachment_upload_task.dart';
+import 'attachment_uploader.dart';
 import 'batch_upload_state.dart';
 
 /// Several attachment uploads run as one operation.
 ///
 /// A batch orchestrates [AttachmentUploadTask]s; it does not upload anything
-/// itself. Everything per-attachment is reached through the task that owns it,
-/// so cancelling, watching or awaiting one attachment is the same API whether
-/// or not it is part of a batch:
+/// itself. It decides only what runs when and when the whole thing is done —
+/// everything per-attachment is reached through the task that owns it, so
+/// cancelling, watching or awaiting one attachment is the same API whether or
+/// not it is part of a batch:
 ///
 /// ```dart
-/// batch.task('video-1')?.state.listen(render);
+/// final batch = uploader.uploadBatch(attachments, maxConcurrent: 3);
+///
+/// batch.state.listen((state) => showProgress(state.progress));
 /// batch.task('video-1')?.cancel();
+///
+/// switch (await batch.result) {
+///   case BatchUploadCompleted(:final items):
+///     submit(items);
+///   case BatchUploadStoppedOnError(:final error):
+///     report(error);
+///   case BatchUploadCancelled():
+///     break;
+/// }
 /// ```
+///
+/// One upload failing does not fail the batch: a batch of three where the
+/// middle one was refused still ran as asked, and finishes as
+/// [BatchUploadCompleted] with that failure on its own item. Only
+/// `eagerError` changes that, and only for the first failure.
+///
+/// Obtained from [AttachmentUploader.uploadBatch] rather than constructed.
+/// Nothing needs disposing: [state] settles and stops once the batch has
+/// finished, and [cancel] is how a batch is stopped before then.
 ///
 /// See also:
 ///
 ///  * [AttachmentUploadTask], the upload a batch is built out of.
 ///  * [BatchUploadState], the states a batch moves through.
+///  * [BatchUploadResult], the three ways a batch can end.
 abstract interface class AttachmentUploadBatch {
-  // Nothing needs disposing: `state` closes itself once the batch finishes,
-  // and `cancel` is how a batch is stopped early.
-  /// This batch's identity.
+  /// This batch's identifier, unique among the batches this process makes.
+  ///
+  /// Assigned when the batch is created and meaningful only within the process
+  /// that made it, so it serves to tell two batches apart in log records
+  /// rather than to address anything.
   String get id;
 
   /// The batch's live state, carrying its aggregate progress.
   ///
-  /// Read [StateEmitter.value] for the current snapshot, or listen — the
-  /// latest state replays to a new listener, and the stream closes once the
-  /// batch has finished.
+  /// The current state is always available synchronously, and is the first
+  /// thing a new listener is given. No state follows [BatchFinished].
   StateEmitter<BatchUploadState> get state;
 
   /// The tasks this batch orchestrates, in the order the attachments were
   /// given.
+  ///
+  /// Fixed when the batch is created and unmodifiable: a batch never grows or
+  /// shrinks, so this is also the order [BatchUploadResult.items] arrives in.
   List<AttachmentUploadTask> get uploads;
 
   /// Every attachment's outcome, once they have all settled.
   ///
   /// Never throws, and never fails as a whole: an upload's own failure is
-  /// carried by its [BatchUploadItemResult].
+  /// carried by its [BatchUploadItemResult]. Completes however the batch ended,
+  /// cancellation included, so awaiting it is always safe.
   Future<BatchUploadResult> get result;
 
   /// The task uploading the attachment with the given [id], or `null` if this
   /// batch has none.
+  ///
+  /// The id is the [StreamAttachment.id] the batch was given, not this batch's
+  /// own [id].
   AttachmentUploadTask? task(String id);
 
   /// Calls off every upload that has not settled.
   ///
-  /// Returns at once and is idempotent. Uploads that already succeeded are
-  /// kept; the batch moves to [BatchCancelling] until the rest have stopped,
-  /// and finishes as [BatchUploadCancelled].
+  /// Returns at once and is idempotent, and is safe on a finished batch, which
+  /// ignores it. Uploads that already succeeded keep their outcome; the batch
+  /// moves to [BatchCancelling] until the rest have stopped, and finishes as
+  /// [BatchUploadCancelled].
+  ///
+  /// Cancelling is not undoing: an attachment already accepted stays where it
+  /// was put.
   void cancel();
 }
 
 /// The [AttachmentUploadBatch] implementation.
-///
-// Owns the scheduler: it holds tasks back until a slot is free, applies the
-// error policy, aggregates progress, and finishes only once it has seen every
-// task settle.
 @internal
 final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
   /// Creates an [AttachmentUploadBatchImpl] and starts scheduling.
@@ -171,8 +202,9 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
     _emitState();
   }
 
-  // Fills every free slot, in input order, and stops filling them once the
-  // batch is giving up — an upload that has not started never will.
+  // Fills every free slot, in input order. An upload the batch already settled
+  // on its behalf — because it was cancelled, or the batch gave up — reads as
+  // final and is skipped, so giving up needs no separate check here.
   void _pump() {
     if (_outcome.isCompleted) return;
 
