@@ -109,13 +109,13 @@ final class UploadCancelled extends AttachmentUploadState {
 
 /// How far one upload has got, in bytes.
 ///
-/// The counts are the attachment's own bytes; whatever a request costs beyond
-/// them is not reported. They are the source of truth and [fraction] is
-/// derived, which is what lets a batch aggregate them; see
-/// [BatchUploadProgress.fraction].
+/// The counts are the attachment's own bytes, and nothing else is reported
+/// against them. They are the source of truth and [fraction] is derived, which
+/// is what lets a batch aggregate them; see [BatchUploadProgress.fraction].
 ///
-/// A file whose length could not be read still reports what went out, so a
-/// caller drawing a bar handles the indeterminate case:
+/// A file whose length could not be read reports how much of it has gone
+/// without a total to measure against, so a caller drawing a bar handles the
+/// indeterminate case:
 ///
 /// ```dart
 /// final label = switch (progress.fraction) {

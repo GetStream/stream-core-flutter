@@ -149,10 +149,10 @@ final class BatchUploadProgress extends Equatable {
 
   /// The number of bytes sent so far, across the batch.
   ///
-  /// An attachment whose length could not be read still contributes what went
-  /// out for it, which can come to more than the attachment itself. [totalBytes]
-  /// is `null` whenever a batch holds one, so [fraction] reads as unknown for
-  /// the whole batch rather than against a total these bytes could exceed.
+  /// An attachment whose length could not be read still contributes to this,
+  /// so it is not a count [totalBytes] can be measured against. [totalBytes]
+  /// is `null` whenever a batch holds one, and [fraction] reads as unknown for
+  /// the whole batch while that is true.
   final int sentBytes;
 
   /// The number of attachment bytes the batch has to send.

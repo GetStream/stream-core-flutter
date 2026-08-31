@@ -28,10 +28,10 @@ import 'attachment_upload_task.dart';
 /// );
 /// ```
 ///
-/// Where the bytes go is the [CdnClient]'s business; this decides which
-/// endpoint an attachment belongs to, tracks how far it has got, and answers
-/// for it. Uploading somewhere else is therefore a matter of supplying a
-/// different [CdnClient], not of replacing this.
+/// Where the bytes go is the [CdnClient]'s business; this tracks how far an
+/// attachment has got and answers for it. Uploading somewhere else is
+/// therefore a matter of supplying a different [CdnClient], not of replacing
+/// this.
 ///
 /// Stateless, so one uploader serves any number of concurrent uploads and
 /// batches; nothing is shared between them.
