@@ -43,9 +43,8 @@ import 'batch_upload_state.dart';
 /// `eagerError` changes that, and only for the first failure.
 ///
 /// Obtained from [StreamAttachmentUploader.uploadBatch] rather than
-/// constructed.
-/// Nothing needs disposing: [state] settles and stops once the batch has
-/// finished, and [cancel] is how a batch is stopped before then.
+/// constructed. Nothing needs disposing: [state] settles and stops once the
+/// batch has finished, and [cancel] is how a batch is stopped before then.
 ///
 /// See also:
 ///
@@ -326,14 +325,14 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
     // state it is reported beside. A progress event still queued behind a
     // settle would otherwise leave a finished batch reporting a fraction of
     // the bytes it sent.
-    final sentBytes = _tasks.fold(0, (sent, task) {
-      return sent +
-          switch (task.state.value) {
-            UploadInProgress(:final progress) => progress.sentBytes,
-            UploadSuccess() => _totals[task.id] ?? _sent[task.id] ?? 0,
-            _ => _sent[task.id] ?? 0,
-          };
-    });
+    var sentBytes = 0;
+    for (final task in _tasks) {
+      sentBytes += switch (task.state.value) {
+        UploadInProgress(:final progress) => progress.sentBytes,
+        UploadSuccess() => _totals[task.id] ?? _sent[task.id] ?? 0,
+        _ => _sent[task.id] ?? 0,
+      };
+    }
 
     // An attachment whose length could not be read contributes no term, and a
     // total missing one of its terms would understate the work left.

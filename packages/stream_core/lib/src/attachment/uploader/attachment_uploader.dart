@@ -58,7 +58,9 @@ class StreamAttachmentUploader {
   ///
   /// Each call starts a new upload and a task is never reused, which is what
   /// makes retrying an attachment a matter of asking again.
-  AttachmentUploadTask upload(StreamAttachment attachment) {
+  AttachmentUploadTask upload(
+    StreamAttachment attachment,
+  ) {
     return AttachmentUploadTaskImpl(
       attachment: attachment,
       cdn: _cdn,
