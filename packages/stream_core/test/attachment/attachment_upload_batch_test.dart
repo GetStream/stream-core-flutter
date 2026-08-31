@@ -33,13 +33,19 @@ void main() {
       await batch.result;
     });
 
-    test('refuses attachments that share an id, which it could not address', () {
-      final uploader = StreamAttachmentUploader(cdn: FakeCdnClient());
+    test('refuses attachments that share an id, which it could not address', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
 
       expect(
         () => uploader.uploadBatch([attachmentOf('dupe'), attachmentOf('dupe')]),
         throwsArgumentError,
       );
+
+      // Refused before a single upload exists, rather than after some of them
+      // have already been set going.
+      await pumpEventQueue();
+      expect(cdn.received, isEmpty);
     });
 
     test('refuses a concurrency limit that would start nothing', () {
@@ -89,6 +95,27 @@ void main() {
 
       expect(cdn.inFlight, 2, reason: 'a freed slot takes exactly one more');
       expect(cdn.received, hasLength(3));
+
+      batch.cancel();
+      await batch.result;
+    });
+
+    test('refills every slot freed in the same turn, and no more', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final attachments = attachmentsOf(5);
+
+      final batch = uploader.uploadBatch(attachments, maxConcurrent: 2);
+      await pumpEventQueue();
+
+      // Both settle before the scheduler runs again, so it has two slots to
+      // fill at once rather than the one slot the case above frees.
+      cdn.upload(attachments[0]).succeed();
+      cdn.upload(attachments[1]).succeed();
+      await pumpEventQueue();
+
+      expect(cdn.inFlight, 2);
+      expect(cdn.received, hasLength(4), reason: 'both freed slots were taken, and the fifth waits');
 
       batch.cancel();
       await batch.result;
@@ -440,6 +467,38 @@ void main() {
 
       batch.cancel();
       await batch.result;
+    });
+
+    test('finishes with the total still unknown when an attachment could not be measured', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final unreadable = StreamAttachment(
+        id: 'unreadable',
+        type: AttachmentType.file,
+        file: AttachmentFile('/nonexistent/does-not-exist.bin'),
+      );
+      final sized = attachmentOf('sized');
+
+      final batch = uploader.uploadBatch([unreadable, sized]);
+
+      (await cdn.awaitUpload(unreadable))
+        ..sendBytes(400, 400)
+        ..succeed();
+      (await cdn.awaitUpload(sized)).succeed();
+
+      final result = await batch.result;
+      final progress = batch.state.value.progress;
+
+      expect(result, isA<BatchUploadCompleted>());
+      expect(progress.succeeded, 2);
+
+      // An attachment that could never be measured contributes no term, so the
+      // total stays unknown for good and the fraction never becomes a number —
+      // even though the batch completed. `sentBytes` still counts what went
+      // out, which for the unmeasured upload is what the transport reported.
+      expect(progress.totalBytes, isNull);
+      expect(progress.fraction, isNull);
+      expect(progress.sentBytes, 1400);
     });
 
     test('knows the whole batch total before every upload has started', () async {

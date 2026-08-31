@@ -56,7 +56,10 @@ abstract interface class AttachmentUploadTask {
   ///
   /// A cancelled upload settles as a failure carrying a
   /// [StreamNetworkException] with [StreamNetworkException.isCancelled] set,
-  /// the same shape every cancelled call in the SDK reports.
+  /// the same shape every cancelled call in the SDK reports. A `Result` rather
+  /// than a sealed outcome like [AttachmentUploadBatch.result], because one
+  /// upload either produced an attachment or did not, and the reason it did
+  /// not is a `StreamException` the caller already knows how to read.
   Future<Result<UploadedAttachment>> get result;
 
   /// Calls the upload off.
@@ -135,7 +138,7 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
 
     final totalBytes = await _measuredLength;
     if (_outcome.isCompleted) return;
-    _state.value = UploadInProgress(progress: UploadProgress.none(totalBytes: totalBytes ?? 0));
+    _state.value = UploadInProgress(progress: UploadProgress.none(totalBytes: totalBytes));
 
     final send = switch (attachment.type) {
       AttachmentType.image => _cdn.uploadImage,
@@ -172,19 +175,13 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
     if (_outcome.isCompleted) return;
 
     if (fileBytes == null) {
-      // Nothing to scale to, so the transport's own counts are reported.
-      final totalBytes = wireTotal > 0 ? wireTotal : 0;
-      _state.value = UploadInProgress(
-        progress: UploadProgress(
-          sentBytes: totalBytes > 0 ? sent.clamp(0, totalBytes) : sent,
-          totalBytes: totalBytes,
-        ),
-      );
-
+      // Nothing to scale to, so what went out is reported as-is and the total
+      // stays unknown, leaving `fraction` indeterminate rather than wrong.
+      _state.value = UploadInProgress(progress: UploadProgress(sentBytes: sent, totalBytes: null));
       return;
     }
 
-    final sentBytes = wireTotal > 0 ? (sent * fileBytes / wireTotal).round() : sent;
+    final sentBytes = wireTotal > 0 ? (sent / wireTotal * fileBytes).round() : sent;
     _state.value = UploadInProgress(
       progress: UploadProgress(sentBytes: sentBytes.clamp(0, fileBytes), totalBytes: fileBytes),
     );

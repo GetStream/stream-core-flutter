@@ -155,11 +155,13 @@ final class BatchUploadProgress extends Equatable {
   /// The sent fraction, between 0.0 and 1.0, or `null` while [totalBytes] is
   /// still unknown.
   ///
-  /// Byte weighted rather than count weighted: a 1 MB image beside a 999 MB
-  /// video is 0.1% of the batch, not half of it.
+  /// `1.0` for a batch with nothing to send. Byte weighted rather than count
+  /// weighted: a 1 MB image beside a 999 MB video is 0.1% of the batch, not
+  /// half of it.
   double? get fraction {
     final total = totalBytes;
-    if (total == null || total == 0) return null;
+    if (total == null) return null;
+    if (total == 0) return 1;
     return (sentBytes / total).clamp(0.0, 1.0);
   }
 

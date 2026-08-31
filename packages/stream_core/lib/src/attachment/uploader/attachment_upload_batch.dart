@@ -73,25 +73,48 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
   /// Creates an [AttachmentUploadBatchImpl] and starts scheduling.
   ///
   /// Throws an [ArgumentError] if two attachments share an id, which would
-  /// make [task] ambiguous.
-  AttachmentUploadBatchImpl({
+  /// make [task] ambiguous, or if [maxConcurrent] is not positive.
+  factory AttachmentUploadBatchImpl({
     required Iterable<StreamAttachment> attachments,
     required CdnClient cdn,
-    this.maxConcurrent = 3,
-    this.eagerError = false,
-  }) : id = const Uuid().v4(),
-       _tasks = [
-         for (final attachment in attachments) AttachmentUploadTaskImpl(attachment: attachment, cdn: cdn),
-       ] {
+    int maxConcurrent = 3,
+    bool eagerError = false,
+  }) {
     if (maxConcurrent <= 0) {
       throw ArgumentError.value(maxConcurrent, 'maxConcurrent', 'A batch that may run no uploads would never finish');
     }
 
-    for (final task in _tasks) {
-      if (_tasksById.containsKey(task.id)) {
-        throw ArgumentError.value(task.id, 'attachments', 'Attachment ids must be unique within a batch');
-      }
+    // Read once: an `Iterable` is free to be lazy, and a batch validated over
+    // one pass but built from another could disagree about what is in it.
+    final requested = attachments.toList();
 
+    final ids = <String>{};
+    for (final attachment in requested) {
+      if (ids.add(attachment.id)) continue;
+      throw ArgumentError.value(attachment.id, 'attachments', 'Attachment ids must be unique within a batch');
+    }
+
+    return AttachmentUploadBatchImpl._(
+      attachments: requested,
+      cdn: cdn,
+      maxConcurrent: maxConcurrent,
+      eagerError: eagerError,
+    );
+  }
+
+  // Nothing is validated here: a task starts reading its file as soon as it is
+  // registered, so a batch that rejects its arguments must do it before any
+  // task exists rather than abandoning the ones it already built.
+  AttachmentUploadBatchImpl._({
+    required List<StreamAttachment> attachments,
+    required CdnClient cdn,
+    required this.maxConcurrent,
+    required this.eagerError,
+  }) : id = const Uuid().v4(),
+       _tasks = [
+         for (final attachment in attachments) AttachmentUploadTaskImpl(attachment: attachment, cdn: cdn),
+       ] {
+    for (final task in _tasks) {
       _tasksById[task.id] = task;
       _measure(task);
       task.state.listen((state) => _onTaskState(task, state));
@@ -157,17 +180,12 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
   void _pump() {
     if (_outcome.isCompleted) return;
 
-    // Belt and braces: `_cancelUnsettled` settles every unstarted upload in the
-    // same turn it gives up, so the loop below would skip them anyway. This
-    // says the invariant out loud rather than resting it on that.
-    if (_ending == null) {
-      for (final task in _tasks) {
-        if (_active.length >= maxConcurrent) break;
-        if (_started.contains(task.id) || task.state.value.isFinal) continue;
-        _started.add(task.id);
-        _active.add(task.id);
-        task.start();
-      }
+    for (final task in _tasks) {
+      if (_active.length >= maxConcurrent) break;
+      if (_started.contains(task.id) || task.state.value.isFinal) continue;
+      _started.add(task.id);
+      _active.add(task.id);
+      task.start();
     }
 
     _emitState();

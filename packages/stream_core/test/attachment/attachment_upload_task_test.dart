@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
@@ -157,7 +159,7 @@ void main() {
       await task.result;
     });
 
-    test('falls back to the transport total when the file length cannot be read', () async {
+    test('leaves the total unknown when the file length cannot be read', () async {
       final cdn = FakeCdnClient();
       final uploader = StreamAttachmentUploader(cdn: cdn);
       final attachment = StreamAttachment(
@@ -178,8 +180,55 @@ void main() {
       await pumpEventQueue();
 
       final progress = states.whereType<UploadInProgress>().map((it) => it.progress);
-      expect(progress.first, const UploadProgress(sentBytes: 0, totalBytes: 0), reason: 'no length to report yet');
-      expect(progress.last, const UploadProgress(sentBytes: 500, totalBytes: 2000));
+      expect(progress.first, const UploadProgress(sentBytes: 0, totalBytes: null), reason: 'no length to report');
+
+      // What went out is still worth reporting; the total is not invented from
+      // the transport's own count, so the fraction reads as indeterminate
+      // rather than as a percentage of the wrong whole.
+      expect(progress.last, const UploadProgress(sentBytes: 500, totalBytes: null));
+      expect(progress.last.fraction, isNull);
+    });
+
+    test('reads an empty file as fully sent rather than as an unknown length', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final attachment = attachmentOf('file-1', bytes: 0);
+
+      final task = uploader.upload(attachment);
+      final states = <AttachmentUploadState>[];
+      task.state.listen(states.add);
+
+      (await cdn.awaitUpload(attachment)).succeed();
+      await task.result;
+      await pumpEventQueue();
+
+      final progress = states.whereType<UploadInProgress>().map((it) => it.progress);
+      expect(progress.first, const UploadProgress(sentBytes: 0, totalBytes: 0));
+      expect(progress.first.fraction, 1.0, reason: 'nothing to send is already sent');
+    });
+  });
+
+  group('when the upload is cancelled', () {
+    test('settles while the file is still being read, sending nothing', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final attachment = attachmentOf('file-1');
+
+      final task = uploader.upload(attachment);
+      final states = <AttachmentUploadState>[];
+      task.state.listen(states.add);
+
+      // Queued behind the microtask that starts the upload, so it lands while
+      // the task is reading its file and before the length has arrived — the
+      // one window where `UploadPreparing` is the live state.
+      scheduleMicrotask(task.cancel);
+
+      final result = await task.result;
+      await pumpEventQueue();
+
+      expect(states, [const UploadQueued(), const UploadPreparing(), const UploadCancelled()]);
+      expect(cdn.wasReceived(attachment), isFalse, reason: 'the read was called off before any send');
+      expect(result, isA<Failure>());
     });
   });
 

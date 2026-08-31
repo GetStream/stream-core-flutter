@@ -90,7 +90,7 @@ final class UploadFailed extends AttachmentUploadState {
   /// Creates an [UploadFailed] state.
   const UploadFailed({required this.error});
 
-  /// What went wrong, [StreamException.stackTrace] included.
+  /// What went wrong.
   final StreamException error;
 
   @override
@@ -121,21 +121,25 @@ final class UploadProgress extends Equatable {
   });
 
   /// An upload that has not sent anything yet, of a file [totalBytes] long.
-  const UploadProgress.none({this.totalBytes = 0}) : sentBytes = 0;
+  const UploadProgress.none({this.totalBytes}) : sentBytes = 0;
 
   /// The number of bytes sent so far.
   final int sentBytes;
 
-  /// The number of bytes to send.
-  ///
-  /// `0` when the file's length could not be determined, which makes
-  /// [fraction] `0` for the whole upload.
-  final int totalBytes;
+  /// The number of bytes to send, or `null` when the file's length could not
+  /// be read.
+  final int? totalBytes;
 
-  /// The sent fraction, between 0.0 and 1.0.
-  double get fraction {
-    if (totalBytes == 0) return 0;
-    return (sentBytes / totalBytes).clamp(0.0, 1.0);
+  /// The sent fraction, between 0.0 and 1.0, or `null` when [totalBytes] is
+  /// unknown.
+  ///
+  /// `1.0` for a file with nothing to send, which is fully sent the moment it
+  /// starts.
+  double? get fraction {
+    final total = totalBytes;
+    if (total == null) return null;
+    if (total == 0) return 1;
+    return (sentBytes / total).clamp(0.0, 1.0);
   }
 
   @override
