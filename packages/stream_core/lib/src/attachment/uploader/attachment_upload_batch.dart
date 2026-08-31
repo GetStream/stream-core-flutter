@@ -95,25 +95,19 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
     }
 
     return AttachmentUploadBatchImpl._(
-      attachments: requested,
-      cdn: cdn,
+      [
+        for (final attachment in requested) AttachmentUploadTaskImpl(attachment: attachment, cdn: cdn),
+      ],
       maxConcurrent: maxConcurrent,
       eagerError: eagerError,
     );
   }
 
-  // Nothing is validated here: a task starts reading its file as soon as it is
-  // registered, so a batch that rejects its arguments must do it before any
-  // task exists rather than abandoning the ones it already built.
-  AttachmentUploadBatchImpl._({
-    required List<StreamAttachment> attachments,
-    required CdnClient cdn,
+  AttachmentUploadBatchImpl._(
+    this._tasks, {
     required this.maxConcurrent,
     required this.eagerError,
-  }) : id = const Uuid().v4(),
-       _tasks = [
-         for (final attachment in attachments) AttachmentUploadTaskImpl(attachment: attachment, cdn: cdn),
-       ] {
+  }) : id = const Uuid().v4() {
     for (final task in _tasks) {
       _tasksById[task.id] = task;
       _measure(task);
