@@ -68,23 +68,7 @@ class AuthInterceptor extends Interceptor {
     // other token codes are clock or configuration problems a refresh cannot
     // help.
     final error = err.toStreamException();
-    if (error is! StreamApiException || !error.isTokenExpired) {
-      // The classification is done; handing it on as a StreamDioException is
-      // what ApiErrorInterceptor would build anyway, and spares it reading the
-      // same body a second time.
-      if (err is StreamDioException) return handler.next(err);
-
-      return handler.next(
-        StreamDioException(
-          exception: error,
-          requestOptions: err.requestOptions,
-          response: err.response,
-          type: err.type,
-          stackTrace: err.stackTrace,
-          message: err.message,
-        ),
-      );
-    }
+    if (error is! StreamApiException || !error.isTokenExpired) return handler.next(err);
 
     final options = err.requestOptions;
 
