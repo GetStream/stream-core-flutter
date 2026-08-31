@@ -24,8 +24,8 @@ import 'uploaded_attachment.dart';
 /// final task = uploader.upload(attachment);
 ///
 /// task.state.listen((state) {
-///   if (state case UploadInProgress(:final progress)) {
-///     showProgress(progress.fraction);
+///   if (state case UploadInProgress(progress: UploadProgress(:final fraction?))) {
+///     showProgress(fraction);
 ///   }
 /// });
 ///
@@ -113,9 +113,7 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
 
   // Read once and shared with the batch, which needs every length up front to
   // aggregate progress — without this the file would be measured twice.
-  late final Future<int?> _measuredLength = runSafely(
-    () => attachment.file.size,
-  ).then((it) => it.getOrNull());
+  late final Future<int?> _measuredLength = runSafely(() => attachment.file.size).then((it) => it.getOrNull());
 
   /// The attachment's length in bytes, or `null` if it could not be read.
   Future<int?> get measuredLength => _measuredLength;

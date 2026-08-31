@@ -88,9 +88,13 @@ abstract interface class AttachmentUploadBatch {
 
   /// Calls off every upload that has not settled.
   ///
-  /// Returns at once and is idempotent, and is safe on a finished batch, which
-  /// ignores it. Uploads that already succeeded keep their outcome; the batch
-  /// moves to [BatchCancelling] until the rest have stopped, and finishes as
+  /// Returns at once and is idempotent. A batch that has finished ignores it,
+  /// and so does one already giving up on a failure — it has called its
+  /// remaining uploads off, and finishes as [BatchUploadStoppedOnError] rather
+  /// than changing its mind.
+  ///
+  /// Otherwise uploads that already succeeded keep their outcome, the batch
+  /// moves to [BatchCancelling] until the rest have stopped, and it finishes as
   /// [BatchUploadCancelled].
   ///
   /// Cancelling is not undoing: an attachment already accepted stays where it

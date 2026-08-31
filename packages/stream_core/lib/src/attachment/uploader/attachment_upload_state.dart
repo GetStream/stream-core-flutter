@@ -18,7 +18,7 @@ import 'uploaded_attachment.dart';
 ///     case UploadPreparing():
 ///       showPreparing();
 ///     case UploadInProgress(:final progress):
-///       updateProgress(progress.fraction);
+///       updateProgress(progress.fraction ?? 0);
 ///     case UploadSuccess(:final attachment):
 ///       showUploaded(attachment);
 ///     case UploadFailed(:final error):
