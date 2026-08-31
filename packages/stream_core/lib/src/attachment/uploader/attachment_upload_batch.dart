@@ -255,10 +255,10 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
     // Every task is terminal, so every outcome is already there; awaiting them
     // is how the batch reads them without restating how a task settles.
     final results = await Future.wait(_tasks.map((task) => task.result));
-    final items = [
+    final items = List<BatchUploadItemResult>.unmodifiable([
       for (final (index, task) in _tasks.indexed)
         BatchUploadItemResult(attachment: task.attachment, result: results[index]),
-    ];
+    ]);
 
     final result = switch (ending) {
       _BatchEnding.stoppedOnError => BatchUploadStoppedOnError(items: items, error: failureError!),

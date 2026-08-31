@@ -147,7 +147,7 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
       () => send(
         attachment.file,
         cancelToken: _cancelToken,
-        onProgress: (sent, total) => _trackProgress(sent, totalBytes ?? total),
+        onProgress: (sent, total) => _trackProgress(sent: sent, wireTotal: total, fileBytes: totalBytes),
       ),
     ).then((it) => it.flatten<UploadedFile>());
 
@@ -165,16 +165,29 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
     );
   }
 
-  // Transport progress counts the multipart framing around the file; what is
-  // reported is the attachment's own bytes, so the framing lands in the clamp.
-  void _trackProgress(int sent, int total) {
+  // The transport counts the multipart framing around the file as well as the
+  // file, so its counts are scaled back to the attachment's own — reaching the
+  // file's length when the request has gone out rather than as soon as the
+  // bytes before the framing have.
+  void _trackProgress({required int sent, required int wireTotal, required int? fileBytes}) {
     if (_outcome.isCompleted) return;
-    final totalBytes = total > 0 ? total : 0;
+
+    if (fileBytes == null) {
+      // Nothing to scale to, so the transport's own counts are reported.
+      final totalBytes = wireTotal > 0 ? wireTotal : 0;
+      _state.value = UploadInProgress(
+        progress: UploadProgress(
+          sentBytes: totalBytes > 0 ? sent.clamp(0, totalBytes) : sent,
+          totalBytes: totalBytes,
+        ),
+      );
+
+      return;
+    }
+
+    final sentBytes = wireTotal > 0 ? (sent * fileBytes / wireTotal).round() : sent;
     _state.value = UploadInProgress(
-      progress: UploadProgress(
-        sentBytes: totalBytes > 0 ? sent.clamp(0, totalBytes) : sent,
-        totalBytes: totalBytes,
-      ),
+      progress: UploadProgress(sentBytes: sentBytes.clamp(0, fileBytes), totalBytes: fileBytes),
     );
   }
 

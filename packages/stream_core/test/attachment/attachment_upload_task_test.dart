@@ -18,8 +18,8 @@ void main() {
       expect(task.state.value, const UploadQueued());
 
       (await cdn.awaitUpload(attachment))
-        ..sendBytes(500, 1200)
-        ..sendBytes(1200, 1200)
+        ..sendBytes(500, 1000)
+        ..sendBytes(1000, 1000)
         ..succeed(fileUrl: 'https://cdn.example.com/file.jpg', thumbUrl: 'https://cdn.example.com/thumb.jpg');
 
       final result = await task.result;
@@ -135,6 +135,26 @@ void main() {
       expect(progress.map((it) => it.totalBytes), everyElement(1000));
       expect(progress.last, const UploadProgress(sentBytes: 1000, totalBytes: 1000));
       expect(progress.last.fraction, 1.0);
+    });
+
+    test('does not reach the file length until the request has gone out', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final attachment = attachmentOf('file-1');
+
+      final task = uploader.upload(attachment);
+      // As many bytes as the file is long have gone out, but the multipart
+      // framing around it has not.
+      (await cdn.awaitUpload(attachment)).sendBytes(1000, 1400);
+      await pumpEventQueue();
+
+      expect(
+        task.state.value,
+        isA<UploadInProgress>().having((it) => it.progress.fraction, 'fraction', lessThan(1.0)),
+      );
+
+      cdn.upload(attachment).succeed();
+      await task.result;
     });
 
     test('falls back to the transport total when the file length cannot be read', () async {
