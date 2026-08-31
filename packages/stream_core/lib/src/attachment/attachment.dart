@@ -2,13 +2,14 @@ import 'package:uuid/uuid.dart';
 
 import 'attachment_file.dart';
 import 'attachment_type.dart';
-import 'attachment_upload_state.dart';
 
-/// Represents a file attachment with type information and upload state.
+/// Represents a file attachment with type information.
 ///
-/// Combines an [AttachmentFile] with its [AttachmentType] and tracks the
-/// upload progress through [AttachmentUploadState]. This class provides
-/// a complete representation of an attachment throughout its lifecycle.
+/// Combines an [AttachmentFile] with its [AttachmentType], and is what an
+/// upload is asked for: it carries the local [id] the upload is addressed by,
+/// the [file] to send, and the [custom] data handed back on the uploaded
+/// attachment. Where the upload has got to lives on the task running it, not
+/// here.
 ///
 /// Example usage:
 /// ```dart
@@ -49,14 +50,12 @@ class StreamAttachment {
   /// If not provided, a UUID v4 will be automatically generated.
   /// The [type] specifies what kind of attachment this is.
   /// The [file] contains the actual file data and metadata.
-  /// The [uploadState] tracks the upload progress, defaulting to preparing.
   /// The [custom] allows storing arbitrary key-value pairs for additional
   /// metadata specific to your application's needs.
   StreamAttachment({
     String? id,
     required this.type,
     required this.file,
-    this.uploadState = const AttachmentUploadState.preparing(),
     this.custom,
   }) : id = id ?? const Uuid().v4();
 
@@ -71,9 +70,6 @@ class StreamAttachment {
 
   /// The file data and metadata.
   final AttachmentFile file;
-
-  /// The current upload state of this attachment.
-  final AttachmentUploadState uploadState;
 
   /// Optional custom data for storing arbitrary key-value pairs.
   ///
@@ -90,14 +86,12 @@ class StreamAttachment {
   StreamAttachment copyWith({
     AttachmentType? type,
     AttachmentFile? file,
-    AttachmentUploadState? uploadState,
     Map<String, Object?>? custom,
   }) {
     return StreamAttachment(
       id: id, // ID is preserved and cannot be changed
       type: type ?? this.type,
       file: file ?? this.file,
-      uploadState: uploadState ?? this.uploadState,
       custom: custom ?? this.custom,
     );
   }

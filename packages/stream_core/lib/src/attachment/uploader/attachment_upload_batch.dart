@@ -1,0 +1,312 @@
+import 'dart:async';
+import 'dart:collection';
+
+import 'package:meta/meta.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../errors/stream_exception.dart';
+import '../../utils.dart';
+import '../attachment.dart';
+import '../cdn/cdn_client.dart';
+import 'attachment_upload_state.dart';
+import 'attachment_upload_task.dart';
+import 'batch_upload_state.dart';
+
+/// Several attachment uploads run as one operation.
+///
+/// A batch orchestrates [AttachmentUploadTask]s; it does not upload anything
+/// itself. Everything per-attachment is reached through the task that owns it,
+/// so cancelling, watching or awaiting one attachment is the same API whether
+/// or not it is part of a batch:
+///
+/// ```dart
+/// batch.task('video-1')?.state.listen(render);
+/// batch.task('video-1')?.cancel();
+/// ```
+///
+/// See also:
+///
+///  * [AttachmentUploadTask], the upload a batch is built out of.
+///  * [BatchUploadState], the states a batch moves through.
+abstract interface class AttachmentUploadBatch {
+  // Nothing needs disposing: `state` closes itself once the batch finishes,
+  // and `cancel` is how a batch is stopped early.
+  /// This batch's identity.
+  String get id;
+
+  /// The batch's live state, carrying its aggregate progress.
+  ///
+  /// Read [StateEmitter.value] for the current snapshot, or listen — the
+  /// latest state replays to a new listener, and the stream closes once the
+  /// batch has finished.
+  StateEmitter<BatchUploadState> get state;
+
+  /// The tasks this batch orchestrates, in the order the attachments were
+  /// given.
+  List<AttachmentUploadTask> get uploads;
+
+  /// Every attachment's outcome, once they have all settled.
+  ///
+  /// Never throws, and never fails as a whole: an upload's own failure is
+  /// carried by its [BatchUploadItemResult].
+  Future<BatchUploadResult> get result;
+
+  /// The task uploading the attachment with the given [id], or `null` if this
+  /// batch has none.
+  AttachmentUploadTask? task(String id);
+
+  /// Calls off every upload that has not settled.
+  ///
+  /// Returns at once and is idempotent. Uploads that already succeeded are
+  /// kept; the batch moves to [BatchCancelling] until the rest have stopped,
+  /// and finishes as [BatchUploadCancelled].
+  void cancel();
+}
+
+/// The [AttachmentUploadBatch] implementation.
+///
+// Owns the scheduler: it holds tasks back until a slot is free, applies the
+// error policy, aggregates progress, and finishes only once it has seen every
+// task settle.
+@internal
+final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
+  /// Creates an [AttachmentUploadBatchImpl] and starts scheduling.
+  ///
+  /// Throws an [ArgumentError] if two attachments share an id, which would
+  /// make [task] ambiguous.
+  AttachmentUploadBatchImpl({
+    required Iterable<StreamAttachment> attachments,
+    required CdnClient cdn,
+    this.maxConcurrent = 3,
+    this.eagerError = false,
+  }) : id = const Uuid().v4(),
+       _tasks = [
+         for (final attachment in attachments) AttachmentUploadTaskImpl(attachment: attachment, cdn: cdn),
+       ] {
+    if (maxConcurrent <= 0) {
+      throw ArgumentError.value(maxConcurrent, 'maxConcurrent', 'A batch that may run no uploads would never finish');
+    }
+
+    for (final task in _tasks) {
+      if (_tasksById.containsKey(task.id)) {
+        throw ArgumentError.value(task.id, 'attachments', 'Attachment ids must be unique within a batch');
+      }
+
+      _tasksById[task.id] = task;
+      _measure(task);
+      task.state.listen((state) => _onTaskState(task, state));
+      unawaited(task.result.then((_) => _onTaskSettled(task)));
+    }
+
+    scheduleMicrotask(_pump);
+  }
+
+  @override
+  final String id;
+
+  /// The most uploads allowed to be in flight at once.
+  final int maxConcurrent;
+
+  /// Whether the batch gives up on the first failure.
+  final bool eagerError;
+
+  final List<AttachmentUploadTaskImpl> _tasks;
+  final _tasksById = <String, AttachmentUploadTaskImpl>{};
+
+  // Measured attachment lengths; membership means the length is known, so a
+  // zero-length attachment counts as measured while an unreadable one does not.
+  final _totals = <String, int>{};
+
+  // The last byte count recorded for an upload, which only a settled one is
+  // read from — a live upload is read straight off its state.
+  final _sent = <String, int>{};
+  final _started = <String>{};
+  final _active = <String>{};
+  final _outcome = Completer<BatchUploadResult>();
+
+  late final _state = MutableStateEmitter<BatchUploadState>(BatchQueued(progress: _aggregate()));
+
+  var _settledCount = 0;
+  _BatchEnding? _ending;
+  String? _failedUploadId;
+  StreamException? _failureError;
+  var _finishing = false;
+
+  @override
+  StateEmitter<BatchUploadState> get state => _state;
+
+  @override
+  List<AttachmentUploadTask> get uploads => UnmodifiableListView(_tasks);
+
+  @override
+  Future<BatchUploadResult> get result => _outcome.future;
+
+  @override
+  AttachmentUploadTask? task(String id) => _tasksById[id];
+
+  @override
+  void cancel() {
+    if (_finishing || _ending != null || _outcome.isCompleted) return;
+    _ending = _BatchEnding.cancelled;
+    _cancelUnsettled();
+    _emitState();
+  }
+
+  // Fills every free slot, in input order, and stops filling them once the
+  // batch is giving up — an upload that has not started never will.
+  void _pump() {
+    if (_outcome.isCompleted) return;
+
+    // Belt and braces: `_cancelUnsettled` settles every unstarted upload in the
+    // same turn it gives up, so the loop below would skip them anyway. This
+    // says the invariant out loud rather than resting it on that.
+    if (_ending == null) {
+      for (final task in _tasks) {
+        if (_active.length >= maxConcurrent) break;
+        if (_started.contains(task.id) || task.state.value.isFinal) continue;
+        _started.add(task.id);
+        _active.add(task.id);
+        task.start();
+      }
+    }
+
+    _emitState();
+    unawaited(_finishIfSettled());
+  }
+
+  // A queued attachment's length is known long before its turn comes, and an
+  // aggregate total missing one of its terms is no total at all — so every
+  // length is read up front rather than as each upload starts.
+  void _measure(AttachmentUploadTaskImpl task) {
+    unawaited(
+      task.measuredLength.then((length) {
+        if (length == null) return;
+        _totals[task.id] = length;
+        _emitState();
+      }),
+    );
+  }
+
+  void _onTaskState(AttachmentUploadTaskImpl task, AttachmentUploadState state) {
+    if (state case UploadInProgress(:final progress)) _sent[task.id] = progress.sentBytes;
+    _emitState();
+  }
+
+  void _onTaskSettled(AttachmentUploadTaskImpl task) {
+    _active.remove(task.id);
+    _settledCount += 1;
+
+    // Only a failure gives up on the batch. A cancellation is a decision
+    // somebody already made, about one upload and no others.
+    if (task.state.value case UploadFailed(:final error)) _stopOnError(task.id, error);
+
+    _pump();
+  }
+
+  void _stopOnError(String uploadId, StreamException error) {
+    if (!eagerError) return;
+    if (_ending != null) return;
+
+    _ending = _BatchEnding.stoppedOnError;
+    _failedUploadId = uploadId;
+    _failureError = error;
+    _cancelUnsettled();
+  }
+
+  void _cancelUnsettled() {
+    for (final task in _tasks) {
+      if (task.state.value.isFinal) continue;
+      task.cancel();
+    }
+  }
+
+  void _emitState() {
+    if (_finishing || _state.isClosed) return;
+
+    final progress = _aggregate();
+    _state.value = switch ((_ending, _failedUploadId, _failureError)) {
+      (_BatchEnding.cancelled, _, _) => BatchCancelling(progress: progress),
+      (_BatchEnding.stoppedOnError, final failedUploadId?, final error?) => BatchStopping(
+        failedUploadId: failedUploadId,
+        error: error,
+        progress: progress,
+      ),
+      _ => _started.isEmpty ? BatchQueued(progress: progress) : BatchInProgress(progress: progress),
+    };
+  }
+
+  Future<void> _finishIfSettled() async {
+    if (_finishing || _outcome.isCompleted) return;
+
+    // Counted rather than read off the tasks: they all reach a terminal state
+    // before the batch is told about any of them, so a batch that waited only
+    // for the states would finish before it had seen the failure that stopped
+    // it, and call itself completed.
+    if (_settledCount < _tasks.length) return;
+    _finishing = true;
+
+    // Read before the suspension below: a `cancel()` can still land while this
+    // is waiting, and a batch whose uploads all succeeded did not end up
+    // cancelled.
+    final ending = _ending;
+    final failureError = _failureError;
+    final progress = _aggregate();
+
+    // Every task is terminal, so every outcome is already there; awaiting them
+    // is how the batch reads them without restating how a task settles.
+    final results = await Future.wait(_tasks.map((task) => task.result));
+    final items = [
+      for (final (index, task) in _tasks.indexed)
+        BatchUploadItemResult(attachment: task.attachment, result: results[index]),
+    ];
+
+    final result = switch (ending) {
+      _BatchEnding.stoppedOnError => BatchUploadStoppedOnError(items: items, error: failureError!),
+      _BatchEnding.cancelled => BatchUploadCancelled(items: items),
+      null => BatchUploadCompleted(items: items),
+    };
+
+    _state.value = BatchFinished(result: result, progress: progress);
+    await _state.close();
+
+    _outcome.complete(result);
+  }
+
+  BatchUploadProgress _aggregate() {
+    final states = [for (final task in _tasks) task.state.value];
+
+    // Bytes and counts come from one clock: every count is derived from the
+    // state it is reported beside. A progress event still queued behind a
+    // settle would otherwise leave a finished batch reporting a fraction of
+    // the bytes it sent.
+    final sentBytes = _tasks.fold(0, (sent, task) {
+      return sent +
+          switch (task.state.value) {
+            UploadInProgress(:final progress) => progress.sentBytes,
+            UploadSuccess() => _totals[task.id] ?? _sent[task.id] ?? 0,
+            _ => _sent[task.id] ?? 0,
+          };
+    });
+
+    // An attachment whose length could not be read contributes no term, and a
+    // total missing one of its terms would understate the work left.
+    final totalKnown = _totals.length == _tasks.length;
+    final totalBytes = _totals.values.fold(0, (total, it) => total + it);
+
+    return BatchUploadProgress(
+      total: _tasks.length,
+      queued: states.whereType<UploadQueued>().length,
+      preparing: states.whereType<UploadPreparing>().length,
+      uploading: states.whereType<UploadInProgress>().length,
+      succeeded: states.whereType<UploadSuccess>().length,
+      failed: states.whereType<UploadFailed>().length,
+      cancelled: states.whereType<UploadCancelled>().length,
+      sentBytes: sentBytes,
+      totalBytes: totalKnown ? totalBytes : null,
+    );
+  }
+}
+
+// Which of the two deliberate endings a batch is heading for, held while it
+// winds down and read once to build the result it finishes with.
+enum _BatchEnding { stoppedOnError, cancelled }
