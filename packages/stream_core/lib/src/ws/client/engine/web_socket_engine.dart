@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../../../utils.dart';
 import 'web_socket_options.dart';
 
+export 'dart:typed_data';
 export 'web_socket_options.dart';
 
 /// Interface for WebSocket engine implementations.
