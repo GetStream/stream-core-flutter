@@ -36,7 +36,7 @@ import 'uploaded_attachment.dart';
 /// );
 /// ```
 ///
-/// Obtained from [AttachmentUploader.upload], or from an
+/// Obtained from [StreamAttachmentUploader.upload], or from an
 /// [AttachmentUploadBatch] through [AttachmentUploadBatch.task]. Nothing needs
 /// disposing: [state] settles and stops once the upload has.
 ///

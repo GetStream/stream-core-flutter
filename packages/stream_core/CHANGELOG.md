@@ -50,7 +50,6 @@
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`, and `connect` throws a `StateError` afterwards
 - Added `InFlightCache`, which hands concurrent callers asking for the same key the one call already in flight, and its outcome, success or failure alike
-- Added `AttachmentUploader`, the interface `StreamAttachmentUploader` implements, so an app can stand in its own uploader
 - Added `AttachmentUploadTask`, one upload as an object: `state` carries the whole lifecycle including byte progress, `result` settles once and never throws, and `cancel` calls it off at once, settling without waiting to hear what became of the upload — so a `CdnClient` that never answers cannot leave it unsettled
 - Added `AttachmentUploadBatch`, which uploads several attachments under a concurrency limit, aggregates byte-weighted progress, and finishes as a sealed `BatchUploadResult` — `BatchUploadCompleted`, `BatchUploadStoppedOnError` or `BatchUploadCancelled` — carrying one outcome per attachment in input order
 

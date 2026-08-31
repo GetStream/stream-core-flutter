@@ -42,7 +42,8 @@ import 'batch_upload_state.dart';
 /// [BatchUploadCompleted] with that failure on its own item. Only
 /// `eagerError` changes that, and only for the first failure.
 ///
-/// Obtained from [AttachmentUploader.uploadBatch] rather than constructed.
+/// Obtained from [StreamAttachmentUploader.uploadBatch] rather than
+/// constructed.
 /// Nothing needs disposing: [state] settles and stops once the batch has
 /// finished, and [cancel] is how a batch is stopped before then.
 ///
