@@ -113,6 +113,16 @@ final class UploadCancelled extends AttachmentUploadState {
 /// them is not reported. They are the source of truth and [fraction] is
 /// derived, which is what lets a batch aggregate them; see
 /// [BatchUploadProgress.fraction].
+///
+/// A file whose length could not be read still reports what went out, so a
+/// caller drawing a bar handles the indeterminate case:
+///
+/// ```dart
+/// final label = switch (progress.fraction) {
+///   null => 'Uploading ${progress.sentBytes} bytes…',
+///   final fraction => '${(fraction * 100).round()}%',
+/// };
+/// ```
 final class UploadProgress extends Equatable {
   /// Creates an [UploadProgress].
   const UploadProgress({

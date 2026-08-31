@@ -104,6 +104,14 @@ final class BatchFinished extends BatchUploadState {
 /// The counts and the bytes answer different questions, so both are kept:
 /// "uploading 3 of 7" and "5 uploaded · 1 failed · 1 remaining" come from the
 /// counts, while a progress bar comes from [fraction].
+///
+/// ```dart
+/// '${progress.finished} of ${progress.total}'
+///
+/// // `null` until every attachment's length is known, and for a batch with
+/// // one that could never be read.
+/// if (progress.fraction case final fraction?) drawBar(fraction);
+/// ```
 final class BatchUploadProgress extends Equatable {
   /// Creates a [BatchUploadProgress].
   const BatchUploadProgress({

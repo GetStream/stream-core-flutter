@@ -3,7 +3,7 @@ import '../cdn/cdn_client.dart';
 import 'attachment_upload_batch.dart';
 import 'attachment_upload_task.dart';
 
-/// Uploads [StreamAttachment]s to remote storage.
+/// An uploader of [StreamAttachment]s to remote storage.
 ///
 /// Both methods return at once, handing back the running operation rather than
 /// a future to wait on: an upload has a lifecycle worth watching and a way to

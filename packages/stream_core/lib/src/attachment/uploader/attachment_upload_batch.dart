@@ -22,7 +22,7 @@ import 'batch_upload_state.dart';
 /// not it is part of a batch:
 ///
 /// ```dart
-/// final batch = uploader.uploadBatch(attachments, maxConcurrent: 3);
+/// final batch = uploader.uploadBatch(attachments);
 ///
 /// batch.state.listen((state) => showProgress(state.progress));
 /// batch.task('video-1')?.cancel();
@@ -59,7 +59,7 @@ abstract interface class AttachmentUploadBatch {
   /// rather than to address anything.
   String get id;
 
-  /// The batch's live state, carrying its aggregate progress.
+  /// This batch's live state, carrying its aggregate progress.
   ///
   /// The current state is always available synchronously, and is the first
   /// thing a new listener is given. No state follows [BatchFinished].

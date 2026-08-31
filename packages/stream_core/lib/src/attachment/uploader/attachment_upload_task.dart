@@ -23,10 +23,17 @@ import 'uploaded_attachment.dart';
 /// ```dart
 /// final task = uploader.upload(attachment);
 ///
-/// task.state.listen(render);
-/// task.cancel();
+/// task.state.listen((state) {
+///   if (state case UploadInProgress(:final progress)) {
+///     showProgress(progress.fraction);
+///   }
+/// });
 ///
 /// final result = await task.result;
+/// result.fold(
+///   onSuccess: submit,
+///   onFailure: (error, _) => showRetry(error),
+/// );
 /// ```
 ///
 /// Obtained from [AttachmentUploader.upload], or from an
@@ -52,7 +59,7 @@ abstract interface class AttachmentUploadTask {
   /// needed to start another one.
   StreamAttachment get attachment;
 
-  /// The upload's live state, its single canonical channel.
+  /// This upload's live state, its single canonical channel.
   ///
   /// Progress is part of the state rather than a source of its own, so a
   /// progress update and a lifecycle update can never disagree. The current
@@ -64,7 +71,7 @@ abstract interface class AttachmentUploadTask {
   /// never arrives as an error, so there is nothing to catch here either.
   StateEmitter<AttachmentUploadState> get state;
 
-  /// The upload's outcome, which never throws.
+  /// This upload's outcome, always a value and never an error.
   ///
   /// A cancelled upload settles as a failure carrying a
   /// [StreamNetworkException] with [StreamNetworkException.isCancelled] set,
