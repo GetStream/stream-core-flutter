@@ -33,6 +33,26 @@ void main() {
       await batch.result;
     });
 
+    test('leaves no upload still emitting once it has finished', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final attachments = attachmentsOf(5);
+
+      // Two in flight and three never started, so the ones the batch settles
+      // on the caller's behalf are covered as well as the ones that ran.
+      final batch = uploader.uploadBatch(attachments, maxConcurrent: 2);
+      await pumpEventQueue();
+
+      batch.cancel();
+      await batch.result;
+      await pumpEventQueue();
+
+      // The batch subscribes to every upload and cancels nothing: what ends
+      // those subscriptions is each upload closing its own channel as it
+      // settles, and the batch cannot finish until all of them have.
+      expect(batch.uploads.where((it) => !it.state.isClosed), isEmpty);
+    });
+
     test('refuses attachments that share an id, which it could not address', () async {
       final cdn = FakeCdnClient();
       final uploader = StreamAttachmentUploader(cdn: cdn);
