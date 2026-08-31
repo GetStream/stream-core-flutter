@@ -62,12 +62,11 @@ abstract interface class AttachmentUploadTask {
   /// Calls the upload off.
   ///
   /// Returns at once, is idempotent, and is safe on a settled task, which
-  /// ignores it. Any other task settles as [UploadCancelled] straight away:
-  /// the request is called off at the transport, but its answer is not waited
-  /// for, so however the [CdnClient] behaves the upload stops here.
+  /// ignores it. Any other task settles as [UploadCancelled] straight away,
+  /// without waiting to hear what became of the upload.
   ///
-  /// An answer that arrives afterwards is dropped, so an upload the server had
-  /// already accepted leaves its file behind on the CDN.
+  /// Cancelling is not undoing: an answer that arrives afterwards is dropped,
+  /// so an upload that had already been accepted keeps whatever it stored.
   void cancel();
 }
 

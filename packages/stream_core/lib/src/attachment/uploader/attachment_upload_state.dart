@@ -109,10 +109,10 @@ final class UploadCancelled extends AttachmentUploadState {
 
 /// How far one upload has got, in bytes.
 ///
-/// The counts are attachment payload bytes, not the bytes on the wire — the
-/// multipart framing the transport adds around the file is not reported. They
-/// are the source of truth and [fraction] is derived, which is what lets a
-/// batch aggregate them; see [BatchUploadProgress.fraction].
+/// The counts are the attachment's own bytes; whatever a request costs beyond
+/// them is not reported. They are the source of truth and [fraction] is
+/// derived, which is what lets a batch aggregate them; see
+/// [BatchUploadProgress.fraction].
 final class UploadProgress extends Equatable {
   /// Creates an [UploadProgress].
   const UploadProgress({
