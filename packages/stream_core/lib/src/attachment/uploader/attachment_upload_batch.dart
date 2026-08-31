@@ -94,10 +94,12 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
       throw ArgumentError.value(attachment.id, 'attachments', 'Attachment ids must be unique within a batch');
     }
 
+    final tasks = [
+      for (final attachment in requested) AttachmentUploadTaskImpl(attachment: attachment, cdn: cdn),
+    ];
+
     return AttachmentUploadBatchImpl._(
-      [
-        for (final attachment in requested) AttachmentUploadTaskImpl(attachment: attachment, cdn: cdn),
-      ],
+      tasks,
       maxConcurrent: maxConcurrent,
       eagerError: eagerError,
     );
