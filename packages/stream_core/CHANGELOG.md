@@ -24,7 +24,7 @@
 - The package no longer re-exports `dart:typed_data`, so code that reached `Uint8List` through `package:stream_core/stream_core.dart` must import `dart:typed_data` itself
 - Reworked attachment uploads around `AttachmentUploadTask`: `StreamAttachmentUploader.upload` returns the running task rather than a `Future`, and `uploadBatch` returns an `AttachmentUploadBatch`. `CancelToken` and progress callbacks are gone from the public API
 - Removed `StreamAttachment.uploadState`. Where an upload has got to lives on the task running it, not on the attachment
-- Replaced the `UploadState*` classes with `UploadQueued`, `UploadPreparing`, `UploadInProgress`, `UploadSuccess`, `UploadFailed` and `UploadCancelled`. `UploadInProgress.progress` is an `UploadProgress` in bytes rather than a `double`, `UploadSuccess` carries the `UploadedAttachment`, and `UploadFailed.error` is a `StreamException` rather than an `Object` with no separate `stackTrace`. The `AttachmentUploadState.preparing()`, `.inProgress()`, `.success()` and `.failed()` named constructors are gone; construct the states directly
+- Replaced the `UploadState*` classes with `UploadQueued`, `UploadPreparing`, `UploadInProgress`, `UploadSuccess`, `UploadFailed` and `UploadCancelled`, constructed directly rather than through named constructors. `UploadInProgress.progress` is an `UploadProgress` in bytes rather than a `double`, and `UploadFailed.error` is a `StreamException`
 - Removed `AttachmentUploadException`. A failed upload carries the `StreamException` that stopped it, and a cancelled one a `StreamNetworkException` with `isCancelled` set
 - Removed the `OnUploadProgress` and `OnBatchUploadProgress` callbacks along with the `StreamAttachmentUploaderBatch` extension. Progress arrives on `AttachmentUploadTask.state` and `AttachmentUploadBatch.state`, so it can never disagree with the lifecycle
 - `uploadBatch`'s `maxConcurrent` now defaults to `3` rather than `5`
@@ -51,7 +51,7 @@
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`, and `connect` throws a `StateError` afterwards
 - Added `InFlightCache`, which hands concurrent callers asking for the same key the one call already in flight, and its outcome, success or failure alike
-- Added `AttachmentUploadTask`, one upload as an object: `state` carries the whole lifecycle including byte progress, `result` settles once and never throws, and `cancel` calls it off at once, settling without waiting to hear what became of the upload — so a `CdnClient` that never answers cannot leave it unsettled
+- Added `AttachmentUploadTask`, one upload as an object: `state` carries the whole lifecycle including byte progress, `result` settles once and never throws, and `cancel` calls it off at once
 - Added `AttachmentUploadBatch`, which uploads several attachments under a concurrency limit, aggregates byte-weighted progress, and finishes as a sealed `BatchUploadResult` — `BatchUploadCompleted`, `BatchUploadStoppedOnError` or `BatchUploadCancelled` — carrying one outcome per attachment in input order
 
 ### 🐛 Bug Fixes
