@@ -302,7 +302,8 @@ sealed class DisconnectionSource extends Equatable {
     // a retry — unless what stopped them was the network itself, which is
     // about the moment, not the credentials.
     AuthenticationFailed(:final error) => switch (error) {
-      StreamNetworkException(isCancelled: false) => true,
+      StreamNetworkException(isCancelled: true) => false,
+      StreamNetworkException() => true,
       _ => false,
     },
     SystemInitiated() => true,

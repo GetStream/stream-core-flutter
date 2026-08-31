@@ -19,8 +19,9 @@ typedef WsRequestSender = Result<void> Function(WsRequest request);
 /// attempt after a refusal sees it. Use it to replace credentials that were refused.
 ///
 /// Throw when the credentials did not go out, whether because sending failed or because this
-/// function chose not to send them. The connection is then closed with [AuthenticationFailed], and
-/// is not reconnected.
+/// function chose not to send them. The connection is then closed with [AuthenticationFailed]
+/// carrying what was thrown, and reconnected only when that says the network was at fault rather
+/// than the credentials — so pass a failed [WsRequestSender]'s error on rather than replacing it.
 typedef WebSocketAuthenticator = Future<void> Function(WsRequestSender send, StreamApiException? previousError);
 
 /// A handler that authenticates newly opened connections and remembers why the server refused the
