@@ -315,7 +315,6 @@ sealed class DisconnectionSource extends Equatable {
       StreamApiException(isTokenExpired: true) => true,
       StreamApiException(isTokenNotYetValid: true) => true,
       StreamApiException(isRateLimited: true) => true,
-      StreamApiException(isRequestTimeout: true) => true,
       StreamApiException(:final statusCode) => statusCode < 400 || statusCode >= 500,
       StreamNetworkException(closeCode: CloseCode.normalClosure) => false,
       StreamNetworkException() => true,

@@ -59,15 +59,6 @@ void main() {
     expect(state.isAutomaticReconnectionEnabled, isTrue);
   });
 
-  test('automatic reconnection is enabled when the server timed out processing', () {
-    // 48 is a request timeout, sent as 408: about the moment, not a verdict on
-    // the request, so it is retried with backoff like the other 5xx-shaped
-    // failures rather than refused like the rest of the 4xx range.
-    final state = _serverDisconnect(_apiError(48, statusCode: 408));
-
-    expect(state.isAutomaticReconnectionEnabled, isTrue);
-  });
-
   test('automatic reconnection is disabled for any other client error', () {
     // 17 is not allowed, and retrying does not change the answer.
     final state = _serverDisconnect(_apiError(17, statusCode: 403));

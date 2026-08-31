@@ -39,7 +39,7 @@ base class StreamApiException extends StreamException {
   bool get isTokenSignatureInvalid; // code 43 — configuration problem; no token or wait fixes it
   bool get isApiKeyInvalid;      // code 2 — wrong key, or product not enabled on the app
   bool get isRateLimited;        // statusCode 429
-  bool get isRequestTimeout;     // statusCode 408 — ran out of time before a verdict; worth retrying
+  bool get isRequestTimeout;     // statusCode 408 — the request did not complete in time; worth retrying
 }
 
 base class StreamNetworkException extends StreamException {

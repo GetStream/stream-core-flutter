@@ -17,7 +17,7 @@
 - Replaced `StreamApiError.isTokenExpiredError`, `isClientError` and `isRateLimitError`: the conditions live on `StreamErrorCode` and `StreamApiException` as `isTokenExpired`, `isTokenNotYetValid`, `isTokenSignatureInvalid`, `isApiKeyInvalid` and `isRateLimited`; `StreamApiError` keeps only `isRateLimited`
 - `StreamApiError.code` is typed `StreamErrorCode` rather than `int`; construction takes `StreamErrorCode(40)` in place of `40`, reads are unchanged
 - `AuthInterceptor` extends `Interceptor` rather than `QueuedInterceptor`, so requests are no longer serialised against one another
-- `WebSocketConnectionState.isAutomaticReconnectionEnabled` reads the error's facts: token conditions that heal, rate limits, server-side processing timeouts and transient network failures reconnect; refused signatures or API keys, other 4xx and `unrecoverable` verdicts do not
+- `WebSocketConnectionState.isAutomaticReconnectionEnabled` reads the error's facts: token conditions that heal, rate limits and transient network failures reconnect; refused signatures or API keys, other 4xx and `unrecoverable` verdicts do not
 - `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` return the result's own type and no longer take a type parameter. To widen, widen the result (`Result<num> widened = intResult`) or use `fold`
 - Replaced the logger: `StreamLogger` is the handle you write with and a `StreamLogHandler` is where records go, so `Priority`, `MessageBuilder`, `Tag`, `IsLoggableValidator` and `Finder` are renamed or gone
 - `LoggingInterceptor` writes through the logger rather than printing, so it is silent until an app asks for records. Its `logPrint` is now optional, and it takes a `tag`
