@@ -120,6 +120,11 @@ void main() {
       expect(StreamApiException.fromApiError(_apiError(code: 9, statusCode: 500)).isRateLimited, isFalse);
     });
 
+    test('reads a request timeout off the status, not the code', () {
+      expect(StreamApiException.fromApiError(_apiError(code: 48, statusCode: 408)).isRequestTimeout, isTrue);
+      expect(StreamApiException.fromApiError(_apiError(code: 48, statusCode: 500)).isRequestTimeout, isFalse);
+    });
+
     test('carries no code for a verdict that was not a Stream error', () {
       // An edge or proxy answers with a status and no Stream payload. No sentinel stands in for
       // the missing code, because any number would collide with a real one.
