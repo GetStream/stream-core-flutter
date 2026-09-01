@@ -188,7 +188,7 @@ close code carries almost no signal: auth, token, and permission rejections all 
 exists on WS) and 1012 (server restart) mean anything. Classify from the drained error event's
 `code`, never from the close code alone.
 
-The two rules you actually need:
+The three rules you actually need:
 
 1. **Misuse throws `Error`, conditions become `StreamException`.** Ask: "can this happen to a
    correct program at runtime?" No → `StateError`/`ArgumentError`, never wrapped. Yes → the
@@ -197,6 +197,12 @@ The two rules you actually need:
    would do the same thing they'd do for an existing category, it is not a new type — it is a field
    or a `code`. Context (like "which item of a batch failed") travels in the data channel, beside
    the outcome, never by wrapping one category inside another.
+3. **A trace records the raise, not the failure.** `StreamException` carries `message` and `cause`
+   and no `stackTrace`. Thrown, the language holds it — `rethrow`, or `Error.throwWithStackTrace`
+   when re-raising something that failed elsewhere. Returned as data, the carrier holds it:
+   `Failure(error, stackTrace)`, `ServerInitiated(error, stackTrace)`. Where nothing raised it — a
+   closure decoded off the wire — it stays `null`; `StackTrace.current` there manufactures a trace
+   pointing at the decoder.
 
 Product SDKs (Chat, Video, Feeds) may extend a category — `StreamChatApiException extends
 StreamApiException` — but never add a fifth top-level kind and never re-map a core exception into an
