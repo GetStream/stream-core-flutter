@@ -189,9 +189,23 @@ void main() {
 
   group('send', () {
     wsClientTest(
-      'fails as a network problem when the connection is not open',
+      'throws when nothing has connected yet, which is an order to fix rather than a failure',
       connect: (_) {}, // never connected
       body: (tester) {
+        // Reported where the caller wrote it: no retry, and no reconnection,
+        // makes a send that came before the connection work.
+        expect(
+          () => tester.client.send(const HealthCheckPingEvent(connectionId: 'connection-id')),
+          throwsStateError,
+        );
+      },
+    );
+
+    wsClientTest(
+      'fails as a network problem when a connection that was established has dropped',
+      body: (tester) async {
+        await tester.client.disconnect();
+
         // A drop can race any send, so a correct caller can hit this: it
         // reads as the moment's failure, classified like every other one.
         final result = tester.client.send(const HealthCheckPingEvent(connectionId: 'connection-id'));
