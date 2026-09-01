@@ -37,12 +37,15 @@ class StreamApiError extends Equatable {
 
   /// Additional error detail codes providing more context.
   ///
-  /// Not every error carries numeric detail codes; anything else in the wire
-  /// value reads as absent rather than failing the whole error.
+  /// Anything that is not a number reads as absent rather than failing the
+  /// whole error.
   @JsonKey(fromJson: _detailsFromJson)
   final List<int> details;
 
   /// The processing duration before the error occurred.
+  ///
+  /// Empty when the error arrived without one.
+  @JsonKey(defaultValue: '')
   final String duration;
 
   /// Additional context about the exception as key-value pairs.
@@ -52,6 +55,9 @@ class StreamApiError extends Equatable {
   final String message;
 
   /// Additional information or documentation URL for this error.
+  ///
+  /// Empty when the error arrived without one.
+  @JsonKey(defaultValue: '')
   final String moreInfo;
 
   /// The HTTP status code associated with this error.
@@ -60,10 +66,9 @@ class StreamApiError extends Equatable {
 
   /// Whether this error is unrecoverable and should not be retried.
   ///
-  /// Only Video sets this as a deliberate retry signal, so it is only worth
-  /// consulting there. Absence means nothing anywhere: most errors never
-  /// carry it, and `null` or `false` must not be read as "retrying will
-  /// help".
+  /// Worth consulting on any product: a permission denial carries it, as do
+  /// some Video errors. Absence means nothing: most errors never carry it,
+  /// and `null` or `false` must not be read as "retrying will help".
   final bool? unrecoverable;
 
   Map<String, dynamic> toJson() => _$StreamApiErrorToJson(this);

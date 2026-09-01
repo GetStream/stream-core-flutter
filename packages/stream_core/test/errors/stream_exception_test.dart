@@ -176,6 +176,28 @@ void main() {
       expect(withDetails(const [1]), isNot(withDetails(const [2])));
       expect(withDetails(const [1]), withDetails(const [1]));
     });
+
+    test('a fact the constructor was handed on its own is a different failure', () {
+      // The payload overlaps `statusCode`, `code` and `moreInfo`, so `props`
+      // carrying both looks redundant — but the constructor takes them with no
+      // payload at all, which is how the WebSocket path and every subclass
+      // build one. Dropping them would make two refusals that behave in
+      // opposite ways compare equal.
+      const expired = StreamApiException(message: 'Refused', statusCode: 401, code: StreamErrorCode.tokenExpired);
+      const badSignature = StreamApiException(
+        message: 'Refused',
+        statusCode: 401,
+        code: StreamErrorCode.tokenSignatureInvalid,
+      );
+
+      expect(expired, isNot(badSignature));
+      expect(expired.isTokenExpired, isNot(badSignature.isTokenExpired));
+
+      expect(
+        const StreamApiException(message: 'Refused', statusCode: 401),
+        isNot(const StreamApiException(message: 'Refused', statusCode: 500)),
+      );
+    });
   });
 
   group('StreamNetworkException', () {
