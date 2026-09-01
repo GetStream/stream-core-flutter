@@ -228,8 +228,8 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
     // The CDN reported the cancellation itself, in the shape a caller wants and
     // carrying its own transport detail. Re-wrapping it would bury that in a
     // cause to say nothing new.
-    if (exception case final StreamNetworkException cancelled when cancelled.isCancelled) {
-      return _settle(const UploadCancelled(), Result.failure(cancelled, stackTrace));
+    if (exception case StreamNetworkException(isCancelled: true)) {
+      return _settle(const UploadCancelled(), Result.failure(exception, stackTrace));
     }
 
     _settle(UploadFailed(error: exception), Result.failure(exception, stackTrace));
