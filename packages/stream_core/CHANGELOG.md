@@ -34,7 +34,6 @@
 - `User.guest` takes an `image`, which it previously dropped
 - Added `TokenManager.unconfigured`, for a client that exists before its user does, and `TokenManager.reset`, which drops the configured identity and its cached token
 - Added `teams` field to `User` class
-- Added `objectRuntimeType`, naming an object's type in `toString` in a way that survives minification
 - Added `StreamDateTimeConverter`, a `JsonConverter` for the API's `DateTime` fields. Accepts either an RFC3339 string (v1) or epoch nanoseconds (v2) when deserializing, and always serializes to RFC3339. Values are normalized to UTC with microsecond precision
 - Added `DioException.toStreamException()`, mapping a Dio failure to the `StreamException` it represents
 - Added `StreamApiException.retryAfter`, the wait the server asked for, read from the `Retry-After` header on rate-limited responses
