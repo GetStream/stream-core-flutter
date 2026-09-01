@@ -222,7 +222,6 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
     exception ??= StreamClientException(
       message: 'The upload failed',
       cause: error,
-      stackTrace: stackTrace,
     );
 
     // The CDN reported the cancellation itself, in the shape a caller wants and
@@ -240,7 +239,6 @@ final class AttachmentUploadTaskImpl implements AttachmentUploadTask {
       message: 'The upload was cancelled',
       isCancelled: true,
       cause: cause,
-      stackTrace: stackTrace,
     );
 
     _settle(const UploadCancelled(), Result.failure(exception, stackTrace));

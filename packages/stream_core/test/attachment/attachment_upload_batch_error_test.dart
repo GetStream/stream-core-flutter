@@ -151,6 +151,23 @@ void main() {
       );
     });
 
+    test('carries the trace of the upload that stopped it', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final attachments = attachmentsOf(2);
+
+      final batch = uploader.uploadBatch(attachments, eagerError: true);
+      await pumpEventQueue();
+      cdn.upload(attachments[1]).fail();
+
+      final result = await batch.result as BatchUploadStoppedOnError;
+
+      // The exception says what went wrong; the trace beside it says where, and
+      // is the failing task's own rather than one made up here.
+      final failed = result.items[1].result as Failure;
+      expect(result.stackTrace, same(failed.stackTrace));
+    });
+
     test('gives up even when the failure settles in the same turn as the last success', () async {
       final cdn = FakeCdnClient();
       final uploader = StreamAttachmentUploader(cdn: cdn);

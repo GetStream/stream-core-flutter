@@ -264,7 +264,7 @@ final class BatchUploadCompleted extends BatchUploadResult {
 /// rest were called off.
 final class BatchUploadStoppedOnError extends BatchUploadResult {
   /// Creates a [BatchUploadStoppedOnError] result.
-  const BatchUploadStoppedOnError({required super.items, required this.error});
+  const BatchUploadStoppedOnError({required super.items, required this.error, this.stackTrace});
 
   /// The failure that gave up on the batch.
   ///
@@ -272,6 +272,9 @@ final class BatchUploadStoppedOnError extends BatchUploadResult {
   /// failure called off report cancellations of their own, which say nothing
   /// about the cause.
   final StreamException error;
+
+  /// Where [error] was raised.
+  final StackTrace? stackTrace;
 
   @override
   List<Object?> get props => [...super.props, error];

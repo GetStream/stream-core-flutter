@@ -12,6 +12,7 @@ import 'attachment_upload_state.dart';
 import 'attachment_upload_task.dart';
 import 'attachment_uploader.dart';
 import 'batch_upload_state.dart';
+import 'uploaded_attachment.dart';
 
 /// Several attachment uploads run as one operation.
 ///
@@ -151,7 +152,7 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
       _tasksById[task.id] = task;
       _measure(task);
       task.state.listen((state) => _onTaskState(task, state));
-      unawaited(task.result.then((_) => _onTaskSettled(task)));
+      unawaited(task.result.then((result) => _onTaskSettled(task, result)));
     }
 
     scheduleMicrotask(_pump);
@@ -186,6 +187,7 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
   _BatchEnding? _ending;
   String? _failedUploadId;
   StreamException? _failureError;
+  StackTrace? _failureStackTrace;
   var _finishing = false;
 
   @override
@@ -244,24 +246,28 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
     _emitState();
   }
 
-  void _onTaskSettled(AttachmentUploadTaskImpl task) {
+  void _onTaskSettled(AttachmentUploadTaskImpl task, Result<UploadedAttachment> result) {
     _active.remove(task.id);
     _settledCount += 1;
 
     // Only a failure gives up on the batch. A cancellation is a decision
-    // somebody already made, about one upload and no others.
-    if (task.state.value case UploadFailed(:final error)) _stopOnError(task.id, error);
+    // somebody already made, about one upload and no others. The state says
+    // which of the two it was; the result carries where it was raised.
+    if (task.state.value case UploadFailed(:final error)) {
+      _stopOnError(task.id, error, result.stackTraceOrNull());
+    }
 
     _pump();
   }
 
-  void _stopOnError(String uploadId, StreamException error) {
+  void _stopOnError(String uploadId, StreamException error, StackTrace? stackTrace) {
     if (!eagerError) return;
     if (_ending != null) return;
 
     _ending = _BatchEnding.stoppedOnError;
     _failedUploadId = uploadId;
     _failureError = error;
+    _failureStackTrace = stackTrace;
     _cancelUnsettled();
   }
 
@@ -302,6 +308,7 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
     // cancelled.
     final ending = _ending;
     final failureError = _failureError;
+    final failureStackTrace = _failureStackTrace;
     final progress = _aggregate();
 
     // Every task is terminal, so every outcome is already there; awaiting them
@@ -313,7 +320,11 @@ final class AttachmentUploadBatchImpl implements AttachmentUploadBatch {
     ]);
 
     final result = switch (ending) {
-      _BatchEnding.stoppedOnError => BatchUploadStoppedOnError(items: items, error: failureError!),
+      _BatchEnding.stoppedOnError => BatchUploadStoppedOnError(
+        items: items,
+        error: failureError!,
+        stackTrace: failureStackTrace,
+      ),
       _BatchEnding.cancelled => BatchUploadCancelled(items: items),
       null => BatchUploadCompleted(items: items),
     };
