@@ -76,26 +76,35 @@ Creates a [StreamWebSocketClient] instance for real-time WebSocket communication
 
 ```dart
 StreamWebSocketClient({
-  required WebSocketOptions options,
+  required WebSocketOptionsBuilder optionsBuilder,
   required WebSocketMessageCodec<WsEvent, WsRequest> messageCodec,
+  WebSocketAuthenticator? onAuthenticate,
   PingRequestBuilder pingRequestBuilder = _defaultPingRequestBuilder,
-  void Function()? onConnectionEstablished,
   Iterable<EventResolver<WsEvent>>? eventResolvers,
+  String tag = 'SC:WsClient',
 })
 ```
 
-The [options] specify connection configuration including URL, protocols, and query parameters. The [messageCodec] handles encoding outgoing requests and decoding incoming events. When [onConnectionEstablished] is provided, it's called when the connection is ready for authentication.
+The [optionsBuilder] is called once per attempt, so the URL and query parameters can change between
+them. The [messageCodec] handles encoding outgoing requests and decoding incoming events. When
+[onAuthenticate] is provided, it is called once the socket is open and is where credentials go out.
 
 ### Authentication
 
-When authentication is required, send authentication messages in the [onConnectionEstablished] callback:
+When authentication is required, send the credentials from [onAuthenticate]. It is handed a sender
+and the error the server closed the previous attempt with, so a refused token can be replaced rather
+than resent:
 
 ```dart
 final client = StreamWebSocketClient(
-  options: WebSocketOptions(url: 'wss://api.example.com'),
+  optionsBuilder: () => const WebSocketOptions(url: 'wss://api.example.com'),
   messageCodec: MyMessageCodec(),
-  onConnectionEstablished: () {
-    client.send(AuthRequest(token: authToken));
+  onAuthenticate: (send, previousError) async {
+    // A refused token is replaced rather than resent.
+    if (previousError?.isTokenExpired ?? false) tokenManager.expireToken();
+
+    final token = await tokenManager.getToken();
+    send(AuthRequest(token: token.rawValue)).getOrThrow();
   },
 );
 ```
@@ -157,22 +166,17 @@ For mobile apps, include network and app lifecycle monitoring:
 final recoveryHandler = ConnectionRecoveryHandler(
   client: client,
   networkStateProvider: NetworkStateProvider(),
-  appLifecycleStateProvider: AppLifecycleStateProvider(),
+  lifecycleStateProvider: myLifecycleStateProvider,
 );
 ```
 
 ### Reconnection Rules
 
-Automatic reconnection is **enabled** for:
-- Server-initiated disconnections (except authentication/client errors)
-- System-initiated disconnections (network changes, etc.)
-- Unhealthy connections (missing pong responses)
+Whether a closure is worth opening again is decided by `DisconnectionSource.isReconnectable`, which
+reads the facts the error carries rather than the close code. Its dartdoc lists every case.
 
-Automatic reconnection is **disabled** for:
-- User-initiated disconnections
-- Server errors with code 1000 (normal closure)
-- Token invalid/expired errors
-- Client errors (4xx status codes)
+Being reconnectable is necessary but not sufficient: `ConnectionRecoveryHandler` recovers only a
+connection that was established, and only while the network and the app lifecycle allow it.
 
 ## Event Resolvers
 
@@ -227,12 +231,13 @@ client.connectionState.on((state) {
 
 ### Sending Messages
 
-Sends a message through the WebSocket connection.
+Sends a message over an established connection. Throws a `StateError` when the client has not been
+connected.
 
 ```dart
 final result = client.send(MyRequest(data: 'hello'));
 if (result.isFailure) {
-  print('Failed to send message: ${result.error}');
+  print('Failed to send message: ${result.exceptionOrNull()}');
 }
 ```
 
@@ -262,13 +267,13 @@ final messageCodec = JsonMessageCodec();
 
 // 2. Create WebSocket client
 final client = StreamWebSocketClient(
-  options: WebSocketOptions(
+  optionsBuilder: () => WebSocketOptions(
     url: 'wss://api.example.com/ws',
     queryParameters: {'token': authToken},
   ),
   messageCodec: messageCodec,
-  onConnectionEstablished: () {
-    client.send(AuthRequest(token: authToken));
+  onAuthenticate: (send, _) async {
+    send(AuthRequest(token: authToken)).getOrThrow();
   },
 );
 
@@ -276,7 +281,7 @@ final client = StreamWebSocketClient(
 final recoveryHandler = ConnectionRecoveryHandler(
   client: client,
   networkStateProvider: NetworkStateProvider(),
-  appLifecycleStateProvider: AppLifecycleStateProvider(),
+  lifecycleStateProvider: myLifecycleStateProvider,
 );
 
 // 4. Listen to events
@@ -300,7 +305,7 @@ await client.connect();
 // 7. Send messages
 final result = client.send(ChatMessage(content: 'Hello, World!'));
 if (result.isFailure) {
-  print('Send failed: ${result.error}');
+  print('Send failed: ${result.exceptionOrNull()}');
 }
 
 // 8. Clean up when done

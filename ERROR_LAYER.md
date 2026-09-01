@@ -8,7 +8,7 @@ Every failure a Stream SDK reports is a `StreamException`. There are exactly fou
 what the caller should do about them:
 
 ```
-StreamException  (sealed)                     message · cause · stackTrace
+StreamException  (sealed)                     message · cause
 ├── StreamApiException                        the server answered, and the answer was an error
 ├── StreamNetworkException                    the server was never heard from — outcome unknown
 ├── StreamAuthenticationException             credentials could not be produced or sent
@@ -20,18 +20,18 @@ sealed class StreamException implements Exception {
   final String message;        // always present, developer-readable; for user-facing UI,
                                // key your own strings off `code` (see localization note below)
   final Object? cause;         // the error underneath, when this wraps another
-  final StackTrace? stackTrace;
 }
 
 base class StreamApiException extends StreamException {
   final int statusCode;         // HTTP status — independent of `code`; never derive one from the other
   final StreamErrorCode? code;  // Stream's stable error code — branch on this, never on message.
                                 // Null when the verdict never reached Stream (a proxy's bare status)
-  final String? moreInfo;      // docs URL; populated on REST errors, empty on WebSocket errors
+  final String? moreInfo;      // docs URL, when the server sent one; most errors carry none
   final bool unrecoverable;    // when true, the server says retrying will not help — authoritative.
-                               // Absence means nothing: only Video sets it deliberately (plus the
-                               // shared permission-denied path); most errors never carry it.
-  final Duration? retryAfter;  // from the Retry-After header on HTTP 429; absent on WS rate limits
+                               // Absence means nothing: a permission denial carries it, some Video
+                               // errors do, and most errors never carry it at all.
+  final Duration? retryAfter;  // from the Retry-After header on any error response carrying one;
+                               // absent on WS rate limits
 
   bool get isTokenExpired;       // code 40 — a fresh token fixes it
   bool get isTokenNotYetValid;   // codes 41, 42 — clock skew (nbf/iat); waiting fixes it, a fresh
@@ -121,21 +121,25 @@ switch (result) {
   case Success(:final data):
     render(data);
   case Failure(:final error):
-    switch (error) {
-      case StreamApiException(isRateLimited: true): scheduleRetry();
-      case StreamApiException(:final code?):       showError(copyFor(code));
-      case StreamApiException():                   showError(genericFailureCopy); // no Stream code: a proxy's bare status
-      case StreamNetworkException(isCancelled: true): break; // user navigated away
-      case StreamNetworkException():               showOfflineBanner();
-      case StreamAuthenticationException():        redirectToLogin();
-      case StreamClientException():                reportToCrashTracker(error);
+    // Narrowing here is what makes the switch below exhaustive.
+    if (error case final StreamException failure) {
+      switch (failure) {
+        case StreamApiException(isRateLimited: true): scheduleRetry();
+        case StreamApiException(:final code?):       showError(copyFor(code));
+        case StreamApiException():                   showError(genericFailureCopy); // no Stream code: a proxy's bare status
+        case StreamNetworkException(isCancelled: true): break; // user navigated away
+        case StreamNetworkException():               showOfflineBanner();
+        case StreamAuthenticationException():        redirectToLogin();
+        case StreamClientException():                reportToCrashTracker(failure);
+      }
     }
 }
 ```
 
-The root is `sealed`, so a `switch` that misses a category does not compile. If you don't want to
-branch, `error.message` is always displayable and `on StreamException` always catches everything
-Stream.
+The root is `sealed`, so a `switch` over a `StreamException` that misses a category does not
+compile. `Failure.error` is typed `Object`, so narrow to the root first, as above, for the check to
+apply. If you don't want to branch, `error.message` is always displayable and `on StreamException`
+always catches everything Stream.
 
 **Bugs are not in this hierarchy.** Misusing the SDK — calling `send()` before `connect()`, using a
 disposed client — throws Dart's own `StateError`/`ArgumentError`.
@@ -228,11 +232,11 @@ The decision runs in order:
 
 3. **Apply the budget**: max attempts, exponential backoff with jitter, a delay cap.
 
-`DisconnectionSource.isReconnectable` is this procedure specialized for the connection (reconnecting
-is inherently idempotent), and the interceptor's one-shot token refresh is the code-40 row. It parts
-from the table on one row: it treats every 4xx as no-reconnect, 408 included, because a 408 is an
-HTTP verdict on a request that arrived too slowly, and nothing on the connection path produces one.
-The 408 row is for operation retry, where the status can actually arrive.
+`DisconnectionSource.isReconnectable` is this procedure specialized for the connection, and the
+interceptor's one-shot token refresh is the code-40 row. It answers three rows differently: an
+expired token reconnects, because the reconnect authenticates again and an operation retry does not;
+an SDK failure reconnects; and every 4xx, 408 included, does not. This table is the authority for
+operations, the `isReconnectable` dartdoc for the connection.
 
 What remains for callers is operation retry: steps 1–2 answer *whether* from the error alone
 (necessary, but not sufficient, since the error cannot know the operation's idempotency), *when*
