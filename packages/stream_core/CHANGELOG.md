@@ -13,7 +13,7 @@
 - Reworked the error layer around one sealed root: every failure the SDK reports is a `StreamException` of four kinds — `StreamApiException`, `StreamNetworkException`, `StreamAuthenticationException` or `StreamClientException`. See `ERROR_LAYER.md` for the contract
 - Removed `ClientException`, `HttpClientException` and `WebSocketEngineException`, replaced by the kinds above. `StreamDioException.exception` is a `StreamException`, and `DioException.toClientException()` is now `toStreamException()`
 - `ServerInitiated.error` is typed `StreamException?` rather than `WebSocketEngineException?`
-- `TokenManager.getToken` fails with a `StreamAuthenticationException` rather than raw errors; a failed provider's own error is preserved as `cause`
+- `TokenManager.getToken` fails with a `StreamAuthenticationException` rather than raw errors; a failed provider's own error is preserved as `cause`. A provider failure that is already a `StreamException`, or a `TimeoutException`, keeps its own kind, so a load that failed at the moment stays retriable
 - Replaced `StreamApiError.isTokenExpiredError`, `isClientError` and `isRateLimitError`: the conditions live on `StreamErrorCode` and `StreamApiException` as `isTokenExpired`, `isTokenNotYetValid`, `isTokenSignatureInvalid`, `isApiKeyInvalid` and `isRateLimited`; `StreamApiError` keeps only `isRateLimited`
 - `StreamApiError.code` is typed `StreamErrorCode` rather than `int`; construction takes `StreamErrorCode(40)` in place of `40`, reads are unchanged
 - `AuthInterceptor` extends `Interceptor` rather than `QueuedInterceptor`, so requests are no longer serialised against one another

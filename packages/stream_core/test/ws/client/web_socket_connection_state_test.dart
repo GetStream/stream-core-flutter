@@ -123,8 +123,11 @@ void main() {
     const state = Disconnected(
       source: AuthenticationFailed(error: StreamAuthenticationException(message: 'no token')),
     );
+    // A failure that named nothing is no better a case for trying again.
+    const bare = Disconnected(source: AuthenticationFailed());
 
     expect(state.isAutomaticReconnectionEnabled, isFalse);
+    expect(bare.isAutomaticReconnectionEnabled, isFalse);
   });
 
   test('automatic reconnection is enabled when authentication failed on the network, since the '
