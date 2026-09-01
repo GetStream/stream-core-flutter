@@ -45,6 +45,128 @@ DioException _failure({
 
 void main() {
   group('DioException.toStreamException', () {
+    test('takes the status from the payload, and the wait from the headers', () {
+      // The two deliberately disagree, so each assertion says which one won.
+      // Reading the status off the response instead would leave a rate limit
+      // behind an edge's 500 reporting as neither rate limited nor 4xx.
+      final exception = _failure(
+        body: _errorBody(code: 9, statusCode: 429, message: 'rate limited'),
+        statusCode: 500,
+        headers: const {
+          'retry-after': ['30'],
+        },
+      ).toStreamException();
+
+      expect(
+        exception,
+        isA<StreamApiException>()
+            .having((it) => it.statusCode, 'statusCode', 429)
+            .having((it) => it.isRateLimited, 'isRateLimited', isTrue)
+            .having((it) => it.retryAfter, 'retryAfter', const Duration(seconds: 30)),
+      );
+    });
+
+    test('reports a body the transport could not decode as an SDK failure', () {
+      // Dio raises transport trouble under its own types, so an `unknown`
+      // without a response came out of its pipeline — its response transformer
+      // failing on a truncated body above all. The server answered and did
+      // what was asked; reporting that as a network failure would say the
+      // outcome is unknown and invite a retry of a write already performed.
+      final exception = DioException(
+        requestOptions: RequestOptions(path: '/test'),
+        error: const FormatException('Unexpected end of input'),
+      ).toStreamException();
+
+      expect(
+        exception,
+        isA<StreamClientException>().having((it) => it.cause, 'cause', isA<FormatException>()),
+      );
+    });
+
+    test('keeps a status the server answered with, even when the body would not decode', () {
+      // A response means a verdict was reached, whatever its body turned out
+      // to be. Reading this as an SDK failure would lose the status.
+      final exception = _failure(
+        body: '<html>gateway error</html>',
+        statusCode: 502,
+      ).toStreamException();
+
+      expect(exception, isA<StreamApiException>().having((it) => it.statusCode, 'statusCode', 502));
+    });
+
+    test('survives a Retry-After sent more than once', () {
+      // Reading it as a single value throws, and this runs while an error is
+      // already being reported — so the mapper itself would fail, and the
+      // failure would escape the seam that promises to classify it.
+      final exception = _failure(
+        body: _errorBody(code: 9, statusCode: 429, message: 'rate limited'),
+        statusCode: 429,
+        headers: const {
+          'retry-after': ['30', '60'],
+        },
+      ).toStreamException();
+
+      expect(
+        exception,
+        isA<StreamApiException>().having((it) => it.retryAfter, 'retryAfter', const Duration(seconds: 30)),
+      );
+    });
+
+    test('reports a bare status when a payload field is not the type it should be', () {
+      // The mapper runs while a failure is already being reported, so nothing
+      // in it may throw: a field of the wrong type has to cost the payload,
+      // not the error.
+      final exception = _failure(
+        body: const {'code': 'not-a-number', 'message': 'refused', 'StatusCode': 401},
+        statusCode: 401,
+      ).toStreamException();
+
+      expect(
+        exception,
+        isA<StreamApiException>()
+            .having((it) => it.statusCode, 'statusCode', 401)
+            .having((it) => it.code, 'code', isNull),
+      );
+    });
+
+    test('reads the details a moderation rejection sends as objects', () {
+      // The case `_detailsFromJson` exists for: code 73 sends a list of
+      // objects rather than of numbers, which must read as empty rather than
+      // failing the whole error.
+      final exception = _failure(
+        body: _errorBody(
+          code: 73,
+          details: const [
+            {'field': 'text'},
+          ],
+        ),
+        statusCode: 400,
+      ).toStreamException();
+
+      expect(
+        exception,
+        isA<StreamApiException>()
+            .having((it) => it.code, 'code', 73)
+            .having((it) => it.apiError?.details, 'apiError.details', isEmpty),
+      );
+    });
+
+    test('reports a bare status when the payload will not decode', () {
+      // A payload missing a field it once required still answers with what a
+      // caller needs, rather than losing the whole error.
+      final exception = _failure(
+        body: {'code': 40, 'message': 'token expired', 'StatusCode': 401},
+        statusCode: 401,
+      ).toStreamException();
+
+      expect(
+        exception,
+        isA<StreamApiException>()
+            .having((it) => it.code, 'code', 40)
+            .having((it) => it.isTokenExpired, 'isTokenExpired', isTrue),
+      );
+    });
+
     test('reads the Stream error from a decoded body', () {
       final exception = _failure(body: _errorBody(), statusCode: 401).toStreamException();
 
