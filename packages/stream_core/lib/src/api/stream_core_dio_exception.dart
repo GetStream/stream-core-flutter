@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 
 import '../errors.dart';
 import '../utils/result.dart';
-import '../utils/standard.dart';
 
 /// A [DioException] carrying the [StreamException] that caused it.
 ///
@@ -34,10 +33,9 @@ class StreamDioException extends DioException {
 extension DioExceptionMapping on DioException {
   /// This failure as the [StreamException] it represents.
   ///
-  /// A response from the server — parseable Stream error payload or bare
-  /// status — becomes a [StreamApiException]. Everything that ended before a
-  /// verdict (timeout, cancellation, socket failure) becomes a
-  /// [StreamNetworkException].
+  /// An answer from the server becomes a [StreamApiException], a transport
+  /// failure a [StreamNetworkException], and data that could not be read a
+  /// [StreamClientException].
   StreamException toStreamException() {
     if (this case StreamDioException(:final exception)) return exception;
 
@@ -46,56 +44,58 @@ extension DioExceptionMapping on DioException {
     // than re-diagnosed from a wrapper that has no response to read.
     if (error case final StreamException exception) return exception;
 
-    if (type == DioExceptionType.cancel) {
+    if (type == .cancel) {
       return StreamNetworkException(
         message: 'The request was cancelled',
         isCancelled: true,
         cause: this,
-        stackTrace: stackTrace,
       );
     }
 
-    if (_isTimeout) {
+    if (type case .connectionTimeout || .sendTimeout || .receiveTimeout) {
       return StreamNetworkException(
         message: 'The request timed out before the server answered',
         isTimeout: true,
         cause: this,
-        stackTrace: stackTrace,
       );
     }
 
     // A response means the server reached a verdict, even when its body is
     // not a Stream error payload — an edge or proxy answering on its own.
     if (response case final response?) {
+      final retryAfter = _parseRetryAfter(response);
+
       if (_parseApiError(response.data) case final apiError?) {
         return StreamApiException.fromApiError(
           apiError,
-          retryAfter: _parseRetryAfter(response),
+          retryAfter: retryAfter,
           cause: this,
-          stackTrace: stackTrace,
         );
       }
 
       return StreamApiException(
         message: response.statusMessage ?? message ?? 'The server responded with an error',
         statusCode: response.statusCode ?? 0,
-        retryAfter: _parseRetryAfter(response),
+        retryAfter: retryAfter,
         cause: this,
-        stackTrace: stackTrace,
+      );
+    }
+
+    // Dio reports transport trouble under its own types, so a failure carrying
+    // neither a response nor one of those came out of its own pipeline: a body
+    // it could not decode, or a request it could not build.
+    if (error case FormatException() || TypeError()) {
+      return StreamClientException(
+        message: 'The request could not be completed',
+        cause: error,
       );
     }
 
     return StreamNetworkException(
       message: message ?? 'The request failed before the server answered',
       cause: this,
-      stackTrace: stackTrace,
     );
   }
-
-  bool get _isTimeout => switch (type) {
-    DioExceptionType.connectionTimeout || DioExceptionType.sendTimeout || DioExceptionType.receiveTimeout => true,
-    _ => false,
-  };
 }
 
 // An interpretation seam: decoding wire data catches everything, `Error`
@@ -112,7 +112,11 @@ StreamApiError? _parseApiError(Object? data) {
 }
 
 Duration? _parseRetryAfter(Response<Object?> response) {
-  final seconds = response.headers.value('retry-after')?.let(int.tryParse);
+  final values = response.headers['retry-after'];
+  if (values == null || values.isEmpty) return null;
+
+  // Only the delta-seconds form is read; RFC 9110 also allows an HTTP date.
+  final seconds = int.tryParse(values.first);
   if (seconds == null || seconds < 0) return null;
   return Duration(seconds: seconds);
 }
@@ -138,7 +142,6 @@ Future<Result<R>> runApiSafely<R>(FutureOr<R> Function() block) async {
     final exception = StreamClientException(
       message: 'The API call failed unexpectedly',
       cause: e,
-      stackTrace: stackTrace,
     );
 
     return Result.failure(exception, stackTrace);

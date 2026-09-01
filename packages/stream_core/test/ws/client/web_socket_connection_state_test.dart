@@ -151,6 +151,19 @@ void main() {
     expect(state.isAutomaticReconnectionEnabled, isTrue);
   });
 
+  test('a source carries the trace of a failure that was raised, and none for one that was read', () {
+    final raised = StackTrace.current;
+
+    // Removed from the exception, so the source is what carries it — the same
+    // shape `Failure` uses, error and trace side by side.
+    const failure = StreamNetworkException(message: 'gone');
+    expect(ServerInitiated(error: failure, stackTrace: raised).stackTrace, same(raised));
+    expect(AuthenticationFailed(error: failure, stackTrace: raised).stackTrace, same(raised));
+
+    // A closure the server reported arrives as data, so there is none.
+    expect(const ServerInitiated(error: StreamApiException(message: 'refused', statusCode: 403)).stackTrace, isNull);
+  });
+
   test('closeReason reads differently for every source', () {
     const sources = [
       UserInitiated(),

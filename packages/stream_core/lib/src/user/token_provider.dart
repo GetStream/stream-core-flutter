@@ -48,10 +48,10 @@ abstract interface class TokenProvider {
   /// Throws an [ArgumentError] if the token does not belong to [userId], or if
   /// it is not valid for the provider's authentication type.
   ///
-  /// What a failure throws decides whether the connection is retried. A
-  /// [StreamNetworkException] or [TimeoutException] means the token could not
-  /// be loaded right then, and it retries; anything else blames the credentials
-  /// and surfaces as a [StreamAuthenticationException], which does not.
+  /// What a failure throws decides whether the connection is retried: a
+  /// [StreamNetworkException] or [TimeoutException] is about the moment and
+  /// retries, a `DioException` is read for what it carries, and anything else
+  /// blames the credentials and does not.
   Future<UserToken> loadToken(String userId);
 }
 

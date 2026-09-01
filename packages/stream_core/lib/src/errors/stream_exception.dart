@@ -29,7 +29,6 @@ sealed class StreamException extends Equatable implements Exception {
   const StreamException({
     required this.message,
     this.cause,
-    this.stackTrace,
   });
 
   /// The [StreamException] that [error] represents, or `null` when it does
@@ -59,9 +58,6 @@ sealed class StreamException extends Equatable implements Exception {
 
   /// The failure underneath this one, when this exception wraps another.
   final Object? cause;
-
-  /// Where the failure was raised.
-  final StackTrace? stackTrace;
 
   @override
   List<Object?> get props => [message, cause];
@@ -93,7 +89,6 @@ base class StreamApiException extends StreamException {
     this.retryAfter,
     this.apiError,
     super.cause,
-    super.stackTrace,
   });
 
   /// Creates a [StreamApiException] from the server's error payload.
@@ -101,7 +96,6 @@ base class StreamApiException extends StreamException {
     StreamApiError error, {
     Duration? retryAfter,
     Object? cause,
-    StackTrace? stackTrace,
   }) {
     return StreamApiException(
       message: error.message,
@@ -112,7 +106,6 @@ base class StreamApiException extends StreamException {
       retryAfter: retryAfter,
       apiError: error,
       cause: cause,
-      stackTrace: stackTrace,
     );
   }
 
@@ -134,13 +127,13 @@ base class StreamApiException extends StreamException {
 
   /// A documentation URL for this error, when the server sent one.
   ///
-  /// Populated on REST errors; WebSocket errors carry none.
+  /// Most errors carry none; a refused connection is the likeliest to.
   final String? moreInfo;
 
   /// Whether the server declared that retrying will not help.
   ///
-  /// Only Video sets this as a deliberate retry signal, so it is only worth
-  /// consulting there. Authoritative when `true`; `false` only means the
+  /// Worth consulting on any product: a permission denial carries it, as do
+  /// some Video errors. Authoritative when `true`; `false` only means the
   /// server said nothing — it must not be read as "retrying will help".
   final bool unrecoverable;
 
@@ -222,7 +215,6 @@ base class StreamNetworkException extends StreamException {
     this.isTimeout = false,
     this.closeCode,
     super.cause,
-    super.stackTrace,
   });
 
   /// Whether the caller cancelled the request.
@@ -271,7 +263,6 @@ base class StreamAuthenticationException extends StreamException {
   const StreamAuthenticationException({
     required super.message,
     super.cause,
-    super.stackTrace,
   });
 
   @override
@@ -294,7 +285,6 @@ base class StreamClientException extends StreamException {
   const StreamClientException({
     required super.message,
     super.cause,
-    super.stackTrace,
   });
 
   @override

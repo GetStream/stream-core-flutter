@@ -218,6 +218,7 @@ sealed class DisconnectionSource extends Equatable {
   /// Reconnection eligibility depends on the specific error type.
   const factory DisconnectionSource.serverInitiated({
     StreamException? error,
+    StackTrace? stackTrace,
   }) = ServerInitiated;
 
   /// Creates a [SystemInitiated] disconnection source.
@@ -242,7 +243,10 @@ sealed class DisconnectionSource extends Equatable {
   ///
   /// Indicates that the connection opened but could not be authenticated, so it
   /// was closed without ever being usable.
-  const factory DisconnectionSource.authenticationFailed({StreamException? error}) = AuthenticationFailed;
+  const factory DisconnectionSource.authenticationFailed({
+    StreamException? error,
+    StackTrace? stackTrace,
+  }) = AuthenticationFailed;
 
   /// A human-readable description of the disconnection source.
   ///
@@ -347,7 +351,7 @@ final class UserInitiated extends DisconnectionSource {
 /// provides additional context about the disconnection cause.
 final class ServerInitiated extends DisconnectionSource {
   /// Creates a [ServerInitiated] disconnection source.
-  const ServerInitiated({this.error});
+  const ServerInitiated({this.error, this.stackTrace});
 
   /// The error that caused the server to close the connection.
   ///
@@ -355,6 +359,9 @@ final class ServerInitiated extends DisconnectionSource {
   /// rejected REST call carries — and a [StreamNetworkException] describing
   /// the closure when it did not.
   final StreamException? error;
+
+  /// Where [error] was raised, when it was raised rather than read off the wire.
+  final StackTrace? stackTrace;
 
   @override
   List<Object?> get props => [error];
@@ -396,13 +403,16 @@ final class ConnectTimeout extends DisconnectionSource {
 /// error event instead.
 final class AuthenticationFailed extends DisconnectionSource {
   /// Creates an [AuthenticationFailed] disconnection source.
-  const AuthenticationFailed({this.error});
+  const AuthenticationFailed({this.error, this.stackTrace});
 
   /// The error that prevented the connection from authenticating.
   ///
   /// Usually a [StreamAuthenticationException] whose [StreamException.cause]
   /// is whatever the authenticator threw.
   final StreamException? error;
+
+  /// Where [error] was raised.
+  final StackTrace? stackTrace;
 
   @override
   List<Object?> get props => [error];

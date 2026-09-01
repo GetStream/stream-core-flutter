@@ -25,7 +25,8 @@ extension type const StreamErrorCode(int code) implements int {
   /// addresses is not enabled for the app.
   static const apiKeyInvalid = StreamErrorCode(2);
 
-  /// `4` – The request input failed validation.
+  /// `4` – The request could not be acted on as sent: input that failed
+  /// validation, or a feature the app has not configured.
   static const inputError = StreamErrorCode(4);
 
   /// `5` – Authentication failed for a reason other than the token codes
@@ -156,6 +157,12 @@ extension type const StreamErrorCode(int code) implements int {
 
   /// `112` – Feeds storage is unavailable.
   static const feedsStorageUnavailable = StreamErrorCode(112);
+
+  /// `113` – Some of the users named by the request do not exist.
+  ///
+  /// Distinct from [notFound] so the missing ids can be read from the error's
+  /// `exception_fields` and created before trying again.
+  static const usersNotFound = StreamErrorCode(113);
 }
 
 /// Convenience predicates grouping the codes that share a remedy.

@@ -9,12 +9,12 @@ part of 'stream_api_error.dart';
 StreamApiError _$StreamApiErrorFromJson(Map<String, dynamic> json) => StreamApiError(
   code: StreamErrorCode.fromJson(json['code'] as num),
   details: _detailsFromJson(json['details']),
-  duration: json['duration'] as String,
+  duration: json['duration'] as String? ?? '',
   exceptionFields: (json['exception_fields'] as Map<String, dynamic>?)?.map(
     (k, e) => MapEntry(k, e as String),
   ),
   message: json['message'] as String,
-  moreInfo: json['more_info'] as String,
+  moreInfo: json['more_info'] as String? ?? '',
   statusCode: (json['StatusCode'] as num).toInt(),
   unrecoverable: json['unrecoverable'] as bool?,
 );

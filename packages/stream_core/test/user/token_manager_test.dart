@@ -225,6 +225,30 @@ void main() {
         expect(provider.loadCount, 2);
       });
 
+      test('reports the failure with the trace the provider raised it at', () async {
+        final raised = StackTrace.current;
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider(
+            (_) => Future.error(StateError('load failed'), raised),
+          ),
+        );
+
+        // A plain rethrow would restart the trace inside `TokenManager`, which
+        // points at the SDK rather than at the code that actually failed.
+        await expectLater(
+          manager.getToken(),
+          throwsA(isA<StreamAuthenticationException>()),
+        );
+
+        try {
+          await manager.getToken();
+          fail('expected a throw');
+        } catch (_, stackTrace) {
+          expect(stackTrace, same(raised));
+        }
+      });
+
       test('keeps a failure the provider already classified', () async {
         const failure = StreamNetworkException(message: 'The token endpoint was unreachable');
         final manager = TokenManager(
@@ -235,6 +259,43 @@ void main() {
         // A provider saying "this was the moment" must stay a network failure: wrapped as an
         // authentication one it would read as "fix the credentials" and stop the reconnect.
         await expectLater(manager.getToken(), throwsA(same(failure)));
+      });
+
+      test('reads a provider that could not reach its endpoint as a network failure', () async {
+        // The ordinary provider fetches over Dio. Blaming the credentials for a
+        // blip would leave the connection down until the app connects again.
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider(
+            (_) async => throw DioException.connectionError(
+              requestOptions: RequestOptions(path: '/token'),
+              reason: 'network is unreachable',
+            ),
+          ),
+        );
+
+        await expectLater(manager.getToken(), throwsA(isA<StreamNetworkException>()));
+      });
+
+      test('keeps a refusal the token endpoint answered with', () async {
+        // A refusal is the server's verdict, not the moment's, so it must not
+        // read as retriable the way an unreachable endpoint does.
+        final options = RequestOptions(path: '/token');
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider(
+            (_) async => throw DioException.badResponse(
+              statusCode: 403,
+              requestOptions: options,
+              response: Response<Object?>(requestOptions: options, statusCode: 403),
+            ),
+          ),
+        );
+
+        await expectLater(
+          manager.getToken(),
+          throwsA(isA<StreamApiException>().having((it) => it.statusCode, 'statusCode', 403)),
+        );
       });
 
       test('reads a provider timeout as a network failure', () async {

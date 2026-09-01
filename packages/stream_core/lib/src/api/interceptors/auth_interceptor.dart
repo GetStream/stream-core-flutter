@@ -37,16 +37,15 @@ class AuthInterceptor extends Interceptor {
       options.headers['stream-auth-type'] = token.authType.headerValue;
 
       return handler.next(options);
-    } catch (e, stackTrace) {
-      _logger.w(() => 'no token to sign ${options.uri} with', error: e, stackTrace: stackTrace);
+    } catch (error, stackTrace) {
+      _logger.w(() => 'no token to sign ${options.uri} with', error: error, stackTrace: stackTrace);
 
       // Caught in full: a rejection must deliver a StreamException whatever
       // the app's token code threw.
-      var exception = StreamException.tryFrom(e);
+      var exception = StreamException.tryFrom(error);
       exception ??= StreamAuthenticationException(
         message: 'Failed to load an auth token',
-        cause: e,
-        stackTrace: stackTrace,
+        cause: error,
       );
 
       final dioError = StreamDioException(
