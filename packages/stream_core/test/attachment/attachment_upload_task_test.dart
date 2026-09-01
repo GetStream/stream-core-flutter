@@ -379,6 +379,30 @@ void main() {
       );
     });
 
+    test('reports a cancellation the CDN shaped itself, rather than wrapping it again', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final attachment = attachmentOf('file-1');
+
+      const reported = StreamNetworkException(
+        message: 'The request was cancelled',
+        isCancelled: true,
+        closeCode: 1000,
+      );
+
+      final task = uploader.upload(attachment);
+      // Nothing cancelled the token: the client answered with a cancellation of
+      // its own, already in the shape a caller wants.
+      (await cdn.awaitUpload(attachment)).fail(reported);
+
+      final result = await task.result;
+
+      expect(task.state.value, const UploadCancelled());
+      // Passed through as it arrived, so its transport detail survives instead
+      // of being buried in the cause of a fresh exception.
+      expect(result, isA<Failure>().having((it) => it.error, 'error', same(reported)));
+    });
+
     test('settles without waiting for a CDN that never answers', () async {
       final cdn = FakeCdnClient(honoursCancellation: false);
       final uploader = StreamAttachmentUploader(cdn: cdn);
