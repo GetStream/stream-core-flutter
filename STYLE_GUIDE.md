@@ -790,7 +790,8 @@ do it.
 
 For classes that appear in error messages or logs, override `toString`. Avoid bare
 `$runtimeType` — use `objectRuntimeType(this, 'ClassName')`, which strips runtime
-type at release-mode.
+type at release-mode. Flutter code gets it from `package:flutter/foundation.dart`;
+in `stream_core` it is package-internal, imported from `src/utils/object.dart`.
 
 ### Be explicit about `dispose()` and the object lifecycle
 

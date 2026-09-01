@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../errors/stream_exception.dart';
 import '../utils/in_flight_cache.dart';
 import '../utils/result.dart';
@@ -144,10 +146,12 @@ class TokenManager {
   /// identity that replaced it.
   ///
   /// Fails with a [StreamAuthenticationException] when no identity is configured, when [reset] runs
-  /// while the token is loading, when the [TokenProvider] fails with anything unclassified —
-  /// preserved as the exception's [StreamException.cause] — and when it returns a token that does
-  /// not belong to the user it was loading for. A provider failure that is already a
-  /// [StreamException] passes through as itself, so a transient network failure stays retriable.
+  /// while the token is loading, and when the [TokenProvider] returns a token that does not belong
+  /// to the user it was loading for.
+  ///
+  /// A [StreamException] from the [TokenProvider] passes through as itself, a [TimeoutException]
+  /// becomes a [StreamNetworkException], and anything else a [StreamAuthenticationException]
+  /// carrying it as [StreamException.cause]. See [TokenProvider.loadToken].
   Future<UserToken> getToken() async {
     final cached = peekToken();
     if (cached != null && !_isSpent(cached)) return cached;
@@ -208,11 +212,20 @@ class TokenManager {
 
     return result.getOrElse((error, stackTrace) {
       var exception = StreamException.tryFrom(error);
-      exception ??= StreamAuthenticationException(
-        message: 'The token provider failed to load a token for user "$userId"',
-        cause: error,
-        stackTrace: stackTrace,
-      );
+      exception ??= switch (error) {
+        // A provider that timed itself out is naming the moment, not the credentials.
+        TimeoutException() => StreamNetworkException(
+          message: 'The token provider timed out loading a token for user "$userId"',
+          isTimeout: true,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+        _ => StreamAuthenticationException(
+          message: 'The token provider failed to load a token for user "$userId"',
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+      };
 
       throw exception;
     });

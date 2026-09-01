@@ -414,6 +414,32 @@ void main() {
       );
 
       wsClientTest(
+        'retries when the token provider named the moment rather than the credentials',
+        authenticator: (_, _) async => throw const StreamNetworkException(
+          message: 'The token endpoint was unreachable',
+        ),
+        recover: true,
+        connect: (tester) async {
+          await tester.client.connect();
+          await tester.pumpEventQueue();
+        },
+        body: (tester) {
+          // A failure the provider classified itself keeps its kind all the way here, which is what
+          // makes the reconnect carve-out reachable at all.
+          expect(
+            tester.connectionState,
+            isA<Disconnected>().having(
+              (it) => it.source,
+              'source',
+              isA<AuthenticationFailed>().having((it) => it.error, 'error', isA<StreamNetworkException>()),
+            ),
+          );
+
+          expect(tester.connectionState.isAutomaticReconnectionEnabled, isTrue);
+        },
+      );
+
+      wsClientTest(
         'reports a refusal the server sent, carrying what it said',
         connect: (tester) async {
           // The credentials reach the server and it refuses them, rather than the client failing to

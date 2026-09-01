@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../errors.dart';
+import '../../user/token_provider.dart';
 import '../../utils.dart';
 import '../events/ws_event.dart';
 import 'engine/web_socket_engine.dart';
@@ -273,10 +274,10 @@ sealed class DisconnectionSource extends Equatable {
   ///
   /// {@template webSocketReconnectionRules}
   /// - [UserInitiated] — no, the caller asked for the connection to close.
-  /// - [AuthenticationFailed] — no, credentials that could not be produced or sent will not fare
-  ///   better on a retry — unless the failure it carries is a non-cancelled
-  ///   [StreamNetworkException], which indicts the moment rather than the credentials (a token
-  ///   endpoint that was briefly unreachable), and reconnects.
+  /// - [AuthenticationFailed] — no, with or without an error: credentials that could not be
+  ///   produced or sent will not fare better on a retry. The exception is a non-cancelled
+  ///   [StreamNetworkException], which indicts the moment rather than the credentials — see
+  ///   [TokenProvider.loadToken].
   /// - [SystemInitiated], [UnHealthyConnection], [ConnectTimeout] — yes.
   /// - [ServerInitiated] — decided by the error it carries:
   ///   - no error — yes, the closure said nothing against trying again.

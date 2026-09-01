@@ -224,6 +224,34 @@ void main() {
         expect(token, generateTestUserToken('user-1'));
         expect(provider.loadCount, 2);
       });
+
+      test('keeps a failure the provider already classified', () async {
+        const failure = StreamNetworkException(message: 'The token endpoint was unreachable');
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider((_) async => throw failure),
+        );
+
+        // A provider saying "this was the moment" must stay a network failure: wrapped as an
+        // authentication one it would read as "fix the credentials" and stop the reconnect.
+        await expectLater(manager.getToken(), throwsA(same(failure)));
+      });
+
+      test('reads a provider timeout as a network failure', () async {
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider((_) async => throw TimeoutException('took too long')),
+        );
+
+        await expectLater(
+          manager.getToken(),
+          throwsA(
+            isA<StreamNetworkException>()
+                .having((it) => it.isTimeout, 'isTimeout', isTrue)
+                .having((it) => it.cause, 'cause', isA<TimeoutException>()),
+          ),
+        );
+      });
     });
 
     group('expireToken', () {
