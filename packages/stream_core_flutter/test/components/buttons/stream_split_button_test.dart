@@ -262,13 +262,113 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           streamTheme: streamTheme,
-          _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(style: .secondary, onPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
       final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
       expect(tester.widget<ColoredBox>(divider).color, streamTheme.colorScheme.borderDefault);
       expect(tester.getSize(divider), const Size(1, 24));
+    });
+
+    // The divider is drawn on the shared surface, so which colour it takes is
+    // a question about that surface rather than about the button's style.
+    testWidgets('draws the divider against an accent fill', (tester) async {
+      final streamTheme = StreamTheme();
+
+      for (final style in [StreamButtonStyle.primary, StreamButtonStyle.destructive]) {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            streamTheme: streamTheme,
+            _splitButton(style: style, onPressed: () {}, onTrailingPressed: () {}),
+          ),
+        );
+
+        final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+        expect(
+          tester.widget<ColoredBox>(divider).color,
+          streamTheme.colorScheme.borderOnAccent,
+          reason: '$style solid is an accent fill',
+        );
+      }
+    });
+
+    // An outlined button has a hairline of its own; the divider continues it
+    // rather than cutting across in a different colour.
+    testWidgets('continues the outline through the divider', (tester) async {
+      final streamTheme = StreamTheme();
+
+      for (final style in StreamButtonStyle.values) {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            streamTheme: streamTheme,
+            _splitButton(style: style, type: .outline, onPressed: () {}, onTrailingPressed: () {}),
+          ),
+        );
+        // Settled, or a subtree can still be reporting the previous
+        // iteration's colours when it is read.
+        await tester.pumpAndSettle();
+
+        final outline = _surfaceOf(tester).shape as OutlinedBorder;
+        final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+
+        expect(tester.widget<ColoredBox>(divider).color, outline.side.color, reason: '$style outline');
+      }
+    });
+
+    // A ghost button has neither a fill nor an outline, so the icons either
+    // side of the divider are the only colour it has to match.
+    testWidgets('matches the icon colour on a ghost button', (tester) async {
+      final streamTheme = StreamTheme();
+
+      for (final style in StreamButtonStyle.values) {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            streamTheme: streamTheme,
+            _splitButton(style: style, type: .ghost, onPressed: () {}, onTrailingPressed: () {}),
+          ),
+        );
+        // Settled, or a subtree can still be reporting the previous
+        // iteration's colours when it is read.
+        await tester.pumpAndSettle();
+
+        // The colour the glyph is actually painted with. An Icon carries none
+        // itself and the button's IconTheme is not the ambient one, so this
+        // reads the text style the Icon ends up building.
+        final iconColor = tester
+            .widget<RichText>(
+              find.descendant(of: find.byIcon(StreamIconData.voiceFill), matching: find.byType(RichText)),
+            )
+            .text
+            .style
+            ?.color;
+        final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+
+        expect(tester.widget<ColoredBox>(divider).color, iconColor, reason: '$style ghost');
+      }
+    });
+
+    // A disabled button drops its accent fill for the shared disabled surface,
+    // so the divider has to come back to the hairline that reads on it — it
+    // used to take borderDisabled and vanish.
+    testWidgets('keeps the divider visible while disabled', (tester) async {
+      final streamTheme = StreamTheme();
+
+      for (final style in StreamButtonStyle.values) {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            streamTheme: streamTheme,
+            _splitButton(style: style),
+          ),
+        );
+
+        final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+        expect(
+          tester.widget<ColoredBox>(divider).color,
+          streamTheme.colorScheme.borderDefault,
+          reason: 'disabled $style',
+        );
+      }
     });
 
     testWidgets('honours separator overrides', (tester) async {

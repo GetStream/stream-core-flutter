@@ -212,8 +212,6 @@ class DefaultStreamSplitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
     final themeStyle = context.streamSplitButtonTheme.style?.merge(props.themeStyle) ?? props.themeStyle;
-    final defaults = _StreamSplitButtonDefaults(context);
-
     // Resolved once and shared: the surface below and the halves above are the
     // same button style, so they cannot render as different colors.
     final buttonStyle = resolveStreamButtonThemeStyle(
@@ -223,6 +221,10 @@ class DefaultStreamSplitButton extends StatelessWidget {
       isFloating: false,
       themeStyle: themeStyle?.buttonStyle,
     );
+
+    // Takes the resolved style because the divider's color is a question about
+    // the surface it is drawn on, which is the button's own.
+    final defaults = _StreamSplitButtonDefaults(context, props.style, props.type, buttonStyle);
 
     final isEnabled = props.onPressed != null || props.onTrailingPressed != null;
     final states = <WidgetState>{if (!isEnabled) WidgetState.disabled};
@@ -425,17 +427,36 @@ class _RenderHitTarget extends RenderShiftedBox {
 // These defaults are used when no explicit value is provided via
 // [StreamSplitButtonStyle] or [StreamSplitButtonThemeData].
 class _StreamSplitButtonDefaults extends StreamSplitButtonStyle {
-  _StreamSplitButtonDefaults(this.context);
+  _StreamSplitButtonDefaults(this.context, this._style, this._type, this._buttonStyle);
 
   final BuildContext context;
+
+  final StreamButtonStyle _style;
+  final StreamButtonType _type;
+  final StreamButtonThemeStyle _buttonStyle;
 
   late final StreamSpacing _spacing = context.streamSpacing;
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
 
+  // The divider is drawn on the button's own surface, so what it should be is
+  // a question about that surface rather than about the button's style.
   @override
   WidgetStateProperty<Color?> get separatorColor => WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.disabled)) return _colorScheme.borderDisabled;
-    return _colorScheme.borderDefault;
+    // A disabled button drops its fill, its outline and its icon colour for
+    // the shared disabled treatment, so the divider goes back to the hairline
+    // that reads on it rather than disappearing into it as borderDisabled did.
+    if (states.contains(WidgetState.disabled)) return _colorScheme.borderDefault;
+
+    return switch (_type) {
+      // Drawn against the fill, unless the fill is already a light one.
+      StreamButtonType.solid =>
+        _style == StreamButtonStyle.secondary ? _colorScheme.borderDefault : _colorScheme.borderOnAccent,
+      // Continues the outline it sits inside.
+      StreamButtonType.outline => _buttonStyle.borderColor?.resolve(states) ?? _colorScheme.borderDefault,
+      // No fill and no outline, so the icons either side of it are the only
+      // colour the button has to match.
+      StreamButtonType.ghost => _buttonStyle.foregroundColor?.resolve(states) ?? _colorScheme.borderDefault,
+    };
   });
 
   @override

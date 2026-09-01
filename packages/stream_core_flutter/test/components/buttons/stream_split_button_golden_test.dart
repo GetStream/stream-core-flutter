@@ -44,6 +44,18 @@ void main() {
     );
 
     goldenTest(
+      'renders the disabled matrix',
+      fileName: 'stream_split_button_disabled_matrix',
+      builder: () => _buildMatrix(enabled: false),
+    );
+
+    goldenTest(
+      'renders the disabled matrix in dark theme',
+      fileName: 'stream_split_button_disabled_matrix_dark',
+      builder: () => _buildMatrix(brightness: Brightness.dark, enabled: false),
+    );
+
+    goldenTest(
       'renders disabled halves',
       fileName: 'stream_split_button_disabled',
       builder: () => GoldenTestGroup(
@@ -69,7 +81,7 @@ void main() {
   });
 }
 
-GoldenTestGroup _buildMatrix({Brightness brightness = Brightness.light}) {
+GoldenTestGroup _buildMatrix({Brightness brightness = Brightness.light, bool enabled = true}) {
   return GoldenTestGroup(
     columns: StreamButtonType.values.length,
     children: [
@@ -78,7 +90,12 @@ GoldenTestGroup _buildMatrix({Brightness brightness = Brightness.light}) {
           GoldenTestScenario(
             name: '${style.name} / ${type.name}',
             child: _buildInTheme(
-              _splitButton(style: style, type: type),
+              _splitButton(
+                style: style,
+                type: type,
+                onPressed: enabled ? () {} : null,
+                onTrailingPressed: enabled ? () {} : null,
+              ),
               brightness: brightness,
             ),
           ),
