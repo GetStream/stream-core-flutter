@@ -96,7 +96,8 @@ Failures arrive on two channels, carrying the same four types:
 
 - **Operations** return `Result<T>`; a `Failure` from an SDK operation always holds a
   `StreamException` — every call runs through the seam that guarantees it (`runApiSafely`, below).
-  Nothing is thrown.
+  No runtime condition is thrown. Misuse still is: calling an operation wrongly raises `StateError`
+  or `ArgumentError`, which is a bug to fix rather than a failure to handle.
 - **Connection lifecycle** failures arrive as state: `connectionState` emits
   `Disconnected(source)`, where `source` says who ended the connection and carries the error when
   there was one:
@@ -154,7 +155,7 @@ already carry the right type — if you are not writing a boundary, you never pi
 | HTTP error mapper (the only file that reads Dio) | `StreamApiException` from a server error body or bare status; `StreamNetworkException` from timeout / cancel / socket errors |
 | Response/event decoding | `StreamClientException` when wire data will not decode, whatever the decoder threw (see the seam rule below) |
 | WebSocket engine + auth handler | `StreamNetworkException` for transport failures; `StreamAuthenticationException` when credentials couldn't be sent; server error events become `StreamApiException` — the inner error object is the same as REST, but it arrives in two envelopes (`{"type":"connection.error",...}` from the monolith, bare `{"error":{...}}` from the edge) and the decoder must accept both |
-| `TokenManager` | `StreamAuthenticationException` when no user is configured, when a reset raced the load, or when the `TokenProvider` fails with something unclassified (preserved as `cause`); a provider failure that is already a `StreamException` passes through as itself, so a transient network failure stays retriable |
+| `TokenManager` | `StreamAuthenticationException` when no user is configured, when a reset raced the load, or when the `TokenProvider` fails with something unclassified (preserved as `cause`); a provider failure that is already a `StreamException` passes through as itself, and a `TimeoutException` becomes a `StreamNetworkException`, so what is about the moment stays retriable |
 | `runApiSafely` (the API call seam) | passes an existing `StreamException` through untouched; maps Dio failures to `StreamApiException`/`StreamNetworkException`; wraps anything else — `Exception` or `Error` alike — into `StreamClientException`, preserving `cause` |
 
 Both capture helpers catch **everything**, `Error` included — they differ in what they hand back:
@@ -228,11 +229,15 @@ The decision runs in order:
 3. **Apply the budget**: max attempts, exponential backoff with jitter, a delay cap.
 
 `DisconnectionSource.isReconnectable` is this procedure specialized for the connection (reconnecting
-is inherently idempotent), and the interceptor's one-shot token refresh is the code-40 row. What
-remains for callers is operation retry: steps 1–2 answer *whether* from the error alone (necessary,
-but not sufficient, since the error cannot know the operation's idempotency), *when* comes from
-`retryAfter` where the server named a wait and from the caller's backoff otherwise, and the budget
-is the caller's. Product SDKs compose this into their retry queues.
+is inherently idempotent), and the interceptor's one-shot token refresh is the code-40 row. It parts
+from the table on one row: it treats every 4xx as no-reconnect, 408 included, because a 408 is an
+HTTP verdict on a request that arrived too slowly, and nothing on the connection path produces one.
+The 408 row is for operation retry, where the status can actually arrive.
+
+What remains for callers is operation retry: steps 1–2 answer *whether* from the error alone
+(necessary, but not sufficient, since the error cannot know the operation's idempotency), *when*
+comes from `retryAfter` where the server named a wait and from the caller's backoff otherwise, and
+the budget is the caller's. Product SDKs compose this into their retry queues.
 
 One honesty rule about retrying writes: a `StreamNetworkException` means the outcome is **unknown**
 — the server may have performed the operation. Retry a write only through an idempotent path
