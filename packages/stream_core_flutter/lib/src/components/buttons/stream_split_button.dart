@@ -26,10 +26,10 @@ import 'stream_button.dart';
 /// wraps the two icons rather than their tap targets, which stay full height
 /// and overhang it. The control has no size of its own.
 ///
-/// The surface is resolved from the same [StreamButtonTheme] entry the halves
-/// use, which is what keeps the two from drifting apart. For
-/// [StreamButtonType.outline] the border is drawn once around the whole
-/// control rather than around each half.
+/// The design gives the control the two variants of
+/// [StreamSplitButtonVariant], both filled. The surface is resolved from the
+/// same [StreamButtonTheme] entry the halves use, which is what keeps the two
+/// from drifting apart.
 ///
 /// Each half keeps its own tap target, hover and press feedback, and
 /// accessibility node; the divider is decorative.
@@ -40,7 +40,6 @@ import 'stream_button.dart';
 ///
 /// ```dart
 /// StreamSplitButton.icon(
-///   style: StreamButtonStyle.secondary,
 ///   icon: Icon(context.streamIcons.voiceFill),
 ///   trailingIcon: Icon(context.streamIcons.caretDown),
 ///   tooltip: 'Mute',
@@ -53,14 +52,15 @@ import 'stream_button.dart';
 ///
 /// {@tool snippet}
 ///
-/// Flip the caret while the menu it opens is showing:
+/// Go destructive once the microphone is off, and flip the caret while the
+/// menu it opens is showing:
 ///
 /// ```dart
 /// StreamSplitButton.icon(
-///   type: StreamButtonType.outline,
-///   icon: const Icon(Icons.share),
+///   variant: isMuted ? StreamSplitButtonVariant.destructive : StreamSplitButtonVariant.regular,
+///   icon: Icon(isMuted ? icons.voiceOffFill : icons.voiceFill),
 ///   trailingIcon: Icon(isMenuOpen ? icons.caretUp : icons.caretDown),
-///   onPressed: () => share(),
+///   onPressed: () => toggleMute(),
 ///   onTrailingPressed: () => toggleMenu(),
 /// )
 /// ```
@@ -69,6 +69,7 @@ import 'stream_button.dart';
 /// See also:
 ///
 ///  * [StreamButton], the button each half is built from.
+///  * [StreamSplitButtonVariant], for the available variants.
 ///  * [StreamSplitButtonTheme], for customizing split button appearance.
 @experimental
 class StreamSplitButton extends StatelessWidget {
@@ -88,8 +89,7 @@ class StreamSplitButton extends StatelessWidget {
     required Widget trailingIcon,
     VoidCallback? onPressed,
     VoidCallback? onTrailingPressed,
-    StreamButtonStyle style = .primary,
-    StreamButtonType type = .solid,
+    StreamSplitButtonVariant variant = .regular,
     String? tooltip,
     String? trailingTooltip,
     StreamSplitButtonStyle? themeStyle,
@@ -98,8 +98,7 @@ class StreamSplitButton extends StatelessWidget {
          trailingIcon: trailingIcon,
          onPressed: onPressed,
          onTrailingPressed: onTrailingPressed,
-         style: style,
-         type: type,
+         variant: variant,
          tooltip: tooltip,
          trailingTooltip: trailingTooltip,
          themeStyle: themeStyle,
@@ -114,6 +113,27 @@ class StreamSplitButton extends StatelessWidget {
     if (builder != null) return builder(context, props);
     return DefaultStreamSplitButton(props: props);
   }
+}
+
+/// The color scheme variant for a [StreamSplitButton].
+///
+/// A split button has no visual weight axis — both variants are filled — so
+/// this stands apart from the [StreamButtonStyle] / [StreamButtonType] pair a
+/// [StreamButton] takes.
+@experimental
+enum StreamSplitButtonVariant {
+  /// The neutral surface fill, for an action in its ordinary state.
+  regular,
+
+  /// The error/danger fill, for an action that is off or destructive — a
+  /// muted microphone, a stopped camera.
+  destructive;
+
+  // The button variant the shared surface and both halves are painted as.
+  StreamButtonStyle get _buttonStyle => switch (this) {
+    StreamSplitButtonVariant.regular => StreamButtonStyle.secondary,
+    StreamSplitButtonVariant.destructive => StreamButtonStyle.destructive,
+  };
 }
 
 /// Properties for configuring a [StreamSplitButton].
@@ -132,8 +152,7 @@ class StreamSplitButtonProps {
     required this.trailingIcon,
     this.onPressed,
     this.onTrailingPressed,
-    this.style = .primary,
-    this.type = .solid,
+    this.variant = .regular,
     this.tooltip,
     this.trailingTooltip,
     this.themeStyle,
@@ -157,16 +176,10 @@ class StreamSplitButtonProps {
   /// If null, that half is disabled.
   final VoidCallback? onTrailingPressed;
 
-  /// The visual style variant of the split button.
+  /// The visual variant of the split button.
   ///
-  /// Determines the color scheme used (primary, secondary, destructive).
-  final StreamButtonStyle style;
-
-  /// The type variant of the split button.
-  ///
-  /// Controls the visual weight (solid, outline, ghost). An outline split
-  /// button draws a single border around both halves.
-  final StreamButtonType type;
+  /// Determines the color scheme used (regular, destructive).
+  final StreamSplitButtonVariant variant;
 
   /// Text shown in a [Tooltip] on hover / long-press of the primary half, and
   /// used as its accessibility label.
@@ -211,25 +224,27 @@ class DefaultStreamSplitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
-    final themeStyle = context.streamSplitButtonTheme.style?.merge(props.themeStyle) ?? props.themeStyle;
+    final inheritedStyle = context.streamSplitButtonTheme.styleOf(props.variant);
+    final themeStyle = inheritedStyle?.merge(props.themeStyle) ?? props.themeStyle;
+    final buttonVariant = props.variant._buttonStyle;
     // Resolved once and shared: the surface below and the halves above are the
     // same button style, so they cannot render as different colors.
     final buttonStyle = resolveStreamButtonThemeStyle(
       context,
-      style: props.style,
-      type: props.type,
+      style: buttonVariant,
+      type: StreamButtonType.solid,
       isFloating: false,
       themeStyle: themeStyle?.buttonStyle,
     );
 
-    // Takes the resolved style because the divider's color is a question about
-    // the surface it is drawn on, which is the button's own.
-    final defaults = _StreamSplitButtonDefaults(context, props.style, props.type, buttonStyle);
+    final defaults = _StreamSplitButtonDefaults(context, props.variant);
 
     final isEnabled = props.onPressed != null || props.onTrailingPressed != null;
     final states = <WidgetState>{if (!isEnabled) WidgetState.disabled};
 
     final shape = buttonStyle.shape?.resolve(states) ?? const StadiumBorder();
+    // Neither variant is outlined, but a theme may still ask for a border; when
+    // it does it is drawn once around the whole control rather than each half.
     final borderColor = buttonStyle.borderColor?.resolve(states);
 
     final effectiveSeparatorColor = (themeStyle?.separatorColor ?? defaults.separatorColor).resolve(states);
@@ -261,8 +276,7 @@ class DefaultStreamSplitButton extends StatelessWidget {
           child: StreamButton.icon(
             icon: icon,
             onPressed: onPressed,
-            style: props.style,
-            type: props.type,
+            style: buttonVariant,
             size: _halfButtonSize,
             tooltip: tooltip,
             themeStyle: halfStyle,
@@ -427,35 +441,29 @@ class _RenderHitTarget extends RenderShiftedBox {
 // These defaults are used when no explicit value is provided via
 // [StreamSplitButtonStyle] or [StreamSplitButtonThemeData].
 class _StreamSplitButtonDefaults extends StreamSplitButtonStyle {
-  _StreamSplitButtonDefaults(this.context, this._style, this._type, this._buttonStyle);
+  _StreamSplitButtonDefaults(this.context, this._variant);
 
   final BuildContext context;
 
-  final StreamButtonStyle _style;
-  final StreamButtonType _type;
-  final StreamButtonThemeStyle _buttonStyle;
+  final StreamSplitButtonVariant _variant;
 
   late final StreamSpacing _spacing = context.streamSpacing;
   late final StreamColorScheme _colorScheme = context.streamColorScheme;
 
-  // The divider is drawn on the button's own surface, so what it should be is
-  // a question about that surface rather than about the button's style.
+  // The divider is drawn on the button's own fill, so what it should be is a
+  // question about that fill rather than about the button's variant.
   @override
   WidgetStateProperty<Color?> get separatorColor => WidgetStateProperty.resolveWith((states) {
-    // A disabled button drops its fill, its outline and its icon colour for
-    // the shared disabled treatment, so the divider goes back to the hairline
-    // that reads on it rather than disappearing into it as borderDisabled did.
+    // A disabled button drops its fill and its icon colour for the shared
+    // disabled treatment, so the divider goes back to the hairline that reads
+    // on it rather than disappearing into it as borderDisabled did.
     if (states.contains(WidgetState.disabled)) return _colorScheme.borderDefault;
 
-    return switch (_type) {
-      // Drawn against the fill, unless the fill is already a light one.
-      StreamButtonType.solid =>
-        _style == StreamButtonStyle.secondary ? _colorScheme.borderDefault : _colorScheme.borderOnAccent,
-      // Continues the outline it sits inside.
-      StreamButtonType.outline => _buttonStyle.borderColor?.resolve(states) ?? _colorScheme.borderDefault,
-      // No fill and no outline, so the icons either side of it are the only
-      // colour the button has to match.
-      StreamButtonType.ghost => _buttonStyle.foregroundColor?.resolve(states) ?? _colorScheme.borderDefault,
+    return switch (_variant) {
+      // A light surface fill, which the ordinary hairline reads on.
+      StreamSplitButtonVariant.regular => _colorScheme.borderDefault,
+      // Drawn against the accent fill.
+      StreamSplitButtonVariant.destructive => _colorScheme.borderOnAccent,
     };
   });
 

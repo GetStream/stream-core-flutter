@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../../components/buttons/stream_split_button.dart';
 import '../stream_theme.dart';
 import 'stream_button_theme.dart';
 
@@ -15,12 +16,12 @@ part 'stream_split_button_theme.g.theme.dart';
 ///
 /// {@tool snippet}
 ///
-/// Override the separator for a specific section:
+/// Override the separator of regular split buttons for a specific section:
 ///
 /// ```dart
 /// StreamSplitButtonTheme(
 ///   data: StreamSplitButtonThemeData(
-///     style: StreamSplitButtonStyle(
+///     regular: StreamSplitButtonStyle(
 ///       separatorColor: WidgetStatePropertyAll(Colors.white24),
 ///     ),
 ///   ),
@@ -71,6 +72,9 @@ class StreamSplitButtonTheme extends InheritedTheme {
 
 /// Theme data for customizing [StreamSplitButton] widgets.
 ///
+/// Organizes split button styles by [StreamSplitButtonVariant], so the
+/// destructive variant can be styled without touching the regular one.
+///
 /// {@tool snippet}
 ///
 /// Customize split button appearance globally via [StreamTheme]:
@@ -78,7 +82,10 @@ class StreamSplitButtonTheme extends InheritedTheme {
 /// ```dart
 /// StreamTheme(
 ///   splitButtonTheme: StreamSplitButtonThemeData(
-///     style: StreamSplitButtonStyle(separatorThickness: 2),
+///     regular: StreamSplitButtonStyle(separatorThickness: 2),
+///     destructive: StreamSplitButtonStyle(
+///       separatorColor: WidgetStatePropertyAll(Colors.white),
+///     ),
 ///   ),
 /// )
 /// ```
@@ -92,11 +99,31 @@ class StreamSplitButtonTheme extends InheritedTheme {
 @immutable
 @experimental
 class StreamSplitButtonThemeData with _$StreamSplitButtonThemeData {
-  /// Creates split button theme data with optional style overrides.
-  const StreamSplitButtonThemeData({this.style});
+  /// Creates split button theme data with optional style overrides per
+  /// variant.
+  const StreamSplitButtonThemeData({this.regular, this.destructive});
 
-  /// The visual styling for split buttons.
-  final StreamSplitButtonStyle? style;
+  /// Creates split button theme data that applies [style] to every variant.
+  ///
+  /// Both [regular] and [destructive] are set to [style]. Useful when scoping
+  /// a [StreamSplitButtonTheme] to a slot that should override every split
+  /// button regardless of its configured [StreamSplitButtonVariant].
+  const StreamSplitButtonThemeData.all(
+    StreamSplitButtonStyle style,
+  ) : regular = style,
+      destructive = style;
+
+  /// Styling for regular (neutral surface) split buttons.
+  final StreamSplitButtonStyle? regular;
+
+  /// Styling for destructive (error/danger) split buttons.
+  final StreamSplitButtonStyle? destructive;
+
+  /// The styling for split buttons of the given [variant].
+  StreamSplitButtonStyle? styleOf(StreamSplitButtonVariant variant) => switch (variant) {
+    StreamSplitButtonVariant.regular => regular,
+    StreamSplitButtonVariant.destructive => destructive,
+  };
 
   /// Linearly interpolate between two [StreamSplitButtonThemeData] objects.
   static StreamSplitButtonThemeData? lerp(
@@ -106,7 +133,7 @@ class StreamSplitButtonThemeData with _$StreamSplitButtonThemeData {
   ) => _$StreamSplitButtonThemeData.lerp(a, b, t);
 }
 
-/// Visual styling properties for [StreamSplitButton].
+/// Visual styling properties for a single [StreamSplitButtonVariant].
 ///
 /// A split button paints one shared surface behind two [StreamButton] halves.
 /// That surface is derived from the same [StreamButtonTheme] entry the halves
@@ -132,8 +159,8 @@ class StreamSplitButtonStyle with _$StreamSplitButtonStyle {
 
   /// Per-instance style overrides for the split button.
   ///
-  /// These take precedence over the inherited [StreamButtonTheme] entry for
-  /// the split button's `style`/`type` combination, and apply to both the
+  /// These take precedence over the inherited [StreamButtonTheme] entry the
+  /// split button's [StreamSplitButtonVariant] maps to, and apply to both the
   /// shared surface and the two halves, without affecting other
   /// [StreamButton] instances in the tree.
   ///
@@ -159,8 +186,10 @@ class StreamSplitButtonStyle with _$StreamSplitButtonStyle {
 
   /// The color of the divider between the two halves.
   ///
-  /// Defaults to [StreamColorScheme.borderDefault], or
-  /// [StreamColorScheme.borderDisabled] while the whole control is disabled.
+  /// Defaults to [StreamColorScheme.borderDefault] on the regular variant and
+  /// [StreamColorScheme.borderOnAccent] on the destructive one, falling back
+  /// to [StreamColorScheme.borderDefault] while the whole control is disabled
+  /// and painting the shared disabled surface.
   final WidgetStateProperty<Color?>? separatorColor;
 
   /// The width of the divider between the two halves, in logical pixels.
@@ -171,9 +200,9 @@ class StreamSplitButtonStyle with _$StreamSplitButtonStyle {
   /// The height of the divider between the two halves, in logical pixels.
   ///
   /// The divider is shorter than the halves it separates, which are in turn
-  /// shorter than the surface. Defaults to the button size inset by
-  /// [StreamSpacing.xxs] twice over on both ends — 24 for a
-  /// [StreamButtonSize.medium] split button.
+  /// shorter than the surface. Defaults to the half's own size inset by
+  /// [StreamSpacing.xxs] at both ends — 24, since the halves are
+  /// [StreamButtonSize.small].
   final double? separatorHeight;
 
   /// Linearly interpolate between two [StreamSplitButtonStyle] objects.

@@ -17,20 +17,12 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 Widget buildStreamSplitButtonPlayground(BuildContext context) {
   final icons = context.streamIcons;
 
-  final style = context.knobs.object.dropdown(
-    label: 'Style',
-    options: StreamButtonStyle.values,
-    initialOption: StreamButtonStyle.secondary,
+  final variant = context.knobs.object.dropdown(
+    label: 'Variant',
+    options: StreamSplitButtonVariant.values,
+    initialOption: StreamSplitButtonVariant.regular,
     labelBuilder: (option) => option.name,
-    description: 'Split button visual style variant.',
-  );
-
-  final type = context.knobs.object.dropdown(
-    label: 'Type',
-    options: StreamButtonType.values,
-    initialOption: StreamButtonType.solid,
-    labelBuilder: (option) => option.name,
-    description: 'Split button type variant. Outline draws one border around both halves.',
+    description: 'Split button color scheme variant.',
   );
 
   final caretUp = context.knobs.boolean(
@@ -61,8 +53,7 @@ Widget buildStreamSplitButtonPlayground(BuildContext context) {
       child: StreamSplitButton.icon(
         icon: Icon(icons.voiceFill),
         trailingIcon: Icon(caretUp ? icons.caretUp : icons.caretDown),
-        style: style,
-        type: type,
+        variant: variant,
         tooltip: 'Mute',
         trailingTooltip: 'Audio settings',
         onPressed: leadingEnabled ? () {} : null,
@@ -94,7 +85,7 @@ Widget buildStreamSplitButtonShowcase(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: spacing.xl,
         children: const [
-          _StyleTypeMatrixSection(),
+          _VariantSection(),
           _DisabledSection(),
           _CallControlSection(),
         ],
@@ -103,8 +94,8 @@ Widget buildStreamSplitButtonShowcase(BuildContext context) {
   );
 }
 
-class _StyleTypeMatrixSection extends StatelessWidget {
-  const _StyleTypeMatrixSection();
+class _VariantSection extends StatelessWidget {
+  const _VariantSection();
 
   @override
   Widget build(BuildContext context) {
@@ -112,28 +103,26 @@ class _StyleTypeMatrixSection extends StatelessWidget {
     final spacing = context.streamSpacing;
 
     return _ExampleCard(
-      title: 'Style × type',
+      title: 'Variants',
       description: 'The surface resolves from the same button style the halves use, so the two never drift apart.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: spacing.md,
         children: [
-          for (final style in StreamButtonStyle.values)
+          for (final variant in StreamSplitButtonVariant.values)
             Row(
               spacing: spacing.md,
               children: [
-                SizedBox(width: 88, child: Text(style.name)),
-                for (final type in StreamButtonType.values)
-                  StreamSplitButton.icon(
-                    icon: Icon(icons.voiceFill),
-                    trailingIcon: Icon(icons.caretDown),
-                    style: style,
-                    type: type,
-                    tooltip: 'Mute',
-                    trailingTooltip: 'Audio settings',
-                    onPressed: () {},
-                    onTrailingPressed: () {},
-                  ),
+                SizedBox(width: 88, child: Text(variant.name)),
+                StreamSplitButton.icon(
+                  icon: Icon(icons.voiceFill),
+                  trailingIcon: Icon(icons.caretDown),
+                  variant: variant,
+                  tooltip: 'Mute',
+                  trailingTooltip: 'Audio settings',
+                  onPressed: () {},
+                  onTrailingPressed: () {},
+                ),
               ],
             ),
         ],
@@ -167,7 +156,6 @@ class _DisabledSection extends StatelessWidget {
                 StreamSplitButton.icon(
                   icon: Icon(icons.voiceFill),
                   trailingIcon: Icon(icons.caretDown),
-                  style: StreamButtonStyle.secondary,
                   onPressed: leading ? () {} : null,
                   onTrailingPressed: trailing ? () {} : null,
                 ),
@@ -206,7 +194,7 @@ class _CallControlSectionState extends State<_CallControlSection> {
           child: StreamSplitButton.icon(
             icon: Icon(_isMuted ? icons.voiceOffFill : icons.voiceFill),
             trailingIcon: Icon(_isSettingsOpen ? icons.caretUp : icons.caretDown),
-            style: _isMuted ? StreamButtonStyle.destructive : StreamButtonStyle.secondary,
+            variant: _isMuted ? StreamSplitButtonVariant.destructive : StreamSplitButtonVariant.regular,
             tooltip: _isMuted ? 'Unmute' : 'Mute',
             trailingTooltip: 'Audio settings',
             onPressed: () => setState(() => _isMuted = !_isMuted),

@@ -37,7 +37,7 @@ void main() {
         children: [
           GoldenTestScenario(
             name: 'pressed',
-            child: _buildInTheme(_splitButton(style: .secondary)),
+            child: _buildInTheme(_splitButton()),
           ),
         ],
       ),
@@ -63,17 +63,15 @@ void main() {
         children: [
           GoldenTestScenario(
             name: 'leading disabled',
-            child: _buildInTheme(_splitButton(style: .secondary, onPressed: null)),
+            child: _buildInTheme(_splitButton(onPressed: null)),
           ),
           GoldenTestScenario(
             name: 'trailing disabled',
-            child: _buildInTheme(_splitButton(style: .secondary, onTrailingPressed: null)),
+            child: _buildInTheme(_splitButton(onTrailingPressed: null)),
           ),
           GoldenTestScenario(
             name: 'both disabled',
-            child: _buildInTheme(
-              _splitButton(style: .secondary, onPressed: null, onTrailingPressed: null),
-            ),
+            child: _buildInTheme(_splitButton(onPressed: null, onTrailingPressed: null)),
           ),
         ],
       ),
@@ -83,37 +81,33 @@ void main() {
 
 GoldenTestGroup _buildMatrix({Brightness brightness = Brightness.light, bool enabled = true}) {
   return GoldenTestGroup(
-    columns: StreamButtonType.values.length,
+    columns: StreamSplitButtonVariant.values.length,
     children: [
-      for (final style in StreamButtonStyle.values)
-        for (final type in StreamButtonType.values)
-          GoldenTestScenario(
-            name: '${style.name} / ${type.name}',
-            child: _buildInTheme(
-              _splitButton(
-                style: style,
-                type: type,
-                onPressed: enabled ? () {} : null,
-                onTrailingPressed: enabled ? () {} : null,
-              ),
-              brightness: brightness,
+      for (final variant in StreamSplitButtonVariant.values)
+        GoldenTestScenario(
+          name: variant.name,
+          child: _buildInTheme(
+            _splitButton(
+              variant: variant,
+              onPressed: enabled ? () {} : null,
+              onTrailingPressed: enabled ? () {} : null,
             ),
+            brightness: brightness,
           ),
+        ),
     ],
   );
 }
 
 StreamSplitButton _splitButton({
-  StreamButtonStyle style = StreamButtonStyle.primary,
-  StreamButtonType type = StreamButtonType.solid,
+  StreamSplitButtonVariant variant = StreamSplitButtonVariant.regular,
   VoidCallback? onPressed = _noop,
   VoidCallback? onTrailingPressed = _noop,
 }) {
   return StreamSplitButton.icon(
     icon: const Icon(StreamIconData.voiceFill),
     trailingIcon: const Icon(StreamIconData.caretDown),
-    style: style,
-    type: type,
+    variant: variant,
     onPressed: onPressed,
     onTrailingPressed: onTrailingPressed,
   );

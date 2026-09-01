@@ -30,14 +30,21 @@ mixin _$StreamSplitButtonThemeData {
     }
 
     return StreamSplitButtonThemeData(
-      style: StreamSplitButtonStyle.lerp(a.style, b.style, t),
+      regular: StreamSplitButtonStyle.lerp(a.regular, b.regular, t),
+      destructive: StreamSplitButtonStyle.lerp(a.destructive, b.destructive, t),
     );
   }
 
-  StreamSplitButtonThemeData copyWith({StreamSplitButtonStyle? style}) {
+  StreamSplitButtonThemeData copyWith({
+    StreamSplitButtonStyle? regular,
+    StreamSplitButtonStyle? destructive,
+  }) {
     final _this = (this as StreamSplitButtonThemeData);
 
-    return StreamSplitButtonThemeData(style: style ?? _this.style);
+    return StreamSplitButtonThemeData(
+      regular: regular ?? _this.regular,
+      destructive: destructive ?? _this.destructive,
+    );
   }
 
   StreamSplitButtonThemeData merge(StreamSplitButtonThemeData? other) {
@@ -51,7 +58,11 @@ mixin _$StreamSplitButtonThemeData {
       return other;
     }
 
-    return copyWith(style: _this.style?.merge(other.style) ?? other.style);
+    return copyWith(
+      regular: _this.regular?.merge(other.regular) ?? other.regular,
+      destructive:
+          _this.destructive?.merge(other.destructive) ?? other.destructive,
+    );
   }
 
   @override
@@ -67,14 +78,15 @@ mixin _$StreamSplitButtonThemeData {
     final _this = (this as StreamSplitButtonThemeData);
     final _other = (other as StreamSplitButtonThemeData);
 
-    return _other.style == _this.style;
+    return _other.regular == _this.regular &&
+        _other.destructive == _this.destructive;
   }
 
   @override
   int get hashCode {
     final _this = (this as StreamSplitButtonThemeData);
 
-    return Object.hash(runtimeType, _this.style);
+    return Object.hash(runtimeType, _this.regular, _this.destructive);
   }
 }
 
