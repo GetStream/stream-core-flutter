@@ -27,6 +27,7 @@
 - Removed `AttachmentUploadException`. A failed upload carries the `StreamException` that stopped it, and a cancelled one a `StreamNetworkException` with `isCancelled` set
 - Removed the `OnUploadProgress` and `OnBatchUploadProgress` callbacks along with the `StreamAttachmentUploaderBatch` extension. Progress arrives on `AttachmentUploadTask.state` and `AttachmentUploadBatch.state`, so it can never disagree with the lifecycle
 - `uploadBatch`'s `maxConcurrent` now defaults to `3` rather than `5`
+- `UploadedAttachment` compares by value rather than by identity
 
 ### ✨ Features
 

@@ -210,7 +210,7 @@ final class BatchUploadItemResult extends Equatable {
   final Result<UploadedAttachment> result;
 
   @override
-  List<Object?> get props => [attachment, result];
+  List<Object?> get props => [attachment.id, result];
 }
 
 /// One outcome per requested attachment, and how the batch came to stop.
@@ -251,6 +251,10 @@ sealed class BatchUploadResult extends Equatable {
 }
 
 /// Every attachment reached a terminal state on its own.
+///
+/// "Completed" is about the batch, not its items: one that was refused, or one
+/// the caller cancelled by itself, still finishes here. Only cancelling the
+/// batch, or `eagerError` giving up, ends it any other way.
 final class BatchUploadCompleted extends BatchUploadResult {
   /// Creates a [BatchUploadCompleted] result.
   const BatchUploadCompleted({required super.items});
