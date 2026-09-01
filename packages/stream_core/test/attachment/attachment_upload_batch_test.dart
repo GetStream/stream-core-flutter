@@ -521,6 +521,36 @@ void main() {
       expect(progress.sentBytes, 1400);
     });
 
+    test('keeps the bytes a failed upload had already sent', () async {
+      final cdn = FakeCdnClient();
+      final uploader = StreamAttachmentUploader(cdn: cdn);
+      final refused = attachmentOf('refused');
+      final delivered = attachmentOf('delivered');
+
+      final batch = uploader.uploadBatch([refused, delivered]);
+
+      (await cdn.awaitUpload(refused))
+        ..sendBytes(400, 1000)
+        ..fail();
+      (await cdn.awaitUpload(delivered))
+        ..sendBytes(1000, 1000)
+        ..succeed();
+
+      final result = await batch.result;
+      final progress = batch.state.value.progress;
+
+      expect(result, isA<BatchUploadCompleted>());
+      expect(progress.failed, 1);
+      expect(progress.succeeded, 1);
+
+      // A failed upload is the one case where the aggregate reads a byte count
+      // recorded by the state listener rather than one it can derive: there is
+      // no total to fall back on the way a success has. The partial bytes
+      // survive only because the progress event is delivered before the settle
+      // that follows it.
+      expect(progress.sentBytes, 1400, reason: '400 partial bytes plus a whole 1000-byte file');
+    });
+
     test('knows the whole batch total before every upload has started', () async {
       final cdn = FakeCdnClient();
       final uploader = StreamAttachmentUploader(cdn: cdn);
