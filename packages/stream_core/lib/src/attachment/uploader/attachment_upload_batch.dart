@@ -44,7 +44,9 @@ import 'batch_upload_state.dart';
 ///
 /// Obtained from [StreamAttachmentUploader.uploadBatch] rather than
 /// constructed. Nothing needs disposing: [state] settles and stops once the
-/// batch has finished, and [cancel] is how a batch is stopped before then.
+/// batch has finished, and [cancel] is how a batch is stopped before then —
+/// including a batch abandoned while a [CdnClient] never answers, which
+/// finishes on nothing else.
 ///
 /// See also:
 ///

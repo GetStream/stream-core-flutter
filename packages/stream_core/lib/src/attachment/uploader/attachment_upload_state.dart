@@ -45,7 +45,7 @@ sealed class AttachmentUploadState extends Equatable {
   List<Object?> get props => const [];
 }
 
-/// The upload is waiting for a turn, and has not touched its file yet.
+/// The upload is waiting for a turn, and has not started sending.
 final class UploadQueued extends AttachmentUploadState {
   /// Creates an [UploadQueued] state.
   const UploadQueued();
