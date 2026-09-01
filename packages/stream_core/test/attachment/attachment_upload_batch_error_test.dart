@@ -165,6 +165,7 @@ void main() {
       // The exception says what went wrong; the trace beside it says where, and
       // is the failing task's own rather than one made up here.
       final failed = result.items[1].result as Failure;
+      expect(result.stackTrace, isNotNull, reason: 'two nulls would agree without a trace ever being kept');
       expect(result.stackTrace, same(failed.stackTrace));
     });
 
