@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
+
+import '../api/stream_core_dio_exception.dart';
 import '../errors/stream_exception.dart';
 import '../utils/in_flight_cache.dart';
 import '../utils/result.dart';
@@ -149,9 +152,8 @@ class TokenManager {
   /// while the token is loading, and when the [TokenProvider] returns a token that does not belong
   /// to the user it was loading for.
   ///
-  /// A [StreamException] from the [TokenProvider] passes through as itself, a [TimeoutException]
-  /// becomes a [StreamNetworkException], and anything else a [StreamAuthenticationException]
-  /// carrying it as [StreamException.cause]. See [TokenProvider.loadToken].
+  /// A failing [TokenProvider] fails this too, with the kind its own failure named — see
+  /// [TokenProvider.loadToken].
   Future<UserToken> getToken() async {
     final cached = peekToken();
     if (cached != null && !_isSpent(cached)) return cached;
@@ -213,21 +215,20 @@ class TokenManager {
     return result.getOrElse((error, stackTrace) {
       var exception = StreamException.tryFrom(error);
       exception ??= switch (error) {
-        // A provider that timed itself out is naming the moment, not the credentials.
+        DioException() => error.toStreamException(),
         TimeoutException() => StreamNetworkException(
           message: 'The token provider timed out loading a token for user "$userId"',
           isTimeout: true,
           cause: error,
-          stackTrace: stackTrace,
         ),
         _ => StreamAuthenticationException(
           message: 'The token provider failed to load a token for user "$userId"',
           cause: error,
-          stackTrace: stackTrace,
         ),
       };
 
-      throw exception;
+      // The provider's own trace, not this line's.
+      Error.throwWithStackTrace(exception, stackTrace ?? StackTrace.current);
     });
   }
 
