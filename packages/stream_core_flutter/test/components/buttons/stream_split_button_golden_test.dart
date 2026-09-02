@@ -63,7 +63,7 @@ void main() {
         children: [
           GoldenTestScenario(
             name: 'leading disabled',
-            child: _buildInTheme(_splitButton(onPressed: null)),
+            child: _buildInTheme(_splitButton(onLeadingPressed: null)),
           ),
           GoldenTestScenario(
             name: 'trailing disabled',
@@ -71,7 +71,7 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'both disabled',
-            child: _buildInTheme(_splitButton(onPressed: null, onTrailingPressed: null)),
+            child: _buildInTheme(_splitButton(onLeadingPressed: null, onTrailingPressed: null)),
           ),
         ],
       ),
@@ -89,7 +89,7 @@ GoldenTestGroup _buildMatrix({Brightness brightness = Brightness.light, bool ena
           child: _buildInTheme(
             _splitButton(
               variant: variant,
-              onPressed: enabled ? () {} : null,
+              onLeadingPressed: enabled ? () {} : null,
               onTrailingPressed: enabled ? () {} : null,
             ),
             brightness: brightness,
@@ -101,14 +101,14 @@ GoldenTestGroup _buildMatrix({Brightness brightness = Brightness.light, bool ena
 
 StreamSplitButton _splitButton({
   StreamSplitButtonVariant variant = StreamSplitButtonVariant.regular,
-  VoidCallback? onPressed = _noop,
+  VoidCallback? onLeadingPressed = _noop,
   VoidCallback? onTrailingPressed = _noop,
 }) {
   return StreamSplitButton.icon(
-    icon: const Icon(StreamIconData.voiceFill),
+    leadingIcon: const Icon(StreamIconData.voiceFill),
     trailingIcon: const Icon(StreamIconData.caretDown),
     variant: variant,
-    onPressed: onPressed,
+    onLeadingPressed: onLeadingPressed,
     onTrailingPressed: onTrailingPressed,
   );
 }

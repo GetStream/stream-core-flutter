@@ -12,19 +12,19 @@ Widget _withStreamTheme(Widget child, {StreamTheme? streamTheme}) {
 StreamSplitButton _splitButton({
   StreamSplitButtonVariant variant = StreamSplitButtonVariant.regular,
   IconData trailingIcon = StreamIconData.caretDown,
-  VoidCallback? onPressed,
+  VoidCallback? onLeadingPressed,
   VoidCallback? onTrailingPressed,
-  String? tooltip,
+  String? leadingTooltip,
   String? trailingTooltip,
   StreamSplitButtonStyle? themeStyle,
 }) {
   return StreamSplitButton.icon(
-    icon: const Icon(StreamIconData.voiceFill),
+    leadingIcon: const Icon(StreamIconData.voiceFill),
     trailingIcon: Icon(trailingIcon),
     variant: variant,
-    onPressed: onPressed,
+    onLeadingPressed: onLeadingPressed,
     onTrailingPressed: onTrailingPressed,
-    tooltip: tooltip,
+    leadingTooltip: leadingTooltip,
     trailingTooltip: trailingTooltip,
     themeStyle: themeStyle,
   );
@@ -63,7 +63,7 @@ void main() {
           _withStreamTheme(
             Column(
               children: [
-                _splitButton(variant: variant, onPressed: () {}, onTrailingPressed: () {}),
+                _splitButton(variant: variant, onLeadingPressed: () {}, onTrailingPressed: () {}),
                 StreamButton.icon(icon: const Icon(Icons.mic), style: buttonStyle, onPressed: () {}),
               ],
             ),
@@ -92,7 +92,7 @@ void main() {
               ),
             ),
           ),
-          _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -101,7 +101,7 @@ void main() {
 
     testWidgets('halves paint neither background nor border', (tester) async {
       await tester.pumpWidget(
-        _withStreamTheme(_splitButton(onPressed: () {}, onTrailingPressed: () {})),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       for (var index = 0; index < 2; index++) {
@@ -115,7 +115,7 @@ void main() {
     testWidgets('draws no border of its own', (tester) async {
       // Neither variant is outlined.
       await tester.pumpWidget(
-        _withStreamTheme(_splitButton(onPressed: () {}, onTrailingPressed: () {})),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       final shape = _surfaceOf(tester).shape as OutlinedBorder;
@@ -128,7 +128,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () {},
+            onLeadingPressed: () {},
             onTrailingPressed: () {},
             themeStyle: const StreamSplitButtonStyle(
               buttonStyle: StreamButtonThemeStyle(borderColor: WidgetStatePropertyAll(Color(0xFF00FF00))),
@@ -151,7 +151,7 @@ void main() {
       final disabledColor = streamTheme.colorScheme.backgroundDisabled;
 
       await tester.pumpWidget(
-        _withStreamTheme(streamTheme: streamTheme, _splitButton(onPressed: () {})),
+        _withStreamTheme(streamTheme: streamTheme, _splitButton(onLeadingPressed: () {})),
       );
       expect(_surfaceOf(tester).color, enabledColor);
 
@@ -168,7 +168,7 @@ void main() {
   group('StreamSplitButton layout', () {
     testWidgets('matches the design: 89x48 control over an 81x40 surface', (tester) async {
       await tester.pumpWidget(
-        _withStreamTheme(_splitButton(onPressed: () {}, onTrailingPressed: () {})),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       // The control is wider than the surface it paints: the same 4pt inset
@@ -194,7 +194,7 @@ void main() {
         _withStreamTheme(
           Column(
             children: [
-              _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+              _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
               StreamButton.icon(icon: const Icon(Icons.mic), style: .secondary, onPressed: () {}),
             ],
           ),
@@ -222,9 +222,9 @@ void main() {
             ),
           ),
           _splitButton(
-            onPressed: () {},
+            onLeadingPressed: () {},
             onTrailingPressed: () {},
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -249,9 +249,9 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () => pressed++,
+            onLeadingPressed: () => pressed++,
             onTrailingPressed: () => trailingPressed++,
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -276,7 +276,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           streamTheme: streamTheme,
-          _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -295,7 +295,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           streamTheme: streamTheme,
-          _splitButton(variant: .destructive, onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(variant: .destructive, onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -343,7 +343,7 @@ void main() {
         await tester.pumpWidget(
           _withStreamTheme(
             streamTheme: StreamTheme(splitButtonTheme: themeData),
-            _splitButton(variant: variant, onPressed: () {}, onTrailingPressed: () {}),
+            _splitButton(variant: variant, onLeadingPressed: () {}, onTrailingPressed: () {}),
           ),
         );
         // Settled, or a subtree can still be reporting the previous
@@ -365,7 +365,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           streamTheme: streamTheme,
-          _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -377,7 +377,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () {},
+            onLeadingPressed: () {},
             onTrailingPressed: () {},
             themeStyle: const StreamSplitButtonStyle(
               separatorColor: WidgetStatePropertyAll(Color(0xFFFF0000)),
@@ -397,7 +397,7 @@ void main() {
   group('StreamSplitButton icons', () {
     testWidgets('renders the leading icon before the trailing one', (tester) async {
       await tester.pumpWidget(
-        _withStreamTheme(_splitButton(onPressed: () {}, onTrailingPressed: () {})),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       final leading = tester.getCenter(find.byIcon(StreamIconData.voiceFill));
@@ -410,7 +410,7 @@ void main() {
       // to pick rather than something the component hard-codes.
       await tester.pumpWidget(
         _withStreamTheme(
-          _splitButton(trailingIcon: StreamIconData.caretUp, onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(trailingIcon: StreamIconData.caretUp, onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -423,7 +423,7 @@ void main() {
         _withStreamTheme(
           Directionality(
             textDirection: TextDirection.rtl,
-            child: _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+            child: _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
           ),
         ),
       );
@@ -442,9 +442,9 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () => pressed++,
+            onLeadingPressed: () => pressed++,
             onTrailingPressed: () => trailingPressed++,
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -466,7 +466,7 @@ void main() {
         _withStreamTheme(
           _splitButton(
             onTrailingPressed: () => trailingPressed++,
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -485,9 +485,9 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () {},
+            onLeadingPressed: () {},
             onTrailingPressed: () {},
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -516,9 +516,9 @@ void main() {
         _withStreamTheme(
           StreamComponentFactory(
             builders: StreamComponentBuilders(
-              splitButton: (context, props) => Text('custom ${props.tooltip}'),
+              splitButton: (context, props) => Text('custom ${props.leadingTooltip}'),
             ),
-            child: _splitButton(onPressed: () {}, onTrailingPressed: () {}, tooltip: 'Mute'),
+            child: _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}, leadingTooltip: 'Mute'),
           ),
         ),
       );

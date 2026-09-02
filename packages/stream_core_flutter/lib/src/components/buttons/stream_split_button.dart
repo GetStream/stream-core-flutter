@@ -40,11 +40,11 @@ import 'stream_button.dart';
 ///
 /// ```dart
 /// StreamSplitButton.icon(
-///   icon: Icon(context.streamIcons.voiceFill),
+///   leadingIcon: Icon(context.streamIcons.voiceFill),
 ///   trailingIcon: Icon(context.streamIcons.caretDown),
-///   tooltip: 'Mute',
+///   leadingTooltip: 'Mute',
 ///   trailingTooltip: 'Audio settings',
-///   onPressed: () => toggleMute(),
+///   onLeadingPressed: () => toggleMute(),
 ///   onTrailingPressed: () => showAudioSettings(),
 /// )
 /// ```
@@ -58,9 +58,9 @@ import 'stream_button.dart';
 /// ```dart
 /// StreamSplitButton.icon(
 ///   variant: isMuted ? StreamSplitButtonVariant.destructive : StreamSplitButtonVariant.regular,
-///   icon: Icon(isMuted ? icons.voiceOffFill : icons.voiceFill),
+///   leadingIcon: Icon(isMuted ? icons.voiceOffFill : icons.voiceFill),
 ///   trailingIcon: Icon(isMenuOpen ? icons.caretUp : icons.caretDown),
-///   onPressed: () => toggleMute(),
+///   onLeadingPressed: () => toggleMute(),
 ///   onTrailingPressed: () => toggleMenu(),
 /// )
 /// ```
@@ -75,7 +75,7 @@ import 'stream_button.dart';
 class StreamSplitButton extends StatelessWidget {
   /// Creates a split button with an icon in each half.
   ///
-  /// [icon] labels the primary half and [trailingIcon] the secondary one.
+  /// [leadingIcon] labels the leading half and [trailingIcon] the trailing one.
   /// Both are configurable so the trailing half can point the caret at
   /// whatever it opens — [StreamIcons.caretDown] for a menu below,
   /// [StreamIcons.caretUp] for one above.
@@ -85,21 +85,21 @@ class StreamSplitButton extends StatelessWidget {
   @experimental
   StreamSplitButton.icon({
     super.key,
-    required Widget icon,
+    required Widget leadingIcon,
     required Widget trailingIcon,
-    VoidCallback? onPressed,
+    VoidCallback? onLeadingPressed,
     VoidCallback? onTrailingPressed,
     StreamSplitButtonVariant variant = .regular,
-    String? tooltip,
+    String? leadingTooltip,
     String? trailingTooltip,
     StreamSplitButtonStyle? themeStyle,
   }) : props = .new(
-         icon: icon,
+         leadingIcon: leadingIcon,
          trailingIcon: trailingIcon,
-         onPressed: onPressed,
+         onLeadingPressed: onLeadingPressed,
          onTrailingPressed: onTrailingPressed,
          variant: variant,
-         tooltip: tooltip,
+         leadingTooltip: leadingTooltip,
          trailingTooltip: trailingTooltip,
          themeStyle: themeStyle,
        );
@@ -148,28 +148,28 @@ enum StreamSplitButtonVariant {
 class StreamSplitButtonProps {
   /// Creates properties for a split button.
   const StreamSplitButtonProps({
-    required this.icon,
+    required this.leadingIcon,
     required this.trailingIcon,
-    this.onPressed,
+    this.onLeadingPressed,
     this.onTrailingPressed,
     this.variant = .regular,
-    this.tooltip,
+    this.leadingTooltip,
     this.trailingTooltip,
     this.themeStyle,
   });
 
-  /// The icon rendered in the primary (leading) half.
-  final Widget icon;
+  /// The icon rendered in the leading half.
+  final Widget leadingIcon;
 
   /// The icon rendered in the secondary (trailing) half.
   ///
   /// Typically a caret pointing at whatever the half opens.
   final Widget trailingIcon;
 
-  /// Called when the primary half is pressed.
+  /// Called when the leading half is pressed.
   ///
   /// If null, that half is disabled.
-  final VoidCallback? onPressed;
+  final VoidCallback? onLeadingPressed;
 
   /// Called when the trailing half is pressed.
   ///
@@ -181,11 +181,11 @@ class StreamSplitButtonProps {
   /// Determines the color scheme used (regular, destructive).
   final StreamSplitButtonVariant variant;
 
-  /// Text shown in a [Tooltip] on hover / long-press of the primary half, and
+  /// Text shown in a [Tooltip] on hover / long-press of the leading half, and
   /// used as its accessibility label.
   ///
   /// When null, that half has no tooltip.
-  final String? tooltip;
+  final String? leadingTooltip;
 
   /// Text shown in a [Tooltip] on hover / long-press of the trailing half, and
   /// used as its accessibility label.
@@ -244,7 +244,7 @@ class DefaultStreamSplitButton extends StatelessWidget {
 
     final defaults = _StreamSplitButtonDefaults(context, props.variant);
 
-    final isEnabled = props.onPressed != null || props.onTrailingPressed != null;
+    final isEnabled = props.onLeadingPressed != null || props.onTrailingPressed != null;
     final states = <WidgetState>{if (!isEnabled) WidgetState.disabled};
 
     final shape = buttonStyle.shape?.resolve(states) ?? const StadiumBorder();
@@ -321,7 +321,7 @@ class DefaultStreamSplitButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: inset,
               children: [
-                half(icon: props.icon, onPressed: props.onPressed, tooltip: props.tooltip),
+                half(icon: props.leadingIcon, onPressed: props.onLeadingPressed, tooltip: props.leadingTooltip),
                 SizedBox(
                   width: effectiveSeparatorThickness,
                   height: effectiveSeparatorHeight,

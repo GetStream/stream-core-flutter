@@ -26,9 +26,9 @@ part 'stream_split_button_theme.g.theme.dart';
 ///     ),
 ///   ),
 ///   child: StreamSplitButton.icon(
-///     icon: Icon(icons.voiceFill),
+///     leadingIcon: Icon(icons.voiceFill),
 ///     trailingIcon: Icon(icons.caretDown),
-///     onPressed: () {},
+///     onLeadingPressed: () {},
 ///     onTrailingPressed: () {},
 ///   ),
 /// )

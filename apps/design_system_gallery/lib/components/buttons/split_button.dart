@@ -51,12 +51,12 @@ Widget buildStreamSplitButtonPlayground(BuildContext context) {
     child: _MaybeBadged(
       showErrorBadge: showErrorBadge,
       child: StreamSplitButton.icon(
-        icon: Icon(icons.voiceFill),
+        leadingIcon: Icon(icons.voiceFill),
         trailingIcon: Icon(caretUp ? icons.caretUp : icons.caretDown),
         variant: variant,
-        tooltip: 'Mute',
+        leadingTooltip: 'Mute',
         trailingTooltip: 'Audio settings',
-        onPressed: leadingEnabled ? () {} : null,
+        onLeadingPressed: leadingEnabled ? () {} : null,
         onTrailingPressed: trailingEnabled ? () {} : null,
       ),
     ),
@@ -115,12 +115,12 @@ class _VariantSection extends StatelessWidget {
               children: [
                 SizedBox(width: 88, child: Text(variant.name)),
                 StreamSplitButton.icon(
-                  icon: Icon(icons.voiceFill),
+                  leadingIcon: Icon(icons.voiceFill),
                   trailingIcon: Icon(icons.caretDown),
                   variant: variant,
-                  tooltip: 'Mute',
+                  leadingTooltip: 'Mute',
                   trailingTooltip: 'Audio settings',
-                  onPressed: () {},
+                  onLeadingPressed: () {},
                   onTrailingPressed: () {},
                 ),
               ],
@@ -154,9 +154,9 @@ class _DisabledSection extends StatelessWidget {
               spacing: spacing.xs,
               children: [
                 StreamSplitButton.icon(
-                  icon: Icon(icons.voiceFill),
+                  leadingIcon: Icon(icons.voiceFill),
                   trailingIcon: Icon(icons.caretDown),
-                  onPressed: leading ? () {} : null,
+                  onLeadingPressed: leading ? () {} : null,
                   onTrailingPressed: trailing ? () {} : null,
                 ),
                 Text(label),
@@ -192,12 +192,12 @@ class _CallControlSectionState extends State<_CallControlSection> {
         child: _MaybeBadged(
           showErrorBadge: true,
           child: StreamSplitButton.icon(
-            icon: Icon(_isMuted ? icons.voiceOffFill : icons.voiceFill),
+            leadingIcon: Icon(_isMuted ? icons.voiceOffFill : icons.voiceFill),
             trailingIcon: Icon(_isSettingsOpen ? icons.caretUp : icons.caretDown),
             variant: _isMuted ? StreamSplitButtonVariant.destructive : StreamSplitButtonVariant.regular,
-            tooltip: _isMuted ? 'Unmute' : 'Mute',
+            leadingTooltip: _isMuted ? 'Unmute' : 'Mute',
             trailingTooltip: 'Audio settings',
-            onPressed: () => setState(() => _isMuted = !_isMuted),
+            onLeadingPressed: () => setState(() => _isMuted = !_isMuted),
             onTrailingPressed: () => setState(() => _isSettingsOpen = !_isSettingsOpen),
           ),
         ),
