@@ -10,23 +10,21 @@ Widget _withStreamTheme(Widget child, {StreamTheme? streamTheme}) {
 }
 
 StreamSplitButton _splitButton({
-  StreamButtonStyle style = StreamButtonStyle.primary,
-  StreamButtonType type = StreamButtonType.solid,
+  StreamSplitButtonVariant variant = StreamSplitButtonVariant.regular,
   IconData trailingIcon = StreamIconData.caretDown,
-  VoidCallback? onPressed,
+  VoidCallback? onLeadingPressed,
   VoidCallback? onTrailingPressed,
-  String? tooltip,
+  String? leadingTooltip,
   String? trailingTooltip,
   StreamSplitButtonStyle? themeStyle,
 }) {
   return StreamSplitButton.icon(
-    icon: const Icon(StreamIconData.voiceFill),
+    leadingIcon: const Icon(StreamIconData.voiceFill),
     trailingIcon: Icon(trailingIcon),
-    style: style,
-    type: type,
-    onPressed: onPressed,
+    variant: variant,
+    onLeadingPressed: onLeadingPressed,
     onTrailingPressed: onTrailingPressed,
-    tooltip: tooltip,
+    leadingTooltip: leadingTooltip,
     trailingTooltip: trailingTooltip,
     themeStyle: themeStyle,
   );
@@ -55,13 +53,18 @@ void main() {
     testWidgets('paints the background a StreamButton of the same variant would', (tester) async {
       // The whole point of the component: the surface and the halves resolve
       // from one button style, so they cannot drift into different colours.
-      for (final style in StreamButtonStyle.values) {
+      const buttonStyles = {
+        StreamSplitButtonVariant.regular: StreamButtonStyle.secondary,
+        StreamSplitButtonVariant.destructive: StreamButtonStyle.destructive,
+      };
+
+      for (final MapEntry(key: variant, value: buttonStyle) in buttonStyles.entries) {
         await tester.pumpWidget(
           _withStreamTheme(
             Column(
               children: [
-                _splitButton(style: style, onPressed: () {}, onTrailingPressed: () {}),
-                StreamButton.icon(icon: const Icon(Icons.mic), style: style, onPressed: () {}),
+                _splitButton(variant: variant, onLeadingPressed: () {}, onTrailingPressed: () {}),
+                StreamButton.icon(icon: const Icon(Icons.mic), style: buttonStyle, onPressed: () {}),
               ],
             ),
           ),
@@ -74,7 +77,7 @@ void main() {
         expect(
           _surfaceOf(tester).color,
           reference.style!.backgroundColor!.resolve(<WidgetState>{}),
-          reason: 'surface should match a $style StreamButton',
+          reason: 'surface should match a $buttonStyle StreamButton',
         );
       }
     });
@@ -84,12 +87,12 @@ void main() {
         _withStreamTheme(
           streamTheme: StreamTheme(
             buttonTheme: const StreamButtonThemeData(
-              primary: StreamButtonTypeStyle(
+              secondary: StreamButtonTypeStyle(
                 solid: StreamButtonThemeStyle(backgroundColor: WidgetStatePropertyAll(Color(0xFF00FF00))),
               ),
             ),
           ),
-          _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -98,9 +101,7 @@ void main() {
 
     testWidgets('halves paint neither background nor border', (tester) async {
       await tester.pumpWidget(
-        _withStreamTheme(
-          _splitButton(type: StreamButtonType.outline, onPressed: () {}, onTrailingPressed: () {}),
-        ),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       for (var index = 0; index < 2; index++) {
@@ -111,33 +112,46 @@ void main() {
       }
     });
 
-    testWidgets('outline draws a single border around the whole control', (tester) async {
+    testWidgets('draws no border of its own', (tester) async {
+      // Neither variant is outlined.
       await tester.pumpWidget(
-        _withStreamTheme(
-          _splitButton(type: StreamButtonType.outline, onPressed: () {}, onTrailingPressed: () {}),
-        ),
-      );
-
-      final shape = _surfaceOf(tester).shape as OutlinedBorder;
-      expect(shape.side.style, BorderStyle.solid);
-    });
-
-    testWidgets('solid draws no border', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(_splitButton(onPressed: () {}, onTrailingPressed: () {})),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       final shape = _surfaceOf(tester).shape as OutlinedBorder;
       expect(shape.side.style, BorderStyle.none);
     });
 
+    testWidgets('draws a themed border once around the whole control', (tester) async {
+      // A theme may still ask for one, and then it wraps the pair rather than
+      // outlining each half.
+      await tester.pumpWidget(
+        _withStreamTheme(
+          _splitButton(
+            onLeadingPressed: () {},
+            onTrailingPressed: () {},
+            themeStyle: const StreamSplitButtonStyle(
+              buttonStyle: StreamButtonThemeStyle(borderColor: WidgetStatePropertyAll(Color(0xFF00FF00))),
+            ),
+          ),
+        ),
+      );
+
+      final shape = _surfaceOf(tester).shape as OutlinedBorder;
+      expect(shape.side.color, const Color(0xFF00FF00));
+
+      for (var index = 0; index < 2; index++) {
+        expect(_halfStyleOf(tester, index).side?.resolve(<WidgetState>{}), isNull);
+      }
+    });
+
     testWidgets('only takes the disabled surface once both halves are disabled', (tester) async {
       final streamTheme = StreamTheme();
-      final enabledColor = streamTheme.colorScheme.accentPrimary;
+      final enabledColor = streamTheme.colorScheme.backgroundSurface;
       final disabledColor = streamTheme.colorScheme.backgroundDisabled;
 
       await tester.pumpWidget(
-        _withStreamTheme(streamTheme: streamTheme, _splitButton(onPressed: () {})),
+        _withStreamTheme(streamTheme: streamTheme, _splitButton(onLeadingPressed: () {})),
       );
       expect(_surfaceOf(tester).color, enabledColor);
 
@@ -154,7 +168,7 @@ void main() {
   group('StreamSplitButton layout', () {
     testWidgets('matches the design: 89x48 control over an 81x40 surface', (tester) async {
       await tester.pumpWidget(
-        _withStreamTheme(_splitButton(style: .secondary, onPressed: () {}, onTrailingPressed: () {})),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       // The control is wider than the surface it paints: the same 4pt inset
@@ -180,7 +194,7 @@ void main() {
         _withStreamTheme(
           Column(
             children: [
-              _splitButton(style: .secondary, onPressed: () {}, onTrailingPressed: () {}),
+              _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
               StreamButton.icon(icon: const Icon(Icons.mic), style: .secondary, onPressed: () {}),
             ],
           ),
@@ -208,9 +222,9 @@ void main() {
             ),
           ),
           _splitButton(
-            onPressed: () {},
+            onLeadingPressed: () {},
             onTrailingPressed: () {},
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -235,9 +249,9 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () => pressed++,
+            onLeadingPressed: () => pressed++,
             onTrailingPressed: () => trailingPressed++,
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -262,7 +276,7 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           streamTheme: streamTheme,
-          _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -271,11 +285,99 @@ void main() {
       expect(tester.getSize(divider), const Size(1, 24));
     });
 
+    // The divider is drawn on the shared surface, so which colour it takes is
+    // a question about that surface rather than about the button's style.
+    // At full strength the white hairline cuts the accent surface in two, so
+    // the design knocks it back to 35%.
+    testWidgets('draws the divider against an accent fill at 35% opacity', (tester) async {
+      final streamTheme = StreamTheme();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          streamTheme: streamTheme,
+          _splitButton(variant: .destructive, onLeadingPressed: () {}, onTrailingPressed: () {}),
+        ),
+      );
+
+      final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+      expect(
+        tester.widget<ColoredBox>(divider).color,
+        streamTheme.colorScheme.borderOnAccent.withValues(alpha: 0.35),
+      );
+    });
+
+    // A disabled button drops its accent fill for the shared disabled surface,
+    // so the divider has to come back to the hairline that reads on it — it
+    // used to take borderDisabled and vanish.
+    testWidgets('keeps the divider visible while disabled', (tester) async {
+      final streamTheme = StreamTheme();
+
+      for (final variant in StreamSplitButtonVariant.values) {
+        await tester.pumpWidget(
+          _withStreamTheme(streamTheme: streamTheme, _splitButton(variant: variant)),
+        );
+
+        final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+        expect(
+          tester.widget<ColoredBox>(divider).color,
+          streamTheme.colorScheme.borderDefault,
+          reason: 'disabled $variant',
+        );
+      }
+    });
+
+    testWidgets('takes the separator style of its own variant', (tester) async {
+      // Each variant carries its own entry, so styling the destructive one
+      // must leave the regular one alone.
+      const themeData = StreamSplitButtonThemeData(
+        regular: StreamSplitButtonStyle(separatorColor: WidgetStatePropertyAll(Color(0xFF00FF00))),
+        destructive: StreamSplitButtonStyle(separatorColor: WidgetStatePropertyAll(Color(0xFF0000FF))),
+      );
+
+      const expected = {
+        StreamSplitButtonVariant.regular: Color(0xFF00FF00),
+        StreamSplitButtonVariant.destructive: Color(0xFF0000FF),
+      };
+
+      for (final MapEntry(key: variant, value: color) in expected.entries) {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            streamTheme: StreamTheme(splitButtonTheme: themeData),
+            _splitButton(variant: variant, onLeadingPressed: () {}, onTrailingPressed: () {}),
+          ),
+        );
+        // Settled, or a subtree can still be reporting the previous
+        // iteration's colours when it is read.
+        await tester.pumpAndSettle();
+
+        final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+        expect(tester.widget<ColoredBox>(divider).color, color, reason: '$variant');
+      }
+    });
+
+    testWidgets('leaves a variant with no entry on its defaults', (tester) async {
+      final streamTheme = StreamTheme(
+        splitButtonTheme: const StreamSplitButtonThemeData(
+          destructive: StreamSplitButtonStyle(separatorThickness: 4),
+        ),
+      );
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          streamTheme: streamTheme,
+          _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
+        ),
+      );
+
+      final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
+      expect(tester.getSize(divider), const Size(1, 24));
+    });
+
     testWidgets('honours separator overrides', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () {},
+            onLeadingPressed: () {},
             onTrailingPressed: () {},
             themeStyle: const StreamSplitButtonStyle(
               separatorColor: WidgetStatePropertyAll(Color(0xFFFF0000)),
@@ -295,7 +397,7 @@ void main() {
   group('StreamSplitButton icons', () {
     testWidgets('renders the leading icon before the trailing one', (tester) async {
       await tester.pumpWidget(
-        _withStreamTheme(_splitButton(onPressed: () {}, onTrailingPressed: () {})),
+        _withStreamTheme(_splitButton(onLeadingPressed: () {}, onTrailingPressed: () {})),
       );
 
       final leading = tester.getCenter(find.byIcon(StreamIconData.voiceFill));
@@ -308,7 +410,7 @@ void main() {
       // to pick rather than something the component hard-codes.
       await tester.pumpWidget(
         _withStreamTheme(
-          _splitButton(trailingIcon: StreamIconData.caretUp, onPressed: () {}, onTrailingPressed: () {}),
+          _splitButton(trailingIcon: StreamIconData.caretUp, onLeadingPressed: () {}, onTrailingPressed: () {}),
         ),
       );
 
@@ -321,7 +423,7 @@ void main() {
         _withStreamTheme(
           Directionality(
             textDirection: TextDirection.rtl,
-            child: _splitButton(onPressed: () {}, onTrailingPressed: () {}),
+            child: _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}),
           ),
         ),
       );
@@ -340,9 +442,9 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () => pressed++,
+            onLeadingPressed: () => pressed++,
             onTrailingPressed: () => trailingPressed++,
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -364,7 +466,7 @@ void main() {
         _withStreamTheme(
           _splitButton(
             onTrailingPressed: () => trailingPressed++,
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -383,9 +485,9 @@ void main() {
       await tester.pumpWidget(
         _withStreamTheme(
           _splitButton(
-            onPressed: () {},
+            onLeadingPressed: () {},
             onTrailingPressed: () {},
-            tooltip: 'Mute',
+            leadingTooltip: 'Mute',
             trailingTooltip: 'Audio settings',
           ),
         ),
@@ -414,9 +516,9 @@ void main() {
         _withStreamTheme(
           StreamComponentFactory(
             builders: StreamComponentBuilders(
-              splitButton: (context, props) => Text('custom ${props.tooltip}'),
+              splitButton: (context, props) => Text('custom ${props.leadingTooltip}'),
             ),
-            child: _splitButton(onPressed: () {}, onTrailingPressed: () {}, tooltip: 'Mute'),
+            child: _splitButton(onLeadingPressed: () {}, onTrailingPressed: () {}, leadingTooltip: 'Mute'),
           ),
         ),
       );

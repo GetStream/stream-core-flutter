@@ -4,7 +4,10 @@
 
 - Added `StreamColorScheme.backgroundOverlayDarkStrong`, the design system's `background/core/overlay-dark-strong` token. A heavier version of `backgroundOverlayDark`, for content that has to stay legible on top of arbitrary imagery or video.
 - Added `StreamReactions.onReactionLongPressed`, reporting the long-pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip. When null, the chips register no long-press gesture, leaving it to an ancestor.
-- Added `StreamSplitButton`.
+- Added `StreamSplitButton`, in the two variants the design covers —
+  `StreamSplitButtonVariant.regular` and `.destructive`. Each variant carries
+  its own `StreamSplitButtonStyle` on `StreamSplitButtonThemeData`, so the two
+  can be themed independently.
 - Refreshed the icon set from the design tokens and added 44 icons, including a
   filled variant for many existing icons: `blurFill`, `boltFill`,
   `cameraFlipFill`, `captionFill`, `caretDown`, `caretUp`, `copyFill`,
