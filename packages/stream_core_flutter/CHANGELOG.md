@@ -1,4 +1,4 @@
-## Upcoming
+## 0.5.1
 
 ### ✨ Features
 

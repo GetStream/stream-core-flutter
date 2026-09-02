@@ -1,4 +1,4 @@
-## Upcoming
+## 0.5.0
 
 ### 💥 BREAKING CHANGES
 
@@ -10,7 +10,7 @@
 - `StreamWebSocketClient` now takes an `optionsBuilder` instead of `options`, called once per connection attempt
 - `WebSocketOptions.connectTimeout` is now a non-nullable `Duration`, 30 seconds by default, and is honoured: a connection that does not come up is given up on instead of waited on indefinitely. A connection that drops later is retried for you; a `connect` that times out is not, so call it again
 - Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, now a `WebSocketAuthenticator`. It is handed a `WsRequestSender` and the `StreamApiException` the server closed the previous attempt with, and throws to say the credentials did not go out
-- Reworked the error layer around one sealed root: every failure the SDK reports is a `StreamException` of four kinds — `StreamApiException`, `StreamNetworkException`, `StreamAuthenticationException` or `StreamClientException`. See `ERROR_LAYER.md` for the contract
+- Reworked the error layer around one sealed root: every failure the SDK reports is a `StreamException` of four kinds — `StreamApiException`, `StreamNetworkException`, `StreamAuthenticationException` or `StreamClientException`
 - `StreamException` no longer takes or carries a `stackTrace`. A trace records where a failure was raised rather than what it was, so it travels beside the failure: on `Failure`, or on `ServerInitiated` and `AuthenticationFailed` for a connection that closed. Where the exception is built at the throw site, `throw` captures it
 - Removed `ClientException`, `HttpClientException` and `WebSocketEngineException`, replaced by the kinds above. `StreamDioException.exception` is a `StreamException`, and the `StreamDioExceptionExtension` extension is now `DioExceptionMapping`, with `toClientException()` renamed to `toStreamException()`
 - `StreamWebSocketClient.send` now fails with a `StreamException` rather than passing the engine's own error through, so a `Failure` that carried a `StateError` or a codec error now carries a `StreamNetworkException` or `StreamClientException`. The `WsRequestSender` handed to a `WebSocketAuthenticator` changed the same way, which matters where its error is propagated into `AuthenticationFailed`
