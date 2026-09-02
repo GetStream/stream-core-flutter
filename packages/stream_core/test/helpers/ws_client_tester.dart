@@ -284,7 +284,7 @@ WsClientTester buildTester({
 WebSocketAuthenticator _authenticatorFor(TokenManager tokens) {
   return (send, previousError) async {
     // The refusal another token repairs. Left cached, the same token would be offered again.
-    if (previousError?.isTokenExpiredError ?? false) tokens.expireToken();
+    if (previousError?.isTokenExpired ?? false) tokens.expireToken();
 
     final token = await tokens.getToken();
     send(WsAuthMessageRequest(token: token.rawValue)).getOrThrow();

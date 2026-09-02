@@ -1,7 +1,12 @@
 import 'package:dio/dio.dart';
 
-import '../stream_core_dio_error.dart';
+import '../stream_core_dio_exception.dart';
 
+/// Interceptor that maps every failed request onto a [StreamDioException]
+/// carrying the `StreamException` it represents.
+///
+/// Installed last, so every rejection leaving the HTTP client — whatever
+/// interceptor or transport produced it — delivers a Stream exception.
 class ApiErrorInterceptor extends Interceptor {
   /// Creates a new [ApiErrorInterceptor].
   const ApiErrorInterceptor();
@@ -12,14 +17,12 @@ class ApiErrorInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) {
     if (err is StreamDioException) {
-      // If the error is already a StreamDioException,
-      // we can directly pass it to the handler.
+      // Already carries a StreamException; pass it along unchanged.
       return super.onError(err, handler);
     }
 
-    // Otherwise, we convert the DioException to a StreamDioException
     final streamDioException = StreamDioException(
-      exception: err.toClientException(),
+      exception: err.toStreamException(),
       requestOptions: err.requestOptions,
       response: err.response,
       type: err.type,

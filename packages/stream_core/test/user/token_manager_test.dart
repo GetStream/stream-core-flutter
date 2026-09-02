@@ -177,7 +177,7 @@ void main() {
         // A provider refusing one caller refuses all five, so asking it five times over would
         // hammer a token endpoint that has already said no.
         for (final future in futures) {
-          await expectLater(future, throwsStateError);
+          await expectLater(future, throwsA(isA<StreamAuthenticationException>()));
         }
 
         expect(provider.loadCount, 1);
@@ -212,12 +212,106 @@ void main() {
         });
         final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
 
-        await expectLater(manager.getToken(), throwsStateError);
+        // Whatever the provider threw arrives as an authentication failure,
+        // with the original error preserved as its cause.
+        await expectLater(
+          manager.getToken(),
+          throwsA(isA<StreamAuthenticationException>().having((it) => it.cause, 'cause', isStateError)),
+        );
         expect(manager.peekToken(), isNull);
 
         final token = await manager.getToken();
         expect(token, generateTestUserToken('user-1'));
         expect(provider.loadCount, 2);
+      });
+
+      test('reports the failure with the trace the provider raised it at', () async {
+        final raised = StackTrace.current;
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider(
+            (_) => Future.error(StateError('load failed'), raised),
+          ),
+        );
+
+        // A plain rethrow would restart the trace inside `TokenManager`, which
+        // points at the SDK rather than at the code that actually failed.
+        await expectLater(
+          manager.getToken(),
+          throwsA(isA<StreamAuthenticationException>()),
+        );
+
+        try {
+          await manager.getToken();
+          fail('expected a throw');
+        } catch (_, stackTrace) {
+          expect(stackTrace, same(raised));
+        }
+      });
+
+      test('keeps a failure the provider already classified', () async {
+        const failure = StreamNetworkException(message: 'The token endpoint was unreachable');
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider((_) async => throw failure),
+        );
+
+        // A provider saying "this was the moment" must stay a network failure: wrapped as an
+        // authentication one it would read as "fix the credentials" and stop the reconnect.
+        await expectLater(manager.getToken(), throwsA(same(failure)));
+      });
+
+      test('reads a provider that could not reach its endpoint as a network failure', () async {
+        // The ordinary provider fetches over Dio. Blaming the credentials for a
+        // blip would leave the connection down until the app connects again.
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider(
+            (_) async => throw DioException.connectionError(
+              requestOptions: RequestOptions(path: '/token'),
+              reason: 'network is unreachable',
+            ),
+          ),
+        );
+
+        await expectLater(manager.getToken(), throwsA(isA<StreamNetworkException>()));
+      });
+
+      test('keeps a refusal the token endpoint answered with', () async {
+        // A refusal is the server's verdict, not the moment's, so it must not
+        // read as retriable the way an unreachable endpoint does.
+        final options = RequestOptions(path: '/token');
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider(
+            (_) async => throw DioException.badResponse(
+              statusCode: 403,
+              requestOptions: options,
+              response: Response<Object?>(requestOptions: options, statusCode: 403),
+            ),
+          ),
+        );
+
+        await expectLater(
+          manager.getToken(),
+          throwsA(isA<StreamApiException>().having((it) => it.statusCode, 'statusCode', 403)),
+        );
+      });
+
+      test('reads a provider timeout as a network failure', () async {
+        final manager = TokenManager(
+          userId: 'user-1',
+          tokenProvider: _CountingProvider((_) async => throw TimeoutException('took too long')),
+        );
+
+        await expectLater(
+          manager.getToken(),
+          throwsA(
+            isA<StreamNetworkException>()
+                .having((it) => it.isTimeout, 'isTimeout', isTrue)
+                .having((it) => it.cause, 'cause', isA<TimeoutException>()),
+          ),
+        );
       });
     });
 
@@ -353,7 +447,7 @@ void main() {
         expect(manager.userId, isNull);
         expect(manager.peekToken(), isNull);
         expect(manager.usesStaticProvider, isFalse);
-        await expectLater(manager.getToken(), throwsA(isA<ClientException>()));
+        await expectLater(manager.getToken(), throwsA(isA<StreamAuthenticationException>()));
       });
 
       test('loads once an identity is supplied', () async {
@@ -380,7 +474,7 @@ void main() {
 
         expect(manager.userId, isNull);
         expect(manager.peekToken(), isNull);
-        await expectLater(manager.getToken(), throwsA(isA<ClientException>()));
+        await expectLater(manager.getToken(), throwsA(isA<StreamAuthenticationException>()));
       });
 
       test('leaves the manager reusable for another user', () async {
@@ -403,7 +497,7 @@ void main() {
         completer.complete(generateTestUserToken('user-1'));
 
         // A reset is a logout, so the token is neither cached nor handed to the caller.
-        await expectLater(inFlight, throwsA(isA<ClientException>()));
+        await expectLater(inFlight, throwsA(isA<StreamAuthenticationException>()));
         expect(manager.peekToken(), isNull);
       });
     });
@@ -448,7 +542,7 @@ void main() {
           tokenProvider: _CountingProvider((_) async => generateTestUserToken('someone-else')),
         );
 
-        await expectLater(manager.getToken(), throwsArgumentError);
+        await expectLater(manager.getToken(), throwsA(isA<StreamAuthenticationException>()));
         expect(manager.peekToken(), isNull);
       });
     });

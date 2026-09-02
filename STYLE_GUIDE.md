@@ -71,6 +71,9 @@ document; the section link is provided.
 - File names are `snake_case.dart` (`file_names`). Imports follow the standard order:
   `dart:` → `package:` → relative — one blank line between groups
   (`directives_ordering`).
+- Misuse throws `StateError`/`ArgumentError`; runtime conditions raise a
+  `StreamException` kind, and throwable names end in `…Exception`. →
+  [Errors vs exceptions](#errors-vs-exceptions)
 
 **Design system**
 
@@ -373,8 +376,12 @@ Public dartdocs are encouraged but currently **not lint-enforced**
 (`public_member_api_docs` is disabled in `analysis_options.yaml`; this is temporary
 while the repo catches up). New public code should still ship with dartdocs.
 
-In general, follow the [Effective Dart documentation guide](https://dart.dev/effective-dart/documentation)
-except where this page contradicts it.
+In general, follow the Effective Dart documentation guide — vendored in this repo as
+[`EFFECTIVE_DART_DOC.md`](EFFECTIVE_DART_DOC.md) so it is readable offline
+(canonical version at [dart.dev](https://dart.dev/effective-dart/documentation)) — except where
+this page contradicts it. Read it before writing or reviewing dartdoc: the rules most often
+missed are single-sentence first paragraphs, "Whether…" for booleans, noun phrases for
+properties, square brackets for in-scope identifiers, and throws documented in prose.
 
 ### Answer your own questions straight away
 
@@ -567,6 +574,45 @@ assert(size > 0);
 assert(!_disposed, 'StreamAvatarController used after dispose()');
 ```
 
+### Errors vs exceptions
+
+Dart splits the two words by who is at fault and what should happen next, and this
+repo follows the split strictly:
+
+- An **`Exception`** is a runtime condition a correct program can encounter — the
+  network dropped, the server said no, a token expired. Exceptions are part of the
+  API contract: callers are expected to catch and handle them.
+- An **`Error`** is a programmer mistake — `StateError`, `ArgumentError`,
+  `TypeError`. Errors are meant to fail fast and loud, not be caught: handling one
+  papers over a bug.
+
+When raising a failure, ask one question: *can this happen to a correct program at
+runtime?*
+
+| Answer | Raise | Examples |
+|---|---|---|
+| No — the caller misused the API | `StateError` / `ArgumentError`, never wrapped, never inside a `Result` | `connect()` on a disposed client, a negative replay count |
+| Yes — it is a condition to handle | the fitting `StreamException` kind | a refused request, a dropped socket, a failed token load |
+
+Which of the four `StreamException` kinds fits — and which layer produces which — is
+the subject of [`ERROR_LAYER.md`](ERROR_LAYER.md); the three-question tree there
+gives every failure exactly one home. In `stream_core_flutter`, prefer catching the
+exception kinds over `StreamException` itself so the reaction can differ per kind.
+
+Naming follows the same line: public throwable types end in `…Exception`; the
+`Error` suffix is reserved for Dart's bug hierarchy and for non-throwable data
+models (`StreamApiError` is the server's wire payload, not a throwable). "Error"
+remains fine as a domain word in prose, fields, and codes (`StreamErrorCode`,
+`errorBuilder`).
+
+The capture seams deliberately cross the don't-catch-`Error` line, each with a
+stated reason: `runApiSafely` and wire decoding catch everything, because a
+`TypeError` there indicts the data rather than the program; the auth boundaries
+catch everything thrown by app-supplied token code, because a rejection must
+always deliver a `StreamException` (the original error stays visible in `cause`);
+and `runSafely` captures raw truth for the boundary above it to classify. Outside
+a seam, an `Error` propagates to the crash reporter where it belongs.
+
 ### Prefer specialized functions, methods, and constructors
 
 Use the most relevant constructor when there are multiple options.
@@ -744,7 +790,8 @@ do it.
 
 For classes that appear in error messages or logs, override `toString`. Avoid bare
 `$runtimeType` — use `objectRuntimeType(this, 'ClassName')`, which strips runtime
-type at release-mode.
+type at release-mode. Flutter code gets it from `package:flutter/foundation.dart`;
+in `stream_core` it is package-internal, imported from `src/utils/object.dart`.
 
 ### Be explicit about `dispose()` and the object lifecycle
 
@@ -1383,9 +1430,10 @@ entries are acceptable for user-visible multi-facet features where the extra
 context matters to someone deciding whether to upgrade — but avoid sub-bullets,
 per-method enumeration, and internal implementation notes.
 
-Older entries in the changelog use `### 🐞 Fixed` and `### 💥 Breaking Changes` /
-`### 💥 BREAKING CHANGES` — those forms are grandfathered but new entries should
-use the labels above.
+Some changelogs use older labels — `### 🐞 Fixed`, `### 💥 Breaking Changes` /
+`### 💥 BREAKING CHANGES`. Match the header style the package's changelog already
+uses rather than mixing forms within one file; a new package starts on the labels
+above.
 
 ### Cross-package PRs
 

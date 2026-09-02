@@ -36,7 +36,7 @@ import 'retry_strategy.dart';
 /// final recoveryHandler = ConnectionRecoveryHandler(
 ///   client: client,
 ///   networkStateProvider: NetworkStateProvider(),
-///   appLifecycleStateProvider: AppLifecycleStateProvider(),
+///   lifecycleStateProvider: myLifecycleStateProvider,
 /// );
 /// ```
 class ConnectionRecoveryHandler extends Disposable {

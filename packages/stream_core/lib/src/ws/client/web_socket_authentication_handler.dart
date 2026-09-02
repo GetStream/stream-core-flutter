@@ -1,4 +1,4 @@
-import '../../errors.dart' show StreamApiError;
+import '../../errors.dart' show StreamApiException, StreamNetworkException;
 import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_request.dart';
@@ -19,9 +19,10 @@ typedef WsRequestSender = Result<void> Function(WsRequest request);
 /// attempt after a refusal sees it. Use it to replace credentials that were refused.
 ///
 /// Throw when the credentials did not go out, whether because sending failed or because this
-/// function chose not to send them. The connection is then closed with [AuthenticationFailed], and
-/// is not reconnected.
-typedef WebSocketAuthenticator = Future<void> Function(WsRequestSender send, StreamApiError? previousError);
+/// function chose not to send them. The connection is then closed with [AuthenticationFailed]
+/// carrying what was thrown, and reconnected only when that says the network was at fault rather
+/// than the credentials — so pass a failed [WsRequestSender]'s error on rather than replacing it.
+typedef WebSocketAuthenticator = Future<void> Function(WsRequestSender send, StreamApiException? previousError);
 
 /// A handler that authenticates newly opened connections and remembers why the server refused the
 /// last one.
@@ -42,7 +43,7 @@ class WebSocketAuthenticationHandler {
 
   final WebSocketAuthenticator? _authenticator;
   final WsRequestSender _send;
-  final void Function(Object error) _onFailure;
+  final void Function(Object error, StackTrace? stackTrace) _onFailure;
 
   // Identifies the attempt in flight: an authenticator can outlive the one that started it.
   var _attempt = 0;
@@ -51,8 +52,8 @@ class WebSocketAuthenticationHandler {
   ///
   /// Becomes null once the attempt that read it finishes, or once a connection is established. An
   /// attempt abandoned before it finishes leaves it behind, for the attempt that replaces it.
-  StreamApiError? get previousError => _previousError;
-  StreamApiError? _previousError;
+  StreamApiException? get previousError => _previousError;
+  StreamApiException? _previousError;
 
   /// Takes in a connection state change.
   ///
@@ -67,8 +68,9 @@ class WebSocketAuthenticationHandler {
       Connected() => null,
       // The caller took control; what they connect with next may have nothing to do with the refusal.
       Disconnected(source: UserInitiated()) => null,
-      // The server closed without sending an error, so the last one still applies.
-      Disconnected(source: ServerInitiated(:final error)) => error?.apiError ?? _previousError,
+      // The server closed without sending an error, so the last one still applies. Only a verdict
+      // counts: a transport failure says nothing about the credentials.
+      Disconnected(source: ServerInitiated(:final StreamApiException error)) => error,
       _ => _previousError,
     };
   }
@@ -103,7 +105,7 @@ class WebSocketAuthenticationHandler {
 
     if (result case Failure(:final error, :final stackTrace)) {
       _logger.w(() => 'attempt #$attempt could not be authenticated', error: error, stackTrace: stackTrace);
-      return _onFailure(error);
+      return _onFailure(error, stackTrace);
     }
   }
 
@@ -111,7 +113,9 @@ class WebSocketAuthenticationHandler {
   WsRequestSender _senderFor(int attempt) => (request) {
     if (attempt == _attempt) return _send(request);
 
-    final error = StateError('Connection attempt was abandoned before its credentials were sent');
-    return Result.failure(error);
+    const error = StreamNetworkException(
+      message: 'The connection attempt was abandoned before its credentials were sent',
+    );
+    return const Result.failure(error);
   };
 }

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import '../errors/stream_exception.dart';
 import 'user_token.dart';
 
 /// A provider for loading user authentication tokens.
@@ -44,6 +47,11 @@ abstract interface class TokenProvider {
   ///
   /// Throws an [ArgumentError] if the token does not belong to [userId], or if
   /// it is not valid for the provider's authentication type.
+  ///
+  /// What a failure throws decides whether the connection is retried: a
+  /// [StreamNetworkException] or [TimeoutException] is about the moment and
+  /// retries, a `DioException` is read for what it carries, and anything else
+  /// blames the credentials and does not.
   Future<UserToken> loadToken(String userId);
 }
 

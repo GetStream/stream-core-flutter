@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'stream_error_code.dart';
+
 part 'stream_api_error.g.dart';
 
 /// An API error response from the Stream API.
@@ -27,12 +29,23 @@ class StreamApiError extends Equatable {
   });
 
   /// The specific error code identifying the type of error.
-  final int code;
+  ///
+  /// [StreamErrorCode] names the known values; a code without a named
+  /// constant still carries its number.
+  @JsonKey(fromJson: StreamErrorCode.fromJson, toJson: StreamErrorCode.toJson)
+  final StreamErrorCode code;
 
   /// Additional error detail codes providing more context.
+  ///
+  /// Anything that is not a number reads as absent rather than failing the
+  /// whole error.
+  @JsonKey(fromJson: _detailsFromJson)
   final List<int> details;
 
   /// The processing duration before the error occurred.
+  ///
+  /// Empty when the error arrived without one.
+  @JsonKey(defaultValue: '')
   final String duration;
 
   /// Additional context about the exception as key-value pairs.
@@ -42,6 +55,9 @@ class StreamApiError extends Equatable {
   final String message;
 
   /// Additional information or documentation URL for this error.
+  ///
+  /// Empty when the error arrived without one.
+  @JsonKey(defaultValue: '')
   final String moreInfo;
 
   /// The HTTP status code associated with this error.
@@ -49,6 +65,10 @@ class StreamApiError extends Equatable {
   final int statusCode;
 
   /// Whether this error is unrecoverable and should not be retried.
+  ///
+  /// Worth consulting on any product: a permission denial carries it, as do
+  /// some Video errors. Absence means nothing: most errors never carry it,
+  /// and `null` or `false` must not be read as "retrying will help".
   final bool? unrecoverable;
 
   Map<String, dynamic> toJson() => _$StreamApiErrorToJson(this);
@@ -69,38 +89,20 @@ class StreamApiError extends Equatable {
   ];
 }
 
-// The token this was issued for has expired; another one is accepted.
-const _expiredTokenCode = 40;
-
-// The token cannot be accepted for a reason another token does not fix: not
-// valid yet, used before it was issued, or signed with the wrong secret.
-final _invalidTokenCodes = _range(41, 43);
-
-// The API key itself is wrong, which no token repairs either.
-const _accessKeyErrorCode = 2;
-
-final _clientErrorStatusCodes = _range(400, 499);
-
-/// Extension methods for [StreamApiError] to provide convenient error type checks.
-extension StreamApiErrorExtension on StreamApiError {
-  /// Whether the token has expired (error code 40).
-  ///
-  /// Distinct from [isInvalidTokenError]: an expired token is fixed by loading another one, whereas
-  /// an invalid token is a configuration problem that a fresh token reproduces.
-  bool get isTokenExpiredError => code == _expiredTokenCode;
-
-  /// Whether the token, or the API key it was signed with, cannot be accepted
-  /// (error codes 41 to 43, and 2).
-  bool get isInvalidTokenError => _invalidTokenCodes.contains(code) || code == _accessKeyErrorCode;
-
-  /// Whether this error is a client-side error (4xx status codes).
-  bool get isClientError => _clientErrorStatusCodes.contains(statusCode);
-
-  /// Whether this error indicates rate limiting (429 status code).
-  bool get isRateLimitError => statusCode == 429;
+// The wire value is not guaranteed to be a list of ints: a moderation
+// rejection (code 73) sends a list of objects, and the field can arrive as an
+// object outright. Tolerating every shape keeps error decoding from failing
+// exactly when an app needs the error.
+List<int> _detailsFromJson(Object? json) {
+  if (json is! List) return const [];
+  return [for (final entry in json.whereType<num>()) entry.toInt()];
 }
 
-// Helper function to generate a range of integers from [from] to [to] inclusive.
-List<int> _range(int from, int to) {
-  return List.generate(to - from + 1, (i) => i + from);
+/// Convenience predicates over the payload's [StreamApiError.statusCode].
+///
+/// The code-based predicates live on [StreamErrorCode] itself — consider
+/// `error.code.isTokenExpired` and its siblings.
+extension StreamApiErrorPredicates on StreamApiError {
+  /// Whether the request was rate limited (HTTP 429).
+  bool get isRateLimited => statusCode == 429;
 }

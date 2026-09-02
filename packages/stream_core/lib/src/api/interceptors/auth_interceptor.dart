@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import '../../errors.dart';
 import '../../logger.dart';
 import '../../user.dart';
-import '../stream_core_dio_error.dart';
+import '../stream_core_dio_exception.dart';
 
 /// Interceptor that signs every request with the caller's token.
 ///
@@ -37,17 +37,19 @@ class AuthInterceptor extends Interceptor {
       options.headers['stream-auth-type'] = token.authType.headerValue;
 
       return handler.next(options);
-    } catch (e, stackTrace) {
-      _logger.w(() => 'no token to sign ${options.uri} with', error: e, stackTrace: stackTrace);
+    } catch (error, stackTrace) {
+      _logger.w(() => 'no token to sign ${options.uri} with', error: error, stackTrace: stackTrace);
 
-      final error = ClientException(
-        message: 'Failed to load auth token',
-        stackTrace: stackTrace,
-        error: e,
+      // Caught in full: a rejection must deliver a StreamException whatever
+      // the app's token code threw.
+      var exception = StreamException.tryFrom(error);
+      exception ??= StreamAuthenticationException(
+        message: 'Failed to load an auth token',
+        cause: error,
       );
 
       final dioError = StreamDioException(
-        exception: error,
+        exception: exception,
         requestOptions: options,
         stackTrace: stackTrace,
       );
@@ -61,8 +63,11 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    final error = err.apiError;
-    if (error == null || !error.isTokenExpiredError) return handler.next(err);
+    // Only an expired token (code 40) is fixed by loading another one; the
+    // other token codes are clock or configuration problems a refresh cannot
+    // help.
+    final error = err.toStreamException();
+    if (error is! StreamApiException || !error.isTokenExpired) return handler.next(err);
 
     final options = err.requestOptions;
 

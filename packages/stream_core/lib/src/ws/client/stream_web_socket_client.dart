@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../errors.dart';
 import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_event.dart';
@@ -90,9 +91,16 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       send: send,
       authenticator: onAuthenticate,
       tag: '$tag:Auth',
-      onFailure: (error) => disconnect(
-        source: .authenticationFailed(error: error),
-      ),
+      onFailure: (error, stackTrace) {
+        var exception = StreamException.tryFrom(error);
+        exception ??= StreamAuthenticationException(
+          message: 'The connection could not be authenticated',
+          cause: error,
+        );
+
+        final source = DisconnectionSource.authenticationFailed(error: exception, stackTrace: stackTrace);
+        unawaited(disconnect(source: source));
+      },
     );
   }
 
@@ -154,8 +162,34 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   ///
   /// The [request] is encoded using the configured message codec and sent to the server.
   ///
-  /// Returns a [Result] indicating success or failure of the send operation.
-  Result<void> send(WsRequest request) => _engine.sendMessage(request);
+  /// Returns a [Result] whose failure carries a [StreamNetworkException] when
+  /// the connection dropped, and a [StreamClientException] otherwise.
+  ///
+  /// Throws a [StateError] when this client has not been connected.
+  Result<void> send(WsRequest request) {
+    if (connectionState.value case Initialized()) {
+      throw StateError('The connection has not been opened. Call connect() first.');
+    }
+
+    final result = _engine.sendMessage(request);
+    if (result case Failure(:final error, :final stackTrace)) {
+      var exception = StreamException.tryFrom(error);
+      exception ??= switch (error) {
+        StateError() => StreamNetworkException(
+          message: 'The connection dropped before the request went out',
+          cause: error,
+        ),
+        _ => StreamClientException(
+          message: 'The request could not be sent',
+          cause: error,
+        ),
+      };
+
+      return Result.failure(exception, stackTrace);
+    }
+
+    return result;
+  }
 
   /// Establishes a WebSocket connection.
   ///
@@ -192,11 +226,16 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // Handed to `disconnect`, which reports the reason, closes the socket, and records the closure
     // even when the close fails. Returned, so a caller connecting again is not refused for the race.
-    return result.getOrElse(
-      (error, _) => disconnect(
-        source: .serverInitiated(error: .new(error: error)),
-      ),
-    );
+    if (result case Failure(:final error, :final stackTrace)) {
+      var exception = StreamException.tryFrom(error);
+      exception ??= StreamNetworkException(
+        message: 'Failed to open the connection to ${options.url}',
+        cause: error,
+      );
+
+      final source = DisconnectionSource.serverInitiated(error: exception, stackTrace: stackTrace);
+      return disconnect(source: source);
+    }
   }
 
   /// Closes the WebSocket connection.
@@ -252,7 +291,10 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
       // Any active state that wasn’t user/system initiated becomes server initiated.
       Connecting() || Authenticating() || Connected() => ServerInitiated(
-        error: WebSocketEngineException(code: closeCode, reason: closeReason),
+        error: StreamNetworkException(
+          message: closeReason ?? 'The connection was closed unexpectedly',
+          closeCode: closeCode,
+        ),
       ),
 
       // Not meaningful to transition from these.
@@ -270,13 +312,16 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   void onError(Object error, [StackTrace? stackTrace]) {
     _logger.e(() => 'socket failed', error: error, stackTrace: stackTrace);
 
-    final source = ServerInitiated(
-      error: WebSocketEngineException(error: error),
+    var exception = StreamException.tryFrom(error);
+    exception ??= StreamNetworkException(
+      message: 'The connection reported an error',
+      cause: error,
     );
 
     // Update the connection state to 'disconnecting' with the source.
     //
     // The socket closes itself after an error, so the closure that follows records the disconnection.
+    final source = ServerInitiated(error: exception, stackTrace: stackTrace);
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
   }
 
@@ -299,10 +344,13 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   void _handleErrorEvent(WsEvent event, Object error) {
     _logger.w(() => 'server sent an error event', error: error);
 
-    final source = ServerInitiated(
-      error: WebSocketEngineException(error: error),
+    var exception = StreamException.tryFrom(error);
+    exception ??= StreamClientException(
+      message: 'The server reported an error the client could not interpret',
+      cause: error,
     );
 
+    final source = ServerInitiated(error: exception);
     return unawaited(disconnect(source: source));
   }
 

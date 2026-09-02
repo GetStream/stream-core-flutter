@@ -9,14 +9,23 @@
 - `User` now requires a user of type `UserType.anonymous` to carry `User.anonymousUserId` as its id. A mismatch fails to compile in a const context, and throws in debug mode otherwise
 - `StreamWebSocketClient` now takes an `optionsBuilder` instead of `options`, called once per connection attempt
 - `WebSocketOptions.connectTimeout` is now a non-nullable `Duration`, 30 seconds by default, and is honoured: a connection that does not come up is given up on instead of waited on indefinitely. A connection that drops later is retried for you; a `connect` that times out is not, so call it again
-- Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, now a `WebSocketAuthenticator`. It is handed a `WsRequestSender` and the error the server closed the previous attempt with, and throws to say the credentials did not go out
-- Removed `WebSocketEngineException.stopErrorCode`, use `CloseCode.normalClosure`
+- Renamed `StreamWebSocketClient.onConnectionEstablished` to `onAuthenticate`, now a `WebSocketAuthenticator`. It is handed a `WsRequestSender` and the `StreamApiException` the server closed the previous attempt with, and throws to say the credentials did not go out
+- Reworked the error layer around one sealed root: every failure the SDK reports is a `StreamException` of four kinds — `StreamApiException`, `StreamNetworkException`, `StreamAuthenticationException` or `StreamClientException`. See `ERROR_LAYER.md` for the contract
+- `StreamException` no longer takes or carries a `stackTrace`. A trace records where a failure was raised rather than what it was, so it travels beside the failure: on `Failure`, or on `ServerInitiated` and `AuthenticationFailed` for a connection that closed. Where the exception is built at the throw site, `throw` captures it
+- Removed `ClientException`, `HttpClientException` and `WebSocketEngineException`, replaced by the kinds above. `StreamDioException.exception` is a `StreamException`, and the `StreamDioExceptionExtension` extension is now `DioExceptionMapping`, with `toClientException()` renamed to `toStreamException()`
+- `StreamWebSocketClient.send` now fails with a `StreamException` rather than passing the engine's own error through, so a `Failure` that carried a `StateError` or a codec error now carries a `StreamNetworkException` or `StreamClientException`. The `WsRequestSender` handed to a `WebSocketAuthenticator` changed the same way, which matters where its error is propagated into `AuthenticationFailed`
+- `StreamWebSocketClient.send` throws a `StateError` when nothing has connected yet, rather than reporting it through the returned `Result`
+- `StreamDioException` no longer defaults its `stackTrace` to `StackTrace.current`, leaving Dio to substitute the stack captured where the request was made
+- `ServerInitiated.error` is typed `StreamException?` rather than `WebSocketEngineException?`
+- `TokenManager.getToken` fails with a `StreamAuthenticationException` rather than raw errors; a failed provider's own error is preserved as `cause`. A provider failure that is already a `StreamException`, or a `TimeoutException`, keeps its own kind, so a load that failed at the moment stays retriable
+- Replaced `StreamApiError.isTokenExpiredError`, `isClientError` and `isRateLimitError`: the conditions live on `StreamErrorCode` and `StreamApiException` as `isTokenExpired`, `isTokenNotYetValid`, `isTokenSignatureInvalid`, `isApiKeyInvalid` and `isRateLimited`; `StreamApiError` keeps only `isRateLimited`
+- `StreamApiError.code` is typed `StreamErrorCode` rather than `int`; construction takes `StreamErrorCode(40)` in place of `40`, reads are unchanged
 - `AuthInterceptor` extends `Interceptor` rather than `QueuedInterceptor`, so requests are no longer serialised against one another
-- `WebSocketConnectionState.isAutomaticReconnectionEnabled` is now `true` for an expired token, and remains `false` for token errors a fresh token cannot fix
-- `StreamApiError.isTokenExpiredError` now means code 40 only; the other token codes and a wrong API key are `isInvalidTokenError`. `isClientError` compares the HTTP `statusCode` against 400..499, rather than the Stream error `code`, which never falls in that range
+- `WebSocketConnectionState.isAutomaticReconnectionEnabled` reads the error's facts: token conditions that heal, rate limits and transient network failures reconnect; refused signatures or API keys, other 4xx and `unrecoverable` verdicts do not
 - `Result.getOrElse`, `getOrDefault`, `recover` and `recoverCatching` return the result's own type and no longer take a type parameter. To widen, widen the result (`Result<num> widened = intResult`) or use `fold`
 - Replaced the logger: `StreamLogger` is the handle you write with and a `StreamLogHandler` is where records go, so `Priority`, `MessageBuilder`, `Tag`, `IsLoggableValidator` and `Finder` are renamed or gone
 - `LoggingInterceptor` writes through the logger rather than printing, so it is silent until an app asks for records. Its `logPrint` is now optional, and it takes a `tag`
+- The package no longer re-exports `dart:typed_data`, so code that reached `Uint8List` through `package:stream_core/stream_core.dart` must import `dart:typed_data` itself
 
 ### ✨ Features
 
@@ -30,15 +39,21 @@
 - Added `TokenManager.unconfigured`, for a client that exists before its user does, and `TokenManager.reset`, which drops the configured identity and its cached token
 - Added `teams` field to `User` class
 - Added `StreamDateTimeConverter`, a `JsonConverter` for the API's `DateTime` fields. Accepts either an RFC3339 string (v1) or epoch nanoseconds (v2) when deserializing, and always serializes to RFC3339. Values are normalized to UTC with microsecond precision
-- Added `DioException.apiError`, the Stream API error a response carried, or `null` for anything else
+- Added `DioException.toStreamException()`, mapping a Dio failure to the `StreamException` it represents
+- Added `StreamApiException.retryAfter`, the wait the server asked for, read from the `Retry-After` header on any error response carrying one — a 503 populates it as readily as a 429. Only the delta-seconds form is read
+- Added `StreamErrorCode`, the API's error-code registry as named constants over `int`, tolerant of codes the SDK does not know yet
+- Added `runApiSafely`, which runs an API call and reports every failure as a `StreamException`
 - Added `DisconnectionSource.connectTimeout` and `authenticationFailed`, and `isReconnectable`, whether a connection closed for that reason is worth opening again
 - Added `DisconnectionSource.cause`, the error that closed the connection, or `null` when the source carries none
+- Added `stackTrace` to `ServerInitiated` and `AuthenticationFailed`, where the failure was raised; `null` for a closure the server reported, which arrives as data rather than as something raised
 - Added `ConnectUserDetailsRequest.fromUser`, which builds the details a client may send from a `User`
 - Added `StreamWebSocketClient.dispose`, which closes the connection along with `events` and `connectionState`; the client is now `Disposable`, and `connect` throws a `StateError` afterwards
 - Added `InFlightCache`, which hands concurrent callers asking for the same key the one call already in flight, and its outcome, success or failure alike
 
 ### 🐛 Bug Fixes
 
+- Fixed `StreamApiError` failing to decode when `details` is not a list of numbers, as a moderation rejection's is; such values read as empty
+- Fixed an error payload without a `duration` or `more_info` failing to decode, which lost the `code` with it and silently stopped the token refresh a code would have triggered. Both read as empty now
 - Fixed three faults in `TokenManager`'s token cache: `getToken` contacted the provider on every call instead of returning the cached token, handed out a token that had already expired rather than replacing it, and cached one that finished loading after `expireToken` or `setTokenProvider` had invalidated it. A static provider is left alone, having nothing fresher to give
 - Fixed `DynamicTokenProvider` accepting a token issued for a different user than the one requested
 - Fixed several faults in the token-expired retry: it was skipped when the response carried no JSON content type, never completed at all when the replacement was refused too, re-sent a multipart body whose streams the refused attempt had consumed, and expired a token another request had already replaced

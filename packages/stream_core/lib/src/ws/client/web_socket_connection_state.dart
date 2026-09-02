@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../errors.dart' show StreamApiErrorExtension;
+import '../../errors.dart';
+import '../../user/token_provider.dart';
 import '../../utils.dart';
 import '../events/ws_event.dart';
 import 'engine/web_socket_engine.dart';
@@ -216,7 +217,8 @@ sealed class DisconnectionSource extends Equatable {
   /// Indicates that the server closed the connection, optionally with error details.
   /// Reconnection eligibility depends on the specific error type.
   const factory DisconnectionSource.serverInitiated({
-    WebSocketEngineException? error,
+    StreamException? error,
+    StackTrace? stackTrace,
   }) = ServerInitiated;
 
   /// Creates a [SystemInitiated] disconnection source.
@@ -241,7 +243,10 @@ sealed class DisconnectionSource extends Equatable {
   ///
   /// Indicates that the connection opened but could not be authenticated, so it
   /// was closed without ever being usable.
-  const factory DisconnectionSource.authenticationFailed({Object? error}) = AuthenticationFailed;
+  const factory DisconnectionSource.authenticationFailed({
+    StreamException? error,
+    StackTrace? stackTrace,
+  }) = AuthenticationFailed;
 
   /// A human-readable description of the disconnection source.
   ///
@@ -260,10 +265,11 @@ sealed class DisconnectionSource extends Equatable {
 
   /// What closed the connection, or `null` when this source carries no cause.
   ///
-  /// For a [ServerInitiated] closure this is the error that was reported, or a
-  /// [WebSocketEngineException] describing the close when nothing else was.
+  /// For a [ServerInitiated] closure this is the [StreamException] that was
+  /// reported; for an [AuthenticationFailed] one, whatever prevented the
+  /// credentials from going out.
   Object? get cause => switch (this) {
-    ServerInitiated(:final error) => error?.error ?? error,
+    ServerInitiated(:final error) => error,
     AuthenticationFailed(:final error) => error,
     UserInitiated() || SystemInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
   };
@@ -272,11 +278,23 @@ sealed class DisconnectionSource extends Equatable {
   ///
   /// {@template webSocketReconnectionRules}
   /// - [UserInitiated] — no, the caller asked for the connection to close.
-  /// - [AuthenticationFailed] — no, credentials that never went out will not go out on a retry.
-  /// - [ServerInitiated] — no for a deliberate close (code 1000), for a token error a fresh token
-  ///   would not fix, and for a client error that is neither a rate limit nor an expired token. Yes
-  ///   otherwise, including an expired token and a rate limit, which a later attempt can get past.
+  /// - [AuthenticationFailed] — no, with or without an error: credentials that could not be
+  ///   produced or sent will not fare better on a retry. The exception is a non-cancelled
+  ///   [StreamNetworkException], which indicts the moment rather than the credentials — see
+  ///   [TokenProvider.loadToken].
   /// - [SystemInitiated], [UnHealthyConnection], [ConnectTimeout] — yes.
+  /// - [ServerInitiated] — decided by the error it carries:
+  ///   - no error — yes, the closure said nothing against trying again.
+  ///   - a server verdict ([StreamApiException]) — no when the server said retrying will not help
+  ///     ([StreamApiException.unrecoverable]), when the token's signature or the API key is refused (configuration a
+  ///     retry reproduces), or for any other 4xx. Yes for an expired token (the reconnect
+  ///     authenticates with a fresh one), a token not valid yet (clock skew a later attempt can get
+  ///     past), a rate limit, and 5xx.
+  ///   - a transport failure ([StreamNetworkException]) — yes, except a bare normal closure
+  ///     (code 1000) with no error event before it, which is the server deliberately ending the
+  ///     session.
+  ///   - anything else — yes for an SDK-side failure, no for credentials that could not be sent
+  ///     (a retry changes nothing).
   ///
   /// Necessary, but not on its own sufficient. Whether a reconnection is then actually made is
   /// decided by `ConnectionRecoveryHandler`, which recovers only a connection that was established,
@@ -284,17 +302,32 @@ sealed class DisconnectionSource extends Equatable {
   /// out stays down, where one that times out on the way back does not.
   /// {@endtemplate}
   bool get isReconnectable => switch (this) {
-    ServerInitiated(:final error) when error?.code == CloseCode.normalClosure => false,
-    ServerInitiated(:final error) => switch (error?.apiError) {
-      final it? when it.isInvalidTokenError => false,
-      final it? when it.isClientError && !it.isRateLimitError && !it.isTokenExpiredError => false,
-      _ => true, // Reconnect on other server initiated disconnections
-    },
-    UnHealthyConnection() => true,
-    SystemInitiated() => true,
-    ConnectTimeout() => true,
     UserInitiated() => false,
-    AuthenticationFailed() => false,
+    // Credentials that could not be produced or sent will not fare better on
+    // a retry — unless what stopped them was the network itself, which is
+    // about the moment, not the credentials.
+    AuthenticationFailed(:final error) => switch (error) {
+      StreamNetworkException(isCancelled: true) => false,
+      StreamNetworkException() => true,
+      _ => false,
+    },
+    SystemInitiated() => true,
+    UnHealthyConnection() => true,
+    ConnectTimeout() => true,
+    ServerInitiated(:final error) => switch (error) {
+      StreamApiException(unrecoverable: true) => false,
+      StreamApiException(isTokenSignatureInvalid: true) => false,
+      StreamApiException(isApiKeyInvalid: true) => false,
+      StreamApiException(isTokenExpired: true) => true,
+      StreamApiException(isTokenNotYetValid: true) => true,
+      StreamApiException(isRateLimited: true) => true,
+      StreamApiException(:final statusCode) => statusCode < 400 || statusCode >= 500,
+      StreamNetworkException(closeCode: CloseCode.normalClosure) => false,
+      StreamNetworkException() => true,
+      StreamAuthenticationException() => false,
+      StreamClientException() => true,
+      null => true,
+    },
   };
 
   @override
@@ -318,14 +351,17 @@ final class UserInitiated extends DisconnectionSource {
 /// provides additional context about the disconnection cause.
 final class ServerInitiated extends DisconnectionSource {
   /// Creates a [ServerInitiated] disconnection source.
-  const ServerInitiated({this.error});
+  const ServerInitiated({this.error, this.stackTrace});
 
   /// The error that caused the server to close the connection.
   ///
-  /// When present, contains details about the server error that led to
-  /// disconnection. This can include authentication failures, protocol
-  /// violations, or other server-side issues.
-  final WebSocketEngineException? error;
+  /// A [StreamApiException] when the server reported why — the same payload a
+  /// rejected REST call carries — and a [StreamNetworkException] describing
+  /// the closure when it did not.
+  final StreamException? error;
+
+  /// Where [error] was raised, when it was raised rather than read off the wire.
+  final StackTrace? stackTrace;
 
   @override
   List<Object?> get props => [error];
@@ -367,10 +403,16 @@ final class ConnectTimeout extends DisconnectionSource {
 /// error event instead.
 final class AuthenticationFailed extends DisconnectionSource {
   /// Creates an [AuthenticationFailed] disconnection source.
-  const AuthenticationFailed({this.error});
+  const AuthenticationFailed({this.error, this.stackTrace});
 
   /// The error that prevented the connection from authenticating.
-  final Object? error;
+  ///
+  /// Usually a [StreamAuthenticationException] whose [StreamException.cause]
+  /// is whatever the authenticator threw.
+  final StreamException? error;
+
+  /// Where [error] was raised.
+  final StackTrace? stackTrace;
 
   @override
   List<Object?> get props => [error];

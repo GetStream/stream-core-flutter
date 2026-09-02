@@ -18,7 +18,7 @@ StreamApiError _apiError({
   required int code,
   int statusCode = 401,
 }) => StreamApiError(
-  code: code,
+  code: StreamErrorCode(code),
   details: const [],
   duration: '0ms',
   message: 'error $code',
@@ -26,20 +26,20 @@ StreamApiError _apiError({
   statusCode: statusCode,
 );
 
-final _expiredToken = _apiError(code: 40);
+final _expiredToken = StreamApiException.fromApiError(_apiError(code: 40));
 
-Disconnected _serverClosure(StreamApiError? apiError) => Disconnected(
-  source: ServerInitiated(error: WebSocketEngineException(error: apiError)),
+Disconnected _serverClosure(StreamApiException? error) => Disconnected(
+  source: ServerInitiated(error: error),
 );
 
 /// Builds a handler, along with the errors it handed the authenticator and the failures it reported.
 ({
   WebSocketAuthenticationHandler authentication,
-  List<StreamApiError?> asked,
+  List<StreamApiException?> asked,
   List<Object> failures,
 })
 _subject({WebSocketAuthenticator? authenticator}) {
-  final asked = <StreamApiError?>[];
+  final asked = <StreamApiException?>[];
   final failures = <Object>[];
 
   final authentication = WebSocketAuthenticationHandler(
@@ -50,7 +50,7 @@ _subject({WebSocketAuthenticator? authenticator}) {
           send(const _PingRequest()).getOrThrow();
         },
     send: (_) => const Result.success(null),
-    onFailure: failures.add,
+    onFailure: (error, _) => failures.add(error),
   );
 
   return (authentication: authentication, asked: asked, failures: failures);
@@ -102,7 +102,7 @@ void main() {
     final running = authentication.authenticate();
 
     // The server refuses again while this attempt is still awaiting its credentials.
-    authentication.onConnectionStateChanged(_serverClosure(_apiError(code: 40)));
+    authentication.onConnectionStateChanged(_serverClosure(StreamApiException.fromApiError(_apiError(code: 40))));
     held.complete();
     await running;
 
@@ -163,7 +163,7 @@ void main() {
     final authentication = WebSocketAuthenticationHandler(
       authenticator: null,
       send: (_) => const Result.success(null),
-      onFailure: (_) => fail('nothing to authenticate, so nothing can fail'),
+      onFailure: (_, _) => fail('nothing to authenticate, so nothing can fail'),
     );
 
     await expectLater(authentication.authenticate(), completes);
@@ -186,7 +186,7 @@ void main() {
     final authentication = WebSocketAuthenticationHandler(
       authenticator: (_, _) => loaded.future,
       send: (_) => const Result.success(null),
-      onFailure: (_) => fail('the credentials went out'),
+      onFailure: (_, _) => fail('the credentials went out'),
     );
 
     authentication.onConnectionStateChanged(const Connecting());
@@ -217,7 +217,7 @@ void main() {
           sent.add(request);
           return const Result.success(null);
         },
-        onFailure: (_) => fail('the credentials were never offered, so nothing failed to go out'),
+        onFailure: (_, _) => fail('the credentials were never offered, so nothing failed to go out'),
       );
 
       authentication.onConnectionStateChanged(const Connecting());
@@ -245,7 +245,7 @@ void main() {
           throw StateError('token load failed');
         },
         send: (_) => const Result.success(null),
-        onFailure: (_) => fail('the attempt this failure belongs to had already been closed'),
+        onFailure: (_, _) => fail('the attempt this failure belongs to had already been closed'),
       );
 
       authentication.onConnectionStateChanged(const Connecting());
@@ -275,7 +275,7 @@ void main() {
           sent.add(request);
           return const Result.success(null);
         },
-        onFailure: (_) => fail('the credentials were never offered, so nothing failed to go out'),
+        onFailure: (_, _) => fail('the credentials were never offered, so nothing failed to go out'),
       );
 
       authentication.onConnectionStateChanged(const Connecting());
@@ -304,7 +304,7 @@ void main() {
           throw StateError('token load failed');
         },
         send: (_) => const Result.success(null),
-        onFailure: failures.add,
+        onFailure: (error, _) => failures.add(error),
       );
 
       authentication.onConnectionStateChanged(const Connecting());
@@ -325,7 +325,7 @@ void main() {
 
     test('leaves the refusal for the attempt that replaces it', () async {
       final loaded = Completer<void>();
-      final asked = <StreamApiError?>[];
+      final asked = <StreamApiException?>[];
       var calls = 0;
 
       final authentication = WebSocketAuthenticationHandler(
@@ -335,7 +335,7 @@ void main() {
           await loaded.future;
         },
         send: (_) => const Result.success(null),
-        onFailure: (_) {},
+        onFailure: (_, _) {},
       );
 
       authentication.onConnectionStateChanged(_serverClosure(_expiredToken));
@@ -362,7 +362,7 @@ void main() {
       final authentication = WebSocketAuthenticationHandler(
         authenticator: (_, _) async => throw StateError('token load failed'),
         send: (_) => const Result.success(null),
-        onFailure: failures.add,
+        onFailure: (error, _) => failures.add(error),
       );
 
       authentication.onConnectionStateChanged(const Connecting());

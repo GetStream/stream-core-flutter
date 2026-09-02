@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
@@ -230,9 +231,9 @@ void main() {
           isA<DioException>().having(
             (it) => it.error,
             'error',
-            isA<ClientException>()
-                .having((it) => it.message, 'message', 'Failed to load auth token')
-                .having((it) => it.underlyingError, 'underlyingError', isStateError),
+            // The token manager reports the load failure itself; the
+            // interceptor passes its report through untouched.
+            isA<StreamAuthenticationException>().having((it) => it.cause, 'cause', isStateError),
           ),
         ),
       );
