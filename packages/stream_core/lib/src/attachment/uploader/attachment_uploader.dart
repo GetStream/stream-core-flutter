@@ -1,168 +1,95 @@
-import 'dart:async';
-
-import 'package:rxdart/rxdart.dart';
-
-import '../../utils.dart';
 import '../attachment.dart';
-import '../attachment_type.dart';
 import '../cdn/cdn_client.dart';
-import 'uploaded_attachment.dart';
+import 'attachment_upload_batch.dart';
+import 'attachment_upload_task.dart';
 
-/// Callback for tracking upload progress.
+/// An uploader of [StreamAttachment]s, sending their bytes through a
+/// [CdnClient].
 ///
-/// Receives the upload [progress] as a value between 0.0 and 1.0.
-typedef OnUploadProgress = void Function(double progress);
-
-/// Exception thrown when an attachment upload fails.
+/// Both methods return at once, handing back the running operation rather than
+/// a future to wait on: an upload has a lifecycle worth watching and a way to
+/// be called off, and both belong to the object that represents it.
 ///
-/// Provides context about which specific attachment failed and the underlying
-/// cause for debugging upload issues.
-class AttachmentUploadException implements Exception {
-  /// Creates an [AttachmentUploadException] with the specified [id] and [cause].
-  const AttachmentUploadException({
-    required this.id,
-    required this.cause,
-  });
-
-  /// The ID of the attachment that failed to upload.
-  final String id;
-
-  /// The underlying cause of the upload failure.
-  final Object cause;
-
-  @override
-  String toString() => 'AttachmentUploadException(id: $id, cause: $cause)';
-}
-
-/// Uploads [StreamAttachment] objects to remote storage.
+/// An upload that fails does not throw. It carries its error, so the outcome is
+/// read rather than caught, and one attachment failing never interrupts the
+/// caller. Arguments that could not describe an upload at all are the exception
+/// and do throw, as documented per method.
 ///
-/// Provides upload functionality with progress tracking and error handling.
-/// Automatically selects the appropriate upload method based on attachment
-/// type and returns [Result] objects for explicit success/failure handling.
-///
-/// Example usage:
 /// ```dart
 /// final uploader = StreamAttachmentUploader(cdn: cdnClient);
 ///
-/// final result = await uploader.upload(attachment);
+/// final task = uploader.upload(attachment);
+/// task.state.listen(render);
+///
+/// final result = await task.result;
 /// result.fold(
 ///   onSuccess: (uploaded) => print('Uploaded: ${uploaded.remoteUrl}'),
 ///   onFailure: (error, _) => print('Upload failed: $error'),
 /// );
 /// ```
+///
+/// Where the bytes go is the [CdnClient]'s business; this tracks how far an
+/// attachment has got and answers for it. Uploading somewhere else is
+/// therefore a matter of supplying a different [CdnClient], not of replacing
+/// this.
+///
+/// Stateless, so one uploader serves any number of concurrent uploads and
+/// batches; nothing is shared between them.
+///
+/// See also:
+///
+///  * [AttachmentUploadTask], which represents one upload.
+///  * [AttachmentUploadBatch], which represents several run as one operation.
+///  * [CdnClient], the seam an app supplies to upload elsewhere.
 class StreamAttachmentUploader {
-  /// Creates a [StreamAttachmentUploader] uploading through the given [CdnClient].
+  /// Creates a [StreamAttachmentUploader] uploading through the given
+  /// [CdnClient].
   const StreamAttachmentUploader({
     required this._cdn,
   });
 
-  // The CDN client used for upload operations.
   final CdnClient _cdn;
 
-  /// Uploads a single attachment to remote storage.
+  /// Starts uploading [attachment], and returns the task running it.
   ///
-  /// Returns a [Result] containing the [UploadedAttachment] on success or
-  /// an [AttachmentUploadException] on failure. Progress updates are provided
-  /// through the optional [onProgress] callback.
-  Future<Result<UploadedAttachment>> upload(
-    StreamAttachment attachment, {
-    OnUploadProgress? onProgress,
-  }) async {
-    final uploadFn = switch (attachment.type) {
-      AttachmentType.image => _cdn.uploadImage,
-      _ => _cdn.uploadFile,
-    };
-
-    final result = await uploadFn(
-      attachment.file,
-      onProgress: onProgress?.let(
-        (f) => (uploaded, total) {
-          if (total == 0) return f(0);
-          final progress = uploaded / total;
-          return f(progress.clamp(0.0, 1.0));
-        },
-      ),
-    );
-
-    return result.fold(
-      onSuccess: (data) {
-        final uploaded = UploadedAttachment(
-          id: attachment.id,
-          type: attachment.type,
-          custom: attachment.custom,
-          remoteUrl: data.fileUrl,
-          thumbnailUrl: data.thumbUrl,
-        );
-
-        return Result.success(uploaded);
-      },
-      onFailure: (cause, stackTrace) {
-        final ex = AttachmentUploadException(
-          id: attachment.id,
-          cause: cause,
-        );
-
-        return Result.failure(ex, stackTrace);
-      },
-    );
+  /// The upload's whole lifecycle plays out on [AttachmentUploadTask.state], it
+  /// can be called off through [AttachmentUploadTask.cancel], and its outcome
+  /// awaited through [AttachmentUploadTask.result].
+  ///
+  /// Each call starts a new upload and a task is never reused, which is what
+  /// makes retrying an attachment a matter of asking again.
+  AttachmentUploadTask upload(
+    StreamAttachment attachment,
+  ) {
+    return AttachmentUploadTaskImpl(
+      attachment: attachment,
+      cdn: _cdn,
+    )..start();
   }
-}
 
-/// Callback for tracking batch upload progress.
-///
-/// Receives the [attachmentId] and upload [progress] as a value between 0.0 and 1.0
-/// for individual attachments during batch upload.
-typedef OnBatchUploadProgress = void Function(String attachmentId, double progress);
-
-/// Extension providing batch upload functionality for [StreamAttachmentUploader].
-///
-/// Adds reactive batch upload with controlled concurrency. Results are emitted
-/// as individual uploads complete, enabling immediate UI updates and partial
-/// success handling.
-extension StreamAttachmentUploaderBatch on StreamAttachmentUploader {
-  /// Uploads multiple attachments as a stream of results.
+  /// Starts uploading every attachment in [attachments], and returns the batch
+  /// orchestrating them.
   ///
-  /// Processes [attachments] concurrently with [maxConcurrent] limit, emitting
-  /// [Result] objects as each upload completes. Progress updates are provided
-  /// through the optional [onProgress] callback.
+  /// At most [maxConcurrent] uploads are in flight at any moment; the rest wait
+  /// their turn in the order they were given. When [eagerError] is true the
+  /// batch gives up on the first failure, calling off the uploads that have not
+  /// settled and never starting the ones that have not begun; when false every
+  /// attachment is attempted whatever the others do. An empty batch is valid,
+  /// and finishes at once with no items.
   ///
-  /// When [eagerError] is true, the stream throws an exception and closes
-  /// immediately on the first upload failure. When false (default), failed
-  /// uploads are emitted as [Result.failure] and processing continues.
-  ///
-  /// Returns a [Stream] of [Result] objects in completion order, not input order.
-  Stream<Result<UploadedAttachment>> uploadBatch(
+  /// Throws an [ArgumentError] if [maxConcurrent] is not greater than zero, or
+  /// if two attachments share an id — a batch addresses its uploads by id, so
+  /// ids must be unique within one.
+  AttachmentUploadBatch uploadBatch(
     Iterable<StreamAttachment> attachments, {
-    OnBatchUploadProgress? onProgress,
-    int maxConcurrent = 5,
+    int maxConcurrent = 3,
     bool eagerError = false,
-  }) async* {
-    // Early return for empty list
-    if (attachments.isEmpty) return;
-
-    // Create a stream that uploads attachments with controlled concurrency
-    final uploadStream = Stream.fromIterable(attachments).flatMap(
+  }) {
+    return AttachmentUploadBatchImpl(
+      attachments: attachments,
+      cdn: _cdn,
       maxConcurrent: maxConcurrent,
-      (attachment) => Stream.fromFuture(
-        upload(
-          attachment,
-          onProgress: onProgress?.let(
-            (f) =>
-                (progress) => f(attachment.id, progress),
-          ),
-        ),
-      ),
+      eagerError: eagerError,
     );
-
-    // Yield results as they complete
-    await for (final result in uploadStream) {
-      // If eagerError is enabled, throw on first failure
-      if (result.exceptionOrNull() case final error? when eagerError) {
-        final stackTrace = result.stackTraceOrNull();
-        Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
-      }
-
-      yield result;
-    }
   }
 }
