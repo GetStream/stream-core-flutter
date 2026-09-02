@@ -287,7 +287,9 @@ void main() {
 
     // The divider is drawn on the shared surface, so which colour it takes is
     // a question about that surface rather than about the button's style.
-    testWidgets('draws the divider against an accent fill', (tester) async {
+    // At full strength the white hairline cuts the accent surface in two, so
+    // the design knocks it back to 35%.
+    testWidgets('draws the divider against an accent fill at 35% opacity', (tester) async {
       final streamTheme = StreamTheme();
 
       await tester.pumpWidget(
@@ -298,7 +300,10 @@ void main() {
       );
 
       final divider = find.descendant(of: find.byType(StreamSplitButton), matching: find.byType(ColoredBox));
-      expect(tester.widget<ColoredBox>(divider).color, streamTheme.colorScheme.borderOnAccent);
+      expect(
+        tester.widget<ColoredBox>(divider).color,
+        streamTheme.colorScheme.borderOnAccent.withValues(alpha: 0.35),
+      );
     });
 
     // A disabled button drops its accent fill for the shared disabled surface,

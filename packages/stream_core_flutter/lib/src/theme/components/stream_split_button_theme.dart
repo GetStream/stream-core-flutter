@@ -187,9 +187,9 @@ class StreamSplitButtonStyle with _$StreamSplitButtonStyle {
   /// The color of the divider between the two halves.
   ///
   /// Defaults to [StreamColorScheme.borderDefault] on the regular variant and
-  /// [StreamColorScheme.borderOnAccent] on the destructive one, falling back
-  /// to [StreamColorScheme.borderDefault] while the whole control is disabled
-  /// and painting the shared disabled surface.
+  /// [StreamColorScheme.borderOnAccent] at 35% opacity on the destructive one,
+  /// falling back to a solid [StreamColorScheme.borderDefault] while the whole
+  /// control is disabled and painting the shared disabled surface.
   final WidgetStateProperty<Color?>? separatorColor;
 
   /// The width of the divider between the two halves, in logical pixels.

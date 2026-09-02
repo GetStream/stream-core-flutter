@@ -205,6 +205,11 @@ class StreamSplitButtonProps {
 // scales the control.
 const _halfButtonSize = StreamButtonSize.small;
 
+// The opacity the design draws the divider at on the destructive fill. At full
+// strength the white hairline cuts the accent surface in two; knocked back it
+// reads as a seam in one control.
+const _accentSeparatorOpacity = 0.35;
+
 /// Default implementation of [StreamSplitButton].
 ///
 /// Renders a [Row] of two [StreamButton.icon] halves over a shared surface,
@@ -462,8 +467,11 @@ class _StreamSplitButtonDefaults extends StreamSplitButtonStyle {
     return switch (_variant) {
       // A light surface fill, which the ordinary hairline reads on.
       StreamSplitButtonVariant.regular => _colorScheme.borderDefault,
-      // Drawn against the accent fill.
-      StreamSplitButtonVariant.destructive => _colorScheme.borderOnAccent,
+      // Drawn against the accent fill, knocked back to the opacity the design
+      // draws it at.
+      StreamSplitButtonVariant.destructive => _colorScheme.borderOnAccent.withValues(
+        alpha: _accentSeparatorOpacity,
+      ),
     };
   });
 
