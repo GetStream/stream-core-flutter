@@ -1,8 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:equatable/equatable.dart';
-
-import '../../../errors.dart';
 import '../../../utils.dart';
 import 'web_socket_options.dart';
 
@@ -19,12 +16,17 @@ abstract interface class WebSocketEngine<Outgoing> {
   /// Creates a new WebSocket connection using the provided [options] and sets up
   /// event listeners.
   ///
+  /// Fails when a connection is already open. Call [close] before opening another.
+  ///
   /// Returns a [Result] indicating success or failure of the connection attempt.
   Future<Result<void>> open(WebSocketOptions options);
 
   /// Closes the WebSocket connection.
   ///
   /// Closes the active WebSocket connection with the specified [closeCode] and [closeReason].
+  ///
+  /// Notifies the listener that the connection closed before completing, including when there was no
+  /// connection to close. A close that fails notifies nothing and reports the failure instead.
   ///
   /// Returns a [Result] indicating success or failure of the close operation.
   Future<Result<void>> close([int? closeCode, String? closeReason]);
@@ -174,29 +176,4 @@ extension type const CloseCode(int code) implements int {
   /// For example: the server certificate could not be verified.
   /// This **must not** be set explicitly by an endpoint.
   static const tlsHandshakeFailure = CloseCode(1015);
-}
-
-class WebSocketEngineException extends Equatable implements Exception {
-  const WebSocketEngineException({
-    String? reason,
-    int? code = 0,
-    this.error,
-  }) : reason = reason ?? 'Unknown',
-       code = code ?? 0;
-
-  final String reason;
-  final int code;
-  final Object? error;
-
-  /// Returns the error as a StreamApiError if it is of that type or
-  /// null otherwise.
-  StreamApiError? get apiError {
-    if (error case final StreamApiError error) return error;
-    return null;
-  }
-
-  static const stopErrorCode = 1000;
-
-  @override
-  List<Object?> get props => [reason, code, error];
 }

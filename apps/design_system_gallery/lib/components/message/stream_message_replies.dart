@@ -88,31 +88,47 @@ Widget buildStreamMessageRepliesPlayground(BuildContext context) {
     description: 'How to clip overflow. Theme default clips for single/bottom, none for top/middle.',
   );
 
+  final presentation = context.knobs.object.dropdown<StreamMessagePresentation>(
+    label: 'Presentation',
+    options: StreamMessagePresentation.values,
+    initialOption: StreamMessagePresentation.standard,
+    labelBuilder: (v) => v.name,
+    description:
+        'What the message is drawn on. Preview (the long-press actions modal) sits above a '
+        'scrim, so the reply label switches from textLink to textOnAccent.',
+  );
+
   final palette = context.streamColorScheme.avatarPalette;
 
-  return Center(
-    child: StreamMessageReplies(
-      label: showLabel ? Text(labelText) : null,
-      avatars: _sampleAvatars(avatarCount.toInt(), palette),
-      avatarSize: avatarSize,
-      maxAvatars: maxAvatars.toInt(),
-      showConnector: showConnector,
-      alignment: alignment,
-      clipBehavior: clipOption.clip,
-      style: StreamMessageRepliesStyle.from(
-        spacing: spacing,
-        padding: EdgeInsets.symmetric(vertical: verticalPadding),
+  return _PresentationBackdrop(
+    presentation: presentation,
+    child: Center(
+      child: StreamMessageLayout(
+        data: StreamMessageLayoutData(presentation: presentation),
+        child: StreamMessageReplies(
+          label: showLabel ? Text(labelText) : null,
+          avatars: _sampleAvatars(avatarCount.toInt(), palette),
+          avatarSize: avatarSize,
+          maxAvatars: maxAvatars.toInt(),
+          showConnector: showConnector,
+          alignment: alignment,
+          clipBehavior: clipOption.clip,
+          style: StreamMessageRepliesStyle.from(
+            spacing: spacing,
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+          ),
+          onTap: () {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Tapped'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+          },
+        ),
       ),
-      onTap: () {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text('Tapped'),
-              duration: Duration(seconds: 1),
-            ),
-          );
-      },
     ),
   );
 }
@@ -141,6 +157,7 @@ Widget buildStreamMessageRepliesShowcase(BuildContext context) {
           _SlotCombinationsSection(),
           _AlignmentSection(),
           _ConnectorOverflowSection(),
+          _PresentationSection(),
           _RealWorldSection(),
           _EmojiOnlySection(),
           _ThemeOverrideSection(),
@@ -292,6 +309,65 @@ class _ConnectorOverflowSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PresentationSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const _Section(
+      label: 'PRESENTATION',
+      description:
+          'StreamMessageLayoutData.presentation tells the replies row what the message is drawn on. '
+          'A preview — the long-press actions modal — sits above backgroundScrim, so the reply label '
+          'resolves to textOnAccent instead of textLink.',
+      children: [
+        _ExampleCard(
+          label: 'Standard (inline)',
+          subtitle: 'Label uses the link color.',
+          child: _PresentationExample(presentation: StreamMessagePresentation.standard),
+        ),
+        _ExampleCard(
+          label: 'Preview (above a scrim)',
+          subtitle: 'Label turns white so it stays legible on the scrim.',
+          child: _PresentationExample(presentation: StreamMessagePresentation.preview),
+        ),
+      ],
+    );
+  }
+}
+
+class _PresentationExample extends StatelessWidget {
+  const _PresentationExample({required this.presentation});
+
+  final StreamMessagePresentation presentation;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.streamColorScheme.avatarPalette;
+    final radius = context.streamRadius;
+
+    return _PresentationBackdrop(
+      presentation: presentation,
+      borderRadius: BorderRadius.all(radius.md),
+      padding: const EdgeInsets.all(16),
+      child: StreamMessageLayout(
+        data: StreamMessageLayoutData(presentation: presentation),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            StreamMessageBubble(
+              child: StreamMessageText('Has anyone tried the new Flutter update?'),
+            ),
+            StreamMessageReplies(
+              label: const Text('3 replies'),
+              avatars: _sampleAvatars(2, palette),
+              onTap: () {},
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -534,6 +610,53 @@ List<Widget> _sampleAvatars(int count, List<StreamAvatarColorPair> palette) {
         placeholder: (context) => Text(_sampleInitials[i % _sampleInitials.length]),
       ),
   ];
+}
+
+/// Paints what a message sits on for the given [presentation]: the app
+/// background for `standard`, and the app background behind a scrim for
+/// `preview`, mirroring the long-press message-actions modal.
+///
+/// Fills the space it is given, so the scrim reads as the whole backdrop
+/// rather than a box behind the component.
+class _PresentationBackdrop extends StatelessWidget {
+  const _PresentationBackdrop({
+    required this.presentation,
+    required this.child,
+    this.borderRadius,
+    this.padding = EdgeInsets.zero,
+  });
+
+  final StreamMessagePresentation presentation;
+  final BorderRadiusGeometry? borderRadius;
+  final EdgeInsetsGeometry padding;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+
+    final scrim = switch (presentation) {
+      StreamMessagePresentation.standard => null,
+      StreamMessagePresentation.preview => colorScheme.backgroundScrim,
+    };
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundApp,
+        borderRadius: borderRadius,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scrim,
+          borderRadius: borderRadius,
+        ),
+        child: Padding(
+          padding: padding,
+          child: SizedBox(width: double.infinity, child: child),
+        ),
+      ),
+    );
+  }
 }
 
 class _Section extends StatelessWidget {

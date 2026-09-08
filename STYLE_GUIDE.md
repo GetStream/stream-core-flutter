@@ -71,6 +71,9 @@ document; the section link is provided.
 - File names are `snake_case.dart` (`file_names`). Imports follow the standard order:
   `dart:` → `package:` → relative — one blank line between groups
   (`directives_ordering`).
+- Misuse throws `StateError`/`ArgumentError`; runtime conditions raise a
+  `StreamException` kind, and throwable names end in `…Exception`. →
+  [Errors vs exceptions](#errors-vs-exceptions)
 
 **Design system**
 
@@ -84,6 +87,9 @@ document; the section link is provided.
   chain in `build`) — mirrors Flutter's own `AppBar`/`TabBar` pattern.
 - Never hand-roll `copyWith`, `merge`, `lerp`, `==`, or `hashCode` on theme classes —
   the generator produces them. → [Theme system](#theme-system)
+- Drop shadows use Material `elevation` in dp, not hand-painted `BoxShadow` lists.
+  `StreamBoxShadow` is reserved for the places Material cannot reach. →
+  [Elevation and shadows](#elevation-and-shadows)
 - Icons are generated from SVGs. Do not hand-edit the icon font or the generated
   `StreamIcons` class. → [Icons](#icons)
 
@@ -370,8 +376,12 @@ Public dartdocs are encouraged but currently **not lint-enforced**
 (`public_member_api_docs` is disabled in `analysis_options.yaml`; this is temporary
 while the repo catches up). New public code should still ship with dartdocs.
 
-In general, follow the [Effective Dart documentation guide](https://dart.dev/effective-dart/documentation)
-except where this page contradicts it.
+In general, follow the Effective Dart documentation guide — vendored in this repo as
+[`EFFECTIVE_DART_DOC.md`](EFFECTIVE_DART_DOC.md) so it is readable offline
+(canonical version at [dart.dev](https://dart.dev/effective-dart/documentation)) — except where
+this page contradicts it. Read it before writing or reviewing dartdoc: the rules most often
+missed are single-sentence first paragraphs, "Whether…" for booleans, noun phrases for
+properties, square brackets for in-scope identifiers, and throws documented in prose.
 
 ### Answer your own questions straight away
 
@@ -525,8 +535,12 @@ explaining the purpose of the item. Subsequent paragraphs elaborate. Avoid multi
 sentence first paragraphs — the first paragraph gets extracted for tables of
 contents.
 
-When referencing a parameter, use backticks. When referencing a parameter that also
-corresponds to a property, use square brackets instead.
+When referencing a parameter, use square brackets, as
+[Effective Dart](https://dart.dev/effective-dart/documentation#do-use-square-brackets-in-doc-comments-to-refer-to-in-scope-identifiers)
+does — `dart doc` resolves them and links to the declaration.
+
+Reserve backticks for names that are *not* in scope where the comment sits: a private
+constructor argument named from a class-level doc, or a type from another package.
 
 Avoid using "above" or "below" to reference other dartdoc sections. Dartdoc pages
 are often viewed in isolation.
@@ -559,6 +573,45 @@ assert(size > 0);
 // Better with a message — the invariant needs context.
 assert(!_disposed, 'StreamAvatarController used after dispose()');
 ```
+
+### Errors vs exceptions
+
+Dart splits the two words by who is at fault and what should happen next, and this
+repo follows the split strictly:
+
+- An **`Exception`** is a runtime condition a correct program can encounter — the
+  network dropped, the server said no, a token expired. Exceptions are part of the
+  API contract: callers are expected to catch and handle them.
+- An **`Error`** is a programmer mistake — `StateError`, `ArgumentError`,
+  `TypeError`. Errors are meant to fail fast and loud, not be caught: handling one
+  papers over a bug.
+
+When raising a failure, ask one question: *can this happen to a correct program at
+runtime?*
+
+| Answer | Raise | Examples |
+|---|---|---|
+| No — the caller misused the API | `StateError` / `ArgumentError`, never wrapped, never inside a `Result` | `connect()` on a disposed client, a negative replay count |
+| Yes — it is a condition to handle | the fitting `StreamException` kind | a refused request, a dropped socket, a failed token load |
+
+Which of the four `StreamException` kinds fits — and which layer produces which — is
+the subject of [`ERROR_LAYER.md`](ERROR_LAYER.md); the three-question tree there
+gives every failure exactly one home. In `stream_core_flutter`, prefer catching the
+exception kinds over `StreamException` itself so the reaction can differ per kind.
+
+Naming follows the same line: public throwable types end in `…Exception`; the
+`Error` suffix is reserved for Dart's bug hierarchy and for non-throwable data
+models (`StreamApiError` is the server's wire payload, not a throwable). "Error"
+remains fine as a domain word in prose, fields, and codes (`StreamErrorCode`,
+`errorBuilder`).
+
+The capture seams deliberately cross the don't-catch-`Error` line, each with a
+stated reason: `runApiSafely` and wire decoding catch everything, because a
+`TypeError` there indicts the data rather than the program; the auth boundaries
+catch everything thrown by app-supplied token code, because a rejection must
+always deliver a `StreamException` (the original error stays visible in `cause`);
+and `runSafely` captures raw truth for the boundary above it to classify. Outside
+a seam, an `Error` propagates to the crash reporter where it belongs.
 
 ### Prefer specialized functions, methods, and constructors
 
@@ -737,7 +790,8 @@ do it.
 
 For classes that appear in error messages or logs, override `toString`. Avoid bare
 `$runtimeType` — use `objectRuntimeType(this, 'ClassName')`, which strips runtime
-type at release-mode.
+type at release-mode. Flutter code gets it from `package:flutter/foundation.dart`;
+in `stream_core` it is package-internal, imported from `src/utils/object.dart`.
 
 ### Be explicit about `dispose()` and the object lifecycle
 
@@ -838,6 +892,13 @@ Avoid test-global variables or state shared between tests — they make maintena
 debugging, and refactoring significantly harder. Instead of `setUp`, use local
 helper functions called inside each test block. For cleanup, prefer `addTearDown`
 over the global `tearDown` callback.
+
+The rule targets shared state, not pure construction. A deterministic fixture
+builder that holds no state — a signed token, an encoded payload, a fixed
+timestamp — may live under `test/helpers/` and be imported by several test files:
+copies of one tend to drift, and a subtly wrong fixture is harder to spot than a
+shared one. Anything that holds state between tests, or that arranges a scenario
+rather than building a value, stays local to the test file.
 
 ### Prefer more test files, avoid long test files
 
@@ -1243,6 +1304,45 @@ Note: the root `StreamTheme` is an exception — it extends
 into Material's `ThemeData.extensions`. New component themes follow the
 `@themeGen` pattern above, not the root pattern.
 
+### Elevation and shadows
+
+**Prefer Material `elevation` over a hand-painted `BoxShadow`.** A component that
+needs a drop shadow exposes `elevation` (a `double`, in dp) on its theme data and
+renders through `Material` — not `boxShadow` on a `BoxDecoration`.
+
+The design system specifies each elevation token as both a shadow and a Material
+level, so the dp value is the authoritative representation for Flutter. Take it
+from `StreamElevation` (`context.streamElevation.level3`, or `StreamTheme.elevation`)
+rather than writing a number — that class carries the token-to-dp table and is the
+single place it lives. `StreamElevation.none` is a fixed `0` for the unelevated
+case; the four levels are themeable.
+
+Two shadow systems side by side do not match. `Canvas.drawShadow` (what Material
+renders) computes an ambient and a spot shadow from a single colour, which no
+multi-layer `BoxShadow` list reproduces — so a component painting its own shadow
+reads visibly different from the elevated component next to it.
+
+`StreamBoxShadow` stays for the cases Material genuinely cannot reach:
+
+- text shadows (`TextStyle.shadows`), as in `StreamBadgeCount`;
+- custom painting, where there is no `Material` to elevate;
+- a surface that must stay translucent — `Material` treats a transparent colour as
+  a transparent occluder and the shadow shows through.
+
+Reaching for a `BoxShadow` outside those cases needs a comment explaining why
+`Material` did not work.
+
+Two things to expect when elevating a component:
+
+- Material clips its children with `PhysicalShape`, so a border with
+  `strokeAlignOutside` on the Material's own `shape` gets clipped. Draw the border
+  in a `DecoratedBox` **outside** the `Material` instead. `StreamAvatar` shows the
+  shape.
+- The shadow colour resolves to `ThemeData.shadowColor` from the **host** app, since
+  this package contributes a `ThemeExtension` rather than building its own
+  `ThemeData`. Pass an explicit `shadowColor` when a component must not drift with
+  the embedding app's theme.
+
 ### Component factory
 
 The design system exposes `StreamComponentFactory` so consumers can substitute
@@ -1310,20 +1410,30 @@ sub-headings:
 
 - Fixed a crash when opening the media viewer with an empty attachments list.
 
+### 🔄 Changed
+
+- Raised the minimum Flutter version to `>=3.44.0` and the Dart SDK to `^3.12.0`.
+
 ### 🛑 Breaking / Removals
 
 - Removed `StreamCoreMessageComposer`. Use `StreamMessageComposer` from
   `stream_chat_flutter` instead.
 ```
 
+`### 🔄 Changed` covers what is neither new API nor a fix and does not break
+existing code — a raised minimum Flutter/Dart version, a tightened dependency
+constraint, a changed default. A raised floor is **not** breaking: code keeps
+compiling, older SDKs simply stop resolving the new version.
+
 Prefer **one short bullet** per entry, describing the functional change. Longer
 entries are acceptable for user-visible multi-facet features where the extra
 context matters to someone deciding whether to upgrade — but avoid sub-bullets,
 per-method enumeration, and internal implementation notes.
 
-Older entries in the changelog use `### 🐞 Fixed` and `### 💥 Breaking Changes` /
-`### 💥 BREAKING CHANGES` — those forms are grandfathered but new entries should
-use the labels above.
+Some changelogs use older labels — `### 🐞 Fixed`, `### 💥 Breaking Changes` /
+`### 💥 BREAKING CHANGES`. Match the header style the package's changelog already
+uses rather than mixing forms within one file; a new package starts on the labels
+above.
 
 ### Cross-package PRs
 
@@ -1331,6 +1441,78 @@ If a PR touches both `stream_core` and `stream_core_flutter`, update each packag
 `CHANGELOG.md` separately. Cross-linking between packages ("bumps stream_core to
 X.Y.Z") is handled by the release tooling — do not write these entries by hand.
 
+### Releasing
+
+Publishing to [pub.dev](https://pub.dev) is automated. Packages are versioned
+**independently**, each on its own tag `<package>-v<version>` (e.g.
+`stream_core-v0.4.0`) — but a single release PR may bump **any number of
+packages at once**. Each bumped package still gets its own tag and its own
+publish run, so releasing all three together and releasing one on its own follow
+the exact same steps.
+
+Cut every release from a `release/...` branch (e.g. `release/2026-07-30`). This
+is required, not a convention: the changelog-placement check in
+[`pr_title.yml`](.github/workflows/pr_title.yml) only allows a `## Upcoming`
+heading to become `## X.Y.Z` on a `release/` branch. On that branch, for **each**
+package you are releasing:
+
+- bump its `version` in `pubspec.yaml`
+- promote its CHANGELOG `## Upcoming` heading to `## X.Y.Z`
+
+Title the PR `chore(repo): release packages` for a multi-package release
+(generic, so it stays short), or `chore(<scope>): release <package> vX.Y.Z`
+(scope `llc` / `ui` / `thumb`) for a single package. The tooling keys only on the `chore(...): release` prefix — tags
+are derived from **package state**, not the title — so a title mentioning one
+version while the PR bumps several still tags and publishes every bumped package.
+
+**Squash-merge the release PR.** `release_tag.yml`'s gate reads the *tip*
+commit's message (`github.event.head_commit.message`), so a squash lands the
+`chore(...): release` title as that commit. A **merge commit** would make the tip
+`Merge pull request #… ` — the gate wouldn't fire and nothing would tag/publish,
+silently. (This is why the tag job also has a `workflow_dispatch` escape hatch.)
+
+When the PR merges to `main`:
+
+1. [`release_tag.yml`](.github/workflows/release_tag.yml) tags every package
+   whose current version is not yet on pub.dev — `<package>-vX.Y.Z` — and pushes
+   the tags one at a time.
+2. [`release_publish.yml`](.github/workflows/release_publish.yml) fires once per
+   pushed tag and publishes only that package (OIDC — no stored credentials),
+   then creates a GitHub Release whose body is the package's `## X.Y.Z` CHANGELOG
+   section.
+
+**Dependent order is handled automatically.** `stream_core_flutter` depends on
+`stream_core`, and each package publishes in its own run, so releasing both
+together could otherwise let the dependent reach pub.dev before its dependency
+is indexed (which the server rejects with `Dependency … does not exist`). Before
+publishing, `release_publish.yml`'s **⏳ Wait for in-workspace dependencies** step
+polls pub.dev's per-version endpoint until every in-workspace dependency of the
+tagged package is live, so publish never races ahead of a dependency. The
+dependency's own run lands moments earlier (tags push in dependency order), so
+the wait usually resolves within a poll or two — an already-live dependency
+passes on the first check; a just-published one needs a retry or so while
+pub.dev indexes it. If a dependency's publish genuinely *fails*,
+the dependent's wait times out and reports it — re-run the failed dependency
+(`workflow_dispatch` on its tag), then the dependent. Re-runs are safe: the
+publish step skips if the version is already on pub.dev (checked against the
+live per-version endpoint, not `melos --no-published`), so re-running a tag
+publishes it only if it isn't already there.
+
+**Tagging is state-derived — mind two consequences.** `release_tag.yml` tags
+*every* package whose current `pubspec.yaml` version isn't on pub.dev yet, not
+only the ones this PR bumped. So:
+
+- **Keep version bumps to release PRs.** If a `version:` bump merges in an
+  ordinary feature PR, the next release will tag and publish it as a side effect.
+  Bump versions only on a `release/` branch.
+- **Publish a brand-new package before releasing anything that depends on it.**
+  A new package's first publish needs pub.dev automated-publishing configured for
+  it; until then its automated publish fails. If that new package is also an
+  in-workspace dependency of an existing one (as `stream_core` is for
+  `stream_core_flutter`), releasing the dependent alongside it makes the
+  dependent's wait step poll for a version that never appears and time out after
+  15 minutes. Land the new package on its own first (or set up its publishing and
+  let its run finish), then release the dependents.
 
 ## Where to look when you're stuck
 

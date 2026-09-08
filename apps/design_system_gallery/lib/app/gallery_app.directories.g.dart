@@ -36,6 +36,8 @@ import 'package:design_system_gallery/components/badge/stream_retry_badge.dart'
     as _design_system_gallery_components_badge_stream_retry_badge;
 import 'package:design_system_gallery/components/buttons/button.dart'
     as _design_system_gallery_components_buttons_button;
+import 'package:design_system_gallery/components/buttons/split_button.dart'
+    as _design_system_gallery_components_buttons_split_button;
 import 'package:design_system_gallery/components/buttons/stream_emoji_button.dart'
     as _design_system_gallery_components_buttons_stream_emoji_button;
 import 'package:design_system_gallery/components/buttons/stream_jump_to_unread_button.dart'
@@ -110,6 +112,8 @@ import 'package:design_system_gallery/components/reaction/stream_reaction_picker
     as _design_system_gallery_components_reaction_stream_reaction_picker;
 import 'package:design_system_gallery/components/reaction/stream_reactions.dart'
     as _design_system_gallery_components_reaction_stream_reactions;
+import 'package:design_system_gallery/components/scaffold/stream_scaffold.dart'
+    as _design_system_gallery_components_scaffold_stream_scaffold;
 import 'package:design_system_gallery/components/sheet/stream_sheet.dart'
     as _design_system_gallery_components_sheet_stream_sheet;
 import 'package:design_system_gallery/components/snackbar/stream_snackbar.dart'
@@ -120,8 +124,12 @@ import 'package:design_system_gallery/components/toolbar/stream_app_bar.dart'
     as _design_system_gallery_components_toolbar_stream_app_bar;
 import 'package:design_system_gallery/components/toolbar/stream_bottom_app_bar.dart'
     as _design_system_gallery_components_toolbar_stream_bottom_app_bar;
+import 'package:design_system_gallery/components/toolbar/stream_bottom_nav_bar.dart'
+    as _design_system_gallery_components_toolbar_stream_bottom_nav_bar;
 import 'package:design_system_gallery/components/toolbar/stream_sheet_header.dart'
     as _design_system_gallery_components_toolbar_stream_sheet_header;
+import 'package:design_system_gallery/components/toolbar/stream_toolbar_button.dart'
+    as _design_system_gallery_components_toolbar_stream_toolbar_button;
 import 'package:design_system_gallery/primitives/colors.dart'
     as _design_system_gallery_primitives_colors;
 import 'package:design_system_gallery/primitives/icons.dart'
@@ -511,6 +519,21 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_buttons_stream_jump_to_unread_button
                         .buildStreamJumpToUnreadButtonShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSplitButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_buttons_split_button
+                    .buildStreamSplitButtonPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_buttons_split_button
+                    .buildStreamSplitButtonShowcase,
               ),
             ],
           ),
@@ -1132,6 +1155,28 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'Scaffold',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamScaffold',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_scaffold_stream_scaffold
+                        .buildStreamScaffoldPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Real-world Example',
+                builder:
+                    _design_system_gallery_components_scaffold_stream_scaffold
+                        .buildStreamScaffoldDrawers,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'Sheet',
         children: [
           _widgetbook.WidgetbookComponent(
@@ -1233,6 +1278,23 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'StreamBottomNavBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_bottom_nav_bar
+                        .buildStreamBottomNavBarPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_bottom_nav_bar
+                        .buildStreamBottomNavBarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StreamSheetHeader',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -1246,6 +1308,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_toolbar_stream_sheet_header
                         .buildStreamSheetHeaderShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamToolbarButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_toolbar_button
+                        .buildStreamToolbarButtonPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Real-world Example',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_toolbar_button
+                        .buildStreamToolbarButtonRealWorld,
               ),
             ],
           ),

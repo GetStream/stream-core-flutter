@@ -113,7 +113,7 @@ class DefaultStreamCommandChip extends StatelessWidget {
               child: Row(
                 mainAxisSize: .min,
                 children: [
-                  Icon(size: 12, context.streamIcons.bolt),
+                  Icon(size: 12, context.streamIcons.boltFill),
                   SizedBox(width: spacing.xxs),
                   Flexible(child: Text(props.label)),
                   if (props.onDismiss != null) ...[

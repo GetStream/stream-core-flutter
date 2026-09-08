@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../stream_surface_style.dart';
 import '../stream_theme.dart';
 import 'stream_button_theme.dart';
 
@@ -110,7 +111,7 @@ class StreamBottomAppBarThemeData with _$StreamBottomAppBarThemeData {
 
 /// Visual styling properties for a [StreamBottomAppBar].
 ///
-/// Defines the appearance of the bottom app bar — background colour,
+/// Defines the appearance of the bottom app bar — background color,
 /// padding, inter-slot spacing, title and subtitle text styles, and
 /// per-slot button style propagation.
 ///
@@ -139,7 +140,9 @@ class StreamBottomAppBarThemeData with _$StreamBottomAppBarThemeData {
 class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
   /// Creates a bottom app bar style with optional property overrides.
   const StreamBottomAppBarStyle({
+    this.surfaceStyle,
     this.backgroundColor,
+    this.floatingBackgroundColor,
     this.padding,
     this.spacing,
     this.titleTextStyle,
@@ -148,8 +151,19 @@ class StreamBottomAppBarStyle with _$StreamBottomAppBarStyle {
     this.trailingStyle,
   });
 
-  /// The background colour of the bottom app bar.
+  /// The floating or regular surface style for this bottom bar.
+  ///
+  /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
+  /// [StreamTheme].
+  final StreamSurfaceStyle? surfaceStyle;
+
+  /// The background color of the bottom app bar when docked.
+  ///
+  /// Ignored when floating — the floating style uses [floatingBackgroundColor].
   final Color? backgroundColor;
+
+  /// The background color of the bottom app bar when floating.
+  final Color? floatingBackgroundColor;
 
   /// The padding around the bar's content row.
   final EdgeInsetsGeometry? padding;

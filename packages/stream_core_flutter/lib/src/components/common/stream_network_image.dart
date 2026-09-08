@@ -1,6 +1,7 @@
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../cache/internal/stream_image_cache.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../badge/stream_retry_badge.dart';
@@ -124,7 +125,7 @@ class StreamNetworkImage extends StatelessWidget {
   /// This is intended for development and testing purposes only.
   @visibleForTesting
   static Future<bool> evictFromCache(String url, {String? cacheKey}) {
-    return CachedNetworkImage.evictFromCache(url, cacheKey: cacheKey);
+    return CachedNetworkImage.evictFromCache(url, cacheKey: cacheKey, cacheManager: StreamImageCache.manager);
   }
 
   @override
@@ -330,6 +331,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     return CachedNetworkImage(
       key: ValueKey(_retryKey),
       imageUrl: props.url,
+      cacheManager: StreamImageCache.manager,
       httpHeaders: props.httpHeaders,
       width: props.width,
       height: props.height,

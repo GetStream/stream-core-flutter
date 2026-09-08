@@ -38,6 +38,7 @@ class IconGeneratorConfig {
   const IconGeneratorConfig({
     required this.inputSvgDir,
     this.inputSvgIconDir,
+    this.inputDeprecatedFile,
     required this.outputFontFile,
     required this.outputFile,
     required this.outputDataFile,
@@ -80,6 +81,7 @@ class IconGeneratorConfig {
     return IconGeneratorConfig(
       inputSvgDir: resolvePath('input_svg_dir'),
       inputSvgIconDir: resolveOptionalPath('input_svg_icon_dir'),
+      inputDeprecatedFile: resolveOptionalPath('input_deprecated_file'),
       outputFontFile: resolvePath('output_font_file'),
       outputFile: resolvePath('output_file'),
       outputDataFile: resolvePath('output_data_file'),
@@ -98,6 +100,7 @@ class IconGeneratorConfig {
 
   final String inputSvgDir;
   final String? inputSvgIconDir;
+  final String? inputDeprecatedFile;
   final String outputFontFile;
   final String outputFile;
   final String outputDataFile;
@@ -161,12 +164,14 @@ String _resolveConfigPath() {
 // =============================================================================
 
 Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async {
-  // 1. Read SVG files
+  // 1. Read deprecations and SVG files
+  final deprecatedIcons = _readDeprecatedIcons(config.inputDeprecatedFile, scriptDir);
   final svgMap = _readSvgFiles(
     config.inputSvgDir,
     config.recursive,
     scriptDir: scriptDir,
     logFilePath: config.outputLogFile,
+    deprecatedIcons: deprecatedIcons,
   );
   if (svgMap.isEmpty) {
     throw const IconGeneratorException('No SVG files found', exitCode: 2);
@@ -208,6 +213,9 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
       (match) => '${match.group(1)}, matchTextDirection: true)',
     );
   }
+  // Deprecated icons always keep their glyph so the code points of the icons
+  // after them stay put; only their Dart constant is annotated or dropped.
+  iconDataContent = _applyDeprecations(iconDataContent, deprecatedIcons);
 
   // 5. Generate StreamSvgIconData class (if configured)
   final svgIconEntries = <SvgIconEntry>[];
@@ -229,7 +237,7 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
   _log('   ├─ ${p.relative(config.outputDataFile, from: scriptDir)}');
 
   // 6. Generate StreamIcons class
-  final iconEntries = _extractIconEntries(fontResult.glyphList);
+  final iconEntries = _extractIconEntries(fontResult.glyphList, deprecatedIcons);
   final classContent = _generateClass(
     iconEntries: iconEntries,
     svgIconEntries: svgIconEntries,
@@ -266,11 +274,20 @@ Future<void> _generateIcons(IconGeneratorConfig config, String scriptDir) async 
 }
 
 /// Reads all SVG files from a directory.
+///
+/// The returned map is keyed by camelCase glyph name and ordered by the icon's
+/// first-seen date recorded in [logFilePath], so the code points the font
+/// generator assigns stay stable across runs.
+///
+/// Deprecated icons keep their place in that order even after their SVG file is
+/// deleted: the glyph is then drawn from the replacement's SVG. Without this,
+/// deleting an icon would shift the code point of every icon after it.
 Map<String, String> _readSvgFiles(
   String directory,
   bool recursive, {
   required String scriptDir,
   required String logFilePath,
+  required List<DeprecatedIcon> deprecatedIcons,
 }) {
   _log('🔍 Reading SVGs: ${p.relative(directory, from: scriptDir)}');
 
@@ -317,35 +334,175 @@ Map<String, String> _readSvgFiles(
           .where((f) => p.extension(f.path).toLowerCase() == '.svg')
           .where((f) => !_excludedSvgIcons.contains(p.basenameWithoutExtension(f.path)))
           .toList()
-        ..sort(
-          (a, b) {
-            final dateDiff =
-                getAdditionDate(
-                  p.basenameWithoutExtension(a.path),
-                ).compareTo(
-                  getAdditionDate(p.basenameWithoutExtension(b.path)),
-                );
-            if (dateDiff != 0) {
-              return dateDiff;
-            }
-            return p.basenameWithoutExtension(a.path).compareTo(p.basenameWithoutExtension(b.path));
-          },
-        );
+        // Sorted only so a duplicate-name failure names the same two files on
+        // every machine; the glyph order is decided further down.
+        ..sort((a, b) => a.path.compareTo(b.path));
+
+  final svgFileByName = <String, File>{};
+  for (final file in svgFiles) {
+    final name = p.basenameWithoutExtension(file.path);
+    final duplicate = svgFileByName[name];
+    // Glyphs are keyed by bare filename, so two files sharing a name across
+    // size folders would silently collapse into whichever the directory
+    // listing happened to yield last — a wrong glyph with no warning.
+    if (duplicate != null) {
+      throw IconGeneratorException(
+        'Duplicate icon name "$name":\n'
+        '  ${p.relative(duplicate.path, from: scriptDir)}\n'
+        '  ${p.relative(file.path, from: scriptDir)}\n'
+        'Icon names must be unique across size folders. Rename one, following the '
+        'suffix convention: bare names come from `20/`, `-large` from `32/`, '
+        '`-small` from `16/`.',
+        exitCode: 2,
+      );
+    }
+    svgFileByName[name] = file;
+  }
+
+  final deprecatedByName = {for (final icon in deprecatedIcons) icon.name: icon};
+
+  // Guard against typos: an icon with no SVG file of its own only earns a glyph
+  // because it already holds a code point. Without one there is nothing to
+  // preserve, and letting it through would invent a glyph and pollute the log.
+  for (final icon in deprecatedIcons) {
+    if (!svgFileByName.containsKey(icon.name) && !logEntries.containsKey(icon.name)) {
+      throw IconGeneratorException(
+        'Deprecated icon "${icon.name}" has neither an SVG file nor a recorded code point. '
+        'Check the spelling in the deprecated icons file.',
+        exitCode: 2,
+      );
+    }
+  }
+
+  /// Resolves the SVG that should draw the glyph for [name].
+  ///
+  /// A deprecated icon is drawn from its replacement, so the deprecated name
+  /// stays a valid glyph without keeping the retired artwork around.
+  File svgSourceFor(String name) {
+    final source = deprecatedByName[name]?.replacement ?? name;
+    final file = svgFileByName[source];
+    if (file == null) {
+      throw IconGeneratorException(
+        source == name
+            ? 'No SVG file found for icon "$name" in $directory'
+            : 'Replacement "$source" for deprecated icon "$name" has no SVG file in $directory',
+        exitCode: 2,
+      );
+    }
+    return file;
+  }
+
+  // Deprecated icons are included even when their own SVG file is gone, so the
+  // glyph order — and with it every code point after them — is preserved.
+  final names = {...svgFileByName.keys, ...deprecatedByName.keys}.toList()
+    ..sort((a, b) {
+      final dateDiff = getAdditionDate(a).compareTo(getAdditionDate(b));
+      if (dateDiff != 0) return dateDiff;
+      return a.compareTo(b);
+    });
 
   for (final entries in newAdditions.entries) {
     logFile.writeAsStringSync('${entries.key};${entries.value}\n', mode: FileMode.append);
   }
 
-  return {
-    for (final file in svgFiles) p.basenameWithoutExtension(file.path).camelCase: file.readAsStringSync(),
-  };
+  return {for (final name in names) name.camelCase: svgSourceFor(name).readAsStringSync()};
+}
+
+/// Reads the deprecated-icon list from [path].
+///
+/// Each non-comment line follows `deprecated;replacement;included`, e.g.
+/// `more;more-horizontal;true`. Returns an empty list when no file is
+/// configured.
+List<DeprecatedIcon> _readDeprecatedIcons(String? path, String scriptDir) {
+  if (path == null) return const [];
+
+  final file = File(path);
+  if (!file.existsSync()) {
+    throw IconGeneratorException('Deprecated icons file not found: $path', exitCode: 2);
+  }
+
+  _log('🔍 Reading deprecations: ${p.relative(path, from: scriptDir)}');
+
+  final icons = <DeprecatedIcon>[];
+  final lines = file.readAsLinesSync();
+  for (var i = 0; i < lines.length; i++) {
+    final line = lines[i].trim();
+    if (line.isEmpty || line.startsWith('#')) continue;
+
+    final parts = line.split(';').map((part) => part.trim()).toList();
+    if (parts.length != 3 || parts.any((part) => part.isEmpty)) {
+      throw IconGeneratorException(
+        'Malformed deprecation on ${p.basename(path)}:${i + 1}: "$line". '
+        'Expected `deprecated;replacement;included`.',
+        exitCode: 2,
+      );
+    }
+
+    final included = switch (parts[2]) {
+      'true' => true,
+      'false' => false,
+      _ => throw IconGeneratorException(
+        'Malformed deprecation on ${p.basename(path)}:${i + 1}: '
+        '"${parts[2]}" is not `true` or `false`.',
+        exitCode: 2,
+      ),
+    };
+
+    icons.add(DeprecatedIcon(name: parts[0], replacement: parts[1], included: included));
+  }
+
+  _log('   └─ ${icons.length} deprecated ${icons.length == 1 ? 'icon' : 'icons'}');
+  return icons;
+}
+
+/// Annotates or removes the [StreamIconData] constants of deprecated icons.
+///
+/// The glyph itself is never touched — it stays in the font at its original
+/// code point. Included icons only gain a `@Deprecated` annotation; excluded
+/// ones lose their constant so they disappear from the public API.
+String _applyDeprecations(String iconDataContent, List<DeprecatedIcon> deprecatedIcons) {
+  var content = iconDataContent;
+
+  for (final icon in deprecatedIcons) {
+    final constantName = icon.name.camelCase;
+    // Matches the doc comment plus the declaration, including the blank line
+    // that separates it from the previous constant.
+    final declaration = RegExp(
+      '(\\n  /// Font icon named "__${constantName}__"\\n(?:  ///[^\\n]*\\n)*)'
+      '(  static const IconData $constantName = IconData\\([^\\n]*\\n)',
+    );
+
+    if (!declaration.hasMatch(content)) {
+      throw IconGeneratorException(
+        'Deprecated icon "${icon.name}" has no generated constant — '
+        'is it listed in _excludedSvgIcons?',
+        exitCode: 2,
+      );
+    }
+
+    content = icon.included
+        ? content.replaceFirstMapped(
+            declaration,
+            (m) => "${m[1]}  @Deprecated('${icon.deprecationMessage}')\n${m[2]}",
+          )
+        : content.replaceFirst(declaration, '');
+  }
+
+  return content;
 }
 
 /// Extracts icon entries from glyph list.
-List<IconEntry> _extractIconEntries(List<GenericGlyph> glyphList) {
+///
+/// Deprecated icons are dropped when they are not `included`, and carry a
+/// deprecation message when they are. Either way their glyph stays in the font.
+List<IconEntry> _extractIconEntries(List<GenericGlyph> glyphList, List<DeprecatedIcon> deprecatedIcons) {
+  final deprecatedByFieldName = {for (final icon in deprecatedIcons) icon.name.camelCase: icon};
+
   return glyphList
       .where((g) => g.metadata.name?.isNotEmpty ?? false)
       .map((g) => IconEntry.fromGlyphName(g.metadata.name!))
+      .where((e) => deprecatedByFieldName[e.fieldName]?.included ?? true)
+      .map((e) => e.deprecatedWith(deprecatedByFieldName[e.fieldName]))
       .toList()
     ..sort((a, b) => a.fieldName.compareTo(b.fieldName));
 }
@@ -433,6 +590,9 @@ String _generateClass({
 }) {
   final partThemeFileName = outputFileName.replaceFirst('.dart', '.g.theme.dart');
   final hasSvgIcons = svgIconEntries.isNotEmpty;
+  // `allIcons` and the constructor defaults reference the deprecated icons this
+  // class deliberately keeps, so the whole file opts out of the lint.
+  final hasDeprecatedIcons = iconEntries.any((e) => e.deprecationMessage != null);
 
   final clazz = Class(
     (b) => b
@@ -454,6 +614,7 @@ String _generateClass({
         'Generated by scripts/generate_icons.dart',
         '',
         'To regenerate: melos run generate:icons',
+        if (hasDeprecatedIcons) ...['', 'ignore_for_file: deprecated_member_use_from_same_package'],
       ])
       ..directives.addAll([
         Directive.import('package:flutter/widgets.dart'),
@@ -486,6 +647,7 @@ Constructor _buildConstructor(
               ..name = e.fieldName
               ..named = true
               ..toThis = true
+              ..annotations.addAll(_deprecatedAnnotation(e))
               ..defaultTo = Code('$iconsClassName.${e.constantName}'),
           ),
         ),
@@ -507,11 +669,20 @@ Iterable<Field> _buildFields(List<IconEntry> entries) {
     (e) => Field(
       (f) => f
         ..docs.add('/// The ${e.humanReadable} icon.')
+        ..annotations.addAll(_deprecatedAnnotation(e))
         ..modifier = FieldModifier.final$
         ..type = refer('IconData')
         ..name = e.fieldName,
     ),
   );
+}
+
+/// The `@Deprecated` annotation for [entry], or nothing if it is not deprecated.
+Iterable<Expression> _deprecatedAnnotation(IconEntry entry) {
+  final message = entry.deprecationMessage;
+  return [
+    if (message != null) refer('Deprecated').call([literalString(message)]),
+  ];
 }
 
 Iterable<Field> _buildSvgIconFields(List<SvgIconEntry> entries) {
@@ -665,6 +836,7 @@ class IconEntry {
     required this.fieldName,
     required this.constantName,
     required this.humanReadable,
+    this.deprecationMessage,
   });
 
   /// Creates an entry from a glyph name (e.g., "__IconFlag2__").
@@ -683,6 +855,21 @@ class IconEntry {
   final String constantName;
   final String humanReadable;
 
+  /// The `@Deprecated` message to emit, or `null` when the icon is current.
+  final String? deprecationMessage;
+
+  /// Returns a copy carrying [icon]'s deprecation message, or this entry
+  /// unchanged when [icon] is `null`.
+  IconEntry deprecatedWith(DeprecatedIcon? icon) {
+    if (icon == null) return this;
+    return IconEntry(
+      fieldName: fieldName,
+      constantName: constantName,
+      humanReadable: humanReadable,
+      deprecationMessage: icon.deprecationMessage,
+    );
+  }
+
   /// Sanitizes a name to be a valid Dart identifier.
   static String _sanitizeName(String name) {
     return name
@@ -690,6 +877,39 @@ class IconEntry {
         .replaceAllMapped(RegExp(r'[-_](\d)'), (m) => m.group(1)!) // Remove separators before digits
         .replaceAllMapped(RegExp('[-_]([a-zA-Z])'), (m) => m.group(1)!.toUpperCase()); // camelCase
   }
+}
+
+/// An icon that is on its way out, as declared in the deprecated icons file.
+///
+/// The glyph is always kept in the font so that removing an icon never shifts
+/// the code points of the icons that come after it. [replacement] names the icon
+/// whose SVG draws that glyph — it may be [name] itself, which keeps the
+/// original artwork while still retiring the name.
+class DeprecatedIcon {
+  const DeprecatedIcon({
+    required this.name,
+    required this.replacement,
+    required this.included,
+  });
+
+  /// The deprecated icon's file name, without extension (e.g. `more`).
+  final String name;
+
+  /// The icon whose SVG draws this glyph (e.g. `more-horizontal`).
+  final String replacement;
+
+  /// Whether the icon is still exposed in the generated Dart classes.
+  ///
+  /// When `true` it is generated with a `@Deprecated` annotation; when `false`
+  /// it is left out entirely and only the font glyph remains.
+  final bool included;
+
+  /// Whether the icon keeps drawing its own artwork.
+  bool get isSelfReplacing => name == replacement;
+
+  /// The message for the generated `@Deprecated` annotation.
+  String get deprecationMessage =>
+      isSelfReplacing ? 'This icon will be removed in a future release.' : 'Use ${replacement.camelCase} instead.';
 }
 
 /// Represents a single colored SVG icon with its naming variants and asset path.

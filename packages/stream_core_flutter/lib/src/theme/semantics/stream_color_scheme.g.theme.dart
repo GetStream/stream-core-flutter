@@ -30,6 +30,7 @@ mixin _$StreamColorScheme {
     }
 
     return StreamColorScheme.raw(
+      brightness: t < 0.5 ? a.brightness : b.brightness,
       brand: t < 0.5 ? a.brand : b.brand,
       chrome: t < 0.5 ? a.chrome : b.chrome,
       accentPrimary: Color.lerp(a.accentPrimary, b.accentPrimary, t)!,
@@ -84,6 +85,11 @@ mixin _$StreamColorScheme {
       backgroundOverlayDark: Color.lerp(
         a.backgroundOverlayDark,
         b.backgroundOverlayDark,
+        t,
+      )!,
+      backgroundOverlayDarkStrong: Color.lerp(
+        a.backgroundOverlayDarkStrong,
+        b.backgroundOverlayDarkStrong,
         t,
       )!,
       backgroundDisabled: Color.lerp(
@@ -164,6 +170,7 @@ mixin _$StreamColorScheme {
   }
 
   StreamColorScheme copyWith({
+    Brightness? brightness,
     StreamColorSwatch? brand,
     StreamColorSwatch? chrome,
     Color? accentPrimary,
@@ -188,6 +195,7 @@ mixin _$StreamColorScheme {
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
+    Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundHover,
     Color? backgroundPressed,
@@ -222,6 +230,7 @@ mixin _$StreamColorScheme {
     final _this = (this as StreamColorScheme);
 
     return StreamColorScheme.raw(
+      brightness: brightness ?? _this.brightness,
       brand: brand ?? _this.brand,
       chrome: chrome ?? _this.chrome,
       accentPrimary: accentPrimary ?? _this.accentPrimary,
@@ -251,6 +260,8 @@ mixin _$StreamColorScheme {
           backgroundOverlayLight ?? _this.backgroundOverlayLight,
       backgroundOverlayDark:
           backgroundOverlayDark ?? _this.backgroundOverlayDark,
+      backgroundOverlayDarkStrong:
+          backgroundOverlayDarkStrong ?? _this.backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled ?? _this.backgroundDisabled,
       backgroundHover: backgroundHover ?? _this.backgroundHover,
       backgroundPressed: backgroundPressed ?? _this.backgroundPressed,
@@ -297,6 +308,7 @@ mixin _$StreamColorScheme {
     }
 
     return copyWith(
+      brightness: other.brightness,
       brand: other.brand,
       chrome: other.chrome,
       accentPrimary: other.accentPrimary,
@@ -321,6 +333,7 @@ mixin _$StreamColorScheme {
       backgroundScrim: other.backgroundScrim,
       backgroundOverlayLight: other.backgroundOverlayLight,
       backgroundOverlayDark: other.backgroundOverlayDark,
+      backgroundOverlayDarkStrong: other.backgroundOverlayDarkStrong,
       backgroundDisabled: other.backgroundDisabled,
       backgroundHover: other.backgroundHover,
       backgroundPressed: other.backgroundPressed,
@@ -367,7 +380,8 @@ mixin _$StreamColorScheme {
     final _this = (this as StreamColorScheme);
     final _other = (other as StreamColorScheme);
 
-    return _other.brand == _this.brand &&
+    return _other.brightness == _this.brightness &&
+        _other.brand == _this.brand &&
         _other.chrome == _this.chrome &&
         _other.accentPrimary == _this.accentPrimary &&
         _other.accentSuccess == _this.accentSuccess &&
@@ -391,6 +405,8 @@ mixin _$StreamColorScheme {
         _other.backgroundScrim == _this.backgroundScrim &&
         _other.backgroundOverlayLight == _this.backgroundOverlayLight &&
         _other.backgroundOverlayDark == _this.backgroundOverlayDark &&
+        _other.backgroundOverlayDarkStrong ==
+            _this.backgroundOverlayDarkStrong &&
         _other.backgroundDisabled == _this.backgroundDisabled &&
         _other.backgroundHover == _this.backgroundHover &&
         _other.backgroundPressed == _this.backgroundPressed &&
@@ -429,6 +445,7 @@ mixin _$StreamColorScheme {
 
     return Object.hashAll([
       runtimeType,
+      _this.brightness,
       _this.brand,
       _this.chrome,
       _this.accentPrimary,
@@ -453,6 +470,7 @@ mixin _$StreamColorScheme {
       _this.backgroundScrim,
       _this.backgroundOverlayLight,
       _this.backgroundOverlayDark,
+      _this.backgroundOverlayDarkStrong,
       _this.backgroundDisabled,
       _this.backgroundHover,
       _this.backgroundPressed,

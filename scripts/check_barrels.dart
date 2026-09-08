@@ -179,6 +179,10 @@ Map<String, List<String>> _buildExportIndex(String root, _Config config, List<_I
 // every src file must be exported by exactly one barrel.
 void _checkCoverage(Set<String> srcFiles, Map<String, List<String>> exportedBy, List<_Issue> issues) {
   for (final entry in exportedBy.entries) {
+    // Only `lib/src/` files are owned by exactly one barrel. A barrel that
+    // re-exports another barrel (`video.dart` -> `core.dart`) is composition,
+    // not a duplicate.
+    if (!srcFiles.contains(entry.key)) continue;
     if (entry.value.length > 1) {
       issues.add(
         _Issue(

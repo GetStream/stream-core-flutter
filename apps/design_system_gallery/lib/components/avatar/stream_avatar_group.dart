@@ -43,11 +43,17 @@ Widget buildStreamAvatarGroupPlayground(BuildContext context) {
     description: 'Use images or show initials placeholder.',
   );
 
+  final isFloating = context.knobs.boolean(
+    label: 'Is Floating',
+    description: 'Whether to show a drop shadow around each individual avatar.',
+  );
+
   final palette = context.streamColorScheme.avatarPalette;
 
   return Center(
     child: StreamAvatarGroup(
       size: size,
+      isFloating: isFloating,
       children: List.generate(
         avatarCount,
         (index) => StreamAvatar(

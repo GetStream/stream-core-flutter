@@ -58,34 +58,62 @@ Widget buildStreamBottomAppBarPlayground(BuildContext context) {
         'the system bottom inset (home indicator).',
   );
 
-  return Align(
-    alignment: Alignment.bottomCenter,
-    child: StreamBottomAppBar(
-      primary: primary,
-      style: StreamBottomAppBarStyle(
-        padding: EdgeInsets.all(padding),
-        spacing: spacing,
-      ),
-      leading: showLeading
-          ? StreamButton.icon(
-              icon: Icon(context.streamIcons.export),
-              style: StreamButtonStyle.secondary,
-              type: StreamButtonType.ghost,
-              onPressed: () {},
-            )
-          : null,
-      title: (title != null && title.isNotEmpty) ? Text(title) : null,
-      subtitle: (subtitle != null && subtitle.isNotEmpty) ? Text(subtitle) : null,
-      trailing: showTrailing
-          ? StreamButton.icon(
-              icon: Icon(context.streamIcons.gallery),
-              style: StreamButtonStyle.secondary,
-              type: StreamButtonType.ghost,
-              onPressed: () {},
-            )
-          : null,
-    ),
+  final floating = context.knobs.boolean(
+    label: 'Floating',
+    description:
+        'When true, the bottom bar floats above content with a gradient fade '
+        'instead of a solid background and a top border.',
   );
+
+  final colorScheme = context.streamColorScheme;
+
+  final Widget bar = StreamBottomAppBar(
+    primary: primary,
+    style: StreamBottomAppBarStyle(
+      surfaceStyle: floating ? StreamSurfaceStyle.floating : StreamSurfaceStyle.regular,
+      padding: EdgeInsets.all(padding),
+      spacing: spacing,
+    ),
+    leading: showLeading
+        ? StreamButton.icon(
+            icon: Icon(context.streamIcons.export),
+            style: StreamButtonStyle.secondary,
+            type: floating ? StreamButtonType.outline : StreamButtonType.ghost,
+            isFloating: floating,
+            onPressed: () {},
+          )
+        : null,
+    title: (title != null && title.isNotEmpty) ? Text(title) : null,
+    subtitle: (subtitle != null && subtitle.isNotEmpty) ? Text(subtitle) : null,
+    trailing: showTrailing
+        ? StreamButton.icon(
+            icon: Icon(context.streamIcons.gallery),
+            style: StreamButtonStyle.secondary,
+            type: floating ? StreamButtonType.outline : StreamButtonType.ghost,
+            isFloating: floating,
+            onPressed: () {},
+          )
+        : null,
+  );
+
+  if (floating) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: ColoredBox(
+            color: colorScheme.backgroundApp,
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: context.streamSpacing.xxl),
+              decoration: BoxDecoration(color: colorScheme.accentPrimary),
+            ),
+          ),
+        ),
+        Align(alignment: Alignment.bottomCenter, child: bar),
+      ],
+    );
+  }
+
+  return Align(alignment: Alignment.bottomCenter, child: bar);
 }
 
 // =============================================================================

@@ -376,8 +376,15 @@ class _StreamMessageRepliesDefaults extends StreamMessageRepliesStyle {
   @override
   StreamMessageLayoutProperty<TextStyle> get labelTextStyle => .all(_textTheme.captionEmphasis);
 
+  // Turns white for previews, where the message sits on a scrim and the label
+  // needs the extra contrast.
   @override
-  StreamMessageLayoutProperty<Color> get labelColor => .all(_colorScheme.textLink);
+  StreamMessageLayoutProperty<Color> get labelColor => .resolveWith(
+    (layout) => switch (layout.presentation) {
+      .standard => _colorScheme.textLink,
+      .preview => _colorScheme.textOnAccent,
+    },
+  );
 
   @override
   StreamMessageLayoutProperty<double> get spacing => .all(_spacing.xs);

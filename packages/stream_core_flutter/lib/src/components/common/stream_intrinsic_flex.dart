@@ -494,28 +494,20 @@ class _RenderStreamIntrinsicFlex extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _IntrinsicFlexParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _IntrinsicFlexParentData> {
   _RenderStreamIntrinsicFlex({
-    required Axis direction,
-    required MainAxisAlignment mainAxisAlignment,
-    required MainAxisSize mainAxisSize,
-    required double spacing,
+    required this._direction,
+    required this._mainAxisAlignment,
+    required this._mainAxisSize,
+    required this._spacing,
     required CrossAxisAlignment crossAxisAlignment,
-    required TextBaseline? textBaseline,
-    required TextDirection? textDirection,
-    required VerticalDirection verticalDirection,
-    required Clip clipBehavior,
+    required this._textBaseline,
+    required this._textDirection,
+    required this._verticalDirection,
+    required this._clipBehavior,
   }) : assert(
          crossAxisAlignment != CrossAxisAlignment.stretch,
          'StreamIntrinsicFlex does not support $crossAxisAlignment.',
        ),
-       _direction = direction,
-       _mainAxisAlignment = mainAxisAlignment,
-       _mainAxisSize = mainAxisSize,
-       _spacing = spacing,
-       _crossAxisAlignment = crossAxisAlignment,
-       _textBaseline = textBaseline,
-       _textDirection = textDirection,
-       _verticalDirection = verticalDirection,
-       _clipBehavior = clipBehavior;
+       _crossAxisAlignment = crossAxisAlignment;
 
   Axis get direction => _direction;
   Axis _direction;

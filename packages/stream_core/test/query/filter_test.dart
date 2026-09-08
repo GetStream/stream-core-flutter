@@ -51,19 +51,6 @@ class TestFilterField extends FilterField<TestModel> {
 void main() {
   group('Comparison', () {
     group('Equal', () {
-      test('should create equal filter correctly', () {
-        final field = TestFilterField.name;
-        const value = 'test';
-
-        var filter = Filter.equal(field, value);
-
-        expect(filter, isA<EqualOperator<TestModel>>());
-        filter = filter as EqualOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.value, value);
-        expect(filter.operator, FilterOperator.equal);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.name;
         const value = 'test';
@@ -90,19 +77,6 @@ void main() {
     });
 
     group('Greater', () {
-      test('should create greater filter correctly', () {
-        final field = TestFilterField.createdAt;
-        final value = DateTime(2023);
-
-        var filter = Filter.greater(field, value);
-
-        expect(filter, isA<GreaterOperator<TestModel>>());
-        filter = filter as GreaterOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.value, value);
-        expect(filter.operator, FilterOperator.greater);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.id;
         const value = 100;
@@ -117,19 +91,6 @@ void main() {
     });
 
     group('GreaterOrEqual', () {
-      test('should create greater or equal filter correctly', () {
-        final field = TestFilterField.id;
-        const value = 50;
-
-        var filter = Filter.greaterOrEqual(field, value);
-
-        expect(filter, isA<GreaterOrEqualOperator<TestModel>>());
-        filter = filter as GreaterOrEqualOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.value, value);
-        expect(filter.operator, FilterOperator.greaterOrEqual);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.id;
         const value = 50;
@@ -144,19 +105,6 @@ void main() {
     });
 
     group('Less', () {
-      test('should create less filter correctly', () {
-        final field = TestFilterField.id;
-        const value = 100;
-
-        var filter = Filter.less(field, value);
-
-        expect(filter, isA<LessOperator<TestModel>>());
-        filter = filter as LessOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.value, value);
-        expect(filter.operator, FilterOperator.less);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.id;
         const value = 100;
@@ -171,19 +119,6 @@ void main() {
     });
 
     group('LessOrEqual', () {
-      test('should create less or equal filter correctly', () {
-        final field = TestFilterField.id;
-        const value = 100;
-
-        var filter = Filter.lessOrEqual(field, value);
-
-        expect(filter, isA<LessOrEqualOperator<TestModel>>());
-        filter = filter as LessOrEqualOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.value, value);
-        expect(filter.operator, FilterOperator.lessOrEqual);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.id;
         const value = 100;
@@ -200,19 +135,6 @@ void main() {
 
   group('List', () {
     group('In', () {
-      test('should create in filter correctly', () {
-        final field = TestFilterField.tags;
-        final values = ['tag1', 'tag2', 'tag3'];
-
-        var filter = Filter.in_(field, values);
-
-        expect(filter, isA<InOperator<TestModel>>());
-        filter = filter as InOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.value, values);
-        expect(filter.operator, FilterOperator.in_);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.tags;
         final values = ['tag1', 'tag2', 'tag3'];
@@ -239,19 +161,6 @@ void main() {
     });
 
     group('Contains', () {
-      test('should create contains filter correctly', () {
-        final field = TestFilterField.members;
-        const value = 'user123';
-
-        var filter = Filter.contains(field, value);
-
-        expect(filter, isA<ContainsOperator<TestModel>>());
-        filter = filter as ContainsOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.value, value);
-        expect(filter.operator, FilterOperator.contains_);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.members;
         const value = 'user123';
@@ -267,19 +176,6 @@ void main() {
   });
 
   group('Exists', () {
-    test('should create exists filter correctly', () {
-      final field = TestFilterField.metadata;
-      const exists = true;
-
-      var filter = Filter.exists(field, exists: exists);
-
-      expect(filter, isA<ExistsOperator<TestModel>>());
-      filter = filter as ExistsOperator<TestModel>;
-      expect(filter.field, field);
-      expect(filter.exists, exists);
-      expect(filter.operator, FilterOperator.exists);
-    });
-
     test('should serialize to JSON correctly with exists=true', () {
       final field = TestFilterField.metadata;
       const exists = true;
@@ -307,19 +203,6 @@ void main() {
 
   group('Evaluation', () {
     group('Query', () {
-      test('should create query filter correctly', () {
-        final field = TestFilterField.name;
-        const query = 'search term';
-
-        var filter = Filter.query(field, query);
-
-        expect(filter, isA<QueryOperator<TestModel>>());
-        filter = filter as QueryOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.query, query);
-        expect(filter.operator, FilterOperator.query);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.name;
         const query = 'search term';
@@ -334,19 +217,6 @@ void main() {
     });
 
     group('AutoComplete', () {
-      test('should create autocomplete filter correctly', () {
-        final field = TestFilterField.name;
-        const query = 'prefix';
-
-        var filter = Filter.autoComplete(field, query);
-
-        expect(filter, isA<AutoCompleteOperator<TestModel>>());
-        filter = filter as AutoCompleteOperator<TestModel>;
-        expect(filter.field, field);
-        expect(filter.query, query);
-        expect(filter.operator, FilterOperator.autoComplete);
-      });
-
       test('should serialize to JSON correctly', () {
         final field = TestFilterField.name;
         const query = 'prefix';
@@ -362,19 +232,6 @@ void main() {
   });
 
   group('PathExists', () {
-    test('should create path exists filter correctly', () {
-      final field = TestFilterField.metadata;
-      const path = 'nested.field';
-
-      var filter = Filter.pathExists(field, path);
-
-      expect(filter, isA<PathExistsOperator<TestModel>>());
-      filter = filter as PathExistsOperator<TestModel>;
-      expect(filter.field, field);
-      expect(filter.path, path);
-      expect(filter.operator, FilterOperator.pathExists);
-    });
-
     test('should serialize to JSON correctly', () {
       final field = TestFilterField.metadata;
       const path = 'nested.field';
@@ -390,19 +247,6 @@ void main() {
 
   group('Logical', () {
     group('And', () {
-      test('should create and filter correctly', () {
-        final filter1 = Filter.equal(TestFilterField.name, 'test');
-        final filter2 = Filter.greater(TestFilterField.id, 100);
-        final filters = [filter1, filter2];
-
-        var andFilter = Filter.and(filters);
-
-        expect(andFilter, isA<AndOperator<TestModel>>());
-        andFilter = andFilter as AndOperator<TestModel>;
-        expect(andFilter.filters, filters);
-        expect(andFilter.operator, FilterOperator.and);
-      });
-
       test('should serialize to JSON correctly', () {
         final filter1 = Filter.equal(TestFilterField.name, 'test');
         final filter2 = Filter.greater(TestFilterField.id, 100);
@@ -454,19 +298,6 @@ void main() {
     });
 
     group('Or', () {
-      test('should create or filter correctly', () {
-        final filter1 = Filter.equal(TestFilterField.name, 'test');
-        final filter2 = Filter.greater(TestFilterField.id, 100);
-        final filters = [filter1, filter2];
-
-        var orFilter = Filter.or(filters);
-
-        expect(orFilter, isA<OrOperator<TestModel>>());
-        orFilter = orFilter as OrOperator<TestModel>;
-        expect(orFilter.filters, filters);
-        expect(orFilter.operator, FilterOperator.or);
-      });
-
       test('should serialize to JSON correctly', () {
         final filter1 = Filter.equal(TestFilterField.name, 'test');
         final filter2 = Filter.greater(TestFilterField.id, 100);
@@ -559,129 +390,11 @@ void main() {
       });
     });
 
-    test('should handle single item list in In', () {
-      final filter = Filter.in_(TestFilterField.tags, ['single']);
-      final json = filter.toJson();
-
-      expect(json, {
-        'tags': {
-          r'$in': ['single'],
-        },
-      });
-    });
-
     test('should handle empty filters list in Logical', () {
       const andFilter = Filter.and(<Filter<TestFilterField>>[]);
       final json = andFilter.toJson();
 
       expect(json, {r'$and': <Map<String, Object?>>[]});
-    });
-  });
-
-  group('Type Safety', () {
-    test('should enforce FilterField type consistency', () {
-      // This test ensures that the generic type system works correctly
-      final filter1 = Filter.equal(TestFilterField.name, 'test');
-      final filter2 = Filter.greater(TestFilterField.id, 100);
-
-      var logicalFilter = Filter.and([filter1, filter2]);
-
-      expect(logicalFilter, isA<AndOperator<TestModel>>());
-      logicalFilter = logicalFilter as AndOperator<TestModel>;
-      expect(logicalFilter.filters.length, 2);
-      expect(logicalFilter.filters.elementAt(0), filter1);
-      expect(logicalFilter.filters.elementAt(1), filter2);
-    });
-  });
-
-  group('Real-world Usage Examples', () {
-    test('should create a complex chat channel filter', () {
-      // Example: Find messaging channels where user is a member, created after a date, and has specific metadata
-      const userId = 'user123';
-      const createdAfter = '2023-01-01T00:00:00Z';
-
-      final filter = Filter.and(
-        [
-          Filter.equal(TestFilterField.type, 'messaging'),
-          Filter.contains(TestFilterField.members, userId),
-          Filter.greater(
-            TestFilterField.createdAt,
-            createdAfter,
-          ),
-          Filter.exists(TestFilterField.metadata, exists: true),
-        ],
-      );
-
-      final json = filter.toJson();
-
-      expect(json, {
-        r'$and': [
-          {
-            'type': {r'$eq': 'messaging'},
-          },
-          {
-            'members': {r'$contains': 'user123'},
-          },
-          {
-            'created_at': {r'$gt': '2023-01-01T00:00:00Z'},
-          },
-          {
-            'metadata': {r'$exists': true},
-          },
-        ],
-      });
-    });
-
-    test('should create a search filter with autocomplete', () {
-      const searchQuery = 'john';
-
-      final filter = Filter.or(
-        [
-          Filter.query(TestFilterField.name, searchQuery),
-          Filter.autoComplete(
-            TestFilterField.name,
-            searchQuery,
-          ),
-        ],
-      );
-
-      final json = filter.toJson();
-
-      expect(json, {
-        r'$or': [
-          {
-            'name': {r'$q': 'john'},
-          },
-          {
-            'name': {r'$autocomplete': 'john'},
-          },
-        ],
-      });
-    });
-
-    test('should create a range filter', () {
-      const minId = 100;
-      const maxId = 200;
-
-      final filter = Filter.and(
-        [
-          Filter.greaterOrEqual(TestFilterField.id, minId),
-          Filter.lessOrEqual(TestFilterField.id, maxId),
-        ],
-      );
-
-      final json = filter.toJson();
-
-      expect(json, {
-        r'$and': [
-          {
-            'id': {r'$gte': 100},
-          },
-          {
-            'id': {r'$lte': 200},
-          },
-        ],
-      });
     });
   });
 

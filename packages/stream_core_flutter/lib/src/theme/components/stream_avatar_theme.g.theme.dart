@@ -34,6 +34,12 @@ mixin _$StreamAvatarThemeData {
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
       border: BoxBorder.lerp(a.border, b.border, t),
+      isFloating: t < 0.5 ? a.isFloating : b.isFloating,
+      floatingElevation: lerpDouble$(
+        a.floatingElevation,
+        b.floatingElevation,
+        t,
+      ),
     );
   }
 
@@ -42,6 +48,8 @@ mixin _$StreamAvatarThemeData {
     Color? backgroundColor,
     Color? foregroundColor,
     BoxBorder? border,
+    bool? isFloating,
+    double? floatingElevation,
   }) {
     final _this = (this as StreamAvatarThemeData);
 
@@ -50,6 +58,8 @@ mixin _$StreamAvatarThemeData {
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       foregroundColor: foregroundColor ?? _this.foregroundColor,
       border: border ?? _this.border,
+      isFloating: isFloating ?? _this.isFloating,
+      floatingElevation: floatingElevation ?? _this.floatingElevation,
     );
   }
 
@@ -69,6 +79,8 @@ mixin _$StreamAvatarThemeData {
       backgroundColor: other.backgroundColor,
       foregroundColor: other.foregroundColor,
       border: other.border,
+      isFloating: other.isFloating,
+      floatingElevation: other.floatingElevation,
     );
   }
 
@@ -88,7 +100,9 @@ mixin _$StreamAvatarThemeData {
     return _other.size == _this.size &&
         _other.backgroundColor == _this.backgroundColor &&
         _other.foregroundColor == _this.foregroundColor &&
-        _other.border == _this.border;
+        _other.border == _this.border &&
+        _other.isFloating == _this.isFloating &&
+        _other.floatingElevation == _this.floatingElevation;
   }
 
   @override
@@ -101,6 +115,8 @@ mixin _$StreamAvatarThemeData {
       _this.backgroundColor,
       _this.foregroundColor,
       _this.border,
+      _this.isFloating,
+      _this.floatingElevation,
     );
   }
 }

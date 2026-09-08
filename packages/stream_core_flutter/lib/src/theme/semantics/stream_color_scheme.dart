@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:stream_core/stream_core.dart' show Standard;
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
-import '../../theme/primitives/stream_colors.dart';
 import '../primitives/internal/tokens/dark/stream_tokens.dart' as dark_tokens;
 import '../primitives/internal/tokens/light/stream_tokens.dart' as light_tokens;
+import '../primitives/stream_colors.dart';
 
 part 'stream_color_scheme.g.theme.dart';
 
@@ -73,6 +74,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
+    Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundInverse,
 
@@ -141,6 +143,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundScrim ??= light_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= light_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= light_tokens.StreamTokens.backgroundCoreOverlayDark;
+    backgroundOverlayDarkStrong ??= light_tokens.StreamTokens.backgroundCoreOverlayDarkStrong;
     backgroundDisabled ??= chrome.shade100;
     backgroundInverse ??= chrome[1000] ?? StreamColors.black;
 
@@ -207,6 +210,7 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
+      brightness: .light,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,
@@ -231,6 +235,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
       backgroundOverlayDark: backgroundOverlayDark,
+      backgroundOverlayDarkStrong: backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
@@ -294,6 +299,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
     Color? backgroundOverlayDark,
+    Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundInverse,
     // Background - Elevation
@@ -361,6 +367,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundScrim ??= dark_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= dark_tokens.StreamTokens.backgroundCoreOverlayLight;
     backgroundOverlayDark ??= dark_tokens.StreamTokens.backgroundCoreOverlayDark;
+    backgroundOverlayDarkStrong ??= dark_tokens.StreamTokens.backgroundCoreOverlayDarkStrong;
     backgroundDisabled ??= chrome.shade100;
     backgroundInverse ??= chrome[1000] ?? StreamColors.white;
 
@@ -427,6 +434,7 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
+      brightness: .dark,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,
@@ -451,6 +459,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
       backgroundOverlayDark: backgroundOverlayDark,
+      backgroundOverlayDarkStrong: backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
       backgroundElevation0: backgroundElevation0,
@@ -484,7 +493,34 @@ class StreamColorScheme with _$StreamColorScheme {
     );
   }
 
+  /// Builds a complete color scheme from a single [brand] seed color.
+  ///
+  /// The brand and chrome scales are generated in HCT — see
+  /// [StreamColorSwatch.fromColor]. When [chrome] is omitted it is derived from
+  /// [brand] at [neutralChroma], so chrome-dependent colors still pick up the brand's
+  /// hue. Every semantic color not covered by those two scales falls back to the SDK
+  /// default for [brightness].
+  factory StreamColorScheme.fromSeed({
+    required Color brand,
+    Color? chrome,
+    Brightness brightness = Brightness.light,
+  }) {
+    final colorScheme = brightness == Brightness.light ? StreamColorScheme.light : StreamColorScheme.dark;
+    return colorScheme(
+      brand: StreamColorSwatch.fromColor(brand, brightness: brightness),
+      chrome:
+          chrome?.let(
+            (chromeColor) => StreamColorSwatch.fromColor(
+              chromeColor,
+              brightness: brightness,
+            ),
+          ) ??
+          StreamColorSwatch.fromColor(brand, brightness: brightness, chroma: neutralChroma),
+    );
+  }
+
   const StreamColorScheme.raw({
+    this.brightness = Brightness.light,
     required this.brand,
     required this.chrome,
     // Accent
@@ -512,6 +548,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundScrim,
     required this.backgroundOverlayLight,
     required this.backgroundOverlayDark,
+    required this.backgroundOverlayDarkStrong,
     required this.backgroundDisabled,
     required this.backgroundInverse,
     // Background - Elevation
@@ -549,6 +586,16 @@ class StreamColorScheme with _$StreamColorScheme {
     // Avatar
     required this.avatarPalette,
   });
+
+  /// Chroma, in HCT units, used to derive a chrome scale from a brand color.
+  ///
+  /// Measured from the default chrome scale, whose chroma peaks at 15.9 on shade 500.
+  /// Low enough that the result reads as neutral, high enough that it still carries the
+  /// brand's hue rather than collapsing to grey.
+  static const neutralChroma = 16.0;
+
+  /// The brightness of the color scheme.
+  final Brightness brightness;
 
   // ---- Brand ----
 
@@ -630,6 +677,12 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The dark overlay background color.
   final Color backgroundOverlayDark;
+
+  /// A stronger dark overlay background color.
+  ///
+  /// Used where content has to stay legible on top of arbitrary imagery or
+  /// video, such as the name pill on a call participant tile.
+  final Color backgroundOverlayDarkStrong;
 
   /// Disabled backgrounds for inputs, buttons, or chips.
   final Color backgroundDisabled;

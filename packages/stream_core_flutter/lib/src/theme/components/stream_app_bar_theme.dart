@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../stream_surface_style.dart';
 import '../stream_theme.dart';
 import 'stream_button_theme.dart';
 
@@ -107,7 +108,7 @@ class StreamAppBarThemeData with _$StreamAppBarThemeData {
 
 /// Visual styling properties for a [StreamAppBar].
 ///
-/// Defines the appearance of the app bar — background colour, padding,
+/// Defines the appearance of the app bar — background color, padding,
 /// inter-slot spacing, title and subtitle text styles, and per-slot button
 /// style propagation.
 ///
@@ -136,7 +137,9 @@ class StreamAppBarThemeData with _$StreamAppBarThemeData {
 class StreamAppBarStyle with _$StreamAppBarStyle {
   /// Creates an app bar style with optional property overrides.
   const StreamAppBarStyle({
+    this.surfaceStyle,
     this.backgroundColor,
+    this.floatingBackgroundColor,
     this.padding,
     this.spacing,
     this.titleTextStyle,
@@ -145,10 +148,21 @@ class StreamAppBarStyle with _$StreamAppBarStyle {
     this.trailingStyle,
   });
 
-  /// The background colour of the app bar.
+  /// The floating or regular surface style for this app bar.
+  ///
+  /// When null the value falls back to the app-wide [StreamSurfaceStyle] set on
+  /// [StreamTheme].
+  final StreamSurfaceStyle? surfaceStyle;
+
+  /// The background color of the app bar when docked.
+  ///
+  /// Ignored when floating — the floating style uses [floatingBackgroundColor].
   final Color? backgroundColor;
 
-  /// The padding around the header's content row.
+  /// The background color of the app bar when floating.
+  final Color? floatingBackgroundColor;
+
+  /// The padding around the bar's content row.
   final EdgeInsetsGeometry? padding;
 
   /// The horizontal space between the leading, heading, and trailing slots.

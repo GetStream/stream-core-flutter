@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
+import 'stream_emoji_chip_theme.dart';
 
 part 'stream_reactions_theme.g.theme.dart';
 
@@ -128,6 +129,7 @@ class StreamReactionsThemeData with _$StreamReactionsThemeData {
     this.spacing,
     this.gap,
     this.overlapExtent,
+    this.chipStyle,
   });
 
   /// The gap between adjacent reaction chips.
@@ -142,6 +144,12 @@ class StreamReactionsThemeData with _$StreamReactionsThemeData {
   ///
   /// Higher values move the reactions further into the child.
   final double? overlapExtent;
+
+  /// The style applied to each reaction chip.
+  ///
+  /// Merged over the default reaction chip appearance, so unset properties
+  /// fall back to those defaults.
+  final StreamEmojiChipThemeStyle? chipStyle;
 
   /// Linearly interpolate between two [StreamReactionsThemeData] objects.
   static StreamReactionsThemeData? lerp(

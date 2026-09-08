@@ -91,7 +91,14 @@ class StreamAvatarGroup extends StatelessWidget {
     super.key,
     StreamAvatarGroupSize? size,
     required Iterable<Widget> children,
-  }) : props = .new(size: size, children: children);
+    bool isFloating = false,
+    String? semanticsLabel,
+  }) : props = .new(
+         size: size,
+         children: children,
+         isFloating: isFloating,
+         semanticsLabel: semanticsLabel,
+       );
 
   /// The properties that configure this avatar group.
   final StreamAvatarGroupProps props;
@@ -118,6 +125,8 @@ class StreamAvatarGroupProps {
   const StreamAvatarGroupProps({
     this.size,
     required this.children,
+    this.isFloating = false,
+    this.semanticsLabel,
   });
 
   /// The list of avatars to display in the group.
@@ -129,6 +138,20 @@ class StreamAvatarGroupProps {
   ///
   /// If null, defaults to [StreamAvatarGroupSize.lg].
   final StreamAvatarGroupSize? size;
+
+  /// Whether each individual avatar is in a floating state, rendering with a drop shadow.
+  ///
+  /// Defaults to false. The elevation used is [StreamAvatarThemeData.floatingElevation],
+  /// falling back to `3`.
+  final bool isFloating;
+
+  /// Screen-reader label for the avatar group.
+  ///
+  /// When null (the default), the group composes through — each child's own
+  /// [StreamAvatar.semanticsLabel] applies. When non-null, the group is
+  /// exposed as a single labeled image node and its children (including the
+  /// "+N" overflow badge) are dropped from the semantics tree.
+  final String? semanticsLabel;
 }
 
 /// The default implementation of [StreamAvatarGroup].
@@ -159,7 +182,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
 
     const avatarBorderWidth = 2.0;
 
-    return AnimatedContainer(
+    Widget group = AnimatedContainer(
       width: effectiveSize.value,
       height: effectiveSize.value,
       duration: kThemeChangeDuration,
@@ -174,6 +197,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
               color: colorScheme.borderOnInverse,
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
+            isFloating: props.isFloating,
           ),
           child: StreamBadgeCountTheme(
             data: StreamBadgeCountThemeData(size: badgeCountSize),
@@ -190,6 +214,17 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
         ),
       ),
     );
+
+    if (props.semanticsLabel case final label?) {
+      group = Semantics(
+        label: label,
+        image: true,
+        excludeSemantics: true,
+        child: group,
+      );
+    }
+
+    return group;
   }
 
   // Build the widget for 1 avatar.

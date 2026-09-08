@@ -2,9 +2,9 @@ import 'package:dio/dio.dart';
 
 typedef ConnectionIdGetter = String? Function();
 
-/// Interceptor that injects the connection id in the request params
+/// Interceptor that injects the connection id into the request params.
 class ConnectionIdInterceptor extends Interceptor {
-  /// Initialize a new [ConnectionIdInterceptor].
+  /// Creates a new [ConnectionIdInterceptor].
   const ConnectionIdInterceptor(this._connectionId);
 
   /// The getter for the connection id.

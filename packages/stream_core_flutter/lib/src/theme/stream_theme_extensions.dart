@@ -6,6 +6,7 @@ import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
 import 'components/stream_bottom_app_bar_theme.dart';
+import 'components/stream_bottom_nav_bar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
@@ -33,9 +34,11 @@ import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
 import 'components/stream_snackbar_theme.dart';
+import 'components/stream_split_button_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'primitives/stream_elevation.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -43,6 +46,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
+import 'stream_surface_style.dart';
 import 'stream_theme.dart';
 
 /// Extension on [BuildContext] for convenient access to [StreamTheme].
@@ -87,6 +91,12 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamSpacing] from the current theme.
   StreamSpacing get streamSpacing => streamTheme.spacing;
 
+  /// Returns the [StreamElevation] from the current theme.
+  StreamElevation get streamElevation => streamTheme.elevation;
+
+  /// Returns the app-wide [StreamSurfaceStyle] from the current theme.
+  StreamSurfaceStyle get streamSurfaceStyle => streamTheme.surfaceStyle;
+
   /// Returns the [StreamBoxShadow] from the current theme.
   StreamBoxShadow get streamBoxShadow => streamTheme.boxShadow;
 
@@ -107,6 +117,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamBottomAppBarThemeData] from the nearest ancestor.
   StreamBottomAppBarThemeData get streamBottomAppBarTheme => StreamBottomAppBarTheme.of(this);
+
+  /// Returns the [StreamBottomNavBarThemeData] from the nearest ancestor.
+  StreamBottomNavBarThemeData get streamBottomNavBarTheme => StreamBottomNavBarTheme.of(this);
 
   /// Returns the [StreamButtonThemeData] from the nearest ancestor.
   StreamButtonThemeData get streamButtonTheme => StreamButtonTheme.of(this);
@@ -198,6 +211,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamSnackbarThemeData] from the nearest ancestor.
   StreamSnackbarThemeData get streamSnackbarTheme => StreamSnackbarTheme.of(this);
+
+  /// Returns the [StreamSplitButtonThemeData] from the nearest ancestor.
+  StreamSplitButtonThemeData get streamSplitButtonTheme => StreamSplitButtonTheme.of(this);
 
   /// Returns the [StreamStepperThemeData] from the nearest ancestor.
   StreamStepperThemeData get streamStepperTheme => StreamStepperTheme.of(this);

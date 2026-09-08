@@ -240,14 +240,23 @@ class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
   late final StreamSpacing _spacing = _context.streamSpacing;
 
+  // Resolves to [standard] for inline messages, and to white for previews,
+  // where the message sits on a scrim and annotations need the extra contrast.
+  StreamMessageLayoutProperty<Color> _presentationAware(Color standard) => .resolveWith(
+    (layout) => switch (layout.presentation) {
+      .standard => standard,
+      .preview => _colorScheme.textOnAccent,
+    },
+  );
+
   @override
   StreamMessageLayoutProperty<TextStyle> get textStyle => .all(_textTheme.metadataEmphasis);
 
   @override
-  StreamMessageLayoutProperty<Color> get textColor => .all(_colorScheme.textPrimary);
+  StreamMessageLayoutProperty<Color> get textColor => _presentationAware(_colorScheme.textPrimary);
 
   @override
-  StreamMessageLayoutProperty<Color> get iconColor => .all(_colorScheme.textPrimary);
+  StreamMessageLayoutProperty<Color> get iconColor => _presentationAware(_colorScheme.textPrimary);
 
   @override
   StreamMessageLayoutProperty<double> get iconSize => .all(16);
@@ -262,5 +271,5 @@ class _StreamMessageAnnotationDefaults extends StreamMessageAnnotationStyle {
   StreamMessageLayoutProperty<TextStyle> get trailingTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  StreamMessageLayoutProperty<Color> get trailingTextColor => .all(_colorScheme.textPrimary);
+  StreamMessageLayoutProperty<Color> get trailingTextColor => _presentationAware(_colorScheme.textPrimary);
 }

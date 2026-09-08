@@ -39,6 +39,14 @@ linter:
     # Single quotes are easier to type and don't compromise on readability.
     prefer_double_quotes: false
 
+    # Conflicts with `unnecessary_await_in_return`, which stays enabled.
+    # The `await` only matters inside a `try`, and no site returns one there.
+    async_return_with_no_await: false
+
+    # Enabled once the packages move to `material_ui`; until then it fires on
+    # every `package:flutter/material.dart` import in the repo.
+    migrate_design_widgets: false
+
     # Conflicts with `omit_local_variable_types` and other rules.
     # As per Dart guidelines, we want to avoid unnecessary types to make the code
     # more readable.

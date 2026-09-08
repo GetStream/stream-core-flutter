@@ -53,7 +53,8 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
     initialValue: true,
     description:
         'Color the trailing text with the theme link color '
-        '(instead of the default primary text color).',
+        '(instead of the default primary text color). Skipped for the preview '
+        'presentation, where the link color would lose contrast against the scrim.',
   );
 
   final spacing = context.knobs.double.slider(
@@ -79,32 +80,50 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
     description: 'Horizontal padding around the row content.',
   );
 
+  final presentation = context.knobs.object.dropdown<StreamMessagePresentation>(
+    label: 'Presentation',
+    options: StreamMessagePresentation.values,
+    initialOption: StreamMessagePresentation.standard,
+    labelBuilder: (v) => v.name,
+    description:
+        'What the message is drawn on. Preview (the long-press actions modal) sits above a '
+        'scrim, so the label, icon and trailing switch to textOnAccent.',
+  );
+
   final isActionable = showTrailing && trailingAsLink;
 
-  return Center(
-    child: StreamMessageAnnotation(
-      onTap: isActionable
-          ? () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  const SnackBar(
-                    content: Text('Tapped'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-            }
-          : null,
-      leading: showLeading ? Icon(leadingIcon.resolve(icons)) : null,
-      label: Text(label),
-      trailing: showTrailing ? Text(trailingText) : null,
-      style: StreamMessageAnnotationStyle.from(
-        spacing: spacing,
-        padding: EdgeInsets.symmetric(
-          vertical: verticalPadding,
-          horizontal: horizontalPadding,
+  return _PresentationBackdrop(
+    presentation: presentation,
+    child: Center(
+      child: StreamMessageLayout(
+        data: StreamMessageLayoutData(presentation: presentation),
+        child: StreamMessageAnnotation(
+          onTap: isActionable
+              ? () {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(
+                        content: Text('Tapped'),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                }
+              : null,
+          leading: showLeading ? Icon(leadingIcon.resolve(icons)) : null,
+          label: Text(label),
+          trailing: showTrailing ? Text(trailingText) : null,
+          style: StreamMessageAnnotationStyle(
+            spacing: StreamMessageLayoutProperty.all(spacing),
+            padding: StreamMessageLayoutProperty.all(
+              EdgeInsets.symmetric(
+                vertical: verticalPadding,
+                horizontal: horizontalPadding,
+              ),
+            ),
+            trailingTextColor: trailingAsLink ? _linkColor(colorScheme.textLink) : null,
+          ),
         ),
-        trailingTextColor: trailingAsLink ? colorScheme.textLink : null,
       ),
     ),
   );
@@ -132,6 +151,7 @@ Widget buildStreamMessageAnnotationShowcase(BuildContext context) {
         spacing: 32,
         children: [
           _AnnotationTypesSection(),
+          _PresentationSection(),
           _ThemeOverrideSection(),
           _RealWorldSection(),
         ],
@@ -244,6 +264,77 @@ class _AnnotationTypesSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PresentationSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const _Section(
+      label: 'PRESENTATION',
+      description:
+          'StreamMessageLayoutData.presentation tells the annotation what the message is drawn on. '
+          'A preview — the long-press actions modal — sits above backgroundScrim, so the label, icon '
+          'and trailing resolve to textOnAccent. A style override wins over that default, so give the '
+          'override its own resolver when it should step aside for previews — the link-colored trailing '
+          'below does exactly that.',
+      children: [
+        _ExampleCard(
+          label: 'Standard (inline)',
+          subtitle: 'Rendered in the message list, on the app background.',
+          child: _PresentationExample(presentation: StreamMessagePresentation.standard),
+        ),
+        _ExampleCard(
+          label: 'Preview (above a scrim)',
+          subtitle: 'The whole row — label, icon and trailing link — turns white on the scrim.',
+          child: _PresentationExample(presentation: StreamMessagePresentation.preview),
+        ),
+      ],
+    );
+  }
+}
+
+class _PresentationExample extends StatelessWidget {
+  const _PresentationExample({required this.presentation});
+
+  final StreamMessagePresentation presentation;
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = context.streamIcons;
+    final colorScheme = context.streamColorScheme;
+    final radius = context.streamRadius;
+
+    return _PresentationBackdrop(
+      presentation: presentation,
+      borderRadius: BorderRadius.all(radius.md),
+      padding: const EdgeInsets.all(16),
+      child: StreamMessageLayout(
+        data: StreamMessageLayoutData(presentation: presentation),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 4,
+          children: [
+            StreamMessageAnnotation(
+              leading: Icon(icons.pin),
+              label: const Text('Pinned by Alice'),
+            ),
+            StreamMessageBubble(
+              child: StreamMessageText('Meeting at 3 PM today.'),
+            ),
+            StreamMessageAnnotation(
+              onTap: () {},
+              leading: Icon(icons.arrowUp),
+              label: const Text('Also sent in channel ·'),
+              trailing: const Text('View'),
+              style: StreamMessageAnnotationStyle(
+                trailingTextColor: _linkColor(colorScheme.textLink),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -406,6 +497,19 @@ class _RealWorldSection extends StatelessWidget {
 // Helper Widgets & Data
 // =============================================================================
 
+/// A link-colored trailing override that applies to the `standard`
+/// presentation only.
+///
+/// Returning null for `preview` lets the resolver fall through to the
+/// presentation-aware default ([StreamColorScheme.textOnAccent]), so the whole
+/// row stays white on the scrim instead of keeping a low-contrast link color.
+StreamMessageLayoutProperty<Color?> _linkColor(Color link) => StreamMessageLayoutProperty.resolveWith(
+  (layout) => switch (layout.presentation) {
+    StreamMessagePresentation.standard => link,
+    StreamMessagePresentation.preview => null,
+  },
+);
+
 enum _IconOption {
   bookmark('Bookmark'),
   pin('Pin'),
@@ -424,6 +528,53 @@ enum _IconOption {
     arrowUp => icons.arrowUp,
     translate => Icons.translate,
   };
+}
+
+/// Paints what a message sits on for the given [presentation]: the app
+/// background for `standard`, and the app background behind a scrim for
+/// `preview`, mirroring the long-press message-actions modal.
+///
+/// Fills the space it is given, so the scrim reads as the whole backdrop
+/// rather than a box behind the component.
+class _PresentationBackdrop extends StatelessWidget {
+  const _PresentationBackdrop({
+    required this.presentation,
+    required this.child,
+    this.borderRadius,
+    this.padding = EdgeInsets.zero,
+  });
+
+  final StreamMessagePresentation presentation;
+  final BorderRadiusGeometry? borderRadius;
+  final EdgeInsetsGeometry padding;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+
+    final scrim = switch (presentation) {
+      StreamMessagePresentation.standard => null,
+      StreamMessagePresentation.preview => colorScheme.backgroundScrim,
+    };
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundApp,
+        borderRadius: borderRadius,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scrim,
+          borderRadius: borderRadius,
+        ),
+        child: Padding(
+          padding: padding,
+          child: SizedBox(width: double.infinity, child: child),
+        ),
+      ),
+    );
+  }
 }
 
 class _Section extends StatelessWidget {

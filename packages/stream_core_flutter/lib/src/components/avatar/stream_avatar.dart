@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/primitives/stream_colors.dart';
+import '../../theme/primitives/stream_elevation.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -85,6 +86,8 @@ class StreamAvatar extends StatelessWidget {
     Color? backgroundColor,
     Color? foregroundColor,
     bool showBorder = true,
+    bool? isFloating,
+    String? semanticsLabel,
   }) : props = .new(
          size: size,
          imageUrl: imageUrl,
@@ -92,6 +95,8 @@ class StreamAvatar extends StatelessWidget {
          backgroundColor: backgroundColor,
          foregroundColor: foregroundColor,
          showBorder: showBorder,
+         isFloating: isFloating,
+         semanticsLabel: semanticsLabel,
        );
 
   /// The properties that configure this avatar.
@@ -123,6 +128,8 @@ class StreamAvatarProps {
     this.backgroundColor,
     this.foregroundColor,
     this.showBorder = true,
+    this.isFloating,
+    this.semanticsLabel,
   });
 
   /// The URL of the avatar image.
@@ -164,6 +171,20 @@ class StreamAvatarProps {
   /// Defaults to true. The border style is determined by
   /// [StreamAvatarThemeData.border].
   final bool showBorder;
+
+  /// Whether this avatar is in a floating state, rendering with a drop shadow.
+  ///
+  /// When true, the elevation is taken from [StreamAvatarThemeData.floatingElevation],
+  /// falling back to `6`. When false or null (resolved to false), no shadow is shown.
+  final bool? isFloating;
+
+  /// Screen-reader label for the avatar.
+  ///
+  /// When null (the default), the placeholder speaks for itself — wrap in
+  /// [ExcludeSemantics] when the surrounding row already labels the user.
+  /// When non-null, the avatar is exposed as a labeled image node and the
+  /// placeholder is dropped from the semantics tree.
+  final String? semanticsLabel;
 }
 
 /// The default implementation of [StreamAvatar].
@@ -191,47 +212,69 @@ class DefaultStreamAvatar extends StatelessWidget {
     final effectiveSize = props.size ?? avatarTheme.size ?? defaults.size;
     final effectiveBackgroundColor = props.backgroundColor ?? avatarTheme.backgroundColor ?? defaults.backgroundColor;
     final effectiveForegroundColor = props.foregroundColor ?? avatarTheme.foregroundColor ?? defaults.foregroundColor;
+    final effectiveIsFloating = props.isFloating ?? avatarTheme.isFloating ?? false;
+    final effectiveElevation = effectiveIsFloating
+        ? (avatarTheme.floatingElevation ?? defaults.floatingElevation)
+        : context.streamElevation.none;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
 
-    final border = props.showBorder ? effectiveBorder : null;
+    // Avatars are circular, so the border is always uniform — use any side.
+    final borderSide = props.showBorder ? effectiveBorder.top : BorderSide.none;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);
     final iconTheme = IconTheme.of(context).copyWith(
       color: effectiveForegroundColor,
       size: _iconSizeForSize(effectiveSize),
     );
 
-    return AnimatedContainer(
-      alignment: .center,
-      clipBehavior: .antiAlias,
-      width: effectiveSize.value,
-      height: effectiveSize.value,
-      duration: kThemeChangeDuration,
-      foregroundDecoration: BoxDecoration(shape: .circle, border: border),
-      decoration: BoxDecoration(shape: .circle, color: effectiveBackgroundColor),
-      child: Center(
-        // Need to disable text scaling here so that the text doesn't
-        // escape the avatar when the textScaleFactor is large.
-        child: MediaQuery.withNoTextScaling(
-          child: IconTheme(
-            data: iconTheme,
-            child: DefaultTextStyle(
-              style: textStyle,
-              child: switch (props.imageUrl) {
-                final imageUrl? => StreamNetworkImage(
-                  imageUrl,
-                  fit: .cover,
-                  width: effectiveSize.value,
-                  height: effectiveSize.value,
-                  placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
-                  errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
+    // Material clips children via PhysicalShape, so a border with strokeAlignOutside
+    // on the Material's shape gets clipped. Draw the border outside Material instead.
+    Widget avatar = SizedBox.square(
+      dimension: effectiveSize.value,
+      child: DecoratedBox(
+        decoration: ShapeDecoration(shape: CircleBorder(side: borderSide)),
+        position: DecorationPosition.foreground,
+        child: Material(
+          shape: const CircleBorder(),
+          color: effectiveBackgroundColor,
+          elevation: effectiveElevation,
+          clipBehavior: .antiAlias,
+          child: Center(
+            // Need to disable text scaling here so that the text doesn't
+            // escape the avatar when the textScaleFactor is large.
+            child: MediaQuery.withNoTextScaling(
+              child: IconTheme(
+                data: iconTheme,
+                child: DefaultTextStyle(
+                  style: textStyle,
+                  child: switch (props.imageUrl) {
+                    final imageUrl? => StreamNetworkImage(
+                      imageUrl,
+                      fit: .cover,
+                      width: effectiveSize.value,
+                      height: effectiveSize.value,
+                      placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
+                      errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
+                    ),
+                    _ => props.placeholder.call(context),
+                  },
                 ),
-                _ => props.placeholder.call(context),
-              },
+              ),
             ),
           ),
         ),
       ),
     );
+
+    if (props.semanticsLabel case final label?) {
+      avatar = Semantics(
+        label: label,
+        image: true,
+        excludeSemantics: true,
+        child: avatar,
+      );
+    }
+
+    return avatar;
   }
 
   // Returns the appropriate text style for the given avatar size.
@@ -269,10 +312,15 @@ class DefaultStreamAvatar extends StatelessWidget {
 class _StreamAvatarThemeDefaults extends StreamAvatarThemeData {
   _StreamAvatarThemeDefaults(
     this.context,
-  ) : _colorScheme = context.streamColorScheme;
+  ) : _colorScheme = context.streamColorScheme,
+      _elevation = context.streamElevation;
 
   final BuildContext context;
   final StreamColorScheme _colorScheme;
+  final StreamElevation _elevation;
+
+  @override
+  double get floatingElevation => _elevation.level3;
 
   @override
   StreamAvatarSize get size => StreamAvatarSize.lg;

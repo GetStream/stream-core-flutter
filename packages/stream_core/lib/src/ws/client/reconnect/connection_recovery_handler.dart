@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:rxdart/utils.dart';
 
+import '../../../logger.dart';
 import '../../../utils.dart';
 import '../stream_web_socket_client.dart';
 import '../web_socket_connection_state.dart';
@@ -18,6 +19,11 @@ import 'retry_strategy.dart';
 /// when reconnection should occur, implementing exponential backoff with jitter for optimal
 /// retry behavior.
 ///
+/// Only connections that were established are recovered. A first attempt that fails is reported
+/// through [StreamWebSocketClient.connectionState] and left there, so it is not retried here, not
+/// even when the network returns; making another belongs to whoever called
+/// [StreamWebSocketClient.connect].
+///
 /// ## Built-in Policies
 ///
 /// The handler automatically includes several reconnection policies:
@@ -30,7 +36,7 @@ import 'retry_strategy.dart';
 /// final recoveryHandler = ConnectionRecoveryHandler(
 ///   client: client,
 ///   networkStateProvider: NetworkStateProvider(),
-///   appLifecycleStateProvider: AppLifecycleStateProvider(),
+///   lifecycleStateProvider: myLifecycleStateProvider,
 /// );
 /// ```
 class ConnectionRecoveryHandler extends Disposable {
@@ -39,12 +45,13 @@ class ConnectionRecoveryHandler extends Disposable {
     required StreamWebSocketClient client,
     NetworkStateProvider? networkStateProvider,
     LifecycleStateProvider? lifecycleStateProvider,
-    bool keepConnectionAliveInBackground = false,
+    this._keepConnectionAliveInBackground = false,
     List<AutomaticReconnectionPolicy>? policies,
     RetryStrategy? retryStrategy,
+    String tag = 'SC:WsRecovery',
   }) : _client = client,
+       _logger = StreamLogger(tag),
        _reconnectStrategy = retryStrategy ?? RetryStrategy(),
-       _keepConnectionAliveInBackground = keepConnectionAliveInBackground,
        _policies = <AutomaticReconnectionPolicy>[
          ...?policies,
          WebSocketAutomaticReconnectionPolicy(
@@ -74,11 +81,16 @@ class ConnectionRecoveryHandler extends Disposable {
   }
 
   final StreamWebSocketClient _client;
+  final StreamLogger _logger;
   final RetryStrategy _reconnectStrategy;
   final bool _keepConnectionAliveInBackground;
   final List<AutomaticReconnectionPolicy> _policies;
 
   late final _subscriptions = CompositeSubscription();
+
+  // True once a connection has been established, and false again if one closes for a reason this
+  // handler will not act on. Tells a drop worth recovering apart from an attempt that never landed.
+  var _hasEstablishedConnection = false;
 
   /// Attempts reconnection if policies allow it.
   ///
@@ -106,6 +118,9 @@ class ConnectionRecoveryHandler extends Disposable {
   Timer? _reconnectionTimer;
   void _scheduleReconnection() {
     final delay = _reconnectStrategy.getDelayAfterTheFailure();
+    _logger.d(
+      () => 'reconnect #${_reconnectStrategy.consecutiveFailuresCount} scheduled in ${delay.inMilliseconds}ms',
+    );
 
     _reconnectionTimer?.cancel();
     _reconnectionTimer = Timer(delay, reconnectIfNeeded);
@@ -118,7 +133,10 @@ class ConnectionRecoveryHandler extends Disposable {
     _reconnectionTimer = null;
   }
 
-  bool _canBeReconnected() => _policies.every((it) => it.canBeReconnected());
+  bool _canBeReconnected() {
+    if (!_hasEstablishedConnection) return false;
+    return _policies.every((it) => it.canBeReconnected());
+  }
 
   bool _canBeDisconnected() {
     return switch (_client.connectionState.value) {
@@ -148,11 +166,27 @@ class ConnectionRecoveryHandler extends Disposable {
   void _onConnectionStateChanged(WebSocketConnectionState state) {
     return switch (state) {
       Connecting() => _cancelReconnection(),
-      Connected() => _reconnectStrategy.resetConsecutiveFailures(),
-      Disconnected() => _scheduleReconnectionIfNeeded(),
+      Connected() => _onConnectionEstablished(),
+      Disconnected(:final source) => _onConnectionLost(source),
       // These states do not require any action.
       Initialized() || Authenticating() || Disconnecting() => () {},
     };
+  }
+
+  void _onConnectionEstablished() {
+    _hasEstablishedConnection = true;
+    return _reconnectStrategy.resetConsecutiveFailures();
+  }
+
+  // Only the source matters here. The network and lifecycle are checked later, when a reconnect is
+  // actually attempted, so a drop during an outage still counts as one worth recovering.
+  void _onConnectionLost(DisconnectionSource source) {
+    if (!source.isReconnectable) {
+      _hasEstablishedConnection = false;
+      return _cancelReconnection();
+    }
+
+    return _scheduleReconnectionIfNeeded();
   }
 
   @override

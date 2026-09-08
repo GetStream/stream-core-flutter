@@ -7,9 +7,12 @@ import '../../theme/components/stream_button_theme.dart';
 import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
+import '../../theme/stream_floating_fade.dart';
+import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
-import '../buttons/stream_button.dart';
 import 'stream_toolbar.dart';
+import 'stream_toolbar_button.dart';
+import 'stream_toolbar_scope.dart';
 
 /// A top-of-screen header for full-page surfaces in the Stream design system.
 ///
@@ -51,7 +54,7 @@ import 'stream_toolbar.dart';
 ///
 /// ## Theming
 ///
-/// [StreamAppBar] uses [StreamAppBarThemeData] for default styling — colours,
+/// [StreamAppBar] uses [StreamAppBarThemeData] for default styling — colors,
 /// padding, spacing, title/subtitle text styles, and per-slot button style
 /// propagation. Defaults are derived from [StreamColorScheme],
 /// [StreamTextTheme], and [StreamSpacing].
@@ -87,6 +90,22 @@ class StreamAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// The properties that configure this app bar.
   final StreamAppBarProps props;
+
+  /// The surface style this app bar renders with in [context].
+  ///
+  /// Precedence: the per-instance [style], then the ambient [StreamAppBarTheme]
+  /// style, then the ambient [StreamSurfaceStyle].
+  ///
+  /// Matches what the bar resolves for itself, so a [StreamScaffold] can lay out
+  /// its slot to match before the bar builds.
+  static StreamSurfaceStyle resolveSurfaceStyle(
+    BuildContext context, {
+    StreamAppBarStyle? style,
+  }) {
+    final themeStyle = context.streamAppBarTheme.style;
+    final effective = themeStyle?.merge(style) ?? style;
+    return effective?.surfaceStyle ?? context.streamSurfaceStyle;
+  }
 
   @override
   Size get preferredSize => const Size.fromHeight(kStreamToolbarHeight);
@@ -214,10 +233,15 @@ class DefaultStreamAppBar extends StatelessWidget {
     final icons = context.streamIcons;
     final spacing = context.streamSpacing;
 
-    final style = context.streamAppBarTheme.style?.merge(props.style) ?? props.style;
+    final appBarTheme = context.streamAppBarTheme;
+
+    final style = appBarTheme.style?.merge(props.style) ?? props.style;
     final defaults = _StreamAppBarStyleDefaults(context);
 
+    final effectiveSurfaceStyle = StreamAppBar.resolveSurfaceStyle(context, style: props.style);
+
     final effectiveBackgroundColor = style?.backgroundColor ?? defaults.backgroundColor;
+    final effectiveFloatingBackgroundColor = style?.floatingBackgroundColor ?? defaults.floatingBackgroundColor;
     final effectivePadding = style?.padding ?? defaults.padding;
     final effectiveSpacing = style?.spacing ?? defaults.spacing;
     final effectiveTitleTextStyle = style?.titleTextStyle ?? defaults.titleTextStyle;
@@ -241,9 +265,7 @@ class DefaultStreamAppBar extends StatelessWidget {
         };
         final useCloseIcon = parentRoute is PageRoute && parentRoute.fullscreenDialog;
         final localizations = MaterialLocalizations.of(context);
-        leading = StreamButton.icon(
-          type: .ghost,
-          style: .secondary,
+        leading = StreamToolbarButton.icon(
           tooltip: useCloseIcon ? localizations.closeButtonTooltip : localizations.backButtonTooltip,
           icon: Icon(useCloseIcon ? icons.xmark : backIcon),
           onPressed: Navigator.of(context).maybePop,
@@ -335,7 +357,7 @@ class DefaultStreamAppBar extends StatelessWidget {
     }
 
     // The bar's bottom edge is intentionally a hairline border in the
-    // design system's `borderSubtle` colour — part of the bar's identity,
+    // design system's `borderSubtle` color — part of the bar's identity,
     // not a configurable divider.
     //
     // The outer [Semantics] keeps the bar's children grouped for screen
@@ -344,18 +366,44 @@ class DefaultStreamAppBar extends StatelessWidget {
     // slot's semantics onto its own node — without it, a raw
     // [GestureDetector] in a slot would attach its action to the outer
     // container and collapse the bar into a single tappable focus stop.
-    return Semantics(
+    bar = Semantics(
       container: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: effectiveBackgroundColor,
-          border: Border(
-            bottom: BorderSide(color: context.streamColorScheme.borderSubtle),
-          ),
+          color: switch (effectiveSurfaceStyle) {
+            .floating => null,
+            .regular => effectiveBackgroundColor,
+          },
+          gradient: switch (effectiveSurfaceStyle) {
+            .floating => _getFloatingGradient(context, color: effectiveFloatingBackgroundColor),
+            .regular => null,
+          },
+          border: switch (effectiveSurfaceStyle) {
+            .floating => null,
+            .regular => Border(bottom: BorderSide(color: context.streamColorScheme.borderSubtle)),
+          },
         ),
         child: Semantics(explicitChildNodes: true, child: bar),
       ),
     );
+
+    // Publish the resolved behaviour to the slots via a [StreamToolbarScope] so
+    // slot widgets ([StreamToolbarButton], header avatars, ...) match the bar.
+    return StreamToolbarScope(surfaceStyle: effectiveSurfaceStyle, child: bar);
+  }
+
+  LinearGradient _getFloatingGradient(
+    BuildContext context, {
+    required Color color,
+  }) {
+    // Compute the fraction of the total bar height occupied by the system
+    // safe area so the gradient is solid through the status bar and fades only
+    // in the toolbar zone below it.
+    final safeAreaTop = props.primary ? MediaQuery.paddingOf(context).top : 0.0;
+    final totalHeight = safeAreaTop + kStreamToolbarHeight;
+    final solidFraction = totalHeight > 0 ? safeAreaTop / totalHeight : 0.0;
+
+    return streamFloatingFadeLinearGradient(color: color, solidFraction: solidFraction);
   }
 }
 
@@ -375,6 +423,9 @@ class _StreamAppBarStyleDefaults extends StreamAppBarStyle {
 
   @override
   Color get backgroundColor => _colorScheme.backgroundElevation1;
+
+  @override
+  Color get floatingBackgroundColor => _colorScheme.backgroundElevation0;
 
   @override
   double get spacing => _spacing.sm;

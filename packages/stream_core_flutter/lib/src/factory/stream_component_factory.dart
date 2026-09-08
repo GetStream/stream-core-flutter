@@ -15,6 +15,7 @@ import '../components/badge/stream_retry_badge.dart';
 import '../components/buttons/stream_button.dart';
 import '../components/buttons/stream_emoji_button.dart';
 import '../components/buttons/stream_jump_to_unread_button.dart';
+import '../components/buttons/stream_split_button.dart';
 import '../components/common/stream_checkbox.dart';
 import '../components/common/stream_loading_spinner.dart';
 import '../components/common/stream_network_image.dart';
@@ -48,6 +49,7 @@ import '../components/reaction/stream_reactions.dart';
 import '../components/snackbar/stream_snackbar.dart';
 import '../components/toolbar/stream_app_bar.dart';
 import '../components/toolbar/stream_bottom_app_bar.dart';
+import '../components/toolbar/stream_bottom_nav_bar.dart';
 import '../components/toolbar/stream_sheet_header.dart';
 
 part 'stream_component_factory.g.theme.dart';
@@ -181,6 +183,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamAppBarProps>? appBar,
     StreamComponentBuilder<StreamAvatarProps>? avatar,
     StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar,
+    StreamComponentBuilder<StreamBottomNavBarProps>? bottomNavBar,
     StreamComponentBuilder<StreamAvatarGroupProps>? avatarGroup,
     StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
     StreamComponentBuilder<StreamBadgeCountProps>? badgeCount,
@@ -221,6 +224,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamSheetHeaderProps>? sheetHeader,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     StreamComponentBuilder<StreamSnackbarProps>? snackbar,
+    StreamComponentBuilder<StreamSplitButtonProps>? splitButton,
     StreamComponentBuilder<StreamStepperProps>? stepper,
     StreamComponentBuilder<StreamTextInputProps>? textInput,
     StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
@@ -234,6 +238,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       appBar: appBar,
       avatar: avatar,
       bottomAppBar: bottomAppBar,
+      bottomNavBar: bottomNavBar,
       avatarGroup: avatarGroup,
       avatarStack: avatarStack,
       badgeCount: badgeCount,
@@ -274,6 +279,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       sheetHeader: sheetHeader,
       skeletonLoading: skeletonLoading,
       snackbar: snackbar,
+      splitButton: splitButton,
       stepper: stepper,
       textInput: textInput,
       toggleSwitch: toggleSwitch,
@@ -288,6 +294,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.appBar,
     required this.avatar,
     required this.bottomAppBar,
+    required this.bottomNavBar,
     required this.avatarGroup,
     required this.avatarStack,
     required this.badgeCount,
@@ -328,6 +335,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.sheetHeader,
     required this.skeletonLoading,
     required this.snackbar,
+    required this.splitButton,
     required this.stepper,
     required this.textInput,
     required this.toggleSwitch,
@@ -369,6 +377,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamBottomAppBar] uses [DefaultStreamBottomAppBar].
   final StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar;
+
+  /// Custom builder for bottom navigation bar widgets.
+  ///
+  /// When null, [StreamBottomNavBar] uses [DefaultStreamBottomNavBar].
+  final StreamComponentBuilder<StreamBottomNavBarProps>? bottomNavBar;
 
   /// Custom builder for avatar group widgets.
   ///
@@ -582,6 +595,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// them by returning `const SizedBox.shrink()`).
   final StreamComponentBuilder<StreamSnackbarProps>? snackbar;
 
+  /// Custom builder for split button widgets.
+  ///
+  /// When null, [StreamSplitButton] uses [DefaultStreamSplitButton].
+  final StreamComponentBuilder<StreamSplitButtonProps>? splitButton;
+
   /// Custom builder for stepper widgets.
   ///
   /// When null, [StreamStepper] uses [DefaultStreamStepper].
@@ -659,8 +677,8 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
 final class StreamComponentBuilderExtension<T> {
   /// Creates a builder extension for a component with Props type [T].
   const StreamComponentBuilderExtension({
-    required StreamComponentBuilder<T> builder,
-  }) : _builder = builder;
+    required this._builder,
+  });
 
   // The internal builder function that creates the widget from the context and props.
   final StreamComponentBuilder<T> _builder;

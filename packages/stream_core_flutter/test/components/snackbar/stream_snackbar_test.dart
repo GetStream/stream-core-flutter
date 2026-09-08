@@ -430,12 +430,14 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
+      // The message merges into the snackbar's own node rather than staying a
+      // child of it, which is what makes the live region announce it.
       expect(
         tester.getSemantics(find.byType(StreamSnackbar)),
         isSemantics(
+          label: 'Saved',
           isLiveRegion: true,
           hasDismissAction: true,
-          children: [isSemantics(label: 'Saved')],
         ),
       );
 

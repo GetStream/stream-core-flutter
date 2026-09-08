@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+
 import '../attachment_type.dart';
 
 /// Represents a successfully uploaded attachment.
@@ -17,7 +19,7 @@ import '../attachment_type.dart';
 ///   custom: {'source': 'camera', 'processed': true},
 /// );
 /// ```
-class UploadedAttachment {
+class UploadedAttachment extends Equatable {
   /// Creates an [UploadedAttachment] with attachment details and remote URLs.
   const UploadedAttachment({
     required this.id,
@@ -49,4 +51,7 @@ class UploadedAttachment {
 
   /// Whether this attachment has a thumbnail.
   bool get hasThumbnail => thumbnailUrl?.isNotEmpty ?? false;
+
+  @override
+  List<Object?> get props => [id, type, remoteUrl, thumbnailUrl, custom];
 }

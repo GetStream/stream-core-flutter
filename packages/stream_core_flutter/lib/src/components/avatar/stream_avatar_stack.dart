@@ -102,8 +102,17 @@ class StreamAvatarStack extends StatelessWidget {
     required Iterable<Widget> children,
     double overlap = 0.33,
     int max = 5,
+    bool isFloating = false,
+    String? semanticsLabel,
   }) : assert(max >= 2, 'max must be at least 2'),
-       props = .new(size: size, children: children, overlap: overlap, max: max);
+       props = .new(
+         size: size,
+         children: children,
+         overlap: overlap,
+         max: max,
+         isFloating: isFloating,
+         semanticsLabel: semanticsLabel,
+       );
 
   /// The properties that configure this avatar stack.
   final StreamAvatarStackProps props;
@@ -132,6 +141,8 @@ class StreamAvatarStackProps {
     required this.children,
     this.overlap = 0.33,
     this.max = 5,
+    this.isFloating = false,
+    this.semanticsLabel,
   });
 
   /// The list of widgets to display in the stack.
@@ -158,6 +169,20 @@ class StreamAvatarStackProps {
   ///
   /// Must be at least 2. Defaults to 5.
   final int max;
+
+  /// Whether each individual avatar is in a floating state, rendering with a drop shadow.
+  ///
+  /// Defaults to false. The elevation used is [StreamAvatarThemeData.floatingElevation],
+  /// falling back to `3`.
+  final bool isFloating;
+
+  /// Screen-reader label for the avatar stack.
+  ///
+  /// When null (the default), the stack composes through — each child's own
+  /// [StreamAvatar.semanticsLabel] applies. When non-null, the stack is
+  /// exposed as a single labeled image node and its children (including the
+  /// "+N" overflow badge) are dropped from the semantics tree.
+  final String? semanticsLabel;
 }
 
 /// The default implementation of [StreamAvatarStack].
@@ -193,7 +218,7 @@ class DefaultStreamAvatarStack extends StatelessWidget {
 
     const avatarBorderWidth = 2.0;
 
-    return MediaQuery.withNoTextScaling(
+    var stack = MediaQuery.withNoTextScaling(
       child: StreamAvatarTheme(
         data: StreamAvatarThemeData(
           size: avatarSize,
@@ -202,6 +227,7 @@ class DefaultStreamAvatarStack extends StatelessWidget {
             color: colorScheme.borderOnInverse,
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
+          isFloating: props.isFloating,
         ),
         child: StreamRow(
           spacing: -diameter * props.overlap,
@@ -216,6 +242,17 @@ class DefaultStreamAvatarStack extends StatelessWidget {
         ),
       ),
     );
+
+    if (props.semanticsLabel case final label?) {
+      stack = Semantics(
+        label: label,
+        image: true,
+        excludeSemantics: true,
+        child: stack,
+      );
+    }
+
+    return stack;
   }
 
   // Returns the appropriate avatar size for the given stack size.

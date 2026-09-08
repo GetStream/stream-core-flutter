@@ -454,6 +454,7 @@ class StreamTokens {
   static const backgroundCoreHighlight = Color(0xFF5F1A05);
   static const backgroundCoreOverlayLight = Color(0xBF000000);
   static const backgroundCoreOverlayDark = Color(0x80000000);
+  static const backgroundCoreOverlayDarkStrong = Color(0xBF000000);
   static const backgroundCoreScrim = Color(0xBF000000);
   static const backgroundUtilityHover = Color(0x26FFFFFF);
   static const backgroundUtilityPressed = Color(0x33FFFFFF);

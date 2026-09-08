@@ -34,6 +34,7 @@ mixin _$StreamComponentBuilders {
       appBar: t < 0.5 ? a.appBar : b.appBar,
       avatar: t < 0.5 ? a.avatar : b.avatar,
       bottomAppBar: t < 0.5 ? a.bottomAppBar : b.bottomAppBar,
+      bottomNavBar: t < 0.5 ? a.bottomNavBar : b.bottomNavBar,
       avatarGroup: t < 0.5 ? a.avatarGroup : b.avatarGroup,
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
@@ -90,6 +91,7 @@ mixin _$StreamComponentBuilders {
       sheetHeader: t < 0.5 ? a.sheetHeader : b.sheetHeader,
       skeletonLoading: t < 0.5 ? a.skeletonLoading : b.skeletonLoading,
       snackbar: t < 0.5 ? a.snackbar : b.snackbar,
+      splitButton: t < 0.5 ? a.splitButton : b.splitButton,
       stepper: t < 0.5 ? a.stepper : b.stepper,
       textInput: t < 0.5 ? a.textInput : b.textInput,
       toggleSwitch: t < 0.5 ? a.toggleSwitch : b.toggleSwitch,
@@ -103,6 +105,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamAppBarProps)? appBar,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
     Widget Function(BuildContext, StreamBottomAppBarProps)? bottomAppBar,
+    Widget Function(BuildContext, StreamBottomNavBarProps)? bottomNavBar,
     Widget Function(BuildContext, StreamAvatarGroupProps)? avatarGroup,
     Widget Function(BuildContext, StreamAvatarStackProps)? avatarStack,
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
@@ -164,6 +167,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamSheetHeaderProps)? sheetHeader,
     Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
     Widget Function(BuildContext, StreamSnackbarProps)? snackbar,
+    Widget Function(BuildContext, StreamSplitButtonProps)? splitButton,
     Widget Function(BuildContext, StreamStepperProps)? stepper,
     Widget Function(BuildContext, StreamTextInputProps)? textInput,
     Widget Function(BuildContext, StreamSwitchProps)? toggleSwitch,
@@ -179,6 +183,7 @@ mixin _$StreamComponentBuilders {
       appBar: appBar ?? _this.appBar,
       avatar: avatar ?? _this.avatar,
       bottomAppBar: bottomAppBar ?? _this.bottomAppBar,
+      bottomNavBar: bottomNavBar ?? _this.bottomNavBar,
       avatarGroup: avatarGroup ?? _this.avatarGroup,
       avatarStack: avatarStack ?? _this.avatarStack,
       badgeCount: badgeCount ?? _this.badgeCount,
@@ -231,6 +236,7 @@ mixin _$StreamComponentBuilders {
       sheetHeader: sheetHeader ?? _this.sheetHeader,
       skeletonLoading: skeletonLoading ?? _this.skeletonLoading,
       snackbar: snackbar ?? _this.snackbar,
+      splitButton: splitButton ?? _this.splitButton,
       stepper: stepper ?? _this.stepper,
       textInput: textInput ?? _this.textInput,
       toggleSwitch: toggleSwitch ?? _this.toggleSwitch,
@@ -255,6 +261,7 @@ mixin _$StreamComponentBuilders {
       appBar: other.appBar,
       avatar: other.avatar,
       bottomAppBar: other.bottomAppBar,
+      bottomNavBar: other.bottomNavBar,
       avatarGroup: other.avatarGroup,
       avatarStack: other.avatarStack,
       badgeCount: other.badgeCount,
@@ -298,6 +305,7 @@ mixin _$StreamComponentBuilders {
       sheetHeader: other.sheetHeader,
       skeletonLoading: other.skeletonLoading,
       snackbar: other.snackbar,
+      splitButton: other.splitButton,
       stepper: other.stepper,
       textInput: other.textInput,
       toggleSwitch: other.toggleSwitch,
@@ -323,6 +331,7 @@ mixin _$StreamComponentBuilders {
         _other.appBar == _this.appBar &&
         _other.avatar == _this.avatar &&
         _other.bottomAppBar == _this.bottomAppBar &&
+        _other.bottomNavBar == _this.bottomNavBar &&
         _other.avatarGroup == _this.avatarGroup &&
         _other.avatarStack == _this.avatarStack &&
         _other.badgeCount == _this.badgeCount &&
@@ -369,6 +378,7 @@ mixin _$StreamComponentBuilders {
         _other.sheetHeader == _this.sheetHeader &&
         _other.skeletonLoading == _this.skeletonLoading &&
         _other.snackbar == _this.snackbar &&
+        _other.splitButton == _this.splitButton &&
         _other.stepper == _this.stepper &&
         _other.textInput == _this.textInput &&
         _other.toggleSwitch == _this.toggleSwitch &&
@@ -386,6 +396,7 @@ mixin _$StreamComponentBuilders {
       _this.appBar,
       _this.avatar,
       _this.bottomAppBar,
+      _this.bottomNavBar,
       _this.avatarGroup,
       _this.avatarStack,
       _this.badgeCount,
@@ -426,6 +437,7 @@ mixin _$StreamComponentBuilders {
       _this.sheetHeader,
       _this.skeletonLoading,
       _this.snackbar,
+      _this.splitButton,
       _this.stepper,
       _this.textInput,
       _this.toggleSwitch,

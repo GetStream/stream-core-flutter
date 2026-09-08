@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show SystemChannels;
 import 'package:flutter_test/flutter_test.dart';
@@ -241,14 +239,12 @@ void main() {
 
       // Push a second route with its own autofocus instance — simulates
       // opening a bottom sheet that contains a text field.
-      unawaited(
-        navigatorKey.currentState!.push(
-          MaterialPageRoute<void>(
-            builder: (_) => const MediaQuery(
-              data: MediaQueryData(accessibleNavigation: true),
-              child: Scaffold(
-                body: StreamAccessibilityAutofocus(child: SizedBox()),
-              ),
+      navigatorKey.currentState!.push(
+        MaterialPageRoute<void>(
+          builder: (_) => const MediaQuery(
+            data: MediaQueryData(accessibleNavigation: true),
+            child: Scaffold(
+              body: StreamAccessibilityAutofocus(child: SizedBox()),
             ),
           ),
         ),

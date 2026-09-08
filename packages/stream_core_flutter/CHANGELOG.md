@@ -1,3 +1,73 @@
+## 0.5.1
+
+### ✨ Features
+
+- Added `StreamColorScheme.backgroundOverlayDarkStrong`, the design system's `background/core/overlay-dark-strong` token. A heavier version of `backgroundOverlayDark`, for content that has to stay legible on top of arbitrary imagery or video.
+- Added `StreamReactions.onReactionLongPressed`, reporting the long-pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip. When null, the chips register no long-press gesture, leaving it to an ancestor.
+- Added `StreamSplitButton`, in the two variants the design covers —
+  `StreamSplitButtonVariant.regular` and `.destructive`. Each variant carries
+  its own `StreamSplitButtonStyle` on `StreamSplitButtonThemeData`, so the two
+  can be themed independently.
+- Refreshed the icon set from the design tokens and added 44 icons, including a
+  filled variant for many existing icons: `blurFill`, `boltFill`,
+  `cameraFlipFill`, `captionFill`, `caretDown`, `caretUp`, `copyFill`,
+  `darkMode`, `emojiAddFill`, `fullBlurFill`, `fullscreenFill`, `gridFill`,
+  `gridPixelFill`, `language`, `leftToRight`, `lightMode`, `menu`,
+  `messageBubblesFill`, `moreHorizontal`, `moreVerticalFill`, `noSignFill`,
+  `phoneDownFill`, `pinFill`, `pipFill`, `presentDesktopFill`,
+  `presentMobileFill`, `questionCircleFill`, `raiseHandFill`,
+  `recordLibraryFill`, `recordingFill`, `recordingStopFill`, `settings`,
+  `settingsFill`, `slidersFill`, `starFill`, `statsFill`, `unpinFill`,
+  `userAddFill`, `userRemoveFill`, `usersFill`, `verifiedFill`, `videoOffFill`,
+  `voiceOffFill`, and `xmarkSmall`.
+- Added 7 more icons from the design tokens: `gridDefaultFill`,
+  `livestreamFill`, `phoneFill`, `speakerBottomFill`, `speakerLeftFill`,
+  `speakerRightFill`, and `speakerTopFill`.
+- Added a `fix_data.yaml`, so deprecated members can be migrated with
+  `dart fix --apply`.
+
+### 🔄 Changed
+
+- Raised the minimum Flutter version to `>=3.44.0` and the Dart SDK to `^3.12.0`.
+
+### 🛑 Breaking / Removals
+
+- Deprecated `StreamIcons.more` / `StreamIconData.more` in favour of
+  `moreHorizontal`, which keeps the original artwork. A vertical variant is now
+  available as `moreVerticalFill`. Run `dart fix --apply` to migrate.
+
+## 0.5.0
+
+### ✨ Features
+
+- Added `StreamReactions.onReactionPressed`, which reports the pressed `StreamReactionsItem` — or `null` for the cluster/overflow chip, which represents no single reaction. Added an optional `StreamReactionsItem.key` so callers can identify the pressed item.
+- Added optional `semanticsLabel` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`. On `StreamAvatar`, `null` (default) drops the placeholder's initials from the semantics tree via `ExcludeSemantics`; a non-null value exposes it as a labeled image node. On `StreamAvatarGroup` / `StreamAvatarStack`, `null` composes through — each child's own `semanticsLabel` applies — while a non-null value collapses the group into a single labeled image node and hides children and the "+N" overflow badge.
+- Added `StreamColorScheme.fromSeed` — builds a complete light or dark color scheme from a single brand color, optionally with a custom chrome color. When chrome is omitted it is derived from the brand hue at `StreamColorScheme.neutralChroma`.
+- `StreamColorSwatch.fromColor` now generates shades in the HCT color space instead of HSL. Each shade takes its tone from a fixed ladder measured from the Stream design tokens, so a shade's contrast is predictable regardless of the seed's hue — seeding a light color such as yellow now yields an accent that can carry white text. Two consequences: the seed is no longer reproduced verbatim at shade 500 (it is normalized onto the ladder), and dark scales now mirror the ladder so the seed's tone lands on shade 300, matching the default dark palette.
+- Added `StreamScaffold` — a full-page scaffold for regular or floating bars; a floating bar enlarges the body's `MediaQuery.padding` so scrollables inset themselves.
+- Added `StreamBottomNavBar` and `StreamBottomNavBarItem` — a bottom navigation bar rendering as a docked bar or a floating pill, themeable via `StreamBottomNavBarTheme`. Its height is `kStreamBottomNavBarHeight`.
+- Added `StreamSafeArea` — a `SafeArea` that insets by `max(systemInset, minimum) + margin`, so a pinned surface keeps a gap from the system bars. `StreamSafeArea.driven` animates the inset; `resolveInsets` returns it as a value.
+- Added floating-bar support to `StreamAppBar` and `StreamBottomAppBar` via `StreamAppBarStyle.surfaceStyle` / `StreamBottomAppBarStyle.surfaceStyle`, plus `StreamBottomAppBarStyle.floatingBackgroundColor` for the upward fade.
+- Each bar publishes its resolved surface style to a `StreamToolbarScope` for its slots, and reports it through a `resolveSurfaceStyle` static so a container can match its layout.
+- Added `StreamToolbarButton` — a toolbar action, labelled or icon-only, that takes its look from the enclosing `StreamToolbarScope`; pass `type` to override the resolved shape.
+- `StreamMediaViewer` chrome now follows the ambient `StreamSurfaceStyle` — floating over full-bleed media, or docked with the media inset between the bars.
+- Added `isFloating` to `StreamAvatar`, `StreamAvatarGroup`, and `StreamAvatarStack`, rendering a Material elevation (`StreamAvatarThemeData.floatingElevation`) instead of a hand-painted shadow.
+- Added `streamFloatingFade` helper — a shared `LinearGradient` factory (alpha stops `0xE8/0xA8/0x40/0x00` with solid-fraction support for safe-area zones) used internally by `StreamAppBar`, `StreamBottomNavBar`, and `StreamMessageComposer` floating fade effects.
+- Added `isFloating` to the default `StreamButton` constructor — the floating (elevated) appearance was previously reachable only through `StreamButton.icon`. Labelled buttons now get the same treatment: elevation for every type, plus a `backgroundElevation1` fill for `outline` and `ghost`.
+- Added `StreamElevation` — the four elevation levels of the design system as logical pixels, for passing to `Material.elevation` or a component theme's `elevation` field. Like `StreamRadius` and `StreamSpacing` it is a theme primitive: reachable as `StreamTheme.elevation` or `context.streamElevation`, overridable per theme through the `StreamTheme` constructor, and lerped on theme transitions. `StreamElevation.none` is a fixed `0` rather than a themeable level, so "flat" cannot be redefined as elevated. `StreamAvatar` and `StreamButton` now resolve their elevations from it instead of hard-coded numbers; the rendered values are unchanged.
+- Added `chipStyle` to `StreamReactionsThemeData` for overriding the per-reaction chip appearance (background, size, etc.); it is merged over the default reaction chip style.
+- Added `StreamMessagePresentation` and `StreamMessageLayoutData.presentation`, describing whether a message is drawn inline in the list (`standard`) or as a preview above a scrim (`preview`, e.g. the long-press message-actions modal). Read it with `StreamMessageLayout.presentationOf(context)`, or resolve per-presentation styling through `StreamMessageLayoutProperty.resolveWith`. For `preview`, the default metadata (username, timestamp, edited, status), annotation (text, icon, trailing) and replies-label colors now resolve to `StreamColorScheme.textOnAccent` so they stay legible against `StreamColorScheme.backgroundScrim`. Also added `StreamMessageLayoutData.copyWith`.
+- `StreamNetworkImage` now caches through a shared cache manager which, on IO platforms, is stored in its own app-scoped directory (isolated from the host app's image cache) with LRU eviction, while other platforms fall back to the library defaults.
+
+### 🐛 Bug Fixes
+
+- Floating buttons (`isFloating: true`) now retain their pill surface (`backgroundElevation1`) when disabled, across all style/type combinations. Previously, outline and ghost variants fell back to transparent when disabled, losing the floating visual.
+
+### ⚠️ Deprecations
+
+- Deprecated `StreamReactions.onPressed` in favor of `onReactionPressed`.
+- Deprecated `StreamTheme.brightness`. Read `colorScheme.brightness` instead. The property, and the `brightness` parameter on `copyWith` and `StreamTheme.raw`, all keep working — for a theme built through the `StreamTheme` factory the value still mirrors `colorScheme.brightness`.
+
 ## 0.4.1
 
 ### ✨ Features

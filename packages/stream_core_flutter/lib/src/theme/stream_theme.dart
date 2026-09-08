@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_redundant_argument_values
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
@@ -10,6 +8,7 @@ import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
 import 'components/stream_bottom_app_bar_theme.dart';
+import 'components/stream_bottom_nav_bar_theme.dart';
 import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
@@ -37,9 +36,11 @@ import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
 import 'components/stream_snackbar_theme.dart';
+import 'components/stream_split_button_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'primitives/stream_elevation.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
 import 'primitives/stream_spacing.dart';
@@ -47,6 +48,7 @@ import 'primitives/stream_typography.dart';
 import 'semantics/stream_box_shadow.dart';
 import 'semantics/stream_color_scheme.dart';
 import 'semantics/stream_text_theme.dart';
+import 'stream_surface_style.dart';
 
 part 'stream_theme.g.theme.dart';
 
@@ -82,6 +84,7 @@ part 'stream_theme.g.theme.dart';
 ///  * [StreamTextTheme], which defines semantic text styles.
 ///  * [StreamRadius], which defines border radius values.
 ///  * [StreamSpacing], which defines spacing values.
+///  * [StreamElevation], which defines Material elevation levels.
 ///  * [StreamBoxShadow], which defines elevation shadows.
 ///  * [StreamButtonThemeData], which defines button styles.
 ///  * [StreamAvatarThemeData], which defines avatar styles.
@@ -104,8 +107,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   ///  * [StreamTheme.light], which creates a light theme.
   ///  * [StreamTheme.dark], which creates a dark theme.
   factory StreamTheme({
-    Brightness brightness = .light,
+    Brightness? brightness,
     TargetPlatform? platform,
+    StreamSurfaceStyle? surfaceStyle,
+    StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
@@ -120,6 +125,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamBottomAppBarThemeData? bottomAppBarTheme,
+    StreamBottomNavBarThemeData? bottomNavBarTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamCommandChipThemeData? commandChipTheme,
@@ -148,13 +154,21 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamSnackbarThemeData? snackbarTheme,
+    StreamSplitButtonThemeData? splitButtonTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
   }) {
+    assert(
+      colorScheme == null || brightness == null || colorScheme.brightness == brightness,
+      'colorScheme brightness must match theme brightness if provided',
+    );
+
     platform ??= defaultTargetPlatform;
-    final isDark = brightness == Brightness.dark;
+    final effectiveBrightness = brightness ?? colorScheme?.brightness ?? .light;
+    final isDark = effectiveBrightness == Brightness.dark;
 
     // Primitives
+    elevation ??= const StreamElevation();
     icons ??= const StreamIcons();
     radius ??= const StreamRadius();
     spacing ??= const StreamSpacing();
@@ -166,12 +180,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
+    surfaceStyle ??= StreamSurfaceStyle.regular;
     appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     badgeNotificationTheme ??= const StreamBadgeNotificationThemeData();
     bottomAppBarTheme ??= const StreamBottomAppBarThemeData();
+    bottomNavBarTheme ??= const StreamBottomNavBarThemeData();
     buttonTheme ??= const StreamButtonThemeData();
     checkboxTheme ??= const StreamCheckboxThemeData();
     commandChipTheme ??= const StreamCommandChipThemeData();
@@ -200,11 +216,14 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     sheetTheme ??= const StreamSheetThemeData();
     skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
     snackbarTheme ??= const StreamSnackbarThemeData();
+    splitButtonTheme ??= const StreamSplitButtonThemeData();
     stepperTheme ??= const StreamStepperThemeData();
     switchTheme ??= const StreamSwitchThemeData();
 
     return .raw(
-      brightness: brightness,
+      brightness: effectiveBrightness,
+      surfaceStyle: surfaceStyle,
+      elevation: elevation,
       icons: icons,
       radius: radius,
       spacing: spacing,
@@ -218,6 +237,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
       bottomAppBarTheme: bottomAppBarTheme,
+      bottomNavBarTheme: bottomNavBarTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       commandChipTheme: commandChipTheme,
@@ -246,16 +266,11 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
       snackbarTheme: snackbarTheme,
+      splitButtonTheme: splitButtonTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
     );
   }
-
-  /// Creates a dark theme configuration.
-  ///
-  /// This is a convenience factory that calls [StreamTheme] with
-  /// [Brightness.dark].
-  factory StreamTheme.dark() => StreamTheme(brightness: .dark);
 
   /// Creates a light theme configuration.
   ///
@@ -263,8 +278,16 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// [Brightness.light].
   factory StreamTheme.light() => StreamTheme(brightness: .light);
 
+  /// Creates a dark theme configuration.
+  ///
+  /// This is a convenience factory that calls [StreamTheme] with
+  /// [Brightness.dark].
+  factory StreamTheme.dark() => StreamTheme(brightness: .dark);
+
   const StreamTheme.raw({
-    required this.brightness,
+    @Deprecated('Use colorScheme.brightness instead') this.brightness = Brightness.light,
+    required this.surfaceStyle,
+    required this.elevation,
     required this.icons,
     required this.radius,
     required this.spacing,
@@ -278,6 +301,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.badgeCountTheme,
     required this.badgeNotificationTheme,
     required this.bottomAppBarTheme,
+    required this.bottomNavBarTheme,
     required this.buttonTheme,
     required this.checkboxTheme,
     required this.commandChipTheme,
@@ -306,6 +330,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.sheetTheme,
     required this.skeletonLoadingTheme,
     required this.snackbarTheme,
+    required this.splitButtonTheme,
     required this.stepperTheme,
     required this.switchTheme,
   });
@@ -340,7 +365,20 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   }
 
   /// The brightness of this theme.
+  ///
+  /// For a theme built through the [StreamTheme] factory this always mirrors
+  /// `colorScheme.brightness` — the factory asserts the two agree. Only
+  /// [StreamTheme.raw] and [copyWith] can set it independently, and a value
+  /// that disagrees with [colorScheme] changes nothing about how the theme
+  /// renders. Read `colorScheme.brightness` instead.
+  @Deprecated('Use colorScheme.brightness instead')
   final Brightness brightness;
+
+  /// The app-wide surface style every component falls back to.
+  final StreamSurfaceStyle surfaceStyle;
+
+  /// The Material elevation values for this theme.
+  final StreamElevation elevation;
 
   /// The icons for this theme.
   final StreamIcons icons;
@@ -385,6 +423,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The bottom app bar theme for this theme.
   final StreamBottomAppBarThemeData bottomAppBarTheme;
+
+  /// The bottom navigation bar theme for this theme.
+  final StreamBottomNavBarThemeData bottomNavBarTheme;
 
   /// The button theme for this theme.
   final StreamButtonThemeData buttonTheme;
@@ -472,6 +513,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The snackbar theme for this theme.
   final StreamSnackbarThemeData snackbarTheme;
 
+  /// The split button theme for this theme.
+  final StreamSplitButtonThemeData splitButtonTheme;
+
   /// The stepper theme for this theme.
   final StreamStepperThemeData stepperTheme;
 
@@ -498,7 +542,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
 
     return StreamTheme.raw(
+      // ignore: deprecated_member_use_from_same_package
       brightness: brightness,
+      surfaceStyle: surfaceStyle,
+      elevation: elevation,
       icons: icons,
       radius: radius,
       spacing: spacing,
@@ -512,6 +559,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
       bottomAppBarTheme: bottomAppBarTheme,
+      bottomNavBarTheme: bottomNavBarTheme,
       buttonTheme: buttonTheme,
       checkboxTheme: checkboxTheme,
       commandChipTheme: commandChipTheme,
@@ -540,6 +588,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
       snackbarTheme: snackbarTheme,
+      splitButtonTheme: splitButtonTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
     );

@@ -13,6 +13,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
   @override
   ThemeExtension<StreamTheme> copyWith({
     Brightness? brightness,
+    StreamSurfaceStyle? surfaceStyle,
+    StreamElevation? elevation,
     StreamIcons? icons,
     StreamRadius? radius,
     StreamSpacing? spacing,
@@ -26,6 +28,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
     StreamBottomAppBarThemeData? bottomAppBarTheme,
+    StreamBottomNavBarThemeData? bottomNavBarTheme,
     StreamButtonThemeData? buttonTheme,
     StreamCheckboxThemeData? checkboxTheme,
     StreamCommandChipThemeData? commandChipTheme,
@@ -60,6 +63,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
     StreamSnackbarThemeData? snackbarTheme,
+    StreamSplitButtonThemeData? splitButtonTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
   }) {
@@ -67,6 +71,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: brightness ?? _this.brightness,
+      surfaceStyle: surfaceStyle ?? _this.surfaceStyle,
+      elevation: elevation ?? _this.elevation,
       icons: icons ?? _this.icons,
       radius: radius ?? _this.radius,
       spacing: spacing ?? _this.spacing,
@@ -81,6 +87,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeNotificationTheme:
           badgeNotificationTheme ?? _this.badgeNotificationTheme,
       bottomAppBarTheme: bottomAppBarTheme ?? _this.bottomAppBarTheme,
+      bottomNavBarTheme: bottomNavBarTheme ?? _this.bottomNavBarTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
       checkboxTheme: checkboxTheme ?? _this.checkboxTheme,
       commandChipTheme: commandChipTheme ?? _this.commandChipTheme,
@@ -126,6 +133,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       sheetTheme: sheetTheme ?? _this.sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
       snackbarTheme: snackbarTheme ?? _this.snackbarTheme,
+      splitButtonTheme: splitButtonTheme ?? _this.splitButtonTheme,
       stepperTheme: stepperTheme ?? _this.stepperTheme,
       switchTheme: switchTheme ?? _this.switchTheme,
     );
@@ -144,6 +152,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
 
     return StreamTheme.raw(
       brightness: t < 0.5 ? _this.brightness : other.brightness,
+      surfaceStyle: t < 0.5 ? _this.surfaceStyle : other.surfaceStyle,
+      elevation: StreamElevation.lerp(_this.elevation, other.elevation, t)!,
       icons: StreamIcons.lerp(_this.icons, other.icons, t)!,
       radius: StreamRadius.lerp(_this.radius, other.radius, t)!,
       spacing: StreamSpacing.lerp(_this.spacing, other.spacing, t)!,
@@ -180,6 +190,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       bottomAppBarTheme: StreamBottomAppBarThemeData.lerp(
         _this.bottomAppBarTheme,
         other.bottomAppBarTheme,
+        t,
+      )!,
+      bottomNavBarTheme: StreamBottomNavBarThemeData.lerp(
+        _this.bottomNavBarTheme,
+        other.bottomNavBarTheme,
         t,
       )!,
       buttonTheme: StreamButtonThemeData.lerp(
@@ -329,6 +344,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.snackbarTheme,
         t,
       )!,
+      splitButtonTheme: StreamSplitButtonThemeData.lerp(
+        _this.splitButtonTheme,
+        other.splitButtonTheme,
+        t,
+      )!,
       stepperTheme: StreamStepperThemeData.lerp(
         _this.stepperTheme,
         other.stepperTheme,
@@ -356,6 +376,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     final _other = (other as StreamTheme);
 
     return _other.brightness == _this.brightness &&
+        _other.surfaceStyle == _this.surfaceStyle &&
+        _other.elevation == _this.elevation &&
         _other.icons == _this.icons &&
         _other.radius == _this.radius &&
         _other.spacing == _this.spacing &&
@@ -369,6 +391,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
         _other.bottomAppBarTheme == _this.bottomAppBarTheme &&
+        _other.bottomNavBarTheme == _this.bottomNavBarTheme &&
         _other.buttonTheme == _this.buttonTheme &&
         _other.checkboxTheme == _this.checkboxTheme &&
         _other.commandChipTheme == _this.commandChipTheme &&
@@ -404,6 +427,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.sheetTheme == _this.sheetTheme &&
         _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
         _other.snackbarTheme == _this.snackbarTheme &&
+        _other.splitButtonTheme == _this.splitButtonTheme &&
         _other.stepperTheme == _this.stepperTheme &&
         _other.switchTheme == _this.switchTheme;
   }
@@ -415,6 +439,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     return Object.hashAll([
       runtimeType,
       _this.brightness,
+      _this.surfaceStyle,
+      _this.elevation,
       _this.icons,
       _this.radius,
       _this.spacing,
@@ -428,6 +454,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.badgeCountTheme,
       _this.badgeNotificationTheme,
       _this.bottomAppBarTheme,
+      _this.bottomNavBarTheme,
       _this.buttonTheme,
       _this.checkboxTheme,
       _this.commandChipTheme,
@@ -456,6 +483,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.sheetTheme,
       _this.skeletonLoadingTheme,
       _this.snackbarTheme,
+      _this.splitButtonTheme,
       _this.stepperTheme,
       _this.switchTheme,
     ]);

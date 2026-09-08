@@ -229,29 +229,38 @@ class _StreamMessageMetadataDefaults extends StreamMessageMetadataStyle {
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
   late final StreamSpacing _spacing = _context.streamSpacing;
 
+  // Resolves to [standard] for inline messages, and to white for previews,
+  // where the message sits on a scrim and metadata needs the extra contrast.
+  StreamMessageLayoutProperty<Color> _presentationAware(Color standard) => .resolveWith(
+    (layout) => switch (layout.presentation) {
+      .standard => standard,
+      .preview => _colorScheme.textOnAccent,
+    },
+  );
+
   @override
   StreamMessageLayoutProperty<TextStyle> get usernameTextStyle => .all(_textTheme.metadataEmphasis);
 
   @override
-  StreamMessageLayoutProperty<Color> get usernameColor => .all(_colorScheme.textSecondary);
+  StreamMessageLayoutProperty<Color> get usernameColor => _presentationAware(_colorScheme.textSecondary);
 
   @override
   StreamMessageLayoutProperty<TextStyle> get timestampTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  StreamMessageLayoutProperty<Color> get timestampColor => .all(_colorScheme.textTertiary);
+  StreamMessageLayoutProperty<Color> get timestampColor => _presentationAware(_colorScheme.textTertiary);
 
   @override
   StreamMessageLayoutProperty<TextStyle> get editedTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  StreamMessageLayoutProperty<Color> get editedColor => .all(_colorScheme.textTertiary);
+  StreamMessageLayoutProperty<Color> get editedColor => _presentationAware(_colorScheme.textTertiary);
 
   @override
   StreamMessageLayoutProperty<TextStyle> get statusTextStyle => .all(_textTheme.metadataDefault);
 
   @override
-  StreamMessageLayoutProperty<Color> get statusColor => .all(_colorScheme.textTertiary);
+  StreamMessageLayoutProperty<Color> get statusColor => _presentationAware(_colorScheme.textTertiary);
 
   @override
   StreamMessageLayoutProperty<double> get statusIconSize => .all(16);

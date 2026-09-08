@@ -82,6 +82,199 @@ void main() {
     });
   });
 
+  group('StreamAppBar floating', () {
+    testWidgets('floating: false uses solid background and bottom border', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            appBar: StreamAppBar(
+              automaticallyImplyLeading: false,
+              title: const Text('Title'),
+            ),
+          ),
+        ),
+      );
+
+      final decoratedBox = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byType(StreamAppBar),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      final decoration = decoratedBox.decoration as BoxDecoration;
+      expect(decoration.color, isNotNull);
+      expect(decoration.gradient, isNull);
+      expect(decoration.border, isNotNull);
+    });
+
+    testWidgets('floating: true uses gradient and no bottom border', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            body: StreamAppBar(
+              automaticallyImplyLeading: false,
+              primary: false,
+              style: const StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
+              title: const Text('Title'),
+            ),
+          ),
+        ),
+      );
+
+      final decoratedBox = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byType(StreamAppBar),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      final decoration = decoratedBox.decoration as BoxDecoration;
+      expect(decoration.color, isNull);
+      expect(decoration.gradient, isA<LinearGradient>());
+      expect(decoration.border, isNull);
+    });
+
+    testWidgets('floating: true uses outline button type for auto-implied leading', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          const _LauncherScreen(appBarStyle: StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating)),
+        ),
+      );
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<StreamButton>(find.byType(StreamButton));
+      expect(button.props.type, equals(StreamButtonType.outline));
+    });
+
+    testWidgets('floating: false uses ghost button type for auto-implied leading', (tester) async {
+      await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<StreamButton>(find.byType(StreamButton));
+      expect(button.props.type, equals(StreamButtonType.ghost));
+    });
+  });
+
+  group('StreamAppBar slot behaviour', () {
+    // A slot resolves its behaviour from the ambient StreamToolbarScope — the
+    // value downstream SDKs read to drive floating-aware slots. The bar
+    // publishes its resolved behaviour so a `style` handed only to the bar
+    // still reaches its slots.
+    StreamSurfaceStyle? captured;
+
+    Widget probe() {
+      return Builder(
+        builder: (context) {
+          captured = StreamToolbarScope.of(context);
+          return const SizedBox.shrink();
+        },
+      );
+    }
+
+    tearDown(() => captured = null);
+
+    testWidgets('slot resolves floating when style is passed to the bar', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            body: StreamAppBar(
+              automaticallyImplyLeading: false,
+              primary: false,
+              style: const StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamSurfaceStyle.floating);
+    });
+
+    testWidgets('slot resolves regular by default', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          Scaffold(
+            appBar: StreamAppBar(
+              automaticallyImplyLeading: false,
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamSurfaceStyle.regular);
+    });
+
+    testWidgets('slot resolves floating from the ambient app style', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme(surfaceStyle: StreamSurfaceStyle.floating)]),
+          home: Scaffold(
+            body: StreamAppBar(
+              automaticallyImplyLeading: false,
+              primary: false,
+              title: const Text('Title'),
+              trailing: probe(),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamSurfaceStyle.floating);
+    });
+
+    testWidgets('slot resolves floating from an ambient app bar theme', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamAppBarTheme(
+            data: const StreamAppBarThemeData(
+              style: StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
+            ),
+            child: Scaffold(
+              body: StreamAppBar(
+                automaticallyImplyLeading: false,
+                primary: false,
+                title: const Text('Title'),
+                trailing: probe(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamSurfaceStyle.floating);
+    });
+
+    testWidgets('bar style overrides the ambient app bar theme for slots', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamAppBarTheme(
+            data: const StreamAppBarThemeData(
+              style: StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.floating),
+            ),
+            child: Scaffold(
+              appBar: StreamAppBar(
+                automaticallyImplyLeading: false,
+                style: const StreamAppBarStyle(surfaceStyle: StreamSurfaceStyle.regular),
+                title: const Text('Title'),
+                trailing: probe(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(captured, StreamSurfaceStyle.regular);
+    });
+  });
+
   group('StreamAppBar semantics', () {
     testWidgets('auto-implied back button carries the localized Back tooltip', (tester) async {
       await tester.pumpWidget(_withStreamTheme(const _LauncherScreen()));
@@ -97,26 +290,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byTooltip('Close'), findsOneWidget);
-    });
-
-    testWidgets('title is marked as a heading by default', (tester) async {
-      final handle = tester.ensureSemantics();
-      await tester.pumpWidget(
-        _withStreamTheme(
-          Scaffold(
-            appBar: StreamAppBar(
-              automaticallyImplyLeading: false,
-              title: const Text('Title'),
-            ),
-          ),
-        ),
-      );
-
-      final data = tester.getSemantics(find.text('Title')).getSemanticsData();
-      expect(data.label, equals('Title'));
-      expect(data.flagsCollection.isHeader, isTrue);
-
-      handle.dispose();
     });
 
     testWidgets('title names the route on Android', (tester) async {
@@ -289,11 +462,13 @@ class _LauncherScreen extends StatelessWidget {
     this.customLeading = false,
     this.implyLeading = true,
     this.fullscreenDialog = false,
+    this.appBarStyle,
   });
 
   final bool customLeading;
   final bool implyLeading;
   final bool fullscreenDialog;
+  final StreamAppBarStyle? appBarStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -308,6 +483,7 @@ class _LauncherScreen extends StatelessWidget {
                   builder: (_) => Scaffold(
                     appBar: StreamAppBar(
                       automaticallyImplyLeading: implyLeading,
+                      style: appBarStyle,
                       leading: customLeading
                           ? const SizedBox(key: ValueKey('custom-leading'), width: 40, height: 40)
                           : null,

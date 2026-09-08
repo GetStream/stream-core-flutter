@@ -99,7 +99,13 @@ mixin _$StreamBottomAppBarStyle {
     }
 
     return StreamBottomAppBarStyle(
+      surfaceStyle: t < 0.5 ? a.surfaceStyle : b.surfaceStyle,
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+      floatingBackgroundColor: Color.lerp(
+        a.floatingBackgroundColor,
+        b.floatingBackgroundColor,
+        t,
+      ),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       spacing: lerpDouble$(a.spacing, b.spacing, t),
       titleTextStyle: TextStyle.lerp(a.titleTextStyle, b.titleTextStyle, t),
@@ -122,7 +128,9 @@ mixin _$StreamBottomAppBarStyle {
   }
 
   StreamBottomAppBarStyle copyWith({
+    StreamSurfaceStyle? surfaceStyle,
     Color? backgroundColor,
+    Color? floatingBackgroundColor,
     EdgeInsetsGeometry? padding,
     double? spacing,
     TextStyle? titleTextStyle,
@@ -133,7 +141,10 @@ mixin _$StreamBottomAppBarStyle {
     final _this = (this as StreamBottomAppBarStyle);
 
     return StreamBottomAppBarStyle(
+      surfaceStyle: surfaceStyle ?? _this.surfaceStyle,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
+      floatingBackgroundColor:
+          floatingBackgroundColor ?? _this.floatingBackgroundColor,
       padding: padding ?? _this.padding,
       spacing: spacing ?? _this.spacing,
       titleTextStyle: titleTextStyle ?? _this.titleTextStyle,
@@ -155,7 +166,9 @@ mixin _$StreamBottomAppBarStyle {
     }
 
     return copyWith(
+      surfaceStyle: other.surfaceStyle,
       backgroundColor: other.backgroundColor,
+      floatingBackgroundColor: other.floatingBackgroundColor,
       padding: other.padding,
       spacing: other.spacing,
       titleTextStyle:
@@ -185,7 +198,9 @@ mixin _$StreamBottomAppBarStyle {
     final _this = (this as StreamBottomAppBarStyle);
     final _other = (other as StreamBottomAppBarStyle);
 
-    return _other.backgroundColor == _this.backgroundColor &&
+    return _other.surfaceStyle == _this.surfaceStyle &&
+        _other.backgroundColor == _this.backgroundColor &&
+        _other.floatingBackgroundColor == _this.floatingBackgroundColor &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
         _other.titleTextStyle == _this.titleTextStyle &&
@@ -200,7 +215,9 @@ mixin _$StreamBottomAppBarStyle {
 
     return Object.hash(
       runtimeType,
+      _this.surfaceStyle,
       _this.backgroundColor,
+      _this.floatingBackgroundColor,
       _this.padding,
       _this.spacing,
       _this.titleTextStyle,

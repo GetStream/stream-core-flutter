@@ -41,12 +41,23 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
     description: 'Duration of the chrome show/hide animation.',
   );
 
+  final surfaceStyle = context.knobs.object.dropdown(
+    label: 'Chrome surfaceStyle',
+    options: StreamSurfaceStyle.values,
+    initialOption: StreamSurfaceStyle.floating,
+    description:
+        'Floating chrome overlays full-bleed media with a gradient fade; '
+        'regular chrome insets the media between opaque bars.',
+  );
+
   final tintChrome = context.knobs.boolean(
     label: 'Tint chrome over dark media',
     description:
         'Demonstrates StreamMediaViewerThemeData.appBarStyle / '
-        'bottomAppBarStyle — scopes a translucent chrome over the media.',
+        'bottomAppBarStyle — scopes a translucent chrome colour over the media.',
   );
+
+  final tint = tintChrome ? const Color(0x55000000) : null;
 
   return _MediaViewerLauncher(
     label: 'Open media viewer',
@@ -55,8 +66,16 @@ Widget buildStreamMediaViewerPlayground(BuildContext context) {
       StreamMediaViewerTheme(
         data: StreamMediaViewerThemeData(
           chromeAnimationDuration: Duration(milliseconds: animationMs.round()),
-          appBarStyle: tintChrome ? const StreamAppBarStyle(backgroundColor: Color(0x55000000)) : null,
-          bottomAppBarStyle: tintChrome ? const StreamBottomAppBarStyle(backgroundColor: Color(0x55000000)) : null,
+          appBarStyle: StreamAppBarStyle(
+            surfaceStyle: surfaceStyle,
+            backgroundColor: tint,
+            floatingBackgroundColor: tint,
+          ),
+          bottomAppBarStyle: StreamBottomAppBarStyle(
+            surfaceStyle: surfaceStyle,
+            backgroundColor: tint,
+            floatingBackgroundColor: tint,
+          ),
         ),
         child: _PlaygroundMediaViewer(
           showHeader: showHeader,
@@ -305,7 +324,7 @@ class _PlaygroundMediaViewerState extends State<_PlaygroundMediaViewer> {
               title: const Text('You'),
               subtitle: const Text('14/01/2026, 16:06'),
               trailing: StreamButton.icon(
-                icon: Icon(icons.more),
+                icon: Icon(icons.moreHorizontal),
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.ghost,
                 onPressed: () {},

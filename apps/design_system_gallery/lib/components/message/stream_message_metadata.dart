@@ -74,6 +74,16 @@ Widget buildStreamMessageMetadataPlayground(BuildContext context) {
     description: 'Minimum height of the metadata row.',
   );
 
+  final presentation = context.knobs.object.dropdown<StreamMessagePresentation>(
+    label: 'Presentation',
+    options: StreamMessagePresentation.values,
+    initialOption: StreamMessagePresentation.standard,
+    labelBuilder: (v) => v.name,
+    description:
+        'What the message is drawn on. Preview (the long-press actions modal) sits above a '
+        'scrim, so metadata switches to textOnAccent.',
+  );
+
   final accentPrimary = context.streamColorScheme.accentPrimary;
 
   Widget child = StreamMessageMetadata(
@@ -96,7 +106,15 @@ Widget buildStreamMessageMetadataPlayground(BuildContext context) {
     );
   }
 
-  return Center(child: child);
+  return _PresentationBackdrop(
+    presentation: presentation,
+    child: Center(
+      child: StreamMessageLayout(
+        data: StreamMessageLayoutData(presentation: presentation),
+        child: child,
+      ),
+    ),
+  );
 }
 
 // =============================================================================
@@ -122,6 +140,7 @@ Widget buildStreamMessageMetadataShowcase(BuildContext context) {
         children: [
           _SlotCombinationsSection(),
           _DeliveryStatusSection(),
+          _PresentationSection(),
           _RealWorldSection(),
           _ThemeOverrideSection(),
         ],
@@ -227,6 +246,66 @@ class _DeliveryStatusSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PresentationSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const _Section(
+      label: 'PRESENTATION',
+      description:
+          'StreamMessageLayoutData.presentation tells metadata what the message is drawn on. '
+          'A preview — the long-press actions modal — sits above backgroundScrim, so username, '
+          'timestamp, edited and status resolve to textOnAccent instead of textSecondary / textTertiary.',
+      children: [
+        _ExampleCard(
+          label: 'Standard (inline)',
+          subtitle: 'Rendered in the message list, on the app background.',
+          child: _PresentationExample(presentation: StreamMessagePresentation.standard),
+        ),
+        _ExampleCard(
+          label: 'Preview (above a scrim)',
+          subtitle: 'Metadata turns white so it stays legible on the scrim.',
+          child: _PresentationExample(presentation: StreamMessagePresentation.preview),
+        ),
+      ],
+    );
+  }
+}
+
+class _PresentationExample extends StatelessWidget {
+  const _PresentationExample({required this.presentation});
+
+  final StreamMessagePresentation presentation;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = context.streamRadius;
+
+    return _PresentationBackdrop(
+      presentation: presentation,
+      borderRadius: BorderRadius.all(radius.md),
+      padding: const EdgeInsets.all(16),
+      child: StreamMessageLayout(
+        data: StreamMessageLayoutData(presentation: presentation),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 4,
+          children: [
+            StreamMessageBubble(
+              child: StreamMessageText('Meeting at 3 PM today.'),
+            ),
+            StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              username: const Text('Alice'),
+              edited: const Text('Edited'),
+              status: const Icon(StreamIconData.checks),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -527,6 +606,53 @@ class _ExampleCard extends StatelessWidget {
           ),
           child,
         ],
+      ),
+    );
+  }
+}
+
+/// Paints what a message sits on for the given [presentation]: the app
+/// background for `standard`, and the app background behind a scrim for
+/// `preview`, mirroring the long-press message-actions modal.
+///
+/// Fills the space it is given, so the scrim reads as the whole backdrop
+/// rather than a box behind the component.
+class _PresentationBackdrop extends StatelessWidget {
+  const _PresentationBackdrop({
+    required this.presentation,
+    required this.child,
+    this.borderRadius,
+    this.padding = EdgeInsets.zero,
+  });
+
+  final StreamMessagePresentation presentation;
+  final BorderRadiusGeometry? borderRadius;
+  final EdgeInsetsGeometry padding;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+
+    final scrim = switch (presentation) {
+      StreamMessagePresentation.standard => null,
+      StreamMessagePresentation.preview => colorScheme.backgroundScrim,
+    };
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.backgroundApp,
+        borderRadius: borderRadius,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scrim,
+          borderRadius: borderRadius,
+        ),
+        child: Padding(
+          padding: padding,
+          child: SizedBox(width: double.infinity, child: child),
+        ),
       ),
     );
   }
