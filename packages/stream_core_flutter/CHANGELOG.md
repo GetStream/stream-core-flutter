@@ -1,3 +1,9 @@
+## Upcoming
+
+### ✨ Features
+
+- Added the `lowBandwidthFill` icon.
+
 ## 0.5.1
 
 ### ✨ Features

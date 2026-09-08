@@ -125,6 +125,7 @@ class StreamIcons with _$StreamIcons {
     this.livestreamFill = StreamIconData.livestreamFill,
     this.location = StreamIconData.location,
     this.lock = StreamIconData.lock,
+    this.lowBandwidthFill = StreamIconData.lowBandwidthFill,
     this.megaphone = StreamIconData.megaphone,
     this.mention = StreamIconData.mention,
     this.menu = StreamIconData.menu,
@@ -408,6 +409,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The lock icon.
   final IconData lock;
+
+  /// The low bandwidth fill icon.
+  final IconData lowBandwidthFill;
 
   /// The megaphone icon.
   final IconData megaphone;
@@ -748,6 +752,7 @@ class StreamIcons with _$StreamIcons {
     'livestreamFill': livestreamFill,
     'location': location,
     'lock': lock,
+    'lowBandwidthFill': lowBandwidthFill,
     'megaphone': megaphone,
     'mention': mention,
     'menu': menu,

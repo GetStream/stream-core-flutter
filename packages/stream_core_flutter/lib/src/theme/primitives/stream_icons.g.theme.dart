@@ -97,6 +97,7 @@ mixin _$StreamIcons {
       livestreamFill: t < 0.5 ? a.livestreamFill : b.livestreamFill,
       location: t < 0.5 ? a.location : b.location,
       lock: t < 0.5 ? a.lock : b.lock,
+      lowBandwidthFill: t < 0.5 ? a.lowBandwidthFill : b.lowBandwidthFill,
       megaphone: t < 0.5 ? a.megaphone : b.megaphone,
       mention: t < 0.5 ? a.mention : b.mention,
       menu: t < 0.5 ? a.menu : b.menu,
@@ -257,6 +258,7 @@ mixin _$StreamIcons {
     IconData? livestreamFill,
     IconData? location,
     IconData? lock,
+    IconData? lowBandwidthFill,
     IconData? megaphone,
     IconData? mention,
     IconData? menu,
@@ -415,6 +417,7 @@ mixin _$StreamIcons {
       livestreamFill: livestreamFill ?? _this.livestreamFill,
       location: location ?? _this.location,
       lock: lock ?? _this.lock,
+      lowBandwidthFill: lowBandwidthFill ?? _this.lowBandwidthFill,
       megaphone: megaphone ?? _this.megaphone,
       mention: mention ?? _this.mention,
       menu: menu ?? _this.menu,
@@ -583,6 +586,7 @@ mixin _$StreamIcons {
       livestreamFill: other.livestreamFill,
       location: other.location,
       lock: other.lock,
+      lowBandwidthFill: other.lowBandwidthFill,
       megaphone: other.megaphone,
       mention: other.mention,
       menu: other.menu,
@@ -751,6 +755,7 @@ mixin _$StreamIcons {
         _other.livestreamFill == _this.livestreamFill &&
         _other.location == _this.location &&
         _other.lock == _this.lock &&
+        _other.lowBandwidthFill == _this.lowBandwidthFill &&
         _other.megaphone == _this.megaphone &&
         _other.mention == _this.mention &&
         _other.menu == _this.menu &&
@@ -911,6 +916,7 @@ mixin _$StreamIcons {
       _this.livestreamFill,
       _this.location,
       _this.lock,
+      _this.lowBandwidthFill,
       _this.megaphone,
       _this.mention,
       _this.menu,
