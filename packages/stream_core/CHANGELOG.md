@@ -1,3 +1,9 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
+
 ## 0.5.0
 
 ### 💥 BREAKING CHANGES

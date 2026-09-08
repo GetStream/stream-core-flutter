@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 import 'detector/platform_detector.dart' if (dart.library.io) 'detector/platform_detector_io.dart';
 
 /// Platform detection utility for identifying the current runtime environment.
@@ -22,10 +24,33 @@ class CurrentPlatform {
   // Private constructor to prevent instantiation.
   CurrentPlatform._();
 
+  /// Overrides the platform reported by [type] in tests.
+  ///
+  /// Every property derived from [type] follows the override, including
+  /// [operatingSystem] and the platform flags ([isAndroid], [isWeb],
+  /// [isMobile], …). [isFlutterTest] reports the real environment and is
+  /// unaffected.
+  ///
+  /// The override is honoured only while asserts are enabled; builds that run
+  /// without them ignore it. Reset it to `null` once the test that set it is
+  /// done, so the platform does not leak into the next one.
+  @visibleForTesting
+  static PlatformType? debugCurrentPlatformOverride;
+
   /// The current platform type.
   ///
-  /// Returns the detected [PlatformType] for the current runtime environment.
-  static PlatformType get type => currentPlatform;
+  /// Returns the detected [PlatformType] for the current runtime environment,
+  /// or [debugCurrentPlatformOverride] where one is set.
+  static PlatformType get type {
+    var platform = currentPlatform;
+    assert(() {
+      if (debugCurrentPlatformOverride case final override?) {
+        platform = override;
+      }
+      return true;
+    }(), 'debugCurrentPlatformOverride applied');
+    return platform;
+  }
 
   /// Whether the current platform is Android.
   static bool get isAndroid => type == PlatformType.android;
