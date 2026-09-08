@@ -73,7 +73,12 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
       {
         return url
       }
-      return URL(fileURLWithPath: String(video.dropFirst(7)))
+      // The authority has to come off by hand here: `file://localhost/tmp/a#b.mp4`
+      // takes this branch for its `#`, and `localhost` would otherwise be read as
+      // the first path segment.
+      var path = String(video.dropFirst(7))
+      if path.hasPrefix("localhost/") { path = String(path.dropFirst(9)) }
+      return URL(fileURLWithPath: path)
     } else if video.hasPrefix("/") {
       return URL(fileURLWithPath: video)
     } else if let url = URL(string: video) {

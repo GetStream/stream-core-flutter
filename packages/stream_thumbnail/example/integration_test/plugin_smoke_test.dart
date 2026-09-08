@@ -167,6 +167,26 @@ void main() {
     }
   });
 
+  testWidgets(
+    'thumbnailFile accepts a file://localhost URL with a # in the name',
+    (tester) async {
+      // Both branches at once: the `#` forces the raw-path fallback, and that
+      // fallback has to drop the `localhost` authority itself or read it as a
+      // path segment.
+      final awkward = File('${Directory.systemTemp.path}/stream thumbnail #host.mp4');
+      await awkward.writeAsBytes(await File(video).readAsBytes(), flush: true);
+      addTearDown(awkward.deleteSync);
+
+      final thumbnail = await StreamThumbnail.thumbnailFile(
+        video: 'file://localhost${awkward.path}',
+        maxWidth: 300,
+      );
+
+      expect(File(thumbnail.path).existsSync(), isTrue);
+    },
+    skip: !_percentDecodesFileUrls,
+  );
+
   testWidgets('thumbnailFiles returns one file per video', (tester) async {
     final thumbnails = await StreamThumbnail.thumbnailFiles(videos: [video, video], maxWidth: 300);
 
