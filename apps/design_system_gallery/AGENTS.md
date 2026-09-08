@@ -56,14 +56,29 @@ apps/design_system_gallery/
 │   │   ├── spacing.dart                  # StreamSpacing showcase
 │   │   └── colors.dart                   # StreamColors showcase
 │   ├── config/
+│   │   ├── theme_color_slot.dart         # ThemeColorSlot/ThemeSeedSlot enums (source of truth for colors)
+│   │   ├── theme_studio_sections.dart    # Section/group layout shared by the panel, export page & codegen
+│   │   ├── component_theme_descriptors.dart # Editable Color props per component theme + name lookup
 │   │   ├── theme_configuration.dart      # Theme state (colors, brightness, etc.)
+│   │   ├── theme_export_configuration.dart # Export page state: a light + dark config, plus link state
 │   │   └── preview_configuration.dart    # Preview state (device, text scale)
 │   ├── core/
-│   │   └── preview_wrapper.dart          # Wraps use cases with theme/device frame
+│   │   ├── preview_wrapper.dart          # Wraps use cases with theme/device frame
+│   │   └── theme_code_generator.dart     # Generates copy-pasteable Dart for the export page
 │   └── widgets/
 │       ├── toolbar/                      # Top toolbar widgets
-│       └── theme_studio/                 # Theme customization panel widgets
+│       ├── theme_studio/                 # Theme customization panel widgets
+│       └── theme_export/                 # Export page widgets (linked color rows, message preview)
 ```
+
+The gallery also has a `test/` directory (`melos run test:flutter` picks it up automatically). It currently covers:
+
+- **`theme_color_slot.dart` vs. `StreamColorScheme`** — pins the slot list so an added SDK color fails loudly instead of being silently missed.
+- **Component themes** — that every `ComponentThemeDescriptor` matches the real `StreamTheme` API.
+- **`theme_export_configuration.dart`** — seeding from the studio, link/unlink semantics, and that export never writes back.
+- **`color_picker_tile.dart`** — the default/customized states, and that a tile keeps a constant height either way.
+- **The export page** — the light/dark columns, link toggles, the responsive side-by-side/tabs split, and the component theme picker.
+- **The code generator** — const naming (shared vs. `Light`/`Dark`-suffixed), chrome derivation, and a check that the generated snippet actually **type-checks against the real API** (`theme_code_generator_compiles_test.dart` writes it to a real `.dart` file and runs `dart analyze` over it).
 
 ## Common Commands
 
@@ -369,7 +384,7 @@ Use `context.read<ThemeConfiguration>()` for calling methods (no rebuild on chan
 
 ```dart
 // For calling setters/methods - use read
-context.read<ThemeConfiguration>().setAccentPrimary(color);
+context.read<ThemeConfiguration>().setOverride(ThemeColorSlot.accentPrimary, color);
 context.read<ThemeConfiguration>().resetToDefaults();
 ```
 
@@ -377,11 +392,29 @@ Use `context.watch<ThemeConfiguration>()` only when you need to rebuild on chang
 
 ### Adding New Theme Properties
 
-1. Add private field and getter in `theme_configuration.dart`
-2. Add setter using `_update()` pattern
-3. Include in `_rebuildTheme()` colorScheme.copyWith()
-4. Add to `resetToDefaults()`
-5. Add UI control in `theme_customization_panel.dart`
+Every plain `Color?` parameter of `StreamColorScheme` is represented once, as a
+`ThemeColorSlot` value — `ThemeConfiguration` stores overrides in a single
+`Map<ThemeColorSlot, Color>` rather than one field/getter/setter/reset per
+color, and the studio panel renders `themeStudioSections` instead of
+hand-written tiles. This is what keeps the panel, the export page, and the
+code generator from drifting apart (they used to — `textOnInverse`,
+`borderOnInverse` and `borderDisabledOnSurface` existed on `StreamColorScheme`
+but were missing from the studio for a while).
+
+To add a new SDK color:
+
+1. Add a `ThemeColorSlot` value in `theme_color_slot.dart` (parameter name +
+   a `_readXxx(StreamColorScheme s) => s.xxx;` top-level reader — enum-constant
+   arguments must be constant expressions, so the reader is a function
+   tear-off, not an inline closure).
+2. Add the same parameter to the `_rebuildTheme()` call in
+   `theme_configuration.dart` (`xxx: _overrides[ThemeColorSlot.xxx]`).
+3. Add the slot to a group in `theme_studio_sections.dart` — this alone adds
+   its UI control to the panel, the export page, and code generation.
+4. Update `theme_color_slot_test.dart`'s pinned parameter-name list.
+
+`brand`/`chrome` (swatch-valued, see `ThemeSeedSlot`) and `avatarPalette`
+(a list, not a color) are handled separately and don't go through this path.
 
 ### Best Practices
 

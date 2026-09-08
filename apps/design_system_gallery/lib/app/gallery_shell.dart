@@ -23,10 +23,12 @@ class GalleryShell extends StatelessWidget {
     super.key,
     required this.showThemePanel,
     required this.onToggleThemePanel,
+    required this.onExportTheme,
   });
 
   final bool showThemePanel;
   final VoidCallback onToggleThemePanel;
+  final VoidCallback onExportTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,7 @@ class GalleryShell extends StatelessWidget {
           GalleryToolbar(
             showThemePanel: showThemePanel,
             onToggleThemePanel: onToggleThemePanel,
+            onExportTheme: onExportTheme,
           ),
           // Content area below toolbar
           Expanded(

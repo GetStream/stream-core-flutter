@@ -25,10 +25,12 @@ class GalleryToolbar extends StatelessWidget {
     super.key,
     required this.showThemePanel,
     required this.onToggleThemePanel,
+    required this.onExportTheme,
   });
 
   final bool showThemePanel;
   final VoidCallback onToggleThemePanel;
+  final VoidCallback onExportTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +129,15 @@ class GalleryToolbar extends StatelessWidget {
             tooltip: 'Theme Studio',
             isActive: showThemePanel,
             onTap: onToggleThemePanel,
+          ),
+          SizedBox(width: spacing.sm),
+
+          // Export the current theme studio state as a Dart snippet.
+          ToolbarButton(
+            icon: Icons.ios_share,
+            tooltip: 'Export Theme',
+            isActive: false,
+            onTap: onExportTheme,
           ),
         ],
       ),

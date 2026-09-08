@@ -3,6 +3,7 @@
 /// This barrel file exports all theme customization-related widgets.
 library;
 
+export 'add_component_theme_button.dart';
 export 'avatar_palette_section.dart';
 export 'color_picker_tile.dart';
 export 'mode_button.dart';

@@ -5,6 +5,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import '../config/preview_configuration.dart';
 import '../config/theme_configuration.dart';
 import 'gallery_shell.dart';
+import 'theme_export_page.dart';
 
 /// Stream Design System Gallery
 ///
@@ -30,6 +31,10 @@ class _StreamDesignSystemGalleryState extends State<StreamDesignSystemGallery> {
     super.dispose();
   }
 
+  void _openThemeExport(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ThemeExportPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -49,9 +54,13 @@ class _StreamDesignSystemGalleryState extends State<StreamDesignSystemGallery> {
             theme: materialTheme,
             darkTheme: materialTheme,
             themeMode: isDark ? .dark : .light,
-            home: GalleryShell(
-              showThemePanel: _showThemePanel,
-              onToggleThemePanel: () => setState(() => _showThemePanel = !_showThemePanel),
+            home: Builder(
+              // Builder gives a context below the [MaterialApp]'s [Navigator].
+              builder: (context) => GalleryShell(
+                showThemePanel: _showThemePanel,
+                onToggleThemePanel: () => setState(() => _showThemePanel = !_showThemePanel),
+                onExportTheme: () => _openThemeExport(context),
+              ),
             ),
           );
         },
