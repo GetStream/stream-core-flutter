@@ -7,6 +7,7 @@
 #include <mferror.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
+#include <objbase.h>
 #include <propvarutil.h>
 #include <shlwapi.h>
 #include <wincodec.h>
@@ -14,7 +15,6 @@
 
 #include <flutter/plugin_registrar_windows.h>
 
-#include <cctype>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -58,14 +58,6 @@ std::string WideToUtf8(const std::wstring &wide) {
   std::string utf8(size, 0);
   WideCharToMultiByte(CP_UTF8, 0, wide.data(), static_cast<int>(wide.size()), utf8.data(), size, nullptr, nullptr);
   return utf8;
-}
-
-bool IsLocalPath(const std::string &video) {
-  if (video.size() >= 2 && std::isalpha(static_cast<unsigned char>(video[0])) && video[1] == ':') return true;
-  if (video.rfind("\\\\", 0) == 0) return true;
-  if (video.rfind("/", 0) == 0) return true;
-  if (video.rfind("file://", 0) == 0) return true;
-  return false;
 }
 
 // Strips a leading "file://" prefix, if present.
@@ -310,38 +302,55 @@ std::vector<uint8_t> GenerateThumbnailData(const ThumbnailRequest &request) {
   return bytes;
 }
 
+// A fresh directory under %TEMP% to hold one thumbnail. The file name comes
+// from the video, so a directory per request is what keeps two same-named
+// videos from different folders off each other.
+std::wstring CreateOutputDirectory() {
+  wchar_t temp_path[MAX_PATH];
+  const DWORD temp_length = GetTempPathW(MAX_PATH, temp_path);
+  if (temp_length == 0 || temp_length > MAX_PATH) {
+    throw ThumbnailException("WRITE_ERROR", "Failed to locate the temporary directory.");
+  }
+
+  GUID guid;
+  wchar_t unique_name[40];
+  if (FAILED(CoCreateGuid(&guid)) || StringFromGUID2(guid, unique_name, ARRAYSIZE(unique_name)) == 0) {
+    throw ThumbnailException("WRITE_ERROR", "Failed to name a directory for the thumbnail.");
+  }
+
+  const std::wstring parent = std::wstring(temp_path, temp_length) + L"stream_thumbnail";
+  if (!CreateDirectoryW(parent.c_str(), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS) {
+    throw ThumbnailException("WRITE_ERROR", "Failed to create a directory for the thumbnail.");
+  }
+
+  const std::wstring directory = parent + L"\\" + unique_name;
+  if (!CreateDirectoryW(directory.c_str(), nullptr)) {
+    throw ThumbnailException("WRITE_ERROR", "Failed to create a directory for the thumbnail.");
+  }
+  return directory;
+}
+
+// The video's own file name, carrying `ext` instead of its own extension.
+std::string OutputFileName(const std::string &video, const std::string &ext) {
+  std::string path = VideoPath(video);
+  const size_t query = path.find_first_of("?#");
+  if (query != std::string::npos) path.erase(query);
+
+  const size_t slash = path.find_last_of("/\\");
+  std::string stem = slash == std::string::npos ? path : path.substr(slash + 1);
+  const size_t dot = stem.find_last_of('.');
+  if (dot != std::string::npos && dot > 0) stem.erase(dot);
+  if (stem.empty()) stem = "thumbnail";
+
+  return stem + "." + ext;
+}
+
 std::string WriteThumbnailFile(const ThumbnailRequest &request) {
   const std::vector<uint8_t> data = GenerateThumbnailData(request);
-  const std::string ext = FileExtension(request.format());
-  const std::string video_path = VideoPath(request.video());
 
-  std::string save_path = request.thumbnail_path() != nullptr ? *request.thumbnail_path() : std::string();
-  if (save_path.empty() && !IsLocalPath(request.video())) {
-    wchar_t temp_path[MAX_PATH];
-    GetTempPathW(MAX_PATH, temp_path);
-    save_path = WideToUtf8(temp_path);
-  }
+  const std::wstring wide_path =
+      CreateOutputDirectory() + L"\\" + Utf8ToWide(OutputFileName(request.video(), FileExtension(request.format())));
 
-  const size_t dot = video_path.find_last_of('.');
-  const std::string base = dot == std::string::npos ? video_path : video_path.substr(0, dot);
-
-  std::string full_path;
-  if (!save_path.empty()) {
-    const bool ends_with_ext =
-        save_path.size() >= ext.size() && save_path.compare(save_path.size() - ext.size(), ext.size(), ext) == 0;
-    if (ends_with_ext) {
-      full_path = save_path;
-    } else {
-      const size_t slash = base.find_last_of("/\\");
-      const std::string file_name = (slash == std::string::npos ? base : base.substr(slash + 1)) + "." + ext;
-      const bool trailing_slash = save_path.back() == '/' || save_path.back() == '\\';
-      full_path = trailing_slash ? save_path + file_name : save_path + "\\" + file_name;
-    }
-  } else {
-    full_path = base + "." + ext;
-  }
-
-  const std::wstring wide_path = Utf8ToWide(full_path);
   ComPtr<IStream> file_stream;
   HRESULT hr = SHCreateStreamOnFileEx(wide_path.c_str(), STGM_CREATE | STGM_WRITE | STGM_SHARE_EXCLUSIVE, 0, TRUE,
                                        nullptr, &file_stream);
@@ -351,7 +360,7 @@ std::string WriteThumbnailFile(const ThumbnailRequest &request) {
     throw ThumbnailException("WRITE_ERROR", "Failed to write the thumbnail to disk.");
   }
 
-  return full_path;
+  return WideToUtf8(wide_path);
 }
 
 }  // namespace

@@ -291,7 +291,6 @@ struct _StreamThumbnailThumbnailRequest {
 
   gchar* video;
   FlValue* headers;
-  gchar* thumbnail_path;
   StreamThumbnailThumbnailFormat format;
   int64_t max_height;
   int64_t max_width;
@@ -305,7 +304,6 @@ static void stream_thumbnail_thumbnail_request_dispose(GObject* object) {
   StreamThumbnailThumbnailRequest* self = STREAM_THUMBNAIL_THUMBNAIL_REQUEST(object);
   g_clear_pointer(&self->video, g_free);
   g_clear_pointer(&self->headers, fl_value_unref);
-  g_clear_pointer(&self->thumbnail_path, g_free);
   G_OBJECT_CLASS(stream_thumbnail_thumbnail_request_parent_class)->dispose(object);
 }
 
@@ -316,7 +314,7 @@ static void stream_thumbnail_thumbnail_request_class_init(StreamThumbnailThumbna
   G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_thumbnail_request_dispose;
 }
 
-StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, const gchar* thumbnail_path, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality) {
+StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality) {
   StreamThumbnailThumbnailRequest* self = STREAM_THUMBNAIL_THUMBNAIL_REQUEST(g_object_new(stream_thumbnail_thumbnail_request_get_type(), nullptr));
   self->video = g_strdup(video);
   if (headers != nullptr) {
@@ -324,12 +322,6 @@ StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gc
   }
   else {
     self->headers = nullptr;
-  }
-  if (thumbnail_path != nullptr) {
-    self->thumbnail_path = g_strdup(thumbnail_path);
-  }
-  else {
-    self->thumbnail_path = nullptr;
   }
   self->format = format;
   self->max_height = max_height;
@@ -347,11 +339,6 @@ const gchar* stream_thumbnail_thumbnail_request_get_video(StreamThumbnailThumbna
 FlValue* stream_thumbnail_thumbnail_request_get_headers(StreamThumbnailThumbnailRequest* self) {
   g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), nullptr);
   return self->headers;
-}
-
-const gchar* stream_thumbnail_thumbnail_request_get_thumbnail_path(StreamThumbnailThumbnailRequest* self) {
-  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), nullptr);
-  return self->thumbnail_path;
 }
 
 StreamThumbnailThumbnailFormat stream_thumbnail_thumbnail_request_get_format(StreamThumbnailThumbnailRequest* self) {
@@ -383,7 +370,6 @@ static FlValue* stream_thumbnail_thumbnail_request_to_list(StreamThumbnailThumbn
   FlValue* values = fl_value_new_list();
   fl_value_append_take(values, fl_value_new_string(self->video));
   fl_value_append_take(values, self->headers != nullptr ? fl_value_ref(self->headers) : fl_value_new_null());
-  fl_value_append_take(values, self->thumbnail_path != nullptr ? fl_value_new_string(self->thumbnail_path) : fl_value_new_null());
   fl_value_append_take(values, fl_value_new_custom(stream_thumbnail_thumbnail_format_type_id, fl_value_new_int(self->format), (GDestroyNotify)fl_value_unref));
   fl_value_append_take(values, fl_value_new_int(self->max_height));
   fl_value_append_take(values, fl_value_new_int(self->max_width));
@@ -401,21 +387,16 @@ static StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new_f
     headers = value1;
   }
   FlValue* value2 = fl_value_get_list_value(values, 2);
-  const gchar* thumbnail_path = nullptr;
-  if (fl_value_get_type(value2) != FL_VALUE_TYPE_NULL) {
-    thumbnail_path = fl_value_get_string(value2);
-  }
+  StreamThumbnailThumbnailFormat format = static_cast<StreamThumbnailThumbnailFormat>(fl_value_get_int(reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value2)))));
   FlValue* value3 = fl_value_get_list_value(values, 3);
-  StreamThumbnailThumbnailFormat format = static_cast<StreamThumbnailThumbnailFormat>(fl_value_get_int(reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value3)))));
+  int64_t max_height = fl_value_get_int(value3);
   FlValue* value4 = fl_value_get_list_value(values, 4);
-  int64_t max_height = fl_value_get_int(value4);
+  int64_t max_width = fl_value_get_int(value4);
   FlValue* value5 = fl_value_get_list_value(values, 5);
-  int64_t max_width = fl_value_get_int(value5);
+  int64_t time_ms = fl_value_get_int(value5);
   FlValue* value6 = fl_value_get_list_value(values, 6);
-  int64_t time_ms = fl_value_get_int(value6);
-  FlValue* value7 = fl_value_get_list_value(values, 7);
-  int64_t quality = fl_value_get_int(value7);
-  return stream_thumbnail_thumbnail_request_new(video, headers, thumbnail_path, format, max_height, max_width, time_ms, quality);
+  int64_t quality = fl_value_get_int(value6);
+  return stream_thumbnail_thumbnail_request_new(video, headers, format, max_height, max_width, time_ms, quality);
 }
 
 gboolean stream_thumbnail_thumbnail_request_equals(StreamThumbnailThumbnailRequest* a, StreamThumbnailThumbnailRequest* b) {
@@ -429,9 +410,6 @@ gboolean stream_thumbnail_thumbnail_request_equals(StreamThumbnailThumbnailReque
     return FALSE;
   }
   if (!flpigeon_deep_equals(a->headers, b->headers)) {
-    return FALSE;
-  }
-  if (g_strcmp0(a->thumbnail_path, b->thumbnail_path) != 0) {
     return FALSE;
   }
   if (a->format != b->format) {
@@ -457,7 +435,6 @@ guint stream_thumbnail_thumbnail_request_hash(StreamThumbnailThumbnailRequest* s
   guint result = 0;
   result = result * 31 + (self->video != nullptr ? g_str_hash(self->video) : 0);
   result = result * 31 + flpigeon_deep_hash(self->headers);
-  result = result * 31 + (self->thumbnail_path != nullptr ? g_str_hash(self->thumbnail_path) : 0);
   result = result * 31 + static_cast<guint>(self->format);
   result = result * 31 + static_cast<guint>(self->max_height);
   result = result * 31 + static_cast<guint>(self->max_width);
@@ -481,13 +458,6 @@ gchar* stream_thumbnail_thumbnail_request_to_string(StreamThumbnailThumbnailRequ
     gchar* val_str = flpigeon_to_string(self->headers);
     g_string_append(str, val_str);
     g_free(val_str);
-  }
-  else {
-    g_string_append(str, "null");
-  }
-  g_string_append(str, ", thumbnail_path: ");
-  if (self->thumbnail_path != nullptr) {
-    g_string_append_printf(str, "\"%s\"", self->thumbnail_path);
   }
   else {
     g_string_append(str, "null");

@@ -64,10 +64,6 @@ using FramePtr = std::unique_ptr<AVFrame, FrameDeleter>;
 using PacketPtr = std::unique_ptr<AVPacket, PacketDeleter>;
 using SwsContextPtr = std::unique_ptr<SwsContext, SwsContextDeleter>;
 
-bool IsLocalPath(const std::string &video) {
-  return video.rfind("/", 0) == 0 || video.rfind("file://", 0) == 0;
-}
-
 // True only for an explicit non-file URL scheme, e.g. "https://host/clip.mp4".
 // Bare absolute and relative paths are local.
 bool IsRemoteUrl(const std::string &video) {
@@ -91,6 +87,21 @@ std::string FileExtension(StreamThumbnailThumbnailFormat format) {
       return "webp";
   }
   return "jpg";
+}
+
+// The video's own file name, carrying `ext` instead of its own extension.
+std::string OutputFileName(const std::string &video, const std::string &ext) {
+  std::string path = VideoPath(video);
+  const size_t query = path.find_first_of("?#");
+  if (query != std::string::npos) path.erase(query);
+
+  g_autofree gchar *base = g_path_get_basename(path.c_str());
+  std::string stem(base);
+  const size_t dot = stem.find_last_of('.');
+  if (dot != std::string::npos && dot > 0) stem.erase(dot);
+  if (stem.empty() || stem == "." || stem == "/") stem = "thumbnail";
+
+  return stem + "." + ext;
 }
 
 // Decodes a single frame from `video` at `time_ms`, at its native resolution
@@ -295,34 +306,25 @@ std::vector<uint8_t> GenerateThumbnailData(const std::string &video, const std::
 }
 
 std::string WriteThumbnailFile(const std::string &video, const std::map<std::string, std::string> *headers,
-                                const std::string *thumbnail_path, StreamThumbnailThumbnailFormat format, int64_t max_width,
-                                int64_t max_height, int64_t time_ms, int64_t quality) {
+                                StreamThumbnailThumbnailFormat format, int64_t max_width, int64_t max_height,
+                                int64_t time_ms, int64_t quality) {
   const std::vector<uint8_t> data = GenerateThumbnailData(video, headers, format, max_width, max_height, time_ms, quality);
-  const std::string ext = FileExtension(format);
-  const std::string video_path = VideoPath(video);
 
-  std::string save_path = thumbnail_path != nullptr ? *thumbnail_path : std::string();
-  if (save_path.empty() && !IsLocalPath(video)) {
-    save_path = g_get_tmp_dir();
+  // The file name comes from the video, so a directory per request is what keeps
+  // two same-named videos from different folders off each other. g_dir_make_tmp
+  // creates it 0700 directly under the temp dir: no fixed-name parent for another
+  // local user to pre-create in world-writable /tmp and then swap underneath us.
+  GError *dir_error = nullptr;
+  g_autofree gchar *dir = g_dir_make_tmp("stream_thumbnail_XXXXXX", &dir_error);
+  if (dir == nullptr) {
+    const std::string message =
+        dir_error != nullptr ? dir_error->message : "Failed to create a directory for the thumbnail.";
+    if (dir_error != nullptr) g_error_free(dir_error);
+    throw ThumbnailException("WRITE_ERROR", message);
   }
 
-  const size_t dot = video_path.find_last_of('.');
-  const std::string base = dot == std::string::npos ? video_path : video_path.substr(0, dot);
-
-  std::string full_path;
-  if (!save_path.empty()) {
-    const bool ends_with_ext =
-        save_path.size() >= ext.size() && save_path.compare(save_path.size() - ext.size(), ext.size(), ext) == 0;
-    if (ends_with_ext) {
-      full_path = save_path;
-    } else {
-      const size_t slash = base.find_last_of('/');
-      const std::string file_name = (slash == std::string::npos ? base : base.substr(slash + 1)) + "." + ext;
-      full_path = save_path.back() == '/' ? save_path + file_name : save_path + "/" + file_name;
-    }
-  } else {
-    full_path = base + "." + ext;
-  }
+  g_autofree gchar *full_path_c = g_build_filename(dir, OutputFileName(video, FileExtension(format)).c_str(), nullptr);
+  const std::string full_path(full_path_c);
 
   GError *error = nullptr;
   if (!g_file_set_contents(full_path.c_str(), reinterpret_cast<const gchar *>(data.data()), data.size(), &error)) {
@@ -376,8 +378,6 @@ struct ThumbnailDataResult {
 struct ThumbnailFileTaskData {
   std::string video;
   std::unique_ptr<std::map<std::string, std::string>> headers;
-  std::string thumbnail_path;
-  bool has_thumbnail_path;
   StreamThumbnailThumbnailFormat format;
   int64_t max_width;
   int64_t max_height;
@@ -432,9 +432,8 @@ void ThumbnailFileThread(GTask *task, gpointer, gpointer task_data, GCancellable
   auto *data = static_cast<ThumbnailFileTaskData *>(task_data);
   auto *result = new ThumbnailFileResult();
   try {
-    result->path = WriteThumbnailFile(data->video, data->headers.get(),
-                                       data->has_thumbnail_path ? &data->thumbnail_path : nullptr, data->format,
-                                       data->max_width, data->max_height, data->time_ms, data->quality);
+    result->path = WriteThumbnailFile(data->video, data->headers.get(), data->format, data->max_width,
+                                       data->max_height, data->time_ms, data->quality);
     result->ok = true;
   } catch (const ThumbnailException &e) {
     result->error_code = e.code();
@@ -479,12 +478,9 @@ void HandleThumbnailData(StreamThumbnailThumbnailRequest *request, StreamThumbna
 
 void HandleThumbnailFile(StreamThumbnailThumbnailRequest *request, StreamThumbnailStreamThumbnailHostApiResponseHandle *response_handle,
                           gpointer) {
-  const gchar *thumbnail_path = stream_thumbnail_thumbnail_request_get_thumbnail_path(request);
   auto *data = new ThumbnailFileTaskData{
       stream_thumbnail_thumbnail_request_get_video(request),
       ExtractHeaders(stream_thumbnail_thumbnail_request_get_headers(request)),
-      thumbnail_path != nullptr ? std::string(thumbnail_path) : std::string(),
-      thumbnail_path != nullptr,
       stream_thumbnail_thumbnail_request_get_format(request),
       stream_thumbnail_thumbnail_request_get_max_width(request),
       stream_thumbnail_thumbnail_request_get_max_height(request),

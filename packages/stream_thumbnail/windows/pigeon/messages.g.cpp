@@ -338,7 +338,6 @@ ThumbnailRequest::ThumbnailRequest(
 ThumbnailRequest::ThumbnailRequest(
   const std::string& video,
   const EncodableMap* headers,
-  const std::string* thumbnail_path,
   const ThumbnailFormat& format,
   int64_t max_height,
   int64_t max_width,
@@ -346,7 +345,6 @@ ThumbnailRequest::ThumbnailRequest(
   int64_t quality)
  : video_(video),
     headers_(headers ? std::optional<EncodableMap>(*headers) : std::nullopt),
-    thumbnail_path_(thumbnail_path ? std::optional<std::string>(*thumbnail_path) : std::nullopt),
     format_(format),
     max_height_(max_height),
     max_width_(max_width),
@@ -372,19 +370,6 @@ void ThumbnailRequest::set_headers(const EncodableMap* value_arg) {
 
 void ThumbnailRequest::set_headers(const EncodableMap& value_arg) {
   headers_ = value_arg;
-}
-
-
-const std::string* ThumbnailRequest::thumbnail_path() const {
-  return thumbnail_path_ ? &(*thumbnail_path_) : nullptr;
-}
-
-void ThumbnailRequest::set_thumbnail_path(const std::string_view* value_arg) {
-  thumbnail_path_ = value_arg ? std::optional<std::string>(*value_arg) : std::nullopt;
-}
-
-void ThumbnailRequest::set_thumbnail_path(std::string_view value_arg) {
-  thumbnail_path_ = value_arg;
 }
 
 
@@ -435,10 +420,9 @@ void ThumbnailRequest::set_quality(int64_t value_arg) {
 
 EncodableList ThumbnailRequest::ToEncodableList() const {
   EncodableList list;
-  list.reserve(8);
+  list.reserve(7);
   list.push_back(EncodableValue(video_));
   list.push_back(headers_ ? EncodableValue(*headers_) : EncodableValue());
-  list.push_back(thumbnail_path_ ? EncodableValue(*thumbnail_path_) : EncodableValue());
   list.push_back(CustomEncodableValue(format_));
   list.push_back(EncodableValue(max_height_));
   list.push_back(EncodableValue(max_width_));
@@ -450,24 +434,20 @@ EncodableList ThumbnailRequest::ToEncodableList() const {
 ThumbnailRequest ThumbnailRequest::FromEncodableList(const EncodableList& list) {
   ThumbnailRequest decoded(
     std::get<std::string>(list[0]),
-    std::any_cast<const ThumbnailFormat&>(std::get<CustomEncodableValue>(list[3])),
+    std::any_cast<const ThumbnailFormat&>(std::get<CustomEncodableValue>(list[2])),
+    std::get<int64_t>(list[3]),
     std::get<int64_t>(list[4]),
     std::get<int64_t>(list[5]),
-    std::get<int64_t>(list[6]),
-    std::get<int64_t>(list[7]));
+    std::get<int64_t>(list[6]));
   auto& encodable_headers = list[1];
   if (!encodable_headers.IsNull()) {
     decoded.set_headers(std::get<EncodableMap>(encodable_headers));
-  }
-  auto& encodable_thumbnail_path = list[2];
-  if (!encodable_thumbnail_path.IsNull()) {
-    decoded.set_thumbnail_path(std::get<std::string>(encodable_thumbnail_path));
   }
   return decoded;
 }
 
 bool ThumbnailRequest::operator==(const ThumbnailRequest& other) const {
-  return PigeonInternalDeepEquals(video_, other.video_) && PigeonInternalDeepEquals(headers_, other.headers_) && PigeonInternalDeepEquals(thumbnail_path_, other.thumbnail_path_) && PigeonInternalDeepEquals(format_, other.format_) && PigeonInternalDeepEquals(max_height_, other.max_height_) && PigeonInternalDeepEquals(max_width_, other.max_width_) && PigeonInternalDeepEquals(time_ms_, other.time_ms_) && PigeonInternalDeepEquals(quality_, other.quality_);
+  return PigeonInternalDeepEquals(video_, other.video_) && PigeonInternalDeepEquals(headers_, other.headers_) && PigeonInternalDeepEquals(format_, other.format_) && PigeonInternalDeepEquals(max_height_, other.max_height_) && PigeonInternalDeepEquals(max_width_, other.max_width_) && PigeonInternalDeepEquals(time_ms_, other.time_ms_) && PigeonInternalDeepEquals(quality_, other.quality_);
 }
 
 bool ThumbnailRequest::operator!=(const ThumbnailRequest& other) const {
@@ -478,7 +458,6 @@ size_t ThumbnailRequest::Hash() const {
   size_t result = 1;
   result = result * 31 + PigeonInternalDeepHash(video_);
   result = result * 31 + PigeonInternalDeepHash(headers_);
-  result = result * 31 + PigeonInternalDeepHash(thumbnail_path_);
   result = result * 31 + PigeonInternalDeepHash(format_);
   result = result * 31 + PigeonInternalDeepHash(max_height_);
   result = result * 31 + PigeonInternalDeepHash(max_width_);
@@ -496,13 +475,6 @@ std::ostream& operator<<(
   os << ", headers: ";
   if (obj.headers_) {
     os << PigeonInternalToString(*obj.headers_);
-  }
-  else {
-    os << "null";
-  }
-  os << ", thumbnail_path: ";
-  if (obj.thumbnail_path_) {
-    os << PigeonInternalToString(*obj.thumbnail_path_);
   }
   else {
     os << "null";

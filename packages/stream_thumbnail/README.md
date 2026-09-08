@@ -38,16 +38,26 @@ final bytes = await StreamThumbnail.thumbnailData(
 
 ### File
 
-Write the thumbnail to disk and get back an `XFile`. If `thumbnailPath` is omitted, the
-image is saved next to the video (or in the cache directory for remote videos):
+Write the thumbnail to a temporary directory and get back an `XFile`:
 
 ```dart
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
 final thumbnail = await StreamThumbnail.thumbnailFile(
   video: '/path/to/video.mp4',
   imageFormat: StreamThumbnailFormat.png,
   maxHeight: 200,
 );
+
+// Copy it somewhere permanent; the temporary file is left for the OS to reclaim.
+final cacheDir = await getApplicationCacheDirectory();
+await thumbnail.saveTo(p.join(cacheDir.path, thumbnail.name));
 ```
+
+On web there is no file system. The `XFile` wraps an object URL the caller owns, so
+read the bytes with `XFile.readAsBytes` and then release it with `URL.revokeObjectURL`
+— calling `saveTo` there ignores the path and triggers a browser download instead.
 
 ### Multiple files
 
@@ -67,7 +77,6 @@ Every method accepts the same options:
 | --------------- | ------------------------------------------------------------------------------- |
 | `video`(s)      | Path to a local video file or a video URL.                                      |
 | `headers`       | HTTP headers sent when fetching a remote video. Not supported on Windows.       |
-| `thumbnailPath` | Output path (file variants only). Defaults to the video's folder or cache dir.  |
 | `imageFormat`   | `JPEG`, `PNG`, or `WEBP`. Defaults to `PNG`. WebP on iOS/macOS is backed by `libwebp`; not yet supported on Windows.|
 | `maxHeight` / `maxWidth` | Max size in pixels, or `0` to keep the source resolution.              |
 | `timeMs`        | Capture position in milliseconds.                                               |

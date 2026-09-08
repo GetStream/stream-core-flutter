@@ -15,14 +15,20 @@
 
 - `thumbnailFiles` now fails fast: if any video fails to produce a thumbnail, the call
   throws instead of silently omitting that video from the returned list.
-- `thumbnailFiles` now throws an `ArgumentError` when `thumbnailPath` names a file rather
-  than a directory and more than one video was given. That combination pointed every
-  video in the batch at the same output path.
+- `thumbnailFile` and `thumbnailFiles` no longer take a `thumbnailPath`. Every thumbnail
+  is written to a fresh temporary directory and returned as an `XFile`; call
+  `XFile.saveTo` to move one somewhere permanent, or `XFile.readAsBytes` on web. The
+  parameter meant "a directory, or the output file itself", and each platform decided
+  which by inspecting the string — differently. Web ignored it outright.
 
 ### 🐞 Fixed
 
 - Fixed a crash on iOS where a failed `thumbnailData` call returned `null` instead of an
   error, causing the Dart side to crash casting `null` to `Uint8List`.
+- Fixed a `file://` video whose path is percent-encoded resolving to the wrong file on
+  iOS and macOS: `file:///tmp/a%20b.mp4` looked for a literal `a%20b.mp4` rather than
+  `a b.mp4`. Android, Linux and Windows still open the path verbatim, so pass those
+  three an unencoded path. A `?` or `#` in a file name is safe everywhere.
 - Native errors now surface as typed `PlatformException`s on all platforms instead of a
   generic `Exception` wrapping a raw Android stack trace.
 - Unified the platform-channel implementation: Android previously acknowledged a call

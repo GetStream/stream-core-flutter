@@ -8,33 +8,29 @@ import 'package:flutter/services.dart';
 import 'stream_thumbnail_format.dart';
 import 'stream_thumbnail_platform.dart';
 
-/// The file extension the native implementations give a thumbnail of [format].
-///
-/// Kept in sync with `formatExt` (Android), `fileExtension` (iOS/macOS), and
-/// `FileExtension` (Windows/Linux).
-String _extensionFor(StreamThumbnailFormat format) => switch (format) {
-  StreamThumbnailFormat.jpeg => 'jpg',
-  StreamThumbnailFormat.png => 'png',
-  StreamThumbnailFormat.webp => 'webp',
-};
-
 /// Creates thumbnails from a local video file or from a video URL.
 abstract final class StreamThumbnail {
   /// Generates a thumbnail file for each of the given `videos`.
   ///
   /// Each video can be a local file or a URL in an iOS/Android supported video
-  /// format. When `thumbnailPath` is null, files are written next to each
-  /// video. Use `maxHeight`/`maxWidth` to bound the size, or `0` to keep the
+  /// format. Use `maxHeight`/`maxWidth` to bound the size, or `0` to keep the
   /// source resolution. A lower `quality` reduces image quality but is ignored
   /// for the `PNG` format.
   ///
-  /// For more than one video, `thumbnailPath` must name a directory rather than
-  /// a file, otherwise an [ArgumentError] is thrown. Every video in the batch
-  /// would otherwise be written to that one path.
+  /// The videos are processed one at a time rather than concurrently: every
+  /// platform holds a hardware video decoder open per in-flight request, and
+  /// devices cap how many can exist at once.
+  ///
+  /// Each thumbnail is written to its own temporary directory. Use
+  /// [XFile.saveTo] to copy one somewhere permanent; the temporary file is left
+  /// behind for the platform to reclaim.
+  ///
+  /// On web there is no file system: each [XFile] wraps an object URL that the
+  /// caller owns and should release with `URL.revokeObjectURL` once the bytes
+  /// have been read via [XFile.readAsBytes].
   static Future<List<XFile>> thumbnailFiles({
     required List<String> videos,
     Map<String, String>? headers,
-    String? thumbnailPath,
     StreamThumbnailFormat imageFormat = StreamThumbnailFormat.png,
     int maxHeight = 0,
     int maxWidth = 0,
@@ -43,22 +39,9 @@ abstract final class StreamThumbnail {
   }) async {
     if (videos.isEmpty) return [];
 
-    // Every platform treats a `thumbnailPath` that already ends in the target
-    // extension as the exact file to write to. With more than one video that
-    // points the whole batch at a single path, so the requests overwrite each
-    // other and the returned files all describe the same bytes.
-    if (videos.length > 1 && thumbnailPath != null && thumbnailPath.endsWith(_extensionFor(imageFormat))) {
-      throw ArgumentError.value(
-        thumbnailPath,
-        'thumbnailPath',
-        'must be a directory when generating thumbnails for multiple videos, not a single file',
-      );
-    }
-
     return StreamThumbnailPlatform.instance.thumbnailFiles(
       videos: videos,
       headers: headers,
-      thumbnailPath: thumbnailPath,
       imageFormat: imageFormat,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -70,14 +53,20 @@ abstract final class StreamThumbnail {
   /// Generates a thumbnail file for the given `video`.
   ///
   /// The video can be a local file or a URL in an iOS/Android supported video
-  /// format. When `thumbnailPath` is null, the file is written next to the
-  /// video. Use `maxHeight`/`maxWidth` to bound the size, or `0` to keep the
+  /// format. Use `maxHeight`/`maxWidth` to bound the size, or `0` to keep the
   /// source resolution. A lower `quality` reduces image quality but is ignored
   /// for the `PNG` format.
+  ///
+  /// The thumbnail is written to its own temporary directory. Use [XFile.saveTo]
+  /// to copy it somewhere permanent; the temporary file is left behind for the
+  /// platform to reclaim.
+  ///
+  /// On web there is no file system: the [XFile] wraps an object URL that the
+  /// caller owns and should release with `URL.revokeObjectURL` once the bytes
+  /// have been read via [XFile.readAsBytes].
   static Future<XFile> thumbnailFile({
     required String video,
     Map<String, String>? headers,
-    String? thumbnailPath,
     StreamThumbnailFormat imageFormat = StreamThumbnailFormat.png,
     int maxHeight = 0,
     int maxWidth = 0,
@@ -89,7 +78,6 @@ abstract final class StreamThumbnail {
     return StreamThumbnailPlatform.instance.thumbnailFile(
       video: video,
       headers: headers,
-      thumbnailPath: thumbnailPath,
       imageFormat: imageFormat,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
