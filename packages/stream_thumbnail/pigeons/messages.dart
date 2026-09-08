@@ -27,7 +27,6 @@ class ThumbnailRequest {
   ThumbnailRequest({
     required this.video,
     required this.headers,
-    required this.thumbnailPath,
     required this.format,
     required this.maxHeight,
     required this.maxWidth,
@@ -37,7 +36,6 @@ class ThumbnailRequest {
 
   final String video;
   final Map<String, String>? headers;
-  final String? thumbnailPath;
   final ThumbnailFormat format;
   final int maxHeight;
   final int maxWidth;

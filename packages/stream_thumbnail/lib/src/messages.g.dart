@@ -106,7 +106,6 @@ class ThumbnailRequest {
   ThumbnailRequest({
     required this.video,
     this.headers,
-    this.thumbnailPath,
     required this.format,
     required this.maxHeight,
     required this.maxWidth,
@@ -117,8 +116,6 @@ class ThumbnailRequest {
   String video;
 
   Map<String, String>? headers;
-
-  String? thumbnailPath;
 
   ThumbnailFormat format;
 
@@ -134,7 +131,6 @@ class ThumbnailRequest {
     return <Object?>[
       video,
       headers,
-      thumbnailPath,
       format,
       maxHeight,
       maxWidth,
@@ -152,12 +148,11 @@ class ThumbnailRequest {
     return ThumbnailRequest(
       video: result[0]! as String,
       headers: (result[1] as Map<Object?, Object?>?)?.cast<String, String>(),
-      thumbnailPath: result[2] as String?,
-      format: result[3]! as ThumbnailFormat,
-      maxHeight: result[4]! as int,
-      maxWidth: result[5]! as int,
-      timeMs: result[6]! as int,
-      quality: result[7]! as int,
+      format: result[2]! as ThumbnailFormat,
+      maxHeight: result[3]! as int,
+      maxWidth: result[4]! as int,
+      timeMs: result[5]! as int,
+      quality: result[6]! as int,
     );
   }
 
@@ -172,7 +167,6 @@ class ThumbnailRequest {
     }
     return _deepEquals(video, other.video) &&
         _deepEquals(headers, other.headers) &&
-        _deepEquals(thumbnailPath, other.thumbnailPath) &&
         _deepEquals(format, other.format) &&
         _deepEquals(maxHeight, other.maxHeight) &&
         _deepEquals(maxWidth, other.maxWidth) &&
@@ -186,7 +180,7 @@ class ThumbnailRequest {
 
   @override
   String toString() {
-    return 'ThumbnailRequest(video: $video, headers: $headers, thumbnailPath: $thumbnailPath, format: $format, maxHeight: $maxHeight, maxWidth: $maxWidth, timeMs: $timeMs, quality: $quality)';
+    return 'ThumbnailRequest(video: $video, headers: $headers, format: $format, maxHeight: $maxHeight, maxWidth: $maxWidth, timeMs: $timeMs, quality: $quality)';
   }
 }
 

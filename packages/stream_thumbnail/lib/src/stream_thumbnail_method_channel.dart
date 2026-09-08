@@ -34,7 +34,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
   ThumbnailRequest _request({
     required String video,
     required Map<String, String>? headers,
-    String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -44,7 +43,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     return ThumbnailRequest(
       video: video,
       headers: headers,
-      thumbnailPath: thumbnailPath,
       format: _wireFormat(imageFormat),
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -57,7 +55,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
   Future<List<XFile>> thumbnailFiles({
     required List<String> videos,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -71,7 +68,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
         await thumbnailFile(
           video: video,
           headers: headers,
-          thumbnailPath: thumbnailPath,
           imageFormat: imageFormat,
           maxHeight: maxHeight,
           maxWidth: maxWidth,
@@ -88,7 +84,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
   Future<XFile> thumbnailFile({
     required String video,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -99,7 +94,6 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
       _request(
         video: video,
         headers: headers,
-        thumbnailPath: thumbnailPath,
         imageFormat: imageFormat,
         maxHeight: maxHeight,
         maxWidth: maxWidth,

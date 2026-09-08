@@ -57,7 +57,28 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
 
   private static func videoURL(for video: String) throws -> URL {
     if video.hasPrefix("file://") {
-      return URL(fileURLWithPath: String(video.dropFirst(7)))
+      // Parsed as a URL first, so percent-encoding is decoded: `file:///tmp/a%20b.mp4`
+      // names `a b.mp4`, not a literal `a%20b.mp4`. The raw path is the fallback for
+      // every form URL parsing would get wrong or refuse:
+      //
+      // - `?` and `#` are legal in a file name but delimit a query/fragment here, so
+      //   `file:///tmp/a#b.mp4` would otherwise parse to just `/tmp/a`.
+      // - before iOS 17 / macOS 14 `URL(string:)` returns nil for a space or a
+      //   non-ASCII byte, which is exactly what interpolating a bare path produces.
+      // - a host other than `localhost` means the input wasn't really a URL, e.g.
+      //   `file://clips/a.mp4`, where `clips` would be read as the host.
+      if let url = URL(string: video), url.isFileURL,
+        url.query == nil, url.fragment == nil,
+        url.host.map({ $0.isEmpty || $0 == "localhost" }) ?? true
+      {
+        return url
+      }
+      // The authority has to come off by hand here: `file://localhost/tmp/a#b.mp4`
+      // takes this branch for its `#`, and `localhost` would otherwise be read as
+      // the first path segment.
+      var path = String(video.dropFirst(7))
+      if path.hasPrefix("localhost/") { path = String(path.dropFirst(9)) }
+      return URL(fileURLWithPath: path)
     } else if video.hasPrefix("/") {
       return URL(fileURLWithPath: video)
     } else if let url = URL(string: video) {
@@ -68,25 +89,20 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
 
   private static func writeThumbnailFile(request: ThumbnailRequest) throws -> String {
     let data = try generateThumbnailData(request: request)
-    let videoURL = try self.videoURL(for: request.video)
-    let isLocalFile = request.video.hasPrefix("/") || request.video.hasPrefix("file://")
-    let ext = fileExtension(for: request.format)
 
-    var savePath = request.thumbnailPath
-    if savePath == nil && !isLocalFile {
-      savePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last
-    }
+    // The file name comes from the video, so a directory per request is what
+    // keeps two same-named videos from different folders off each other.
+    let outputDir = FileManager.default.temporaryDirectory
+      .appendingPathComponent("stream_thumbnail", isDirectory: true)
+      .appendingPathComponent(UUID().uuidString, isDirectory: true)
 
-    var thumbnailURL = videoURL.deletingPathExtension().appendingPathExtension(ext)
-    if let savePath, !savePath.isEmpty {
-      let lastPart = thumbnailURL.lastPathComponent
-      thumbnailURL = URL(fileURLWithPath: savePath)
-      if thumbnailURL.pathExtension != ext {
-        thumbnailURL = thumbnailURL.appendingPathComponent(lastPart)
-      }
-    }
+    let stem = try videoURL(for: request.video).deletingPathExtension().lastPathComponent
+    let thumbnailURL = outputDir
+      .appendingPathComponent(stem.isEmpty ? "thumbnail" : stem)
+      .appendingPathExtension(fileExtension(for: request.format))
 
     do {
+      try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
       try data.write(to: thumbnailURL, options: .atomic)
     } catch {
       throw ThumbnailError.writeFailed(error as NSError)

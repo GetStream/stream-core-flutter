@@ -83,7 +83,6 @@ class ThumbnailRequest {
   explicit ThumbnailRequest(
     const std::string& video,
     const ::flutter::EncodableMap* headers,
-    const std::string* thumbnail_path,
     const ThumbnailFormat& format,
     int64_t max_height,
     int64_t max_width,
@@ -96,10 +95,6 @@ class ThumbnailRequest {
   const ::flutter::EncodableMap* headers() const;
   void set_headers(const ::flutter::EncodableMap* value_arg);
   void set_headers(const ::flutter::EncodableMap& value_arg);
-
-  const std::string* thumbnail_path() const;
-  void set_thumbnail_path(const std::string_view* value_arg);
-  void set_thumbnail_path(std::string_view value_arg);
 
   const ThumbnailFormat& format() const;
   void set_format(const ThumbnailFormat& value_arg);
@@ -129,7 +124,6 @@ class ThumbnailRequest {
   friend class PigeonInternalCodecSerializer;
   std::string video_;
   std::optional<::flutter::EncodableMap> headers_;
-  std::optional<std::string> thumbnail_path_;
   ThumbnailFormat format_;
   int64_t max_height_;
   int64_t max_width_;

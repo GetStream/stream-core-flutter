@@ -34,6 +34,9 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
   /// The arguments captured from the most recent [thumbnailFile] call.
   Map<String, Object?>? lastFileCall;
 
+  /// The arguments captured from the most recent [thumbnailFiles] call.
+  Map<String, Object?>? lastFilesCall;
+
   @override
   Future<Uint8List> thumbnailData({
     required String video,
@@ -60,7 +63,6 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
   Future<XFile> thumbnailFile({
     required String video,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -69,7 +71,6 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
   }) async {
     lastFileCall = {
       'video': video,
-      'thumbnailPath': thumbnailPath,
       'imageFormat': imageFormat,
     };
     return _file;
@@ -79,7 +80,6 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
   Future<List<XFile>> thumbnailFiles({
     required List<String> videos,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -87,6 +87,10 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
     required int quality,
   }) async {
     _filesCalled = true;
+    lastFilesCall = {
+      'videos': videos,
+      'imageFormat': imageFormat,
+    };
     return [];
   }
 }
@@ -164,52 +168,18 @@ void main() {
       expect(fake.filesCalled, isFalse);
     });
 
-    test('thumbnailFiles rejects a thumbnailPath that names a file for multiple videos', () {
-      final fake = useFakePlatform();
-
-      expect(
-        () => StreamThumbnail.thumbnailFiles(
-          videos: ['a.mp4', 'b.mp4'],
-          thumbnailPath: '/tmp/thumb.png',
-        ),
-        throwsA(isA<ArgumentError>().having((e) => e.name, 'name', 'thumbnailPath')),
-      );
-      expect(fake.filesCalled, isFalse);
-    });
-
-    test('thumbnailFiles matches the extension of the requested format, not just png', () {
-      useFakePlatform();
-
-      expect(
-        () => StreamThumbnail.thumbnailFiles(
-          videos: ['a.mp4', 'b.mp4'],
-          thumbnailPath: '/tmp/thumb.jpg',
-          imageFormat: StreamThumbnailFormat.jpeg,
-        ),
-        throwsA(isA<ArgumentError>()),
-      );
-    });
-
-    test('thumbnailFiles allows a directory thumbnailPath for multiple videos', () async {
+    test('thumbnailFiles forwards every video to the platform', () async {
       final fake = useFakePlatform();
 
       await StreamThumbnail.thumbnailFiles(
         videos: ['a.mp4', 'b.mp4'],
-        thumbnailPath: '/tmp/thumbs/',
+        imageFormat: StreamThumbnailFormat.webp,
       );
 
-      expect(fake.filesCalled, isTrue);
-    });
-
-    test('thumbnailFiles allows a file thumbnailPath for a single video', () async {
-      final fake = useFakePlatform();
-
-      await StreamThumbnail.thumbnailFiles(
-        videos: ['a.mp4'],
-        thumbnailPath: '/tmp/thumb.png',
-      );
-
-      expect(fake.filesCalled, isTrue);
+      expect(fake.lastFilesCall, {
+        'videos': ['a.mp4', 'b.mp4'],
+        'imageFormat': StreamThumbnailFormat.webp,
+      });
     });
 
     test('thumbnailData rejects an empty video path', () {
@@ -261,7 +231,6 @@ void main() {
       final result = await channel.thumbnailFile(
         video: 'a.mp4',
         headers: null,
-        thumbnailPath: null,
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,
@@ -297,7 +266,6 @@ void main() {
       final result = await channel.thumbnailFiles(
         videos: ['a.mp4', 'b.mp4', 'c.mp4'],
         headers: null,
-        thumbnailPath: null,
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,
@@ -322,7 +290,6 @@ void main() {
         channel.thumbnailFiles(
           videos: ['a.mp4', 'b.mp4', 'c.mp4'],
           headers: null,
-          thumbnailPath: null,
           imageFormat: StreamThumbnailFormat.png,
           maxHeight: 0,
           maxWidth: 0,
@@ -344,7 +311,6 @@ void main() {
       final result = channel.thumbnailFiles(
         videos: ['a.mp4', 'b.mp4', 'c.mp4'],
         headers: null,
-        thumbnailPath: null,
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,

@@ -49,41 +49,41 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
   Future<List<XFile>> thumbnailFiles({
     required List<String> videos,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
     int? timeMs,
     required int quality,
   }) async {
-    final blobs = <web.Blob>[];
+    final files = <XFile>[];
 
     for (final video in videos) {
-      blobs.add(
-        await _createThumbnail(
-          videoSrc: video,
-          headers: headers,
-          imageFormat: imageFormat,
-          maxHeight: maxHeight,
-          maxWidth: maxWidth,
-          timeMs: timeMs ?? 0,
-          quality: quality,
+      final blob = await _createThumbnail(
+        videoSrc: video,
+        headers: headers,
+        imageFormat: imageFormat,
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        timeMs: timeMs ?? 0,
+        quality: quality,
+      );
+
+      files.add(
+        XFile(
+          web.URL.createObjectURL(blob),
+          mimeType: blob.type,
+          name: _thumbnailName(video, imageFormat),
         ),
       );
     }
 
-    return blobs
-        .map(
-          (blob) => XFile(web.URL.createObjectURL(blob), mimeType: blob.type),
-        )
-        .toList();
+    return files;
   }
 
   @override
   Future<XFile> thumbnailFile({
     required String video,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -100,7 +100,11 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
       quality: quality,
     );
 
-    return XFile(web.URL.createObjectURL(blob), mimeType: blob.type);
+    return XFile(
+      web.URL.createObjectURL(blob),
+      mimeType: blob.type,
+      name: _thumbnailName(video, imageFormat),
+    );
   }
 
   @override
@@ -332,5 +336,31 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
       case StreamThumbnailFormat.webp:
         return 'image/webp';
     }
+  }
+
+  /// The video's own file name, carrying the thumbnail's extension instead.
+  ///
+  /// An object URL carries no name of its own, so without this the returned
+  /// [XFile] has an empty [XFile.name] and `saveTo` downloads an unnamed file.
+  /// Derived the same way the native implementations derive theirs.
+  String _thumbnailName(String videoSrc, StreamThumbnailFormat imageFormat) {
+    final ext = switch (imageFormat) {
+      StreamThumbnailFormat.jpeg => 'jpg',
+      StreamThumbnailFormat.png => 'png',
+      StreamThumbnailFormat.webp => 'webp',
+    };
+
+    // A data/blob URL's body is the payload itself, so there is no name to take.
+    if (videoSrc.startsWith('data:') || videoSrc.startsWith('blob:')) return 'thumbnail.$ext';
+
+    var path = videoSrc;
+    final query = path.indexOf(RegExp('[?#]'));
+    if (query != -1) path = path.substring(0, query);
+
+    final segment = path.split('/').last;
+    final dot = segment.lastIndexOf('.');
+    final stem = dot > 0 ? segment.substring(0, dot) : segment;
+
+    return '${stem.isEmpty ? 'thumbnail' : stem}.$ext';
   }
 }

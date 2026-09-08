@@ -34,7 +34,6 @@ G_DECLARE_FINAL_TYPE(StreamThumbnailThumbnailRequest, stream_thumbnail_thumbnail
  * stream_thumbnail_thumbnail_request_new:
  * video: field in this object.
  * headers: field in this object.
- * thumbnail_path: field in this object.
  * format: field in this object.
  * max_height: field in this object.
  * max_width: field in this object.
@@ -45,7 +44,7 @@ G_DECLARE_FINAL_TYPE(StreamThumbnailThumbnailRequest, stream_thumbnail_thumbnail
  *
  * Returns: a new #StreamThumbnailThumbnailRequest
  */
-StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, const gchar* thumbnail_path, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality);
+StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality);
 
 /**
  * stream_thumbnail_thumbnail_request_get_video
@@ -66,16 +65,6 @@ const gchar* stream_thumbnail_thumbnail_request_get_video(StreamThumbnailThumbna
  * Returns: the field value.
  */
 FlValue* stream_thumbnail_thumbnail_request_get_headers(StreamThumbnailThumbnailRequest* object);
-
-/**
- * stream_thumbnail_thumbnail_request_get_thumbnail_path
- * @object: a #StreamThumbnailThumbnailRequest.
- *
- * Gets the value of the thumbnailPath field of @object.
- *
- * Returns: the field value.
- */
-const gchar* stream_thumbnail_thumbnail_request_get_thumbnail_path(StreamThumbnailThumbnailRequest* object);
 
 /**
  * stream_thumbnail_thumbnail_request_get_format

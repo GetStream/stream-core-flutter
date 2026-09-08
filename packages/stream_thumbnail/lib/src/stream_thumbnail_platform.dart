@@ -36,7 +36,6 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
   Future<List<XFile>> thumbnailFiles({
     required List<String> videos,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -50,7 +49,6 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
   Future<XFile> thumbnailFile({
     required String video,
     required Map<String, String>? headers,
-    required String? thumbnailPath,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,

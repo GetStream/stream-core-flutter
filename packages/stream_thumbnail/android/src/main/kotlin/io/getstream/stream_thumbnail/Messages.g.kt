@@ -213,7 +213,6 @@ enum class ThumbnailFormat(val raw: Int) {
 data class ThumbnailRequest (
   val video: String,
   val headers: Map<String, String>? = null,
-  val thumbnailPath: String? = null,
   val format: ThumbnailFormat,
   val maxHeight: Long,
   val maxWidth: Long,
@@ -225,20 +224,18 @@ data class ThumbnailRequest (
     fun fromList(pigeonVar_list: List<Any?>): ThumbnailRequest {
       val video = pigeonVar_list[0] as String
       val headers = pigeonVar_list[1] as Map<String, String>?
-      val thumbnailPath = pigeonVar_list[2] as String?
-      val format = pigeonVar_list[3] as ThumbnailFormat
-      val maxHeight = pigeonVar_list[4] as Long
-      val maxWidth = pigeonVar_list[5] as Long
-      val timeMs = pigeonVar_list[6] as Long
-      val quality = pigeonVar_list[7] as Long
-      return ThumbnailRequest(video, headers, thumbnailPath, format, maxHeight, maxWidth, timeMs, quality)
+      val format = pigeonVar_list[2] as ThumbnailFormat
+      val maxHeight = pigeonVar_list[3] as Long
+      val maxWidth = pigeonVar_list[4] as Long
+      val timeMs = pigeonVar_list[5] as Long
+      val quality = pigeonVar_list[6] as Long
+      return ThumbnailRequest(video, headers, format, maxHeight, maxWidth, timeMs, quality)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       video,
       headers,
-      thumbnailPath,
       format,
       maxHeight,
       maxWidth,
@@ -254,14 +251,13 @@ data class ThumbnailRequest (
       return true
     }
     val other = other as ThumbnailRequest
-    return MessagesPigeonUtils.deepEquals(this.video, other.video) && MessagesPigeonUtils.deepEquals(this.headers, other.headers) && MessagesPigeonUtils.deepEquals(this.thumbnailPath, other.thumbnailPath) && MessagesPigeonUtils.deepEquals(this.format, other.format) && MessagesPigeonUtils.deepEquals(this.maxHeight, other.maxHeight) && MessagesPigeonUtils.deepEquals(this.maxWidth, other.maxWidth) && MessagesPigeonUtils.deepEquals(this.timeMs, other.timeMs) && MessagesPigeonUtils.deepEquals(this.quality, other.quality)
+    return MessagesPigeonUtils.deepEquals(this.video, other.video) && MessagesPigeonUtils.deepEquals(this.headers, other.headers) && MessagesPigeonUtils.deepEquals(this.format, other.format) && MessagesPigeonUtils.deepEquals(this.maxHeight, other.maxHeight) && MessagesPigeonUtils.deepEquals(this.maxWidth, other.maxWidth) && MessagesPigeonUtils.deepEquals(this.timeMs, other.timeMs) && MessagesPigeonUtils.deepEquals(this.quality, other.quality)
   }
 
   override fun hashCode(): Int {
     var result = javaClass.hashCode()
     result = 31 * result + MessagesPigeonUtils.deepHash(this.video)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.headers)
-    result = 31 * result + MessagesPigeonUtils.deepHash(this.thumbnailPath)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.format)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.maxHeight)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.maxWidth)
@@ -270,7 +266,7 @@ data class ThumbnailRequest (
     return result
   }
   override fun toString(): String {
-    return "ThumbnailRequest(video=$video, headers=$headers, thumbnailPath=$thumbnailPath, format=$format, maxHeight=$maxHeight, maxWidth=$maxWidth, timeMs=$timeMs, quality=$quality)"
+    return "ThumbnailRequest(video=$video, headers=$headers, format=$format, maxHeight=$maxHeight, maxWidth=$maxWidth, timeMs=$timeMs, quality=$quality)"
   }
 }
 private open class MessagesPigeonCodec : StandardMessageCodec() {

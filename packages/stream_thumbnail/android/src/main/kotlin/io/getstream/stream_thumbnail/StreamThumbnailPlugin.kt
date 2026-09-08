@@ -18,6 +18,7 @@ import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.UUID
 import java.util.concurrent.Executors
 
 /** StreamThumbnailPlugin */
@@ -80,36 +81,28 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
 
     private fun buildThumbnailFile(request: ThumbnailRequest): String {
         val bytes = buildThumbnailData(request)
-        val ext = formatExt(request.format)
-        val vidPath = request.video
-        val i = vidPath.lastIndexOf(".")
-        var fullpath = vidPath.substring(0, i + 1) + ext
-        val isLocalFile = vidPath.startsWith("/") || vidPath.startsWith("file://")
+        val cacheDir = context?.cacheDir ?: throw IOException("Failed to resolve the cache directory.")
 
-        var savePath = request.thumbnailPath
-        if (savePath == null && !isLocalFile) {
-            savePath = context?.cacheDir?.absolutePath
-        }
+        // The file name comes from the video, so a directory per request is what
+        // keeps two same-named videos from different folders off each other.
+        val outputDir = File(cacheDir, "stream_thumbnail/${UUID.randomUUID()}")
+        if (!outputDir.mkdirs()) throw IOException("Failed to create the thumbnail directory.")
 
-        if (savePath != null) {
-            if (savePath.endsWith(ext)) {
-                fullpath = savePath
-            } else {
-                val j = fullpath.lastIndexOf("/")
-                fullpath = if (savePath.endsWith("/")) {
-                    savePath + fullpath.substring(j + 1)
-                } else {
-                    savePath + fullpath.substring(j)
-                }
-            }
-        }
+        val output = File(outputDir, thumbnailName(request.video, formatExt(request.format)))
+        FileOutputStream(output).use { f -> f.write(bytes) }
+        Log.d(TAG, String.format("buildThumbnailFile( written:%d )", bytes.size))
+        return output.absolutePath
+    }
 
-        FileOutputStream(fullpath).use { f ->
-            f.write(bytes)
-            f.close()
-            Log.d(TAG, String.format("buildThumbnailFile( written:%d )", bytes.size))
-        }
-        return fullpath
+    /** The video's own file name, carrying the thumbnail's `ext` instead. */
+    private fun thumbnailName(video: String, ext: String): String {
+        // Uri splits the path on `/` before decoding each segment, so a `%2F` comes
+        // back as a literal separator: `..%2Fevil.mp4` would otherwise name a file
+        // outside the directory created for this request.
+        val decoded = Uri.parse(video).lastPathSegment ?: video
+        val segment = decoded.substringAfterLast('/').substringAfterLast('\\')
+        val stem = segment.substringBeforeLast('.', segment).ifEmpty { "thumbnail" }
+        return "$stem.$ext"
     }
 
     /**

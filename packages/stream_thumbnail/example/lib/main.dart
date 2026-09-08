@@ -3,6 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:stream_thumbnail/stream_thumbnail.dart';
 
+/// A generated thumbnail: its bytes, plus where it was written when it came
+/// from `thumbnailFile` rather than `thumbnailData`.
+typedef Thumbnail = ({Uint8List bytes, String? path});
+
 void main() => runApp(const ExampleApp());
 
 class ExampleApp extends StatelessWidget {
@@ -28,7 +32,7 @@ class _ThumbnailPageState extends State<ThumbnailPage> {
   static const _sampleVideo = 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
 
   final _controller = TextEditingController(text: _sampleVideo);
-  Future<Uint8List>? _thumbnail;
+  Future<Thumbnail>? _thumbnail;
 
   @override
   void dispose() {
@@ -36,15 +40,26 @@ class _ThumbnailPageState extends State<ThumbnailPage> {
     super.dispose();
   }
 
-  void _generate() {
-    setState(() {
-      _thumbnail = StreamThumbnail.thumbnailData(
-        video: _controller.text,
-        imageFormat: StreamThumbnailFormat.jpeg,
-        maxWidth: 300,
-        quality: 75,
-      );
-    });
+  Future<Thumbnail> _generateData() async {
+    final bytes = await StreamThumbnail.thumbnailData(
+      video: _controller.text,
+      imageFormat: StreamThumbnailFormat.jpeg,
+      maxWidth: 300,
+      quality: 75,
+    );
+
+    return (bytes: bytes, path: null);
+  }
+
+  Future<Thumbnail> _generateFile() async {
+    final file = await StreamThumbnail.thumbnailFile(
+      video: _controller.text,
+      imageFormat: StreamThumbnailFormat.jpeg,
+      maxWidth: 300,
+      quality: 75,
+    );
+
+    return (bytes: await file.readAsBytes(), path: file.path);
   }
 
   @override
@@ -63,9 +78,26 @@ class _ThumbnailPageState extends State<ThumbnailPage> {
               ),
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _generate,
-              child: const Text('Generate thumbnail'),
+            Row(
+              spacing: 12,
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () => setState(() {
+                      _thumbnail = _generateData();
+                    }),
+                    child: const Text('As bytes'),
+                  ),
+                ),
+                Expanded(
+                  child: FilledButton.tonal(
+                    onPressed: () => setState(() {
+                      _thumbnail = _generateFile();
+                    }),
+                    child: const Text('As a file'),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
             Expanded(child: Center(child: _buildPreview())),
@@ -78,10 +110,10 @@ class _ThumbnailPageState extends State<ThumbnailPage> {
   Widget _buildPreview() {
     final thumbnail = _thumbnail;
     if (thumbnail == null) {
-      return const Text('Tap "Generate thumbnail" to preview a frame.');
+      return const Text('Generate a thumbnail to preview a frame.');
     }
 
-    return FutureBuilder<Uint8List>(
+    return FutureBuilder<Thumbnail>(
       future: thumbnail,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -90,7 +122,21 @@ class _ThumbnailPageState extends State<ThumbnailPage> {
         if (snapshot.hasError) {
           return Text('Failed to generate thumbnail:\n${snapshot.error}');
         }
-        return Image.memory(snapshot.data!);
+
+        final (:bytes, :path) = snapshot.data!;
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 12,
+          children: [
+            Flexible(child: Image.memory(bytes)),
+            if (path != null)
+              Text(
+                path,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+          ],
+        );
       },
     );
   }

@@ -197,7 +197,6 @@ enum ThumbnailFormat: Int, CaseIterable {
 struct ThumbnailRequest: Hashable, CustomStringConvertible {
   var video: String
   var headers: [String: String]? = nil
-  var thumbnailPath: String? = nil
   var format: ThumbnailFormat
   var maxHeight: Int64
   var maxWidth: Int64
@@ -209,17 +208,15 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
   static func fromList(_ pigeonVar_list: [Any?]) -> ThumbnailRequest? {
     let video = pigeonVar_list[0] as! String
     let headers: [String: String]? = nilOrValue(pigeonVar_list[1])
-    let thumbnailPath: String? = nilOrValue(pigeonVar_list[2])
-    let format = pigeonVar_list[3] as! ThumbnailFormat
-    let maxHeight = pigeonVar_list[4] as! Int64
-    let maxWidth = pigeonVar_list[5] as! Int64
-    let timeMs = pigeonVar_list[6] as! Int64
-    let quality = pigeonVar_list[7] as! Int64
+    let format = pigeonVar_list[2] as! ThumbnailFormat
+    let maxHeight = pigeonVar_list[3] as! Int64
+    let maxWidth = pigeonVar_list[4] as! Int64
+    let timeMs = pigeonVar_list[5] as! Int64
+    let quality = pigeonVar_list[6] as! Int64
 
     return ThumbnailRequest(
       video: video,
       headers: headers,
-      thumbnailPath: thumbnailPath,
       format: format,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -231,7 +228,6 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
     return [
       video,
       headers,
-      thumbnailPath,
       format,
       maxHeight,
       maxWidth,
@@ -243,14 +239,13 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.video, rhs.video) && MessagesPigeonInternal.deepEquals(lhs.headers, rhs.headers) && MessagesPigeonInternal.deepEquals(lhs.thumbnailPath, rhs.thumbnailPath) && MessagesPigeonInternal.deepEquals(lhs.format, rhs.format) && MessagesPigeonInternal.deepEquals(lhs.maxHeight, rhs.maxHeight) && MessagesPigeonInternal.deepEquals(lhs.maxWidth, rhs.maxWidth) && MessagesPigeonInternal.deepEquals(lhs.timeMs, rhs.timeMs) && MessagesPigeonInternal.deepEquals(lhs.quality, rhs.quality)
+    return MessagesPigeonInternal.deepEquals(lhs.video, rhs.video) && MessagesPigeonInternal.deepEquals(lhs.headers, rhs.headers) && MessagesPigeonInternal.deepEquals(lhs.format, rhs.format) && MessagesPigeonInternal.deepEquals(lhs.maxHeight, rhs.maxHeight) && MessagesPigeonInternal.deepEquals(lhs.maxWidth, rhs.maxWidth) && MessagesPigeonInternal.deepEquals(lhs.timeMs, rhs.timeMs) && MessagesPigeonInternal.deepEquals(lhs.quality, rhs.quality)
   }
 
   func hash(into hasher: inout Hasher) {
     hasher.combine("ThumbnailRequest")
     MessagesPigeonInternal.deepHash(value: video, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: headers, hasher: &hasher)
-    MessagesPigeonInternal.deepHash(value: thumbnailPath, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: format, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: maxHeight, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: maxWidth, hasher: &hasher)
@@ -259,7 +254,7 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
   }
 
   public var description: String {
-    return "ThumbnailRequest(video: \(String(describing: video)), headers: \(String(describing: headers)), thumbnailPath: \(String(describing: thumbnailPath)), format: \(String(describing: format)), maxHeight: \(String(describing: maxHeight)), maxWidth: \(String(describing: maxWidth)), timeMs: \(String(describing: timeMs)), quality: \(String(describing: quality)))"
+    return "ThumbnailRequest(video: \(String(describing: video)), headers: \(String(describing: headers)), format: \(String(describing: format)), maxHeight: \(String(describing: maxHeight)), maxWidth: \(String(describing: maxWidth)), timeMs: \(String(describing: timeMs)), quality: \(String(describing: quality)))"
   }
 }
 
