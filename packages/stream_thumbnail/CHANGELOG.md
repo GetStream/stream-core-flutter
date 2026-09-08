@@ -12,9 +12,10 @@
 
 ### 💥 BREAKING CHANGES
 
-- `thumbnailFile` and `thumbnailFiles` no longer take a `thumbnailPath`. Each thumbnail
-  is written to its own temporary directory and returned as an `XFile`. Use
-  `XFile.saveTo` to copy it somewhere permanent, or `XFile.readAsBytes` on web.
+- `thumbnailFile` and `thumbnailFiles` no longer take a `thumbnailPath`, and no longer
+  write next to the source video or into the cache directory. Each thumbnail goes to its
+  own temporary directory and is returned as an `XFile`. Use `XFile.saveTo` to copy it
+  somewhere permanent, or `XFile.readAsBytes` on web.
 - `thumbnailFiles` now throws if any video fails, instead of dropping it from the
   returned list. A shorter list no longer silently means some videos failed.
 
@@ -23,9 +24,12 @@
 - Failures now surface as a `PlatformException` with a code and message on every
   platform, rather than a generic `Exception`. On iOS, a failed `thumbnailData` used to
   crash on a null cast instead of reporting the error.
-- A percent-encoded `file://` video now resolves to the right file on iOS and macOS:
-  `file:///tmp/a%20b.mp4` previously looked for a literal `a%20b.mp4`. Android, Linux
-  and Windows read the path as given, so pass those an unencoded path.
+- On iOS, a percent-encoded `file://` video now resolves to the right file:
+  `file:///tmp/a%20b.mp4` used to look for a literal `a%20b.mp4`. macOS behaves the
+  same; Android, Linux and Windows read the path as given, so pass those an unencoded
+  path.
+- On web, the returned `XFile` now carries a file name, so `XFile.saveTo` saves
+  `clip.png` instead of an unnamed file.
 
 ## 0.1.0+1
 
