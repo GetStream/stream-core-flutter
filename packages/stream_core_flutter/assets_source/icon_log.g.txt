@@ -149,3 +149,4 @@ speaker-bottom-fill;2026827
 grid-default-fill;2026827
 phone-fill;2026827
 livestream-fill;2026827
+low-bandwidth-fill;202698
