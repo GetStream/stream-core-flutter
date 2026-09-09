@@ -28,9 +28,6 @@ const _vietnameseUHornLower = 0x01B0;
 /// Folds case, diacritics and ligatures, so a list sorted locally lands in the
 /// same order a query returns. Apply it in a `SortField` value getter: a plain
 /// [String.compareTo] orders by code unit, putting `jhon` and `Łukasz` last.
-// Mirrors the API's own `NormalizeName`, which is why the folding is selective
-// rather than a blanket `removeDiacritics`:
-// https://github.com/GetStream/chat/blob/b92bf7991752a29e9f67b6ffe69b0bc529f5c48c/lib/combined/utils/text.go#L88-L95
 String normalizeStringForSort(String value) {
   if (value.isEmpty) return value;
   final folded = value.runes.map(_foldRune).join();
@@ -39,6 +36,10 @@ String normalizeStringForSort(String value) {
 
 // Returns the sort form of `rune`. ASCII and preserved-script runes pass
 // through unchanged; everything else routes through `removeDiacritics`.
+//
+// The preserved scripts are what makes this selective rather than a blanket
+// fold, and they mirror the API's own `NormalizeName`:
+// https://github.com/GetStream/chat/blob/b92bf7991752a29e9f67b6ffe69b0bc529f5c48c/lib/combined/utils/text.go#L88-L95
 String _foldRune(int rune) {
   if (rune <= _maxAscii) return String.fromCharCode(rune);
   if (_isJapaneseRune(rune)) return String.fromCharCode(rune);
