@@ -177,10 +177,11 @@ sealed class Filter<T extends Object> {
 
   /// A filter serialized verbatim from [value], bypassing this type.
   ///
-  /// For a query the API accepts but this package does not model. Prefer a
-  /// declared operator wherever one exists: nothing validates [value], and
-  /// because it cannot be interpreted, [matches] returns `true` for it rather
-  /// than guessing — so a filter containing one cannot be evaluated locally.
+  /// For a query the API accepts but this package does not model — typically
+  /// one built elsewhere and handed back, where an unmodelled operator would
+  /// otherwise have nowhere to go. Prefer a declared operator wherever one
+  /// exists: nothing validates [value], and [matches] throws for it, so a
+  /// filter containing one cannot be evaluated locally.
   const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
 
   /// Whether this filter matches the given [other] instance.
@@ -663,8 +664,21 @@ final class RawFilter<T extends Object> extends Filter<T> {
   /// The query to serialize, used as-is.
   final Map<String, Object?> value;
 
+  /// Always throws: [value] is opaque, so it cannot be evaluated.
+  ///
+  /// Neither answer would be right. Reporting a match is correct under
+  /// [AndOperator] and wrong under [OrOperator], where it would match every
+  /// record; reporting no match inverts the problem. Refusing is the only
+  /// answer that cannot silently produce a wrong result, and it names the
+  /// query that caused it.
   @override
-  bool matches(T other) => true;
+  bool matches(T other) {
+    throw UnsupportedError(
+      'Filter.raw cannot be evaluated locally: $value. It carries a query this '
+      'package does not model, so there is nothing to compare against. Use a '
+      'declared operator if you need matches().',
+    );
+  }
 
   @override
   Map<String, Object?> toJson() => value;

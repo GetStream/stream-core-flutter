@@ -275,14 +275,25 @@ void main() {
         });
       });
 
-      test('should match rather than guess, since it cannot be interpreted', () {
+      test('should refuse to evaluate rather than guess', () {
         const filter = Filter<TestModel>.raw({
           'name': {r'$ne': 'test'},
         });
 
-        // `$ne 'test'` would exclude this record on the server; locally the
-        // filter is opaque, so it does not exclude anything.
-        expect(filter.matches(TestModel(name: 'test')), isTrue);
+        expect(() => filter.matches(TestModel(name: 'test')), throwsUnsupportedError);
+      });
+
+      test('should make a filter containing one un-evaluatable', () {
+        // Reporting a match would be right here and wrong under `or`, so the
+        // refusal propagates rather than being resolved per composition.
+        final filter = Filter.and([
+          Filter.equal(TestFilterField.name, 'test'),
+          const Filter<TestModel>.raw({
+            'name': {r'$ne': 'other'},
+          }),
+        ]);
+
+        expect(() => filter.matches(TestModel(name: 'test')), throwsUnsupportedError);
       });
     });
   });

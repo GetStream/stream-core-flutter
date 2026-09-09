@@ -3,7 +3,7 @@
 ### ✨ Features
 
 - Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
-- Added `Filter.raw`, which serializes a pre-built query verbatim
+- Added `Filter.raw`, which serializes a pre-built query verbatim. It cannot be evaluated locally, so `matches` throws for it
 - Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
 
 ## 0.5.0
