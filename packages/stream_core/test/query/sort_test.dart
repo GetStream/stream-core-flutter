@@ -494,32 +494,4 @@ void main() {
       }
     });
   });
-
-  group('Sort equality', () {
-    test('should treat two independently built identical sorts as equal', () {
-      final a = Sort.desc(SortField<Person>('name', (p) => p.name));
-      final b = Sort.desc(SortField<Person>('name', (p) => p.name));
-
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('should distinguish field, direction and null ordering', () {
-      final name = SortField<Person>('name', (p) => p.name);
-      final age = SortField<Person>('age', (p) => p.age);
-
-      expect(Sort.asc(name), isNot(equals(Sort.asc(age))));
-      expect(Sort.asc(name), isNot(equals(Sort.desc(name))));
-      expect(
-        Sort.asc(name),
-        isNot(equals(Sort.asc(name, nullOrdering: NullOrdering.nullsFirst))),
-      );
-    });
-
-    test('should let a list of sorts compare equal', () {
-      final field = SortField<Person>('name', (p) => p.name);
-
-      expect([Sort.asc(field)], equals([Sort.asc(field)]));
-    });
-  });
 }
