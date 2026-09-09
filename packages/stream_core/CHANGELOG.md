@@ -6,6 +6,7 @@
 - Added `Filter.nor`, the logical negation of `Filter.or`, matching only when none of its filters match
 - Added `SortDirection.fromJson`, which reads back the direction a `Sort` serializes
 - `Sort` now compares by value, so two independently built identical sorts are equal
+- Added `Filter.empty`, which constrains nothing, and `Filter.raw`, which serializes a pre-built query verbatim
 
 ## 0.5.0
 

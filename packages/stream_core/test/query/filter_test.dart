@@ -245,6 +245,69 @@ void main() {
     });
   });
 
+  group('Escape hatches', () {
+    group('Empty', () {
+      test('should serialize to an empty map', () {
+        expect(const Filter<TestModel>.empty().toJson(), isEmpty);
+      });
+
+      test('should match every record', () {
+        const filter = Filter<TestModel>.empty();
+
+        expect(filter.matches(TestModel()), isTrue);
+        expect(filter.matches(TestModel(name: 'anything')), isTrue);
+      });
+
+      test('should leave an and unchanged, being its identity element', () {
+        final constrained = Filter.equal(TestFilterField.name, 'test');
+        final withEmpty = Filter.and([constrained, const Filter<TestModel>.empty()]);
+
+        expect(withEmpty.matches(TestModel(name: 'test')), isTrue);
+        expect(withEmpty.matches(TestModel(name: 'other')), isFalse);
+      });
+    });
+
+    group('Raw', () {
+      test('should serialize the given map verbatim', () {
+        const value = {
+          'name': {r'$ne': 'test'},
+        };
+
+        expect(const Filter<TestModel>.raw(value).toJson(), equals(value));
+      });
+
+      test('should nest inside a logical filter unchanged', () {
+        final filter = Filter.and([
+          Filter.equal(TestFilterField.type, 'messaging'),
+          const Filter<TestModel>.raw({
+            'name': {r'$ne': 'test'},
+          }),
+        ]);
+
+        expect(filter.toJson(), {
+          r'$and': [
+            {
+              'type': {r'$eq': 'messaging'},
+            },
+            {
+              'name': {r'$ne': 'test'},
+            },
+          ],
+        });
+      });
+
+      test('should match rather than guess, since it cannot be interpreted', () {
+        const filter = Filter<TestModel>.raw({
+          'name': {r'$ne': 'test'},
+        });
+
+        // `$ne 'test'` would exclude this record on the server; locally the
+        // filter is opaque, so it does not exclude anything.
+        expect(filter.matches(TestModel(name: 'test')), isTrue);
+      });
+    });
+  });
+
   group('Logical', () {
     group('And', () {
       test('should serialize to JSON correctly', () {

@@ -178,6 +178,21 @@ sealed class Filter<T extends Object> {
   /// Logical NOR filter matching when none of [filters] match.
   const factory Filter.nor(Iterable<Filter<T>> filters) = NorOperator<T>;
 
+  /// A filter that constrains nothing.
+  ///
+  /// Serializes to `{}` and matches every record, so it is the identity
+  /// element of [Filter.and] and useful where a filter is required but the
+  /// caller has nothing to constrain by.
+  const factory Filter.empty() = EmptyFilter<T>;
+
+  /// A filter serialized verbatim from [value], bypassing this type.
+  ///
+  /// For a query the API accepts but this package does not model. Prefer a
+  /// declared operator wherever one exists: nothing validates [value], and
+  /// because it cannot be interpreted, [matches] returns `true` for it rather
+  /// than guessing — so a filter containing one cannot be evaluated locally.
+  const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
+
   /// Whether this filter matches the given [other] instance.
   ///
   /// Evaluates filter criteria against field values extracted from [other]
@@ -654,6 +669,41 @@ final class NorOperator<T extends Object> extends LogicalOperator<T> {
 
   @override
   bool matches(T other) => !filters.any((filter) => filter.matches(other));
+}
+
+// endregion
+
+// region Escape hatches
+
+/// A filter that constrains nothing and matches every record.
+///
+/// **Supported with**: `.empty` factory method
+final class EmptyFilter<T extends Object> extends Filter<T> {
+  /// Creates a filter that constrains nothing.
+  const EmptyFilter() : super._();
+
+  @override
+  bool matches(T other) => true;
+
+  @override
+  Map<String, Object?> toJson() => const {};
+}
+
+/// A filter carrying a pre-built query this package does not model.
+///
+/// **Supported with**: `.raw` factory method
+final class RawFilter<T extends Object> extends Filter<T> {
+  /// Creates a filter serialized verbatim from [value].
+  const RawFilter(this.value) : super._();
+
+  /// The query to serialize, used as-is.
+  final Map<String, Object?> value;
+
+  @override
+  bool matches(T other) => true;
+
+  @override
+  Map<String, Object?> toJson() => value;
 }
 
 // endregion
