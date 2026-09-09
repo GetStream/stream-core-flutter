@@ -180,8 +180,7 @@ sealed class Filter<T extends Object> {
   /// A last resort, for a query the API accepts but this package does not
   /// model. Prefer a declared operator wherever one exists.
   ///
-  /// [value] is not validated, and [matches] throws for any filter containing
-  /// one.
+  /// [value] is not validated, and [matches] throws for any filter containing one.
   const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
 
   /// Whether this filter matches the given [other] instance.
