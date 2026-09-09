@@ -471,4 +471,55 @@ void main() {
       expect(sort.compare(person1, person2), equals(0));
     });
   });
+
+  group('SortDirection.fromJson', () {
+    test('should read back the values Sort serializes', () {
+      expect(SortDirection.fromJson(1), equals(SortDirection.asc));
+      expect(SortDirection.fromJson(-1), equals(SortDirection.desc));
+    });
+
+    test('should read anything other than -1 as ascending, as the API does', () {
+      // The API treats any direction it did not write as ascending rather than
+      // rejecting it, so a round-trip never fails on an unexpected value.
+      expect(SortDirection.fromJson(null), equals(SortDirection.asc));
+      expect(SortDirection.fromJson(0), equals(SortDirection.asc));
+      expect(SortDirection.fromJson('desc'), equals(SortDirection.asc));
+    });
+
+    test('should round-trip the direction a Sort wrote', () {
+      final field = SortField<Person>('name', (p) => p.name);
+
+      for (final sort in [Sort.asc(field), Sort.desc(field)]) {
+        expect(SortDirection.fromJson(sort.toJson()['direction']), equals(sort.direction));
+      }
+    });
+  });
+
+  group('Sort equality', () {
+    test('should treat two independently built identical sorts as equal', () {
+      final a = Sort.desc(SortField<Person>('name', (p) => p.name));
+      final b = Sort.desc(SortField<Person>('name', (p) => p.name));
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('should distinguish field, direction and null ordering', () {
+      final name = SortField<Person>('name', (p) => p.name);
+      final age = SortField<Person>('age', (p) => p.age);
+
+      expect(Sort.asc(name), isNot(equals(Sort.asc(age))));
+      expect(Sort.asc(name), isNot(equals(Sort.desc(name))));
+      expect(
+        Sort.asc(name),
+        isNot(equals(Sort.asc(name, nullOrdering: NullOrdering.nullsFirst))),
+      );
+    });
+
+    test('should let a list of sorts compare equal', () {
+      final field = SortField<Person>('name', (p) => p.name);
+
+      expect([Sort.asc(field)], equals([Sort.asc(field)]));
+    });
+  });
 }

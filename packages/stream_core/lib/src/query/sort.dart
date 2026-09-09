@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 
 import '../utils.dart';
 
@@ -19,6 +20,16 @@ enum SortDirection {
 
   /// Creates a new [SortDirection] instance with the specified direction.
   const SortDirection(this.value);
+
+  /// Reads a direction back from the value [Sort] serializes.
+  ///
+  /// Anything other than [desc]'s value is [asc], which is how the API reads
+  /// it — so a value it did not write, or none at all, is ascending rather
+  /// than an error.
+  static SortDirection fromJson(Object? json) {
+    if (json == desc.value) return desc;
+    return asc;
+  }
 
   /// The numeric value representing the sort direction.
   final int value;
@@ -64,6 +75,7 @@ typedef SortFieldComparator<T> =
 /// final ascendingSort = Sort.asc(createdAtField);
 /// final descendingSort = Sort.desc(createdAtField, nullOrdering: NullOrdering.nullsFirst);
 /// ```
+@immutable
 @JsonSerializable(createFactory: false)
 class Sort<T extends Object> {
   /// Creates an ascending sort with the specified field and null ordering.
@@ -108,6 +120,18 @@ class Sort<T extends Object> {
 
   /// Converts this sort specification to a JSON representation.
   Map<String, dynamic> toJson() => _$SortToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Sort<T> &&
+        other.field.remote == field.remote &&
+        other.direction == direction &&
+        other.nullOrdering == nullOrdering;
+  }
+
+  @override
+  int get hashCode => Object.hash(field.remote, direction, nullOrdering);
 }
 
 /// A sortable field definition that maps remote field names to local value extractors.

@@ -4,6 +4,8 @@
 
 - Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
 - Added `Filter.nor`, the logical negation of `Filter.or`, matching only when none of its filters match
+- Added `SortDirection.fromJson`, which reads back the direction a `Sort` serializes
+- `Sort` now compares by value, so two independently built identical sorts are equal
 
 ## 0.5.0
 
