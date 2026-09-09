@@ -77,6 +77,7 @@ export 'src/theme/components/stream_context_menu_action_theme.dart';
 export 'src/theme/components/stream_context_menu_theme.dart';
 export 'src/theme/components/stream_emoji_button_theme.dart';
 export 'src/theme/components/stream_emoji_chip_theme.dart';
+export 'src/theme/components/stream_error_badge_theme.dart';
 export 'src/theme/components/stream_list_tile_theme.dart';
 export 'src/theme/components/stream_media_viewer_theme.dart';
 export 'src/theme/components/stream_online_indicator_theme.dart';

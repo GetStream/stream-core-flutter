@@ -3,6 +3,26 @@
 ### ✨ Features
 
 - Added the `lowBandwidthFill` icon.
+- Added `StreamErrorBadge.style`, taking a `StreamErrorBadgeStyle` — `.error`
+  (the default, unchanged) or `.warning`, a warning-colored background with a
+  black icon. The icon is pinned to black rather than to a mode-aware text
+  color, because the warning background does not invert between light and dark.
+- Added `StreamErrorBadge.showBorder`, defaulting to true. Set it to false for
+  the borderless badge the call control button uses, where the border loses its
+  edge over video.
+- Added `StreamErrorBadgeTheme` and `StreamErrorBadgeThemeData`, reachable as
+  `StreamTheme.errorBadgeTheme` and `BuildContext.streamErrorBadgeTheme`. It
+  carries a shared `size` and `border` plus an `errorStyle` and a
+  `warningStyle`, each a `StreamErrorBadgeThemeStyle` of `backgroundColor` and
+  `foregroundColor`, so the two styles can be themed independently. Use
+  `styleOf` to look up the entry for a given `StreamErrorBadgeStyle`.
+
+### 🔄 Changed
+
+- `StreamErrorBadgeSize` moved from `stream_error_badge.dart` to
+  `stream_error_badge_theme.dart`, alongside the new `StreamErrorBadgeStyle`.
+  Both are still exported from `core.dart`, so imports through the barrel are
+  unaffected.
 
 ## 0.5.1
 

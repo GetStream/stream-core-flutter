@@ -36,6 +36,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
+    StreamErrorBadgeThemeData? errorBadgeTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
     StreamMediaViewerThemeData? mediaViewerTheme,
@@ -96,6 +97,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           contextMenuActionTheme ?? _this.contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
+      errorBadgeTheme: errorBadgeTheme ?? _this.errorBadgeTheme,
       jumpToUnreadButtonTheme:
           jumpToUnreadButtonTheme ?? _this.jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
@@ -230,6 +232,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       emojiChipTheme: StreamEmojiChipThemeData.lerp(
         _this.emojiChipTheme,
         other.emojiChipTheme,
+        t,
+      )!,
+      errorBadgeTheme: StreamErrorBadgeThemeData.lerp(
+        _this.errorBadgeTheme,
+        other.errorBadgeTheme,
         t,
       )!,
       jumpToUnreadButtonTheme: StreamJumpToUnreadButtonThemeData.lerp(
@@ -399,6 +406,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
+        _other.errorBadgeTheme == _this.errorBadgeTheme &&
         _other.jumpToUnreadButtonTheme == _this.jumpToUnreadButtonTheme &&
         _other.listTileTheme == _this.listTileTheme &&
         _other.mediaViewerTheme == _this.mediaViewerTheme &&
@@ -462,6 +470,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.contextMenuActionTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
+      _this.errorBadgeTheme,
       _this.jumpToUnreadButtonTheme,
       _this.listTileTheme,
       _this.mediaViewerTheme,

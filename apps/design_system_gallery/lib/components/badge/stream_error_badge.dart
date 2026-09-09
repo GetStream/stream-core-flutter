@@ -21,8 +21,22 @@ Widget buildStreamErrorBadgePlayground(BuildContext context) {
     description: 'The diameter of the badge.',
   );
 
+  final style = context.knobs.object.dropdown<StreamErrorBadgeStyle>(
+    label: 'Style',
+    options: StreamErrorBadgeStyle.values,
+    initialOption: StreamErrorBadgeStyle.error,
+    labelBuilder: (option) => option.name.toUpperCase(),
+    description: 'The severity the badge conveys.',
+  );
+
+  final showBorder = context.knobs.boolean(
+    label: 'Show Border',
+    initialValue: true,
+    description: 'Whether to show a border around the badge.',
+  );
+
   return Center(
-    child: StreamErrorBadge(size: size),
+    child: StreamErrorBadge(size: size, style: style, showBorder: showBorder),
   );
 }
 
@@ -44,10 +58,12 @@ Widget buildStreamErrorBadgeShowcase(BuildContext context) {
     style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),
     child: SingleChildScrollView(
       padding: EdgeInsets.all(spacing.lg),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SizeVariantsSection(),
+          const _SizeVariantsSection(),
+          SizedBox(height: spacing.xl),
+          const _StyleVariantsSection(),
         ],
       ),
     ),
@@ -143,6 +159,109 @@ class _SizeDemo extends StatelessWidget {
         ),
         Text(
           '${size.value.toInt()}px',
+          style: textTheme.metadataDefault.copyWith(
+            color: colorScheme.textTertiary,
+            fontFamily: 'monospace',
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// Style Variants Section
+// =============================================================================
+
+class _StyleVariantsSection extends StatelessWidget {
+  const _StyleVariantsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final boxShadow = context.streamBoxShadow;
+    final radius = context.streamRadius;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionLabel(label: 'STYLE VARIANTS'),
+        SizedBox(height: spacing.md),
+        Container(
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: colorScheme.backgroundSurface,
+            borderRadius: BorderRadius.all(radius.lg),
+            boxShadow: boxShadow.elevation1,
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(radius.lg),
+            border: Border.all(color: colorScheme.borderSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Error and warning, each with the border on and off',
+                style: textTheme.captionDefault.copyWith(
+                  color: colorScheme.textSecondary,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Row(
+                children: [
+                  for (final style in StreamErrorBadgeStyle.values)
+                    for (final showBorder in [true, false])
+                      Padding(
+                        padding: EdgeInsetsDirectional.only(end: spacing.xl),
+                        child: _StyleDemo(style: style, showBorder: showBorder),
+                      ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StyleDemo extends StatelessWidget {
+  const _StyleDemo({required this.style, required this.showBorder});
+
+  final StreamErrorBadgeStyle style;
+  final bool showBorder;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Column(
+      children: [
+        SizedBox(
+          width: 48,
+          height: 48,
+          child: Center(
+            child: StreamErrorBadge(style: style, showBorder: showBorder),
+          ),
+        ),
+        SizedBox(height: spacing.sm),
+        Text(
+          style.name.toUpperCase(),
+          style: textTheme.metadataEmphasis.copyWith(
+            color: colorScheme.accentPrimary,
+            fontFamily: 'monospace',
+          ),
+        ),
+        Text(
+          showBorder ? 'border' : 'no border',
           style: textTheme.metadataDefault.copyWith(
             color: colorScheme.textTertiary,
             fontFamily: 'monospace',
