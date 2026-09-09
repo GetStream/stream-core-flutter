@@ -383,48 +383,6 @@ void main() {
     });
   });
 
-  group('Nor', () {
-    test('should serialize to JSON correctly', () {
-      final filter1 = Filter.equal(TestFilterField.name, 'test');
-      final filter2 = Filter.greater(TestFilterField.id, 100);
-
-      final norFilter = Filter.nor([filter1, filter2]);
-
-      expect(norFilter.toJson(), {
-        r'$nor': [
-          {
-            'name': {r'$eq': 'test'},
-          },
-          {
-            'id': {r'$gt': 100},
-          },
-        ],
-      });
-    });
-
-    test('should match only when no filter matches', () {
-      final norFilter = Filter.nor([
-        Filter.equal(TestFilterField.name, 'test'),
-        Filter.equal(TestFilterField.type, 'messaging'),
-      ]);
-
-      expect(norFilter.matches(TestModel(name: 'other', type: 'team')), isTrue);
-      expect(norFilter.matches(TestModel(name: 'test', type: 'team')), isFalse);
-      expect(norFilter.matches(TestModel(name: 'other', type: 'messaging')), isFalse);
-      expect(norFilter.matches(TestModel(name: 'test', type: 'messaging')), isFalse);
-    });
-
-    test('should negate the same filters an or would match', () {
-      final filters = [
-        Filter.equal(TestFilterField.name, 'test'),
-        Filter.equal(TestFilterField.type, 'messaging'),
-      ];
-      final model = TestModel(name: 'test', type: 'team');
-
-      expect(Filter.nor(filters).matches(model), isNot(Filter.or(filters).matches(model)));
-    });
-  });
-
   group('JSON Encoding', () {
     test('should encode filters correctly using json.encode', () {
       final filter = Filter.equal(TestFilterField.name, 'test');

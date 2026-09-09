@@ -12,7 +12,7 @@
 /// - **Existence**: [exists]
 /// - **Evaluation**: [query], [autoComplete]
 /// - **Path**: [pathExists]
-/// - **Logical**: [and], [or], [nor]
+/// - **Logical**: [and], [or]
 ///
 /// Example usage:
 /// ```dart
@@ -72,13 +72,6 @@ extension type const FilterOperator(String _) implements String {
   /// At least one of the specified filter conditions must be true for a
   /// record to match. This operator combines multiple filters with OR logic.
   static const or = FilterOperator(r'$or');
-
-  /// Performs a logical NOR operation on an array of filter expressions.
-  ///
-  /// None of the specified filter conditions may be true for a record to
-  /// match. This operator combines multiple filters with NOR logic, and is the
-  /// negation of [or].
-  static const nor = FilterOperator(r'$nor');
 
   /// Matches arrays that contain the specified value.
   ///
