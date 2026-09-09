@@ -178,10 +178,10 @@ sealed class Filter<T extends Object> {
   /// Raw filter serializing [value] verbatim, bypassing this type.
   ///
   /// A last resort, for a query the API accepts but this package does not
-  /// model. Prefer any declared operator: those name their field through a
-  /// [FilterField], so a typo is a compile error and the result can be
-  /// evaluated locally. Nothing checks [value], and [matches] throws for any
-  /// filter containing one.
+  /// model. Prefer a declared operator wherever one exists.
+  ///
+  /// [value] is not validated, and [matches] throws for any filter containing
+  /// one.
   const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
 
   /// Whether this filter matches the given [other] instance.
@@ -656,7 +656,7 @@ final class OrOperator<T extends Object> extends LogicalOperator<T> {
 
 /// A filter carrying a pre-built query this package does not model.
 ///
-/// Prefer a declared operator wherever one exists — see [Filter.raw].
+/// A last resort — see [Filter.raw].
 ///
 /// **Supported with**: `.raw` factory method
 final class RawFilter<T extends Object> extends Filter<T> {
