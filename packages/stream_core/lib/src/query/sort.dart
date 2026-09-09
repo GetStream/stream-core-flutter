@@ -8,12 +8,13 @@ part 'sort.g.dart';
 ///
 /// Defines whether a sort should be performed in ascending (forward) or
 /// descending (reverse) order.
-@JsonEnum(valueField: 'value')
 enum SortDirection {
   /// Sort in ascending order (A to Z, 1 to 9, etc.).
+  @JsonValue(1)
   asc(1),
 
   /// Sort in descending order (Z to A, 9 to 1, etc.).
+  @JsonValue(-1)
   desc(-1);
 
   /// Creates a new [SortDirection] instance with the specified direction.
