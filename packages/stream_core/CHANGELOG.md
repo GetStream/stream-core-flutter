@@ -6,6 +6,10 @@
 - Added `Filter.raw`, a last resort for a query this package does not model. It serializes verbatim, is not validated, and cannot be evaluated locally, so `matches` throws for it
 - Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
 
+### 🐞 Fixed
+
+- `Filter.equal` and `Filter.in_` now match an array-valued field the way a query does: `$eq` compares it as a set, and `$in` intersects it
+
 ## 0.5.0
 
 ### 💥 BREAKING CHANGES

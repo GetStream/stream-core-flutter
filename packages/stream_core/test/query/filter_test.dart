@@ -488,7 +488,7 @@ void main() {
         );
       });
 
-      test('should match arrays with order-sensitivity', () {
+      test('should match arrays as a set', () {
         final model = TestModel(tags: ['a', 'b', 'c']);
 
         expect(
@@ -497,12 +497,23 @@ void main() {
         );
         expect(
           Filter.equal(TestFilterField.tags, ['c', 'b', 'a']).matches(model),
-          isFalse,
+          isTrue,
         );
         expect(
           Filter.equal(TestFilterField.tags, ['a', 'b']).matches(model),
           isFalse,
         );
+        expect(
+          Filter.equal(TestFilterField.tags, ['a', 'b', 'c', 'd']).matches(model),
+          isFalse,
+        );
+      });
+
+      test('should match a single value against an array', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(Filter.equal(TestFilterField.tags, 'b').matches(model), isTrue);
+        expect(Filter.equal(TestFilterField.tags, 'z').matches(model), isFalse);
       });
 
       test('should match objects with key order-insensitivity', () {
@@ -614,6 +625,19 @@ void main() {
             ['c', 'b', 'a'],
             ['x', 'y'],
           ]).matches(model),
+          isFalse,
+        );
+      });
+
+      test('should match an array against plain values that intersect', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(
+          Filter.in_(TestFilterField.tags, ['c', 'x']).matches(model),
+          isTrue,
+        );
+        expect(
+          Filter.in_(TestFilterField.tags, ['x', 'y']).matches(model),
           isFalse,
         );
       });
