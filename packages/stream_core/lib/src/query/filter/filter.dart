@@ -273,10 +273,13 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
 
     // An array field equals a set, or contains a single value.
     if (fieldValue is Iterable<Object?>) {
-      return switch (comparisonValue) {
-        final Iterable<Object?> values => fieldValue.containsValue(values) && values.containsValue(fieldValue),
-        _ => fieldValue.containsValue(comparisonValue),
-      };
+      if (comparisonValue case final Iterable<Object?> values) {
+        final containsEvery = fieldValue.containsValue(values);
+        final isContainedBy = values.containsValue(fieldValue);
+        return containsEvery && isContainedBy;
+      }
+
+      return fieldValue.containsValue(comparisonValue);
     }
 
     // Deep equality: order-insensitive for objects.
@@ -420,12 +423,10 @@ final class InOperator<T extends Object> extends ListOperator<T> {
 
     // An array field intersects plain values, and equals array ones.
     if (fieldValue is Iterable<Object?>) {
-      return comparisonValues.any(
-        (it) => switch (it) {
-          final Iterable<Object?> values => fieldValue.deepEquals(values),
-          _ => fieldValue.containsValue(it),
-        },
-      );
+      return comparisonValues.any((it) {
+        if (it is Iterable<Object?>) return fieldValue.deepEquals(it);
+        return fieldValue.containsValue(it);
+      });
     }
 
     return comparisonValues.any(fieldValue.deepEquals);
