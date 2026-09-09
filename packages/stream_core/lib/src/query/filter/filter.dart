@@ -273,9 +273,9 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
 
     // An array field equals a set, or contains a single value.
     if (fieldValue is Iterable<Object?>) {
-      if (comparisonValue case final Iterable<Object?> values) {
-        final containsEvery = fieldValue.containsValue(values);
-        final isContainedBy = values.containsValue(fieldValue);
+      if (comparisonValue is Iterable<Object?>) {
+        final containsEvery = fieldValue.containsValue(comparisonValue);
+        final isContainedBy = comparisonValue.containsValue(fieldValue);
         return containsEvery && isContainedBy;
       }
 
