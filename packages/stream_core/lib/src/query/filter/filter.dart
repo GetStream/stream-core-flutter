@@ -177,10 +177,8 @@ sealed class Filter<T extends Object> {
 
   /// Raw filter serializing [value] verbatim, bypassing this type.
   ///
-  /// Carries a query the API accepts but this package does not model, such as
-  /// one built elsewhere and handed back. Prefer a declared operator wherever
-  /// one exists: nothing validates [value], and [matches] throws for it, so a
-  /// filter containing one cannot be evaluated locally.
+  /// For a query the API accepts but this package does not model. Nothing
+  /// validates [value], and [matches] throws for it.
   const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
 
   /// Whether this filter matches the given [other] instance.
@@ -663,13 +661,7 @@ final class RawFilter<T extends Object> extends Filter<T> {
   /// The query to serialize, used as-is.
   final Map<String, Object?> value;
 
-  /// Always throws: [value] is opaque, so it cannot be evaluated.
-  ///
-  /// Neither answer would be right. Reporting a match is correct under
-  /// [AndOperator] and wrong under [OrOperator], where it would match every
-  /// record; reporting no match inverts the problem. Refusing is the only
-  /// answer that cannot silently produce a wrong result, and it names the
-  /// query that caused it.
+  /// Always throws: [value] is opaque, so there is nothing to compare against.
   @override
   bool matches(T other) {
     throw UnsupportedError(

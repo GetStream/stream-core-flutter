@@ -25,21 +25,12 @@ const _vietnameseUHornLower = 0x01B0;
 
 /// Normalizes [value] into a sort key matching how the API orders names.
 ///
-/// Apply it in a `SortField`'s value getter so a list sorted locally lands in
-/// the same order a query returns. A plain [String.compareTo] does not: it
-/// orders by code unit, so it pushes lowercase-leading and accented names
-/// (`jhon`, `Łukasz`, `Øystein`) to the end.
-///
-/// Applied in order:
-///
-/// 1. Fold Latin diacritics and ligatures — `é → e`, `Ł → l`, `Æ → ae`.
-/// 2. Preserve Japanese, Thai, and Vietnamese-specific runes unchanged.
-/// 3. Lowercase.
-/// 4. Trim leading/trailing ASCII apostrophes (U+0027) then whitespace.
-///
-/// Mirrors the API's own [`NormalizeName`][ref].
-///
-/// [ref]: https://github.com/GetStream/chat/blob/b92bf7991752a29e9f67b6ffe69b0bc529f5c48c/lib/combined/utils/text.go#L88-L95
+/// Folds case, diacritics and ligatures, so a list sorted locally lands in the
+/// same order a query returns. Apply it in a `SortField` value getter: a plain
+/// [String.compareTo] orders by code unit, putting `jhon` and `Łukasz` last.
+// Mirrors the API's own `NormalizeName`, which is why the folding is selective
+// rather than a blanket `removeDiacritics`:
+// https://github.com/GetStream/chat/blob/b92bf7991752a29e9f67b6ffe69b0bc529f5c48c/lib/combined/utils/text.go#L88-L95
 String normalizeStringForSort(String value) {
   if (value.isEmpty) return value;
   final folded = value.runes.map(_foldRune).join();
