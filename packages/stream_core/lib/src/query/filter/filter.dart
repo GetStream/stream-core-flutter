@@ -175,13 +175,6 @@ sealed class Filter<T extends Object> {
   /// Logical OR filter matching when any [filters] match.
   const factory Filter.or(Iterable<Filter<T>> filters) = OrOperator<T>;
 
-  /// A filter that constrains nothing.
-  ///
-  /// Serializes to `{}` and matches every record, so it is the identity
-  /// element of [Filter.and] and useful where a filter is required but the
-  /// caller has nothing to constrain by.
-  const factory Filter.empty() = EmptyFilter<T>;
-
   /// A filter serialized verbatim from [value], bypassing this type.
   ///
   /// For a query the API accepts but this package does not model. Prefer a
@@ -659,20 +652,6 @@ final class OrOperator<T extends Object> extends LogicalOperator<T> {
 // endregion
 
 // region Escape hatches
-
-/// A filter that constrains nothing and matches every record.
-///
-/// **Supported with**: `.empty` factory method
-final class EmptyFilter<T extends Object> extends Filter<T> {
-  /// Creates a filter that constrains nothing.
-  const EmptyFilter() : super._();
-
-  @override
-  bool matches(T other) => true;
-
-  @override
-  Map<String, Object?> toJson() => const {};
-}
 
 /// A filter carrying a pre-built query this package does not model.
 ///

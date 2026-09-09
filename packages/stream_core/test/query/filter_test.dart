@@ -246,27 +246,6 @@ void main() {
   });
 
   group('Escape hatches', () {
-    group('Empty', () {
-      test('should serialize to an empty map', () {
-        expect(const Filter<TestModel>.empty().toJson(), isEmpty);
-      });
-
-      test('should match every record', () {
-        const filter = Filter<TestModel>.empty();
-
-        expect(filter.matches(TestModel()), isTrue);
-        expect(filter.matches(TestModel(name: 'anything')), isTrue);
-      });
-
-      test('should leave an and unchanged, being its identity element', () {
-        final constrained = Filter.equal(TestFilterField.name, 'test');
-        final withEmpty = Filter.and([constrained, const Filter<TestModel>.empty()]);
-
-        expect(withEmpty.matches(TestModel(name: 'test')), isTrue);
-        expect(withEmpty.matches(TestModel(name: 'other')), isFalse);
-      });
-    });
-
     group('Raw', () {
       test('should serialize the given map verbatim', () {
         const value = {
