@@ -26,7 +26,7 @@ const _vietnameseUHornLower = 0x01B0;
 /// Normalizes [value] into a sort key matching how the API orders names.
 ///
 /// Apply it in a `SortField`'s value getter so a list sorted locally lands in
-/// the same order a query returns. A plain `String.compareTo` does not: it
+/// the same order a query returns. A plain [String.compareTo] does not: it
 /// orders by code unit, so it pushes lowercase-leading and accented names
 /// (`jhon`, `Łukasz`, `Øystein`) to the end.
 ///

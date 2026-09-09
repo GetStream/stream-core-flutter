@@ -175,12 +175,11 @@ sealed class Filter<T extends Object> {
   /// Logical OR filter matching when any [filters] match.
   const factory Filter.or(Iterable<Filter<T>> filters) = OrOperator<T>;
 
-  /// A filter serialized verbatim from [value], bypassing this type.
+  /// Raw filter serializing [value] verbatim, bypassing this type.
   ///
-  /// For a query the API accepts but this package does not model — typically
-  /// one built elsewhere and handed back, where an unmodelled operator would
-  /// otherwise have nowhere to go. Prefer a declared operator wherever one
-  /// exists: nothing validates [value], and [matches] throws for it, so a
+  /// Carries a query the API accepts but this package does not model, such as
+  /// one built elsewhere and handed back. Prefer a declared operator wherever
+  /// one exists: nothing validates [value], and [matches] throws for it, so a
   /// filter containing one cannot be evaluated locally.
   const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
 
