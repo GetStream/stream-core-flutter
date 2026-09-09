@@ -471,27 +471,4 @@ void main() {
       expect(sort.compare(person1, person2), equals(0));
     });
   });
-
-  group('SortDirection.fromJson', () {
-    test('should read back the values Sort serializes', () {
-      expect(SortDirection.fromJson(1), equals(SortDirection.asc));
-      expect(SortDirection.fromJson(-1), equals(SortDirection.desc));
-    });
-
-    test('should read anything other than -1 as ascending, as the API does', () {
-      // The API treats any direction it did not write as ascending rather than
-      // rejecting it, so a round-trip never fails on an unexpected value.
-      expect(SortDirection.fromJson(null), equals(SortDirection.asc));
-      expect(SortDirection.fromJson(0), equals(SortDirection.asc));
-      expect(SortDirection.fromJson('desc'), equals(SortDirection.asc));
-    });
-
-    test('should round-trip the direction a Sort wrote', () {
-      final field = SortField<Person>('name', (p) => p.name);
-
-      for (final sort in [Sort.asc(field), Sort.desc(field)]) {
-        expect(SortDirection.fromJson(sort.toJson()['direction']), equals(sort.direction));
-      }
-    });
-  });
 }

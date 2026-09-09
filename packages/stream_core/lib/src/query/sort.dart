@@ -19,16 +19,6 @@ enum SortDirection {
   /// Creates a new [SortDirection] instance with the specified direction.
   const SortDirection(this.value);
 
-  /// Reads a direction back from the value [Sort] serializes.
-  ///
-  /// Anything other than [desc]'s value is [asc], which is how the API reads
-  /// it — so a value it did not write, or none at all, is ascending rather
-  /// than an error.
-  static SortDirection fromJson(Object? json) {
-    if (json == desc.value) return desc;
-    return asc;
-  }
-
   /// The numeric value representing the sort direction.
   final int value;
 }

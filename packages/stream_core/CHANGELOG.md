@@ -3,7 +3,6 @@
 ### ✨ Features
 
 - Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
-- Added `SortDirection.fromJson`, which reads back the direction a `Sort` serializes
 - Added `Filter.raw`, which serializes a pre-built query verbatim
 - Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
 
