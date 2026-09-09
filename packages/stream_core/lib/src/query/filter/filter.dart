@@ -175,6 +175,9 @@ sealed class Filter<T extends Object> {
   /// Logical OR filter matching when any [filters] match.
   const factory Filter.or(Iterable<Filter<T>> filters) = OrOperator<T>;
 
+  /// Logical NOR filter matching when none of [filters] match.
+  const factory Filter.nor(Iterable<Filter<T>> filters) = NorOperator<T>;
+
   /// Whether this filter matches the given [other] instance.
   ///
   /// Evaluates filter criteria against field values extracted from [other]
@@ -639,6 +642,18 @@ final class OrOperator<T extends Object> extends LogicalOperator<T> {
 
   @override
   bool matches(T other) => filters.any((filter) => filter.matches(other));
+}
+
+/// Logical NOR filter requiring no condition to match.
+///
+/// A record is included only when none of the provided filters match, so this
+/// is the negation of [OrOperator].
+final class NorOperator<T extends Object> extends LogicalOperator<T> {
+  /// Creates a logical NOR filter combining the specified [filters].
+  const NorOperator(super.filters) : super._(operator: FilterOperator.nor);
+
+  @override
+  bool matches(T other) => !filters.any((filter) => filter.matches(other));
 }
 
 // endregion

@@ -3,6 +3,7 @@
 ### ✨ Features
 
 - Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
+- Added `Filter.nor`, the logical negation of `Filter.or`, matching only when none of its filters match
 
 ## 0.5.0
 
