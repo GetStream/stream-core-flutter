@@ -1251,8 +1251,12 @@ Themes are generated via `theme_extensions_builder`. **Never hand-roll `copyWith
 
 The hierarchy is layered: **primitives** (`theme/primitives/`, raw tokens) →
 **semantics** (`theme/semantics/`, semantic mappings) → **component themes**
-(`theme/components/`, per-widget classes, 50+) → **tokens** (figma-generated,
-internal).
+(`theme/components/`, per-widget classes, 50+) → **tokens** (vendored from the
+design-token repo, internal).
+
+Only root semantic tokens are vendored; a component's derived values are resolved
+from `colorScheme.*` in its own defaults, never from a token constant. Use the
+`update-design-tokens` skill when syncing a token change.
 
 Adding a new component theme:
 
@@ -1513,8 +1517,10 @@ only the ones this PR bumped. So:
 - **Melos commands**: `melos.yaml` — every task the repo runs.
 - **Design source**: the Chat SDK Design System Figma project — accessed via the
   Figma MCP when implementing UI.
-- **Design tokens**: the [design-system-tokens](https://github.com/GetStream/design-system-tokens)
-  sibling repo (mirrored internally in the theme primitives).
+- **Design tokens and icons**: the [design-system-tokens](https://github.com/GetStream/design-system-tokens)
+  sibling repo (colours mirrored into the theme primitives, SVGs into
+  `assets_source/icons/`). The `update-design-tokens` and `update-icons` skills
+  cover syncing from it.
 
 When something isn't covered here and isn't obvious from surrounding code, prefer
 to ask in the PR rather than guessing. If a convention isn't documented, propose

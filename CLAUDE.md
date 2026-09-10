@@ -105,9 +105,27 @@ Uses `theme_extensions_builder` to generate Material 3 theme extensions. The hie
 1. **Primitives** — raw design tokens: colors, typography, spacing, radius, icons
 2. **Semantics** — semantic mappings (e.g., `primaryColor`, `bodyText`)
 3. **Component themes** — per-widget theme classes (50+ components), defined in `theme/components/`
-4. **Tokens** — light/dark concrete values in `theme/primitives/internal/tokens/` (figma-generated, not part of the public API)
+4. **Tokens** — light/dark concrete values in `theme/primitives/internal/tokens/`, copied by hand from the design-token repo and not part of the public API (see [Design tokens](#design-tokens))
 
 Generated files have `.g.theme.dart` extension. After modifying `.theme.dart` files, run `melos run generate:flutter`.
+
+### Design tokens
+
+Colors originate in [design-system-tokens](https://github.com/GetStream/design-system-tokens),
+the same repo the icons come from. `theme/primitives/internal/tokens/{light,dark}/stream_tokens.dart`
+holds the vendored values; it is maintained by hand, is not part of the public API,
+and only `stream_color_scheme.dart`, `stream_colors.dart` and
+`stream_color_swatch_helper.dart` read it.
+
+Only the **root semantics** are vendored. Upstream's derived tokens (`badge/*`,
+`button/*`, `avatar/*`) have no counterpart here by design — components re-derive
+them from `colorScheme.*` in their own defaults. Typography, spacing and radius do
+not come from upstream at all. `StreamColorScheme` is exported from `core.dart`, so
+every field on it is public API.
+
+**Use the `update-design-tokens` skill** when syncing a token change or assessing
+an upstream PR — it covers the naming rules, how a field default should resolve,
+and how to read a change without drowning in the generator's re-sort noise.
 
 ### Component Structure (`stream_core_flutter/lib/src/components/`)
 
