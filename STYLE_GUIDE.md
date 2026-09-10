@@ -1366,7 +1366,7 @@ font and the `StreamIcons` / `StreamIconData` classes from the source SVGs in
 [design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons)
 repo.
 
-Do not edit the generated `stream_icons.dart`, the font, or
+Do not edit the generated `stream_icons.dart`, `stream_icons.g.dart`, the font, or
 `assets_source/icon_log.g.txt` by hand. Commit SVG sources and regenerated output
 together — they must stay in sync.
 

@@ -114,14 +114,19 @@ Generated files have `.g.theme.dart` extension. After modifying `.theme.dart` fi
 Colors originate in [design-system-tokens](https://github.com/GetStream/design-system-tokens),
 the same repo the icons come from. `theme/primitives/internal/tokens/{light,dark}/stream_tokens.dart`
 holds the vendored values; it is maintained by hand, is not part of the public API,
-and only `stream_color_scheme.dart`, `stream_colors.dart` and
-`stream_color_swatch_helper.dart` read it.
+and only `stream_colors.dart` and `stream_color_scheme.dart` read it.
 
-Only the **root semantics** are vendored. Upstream's derived tokens (`badge/*`,
-`button/*`, `avatar/*`) have no counterpart here by design — components re-derive
-them from `colorScheme.*` in their own defaults. Typography, spacing and radius do
-not come from upstream at all. `StreamColorScheme` is exported from `core.dart`, so
-every field on it is public API.
+Only the **root semantics** are mapped to a `StreamColorScheme` field. Upstream's
+derived tokens (`badge/*`, `button/*`, `avatar/*`) get no field — components
+re-derive them from `colorScheme.*` in their own defaults. Typography, spacing and
+radius do come from upstream, but `StreamTokensTypography`, `StreamSpacing` and
+`StreamRadius` hard-code the values rather than reading a token constant, so a
+dimension change is applied to those classes by hand. `StreamColorScheme` is
+exported from `core.dart`, so every field on it is public API.
+
+A field's dartdoc comes from the token's own `$description` in the upstream JSON —
+quote it rather than inventing prose, but check it against the resolved light and
+dark values first, because those descriptions can be stale.
 
 **Use the `update-design-tokens` skill** when syncing a token change or assessing
 an upstream PR — it covers the naming rules, how a field default should resolve,

@@ -63,7 +63,8 @@ def load(path: str, ref: str | None = None) -> dict[str, str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("path", help="path to a semantics JSON file")
     parser.add_argument(
         "--diff",

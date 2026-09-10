@@ -18,10 +18,16 @@ python3 <skill>/scripts/flatten_tokens.py --diff 4ef9b54 origin/main tokens/core
 ```
 
 Read it as *"every semantic change up to here has been triaged"*, not *"the vendored
-files mirror this commit"*. They do not, and knowingly so: 459 names are shared with
-`4ef9b54`, 50 exist only here (pre-dating upstream's core/chat/video namespace
-split — `backgroundElevationElevation0`, `avatarPaletteBg1`), and 98 exist only
-upstream, most of them derived tokens this package deliberately does not vendor.
+files mirror this commit"*. They do not, and knowingly so: the vendored set is
+neither a subset nor a superset of upstream. Some names pre-date upstream's
+core/chat/video namespace split and survive only here (`backgroundElevationElevation0`,
+`avatarPaletteBg1`); many upstream names — mostly derived tokens — are deliberately
+not vendored; and `light/` and `dark/` do not even hold the same set. Compare them
+yourself rather than trusting a count that rots:
+
+```bash
+python3 <skill>/scripts/flatten_tokens.py tokens/core/semantics/light.json
+```
 Adopting the namespace split is its own migration, not part of a routine sync.
 
 ## Derived-token map
@@ -55,8 +61,8 @@ Reference ref: `origin/v2` in stream-video-flutter (the design-system branch).
 | `indicator/connection-quality/fair` | `{accent.warning}` | video · same file → `fairColor` | `StreamConnectionQualityIndicator` |
 | `indicator/connection-quality/great` | `{accent.success}` | video · same file → `greatColor` | `StreamConnectionQualityIndicator` |
 | `indicator/sound-indicator/speaking` | `{brand.400}` | video · `theme/components/participant_label_theme.dart` → `speakingColor` | `StreamAudioIndicator` |
-| `control/call-control-error-badge/bg` | `{accent.warning}` | **core** · `components/badge/stream_error_badge.dart` → `colorScheme.accentError` | `StreamErrorBadge`, wrapped by video's `CallButtonBadge` |
-| `control/call-control-error-badge/text` | `{base.black}` | **core** · same file → `colorScheme.textOnAccent` | `StreamErrorBadge` |
+| `control/call-control-error-badge/bg` | `{accent.warning}` | **core** · `components/badge/stream_error_badge.dart` → `warningBackgroundColor`, i.e. `colorScheme.accentWarning` | `StreamErrorBadge`, wrapped by video's `CallButtonBadge` |
+| `control/call-control-error-badge/text` | `{base.black}` | **core** · same file → `warningForegroundColor`, a literal `StreamColors.black` — `textOnAccent` resolves to white in *both* modes and cannot satisfy `{base.black}` | `StreamErrorBadge` |
 | `indicator/microphone-level/bar-active` | `{brand.400}` | not implemented — the lobby level meter is new | — |
 | `indicator/microphone-level/bar-inactive` | `{chrome.200}` | not implemented | — |
 

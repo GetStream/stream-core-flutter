@@ -39,10 +39,11 @@ covered below.
 | derived values | each component's `build` / defaults, reading `colorScheme.*` |
 
 The vendored files are **maintained by hand** — there is no sync command, and the
-upstream build output is not copied in verbatim. Only
-`stream_color_scheme.dart`, `stream_colors.dart` and
-`stream_color_swatch_helper.dart` import them; no component theme or widget ever
-references `StreamTokens`.
+upstream build output is not copied in verbatim. Only `stream_colors.dart` and
+`stream_color_scheme.dart` import them; no component theme or widget ever
+references `StreamTokens`. (`stream_color_swatch_helper.dart` generates shades in
+HCT from a seed and never reads a token — it is measured *against* the vendored
+values, not driven by them.)
 
 **Colors are byte-identical across the three upstream flavors; typography is not
 — and for type the flavor is `web`.** Only web carries the `Geist` family this
@@ -181,6 +182,14 @@ Two limits worth knowing, both by design:
   `references/derived-token-map.md`, hand-traced, with the caveat that it points at
   repos which move independently — verify a row before acting on it.
 
+And one that is not by design: the pattern matches the bare string `colorScheme.`,
+so **Material's** `Theme.of(context).colorScheme.surface` is reported exactly like a
+`StreamColorScheme` read. There are none in this repo, which uses
+`StreamTheme.of(context).colorScheme`, but the consuming SDKs are Material apps
+where the collision is real. Check the `Theme.of` receiver before reading a hit as
+a Stream token — and read a *clean* result with the same suspicion, since app and
+example directories are not filtered either.
+
 When you do trace a derived token by hand, add the row. That is the only mapping
 worth recording: the greppable half goes stale the moment someone edits a widget,
 while the non-greppable half is what nobody can reconstruct without repeating your
@@ -221,7 +230,7 @@ dependency_overrides:
   stream_core_flutter:
     git:
       url: https://github.com/GetStream/stream-core-flutter.git
-      ref: 2762ea870b3f38bdfb33280230d0709540bde35a # a commit, never a branch
+      ref: dbf84703ceb4dc19a7c847707428e8727d867203 # a commit, never a branch
       path: packages/stream_core_flutter
 ```
 
@@ -283,14 +292,37 @@ silently stops applying:
   `chrome.shade100`, `brand.shade500`, `chrome[0] ?? StreamColors.white`.
   Never the baked hex. These scales are regenerated from a seed color, so a
   hard-coded value ignores `StreamColorScheme.light(brand: ...)`.
-- **another semantic** → alias the field: `borderWarning ??= accentWarning`,
-  `textLink ??= accentPrimary`.
+- **another semantic** → alias the field: `borderWarning ??= accentWarning`.
+  Check both modes before generalising — `textLink` aliases `accentPrimary` in
+  light but resolves `brand.shade600` in dark, so the two factories can differ.
 - **a raw hex, or a primitive outside those two scales** (a `yellow`, a
   transparent black) → add a constant to both vendored files and read it:
   `light_tokens.StreamTokens.backgroundCoreHighlight`.
 
 Only the third case earns a vendored constant. Add the same name to **both**
 `light/` and `dark/`, keeping the file's existing ordering.
+
+### Writing the dartdoc
+
+The field's dartdoc comes from the token's own `$description`, which upstream
+carries alongside `$value` in the semantics JSON:
+
+```bash
+python3 -c "import json;d=json.load(open('tokens/core/semantics/light.json'));\
+print(d['border']['core']['on-elevation'])"
+```
+
+Quote it rather than inventing prose — it is the designer's statement of intent,
+and matching wording is what lets the next person recognise the field as that
+token. Swap upstream's token paths for `[fieldName]` references.
+
+**Verify the claim against the resolved light and dark values first.** These
+descriptions are hand-written and can be stale: upstream's
+`border/core/on-elevation` says it "steps up in dark mode to keep the edge
+visible" while resolving to `{chrome.300}` in dark — identical to
+`border/core/on-surface`, the field it tells you to contrast it with. When a
+description and the values disagree, document what the values encode and open an
+issue upstream, so the source gets fixed rather than the copy.
 
 ## Root semantics only
 

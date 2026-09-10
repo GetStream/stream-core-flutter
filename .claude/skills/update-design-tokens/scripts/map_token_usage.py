@@ -16,6 +16,13 @@ from the widget that renders it — a component theme's defaults class will show
 up rather than the widget consuming that theme. Follow the theme field to the
 widget when the answer needs to name a component.
 
+The match is on the bare string `colorScheme.`, so Material's
+`Theme.of(context).colorScheme.surface` is reported identically to a
+`StreamColorScheme` read. This repo uses `StreamTheme.of(context).colorScheme` and
+has no collisions, but the consuming SDKs are Material apps where it is real —
+check the receiver before trusting a hit, and note that app/example directories
+are not filtered either, only tests.
+
 It also only sees root semantics, the ones with a `colorScheme` field. Derived
 chat/video tokens have no field at all — the SDK inlines them as swatch reads
 (`colorScheme.brand.shade300`) inside component-theme defaults, which no token
@@ -35,7 +42,8 @@ LINE_RE = re.compile(r"^(?P<ref>.*?):(?P<path>.*?):(?P<line>\d+):.*?_?colorSchem
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("repo", help="path to the consuming SDK checkout")
     parser.add_argument("ref", help="git ref to inspect, e.g. origin/v2")
     parser.add_argument("field", nargs="?", help="limit to one colorScheme field")
