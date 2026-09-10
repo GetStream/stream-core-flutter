@@ -3,6 +3,10 @@
 ### ✨ Features
 
 - Added the `lowBandwidthFill` icon.
+- Added `StreamErrorBadge.style`, taking a `StreamErrorBadgeStyle` — `.error`
+  (the default) or `.warning` — and `StreamErrorBadge.showBorder`.
+- Added `StreamErrorBadgeTheme` and `StreamErrorBadgeThemeData`, carrying a
+  background and foreground color per style.
 
 ## 0.5.1
 

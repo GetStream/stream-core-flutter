@@ -1,37 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../../factory/stream_component_factory.dart';
+import '../../theme/components/stream_error_badge_theme.dart';
+import '../../theme/primitives/stream_colors.dart';
 import '../../theme/primitives/stream_icons.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
-/// Predefined sizes for [StreamErrorBadge].
-///
-/// Each size corresponds to a specific diameter and icon size in logical pixels.
-enum StreamErrorBadgeSize {
-  /// Medium badge (24px diameter, 20px icon).
-  md(24, 20),
-
-  /// Small badge (20px diameter, 16px icon).
-  sm(20, 16),
-
-  /// Extra-small badge (16px diameter, 12px icon).
-  xs(16, 12);
-
-  const StreamErrorBadgeSize(this.value, this.iconSize);
-
-  /// The diameter of the badge in logical pixels.
-  final double value;
-
-  /// The icon size for this badge size.
-  final double iconSize;
-}
-
-/// A circular error badge that displays an exclamation mark icon.
+/// A circular badge that displays an exclamation mark icon.
 ///
 /// [StreamErrorBadge] is used to indicate a failed operation, such as a
 /// message that could not be sent. It renders as a fixed-size circle with
-/// an error-colored background and an exclamation mark icon.
+/// a background colored by [StreamErrorBadgeStyle] and an exclamation mark
+/// icon.
 ///
 /// {@tool snippet}
 ///
@@ -51,9 +32,29 @@ enum StreamErrorBadgeSize {
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// Warning variant without a border, as a call control button uses it:
+///
+/// ```dart
+/// StreamErrorBadge(
+///   style: StreamErrorBadgeStyle.warning,
+///   showBorder: false,
+/// )
+/// ```
+/// {@end-tool}
+///
+/// ## Theming
+///
+/// [StreamErrorBadge] uses [StreamErrorBadgeThemeData] for default styling.
+/// Colors are determined by the current [StreamColorScheme].
+///
 /// See also:
 ///
 ///  * [StreamErrorBadgeSize], the available size variants.
+///  * [StreamErrorBadgeStyle], the available style variants.
+///  * [StreamErrorBadgeThemeData], for customizing appearance.
+///  * [StreamErrorBadgeTheme], for overriding theme in a subtree.
 ///  * [StreamRetryBadge], a badge for indicating retryable actions.
 ///  * [StreamBadgeNotification], a badge for displaying notification counts.
 class StreamErrorBadge extends StatelessWidget {
@@ -61,7 +62,9 @@ class StreamErrorBadge extends StatelessWidget {
   StreamErrorBadge({
     super.key,
     StreamErrorBadgeSize? size,
-  }) : props = .new(size: size);
+    StreamErrorBadgeStyle? style,
+    bool showBorder = true,
+  }) : props = .new(size: size, style: style, showBorder: showBorder);
 
   /// The properties that configure this error badge.
   final StreamErrorBadgeProps props;
@@ -85,18 +88,37 @@ class StreamErrorBadge extends StatelessWidget {
 ///  * [DefaultStreamErrorBadge], the default implementation.
 class StreamErrorBadgeProps {
   /// Creates properties for an error badge.
-  const StreamErrorBadgeProps({this.size});
+  const StreamErrorBadgeProps({
+    this.size,
+    this.style,
+    this.showBorder = true,
+  });
 
   /// The size of the badge.
   ///
-  /// If null, defaults to [StreamErrorBadgeSize.sm].
+  /// If null, uses [StreamErrorBadgeThemeData.size], or falls back to
+  /// [StreamErrorBadgeSize.sm].
   final StreamErrorBadgeSize? size;
+
+  /// The severity the badge conveys.
+  ///
+  /// If null, defaults to [StreamErrorBadgeStyle.error].
+  final StreamErrorBadgeStyle? style;
+
+  /// Whether a border is drawn around the badge.
+  ///
+  /// The border style is determined by [StreamErrorBadgeThemeData.border]. It
+  /// is drawn outside the badge's [size], so it separates the badge from
+  /// whatever it overlaps without changing the badge's layout size. Defaults
+  /// to true.
+  final bool showBorder;
 }
 
 /// The default implementation of [StreamErrorBadge].
 ///
 /// Renders a circular badge with an exclamation mark icon. Styling is
-/// resolved from the current [StreamColorScheme] and [StreamIcons].
+/// resolved from [StreamErrorBadgeThemeData], falling back to the current
+/// [StreamColorScheme] and [StreamIcons].
 ///
 /// See also:
 ///
@@ -112,27 +134,76 @@ class DefaultStreamErrorBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icons = context.streamIcons;
-    final colorScheme = context.streamColorScheme;
 
-    final effectiveSize = props.size ?? StreamErrorBadgeSize.sm;
+    final theme = context.streamErrorBadgeTheme;
+    final defaults = _StreamErrorBadgeThemeDefaults(context);
 
-    final border = Border.all(
-      width: 2,
-      color: colorScheme.borderOnInverse,
-      strokeAlign: BorderSide.strokeAlignOutside,
-    );
+    final effectiveSize = props.size ?? theme.size ?? defaults.size;
+    final effectiveStyle = props.style ?? StreamErrorBadgeStyle.error;
+    final effectiveBorder = props.showBorder ? theme.border ?? defaults.border : null;
+
+    final effectiveBackgroundColor = _resolveBackgroundColor(effectiveStyle, theme, defaults);
+    final effectiveForegroundColor = _resolveForegroundColor(effectiveStyle, theme, defaults);
 
     return AnimatedContainer(
       width: effectiveSize.value,
       height: effectiveSize.value,
       clipBehavior: Clip.antiAlias,
       duration: kThemeChangeDuration,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: colorScheme.accentError),
-      foregroundDecoration: BoxDecoration(shape: BoxShape.circle, border: border),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: effectiveBackgroundColor),
+      foregroundDecoration: BoxDecoration(shape: BoxShape.circle, border: effectiveBorder),
       child: IconTheme(
-        data: .new(size: effectiveSize.iconSize, color: colorScheme.textOnAccent),
+        data: .new(size: effectiveSize.iconSize, color: effectiveForegroundColor),
         child: Center(child: Icon(icons.exclamationMarkFill)),
       ),
     );
   }
+
+  Color _resolveBackgroundColor(
+    StreamErrorBadgeStyle style,
+    StreamErrorBadgeThemeData theme,
+    _StreamErrorBadgeThemeDefaults defaults,
+  ) => switch (style) {
+    .error => theme.errorBackgroundColor ?? defaults.errorBackgroundColor,
+    .warning => theme.warningBackgroundColor ?? defaults.warningBackgroundColor,
+  };
+
+  Color _resolveForegroundColor(
+    StreamErrorBadgeStyle style,
+    StreamErrorBadgeThemeData theme,
+    _StreamErrorBadgeThemeDefaults defaults,
+  ) => switch (style) {
+    .error => theme.errorForegroundColor ?? defaults.errorForegroundColor,
+    .warning => theme.warningForegroundColor ?? defaults.warningForegroundColor,
+  };
+}
+
+class _StreamErrorBadgeThemeDefaults extends StreamErrorBadgeThemeData {
+  _StreamErrorBadgeThemeDefaults(this._context);
+
+  final BuildContext _context;
+
+  late final _colorScheme = _context.streamColorScheme;
+
+  @override
+  StreamErrorBadgeSize get size => .sm;
+
+  @override
+  Color get errorBackgroundColor => _colorScheme.accentError;
+
+  @override
+  Color get errorForegroundColor => _colorScheme.textOnAccent;
+
+  @override
+  Color get warningBackgroundColor => _colorScheme.accentWarning;
+
+  @override
+  Color get warningForegroundColor => StreamColors.black;
+
+  @override
+  BoxBorder get border => Border.all(
+    width: 2,
+    color: _colorScheme.borderOnInverse,
+    strokeAlign: BorderSide.strokeAlignOutside,
+  );
 }
