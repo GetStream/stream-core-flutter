@@ -68,6 +68,14 @@ git fetch origin <pr-branch>
 python3 <skill>/scripts/flatten_tokens.py --diff main FETCH_HEAD tokens/core/semantics/light.json
 ```
 
+To catch up rather than review one PR, diff from the last synced commit — recorded
+under **Last sync** in `references/derived-token-map.md`, and worth updating there
+whenever you land a sync, since nothing in the repo itself records it:
+
+```bash
+python3 <skill>/scripts/flatten_tokens.py --diff <last-sync-sha> origin/main tokens/core/semantics/light.json
+```
+
 Run it for each namespace and mode the change touches (`core`/`chat` here,
 `light` and `dark` both — they alias different primitives and can drift apart).
 Output is `ADDED` / `REMOVED` / `CHANGED` per token path. Without `--diff` the

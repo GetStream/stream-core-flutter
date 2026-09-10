@@ -1,4 +1,30 @@
-# Derived-token map
+# Token sync state
+
+## Last sync
+
+| | |
+| --- | --- |
+| upstream commit | `4ef9b54bf93f2e42f346340690296dfca480ebc9` |
+| upstream PR | [design-system-tokens#73](https://github.com/GetStream/design-system-tokens/pull/73) |
+| date | 2026-09-10 |
+
+**Update this on every sync.** Nothing in the repo records which upstream state the
+vendored tokens correspond to, and unlike a token's readers it cannot be recovered
+by grepping — you would have to bisect upstream comparing values. One line here
+turns the next sync into a mechanical diff:
+
+```bash
+python3 <skill>/scripts/flatten_tokens.py --diff 4ef9b54 origin/main tokens/core/semantics/light.json
+```
+
+Read it as *"every semantic change up to here has been triaged"*, not *"the vendored
+files mirror this commit"*. They do not, and knowingly so: 459 names are shared with
+`4ef9b54`, 50 exist only here (pre-dating upstream's core/chat/video namespace
+split — `backgroundElevationElevation0`, `avatarPaletteBg1`), and 98 exist only
+upstream, most of them derived tokens this package deliberately does not vendor.
+Adopting the namespace split is its own migration, not part of a routine sync.
+
+## Derived-token map
 
 Where upstream's **derived** chat and video semantics are actually implemented.
 
