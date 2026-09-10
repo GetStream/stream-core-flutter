@@ -1356,28 +1356,19 @@ shape.
 
 ### Icons
 
-Source SVGs live in `packages/stream_core_flutter/assets_source/icons/`. They come
-from the [design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons)
-repository.
+Icons are generated, not hand-written: `melos run generate:icons` builds the icon
+font and the `StreamIcons` / `StreamIconData` classes from the source SVGs in
+`packages/stream_core_flutter/assets_source/icons/`, which are copied from the
+[design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons)
+repo.
 
-When adding or updating icons:
+Do not edit the generated `stream_icons.dart`, the font, or
+`assets_source/icon_log.g.txt` by hand. Commit SVG sources and regenerated output
+together — they must stay in sync.
 
-1. Pull the latest SVGs from `design-system-tokens/assets/icons/` into
-   `assets_source/icons/`.
-2. If the icon should mirror in RTL layouts, add its base name to the
-   `_rtlIcons` list in `scripts/generate_icons.dart` so the generator emits
-   `matchTextDirection: true` for it. This covers obvious directional glyphs
-   (arrows, chevrons, `reply`, `send`, `sidebar`) but also icons with
-   directional metaphors that read wrong when unmirrored (`audio`, `megaphone`,
-   `search`, `video`). Skip icons that are symmetric or shouldn't mirror
-   (a bell, a heart, brand logos). If in doubt, look at what comparable icons
-   already do in `_rtlIcons`.
-3. Run `melos run generate:icons` to regenerate the icon font and the
-   `StreamIcons` class.
-4. Commit both the SVG sources and the regenerated font + Dart output together —
-   they must stay in sync.
-
-Do not edit the generated `StreamIcons.dart` or the icon font by hand.
+Adding, renaming or retiring an icon affects more than the file you touch, because
+glyph code points are append-only. **Use the `update-icons` skill** for any icon
+work.
 
 ## Commits, PRs, and changelogs
 

@@ -44,78 +44,20 @@ melos run gen-l10n          # regenerate localizations
 
 ### Icons
 
-Source SVGs in `packages/stream_core_flutter/assets_source/icons/` come from the [design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons) repository. When adding or updating icons, pull the latest SVGs from that repo first, then run `melos run generate:icons` to regenerate the icon font and Dart classes.
+`StreamIcons` is generated: an icon font (`lib/fonts/stream_icons_font.otf`) plus
+Dart constants, built by `melos run generate:icons` from the source SVGs in
+`packages/stream_core_flutter/assets_source/icons/`. Those SVGs are copied from the
+[design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons)
+repo. Multicolour file-type icons are not part of the font — they ship as runtime
+assets in `assets/file_type/` and are resolved by path by `StreamFileTypeIcon`.
 
-Upstream groups its icons by *product* first, then style, then size:
+Glyph code points are append-only and recorded in `assets_source/icon_log.g.txt`,
+so adding, renaming or retiring an icon has consequences beyond the file you touch.
+Never hand-edit the generated Dart, the font, or the log.
 
-```
-assets/icons/{core,chat,video}/flat/{12,16,20,32}/
-assets/icons/{core,chat,video}/line/
-assets/icons/chat/filetype/
-```
-
-- **Products** — `core/` (~100 icons), `chat/` (~19) and `video/` (~30) mirror the token structure so each SDK ships only the icons it needs. Classification follows *component ownership*, not the Figma category, so a product does not tell you what an icon depicts and vice versa: `camera` is a **chat** icon (the composer's camera button) while `camera-flip-fill` is **video**. Search all three products before concluding an icon does not exist upstream.
-- `flat/{12,16,20,32}/` — solid filled paths. **This is the only style that goes into the icon font.**
-- `line/` — stroke-based outline variants of (almost) the same names, one unsized folder per product. Deliberately unused; do not mix them in, the two styles do not read as one set.
-- `chat/filetype/` — multicolor file-type icons at four sizes. Shipped by the SDK, but **not through the icon font** — they are multicolor, so they could never be font glyphs. See [File-type icons](#file-type-icons) below.
-
-**This repo does not carry the product split.** `assets_source/icons/` is a single size-keyed tree fed from all three products at once (today 101 core, 23 chat, 28 video), because the generator emits one font and one `StreamIcons` class — there is nothing for a product segment to key off. So a `core` name and a `video` name collide here exactly as two sizes would (see below). Upstream has no cross-product duplicate today; if one ever appears, one of the two has to be renamed on the way in.
-
-Upstream ships every icon in all four `flat/` sizes. This repo does **not** mirror that: `20/` is the default and holds essentially everything, and a smaller or larger variant is copied in only when a design actually calls for one — today that is `16/xmark-small.svg` and seven `-large` icons in `32/`. Do not bulk-copy a size folder to "have it available"; every name you add burns a permanent code point (see below).
-
-Upstream names carry a size suffix that this repo strips or rewrites: everything in `20/` keeps its bare name (`core/flat/20/account-20.svg` → `20/account.svg`), while an off-default size must be given a name that cannot collide with its `20/` sibling. `32/` established `-large` for this (`chat/flat/32/camera-32.svg` → `32/camera-large.svg`). `16/` has no such convention yet — its single icon was copied over bare, back when no `20/` icon shared the name.
-
-**Names must be unique across the size folders — and across the three products.** Glyphs are keyed by bare filename, so copying a whole upstream size folder is how you accidentally end up with e.g. `16/xmark-small.svg` and `20/xmark-small.svg` competing for one glyph. The generator fails on a duplicate rather than letting directory-listing order pick a winner.
-
-This is a live trap, not a hypothetical: upstream now ships `xmark-small` in both `core/flat/16` and `core/flat/20`, with **different artwork**. We ship the 16px one as `16/xmark-small.svg`. Adopting the 20px variant too would mean giving it a distinct name and a new code point — never silently swapping the artwork behind the existing name, which would repaint the glyph everywhere it is already used.
-
-**Code points are append-only.** `assets_source/icon_log.g.txt` records the date each icon was first seen, and the generator orders glyphs by that date so every icon keeps its code point across runs. The font ships as `lib/fonts/stream_icons_font.otf`, so a shifted code point silently repoints every icon after it in any app that has not rebuilt. Never reorder or hand-edit the log.
-
-**Deleting an icon therefore requires a deprecation entry** in `assets_source/deprecated.txt` — one `deprecated;replacement;included` line per icon:
-
-```
-more;more-horizontal;true
-```
-
-- `replacement` — the icon whose SVG draws the glyph. A deprecated icon always keeps its glyph, and with it its code point; pointing at a replacement is what lets you delete the retired SVG and still render something sensible. Naming itself (`more;more;true`) keeps the original artwork while retiring the name.
-- `included` — whether the name survives in the generated Dart. `true` emits `StreamIcons.more` and `StreamIconData.more` annotated with `@Deprecated('Use moreHorizontal instead.')`; `false` drops both while the glyph stays in the font.
-
-Entries are effectively permanent — removing one releases its glyph and shifts every later code point. The generator fails if a replacement has no SVG file, or if a deprecated name has neither an SVG file nor a logged code point (which means a typo).
-
-Deprecating an icon also means adding transforms to `lib/fix_data.yaml`; see [Deprecations](#deprecations).
-
-#### File-type icons
-
-`chat/filetype/` follows a completely separate path from everything above. The SVGs are
-copied into `packages/stream_core_flutter/assets/file_type/` and shipped as runtime
-assets (declared in `pubspec.yaml`), then resolved by path at runtime from
-`StreamFileTypeIcon`. No generator, no font, no code points — so none of the
-append-only rules above apply, and updating them is just copy-and-rename.
-
-Upstream names them by t-shirt size; this repo renames each to its **pixel height**,
-because `StreamFileTypeIcon` interpolates that height straight into the asset path
-(`assets/file_type/filetype-pdf-${size.height.toInt()}.svg`):
-
-| upstream | here | dimensions |
-| --- | --- | --- |
-| `-sm` | `-24` | 19×24 |
-| `-md` | `-32` | 26×32 |
-| `-lg` | `-40` | 32×40 |
-| `-xl` | `-48` | 40×48 |
-
-The sizes are uniform across all kinds, so `filetype-pdf-lg.svg` → `filetype-pdf-40.svg`,
-`filetype-audio-lg.svg` → `filetype-audio-40.svg`, and so on. Note the glyphs are
-portrait, not square — the width is *not* what the name encodes.
-
-All nine kinds (`audio`, `code`, `compression`, `other`, `pdf`, `presentation`,
-`spreadsheet`, `text`, `video`) ship in all four sizes; a missing file is a runtime
-asset failure, not a compile error, so keep the set complete.
-
-When diffing these against upstream, expect **every file to differ even when nothing
-changed**: each Figma re-export bumps the `clip0_…` element ids and jitters path
-coordinates in the 4th decimal. Compare the rendered artwork, not the bytes, and do
-not re-copy all 36 files just to absorb that noise.
-
+**Use the `update-icons` skill** for any icon work — it covers finding an icon
+upstream, the naming and size conventions, RTL mirroring, deprecations, and the
+file-type assets.
 
 ## Design
 
