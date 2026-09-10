@@ -52,6 +52,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundSurfaceStrong;
   Color? _backgroundSurfaceCard;
   Color? _backgroundOnAccent;
+  Color? _backgroundOnElevation;
   Color? _backgroundHighlight;
   Color? _backgroundScrim;
   Color? _backgroundOverlayLight;
@@ -74,6 +75,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _borderStrong;
   Color? _borderOnAccent;
   Color? _borderOnSurface;
+  Color? _borderOnElevation;
   Color? _borderOpacitySubtle;
   Color? _borderOpacityStrong;
 
@@ -139,6 +141,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundSurfaceStrong => _backgroundSurfaceStrong ?? _themeData.colorScheme.backgroundSurfaceStrong;
   Color get backgroundSurfaceCard => _backgroundSurfaceCard ?? _themeData.colorScheme.backgroundSurfaceCard;
   Color get backgroundOnAccent => _backgroundOnAccent ?? _themeData.colorScheme.backgroundOnAccent;
+  Color get backgroundOnElevation => _backgroundOnElevation ?? _themeData.colorScheme.backgroundOnElevation;
   Color get backgroundHighlight => _backgroundHighlight ?? _themeData.colorScheme.backgroundHighlight;
   Color get backgroundScrim => _backgroundScrim ?? _themeData.colorScheme.backgroundScrim;
   Color get backgroundOverlayLight => _backgroundOverlayLight ?? _themeData.colorScheme.backgroundOverlayLight;
@@ -161,6 +164,7 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get borderStrong => _borderStrong ?? _themeData.colorScheme.borderStrong;
   Color get borderOnAccent => _borderOnAccent ?? _themeData.colorScheme.borderOnAccent;
   Color get borderOnSurface => _borderOnSurface ?? _themeData.colorScheme.borderOnSurface;
+  Color get borderOnElevation => _borderOnElevation ?? _themeData.colorScheme.borderOnElevation;
   Color get borderOpacitySubtle => _borderOpacitySubtle ?? _themeData.colorScheme.borderOpacitySubtle;
   Color get borderOpacityStrong => _borderOpacityStrong ?? _themeData.colorScheme.borderOpacityStrong;
 
@@ -231,6 +235,7 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundSurfaceStrong(Color color) => _update(() => _backgroundSurfaceStrong = color);
   void setBackgroundSurfaceCard(Color color) => _update(() => _backgroundSurfaceCard = color);
   void setBackgroundOnAccent(Color color) => _update(() => _backgroundOnAccent = color);
+  void setBackgroundOnElevation(Color color) => _update(() => _backgroundOnElevation = color);
   void setBackgroundHighlight(Color color) => _update(() => _backgroundHighlight = color);
   void setBackgroundScrim(Color color) => _update(() => _backgroundScrim = color);
   void setBackgroundOverlayLight(Color color) => _update(() => _backgroundOverlayLight = color);
@@ -251,6 +256,7 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBorderStrong(Color color) => _update(() => _borderStrong = color);
   void setBorderOnAccent(Color color) => _update(() => _borderOnAccent = color);
   void setBorderOnSurface(Color color) => _update(() => _borderOnSurface = color);
+  void setBorderOnElevation(Color color) => _update(() => _borderOnElevation = color);
   void setBorderOpacitySubtle(Color color) => _update(() => _borderOpacitySubtle = color);
   void setBorderOpacityStrong(Color color) => _update(() => _borderOpacityStrong = color);
 
@@ -331,6 +337,7 @@ class ThemeConfiguration extends ChangeNotifier {
   bool get backgroundSurfaceStrongIsCustom => _backgroundSurfaceStrong != null;
   bool get backgroundSurfaceCardIsCustom => _backgroundSurfaceCard != null;
   bool get backgroundOnAccentIsCustom => _backgroundOnAccent != null;
+  bool get backgroundOnElevationIsCustom => _backgroundOnElevation != null;
   bool get backgroundHighlightIsCustom => _backgroundHighlight != null;
   bool get backgroundScrimIsCustom => _backgroundScrim != null;
   bool get backgroundOverlayLightIsCustom => _backgroundOverlayLight != null;
@@ -351,6 +358,7 @@ class ThemeConfiguration extends ChangeNotifier {
   bool get borderStrongIsCustom => _borderStrong != null;
   bool get borderOnAccentIsCustom => _borderOnAccent != null;
   bool get borderOnSurfaceIsCustom => _borderOnSurface != null;
+  bool get borderOnElevationIsCustom => _borderOnElevation != null;
   bool get borderOpacitySubtleIsCustom => _borderOpacitySubtle != null;
   bool get borderOpacityStrongIsCustom => _borderOpacityStrong != null;
 
@@ -402,6 +410,7 @@ class ThemeConfiguration extends ChangeNotifier {
   void resetBackgroundSurfaceStrong() => _update(() => _backgroundSurfaceStrong = null);
   void resetBackgroundSurfaceCard() => _update(() => _backgroundSurfaceCard = null);
   void resetBackgroundOnAccent() => _update(() => _backgroundOnAccent = null);
+  void resetBackgroundOnElevation() => _update(() => _backgroundOnElevation = null);
   void resetBackgroundHighlight() => _update(() => _backgroundHighlight = null);
   void resetBackgroundScrim() => _update(() => _backgroundScrim = null);
   void resetBackgroundOverlayLight() => _update(() => _backgroundOverlayLight = null);
@@ -422,6 +431,7 @@ class ThemeConfiguration extends ChangeNotifier {
   void resetBorderStrong() => _update(() => _borderStrong = null);
   void resetBorderOnAccent() => _update(() => _borderOnAccent = null);
   void resetBorderOnSurface() => _update(() => _borderOnSurface = null);
+  void resetBorderOnElevation() => _update(() => _borderOnElevation = null);
   void resetBorderOpacitySubtle() => _update(() => _borderOpacitySubtle = null);
   void resetBorderOpacityStrong() => _update(() => _borderOpacityStrong = null);
 
@@ -475,6 +485,7 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundSurfaceStrong = null;
     _backgroundSurfaceCard = null;
     _backgroundOnAccent = null;
+    _backgroundOnElevation = null;
     _backgroundHighlight = null;
     _backgroundScrim = null;
     _backgroundOverlayLight = null;
@@ -494,6 +505,7 @@ class ThemeConfiguration extends ChangeNotifier {
     _borderStrong = null;
     _borderOnAccent = null;
     _borderOnSurface = null;
+    _borderOnElevation = null;
     _borderOpacitySubtle = null;
     _borderOpacityStrong = null;
     // Border Utility
@@ -563,6 +575,7 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundSurfaceStrong: _backgroundSurfaceStrong,
       backgroundSurfaceCard: _backgroundSurfaceCard,
       backgroundOnAccent: _backgroundOnAccent,
+      backgroundOnElevation: _backgroundOnElevation,
       backgroundHighlight: _backgroundHighlight,
       backgroundScrim: _backgroundScrim,
       backgroundOverlayLight: _backgroundOverlayLight,
@@ -582,6 +595,7 @@ class ThemeConfiguration extends ChangeNotifier {
       borderStrong: _borderStrong,
       borderOnAccent: _borderOnAccent,
       borderOnSurface: _borderOnSurface,
+      borderOnElevation: _borderOnElevation,
       borderOpacitySubtle: _borderOpacitySubtle,
       borderOpacityStrong: _borderOpacityStrong,
       // Border Utility

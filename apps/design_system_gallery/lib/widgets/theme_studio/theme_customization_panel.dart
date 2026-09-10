@@ -377,6 +377,13 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             onReset: config.resetBackgroundOnAccent,
           ),
           ColorPickerTile(
+            label: 'backgroundOnElevation',
+            color: config.backgroundOnElevation,
+            isDefault: !config.backgroundOnElevationIsCustom,
+            onColorChanged: config.setBackgroundOnElevation,
+            onReset: config.resetBackgroundOnElevation,
+          ),
+          ColorPickerTile(
             label: 'backgroundHighlight',
             color: config.backgroundHighlight,
             isDefault: !config.backgroundHighlightIsCustom,
@@ -551,6 +558,13 @@ class _ThemeCustomizationPanelState extends State<ThemeCustomizationPanel> {
             isDefault: !config.borderOnSurfaceIsCustom,
             onColorChanged: config.setBorderOnSurface,
             onReset: config.resetBorderOnSurface,
+          ),
+          ColorPickerTile(
+            label: 'borderOnElevation',
+            color: config.borderOnElevation,
+            isDefault: !config.borderOnElevationIsCustom,
+            onColorChanged: config.setBorderOnElevation,
+            onReset: config.resetBorderOnElevation,
           ),
           ColorPickerTile(
             label: 'borderOpacitySubtle',

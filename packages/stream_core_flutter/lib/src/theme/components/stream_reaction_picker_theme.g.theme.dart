@@ -35,10 +35,10 @@ mixin _$StreamReactionPickerThemeData {
       elevation: lerpDouble$(a.elevation, b.elevation, t),
       spacing: lerpDouble$(a.spacing, b.spacing, t),
       shape: OutlinedBorder.lerp(a.shape, b.shape, t),
-      side: a.side == null
-          ? b.side
-          : b.side == null
-          ? a.side
+      side: a.side == null || b.side == null
+          ? t < 0.5
+                ? a.side
+                : b.side
           : BorderSide.lerp(a.side!, b.side!, t),
     );
   }
@@ -80,9 +80,11 @@ mixin _$StreamReactionPickerThemeData {
       elevation: other.elevation,
       spacing: other.spacing,
       shape: other.shape,
-      side: _this.side != null && other.side != null
-          ? BorderSide.merge(_this.side!, other.side!)
-          : other.side,
+      side: _this.side == null
+          ? other.side
+          : other.side == null
+          ? _this.side
+          : BorderSide.merge(_this.side!, other.side!),
     );
   }
 

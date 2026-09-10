@@ -140,7 +140,7 @@ mixin _$StreamEmojiChipThemeStyle {
       maximumSize: Size.lerp(a.maximumSize, b.maximumSize, t),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       shape: OutlinedBorder.lerp(a.shape, b.shape, t),
-      side: WidgetStateBorderSide.lerp(a.side, b.side, t),
+      side: t < 0.5 ? a.side : b.side,
     );
   }
 

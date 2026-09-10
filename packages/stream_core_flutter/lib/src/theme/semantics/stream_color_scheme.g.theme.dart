@@ -71,6 +71,11 @@ mixin _$StreamColorScheme {
         b.backgroundOnAccent,
         t,
       )!,
+      backgroundOnElevation: Color.lerp(
+        a.backgroundOnElevation,
+        b.backgroundOnElevation,
+        t,
+      )!,
       backgroundHighlight: Color.lerp(
         a.backgroundHighlight,
         b.backgroundHighlight,
@@ -139,6 +144,11 @@ mixin _$StreamColorScheme {
       borderOnAccent: Color.lerp(a.borderOnAccent, b.borderOnAccent, t)!,
       borderOnInverse: Color.lerp(a.borderOnInverse, b.borderOnInverse, t)!,
       borderOnSurface: Color.lerp(a.borderOnSurface, b.borderOnSurface, t)!,
+      borderOnElevation: Color.lerp(
+        a.borderOnElevation,
+        b.borderOnElevation,
+        t,
+      )!,
       borderOpacitySubtle: Color.lerp(
         a.borderOpacitySubtle,
         b.borderOpacitySubtle,
@@ -191,6 +201,7 @@ mixin _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundSurfaceCard,
     Color? backgroundOnAccent,
+    Color? backgroundOnElevation,
     Color? backgroundHighlight,
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
@@ -211,6 +222,7 @@ mixin _$StreamColorScheme {
     Color? borderOnAccent,
     Color? borderOnInverse,
     Color? borderOnSurface,
+    Color? borderOnElevation,
     Color? borderOpacitySubtle,
     Color? borderOpacityStrong,
     Color? borderFocus,
@@ -254,6 +266,8 @@ mixin _$StreamColorScheme {
       backgroundSurfaceCard:
           backgroundSurfaceCard ?? _this.backgroundSurfaceCard,
       backgroundOnAccent: backgroundOnAccent ?? _this.backgroundOnAccent,
+      backgroundOnElevation:
+          backgroundOnElevation ?? _this.backgroundOnElevation,
       backgroundHighlight: backgroundHighlight ?? _this.backgroundHighlight,
       backgroundScrim: backgroundScrim ?? _this.backgroundScrim,
       backgroundOverlayLight:
@@ -277,6 +291,7 @@ mixin _$StreamColorScheme {
       borderOnAccent: borderOnAccent ?? _this.borderOnAccent,
       borderOnInverse: borderOnInverse ?? _this.borderOnInverse,
       borderOnSurface: borderOnSurface ?? _this.borderOnSurface,
+      borderOnElevation: borderOnElevation ?? _this.borderOnElevation,
       borderOpacitySubtle: borderOpacitySubtle ?? _this.borderOpacitySubtle,
       borderOpacityStrong: borderOpacityStrong ?? _this.borderOpacityStrong,
       borderFocus: borderFocus ?? _this.borderFocus,
@@ -329,6 +344,7 @@ mixin _$StreamColorScheme {
       backgroundSurfaceStrong: other.backgroundSurfaceStrong,
       backgroundSurfaceCard: other.backgroundSurfaceCard,
       backgroundOnAccent: other.backgroundOnAccent,
+      backgroundOnElevation: other.backgroundOnElevation,
       backgroundHighlight: other.backgroundHighlight,
       backgroundScrim: other.backgroundScrim,
       backgroundOverlayLight: other.backgroundOverlayLight,
@@ -349,6 +365,7 @@ mixin _$StreamColorScheme {
       borderOnAccent: other.borderOnAccent,
       borderOnInverse: other.borderOnInverse,
       borderOnSurface: other.borderOnSurface,
+      borderOnElevation: other.borderOnElevation,
       borderOpacitySubtle: other.borderOpacitySubtle,
       borderOpacityStrong: other.borderOpacityStrong,
       borderFocus: other.borderFocus,
@@ -401,6 +418,7 @@ mixin _$StreamColorScheme {
         _other.backgroundSurfaceStrong == _this.backgroundSurfaceStrong &&
         _other.backgroundSurfaceCard == _this.backgroundSurfaceCard &&
         _other.backgroundOnAccent == _this.backgroundOnAccent &&
+        _other.backgroundOnElevation == _this.backgroundOnElevation &&
         _other.backgroundHighlight == _this.backgroundHighlight &&
         _other.backgroundScrim == _this.backgroundScrim &&
         _other.backgroundOverlayLight == _this.backgroundOverlayLight &&
@@ -422,6 +440,7 @@ mixin _$StreamColorScheme {
         _other.borderOnAccent == _this.borderOnAccent &&
         _other.borderOnInverse == _this.borderOnInverse &&
         _other.borderOnSurface == _this.borderOnSurface &&
+        _other.borderOnElevation == _this.borderOnElevation &&
         _other.borderOpacitySubtle == _this.borderOpacitySubtle &&
         _other.borderOpacityStrong == _this.borderOpacityStrong &&
         _other.borderFocus == _this.borderFocus &&
@@ -466,6 +485,7 @@ mixin _$StreamColorScheme {
       _this.backgroundSurfaceStrong,
       _this.backgroundSurfaceCard,
       _this.backgroundOnAccent,
+      _this.backgroundOnElevation,
       _this.backgroundHighlight,
       _this.backgroundScrim,
       _this.backgroundOverlayLight,
@@ -486,6 +506,7 @@ mixin _$StreamColorScheme {
       _this.borderOnAccent,
       _this.borderOnInverse,
       _this.borderOnSurface,
+      _this.borderOnElevation,
       _this.borderOpacitySubtle,
       _this.borderOpacityStrong,
       _this.borderFocus,

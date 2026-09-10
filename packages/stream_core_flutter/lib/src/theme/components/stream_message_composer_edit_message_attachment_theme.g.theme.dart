@@ -44,10 +44,10 @@ mixin _$StreamMessageComposerEditMessageAttachmentThemeData {
         b.thumbnailShape,
         t,
       ),
-      thumbnailSide: a.thumbnailSide == null
-          ? b.thumbnailSide
-          : b.thumbnailSide == null
-          ? a.thumbnailSide
+      thumbnailSide: a.thumbnailSide == null || b.thumbnailSide == null
+          ? t < 0.5
+                ? a.thumbnailSide
+                : b.thumbnailSide
           : BorderSide.lerp(a.thumbnailSide!, b.thumbnailSide!, t),
       thumbnailSize: Size.lerp(a.thumbnailSize, b.thumbnailSize, t),
     );
@@ -101,9 +101,11 @@ mixin _$StreamMessageComposerEditMessageAttachmentThemeData {
           other.subtitleTextStyle,
       padding: other.padding,
       thumbnailShape: other.thumbnailShape,
-      thumbnailSide: _this.thumbnailSide != null && other.thumbnailSide != null
-          ? BorderSide.merge(_this.thumbnailSide!, other.thumbnailSide!)
-          : other.thumbnailSide,
+      thumbnailSide: _this.thumbnailSide == null
+          ? other.thumbnailSide
+          : other.thumbnailSide == null
+          ? _this.thumbnailSide
+          : BorderSide.merge(_this.thumbnailSide!, other.thumbnailSide!),
       thumbnailSize: other.thumbnailSize,
     );
   }

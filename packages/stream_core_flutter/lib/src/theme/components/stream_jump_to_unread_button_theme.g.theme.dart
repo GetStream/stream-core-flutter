@@ -32,10 +32,10 @@ mixin _$StreamJumpToUnreadButtonThemeData {
     return StreamJumpToUnreadButtonThemeData(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       shape: OutlinedBorder.lerp(a.shape, b.shape, t),
-      side: a.side == null
-          ? b.side
-          : b.side == null
-          ? a.side
+      side: a.side == null || b.side == null
+          ? t < 0.5
+                ? a.side
+                : b.side
           : BorderSide.lerp(a.side!, b.side!, t),
       elevation: lerpDouble$(a.elevation, b.elevation, t),
       shadowColor: Color.lerp(a.shadowColor, b.shadowColor, t),
@@ -93,9 +93,11 @@ mixin _$StreamJumpToUnreadButtonThemeData {
     return copyWith(
       backgroundColor: other.backgroundColor,
       shape: other.shape,
-      side: _this.side != null && other.side != null
-          ? BorderSide.merge(_this.side!, other.side!)
-          : other.side,
+      side: _this.side == null
+          ? other.side
+          : other.side == null
+          ? _this.side
+          : BorderSide.merge(_this.side!, other.side!),
       elevation: other.elevation,
       shadowColor: other.shadowColor,
       padding: other.padding,
