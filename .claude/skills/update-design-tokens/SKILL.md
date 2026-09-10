@@ -1,11 +1,11 @@
 ---
 name: update-design-tokens
 description: >
-  Sync colour design tokens from the GetStream/design-system-tokens repo into stream_core_flutter, and assess what
+  Sync color design tokens from the GetStream/design-system-tokens repo into stream_core_flutter, and assess what
   an upstream token change means for this package. Use whenever a design-system-tokens PR or commit needs
-  reviewing ("what does this token PR do to us?", "assess the impact of this change"), whenever a colour value or
+  reviewing ("what does this token PR do to us?", "assess the impact of this change"), whenever a color value or
   a new semantic token has to land in `theme/primitives/internal/tokens/`, whenever a new `StreamColorScheme`
-  field is being added or wired up, and whenever someone asks where a colour comes from or why a token resolves
+  field is being added or wired up, and whenever someone asks where a color comes from or why a token resolves
   the way it does. Covers tracing the blast radius into the consuming SDKs (stream-chat-flutter for chat tokens,
   stream-video-flutter for video), where the derived values actually live. Also use before hard-coding any `Color(0x...)` in this package — the answer is almost always a
   token or a colorScheme field instead.
@@ -18,7 +18,7 @@ allowed-tools:
 
 # Updating design tokens
 
-Colours in `stream_core_flutter` originate in
+Colors in `stream_core_flutter` originate in
 [GetStream/design-system-tokens](https://github.com/GetStream/design-system-tokens)
 — the same repo the icons come from. This skill covers reading a change upstream
 and landing it here.
@@ -44,7 +44,7 @@ upstream build output is not copied in verbatim. Only
 `stream_color_swatch_helper.dart` import them; no component theme or widget ever
 references `StreamTokens`.
 
-Colours are byte-identical across the three upstream platform flavours (only
+Colors are byte-identical across the three upstream platform flavours (only
 typography differs), so when you do read the upstream build, the flavour is
 irrelevant — pick any. Typography, spacing and radius are **not** synced at all:
 `stream_tokens_typography.dart` composes `TextStyle`s on a single `Geist` family,
@@ -87,7 +87,7 @@ Then classify what you found:
   renamed derived token is often implemented there rather than here.
 
 When assessing impact, distinguish a token **definition** from a **paint site**.
-A grep for the field name will mostly hit the colour scheme and generated
+A grep for the field name will mostly hit the color scheme and generated
 `.g.theme.dart` plumbing; what matters is whether a widget renders with it:
 
 ```bash
@@ -262,12 +262,12 @@ mechanically.
 ## Wiring a field default
 
 Look at what the token aliases upstream. The answer decides whether a vendored
-constant is needed at all — and getting it wrong is how a custom brand colour
+constant is needed at all — and getting it wrong is how a custom brand color
 silently stops applying:
 
 - **`{chrome.*}` or `{brand.*}`** → resolve through the generated swatch:
   `chrome.shade100`, `brand.shade500`, `chrome[0] ?? StreamColors.white`.
-  Never the baked hex. These scales are regenerated from a seed colour, so a
+  Never the baked hex. These scales are regenerated from a seed color, so a
   hard-coded value ignores `StreamColorScheme.light(brand: ...)`.
 - **another semantic** → alias the field: `borderWarning ??= accentWarning`,
   `textLink ??= accentPrimary`.
@@ -291,7 +291,7 @@ Color get errorBackgroundColor => _colorScheme.accentError;
 
 So upstream `badge/bg-error` has no counterpart here, by design — a component
 theme reads `colorScheme.accentError` instead. This keeps the token surface small
-and keeps every component overridable through one seedable colour scheme.
+and keeps every component overridable through one seedable color scheme.
 
 The vendored files still carry a historical full dump of ~500 constants, of which
 roughly a third are read. Treat the unread ones as dead weight: don't add more,
@@ -304,18 +304,45 @@ melos run analyze
 melos run test:flutter
 ```
 
-Regenerate only if you touched a `.theme.dart` annotation (adding a colour-scheme
+Regenerate only if you touched a `.theme.dart` annotation (adding a color-scheme
 field does): `melos run generate:flutter`. A new field also needs wiring into the
 gallery's Theme Studio (`apps/design_system_gallery/lib/config/theme_configuration.dart`
 and `widgets/theme_studio/theme_customization_panel.dart`) — follow the
 surrounding fields.
 
-Goldens only move if a component actually paints with the changed colour. The
+### Goldens
+
+Goldens only move if a component actually paints with the changed color. The
 palette golden (`test/theme/goldens/ci/stream_theme_color_generation.png`) covers
 seed-generated brand/chrome ladders, not semantic accents, so a semantic value
-change usually leaves it alone. When goldens do drift, remember local `macos/`
-images are review-only — committed `ci/` goldens come from the update-goldens
-workflow.
+change usually leaves it alone.
+
+**Expect every macOS-variant golden to fail locally, change or no change.** Only
+the `ci/` images are committed — there are no `macos/` ones in the repo at all —
+so on a Mac those tests have nothing to compare against. That is the noise you
+will see, not evidence your change broke something, and the local failure count
+tends to match the number of committed goldens exactly. When in doubt, prove it:
+revert your edit, re-run the same test, and watch it fail identically.
+
+**Regenerate the `ci/` images on CI, not on your machine.** The workflow runs on
+ubuntu, which is what makes them match CI in the first place:
+
+```bash
+gh workflow run update_goldens.yml --ref <your-branch>
+gh run list --workflow=update_goldens.yml --limit 1   # then: gh run watch <id>
+git pull                                              # picks up "chore: Update Goldens"
+```
+
+It bootstraps the workspace, runs `melos run update:goldens`, and commits every
+changed PNG back to the branch you dispatched, as the Stream SDK Bot. Dispatching
+it is also the cheapest way to *see* what a color change did — the bot's diff is a
+before/after of every affected component, which is worth attaching to the PR when
+the change is a value move rather than a new token.
+
+Two caveats. The regeneration step is `continue-on-error`, so a green run does not
+mean the goldens rebuilt cleanly — read the bot's commit and check the images moved
+the way you expected, and that nothing you did not touch moved with them. And it
+commits to whatever ref you dispatch, so pass your own branch.
 
 ## Changelog
 
@@ -332,8 +359,8 @@ transform).
 ## Contrast is not automatic
 
 Token aliases carry no contrast guarantee, and upstream can move a value across
-the light/dark divide — a warning colour going from orange to a pale yellow flips
-which text colour is legible on it. When adopting a changed fill, check what text
+the light/dark divide — a warning color going from orange to a pale yellow flips
+which text color is legible on it. When adopting a changed fill, check what text
 or icon token is painted on top of it, and say so if the pairing no longer works.
 `accent/*` values have no `on-*` counterpart in the core namespace, so this has to
 be reasoned about rather than looked up.

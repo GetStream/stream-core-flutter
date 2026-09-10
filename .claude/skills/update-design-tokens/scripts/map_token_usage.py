@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Map `StreamColorScheme` fields to the files that read them, in any repo.
 
-Answers "who paints with this colour?" for a consuming SDK without reading it
+Answers "who paints with this color?" for a consuming SDK without reading it
 into context file by file. Run it against a ref rather than a working tree, so a
 design-system branch can be inspected without checking it out.
 

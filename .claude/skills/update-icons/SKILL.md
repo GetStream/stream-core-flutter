@@ -3,7 +3,7 @@ name: update-icons
 description: >
   Add, update, retire or debug icons in stream_core_flutter — pulling SVGs from GetStream/design-system-tokens
   into `assets_source/icons/`, regenerating the icon font and `StreamIcons` via `melos run generate:icons`,
-  handling RTL mirroring, deprecations and code points, and updating the multicolour file-type SVGs. Use whenever
+  handling RTL mirroring, deprecations and code points, and updating the multicolor file-type SVGs. Use whenever
   an icon needs adding or replacing, whenever `melos run generate:icons` fails or warns, whenever an icon renders
   as the wrong glyph or a box, whenever an icon should mirror in RTL, and whenever someone asks whether an icon
   exists upstream. Also use before deleting any SVG from `assets_source/icons/` — a bare delete silently
@@ -19,7 +19,7 @@ allowed-tools:
 
 Icons come from
 [GetStream/design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons),
-the same repo the colour tokens come from. `melos run generate:icons` turns
+the same repo the color tokens come from. `melos run generate:icons` turns
 `assets_source/icons/` into a font (`lib/fonts/stream_icons_font.otf`) plus the
 `StreamIcons` / `StreamIconData` classes.
 
@@ -52,7 +52,7 @@ find assets/icons -name "*camera*" -path "*/flat/*"
 Only `flat/` (solid filled paths) goes into the font. `line/` is a stroke-based
 outline set covering nearly the same names and is **deliberately unused** — the
 two styles do not read as one set, so do not mix them in. `chat/filetype/` is
-multicolour and takes a completely separate path (see the end of this file).
+multicolor and takes a completely separate path (see the end of this file).
 
 ## Copying it in
 
