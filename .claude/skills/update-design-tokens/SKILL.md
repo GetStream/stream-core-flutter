@@ -391,8 +391,12 @@ change: the call control badge going red to yellow moved
 `StreamColorScheme` is exported from `core.dart`, so **every one of its fields is
 public API**. A token whose *value* changes is a visual change for anyone reading
 the field instead of overriding it, and needs a `### 🔄 Changed` CHANGELOG entry
-under `## Upcoming` even though no signature moved. Name the old and new resolved
-values — that is what a consumer diffing screenshots needs.
+under `## Upcoming` even though no signature moved.
+
+**A line or two.** Name the old and new resolved values, since that is what a
+consumer diffing screenshots needs, and say if the new value constrains what can
+sit on it. Everything else — why upstream changed it, contrast ratios, which
+component made it visible — belongs in the PR.
 
 A field that is removed or renamed follows the deprecation policy in
 `STYLE_GUIDE.md` (annotate, `### 🛑 Breaking / Removals`, and a `fix_data.yaml`

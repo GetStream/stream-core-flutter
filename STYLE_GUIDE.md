@@ -1391,8 +1391,10 @@ PR titles follow [Conventional Commits](https://www.conventionalcommits.org/):
 ### Changelog policy
 
 Every PR that changes package behavior updates the affected package's
-`CHANGELOG.md` under the `Upcoming` heading. Entries live under one of these
-sub-headings:
+`CHANGELOG.md` under the `Upcoming` heading. **Keep entries to a line or two** —
+what changed and, for a value change, the old and new values. Rationale, contrast
+figures and migration detail belong in the PR, not here. Entries live under one of
+these sub-headings:
 
 ```markdown
 ## Upcoming

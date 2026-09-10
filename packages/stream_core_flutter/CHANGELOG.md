@@ -7,22 +7,14 @@
   (the default) or `.warning` — and `StreamErrorBadge.showBorder`.
 - Added `StreamErrorBadgeTheme` and `StreamErrorBadgeThemeData`, carrying a
   background and foreground color per style.
-- Added `StreamColorScheme.backgroundOnElevation` and `borderOnElevation`, the
-  design system's `background/core/on-elevation` and `border/core/on-elevation`
-  tokens. For controls sitting inside a floating surface — a menu, dialog or
-  popover — where the plain surface and border values lose their edge in dark
-  mode, because the elevated surface has already lightened.
+- Added `StreamColorScheme.backgroundOnElevation` and `borderOnElevation`, for
+  controls inside a floating surface such as a menu or popover.
 
 ### 🔄 Changed
 
-- `StreamColorScheme.accentWarning` moved from orange to yellow, following the
-  design system's `accent/warning` token now resolving to `yellow.200` in light
-  and `yellow.150` in dark: `#F26D10` → `#F6BF57` (light) and `#FA922B` →
-  `#FCD579` (dark). `borderWarning` defaults to `accentWarning`, so it moves with
-  it. The visible effect is `StreamErrorBadge` with
-  `StreamErrorBadgeStyle.warning`, whose icon is already pinned to black; anything
-  overriding either field is unaffected. The new value is legible under dark text
-  only — white on `#F6BF57` is roughly 1.7:1 — so pair it with a dark foreground.
+- `StreamColorScheme.accentWarning` — and `borderWarning`, which defaults to it —
+  moved from orange to yellow: `#F26D10` → `#F6BF57` light, `#FA922B` → `#FCD579`
+  dark. Pair it with a dark foreground.
 
 ## 0.5.1
 
