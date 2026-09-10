@@ -754,8 +754,9 @@ class StreamColorScheme with _$StreamColorScheme {
   final Color borderOnSurface;
 
   /// Border for controls sitting inside a floating surface — a menu, dialog or
-  /// popover. Steps up in dark mode to keep the edge visible once the elevated
-  /// surface has lightened. Use [borderOnSurface] on a plain surface instead.
+  /// popover. Softer than [borderOnSurface] in light mode, where elevated
+  /// surfaces are white and need less of an edge; the two converge in dark.
+  /// Use [borderOnSurface] on a plain surface instead.
   final Color borderOnElevation;
 
   /// Image frame border treatment (subtle opacity).
