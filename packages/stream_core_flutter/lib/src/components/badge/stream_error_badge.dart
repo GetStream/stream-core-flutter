@@ -107,9 +107,10 @@ class StreamErrorBadgeProps {
 
   /// Whether a border is drawn around the badge.
   ///
-  /// The border is drawn outside the badge's [size], so it separates the
-  /// badge from whatever it overlaps without changing the badge's layout
-  /// size. Defaults to true.
+  /// The border style is determined by [StreamErrorBadgeThemeData.border]. It
+  /// is drawn outside the badge's [size], so it separates the badge from
+  /// whatever it overlaps without changing the badge's layout size. Defaults
+  /// to true.
   final bool showBorder;
 }
 
@@ -141,22 +142,40 @@ class DefaultStreamErrorBadge extends StatelessWidget {
     final effectiveStyle = props.style ?? StreamErrorBadgeStyle.error;
     final effectiveBorder = props.showBorder ? theme.border ?? defaults.border : null;
 
-    // Defaults first, theme overrides layered on top, so every color resolves.
-    final style = defaults.styleOf(effectiveStyle).merge(theme.styleOf(effectiveStyle));
+    final effectiveBackgroundColor = _resolveBackgroundColor(effectiveStyle, theme, defaults);
+    final effectiveForegroundColor = _resolveForegroundColor(effectiveStyle, theme, defaults);
 
     return AnimatedContainer(
       width: effectiveSize.value,
       height: effectiveSize.value,
       clipBehavior: Clip.antiAlias,
       duration: kThemeChangeDuration,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: style.backgroundColor),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: effectiveBackgroundColor),
       foregroundDecoration: BoxDecoration(shape: BoxShape.circle, border: effectiveBorder),
       child: IconTheme(
-        data: .new(size: effectiveSize.iconSize, color: style.foregroundColor),
+        data: .new(size: effectiveSize.iconSize, color: effectiveForegroundColor),
         child: Center(child: Icon(icons.exclamationMarkFill)),
       ),
     );
   }
+
+  Color _resolveBackgroundColor(
+    StreamErrorBadgeStyle style,
+    StreamErrorBadgeThemeData theme,
+    _StreamErrorBadgeThemeDefaults defaults,
+  ) => switch (style) {
+    .error => theme.errorBackgroundColor ?? defaults.errorBackgroundColor,
+    .warning => theme.warningBackgroundColor ?? defaults.warningBackgroundColor,
+  };
+
+  Color _resolveForegroundColor(
+    StreamErrorBadgeStyle style,
+    StreamErrorBadgeThemeData theme,
+    _StreamErrorBadgeThemeDefaults defaults,
+  ) => switch (style) {
+    .error => theme.errorForegroundColor ?? defaults.errorForegroundColor,
+    .warning => theme.warningForegroundColor ?? defaults.warningForegroundColor,
+  };
 }
 
 class _StreamErrorBadgeThemeDefaults extends StreamErrorBadgeThemeData {
@@ -170,16 +189,16 @@ class _StreamErrorBadgeThemeDefaults extends StreamErrorBadgeThemeData {
   StreamErrorBadgeSize get size => .sm;
 
   @override
-  StreamErrorBadgeThemeStyle get errorStyle => .new(
-    backgroundColor: _colorScheme.accentError,
-    foregroundColor: _colorScheme.textOnAccent,
-  );
+  Color get errorBackgroundColor => _colorScheme.accentError;
 
   @override
-  StreamErrorBadgeThemeStyle get warningStyle => .new(
-    backgroundColor: _colorScheme.accentWarning,
-    foregroundColor: StreamColors.black,
-  );
+  Color get errorForegroundColor => _colorScheme.textOnAccent;
+
+  @override
+  Color get warningBackgroundColor => _colorScheme.accentWarning;
+
+  @override
+  Color get warningForegroundColor => StreamColors.black;
 
   @override
   BoxBorder get border => Border.all(
@@ -187,12 +206,4 @@ class _StreamErrorBadgeThemeDefaults extends StreamErrorBadgeThemeData {
     color: _colorScheme.borderOnInverse,
     strokeAlign: BorderSide.strokeAlignOutside,
   );
-
-  // Narrowed to non-nullable: every style has a default, so callers can merge
-  // the theme's partial override straight onto the result.
-  @override
-  StreamErrorBadgeThemeStyle styleOf(StreamErrorBadgeStyle style) => switch (style) {
-    StreamErrorBadgeStyle.error => errorStyle,
-    StreamErrorBadgeStyle.warning => warningStyle,
-  };
 }

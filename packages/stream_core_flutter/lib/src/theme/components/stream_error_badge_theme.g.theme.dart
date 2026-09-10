@@ -31,14 +31,24 @@ mixin _$StreamErrorBadgeThemeData {
 
     return StreamErrorBadgeThemeData(
       size: t < 0.5 ? a.size : b.size,
-      errorStyle: StreamErrorBadgeThemeStyle.lerp(
-        a.errorStyle,
-        b.errorStyle,
+      errorBackgroundColor: Color.lerp(
+        a.errorBackgroundColor,
+        b.errorBackgroundColor,
         t,
       ),
-      warningStyle: StreamErrorBadgeThemeStyle.lerp(
-        a.warningStyle,
-        b.warningStyle,
+      errorForegroundColor: Color.lerp(
+        a.errorForegroundColor,
+        b.errorForegroundColor,
+        t,
+      ),
+      warningBackgroundColor: Color.lerp(
+        a.warningBackgroundColor,
+        b.warningBackgroundColor,
+        t,
+      ),
+      warningForegroundColor: Color.lerp(
+        a.warningForegroundColor,
+        b.warningForegroundColor,
         t,
       ),
       border: BoxBorder.lerp(a.border, b.border, t),
@@ -47,16 +57,22 @@ mixin _$StreamErrorBadgeThemeData {
 
   StreamErrorBadgeThemeData copyWith({
     StreamErrorBadgeSize? size,
-    StreamErrorBadgeThemeStyle? errorStyle,
-    StreamErrorBadgeThemeStyle? warningStyle,
+    Color? errorBackgroundColor,
+    Color? errorForegroundColor,
+    Color? warningBackgroundColor,
+    Color? warningForegroundColor,
     BoxBorder? border,
   }) {
     final _this = (this as StreamErrorBadgeThemeData);
 
     return StreamErrorBadgeThemeData(
       size: size ?? _this.size,
-      errorStyle: errorStyle ?? _this.errorStyle,
-      warningStyle: warningStyle ?? _this.warningStyle,
+      errorBackgroundColor: errorBackgroundColor ?? _this.errorBackgroundColor,
+      errorForegroundColor: errorForegroundColor ?? _this.errorForegroundColor,
+      warningBackgroundColor:
+          warningBackgroundColor ?? _this.warningBackgroundColor,
+      warningForegroundColor:
+          warningForegroundColor ?? _this.warningForegroundColor,
       border: border ?? _this.border,
     );
   }
@@ -74,9 +90,10 @@ mixin _$StreamErrorBadgeThemeData {
 
     return copyWith(
       size: other.size,
-      errorStyle: _this.errorStyle?.merge(other.errorStyle) ?? other.errorStyle,
-      warningStyle:
-          _this.warningStyle?.merge(other.warningStyle) ?? other.warningStyle,
+      errorBackgroundColor: other.errorBackgroundColor,
+      errorForegroundColor: other.errorForegroundColor,
+      warningBackgroundColor: other.warningBackgroundColor,
+      warningForegroundColor: other.warningForegroundColor,
       border: other.border,
     );
   }
@@ -95,8 +112,10 @@ mixin _$StreamErrorBadgeThemeData {
     final _other = (other as StreamErrorBadgeThemeData);
 
     return _other.size == _this.size &&
-        _other.errorStyle == _this.errorStyle &&
-        _other.warningStyle == _this.warningStyle &&
+        _other.errorBackgroundColor == _this.errorBackgroundColor &&
+        _other.errorForegroundColor == _this.errorForegroundColor &&
+        _other.warningBackgroundColor == _this.warningBackgroundColor &&
+        _other.warningForegroundColor == _this.warningForegroundColor &&
         _other.border == _this.border;
   }
 
@@ -107,93 +126,11 @@ mixin _$StreamErrorBadgeThemeData {
     return Object.hash(
       runtimeType,
       _this.size,
-      _this.errorStyle,
-      _this.warningStyle,
+      _this.errorBackgroundColor,
+      _this.errorForegroundColor,
+      _this.warningBackgroundColor,
+      _this.warningForegroundColor,
       _this.border,
-    );
-  }
-}
-
-mixin _$StreamErrorBadgeThemeStyle {
-  bool get canMerge => true;
-
-  static StreamErrorBadgeThemeStyle? lerp(
-    StreamErrorBadgeThemeStyle? a,
-    StreamErrorBadgeThemeStyle? b,
-    double t,
-  ) {
-    if (identical(a, b)) {
-      return a;
-    }
-
-    if (a == null) {
-      return t == 1.0 ? b : null;
-    }
-
-    if (b == null) {
-      return t == 0.0 ? a : null;
-    }
-
-    return StreamErrorBadgeThemeStyle(
-      backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
-      foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
-    );
-  }
-
-  StreamErrorBadgeThemeStyle copyWith({
-    Color? backgroundColor,
-    Color? foregroundColor,
-  }) {
-    final _this = (this as StreamErrorBadgeThemeStyle);
-
-    return StreamErrorBadgeThemeStyle(
-      backgroundColor: backgroundColor ?? _this.backgroundColor,
-      foregroundColor: foregroundColor ?? _this.foregroundColor,
-    );
-  }
-
-  StreamErrorBadgeThemeStyle merge(StreamErrorBadgeThemeStyle? other) {
-    final _this = (this as StreamErrorBadgeThemeStyle);
-
-    if (other == null || identical(_this, other)) {
-      return _this;
-    }
-
-    if (!other.canMerge) {
-      return other;
-    }
-
-    return copyWith(
-      backgroundColor: other.backgroundColor,
-      foregroundColor: other.foregroundColor,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final _this = (this as StreamErrorBadgeThemeStyle);
-    final _other = (other as StreamErrorBadgeThemeStyle);
-
-    return _other.backgroundColor == _this.backgroundColor &&
-        _other.foregroundColor == _this.foregroundColor;
-  }
-
-  @override
-  int get hashCode {
-    final _this = (this as StreamErrorBadgeThemeStyle);
-
-    return Object.hash(
-      runtimeType,
-      _this.backgroundColor,
-      _this.foregroundColor,
     );
   }
 }

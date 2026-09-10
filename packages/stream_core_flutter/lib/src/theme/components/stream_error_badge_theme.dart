@@ -105,10 +105,8 @@ class StreamErrorBadgeTheme extends InheritedTheme {
 /// ```dart
 /// StreamTheme(
 ///   errorBadgeTheme: StreamErrorBadgeThemeData(
-///     warningStyle: StreamErrorBadgeThemeStyle(
-///       backgroundColor: Colors.amber,
-///       foregroundColor: Colors.black,
-///     ),
+///     warningBackgroundColor: Colors.amber,
+///     warningForegroundColor: Colors.black,
 ///   ),
 /// )
 /// ```
@@ -118,16 +116,16 @@ class StreamErrorBadgeTheme extends InheritedTheme {
 ///
 ///  * [StreamErrorBadge], the widget that uses this theme data.
 ///  * [StreamErrorBadgeTheme], for overriding theme in a widget subtree.
-///  * [StreamErrorBadgeThemeStyle], the per-style properties this groups.
 @themeGen
 @immutable
 class StreamErrorBadgeThemeData with _$StreamErrorBadgeThemeData {
-  /// Creates an error badge theme with optional style overrides per
-  /// [StreamErrorBadgeStyle].
+  /// Creates an error badge theme with optional style overrides.
   const StreamErrorBadgeThemeData({
     this.size,
-    this.errorStyle,
-    this.warningStyle,
+    this.errorBackgroundColor,
+    this.errorForegroundColor,
+    this.warningBackgroundColor,
+    this.warningForegroundColor,
     this.border,
   });
 
@@ -136,11 +134,26 @@ class StreamErrorBadgeThemeData with _$StreamErrorBadgeThemeData {
   /// Falls back to [StreamErrorBadgeSize.sm].
   final StreamErrorBadgeSize? size;
 
-  /// Styling for badges of the [StreamErrorBadgeStyle.error] style.
-  final StreamErrorBadgeThemeStyle? errorStyle;
+  /// The fill color of badges of the [StreamErrorBadgeStyle.error] style.
+  ///
+  /// Defaults to [StreamColorScheme.accentError].
+  final Color? errorBackgroundColor;
 
-  /// Styling for badges of the [StreamErrorBadgeStyle.warning] style.
-  final StreamErrorBadgeThemeStyle? warningStyle;
+  /// The icon color of badges of the [StreamErrorBadgeStyle.error] style.
+  ///
+  /// Defaults to [StreamColorScheme.textOnAccent].
+  final Color? errorForegroundColor;
+
+  /// The fill color of badges of the [StreamErrorBadgeStyle.warning] style.
+  ///
+  /// Defaults to [StreamColorScheme.accentWarning].
+  final Color? warningBackgroundColor;
+
+  /// The icon color of badges of the [StreamErrorBadgeStyle.warning] style.
+  ///
+  /// Defaults to black rather than to a mode-aware text color, because the
+  /// warning background does not invert between light and dark.
+  final Color? warningForegroundColor;
 
   /// The border drawn around the badge.
   ///
@@ -148,54 +161,10 @@ class StreamErrorBadgeThemeData with _$StreamErrorBadgeThemeData {
   /// of both border color and width. Shared by both styles.
   final BoxBorder? border;
 
-  /// The styling for badges of the given [style].
-  StreamErrorBadgeThemeStyle? styleOf(StreamErrorBadgeStyle style) => switch (style) {
-    StreamErrorBadgeStyle.error => errorStyle,
-    StreamErrorBadgeStyle.warning => warningStyle,
-  };
-
   /// Linearly interpolate between two [StreamErrorBadgeThemeData].
   static StreamErrorBadgeThemeData? lerp(
     StreamErrorBadgeThemeData? a,
     StreamErrorBadgeThemeData? b,
     double t,
   ) => _$StreamErrorBadgeThemeData.lerp(a, b, t);
-}
-
-/// Visual styling properties for a single [StreamErrorBadgeStyle].
-///
-/// See also:
-///
-///  * [StreamErrorBadgeThemeData], which groups one of these per style.
-///  * [StreamErrorBadge], which uses this styling.
-@themeGen
-@immutable
-class StreamErrorBadgeThemeStyle with _$StreamErrorBadgeThemeStyle {
-  /// Creates error badge style properties.
-  const StreamErrorBadgeThemeStyle({
-    this.backgroundColor,
-    this.foregroundColor,
-  });
-
-  /// The fill color of the badge circle.
-  ///
-  /// Defaults to [StreamColorScheme.accentError] on
-  /// [StreamErrorBadgeStyle.error] and [StreamColorScheme.accentWarning] on
-  /// [StreamErrorBadgeStyle.warning].
-  final Color? backgroundColor;
-
-  /// The color of the exclamation mark icon.
-  ///
-  /// Defaults to [StreamColorScheme.textOnAccent] on
-  /// [StreamErrorBadgeStyle.error]. On [StreamErrorBadgeStyle.warning] it
-  /// falls back to black rather than to a mode-aware text color, because the
-  /// warning background does not invert between light and dark.
-  final Color? foregroundColor;
-
-  /// Linearly interpolate between two [StreamErrorBadgeThemeStyle].
-  static StreamErrorBadgeThemeStyle? lerp(
-    StreamErrorBadgeThemeStyle? a,
-    StreamErrorBadgeThemeStyle? b,
-    double t,
-  ) => _$StreamErrorBadgeThemeStyle.lerp(a, b, t);
 }

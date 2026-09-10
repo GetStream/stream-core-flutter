@@ -48,14 +48,10 @@ void main() {
 
   testWidgets('StreamErrorBadgeTheme overrides the resolved style colors', (tester) async {
     const themeData = StreamErrorBadgeThemeData(
-      errorStyle: StreamErrorBadgeThemeStyle(
-        backgroundColor: Color(0xFF111111),
-        foregroundColor: Color(0xFF222222),
-      ),
-      warningStyle: StreamErrorBadgeThemeStyle(
-        backgroundColor: Color(0xFF333333),
-        foregroundColor: Color(0xFF444444),
-      ),
+      errorBackgroundColor: Color(0xFF111111),
+      errorForegroundColor: Color(0xFF222222),
+      warningBackgroundColor: Color(0xFF333333),
+      warningForegroundColor: Color(0xFF444444),
     );
 
     await tester.pumpWidget(
@@ -64,8 +60,8 @@ void main() {
       ),
     );
 
-    expect(_backgroundColorOf(tester), themeData.errorStyle!.backgroundColor);
-    expect(_iconColorOf(tester), themeData.errorStyle!.foregroundColor);
+    expect(_backgroundColorOf(tester), themeData.errorBackgroundColor);
+    expect(_iconColorOf(tester), themeData.errorForegroundColor);
 
     await tester.pumpWidget(
       _wrap(
@@ -76,14 +72,12 @@ void main() {
       ),
     );
 
-    expect(_backgroundColorOf(tester), themeData.warningStyle!.backgroundColor);
-    expect(_iconColorOf(tester), themeData.warningStyle!.foregroundColor);
+    expect(_backgroundColorOf(tester), themeData.warningBackgroundColor);
+    expect(_iconColorOf(tester), themeData.warningForegroundColor);
   });
 
   testWidgets('StreamErrorBadgeTheme leaves the other style untouched', (tester) async {
-    const themeData = StreamErrorBadgeThemeData(
-      warningStyle: StreamErrorBadgeThemeStyle(backgroundColor: Color(0xFF333333)),
-    );
+    const themeData = StreamErrorBadgeThemeData(warningBackgroundColor: Color(0xFF333333));
 
     await tester.pumpWidget(
       _wrap(
@@ -96,11 +90,9 @@ void main() {
     expect(_iconColorOf(tester), colorScheme.textOnAccent);
   });
 
-  testWidgets('StreamErrorBadgeThemeStyle merges onto the defaults per property', (tester) async {
+  testWidgets('StreamErrorBadgeTheme falls back per property', (tester) async {
     // Only the background is overridden — the icon color must still resolve.
-    const themeData = StreamErrorBadgeThemeData(
-      warningStyle: StreamErrorBadgeThemeStyle(backgroundColor: Color(0xFF333333)),
-    );
+    const themeData = StreamErrorBadgeThemeData(warningBackgroundColor: Color(0xFF333333));
 
     await tester.pumpWidget(
       _wrap(
@@ -113,16 +105,6 @@ void main() {
 
     expect(_backgroundColorOf(tester), const Color(0xFF333333));
     expect(_iconColorOf(tester), StreamColors.black);
-  });
-
-  testWidgets('StreamErrorBadgeThemeData.styleOf maps each style to its own entry', (tester) async {
-    const errorStyle = StreamErrorBadgeThemeStyle(backgroundColor: Color(0xFF111111));
-    const warningStyle = StreamErrorBadgeThemeStyle(backgroundColor: Color(0xFF333333));
-    const themeData = StreamErrorBadgeThemeData(errorStyle: errorStyle, warningStyle: warningStyle);
-
-    expect(themeData.styleOf(StreamErrorBadgeStyle.error), errorStyle);
-    expect(themeData.styleOf(StreamErrorBadgeStyle.warning), warningStyle);
-    expect(const StreamErrorBadgeThemeData().styleOf(StreamErrorBadgeStyle.error), isNull);
   });
 
   testWidgets('StreamErrorBadgeTheme overrides the border and default size', (tester) async {
