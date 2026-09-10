@@ -15,6 +15,8 @@
 - `StreamColorScheme.accentWarning` — and `borderWarning`, which defaults to it —
   moved from orange to yellow: `#F26D10` → `#F6BF57` light, `#FA922B` → `#FCD579`
   dark. Pair it with a dark foreground.
+- Fixed `lerp` on theme styles carrying a `WidgetStateBorderSide` throwing a cast
+  error. The border side now steps at the midpoint rather than interpolating.
 
 ## 0.5.1
 
