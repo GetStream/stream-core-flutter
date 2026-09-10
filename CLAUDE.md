@@ -125,8 +125,9 @@ dimension change is applied to those classes by hand. `StreamColorScheme` is
 exported from `core.dart`, so every field on it is public API.
 
 A field's dartdoc comes from the token's own `$description` in the upstream JSON —
-quote it rather than inventing prose, but check it against the resolved light and
-dark values first, because those descriptions can be stale.
+quote it rather than inventing prose, but resolve the aliases first, since a
+description tracks the token's own light/dark progression and not a comparison
+with the sibling it names.
 
 **Use the `update-design-tokens` skill** when syncing a token change or assessing
 an upstream PR — it covers the naming rules, how a field default should resolve,

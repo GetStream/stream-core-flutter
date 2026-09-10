@@ -316,13 +316,15 @@ Quote it rather than inventing prose — it is the designer's statement of inten
 and matching wording is what lets the next person recognise the field as that
 token. Swap upstream's token paths for `[fieldName]` references.
 
-**Verify the claim against the resolved light and dark values first.** These
-descriptions are hand-written and can be stale: upstream's
-`border/core/on-elevation` says it "steps up in dark mode to keep the edge
-visible" while resolving to `{chrome.300}` in dark — identical to
-`border/core/on-surface`, the field it tells you to contrast it with. When a
-description and the values disagree, document what the values encode and open an
-issue upstream, so the source gets fixed rather than the copy.
+**Read the claim against the resolved light and dark values first**, and note
+what it is *not* saying. A description usually tracks the token's own light→dark
+progression, not a comparison with the sibling it names: `border/core/on-elevation`
+"steps up in dark mode" because it goes `{chrome.150}` → `{chrome.300}` as the
+elevated surface lightens — while in that same mode it lands on `{chrome.300}`,
+exactly `border/core/on-surface`, the token it tells you to use instead. Both
+halves are true and they are easy to read as contradictory. Resolve the aliases
+before deciding a description is wrong, and add the nuance the description omits
+rather than replacing wording that is accurate.
 
 ## Root semantics only
 
