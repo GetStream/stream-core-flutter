@@ -460,10 +460,6 @@ class StreamTokens {
   static const backgroundUtilityPressed = Color(0x33FFFFFF);
   static const backgroundUtilitySelected = Color(0x40FFFFFF);
   static const backgroundUtilityDisabled = Color(0xFF323232);
-  static const backgroundElevationElevation0 = Color(0xFF000000);
-  static const backgroundElevationElevation1 = Color(0xFF1C1C1C);
-  static const backgroundElevationElevation2 = Color(0xFF323232);
-  static const backgroundElevationElevation3 = Color(0xFF565656);
   static const borderUtilityFocus = Color(0x4078A8FF);
   static const borderUtilityError = Color(0xFFFC526A);
   static const borderUtilityWarning = Color(0xFFFCD579);
