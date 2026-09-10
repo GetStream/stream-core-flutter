@@ -114,15 +114,19 @@ Generated files have `.g.theme.dart` extension. After modifying `.theme.dart` fi
 Colors originate in [design-system-tokens](https://github.com/GetStream/design-system-tokens),
 the same repo the icons come from. `theme/primitives/internal/tokens/{light,dark}/stream_tokens.dart`
 holds the vendored values; it is maintained by hand, is not part of the public API,
-and only `stream_colors.dart` and `stream_color_scheme.dart` read it.
+and only `stream_colors.dart` and `stream_color_scheme.dart` read it. Dimensions
+live beside it in `internal/tokens/stream_tokens_dimensions.dart` — one
+mode-independent copy, read by `StreamSpacing`, `StreamRadius` and
+`StreamTokensTypography`.
 
 Only the **root semantics** are mapped to a `StreamColorScheme` field. Upstream's
 derived tokens (`badge/*`, `button/*`, `avatar/*`) get no field — components
-re-derive them from `colorScheme.*` in their own defaults. Typography, spacing and
-radius do come from upstream, but `StreamTokensTypography`, `StreamSpacing` and
-`StreamRadius` hard-code the values rather than reading a token constant, so a
-dimension change is applied to those classes by hand. `StreamColorScheme` is
+re-derive them from `colorScheme.*` in their own defaults. `StreamColorScheme` is
 exported from `core.dart`, so every field on it is public API.
+
+`melos run check:tokens` fails on a vendored constant nothing reads, and on
+`light/` and `dark/` disagreeing about which constants exist — so add a constant
+only when a field or class will read it, and let CI catch the rest.
 
 A field's dartdoc comes from the token's own `$description` in the upstream JSON —
 quote it rather than inventing prose, but resolve the aliases first, since a
