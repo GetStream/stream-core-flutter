@@ -44,11 +44,17 @@ upstream build output is not copied in verbatim. Only
 `stream_color_swatch_helper.dart` import them; no component theme or widget ever
 references `StreamTokens`.
 
-Colors are byte-identical across the three upstream platform flavours (only
-typography differs), so when you do read the upstream build, the flavour is
-irrelevant — pick any. Typography, spacing and radius are **not** synced at all:
-`stream_tokens_typography.dart` composes `TextStyle`s on a single `Geist` family,
-and `stream_spacing.dart` / `stream_radius.dart` declare their own scales.
+**Colors are byte-identical across the three upstream flavors; typography is not
+— and for type the flavor is `web`.** Only web carries the `Geist` family this
+package ships; android resolves to Roboto, iOS to SF Pro, and iOS also runs a
+size up at every step (`typographyFontSizeMd` is 17 there against 16 on
+android/web). So read colors from any flavor and type from `web`.
+
+Dimensions — spacing, radius, sizes, line heights, weights — are identical across
+all three, so no flavor choice arises. They do come from upstream, but
+`StreamSpacing`, `StreamRadius` and `StreamTokensTypography` hard-code the values
+instead of reading the vendored constants, so a dimension change upstream has to
+be applied to those classes by hand.
 
 Only core and chat semantics are vendored into `internal/tokens/`; the video
 namespace is not. That is about *vendoring*, not about impact — a video token can
@@ -264,7 +270,7 @@ background/core/on-accent  backgroundCoreOnAccent  backgroundOnAccent
 
 Some fields also shorten further where the upstream suffix carried no meaning
 here (`background/core/surface-default` → `backgroundSurface`). Match the
-existing neighbours in `stream_color_scheme.dart` rather than deriving the name
+existing neighbors in `stream_color_scheme.dart` rather than deriving the name
 mechanically.
 
 ## Wiring a field default
@@ -307,12 +313,16 @@ component from a token, which is the one thing a component must not do — a
 constant bypasses the seedable color scheme, so a custom brand or chrome stops
 applying.
 
-Dimensions and type never belong there at all. Spacing, radius, sizes, font sizes
-and weights come from `StreamSpacing`, `StreamRadius` and
-`StreamTokensTypography`, which declare their own scales — upstream's type is
-per-platform where this package composes a single `Geist` family. If a design
-calls for a new spacing or radius step, it goes in those classes, not in a token
-file.
+Dimensions and type are a separate matter. Their upstream values *are* mirrored
+here, but in `StreamSpacing`, `StreamRadius` and `StreamTokensTypography`, which
+hard-code them rather than reading a token constant. So a spacing or radius change
+is applied to those classes by hand — and taking the type values from the wrong
+flavor is a live mistake, since only `web` carries the `Geist` family.
+
+That hand-copying is the same hazard as baking a hex where a swatch belongs, one
+layer up: nothing ties the class to the constant it mirrors, so the two drift
+silently. The fix is to have those classes read the constants, not to add more
+unread ones.
 
 ## After editing
 
