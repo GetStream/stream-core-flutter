@@ -119,6 +119,18 @@ A `tokens/video/**` change reaching this repo is not hypothetical:
 `StreamErrorBadge`, a core component that video merely wraps. Never conclude "video
 namespace, not our problem" from the path alone.
 
+### A token for an internal component
+
+Upstream giving a component its own token is a signal that the component is part
+of the design system's surface, so a themeable, public component is usually the
+right shape — even where today's implementation is internal. Public components are
+named with a `Stream` prefix.
+
+**Ask before making one public.** Widening the public API is a maintenance
+commitment the SDK carries until the next major version, and that is the owner's
+call, not a detail to slip into a token sync. Implement the theme, note that the
+widget it themes is internal, and put the question to them.
+
 Which ref to inspect:
 
 | repo | ref |
@@ -169,16 +181,16 @@ dependency override, in this order:
 
 1. Branch and push here first — the override resolves against the remote, so a
    local commit is not enough.
-2. Branch in the consumer under the **same name** (see below) and point its
-   `stream_core_flutter` at the core branch.
+2. Take the pushed SHA (`git rev-parse HEAD`), branch in the consumer under the
+   **same name** (see below), and point its `stream_core_flutter` at that SHA.
 3. `melos bootstrap` in the consumer. Both halves are now buildable and reviewable
    together.
 
 ### Branch naming
 
-The override's `ref:` is the core branch, so its name is shared vocabulary across
-repos rather than a private detail — matching names are what let someone find the
-other half of a change.
+The `ref:` is a SHA, so the branch name is not load-bearing for resolution — but
+it is shared vocabulary across repos, and matching names are what let someone find
+the other half of a change.
 
 - **If core is already on a branch for this work, use that branch everywhere.**
   Reuse it rather than cutting a second one, and give the consumer's branch the same
@@ -195,7 +207,7 @@ dependency_overrides:
   stream_core_flutter:
     git:
       url: https://github.com/GetStream/stream-core-flutter.git
-      ref: feat/update-tokens-on-elevation
+      ref: 2762ea870b3f38bdfb33280230d0709540bde35a # a commit, never a branch
       path: packages/stream_core_flutter
 ```
 
@@ -214,10 +226,17 @@ consumer's default branch and comes off only when that SDK is released: at that
 point this package is released too, and the dependency goes back to a published
 version constraint.
 
-Because the ref is a branch, the branch has to keep resolving for as long as the
-override is merged — so the core branch outlives its own PR. Do not delete it on
-merge, and if you rebase it, remember every consumer that points at it resolves the
-new tip.
+**Always pin a commit SHA, never a branch name.** A branch ref resolves to
+whatever the tip happens to be at `pub get` time and writes that SHA into
+`pubspec.lock`, so the locked version drifts unpredictably as the branch moves and
+two checkouts of the same consumer commit can resolve differently. A SHA is stable
+and survives the branch being rebased or deleted.
+
+**Repoint only the package your change touches.** `stream_core` and
+`stream_core_flutter` come from this repo but are separate git dependencies with
+separate pins, and a consumer is often pinned to an older core than `main`.
+Dragging `stream_core` forward for a change that only touches
+`stream_core_flutter` pulls in unrelated churn — the error layer, for one.
 
 Distinct from the sibling-path override this repo's CI guidance warns about — a git
 ref is reproducible off-machine, where a `path:` to a sibling checkout is not. Do
