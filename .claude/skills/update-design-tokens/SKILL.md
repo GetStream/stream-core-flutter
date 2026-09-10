@@ -301,9 +301,18 @@ So upstream `badge/bg-error` has no counterpart here, by design — a component
 theme reads `colorScheme.accentError` instead. This keeps the token surface small
 and keeps every component overridable through one seedable color scheme.
 
-The vendored files still carry a historical full dump of ~500 constants, of which
-roughly a third are read. Treat the unread ones as dead weight: don't add more,
-and don't take their presence as precedent.
+**Add a constant only when a field will read it**, and add it to both `light/` and
+`dark/`. An unread constant is not harmless: it reads as an invitation to paint a
+component from a token, which is the one thing a component must not do — a
+constant bypasses the seedable color scheme, so a custom brand or chrome stops
+applying.
+
+Dimensions and type never belong there at all. Spacing, radius, sizes, font sizes
+and weights come from `StreamSpacing`, `StreamRadius` and
+`StreamTokensTypography`, which declare their own scales — upstream's type is
+per-platform where this package composes a single `Geist` family. If a design
+calls for a new spacing or radius step, it goes in those classes, not in a token
+file.
 
 ## After editing
 
@@ -351,6 +360,21 @@ Two caveats. The regeneration step is `continue-on-error`, so a green run does n
 mean the goldens rebuilt cleanly — read the bot's commit and check the images moved
 the way you expected, and that nothing you did not touch moved with them. And it
 commits to whatever ref you dispatch, so pass your own branch.
+
+**Run it on the consuming SDKs too.** stream-chat-flutter and
+stream-video-flutter each have the same `update_goldens.yml`, and a value change
+moves their goldens as surely as it moves this package's — a component they own
+paints with the field. Their CI fails on the `variant: CI` goldens, which is the
+signal, and dispatching the workflow on the consumer's branch is the fix:
+
+```bash
+gh workflow run update_goldens.yml --repo GetStream/stream-video-flutter --ref <branch>
+```
+
+Do it once the consumer's override points at your core commit, so the images it
+renders are the ones the change actually produces. Expect this on any value
+change: the call control badge going red to yellow moved
+`call_control_button` and `call_feature_button`, neither of which is in this repo.
 
 ## Changelog
 
