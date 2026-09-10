@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import 'internal/tokens/stream_tokens_dimensions.dart' as tokens;
+
 part 'stream_radius.g.theme.dart';
 
 /// Border radius primitives for the Stream design system.
@@ -28,17 +30,20 @@ part 'stream_radius.g.theme.dart';
 class StreamRadius with _$StreamRadius {
   /// Creates a [StreamRadius] with the default values.
   const StreamRadius({
+    // `Radius.zero` rather than `circular(radiusNone)`: the analyzer's
+    // use_named_constants prefers the named constant, so the token has no
+    // reader and is not carried.
     this.none = .zero,
-    this.xxs = const .circular(2),
-    this.xs = const .circular(4),
-    this.sm = const .circular(6),
-    this.md = const .circular(8),
-    this.lg = const .circular(12),
-    this.xl = const .circular(16),
-    this.xxl = const .circular(20),
-    this.xxxl = const .circular(24),
-    this.xxxxl = const .circular(32),
-    this.max = const .circular(9999),
+    this.xxs = const .circular(tokens.StreamTokensDimensions.radiusXxs),
+    this.xs = const .circular(tokens.StreamTokensDimensions.radiusXs),
+    this.sm = const .circular(tokens.StreamTokensDimensions.radiusSm),
+    this.md = const .circular(tokens.StreamTokensDimensions.radiusMd),
+    this.lg = const .circular(tokens.StreamTokensDimensions.radiusLg),
+    this.xl = const .circular(tokens.StreamTokensDimensions.radiusXl),
+    this.xxl = const .circular(tokens.StreamTokensDimensions.radius2xl),
+    this.xxxl = const .circular(tokens.StreamTokensDimensions.radius3xl),
+    this.xxxxl = const .circular(tokens.StreamTokensDimensions.radius4xl),
+    this.max = const .circular(tokens.StreamTokensDimensions.radiusMax),
   });
 
   /// No border radius.

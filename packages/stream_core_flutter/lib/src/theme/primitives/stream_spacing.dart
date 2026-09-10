@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import 'internal/tokens/stream_tokens_dimensions.dart' as tokens;
+
 part 'stream_spacing.g.theme.dart';
 
 /// Spacing primitives for the Stream design system.
@@ -28,16 +30,16 @@ part 'stream_spacing.g.theme.dart';
 class StreamSpacing with _$StreamSpacing {
   /// Creates a [StreamSpacing] with the default values.
   const StreamSpacing({
-    this.none = 0,
-    this.xxxs = 2,
-    this.xxs = 4,
-    this.xs = 8,
-    this.sm = 12,
-    this.md = 16,
-    this.lg = 20,
-    this.xl = 24,
-    this.xxl = 32,
-    this.xxxl = 40,
+    this.none = tokens.StreamTokensDimensions.spacingNone,
+    this.xxxs = tokens.StreamTokensDimensions.spacingXxxs,
+    this.xxs = tokens.StreamTokensDimensions.spacingXxs,
+    this.xs = tokens.StreamTokensDimensions.spacingXs,
+    this.sm = tokens.StreamTokensDimensions.spacingSm,
+    this.md = tokens.StreamTokensDimensions.spacingMd,
+    this.lg = tokens.StreamTokensDimensions.spacingLg,
+    this.xl = tokens.StreamTokensDimensions.spacingXl,
+    this.xxl = tokens.StreamTokensDimensions.spacing2xl,
+    this.xxxl = tokens.StreamTokensDimensions.spacing3xl,
   });
 
   /// No spacing.

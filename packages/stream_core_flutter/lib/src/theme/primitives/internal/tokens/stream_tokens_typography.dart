@@ -1,122 +1,124 @@
 import 'package:flutter/widgets.dart';
 
+import 'stream_tokens_dimensions.dart';
+
 class StreamTokensTypography {
   StreamTokensTypography._();
 
   static const headingLg = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 20,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXl,
     fontWeight: FontWeight.w600,
-    height: 1.2,
+    height: StreamTokensDimensions.typographyLineHeightRelaxed / StreamTokensDimensions.typographyFontSizeXl,
   );
   static const headingMd = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 18,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeLg,
     fontWeight: FontWeight.w600,
-    height: 1.1111111111111112,
+    height: StreamTokensDimensions.typographyLineHeightNormal / StreamTokensDimensions.typographyFontSizeLg,
   );
   static const headingSm = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 16,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeMd,
     fontWeight: FontWeight.w600,
-    height: 1.25,
+    height: StreamTokensDimensions.typographyLineHeightNormal / StreamTokensDimensions.typographyFontSizeMd,
   );
   static const headingXs = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 12,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXs,
     fontWeight: FontWeight.w600,
-    height: 1.3333333333333333,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeXs,
   );
   static const bodyDefault = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 16,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeMd,
     fontWeight: FontWeight.w400,
-    height: 1.25,
+    height: StreamTokensDimensions.typographyLineHeightNormal / StreamTokensDimensions.typographyFontSizeMd,
   );
   static const bodyEmphasis = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 16,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeMd,
     fontWeight: FontWeight.w600,
-    height: 1.25,
+    height: StreamTokensDimensions.typographyLineHeightNormal / StreamTokensDimensions.typographyFontSizeMd,
   );
   static const bodyLink = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 16,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeMd,
     fontWeight: FontWeight.w400,
-    height: 1.25,
+    height: StreamTokensDimensions.typographyLineHeightNormal / StreamTokensDimensions.typographyFontSizeMd,
   );
   static const bodyLinkEmphasis = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 16,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeMd,
     fontWeight: FontWeight.w600,
-    height: 1.25,
+    height: StreamTokensDimensions.typographyLineHeightNormal / StreamTokensDimensions.typographyFontSizeMd,
   );
   static const captionDefault = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 14,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeSm,
     fontWeight: FontWeight.w400,
-    height: 1.1428571428571428,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeSm,
   );
   static const captionEmphasis = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 14,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeSm,
     fontWeight: FontWeight.w600,
-    height: 1.1428571428571428,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeSm,
   );
   static const captionLink = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 14,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeSm,
     fontWeight: FontWeight.w400,
-    height: 1.1428571428571428,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeSm,
   );
   static const captionLinkEmphasis = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 14,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeSm,
     fontWeight: FontWeight.w600,
-    height: 1.1428571428571428,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeSm,
   );
   static const metadataDefault = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 12,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXs,
     fontWeight: FontWeight.w400,
-    height: 1.3333333333333333,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeXs,
   );
   static const metadataEmphasis = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 12,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXs,
     fontWeight: FontWeight.w600,
-    height: 1.3333333333333333,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeXs,
   );
   static const metadataLink = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 12,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXs,
     fontWeight: FontWeight.w400,
-    height: 1.3333333333333333,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeXs,
   );
   static const metadataLinkEmphasis = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 12,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXs,
     fontWeight: FontWeight.w600,
-    height: 1.3333333333333333,
+    height: StreamTokensDimensions.typographyLineHeightTight / StreamTokensDimensions.typographyFontSizeXs,
   );
   static const numericXl = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 14,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeSm,
     fontWeight: FontWeight.w700,
   );
   static const numericLg = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 12,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXs,
     fontWeight: FontWeight.w700,
   );
   static const numericMd = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 10,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeXxs,
     fontWeight: FontWeight.w700,
   );
   static const numericSm = TextStyle(
-    fontFamily: 'Geist',
-    fontSize: 8,
+    fontFamily: StreamTokensDimensions.typographyFontFamilySans,
+    fontSize: StreamTokensDimensions.typographyFontSizeMicro,
     fontWeight: FontWeight.w700,
   );
 }

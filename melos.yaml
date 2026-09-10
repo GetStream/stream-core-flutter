@@ -155,6 +155,10 @@ scripts:
     run: melos exec -c 1 --file-exists="check_barrels.yaml" -- "dart run \$MELOS_ROOT_PATH/scripts/check_barrels.dart"
     description: Validate the public-barrel contract for packages with a check_barrels.yaml config.
 
+  check:tokens:
+    run: melos exec -c 1 --dir-exists="lib/src/theme/primitives/internal/tokens" -- "dart run \$MELOS_ROOT_PATH/scripts/check_tokens.dart"
+    description: Fail if a vendored design token is unreferenced, or if light/ and dark/ disagree.
+
   generate:dart:
     run: melos exec -c 1 --depends-on="build_runner" --no-flutter -- "dart run build_runner build --delete-conflicting-outputs"
     description: Build all generated files for Dart packages in this project.
