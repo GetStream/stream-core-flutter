@@ -272,9 +272,9 @@ Upstream's generator flattens `group/subgroup/name` into camelCase. The
 because Flutter has no such layer:
 
 ```
-upstream token          vendored constant         colorScheme field
-border/utility/warning  borderUtilityWarning      borderWarning
-background/core/on-accent  backgroundCoreOnAccent  backgroundOnAccent
+upstream token            vendored constant        colorScheme field
+border/utility/selected   borderUtilitySelected    borderSelected
+background/core/highlight backgroundCoreHighlight  backgroundHighlight
 ```
 
 Some fields also shorten further where the upstream suffix carried no meaning
@@ -313,7 +313,7 @@ print(d['border']['core']['on-elevation'])"
 ```
 
 Quote it rather than inventing prose — it is the designer's statement of intent,
-and matching wording is what lets the next person recognise the field as that
+and matching wording is what lets the next person recognize the field as that
 token. Swap upstream's token paths for `[fieldName]` references.
 
 **Read the claim against the resolved light and dark values first**, and note

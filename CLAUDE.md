@@ -48,7 +48,7 @@ melos run gen-l10n          # regenerate localizations
 Dart constants, built by `melos run generate:icons` from the source SVGs in
 `packages/stream_core_flutter/assets_source/icons/`. Those SVGs are copied from the
 [design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons)
-repo. Multicolour file-type icons are not part of the font — they ship as runtime
+repo. Multicolor file-type icons are not part of the font — they ship as runtime
 assets in `assets/file_type/` and are resolved by path by `StreamFileTypeIcon`.
 
 Glyph code points are append-only and recorded in `assets_source/icon_log.g.txt`,
