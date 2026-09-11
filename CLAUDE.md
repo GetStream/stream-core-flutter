@@ -117,7 +117,9 @@ holds the vendored values; it is maintained by hand, is not part of the public A
 and only `stream_colors.dart` and `stream_color_scheme.dart` read it. Dimensions
 live beside it in `internal/tokens/stream_tokens_dimensions.dart` — one
 mode-independent copy, read by `StreamSpacing`, `StreamRadius` and
-`StreamTokensTypography`.
+`StreamLineHeight`. Font sizes and weights are not vendored: `StreamFontSize`
+ships an ios scale from a flavor this package does not carry, and a `FontWeight`
+cannot be built from a number in a const expression.
 
 Only the **root semantics** are mapped to a `StreamColorScheme` field. Upstream's
 derived tokens (`badge/*`, `button/*`, `avatar/*`) get no field — components

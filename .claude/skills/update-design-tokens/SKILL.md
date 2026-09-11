@@ -56,11 +56,15 @@ package ships; android resolves to Roboto, iOS to SF Pro, and iOS also runs a
 size up at every step (`typographyFontSizeMd` is 17 there against 16 on
 android/web). So read colors from any flavor and type from `web`.
 
-Dimensions — spacing, radius, sizes, line heights — are identical across all
-three, so no flavor choice arises there. They live in
+Spacing, radius and line heights are identical across all three flavors, so no
+flavor choice arises for them. They live in
 `internal/tokens/stream_tokens_dimensions.dart`, one copy rather than one per
-mode, and `StreamSpacing`, `StreamRadius` and `StreamTokensTypography` read them.
-So a dimension change is a value edit in that one file; the classes follow.
+mode, and `StreamSpacing`, `StreamRadius` and `StreamLineHeight` read them. So a
+dimension change is a value edit in that one file; the classes follow.
+
+Font sizes are the exception, and are **not** vendored: `StreamFontSize` ships an
+android and an ios scale, and only android matches the web values. Change one of
+those by hand and you must change the other from the ios flavor.
 
 Only core and chat semantics are vendored into `internal/tokens/`; the video
 namespace is not. That is about *vendoring*, not about impact — a video token can
@@ -352,16 +356,17 @@ component from a token, which is the one thing a component must not do — a
 constant bypasses the seedable color scheme, so a custom brand or chrome stops
 applying.
 
-Dimensions and type live in `stream_tokens_dimensions.dart` instead — one
-mode-independent file, read by `StreamSpacing`, `StreamRadius` and
-`StreamTokensTypography`. Edit the value there and the classes follow; do not
+Spacing, radius and line heights live in `stream_tokens_dimensions.dart` instead
+— one mode-independent file, read by `StreamSpacing`, `StreamRadius` and
+`StreamLineHeight`. Edit the value there and the classes follow; do not
 re-introduce a literal in a class, which is the same hazard as baking a hex where
-a swatch belongs, one layer up. And take type values from the **web** flavor, the
-only one carrying the `Geist` family.
+a swatch belongs, one layer up.
 
-Two dimensions are deliberately absent because nothing can read them: font
-weights, since `TextStyle.fontWeight` takes a `FontWeight` that cannot be built
-from a number in a const expression, and `radiusNone`, since the analyzer's
+Three groups of upstream dimensions are deliberately absent, because nothing here
+can read them: **font sizes**, since only `StreamFontSize.android` matches the web
+values and the ios scale comes from a flavor this package does not vendor; **font
+weights**, since `TextStyle.fontWeight` takes a `FontWeight` that cannot be built
+from a number in a const expression; and **`radiusNone`**, since the analyzer's
 `use_named_constants` prefers `Radius.zero` over `circular(0)`.
 
 **`melos run check:tokens` enforces all of this.** It fails when a constant in

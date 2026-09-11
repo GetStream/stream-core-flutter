@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import 'internal/tokens/stream_tokens_dimensions.dart' as tokens;
+
 part 'stream_typography.g.theme.dart';
 
 /// Typography primitives for the Stream design system.
@@ -79,9 +81,9 @@ class StreamTypography with _$StreamTypography {
 class StreamLineHeight with _$StreamLineHeight {
   /// Creates a [StreamLineHeight] with the given values.
   const StreamLineHeight({
-    this.tight = 16,
-    this.normal = 20,
-    this.relaxed = 24,
+    this.tight = tokens.StreamTokensDimensions.typographyLineHeightTight,
+    this.normal = tokens.StreamTokensDimensions.typographyLineHeightNormal,
+    this.relaxed = tokens.StreamTokensDimensions.typographyLineHeightRelaxed,
   });
 
   /// The tight line height.

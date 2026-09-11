@@ -156,7 +156,11 @@ scripts:
     description: Validate the public-barrel contract for packages with a check_barrels.yaml config.
 
   check:tokens:
-    run: melos exec -c 1 --dir-exists="lib/src/theme/primitives/internal/tokens" -- "dart run \$MELOS_ROOT_PATH/scripts/check_tokens.dart"
+    # Deliberately not `melos exec`: any package filter that stops matching
+    # selects zero packages and reports SUCCESS, which is the one outcome this
+    # check must never produce silently. Run once from the root instead, and
+    # let the script fail if the package or its token directory is missing.
+    run: dart run scripts/check_tokens.dart
     description: Fail if a vendored design token is unreferenced, or if light/ and dark/ disagree.
 
   generate:dart:
