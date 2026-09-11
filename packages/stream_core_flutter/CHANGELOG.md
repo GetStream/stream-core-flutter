@@ -7,6 +7,12 @@
   (the default) or `.warning` — and `StreamErrorBadge.showBorder`.
 - Added `StreamErrorBadgeTheme` and `StreamErrorBadgeThemeData`, carrying a
   background and foreground color per style.
+- Added `StreamAvatarSize.xxxl` (104px) and `StreamAvatarGroupSize.xxxl`
+  (104px), the size the ringing call screens are built on.
+- Added `StreamOnlineIndicatorSize.xxxl` (24px), the presence badge that pairs
+  with a 104px avatar.
+- Added `StreamBadgeCountSize.xl` (56px), the overflow badge of a 104px avatar
+  group.
 
 ## 0.5.1
 

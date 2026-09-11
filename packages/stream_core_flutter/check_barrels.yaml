@@ -30,3 +30,4 @@ internal_dirs:
   - lib/src/theme/primitives/internal
   - lib/src/cache/internal
   - lib/src/components/buttons/internal
+  - lib/src/components/avatar/internal

@@ -108,4 +108,35 @@ void main() {
       handle.dispose();
     });
   });
+
+  group('StreamAvatarGroup sizing', () {
+    // Every size but the largest packs children at a diameter some
+    // StreamAvatarSize names. The largest does not, so it is the one that can
+    // silently regress to the size its children would otherwise resolve to.
+    for (final (groupSize, childDiameter) in const [
+      (StreamAvatarGroupSize.lg, 24.0),
+      (StreamAvatarGroupSize.xl, 32.0),
+      (StreamAvatarGroupSize.xxl, 48.0),
+      (StreamAvatarGroupSize.xxxl, 64.0),
+    ]) {
+      testWidgets('${groupSize.name} draws ${childDiameter}px children', (tester) async {
+        await tester.pumpWidget(
+          _withStreamTheme(
+            StreamAvatarGroup(
+              size: groupSize,
+              children: [
+                StreamAvatar(placeholder: (_) => const Text('AB')),
+                StreamAvatar(placeholder: (_) => const Text('CD')),
+              ],
+            ),
+          ),
+        );
+
+        expect(tester.getSize(find.byType(StreamAvatarGroup)), Size.square(groupSize.value));
+        for (final avatar in find.byType(StreamAvatar).evaluate()) {
+          expect(tester.getSize(find.byWidget(avatar.widget)), Size.square(childDiameter));
+        }
+      });
+    }
+  });
 }
