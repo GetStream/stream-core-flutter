@@ -34,28 +34,44 @@ covered below.
 | --- | --- |
 | source of truth | `tokens/{core,chat,video}/semantics/{light,dark}.json` upstream |
 | upstream Flutter build | `build/flutter/tokens/lib/src/{android,ios,web}/{light,dark}/stream_tokens.dart` |
-| vendored here | `packages/stream_core_flutter/lib/src/theme/primitives/internal/tokens/{light,dark}/stream_tokens.dart` |
+| colors vendored here | `lib/src/theme/primitives/internal/tokens/{light,dark}/stream_tokens.dart` |
+| dimensions vendored here | `lib/src/theme/primitives/internal/tokens/stream_tokens_dimensions.dart` (one copy — mode-independent) |
 | root semantics | `lib/src/theme/semantics/stream_color_scheme.dart` |
 | derived values | each component's `build` / defaults, reading `colorScheme.*` |
 
 The vendored files are **maintained by hand** — there is no sync command, and the
-upstream build output is not copied in verbatim. Only `stream_colors.dart` and
-`stream_color_scheme.dart` import them; no component theme or widget ever
-references `StreamTokens`. (`stream_color_swatch_helper.dart` generates shades in
-HCT from a seed and never reads a token — it is measured *against* the vendored
-values, not driven by them.)
+upstream build output is not copied in verbatim. Their readers are only the
+primitive and semantic classes: `stream_colors.dart` and
+`stream_color_scheme.dart` for the colors, and `stream_spacing.dart`,
+`stream_radius.dart` and `stream_tokens_typography.dart` for the dimensions. No
+component theme or widget ever references `StreamTokens` directly — a component
+reads a `colorScheme` field or one of those classes.
+(`stream_color_swatch_helper.dart` is *not* a reader: it generates shades in HCT
+from a seed, and is measured against the vendored values rather than driven by
+them.)
 
-**Colors are byte-identical across the three upstream flavors; typography is not
-— and for type the flavor is `web`.** Only web carries the `Geist` family this
-package ships; android resolves to Roboto, iOS to SF Pro, and iOS also runs a
-size up at every step (`typographyFontSizeMd` is 17 there against 16 on
-android/web). So read colors from any flavor and type from `web`.
+**Colors are byte-identical across the three upstream flavors, and so is every
+dimension except font size.** iOS runs a size up at almost every step
+(`typographyFontSizeMd` is 17 there against 16 on android and web), which is why
+that one group is vendored per flavor while the rest is not. Read colors from any
+flavor; read a font size from the flavor whose scale you are editing.
 
-Dimensions — spacing, radius, sizes, line heights, weights — are identical across
-all three, so no flavor choice arises. They do come from upstream, but
-`StreamSpacing`, `StreamRadius` and `StreamTokensTypography` hard-code the values
-instead of reading the vendored constants, so a dimension change upstream has to
-be applied to those classes by hand.
+The font *family* does not arise: this package never sets one for text, and ships
+no text font — only the generated `Stream Icons` face. Upstream's
+`typographyFontFamilySans` is therefore not vendored.
+
+Spacing, radius, line heights and font weights are identical across all three
+flavors, so no flavor choice arises for them. They live in
+`internal/tokens/stream_tokens_dimensions.dart`, one copy rather than one per
+mode, read by `StreamSpacing`, `StreamRadius`, `StreamLineHeight` and
+`StreamFontWeight`.
+
+**Font sizes are the exception**: iOS runs a size up at almost every step, so
+they mirror upstream's flavor split in
+`internal/tokens/{android,ios}/stream_tokens_font_size.dart` and feed
+`StreamFontSize.android` and `StreamFontSize.ios`. A size change has to be taken
+from the matching flavor — `check:tokens` enforces that both declare the same
+names, but it cannot tell you a value came from the wrong one.
 
 Only core and chat semantics are vendored into `internal/tokens/`; the video
 namespace is not. That is about *vendoring*, not about impact — a video token can
@@ -347,21 +363,34 @@ component from a token, which is the one thing a component must not do — a
 constant bypasses the seedable color scheme, so a custom brand or chrome stops
 applying.
 
-Dimensions and type are a separate matter. Their upstream values *are* mirrored
-here, but in `StreamSpacing`, `StreamRadius` and `StreamTokensTypography`, which
-hard-code them rather than reading a token constant. So a spacing or radius change
-is applied to those classes by hand — and taking the type values from the wrong
-flavor is a live mistake, since only `web` carries the `Geist` family.
+Spacing, radius and line heights live in `stream_tokens_dimensions.dart` instead
+— one mode-independent file, read by `StreamSpacing`, `StreamRadius` and
+`StreamLineHeight`. Edit the value there and the classes follow; do not
+re-introduce a literal in a class, which is the same hazard as baking a hex where
+a swatch belongs, one layer up.
 
-That hand-copying is the same hazard as baking a hex where a swatch belongs, one
-layer up: nothing ties the class to the constant it mirrors, so the two drift
-silently. The fix is to have those classes read the constants, not to add more
-unread ones.
+One upstream dimension is deliberately absent: **`radiusNone`**, since the
+analyzer's `use_named_constants` prefers `Radius.zero` over `circular(0)`. The
+font family is not carried either — this package never sets one for text, only
+for the emoji and icon fonts. Weights are carried as `FontWeight` rather than the
+raw 400/500/600/700, for the same reason the rest are `double`: it is the type
+Flutter consumes, and `FontWeight` has no public constructor from a number.
+
+**`melos run check:tokens` enforces all of this.** It fails when a constant in
+`internal/tokens/` is never referenced, and when `light/` and `dark/` disagree
+about which constants exist — the second because a field resolving from a constant
+in one mode but not the other falls back silently rather than failing. So there is
+no judgment call about what belongs: add a constant when a field or class will
+read it, and CI tells you if you got it wrong.
+
+Run it after any token edit, alongside `analyze`. Its allowlist is empty and worth
+keeping that way; an entry there is a token the SDK carries without using.
 
 ## After editing
 
 ```bash
 melos run analyze
+melos run check:tokens
 melos run test:flutter
 ```
 
