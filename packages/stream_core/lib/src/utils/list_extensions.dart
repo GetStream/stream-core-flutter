@@ -23,6 +23,9 @@ extension ListExtensions<T extends Object> on List<T> {
   /// [insertAt] (defaults to appending at the end).
   /// Time complexity: O(n) for search, O(n) for list creation.
   ///
+  /// Where the list is kept sorted, [SortedListExtensions.sortedUpsert] places
+  /// the element by sort position instead of by index.
+  ///
   /// ```dart
   /// final users = [User(id: '1', name: 'Alice'), User(id: '2', name: 'Bob')];
   /// final updated = users.upsert(
@@ -242,9 +245,19 @@ extension SortedListExtensions<T extends Object> on List<T> {
     required T Function(T original) update,
     Comparator<T>? compare,
   }) {
-    final iterable = map((it) => filter(it) ? update(it) : it);
-    if (compare != null) return iterable.sorted(compare);
-    return iterable.toList();
+    // Copy only once something matches, so a pass that changes nothing can
+    // hand back the receiver and let a listener comparing references skip.
+    List<T>? updated;
+    for (var i = 0; i < length; i++) {
+      final item = this[i];
+      if (!filter(item)) continue;
+      updated ??= [...this];
+      updated[i] = update(item);
+    }
+
+    final result = updated ?? this;
+    if (compare == null) return result;
+    return result.sorted(compare);
   }
 
   /// Inserts an element into the list, ensuring uniqueness by key.
@@ -286,6 +299,9 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
   /// Inserts an element into a sorted list at the correct position.
   ///
+  /// The receiver must already be sorted by [compare]. For a list kept in no
+  /// particular order, append the element and sort the result instead.
+  ///
   /// Uses binary search to find the insertion point and inserts the element
   /// while maintaining the sorted order. Uses stable insertion behavior where
   /// new elements are inserted after existing equal elements.
@@ -309,8 +325,17 @@ extension SortedListExtensions<T extends Object> on List<T> {
     T element, {
     required Comparator<T> compare,
   }) {
+    assert(_debugAssertSorted(this, compare));
+
+    if (isEmpty) return [element];
+
+    // Both ends spread directly rather than splicing. Prepending is what
+    // that saves on, since inserting at 0 shifts every element.
+    if (compare(last, element) <= 0) return [...this, element];
+    if (compare(first, element) > 0) return [element, ...this];
+
     final insertionIndex = _upperBound(this, element, compare);
-    return [...this].apply((it) => it.insert(insertionIndex, element));
+    return [...this]..insert(insertionIndex, element);
   }
 
   // Finds the first position where all elements before it compare less than [element].
@@ -337,11 +362,16 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
   /// Inserts or replaces an element in a sorted list based on a key.
   ///
+  /// The receiver must already be sorted by [compare]; [ListExtensions.upsert]
+  /// does the same for a list kept in no particular order, appending rather
+  /// than placing by sort position.
+  ///
   /// First searches for an existing element with the same key. If found,
   /// replaces it using the optional [update] callback (defaults to preferring
-  /// the updated element) and re-sorts the list. If not found, inserts the element
+  /// the updated element), keeping its position when the replacement sorts to
+  /// the same place and moving it otherwise. If not found, inserts the element
   /// at the correct sorted position using binary search.
-  /// Time complexity: O(n) for key search + O(n log n) for sorting if replacing,
+  /// Time complexity: O(n) for key search + O(n) for the copy if replacing,
   /// O(log n) for binary search + O(n) for insertion if adding new.
   ///
   /// ```dart
@@ -387,25 +417,57 @@ extension SortedListExtensions<T extends Object> on List<T> {
   }) {
     final elementKey = key(element);
     final index = indexWhere((e) => key(e) == elementKey);
+    return sortedUpsertAt(index, element, update: update, compare: compare);
+  }
 
-    // If the element does not exist, insert it at the correct position
+  /// Inserts or replaces the element at [index], keeping the list sorted.
+  ///
+  /// Like [sortedUpsert], but for a caller that already knows where the
+  /// element is and should not pay to look it up again. Pass `-1` when there
+  /// is no existing element, and it inserts instead.
+  ///
+  /// The receiver must already be sorted by [compare]; [ListExtensions.upsert]
+  /// does the same for a list kept in no particular order.
+  ///
+  /// ```dart
+  /// final index = scores.lastIndexWhere((it) => it.userId == incoming.userId);
+  /// final updated = scores.sortedUpsertAt(
+  ///   index,
+  ///   incoming,
+  ///   compare: (a, b) => b.points.compareTo(a.points),
+  /// );
+  /// ```
+  List<T> sortedUpsertAt(
+    int index,
+    T element, {
+    T Function(T original, T updated)? update,
+    required Comparator<T> compare,
+  }) {
     if (index == -1) return sortedInsert(element, compare: compare);
 
-    // Otherwise, replace the existing element at the found index
-    // and re-sort the list if necessary.
+    // Asserted after the insert path, which checks for itself, so a debug
+    // build never walks the list twice for one call.
+    assert(_debugAssertSorted(this, compare));
 
-    final updatedList = [...this];
-    final original = updatedList.removeAt(index);
+    final original = this[index];
+    // Defaults to preferring the updated element.
+    final resolved = update != null ? update(original, element) : element;
 
-    T handleUpdate(T original, T updated) {
-      if (update != null) return update(original, updated);
-      return updated; // Default behavior: prefer the updated
+    // An update usually leaves the element where it sits, and writing it in
+    // place avoids walking the list twice to remove and re-insert.
+    if (compare(original, resolved) == 0) {
+      return [...this]..[index] = resolved;
     }
 
-    return updatedList.sortedInsert(
-      handleUpdate(original, element),
-      compare: compare,
-    );
+    // Placed against the list it is going into rather than through
+    // [sortedInsert], which would copy a second time to reach the same index.
+    final updated = [...this]..removeAt(index);
+    final destination = _upperBound(updated, resolved, compare);
+
+    // The one place a second copy pays for itself: inserting at 0 shifts every
+    // element to make room, where spreading writes them out once instead.
+    if (destination == 0) return [resolved, ...updated];
+    return updated..insert(destination, resolved);
   }
 
   /// Merges this list with another list, handling duplicates based on a key.
@@ -415,6 +477,12 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// to preferring the element from the `other` list. The result can
   /// optionally be sorted. Time complexity: O(n + m) for merging + O(k log k)
   /// for sorting if compare is provided, where n, m are list sizes and k is result size.
+  ///
+  /// Returns the receiver unchanged when [other] is null, empty, or identical
+  /// to this list.
+  ///
+  /// Where the receiver is kept sorted, [sortedMerge] reaches the same result
+  /// in O(n + m) by merging rather than sorting.
   ///
   /// ```dart
   /// final oldScores = [
@@ -447,12 +515,13 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// // Result: [Score(userId: '1', points: 150), Score(userId: '3', points: 120), Score(userId: '2', points: 80)]
   /// ```
   List<T> merge<K>(
-    Iterable<T> other, {
+    Iterable<T>? other, {
     required K Function(T item) key,
     T Function(T original, T updated)? update,
     Comparator<T>? compare,
   }) {
-    if (other.isEmpty) return this;
+    // Nothing to merge in: hand back the receiver rather than a copy of it.
+    if (other == null || other.isEmpty || identical(other, this)) return this;
 
     T handleUpdate(T original, T updated) {
       if (update != null) return update(original, updated);
@@ -471,6 +540,161 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
     final result = itemMap.values;
     return compare?.let(result.sorted) ?? result.toList();
+  }
+
+  /// Merges [other] into this list, keeping it sorted.
+  ///
+  /// The receiver must already be sorted by [compare]; [other] may arrive in
+  /// any order. Time complexity: O(n + m) when [other] is sorted too and
+  /// O(n + m log m) when it has to be sorted first, against
+  /// O((n + m) log(n + m)) for [merge], which assumes no order. Prefer this
+  /// whenever the receiver is kept sorted anyway, and [merge] when it is not.
+  ///
+  /// The keys of [other] win: an element of this list whose key appears in
+  /// [other] is replaced by the [other] copy, passed through [update] when
+  /// given. Each key appears once in the result, keeping the last element
+  /// that carried it, as [merge] does. A replacement is placed by sort
+  /// position, so one that ties with its neighbours lands behind them where
+  /// [merge] would leave it in front.
+  ///
+  /// Returns the receiver unchanged when [other] is null, empty, or identical
+  /// to this list.
+  ///
+  /// ```dart
+  /// final merged = scores.sortedMerge(
+  ///   incoming,
+  ///   key: (score) => score.userId,
+  ///   compare: (a, b) => b.points.compareTo(a.points),
+  /// );
+  /// ```
+  List<T> sortedMerge<K>(
+    Iterable<T>? other, {
+    required K Function(T item) key,
+    required Comparator<T> compare,
+    T Function(T original, T updated)? update,
+  }) {
+    // Nothing to merge in: hand back the receiver rather than a copy of it.
+    if (other == null || other.isEmpty || identical(other, this)) return this;
+
+    assert(_debugAssertSorted(this, compare));
+
+    T handleUpdate(T original, T updated) {
+      if (update != null) return update(original, updated);
+      return updated; // Default behavior: prefer the updated
+    }
+
+    final otherList = other is List<T> ? other : other.toList(growable: false);
+    // An incoming batch is usually in order already, and noticing that costs
+    // one walk against the n log n of sorting it regardless. Skipping the sort
+    // leaves this aliasing the caller's list, so it is only ever read.
+    final sortedOther = otherList.isSorted(compare) ? otherList : otherList.sorted(compare);
+    return _mergeSorted(this, sortedOther, key, compare, handleUpdate);
+  }
+
+  // Keeps the last element carrying each key, matching what a keyed-map
+  // merge would settle on. Order is otherwise preserved, so a sorted list
+  // stays sorted.
+  static List<T> _lastPerKey<T, K>(List<T> list, K Function(T item) key) {
+    final seen = <K>{};
+    final reversed = <T>[];
+    for (var i = list.length - 1; i >= 0; i--) {
+      final item = list[i];
+      if (seen.add(key(item))) reversed.add(item);
+    }
+    return reversed.reversed.toList();
+  }
+
+  // Two-pointer merge of two lists already sorted by [compare]. Walks both
+  // once, so it never pays for a full re-sort the way a keyed-map merge does.
+  static List<T> _mergeSorted<T, K>(
+    List<T> aIn,
+    List<T> bIn,
+    K Function(T item) key,
+    Comparator<T> compare,
+    T Function(T original, T updated) resolve,
+  ) {
+    final aByKey = <K, T>{for (final item in aIn) key(item): item};
+
+    // Whether anything in [bIn] supersedes an element of [aIn] falls out of
+    // building its key set, so it costs no pass of its own.
+    var supersedes = false;
+    final bKeys = <K>{};
+    for (final item in bIn) {
+      final itemKey = key(item);
+      bKeys.add(itemKey);
+      if (!supersedes && aByKey.containsKey(itemKey)) supersedes = true;
+    }
+
+    // A key identifies one element, so emitting it twice would put the same
+    // thing in the list twice. Both collections are keyed already, so a short
+    // count notices repeats for free, and only then do we pay to drop them.
+    final a = aByKey.length == aIn.length ? aIn : _lastPerKey(aIn, key);
+    final b = bKeys.length == bIn.length ? bIn : _lastPerKey(bIn, key);
+
+    // When the two share no key, nothing supersedes anything and the walk
+    // needs no key lookups at all — the shape of appending a batch that is
+    // entirely new.
+    if (!supersedes) return _mergeDisjoint(a, b, compare);
+
+    final result = <T>[];
+    var i = 0;
+    var j = 0;
+    while (i < a.length && j < b.length) {
+      final ai = a[i];
+      if (bKeys.contains(key(ai))) {
+        i++;
+        continue;
+      }
+
+      final bj = b[j];
+      if (compare(ai, bj) <= 0) {
+        result.add(ai);
+        i++;
+      } else {
+        final original = aByKey[key(bj)];
+        result.add(original != null ? resolve(original, bj) : bj);
+        j++;
+      }
+    }
+
+    while (i < a.length) {
+      final ai = a[i++];
+      if (!bKeys.contains(key(ai))) result.add(ai);
+    }
+
+    while (j < b.length) {
+      final bj = b[j++];
+      final original = aByKey[key(bj)];
+      result.add(original != null ? resolve(original, bj) : bj);
+    }
+
+    return result;
+  }
+
+  // Merge of two sorted lists that share no keys, so neither supersedes the
+  // other and the walk needs no key lookups at all.
+  static List<T> _mergeDisjoint<T>(List<T> a, List<T> b, Comparator<T> compare) {
+    final result = <T>[];
+    var i = 0;
+    var j = 0;
+    while (i < a.length && j < b.length) {
+      final ai = a[i];
+      final bj = b[j];
+      if (compare(ai, bj) <= 0) {
+        result.add(ai);
+        i++;
+      } else {
+        result.add(bj);
+        j++;
+      }
+    }
+    while (i < a.length) {
+      result.add(a[i++]);
+    }
+    while (j < b.length) {
+      result.add(b[j++]);
+    }
+    return result;
   }
 
   /// Recursively removes elements from a nested tree structure.
@@ -653,4 +877,21 @@ extension SortedListExtensions<T extends Object> on List<T> {
     // If no changes were made, return the original list
     return this;
   }
+}
+
+/// Asserts that [list] is already sorted by [compare].
+///
+/// **Note**: This method is only called in debug mode.
+bool _debugAssertSorted<T>(List<T> list, Comparator<T> compare) {
+  assert(() {
+    if (!list.isSorted(compare)) {
+      throw AssertionError(
+        'A ${list.runtimeType} was used as though it were sorted by `compare`, '
+        'but it is not. The result would be silently misordered rather than '
+        'rejected.',
+      );
+    }
+    return true;
+  }());
+  return true;
 }

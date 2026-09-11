@@ -175,6 +175,14 @@ sealed class Filter<T extends Object> {
   /// Logical OR filter matching when any [filters] match.
   const factory Filter.or(Iterable<Filter<T>> filters) = OrOperator<T>;
 
+  /// Raw filter serializing [value] verbatim, bypassing this type.
+  ///
+  /// A last resort, for a query the API accepts but this package does not
+  /// model. Prefer a declared operator wherever one exists.
+  ///
+  /// [value] is not validated, and [matches] throws for any filter containing one.
+  const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
+
   /// Whether this filter matches the given [other] instance.
   ///
   /// Evaluates filter criteria against field values extracted from [other]
@@ -237,8 +245,9 @@ sealed class ComparisonOperator<T extends Object> extends Filter<T> {
 ///
 /// Performs deep equality comparison for all data types:
 /// - **Primitives**: Standard equality (`==`)
-/// - **Arrays**: Order-sensitive, element-by-element comparison
 /// - **Objects**: Key-value equality, order-insensitive for keys
+/// - **Arrays**: Set equality against another array, or containment of a
+///   single value
 ///
 /// **Supported with**: `.equal` factory method
 final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
@@ -262,7 +271,18 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
       return isNear || isWithinBounds;
     }
 
-    // Deep equality: order-sensitive for arrays, order-insensitive for objects.
+    // An array field equals a set, or contains a single value.
+    if (fieldValue is Iterable<Object?>) {
+      if (comparisonValue is Iterable<Object?>) {
+        final containsEvery = fieldValue.containsValue(comparisonValue);
+        final isContainedBy = comparisonValue.containsValue(fieldValue);
+        return containsEvery && isContainedBy;
+      }
+
+      return fieldValue.containsValue(comparisonValue);
+    }
+
+    // Deep equality: order-insensitive for objects.
     return fieldValue.deepEquals(comparisonValue);
   }
 }
@@ -387,7 +407,7 @@ sealed class ListOperator<T extends Object> extends Filter<T> {
 /// Membership test filter for list containment.
 ///
 /// Tests whether the field value exists within the provided list of values.
-/// Uses deep equality with order-sensitive comparison for arrays.
+/// An array-valued field matches when the two intersect.
 ///
 /// **Supported with**: `.in_` factory method
 final class InOperator<T extends Object> extends ListOperator<T> {
@@ -401,7 +421,14 @@ final class InOperator<T extends Object> extends ListOperator<T> {
     final comparisonValues = value;
     if (comparisonValues is! Iterable<Object?>) return false;
 
-    // Deep equality (order-sensitive for arrays).
+    // An array field intersects plain values, and equals array ones.
+    if (fieldValue is Iterable<Object?>) {
+      return comparisonValues.any((it) {
+        if (it is Iterable<Object?>) return fieldValue.deepEquals(it);
+        return fieldValue.containsValue(it);
+      });
+    }
+
     return comparisonValues.any(fieldValue.deepEquals);
   }
 }
@@ -639,6 +666,36 @@ final class OrOperator<T extends Object> extends LogicalOperator<T> {
 
   @override
   bool matches(T other) => filters.any((filter) => filter.matches(other));
+}
+
+// endregion
+
+// region Escape hatches
+
+/// A filter carrying a pre-built query this package does not model.
+///
+/// A last resort — see [Filter.raw].
+///
+/// **Supported with**: `.raw` factory method
+final class RawFilter<T extends Object> extends Filter<T> {
+  /// Creates a filter serialized verbatim from [value].
+  const RawFilter(this.value) : super._();
+
+  /// The query to serialize, used as-is.
+  final Map<String, Object?> value;
+
+  /// Always throws: [value] is opaque, so there is nothing to compare against.
+  @override
+  bool matches(T other) {
+    throw UnsupportedError(
+      'Filter.raw cannot be evaluated locally: $value. It carries a query this '
+      'package does not model, so there is nothing to compare against. Use a '
+      'declared operator if you need matches().',
+    );
+  }
+
+  @override
+  Map<String, Object?> toJson() => value;
 }
 
 // endregion

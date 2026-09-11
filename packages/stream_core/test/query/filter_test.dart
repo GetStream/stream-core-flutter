@@ -245,6 +245,59 @@ void main() {
     });
   });
 
+  group('Escape hatches', () {
+    group('Raw', () {
+      test('should serialize the given map verbatim', () {
+        const value = {
+          'name': {r'$ne': 'test'},
+        };
+
+        expect(const Filter<TestModel>.raw(value).toJson(), equals(value));
+      });
+
+      test('should nest inside a logical filter unchanged', () {
+        final filter = Filter.and([
+          Filter.equal(TestFilterField.type, 'messaging'),
+          const Filter<TestModel>.raw({
+            'name': {r'$ne': 'test'},
+          }),
+        ]);
+
+        expect(filter.toJson(), {
+          r'$and': [
+            {
+              'type': {r'$eq': 'messaging'},
+            },
+            {
+              'name': {r'$ne': 'test'},
+            },
+          ],
+        });
+      });
+
+      test('should refuse to evaluate rather than guess', () {
+        const filter = Filter<TestModel>.raw({
+          'name': {r'$ne': 'test'},
+        });
+
+        expect(() => filter.matches(TestModel(name: 'test')), throwsUnsupportedError);
+      });
+
+      test('should make a filter containing one un-evaluatable', () {
+        // Reporting a match would be right here and wrong under `or`, so the
+        // refusal propagates rather than being resolved per composition.
+        final filter = Filter.and([
+          Filter.equal(TestFilterField.name, 'test'),
+          const Filter<TestModel>.raw({
+            'name': {r'$ne': 'other'},
+          }),
+        ]);
+
+        expect(() => filter.matches(TestModel(name: 'test')), throwsUnsupportedError);
+      });
+    });
+  });
+
   group('Logical', () {
     group('And', () {
       test('should serialize to JSON correctly', () {
@@ -435,7 +488,7 @@ void main() {
         );
       });
 
-      test('should match arrays with order-sensitivity', () {
+      test('should match arrays as a set', () {
         final model = TestModel(tags: ['a', 'b', 'c']);
 
         expect(
@@ -444,12 +497,23 @@ void main() {
         );
         expect(
           Filter.equal(TestFilterField.tags, ['c', 'b', 'a']).matches(model),
-          isFalse,
+          isTrue,
         );
         expect(
           Filter.equal(TestFilterField.tags, ['a', 'b']).matches(model),
           isFalse,
         );
+        expect(
+          Filter.equal(TestFilterField.tags, ['a', 'b', 'c', 'd']).matches(model),
+          isFalse,
+        );
+      });
+
+      test('should match a single value against an array', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(Filter.equal(TestFilterField.tags, 'b').matches(model), isTrue);
+        expect(Filter.equal(TestFilterField.tags, 'z').matches(model), isFalse);
       });
 
       test('should match objects with key order-insensitivity', () {
@@ -561,6 +625,19 @@ void main() {
             ['c', 'b', 'a'],
             ['x', 'y'],
           ]).matches(model),
+          isFalse,
+        );
+      });
+
+      test('should match an array against plain values that intersect', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(
+          Filter.in_(TestFilterField.tags, ['c', 'x']).matches(model),
+          isTrue,
+        );
+        expect(
+          Filter.in_(TestFilterField.tags, ['x', 'y']).matches(model),
           isFalse,
         );
       });
