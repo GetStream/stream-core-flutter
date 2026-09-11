@@ -1450,6 +1450,22 @@ void main() {
         expect(result.map((it) => it.points), [10, 30, 50, 70]);
       });
 
+      test('should leave the ties in an already sorted other where they are', () {
+        // The counterpart to sorting an unsorted other: an other already in
+        // order is merged as it stands. Pinned on ties because `sort` is not
+        // stable, so they are the one input where merging as it stands and
+        // re-sorting can be told apart — and on enough of them to pass the
+        // length below which `sort` happens to preserve order anyway.
+        final scores = [const _TestScore(userId: 0, points: 10)];
+        final incoming = [
+          for (var i = 40; i > 0; i--) _TestScore(userId: i, points: 30),
+        ];
+
+        final result = scores.sortedMerge(incoming, key: userId, compare: byPoints);
+
+        expect(result.map((it) => it.userId), [0, ...incoming.map((it) => it.userId)]);
+      });
+
       test('should append an other that sorts entirely after the receiver', () {
         final scores = [
           const _TestScore(userId: 1, points: 10),

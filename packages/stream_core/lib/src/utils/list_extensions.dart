@@ -325,7 +325,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
     T element, {
     required Comparator<T> compare,
   }) {
-    assert(_debugAssertSortedBy(this, compare));
+    assert(_debugAssertSorted(this, compare));
 
     if (isEmpty) return [element];
 
@@ -447,7 +447,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
     // Asserted after the insert path, which checks for itself, so a debug
     // build never walks the list twice for one call.
-    assert(_debugAssertSortedBy(this, compare));
+    assert(_debugAssertSorted(this, compare));
 
     final original = this[index];
     // Defaults to preferring the updated element.
@@ -459,8 +459,15 @@ extension SortedListExtensions<T extends Object> on List<T> {
       return [...this]..[index] = resolved;
     }
 
-    final updatedList = [...this]..removeAt(index);
-    return updatedList.sortedInsert(resolved, compare: compare);
+    // Placed against the list it is going into rather than through
+    // [sortedInsert], which would copy a second time to reach the same index.
+    final updated = [...this]..removeAt(index);
+    final destination = _upperBound(updated, resolved, compare);
+
+    // The one place a second copy pays for itself: inserting at 0 shifts every
+    // element to make room, where spreading writes them out once instead.
+    if (destination == 0) return [resolved, ...updated];
+    return updated..insert(destination, resolved);
   }
 
   /// Merges this list with another list, handling duplicates based on a key.
@@ -538,9 +545,10 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// Merges [other] into this list, keeping it sorted.
   ///
   /// The receiver must already be sorted by [compare]; [other] may arrive in
-  /// any order. Time complexity: O(n + m), against O((n + m) log(n + m)) for
-  /// [merge], which assumes no order. Prefer this whenever the receiver is
-  /// kept sorted anyway, and [merge] when it is not.
+  /// any order. Time complexity: O(n + m) when [other] is sorted too and
+  /// O(n + m log m) when it has to be sorted first, against
+  /// O((n + m) log(n + m)) for [merge], which assumes no order. Prefer this
+  /// whenever the receiver is kept sorted anyway, and [merge] when it is not.
   ///
   /// The keys of [other] win: an element of this list whose key appears in
   /// [other] is replaced by the [other] copy, passed through [update] when
@@ -565,10 +573,10 @@ extension SortedListExtensions<T extends Object> on List<T> {
     required Comparator<T> compare,
     T Function(T original, T updated)? update,
   }) {
-    assert(_debugAssertSortedBy(this, compare));
-
     // Nothing to merge in: hand back the receiver rather than a copy of it.
     if (other == null || other.isEmpty || identical(other, this)) return this;
+
+    assert(_debugAssertSorted(this, compare));
 
     T handleUpdate(T original, T updated) {
       if (update != null) return update(original, updated);
@@ -576,7 +584,10 @@ extension SortedListExtensions<T extends Object> on List<T> {
     }
 
     final otherList = other is List<T> ? other : other.toList(growable: false);
-    final sortedOther = otherList.sorted(compare);
+    // An incoming batch is usually in order already, and noticing that costs
+    // one walk against the n log n of sorting it regardless. Skipping the sort
+    // leaves this aliasing the caller's list, so it is only ever read.
+    final sortedOther = otherList.isSorted(compare) ? otherList : otherList.sorted(compare);
     return _mergeSorted(this, sortedOther, key, compare, handleUpdate);
   }
 
@@ -602,8 +613,17 @@ extension SortedListExtensions<T extends Object> on List<T> {
     Comparator<T> compare,
     T Function(T original, T updated) resolve,
   ) {
-    final bKeys = <K>{for (final item in bIn) key(item)};
     final aByKey = <K, T>{for (final item in aIn) key(item): item};
+
+    // Whether anything in [bIn] supersedes an element of [aIn] falls out of
+    // building its key set, so it costs no pass of its own.
+    var supersedes = false;
+    final bKeys = <K>{};
+    for (final item in bIn) {
+      final itemKey = key(item);
+      bKeys.add(itemKey);
+      if (!supersedes && aByKey.containsKey(itemKey)) supersedes = true;
+    }
 
     // A key identifies one element, so emitting it twice would put the same
     // thing in the list twice. Both collections are keyed already, so a short
@@ -612,15 +632,8 @@ extension SortedListExtensions<T extends Object> on List<T> {
     final b = bKeys.length == bIn.length ? bIn : _lastPerKey(bIn, key);
 
     // When the two share no key, nothing supersedes anything and the walk
-    // needs no key lookups at all — the common shape when a page of older
-    // history arrives.
-    var supersedes = false;
-    for (final item in b) {
-      if (aByKey.containsKey(key(item))) {
-        supersedes = true;
-        break;
-      }
-    }
+    // needs no key lookups at all — the shape of appending a batch that is
+    // entirely new.
     if (!supersedes) return _mergeDisjoint(a, b, compare);
 
     final result = <T>[];
@@ -869,17 +882,16 @@ extension SortedListExtensions<T extends Object> on List<T> {
 /// Asserts that [list] is already sorted by [compare].
 ///
 /// **Note**: This method is only called in debug mode.
-bool _debugAssertSortedBy<T>(List<T> list, Comparator<T> compare) {
+bool _debugAssertSorted<T>(List<T> list, Comparator<T> compare) {
   assert(() {
-    for (var i = 1; i < list.length; i++) {
-      if (compare(list[i - 1], list[i]) <= 0) continue;
+    if (!list.isSorted(compare)) {
       throw AssertionError(
         'A ${list.runtimeType} was used as though it were sorted by `compare`, '
-        'but element $i sorts before element ${i - 1}. The result would be '
-        'silently misordered rather than rejected.',
+        'but it is not. The result would be silently misordered rather than '
+        'rejected.',
       );
     }
     return true;
-  }(), '');
+  }());
   return true;
 }

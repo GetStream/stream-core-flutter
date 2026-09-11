@@ -6,7 +6,7 @@
 - Added `Filter.raw`, a last resort for a query this package does not model. It serializes verbatim, is not validated, and cannot be evaluated locally, so `matches` throws for it
 - Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
 - Added `sortedUpsertAt`, which upserts at an index the caller already has instead of searching for one
-- Added `sortedMerge`, an O(N+M) merge for a receiver that is already sorted. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
+- Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
 
 ### 🐞 Fixed
