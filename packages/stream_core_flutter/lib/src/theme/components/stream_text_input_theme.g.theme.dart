@@ -126,20 +126,20 @@ mixin _$StreamTextInputStyle {
         b.borderRadius,
         t,
       ),
-      border: a.border == null
-          ? b.border
-          : b.border == null
-          ? a.border
+      border: a.border == null || b.border == null
+          ? t < 0.5
+                ? a.border
+                : b.border
           : BorderSide.lerp(a.border!, b.border!, t),
-      focusBorder: a.focusBorder == null
-          ? b.focusBorder
-          : b.focusBorder == null
-          ? a.focusBorder
+      focusBorder: a.focusBorder == null || b.focusBorder == null
+          ? t < 0.5
+                ? a.focusBorder
+                : b.focusBorder
           : BorderSide.lerp(a.focusBorder!, b.focusBorder!, t),
-      errorBorder: a.errorBorder == null
-          ? b.errorBorder
-          : b.errorBorder == null
-          ? a.errorBorder
+      errorBorder: a.errorBorder == null || b.errorBorder == null
+          ? t < 0.5
+                ? a.errorBorder
+                : b.errorBorder
           : BorderSide.lerp(a.errorBorder!, b.errorBorder!, t),
       fillColor: Color.lerp(a.fillColor, b.fillColor, t),
       contentPadding: EdgeInsetsGeometry.lerp(
@@ -240,15 +240,21 @@ mixin _$StreamTextInputStyle {
           other.helperSuccessStyle,
       helperAffinity: other.helperAffinity,
       borderRadius: other.borderRadius,
-      border: _this.border != null && other.border != null
-          ? BorderSide.merge(_this.border!, other.border!)
-          : other.border,
-      focusBorder: _this.focusBorder != null && other.focusBorder != null
-          ? BorderSide.merge(_this.focusBorder!, other.focusBorder!)
-          : other.focusBorder,
-      errorBorder: _this.errorBorder != null && other.errorBorder != null
-          ? BorderSide.merge(_this.errorBorder!, other.errorBorder!)
-          : other.errorBorder,
+      border: _this.border == null
+          ? other.border
+          : other.border == null
+          ? _this.border
+          : BorderSide.merge(_this.border!, other.border!),
+      focusBorder: _this.focusBorder == null
+          ? other.focusBorder
+          : other.focusBorder == null
+          ? _this.focusBorder
+          : BorderSide.merge(_this.focusBorder!, other.focusBorder!),
+      errorBorder: _this.errorBorder == null
+          ? other.errorBorder
+          : other.errorBorder == null
+          ? _this.errorBorder
+          : BorderSide.merge(_this.errorBorder!, other.errorBorder!),
       fillColor: other.fillColor,
       contentPadding: other.contentPadding,
       constraints: other.constraints,

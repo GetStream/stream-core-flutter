@@ -466,7 +466,7 @@ class StreamTokens {
   static const backgroundElevationElevation3 = Color(0xFF565656);
   static const borderUtilityFocus = Color(0x4078A8FF);
   static const borderUtilityError = Color(0xFFFC526A);
-  static const borderUtilityWarning = Color(0xFFFA922B);
+  static const borderUtilityWarning = Color(0xFFFCD579);
   static const borderUtilitySuccess = Color(0xFF00C384);
   static const borderUtilitySelected = Color(0x26FFFFFF);
   static const borderUtilityDisabled = Color(0xFF323232);
@@ -596,7 +596,7 @@ class StreamTokens {
   static const avatarPresenceBorder = Color(0xFF000000);
   static const accentPrimary = Color(0xFF4586FF);
   static const accentSuccess = Color(0xFF00C384);
-  static const accentWarning = Color(0xFFFA922B);
+  static const accentWarning = Color(0xFFFCD579);
   static const accentError = Color(0xFFFC526A);
   static const accentNeutral = Color(0xFFABABAB);
   static const brand50 = Color(0xFF091A3B);

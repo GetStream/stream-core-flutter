@@ -7,6 +7,22 @@
   (the default) or `.warning` — and `StreamErrorBadge.showBorder`.
 - Added `StreamErrorBadgeTheme` and `StreamErrorBadgeThemeData`, carrying a
   background and foreground color per style.
+- Added `StreamColorScheme.backgroundOnElevation` and `borderOnElevation`, for
+  controls inside a floating surface such as a menu or popover.
+
+### 🐛 Bug Fixes
+
+- Fixed `lerp` on theme styles carrying a `WidgetStateBorderSide` throwing a cast
+  error. The border side now steps at the midpoint rather than interpolating.
+- Fixed `lerp` on a theme style whose border side is set on one end only. It now
+  steps at the midpoint instead of applying the non-null side across the whole
+  transition.
+
+### 🔄 Changed
+
+- `StreamColorScheme.accentWarning` — and `borderWarning`, which defaults to it —
+  moved from orange to yellow: `#F26D10` → `#F6BF57` light, `#FA922B` → `#FCD579`
+  dark. Pair it with a dark foreground.
 
 ## 0.5.1
 

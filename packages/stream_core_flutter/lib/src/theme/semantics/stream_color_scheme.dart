@@ -70,6 +70,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundSurfaceCard,
     Color? backgroundOnAccent,
+    Color? backgroundOnElevation,
     Color? backgroundHighlight,
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
@@ -90,6 +91,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderOnAccent,
     Color? borderOnInverse,
     Color? borderOnSurface,
+    Color? borderOnElevation,
     Color? borderOpacitySubtle,
     Color? borderOpacityStrong,
     // Border - Utility
@@ -139,6 +141,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceStrong ??= chrome.shade150;
     backgroundSurfaceCard ??= chrome.shade50;
     backgroundOnAccent ??= chrome[0] ?? StreamColors.white;
+    backgroundOnElevation ??= chrome.shade100;
     backgroundHighlight ??= light_tokens.StreamTokens.backgroundCoreHighlight;
     backgroundScrim ??= light_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= light_tokens.StreamTokens.backgroundCoreOverlayLight;
@@ -161,6 +164,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderOnAccent ??= chrome[0] ?? StreamColors.white;
     borderOnInverse ??= chrome[0] ?? StreamColors.white;
     borderOnSurface ??= chrome.shade300;
+    borderOnElevation ??= chrome.shade150;
     borderOpacitySubtle ??= light_tokens.StreamTokens.borderCoreOpacitySubtle;
     borderOpacityStrong ??= light_tokens.StreamTokens.borderCoreOpacityStrong;
 
@@ -231,6 +235,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundSurfaceCard: backgroundSurfaceCard,
       backgroundOnAccent: backgroundOnAccent,
+      backgroundOnElevation: backgroundOnElevation,
       backgroundHighlight: backgroundHighlight,
       backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
@@ -246,6 +251,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderOnAccent: borderOnAccent,
       borderOnInverse: borderOnInverse,
       borderOnSurface: borderOnSurface,
+      borderOnElevation: borderOnElevation,
       borderSubtle: borderSubtle,
       borderStrong: borderStrong,
       borderOpacitySubtle: borderOpacitySubtle,
@@ -295,6 +301,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundSurfaceStrong,
     Color? backgroundSurfaceCard,
     Color? backgroundOnAccent,
+    Color? backgroundOnElevation,
     Color? backgroundHighlight,
     Color? backgroundScrim,
     Color? backgroundOverlayLight,
@@ -316,6 +323,7 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? borderOnAccent,
     Color? borderOnInverse,
     Color? borderOnSurface,
+    Color? borderOnElevation,
     // Border - Utility
     Color? borderFocus,
     Color? borderDisabled,
@@ -363,6 +371,7 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundSurfaceStrong ??= chrome.shade150;
     backgroundSurfaceCard ??= chrome.shade100;
     backgroundOnAccent ??= chrome[1000] ?? StreamColors.white;
+    backgroundOnElevation ??= chrome.shade150;
     backgroundHighlight ??= dark_tokens.StreamTokens.backgroundCoreHighlight;
     backgroundScrim ??= dark_tokens.StreamTokens.backgroundCoreScrim;
     backgroundOverlayLight ??= dark_tokens.StreamTokens.backgroundCoreOverlayLight;
@@ -387,6 +396,7 @@ class StreamColorScheme with _$StreamColorScheme {
     borderOnAccent ??= chrome[1000] ?? StreamColors.white;
     borderOnInverse ??= chrome[0] ?? StreamColors.black;
     borderOnSurface ??= chrome.shade300;
+    borderOnElevation ??= chrome.shade300;
 
     // Border - Utility
     borderFocus ??= brand.shade150;
@@ -455,6 +465,7 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundSurfaceStrong: backgroundSurfaceStrong,
       backgroundSurfaceCard: backgroundSurfaceCard,
       backgroundOnAccent: backgroundOnAccent,
+      backgroundOnElevation: backgroundOnElevation,
       backgroundHighlight: backgroundHighlight,
       backgroundScrim: backgroundScrim,
       backgroundOverlayLight: backgroundOverlayLight,
@@ -473,6 +484,7 @@ class StreamColorScheme with _$StreamColorScheme {
       borderOnAccent: borderOnAccent,
       borderOnInverse: borderOnInverse,
       borderOnSurface: borderOnSurface,
+      borderOnElevation: borderOnElevation,
       borderSubtle: borderSubtle,
       borderFocus: borderFocus,
       borderDisabled: borderDisabled,
@@ -544,6 +556,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundSurfaceStrong,
     required this.backgroundSurfaceCard,
     required this.backgroundOnAccent,
+    required this.backgroundOnElevation,
     required this.backgroundHighlight,
     required this.backgroundScrim,
     required this.backgroundOverlayLight,
@@ -563,6 +576,7 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.borderOnAccent,
     required this.borderOnInverse,
     required this.borderOnSurface,
+    required this.borderOnElevation,
     required this.borderOpacitySubtle,
     required this.borderOpacityStrong,
     // Border - Utility
@@ -666,6 +680,11 @@ class StreamColorScheme with _$StreamColorScheme {
   /// Surface that must remain white across themes (e.g., media controls over video).
   final Color backgroundOnAccent;
 
+  /// Background for controls sitting inside a floating surface — a menu, dialog
+  /// or popover. Steps up in dark mode, where the elevated surface has already
+  /// lightened and a plain surface background would disappear into it.
+  final Color backgroundOnElevation;
+
   /// Highlight background (e.g., quoted message, search hit).
   final Color backgroundHighlight;
 
@@ -733,6 +752,13 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// The border color on surface backgrounds.
   final Color borderOnSurface;
+
+  /// Border for controls sitting inside a floating surface — a menu, dialog or
+  /// popover. Steps up in dark mode to keep the edge visible once the elevated
+  /// surface has lightened. Use [borderOnSurface] on a plain surface instead —
+  /// though the two resolve to the same value in dark, so the choice only shows
+  /// in light.
+  final Color borderOnElevation;
 
   /// Image frame border treatment (subtle opacity).
   final Color borderOpacitySubtle;

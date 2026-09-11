@@ -118,7 +118,7 @@ mixin _$StreamEmojiButtonThemeStyle {
         t,
         Color.lerp,
       ),
-      side: WidgetStateBorderSide.lerp(a.side, b.side, t),
+      side: t < 0.5 ? a.side : b.side,
     );
   }
 

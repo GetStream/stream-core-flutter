@@ -1251,8 +1251,12 @@ Themes are generated via `theme_extensions_builder`. **Never hand-roll `copyWith
 
 The hierarchy is layered: **primitives** (`theme/primitives/`, raw tokens) →
 **semantics** (`theme/semantics/`, semantic mappings) → **component themes**
-(`theme/components/`, per-widget classes, 50+) → **tokens** (figma-generated,
-internal).
+(`theme/components/`, per-widget classes, 50+) → **tokens** (vendored from the
+design-token repo, internal).
+
+Only root semantic tokens are vendored; a component's derived values are resolved
+from `colorScheme.*` in its own defaults, never from a token constant. Use the
+`update-design-tokens` skill when syncing a token change.
 
 Adding a new component theme:
 
@@ -1356,28 +1360,19 @@ shape.
 
 ### Icons
 
-Source SVGs live in `packages/stream_core_flutter/assets_source/icons/`. They come
-from the [design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons)
-repository.
+Icons are generated, not hand-written: `melos run generate:icons` builds the icon
+font and the `StreamIcons` / `StreamIconData` classes from the source SVGs in
+`packages/stream_core_flutter/assets_source/icons/`, which are copied from the
+[design-system-tokens](https://github.com/GetStream/design-system-tokens/tree/main/assets/icons)
+repo.
 
-When adding or updating icons:
+Do not edit the generated `stream_icons.dart`, `stream_icons.g.dart`, the font, or
+`assets_source/icon_log.g.txt` by hand. Commit SVG sources and regenerated output
+together — they must stay in sync.
 
-1. Pull the latest SVGs from `design-system-tokens/assets/icons/` into
-   `assets_source/icons/`.
-2. If the icon should mirror in RTL layouts, add its base name to the
-   `_rtlIcons` list in `scripts/generate_icons.dart` so the generator emits
-   `matchTextDirection: true` for it. This covers obvious directional glyphs
-   (arrows, chevrons, `reply`, `send`, `sidebar`) but also icons with
-   directional metaphors that read wrong when unmirrored (`audio`, `megaphone`,
-   `search`, `video`). Skip icons that are symmetric or shouldn't mirror
-   (a bell, a heart, brand logos). If in doubt, look at what comparable icons
-   already do in `_rtlIcons`.
-3. Run `melos run generate:icons` to regenerate the icon font and the
-   `StreamIcons` class.
-4. Commit both the SVG sources and the regenerated font + Dart output together —
-   they must stay in sync.
-
-Do not edit the generated `StreamIcons.dart` or the icon font by hand.
+Adding, renaming or retiring an icon affects more than the file you touch, because
+glyph code points are append-only. **Use the `update-icons` skill** for any icon
+work.
 
 ## Commits, PRs, and changelogs
 
@@ -1396,8 +1391,10 @@ PR titles follow [Conventional Commits](https://www.conventionalcommits.org/):
 ### Changelog policy
 
 Every PR that changes package behavior updates the affected package's
-`CHANGELOG.md` under the `Upcoming` heading. Entries live under one of these
-sub-headings:
+`CHANGELOG.md` under the `Upcoming` heading. **Keep entries to a line or two** —
+what changed and, for a value change, the old and new values. Rationale, contrast
+figures and migration detail belong in the PR, not here. Entries live under one of
+these sub-headings:
 
 ```markdown
 ## Upcoming
@@ -1522,8 +1519,10 @@ only the ones this PR bumped. So:
 - **Melos commands**: `melos.yaml` — every task the repo runs.
 - **Design source**: the Chat SDK Design System Figma project — accessed via the
   Figma MCP when implementing UI.
-- **Design tokens**: the [design-system-tokens](https://github.com/GetStream/design-system-tokens)
-  sibling repo (mirrored internally in the theme primitives).
+- **Design tokens and icons**: the [design-system-tokens](https://github.com/GetStream/design-system-tokens)
+  sibling repo (colours mirrored into the theme primitives, SVGs into
+  `assets_source/icons/`). The `update-design-tokens` and `update-icons` skills
+  cover syncing from it.
 
 When something isn't covered here and isn't obvious from surrounding code, prefer
 to ask in the PR rather than guessing. If a convention isn't documented, propose

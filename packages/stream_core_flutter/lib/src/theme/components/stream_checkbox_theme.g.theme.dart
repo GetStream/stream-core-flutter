@@ -120,7 +120,7 @@ mixin _$StreamCheckboxStyle {
         Color.lerp,
       ),
       shape: OutlinedBorder.lerp(a.shape, b.shape, t),
-      side: WidgetStateBorderSide.lerp(a.side, b.side, t),
+      side: t < 0.5 ? a.side : b.side,
     );
   }
 

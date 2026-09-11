@@ -160,9 +160,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       radius: StreamRadius.lerp(_this.radius, other.radius, t)!,
       spacing: StreamSpacing.lerp(_this.spacing, other.spacing, t)!,
       typography: StreamTypography.lerp(_this.typography, other.typography, t)!,
-      colorScheme:
-          (_this.colorScheme.lerp(other.colorScheme, t) as StreamColorScheme),
-      textTheme: (_this.textTheme.lerp(other.textTheme, t) as StreamTextTheme),
+      colorScheme: _this.colorScheme.lerp(other.colorScheme, t),
+      textTheme: _this.textTheme.lerp(other.textTheme, t),
       boxShadow: StreamBoxShadow.lerp(_this.boxShadow, other.boxShadow, t)!,
       appBarTheme: StreamAppBarThemeData.lerp(
         _this.appBarTheme,
