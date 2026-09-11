@@ -18,8 +18,16 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
 
   final label = context.knobs.string(
     label: 'Label',
-    initialValue: 'Also sent in channel ·',
+    initialValue: 'Also sent in channel',
     description: 'The annotation label text.',
+  );
+
+  final showSeparator = context.knobs.boolean(
+    label: 'Show Separator',
+    initialValue: true,
+    description:
+        'Whether to place a middle dot between the label and the trailing slot. '
+        'It is dropped automatically when the row wraps onto a second line.',
   );
 
   final showLeading = context.knobs.boolean(
@@ -112,6 +120,7 @@ Widget buildStreamMessageAnnotationPlayground(BuildContext context) {
               : null,
           leading: showLeading ? Icon(leadingIcon.resolve(icons)) : null,
           label: Text(label),
+          separator: showSeparator ? StreamMessageAnnotation.separator : null,
           trailing: showTrailing ? Text(trailingText) : null,
           style: StreamMessageAnnotationStyle(
             spacing: StreamMessageLayoutProperty.all(spacing),
@@ -202,7 +211,8 @@ class _AnnotationTypesSection extends StatelessWidget {
           subtitle: 'Bold label + regular-weight informational trailing timestamp.',
           child: StreamMessageAnnotation(
             leading: Icon(icons.bell),
-            label: const Text('Reminder set ·'),
+            label: const Text('Reminder set'),
+            separator: StreamMessageAnnotation.separator,
             trailing: const Text('In 2 hours'),
           ),
         ),
@@ -212,7 +222,8 @@ class _AnnotationTypesSection extends StatelessWidget {
           child: StreamMessageAnnotation(
             onTap: () {},
             leading: const Icon(Icons.translate),
-            label: const Text('Translated ·'),
+            label: const Text('Translated'),
+            separator: StreamMessageAnnotation.separator,
             trailing: const Text('Show original'),
             style: StreamMessageAnnotationStyle.from(
               trailingTextColor: colorScheme.textLink,
@@ -225,7 +236,8 @@ class _AnnotationTypesSection extends StatelessWidget {
           child: StreamMessageAnnotation(
             onTap: () {},
             leading: Icon(icons.arrowUp),
-            label: const Text('Also sent in channel ·'),
+            label: const Text('Also sent in channel'),
+            separator: StreamMessageAnnotation.separator,
             trailing: const Text('View'),
             style: StreamMessageAnnotationStyle.from(
               trailingTextColor: colorScheme.textLink,
@@ -238,7 +250,8 @@ class _AnnotationTypesSection extends StatelessWidget {
           child: StreamMessageAnnotation(
             onTap: () {},
             leading: Icon(icons.arrowUp),
-            label: const Text('Replied to a thread ·'),
+            label: const Text('Replied to a thread'),
+            separator: StreamMessageAnnotation.separator,
             trailing: const Text('View'),
             style: StreamMessageAnnotationStyle.from(
               trailingTextColor: colorScheme.textLink,
@@ -252,7 +265,8 @@ class _AnnotationTypesSection extends StatelessWidget {
               'own GestureDetector and leave onTap null.',
           child: StreamMessageAnnotation(
             leading: const Icon(Icons.translate),
-            label: const Text('Translated ·'),
+            label: const Text('Translated'),
+            separator: StreamMessageAnnotation.separator,
             trailing: GestureDetector(
               onTap: () {},
               behavior: HitTestBehavior.opaque,
@@ -326,7 +340,8 @@ class _PresentationExample extends StatelessWidget {
             StreamMessageAnnotation(
               onTap: () {},
               leading: Icon(icons.arrowUp),
-              label: const Text('Also sent in channel ·'),
+              label: const Text('Also sent in channel'),
+              separator: StreamMessageAnnotation.separator,
               trailing: const Text('View'),
               style: StreamMessageAnnotationStyle(
                 trailingTextColor: _linkColor(colorScheme.textLink),
@@ -458,7 +473,8 @@ class _RealWorldSection extends StatelessWidget {
             children: [
               StreamMessageAnnotation(
                 leading: Icon(icons.bell),
-                label: const Text('Reminder set ·'),
+                label: const Text('Reminder set'),
+                separator: StreamMessageAnnotation.separator,
                 trailing: const Text('In 30 minutes'),
               ),
               StreamMessageBubble(
@@ -476,7 +492,8 @@ class _RealWorldSection extends StatelessWidget {
               StreamMessageAnnotation(
                 onTap: () {},
                 leading: Icon(icons.arrowUp),
-                label: const Text('Also sent in channel ·'),
+                label: const Text('Also sent in channel'),
+                separator: StreamMessageAnnotation.separator,
                 trailing: const Text('View'),
                 style: StreamMessageAnnotationStyle.from(
                   trailingTextColor: colorScheme.textLink,
