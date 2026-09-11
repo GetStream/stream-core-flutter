@@ -18,17 +18,19 @@ python3 <skill>/scripts/flatten_tokens.py --diff 4ef9b54 origin/main tokens/core
 ```
 
 Read it as *"every semantic change up to here has been triaged"*, not *"the vendored
-files mirror this commit"*. They do not, and knowingly so: the vendored set is
-neither a subset nor a superset of upstream. Some names pre-date upstream's
-core/chat/video namespace split and survive only here (`backgroundElevationElevation0`,
-`avatarPaletteBg1`); many upstream names — mostly derived tokens — are deliberately
-not vendored; and `light/` and `dark/` do not even hold the same set. Compare them
-yourself rather than trusting a count that rots:
+files mirror this commit"*. They do not, and knowingly so: the vendored set is a
+strict **subset** of upstream. Every name here exists upstream under the same
+spelling, but a large share of upstream's names are deliberately absent — mostly
+derived tokens a component re-derives from a `colorScheme` field instead.
+
+Two properties also hold as of this commit: every vendored color constant has a
+reader, and `light/` and `dark/` declare the same set. Neither is a claim about
+upstream, so check the subset relation yourself rather than trusting a count that
+rots:
 
 ```bash
 python3 <skill>/scripts/flatten_tokens.py tokens/core/semantics/light.json
 ```
-Adopting the namespace split is its own migration, not part of a routine sync.
 
 ## Derived-token map
 
