@@ -256,6 +256,36 @@ void main() {
     });
 
     group('updateWhere', () {
+      test('should return the same instance when nothing matches', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.updateWhere(
+          (user) => user.id == 'missing',
+          update: (user) => const _TestUser(id: 'x', name: 'X'),
+        );
+
+        expect(identical(result, users), isTrue);
+      });
+
+      test('should copy rather than mutate when something matches', () {
+        final users = [
+          const _TestUser(id: '1', name: 'Alice'),
+          const _TestUser(id: '2', name: 'Bob'),
+        ];
+
+        final result = users.updateWhere(
+          (user) => user.id == '2',
+          update: (user) => const _TestUser(id: '2', name: 'Robert'),
+        );
+
+        expect(result.map((it) => it.name), ['Alice', 'Robert']);
+        expect(users.map((it) => it.name), ['Alice', 'Bob']);
+        expect(identical(result, users), isFalse);
+      });
+
       test('should update elements matching filter condition', () {
         final users = [
           const _TestUser(id: '1', name: 'Alice'),
@@ -702,6 +732,15 @@ void main() {
         expect(numbers, [1, 3, 5, 7]);
       });
 
+      test('should insert into an empty list', () {
+        final numbers = <int>[];
+
+        final result = numbers.sortedInsert(1, compare: (a, b) => a.compareTo(b));
+
+        expect(result, [1]);
+        expect(numbers, isEmpty);
+      });
+
       test('should insert at beginning when element is smallest', () {
         final numbers = [3, 5, 7];
 
@@ -957,6 +996,93 @@ void main() {
         expect(result.map((s) => s.userId), [1, 3, 5]);
       });
 
+      test('should leave a replaced element among its ties where it was', () {
+        final users = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 100),
+          const _TestScore(userId: 3, points: 100),
+        ];
+
+        final result = users.sortedUpsert(
+          const _TestScore(userId: 1, points: 100),
+          key: (score) => score.userId,
+          compare: (a, b) => b.points.compareTo(a.points),
+        );
+
+        expect(result.map((s) => s.userId), [1, 2, 3]);
+      });
+
+      test('sortedUpsertAt inserts when the index is -1', () {
+        final users = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 3, points: 60),
+        ];
+
+        final result = users.sortedUpsertAt(
+          -1,
+          const _TestScore(userId: 2, points: 80),
+          compare: (a, b) => b.points.compareTo(a.points),
+        );
+
+        expect(result.map((s) => s.userId), [1, 2, 3]);
+      });
+
+      test('sortedUpsertAt agrees with sortedUpsert for the same element', () {
+        final users = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 80),
+          const _TestScore(userId: 3, points: 60),
+        ];
+        int byPoints(_TestScore a, _TestScore b) => b.points.compareTo(a.points);
+
+        for (final incoming in [
+          const _TestScore(userId: 2, points: 80), // stays put
+          const _TestScore(userId: 2, points: 999), // moves to the front
+          const _TestScore(userId: 4, points: 70), // not present
+        ]) {
+          final index = users.indexWhere((it) => it.userId == incoming.userId);
+          expect(
+            users.sortedUpsertAt(index, incoming, compare: byPoints).map((s) => s.points),
+            users.sortedUpsert(incoming, key: (it) => it.userId, compare: byPoints).map((s) => s.points),
+            reason: 'disagreed for ${incoming.userId}',
+          );
+        }
+      });
+
+      test('should replace in place when the position is unchanged', () {
+        final users = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 80),
+          const _TestScore(userId: 3, points: 60),
+        ];
+
+        final result = users.sortedUpsert(
+          const _TestScore(userId: 2, points: 80),
+          key: (score) => score.userId,
+          compare: (a, b) => b.points.compareTo(a.points),
+        );
+
+        expect(result.map((s) => s.userId), [1, 2, 3]);
+        expect(result.map((s) => s.points), [100, 80, 60]);
+      });
+
+      test('should move the element when the update reorders it', () {
+        final users = [
+          const _TestScore(userId: 1, points: 100),
+          const _TestScore(userId: 2, points: 80),
+          const _TestScore(userId: 3, points: 60),
+        ];
+
+        final result = users.sortedUpsert(
+          const _TestScore(userId: 3, points: 999),
+          key: (score) => score.userId,
+          compare: (a, b) => b.points.compareTo(a.points),
+        );
+
+        expect(result.map((s) => s.userId), [3, 1, 2]);
+        expect(result.map((s) => s.points), [999, 100, 80]);
+      });
+
       test('should insert new element at correct sorted position', () {
         final users = [
           const _TestScore(userId: 1, points: 100),
@@ -1057,9 +1183,10 @@ void main() {
       });
 
       test('should use default update behavior when update function is not provided', () {
+        // Sorted descending, matching the comparator below.
         final scores = [
-          const _TestScore(userId: 1, points: 100),
           const _TestScore(userId: 2, points: 200),
+          const _TestScore(userId: 1, points: 100),
         ];
 
         final result = scores.sortedUpsert(
@@ -1258,6 +1385,252 @@ void main() {
           ['act1', 'act2', 'act3', 'act4', 'act5'],
         );
         expect(result.first.content, 'Hello Updated'); // Updated content
+      });
+    });
+
+    group('sortedMerge', () {
+      int byPoints(_TestScore a, _TestScore b) => a.points.compareTo(b.points);
+      int userId(_TestScore it) => it.userId;
+
+      test('should assert when the receiver is not sorted', () {
+        // Without this the result is quietly misordered, which is far harder
+        // to trace back than a failed assertion.
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 30),
+          const _TestScore(userId: 3, points: 20),
+        ];
+
+        expect(
+          () => scores.sortedMerge(
+            const [_TestScore(userId: 4, points: 40)],
+            key: userId,
+            compare: byPoints,
+          ),
+          throwsA(isA<AssertionError>()),
+        );
+      });
+
+      test('should return the receiver when other is null', () {
+        final scores = [const _TestScore(userId: 1, points: 100)];
+
+        final result = scores.sortedMerge(null, key: userId, compare: byPoints);
+
+        expect(identical(result, scores), isTrue);
+      });
+
+      test('should return the receiver when other is empty', () {
+        final scores = [const _TestScore(userId: 1, points: 100)];
+
+        final result = scores.sortedMerge(const [], key: userId, compare: byPoints);
+
+        expect(identical(result, scores), isTrue);
+      });
+
+      test('should return the receiver when other is identical to it', () {
+        final scores = [const _TestScore(userId: 1, points: 100)];
+
+        final result = scores.sortedMerge(scores, key: userId, compare: byPoints);
+
+        expect(identical(result, scores), isTrue);
+      });
+
+      test('should sort other internally when it arrives unsorted', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 3, points: 50),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 4, points: 70), _TestScore(userId: 2, points: 30)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => it.points), [10, 30, 50, 70]);
+      });
+
+      test('should append an other that sorts entirely after the receiver', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 30),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 3, points: 50), _TestScore(userId: 4, points: 70)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => it.userId), [1, 2, 3, 4]);
+      });
+
+      test('should prepend an other that sorts entirely before the receiver', () {
+        final scores = [
+          const _TestScore(userId: 3, points: 50),
+          const _TestScore(userId: 4, points: 70),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 1, points: 10), _TestScore(userId: 2, points: 30)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => it.userId), [1, 2, 3, 4]);
+      });
+
+      test('should interleave two sorted lists', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 3, points: 50),
+          const _TestScore(userId: 5, points: 90),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 2, points: 30), _TestScore(userId: 4, points: 70)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => it.userId), [1, 2, 3, 4, 5]);
+      });
+
+      test('should apply update on a key collision', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 30),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 2, points: 40)],
+          key: userId,
+          compare: byPoints,
+          update: (original, updated) => _TestScore(
+            userId: original.userId,
+            points: original.points + updated.points,
+          ),
+        );
+
+        expect(result.map((it) => it.points), [10, 70]);
+      });
+
+      test('should move a replacement behind the elements it ties with', () {
+        // Pinned because it surprises: `merge` would leave userId 1 in front.
+        // Either order is valid for elements that compare equal, so this
+        // records the choice rather than requiring it.
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 10),
+          const _TestScore(userId: 3, points: 20),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 1, points: 10)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => it.userId), [2, 1, 3]);
+      });
+
+      test('should move a replacement that no longer sorts where it sat', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 20),
+          const _TestScore(userId: 3, points: 30),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 1, points: 40)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => it.userId), [2, 3, 1]);
+      });
+
+      test('should run update once for a key held by both lists', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 20),
+        ];
+        var calls = 0;
+
+        scores.sortedMerge(
+          const [_TestScore(userId: 1, points: 30)],
+          key: userId,
+          compare: byPoints,
+          update: (original, updated) {
+            calls++;
+            return updated;
+          },
+        );
+
+        expect(calls, 1);
+      });
+
+      test('should collapse a repeated key, keeping the last that carried it', () {
+        // A key identifies one element, so emitting it twice would put the
+        // same thing in the list twice. Interleaved on purpose, so the
+        // repeats straddle each other rather than sitting at one end.
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 1, points: 30),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 2, points: 20), _TestScore(userId: 2, points: 40)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => '${it.userId}:${it.points}'), ['1:30', '2:40']);
+      });
+
+      test('should agree with merge on which copy of a repeated key survives', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 1, points: 30),
+        ];
+        const incoming = [_TestScore(userId: 2, points: 20)];
+
+        expect(
+          scores.sortedMerge(incoming, key: userId, compare: byPoints),
+          scores.merge(incoming, key: userId, compare: byPoints),
+        );
+      });
+
+      test('should drop every receiver copy of a key that other supplies', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 1, points: 20),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 1, points: 50), _TestScore(userId: 2, points: 70)],
+          key: userId,
+          compare: byPoints,
+        );
+
+        expect(result.map((it) => '${it.userId}:${it.points}'), ['1:50', '2:70']);
+      });
+
+      test('should agree with merge when both inputs are sorted and unique', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 3, points: 50),
+          const _TestScore(userId: 5, points: 90),
+        ];
+        const incoming = [
+          _TestScore(userId: 3, points: 55),
+          _TestScore(userId: 4, points: 70),
+        ];
+
+        expect(
+          scores.sortedMerge(incoming, key: userId, compare: byPoints),
+          scores.merge(incoming, key: userId, compare: byPoints),
+        );
       });
     });
 

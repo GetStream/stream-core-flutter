@@ -5,10 +5,16 @@
 - Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
 - Added `Filter.raw`, a last resort for a query this package does not model. It serializes verbatim, is not validated, and cannot be evaluated locally, so `matches` throws for it
 - Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
+- Added `sortedUpsertAt`, which upserts at an index the caller already has instead of searching for one
+- Added `sortedMerge`, an O(N+M) merge for a receiver that is already sorted. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
+- `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
 
 ### 🐞 Fixed
 
 - `Filter.equal` and `Filter.in_` now match an array-valued field the way a query does: `$eq` compares it as a set, and `$in` intersects it
+- `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with
+- `updateWhere` now returns the receiver when nothing matches, so an unchanged list keeps its identity
+- `sortedInsert`, `sortedUpsert`, `sortedUpsertAt` and `sortedMerge` now assert in debug that the receiver is sorted by `compare`. Breaking that never threw, it quietly misplaced elements
 
 ## 0.5.0
 
