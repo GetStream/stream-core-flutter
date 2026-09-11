@@ -31,7 +31,10 @@ enum StreamAvatarSize {
   xl(48),
 
   /// Extra-extra large avatar (80px diameter).
-  xxl(80);
+  xxl(80),
+
+  /// Extra-extra-extra large avatar (104px diameter).
+  xxxl(104);
 
   /// Constructs a [StreamAvatarSize] with the given diameter.
   const StreamAvatarSize(this.value);

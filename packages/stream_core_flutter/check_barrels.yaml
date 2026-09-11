@@ -31,3 +31,4 @@ internal_dirs:
   - lib/src/cache/internal
   - lib/src/components/buttons/internal
   - lib/src/utils
+  - lib/src/components/avatar/internal
