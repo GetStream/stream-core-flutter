@@ -6,9 +6,14 @@ class StreamTokens {
   static const baseTransparent0 = Color(0x00FFFFFF);
   static const baseTransparentWhite10 = Color(0x1AFFFFFF);
   static const baseTransparentWhite20 = Color(0x33FFFFFF);
+  static const baseTransparentWhite30 = Color(0x4DFFFFFF);
+  static const baseTransparentWhite50 = Color(0x80FFFFFF);
   static const baseTransparentWhite70 = Color(0xB3FFFFFF);
   static const baseTransparentBlack5 = Color(0x0D000000);
   static const baseTransparentBlack10 = Color(0x1A000000);
+  static const baseTransparentBlack50 = Color(0x80000000);
+  static const baseTransparentBlack70 = Color(0xB3000000);
+  static const baseTransparentBlack75 = Color(0xBF000000);
   static const baseBlack = Color(0xFF000000);
   static const baseWhite = Color(0xFFFFFFFF);
   static const slate50 = Color(0xFFF6F8FA);

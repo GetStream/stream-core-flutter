@@ -48,8 +48,11 @@ abstract final class StreamColors {
   /// The white color with 20% opacity.
   static const white20 = tokens.StreamTokens.baseTransparentWhite20;
 
+  /// The white color with 30% opacity.
+  static const white30 = tokens.StreamTokens.baseTransparentWhite30;
+
   /// The white color with 50% opacity.
-  static const white50 = Color(0x80FFFFFF);
+  static const white50 = tokens.StreamTokens.baseTransparentWhite50;
 
   /// The white color with 70% opacity.
   static const white70 = tokens.StreamTokens.baseTransparentWhite70;
@@ -64,10 +67,13 @@ abstract final class StreamColors {
   static const black10 = tokens.StreamTokens.baseTransparentBlack10;
 
   /// The black color with 50% opacity.
-  static const black50 = Color(0x80000000);
+  static const black50 = tokens.StreamTokens.baseTransparentBlack50;
+
+  /// The black color with 70% opacity.
+  static const black70 = tokens.StreamTokens.baseTransparentBlack70;
 
   /// The black color with 75% opacity.
-  static const black75 = Color(0xBF000000);
+  static const black75 = tokens.StreamTokens.baseTransparentBlack75;
 
   /// The slate color swatch.
   static final slate = StreamColorSwatch(
