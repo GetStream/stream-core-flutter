@@ -1,26 +1,26 @@
+import 'dart:ui';
+
 /// Dimension tokens from the design system.
 ///
 /// Mode-independent, unlike the colors: the token repo publishes one set of
-/// spacing, radius and line-height values, so these live here rather than being
-/// duplicated under `light/` and `dark/`. They are also identical across the
-/// android, ios and web flavors of the token build, so no flavor choice arises
-/// here — unlike the font sizes, where iOS runs a size up at every step.
+/// spacing, radius, line-height and weight values, so these live here rather
+/// than being duplicated under `light/` and `dark/`. They are also identical
+/// across the android, ios and web flavors of the token build, so no flavor
+/// choice arises. Font sizes are the exception and live in `android/` and
+/// `ios/` beside this file.
 ///
-/// Declared as `double` because that is what `Radius`, `EdgeInsets` and
-/// `TextStyle` take; the token repo emits them without a decimal point.
+/// Declared in the types Flutter consumes rather than the raw numbers upstream
+/// emits — `double` for what `Radius`, `EdgeInsets` and `TextStyle` take, and
+/// `FontWeight` for the weights, which have no public constructor from a number
+/// and so could not otherwise be read in a const expression.
 ///
-/// Read these through `StreamSpacing`, `StreamRadius` and `StreamLineHeight`,
-/// which are the public surface. Three groups of upstream dimensions are
-/// deliberately not carried, because nothing here can read them:
+/// Read these through `StreamSpacing`, `StreamRadius`, `StreamLineHeight` and
+/// `StreamFontWeight`, which are the public surface.
 ///
-/// - **Font sizes.** `StreamFontSize` ships two platform scales, and only the
-///   android one matches these values; the ios scale comes from a flavor this
-///   package does not vendor. Wiring one and not the other would read as an
-///   oversight rather than a choice.
-/// - **Font weights.** `TextStyle.fontWeight` takes a `FontWeight`, which
-///   cannot be built from a number in a const expression.
-/// - **`radiusNone`.** The analyzer's `use_named_constants` prefers
-///   `Radius.zero` over `circular(0)`.
+/// One upstream dimension is deliberately not carried: `radiusNone`, since the
+/// analyzer's `use_named_constants` prefers `Radius.zero` over `circular(0)`.
+/// The font family is not carried either — this package never sets one for
+/// text, only for the emoji and icon fonts.
 class StreamTokensDimensions {
   StreamTokensDimensions._();
 
@@ -52,4 +52,15 @@ class StreamTokensDimensions {
   static const double typographyLineHeightTight = 16;
   static const double typographyLineHeightNormal = 20;
   static const double typographyLineHeightRelaxed = 24;
+
+  // Typography — weight
+  //
+  // Declared as `FontWeight` rather than the raw 400/500/600/700 upstream
+  // emits, for the same reason the values above are `double`: it is the type
+  // Flutter consumes, and `FontWeight` has no public constructor taking a
+  // number, so an int here could not be read in a const expression.
+  static const FontWeight typographyFontWeightRegular = FontWeight.w400;
+  static const FontWeight typographyFontWeightMedium = FontWeight.w500;
+  static const FontWeight typographyFontWeightSemiBold = FontWeight.w600;
+  static const FontWeight typographyFontWeightBold = FontWeight.w700;
 }

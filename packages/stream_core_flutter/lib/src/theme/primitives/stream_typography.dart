@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import 'internal/tokens/android/stream_tokens_font_size.dart' as android_tokens;
+import 'internal/tokens/ios/stream_tokens_font_size.dart' as ios_tokens;
 import 'internal/tokens/stream_tokens_dimensions.dart' as tokens;
 
 part 'stream_typography.g.theme.dart';
@@ -174,28 +176,28 @@ class StreamFontSize with _$StreamFontSize {
   ///
   /// Uses San Francisco font sizing conventions.
   static const StreamFontSize ios = .raw(
-    micro: 8,
-    xxs: 12,
-    xs: 13,
-    sm: 15,
-    md: 17,
-    lg: 20,
-    xl: 22,
-    xxl: 24,
+    micro: ios_tokens.StreamTokensFontSize.typographyFontSizeMicro,
+    xxs: ios_tokens.StreamTokensFontSize.typographyFontSizeXxs,
+    xs: ios_tokens.StreamTokensFontSize.typographyFontSizeXs,
+    sm: ios_tokens.StreamTokensFontSize.typographyFontSizeSm,
+    md: ios_tokens.StreamTokensFontSize.typographyFontSizeMd,
+    lg: ios_tokens.StreamTokensFontSize.typographyFontSizeLg,
+    xl: ios_tokens.StreamTokensFontSize.typographyFontSizeXl,
+    xxl: ios_tokens.StreamTokensFontSize.typographyFontSize2xl,
   );
 
   /// The Android font size scale.
   ///
   /// Uses Roboto font sizing conventions.
   static const StreamFontSize android = .raw(
-    micro: 8,
-    xxs: 10,
-    xs: 12,
-    sm: 14,
-    md: 16,
-    lg: 18,
-    xl: 20,
-    xxl: 24,
+    micro: android_tokens.StreamTokensFontSize.typographyFontSizeMicro,
+    xxs: android_tokens.StreamTokensFontSize.typographyFontSizeXxs,
+    xs: android_tokens.StreamTokensFontSize.typographyFontSizeXs,
+    sm: android_tokens.StreamTokensFontSize.typographyFontSizeSm,
+    md: android_tokens.StreamTokensFontSize.typographyFontSizeMd,
+    lg: android_tokens.StreamTokensFontSize.typographyFontSizeLg,
+    xl: android_tokens.StreamTokensFontSize.typographyFontSizeXl,
+    xxl: android_tokens.StreamTokensFontSize.typographyFontSize2xl,
   );
 
   /// The micro font size.
@@ -238,10 +240,10 @@ class StreamFontSize with _$StreamFontSize {
 class StreamFontWeight with _$StreamFontWeight {
   /// Creates a [StreamFontWeight] with the given values.
   const StreamFontWeight({
-    this.regular = .w400,
-    this.medium = .w500,
-    this.semibold = .w600,
-    this.bold = .w700,
+    this.regular = tokens.StreamTokensDimensions.typographyFontWeightRegular,
+    this.medium = tokens.StreamTokensDimensions.typographyFontWeightMedium,
+    this.semibold = tokens.StreamTokensDimensions.typographyFontWeightSemiBold,
+    this.bold = tokens.StreamTokensDimensions.typographyFontWeightBold,
   });
 
   /// The regular font weight.

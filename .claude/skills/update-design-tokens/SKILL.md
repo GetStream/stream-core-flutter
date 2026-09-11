@@ -50,21 +50,28 @@ reads a `colorScheme` field or one of those classes.
 from a seed, and is measured against the vendored values rather than driven by
 them.)
 
-**Colors are byte-identical across the three upstream flavors; typography is not
-— and for type the flavor is `web`.** Only web carries the `Geist` family this
-package ships; android resolves to Roboto, iOS to SF Pro, and iOS also runs a
-size up at every step (`typographyFontSizeMd` is 17 there against 16 on
-android/web). So read colors from any flavor and type from `web`.
+**Colors are byte-identical across the three upstream flavors, and so is every
+dimension except font size.** iOS runs a size up at almost every step
+(`typographyFontSizeMd` is 17 there against 16 on android and web), which is why
+that one group is vendored per flavor while the rest is not. Read colors from any
+flavor; read a font size from the flavor whose scale you are editing.
 
-Spacing, radius and line heights are identical across all three flavors, so no
-flavor choice arises for them. They live in
+The font *family* does not arise: this package never sets one for text, and ships
+no text font — only the generated `Stream Icons` face. Upstream's
+`typographyFontFamilySans` is therefore not vendored.
+
+Spacing, radius, line heights and font weights are identical across all three
+flavors, so no flavor choice arises for them. They live in
 `internal/tokens/stream_tokens_dimensions.dart`, one copy rather than one per
-mode, and `StreamSpacing`, `StreamRadius` and `StreamLineHeight` read them. So a
-dimension change is a value edit in that one file; the classes follow.
+mode, read by `StreamSpacing`, `StreamRadius`, `StreamLineHeight` and
+`StreamFontWeight`.
 
-Font sizes are the exception, and are **not** vendored: `StreamFontSize` ships an
-android and an ios scale, and only android matches the web values. Change one of
-those by hand and you must change the other from the ios flavor.
+**Font sizes are the exception**: iOS runs a size up at almost every step, so
+they mirror upstream's flavor split in
+`internal/tokens/{android,ios}/stream_tokens_font_size.dart` and feed
+`StreamFontSize.android` and `StreamFontSize.ios`. A size change has to be taken
+from the matching flavor — `check:tokens` enforces that both declare the same
+names, but it cannot tell you a value came from the wrong one.
 
 Only core and chat semantics are vendored into `internal/tokens/`; the video
 namespace is not. That is about *vendoring*, not about impact — a video token can
@@ -362,12 +369,12 @@ Spacing, radius and line heights live in `stream_tokens_dimensions.dart` instead
 re-introduce a literal in a class, which is the same hazard as baking a hex where
 a swatch belongs, one layer up.
 
-Three groups of upstream dimensions are deliberately absent, because nothing here
-can read them: **font sizes**, since only `StreamFontSize.android` matches the web
-values and the ios scale comes from a flavor this package does not vendor; **font
-weights**, since `TextStyle.fontWeight` takes a `FontWeight` that cannot be built
-from a number in a const expression; and **`radiusNone`**, since the analyzer's
-`use_named_constants` prefers `Radius.zero` over `circular(0)`.
+One upstream dimension is deliberately absent: **`radiusNone`**, since the
+analyzer's `use_named_constants` prefers `Radius.zero` over `circular(0)`. The
+font family is not carried either — this package never sets one for text, only
+for the emoji and icon fonts. Weights are carried as `FontWeight` rather than the
+raw 400/500/600/700, for the same reason the rest are `double`: it is the type
+Flutter consumes, and `FontWeight` has no public constructor from a number.
 
 **`melos run check:tokens` enforces all of this.** It fails when a constant in
 `internal/tokens/` is never referenced, and when `light/` and `dark/` disagree

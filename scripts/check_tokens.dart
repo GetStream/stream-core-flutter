@@ -48,6 +48,9 @@ const _minColorTokens = 50;
 /// Lower bound on the dimension constants, on the same reasoning.
 const _minDimensionTokens = 10;
 
+/// Lower bound on the per-flavor font-size constants, on the same reasoning.
+const _minFontSizeTokens = 5;
+
 void main(List<String> args) {
   // Resolved from the repo root rather than inherited from the caller's cwd,
   // so the check cannot be pointed at a package that has no tokens and pass.
@@ -151,10 +154,71 @@ void main(List<String> args) {
     );
   }
 
+  // Font sizes are the one dimension group that differs per platform, so they
+  // mirror upstream's flavor split rather than sitting in the shared file. Same
+  // rules as light/dark: both must declare the same names, and each file must
+  // actually be imported — identical constant names across the two would
+  // otherwise let an orphaned flavor look referenced.
+  final fontSizeFiles = <String, File>{
+    for (final flavor in const ['android', 'ios'])
+      flavor: File(p.join(tokenDir.path, flavor, 'stream_tokens_font_size.dart')),
+  };
+  final declaredFontSizes = <String, Set<String>>{};
+  fontSizeFiles.forEach((flavor, file) {
+    final label = p.relative(file.path, from: packageRoot);
+    if (!file.existsSync()) _fail('Missing $label');
+    declaredFontSizes[flavor] = _declarations(file.readAsStringSync(), label);
+    if (declaredFontSizes[flavor]!.length < _minFontSizeTokens) {
+      _fail(
+        'Only ${declaredFontSizes[flavor]!.length} constants parsed from $label, '
+        'expected at least $_minFontSizeTokens.',
+      );
+    }
+    if (!_isImportedUnder(libDir, file, packageRoot)) {
+      failures.add(
+        '$label is never imported.\n'
+        '  Both flavors declare the same constant names, so an unused one still\n'
+        '  looks referenced. Wire it to StreamFontSize.$flavor, or delete it.',
+      );
+    }
+  });
+
+  final onlyAndroid = declaredFontSizes['android']!.difference(declaredFontSizes['ios']!);
+  final onlyIos = declaredFontSizes['ios']!.difference(declaredFontSizes['android']!);
+  if (onlyAndroid.isNotEmpty || onlyIos.isNotEmpty) {
+    failures.add(
+      'android/ and ios/ declare different font-size constants.\n'
+      '${onlyAndroid.isEmpty ? '' : '  only in android/: ${_list(onlyAndroid)}\n'}'
+      '${onlyIos.isEmpty ? '' : '  only in ios/:     ${_list(onlyIos)}'}',
+    );
+  }
+
+  final fontSizeScan = _references(
+    libDir,
+    fontSizeFiles.values.map((f) => p.normalize(f.path)).toSet(),
+    className: 'StreamTokensFontSize',
+  );
+  final unusedFontSizes = {
+    ...declaredFontSizes['android']!,
+    ...declaredFontSizes['ios']!,
+  }.where((name) => !fontSizeScan.names.contains(name) && !_allowedUnused.contains(name)).toList()..sort();
+  if (unusedFontSizes.isNotEmpty) {
+    failures.add(
+      '${unusedFontSizes.length} font-size token${unusedFontSizes.length == 1 ? '' : 's'} '
+      '${unusedFontSizes.length == 1 ? 'is' : 'are'} never referenced:\n'
+      '  ${_list(unusedFontSizes)}\n'
+      '  StreamFontSize.android and StreamFontSize.ios are the only readers.',
+    );
+  }
+
   // Any other Dart file in the token directory is vendored too. Rather than
   // being invisible to this check, it has to be accounted for — that is how a
   // whole file of dead constants stayed hidden once already.
-  final covered = {...modeFiles, p.normalize(dimensionsFile.path)};
+  final covered = {
+    ...modeFiles,
+    p.normalize(dimensionsFile.path),
+    ...fontSizeFiles.values.map((f) => p.normalize(f.path)),
+  };
   final uncovered =
       tokenDir
           .listSync(recursive: true)
@@ -188,8 +252,9 @@ void main(List<String> args) {
   if (failures.isNotEmpty) _fail(failures.join('\n\n'));
 
   stdout.writeln(
-    '✓ ${declared['light']!.length} color tokens and ${declaredDimensions.length} dimension tokens, '
-    'all referenced, light/ and dark/ in agreement '
+    '✓ ${declared['light']!.length} color tokens, ${declaredDimensions.length} dimension tokens and '
+    '${declaredFontSizes['android']!.length} font sizes per flavor, all referenced; '
+    'light/ and dark/ and android/ and ios/ in agreement '
     '(${colorScan.filesRead} Dart files scanned).',
   );
 }
@@ -291,6 +356,28 @@ String _stripCommentsAndStrings(String source) {
     i++;
   }
   return out.toString();
+}
+
+/// Whether any Dart file under [libDir] imports [file].
+///
+/// Matched on the file's basename inside an import directive, which is enough
+/// here: the vendored token file names are unique across the package.
+///
+/// Deliberately matches the raw source rather than the comment-stripped form —
+/// the path is itself a string literal, so stripping strings would remove the
+/// very thing being looked for. Anchoring to the start of a line keeps a
+/// commented-out import from counting.
+bool _isImportedUnder(Directory libDir, File file, String packageRoot) {
+  final needle = RegExp(
+    "^\\s*import\\s+['\"][^'\"]*${RegExp.escape(p.basename(file.path))}['\"]",
+    multiLine: true,
+  );
+  for (final entity in libDir.listSync(recursive: true)) {
+    if (entity is! File || !entity.path.endsWith('.dart')) continue;
+    if (p.normalize(entity.path) == p.normalize(file.path)) continue;
+    if (needle.hasMatch(entity.readAsStringSync())) return true;
+  }
+  return false;
 }
 
 String _list(Iterable<String> names) {

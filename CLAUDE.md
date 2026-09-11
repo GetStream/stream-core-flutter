@@ -116,10 +116,11 @@ the same repo the icons come from. `theme/primitives/internal/tokens/{light,dark
 holds the vendored values; it is maintained by hand, is not part of the public API,
 and only `stream_colors.dart` and `stream_color_scheme.dart` read it. Dimensions
 live beside it in `internal/tokens/stream_tokens_dimensions.dart` — one
-mode-independent copy, read by `StreamSpacing`, `StreamRadius` and
-`StreamLineHeight`. Font sizes and weights are not vendored: `StreamFontSize`
-ships an ios scale from a flavor this package does not carry, and a `FontWeight`
-cannot be built from a number in a const expression.
+mode-independent copy, read by `StreamSpacing`, `StreamRadius`,
+`StreamLineHeight` and `StreamFontWeight`. Font sizes are the one group that
+differs per platform, so they mirror upstream's flavor split in
+`internal/tokens/{android,ios}/stream_tokens_font_size.dart` and feed the two
+`StreamFontSize` scales.
 
 Only the **root semantics** are mapped to a `StreamColorScheme` field. Upstream's
 derived tokens (`badge/*`, `button/*`, `avatar/*`) get no field — components
