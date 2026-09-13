@@ -209,11 +209,9 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// Time complexity: O(n log n), in extra space the size of the list.
   ///
   /// ```dart
-  /// final byScore = users.sortedWith(
-  ///   compare: (a, b) => b.score.compareTo(a.score),
-  /// );
+  /// final byScore = users.sortedWith((a, b) => b.score.compareTo(a.score));
   /// ```
-  List<T> sortedWith({required Comparator<T> compare}) {
+  List<T> sortedWith(Comparator<T> compare) {
     if (length < 2) return this;
 
     final sorted = [...this];
@@ -279,7 +277,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
     final result = updated ?? this;
     if (compare == null) return result;
-    return result.sortedWith(compare: compare);
+    return result.sortedWith(compare);
   }
 
   /// Inserts an element into the list, ensuring uniqueness by key.
@@ -609,7 +607,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
     // An incoming batch is usually in order already, and noticing that costs
     // one walk against the n log n of sorting it regardless. Skipping the sort
     // leaves this aliasing the caller's list, so it is only ever read.
-    final sortedOther = otherList.isSorted(compare) ? otherList : otherList.sortedWith(compare: compare);
+    final sortedOther = otherList.isSorted(compare) ? otherList : otherList.sortedWith(compare);
     return _mergeSorted(this, sortedOther, key, compare, handleUpdate);
   }
 

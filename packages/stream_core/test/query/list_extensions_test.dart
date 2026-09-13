@@ -725,7 +725,7 @@ void main() {
       test('should sort the elements by the comparator', () {
         final numbers = [3, 1, 4, 1, 5];
 
-        final result = numbers.sortedWith(compare: (a, b) => a.compareTo(b));
+        final result = numbers.sortedWith((a, b) => a.compareTo(b));
 
         expect(result, [1, 1, 3, 4, 5]);
       });
@@ -733,7 +733,7 @@ void main() {
       test('should leave the receiver unchanged', () {
         final numbers = [3, 1, 2];
 
-        numbers.sortedWith(compare: (a, b) => a.compareTo(b));
+        numbers.sortedWith((a, b) => a.compareTo(b));
 
         expect(numbers, [3, 1, 2]);
       });
@@ -745,7 +745,7 @@ void main() {
           for (var i = 0; i < 50; i++) _TestUser(id: '$i', name: i.isEven ? 'Alice' : 'Bob'),
         ];
 
-        final result = users.sortedWith(compare: (a, b) => a.name.compareTo(b.name));
+        final result = users.sortedWith((a, b) => a.name.compareTo(b.name));
 
         final alices = result.takeWhile((it) => it.name == 'Alice');
         expect(alices.map((it) => it.id), users.where((it) => it.name == 'Alice').map((it) => it.id));
@@ -754,7 +754,7 @@ void main() {
       test('should hand back the receiver when there is nothing to order', () {
         final single = [const _TestUser(id: '1', name: 'Alice')];
 
-        final result = single.sortedWith(compare: (a, b) => a.name.compareTo(b.name));
+        final result = single.sortedWith((a, b) => a.name.compareTo(b.name));
 
         expect(result, same(single));
       });
