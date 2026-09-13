@@ -199,6 +199,26 @@ extension ListExtensions<T extends Object> on List<T> {
 /// for efficient insertion into already-sorted lists, while others like [updateWhere]
 /// and [merge] provide optional sorting as a convenience.
 extension SortedListExtensions<T extends Object> on List<T> {
+  /// Creates a list sorted by [compare].
+  ///
+  /// Stable: elements [compare] calls equal keep the order they arrived in,
+  /// where `sorted` reorders them once the list is longer than 32.
+  ///
+  /// Returns the receiver when there is nothing to order, so a listener
+  /// comparing references can skip a pass that changed nothing.
+  /// Time complexity: O(n log n), in extra space the size of the list.
+  ///
+  /// ```dart
+  /// final byScore = users.sortedWith((a, b) => b.score.compareTo(a.score));
+  /// ```
+  List<T> sortedWith(Comparator<T> compare) {
+    if (length < 2) return this;
+
+    final sorted = [...this];
+    mergeSort(sorted, compare: compare);
+    return sorted;
+  }
+
   /// Updates all elements in the list that match the filter condition.
   ///
   /// Returns a new list where elements matching [filter] are transformed
@@ -257,7 +277,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
     final result = updated ?? this;
     if (compare == null) return result;
-    return result.sorted(compare);
+    return result.sortedWith(compare);
   }
 
   /// Inserts an element into the list, ensuring uniqueness by key.
@@ -587,7 +607,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
     // An incoming batch is usually in order already, and noticing that costs
     // one walk against the n log n of sorting it regardless. Skipping the sort
     // leaves this aliasing the caller's list, so it is only ever read.
-    final sortedOther = otherList.isSorted(compare) ? otherList : otherList.sorted(compare);
+    final sortedOther = otherList.isSorted(compare) ? otherList : otherList.sortedWith(compare);
     return _mergeSorted(this, sortedOther, key, compare, handleUpdate);
   }
 

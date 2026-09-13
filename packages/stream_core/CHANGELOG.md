@@ -7,6 +7,7 @@
 - Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
 - Added `sortedUpsertAt`, which upserts at an index the caller already has instead of searching for one
 - Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
+- Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
 
 ### 🐞 Fixed
@@ -15,6 +16,7 @@
 - `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with
 - `updateWhere` now returns the receiver when nothing matches, so an unchanged list keeps its identity
 - `sortedInsert`, `sortedUpsert`, `sortedUpsertAt` and `sortedMerge` now assert in debug that the receiver is sorted by `compare`. Breaking that never threw, it quietly misplaced elements
+- `updateWhere` and `sortedMerge` sorted through `sorted`, which reorders elements the comparator calls equal once a list is longer than 32. Both are stable now
 
 ## 0.5.0
 
