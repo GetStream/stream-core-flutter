@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 import 'distance.dart';
@@ -7,6 +8,11 @@ import 'distance.dart';
 /// A geographic coordinate with latitude and longitude.
 ///
 /// Uses the WGS84 coordinate system (same as GPS).
+///
+/// Two coordinates are equal when their latitude and longitude are, so this is
+/// safe as a `Set` element or a `Map` key. For "is this the same place", ask
+/// [distanceTo] instead — `a.distanceTo(b) <= 1.meters`. Comparing within a
+/// tolerance is not transitive, so it cannot decide equality.
 ///
 /// ```dart
 /// const sanFrancisco = LocationCoordinate(
@@ -18,7 +24,7 @@ import 'distance.dart';
 /// print('Distance: ${distance.inKilometers} km');
 /// ```
 @immutable
-class LocationCoordinate {
+class LocationCoordinate extends Equatable {
   const LocationCoordinate({
     required this.latitude,
     required this.longitude,
@@ -35,19 +41,7 @@ class LocationCoordinate {
   final double longitude;
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! LocationCoordinate) return false;
-
-    const epsilon = 1e-7; // ~1cm precision
-    final absLatDiff = (latitude - other.latitude).abs();
-    final absLngDiff = (longitude - other.longitude).abs();
-
-    return absLatDiff < epsilon && absLngDiff < epsilon;
-  }
-
-  @override
-  int get hashCode => Object.hash(latitude, longitude);
+  List<Object?> get props => [latitude, longitude];
 
   /// The distance to [other].
   ///
