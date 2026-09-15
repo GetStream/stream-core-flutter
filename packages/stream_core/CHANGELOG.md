@@ -3,6 +3,22 @@
 ### ✨ Features
 
 - Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
+- Added `Filter.raw`, a last resort for a query this package does not model. It serializes verbatim, is not validated, and cannot be evaluated locally, so `matches` throws for it
+- Added `FilterField.collectionEquality`, which declares whether `Filter.equal` asks a collection field to hold every given element, or to hold nothing else either
+- Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
+- Added `sortedUpsertAt`, which upserts at an index the caller already has instead of searching for one
+- Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
+- Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
+- `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
+
+### 🐞 Fixed
+
+- `Filter.equal` and `Filter.in_` now ask whether a collection field holds the values given, rather than comparing it with order-sensitive deep equality that no query can produce
+- `LocationCoordinate` equality is now exact, where `==` matched within ~1.1cm and so disagreed with `hashCode`, `Set` and `Map`. `distanceTo` no longer reports `0m` for points closer than that; for proximity, ask `a.distanceTo(b) <= 1.meters`
+- `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with
+- `updateWhere` now returns the receiver when nothing matches, so an unchanged list keeps its identity
+- `sortedInsert`, `sortedUpsert`, `sortedUpsertAt` and `sortedMerge` now assert in debug that the receiver is sorted by `compare`. Breaking that never threw, it quietly misplaced elements
+- `updateWhere` and `sortedMerge` sorted through `sorted`, which reorders elements the comparator calls equal once a list is longer than 32. Both are stable now
 
 ## 0.5.0
 

@@ -11,3 +11,4 @@ export 'utils/result.dart';
 export 'utils/shared_emitter.dart';
 export 'utils/standard.dart';
 export 'utils/state_emitter.dart';
+export 'utils/string_sort_normalizer.dart';

@@ -12,6 +12,19 @@ import 'location/location_coordinate.dart';
 /// Returns the field value of type [V] from an instance of type [T].
 typedef FilterFieldValueGetter<T, V> = V? Function(T);
 
+/// A comparison [Filter.equal] makes against a field whose value holds several
+/// elements.
+///
+/// Set on the [FilterField], so every [Filter.equal] against that field asks
+/// the same thing of it.
+enum CollectionEquality {
+  /// The field holds every given element, and may hold others.
+  containsAll,
+
+  /// The field holds every given element and nothing else.
+  containsExactly,
+}
+
 /// Type-safe field identifier for filtering and value extraction.
 ///
 /// Associates a field name with a value getter function for type-safe filtering.
@@ -41,13 +54,21 @@ typedef FilterFieldValueGetter<T, V> = V? Function(T);
 /// final matches = filter.matches(User('1', 'John', 30)); // true
 /// ```
 class FilterField<T> {
-  const FilterField(this.remote, this.value);
+  const FilterField(
+    this.remote,
+    this.value, {
+    this.collectionEquality = .containsAll,
+  });
 
   /// The remote field name used in API queries.
   final String remote;
 
   /// The function that extracts the field value of type [T] from a model instance.
   final FilterFieldValueGetter<T, Object> value;
+
+  /// The comparison [Filter.equal] makes against this field when both it and
+  /// the value it is compared against hold several elements.
+  final CollectionEquality collectionEquality;
 }
 
 /// Type-safe filter for querying data.
@@ -175,6 +196,21 @@ sealed class Filter<T extends Object> {
   /// Logical OR filter matching when any [filters] match.
   const factory Filter.or(Iterable<Filter<T>> filters) = OrOperator<T>;
 
+  /// Raw filter serializing [value] verbatim, bypassing this type.
+  ///
+  /// **A last resort.** Reach for it only when the API accepts a query this
+  /// package cannot express — an operator it does not model, or a filter
+  /// authored server-side and echoed back. Prefer a declared operator wherever
+  /// one exists: [value] is not validated, so a mistake in it surfaces as an
+  /// API error at runtime rather than as a compile error here.
+  ///
+  /// **It cannot be matched locally.** There is nothing to compare an opaque
+  /// query against, so [matches] throws for one, and may throw for any filter
+  /// holding one. Treat a filter holding one as un-matchable: build it for a
+  /// query sent to the API, never for one also evaluated in memory, such as a
+  /// filter applied to a cached list.
+  const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
+
   /// Whether this filter matches the given [other] instance.
   ///
   /// Evaluates filter criteria against field values extracted from [other]
@@ -237,8 +273,9 @@ sealed class ComparisonOperator<T extends Object> extends Filter<T> {
 ///
 /// Performs deep equality comparison for all data types:
 /// - **Primitives**: Standard equality (`==`)
-/// - **Arrays**: Order-sensitive, element-by-element comparison
 /// - **Objects**: Key-value equality, order-insensitive for keys
+/// - **Arrays**: Containment of a single value, or as much of another array
+///   as the field's [FilterField.collectionEquality] asks for
 ///
 /// **Supported with**: `.equal` factory method
 final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
@@ -262,7 +299,20 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
       return isNear || isWithinBounds;
     }
 
-    // Deep equality: order-sensitive for arrays, order-insensitive for objects.
+    if (fieldValue is Iterable<Object?>) {
+      final holdsValue = fieldValue.containsValue(comparisonValue);
+      if (comparisonValue is! Iterable<Object?>) return holdsValue;
+
+      // Every field holds all of nothing, so an empty value asks for an empty field.
+      if (comparisonValue.isEmpty) return fieldValue.isEmpty;
+
+      return switch (field.collectionEquality) {
+        .containsAll => holdsValue,
+        .containsExactly => holdsValue && comparisonValue.containsValue(fieldValue),
+      };
+    }
+
+    // Deep equality: order-insensitive for objects.
     return fieldValue.deepEquals(comparisonValue);
   }
 }
@@ -387,7 +437,8 @@ sealed class ListOperator<T extends Object> extends Filter<T> {
 /// Membership test filter for list containment.
 ///
 /// Tests whether the field value exists within the provided list of values.
-/// Uses deep equality with order-sensitive comparison for arrays.
+/// An array-valued field matches a value it contains: any one of the plain
+/// values, or an array whose every element it holds.
 ///
 /// **Supported with**: `.in_` factory method
 final class InOperator<T extends Object> extends ListOperator<T> {
@@ -401,7 +452,10 @@ final class InOperator<T extends Object> extends ListOperator<T> {
     final comparisonValues = value;
     if (comparisonValues is! Iterable<Object?>) return false;
 
-    // Deep equality (order-sensitive for arrays).
+    if (fieldValue is Iterable<Object?>) {
+      return comparisonValues.any(fieldValue.containsValue);
+    }
+
     return comparisonValues.any(fieldValue.deepEquals);
   }
 }
@@ -639,6 +693,36 @@ final class OrOperator<T extends Object> extends LogicalOperator<T> {
 
   @override
   bool matches(T other) => filters.any((filter) => filter.matches(other));
+}
+
+// endregion
+
+// region Escape hatches
+
+/// A filter carrying a pre-built query this package does not model.
+///
+/// A last resort — see [Filter.raw].
+///
+/// **Supported with**: `.raw` factory method
+final class RawFilter<T extends Object> extends Filter<T> {
+  /// Creates a filter serialized verbatim from [value].
+  const RawFilter(this.value) : super._();
+
+  /// The query to serialize, used as-is.
+  final Map<String, Object?> value;
+
+  /// Always throws: [value] is opaque, so there is nothing to compare against.
+  @override
+  bool matches(T other) {
+    throw UnsupportedError(
+      'Filter.raw cannot be evaluated locally: $value. It carries a query this '
+      'package does not model, so there is nothing to compare against. Use a '
+      'declared operator if you need matches().',
+    );
+  }
+
+  @override
+  Map<String, Object?> toJson() => value;
 }
 
 // endregion
