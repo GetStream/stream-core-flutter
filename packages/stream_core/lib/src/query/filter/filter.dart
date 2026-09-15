@@ -12,6 +12,19 @@ import 'location/location_coordinate.dart';
 /// Returns the field value of type [V] from an instance of type [T].
 typedef FilterFieldValueGetter<T, V> = V? Function(T);
 
+/// A comparison [Filter.equal] makes against a field whose value holds several
+/// elements.
+///
+/// Set on the [FilterField], so every [Filter.equal] against that field asks
+/// the same thing of it.
+enum CollectionEquality {
+  /// The field holds every given element, and may hold others.
+  containsAll,
+
+  /// The field holds every given element and nothing else.
+  containsExactly,
+}
+
 /// Type-safe field identifier for filtering and value extraction.
 ///
 /// Associates a field name with a value getter function for type-safe filtering.
@@ -41,13 +54,21 @@ typedef FilterFieldValueGetter<T, V> = V? Function(T);
 /// final matches = filter.matches(User('1', 'John', 30)); // true
 /// ```
 class FilterField<T> {
-  const FilterField(this.remote, this.value);
+  const FilterField(
+    this.remote,
+    this.value, {
+    this.collectionEquality = .containsAll,
+  });
 
   /// The remote field name used in API queries.
   final String remote;
 
   /// The function that extracts the field value of type [T] from a model instance.
   final FilterFieldValueGetter<T, Object> value;
+
+  /// The comparison [Filter.equal] makes against this field when both it and
+  /// the value it is compared against hold several elements.
+  final CollectionEquality collectionEquality;
 }
 
 /// Type-safe filter for querying data.
@@ -253,8 +274,8 @@ sealed class ComparisonOperator<T extends Object> extends Filter<T> {
 /// Performs deep equality comparison for all data types:
 /// - **Primitives**: Standard equality (`==`)
 /// - **Objects**: Key-value equality, order-insensitive for keys
-/// - **Arrays**: Set equality against another array, or containment of a
-///   single value
+/// - **Arrays**: Containment of a single value, or as much of another array
+///   as the field's [FilterField.collectionEquality] asks for
 ///
 /// **Supported with**: `.equal` factory method
 final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
@@ -278,15 +299,17 @@ final class EqualOperator<T extends Object> extends ComparisonOperator<T> {
       return isNear || isWithinBounds;
     }
 
-    // An array field equals a set, or contains a single value.
     if (fieldValue is Iterable<Object?>) {
-      if (comparisonValue is Iterable<Object?>) {
-        final containsEvery = fieldValue.containsValue(comparisonValue);
-        final isContainedBy = comparisonValue.containsValue(fieldValue);
-        return containsEvery && isContainedBy;
-      }
+      final holdsValue = fieldValue.containsValue(comparisonValue);
+      if (comparisonValue is! Iterable<Object?>) return holdsValue;
 
-      return fieldValue.containsValue(comparisonValue);
+      // Every field holds all of nothing, so an empty value asks for an empty field.
+      if (comparisonValue.isEmpty) return fieldValue.isEmpty;
+
+      return switch (field.collectionEquality) {
+        .containsAll => holdsValue,
+        .containsExactly => holdsValue && comparisonValue.containsValue(fieldValue),
+      };
     }
 
     // Deep equality: order-insensitive for objects.
@@ -414,7 +437,8 @@ sealed class ListOperator<T extends Object> extends Filter<T> {
 /// Membership test filter for list containment.
 ///
 /// Tests whether the field value exists within the provided list of values.
-/// An array-valued field matches when the two intersect.
+/// An array-valued field matches a value it contains: any one of the plain
+/// values, or an array whose every element it holds.
 ///
 /// **Supported with**: `.in_` factory method
 final class InOperator<T extends Object> extends ListOperator<T> {
@@ -428,12 +452,8 @@ final class InOperator<T extends Object> extends ListOperator<T> {
     final comparisonValues = value;
     if (comparisonValues is! Iterable<Object?>) return false;
 
-    // An array field intersects plain values, and equals array ones.
     if (fieldValue is Iterable<Object?>) {
-      return comparisonValues.any((it) {
-        if (it is Iterable<Object?>) return fieldValue.deepEquals(it);
-        return fieldValue.containsValue(it);
-      });
+      return comparisonValues.any(fieldValue.containsValue);
     }
 
     return comparisonValues.any(fieldValue.deepEquals);

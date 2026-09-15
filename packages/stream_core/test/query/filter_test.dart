@@ -31,7 +31,7 @@ class TestModel {
 
 // Test implementation of FilterField for testing purposes
 class TestFilterField extends FilterField<TestModel> {
-  TestFilterField(super.remote, super.value);
+  TestFilterField(super.remote, super.value, {super.collectionEquality});
 
   static final id = TestFilterField('id', (it) => it.id);
   static final name = TestFilterField('name', (it) => it.name);
@@ -40,6 +40,11 @@ class TestFilterField extends FilterField<TestModel> {
   static final type = TestFilterField('type', (it) => it.type);
   static final metadata = TestFilterField('metadata', (it) => it.metadata);
   static final tags = TestFilterField('tags', (it) => it.tags);
+  static final exactTags = TestFilterField(
+    'tags',
+    (it) => it.tags,
+    collectionEquality: CollectionEquality.containsExactly,
+  );
   static final projects = TestFilterField('projects', (it) => it.projects);
   static final near = TestFilterField('near', (it) => it.location);
   static final withinBounds = TestFilterField(
@@ -488,24 +493,48 @@ void main() {
         );
       });
 
-      test('should match arrays as a set', () {
+      test('should match an array the field holds every element of', () {
         final model = TestModel(tags: ['a', 'b', 'c']);
 
-        expect(
-          Filter.equal(TestFilterField.tags, ['a', 'b', 'c']).matches(model),
-          isTrue,
-        );
         expect(
           Filter.equal(TestFilterField.tags, ['c', 'b', 'a']).matches(model),
           isTrue,
         );
+      });
+
+      test('should ignore elements the field holds beyond the ones given', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
         expect(
           Filter.equal(TestFilterField.tags, ['a', 'b']).matches(model),
-          isFalse,
+          isTrue,
         );
+      });
+
+      test('should not match an array holding an element the field lacks', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
         expect(
           Filter.equal(TestFilterField.tags, ['a', 'b', 'c', 'd']).matches(model),
           isFalse,
+        );
+      });
+
+      test('should refuse a subset for a field asking to hold nothing else', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(
+          Filter.equal(TestFilterField.exactTags, ['a', 'b']).matches(model),
+          isFalse,
+        );
+      });
+
+      test('should match the same elements for a field asking to hold nothing else', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(
+          Filter.equal(TestFilterField.exactTags, ['c', 'b', 'a']).matches(model),
+          isTrue,
         );
       });
 
@@ -514,6 +543,19 @@ void main() {
 
         expect(Filter.equal(TestFilterField.tags, 'b').matches(model), isTrue);
         expect(Filter.equal(TestFilterField.tags, 'z').matches(model), isFalse);
+      });
+
+      test('should match a single value however the field asks for arrays', () {
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(Filter.equal(TestFilterField.exactTags, 'b').matches(model), isTrue);
+      });
+
+      test('should not match a populated field against an empty array', () {
+        // The vacuous reading would make an empty filter match everything.
+        final model = TestModel(tags: ['a', 'b', 'c']);
+
+        expect(Filter.equal(TestFilterField.tags, []).matches(model), isFalse);
       });
 
       test('should match objects with key order-insensitivity', () {
@@ -610,19 +652,26 @@ void main() {
         expect(Filter.in_(TestFilterField.name, []).matches(model), isFalse);
       });
 
-      test('should match arrays with order-sensitivity', () {
+      test('should match an array value the field contains', () {
         final model = TestModel(tags: ['a', 'b', 'c']);
 
         expect(
           Filter.in_(TestFilterField.tags, [
-            ['a', 'b', 'c'],
+            ['c', 'b', 'a'],
             ['x', 'y'],
           ]).matches(model),
           isTrue,
         );
         expect(
           Filter.in_(TestFilterField.tags, [
-            ['c', 'b', 'a'],
+            ['a', 'b'],
+            ['x', 'y'],
+          ]).matches(model),
+          isTrue,
+        );
+        expect(
+          Filter.in_(TestFilterField.tags, [
+            ['a', 'b', 'c', 'd'],
             ['x', 'y'],
           ]).matches(model),
           isFalse,
