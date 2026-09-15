@@ -17,7 +17,7 @@
   `voiceOffFill`, and `xmarkSmall`.
 - Added a `fix_data.yaml`, so deprecated members can be migrated with
   `dart fix --apply`.
-- Added `StreamMessageAnnotation.separator`, a slot between `label` and `trailing` for a punctuation mark, along with a ready-made `StreamMessageAnnotation.separator` middle dot to pass to it. It defaults to null, so existing annotations are unaffected. It only renders alongside a `trailing`, is styled like the `label`, and is hidden from assistive technologies.
+- Added `StreamMessageAnnotation.separator`, a slot between `label` and `trailing` for a punctuation mark, along with a ready-made middle dot to pass to it.
 
 ### 🐞 Fixed
 
