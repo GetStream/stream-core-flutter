@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_redundant_argument_values
 
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:stream_core/src/utils/list_extensions.dart';
 import 'package:test/test.dart';
@@ -1603,6 +1604,42 @@ void main() {
         );
 
         expect(result.map((it) => it.userId), [2, 3, 1]);
+      });
+
+      test('should place a replacement by the position update gives it', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 30),
+          const _TestScore(userId: 3, points: 50),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 1, points: 45)],
+          key: userId,
+          compare: byPoints,
+          update: (original, updated) => _TestScore(userId: updated.userId, points: updated.points + 10),
+        );
+
+        expect(result.map((it) => '${it.userId}:${it.points}'), ['2:30', '3:50', '1:55']);
+        expect(result.isSorted(byPoints), isTrue);
+      });
+
+      test('should keep the result sorted when update holds the original position', () {
+        final scores = [
+          const _TestScore(userId: 1, points: 10),
+          const _TestScore(userId: 2, points: 30),
+          const _TestScore(userId: 3, points: 50),
+        ];
+
+        final result = scores.sortedMerge(
+          const [_TestScore(userId: 1, points: 45)],
+          key: userId,
+          compare: byPoints,
+          update: (original, updated) => _TestScore(userId: updated.userId, points: original.points),
+        );
+
+        expect(result.map((it) => '${it.userId}:${it.points}'), ['1:10', '2:30', '3:50']);
+        expect(result.isSorted(byPoints), isTrue);
       });
 
       test('should run update once for a key held by both lists', () {

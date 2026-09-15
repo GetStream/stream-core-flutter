@@ -573,9 +573,9 @@ extension SortedListExtensions<T extends Object> on List<T> {
   /// The keys of [other] win: an element of this list whose key appears in
   /// [other] is replaced by the [other] copy, passed through [update] when
   /// given. Each key appears once in the result, keeping the last element
-  /// that carried it, as [merge] does. A replacement is placed by sort
-  /// position, so one that ties with its neighbours lands behind them where
-  /// [merge] would leave it in front.
+  /// that carried it, as [merge] does. A replacement is placed by the sort
+  /// position of the element [update] returns, so one that ties with its
+  /// neighbours lands behind them where [merge] would leave it in front.
   ///
   /// Returns the receiver unchanged when [other] is null, empty, or identical
   /// to this list.
@@ -598,17 +598,12 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
     assert(_debugAssertSorted(this, compare));
 
-    T handleUpdate(T original, T updated) {
-      if (update != null) return update(original, updated);
-      return updated; // Default behavior: prefer the updated
-    }
-
     final otherList = other is List<T> ? other : other.toList(growable: false);
     // An incoming batch is usually in order already, and noticing that costs
     // one walk against the n log n of sorting it regardless. Skipping the sort
     // leaves this aliasing the caller's list, so it is only ever read.
     final sortedOther = otherList.isSorted(compare) ? otherList : otherList.sortedWith(compare);
-    return _mergeSorted(this, sortedOther, key, compare, handleUpdate);
+    return _mergeSorted(this, sortedOther, key, compare, update);
   }
 
   // Keeps the last element carrying each key, matching what a keyed-map
@@ -626,12 +621,12 @@ extension SortedListExtensions<T extends Object> on List<T> {
 
   // Two-pointer merge of two lists already sorted by [compare]. Walks both
   // once, so it never pays for a full re-sort the way a keyed-map merge does.
-  static List<T> _mergeSorted<T, K>(
+  static List<T> _mergeSorted<T extends Object, K>(
     List<T> aIn,
     List<T> bIn,
     K Function(T item) key,
     Comparator<T> compare,
-    T Function(T original, T updated) resolve,
+    T Function(T original, T updated)? resolve,
   ) {
     final aByKey = <K, T>{for (final item in aIn) key(item): item};
 
@@ -656,6 +651,39 @@ extension SortedListExtensions<T extends Object> on List<T> {
     // entirely new.
     if (!supersedes) return _mergeDisjoint(a, b, compare);
 
+    // Without a [resolve] the incoming element still sorts where it arrived.
+    if (resolve == null) return _mergeSuperseding(a, b, bKeys, key, compare);
+
+    // [resolve] can move an element, so the merge walks the resolved values.
+    var moved = false;
+    final resolved = <T>[];
+    for (final item in b) {
+      final original = aByKey[key(item)];
+      if (original == null) {
+        resolved.add(item);
+        continue;
+      }
+
+      final value = resolve(original, item);
+      if (!moved && compare(item, value) != 0) moved = true;
+      resolved.add(value);
+    }
+
+    // A shift applied to every element leaves the order alone, so a move only
+    // pays for a sort when it actually lands out of place.
+    final mergeB = !moved || resolved.isSorted(compare) ? resolved : resolved.sortedWith(compare);
+    return _mergeSuperseding(a, mergeB, bKeys, key, compare);
+  }
+
+  // Two-pointer merge where [b] supersedes any element of [a] carrying one of
+  // [bKeys].
+  static List<T> _mergeSuperseding<T extends Object, K>(
+    List<T> a,
+    List<T> b,
+    Set<K> bKeys,
+    K Function(T item) key,
+    Comparator<T> compare,
+  ) {
     final result = <T>[];
     var i = 0;
     var j = 0;
@@ -671,8 +699,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
         result.add(ai);
         i++;
       } else {
-        final original = aByKey[key(bj)];
-        result.add(original != null ? resolve(original, bj) : bj);
+        result.add(bj);
         j++;
       }
     }
@@ -683,9 +710,7 @@ extension SortedListExtensions<T extends Object> on List<T> {
     }
 
     while (j < b.length) {
-      final bj = b[j++];
-      final original = aByKey[key(bj)];
-      result.add(original != null ? resolve(original, bj) : bj);
+      result.add(b[j++]);
     }
 
     return result;
