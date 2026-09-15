@@ -13,6 +13,7 @@
 ### 🐞 Fixed
 
 - `Filter.equal` and `Filter.in_` now match an array-valued field the way a query does: `$eq` compares it as a set, and `$in` intersects it
+- `LocationCoordinate` equality is now exact. `==` matched within ~1.1cm, which made it non-transitive — `a == b` and `b == c` while `a != c` — and disagreed with `Set` and `Map`, where those coordinates already counted as distinct. `distanceTo` no longer reports `0m` for two points closer than that. For proximity, ask `a.distanceTo(b) <= 1.meters`
 - `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with
 - `updateWhere` now returns the receiver when nothing matches, so an unchanged list keeps its identity
 - `sortedInsert`, `sortedUpsert`, `sortedUpsertAt` and `sortedMerge` now assert in debug that the receiver is sorted by `compare`. Breaking that never threw, it quietly misplaced elements
