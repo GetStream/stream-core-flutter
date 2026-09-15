@@ -51,6 +51,11 @@
   `speakerRightFill`, and `speakerTopFill`.
 - Added a `fix_data.yaml`, so deprecated members can be migrated with
   `dart fix --apply`.
+- Added `StreamMessageAnnotation.separator`, a slot between `label` and `trailing` for a punctuation mark, along with a ready-made middle dot to pass to it.
+
+### 🐞 Fixed
+
+- `StreamMessageAnnotation` no longer wraps its `label` mid-sentence when the row is too narrow, stranding the trailing action beside the label's last line. The trailing slot now moves below the label as a whole, and the separator — which separates nothing once the two are on different lines — is dropped. A label too wide even on its own still wraps across as many lines as it needs.
 
 ### 🔄 Changed
 
