@@ -26,12 +26,26 @@ const _vietnameseUHornLower = 0x01B0;
 /// Normalizes [value] into a sort key matching how the API orders names.
 ///
 /// Folds case, diacritics and ligatures, so a list sorted locally lands in the
-/// same order a query returns. Apply it in a `SortField` value getter: a plain
-/// [String.compareTo] orders by code unit, putting `jhon` and `Łukasz` last.
+/// same order a query returns, where a plain [String.compareTo] orders by code
+/// unit and puts `jhon` and `Łukasz` last.
+///
+/// Fold once and keep the result. A `SortField` value getter runs on every
+/// comparison, so folding inside one repeats the work for each of them, where
+/// a field normalized as the model is built is folded once.
 String normalizeStringForSort(String value) {
   if (value.isEmpty) return value;
-  final folded = value.runes.map(_foldRune).join();
+
+  // `_foldRune` is the identity below U+0080, so ASCII is already folded.
+  final folded = _isAscii(value) ? value : value.runes.map(_foldRune).join();
   return _trimApostropheEdges(folded.toLowerCase()).trim();
+}
+
+bool _isAscii(String value) {
+  for (var index = 0; index < value.length; index++) {
+    if (value.codeUnitAt(index) > _maxAscii) return false;
+  }
+
+  return true;
 }
 
 // Returns the sort form of `rune`. ASCII and preserved-script runes pass
