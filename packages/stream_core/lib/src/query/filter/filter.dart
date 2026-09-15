@@ -177,10 +177,17 @@ sealed class Filter<T extends Object> {
 
   /// Raw filter serializing [value] verbatim, bypassing this type.
   ///
-  /// A last resort, for a query the API accepts but this package does not
-  /// model. Prefer a declared operator wherever one exists.
+  /// **A last resort.** Reach for it only when the API accepts a query this
+  /// package cannot express — an operator it does not model, or a filter
+  /// authored server-side and echoed back. Prefer a declared operator wherever
+  /// one exists: [value] is not validated, so a mistake in it surfaces as an
+  /// API error at runtime rather than as a compile error here.
   ///
-  /// [value] is not validated, and [matches] throws for any filter containing one.
+  /// **It cannot be matched locally.** There is nothing to compare an opaque
+  /// query against, so [matches] throws for one, and may throw for any filter
+  /// holding one. Treat a filter holding one as un-matchable: build it for a
+  /// query sent to the API, never for one also evaluated in memory, such as a
+  /// filter applied to a cached list.
   const factory Filter.raw(Map<String, Object?> value) = RawFilter<T>;
 
   /// Whether this filter matches the given [other] instance.
