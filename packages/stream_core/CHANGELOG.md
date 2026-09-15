@@ -4,7 +4,7 @@
 
 - Added `CurrentPlatform.debugCurrentPlatformOverride`, which points `CurrentPlatform` at a chosen `PlatformType` in tests
 - Added `Filter.raw`, a last resort for a query this package does not model. It serializes verbatim, is not validated, and cannot be evaluated locally, so `matches` throws for it
-- Added `FilterField.collectionEquality`, which declares what `Filter.equal` asks of a field holding several elements: that it hold every given element, or — for a field identified by its elements rather than described by them — that it hold nothing else either
+- Added `FilterField.collectionEquality`, which declares whether `Filter.equal` asks a collection field to hold every given element, or to hold nothing else either
 - Added `normalizeStringForSort`, which folds diacritics, ligatures and case so a locally sorted list of names matches the order a query returns
 - Added `sortedUpsertAt`, which upserts at an index the caller already has instead of searching for one
 - Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
@@ -13,8 +13,8 @@
 
 ### 🐞 Fixed
 
-- `Filter.equal` and `Filter.in_` no longer compare an array-valued field with order-sensitive deep equality, which no query the API accepts can produce. Both now ask whether the field holds the values given, `Filter.equal` against one array and `Filter.in_` against any of several
-- `LocationCoordinate` equality is now exact. `==` matched within ~1.1cm, which made it non-transitive — `a == b` and `b == c` while `a != c` — and disagreed with `Set` and `Map`, where those coordinates already counted as distinct. `distanceTo` no longer reports `0m` for two points closer than that. For proximity, ask `a.distanceTo(b) <= 1.meters`
+- `Filter.equal` and `Filter.in_` now ask whether a collection field holds the values given, rather than comparing it with order-sensitive deep equality that no query can produce
+- `LocationCoordinate` equality is now exact, where `==` matched within ~1.1cm and so disagreed with `hashCode`, `Set` and `Map`. `distanceTo` no longer reports `0m` for points closer than that; for proximity, ask `a.distanceTo(b) <= 1.meters`
 - `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with
 - `updateWhere` now returns the receiver when nothing matches, so an unchanged list keeps its identity
 - `sortedInsert`, `sortedUpsert`, `sortedUpsertAt` and `sortedMerge` now assert in debug that the receiver is sorted by `compare`. Breaking that never threw, it quietly misplaced elements
