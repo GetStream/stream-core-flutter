@@ -307,6 +307,7 @@ final class ServerInitiated extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
+
   @override
   String toString() => objectRuntimeType(this, 'ServerInitiated');
 }
@@ -328,6 +329,7 @@ final class SystemInitiated extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
+
   @override
   String toString() => objectRuntimeType(this, 'SystemInitiated');
 }
