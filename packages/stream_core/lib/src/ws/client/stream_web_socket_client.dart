@@ -150,10 +150,10 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   late final WebSocketAuthenticationHandler _authenticationHandler;
   late final WebSocketHealthMonitor _healthMonitor;
 
-  /// The time [optionsProvider] is given to supply the options for an attempt.
+  /// The time [optionsProvider] has to supply the options for an attempt.
   ///
-  /// Separate from [WebSocketOptions.connectTimeout], which the options name for the connection
-  /// they describe and so cannot bound the wait for the options themselves.
+  /// An attempt that does not get them within it closes with [ConnectTimeout]. The connection the
+  /// options describe is bounded separately, by the [WebSocketOptions.connectTimeout] they name.
   static const defaultOptionsTimeout = Duration(seconds: 30);
 
   // Bounds an attempt while `Connecting` or `Authenticating`; the health monitor takes over after.
@@ -255,9 +255,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // Update the connection state to 'connecting'.
     _connectionState = const WebSocketConnectionState.connecting();
-
-    // Bounds the wait for the options, which the options cannot: the timeout they name is not
-    // known until they have been supplied.
+    // Bound the wait for the options, so one that never becomes usable is not waited on forever.
     _startConnectTimeout(defaultOptionsTimeout);
 
     final optionsResult = await runSafely(() => _buildOptions(_authenticationHandler.previousError));
