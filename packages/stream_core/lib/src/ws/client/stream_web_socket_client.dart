@@ -267,7 +267,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       return disconnect(source: source);
     }
 
-    return _connect(optionsResult.getOrThrow());
+    return _connect(attempt, optionsResult.getOrThrow());
   }
 
   FutureOr<WebSocketOptions> _buildOptions(StreamApiException? previousError) {
@@ -280,11 +280,11 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
   // Opens the socket the options describe, for an attempt already reported as `Connecting` and
   // already bounded.
-  Future<void> _connect(WebSocketOptions options) async {
+  Future<void> _connect(WebSocketConnectionAttempt attempt, WebSocketOptions options) async {
     _logger.d(() => 'connect to ${options.url}');
 
     // The options are known now, so the connection they describe gets the timeout they name.
-    _attempt?.boundBy(options.connectTimeout);
+    attempt.boundBy(options.connectTimeout);
     final result = await _engine.open(options);
 
     // Handed to `disconnect`, which reports the reason, closes the socket, and records the closure
