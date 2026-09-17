@@ -50,10 +50,10 @@ class WebSocketHealthMonitor {
 
   final StreamLogger _logger;
 
-  /// The [pingInterval] used when none is given, twenty-five seconds.
+  /// The [pingInterval] used when none is given.
   static const defaultPingInterval = Duration(seconds: 25);
 
-  /// The [timeoutThreshold] used when none is given, three seconds.
+  /// The [timeoutThreshold] used when none is given.
   static const defaultPongTimeout = Duration(seconds: 3);
 
   /// The interval between ping requests for health checking.

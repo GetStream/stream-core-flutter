@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 import '../../errors.dart';
-import '../../user/token_provider.dart';
 import '../../utils.dart';
 import '../events/ws_event.dart';
 import 'engine/web_socket_engine.dart';
@@ -349,16 +348,10 @@ final class AuthenticationFailed extends DisconnectionSource {
 }
 
 /// Reads derived from what closed a connection.
-///
-/// Each switches over every [DisconnectionSource], so a variant added to the sealed class fails to
-/// compile here rather than falling into a default.
+// Each switches over every source, so one added to the sealed class fails to compile here rather
+// than falling into a default.
 extension DisconnectionSourceReads on DisconnectionSource {
-  /// A human-readable description of the disconnection source.
-  ///
-  /// Provides a descriptive string that explains why the connection was closed.
-  /// This is typically used for logging and debugging purposes.
-  ///
-  /// Returns a descriptive string for the disconnection cause.
+  /// Why the connection closed, in a form fit for a log.
   String get closeReason => switch (this) {
     UserInitiated() => 'User initiated disconnection',
     ServerInitiated() => 'Server initiated disconnection',
@@ -398,29 +391,18 @@ extension DisconnectionSourceReads on DisconnectionSource {
   /// Whether a connection closed for this reason is worth opening again.
   ///
   /// {@template webSocketReconnectionRules}
-  /// - [UserInitiated] — no, the caller asked for the connection to close.
-  /// - [AuthenticationFailed] — no, with or without an error: credentials that could not be
-  ///   produced or sent will not fare better on a retry. The exception is a non-cancelled
-  ///   [StreamNetworkException], which indicts the moment rather than the credentials — see
-  ///   [TokenProvider.loadToken].
   /// - [SystemInitiated], [UnHealthyConnection], [ConnectTimeout] — yes.
-  /// - [ServerInitiated] — decided by the error it carries:
-  ///   - no error — yes, the closure said nothing against trying again.
-  ///   - a server verdict ([StreamApiException]) — no when the server said retrying will not help
-  ///     ([StreamApiException.unrecoverable]), when the token's signature or the API key is refused (configuration a
-  ///     retry reproduces), or for any other 4xx. Yes for an expired token (the reconnect
-  ///     authenticates with a fresh one), a token not valid yet (clock skew a later attempt can get
-  ///     past), a rate limit, and 5xx.
-  ///   - a transport failure ([StreamNetworkException]) — yes, except a bare normal closure
-  ///     (code 1000) with no error event before it, which is the server deliberately ending the
-  ///     session.
-  ///   - anything else — yes for an SDK-side failure, no for credentials that could not be sent
-  ///     (a retry changes nothing).
+  /// - [UserInitiated] — no.
+  /// - [AuthenticationFailed] — only for a [StreamNetworkException] that is not
+  ///   [StreamNetworkException.isCancelled].
+  /// - [ServerInitiated] — decided by the error it carries. No for a [StreamApiException] that is
+  ///   [StreamApiException.unrecoverable], reports a refused token signature or API key, or carries
+  ///   any other 4xx; no for a [StreamNetworkException] closing with [CloseCode.normalClosure]; no
+  ///   for a [StreamAuthenticationException]. Yes for anything else, including an expired or
+  ///   not-yet-valid token, a rate limit, a 5xx, and no error at all.
   ///
-  /// Necessary, but not on its own sufficient. Whether a reconnection is then actually made is
-  /// decided by `ConnectionRecoveryHandler`, which recovers only a connection that was established,
-  /// and only while the network and the app lifecycle allow it — so a first connection that times
-  /// out stays down, where one that times out on the way back does not.
+  /// Necessary but not sufficient: `ConnectionRecoveryHandler` reopens only a connection that was
+  /// established, and only while the network and the app lifecycle allow it.
   /// {@endtemplate}
   bool get isReconnectable => switch (this) {
     UserInitiated() => false,
@@ -452,14 +434,13 @@ extension DisconnectionSourceReads on DisconnectionSource {
   };
 }
 
-/// Waiting on what a connection is doing.
-extension ConnectionStateEmitterExtension on ConnectionStateEmitter {
-  /// The connection state once nothing is in transition: [Initialized], [Connected] or
-  /// [Disconnected].
+/// Waits on what a connection is doing.
+extension ConnectionStateWaits on ConnectionStateEmitter {
+  /// The connection state once nothing is in transition.
   ///
-  /// Completes immediately when the connection is already in one of those, so a caller that cannot
-  /// go on without one can await it unconditionally — and has to handle the two that are not
-  /// [Connected].
+  /// One of [Initialized], [Connected] or [Disconnected]. Completes immediately when the connection
+  /// is already in one of those, so a caller that cannot go on without one can await it
+  /// unconditionally, and has to handle the two that are not [Connected].
   Future<WebSocketConnectionState> get settled {
     final state = value;
 

@@ -33,9 +33,8 @@ abstract class StreamLogHandler {
   /// Reaches the console of whatever runs the SDK — stdout under the Dart VM, the device log
   /// under Flutter, the browser console on the web — without depending on Flutter.
   ///
-  /// Android discards console output that arrives in a burst of hundreds of lines. A connection
-  /// reporting itself comes nowhere near that, but a product logging heavily can, so consider
-  /// handing records to `debugPrint`, which paces them to stay under the limit:
+  /// A console may drop output that arrives in a burst of hundreds of lines. Consider handing
+  /// records to `debugPrint` under Flutter, which paces them:
   ///
   /// ```dart
   /// StreamLogger.handler = StreamLogHandler.from((record) => debugPrint('$record'));

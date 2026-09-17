@@ -27,10 +27,9 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 /// options carrying a credential the caller has to load; the attempt is abandoned with
 /// [ConnectTimeout] if it takes longer than [WebSocketOptions.defaultConnectTimeout].
 ///
-/// `previousError` is the error the server closed the previous attempt with, and null when there
-/// was none, once a connection has been established, or once the caller has disconnected. Use it
-/// to replace a credential the server refused — for options that carry one, this is the only place
-/// a refusal can still be acted on, because nothing is sent over the socket to authenticate them.
+/// `previousError` is what closed the previous attempt, and null when there was none, once a
+/// connection has been established, or once the caller has disconnected. Use it to replace a
+/// credential that was refused.
 ///
 /// Throw to abandon the attempt, which closes the connection with [AuthenticationFailed].
 typedef WebSocketOptionsBuilder = FutureOr<WebSocketOptions> Function(StreamApiException? previousError);

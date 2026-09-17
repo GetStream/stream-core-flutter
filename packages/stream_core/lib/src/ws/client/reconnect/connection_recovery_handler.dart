@@ -118,7 +118,7 @@ class ConnectionRecoveryHandler extends Disposable {
   Timer? _reconnectionTimer;
   void _scheduleReconnection() {
     final delay = _reconnectStrategy.getDelayAfterTheFailure();
-    _logger.i(() => 'Reconnect #${_reconnectStrategy.consecutiveFailuresCount} scheduled in ${delay.inMilliseconds}ms');
+    _logger.d(() => 'Reconnect #${_reconnectStrategy.consecutiveFailuresCount} scheduled in ${delay.inMilliseconds}ms');
 
     _reconnectionTimer?.cancel();
     _reconnectionTimer = Timer(delay, reconnectIfNeeded);
@@ -173,7 +173,7 @@ class ConnectionRecoveryHandler extends Disposable {
 
   void _onConnectionEstablished() {
     final attempts = _reconnectStrategy.consecutiveFailuresCount;
-    if (attempts > 0) _logger.i(() => 'Reconnected on attempt #$attempts');
+    if (attempts > 0) _logger.d(() => 'Reconnected on attempt #$attempts');
 
     _hasEstablishedConnection = true;
     return _reconnectStrategy.resetConsecutiveFailures();
