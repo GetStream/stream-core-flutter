@@ -24,7 +24,9 @@ final class WebSocketConnectionAttempt {
   ///
   /// Raced rather than checked afterwards, so an operation that never completes cannot hold up its
   /// caller once the attempt it belongs to is over.
-  Future<T?> valueUnlessEnded<T>(Future<T> operation) => Future.any([operation, _ended.future.then((_) => null)]);
+  Future<T?> valueUnlessEnded<T>(Future<T> operation) {
+    return Future.any([operation, _ended.future.then((_) => null)]);
+  }
 
   /// Gives this attempt [timeout] to become usable, replacing any bound it already had.
   void boundBy(Duration timeout) {
