@@ -36,7 +36,7 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 typedef WebSocketOptionsProvider = FutureOr<WebSocketOptions> Function(StreamApiException? previousError);
 
 /// A function that builds the options for a connection attempt.
-@Deprecated('Use WebSocketOptionsProvider instead, which may be asynchronous and is told what closed the last attempt.')
+@Deprecated('Use WebSocketOptionsProvider instead.')
 typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 
 /// A WebSocket client with connection management and event handling.
@@ -83,10 +83,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
     this.optionsProvider,
-    @Deprecated(
-      'Use optionsProvider instead. This one cannot be told what closed the last attempt, so a refused credential is not replaced.',
-    )
-    this.optionsBuilder,
+    @Deprecated('Use optionsProvider instead.') this.optionsBuilder,
     WebSocketProvider? wsProvider,
     WebSocketAuthenticator? onAuthenticate,
     this.pingRequestBuilder = _defaultPingRequestBuilder,
@@ -136,9 +133,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   final WebSocketOptionsProvider? optionsProvider;
 
   /// The function used to build the connection options for each attempt.
-  @Deprecated(
-    'Use optionsProvider instead. This one cannot be told what closed the last attempt, so a refused credential is not replaced.',
-  )
+  @Deprecated('Use optionsProvider instead.')
   final WebSocketOptionsBuilder? optionsBuilder;
 
   /// The function used to build ping requests for health checks.
