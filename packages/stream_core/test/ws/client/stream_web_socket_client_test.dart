@@ -833,13 +833,14 @@ void main() {
 
     group('when the socket itself gives out', () {
       wsClientTest(
-        'reports the closure as the server ending it',
+        'reports the closure as the system, not the server, ending it',
         connect: (tester) async {
           await tester.client.connect();
           await tester.pumpEventQueue();
         },
         body: (tester) async {
-          // Not a `connection.error` over a working socket: the socket is what failed.
+          // Not a `connection.error` over a working socket: the socket is what failed, which is
+          // this side of the connection — the server was never reached to end anything.
           tester.server.fail(StateError('socket died'));
           await tester.pumpEventQueue();
 
@@ -848,7 +849,7 @@ void main() {
             isA<Disconnected>().having(
               (it) => it.source,
               'source',
-              isA<ServerInitiated>().having(
+              isA<SystemInitiated>().having(
                 (it) => it.error,
                 'error',
                 isA<StreamNetworkException>().having((it) => it.cause, 'cause', isStateError),
@@ -892,6 +893,262 @@ void main() {
           );
         },
       );
+    });
+  });
+
+  group('the options behind the attempt', () {
+    // Completed by a test body to release a builder it deliberately left hanging.
+    late Completer<WebSocketOptions> optionsAfter;
+    setUp(() => optionsAfter = Completer<WebSocketOptions>());
+
+    wsClientTest(
+      'waits for options the caller builds asynchronously',
+      optionsBuilder: ([_]) async {
+        // An app loading a credential the connection URL carries.
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        return const WebSocketOptions(url: 'wss://example.com');
+      },
+      body: (tester) {
+        // `wsClientTest` asserts the connection was established before this runs, which it could
+        // not be if the attempt went ahead without waiting.
+        expect(tester.attempts, 1);
+      },
+    );
+
+    wsClientTest(
+      'reports a builder that throws as an authentication failure',
+      optionsBuilder: ([_]) => throw const StreamAuthenticationException(message: 'no token'),
+      connect: (_) {},
+      body: (tester) async {
+        await tester.client.connect();
+        await tester.pumpEventQueue();
+
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having(
+            (it) => it.source,
+            'source',
+            isA<AuthenticationFailed>().having(
+              (it) => it.error,
+              'error',
+              isA<StreamAuthenticationException>().having((it) => it.message, 'message', 'no token'),
+            ),
+          ),
+        );
+
+        // Credentials that could not be produced will not fare better on a retry.
+        expect(tester.connectionState.isAutomaticReconnectionEnabled, isFalse);
+      },
+    );
+
+    wsClientTest(
+      'retries a builder that failed on the network rather than on the credentials',
+      optionsBuilder: ([_]) => throw const StreamNetworkException(message: 'the token request failed'),
+      connect: (_) {},
+      body: (tester) async {
+        await tester.client.connect();
+        await tester.pumpEventQueue();
+
+        // The moment was at fault, not the credentials, so the attempt is worth making again.
+        // Eligibility only: a first attempt is still not recovered, because nothing was ever
+        // established for `ConnectionRecoveryHandler` to recover.
+        expect(tester.connectionState.isAutomaticReconnectionEnabled, isTrue);
+      },
+    );
+
+    test('tells an attempt what the server refused the one before it with', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        // Nothing was refused before the first attempt, so it is told nothing.
+        expect(tester.refusals, [null]);
+
+        // The server refuses an expired token and hangs up, which is reconnected.
+        tester.server.send(expiredTokenFrame());
+        async.flushMicrotasks();
+        async.elapse(const Duration(seconds: 1));
+
+        // The options for the attempt that follows carry the refusal, which is the only place an
+        // SDK authenticating in its request can act on one.
+        expect(
+          tester.refusals.last,
+          isA<StreamApiException>().having((it) => it.isTokenExpired, 'isTokenExpired', isTrue),
+        );
+      });
+    });
+
+    test('tells an attempt nothing once a connection has been established', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.server.send(expiredTokenFrame());
+        async.flushMicrotasks();
+        async.elapse(const Duration(seconds: 1));
+        expect(tester.refusals.last, isNotNull);
+
+        // Established, so the refusal before it no longer describes anything. A drop after this
+        // starts an attempt that is told nothing.
+        expect(tester.connectionState, isA<Connected>());
+        tester.server.socket.endStream();
+        async.flushMicrotasks();
+        async.elapse(const Duration(seconds: 1));
+
+        expect(tester.refusals.last, isNull);
+      });
+    });
+
+    test('abandons an attempt whose options never arrive', () {
+      fakeAsync((async) {
+        // A builder awaiting a credential that never loads. Nothing else watches 'connecting',
+        // so only the connect timeout can end this.
+        final tester = buildTester(
+          optionsBuilder: ([_]) => Completer<WebSocketOptions>().future,
+        );
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connecting>());
+
+        async.elapse(WebSocketOptions.defaultConnectTimeout);
+
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having((it) => it.source, 'source', isA<ConnectTimeout>()),
+        );
+      });
+    });
+
+    wsClientTest(
+      'opens nothing for an attempt the caller abandoned while the options were being built',
+      optionsBuilder: ([_]) => optionsAfter.future,
+      connect: (_) {},
+      body: (tester) async {
+        tester.client.connect().ignore();
+        await tester.pumpEventQueue();
+
+        await tester.client.disconnect();
+        expect(tester.connectionState, isA<Disconnected>().having((it) => it.source, 'source', isA<UserInitiated>()));
+
+        // The builder answers for an attempt nobody is making any more. Acted on, it opens a socket
+        // the client reports nothing about and nothing is left holding to close.
+        optionsAfter.complete(const WebSocketOptions(url: 'wss://example.com'));
+        await tester.pumpEventQueue();
+
+        expect(tester.server.sockets, isEmpty);
+        expect(tester.connectionState, isA<Disconnected>().having((it) => it.source, 'source', isA<UserInitiated>()));
+      },
+    );
+
+    test('bounds the options it is waiting for separately from the connection they describe', () {
+      fakeAsync((async) {
+        // A builder that never returns, for options that would have named a longer timeout than
+        // the default. That timeout is not knowable until the builder returns, so it cannot be
+        // what bounds the wait — and a connection nobody is still trying to make must not outlive
+        // the default either.
+        final tester = buildTester(
+          connectTimeout: const Duration(minutes: 5),
+          optionsBuilder: ([_]) => Completer<WebSocketOptions>().future,
+        );
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        async.elapse(WebSocketOptions.defaultConnectTimeout - const Duration(seconds: 1));
+        expect(tester.connectionState, isA<Connecting>());
+
+        async.elapse(const Duration(seconds: 1));
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having((it) => it.source, 'source', isA<ConnectTimeout>()),
+        );
+      });
+    });
+
+    test('spends the whole timeout the options name on the connection they describe', () {
+      fakeAsync((async) {
+        // A builder that takes its time, then options naming a short timeout. Reusing one budget
+        // for both would leave the connection less than the timeout it asked for.
+        final tester = buildTester(
+          optionsBuilder: ([_]) => Future.delayed(
+            const Duration(seconds: 20),
+            () => const WebSocketOptions(url: 'wss://example.com', connectTimeout: Duration(seconds: 20)),
+          ),
+          handshakeHangs: true,
+        );
+
+        tester.client.connect().ignore();
+        async.elapse(const Duration(seconds: 20));
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connecting>());
+
+        // 19 of the connection's own 20 seconds have gone by; it is still being given them.
+        async.elapse(const Duration(seconds: 19));
+        expect(tester.connectionState, isA<Connecting>());
+
+        async.elapse(const Duration(seconds: 1));
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having((it) => it.source, 'source', isA<ConnectTimeout>()),
+        );
+      });
+    });
+  });
+
+  group('the health check interval', () {
+    test('pings on the interval the client was given', () {
+      fakeAsync((async) {
+        var pings = 0;
+        final tester = buildTester(
+          pingInterval: const Duration(seconds: 5),
+          pongTimeout: const Duration(seconds: 1),
+        );
+
+        tester.server.onFrame = (frame) {
+          if (frame['type'] == 'health.check') pings++;
+          return [
+            {'type': 'health.check', 'connection_id': 'connection-id'},
+          ];
+        };
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connected>());
+
+        async.elapse(const Duration(seconds: 12));
+
+        // Two intervals elapsed, and the connection is still answered for.
+        expect(pings, 2);
+        expect(tester.connectionState, isA<Connected>());
+      });
+    });
+
+    test('gives up on a connection that misses the pong timeout it was given', () {
+      fakeAsync((async) {
+        final tester = buildTester(
+          pingInterval: const Duration(seconds: 5),
+          pongTimeout: const Duration(seconds: 1),
+        );
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        // A server that stops answering pings once the connection is up.
+        tester.server.onFrame = (_) => const [];
+
+        // One ping goes out at 5s, and its pong is due a second later.
+        async.elapse(const Duration(seconds: 7));
+
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having((it) => it.source, 'source', isA<UnHealthyConnection>()),
+        );
+      });
     });
   });
 

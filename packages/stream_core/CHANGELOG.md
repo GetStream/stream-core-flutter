@@ -10,9 +10,21 @@
 - Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
 - Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
+- `StreamWebSocketClient`'s `optionsBuilder` may now be asynchronous, for a connection whose URL carries a credential the caller has to load. A builder that throws closes the attempt with `AuthenticationFailed`, and one that never returns is abandoned after `WebSocketOptions.defaultConnectTimeout`
+- Added `pingInterval` and `pongTimeout` to `StreamWebSocketClient`, which were fixed at the health monitor's defaults. The defaults are unchanged, and are now named by `WebSocketHealthMonitor.defaultPingInterval` and `defaultPongTimeout`
+- `SystemInitiated` now carries the `error` and `stackTrace` of whatever closed the connection, which it had no way to report
+- Added `DisconnectionSourceReads.exception`, the failure a disconnection is raised as: its `cause` where there is one, and a `StreamNetworkException` describing the closure otherwise
+- Added `DisconnectionSourceReads.stackTrace`, present wherever there is a `cause`
+- Added `ConnectionStateEmitter.settled`, which completes once the connection is `Initialized`, `Connected` or `Disconnected`, so a caller that cannot go on without one can await it unconditionally
+- `closeReason`, `cause` and `isReconnectable` moved from `DisconnectionSource` onto the `DisconnectionSourceReads` extension. Reads are unchanged; `cause` is now typed `StreamException?` rather than `Object?`
 
 ### 🐞 Fixed
 
+- `StreamLogHandler.console` now marks an attached error or stack trace with `↳` instead of indenting it two spaces. Every line carries the tag and priority, which is what made a cause read as a record of its own; the marker also survives a pipeline that collapses whitespace
+- A socket that fails now closes with `SystemInitiated` rather than `ServerInitiated`: the error arrives without a close frame, so there is no server-stated reason to classify by. Both are reconnectable, so recovery is unchanged
+- `ConnectionRecoveryHandler` no longer counts a run of retries the caller called off against the next connection, which reported a fresh connect as `Reconnected on attempt #N`
+- A closure with an empty `closeReason` now reports none, rather than an empty string
+- `Reconnect #N scheduled` is now logged at info rather than debug, and a recovered connection reports which attempt landed it
 - `Filter.equal` and `Filter.in_` now ask whether a collection field holds the values given, rather than comparing it with order-sensitive deep equality that no query can produce
 - `LocationCoordinate` equality is now exact, where `==` matched within ~1.1cm and so disagreed with `hashCode`, `Set` and `Map`. `distanceTo` no longer reports `0m` for points closer than that; for proximity, ask `a.distanceTo(b) <= 1.meters`
 - `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with

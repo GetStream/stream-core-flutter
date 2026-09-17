@@ -23,8 +23,17 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 
 /// A function that builds the options for a connection attempt.
 ///
-/// Called once per attempt, so the options can change between attempts.
-typedef WebSocketOptionsBuilder = WebSocketOptions Function();
+/// Called once per attempt, so the options can change between attempts. May be asynchronous, for
+/// options carrying a credential the caller has to load; the attempt is abandoned with
+/// [ConnectTimeout] if it takes longer than [WebSocketOptions.defaultConnectTimeout].
+///
+/// `previousError` is the error the server closed the previous attempt with, and null when there
+/// was none, once a connection has been established, or once the caller has disconnected. Use it
+/// to replace a credential the server refused — for options that carry one, this is the only place
+/// a refusal can still be acted on, because nothing is sent over the socket to authenticate them.
+///
+/// Throw to abandon the attempt, which closes the connection with [AuthenticationFailed].
+typedef WebSocketOptionsBuilder = FutureOr<WebSocketOptions> Function([StreamApiException? previousError]);
 
 /// A WebSocket client with connection management and event handling.
 ///
@@ -75,6 +84,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     this.pingRequestBuilder = _defaultPingRequestBuilder,
     required WebSocketMessageCodec<WsEvent, WsRequest> messageCodec,
     Iterable<EventResolver<WsEvent>>? eventResolvers,
+    Duration pingInterval = WebSocketHealthMonitor.defaultPingInterval,
+    Duration pongTimeout = WebSocketHealthMonitor.defaultPongTimeout,
     String tag = 'SC:WsClient',
   }) : _logger = StreamLogger(tag) {
     _events = MutableEventEmitter(resolvers: eventResolvers);
@@ -85,7 +96,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       tag: '$tag:Engine',
     );
 
-    _healthMonitor = WebSocketHealthMonitor(listener: this, tag: '$tag:Health');
+    _healthMonitor = WebSocketHealthMonitor(
+      listener: this,
+      pingInterval: pingInterval,
+      timeoutThreshold: pongTimeout,
+      tag: '$tag:Health',
+    );
 
     _authenticationHandler = WebSocketAuthenticationHandler(
       send: send,
@@ -152,11 +168,21 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     final previous = _connectionStateEmitter.value;
     _connectionStateEmitter.value = connectionState;
-    _logger.d(() => 'state: $previous -> $connectionState');
+    _logger.d(() => 'state: ${_describe(previous)} -> ${_describe(connectionState)}');
 
     _healthMonitor.onConnectionStateChanged(connectionState);
     _authenticationHandler.onConnectionStateChanged(connectionState);
   }
+
+  // What a state is, rather than everything it carries: a disconnection's `toString` embeds the
+  // failure and its cause, which the warning that reported it already carries, and which every
+  // transition would otherwise repeat on both sides of the arrow.
+  static String _describe(WebSocketConnectionState state) => switch (state) {
+    Connected(:final healthCheck) => 'Connected(${healthCheck.connectionId})',
+    Disconnecting(:final source) => 'Disconnecting(${source.runtimeType})',
+    Disconnected(:final source) => 'Disconnected(${source.runtimeType})',
+    Initialized() || Connecting() || Authenticating() => '${state.runtimeType}',
+  };
 
   /// Sends a message through the WebSocket connection.
   ///
@@ -216,8 +242,36 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Update the connection state to 'connecting'.
     _connectionState = const WebSocketConnectionState.connecting();
 
-    // Open the connection using the engine, with options built for this attempt.
-    final options = optionsBuilder.call();
+    // Bounds the builder, which the options cannot: the timeout they name is not known until they
+    // are built.
+    _startConnectTimeout(WebSocketOptions.defaultConnectTimeout);
+
+    // Build the options for this attempt, which the caller may do asynchronously.
+    final optionsResult = await runSafely(() => optionsBuilder(_authenticationHandler.previousError));
+
+    // Stale: the attempt was abandoned while the builder ran, by a caller disconnecting or by the
+    // bound above elapsing. Connecting now would undo the closure already reported.
+    if (connectionState.value is! Connecting) return;
+
+    // Handed to `disconnect`, which reports the reason and records the closure. Not retried unless
+    // the error says the network was at fault rather than the credentials.
+    if (optionsResult case Failure(:final error, :final stackTrace)) {
+      var exception = StreamException.tryFrom(error);
+      exception ??= StreamAuthenticationException(
+        message: 'The options for the connection could not be built',
+        cause: error,
+      );
+
+      final source = DisconnectionSource.authenticationFailed(error: exception, stackTrace: stackTrace);
+      return disconnect(source: source);
+    }
+
+    return _connect(optionsResult.getOrThrow());
+  }
+
+  // Opens the socket the options describe, for an attempt already reported as `Connecting` and
+  // already bounded.
+  Future<void> _connect(WebSocketOptions options) async {
     _logger.d(() => 'connect to ${options.url}');
 
     // Bound the attempt, so one that never becomes usable is not waited on forever.
@@ -310,7 +364,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
   @override
   void onError(Object error, [StackTrace? stackTrace]) {
-    _logger.e(() => 'socket failed', error: error, stackTrace: stackTrace);
+    _logger.w(() => 'socket failed', error: error, stackTrace: stackTrace);
 
     var exception = StreamException.tryFrom(error);
     exception ??= StreamNetworkException(
@@ -321,7 +375,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Update the connection state to 'disconnecting' with the source.
     //
     // The socket closes itself after an error, so the closure that follows records the disconnection.
-    final source = ServerInitiated(error: exception, stackTrace: stackTrace);
+    final source = SystemInitiated(error: exception, stackTrace: stackTrace);
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
   }
 

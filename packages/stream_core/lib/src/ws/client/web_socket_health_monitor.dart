@@ -43,12 +43,18 @@ class WebSocketHealthMonitor {
   /// Creates a new instance of [WebSocketHealthMonitor].
   WebSocketHealthMonitor({
     required this._listener,
-    this.pingInterval = const Duration(seconds: 25),
-    this.timeoutThreshold = const Duration(seconds: 3),
+    this.pingInterval = defaultPingInterval,
+    this.timeoutThreshold = defaultPongTimeout,
     String tag = 'SC:WsHealth',
   }) : _logger = StreamLogger(tag);
 
   final StreamLogger _logger;
+
+  /// The [pingInterval] used when none is given, twenty-five seconds.
+  static const defaultPingInterval = Duration(seconds: 25);
+
+  /// The [timeoutThreshold] used when none is given, three seconds.
+  static const defaultPongTimeout = Duration(seconds: 3);
 
   /// The interval between ping requests for health checking.
   final Duration pingInterval;

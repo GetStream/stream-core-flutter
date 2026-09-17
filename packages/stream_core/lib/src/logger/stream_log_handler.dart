@@ -41,9 +41,14 @@ abstract class StreamLogHandler {
   /// StreamLogger.handler = StreamLogHandler.from((record) => debugPrint('$record'));
   /// ```
   ///
+  /// Every line carries its priority and tag as text, an attached error and stack trace included,
+  /// because no console takes a severity of its own.
+  ///
+  /// Set [emoji] to false where emoji render inconsistently, such as a CI log.
+  ///
   /// Emits whatever [StreamLogger.priority] admits. Wrap in [StreamLogHandler.filtered] to hold
   /// this destination quieter than the rest.
-  const factory StreamLogHandler.console() = _ConsoleHandler;
+  const factory StreamLogHandler.console({bool emoji}) = _ConsoleHandler;
 
   /// A handler giving every record to each of [handlers], in order.
   ///
@@ -100,13 +105,52 @@ final class _SilentHandler extends StreamLogHandler {
 }
 
 final class _ConsoleHandler extends StreamLogHandler {
-  const _ConsoleHandler();
+  const _ConsoleHandler({this.emoji = true});
+
+  final bool emoji;
+
+  // A legibility budget, not a platform limit. Counted rather than split, so a record that drew
+  // its own structure keeps it.
+  static const _lineLimit = 800;
 
   @override
   void handle(StreamLogRecord record) {
-    print('${record.time} $record');
-    if (record.error case final error?) print(error);
-    if (record.stackTrace case final stackTrace?) print(stackTrace);
+    final priority = record.priority;
+    final marker = emoji ? '${priority.emoji} ' : '';
+    final prefix = '${_timestamp(record.time)} $marker${priority.label}/${record.tag}:';
+
+    _write(prefix, record.message);
+
+    // Prefixed so no line is lost to a tag filter, marked so none reads as a record of its own.
+    for (final detail in [?record.error, ?record.stackTrace]) {
+      for (final line in '$detail'.trimRight().split('\n')) {
+        if (line.trim().isEmpty) continue;
+        _write(prefix, line, marker: '↳ ');
+      }
+    }
+  }
+
+  static void _write(String prefix, String line, {String marker = ''}) {
+    final room = _lineLimit - prefix.length - marker.length - 1;
+    if (room <= 0 || line.length <= room) return print('$prefix $marker$line');
+
+    final dropped = line.length - room;
+    print('$prefix $marker${line.substring(0, room)}… $dropped more characters');
+  }
+
+  // No date: it repeats all session. The offset is what lines a record up against anything in UTC.
+  static String _timestamp(DateTime time) {
+    final offset = time.timeZoneOffset;
+    final sign = offset.isNegative ? '-' : '+';
+    final offsetHours = offset.inHours.abs().toString().padLeft(2, '0');
+    final offsetMinutes = offset.inMinutes.abs().remainder(60).toString().padLeft(2, '0');
+
+    final hours = time.hour.toString().padLeft(2, '0');
+    final minutes = time.minute.toString().padLeft(2, '0');
+    final seconds = time.second.toString().padLeft(2, '0');
+    final milliseconds = time.millisecond.toString().padLeft(3, '0');
+
+    return '$hours:$minutes:$seconds.$milliseconds$sign$offsetHours:$offsetMinutes';
   }
 }
 

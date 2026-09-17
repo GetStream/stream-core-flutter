@@ -51,6 +51,7 @@ class WsClientTester {
     required this.lifecycle,
     required this.states,
     required this._attempts,
+    required this.refusals,
     required this._tokenLoads,
     required this._subscription,
     required this._recovery,
@@ -79,6 +80,9 @@ class WsClientTester {
   /// An app can observe these, which is what makes them worth asserting on: a reconnection shows
   /// up as another [Connecting], and nothing else needs to be reached into to see it.
   final List<WebSocketConnectionState> states;
+
+  /// What each attempt was told the server refused the one before it with, in order.
+  final List<StreamApiException?> refusals;
 
   final int Function() _attempts;
   final int Function() _tokenLoads;
@@ -147,6 +151,7 @@ void wsClientTest(
   TokenManager? tokens,
   bool recover = false,
   Duration? connectTimeout,
+  WebSocketOptionsBuilder? optionsBuilder,
   bool handshakeFails = false,
   bool handshakeHangs = false,
   bool holdClose = false,
@@ -167,6 +172,7 @@ void wsClientTest(
         tokens: tokens,
         recover: recover,
         connectTimeout: connectTimeout,
+        optionsBuilder: optionsBuilder,
         handshakeFails: handshakeFails,
         handshakeHangs: handshakeHangs,
         holdClose: holdClose,
@@ -204,6 +210,9 @@ WsClientTester buildTester({
   TokenManager? tokens,
   bool recover = false,
   Duration? connectTimeout,
+  WebSocketOptionsBuilder? optionsBuilder,
+  Duration pingInterval = WebSocketHealthMonitor.defaultPingInterval,
+  Duration pongTimeout = WebSocketHealthMonitor.defaultPongTimeout,
   bool handshakeFails = false,
   bool Function()? handshakeFailsWhen,
   bool handshakeHangs = false,
@@ -225,15 +234,20 @@ WsClientTester buildTester({
       );
 
   var attempts = 0;
+  final refusals = <StreamApiException?>[];
   final client = StreamWebSocketClient(
-    optionsBuilder: () {
+    optionsBuilder: ([previousError]) {
       attempts++;
+      refusals.add(previousError);
+      if (optionsBuilder case final build?) return build(previousError);
       return switch (connectTimeout) {
         final it? => WebSocketOptions(url: 'wss://example.com', connectTimeout: it),
         // Left to the class default, so the attempts that rely on it really go through it.
         null => const WebSocketOptions(url: 'wss://example.com'),
       };
     },
+    pingInterval: pingInterval,
+    pongTimeout: pongTimeout,
     wsProvider: (_) => server.connect(
       handshakeFails: handshakeFailsWhen?.call() ?? handshakeFails,
       handshakeHangs: handshakeHangs,
@@ -272,6 +286,7 @@ WsClientTester buildTester({
     lifecycle: lifecycle,
     states: states,
     attempts: () => attempts,
+    refusals: refusals,
     tokenLoads: () => tokenLoads,
     subscription: subscription,
     recovery: recovery,

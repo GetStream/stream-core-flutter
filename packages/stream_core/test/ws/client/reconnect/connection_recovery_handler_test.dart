@@ -4,6 +4,7 @@ import 'package:fake_async/fake_async.dart';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
+import '../../../helpers/logger.dart';
 import '../../../helpers/user_token.dart';
 import '../../../helpers/ws_client_tester.dart';
 
@@ -48,6 +49,26 @@ void main() {
 
       expect(tester.attempts, 2);
       expect(tester.states.whereType<Connecting>(), hasLength(2));
+    });
+  });
+
+  test('reports which attempt recovered the connection', () {
+    fakeAsync((async) {
+      final handler = RecordingLogHandler();
+      final tester = buildTester(recover: true);
+
+      withStreamLogger(handler: handler, () {
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        async.elapse(Duration.zero);
+        async.flushMicrotasks();
+      });
+
+      expect(tester.connectionState, isA<Connected>());
+      expect(handler.messages, contains('Reconnected on attempt #1'));
     });
   });
 
@@ -140,6 +161,35 @@ void main() {
       // Nothing is left armed. A timer that outlives the caller's disconnect fires against a client
       // they have closed, and reconnects it behind them.
       expect(async.pendingTimers, isEmpty);
+    });
+  });
+
+  test('does not count a run of retries the caller called off against the next connection', () {
+    fakeAsync((async) {
+      final handler = RecordingLogHandler();
+      var handshakeFails = false;
+      final tester = buildTester(recover: true, handshakeFailsWhen: () => handshakeFails);
+
+      withStreamLogger(handler: handler, () {
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        handshakeFails = true;
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        async.elapse(const Duration(minutes: 1));
+        async.flushMicrotasks();
+
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+
+        handshakeFails = false;
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+      });
+
+      expect(tester.connectionState, isA<Connected>());
+      expect(handler.messages, isNot(contains(startsWith('Reconnected on attempt'))));
     });
   });
 
