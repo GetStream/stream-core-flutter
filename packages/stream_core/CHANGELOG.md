@@ -10,20 +10,20 @@
 - Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
 - Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
-- Added `StreamWebSocketClient.optionsProvider`, which may be asynchronous and is handed the error that closed the previous attempt so a refused credential can be replaced. It has `defaultOptionsTimeout` to supply them in, separate from the `connectTimeout` those options name
-- Added `pingInterval` and `pongTimeout` to `StreamWebSocketClient`, which were fixed at the health monitor's defaults
-- `SystemInitiated` now carries the `error` and `stackTrace` of whatever closed the connection
-- Added `ConnectionStateEmitter.settled`, which completes once the connection is `Initialized`, `Connected` or `Disconnected`
-- `WebSocketConnectionState.toString` and `DisconnectionSource.toString` are now one short line, and read the same in release as in debug
-- `closeReason`, `cause` and `isReconnectable` moved from `DisconnectionSource` onto the `DisconnectionSourceReads` extension, which adds `exception` and `stackTrace`. Reads are unchanged; `cause` is now typed `StreamException?` rather than `Object?`
+- Added `StreamWebSocketClient.optionsProvider`, which builds the options asynchronously and is given the error that closed the previous attempt, within `defaultOptionsTimeout`
+- Added `pingInterval` and `pongTimeout` to `StreamWebSocketClient`
+- `SystemInitiated` now carries an `error` and `stackTrace`
+- Added `ConnectionStateEmitter.settled`, which completes once the connection is no longer in transition
+- `WebSocketConnectionState` and `DisconnectionSource` now have a one-line `toString` that reads the same in release as in debug
+- `closeReason`, `cause` and `isReconnectable` moved onto the `DisconnectionSourceReads` extension, which adds `exception` and `stackTrace`. `cause` is now `StreamException?`
 
 ### ⚠️ Deprecated
 
-- `StreamWebSocketClient.optionsBuilder` and `WebSocketOptionsBuilder`, in favour of `optionsProvider` and `WebSocketOptionsProvider`. A builder takes no arguments, so a caller left on it is never told what closed the last attempt and cannot replace a refused credential
+- `StreamWebSocketClient.optionsBuilder` and `WebSocketOptionsBuilder`, in favour of `optionsProvider` and `WebSocketOptionsProvider`. A builder takes no arguments, so it cannot be told what closed the last attempt
 
 ### 🐞 Fixed
 
-- A socket that fails now closes with `SystemInitiated` rather than `ServerInitiated`. Both are reconnectable, so recovery is unchanged
+- A socket that fails now closes with `SystemInitiated` rather than `ServerInitiated`; both reconnect
 - `Filter.equal` and `Filter.in_` now ask whether a collection field holds the values given, rather than comparing it with order-sensitive deep equality that no query can produce
 - `LocationCoordinate` equality is now exact, where `==` matched within ~1.1cm and so disagreed with `hashCode`, `Set` and `Map`. `distanceTo` no longer reports `0m` for points closer than that; for proximity, ask `a.distanceTo(b) <= 1.meters`
 - `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with
