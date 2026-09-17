@@ -10,15 +10,18 @@
 - Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
 - Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
-- `StreamWebSocketClient`'s `optionsBuilder` may now be asynchronous, and is handed the error that closed the previous attempt so a refused credential can be replaced
+- Added `StreamWebSocketClient.optionsProvider`, which may be asynchronous and is handed the error that closed the previous attempt so a refused credential can be replaced
 - Added `pingInterval` and `pongTimeout` to `StreamWebSocketClient`, which were fixed at the health monitor's defaults. The defaults are unchanged, and are now named by `WebSocketHealthMonitor.defaultPingInterval` and `defaultPongTimeout`
 - `SystemInitiated` now carries the `error` and `stackTrace` of whatever closed the connection
 - Added `DisconnectionSourceReads.exception`, the failure a disconnection is raised as
 - Added `DisconnectionSourceReads.stackTrace`, present wherever there is a `cause`
 - Added `ConnectionStateEmitter.settled`, which completes once the connection is `Initialized`, `Connected` or `Disconnected`
 - `WebSocketConnectionState.toString` and `DisconnectionSource.toString` are now a compact single line naming the state and what closed it, rather than embedding the failure and its cause, and read the same in release as in debug
-- Added `WebSocketConnectionStateReads.label`, a compact rendering of a state for a log
 - `closeReason`, `cause` and `isReconnectable` moved from `DisconnectionSource` onto the `DisconnectionSourceReads` extension. Reads are unchanged; `cause` is now typed `StreamException?` rather than `Object?`
+
+### ⚠️ Deprecated
+
+- `StreamWebSocketClient.optionsBuilder` and `WebSocketOptionsBuilder`, in favour of `optionsProvider` and `WebSocketOptionsProvider`. A builder takes no arguments, so a caller left on it is never told what closed the last attempt and cannot replace a refused credential
 
 ### 🐞 Fixed
 

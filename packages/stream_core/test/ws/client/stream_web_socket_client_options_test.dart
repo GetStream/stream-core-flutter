@@ -9,13 +9,27 @@ import '../../helpers/ws_client_tester.dart';
 
 void main() {
   group('the options behind the attempt', () {
+    test('takes them from the deprecated builder when that is what the caller gave', () async {
+      // The builder cannot be handed the refusal, so a caller left on it never replaces a token the
+      // server turned down — which is what the deprecation says.
+      final tester = buildTester(
+        optionsBuilder: () => const WebSocketOptions(url: 'wss://example.com'),
+      );
+      addTearDown(tester.dispose);
+
+      await tester.client.connect();
+      await tester.pumpEventQueue();
+
+      expect(tester.connectionState, isA<Connected>());
+    });
+
     // Completed by a test body to release a builder it deliberately left hanging.
     late Completer<WebSocketOptions> optionsAfter;
     setUp(() => optionsAfter = Completer<WebSocketOptions>());
 
     wsClientTest(
       'waits for options the caller builds asynchronously',
-      optionsBuilder: ([_]) async {
+      optionsProvider: (_) async {
         // An app loading a credential the connection URL carries.
         await Future<void>.delayed(const Duration(milliseconds: 1));
         return const WebSocketOptions(url: 'wss://example.com');
@@ -29,7 +43,7 @@ void main() {
 
     wsClientTest(
       'reports a builder that throws as an authentication failure',
-      optionsBuilder: ([_]) => throw const StreamAuthenticationException(message: 'no token'),
+      optionsProvider: (_) => throw const StreamAuthenticationException(message: 'no token'),
       connect: (_) {},
       body: (tester) async {
         await tester.client.connect();
@@ -55,7 +69,7 @@ void main() {
 
     wsClientTest(
       'retries a builder that failed on the network rather than on the credentials',
-      optionsBuilder: ([_]) => throw const StreamNetworkException(message: 'the token request failed'),
+      optionsProvider: (_) => throw const StreamNetworkException(message: 'the token request failed'),
       connect: (_) {},
       body: (tester) async {
         await tester.client.connect();
@@ -120,7 +134,7 @@ void main() {
         // A builder awaiting a credential that never loads. Nothing else watches 'connecting',
         // so only the connect timeout can end this.
         final tester = buildTester(
-          optionsBuilder: ([_]) => Completer<WebSocketOptions>().future,
+          optionsProvider: (_) => Completer<WebSocketOptions>().future,
         );
 
         tester.client.connect().ignore();
@@ -138,7 +152,7 @@ void main() {
 
     wsClientTest(
       'opens nothing for an attempt the caller abandoned while the options were being built',
-      optionsBuilder: ([_]) => optionsAfter.future,
+      optionsProvider: (_) => optionsAfter.future,
       connect: (_) {},
       body: (tester) async {
         tester.client.connect().ignore();
@@ -165,7 +179,7 @@ void main() {
         // the default either.
         final tester = buildTester(
           connectTimeout: const Duration(minutes: 5),
-          optionsBuilder: ([_]) => Completer<WebSocketOptions>().future,
+          optionsProvider: (_) => Completer<WebSocketOptions>().future,
         );
 
         tester.client.connect().ignore();
@@ -187,7 +201,7 @@ void main() {
         // A builder that takes its time, then options naming a short timeout. Reusing one budget
         // for both would leave the connection less than the timeout it asked for.
         final tester = buildTester(
-          optionsBuilder: ([_]) => Future.delayed(
+          optionsProvider: (_) => Future.delayed(
             const Duration(seconds: 20),
             () => const WebSocketOptions(url: 'wss://example.com', connectTimeout: Duration(seconds: 20)),
           ),

@@ -151,7 +151,7 @@ void wsClientTest(
   TokenManager? tokens,
   bool recover = false,
   Duration? connectTimeout,
-  WebSocketOptionsBuilder? optionsBuilder,
+  WebSocketOptionsProvider? optionsProvider,
   bool handshakeFails = false,
   bool handshakeHangs = false,
   bool holdClose = false,
@@ -172,7 +172,7 @@ void wsClientTest(
         tokens: tokens,
         recover: recover,
         connectTimeout: connectTimeout,
-        optionsBuilder: optionsBuilder,
+        optionsProvider: optionsProvider,
         handshakeFails: handshakeFails,
         handshakeHangs: handshakeHangs,
         holdClose: holdClose,
@@ -210,6 +210,8 @@ WsClientTester buildTester({
   TokenManager? tokens,
   bool recover = false,
   Duration? connectTimeout,
+  WebSocketOptionsProvider? optionsProvider,
+  // ignore: deprecated_member_use_from_same_package
   WebSocketOptionsBuilder? optionsBuilder,
   Duration pingInterval = WebSocketHealthMonitor.defaultPingInterval,
   Duration pongTimeout = WebSocketHealthMonitor.defaultPongTimeout,
@@ -236,16 +238,20 @@ WsClientTester buildTester({
   var attempts = 0;
   final refusals = <StreamApiException?>[];
   final client = StreamWebSocketClient(
-    optionsBuilder: ([previousError]) {
-      attempts++;
-      refusals.add(previousError);
-      if (optionsBuilder case final build?) return build(previousError);
-      return switch (connectTimeout) {
-        final it? => WebSocketOptions(url: 'wss://example.com', connectTimeout: it),
-        // Left to the class default, so the attempts that rely on it really go through it.
-        null => const WebSocketOptions(url: 'wss://example.com'),
-      };
-    },
+    // ignore: deprecated_member_use_from_same_package
+    optionsBuilder: optionsBuilder,
+    optionsProvider: optionsBuilder != null
+        ? null
+        : (previousError) {
+            attempts++;
+            refusals.add(previousError);
+            if (optionsProvider case final provide?) return provide(previousError);
+            return switch (connectTimeout) {
+              final it? => WebSocketOptions(url: 'wss://example.com', connectTimeout: it),
+              // Left to the class default, so the attempts that rely on it really go through it.
+              null => const WebSocketOptions(url: 'wss://example.com'),
+            };
+          },
     pingInterval: pingInterval,
     pongTimeout: pongTimeout,
     wsProvider: (_) => server.connect(

@@ -21,10 +21,10 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
   return HealthCheckPingEvent(connectionId: info?.connectionId);
 }
 
-/// A function that builds the options for a connection attempt.
+/// A function supplying the options for a connection attempt.
 ///
 /// Called once per attempt, so the options can change between attempts. May be asynchronous, for
-/// options carrying a credential the caller has to load; a builder taking longer than
+/// options carrying a credential the caller has to load; one taking longer than
 /// [WebSocketOptions.defaultConnectTimeout] closes the attempt with [ConnectTimeout]. The
 /// connection it returns is then given the whole of its own [WebSocketOptions.connectTimeout].
 ///
@@ -33,7 +33,11 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 /// credential that was refused.
 ///
 /// Throw to abandon the attempt, which closes the connection with [AuthenticationFailed].
-typedef WebSocketOptionsBuilder = FutureOr<WebSocketOptions> Function(StreamApiException? previousError);
+typedef WebSocketOptionsProvider = FutureOr<WebSocketOptions> Function(StreamApiException? previousError);
+
+/// A function that builds the options for a connection attempt.
+@Deprecated('Use WebSocketOptionsProvider instead, which may be asynchronous and is told what closed the last attempt.')
+typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 
 /// A WebSocket client with connection management and event handling.
 ///
@@ -48,7 +52,7 @@ typedef WebSocketOptionsBuilder = FutureOr<WebSocketOptions> Function(StreamApiE
 /// ## Example
 /// ```dart
 /// final client = StreamWebSocketClient(
-///   optionsBuilder: () => const WebSocketOptions(url: 'wss://api.example.com'),
+///   optionsProvider: (_) => const WebSocketOptions(url: 'wss://api.example.com'),
 ///   // A WebSocketMessageCodec for the event and request types this SDK puts on the wire.
 ///   messageCodec: const AppWsCodec(),
 ///   onAuthenticate: (send, _) async {
@@ -78,7 +82,11 @@ typedef WebSocketOptionsBuilder = FutureOr<WebSocketOptions> Function(StreamApiE
 class StreamWebSocketClient with Disposable implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
-    required this.optionsBuilder,
+    this.optionsProvider,
+    @Deprecated(
+      'Use optionsProvider instead. This one cannot be told what closed the last attempt, so a refused credential is not replaced.',
+    )
+    this.optionsBuilder,
     WebSocketProvider? wsProvider,
     WebSocketAuthenticator? onAuthenticate,
     this.pingRequestBuilder = _defaultPingRequestBuilder,
@@ -87,7 +95,11 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     Duration pingInterval = WebSocketHealthMonitor.defaultPingInterval,
     Duration pongTimeout = WebSocketHealthMonitor.defaultPongTimeout,
     String tag = 'SC:WsClient',
-  }) : _logger = StreamLogger(tag) {
+  }) : assert(
+         (optionsProvider == null) != (optionsBuilder == null),
+         'Give exactly one of optionsProvider or optionsBuilder.',
+       ),
+       _logger = StreamLogger(tag) {
     _events = MutableEventEmitter(resolvers: eventResolvers);
     _engine = StreamWebSocketEngine(
       listener: this,
@@ -120,8 +132,14 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     );
   }
 
+  /// Supplies the connection options for each attempt.
+  final WebSocketOptionsProvider? optionsProvider;
+
   /// The function used to build the connection options for each attempt.
-  final WebSocketOptionsBuilder optionsBuilder;
+  @Deprecated(
+    'Use optionsProvider instead. This one cannot be told what closed the last attempt, so a refused credential is not replaced.',
+  )
+  final WebSocketOptionsBuilder? optionsBuilder;
 
   /// The function used to build ping requests for health checks.
   final PingRequestBuilder pingRequestBuilder;
@@ -237,7 +255,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _startConnectTimeout(WebSocketOptions.defaultConnectTimeout);
 
     // Build the options for this attempt, which the caller may do asynchronously.
-    final optionsResult = await runSafely(() => optionsBuilder(_authenticationHandler.previousError));
+    final optionsResult = await runSafely(() => _buildOptions(_authenticationHandler.previousError));
 
     // Stale: the attempt was abandoned while the builder ran, by a caller disconnecting or by the
     // bound above elapsing. Connecting now would undo the closure already reported.
@@ -257,6 +275,13 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     }
 
     return _connect(optionsResult.getOrThrow());
+  }
+
+  // Whichever of the two the caller gave. The constructor has already refused both and neither.
+  FutureOr<WebSocketOptions> _buildOptions(StreamApiException? previousError) {
+    if (optionsProvider case final provider?) return provider(previousError);
+    // ignore: deprecated_member_use_from_same_package
+    return optionsBuilder!();
   }
 
   // Opens the socket the options describe, for an attempt already reported as `Connecting` and
