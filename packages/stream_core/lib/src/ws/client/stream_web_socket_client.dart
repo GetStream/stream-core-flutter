@@ -254,15 +254,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // are built.
     _startConnectTimeout(WebSocketOptions.defaultConnectTimeout);
 
-    // Build the options for this attempt, which the caller may do asynchronously.
     final optionsResult = await runSafely(() => _buildOptions(_authenticationHandler.previousError));
 
     // Stale: the attempt was abandoned while the builder ran, by a caller disconnecting or by the
     // bound above elapsing. Connecting now would undo the closure already reported.
     if (connectionState.value is! Connecting) return;
 
-    // Handed to `disconnect`, which reports the reason and records the closure. Not retried unless
-    // the error says the network was at fault rather than the credentials.
     if (optionsResult case Failure(:final error, :final stackTrace)) {
       var exception = StreamException.tryFrom(error);
       exception ??= StreamAuthenticationException(
@@ -277,8 +274,6 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     return _connect(optionsResult.getOrThrow());
   }
 
-  // Whichever of the two the caller gave, which the constructor asserts is exactly one. Neither
-  // reaches here in release, where that assert is gone, without saying which contract was broken.
   FutureOr<WebSocketOptions> _buildOptions(StreamApiException? previousError) {
     if (optionsProvider case final provider?) return provider(previousError);
     // ignore: deprecated_member_use_from_same_package

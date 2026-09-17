@@ -183,7 +183,6 @@ class ConnectionRecoveryHandler extends Disposable {
   // actually attempted, so a drop during an outage still counts as one worth recovering.
   void _onConnectionLost(DisconnectionSource source) {
     if (!source.isReconnectable) {
-      // Reset the count for the next attempt.
       _reconnectStrategy.resetConsecutiveFailures();
       _hasEstablishedConnection = false;
       return _cancelReconnection();
