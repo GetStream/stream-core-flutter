@@ -11,7 +11,6 @@
 - Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
 - Added `StreamWebSocketClient.optionsProvider`, which builds the options asynchronously and is given the error that closed the previous attempt, within `defaultOptionsTimeout`
-- Added `pingInterval` and `pongTimeout` to `StreamWebSocketClient`
 - Added `ConnectionStateEmitter.settled`, which completes once the connection is no longer in transition
 - `closeReason`, `cause` and `isReconnectable` moved onto the `DisconnectionSourceReads` extension, which adds `exception` and `stackTrace`. `cause` is now `StreamException?`
 
