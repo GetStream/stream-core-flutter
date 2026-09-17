@@ -16,7 +16,7 @@
 - Added `DisconnectionSourceReads.exception`, the failure a disconnection is raised as
 - Added `DisconnectionSourceReads.stackTrace`, present wherever there is a `cause`
 - Added `ConnectionStateEmitter.settled`, which completes once the connection is `Initialized`, `Connected` or `Disconnected`
-- `WebSocketConnectionState.toString` is now a compact single line naming the state and what closed it, rather than embedding the failure and its cause
+- `WebSocketConnectionState.toString` and `DisconnectionSource.toString` are now a compact single line naming the state and what closed it, rather than embedding the failure and its cause, and read the same in release as in debug
 - Added `WebSocketConnectionStateReads.label`, a compact rendering of a state for a log
 - `closeReason`, `cause` and `isReconnectable` moved from `DisconnectionSource` onto the `DisconnectionSourceReads` extension. Reads are unchanged; `cause` is now typed `StreamException?` rather than `Object?`
 

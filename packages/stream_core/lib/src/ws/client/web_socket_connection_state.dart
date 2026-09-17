@@ -183,7 +183,7 @@ final class Disconnecting extends WebSocketConnectionState {
   List<Object?> get props => [source];
 
   @override
-  String toString() => 'Disconnecting(${source.runtimeType})';
+  String toString() => 'Disconnecting($source)';
 }
 
 /// The WebSocket connection is closed and not available for communication.
@@ -206,7 +206,7 @@ final class Disconnected extends WebSocketConnectionState {
   List<Object?> get props => [source];
 
   @override
-  String toString() => 'Disconnected(${source.runtimeType})';
+  String toString() => 'Disconnected($source)';
 }
 
 /// Represents the source or cause of a WebSocket disconnection.
@@ -282,6 +282,11 @@ sealed class DisconnectionSource extends Equatable {
 final class UserInitiated extends DisconnectionSource {
   /// Creates a [UserInitiated] disconnection source.
   const UserInitiated();
+  // Named rather than left to Equatable, which prints every prop in debug and only the type
+  // in release, so the state embedding it reads differently between builds.
+
+  @override
+  String toString() => 'UserInitiated';
 }
 
 /// A disconnection that was initiated by the server.
@@ -305,6 +310,8 @@ final class ServerInitiated extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
+  @override
+  String toString() => 'ServerInitiated';
 }
 
 /// A disconnection that was initiated by system-level conditions.
@@ -324,6 +331,8 @@ final class SystemInitiated extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
+  @override
+  String toString() => 'SystemInitiated';
 }
 
 /// A disconnection caused by failed connection health checks.
@@ -334,6 +343,8 @@ final class SystemInitiated extends DisconnectionSource {
 final class UnHealthyConnection extends DisconnectionSource {
   /// Creates an [UnHealthyConnection] disconnection source.
   const UnHealthyConnection();
+  @override
+  String toString() => 'UnHealthyConnection';
 }
 
 /// A disconnection caused by the connection not becoming usable in time.
@@ -343,6 +354,8 @@ final class UnHealthyConnection extends DisconnectionSource {
 final class ConnectTimeout extends DisconnectionSource {
   /// Creates a [ConnectTimeout] disconnection source.
   const ConnectTimeout();
+  @override
+  String toString() => 'ConnectTimeout';
 }
 
 /// A disconnection caused by the connection failing to authenticate.
@@ -365,6 +378,8 @@ final class AuthenticationFailed extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
+  @override
+  String toString() => 'AuthenticationFailed';
 }
 
 /// Reads derived from what closed a connection.
