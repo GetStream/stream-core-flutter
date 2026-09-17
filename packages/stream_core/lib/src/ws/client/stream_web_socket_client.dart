@@ -25,7 +25,7 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 ///
 /// Called once per attempt, so the options can change between attempts. May be asynchronous, for
 /// options carrying a credential the caller has to load; one taking longer than
-/// [WebSocketOptions.defaultConnectTimeout] closes the attempt with [ConnectTimeout]. The
+/// [StreamWebSocketClient.defaultOptionsTimeout] closes the attempt with [ConnectTimeout]. The
 /// connection it returns is then given the whole of its own [WebSocketOptions.connectTimeout].
 ///
 /// `previousError` is what closed the previous attempt, and null when there was none, once a
@@ -150,6 +150,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   late final WebSocketAuthenticationHandler _authenticationHandler;
   late final WebSocketHealthMonitor _healthMonitor;
 
+  /// The time [optionsProvider] is given to supply the options for an attempt.
+  ///
+  /// Separate from [WebSocketOptions.connectTimeout], which the options name for the connection
+  /// they describe and so cannot bound the wait for the options themselves.
+  static const defaultOptionsTimeout = Duration(seconds: 30);
+
   // Bounds an attempt while `Connecting` or `Authenticating`; the health monitor takes over after.
   Timer? _connectTimeoutTimer;
 
@@ -250,9 +256,9 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Update the connection state to 'connecting'.
     _connectionState = const WebSocketConnectionState.connecting();
 
-    // Bounds the builder, which the options cannot: the timeout they name is not known until they
-    // are built.
-    _startConnectTimeout(WebSocketOptions.defaultConnectTimeout);
+    // Bounds the wait for the options, which the options cannot: the timeout they name is not
+    // known until they have been supplied.
+    _startConnectTimeout(defaultOptionsTimeout);
 
     final optionsResult = await runSafely(() => _buildOptions(_authenticationHandler.previousError));
 

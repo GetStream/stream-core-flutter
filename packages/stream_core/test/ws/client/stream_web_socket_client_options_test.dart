@@ -141,7 +141,7 @@ void main() {
         async.flushMicrotasks();
         expect(tester.connectionState, isA<Connecting>());
 
-        async.elapse(WebSocketOptions.defaultConnectTimeout);
+        async.elapse(StreamWebSocketClient.defaultOptionsTimeout);
 
         expect(
           tester.connectionState,
@@ -185,7 +185,7 @@ void main() {
         tester.client.connect().ignore();
         async.flushMicrotasks();
 
-        async.elapse(WebSocketOptions.defaultConnectTimeout - const Duration(seconds: 1));
+        async.elapse(StreamWebSocketClient.defaultOptionsTimeout - const Duration(seconds: 1));
         expect(tester.connectionState, isA<Connecting>());
 
         async.elapse(const Duration(seconds: 1));

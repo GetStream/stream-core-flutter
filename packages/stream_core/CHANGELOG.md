@@ -11,6 +11,7 @@
 - Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
 - Added `StreamWebSocketClient.optionsProvider`, which may be asynchronous and is handed the error that closed the previous attempt so a refused credential can be replaced
+- Added `StreamWebSocketClient.defaultOptionsTimeout`, the time `optionsProvider` is given to supply the options, separate from the `connectTimeout` those options name for the connection itself
 - Added `pingInterval` and `pongTimeout` to `StreamWebSocketClient`, which were fixed at the health monitor's defaults. The defaults are unchanged, and are now named by `WebSocketHealthMonitor.defaultPingInterval` and `defaultPongTimeout`
 - `SystemInitiated` now carries the `error` and `stackTrace` of whatever closed the connection
 - Added `DisconnectionSourceReads.exception`, the failure a disconnection is raised as
