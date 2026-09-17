@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:stream_core/src/ws/client/web_socket_authentication_handler.dart';
-import 'package:stream_core/src/ws/client/web_socket_connection_attempt.dart';
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
@@ -32,9 +31,6 @@ final _expiredToken = StreamApiException.fromApiError(_apiError(code: 40));
 Disconnected _serverClosure(StreamApiException? error) => Disconnected(
   source: ServerInitiated(error: error),
 );
-
-/// An attempt for a test that only needs one to exist.
-WebSocketConnectionAttempt _anAttempt() => WebSocketConnectionAttempt(onTimeout: () {});
 
 /// Builds a handler, along with the errors it handed the authenticator and the failures it reported.
 ({
@@ -102,7 +98,8 @@ void main() {
     );
 
     authentication.onConnectionStateChanged(_serverClosure(_expiredToken));
-    final running = authentication.authenticate(_anAttempt());
+    authentication.onConnectionStateChanged(const Connecting());
+    final running = authentication.authenticate();
 
     // The server refuses again while this attempt is still awaiting its credentials.
     authentication.onConnectionStateChanged(_serverClosure(StreamApiException.fromApiError(_apiError(code: 40))));
@@ -133,8 +130,8 @@ void main() {
     final (:authentication, :asked, failures: _) = _subject();
     authentication.onConnectionStateChanged(_serverClosure(_expiredToken));
 
-    await authentication.authenticate(_anAttempt());
-    await authentication.authenticate(_anAttempt());
+    await authentication.authenticate();
+    await authentication.authenticate();
 
     // Left behind, the refusal would reach a later attempt that it says nothing about.
     expect(asked, [_expiredToken, null]);
@@ -155,9 +152,9 @@ void main() {
   test('authenticate hands the previous error to the authenticator', () async {
     final (:authentication, :asked, failures: _) = _subject();
 
-    await authentication.authenticate(_anAttempt());
+    await authentication.authenticate();
     authentication.onConnectionStateChanged(_serverClosure(_expiredToken));
-    await authentication.authenticate(_anAttempt());
+    await authentication.authenticate();
 
     expect(asked, [null, _expiredToken]);
   });
@@ -169,7 +166,7 @@ void main() {
       onFailure: (_, _) => fail('nothing to authenticate, so nothing can fail'),
     );
 
-    await expectLater(authentication.authenticate(_anAttempt()), completes);
+    await expectLater(authentication.authenticate(), completes);
   });
 
   test('authenticate reports an error the authenticator threw, rather than letting it escape', () async {
@@ -179,7 +176,7 @@ void main() {
       authenticator: (_, _) async => throw StateError('token load failed'),
     );
 
-    await authentication.authenticate(_anAttempt());
+    await authentication.authenticate();
 
     expect(failures, [isStateError]);
   });
@@ -192,7 +189,8 @@ void main() {
       onFailure: (_, _) => fail('the credentials went out'),
     );
 
-    final authenticating = authentication.authenticate(_anAttempt());
+    authentication.onConnectionStateChanged(const Connecting());
+    final authenticating = authentication.authenticate();
 
     // Refused while this attempt was still running, so it is not the refusal this attempt read and
     // it has yet to be answered.
@@ -222,12 +220,14 @@ void main() {
         onFailure: (_, _) => fail('the credentials were never offered, so nothing failed to go out'),
       );
 
-      final attempt = _anAttempt();
-      final authenticating = authentication.authenticate(attempt);
+      authentication.onConnectionStateChanged(const Connecting());
+      final authenticating = authentication.authenticate();
 
       // Closed, and nothing has begun in its place. The credentials still belong to the attempt
       // that closure ended, so the socket they would reach is not the one that asked for them.
-      attempt.end();
+      authentication.onConnectionStateChanged(
+        const Disconnected(source: DisconnectionSource.connectTimeout()),
+      );
 
       loaded.complete();
       await authenticating;
@@ -248,12 +248,14 @@ void main() {
         onFailure: (_, _) => fail('the attempt this failure belongs to had already been closed'),
       );
 
-      final attempt = _anAttempt();
-      final authenticating = authentication.authenticate(attempt);
+      authentication.onConnectionStateChanged(const Connecting());
+      final authenticating = authentication.authenticate();
 
       // Reported, this would replace the reason the connection closed with one that is never
       // reconnected, on an attempt nothing has taken over from.
-      attempt.end();
+      authentication.onConnectionStateChanged(
+        const Disconnected(source: DisconnectionSource.connectTimeout()),
+      );
 
       loaded.complete();
       await authenticating;
@@ -276,12 +278,14 @@ void main() {
         onFailure: (_, _) => fail('the credentials were never offered, so nothing failed to go out'),
       );
 
-      final attempt = _anAttempt();
-      final authenticating = authentication.authenticate(attempt);
+      authentication.onConnectionStateChanged(const Connecting());
+      final authenticating = authentication.authenticate();
 
       // Abandoned while its credentials were still loading, and replaced.
-      attempt.end();
-      unawaited(authentication.authenticate(_anAttempt()));
+      authentication.onConnectionStateChanged(
+        const Disconnected(source: DisconnectionSource.connectTimeout()),
+      );
+      authentication.onConnectionStateChanged(const Connecting());
 
       loaded.complete();
       await authenticating;
@@ -303,11 +307,13 @@ void main() {
         onFailure: (error, _) => failures.add(error),
       );
 
-      final attempt = _anAttempt();
-      final authenticating = authentication.authenticate(attempt);
+      authentication.onConnectionStateChanged(const Connecting());
+      final authenticating = authentication.authenticate();
 
-      attempt.end();
-      unawaited(authentication.authenticate(_anAttempt()));
+      authentication.onConnectionStateChanged(
+        const Disconnected(source: DisconnectionSource.connectTimeout()),
+      );
+      authentication.onConnectionStateChanged(const Connecting());
 
       loaded.complete();
       await authenticating;
@@ -333,14 +339,17 @@ void main() {
       );
 
       authentication.onConnectionStateChanged(_serverClosure(_expiredToken));
-      final abandoned = _anAttempt();
-      final running = authentication.authenticate(abandoned);
+      authentication.onConnectionStateChanged(const Connecting());
+      final abandoned = authentication.authenticate();
 
-      abandoned.end();
-      await authentication.authenticate(_anAttempt());
+      authentication.onConnectionStateChanged(
+        const Disconnected(source: DisconnectionSource.connectTimeout()),
+      );
+      authentication.onConnectionStateChanged(const Connecting());
+      await authentication.authenticate();
 
       loaded.complete();
-      await running;
+      await abandoned;
 
       // The abandoned attempt never sent anything, so the refusal still applies to the credentials
       // in place, and belongs to the attempt that can actually answer it.
@@ -356,7 +365,10 @@ void main() {
         onFailure: (error, _) => failures.add(error),
       );
 
-      await authentication.authenticate(_anAttempt());
+      authentication.onConnectionStateChanged(const Connecting());
+      authentication.onConnectionStateChanged(const Authenticating());
+
+      await authentication.authenticate();
 
       expect(failures, [isStateError]);
     });
