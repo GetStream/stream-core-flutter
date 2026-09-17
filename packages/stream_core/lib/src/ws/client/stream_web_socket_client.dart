@@ -24,8 +24,9 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 /// A function that builds the options for a connection attempt.
 ///
 /// Called once per attempt, so the options can change between attempts. May be asynchronous, for
-/// options carrying a credential the caller has to load; the attempt is abandoned with
-/// [ConnectTimeout] if it takes longer than [WebSocketOptions.defaultConnectTimeout].
+/// options carrying a credential the caller has to load; a builder taking longer than
+/// [WebSocketOptions.defaultConnectTimeout] closes the attempt with [ConnectTimeout]. The
+/// connection it returns is then given the whole of its own [WebSocketOptions.connectTimeout].
 ///
 /// `previousError` is what closed the previous attempt, and null when there was none, once a
 /// connection has been established, or once the caller has disconnected. Use it to replace a
