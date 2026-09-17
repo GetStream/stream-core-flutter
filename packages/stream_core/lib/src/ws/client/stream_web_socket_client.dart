@@ -33,7 +33,7 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
 /// a refusal can still be acted on, because nothing is sent over the socket to authenticate them.
 ///
 /// Throw to abandon the attempt, which closes the connection with [AuthenticationFailed].
-typedef WebSocketOptionsBuilder = FutureOr<WebSocketOptions> Function([StreamApiException? previousError]);
+typedef WebSocketOptionsBuilder = FutureOr<WebSocketOptions> Function(StreamApiException? previousError);
 
 /// A WebSocket client with connection management and event handling.
 ///
