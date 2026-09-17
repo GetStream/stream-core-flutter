@@ -12,9 +12,7 @@
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
 - Added `StreamWebSocketClient.optionsProvider`, which builds the options asynchronously and is given the error that closed the previous attempt, within `defaultOptionsTimeout`
 - Added `pingInterval` and `pongTimeout` to `StreamWebSocketClient`
-- `SystemInitiated` now carries an `error` and `stackTrace`
 - Added `ConnectionStateEmitter.settled`, which completes once the connection is no longer in transition
-- `WebSocketConnectionState` and `DisconnectionSource` now have a one-line `toString` that reads the same in release as in debug
 - `closeReason`, `cause` and `isReconnectable` moved onto the `DisconnectionSourceReads` extension, which adds `exception` and `stackTrace`. `cause` is now `StreamException?`
 
 ### ⚠️ Deprecated
@@ -23,7 +21,7 @@
 
 ### 🐞 Fixed
 
-- A socket that fails now closes with `SystemInitiated` rather than `ServerInitiated`; both reconnect
+- A socket that fails now closes with `SystemInitiated`, carrying the `error`, rather than `ServerInitiated`; both reconnect
 - `Filter.equal` and `Filter.in_` now ask whether a collection field holds the values given, rather than comparing it with order-sensitive deep equality that no query can produce
 - `LocationCoordinate` equality is now exact, where `==` matched within ~1.1cm and so disagreed with `hashCode`, `Set` and `Map`. `distanceTo` no longer reports `0m` for points closer than that; for proximity, ask `a.distanceTo(b) <= 1.meters`
 - `sortedUpsert` now leaves a replacement in place when it sorts to the same position, instead of moving it after the elements it ties with
