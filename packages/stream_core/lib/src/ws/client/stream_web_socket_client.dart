@@ -277,11 +277,14 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     return _connect(optionsResult.getOrThrow());
   }
 
-  // Whichever of the two the caller gave. The constructor has already refused both and neither.
+  // Whichever of the two the caller gave, which the constructor asserts is exactly one. Neither
+  // reaches here in release, where that assert is gone, without saying which contract was broken.
   FutureOr<WebSocketOptions> _buildOptions(StreamApiException? previousError) {
     if (optionsProvider case final provider?) return provider(previousError);
     // ignore: deprecated_member_use_from_same_package
-    return optionsBuilder!();
+    if (optionsBuilder case final builder?) return builder();
+
+    throw StateError('Cannot connect without an optionsProvider');
   }
 
   // Opens the socket the options describe, for an attempt already reported as `Connecting` and
