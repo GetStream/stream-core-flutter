@@ -99,23 +99,6 @@ sealed class WebSocketConnectionState extends Equatable {
 
   @override
   List<Object?> get props => [];
-
-  /// Names this state, and the one detail that tells two of the same apart: the connection id for
-  /// [Connected], and what closed it for [Disconnecting] and [Disconnected].
-  ///
-  /// The failure behind a closure is reached through [DisconnectionSourceReads.cause] rather than
-  /// repeated here, which would put it on both sides of every transition a log records.
-  // Switches over every state, so one added to the sealed class fails to compile here rather than
-  // falling into a default.
-  @override
-  String toString() => switch (this) {
-    Connected(:final healthCheck) => 'Connected(${healthCheck.connectionId})',
-    Disconnecting(:final source) => 'Disconnecting(${source.runtimeType})',
-    Disconnected(:final source) => 'Disconnected(${source.runtimeType})',
-    Initialized() => 'Initialized',
-    Connecting() => 'Connecting',
-    Authenticating() => 'Authenticating',
-  };
 }
 
 /// The initial state before any connection attempt has been made.
@@ -126,6 +109,11 @@ sealed class WebSocketConnectionState extends Equatable {
 final class Initialized extends WebSocketConnectionState {
   /// Creates an [Initialized] connection state.
   const Initialized();
+
+  // Spelled out rather than left to Equatable, which prints every prop in debug and only the
+  // type in release — so a log either breaks across lines or loses why the connection closed.
+  @override
+  String toString() => 'Initialized';
 }
 
 /// The WebSocket is attempting to establish a connection.
@@ -136,6 +124,9 @@ final class Initialized extends WebSocketConnectionState {
 final class Connecting extends WebSocketConnectionState {
   /// Creates a [Connecting] connection state.
   const Connecting();
+
+  @override
+  String toString() => 'Connecting';
 }
 
 /// The WebSocket connection is established and authentication is in progress.
@@ -146,6 +137,9 @@ final class Connecting extends WebSocketConnectionState {
 final class Authenticating extends WebSocketConnectionState {
   /// Creates an [Authenticating] connection state.
   const Authenticating();
+
+  @override
+  String toString() => 'Authenticating';
 }
 
 /// The WebSocket is fully connected and authenticated.
@@ -165,6 +159,9 @@ final class Connected extends WebSocketConnectionState {
 
   @override
   List<Object?> get props => [healthCheck];
+
+  @override
+  String toString() => 'Connected(${healthCheck.connectionId})';
 }
 
 /// The WebSocket connection is in the process of being closed.
@@ -184,6 +181,9 @@ final class Disconnecting extends WebSocketConnectionState {
 
   @override
   List<Object?> get props => [source];
+
+  @override
+  String toString() => 'Disconnecting(${source.runtimeType})';
 }
 
 /// The WebSocket connection is closed and not available for communication.
@@ -204,6 +204,9 @@ final class Disconnected extends WebSocketConnectionState {
 
   @override
   List<Object?> get props => [source];
+
+  @override
+  String toString() => 'Disconnected(${source.runtimeType})';
 }
 
 /// Represents the source or cause of a WebSocket disconnection.
