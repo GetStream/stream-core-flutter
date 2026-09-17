@@ -99,6 +99,23 @@ sealed class WebSocketConnectionState extends Equatable {
 
   @override
   List<Object?> get props => [];
+
+  /// Names this state, and the one detail that tells two of the same apart: the connection id for
+  /// [Connected], and what closed it for [Disconnecting] and [Disconnected].
+  ///
+  /// The failure behind a closure is reached through [DisconnectionSourceReads.cause] rather than
+  /// repeated here, which would put it on both sides of every transition a log records.
+  // Switches over every state, so one added to the sealed class fails to compile here rather than
+  // falling into a default.
+  @override
+  String toString() => switch (this) {
+    Connected(:final healthCheck) => 'Connected(${healthCheck.connectionId})',
+    Disconnecting(:final source) => 'Disconnecting(${source.runtimeType})',
+    Disconnected(:final source) => 'Disconnected(${source.runtimeType})',
+    Initialized() => 'Initialized',
+    Connecting() => 'Connecting',
+    Authenticating() => 'Authenticating',
+  };
 }
 
 /// The initial state before any connection attempt has been made.

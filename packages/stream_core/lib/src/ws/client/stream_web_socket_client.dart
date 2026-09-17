@@ -168,21 +168,11 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     final previous = _connectionStateEmitter.value;
     _connectionStateEmitter.value = connectionState;
-    _logger.d(() => 'state: ${_describe(previous)} -> ${_describe(connectionState)}');
+    _logger.d(() => 'state: $previous -> $connectionState');
 
     _healthMonitor.onConnectionStateChanged(connectionState);
     _authenticationHandler.onConnectionStateChanged(connectionState);
   }
-
-  // What a state is, rather than everything it carries: a disconnection's `toString` embeds the
-  // failure and its cause, which the warning that reported it already carries, and which every
-  // transition would otherwise repeat on both sides of the arrow.
-  static String _describe(WebSocketConnectionState state) => switch (state) {
-    Connected(:final healthCheck) => 'Connected(${healthCheck.connectionId})',
-    Disconnecting(:final source) => 'Disconnecting(${source.runtimeType})',
-    Disconnected(:final source) => 'Disconnected(${source.runtimeType})',
-    Initialized() || Connecting() || Authenticating() => '${state.runtimeType}',
-  };
 
   /// Sends a message through the WebSocket connection.
   ///
