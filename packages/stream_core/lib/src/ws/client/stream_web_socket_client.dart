@@ -93,8 +93,13 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     Duration pongTimeout = WebSocketHealthMonitor.defaultPongTimeout,
     String tag = 'SC:WsClient',
   }) : assert(
-         (optionsProvider == null) != (optionsBuilder == null),
-         'Give exactly one of optionsProvider or optionsBuilder.',
+         optionsProvider != null || optionsBuilder != null,
+         'Either optionsProvider or optionsBuilder should be != null',
+       ),
+       assert(
+         optionsProvider == null || optionsBuilder == null,
+         'Only one of optionsProvider or optionsBuilder can be provided. '
+         'Prefer optionsProvider; optionsBuilder is deprecated.',
        ),
        _logger = StreamLogger(tag) {
     _events = MutableEventEmitter(resolvers: eventResolvers);
