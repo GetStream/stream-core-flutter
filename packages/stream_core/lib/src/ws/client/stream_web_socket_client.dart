@@ -156,6 +156,9 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   /// options describe is bounded separately, by the [WebSocketOptions.connectTimeout] they name.
   static const defaultOptionsTimeout = Duration(seconds: 30);
 
+  // The attempt in flight, so work resuming after an await can tell whether it still belongs.
+  _ConnectionAttempt? _attempt;
+
   // Bounds an attempt while `Connecting` or `Authenticating`; the health monitor takes over after.
   Timer? _connectTimeoutTimer;
 
@@ -194,6 +197,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _connectionStateEmitter.value = connectionState;
     _logger.d(() => 'state: $previous -> $connectionState');
 
+    _attempt?.onConnectionStateChanged(connectionState);
     _healthMonitor.onConnectionStateChanged(connectionState);
     _authenticationHandler.onConnectionStateChanged(connectionState);
   }
@@ -258,11 +262,13 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Bound the wait for the options, so one that never becomes usable is not waited on forever.
     _startConnectTimeout(defaultOptionsTimeout);
 
-    final optionsResult = await runSafely(() => _buildOptions(_authenticationHandler.previousError));
+    final attempt = _attempt = _ConnectionAttempt();
+    final optionsResult = await attempt.valueUnlessEnded(
+      runSafely(() => _buildOptions(_authenticationHandler.previousError)),
+    );
 
-    // Stale: the attempt was abandoned while the builder ran, by a caller disconnecting or by the
-    // bound above elapsing. Connecting now would undo the closure already reported.
-    if (connectionState.value is! Connecting) return;
+    // A state check cannot stand in: an attempt that replaced this one reports `Connecting` too.
+    if (optionsResult == null) return;
 
     if (optionsResult case Failure(:final error, :final stackTrace)) {
       var exception = StreamException.tryFrom(error);
@@ -480,5 +486,21 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     await _connectionStateEmitter.close();
 
     return super.dispose();
+  }
+}
+
+// One attempt to open a connection, which ends when the connection it was making starts closing.
+final class _ConnectionAttempt {
+  final _ended = Completer<void>();
+
+  // What `operation` completes with, or null if this attempt ends first. Raced rather than
+  // checked afterwards, so one that never completes cannot hold up its caller.
+  Future<T?> valueUnlessEnded<T>(Future<T> operation) {
+    return Future.any([operation, _ended.future.then((_) => null)]);
+  }
+
+  void onConnectionStateChanged(WebSocketConnectionState state) {
+    if (_ended.isCompleted) return;
+    if (state case Disconnecting() || Disconnected()) _ended.complete();
   }
 }

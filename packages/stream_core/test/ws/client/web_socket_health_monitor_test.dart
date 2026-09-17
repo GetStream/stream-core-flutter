@@ -37,6 +37,19 @@ const _timeout = Duration(seconds: 2);
 }
 
 void main() {
+  test('refuses a ping interval that outpaces the pong it waits for', () {
+    // Each ping cancels the outstanding pong timer, so pinging faster than the pong window leaves
+    // an unanswered connection never reported unhealthy.
+    expect(
+      () => WebSocketHealthMonitor(
+        listener: _Listener(),
+        pingInterval: const Duration(seconds: 1),
+        timeoutThreshold: const Duration(seconds: 2),
+      ),
+      throwsA(isA<AssertionError>()),
+    );
+  });
+
   test('asks for nothing until it is started', () {
     fakeAsync((async) {
       final (monitor: _, :listener) = _subject();

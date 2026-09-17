@@ -123,6 +123,29 @@ void main() {
         expect(seen, [null, isA<StreamApiException>().having((it) => it.code, 'code', 43)]);
       });
 
+      test('is spent even for a connection that authenticates through its options', () async {
+        // Nothing is sent over a socket whose credential rides in its URL, so the options builder is
+        // the only reader. Establishing clears the refusal on its own, so the attempt between has to
+        // be one that opens and then drops.
+        final tester = buildTester(authenticates: false);
+
+        await tester.client.connect();
+        await tester.emit(healthCheckFrame());
+        await tester.emit(expiredTokenFrame());
+
+        // The second attempt is told what the server refused, and spends it by opening at all.
+        await tester.client.connect();
+        await tester.pumpEventQueue();
+        tester.server.hangUp();
+        await tester.pumpEventQueue();
+
+        // The third is told nothing: the drop above says nothing about the credentials.
+        await tester.client.connect();
+        await tester.pumpEventQueue();
+
+        expect(tester.refusals, [null, isA<StreamApiException>().having((it) => it.code, 'code', 40), null]);
+      });
+
       test('is absent once a connection has been established', () async {
         final (:authenticator, :seen) = watching();
         final tester = buildTester(authenticator: authenticator);

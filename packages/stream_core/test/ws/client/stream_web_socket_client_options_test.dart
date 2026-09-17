@@ -171,6 +171,48 @@ void main() {
       },
     );
 
+    test('opens nothing for an attempt the caller replaced while the options were being built', () {
+      fakeAsync((async) {
+        final answers = <Completer<WebSocketOptions>>[];
+        final tester = buildTester(
+          optionsProvider: (_) => (answers..add(Completer<WebSocketOptions>())).last.future,
+        );
+
+        // One user's options are still loading when the caller signs in as another.
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        // The first answers for an attempt nobody is making any more. The state cannot say so on
+        // its own: the attempt that replaced it reports `Connecting` too.
+        answers.first.complete(const WebSocketOptions(url: 'wss://example.com'));
+        async.flushMicrotasks();
+
+        expect(tester.server.sockets, isEmpty);
+        expect(tester.connectionState, isA<Connecting>());
+      });
+    });
+
+    test('settles a connect whose options never arrive', () {
+      fakeAsync((async) {
+        var settled = false;
+        final tester = buildTester(optionsProvider: (_) => Completer<WebSocketOptions>().future);
+
+        tester.client.connect().then((_) => settled = true).ignore();
+        async.flushMicrotasks();
+        expect(settled, isFalse);
+
+        // The bound reports the connection down, so nothing is left for the caller to wait on.
+        async.elapse(StreamWebSocketClient.defaultOptionsTimeout);
+        async.flushMicrotasks();
+
+        expect(settled, isTrue);
+      });
+    });
+
     test('bounds the options it is waiting for separately from the connection they describe', () {
       fakeAsync((async) {
         // A builder that never returns, for options that would have named a longer timeout than

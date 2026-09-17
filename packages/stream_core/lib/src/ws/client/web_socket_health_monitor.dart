@@ -46,7 +46,12 @@ class WebSocketHealthMonitor {
     this.pingInterval = defaultPingInterval,
     this.timeoutThreshold = defaultPongTimeout,
     String tag = 'SC:WsHealth',
-  }) : _logger = StreamLogger(tag);
+  }) : assert(
+         pingInterval > timeoutThreshold,
+         'pingInterval must outlast timeoutThreshold, or each ping cancels the pong it waits for '
+         'and an unanswered connection is never reported unhealthy',
+       ),
+       _logger = StreamLogger(tag);
 
   final StreamLogger _logger;
 

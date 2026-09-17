@@ -113,6 +113,17 @@ void main() {
       expect(printed.single, matches(RegExp(r'… \d+ more characters$')));
     });
 
+    test('tags every line of a message that spans several', () {
+      final printed = withStreamLogger(
+        handler: const StreamLogHandler.console(),
+        () => capturePrints(() => _logger.i(() => 'first\nsecond\nthird')),
+      );
+
+      // A console breaks on newlines whatever we do, so the prefix has to be on each of them.
+      expect(printed, hasLength(3));
+      expect(printed, everyElement(contains('I/SC:Component:')));
+    });
+
     test('tags every line it prints, so a cause is not lost to a filter', () {
       final printed = withStreamLogger(
         handler: const StreamLogHandler.console(),

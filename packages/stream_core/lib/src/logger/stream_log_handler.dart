@@ -118,7 +118,10 @@ final class _ConsoleHandler extends StreamLogHandler {
     final marker = emoji ? '${priority.emoji} ' : '';
     final prefix = '${_timestamp(record.time)} $marker${priority.label}/${record.tag}:';
 
-    _write(prefix, record.message);
+    // A console breaks on newlines anyway, and a line without the prefix loses its tag and time.
+    for (final line in record.message.split('\n')) {
+      _write(prefix, line);
+    }
 
     // Prefixed so no line is lost to a tag filter, marked so none reads as a record of its own.
     for (final detail in [?record.error, ?record.stackTrace]) {

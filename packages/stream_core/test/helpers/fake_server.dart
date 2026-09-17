@@ -86,6 +86,12 @@ Map<String, Object?> connectionErrorFrame({required int code, int statusCode = 4
 }
 
 /// The refusal that another token repairs, which is why it is reconnected.
+/// The frame that establishes a connection, which the server sends once it has accepted one.
+Map<String, Object?> healthCheckFrame({String connectionId = 'connection-id'}) => {
+  'type': 'health.check',
+  'connection_id': connectionId,
+};
+
 Map<String, Object?> expiredTokenFrame() => connectionErrorFrame(code: 40);
 
 /// The refusal no other token repairs, which is why it is not.
