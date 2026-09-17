@@ -110,10 +110,9 @@ final class Initialized extends WebSocketConnectionState {
   /// Creates an [Initialized] connection state.
   const Initialized();
 
-  // Spelled out rather than left to Equatable, which prints every prop in debug and only the
-  // type in release — so a log either breaks across lines or loses why the connection closed.
+  // Named rather than left to Equatable, whose prop dump breaks a log line across two of them.
   @override
-  String toString() => 'Initialized';
+  String toString() => objectRuntimeType(this, 'Initialized');
 }
 
 /// The WebSocket is attempting to establish a connection.
@@ -126,7 +125,7 @@ final class Connecting extends WebSocketConnectionState {
   const Connecting();
 
   @override
-  String toString() => 'Connecting';
+  String toString() => objectRuntimeType(this, 'Connecting');
 }
 
 /// The WebSocket connection is established and authentication is in progress.
@@ -139,7 +138,7 @@ final class Authenticating extends WebSocketConnectionState {
   const Authenticating();
 
   @override
-  String toString() => 'Authenticating';
+  String toString() => objectRuntimeType(this, 'Authenticating');
 }
 
 /// The WebSocket is fully connected and authenticated.
@@ -161,7 +160,7 @@ final class Connected extends WebSocketConnectionState {
   List<Object?> get props => [healthCheck];
 
   @override
-  String toString() => 'Connected(${healthCheck.connectionId})';
+  String toString() => '${objectRuntimeType(this, 'Connected')}(${healthCheck.connectionId})';
 }
 
 /// The WebSocket connection is in the process of being closed.
@@ -183,7 +182,7 @@ final class Disconnecting extends WebSocketConnectionState {
   List<Object?> get props => [source];
 
   @override
-  String toString() => 'Disconnecting($source)';
+  String toString() => '${objectRuntimeType(this, 'Disconnecting')}($source)';
 }
 
 /// The WebSocket connection is closed and not available for communication.
@@ -206,7 +205,7 @@ final class Disconnected extends WebSocketConnectionState {
   List<Object?> get props => [source];
 
   @override
-  String toString() => 'Disconnected($source)';
+  String toString() => '${objectRuntimeType(this, 'Disconnected')}($source)';
 }
 
 /// Represents the source or cause of a WebSocket disconnection.
@@ -282,11 +281,9 @@ sealed class DisconnectionSource extends Equatable {
 final class UserInitiated extends DisconnectionSource {
   /// Creates a [UserInitiated] disconnection source.
   const UserInitiated();
-  // Named rather than left to Equatable, which prints every prop in debug and only the type
-  // in release, so the state embedding it reads differently between builds.
 
   @override
-  String toString() => 'UserInitiated';
+  String toString() => objectRuntimeType(this, 'UserInitiated');
 }
 
 /// A disconnection that was initiated by the server.
@@ -311,7 +308,7 @@ final class ServerInitiated extends DisconnectionSource {
   @override
   List<Object?> get props => [error];
   @override
-  String toString() => 'ServerInitiated';
+  String toString() => objectRuntimeType(this, 'ServerInitiated');
 }
 
 /// A disconnection that was initiated by system-level conditions.
@@ -332,7 +329,7 @@ final class SystemInitiated extends DisconnectionSource {
   @override
   List<Object?> get props => [error];
   @override
-  String toString() => 'SystemInitiated';
+  String toString() => objectRuntimeType(this, 'SystemInitiated');
 }
 
 /// A disconnection caused by failed connection health checks.
@@ -343,8 +340,9 @@ final class SystemInitiated extends DisconnectionSource {
 final class UnHealthyConnection extends DisconnectionSource {
   /// Creates an [UnHealthyConnection] disconnection source.
   const UnHealthyConnection();
+
   @override
-  String toString() => 'UnHealthyConnection';
+  String toString() => objectRuntimeType(this, 'UnHealthyConnection');
 }
 
 /// A disconnection caused by the connection not becoming usable in time.
@@ -354,8 +352,9 @@ final class UnHealthyConnection extends DisconnectionSource {
 final class ConnectTimeout extends DisconnectionSource {
   /// Creates a [ConnectTimeout] disconnection source.
   const ConnectTimeout();
+
   @override
-  String toString() => 'ConnectTimeout';
+  String toString() => objectRuntimeType(this, 'ConnectTimeout');
 }
 
 /// A disconnection caused by the connection failing to authenticate.
@@ -378,8 +377,9 @@ final class AuthenticationFailed extends DisconnectionSource {
 
   @override
   List<Object?> get props => [error];
+
   @override
-  String toString() => 'AuthenticationFailed';
+  String toString() => objectRuntimeType(this, 'AuthenticationFailed');
 }
 
 /// Reads derived from what closed a connection.
