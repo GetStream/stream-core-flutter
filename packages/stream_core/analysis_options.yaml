@@ -5,6 +5,13 @@ analyzer:
     # The repository excludes generated files by a path relative to its own options file, which
     # stops matching once that file is included from here.
     - lib/**/*.*.dart
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:

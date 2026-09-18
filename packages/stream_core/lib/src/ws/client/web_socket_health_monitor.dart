@@ -43,12 +43,23 @@ class WebSocketHealthMonitor {
   /// Creates a new instance of [WebSocketHealthMonitor].
   WebSocketHealthMonitor({
     required this._listener,
-    this.pingInterval = const Duration(seconds: 25),
-    this.timeoutThreshold = const Duration(seconds: 3),
+    this.pingInterval = defaultPingInterval,
+    this.timeoutThreshold = defaultPongTimeout,
     String tag = 'SC:WsHealth',
-  }) : _logger = StreamLogger(tag);
+  }) : assert(
+         pingInterval > timeoutThreshold,
+         'pingInterval must outlast timeoutThreshold, or each ping cancels the pong it waits for '
+         'and an unanswered connection is never reported unhealthy',
+       ),
+       _logger = StreamLogger(tag);
 
   final StreamLogger _logger;
+
+  /// The [pingInterval] used when none is given.
+  static const defaultPingInterval = Duration(seconds: 25);
+
+  /// The [timeoutThreshold] used when none is given.
+  static const defaultPongTimeout = Duration(seconds: 3);
 
   /// The interval between ping requests for health checking.
   final Duration pingInterval;

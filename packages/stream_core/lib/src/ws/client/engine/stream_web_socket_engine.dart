@@ -81,7 +81,7 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   void _onDone() {
     // Capture the close code and reason before closing.
     final closeCode = _ws?.closeCode;
-    final closeReason = _ws?.closeReason;
+    final closeReason = _ws?.closeReason?.takeIf((it) => it.isNotEmpty);
 
     // Close the connection and notify the listener.
     unawaited(close(closeCode, closeReason));

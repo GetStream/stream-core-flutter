@@ -21,9 +21,22 @@ WsRequest _defaultPingRequestBuilder([HealthCheckInfo? info]) {
   return HealthCheckPingEvent(connectionId: info?.connectionId);
 }
 
-/// A function that builds the options for a connection attempt.
+/// A function supplying the options for a connection attempt.
 ///
-/// Called once per attempt, so the options can change between attempts.
+/// Called once per attempt, so the options can change between attempts. May be asynchronous, for
+/// options carrying a credential the caller has to load; one taking longer than
+/// [StreamWebSocketClient.defaultOptionsTimeout] closes the attempt with [ConnectTimeout]. The
+/// connection it returns is then given the whole of its own [WebSocketOptions.connectTimeout].
+///
+/// `previousError` is what closed the previous attempt, and null when there was none, once a
+/// connection has been established, or once the caller has disconnected. Use it to replace a
+/// credential that was refused.
+///
+/// Throw to abandon the attempt, which closes the connection with [AuthenticationFailed].
+typedef WebSocketOptionsProvider = FutureOr<WebSocketOptions> Function(StreamApiException? previousError);
+
+/// A function that builds the options for a connection attempt.
+@Deprecated('Use WebSocketOptionsProvider instead.')
 typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 
 /// A WebSocket client with connection management and event handling.
@@ -39,7 +52,7 @@ typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 /// ## Example
 /// ```dart
 /// final client = StreamWebSocketClient(
-///   optionsBuilder: () => const WebSocketOptions(url: 'wss://api.example.com'),
+///   optionsProvider: (_) => const WebSocketOptions(url: 'wss://api.example.com'),
 ///   // A WebSocketMessageCodec for the event and request types this SDK puts on the wire.
 ///   messageCodec: const AppWsCodec(),
 ///   onAuthenticate: (send, _) async {
@@ -69,14 +82,26 @@ typedef WebSocketOptionsBuilder = WebSocketOptions Function();
 class StreamWebSocketClient with Disposable implements WebSocketHealthListener, WebSocketEngineListener<WsEvent> {
   /// Creates a new instance of [StreamWebSocketClient].
   StreamWebSocketClient({
-    required this.optionsBuilder,
+    this.optionsProvider,
+    @Deprecated('Use optionsProvider instead.') this.optionsBuilder,
     WebSocketProvider? wsProvider,
     WebSocketAuthenticator? onAuthenticate,
     this.pingRequestBuilder = _defaultPingRequestBuilder,
     required WebSocketMessageCodec<WsEvent, WsRequest> messageCodec,
     Iterable<EventResolver<WsEvent>>? eventResolvers,
+    Duration pingInterval = WebSocketHealthMonitor.defaultPingInterval,
+    Duration pongTimeout = WebSocketHealthMonitor.defaultPongTimeout,
     String tag = 'SC:WsClient',
-  }) : _logger = StreamLogger(tag) {
+  }) : assert(
+         optionsProvider != null || optionsBuilder != null,
+         'Either optionsProvider or optionsBuilder should be != null',
+       ),
+       assert(
+         optionsProvider == null || optionsBuilder == null,
+         'Only one of optionsProvider or optionsBuilder can be provided. '
+         'Prefer optionsProvider; optionsBuilder is deprecated.',
+       ),
+       _logger = StreamLogger(tag) {
     _events = MutableEventEmitter(resolvers: eventResolvers);
     _engine = StreamWebSocketEngine(
       listener: this,
@@ -85,7 +110,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       tag: '$tag:Engine',
     );
 
-    _healthMonitor = WebSocketHealthMonitor(listener: this, tag: '$tag:Health');
+    _healthMonitor = WebSocketHealthMonitor(
+      listener: this,
+      pingInterval: pingInterval,
+      timeoutThreshold: pongTimeout,
+      tag: '$tag:Health',
+    );
 
     _authenticationHandler = WebSocketAuthenticationHandler(
       send: send,
@@ -104,8 +134,12 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     );
   }
 
+  /// Supplies the connection options for each attempt.
+  final WebSocketOptionsProvider? optionsProvider;
+
   /// The function used to build the connection options for each attempt.
-  final WebSocketOptionsBuilder optionsBuilder;
+  @Deprecated('Use optionsProvider instead.')
+  final WebSocketOptionsBuilder? optionsBuilder;
 
   /// The function used to build ping requests for health checks.
   final PingRequestBuilder pingRequestBuilder;
@@ -115,6 +149,15 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   late final StreamWebSocketEngine<WsEvent, WsRequest> _engine;
   late final WebSocketAuthenticationHandler _authenticationHandler;
   late final WebSocketHealthMonitor _healthMonitor;
+
+  /// The time [optionsProvider] has to supply the options for an attempt.
+  ///
+  /// An attempt that does not get them within it closes with [ConnectTimeout]. The connection the
+  /// options describe is bounded separately, by the [WebSocketOptions.connectTimeout] they name.
+  static const defaultOptionsTimeout = Duration(seconds: 30);
+
+  // The attempt in flight, so work resuming after an await can tell whether it still belongs.
+  _ConnectionAttempt? _attempt;
 
   // Bounds an attempt while `Connecting` or `Authenticating`; the health monitor takes over after.
   Timer? _connectTimeoutTimer;
@@ -154,6 +197,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _connectionStateEmitter.value = connectionState;
     _logger.d(() => 'state: $previous -> $connectionState');
 
+    _attempt?.onConnectionStateChanged(connectionState);
     _healthMonitor.onConnectionStateChanged(connectionState);
     _authenticationHandler.onConnectionStateChanged(connectionState);
   }
@@ -215,9 +259,42 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // Update the connection state to 'connecting'.
     _connectionState = const WebSocketConnectionState.connecting();
+    // Bound the wait for the options, so one that never becomes usable is not waited on forever.
+    _startConnectTimeout(defaultOptionsTimeout);
 
-    // Open the connection using the engine, with options built for this attempt.
-    final options = optionsBuilder.call();
+    final attempt = _attempt = _ConnectionAttempt();
+    final optionsResult = await attempt.valueUnlessEnded(
+      runSafely(() => _buildOptions(_authenticationHandler.previousError)),
+    );
+
+    // A state check cannot stand in: an attempt that replaced this one reports `Connecting` too.
+    if (optionsResult == null) return;
+
+    if (optionsResult case Failure(:final error, :final stackTrace)) {
+      var exception = StreamException.tryFrom(error);
+      exception ??= StreamAuthenticationException(
+        message: 'The options for the connection could not be built',
+        cause: error,
+      );
+
+      final source = DisconnectionSource.authenticationFailed(error: exception, stackTrace: stackTrace);
+      return disconnect(source: source);
+    }
+
+    return _connect(optionsResult.getOrThrow());
+  }
+
+  FutureOr<WebSocketOptions> _buildOptions(StreamApiException? previousError) {
+    if (optionsProvider case final provider?) return provider(previousError);
+    // ignore: deprecated_member_use_from_same_package
+    if (optionsBuilder case final builder?) return builder();
+
+    throw StateError('Cannot connect without an optionsProvider');
+  }
+
+  // Opens the socket the options describe, for an attempt already reported as `Connecting` and
+  // already bounded.
+  Future<void> _connect(WebSocketOptions options) async {
     _logger.d(() => 'connect to ${options.url}');
 
     // Bound the attempt, so one that never becomes usable is not waited on forever.
@@ -310,7 +387,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
   @override
   void onError(Object error, [StackTrace? stackTrace]) {
-    _logger.e(() => 'socket failed', error: error, stackTrace: stackTrace);
+    _logger.w(() => 'socket failed', error: error, stackTrace: stackTrace);
 
     var exception = StreamException.tryFrom(error);
     exception ??= StreamNetworkException(
@@ -321,7 +398,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Update the connection state to 'disconnecting' with the source.
     //
     // The socket closes itself after an error, so the closure that follows records the disconnection.
-    final source = ServerInitiated(error: exception, stackTrace: stackTrace);
+    final source = SystemInitiated(error: exception, stackTrace: stackTrace);
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
   }
 
@@ -409,5 +486,21 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     await _connectionStateEmitter.close();
 
     return super.dispose();
+  }
+}
+
+// One attempt to open a connection, which ends when the connection it was making starts closing.
+final class _ConnectionAttempt {
+  final _ended = Completer<void>();
+
+  // What `operation` completes with, or null if this attempt ends first. Raced rather than
+  // checked afterwards, so one that never completes cannot hold up its caller.
+  Future<T?> valueUnlessEnded<T>(Future<T> operation) {
+    return Future.any([operation, _ended.future.then((_) => null)]);
+  }
+
+  void onConnectionStateChanged(WebSocketConnectionState state) {
+    if (_ended.isCompleted) return;
+    if (state case Disconnecting() || Disconnected()) _ended.complete();
   }
 }

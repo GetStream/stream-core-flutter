@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 import '../../errors.dart';
-import '../../user/token_provider.dart';
 import '../../utils.dart';
 import '../events/ws_event.dart';
 import 'engine/web_socket_engine.dart';
@@ -90,7 +89,7 @@ sealed class WebSocketConnectionState extends Equatable {
   /// Whether automatic reconnection is enabled for this connection state.
   ///
   /// `false` for every state but [Disconnected], where it is the source's
-  /// [DisconnectionSource.isReconnectable] and nothing more.
+  /// [DisconnectionSourceReads.isReconnectable] and nothing more.
   ///
   /// {@macro webSocketReconnectionRules}
   bool get isAutomaticReconnectionEnabled => switch (this) {
@@ -110,6 +109,10 @@ sealed class WebSocketConnectionState extends Equatable {
 final class Initialized extends WebSocketConnectionState {
   /// Creates an [Initialized] connection state.
   const Initialized();
+
+  // Named rather than left to Equatable, whose prop dump breaks a log line across two of them.
+  @override
+  String toString() => objectRuntimeType(this, 'Initialized');
 }
 
 /// The WebSocket is attempting to establish a connection.
@@ -120,6 +123,9 @@ final class Initialized extends WebSocketConnectionState {
 final class Connecting extends WebSocketConnectionState {
   /// Creates a [Connecting] connection state.
   const Connecting();
+
+  @override
+  String toString() => objectRuntimeType(this, 'Connecting');
 }
 
 /// The WebSocket connection is established and authentication is in progress.
@@ -130,6 +136,9 @@ final class Connecting extends WebSocketConnectionState {
 final class Authenticating extends WebSocketConnectionState {
   /// Creates an [Authenticating] connection state.
   const Authenticating();
+
+  @override
+  String toString() => objectRuntimeType(this, 'Authenticating');
 }
 
 /// The WebSocket is fully connected and authenticated.
@@ -149,6 +158,9 @@ final class Connected extends WebSocketConnectionState {
 
   @override
   List<Object?> get props => [healthCheck];
+
+  @override
+  String toString() => '${objectRuntimeType(this, 'Connected')}(${healthCheck.connectionId})';
 }
 
 /// The WebSocket connection is in the process of being closed.
@@ -168,6 +180,9 @@ final class Disconnecting extends WebSocketConnectionState {
 
   @override
   List<Object?> get props => [source];
+
+  @override
+  String toString() => '${objectRuntimeType(this, 'Disconnecting')}($source)';
 }
 
 /// The WebSocket connection is closed and not available for communication.
@@ -188,6 +203,9 @@ final class Disconnected extends WebSocketConnectionState {
 
   @override
   List<Object?> get props => [source];
+
+  @override
+  String toString() => '${objectRuntimeType(this, 'Disconnected')}($source)';
 }
 
 /// Represents the source or cause of a WebSocket disconnection.
@@ -225,7 +243,10 @@ sealed class DisconnectionSource extends Equatable {
   ///
   /// Indicates that the connection was closed due to system-level conditions
   /// such as network changes or application lifecycle events.
-  const factory DisconnectionSource.systemInitiated() = SystemInitiated;
+  const factory DisconnectionSource.systemInitiated({
+    StreamException? error,
+    StackTrace? stackTrace,
+  }) = SystemInitiated;
 
   /// Creates an [UnHealthyConnection] disconnection source.
   ///
@@ -248,16 +269,130 @@ sealed class DisconnectionSource extends Equatable {
     StackTrace? stackTrace,
   }) = AuthenticationFailed;
 
-  /// A human-readable description of the disconnection source.
+  @override
+  List<Object?> get props => [];
+}
+
+/// A disconnection that was explicitly requested by the application.
+///
+/// This source indicates that the disconnection was intentionally triggered
+/// by application code, typically through a call to `disconnect()`. Automatic
+/// reconnection is disabled for user-initiated disconnections.
+final class UserInitiated extends DisconnectionSource {
+  /// Creates a [UserInitiated] disconnection source.
+  const UserInitiated();
+
+  @override
+  String toString() => objectRuntimeType(this, 'UserInitiated');
+}
+
+/// A disconnection that was initiated by the server.
+///
+/// This source indicates that the server closed the WebSocket connection,
+/// either gracefully or due to an error condition. The optional [error]
+/// provides additional context about the disconnection cause.
+final class ServerInitiated extends DisconnectionSource {
+  /// Creates a [ServerInitiated] disconnection source.
+  const ServerInitiated({this.error, this.stackTrace});
+
+  /// The error that caused the server to close the connection.
   ///
-  /// Provides a descriptive string that explains why the connection was closed.
-  /// This is typically used for logging and debugging purposes.
+  /// A [StreamApiException] when the server reported why — the same payload a
+  /// rejected REST call carries — and a [StreamNetworkException] describing
+  /// the closure when it did not.
+  final StreamException? error;
+
+  /// Where [error] was raised, when it was raised rather than read off the wire.
+  final StackTrace? stackTrace;
+
+  @override
+  List<Object?> get props => [error];
+
+  @override
+  String toString() => objectRuntimeType(this, 'ServerInitiated');
+}
+
+/// A disconnection that was initiated by system-level conditions.
+///
+/// This source indicates that the connection was closed due to system events
+/// such as network connectivity changes, application lifecycle transitions,
+/// or other environmental factors outside of direct user or server control.
+final class SystemInitiated extends DisconnectionSource {
+  /// Creates a [SystemInitiated] disconnection source.
+  const SystemInitiated({this.error, this.stackTrace});
+
+  /// What the connection failed on, and `null` when it closed without a failure.
+  final StreamException? error;
+
+  /// Where [error] was raised.
+  final StackTrace? stackTrace;
+
+  @override
+  List<Object?> get props => [error];
+
+  @override
+  String toString() => objectRuntimeType(this, 'SystemInitiated');
+}
+
+/// A disconnection caused by failed connection health checks.
+///
+/// This source indicates that the connection was closed because health
+/// monitoring detected an unresponsive connection, typically when ping
+/// requests do not receive corresponding pong responses within the timeout.
+final class UnHealthyConnection extends DisconnectionSource {
+  /// Creates an [UnHealthyConnection] disconnection source.
+  const UnHealthyConnection();
+
+  @override
+  String toString() => objectRuntimeType(this, 'UnHealthyConnection');
+}
+
+/// A disconnection caused by the connection not becoming usable in time.
+///
+/// This source indicates that the connection was abandoned while it was still
+/// being established, so it was never usable.
+final class ConnectTimeout extends DisconnectionSource {
+  /// Creates a [ConnectTimeout] disconnection source.
+  const ConnectTimeout();
+
+  @override
+  String toString() => objectRuntimeType(this, 'ConnectTimeout');
+}
+
+/// A disconnection caused by the connection failing to authenticate.
+///
+/// This source indicates that the socket opened but the credentials could not be loaded or sent, so
+/// the connection was never usable. A server rejecting credentials it did receive is reported as an
+/// error event instead.
+final class AuthenticationFailed extends DisconnectionSource {
+  /// Creates an [AuthenticationFailed] disconnection source.
+  const AuthenticationFailed({this.error, this.stackTrace});
+
+  /// The error that prevented the connection from authenticating.
   ///
-  /// Returns a descriptive string for the disconnection cause.
+  /// Usually a [StreamAuthenticationException] whose [StreamException.cause]
+  /// is whatever the authenticator threw.
+  final StreamException? error;
+
+  /// Where [error] was raised.
+  final StackTrace? stackTrace;
+
+  @override
+  List<Object?> get props => [error];
+
+  @override
+  String toString() => objectRuntimeType(this, 'AuthenticationFailed');
+}
+
+/// Reads derived from what closed a connection.
+// Each switches over every source, so one added to the sealed class fails to compile here rather
+// than falling into a default.
+extension DisconnectionSourceReads on DisconnectionSource {
+  /// Why the connection closed, in a form fit for a log.
   String get closeReason => switch (this) {
     UserInitiated() => 'User initiated disconnection',
     ServerInitiated() => 'Server initiated disconnection',
-    SystemInitiated() => 'System initiated disconnection',
+    SystemInitiated() => 'Disconnected by the network or the system',
     UnHealthyConnection() => 'Unhealthy connection (no pong received)',
     ConnectTimeout() => 'Timed out before the connection was established',
     AuthenticationFailed() => 'Authentication failed',
@@ -265,41 +400,46 @@ sealed class DisconnectionSource extends Equatable {
 
   /// What closed the connection, or `null` when this source carries no cause.
   ///
-  /// For a [ServerInitiated] closure this is the [StreamException] that was
-  /// reported; for an [AuthenticationFailed] one, whatever prevented the
-  /// credentials from going out.
-  Object? get cause => switch (this) {
+  /// For a [ServerInitiated] closure this is the failure the server reported; for an
+  /// [AuthenticationFailed] one, what stopped the credentials going out.
+  StreamException? get cause => switch (this) {
     ServerInitiated(:final error) => error,
     AuthenticationFailed(:final error) => error,
-    UserInitiated() || SystemInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
+    SystemInitiated(:final error) => error,
+    UserInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
   };
+
+  /// The stack trace of the failure that closed the connection, or `null` when it closed without one.
+  ///
+  /// Present whenever there is a [cause].
+  StackTrace? get stackTrace => switch (this) {
+    ServerInitiated(:final stackTrace) ||
+    AuthenticationFailed(:final stackTrace) ||
+    SystemInitiated(:final stackTrace) => stackTrace,
+    UserInitiated() || UnHealthyConnection() || ConnectTimeout() => null,
+  };
+
+  /// The exception this disconnection is reported as.
+  ///
+  /// The [cause] where there is one, and a [StreamNetworkException] describing the closure
+  /// otherwise, so every disconnection can be raised whether or not it carried a failure.
+  StreamException get exception => cause ?? StreamNetworkException(message: closeReason);
 
   /// Whether a connection closed for this reason is worth opening again.
   ///
   /// {@template webSocketReconnectionRules}
-  /// - [UserInitiated] — no, the caller asked for the connection to close.
-  /// - [AuthenticationFailed] — no, with or without an error: credentials that could not be
-  ///   produced or sent will not fare better on a retry. The exception is a non-cancelled
-  ///   [StreamNetworkException], which indicts the moment rather than the credentials — see
-  ///   [TokenProvider.loadToken].
   /// - [SystemInitiated], [UnHealthyConnection], [ConnectTimeout] — yes.
-  /// - [ServerInitiated] — decided by the error it carries:
-  ///   - no error — yes, the closure said nothing against trying again.
-  ///   - a server verdict ([StreamApiException]) — no when the server said retrying will not help
-  ///     ([StreamApiException.unrecoverable]), when the token's signature or the API key is refused (configuration a
-  ///     retry reproduces), or for any other 4xx. Yes for an expired token (the reconnect
-  ///     authenticates with a fresh one), a token not valid yet (clock skew a later attempt can get
-  ///     past), a rate limit, and 5xx.
-  ///   - a transport failure ([StreamNetworkException]) — yes, except a bare normal closure
-  ///     (code 1000) with no error event before it, which is the server deliberately ending the
-  ///     session.
-  ///   - anything else — yes for an SDK-side failure, no for credentials that could not be sent
-  ///     (a retry changes nothing).
+  /// - [UserInitiated] — no.
+  /// - [AuthenticationFailed] — only for a [StreamNetworkException] that is not
+  ///   [StreamNetworkException.isCancelled].
+  /// - [ServerInitiated] — decided by the error it carries. No for a [StreamApiException] that is
+  ///   [StreamApiException.unrecoverable], reports a refused token signature or API key, or carries
+  ///   any other 4xx; no for a [StreamNetworkException] closing with [CloseCode.normalClosure]; no
+  ///   for a [StreamAuthenticationException]. Yes for anything else, including an expired or
+  ///   not-yet-valid token, a rate limit, a 5xx, and no error at all.
   ///
-  /// Necessary, but not on its own sufficient. Whether a reconnection is then actually made is
-  /// decided by `ConnectionRecoveryHandler`, which recovers only a connection that was established,
-  /// and only while the network and the app lifecycle allow it — so a first connection that times
-  /// out stays down, where one that times out on the way back does not.
+  /// Necessary but not sufficient: `ConnectionRecoveryHandler` reopens only a connection that was
+  /// established, and only while the network and the app lifecycle allow it.
   /// {@endtemplate}
   bool get isReconnectable => switch (this) {
     UserInitiated() => false,
@@ -329,91 +469,22 @@ sealed class DisconnectionSource extends Equatable {
       null => true,
     },
   };
-
-  @override
-  List<Object?> get props => [];
 }
 
-/// A disconnection that was explicitly requested by the application.
-///
-/// This source indicates that the disconnection was intentionally triggered
-/// by application code, typically through a call to `disconnect()`. Automatic
-/// reconnection is disabled for user-initiated disconnections.
-final class UserInitiated extends DisconnectionSource {
-  /// Creates a [UserInitiated] disconnection source.
-  const UserInitiated();
-}
-
-/// A disconnection that was initiated by the server.
-///
-/// This source indicates that the server closed the WebSocket connection,
-/// either gracefully or due to an error condition. The optional [error]
-/// provides additional context about the disconnection cause.
-final class ServerInitiated extends DisconnectionSource {
-  /// Creates a [ServerInitiated] disconnection source.
-  const ServerInitiated({this.error, this.stackTrace});
-
-  /// The error that caused the server to close the connection.
+/// Waits on what a connection is doing.
+extension ConnectionStateWaits on ConnectionStateEmitter {
+  /// The connection state once nothing is in transition.
   ///
-  /// A [StreamApiException] when the server reported why — the same payload a
-  /// rejected REST call carries — and a [StreamNetworkException] describing
-  /// the closure when it did not.
-  final StreamException? error;
+  /// One of [Initialized], [Connected] or [Disconnected]. Completes immediately when the connection
+  /// is already in one of those, so a caller that cannot go on without one can await it
+  /// unconditionally, and has to handle the two that are not [Connected].
+  Future<WebSocketConnectionState> get settled {
+    final state = value;
 
-  /// Where [error] was raised, when it was raised rather than read off the wire.
-  final StackTrace? stackTrace;
+    if (state case Connecting() || Authenticating() || Disconnecting()) {
+      return Future.any([waitFor<Connected>(), waitFor<Disconnected>()]);
+    }
 
-  @override
-  List<Object?> get props => [error];
-}
-
-/// A disconnection that was initiated by system-level conditions.
-///
-/// This source indicates that the connection was closed due to system events
-/// such as network connectivity changes, application lifecycle transitions,
-/// or other environmental factors outside of direct user or server control.
-final class SystemInitiated extends DisconnectionSource {
-  /// Creates a [SystemInitiated] disconnection source.
-  const SystemInitiated();
-}
-
-/// A disconnection caused by failed connection health checks.
-///
-/// This source indicates that the connection was closed because health
-/// monitoring detected an unresponsive connection, typically when ping
-/// requests do not receive corresponding pong responses within the timeout.
-final class UnHealthyConnection extends DisconnectionSource {
-  /// Creates an [UnHealthyConnection] disconnection source.
-  const UnHealthyConnection();
-}
-
-/// A disconnection caused by the connection not becoming usable in time.
-///
-/// This source indicates that the connection was abandoned while it was still
-/// being established, so it was never usable.
-final class ConnectTimeout extends DisconnectionSource {
-  /// Creates a [ConnectTimeout] disconnection source.
-  const ConnectTimeout();
-}
-
-/// A disconnection caused by the connection failing to authenticate.
-///
-/// This source indicates that the socket opened but the credentials could not be loaded or sent, so
-/// the connection was never usable. A server rejecting credentials it did receive is reported as an
-/// error event instead.
-final class AuthenticationFailed extends DisconnectionSource {
-  /// Creates an [AuthenticationFailed] disconnection source.
-  const AuthenticationFailed({this.error, this.stackTrace});
-
-  /// The error that prevented the connection from authenticating.
-  ///
-  /// Usually a [StreamAuthenticationException] whose [StreamException.cause]
-  /// is whatever the authenticator threw.
-  final StreamException? error;
-
-  /// Where [error] was raised.
-  final StackTrace? stackTrace;
-
-  @override
-  List<Object?> get props => [error];
+    return Future.value(state);
+  }
 }

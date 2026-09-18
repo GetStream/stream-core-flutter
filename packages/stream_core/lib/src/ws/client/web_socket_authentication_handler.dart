@@ -77,15 +77,16 @@ class WebSocketAuthenticationHandler {
 
   /// Authenticates a socket that has just opened.
   ///
-  /// Does nothing when there is no authenticator. Passes [previousError] to the authenticator, and
-  /// spends it once this attempt finishes, so a later attempt does not see a refusal that was not
-  /// about it.
+  /// Passes [previousError] to the authenticator and spends it once this attempt finishes, so a
+  /// later attempt does not see a refusal that was not about it. With no authenticator there is
+  /// nothing to send, but the refusal is spent all the same, because the options builder reads it
+  /// too.
   ///
   /// An error the authenticator throws is passed to `onFailure` instead of escaping, unless the
   /// attempt has since been abandoned, which leaves nothing to report it against.
   Future<void> authenticate() async {
     final authenticate = _authenticator;
-    if (authenticate == null) return;
+    if (authenticate == null) return _previousError = null;
 
     final attempt = _attempt;
     final previousError = _previousError;

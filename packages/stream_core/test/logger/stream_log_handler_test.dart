@@ -79,9 +79,74 @@ void main() {
         ),
       );
 
-      expect(printed, hasLength(3));
-      expect(printed[0], contains('failed'));
+      expect(printed.first, contains('failed'));
       expect(printed[1], contains('boom'));
+    });
+
+    test('writes the time of day and its offset, not the date', () {
+      final printed = withStreamLogger(
+        handler: const StreamLogHandler.console(),
+        () => capturePrints(() => _logger.i(() => 'connected')),
+      );
+
+      expect(printed.single, matches(RegExp(r'^\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2} ')));
+    });
+
+    test('writes the priority without an emoji when asked', () {
+      final printed = withStreamLogger(
+        handler: const StreamLogHandler.console(emoji: false),
+        () => capturePrints(() => _logger.w(() => 'slow')),
+      );
+
+      expect(printed.single, contains('W/SC:Component: slow'));
+      expect(printed.single, isNot(contains('\u26a0')));
+    });
+
+    test('cuts a record too long for one line, and says what it dropped', () {
+      final printed = withStreamLogger(
+        handler: const StreamLogHandler.console(),
+        () => capturePrints(() => _logger.i(() => 'x' * 100000)),
+      );
+
+      // One line, so a record that drew its own structure keeps it.
+      expect(printed, hasLength(1));
+      expect(printed.single, matches(RegExp(r'… \d+ more characters$')));
+    });
+
+    test('tags every line of a message that spans several', () {
+      final printed = withStreamLogger(
+        handler: const StreamLogHandler.console(),
+        () => capturePrints(() => _logger.i(() => 'first\nsecond\nthird')),
+      );
+
+      // A console breaks on newlines whatever we do, so the prefix has to be on each of them.
+      expect(printed, hasLength(3));
+      expect(printed, everyElement(contains('I/SC:Component:')));
+    });
+
+    test('tags every line it prints, so a cause is not lost to a filter', () {
+      final printed = withStreamLogger(
+        handler: const StreamLogHandler.console(),
+        () => capturePrints(
+          () => _logger.e(() => 'failed', error: StateError('boom'), stackTrace: StackTrace.current),
+        ),
+      );
+
+      // A console splits on newlines, so a stack trace arrives as many lines.
+      expect(printed.length, greaterThan(2));
+      expect(printed, everyElement(contains('E/SC:Component:')));
+    });
+
+    test('marks an attached cause as belonging to the message above it', () {
+      final printed = withStreamLogger(
+        handler: const StreamLogHandler.console(),
+        () => capturePrints(
+          () => _logger.e(() => 'failed', error: StateError('boom'), stackTrace: StackTrace.current),
+        ),
+      );
+
+      expect(printed.first, contains('E/SC:Component: failed'));
+      expect(printed.skip(1), everyElement(contains('E/SC:Component: ↳ ')));
     });
   });
 
