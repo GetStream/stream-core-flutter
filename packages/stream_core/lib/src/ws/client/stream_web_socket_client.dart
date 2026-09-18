@@ -331,26 +331,13 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     _logger.d(() => 'disconnect with $closeCode, source: $source');
 
-    // Nothing reads what a socket sends until its handshake lands, so a close asked of one still
-    // connecting never finishes. Read before the state moves on, which is the only place that
-    // answers it.
-    final handshakeLanded = connectionState.value is! Connecting;
-
     // Update the connection state to 'disconnecting'.
     _connectionState = WebSocketConnectionState.disconnecting(source: source);
 
     // Close the connection using the engine.
-    final closing = _engine.close(closeCode, source.closeReason);
-
-    // A socket with nobody to answer is left to close on its own, and the closure recorded here.
-    // Awaited, it would leave this disconnecting for good.
-    if (!handshakeLanded) {
-      closing.ignore();
-      return onClose(closeCode, source.closeReason);
-    }
+    final result = await _engine.close(closeCode, source.closeReason);
 
     // The engine announces nothing when a close fails, which would leave this stuck disconnecting.
-    final result = await closing;
     return result.getOrElse((_, _) => onClose(closeCode, source.closeReason));
   }
 

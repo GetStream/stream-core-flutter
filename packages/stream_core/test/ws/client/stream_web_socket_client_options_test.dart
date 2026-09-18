@@ -516,13 +516,13 @@ void main() {
         'does not report the connection as established again',
         holdClose: true,
         body: (tester) async {
-          tester.client.disconnect().ignore();
-          expect(tester.connectionState, isA<Disconnecting>());
+          await tester.client.disconnect();
+          expect(tester.connectionState, isA<Disconnected>());
 
-          // Arrives before the socket finished closing.
+          // Sent by a socket still finishing the close it was asked for.
           await tester.emit({'type': 'connection.ok', 'connection_id': 'late'});
 
-          expect(tester.connectionState, isA<Disconnecting>());
+          expect(tester.connectionState, isA<Disconnected>());
           tester.server.socket.sink.completeClose();
         },
       );
