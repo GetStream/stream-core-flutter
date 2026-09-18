@@ -196,6 +196,46 @@ void main() {
       });
     });
 
+    test('opens nothing for an attempt the caller ended while the options were completing', () {
+      fakeAsync((async) {
+        final answer = Completer<WebSocketOptions>();
+        final tester = buildTester(optionsProvider: (_) => answer.future);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        // The options land and the caller signs out in the same turn, so the attempt ends between
+        // the race being decided and the connect resuming on the value it won.
+        answer.complete(const WebSocketOptions(url: 'wss://example.com'));
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+
+        expect(tester.server.sockets, isEmpty);
+        expect(tester.connectionState, isA<Disconnected>());
+      });
+    });
+
+    test('keeps the closure the caller asked for when the options fail in the same turn', () {
+      fakeAsync((async) {
+        final answer = Completer<WebSocketOptions>();
+        final tester = buildTester(optionsProvider: (_) => answer.future);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        answer.completeError(StateError('the options were refused'));
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+
+        // Both sources force a closure through, so reporting the refusal here would overwrite the
+        // one the caller asked for rather than be dropped for arriving second.
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having((it) => it.source, 'source', isA<UserInitiated>()),
+        );
+      });
+    });
+
     test('settles a connect whose options never arrive', () {
       fakeAsync((async) {
         var settled = false;

@@ -253,8 +253,10 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       runSafely(() => _buildOptions(_authenticationHandler.previousError)),
     );
 
-    // A state check cannot stand in: an attempt that replaced this one reports `Connecting` too.
-    if (optionsResult == null) return;
+    // Checked again, not just raced: the attempt can end between the race being decided and this
+    // line resuming on what it won. A state check cannot stand in — a replacement reports
+    // `Connecting` too.
+    if (attempt.hasEnded || optionsResult == null) return;
 
     if (optionsResult case Failure(:final error, :final stackTrace)) {
       var exception = StreamException.tryFrom(error);
