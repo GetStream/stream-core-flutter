@@ -287,6 +287,10 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     attempt.boundBy(options.connectTimeout);
     final result = await _engine.open(options);
 
+    // The attempt can end while the handshake is in flight, and a refusal it earned is not the
+    // connection that replaced it to answer for.
+    if (attempt.hasEnded) return;
+
     // Handed to `disconnect`, which reports the reason, closes the socket, and records the closure
     // even when the close fails. Returned, so a caller connecting again is not refused for the race.
     if (result case Failure(:final error, :final stackTrace)) {
@@ -343,8 +347,6 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _connectionState = const WebSocketConnectionState.authenticating();
 
     // The socket is open but not yet usable: the credentials go out before the server will serve it.
-    // No attempt means this socket outlived the one that opened it, so there is nothing to
-    // authenticate against.
     if (_attempt case final attempt?) unawaited(_authenticationHandler.authenticate(attempt));
   }
 

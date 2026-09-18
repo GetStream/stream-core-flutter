@@ -428,6 +428,32 @@ void main() {
       });
     });
 
+    test('leaves the connection that replaced an attempt alone when its handshake is refused late', () {
+      fakeAsync((async) {
+        var attempts = 0;
+        final tester = buildTester(
+          connectTimeout: const Duration(seconds: 5),
+          handshakeHangsWhen: () => attempts++ == 0,
+        );
+
+        // The first handshake hangs until its own bound abandons the attempt.
+        tester.client.connect().ignore();
+        async.elapse(const Duration(seconds: 5));
+        async.flushMicrotasks();
+
+        // The caller connects again, and that one completes.
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connected>());
+
+        // The abandoned handshake is refused, long after the connection that replaced it.
+        tester.server.sockets.first.failReady(Exception('upgrade refused'));
+        async.flushMicrotasks();
+
+        expect(tester.connectionState, isA<Connected>());
+      });
+    });
+
     test('does not replace the source of a closure that came first', () {
       fakeAsync((async) {
         final tester = buildTester();
