@@ -55,6 +55,10 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   // ignore: cancel_subscriptions
   StreamSubscription<Object?>? _wsSubscription;
 
+  // Whether the handshake of the socket in hand has settled, whichever way it went. One still in
+  // flight has nobody on the other end, which is what `close` needs to know.
+  var _handshakeSettled = false;
+
   @override
   Future<Result<void>> open(WebSocketOptions options) {
     return runSafely(() async {
@@ -71,7 +75,9 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
         onError: _listener?.onError,
       );
 
-      await ws.ready;
+      await ws.ready.whenComplete(() {
+        if (_ws == ws) _handshakeSettled = true;
+      });
 
       // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
       if (_ws == ws) _listener?.onOpen();
@@ -113,12 +119,23 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     return runSafely(() async {
       final ws = _ws;
       final subscription = _wsSubscription;
+      final settled = _handshakeSettled;
 
       _ws = null;
       _wsSubscription = null;
+      _handshakeSettled = false;
 
       await subscription?.cancel();
-      await ws?.sink.close(closeCode, closeReason);
+
+      final closing = ws?.sink.close(closeCode, closeReason);
+      // Nothing reads what a socket sends until its handshake settles, so a close asked of one
+      // still shaking hands never finishes. That one is dropped rather than waited on; waiting is
+      // what keeps a slow close ahead of the socket that replaces it.
+      if (settled) {
+        await closing;
+      } else {
+        closing?.ignore();
+      }
 
       // A new socket can open while this one closes, and must not be brought down by its closure.
       if (_ws == null) _listener?.onClose(closeCode, closeReason);
