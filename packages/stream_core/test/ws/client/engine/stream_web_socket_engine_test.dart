@@ -134,8 +134,8 @@ void main() {
 
     final result = await engine.close(CloseCode.normalClosure, 'done');
 
-    // What the socket makes of the close is its own business: this engine has let go of it either
-    // way, so the connection is gone whether or not it went quietly.
+    // This engine has let go of the socket either way, so the connection is gone whether or not it
+    // closed cleanly.
     expect(result.isSuccess, isTrue);
     expect(listener.closures, [(code: CloseCode.normalClosure, reason: 'done')]);
   });
@@ -189,9 +189,8 @@ void main() {
     await closing;
     await pumpEventQueue();
 
-    // The closure was announced when this engine let the socket go, which is before the one that
-    // replaced it opened. What the socket does afterwards announces nothing: reported then, it
-    // would bring down a connection that has since been established.
+    // Announced when this engine let the socket go, before its replacement opened. Announced
+    // after, it would bring down a connection that has since been established.
     expect(listener.opened, 2);
     expect(listener.closures, hasLength(1));
   });

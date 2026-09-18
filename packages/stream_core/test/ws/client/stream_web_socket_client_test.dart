@@ -272,8 +272,8 @@ void main() {
         expect(tester.attempts, 2);
         expect(tester.connectionState, isA<Connected>());
 
-        // The socket that was replaced, finishing on its own schedule. Its closure belongs to a
-        // connection already reported as closed, so it must not bring down the one that replaced it.
+        // The replaced socket, finishing on its own schedule. Its closure belongs to a connection
+        // already reported as closed.
         closing.sink.completeClose();
         await tester.pumpEventQueue();
 

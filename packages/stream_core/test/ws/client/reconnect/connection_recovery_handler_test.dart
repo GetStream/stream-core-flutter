@@ -375,8 +375,8 @@ void main() {
     });
   });
 
-  // What `isRecovering` is for: a connection waiting out a backoff and one nothing will reopen are
-  // both `Disconnected` with a reconnectable source, so the state alone cannot tell them apart.
+  // A connection waiting out a backoff and one nothing will reopen are both `Disconnected` with a
+  // reconnectable source, so the state alone cannot tell them apart.
   group('isRecovering', () {
     test('holds across the wait between attempts', () {
       fakeAsync((async) {

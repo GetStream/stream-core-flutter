@@ -97,14 +97,8 @@ class ConnectionRecoveryHandler extends Disposable {
 
   /// Whether a connection that dropped is on its way back.
   ///
-  /// True from the moment this handler takes one on until the attempt connects, so it covers the
-  /// wait between attempts as well as the attempts themselves. False where nothing will reopen the
-  /// connection: a closure this handler does not act on, an attempt that was never established, or
-  /// a policy turning one down.
-  ///
-  /// Read alongside [StreamWebSocketClient.connectionState] to tell a connection that is coming
-  /// back from one that is closed for good. The state alone cannot:
-  /// [DisconnectionSourceReads.isReconnectable] answers for the closure, not for this handler.
+  /// True from the moment a reopen is taken on until it connects, so it covers the wait between
+  /// attempts as well as the attempts themselves. False where nothing will reopen the connection.
   bool get isRecovering => _isRecovering;
 
   /// Attempts reconnection if policies allow it.

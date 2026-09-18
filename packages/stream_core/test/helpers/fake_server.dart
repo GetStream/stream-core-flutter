@@ -136,8 +136,7 @@ class FakeServer {
   }) {
     final socket = FakeWebSocketChannel(
       // A real socket routes what it sends through the handshake, so one that never finishes
-      // shaking hands cannot finish closing either. Modelled here, or a test against a hung
-      // handshake passes on a socket that could not exist.
+      // shaking hands cannot finish closing either.
       holdClose: holdClose || handshakeHangs,
       closeError: closeError,
       readyError: handshakeFails ? Exception('upgrade refused') : null,
