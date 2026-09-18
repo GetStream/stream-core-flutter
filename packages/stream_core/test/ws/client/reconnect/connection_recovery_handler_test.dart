@@ -375,6 +375,107 @@ void main() {
     });
   });
 
+  // What `isRecovering` is for: a connection waiting out a backoff and one nothing will reopen are
+  // both `Disconnected` with a reconnectable source, so the state alone cannot tell them apart.
+  group('isRecovering', () {
+    test('holds across the wait between attempts', () {
+      fakeAsync((async) {
+        var handshakeFails = false;
+        final tester = buildTester(recover: true, handshakeFailsWhen: () => handshakeFails);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        expect(tester.isRecovering, isFalse);
+
+        handshakeFails = true;
+        tester.server.hangUp();
+        async.flushMicrotasks();
+
+        // Reported between attempts, where the connection is down and one is scheduled anyway.
+        expect(tester.connectionState, isA<Disconnected>());
+        expect(tester.isRecovering, isTrue);
+
+        async.elapse(const Duration(minutes: 1));
+        async.flushMicrotasks();
+        expect(tester.isRecovering, isTrue);
+      });
+    });
+
+    test('is given up once the connection is back', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        expect(tester.isRecovering, isTrue);
+
+        async.elapse(Duration.zero);
+        async.flushMicrotasks();
+
+        expect(tester.connectionState, isA<Connected>());
+        expect(tester.isRecovering, isFalse);
+      });
+    });
+
+    test('is withheld from a first attempt that never connected', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+        tester.server.onFrame = (_) => [];
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        async.elapse(WebSocketOptions.defaultConnectTimeout);
+        async.flushMicrotasks();
+
+        // Abandoned for a reason worth retrying, but not by this handler, which leaves a first
+        // attempt to whoever made it.
+        expect(tester.connectionState, isA<Disconnected>());
+        expect(tester.isRecovering, isFalse);
+      });
+    });
+
+    test('is withheld while a policy is turning a retry down', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.lifecycle.background();
+        async.flushMicrotasks();
+
+        // Down for a reason worth retrying, with nothing retrying it until the app is back.
+        expect(tester.connectionState, isA<Disconnected>());
+        expect(tester.isRecovering, isFalse);
+
+        tester.lifecycle.foreground();
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connected>());
+      });
+    });
+
+    test('is given up when the caller disconnects mid-recovery', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        expect(tester.isRecovering, isTrue);
+
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+
+        expect(tester.isRecovering, isFalse);
+      });
+    });
+  });
+
   group('a policy the app supplied', () {
     test('can refuse a reconnection the built-in policies would allow', () {
       fakeAsync((async) {

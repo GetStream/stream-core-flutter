@@ -100,6 +100,9 @@ class WsClientTester {
   /// The current connection state.
   WebSocketConnectionState get connectionState => client.connectionState.value;
 
+  /// Whether the recovery handler has taken the connection on, and `false` without one wired in.
+  bool get isRecovering => _recovery?.isRecovering ?? false;
+
   /// Sends [frame] from the server and lets the client react to it.
   Future<void> emit(Map<String, Object?> frame) async {
     server.send(frame);

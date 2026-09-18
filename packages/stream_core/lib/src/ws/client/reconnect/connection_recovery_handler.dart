@@ -22,7 +22,8 @@ import 'retry_strategy.dart';
 /// Only connections that were established are recovered. A first attempt that fails is reported
 /// through [StreamWebSocketClient.connectionState] and left there, so it is not retried here, not
 /// even when the network returns; making another belongs to whoever called
-/// [StreamWebSocketClient.connect].
+/// [StreamWebSocketClient.connect]. [isRecovering] tells that connection apart from one this
+/// handler has taken on.
 ///
 /// ## Built-in Policies
 ///
@@ -92,12 +93,31 @@ class ConnectionRecoveryHandler extends Disposable {
   // handler will not act on. Tells a drop worth recovering apart from an attempt that never landed.
   var _hasEstablishedConnection = false;
 
+  var _isRecovering = false;
+
+  /// Whether a connection that dropped is on its way back.
+  ///
+  /// True from the moment this handler takes one on until the attempt connects, so it covers the
+  /// wait between attempts as well as the attempts themselves. False where nothing will reopen the
+  /// connection: a closure this handler does not act on, an attempt that was never established, or
+  /// a policy turning one down.
+  ///
+  /// Read alongside [StreamWebSocketClient.connectionState] to tell a connection that is coming
+  /// back from one that is closed for good. The state alone cannot:
+  /// [DisconnectionSourceReads.isReconnectable] answers for the closure, not for this handler.
+  bool get isRecovering => _isRecovering;
+
   /// Attempts reconnection if policies allow it.
   ///
   /// Evaluates all configured policies and initiates reconnection when conditions are met.
   /// Called automatically by the handler based on state changes.
   void reconnectIfNeeded() {
-    if (!_canBeReconnected()) return;
+    if (!_canBeReconnected()) {
+      _isRecovering = false;
+      return;
+    }
+
+    _isRecovering = true;
     _client.connect();
   }
 
@@ -111,7 +131,12 @@ class ConnectionRecoveryHandler extends Disposable {
   }
 
   void _scheduleReconnectionIfNeeded() {
-    if (!_canBeReconnected()) return;
+    if (!_canBeReconnected()) {
+      _isRecovering = false;
+      return;
+    }
+
+    _isRecovering = true;
     _scheduleReconnection();
   }
 
@@ -175,6 +200,7 @@ class ConnectionRecoveryHandler extends Disposable {
     final attempts = _reconnectStrategy.consecutiveFailuresCount;
     if (attempts > 0) _logger.d(() => 'Reconnected on attempt #$attempts');
 
+    _isRecovering = false;
     _hasEstablishedConnection = true;
     return _reconnectStrategy.resetConsecutiveFailures();
   }
@@ -183,6 +209,7 @@ class ConnectionRecoveryHandler extends Disposable {
   // actually attempted, so a drop during an outage still counts as one worth recovering.
   void _onConnectionLost(DisconnectionSource source) {
     if (!source.isReconnectable) {
+      _isRecovering = false;
       _reconnectStrategy.resetConsecutiveFailures();
       _hasEstablishedConnection = false;
       return _cancelReconnection();
@@ -193,6 +220,7 @@ class ConnectionRecoveryHandler extends Disposable {
 
   @override
   Future<void> dispose() async {
+    _isRecovering = false;
     _cancelReconnection();
     await _subscriptions.dispose();
     return super.dispose();
