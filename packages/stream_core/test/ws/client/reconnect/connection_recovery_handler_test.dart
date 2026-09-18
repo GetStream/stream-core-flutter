@@ -457,6 +457,101 @@ void main() {
       });
     });
 
+    test('survives being asked to reconnect while an attempt is in flight', () {
+      fakeAsync((async) {
+        var handshakeHangs = false;
+        final tester = buildTester(handshakeHangsWhen: () => handshakeHangs);
+        final recovery = ConnectionRecoveryHandler(client: tester.client);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        // The connection drops and the retry that follows hangs, so it sits in `Connecting`.
+        handshakeHangs = true;
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        async.elapse(Duration.zero);
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connecting>());
+        expect(recovery.isRecovering, isTrue);
+
+        // What the app returning to the foreground asks for. There is nothing to start, but the
+        // recovery under way is not over: given up here, the closure that ends this attempt reads
+        // as a connection nothing is coming back for.
+        recovery.reconnectIfNeeded();
+
+        expect(recovery.isRecovering, isTrue);
+      });
+    });
+
+    // The state a failed attempt passes through on its way back to waiting. Given up here, the
+    // connection reads as one nothing is coming back for, for as long as the teardown takes.
+    test('holds while the attempt that failed is still tearing down', () {
+      fakeAsync((async) {
+        var handshakeHangs = false;
+        final tester = buildTester(recover: true, handshakeHangsWhen: () => handshakeHangs);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        handshakeHangs = true;
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        async.elapse(Duration.zero);
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connecting>());
+
+        // Abandoned for taking too long, which starts the teardown rather than finishing it.
+        async.elapse(WebSocketOptions.defaultConnectTimeout);
+        expect(tester.states.whereType<Disconnecting>(), isNotEmpty);
+        expect(tester.isRecovering, isTrue);
+      });
+    });
+
+    // The attempt this handler makes the moment a policy allows one again, rather than on a delay.
+    // It is a recovery like any other, and nothing about it is counted as a failure.
+    test('holds through an attempt started the moment the network returns', () {
+      fakeAsync((async) {
+        var handshakeHangs = false;
+        final tester = buildTester(recover: true, handshakeHangsWhen: () => handshakeHangs);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connected>());
+
+        // Losing the network takes the connection down, and nothing retries while it is away.
+        tester.network.disconnect();
+        async.flushMicrotasks();
+        expect(tester.isRecovering, isFalse);
+
+        // The network returning starts an attempt straight away, on no delay and after no failure.
+        handshakeHangs = true;
+        tester.network.connect();
+        async.flushMicrotasks();
+
+        expect(tester.connectionState, isA<Connecting>());
+        expect(tester.isRecovering, isTrue);
+      });
+    });
+
+    test('is given up when the handler is disposed mid-recovery', () {
+      fakeAsync((async) {
+        final tester = buildTester(recover: true);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        tester.server.hangUp();
+        async.flushMicrotasks();
+        expect(tester.isRecovering, isTrue);
+
+        // Nothing is coming back for a connection whose handler has been let go of.
+        tester.recovery.dispose().ignore();
+        async.flushMicrotasks();
+
+        expect(tester.isRecovering, isFalse);
+      });
+    });
+
     test('is given up when the caller disconnects mid-recovery', () {
       fakeAsync((async) {
         final tester = buildTester(recover: true);

@@ -103,6 +103,9 @@ class WsClientTester {
   /// Whether the recovery handler has taken the connection on, and `false` without one wired in.
   bool get isRecovering => _recovery?.isRecovering ?? false;
 
+  /// The recovery handler [buildTester] wired in, for a test that drives it directly.
+  ConnectionRecoveryHandler get recovery => _recovery!;
+
   /// Sends [frame] from the server and lets the client react to it.
   Future<void> emit(Map<String, Object?> frame) async {
     server.send(frame);
