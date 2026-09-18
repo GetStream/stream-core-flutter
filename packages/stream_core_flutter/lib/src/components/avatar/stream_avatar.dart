@@ -8,6 +8,7 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../common/stream_network_image.dart';
+import 'internal/avatar_dimension_override.dart';
 
 /// A circular avatar component for the Stream design system.
 ///
@@ -218,6 +219,10 @@ class DefaultStreamAvatar extends StatelessWidget {
         : context.streamElevation.none;
     final effectiveBorder = avatarTheme.border ?? defaults.border;
 
+    // The size names a diameter as well as the text and icon metrics. A group
+    // packing children between two named sizes overrides only the diameter.
+    final effectiveDimension = AvatarDimensionOverride.maybeOf(context) ?? effectiveSize.value;
+
     // Avatars are circular, so the border is always uniform — use any side.
     final borderSide = props.showBorder ? effectiveBorder.top : BorderSide.none;
     final textStyle = _textStyleForSize(effectiveSize, textTheme).copyWith(color: effectiveForegroundColor);
@@ -229,7 +234,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     // Material clips children via PhysicalShape, so a border with strokeAlignOutside
     // on the Material's shape gets clipped. Draw the border outside Material instead.
     Widget avatar = SizedBox.square(
-      dimension: effectiveSize.value,
+      dimension: effectiveDimension,
       child: DecoratedBox(
         decoration: ShapeDecoration(shape: CircleBorder(side: borderSide)),
         position: DecorationPosition.foreground,
@@ -250,8 +255,8 @@ class DefaultStreamAvatar extends StatelessWidget {
                     final imageUrl? => StreamNetworkImage(
                       imageUrl,
                       fit: .cover,
-                      width: effectiveSize.value,
-                      height: effectiveSize.value,
+                      width: effectiveDimension,
+                      height: effectiveDimension,
                       placeholderBuilder: (context) => Center(child: props.placeholder.call(context)),
                       errorBuilder: (context, _, _) => Center(child: props.placeholder.call(context)),
                     ),
@@ -286,7 +291,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     .sm || .md => textTheme.captionEmphasis,
     .lg => textTheme.bodyEmphasis,
     .xl => textTheme.headingMd,
-    .xxl => textTheme.headingLg,
+    .xxl || .xxxl => textTheme.headingLg,
   };
 
   // Returns the appropriate icon size for the given avatar size.
@@ -298,7 +303,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     .md => 16,
     .lg => 20,
     .xl => 24,
-    .xxl => 32,
+    .xxl || .xxxl => 32,
   };
 }
 
