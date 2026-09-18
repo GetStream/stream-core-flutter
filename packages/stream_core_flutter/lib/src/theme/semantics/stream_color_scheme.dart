@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:stream_core/stream_core.dart' show Standard;
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../../utils/standard.dart';
 import '../primitives/internal/tokens/dark/stream_tokens.dart' as dark_tokens;
 import '../primitives/internal/tokens/light/stream_tokens.dart' as light_tokens;
 import '../primitives/stream_colors.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_context_menu_action_theme.dart';
@@ -9,6 +8,7 @@ import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../../utils/list_extensions.dart';
 import 'stream_context_menu.dart';
 
 /// A single action row in a [StreamContextMenu].

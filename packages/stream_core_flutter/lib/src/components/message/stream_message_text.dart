@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
-import 'package:stream_core/stream_core.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_message_item_theme.dart';
@@ -11,6 +10,7 @@ import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../../utils/standard.dart';
 import '../accessories/stream_emoji.dart';
 import '../message_layout/stream_message_layout.dart';
 
