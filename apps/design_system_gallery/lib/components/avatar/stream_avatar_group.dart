@@ -136,6 +136,7 @@ class _SizeCard extends StatelessWidget {
       StreamAvatarGroupSize.lg => 'Channel list items, compact group displays',
       StreamAvatarGroupSize.xl => 'Channel list items, standard group displays',
       StreamAvatarGroupSize.xxl => 'Channel headers, prominent group displays',
+      StreamAvatarGroupSize.xxxl => 'Ringing call screens, full-screen group displays',
     };
   }
 
