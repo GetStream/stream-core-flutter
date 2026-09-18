@@ -8,6 +8,7 @@ import '../events/ws_request.dart';
 import 'engine/stream_web_socket_engine.dart';
 import 'engine/web_socket_engine.dart';
 import 'web_socket_authentication_handler.dart';
+import 'web_socket_connection_attempt.dart';
 import 'web_socket_connection_state.dart';
 import 'web_socket_health_monitor.dart';
 
@@ -157,23 +158,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
   static const defaultOptionsTimeout = Duration(seconds: 30);
 
   // The attempt in flight, so work resuming after an await can tell whether it still belongs.
-  _ConnectionAttempt? _attempt;
-
-  // Bounds an attempt while `Connecting` or `Authenticating`; the health monitor takes over after.
-  Timer? _connectTimeoutTimer;
-
-  void _startConnectTimeout(Duration timeout) {
-    _connectTimeoutTimer?.cancel();
-    _connectTimeoutTimer = Timer(timeout, () {
-      const source = DisconnectionSource.connectTimeout();
-      unawaited(disconnect(source: source));
-    });
-  }
-
-  void _cancelConnectTimeout() {
-    _connectTimeoutTimer?.cancel();
-    _connectTimeoutTimer = null;
-  }
+  WebSocketConnectionAttempt? _attempt;
 
   /// The event emitter for WebSocket events.
   ///
@@ -259,16 +244,17 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
     // Update the connection state to 'connecting'.
     _connectionState = const WebSocketConnectionState.connecting();
-    // Bound the wait for the options, so one that never becomes usable is not waited on forever.
-    _startConnectTimeout(defaultOptionsTimeout);
 
-    final attempt = _attempt = _ConnectionAttempt();
+    final attempt = _attempt = WebSocketConnectionAttempt(
+      onTimeout: () => unawaited(disconnect(source: const .connectTimeout())),
+    )..boundBy(defaultOptionsTimeout);
+
     final optionsResult = await attempt.valueUnlessEnded(
       runSafely(() => _buildOptions(_authenticationHandler.previousError)),
     );
 
-    // A state check cannot stand in: an attempt that replaced this one reports `Connecting` too.
-    if (optionsResult == null) return;
+    // The attempt can end between the race being decided and this line resuming on what it won.
+    if (attempt.hasEnded || optionsResult == null) return;
 
     if (optionsResult case Failure(:final error, :final stackTrace)) {
       var exception = StreamException.tryFrom(error);
@@ -281,7 +267,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
       return disconnect(source: source);
     }
 
-    return _connect(optionsResult.getOrThrow());
+    return _connect(attempt, optionsResult.getOrThrow());
   }
 
   FutureOr<WebSocketOptions> _buildOptions(StreamApiException? previousError) {
@@ -294,12 +280,16 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
 
   // Opens the socket the options describe, for an attempt already reported as `Connecting` and
   // already bounded.
-  Future<void> _connect(WebSocketOptions options) async {
+  Future<void> _connect(WebSocketConnectionAttempt attempt, WebSocketOptions options) async {
     _logger.d(() => 'connect to ${options.url}');
 
-    // Bound the attempt, so one that never becomes usable is not waited on forever.
-    _startConnectTimeout(options.connectTimeout);
+    // The options are known now, so the connection they describe gets the timeout they name.
+    attempt.boundBy(options.connectTimeout);
     final result = await _engine.open(options);
+
+    // The attempt can end while the handshake is in flight, and a refusal it earned is not the
+    // connection that replaced it to answer for.
+    if (attempt.hasEnded) return;
 
     // Handed to `disconnect`, which reports the reason, closes the socket, and records the closure
     // even when the close fails. Returned, so a caller connecting again is not refused for the race.
@@ -329,7 +319,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     CloseCode closeCode = CloseCode.normalClosure,
     DisconnectionSource source = const UserInitiated(),
   }) async {
-    _cancelConnectTimeout();
+    _attempt?.end();
 
     if (connectionState.value case Initialized()) return;
 
@@ -357,7 +347,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     _connectionState = const WebSocketConnectionState.authenticating();
 
     // The socket is open but not yet usable: the credentials go out before the server will serve it.
-    unawaited(_authenticationHandler.authenticate());
+    if (_attempt case final attempt?) unawaited(_authenticationHandler.authenticate(attempt));
   }
 
   @override
@@ -379,7 +369,7 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     };
 
     if (source == null) return;
-    _cancelConnectTimeout();
+    _attempt?.end();
 
     // Update the connection state to 'disconnected' with the source.
     _connectionState = WebSocketConnectionState.disconnected(source: source);
@@ -435,8 +425,8 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     // Still authenticating counts too: with no authenticator we never send anything, so this pong
     // is the only sign we get that the connection works.
     if (connectionState.value case Authenticating() || Connected()) {
-      // The connection is established, so the attempt is no longer being timed.
-      _cancelConnectTimeout();
+      // The connection has answered, so the attempt no longer needs a deadline.
+      _attempt?.stopBounding();
 
       // Update the connection state with health check info.
       _connectionState = WebSocketConnectionState.connected(healthCheck: info);
@@ -486,21 +476,5 @@ class StreamWebSocketClient with Disposable implements WebSocketHealthListener, 
     await _connectionStateEmitter.close();
 
     return super.dispose();
-  }
-}
-
-// One attempt to open a connection, which ends when the connection it was making starts closing.
-final class _ConnectionAttempt {
-  final _ended = Completer<void>();
-
-  // What `operation` completes with, or null if this attempt ends first. Raced rather than
-  // checked afterwards, so one that never completes cannot hold up its caller.
-  Future<T?> valueUnlessEnded<T>(Future<T> operation) {
-    return Future.any([operation, _ended.future.then((_) => null)]);
-  }
-
-  void onConnectionStateChanged(WebSocketConnectionState state) {
-    if (_ended.isCompleted) return;
-    if (state case Disconnecting() || Disconnected()) _ended.complete();
   }
 }

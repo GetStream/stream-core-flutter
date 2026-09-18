@@ -126,6 +126,11 @@ class FakeWebSocketChannel extends StreamChannelMixin<Object?> implements WebSoc
     if (!_ready.isCompleted) _ready.complete();
   }
 
+  /// Fails a handshake held by `holdReady`, for one that is refused late.
+  void failReady(Object error) {
+    if (!_ready.isCompleted) _ready.completeError(error);
+  }
+
   @override
   Future<void> get ready {
     if (readyError case final error?) return Future.error(error);

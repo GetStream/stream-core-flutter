@@ -259,19 +259,25 @@ void main() {
     );
 
     wsClientTest(
-      'does not open a socket while the previous one is still closing',
+      'opens a socket without waiting for the previous one to finish closing',
       holdClose: true,
       body: (tester) async {
-        tester.client.disconnect().ignore();
-        expect(tester.connectionState, isA<Disconnecting>());
+        final closing = tester.server.socket;
+
+        await tester.client.disconnect();
+        expect(tester.connectionState, isA<Disconnected>());
 
         await tester.client.connect();
+        await tester.pumpEventQueue();
+        expect(tester.attempts, 2);
+        expect(tester.connectionState, isA<Connected>());
 
-        // The old socket's close event would otherwise bring the new connection down and disarm the
-        // timeout meant to be watching it.
-        expect(tester.attempts, 1);
-        expect(tester.connectionState, isA<Disconnecting>());
-        tester.server.socket.sink.completeClose();
+        // The replaced socket, finishing on its own schedule. Its closure belongs to a connection
+        // already reported as closed.
+        closing.sink.completeClose();
+        await tester.pumpEventQueue();
+
+        expect(tester.connectionState, isA<Connected>());
       },
     );
 

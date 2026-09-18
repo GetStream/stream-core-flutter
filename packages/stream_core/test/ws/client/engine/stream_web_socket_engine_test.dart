@@ -128,16 +128,16 @@ void main() {
     expect(listener.closures, hasLength(1));
   });
 
-  test('reports a socket that failed to close as a failure, not a closure', () async {
+  test('reports the closure even when the socket refuses to close', () async {
     final (:engine, :listener, socket: _) = _subject(closeFails: true);
     await engine.open(_options);
 
     final result = await engine.close(CloseCode.normalClosure, 'done');
 
-    // Nothing closed, so nothing is announced. The caller hears the failure instead and decides
-    // what to tell anyone waiting.
-    expect(result.isFailure, isTrue);
-    expect(listener.closures, isEmpty);
+    // This engine has let go of the socket either way, so the connection is gone whether or not it
+    // closed cleanly.
+    expect(result.isSuccess, isTrue);
+    expect(listener.closures, [(code: CloseCode.normalClosure, reason: 'done')]);
   });
 
   test('delivers nothing from a socket it has closed', () async {
@@ -176,7 +176,7 @@ void main() {
     expect(listener.closures, [(code: CloseCode.normalClosure, reason: 'done')]);
   });
 
-  test('does not report the closure of a socket that has already been replaced', () async {
+  test('announces the closure of a socket it let go of before its replacement opened', () async {
     // Only the first socket holds its close, so it is still closing when the next one opens.
     final (:engine, :listener, :sockets) = _subjectWithFreshSockets(holdFirstClose: true);
 
@@ -189,10 +189,10 @@ void main() {
     await closing;
     await pumpEventQueue();
 
-    // Closing yields, so the second socket is already open by the time the first one finishes.
-    // Reported now, its closure would bring down a connection that is being established.
+    // Announced when this engine let the socket go, before its replacement opened. Announced
+    // after, it would bring down a connection that has since been established.
     expect(listener.opened, 2);
-    expect(listener.closures, isEmpty);
+    expect(listener.closures, hasLength(1));
   });
 
   test('reports the closure for every close it is asked for', () async {

@@ -100,6 +100,12 @@ class WsClientTester {
   /// The current connection state.
   WebSocketConnectionState get connectionState => client.connectionState.value;
 
+  /// Whether the recovery handler has taken the connection on, and `false` without one wired in.
+  bool get isRecovering => _recovery?.isRecovering ?? false;
+
+  /// The recovery handler [buildTester] wired in, for a test that drives it directly.
+  ConnectionRecoveryHandler get recovery => _recovery!;
+
   /// Sends [frame] from the server and lets the client react to it.
   Future<void> emit(Map<String, Object?> frame) async {
     server.send(frame);
@@ -200,8 +206,9 @@ Future<void> _defaultConnect(WsClientTester tester) async {
 /// A test that drives timers wraps its own `fakeAsync` and cannot await a connect across it, so it
 /// calls this and connects by hand. Everything else should use [wsClientTest].
 ///
-/// [handshakeFailsWhen] is asked before each attempt, for a test where only some of them fail. It
-/// takes precedence over [handshakeFails], which applies to every attempt alike.
+/// [handshakeFailsWhen] and [handshakeHangsWhen] are asked before each attempt, for a test where
+/// only some of them fail or hang. Each takes precedence over the flag it mirrors, which applies to
+/// every attempt alike.
 WsClientTester buildTester({
   String user = 'luke_skywalker',
   Future<UserToken> Function(String userId)? tokenLoader,
@@ -218,6 +225,7 @@ WsClientTester buildTester({
   bool handshakeFails = false,
   bool Function()? handshakeFailsWhen,
   bool handshakeHangs = false,
+  bool Function()? handshakeHangsWhen,
   bool holdClose = false,
   Object? closeError,
   String tag = 'SC:WsClient',
@@ -256,7 +264,7 @@ WsClientTester buildTester({
     pongTimeout: pongTimeout,
     wsProvider: (_) => server.connect(
       handshakeFails: handshakeFailsWhen?.call() ?? handshakeFails,
-      handshakeHangs: handshakeHangs,
+      handshakeHangs: handshakeHangsWhen?.call() ?? handshakeHangs,
       holdClose: holdClose,
       closeError: closeError,
     ),

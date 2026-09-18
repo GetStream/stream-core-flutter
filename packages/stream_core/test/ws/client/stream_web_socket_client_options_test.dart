@@ -196,6 +196,46 @@ void main() {
       });
     });
 
+    test('opens nothing for an attempt the caller ended while the options were completing', () {
+      fakeAsync((async) {
+        final answer = Completer<WebSocketOptions>();
+        final tester = buildTester(optionsProvider: (_) => answer.future);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        // The options land and the caller signs out in the same turn, so the attempt ends between
+        // the race being decided and the connect resuming on the value it won.
+        answer.complete(const WebSocketOptions(url: 'wss://example.com'));
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+
+        expect(tester.server.sockets, isEmpty);
+        expect(tester.connectionState, isA<Disconnected>());
+      });
+    });
+
+    test('keeps the closure the caller asked for when the options fail in the same turn', () {
+      fakeAsync((async) {
+        final answer = Completer<WebSocketOptions>();
+        final tester = buildTester(optionsProvider: (_) => answer.future);
+
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        answer.completeError(StateError('the options were refused'));
+        tester.client.disconnect().ignore();
+        async.flushMicrotasks();
+
+        // Both sources force a closure through, so reporting the refusal here would overwrite the
+        // one the caller asked for rather than be dropped for arriving second.
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having((it) => it.source, 'source', isA<UserInitiated>()),
+        );
+      });
+    });
+
     test('settles a connect whose options never arrive', () {
       fakeAsync((async) {
         var settled = false;
@@ -388,6 +428,32 @@ void main() {
       });
     });
 
+    test('leaves the connection that replaced an attempt alone when its handshake is refused late', () {
+      fakeAsync((async) {
+        var attempts = 0;
+        final tester = buildTester(
+          connectTimeout: const Duration(seconds: 5),
+          handshakeHangsWhen: () => attempts++ == 0,
+        );
+
+        // The first handshake hangs until its own bound abandons the attempt.
+        tester.client.connect().ignore();
+        async.elapse(const Duration(seconds: 5));
+        async.flushMicrotasks();
+
+        // The caller connects again, and that one completes.
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+        expect(tester.connectionState, isA<Connected>());
+
+        // The abandoned handshake is refused, long after the connection that replaced it.
+        tester.server.sockets.first.failReady(Exception('upgrade refused'));
+        async.flushMicrotasks();
+
+        expect(tester.connectionState, isA<Connected>());
+      });
+    });
+
     test('does not replace the source of a closure that came first', () {
       fakeAsync((async) {
         final tester = buildTester();
@@ -450,13 +516,13 @@ void main() {
         'does not report the connection as established again',
         holdClose: true,
         body: (tester) async {
-          tester.client.disconnect().ignore();
-          expect(tester.connectionState, isA<Disconnecting>());
+          await tester.client.disconnect();
+          expect(tester.connectionState, isA<Disconnected>());
 
-          // Arrives before the socket finished closing.
+          // Sent by a socket still finishing the close it was asked for.
           await tester.emit({'type': 'connection.ok', 'connection_id': 'late'});
 
-          expect(tester.connectionState, isA<Disconnecting>());
+          expect(tester.connectionState, isA<Disconnected>());
           tester.server.socket.sink.completeClose();
         },
       );

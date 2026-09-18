@@ -2,6 +2,7 @@ import '../../errors.dart' show StreamApiException, StreamNetworkException;
 import '../../logger.dart';
 import '../../utils.dart';
 import '../events/ws_request.dart';
+import 'web_socket_connection_attempt.dart';
 import 'web_socket_connection_state.dart';
 
 /// A function that sends a request over a connection that is not usable yet.
@@ -45,9 +46,6 @@ class WebSocketAuthenticationHandler {
   final WsRequestSender _send;
   final void Function(Object error, StackTrace? stackTrace) _onFailure;
 
-  // Identifies the attempt in flight: an authenticator can outlive the one that started it.
-  var _attempt = 0;
-
   /// The error the server closed the previous attempt with, if it sent one.
   ///
   /// Becomes null once the attempt that read it finishes, or once a connection is established. An
@@ -57,13 +55,9 @@ class WebSocketAuthenticationHandler {
 
   /// Takes in a connection state change.
   ///
-  /// A [Connecting] state begins an attempt and a closure ends one, after which an authenticator
-  /// still running for it can neither send nor report a failure: whatever it comes back with
-  /// describes a connection that is already gone. Every other state only updates [previousError],
-  /// which is left alone unless the server refused or the caller took over.
+  /// Updates [previousError], which is left alone unless the server refused or the caller took
+  /// over. Whether an attempt is still the one in flight is the attempt's own business.
   void onConnectionStateChanged(WebSocketConnectionState state) {
-    if (state case Connecting() || Disconnecting() || Disconnected()) _attempt++;
-
     _previousError = switch (state) {
       Connected() => null,
       // The caller took control; what they connect with next may have nothing to do with the refusal.
@@ -84,35 +78,32 @@ class WebSocketAuthenticationHandler {
   ///
   /// An error the authenticator throws is passed to `onFailure` instead of escaping, unless the
   /// attempt has since been abandoned, which leaves nothing to report it against.
-  Future<void> authenticate() async {
+  Future<void> authenticate(WebSocketConnectionAttempt attempt) async {
     final authenticate = _authenticator;
     if (authenticate == null) return _previousError = null;
 
-    final attempt = _attempt;
     final previousError = _previousError;
-    _logger.d(() => 'authenticate attempt #$attempt, previousError: $previousError');
+    _logger.d(() => 'authenticating, previousError: $previousError');
 
     // Guarded because nothing awaits this: an error thrown here would go unhandled.
     final result = await runSafely(() => authenticate(_senderFor(attempt), previousError));
 
     // Stale: its failure would close the connection that replaced it, and never be reconnected.
-    if (attempt != _attempt) {
-      return _logger.d(() => 'attempt #$attempt is stale, dropping its outcome: $result');
-    }
+    if (attempt.hasEnded) return _logger.d(() => 'the attempt ended, dropping its outcome: $result');
 
     // Spent, unless the server refused something newer while the authenticator ran. By identity,
     // not equality: a newer refusal of the same kind compares equal to this one.
     if (identical(_previousError, previousError)) _previousError = null;
 
     if (result case Failure(:final error, :final stackTrace)) {
-      _logger.w(() => 'attempt #$attempt could not be authenticated', error: error, stackTrace: stackTrace);
+      _logger.w(() => 'the attempt could not be authenticated', error: error, stackTrace: stackTrace);
       return _onFailure(error, stackTrace);
     }
   }
 
   // The sender is held across the authenticator's own awaits, so the attempt is checked on each send.
-  WsRequestSender _senderFor(int attempt) => (request) {
-    if (attempt == _attempt) return _send(request);
+  WsRequestSender _senderFor(WebSocketConnectionAttempt attempt) => (request) {
+    if (!attempt.hasEnded) return _send(request);
 
     const error = StreamNetworkException(
       message: 'The connection attempt was abandoned before its credentials were sent',

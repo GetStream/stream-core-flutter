@@ -118,7 +118,10 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
       _wsSubscription = null;
 
       await subscription?.cancel();
-      await ws?.sink.close(closeCode, closeReason);
+
+      // Asked for, not waited on: a peer answers a close on its own schedule, and a socket still
+      // shaking hands never answers at all.
+      ws?.sink.close(closeCode, closeReason).ignore();
 
       // A new socket can open while this one closes, and must not be brought down by its closure.
       if (_ws == null) _listener?.onClose(closeCode, closeReason);

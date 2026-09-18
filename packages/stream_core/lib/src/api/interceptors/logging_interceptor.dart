@@ -282,6 +282,29 @@ class LoggingInterceptor extends Interceptor {
 
   String _indent([int tabCount = initialTab]) => tabStep * tabCount;
 
+  // Reports [entry] on one line, cut to [maxWidth] with the count of what was dropped in its place.
+  // Cut here rather than left to whatever reads these: a platform that cuts a line of its own
+  // accord says nothing about having done so, and takes the rest of the record with it.
+  void _printCompact(void Function(Object) logPrint, String indent, String entry) {
+    final prefix = '║$indent ';
+    final room = math.max(1, maxWidth - prefix.length);
+    if (entry.length <= room) return logPrint('$prefix$entry');
+
+    final omitted = ' … +${entry.length - room} chars';
+    final kept = math.max(0, room - omitted.length);
+    return logPrint('$prefix${entry.substring(0, kept)}$omitted');
+  }
+
+  // Reports [entry] over as many lines as it takes, each of them inside the box.
+  void _printWrapped(void Function(Object) logPrint, String indent, String entry) {
+    final prefix = '║$indent ';
+    final room = math.max(1, maxWidth - prefix.length);
+
+    for (var i = 0; i < entry.length; i += room) {
+      logPrint('$prefix${entry.substring(i, math.min(i + room, entry.length))}');
+    }
+  }
+
   void _printPrettyMap(
     void Function(Object) logPrint,
     Map<dynamic, dynamic> data, {
@@ -302,39 +325,31 @@ class LoggingInterceptor extends Interceptor {
       if (value is String) {
         value = '"${value.replaceAll(RegExp(r'(\r|\n)+'), " ")}"';
       }
+      final indent = _indent(indentedTabs);
       if (value is Map) {
         if (compact) {
-          logPrint(
-            '║${_indent(indentedTabs)} $key: $value${!isLast ? ',' : ''}',
-          );
+          _printCompact(logPrint, indent, '$key: $value${!isLast ? ',' : ''}');
         } else {
-          logPrint('║${_indent(indentedTabs)} $key: {');
+          logPrint('║$indent $key: {');
           _printPrettyMap(logPrint, value, tabs: indentedTabs);
         }
       } else if (value is List) {
         if (compact) {
-          logPrint('║${_indent(indentedTabs)} $key: $value');
+          _printCompact(logPrint, indent, '$key: $value');
         } else {
-          logPrint('║${_indent(indentedTabs)} $key: [');
+          logPrint('║$indent $key: [');
           _printList(logPrint, value, tabs: indentedTabs);
-          logPrint('║${_indent(indentedTabs)} ]${isLast ? '' : ','}');
+          logPrint('║$indent ]${isLast ? '' : ','}');
         }
       } else {
         final msg = value.toString().replaceAll('\n', '');
-        final indent = _indent(indentedTabs);
-        final linWidth = maxWidth - indent.length;
-        if (msg.length + indent.length > linWidth) {
-          final lines = (msg.length / linWidth).ceil();
-          for (var i = 0; i < lines; ++i) {
-            logPrint(
-              '║${_indent(indentedTabs)} ${msg.substring(
-                i * linWidth,
-                math.min<int>(i * linWidth + linWidth, msg.length),
-              )}',
-            );
-          }
+        final entry = '$key: $msg${!isLast ? ',' : ''}';
+
+        // Wrapped rather than cut, so nothing a caller asked to see in full goes missing.
+        if (compact) {
+          _printCompact(logPrint, indent, entry);
         } else {
-          logPrint('║${_indent(indentedTabs)} $key: $msg${!isLast ? ',' : ''}');
+          _printWrapped(logPrint, indent, entry);
         }
       }
     });
@@ -351,7 +366,7 @@ class LoggingInterceptor extends Interceptor {
       final isLast = i == list.length - 1;
       if (e is Map) {
         if (compact) {
-          logPrint('║${_indent(tabs)}  $e${!isLast ? ',' : ''}');
+          _printCompact(logPrint, '${_indent(tabs)} ', '$e${!isLast ? ',' : ''}');
         } else {
           _printPrettyMap(
             logPrint,
