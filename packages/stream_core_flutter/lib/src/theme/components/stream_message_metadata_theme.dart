@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:stream_core/stream_core.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import '../../utils/standard.dart';
 import 'stream_message_style_property.dart';
 
 part 'stream_message_metadata_theme.g.theme.dart';
