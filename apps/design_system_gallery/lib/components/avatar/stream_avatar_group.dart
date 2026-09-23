@@ -166,9 +166,9 @@ class _SizeCard extends StatelessWidget {
         child: Row(
           children: [
             // Avatar group preview
-            SizedBox(
-              width: 80,
-              height: 80,
+            // Sized for the largest variant so every size previews unclipped.
+            SizedBox.square(
+              dimension: StreamAvatarGroupSize.values.last.value,
               child: Center(
                 child: StreamAvatarGroup(
                   size: size,
