@@ -24,7 +24,10 @@ enum StreamBadgeCountSize {
   md(32),
 
   /// Large badge (40px height).
-  lg(40);
+  lg(40),
+
+  /// Extra large badge (56px height).
+  xl(56);
 
   /// Constructs a [StreamBadgeCountSize] with the given height.
   const StreamBadgeCountSize(this.value);

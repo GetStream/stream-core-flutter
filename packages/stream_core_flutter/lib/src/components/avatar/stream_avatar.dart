@@ -286,7 +286,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     .sm || .md => textTheme.captionEmphasis,
     .lg => textTheme.bodyEmphasis,
     .xl => textTheme.headingMd,
-    .xxl => textTheme.headingLg,
+    .xlPlus || .xxl || .xxxl => textTheme.headingLg,
   };
 
   // Returns the appropriate icon size for the given avatar size.
@@ -298,7 +298,7 @@ class DefaultStreamAvatar extends StatelessWidget {
     .md => 16,
     .lg => 20,
     .xl => 24,
-    .xxl => 32,
+    .xlPlus || .xxl || .xxxl => 32,
   };
 }
 
