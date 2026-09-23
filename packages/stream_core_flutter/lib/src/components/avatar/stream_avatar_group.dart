@@ -5,7 +5,6 @@ import '../../theme/components/stream_avatar_theme.dart';
 import '../../theme/components/stream_badge_count_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../badge/stream_badge_count.dart';
-import 'internal/avatar_dimension_override.dart';
 import 'stream_avatar.dart';
 
 /// Predefined avatar group sizes.
@@ -182,7 +181,6 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
 
     final effectiveSize = props.size ?? StreamAvatarGroupSize.lg;
     final avatarSize = _avatarSizeForGroupSize(effectiveSize);
-    final avatarDimension = _avatarDimensionForGroupSize(effectiveSize);
     final badgeCountSize = _badgeCountSizeForGroupSize(effectiveSize);
 
     const avatarBorderWidth = 2.0;
@@ -206,17 +204,14 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
           ),
           child: StreamBadgeCountTheme(
             data: StreamBadgeCountThemeData(size: badgeCountSize),
-            child: _MaybeAvatarDimension(
-              dimension: avatarDimension,
-              child: Builder(
-                builder: (context) => switch (props.children.length) {
-                  1 => _buildForOne(context, props.children),
-                  2 => _buildForTwo(context, props.children),
-                  3 => _buildForThree(context, props.children),
-                  4 => _buildForFour(context, props.children),
-                  _ => _buildForFourOrMore(context, props.children),
-                },
-              ),
+            child: Builder(
+              builder: (context) => switch (props.children.length) {
+                1 => _buildForOne(context, props.children),
+                2 => _buildForTwo(context, props.children),
+                3 => _buildForThree(context, props.children),
+                4 => _buildForFour(context, props.children),
+                _ => _buildForFourOrMore(context, props.children),
+              },
             ),
           ),
         ),
@@ -404,16 +399,7 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
     .lg => StreamAvatarSize.sm,
     .xl => StreamAvatarSize.md,
     .xxl => StreamAvatarSize.xl,
-    // Children here are 64px, which no size names. They take the metrics of
-    // the next size up and are shrunk to fit by [_avatarDimensionForGroupSize].
-    .xxxl => StreamAvatarSize.xxl,
-  };
-
-  // Returns the child diameter for the given group size, when it is not the
-  // diameter the child's own size names.
-  double? _avatarDimensionForGroupSize(StreamAvatarGroupSize size) => switch (size) {
-    .lg || .xl || .xxl => null,
-    .xxxl => 64,
+    .xxxl => StreamAvatarSize.xlPlus,
   };
 
   // Returns the appropriate badge count size for the given group size.
@@ -425,22 +411,4 @@ class DefaultStreamAvatarGroup extends StatelessWidget {
     .xxl => StreamBadgeCountSize.lg,
     .xxxl => StreamBadgeCountSize.xl,
   };
-}
-
-// Applies an [AvatarDimensionOverride] when the group packs its children at a
-// diameter their own size does not name, and gets out of the way otherwise.
-class _MaybeAvatarDimension extends StatelessWidget {
-  const _MaybeAvatarDimension({required this.dimension, required this.child});
-
-  final double? dimension;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    if (dimension case final dimension?) {
-      return AvatarDimensionOverride(dimension: dimension, child: child);
-    }
-
-    return child;
-  }
 }

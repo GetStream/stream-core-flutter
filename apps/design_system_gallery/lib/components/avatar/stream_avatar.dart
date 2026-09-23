@@ -130,6 +130,7 @@ class _SizeCard extends StatelessWidget {
       StreamAvatarSize.md => 'Message bubbles, comments',
       StreamAvatarSize.lg => 'Profile headers, user cards',
       StreamAvatarSize.xl => 'Channel list items, conversation lists',
+      StreamAvatarSize.xlPlus => 'Group avatars on ringing call screens',
       StreamAvatarSize.xxl => 'Hero sections, large profile displays',
       StreamAvatarSize.xxxl => 'Ringing call screens, full-screen profiles',
     };

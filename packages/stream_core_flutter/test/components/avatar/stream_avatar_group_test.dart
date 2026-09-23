@@ -110,9 +110,6 @@ void main() {
   });
 
   group('StreamAvatarGroup sizing', () {
-    // Every size but the largest packs children at a diameter some
-    // StreamAvatarSize names. The largest does not, so it is the one that can
-    // silently regress to the size its children would otherwise resolve to.
     for (final (groupSize, childDiameter) in const [
       (StreamAvatarGroupSize.lg, 24.0),
       (StreamAvatarGroupSize.xl, 32.0),

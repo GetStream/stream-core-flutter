@@ -11,6 +11,8 @@
   controls inside a floating surface such as a menu or popover.
 - Added `StreamAvatarSize.xxxl` (104px) and `StreamAvatarGroupSize.xxxl`
   (104px), the size the ringing call screens are built on.
+- Added `StreamAvatarSize.xlPlus` (64px), the size of each avatar inside a
+  104px avatar group.
 - Added `StreamOnlineIndicatorSize.xxxl` (24px), the presence badge that pairs
   with a 104px avatar.
 - Added `StreamBadgeCountSize.xl` (56px), the overflow badge of a 104px avatar
