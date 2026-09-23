@@ -9,10 +9,7 @@
   background and foreground color per style.
 - Added `StreamColorScheme.backgroundOnElevation` and `borderOnElevation`, for
   controls inside a floating surface such as a menu or popover.
-- Added `StreamAvatarSize.xlPlus` (64px) and `StreamAvatarSize.xxxl` (104px).
-- Added `StreamAvatarGroupSize.xxxl` (104px).
-- Added `StreamOnlineIndicatorSize.xxxl` (24px).
-- Added `StreamBadgeCountSize.xl` (56px).
+- Added `StreamAvatarSize.xlPlus` (64px), `StreamAvatarSize.xxxl` (104px), `StreamAvatarGroupSize.xxxl` (104px), `StreamOnlineIndicatorSize.xxxl` (24px) and `StreamBadgeCountSize.xl` (56px).
 
 ### 🐛 Bug Fixes
 
