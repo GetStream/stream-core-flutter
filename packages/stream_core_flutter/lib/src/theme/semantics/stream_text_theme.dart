@@ -51,6 +51,7 @@ class StreamTextTheme with _$StreamTextTheme {
     TextStyle? metadataEmphasis,
     TextStyle? metadataLink,
     TextStyle? metadataLinkEmphasis,
+    TextStyle? numericXxl,
     TextStyle? numericXl,
     TextStyle? numericLg,
     TextStyle? numericMd,
@@ -184,6 +185,13 @@ class StreamTextTheme with _$StreamTextTheme {
     );
 
     // Numeric styles
+    numericXxl ??= TextStyle(
+      fontSize: fontSize.lg,
+      fontWeight: fontWeight.bold,
+      height: 1,
+      fontStyle: FontStyle.normal,
+      decoration: TextDecoration.none,
+    );
     numericXl ??= TextStyle(
       fontSize: fontSize.sm,
       fontWeight: fontWeight.bold,
@@ -230,6 +238,7 @@ class StreamTextTheme with _$StreamTextTheme {
       metadataEmphasis: metadataEmphasis,
       metadataLink: metadataLink,
       metadataLinkEmphasis: metadataLinkEmphasis,
+      numericXxl: numericXxl,
       numericXl: numericXl,
       numericLg: numericLg,
       numericMd: numericMd,
@@ -254,6 +263,7 @@ class StreamTextTheme with _$StreamTextTheme {
     required this.metadataEmphasis,
     required this.metadataLink,
     required this.metadataLinkEmphasis,
+    required this.numericXxl,
     required this.numericXl,
     required this.numericLg,
     required this.numericMd,
@@ -344,6 +354,11 @@ class StreamTextTheme with _$StreamTextTheme {
   ///
   /// Uses semibold weight, xs font size, and tight line height.
   final TextStyle metadataLinkEmphasis;
+
+  /// Double extra large numeric text style for the largest badge counts.
+  ///
+  /// Uses bold weight, lg font size, and 100% line height.
+  final TextStyle numericXxl;
 
   /// Extra large numeric text style for timestamps and delivery status.
   ///
@@ -567,6 +582,17 @@ class StreamTextTheme with _$StreamTextTheme {
       decoration: decoration,
     ),
     metadataLinkEmphasis: metadataLinkEmphasis.apply(
+      color: color,
+      package: package,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+      heightFactor: heightFactor,
+      heightDelta: heightDelta,
+      fontSizeFactor: fontSizeFactor,
+      fontSizeDelta: fontSizeDelta,
+      decoration: decoration,
+    ),
+    numericXxl: numericXxl.apply(
       color: color,
       package: package,
       fontFamily: fontFamily,

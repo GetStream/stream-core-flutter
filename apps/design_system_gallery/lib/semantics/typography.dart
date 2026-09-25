@@ -89,6 +89,7 @@ class _TypeScale extends StatelessWidget {
         'NUMERIC',
         'Numbers and counters',
         [
+          ('numericXxl', textTheme.numericXxl, 'Largest badge counts'),
           ('numericXl', textTheme.numericXl, 'Timestamps, delivery status'),
           ('numericLg', textTheme.numericLg, 'Badges, avatar initials'),
           ('numericMd', textTheme.numericMd, 'Small badge counts'),
@@ -439,6 +440,7 @@ class _CompleteReference extends StatelessWidget {
                   _SizeTag(
                     label: 'numeric',
                     sizes: _sizesOf([
+                      textTheme.numericXxl,
                       textTheme.numericXl,
                       textTheme.numericLg,
                       textTheme.numericMd,
