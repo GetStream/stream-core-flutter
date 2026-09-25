@@ -62,6 +62,7 @@ mixin _$StreamTextTheme {
         b.metadataLinkEmphasis,
         t,
       )!,
+      numericXxl: TextStyle.lerp(a.numericXxl, b.numericXxl, t)!,
       numericXl: TextStyle.lerp(a.numericXl, b.numericXl, t)!,
       numericLg: TextStyle.lerp(a.numericLg, b.numericLg, t)!,
       numericMd: TextStyle.lerp(a.numericMd, b.numericMd, t)!,
@@ -86,6 +87,7 @@ mixin _$StreamTextTheme {
     TextStyle? metadataEmphasis,
     TextStyle? metadataLink,
     TextStyle? metadataLinkEmphasis,
+    TextStyle? numericXxl,
     TextStyle? numericXl,
     TextStyle? numericLg,
     TextStyle? numericMd,
@@ -110,6 +112,7 @@ mixin _$StreamTextTheme {
       metadataEmphasis: metadataEmphasis ?? _this.metadataEmphasis,
       metadataLink: metadataLink ?? _this.metadataLink,
       metadataLinkEmphasis: metadataLinkEmphasis ?? _this.metadataLinkEmphasis,
+      numericXxl: numericXxl ?? _this.numericXxl,
       numericXl: numericXl ?? _this.numericXl,
       numericLg: numericLg ?? _this.numericLg,
       numericMd: numericMd ?? _this.numericMd,
@@ -149,6 +152,7 @@ mixin _$StreamTextTheme {
       metadataLinkEmphasis: _this.metadataLinkEmphasis.merge(
         other.metadataLinkEmphasis,
       ),
+      numericXxl: _this.numericXxl.merge(other.numericXxl),
       numericXl: _this.numericXl.merge(other.numericXl),
       numericLg: _this.numericLg.merge(other.numericLg),
       numericMd: _this.numericMd.merge(other.numericMd),
@@ -185,6 +189,7 @@ mixin _$StreamTextTheme {
         _other.metadataEmphasis == _this.metadataEmphasis &&
         _other.metadataLink == _this.metadataLink &&
         _other.metadataLinkEmphasis == _this.metadataLinkEmphasis &&
+        _other.numericXxl == _this.numericXxl &&
         _other.numericXl == _this.numericXl &&
         _other.numericLg == _this.numericLg &&
         _other.numericMd == _this.numericMd &&
@@ -213,6 +218,7 @@ mixin _$StreamTextTheme {
       _this.metadataEmphasis,
       _this.metadataLink,
       _this.metadataLinkEmphasis,
+      _this.numericXxl,
       _this.numericXl,
       _this.numericLg,
       _this.numericMd,

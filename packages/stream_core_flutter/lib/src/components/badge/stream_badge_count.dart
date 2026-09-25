@@ -251,9 +251,7 @@ class DefaultStreamBadgeCount extends StatelessWidget {
   ) => switch (size) {
     .xs => textTheme.numericMd,
     .sm || .md || .lg => textTheme.numericXl,
-    // The design ships no numeric style at this size; the largest badge is
-    // drawn in the heading style the design uses for it.
-    .xl => textTheme.headingMd,
+    .xl => textTheme.numericXxl,
   };
 
   // Returns the appropriate padding for the given badge size.
