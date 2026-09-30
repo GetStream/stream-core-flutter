@@ -90,7 +90,8 @@ class StreamBadgeNotification extends StatelessWidget {
   ///
   /// If [child] is provided, the badge is automatically positioned relative
   /// to the child using a [Stack], similar to Flutter's [Badge] widget.
-  /// Use [alignment] and [offset] to fine-tune placement.
+  /// Use [alignment] and [offset] to fine-tune placement. The badge does not
+  /// respond to pointer events, so taps on it reach [child].
   StreamBadgeNotification({
     super.key,
     StreamBadgeNotificationType? type,
@@ -170,6 +171,9 @@ class StreamBadgeNotificationProps {
   ///
   /// When provided, the badge is positioned relative to this child
   /// using a [Stack]. When null, only the badge is displayed.
+  ///
+  /// The badge does not respond to pointer events, so taps on it reach this
+  /// child.
   final Widget? child;
 
   /// The alignment of the badge relative to [child].
@@ -259,12 +263,14 @@ class DefaultStreamBadgeNotification extends StatelessWidget {
       children: [
         props.child!,
         Positioned.fill(
-          child: FittedBox(
-            fit: BoxFit.none,
-            alignment: effectiveAlignment,
-            child: Transform.translate(
-              offset: effectiveOffset,
-              child: badge,
+          child: IgnorePointer(
+            child: FittedBox(
+              fit: BoxFit.none,
+              alignment: effectiveAlignment,
+              child: Transform.translate(
+                offset: effectiveOffset,
+                child: badge,
+              ),
             ),
           ),
         ),

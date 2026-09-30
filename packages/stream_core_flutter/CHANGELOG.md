@@ -19,6 +19,8 @@
 - Fixed `lerp` on a theme style whose border side is set on one end only. It now
   steps at the midpoint instead of applying the non-null side across the whole
   transition.
+- Fixed `StreamBadgeNotification` with a `child` swallowing taps on the badge;
+  they now reach the child.
 
 ### 🔄 Changed
 
