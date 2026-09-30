@@ -41,7 +41,7 @@ command:
       shimmer: ^3.0.0
       stream_core: '>=0.4.0 <0.6.0'
       stream_core_flutter: ^0.5.0
-      stream_thumbnail: ^0.1.0
+      stream_thumbnail: ^0.2.0
       svg_icon_widget: ^0.0.1+1
       theme_extensions_builder_annotation: ^7.1.0
       unicode_emojis: ^0.5.1
