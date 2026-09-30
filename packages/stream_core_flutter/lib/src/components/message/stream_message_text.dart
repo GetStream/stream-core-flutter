@@ -10,7 +10,6 @@ import '../../theme/primitives/stream_colors.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
-import '../../utils/standard.dart';
 import '../accessories/stream_emoji.dart';
 import '../message_layout/stream_message_layout.dart';
 
@@ -339,28 +338,18 @@ class DefaultStreamMessageText extends StatelessWidget {
       effectiveTextStyle = effectiveTextStyle.merge(emojiStyle);
     }
 
-    final streamThemeData = Theme.of(context).let(
-      (it) => it.copyWith(
-        textTheme: it.textTheme.apply(
-          bodyColor: effectiveTextStyle.color,
-          decoration: effectiveTextStyle.decoration,
-          decorationColor: effectiveTextStyle.decorationColor,
-          decorationStyle: effectiveTextStyle.decorationStyle,
-          fontFamily: effectiveTextStyle.fontFamily,
-          fontFamilyFallback: effectiveTextStyle.fontFamilyFallback,
-        ),
-      ),
+    final markdownSheet = _resolveMarkdownStyleSheet(
+      theme: Theme.of(context),
+      textStyle: effectiveTextStyle,
+      linkStyle: effectiveLinkStyle,
+      styleSheet: props.styleSheet,
     );
-
-    final markdownSheet = MarkdownStyleSheet.fromTheme(
-      streamThemeData, // Apply stream theme data
-    ).copyWith(p: effectiveTextStyle, a: effectiveLinkStyle).merge(props.styleSheet);
 
     // Prepend mention syntax so `[text](mention[-type]:id)` is intercepted
     // before the standard LinkSyntax, producing `mention` elements.
     // Regular `a` elements are never touched.
     final effectiveInlineSyntaxes = [
-      _StreamMentionSyntax(),
+      _mentionSyntax,
       ...?props.inlineSyntaxes,
     ];
 
@@ -401,6 +390,49 @@ class DefaultStreamMessageText extends StatelessWidget {
         fitContent: props.fitContent,
       ),
     );
+  }
+
+  // The syntax is stateless, so every message shares one instance instead of
+  // compiling its pattern again on each build.
+  static final _mentionSyntax = _StreamMentionSyntax();
+
+  // Style sheets already built from a theme, keyed by the other inputs. Every
+  // message in a list resolves the same few combinations, and building a sheet
+  // from scratch is a large share of a message's build cost. Held weakly on the
+  // theme, so a replaced theme takes its sheets with it.
+  static final _styleSheetCache = Expando<Map<(TextStyle, TextStyle, MarkdownStyleSheet?), MarkdownStyleSheet>>();
+
+  // Upper bound on the combinations cached per theme; each jumbomoji size and
+  // each message alignment with its own text style adds one.
+  static const _maxStyleSheetsPerTheme = 32;
+
+  static MarkdownStyleSheet _resolveMarkdownStyleSheet({
+    required ThemeData theme,
+    required TextStyle textStyle,
+    required TextStyle linkStyle,
+    required MarkdownStyleSheet? styleSheet,
+  }) {
+    final cache = _styleSheetCache[theme] ??= {};
+    final key = (textStyle, linkStyle, styleSheet);
+    if (cache[key] case final cached?) return cached;
+
+    final streamThemeData = theme.copyWith(
+      textTheme: theme.textTheme.apply(
+        bodyColor: textStyle.color,
+        decoration: textStyle.decoration,
+        decorationColor: textStyle.decorationColor,
+        decorationStyle: textStyle.decorationStyle,
+        fontFamily: textStyle.fontFamily,
+        fontFamilyFallback: textStyle.fontFamilyFallback,
+      ),
+    );
+
+    final sheet = MarkdownStyleSheet.fromTheme(
+      streamThemeData,
+    ).copyWith(p: textStyle, a: linkStyle).merge(styleSheet);
+
+    if (cache.length >= _maxStyleSheetsPerTheme) cache.clear();
+    return cache[key] = sheet;
   }
 
   // Resolves one text style per mention kind. Each variant-specific lookup

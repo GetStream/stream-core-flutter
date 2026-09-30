@@ -1,3 +1,9 @@
+## Upcoming
+
+### 🔄 Changed
+
+- Improved `StreamMessageText` build performance in long message lists.
+
 ## 0.5.2
 
 ### ✨ Features
