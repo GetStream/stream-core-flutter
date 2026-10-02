@@ -21,7 +21,7 @@ void main() {
     expect(redSheet.p?.color, Colors.red);
   });
 
-  testWidgets('StreamMessageText applies each message its own style sheet override', (tester) async {
+  testWidgets("StreamMessageText keeps each message's style sheet override separate", (tester) async {
     await _pumpMessageTexts(tester, [
       StreamMessageText('Visible', styleSheet: MarkdownStyleSheet(tableScrollbarThumbVisibility: true)),
       StreamMessageText('Hidden', styleSheet: MarkdownStyleSheet(tableScrollbarThumbVisibility: false)),
@@ -37,14 +37,17 @@ void main() {
     final theme = ThemeData(extensions: [StreamTheme()]);
 
     await _pumpMessageTexts(tester, [StreamMessageText('Hello')], theme: theme);
+    final [before] = _styleSheetsOf(tester);
+    expect(before.h1?.fontSize, isNot(headline.fontSize));
+
     await _pumpMessageTexts(
       tester,
       [StreamMessageText('Hello')],
       theme: theme.copyWith(textTheme: theme.textTheme.copyWith(headlineSmall: headline)),
     );
 
-    final [sheet] = _styleSheetsOf(tester);
-    expect(sheet.h1?.fontSize, headline.fontSize);
+    final [after] = _styleSheetsOf(tester);
+    expect(after.h1?.fontSize, headline.fontSize);
   });
 }
 
