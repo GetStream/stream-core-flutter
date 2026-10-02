@@ -1,3 +1,0 @@
-# Icons deprecated and replaced with a new one, following `deprecated;replacement;included` pattern.
-# Deprecated icons are kept around for some time, but will be removed at some point. When included is `false` we do keep the code points of other icons in the right order.
-more;more-horizontal;true
