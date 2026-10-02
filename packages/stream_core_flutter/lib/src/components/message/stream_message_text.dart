@@ -391,23 +391,15 @@ class DefaultStreamMessageText extends StatelessWidget {
     );
   }
 
-  // The syntax is stateless, so every message shares one instance instead of
-  // compiling its pattern again on each build.
+  // Stateless, so shared instead of recompiling its pattern on every build.
   static final _mentionSyntax = _StreamMentionSyntax();
 
-  // Style sheets already built from a theme, keyed by the text and link style.
-  // Every message in a list resolves the same few combinations, and building a
-  // sheet from scratch is a large share of a message's build cost. Held weakly
-  // on the theme, so a replaced theme takes its sheets with it.
-  //
-  // The caller's style sheet is merged after the lookup rather than keyed on,
-  // because `MarkdownStyleSheet.==` ignores some of the fields that `merge`
-  // copies, so two different sheets could otherwise share one entry. A message
-  // with its own style sheet therefore gets a fresh merged sheet on each build.
+  // Shared across messages because building a sheet is costly.
+  // The caller's sheet is merged after the lookup, not keyed on, because
+  // `MarkdownStyleSheet.==` ignores some fields.
   static final _styleSheetCache = Expando<Map<(TextStyle, TextStyle), MarkdownStyleSheet>>();
 
-  // Upper bound on the combinations cached per theme; each jumbomoji size and
-  // each message alignment with its own text style adds one.
+  // Each jumbomoji size and alignment-specific text style adds an entry.
   static const _maxStyleSheetsPerTheme = 32;
 
   static MarkdownStyleSheet _resolveMarkdownStyleSheet({
