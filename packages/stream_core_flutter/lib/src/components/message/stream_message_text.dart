@@ -342,8 +342,7 @@ class DefaultStreamMessageText extends StatelessWidget {
       theme: Theme.of(context),
       textStyle: effectiveTextStyle,
       linkStyle: effectiveLinkStyle,
-      styleSheet: props.styleSheet,
-    );
+    ).merge(props.styleSheet);
 
     // Prepend mention syntax so `[text](mention[-type]:id)` is intercepted
     // before the standard LinkSyntax, producing `mention` elements.
@@ -396,11 +395,16 @@ class DefaultStreamMessageText extends StatelessWidget {
   // compiling its pattern again on each build.
   static final _mentionSyntax = _StreamMentionSyntax();
 
-  // Style sheets already built from a theme, keyed by the other inputs. Every
-  // message in a list resolves the same few combinations, and building a sheet
-  // from scratch is a large share of a message's build cost. Held weakly on the
-  // theme, so a replaced theme takes its sheets with it.
-  static final _styleSheetCache = Expando<Map<(TextStyle, TextStyle, MarkdownStyleSheet?), MarkdownStyleSheet>>();
+  // Style sheets already built from a theme, keyed by the text and link style.
+  // Every message in a list resolves the same few combinations, and building a
+  // sheet from scratch is a large share of a message's build cost. Held weakly
+  // on the theme, so a replaced theme takes its sheets with it.
+  //
+  // The caller's style sheet is merged after the lookup rather than keyed on,
+  // because `MarkdownStyleSheet.==` ignores some of the fields that `merge`
+  // copies, so two different sheets could otherwise share one entry. A message
+  // with its own style sheet therefore gets a fresh merged sheet on each build.
+  static final _styleSheetCache = Expando<Map<(TextStyle, TextStyle), MarkdownStyleSheet>>();
 
   // Upper bound on the combinations cached per theme; each jumbomoji size and
   // each message alignment with its own text style adds one.
@@ -410,10 +414,9 @@ class DefaultStreamMessageText extends StatelessWidget {
     required ThemeData theme,
     required TextStyle textStyle,
     required TextStyle linkStyle,
-    required MarkdownStyleSheet? styleSheet,
   }) {
     final cache = _styleSheetCache[theme] ??= {};
-    final key = (textStyle, linkStyle, styleSheet);
+    final key = (textStyle, linkStyle);
     if (cache[key] case final cached?) return cached;
 
     final streamThemeData = theme.copyWith(
@@ -429,9 +432,9 @@ class DefaultStreamMessageText extends StatelessWidget {
 
     final sheet = MarkdownStyleSheet.fromTheme(
       streamThemeData,
-    ).copyWith(p: textStyle, a: linkStyle).merge(styleSheet);
+    ).copyWith(p: textStyle, a: linkStyle);
 
-    if (cache.length >= _maxStyleSheetsPerTheme) cache.clear();
+    if (cache.length >= _maxStyleSheetsPerTheme) cache.remove(cache.keys.first);
     return cache[key] = sheet;
   }
 
