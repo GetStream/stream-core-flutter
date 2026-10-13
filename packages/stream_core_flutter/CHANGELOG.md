@@ -1,5 +1,9 @@
 ## Upcoming
 
+### ✨ Features
+
+- Added `StreamTypingIndicatorDots` and `StreamTypingIndicatorDotsTheme`.
+
 ### 🔄 Changed
 
 - Improved `StreamMessageText` build performance in long message lists.

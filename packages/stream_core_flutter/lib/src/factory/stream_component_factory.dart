@@ -22,6 +22,7 @@ import '../components/common/stream_network_image.dart';
 import '../components/common/stream_progress_bar.dart';
 import '../components/common/stream_skeleton_loading.dart';
 import '../components/common/stream_text_input.dart';
+import '../components/common/stream_typing_indicator_dots.dart';
 import '../components/context_menu/stream_context_menu_action.dart';
 import '../components/controls/stream_command_chip.dart';
 import '../components/controls/stream_emoji_chip.dart';
@@ -228,6 +229,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamStepperProps>? stepper,
     StreamComponentBuilder<StreamTextInputProps>? textInput,
     StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
+    StreamComponentBuilder<StreamTypingIndicatorDotsProps>? typingIndicatorDots,
     StreamComponentBuilder<StreamImageSourceBadgeProps>? imageSourceBadge,
     StreamComponentBuilder<StreamJumpToUnreadButtonProps>? jumpToUnreadButton,
     Iterable<StreamComponentBuilderExtension<Object>>? extensions,
@@ -283,6 +285,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       stepper: stepper,
       textInput: textInput,
       toggleSwitch: toggleSwitch,
+      typingIndicatorDots: typingIndicatorDots,
       imageSourceBadge: imageSourceBadge,
       jumpToUnreadButton: jumpToUnreadButton,
       extensions: _extensionIterableToMap(extensions),
@@ -339,6 +342,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.stepper,
     required this.textInput,
     required this.toggleSwitch,
+    required this.typingIndicatorDots,
     required this.imageSourceBadge,
     required this.jumpToUnreadButton,
     required this.extensions,
@@ -614,6 +618,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamSwitch] uses [DefaultStreamSwitch].
   final StreamComponentBuilder<StreamSwitchProps>? toggleSwitch;
+
+  /// Custom builder for typing indicator dots widgets.
+  ///
+  /// When null, [StreamTypingIndicatorDots] uses [DefaultStreamTypingIndicatorDots].
+  final StreamComponentBuilder<StreamTypingIndicatorDotsProps>? typingIndicatorDots;
 
   /// Custom builder for source badge widgets.
   ///
