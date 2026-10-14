@@ -44,8 +44,8 @@ void main() {
       _painterOf(tester),
       paints
         ..circle(x: 2.5, y: 2.5, radius: 2.5, color: color)
-        ..circle(x: 11.5, y: 2.5, radius: 2.5, color: color.withValues(alpha: 0.5))
-        ..circle(x: 20.5, y: 2.5, radius: 2.5, color: color.withValues(alpha: 0.25)),
+        ..circle(x: 11.5, y: 2.5, radius: 2.5, color: color.withValues(alpha: 0.75))
+        ..circle(x: 20.5, y: 2.5, radius: 2.5, color: color.withValues(alpha: 0.5)),
     );
   });
 
@@ -80,8 +80,8 @@ void main() {
       _painterOf(tester),
       paints
         ..circle(x: 20.5, color: color)
-        ..circle(x: 11.5, color: color.withValues(alpha: 0.5))
-        ..circle(x: 2.5, color: color.withValues(alpha: 0.25)),
+        ..circle(x: 11.5, color: color.withValues(alpha: 0.75))
+        ..circle(x: 2.5, color: color.withValues(alpha: 0.5)),
     );
   });
 

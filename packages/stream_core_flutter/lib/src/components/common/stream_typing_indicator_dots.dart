@@ -239,7 +239,7 @@ class _TypingIndicatorDotsPainter extends CustomPainter {
   static const _restingOpacity = 0.25;
 
   // Shown instead of the animation when the platform asks for reduced motion.
-  static const _staticOpacities = [1.0, 0.5, 0.25];
+  static const _staticOpacities = [1.0, 0.75, 0.5];
 
   final Animation<double> progress;
   final bool animate;
