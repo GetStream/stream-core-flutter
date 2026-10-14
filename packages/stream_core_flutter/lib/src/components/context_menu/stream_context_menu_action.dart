@@ -21,7 +21,9 @@ import 'stream_context_menu.dart';
 /// disabled) and can be fully customized via [StreamContextMenuActionTheme].
 ///
 /// Each action carries a [value], and when tapped the default implementation
-/// calls [Navigator.pop] with that value so the dialog caller can handle it.
+/// calls [Navigator.pop] with that value so the dialog caller can handle it,
+/// unless the enclosing [StreamContextMenu] sets
+/// [StreamContextMenu.dismissesRoute] to false.
 /// Use [enabled] to control whether the action is interactive (disabled actions
 /// remain visible but are not tappable).
 ///
@@ -366,8 +368,10 @@ class DefaultStreamContextMenuAction<T> extends StatelessWidget {
       //
       // The guard ensures we only pop when the action is actually inside a
       // popup route (dialog, bottom sheet, etc.). When rendered inline there
-      // is no route to dismiss, so only onTap fires.
-      if (ModalRoute.of(context) case PopupRoute()) {
+      // is no route to dismiss, so only onTap fires. A menu drawn in an
+      // overlay opts out, as the popup route around it is not the menu's.
+      final dismissesRoute = StreamContextMenu.dismissesRouteOf(context) && ModalRoute.of(context) is PopupRoute;
+      if (dismissesRoute) {
         Navigator.pop<T>(context, props.value);
       }
 

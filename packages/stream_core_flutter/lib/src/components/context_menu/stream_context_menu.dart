@@ -64,7 +64,29 @@ class StreamContextMenu extends StatelessWidget {
     required this.children,
     this.clipBehavior = Clip.hardEdge,
     this.elevation,
+    this.dismissesRoute = true,
   });
+
+  /// Whether tapping one of the menu's actions pops the enclosing popup route.
+  ///
+  /// Leave this true when the menu is the content of its own popup route, such
+  /// as a dialog or a bottom sheet, so a tap closes it. Set it to false when
+  /// the menu is drawn in an overlay above other content, as a [MenuAnchor]
+  /// does: the enclosing popup route then belongs to that content, and
+  /// closing the menu is up to whoever opened it.
+  ///
+  /// Defaults to true.
+  final bool dismissesRoute;
+
+  /// Whether a [StreamContextMenuAction] at [context] pops the enclosing popup
+  /// route when tapped.
+  ///
+  /// Reads [dismissesRoute] from the closest [StreamContextMenu], and is true
+  /// outside one.
+  static bool dismissesRouteOf(BuildContext context) {
+    final scope = context.getInheritedWidgetOfExactType<_StreamContextMenuScope>();
+    return scope?.dismissesRoute ?? true;
+  }
 
   /// The menu items to display.
   ///
@@ -106,15 +128,27 @@ class StreamContextMenu extends StatelessWidget {
         color: effectiveBackgroundColor,
         child: SingleChildScrollView(
           padding: effectivePadding,
-          child: Column(
-            mainAxisSize: .min,
-            crossAxisAlignment: .stretch,
-            children: children,
+          child: _StreamContextMenuScope(
+            dismissesRoute: dismissesRoute,
+            child: Column(
+              mainAxisSize: .min,
+              crossAxisAlignment: .stretch,
+              children: children,
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+class _StreamContextMenuScope extends InheritedWidget {
+  const _StreamContextMenuScope({required this.dismissesRoute, required super.child});
+
+  final bool dismissesRoute;
+
+  @override
+  bool updateShouldNotify(_StreamContextMenuScope oldWidget) => dismissesRoute != oldWidget.dismissesRoute;
 }
 
 /// A visual separator between groups of items in a [StreamContextMenu].

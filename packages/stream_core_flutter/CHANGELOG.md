@@ -4,6 +4,8 @@
 
 - Added `StreamTypingIndicatorDots` and `StreamTypingIndicatorDotsTheme`.
 - Added `StreamAvatarStackSize.md` (32px).
+- Added `StreamContextMenu.dismissesRoute`, so a menu drawn in an overlay
+  inside a dialog leaves the dialog open when an action is tapped.
 
 ### 🔄 Changed
 
