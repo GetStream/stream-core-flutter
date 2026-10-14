@@ -3,6 +3,7 @@
 ### ✨ Features
 
 - Added `StreamTypingIndicatorDots` and `StreamTypingIndicatorDotsTheme`.
+- Added `StreamAvatarStackSize.md` (32px).
 
 ### 🔄 Changed
 
