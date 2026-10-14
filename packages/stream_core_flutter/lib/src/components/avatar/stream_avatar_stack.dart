@@ -19,7 +19,10 @@ enum StreamAvatarStackSize {
   xs(20),
 
   /// Small avatar stack (24px diameter).
-  sm(24);
+  sm(24),
+
+  /// Medium avatar stack (32px diameter).
+  md(32);
 
   /// Constructs a [StreamAvatarStackSize] with the given diameter.
   const StreamAvatarStackSize(this.value);
@@ -261,6 +264,7 @@ class DefaultStreamAvatarStack extends StatelessWidget {
   ) => switch (size) {
     .xs => StreamAvatarSize.xs,
     .sm => StreamAvatarSize.sm,
+    .md => StreamAvatarSize.md,
   };
 
   // Returns the appropriate badge count size for the given stack size.
@@ -269,5 +273,6 @@ class DefaultStreamAvatarStack extends StatelessWidget {
   ) => switch (size) {
     .xs => StreamBadgeCountSize.xs,
     .sm => StreamBadgeCountSize.sm,
+    .md => StreamBadgeCountSize.md,
   };
 }

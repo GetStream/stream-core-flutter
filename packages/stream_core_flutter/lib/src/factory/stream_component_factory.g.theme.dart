@@ -95,6 +95,9 @@ mixin _$StreamComponentBuilders {
       stepper: t < 0.5 ? a.stepper : b.stepper,
       textInput: t < 0.5 ? a.textInput : b.textInput,
       toggleSwitch: t < 0.5 ? a.toggleSwitch : b.toggleSwitch,
+      typingIndicatorDots: t < 0.5
+          ? a.typingIndicatorDots
+          : b.typingIndicatorDots,
       imageSourceBadge: t < 0.5 ? a.imageSourceBadge : b.imageSourceBadge,
       jumpToUnreadButton: t < 0.5 ? a.jumpToUnreadButton : b.jumpToUnreadButton,
     );
@@ -171,6 +174,8 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamStepperProps)? stepper,
     Widget Function(BuildContext, StreamTextInputProps)? textInput,
     Widget Function(BuildContext, StreamSwitchProps)? toggleSwitch,
+    Widget Function(BuildContext, StreamTypingIndicatorDotsProps)?
+    typingIndicatorDots,
     Widget Function(BuildContext, StreamImageSourceBadgeProps)?
     imageSourceBadge,
     Widget Function(BuildContext, StreamJumpToUnreadButtonProps)?
@@ -240,6 +245,7 @@ mixin _$StreamComponentBuilders {
       stepper: stepper ?? _this.stepper,
       textInput: textInput ?? _this.textInput,
       toggleSwitch: toggleSwitch ?? _this.toggleSwitch,
+      typingIndicatorDots: typingIndicatorDots ?? _this.typingIndicatorDots,
       imageSourceBadge: imageSourceBadge ?? _this.imageSourceBadge,
       jumpToUnreadButton: jumpToUnreadButton ?? _this.jumpToUnreadButton,
     );
@@ -309,6 +315,7 @@ mixin _$StreamComponentBuilders {
       stepper: other.stepper,
       textInput: other.textInput,
       toggleSwitch: other.toggleSwitch,
+      typingIndicatorDots: other.typingIndicatorDots,
       imageSourceBadge: other.imageSourceBadge,
       jumpToUnreadButton: other.jumpToUnreadButton,
     );
@@ -382,6 +389,7 @@ mixin _$StreamComponentBuilders {
         _other.stepper == _this.stepper &&
         _other.textInput == _this.textInput &&
         _other.toggleSwitch == _this.toggleSwitch &&
+        _other.typingIndicatorDots == _this.typingIndicatorDots &&
         _other.imageSourceBadge == _this.imageSourceBadge &&
         _other.jumpToUnreadButton == _this.jumpToUnreadButton;
   }
@@ -441,6 +449,7 @@ mixin _$StreamComponentBuilders {
       _this.stepper,
       _this.textInput,
       _this.toggleSwitch,
+      _this.typingIndicatorDots,
       _this.imageSourceBadge,
       _this.jumpToUnreadButton,
     ]);

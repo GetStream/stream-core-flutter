@@ -39,6 +39,7 @@ import 'components/stream_split_button_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'components/stream_typing_indicator_dots_theme.dart';
 import 'primitives/stream_elevation.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
@@ -224,4 +225,7 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamSwitchThemeData] from the nearest ancestor.
   StreamSwitchThemeData get streamSwitchTheme => StreamSwitchTheme.of(this);
+
+  /// Returns the [StreamTypingIndicatorDotsThemeData] from the nearest ancestor.
+  StreamTypingIndicatorDotsThemeData get streamTypingIndicatorDotsTheme => StreamTypingIndicatorDotsTheme.of(this);
 }

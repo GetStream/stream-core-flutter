@@ -41,6 +41,7 @@ import 'components/stream_split_button_theme.dart';
 import 'components/stream_stepper_theme.dart';
 import 'components/stream_switch_theme.dart';
 import 'components/stream_text_input_theme.dart';
+import 'components/stream_typing_indicator_dots_theme.dart';
 import 'primitives/stream_elevation.dart';
 import 'primitives/stream_icons.dart';
 import 'primitives/stream_radius.dart';
@@ -159,6 +160,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamSplitButtonThemeData? splitButtonTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
+    StreamTypingIndicatorDotsThemeData? typingIndicatorDotsTheme,
   }) {
     assert(
       colorScheme == null || brightness == null || colorScheme.brightness == brightness,
@@ -222,6 +224,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     splitButtonTheme ??= const StreamSplitButtonThemeData();
     stepperTheme ??= const StreamStepperThemeData();
     switchTheme ??= const StreamSwitchThemeData();
+    typingIndicatorDotsTheme ??= const StreamTypingIndicatorDotsThemeData();
 
     return .raw(
       brightness: effectiveBrightness,
@@ -273,6 +276,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       splitButtonTheme: splitButtonTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
+      typingIndicatorDotsTheme: typingIndicatorDotsTheme,
     );
   }
 
@@ -338,6 +342,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.splitButtonTheme,
     required this.stepperTheme,
     required this.switchTheme,
+    required this.typingIndicatorDotsTheme,
   });
 
   /// Returns the [StreamTheme] from the closest [Theme] ancestor.
@@ -530,6 +535,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The switch theme for this theme.
   final StreamSwitchThemeData switchTheme;
 
+  /// The typing indicator dots theme for this theme.
+  final StreamTypingIndicatorDotsThemeData typingIndicatorDotsTheme;
+
   /// Creates a copy of this theme but with platform-dependent primitives
   /// recomputed for the given [platform].
   ///
@@ -600,6 +608,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       splitButtonTheme: splitButtonTheme,
       stepperTheme: stepperTheme,
       switchTheme: switchTheme,
+      typingIndicatorDotsTheme: typingIndicatorDotsTheme,
     );
   }
 }

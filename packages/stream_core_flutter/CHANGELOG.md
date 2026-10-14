@@ -1,5 +1,10 @@
 ## Upcoming
 
+### ✨ Features
+
+- Added `StreamTypingIndicatorDots` and `StreamTypingIndicatorDotsTheme`.
+- Added `StreamAvatarStackSize.md` (32px).
+
 ### 🔄 Changed
 
 - Improved `StreamMessageText` build performance in long message lists.
