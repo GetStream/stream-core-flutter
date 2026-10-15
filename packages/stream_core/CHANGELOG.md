@@ -20,6 +20,9 @@
 
 ### 🐞 Fixed
 
+- `AttachmentFile.toMultipartFile` now falls back to the bytes when the path cannot be read, so a file made with `AttachmentFile.fromData` uploads on mobile and desktop
+- `AttachmentFile.fromData` now keeps its `name` on mobile and desktop, where it was empty, and with it the `extension` and `mimeType` derived from it
+- `AttachmentFile.extension` now returns `null` for a name without an extension, where it returned the whole name, and for one ending in a dot, where it returned an empty string
 - A socket that fails now closes with `SystemInitiated`, carrying the `error`, rather than `ServerInitiated`; both reconnect
 - An attempt abandoned while its options were being built no longer opens its socket once they arrive, and no longer leaves `connect` awaiting a provider that never answers
 - A refusal is now spent for a connection with no authenticator, rather than reaching every attempt after it
