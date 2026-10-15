@@ -71,22 +71,15 @@ class StreamContextMenu extends StatelessWidget {
   ///
   /// Leave this true when the menu is the content of its own popup route, such
   /// as a dialog or a bottom sheet, so a tap closes it. Set it to false when
-  /// the menu is drawn in an overlay above other content, as a [MenuAnchor]
-  /// does: the enclosing popup route then belongs to that content, and
-  /// closing the menu is up to whoever opened it.
+  /// the menu is shown from a [MenuAnchor] above other content: a tap then
+  /// leaves the enclosing popup route open, and closing the menu is up to
+  /// whoever opened it.
+  ///
+  /// An action built through [StreamComponentBuilders.contextMenuAction] reads
+  /// this itself, through [dismissesRouteOf].
   ///
   /// Defaults to true.
   final bool dismissesRoute;
-
-  /// Whether a [StreamContextMenuAction] at [context] pops the enclosing popup
-  /// route when tapped.
-  ///
-  /// Reads [dismissesRoute] from the closest [StreamContextMenu], and is true
-  /// outside one.
-  static bool dismissesRouteOf(BuildContext context) {
-    final scope = context.getInheritedWidgetOfExactType<_StreamContextMenuScope>();
-    return scope?.dismissesRoute ?? true;
-  }
 
   /// The menu items to display.
   ///
@@ -108,6 +101,13 @@ class StreamContextMenu extends StatelessWidget {
   /// If null, resolves from [StreamContextMenuStyle.elevation], then falls
   /// back to `3`.
   final double? elevation;
+
+  /// The [dismissesRoute] of the closest [StreamContextMenu] above [context],
+  /// or true outside one.
+  static bool dismissesRouteOf(BuildContext context) {
+    final scope = context.getInheritedWidgetOfExactType<_StreamContextMenuScope>();
+    return scope?.dismissesRoute ?? true;
+  }
 
   @override
   Widget build(BuildContext context) {

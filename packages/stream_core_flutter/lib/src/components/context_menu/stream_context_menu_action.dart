@@ -267,11 +267,12 @@ class StreamContextMenuActionProps<T extends Object?> {
     this.isDestructive = false,
   });
 
-  /// The value returned when this action is selected inside a popup route
-  /// (e.g. a dialog or bottom sheet).
+  /// The value the enclosing popup route (e.g. a dialog or bottom sheet) is
+  /// popped with when this action is tapped.
   ///
-  /// When the action is rendered inline — outside any popup route — the value
-  /// is not returned; only [onTap] fires.
+  /// Not returned when the action is outside a popup route, or its
+  /// [StreamContextMenu] sets [StreamContextMenu.dismissesRoute] to false;
+  /// only [onTap] fires.
   ///
   /// Consumers can also use this to find, remove, reorder, or replace specific
   /// actions when customizing a default list of context menu actions.
@@ -293,12 +294,12 @@ class StreamContextMenuActionProps<T extends Object?> {
 
   /// Called when the action is tapped.
   ///
-  /// When used inside a popup route, this is called **after** the route is
-  /// dismissed with [value]. The dismissal happens first so that [onTap] can
-  /// safely push a new route without conflicting with the closing menu.
+  /// When the action pops the enclosing popup route (see
+  /// [StreamContextMenu.dismissesRoute]), this is called **after** the route
+  /// is dismissed with [value], so that [onTap] can safely push a new route
+  /// without conflicting with the closing menu.
   ///
-  /// When used inline (outside any popup route), this is the only callback
-  /// that fires.
+  /// Otherwise this is the only callback that fires.
   final VoidCallback? onTap;
 
   /// Whether this action is interactive.
@@ -368,8 +369,8 @@ class DefaultStreamContextMenuAction<T> extends StatelessWidget {
       //
       // The guard ensures we only pop when the action is actually inside a
       // popup route (dialog, bottom sheet, etc.). When rendered inline there
-      // is no route to dismiss, so only onTap fires. A menu drawn in an
-      // overlay opts out, as the popup route around it is not the menu's.
+      // is no route to dismiss, so only onTap fires. Skipped when the
+      // enclosing StreamContextMenu has dismissesRoute set to false.
       final dismissesRoute = StreamContextMenu.dismissesRouteOf(context) && ModalRoute.of(context) is PopupRoute;
       if (dismissesRoute) {
         Navigator.pop<T>(context, props.value);
