@@ -20,10 +20,11 @@ import 'stream_context_menu.dart';
 /// The visual appearance adapts to interaction states (hover, pressed,
 /// disabled) and can be fully customized via [StreamContextMenuActionTheme].
 ///
-/// Each action carries a [value], and when tapped the default implementation
-/// calls [Navigator.pop] with that value so the dialog caller can handle it,
-/// unless the enclosing [StreamContextMenu] sets
-/// [StreamContextMenu.dismissesRoute] to false.
+/// Each action carries a [value]. When tapped, the default implementation
+/// closes the menu it is shown in: a menu shown from a [MenuAnchor] is
+/// closed, and a menu that is the content of a popup route, such as a dialog,
+/// is popped with that value so the caller can handle it. Set
+/// [StreamContextMenuActionProps.closeOnActivate] to false to keep it open.
 /// Use [enabled] to control whether the action is interactive (disabled actions
 /// remain visible but are not tappable).
 ///
@@ -76,6 +77,7 @@ class StreamContextMenuAction<T> extends StatelessWidget {
     Widget? leading,
     Widget? trailing,
     bool isDestructive = false,
+    bool closeOnActivate = true,
   }) : props = .new(
          value: value,
          label: label,
@@ -84,6 +86,7 @@ class StreamContextMenuAction<T> extends StatelessWidget {
          leading: leading,
          trailing: trailing,
          isDestructive: isDestructive,
+         closeOnActivate: closeOnActivate,
        );
 
   /// Creates a destructive context menu action.
@@ -109,6 +112,7 @@ class StreamContextMenuAction<T> extends StatelessWidget {
     bool enabled = true,
     Widget? leading,
     Widget? trailing,
+    bool closeOnActivate = true,
   }) : props = .new(
          value: value,
          label: label,
@@ -117,6 +121,7 @@ class StreamContextMenuAction<T> extends StatelessWidget {
          leading: leading,
          trailing: trailing,
          isDestructive: true,
+         closeOnActivate: closeOnActivate,
        );
 
   /// Add a [StreamContextMenuSeparator] between each action in the given
@@ -265,14 +270,15 @@ class StreamContextMenuActionProps<T extends Object?> {
     this.leading,
     this.trailing,
     this.isDestructive = false,
+    this.closeOnActivate = true,
   });
 
-  /// The value the enclosing popup route (e.g. a dialog or bottom sheet) is
-  /// popped with when this action is tapped.
+  /// The value the enclosing popup route, such as a dialog or a bottom sheet,
+  /// is popped with when this action is tapped.
   ///
-  /// Not returned when the action is outside a popup route, or its
-  /// [StreamContextMenu] sets [StreamContextMenu.dismissesRoute] to false;
-  /// only [onTap] fires.
+  /// Not returned when the action closes a menu shown from a [MenuAnchor], is
+  /// outside a popup route, or has [closeOnActivate] set to false; only
+  /// [onTap] fires.
   ///
   /// Consumers can also use this to find, remove, reorder, or replace specific
   /// actions when customizing a default list of context menu actions.
@@ -294,12 +300,9 @@ class StreamContextMenuActionProps<T extends Object?> {
 
   /// Called when the action is tapped.
   ///
-  /// When the action pops the enclosing popup route (see
-  /// [StreamContextMenu.dismissesRoute]), this is called **after** the route
-  /// is dismissed with [value], so that [onTap] can safely push a new route
-  /// without conflicting with the closing menu.
-  ///
-  /// Otherwise this is the only callback that fires.
+  /// When [closeOnActivate] is true, this is called **after** the menu is
+  /// closed, so that [onTap] can safely push a new route without conflicting
+  /// with the closing menu.
   final VoidCallback? onTap;
 
   /// Whether this action is interactive.
@@ -328,6 +331,15 @@ class StreamContextMenuActionProps<T extends Object?> {
   /// When true, the action uses [StreamColorScheme.accentError] for text and
   /// icon colors. Use [StreamContextMenuAction.destructive] for convenience.
   final bool isDestructive;
+
+  /// Whether tapping this action closes the menu it is shown in.
+  ///
+  /// A menu shown from a [MenuAnchor] is closed, and a menu that is the content
+  /// of a popup route, such as a dialog or a bottom sheet, is popped with
+  /// [value]. When false, only [onTap] is called.
+  ///
+  /// Defaults to true.
+  final bool closeOnActivate;
 }
 
 /// Default implementation of [StreamContextMenuAction].
@@ -364,16 +376,20 @@ class DefaultStreamContextMenuAction<T> extends StatelessWidget {
     final effectiveShape = themeStyle?.shape ?? defaults.shape;
 
     void handleTap() {
-      // Dismiss the route first so that onTap can safely push a new route
+      // Close the menu first so that onTap can safely push a new route
       // without conflicting with the closing menu.
       //
-      // The guard ensures we only pop when the action is actually inside a
-      // popup route (dialog, bottom sheet, etc.). When rendered inline there
-      // is no route to dismiss, so only onTap fires. Skipped when the
-      // enclosing StreamContextMenu has dismissesRoute set to false.
-      final dismissesRoute = StreamContextMenu.dismissesRouteOf(context) && ModalRoute.of(context) is PopupRoute;
-      if (dismissesRoute) {
-        Navigator.pop<T>(context, props.value);
+      // An open MenuAnchor around the action is the menu it is shown in. Its
+      // controller is visible to the anchor's whole subtree, so a closed one
+      // is skipped. Otherwise the action pops only when it is inside a popup
+      // route (dialog, bottom sheet, etc.); when rendered inline there is no
+      // route to dismiss, so only onTap fires.
+      if (props.closeOnActivate) {
+        if (MenuController.maybeOf(context) case final menu? when menu.isOpen) {
+          menu.close();
+        } else if (ModalRoute.of(context) is PopupRoute) {
+          Navigator.pop<T>(context, props.value);
+        }
       }
 
       props.onTap?.call();

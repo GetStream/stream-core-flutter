@@ -4,12 +4,18 @@
 
 - Added `StreamTypingIndicatorDots` and `StreamTypingIndicatorDotsTheme`.
 - Added `StreamAvatarStackSize.md` (32px).
-- Added `StreamContextMenu.dismissesRoute`; set it to false to keep the
-  enclosing route open when an action is tapped.
+- Added `closeOnActivate` to `StreamContextMenuAction`.
+
+### 🐛 Bug Fixes
+
+- Fixed `StreamContextMenuAction` in a `MenuAnchor` closing the dialog
+  around it.
 
 ### 🔄 Changed
 
 - Improved `StreamMessageText` build performance in long message lists.
+- Tapping a `StreamContextMenuAction` in a `MenuAnchor` now closes the menu.
+  Pass `closeOnActivate: false` to keep it open.
 
 ## 0.5.2
 

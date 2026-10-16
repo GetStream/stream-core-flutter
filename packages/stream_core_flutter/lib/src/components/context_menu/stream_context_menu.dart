@@ -64,22 +64,7 @@ class StreamContextMenu extends StatelessWidget {
     required this.children,
     this.clipBehavior = Clip.hardEdge,
     this.elevation,
-    this.dismissesRoute = true,
   });
-
-  /// Whether tapping one of the menu's actions pops the enclosing popup route.
-  ///
-  /// Leave this true when the menu is the content of its own popup route, such
-  /// as a dialog or a bottom sheet, so a tap closes it. Set it to false when
-  /// the menu is shown from a [MenuAnchor] above other content: a tap then
-  /// leaves the enclosing popup route open, and closing the menu is up to
-  /// whoever opened it.
-  ///
-  /// An action built through [StreamComponentBuilders.contextMenuAction] reads
-  /// this itself, through [dismissesRouteOf].
-  ///
-  /// Defaults to true.
-  final bool dismissesRoute;
 
   /// The menu items to display.
   ///
@@ -102,13 +87,6 @@ class StreamContextMenu extends StatelessWidget {
   /// back to `3`.
   final double? elevation;
 
-  /// The [dismissesRoute] of the closest [StreamContextMenu] above [context],
-  /// or true outside one.
-  static bool dismissesRouteOf(BuildContext context) {
-    final scope = context.getInheritedWidgetOfExactType<_StreamContextMenuScope>();
-    return scope?.dismissesRoute ?? true;
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeStyle = context.streamContextMenuTheme.style;
@@ -128,27 +106,15 @@ class StreamContextMenu extends StatelessWidget {
         color: effectiveBackgroundColor,
         child: SingleChildScrollView(
           padding: effectivePadding,
-          child: _StreamContextMenuScope(
-            dismissesRoute: dismissesRoute,
-            child: Column(
-              mainAxisSize: .min,
-              crossAxisAlignment: .stretch,
-              children: children,
-            ),
+          child: Column(
+            mainAxisSize: .min,
+            crossAxisAlignment: .stretch,
+            children: children,
           ),
         ),
       ),
     );
   }
-}
-
-class _StreamContextMenuScope extends InheritedWidget {
-  const _StreamContextMenuScope({required this.dismissesRoute, required super.child});
-
-  final bool dismissesRoute;
-
-  @override
-  bool updateShouldNotify(_StreamContextMenuScope oldWidget) => dismissesRoute != oldWidget.dismissesRoute;
 }
 
 /// A visual separator between groups of items in a [StreamContextMenu].
