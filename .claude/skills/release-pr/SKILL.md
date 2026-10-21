@@ -136,12 +136,12 @@ Branch name: `release/<pkg>-vX.Y.Z` for a single package, or `release/YYYY-MM-DD
 For **each** package being released:
 
 - Set `version: <newver>` in `packages/<pkg>/pubspec.yaml`.
+- Set its entry in `melos.yaml`'s `command.bootstrap.dependencies` block to `^<newver>`
+  (`grep -nE 'stream_(core|core_flutter|thumbnail):' melos.yaml`), replacing whatever range is there — even when the
+  old range already allows the new version. The block is the repo's record of the current version of each package,
+  and it is what `melos bootstrap` writes into every in-repo consumer's pubspec (the gallery, the thumbnail example).
 
-Only if a released package is a **dependency that a dependent must now require at the new version** (the dependent
-started using a new API), also bump that package's entry in `melos.yaml`'s `command.bootstrap.dependencies` block
-(`grep -nE 'stream_(core|core_flutter|thumbnail):' melos.yaml`) — and release the dependent too. A compatible bump
-that the existing caret already allows (e.g. `stream_core 0.4.0 → 0.4.1` under `stream_core: ^0.4.0`) needs **no**
-block change.
+If an in-repo dependent started using API that only exists in the new version, release that dependent too.
 
 Then propagate constraints:
 

@@ -1454,6 +1454,8 @@ heading to become `## X.Y.Z` on a `release/` branch. On that branch, for **each*
 package you are releasing:
 
 - bump its `version` in `pubspec.yaml`
+- set its `melos.yaml` `command.bootstrap.dependencies` entry to `^X.Y.Z`, then
+  run `melos bootstrap` so in-repo consumers pick it up
 - promote its CHANGELOG `## Upcoming` heading to `## X.Y.Z`
 
 Title the PR `chore(repo): release packages` for a multi-package release
