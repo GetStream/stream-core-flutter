@@ -1,3 +1,9 @@
+## Upcoming
+
+### 🔄 Changed
+
+- `equatable` now resolves to 3.x as well as 2.x (`>=2.0.8 <4.0.0`)
+
 ## 0.5.1
 
 ### ✨ Features
