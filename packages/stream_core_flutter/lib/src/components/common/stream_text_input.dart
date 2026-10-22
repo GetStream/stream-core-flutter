@@ -539,7 +539,10 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+          // Keyed so the label and helper text changing together keeps the
+          // field, and its keyboard, attached.
           GestureDetector(
+            key: const ValueKey('input'),
             onTap: props.enabled ? _effectiveFocusNode.requestFocus : null,
             excludeFromSemantics: true,
             child: Container(

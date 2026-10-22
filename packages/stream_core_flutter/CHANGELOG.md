@@ -2,8 +2,8 @@
 
 ### 🐛 Bug Fixes
 
-- Fixed `StreamTextInput` ignoring typed text after its `leading` or `trailing`
-  was added or removed while it had focus.
+- Fixed `StreamTextInput` ignoring typed text after the widgets around it, such
+  as `leading` and `trailing`, changed while it had focus.
 
 ## 0.5.3
 
