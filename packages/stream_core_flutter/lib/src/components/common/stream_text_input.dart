@@ -572,7 +572,10 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
                               sortKey: _leadingSortKey,
                               child: leading,
                             ),
+                          // Keyed so adding or removing leading or trailing
+                          // keeps the field, and its keyboard, attached.
                           Expanded(
+                            key: const ValueKey('field'),
                             child: ExcludeSemantics(
                               child: TextField(
                                 autocorrect: props.autocorrect,

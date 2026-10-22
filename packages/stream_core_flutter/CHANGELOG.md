@@ -1,3 +1,10 @@
+## Upcoming
+
+### 🐛 Bug Fixes
+
+- Fixed `StreamTextInput` ignoring typed text after its `leading` or `trailing`
+  was added or removed while it had focus.
+
 ## 0.5.3
 
 ### ✨ Features
