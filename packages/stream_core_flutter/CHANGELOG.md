@@ -4,6 +4,9 @@
 
 - Fixed `StreamTextInput` ignoring typed text after the widgets around it, such
   as `leading` and `trailing`, changed while it had focus.
+- Fixed `StreamSnackbarHost` and `StreamSnackbarPopup` throwing in debug when
+  they mount while their messenger already has a snackbar queued, as an
+  external messenger does when the widget holding the host is rebuilt.
 
 ## 0.5.3
 

@@ -734,6 +734,13 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
 
   void _onControllerChanged() => _syncWithController();
 
+  // Read without depending on MediaQuery: it is only consulted when an
+  // animation starts, and the first one starts from initState when the
+  // messenger already has a snackbar queued, where depending on an inherited
+  // widget is not allowed.
+  bool get _accessibleNavigation =>
+      context.getInheritedWidgetOfExactType<MediaQuery>()?.data.accessibleNavigation ?? false;
+
   void _syncWithController() {
     final next = widget.messenger._queue.isEmpty ? null : widget.messenger._queue.first;
 
@@ -756,7 +763,7 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     _animation.value = 0;
     setState(() {});
     if (next != null) {
-      if (MediaQuery.accessibleNavigationOf(context)) {
+      if (_accessibleNavigation) {
         _animation.value = 1;
       } else {
         _animation.forward(from: 0);
@@ -786,7 +793,7 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     final messenger = widget.messenger;
     _exiting = true;
     _timer?.cancel();
-    if (MediaQuery.accessibleNavigationOf(context)) {
+    if (_accessibleNavigation) {
       _animation.value = 0;
     } else {
       await _animation.reverse();
