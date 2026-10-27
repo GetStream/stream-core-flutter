@@ -26,7 +26,7 @@ jobs:
         uses: ./.github/actions/pana
         with:
           working_directory: packages/stream_core
-          min_score: 125  # Missing 10 points for no example, 10 points for license, and 10 points for `publish_to` in pubspec.
+          min_score: 120  # Missing 10 points for no example, 10 points for no license, 10 points for static analysis issues, and 10 points for outdated dependencies (cross_file 0.4.0 requires Flutter).
 
   stream_core_flutter:
     runs-on: ubuntu-latest
@@ -48,4 +48,4 @@ jobs:
         uses: ./.github/actions/pana
         with:
           working_directory: packages/stream_thumbnail
-          min_score: 150  # Missing 10 points for static analysis issues.
+          min_score: 140  # Missing 10 points for static analysis issues and 10 points for outdated dependencies (cross_file 0.4.0 is a breaking federated rewrite).
