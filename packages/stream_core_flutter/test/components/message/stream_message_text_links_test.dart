@@ -40,6 +40,13 @@ void main() {
     expect(await _tapLink(tester, 'Mail anna.li+tag@gmail.com', 'anna.li'), 'mailto:anna.li+tag@gmail.com');
   });
 
+  testWidgets('StreamMessageText opens a markdown link to an email address', (tester) async {
+    expect(
+      await _tapLink(tester, '[Mail Anna](mailto:anna@example.com)', 'Mail Anna'),
+      'mailto:anna@example.com',
+    );
+  });
+
   testWidgets('StreamMessageText keeps the target of a domain in a link label', (tester) async {
     expect(
       await _tapLink(tester, '[visit youtube.com](https://example.com)', 'youtube.com'),
