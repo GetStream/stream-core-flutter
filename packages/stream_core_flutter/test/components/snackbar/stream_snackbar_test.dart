@@ -849,8 +849,6 @@ void main() {
       expect(find.text('Auto-managed'), findsOneWidget);
     });
 
-    // An external messenger outlives the popup, so a snackbar can be queued
-    // while no popup is mounted, such as while the bar holding it is rebuilt.
     testWidgets('shows a snackbar queued before it mounts', (tester) async {
       final messenger = StreamSnackbarMessenger();
       addTearDown(messenger.dispose);
