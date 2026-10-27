@@ -848,6 +848,29 @@ void main() {
 
       expect(find.text('Auto-managed'), findsOneWidget);
     });
+
+    testWidgets('shows a snackbar queued before it mounts', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      messenger.show(StreamSnackbar(message: const Text('Queued')));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Center(
+            child: StreamSnackbarPopup.withState(
+              messenger: messenger,
+              child: const SizedBox(width: 200, height: 60),
+            ),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Queued'), findsOneWidget);
+    });
   });
 
   group('accessibleNavigation', () {
@@ -890,6 +913,22 @@ void main() {
       messenger.show(StreamSnackbar(message: const Text('Hello')));
       await tester.pump();
 
+      expect(fadeOf(tester).opacity.value, equals(1.0));
+    });
+
+    testWidgets('on — a snackbar queued before the host mounts skips animation', (tester) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+        accessibleNavigation: true,
+      );
+      addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      messenger.show(StreamSnackbar(message: const Text('Queued')));
+      await tester.pumpWidget(hostScaffold(messenger));
+
+      expect(tester.takeException(), isNull);
       expect(fadeOf(tester).opacity.value, equals(1.0));
     });
 

@@ -734,6 +734,12 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
 
   void _onControllerChanged() => _syncWithController();
 
+  // No dependency on MediaQuery: the first read can come from initState.
+  bool get _accessibleNavigation {
+    final mediaQuery = context.getInheritedWidgetOfExactType<MediaQuery>();
+    return mediaQuery?.data.accessibleNavigation ?? false;
+  }
+
   void _syncWithController() {
     final next = widget.messenger._queue.isEmpty ? null : widget.messenger._queue.first;
 
@@ -756,7 +762,7 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     _animation.value = 0;
     setState(() {});
     if (next != null) {
-      if (MediaQuery.accessibleNavigationOf(context)) {
+      if (_accessibleNavigation) {
         _animation.value = 1;
       } else {
         _animation.forward(from: 0);
@@ -786,7 +792,7 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
     final messenger = widget.messenger;
     _exiting = true;
     _timer?.cancel();
-    if (MediaQuery.accessibleNavigationOf(context)) {
+    if (_accessibleNavigation) {
       _animation.value = 0;
     } else {
       await _animation.reverse();
