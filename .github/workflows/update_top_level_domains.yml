@@ -5,6 +5,10 @@ on:
     # Runs "At 06:00 on the 1st of every month"
     - cron: '0 6 1 * *'
   workflow_dispatch:
+  # Temporary: exercises the workflow before it is on main.
+  push:
+    branches:
+      - test/update-tlds-workflow
 
 permissions:
   contents: read
