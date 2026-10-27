@@ -19,9 +19,9 @@
 /// Or directly, from the repository root:
 ///   dart run scripts/generate_top_level_domains.dart
 ///
-/// Run it when a link with a new top-level domain is not found, or
-/// periodically to pick up domains IANA has added or retired, and commit the
-/// result. It needs network access, so it is not part of `generate:all`.
+/// The `update_top_level_domains` workflow runs it monthly and opens a pull
+/// request when the list has changed. Run it by hand to pick up a domain
+/// sooner. It needs network access, so it is not part of `generate:all`.
 ///
 /// Steps:
 ///   1. Downloads the list and checks that it starts with its version line
