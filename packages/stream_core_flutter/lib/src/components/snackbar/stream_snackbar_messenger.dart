@@ -734,12 +734,11 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
 
   void _onControllerChanged() => _syncWithController();
 
-  // Read without depending on MediaQuery: it is only consulted when an
-  // animation starts, and the first one starts from initState when the
-  // messenger already has a snackbar queued, where depending on an inherited
-  // widget is not allowed.
-  bool get _accessibleNavigation =>
-      context.getInheritedWidgetOfExactType<MediaQuery>()?.data.accessibleNavigation ?? false;
+  // No dependency on MediaQuery: the first read can come from initState.
+  bool get _accessibleNavigation {
+    final mediaQuery = context.getInheritedWidgetOfExactType<MediaQuery>();
+    return mediaQuery?.data.accessibleNavigation ?? false;
+  }
 
   void _syncWithController() {
     final next = widget.messenger._queue.isEmpty ? null : widget.messenger._queue.first;
