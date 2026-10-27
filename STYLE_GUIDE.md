@@ -368,6 +368,9 @@ Sub-tasks:
 - `melos run generate:icons` — regenerates the icon font from SVGs in
   `assets_source/icons/`. → [Icons](#icons)
 - `melos run gen-l10n` — regenerates localization ARB output.
+- `melos run generate:tlds` — regenerates the top-level domains the link finder
+  recognizes from the IANA root zone list. It downloads the list, so it is not
+  part of `generate:all`.
 
 
 ## Documentation

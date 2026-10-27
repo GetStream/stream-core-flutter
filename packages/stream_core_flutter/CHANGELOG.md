@@ -1,12 +1,25 @@
 ## Upcoming
 
+### ✨ Features
+
+- `StreamMessageText` now links a web address written without a scheme, such
+  as `example.com`, when it ends in a known top-level domain. It opens over
+  `https://`.
+
 ### 🐛 Bug Fixes
 
+- Fixed `StreamMessageText` not linking a web address right after a quote or
+  text in a script written without spaces, such as Chinese.
 - Fixed `StreamTextInput` ignoring typed text after the widgets around it, such
   as `leading` and `trailing`, changed while it had focus.
 - Fixed `StreamSnackbarHost` and `StreamSnackbarPopup` throwing in debug when
   they mount with a snackbar already queued on their messenger, for example
   after the widget holding them is rebuilt.
+
+### 🔄 Changed
+
+- `StreamMessageText` opens a `www.` address over `https://` instead of
+  `http://`.
 
 ## 0.5.3
 

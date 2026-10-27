@@ -4,6 +4,7 @@ export 'utils/disposable.dart';
 export 'utils/event_emitter.dart';
 export 'utils/in_flight_cache.dart';
 export 'utils/lifecycle_state_provider.dart';
+export 'utils/link_finder.dart';
 export 'utils/list_extensions.dart';
 export 'utils/network_state_provider.dart';
 export 'utils/object.dart';
