@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `findLinks` and `findLinkAt`, which find the web links in a text, with
+  or without a scheme, such as `https://example.com` or `example.com`.
+
 ## 0.5.1+1
 
 ### 🔄 Changed

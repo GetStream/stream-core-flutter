@@ -52,6 +52,7 @@ command:
     # List of all the dev_dependencies used in the project.
     dev_dependencies:
       alchemist: ^0.13.0
+      benchmark_harness: ^2.4.0
       build_runner: ^2.10.5
       fake_async: ^1.3.3
       json_serializable: ^6.9.5
@@ -137,6 +138,10 @@ scripts:
   generate:icons:
     run: melos exec -c 1 --file-exists="stream_icons.yaml" -- "dart run \$MELOS_ROOT_PATH/scripts/generate_icons.dart"
     description: Generate icon font and Dart classes from SVG files.
+
+  generate:tlds:
+    run: dart run scripts/generate_top_level_domains.dart
+    description: Regenerate the top-level domains the link finder recognizes from the IANA root zone list.
 
   generate:pigeon:
     run: |

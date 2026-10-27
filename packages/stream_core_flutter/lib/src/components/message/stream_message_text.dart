@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:stream_core/stream_core.dart' show findLinkAt;
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_message_item_theme.dart';
@@ -80,6 +81,10 @@ typedef MarkdownTapAnyMentionCallback =
 final _emojiRegex = RegExp(r'\p{Emoji_Presentation}|\p{Emoji}\uFE0F', unicode: true);
 
 /// Renders markdown text with themed styling.
+///
+/// Web addresses in the text are links. An address written without a scheme,
+/// such as `example.com` or `www.example.com`, opens over `https://`, and is a
+/// link only when it ends in a known top-level domain.
 ///
 /// {@tool snippet}
 ///
@@ -350,6 +355,7 @@ class DefaultStreamMessageText extends StatelessWidget {
     final effectiveInlineSyntaxes = [
       _mentionSyntax,
       ...?props.inlineSyntaxes,
+      _linkSyntax,
     ];
 
     // Base mention style — variant-specific overrides from [mentionStyles]
@@ -393,6 +399,7 @@ class DefaultStreamMessageText extends StatelessWidget {
 
   // Stateless, so shared instead of recompiling its pattern on every build.
   static final _mentionSyntax = _StreamMentionSyntax();
+  static final _linkSyntax = _StreamLinkSyntax();
 
   // Shared across messages because building a sheet is costly.
   // The caller's sheet is merged after the lookup, not keyed on, because
@@ -517,6 +524,64 @@ class _StreamMentionSyntax extends md.InlineSyntax {
     el.attributes['type'] = type;
     parser.addNode(el);
     return true;
+  }
+}
+
+// Links the web addresses found by [findLinkAt], with or without a scheme,
+// and keeps an address in the label of a link as part of that link, as in
+// `[example.com](https://example.com/docs)`.
+//
+// Other links, such as email addresses, are left to the markdown autolinks.
+class _StreamLinkSyntax extends md.LinkSyntax {
+  @override
+  bool tryMatch(md.InlineParser parser, [int? startMatchPos]) {
+    if (super.tryMatch(parser, startMatchPos)) return true;
+
+    final start = startMatchPos ?? parser.pos;
+    final link = findLinkAt(parser.source, start);
+    if (link == null) return false;
+
+    final anchor = md.Element.text('a', link.text);
+    anchor.attributes['href'] = link.url;
+
+    parser
+      ..writeText()
+      ..addNode(anchor)
+      ..consume(link.end - start);
+    return true;
+  }
+
+  @override
+  md.Node createNode(
+    String destination,
+    String? title, {
+    required List<md.Node> Function() getChildren,
+  }) {
+    return super.createNode(
+      destination,
+      title,
+      getChildren: () => _withoutLinks(getChildren()),
+    );
+  }
+
+  // The [nodes] with every link in them replaced by its children.
+  static List<md.Node> _withoutLinks(List<md.Node> nodes) {
+    return [
+      for (final node in nodes)
+        if (node is md.Element && node.tag == 'a')
+          ..._withoutLinks(node.children ?? const [])
+        else if (node is md.Element && node.children != null)
+          _withoutLinksIn(node)
+        else
+          node,
+    ];
+  }
+
+  // A copy of [element] with every link in its children replaced by its own
+  // children.
+  static md.Element _withoutLinksIn(md.Element element) {
+    final children = _withoutLinks(element.children!);
+    return md.Element(element.tag, children)..attributes.addAll(element.attributes);
   }
 }
 

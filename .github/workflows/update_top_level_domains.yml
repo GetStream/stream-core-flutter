@@ -1,0 +1,40 @@
+name: update_top_level_domains
+
+on:
+  schedule:
+    # Runs "At 06:00 on the 1st of every month"
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update_top_level_domains:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v6
+
+      - name: 🎯 Install Dart
+        uses: dart-lang/setup-dart@v1
+
+      # Leaves the file as it is when the list of domains has not changed, so
+      # no pull request is opened then.
+      - name: 🌐 Regenerate Top-Level Domains
+        run: dart run scripts/generate_top_level_domains.dart
+
+      # Opened with the bot's token so the pull request's checks run, which
+      # they don't for one opened with the workflow's own token.
+      - name: 📤 Open Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
+          branch: chore/update-top-level-domains
+          delete-branch: true
+          commit-message: 'chore(repo): update the IANA top-level domains'
+          title: 'chore(repo): update the IANA top-level domains'
+          body: |
+            Regenerates the top-level domains `findLinks` recognizes from the IANA root zone list with `melos run generate:tlds`.
+          committer: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
+          author: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
