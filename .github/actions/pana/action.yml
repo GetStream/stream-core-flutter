@@ -26,7 +26,7 @@ runs:
       uses: mikefarah/yq@v4
       with:
         cmd: |
-          yq eval 'with(select(.dependencies.stream_core != null); .dependencies.stream_core = {"path": "../stream_core"})' -i packages/stream_core_flutter/pubspec.yaml
+          yq eval '(.dependencies | select(has("stream_core")) | .stream_core) = {"path": "../stream_core"}' -i packages/stream_core_flutter/pubspec.yaml
 
     - name: Install Flutter
       uses: subosito/flutter-action@v2
