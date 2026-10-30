@@ -222,6 +222,70 @@ void main() {
     });
   });
 
+  group('StreamButton.icon long press', () {
+    testWidgets('calls onLongPress instead of showing the tooltip', (tester) async {
+      var pressed = 0;
+      var longPressed = 0;
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamButton.icon(
+            icon: const Icon(Icons.send),
+            tooltip: 'Send',
+            onPressed: () => pressed++,
+            onLongPress: () => longPressed++,
+          ),
+        ),
+      );
+
+      await tester.longPress(find.byType(StreamButton));
+      await tester.pumpAndSettle();
+
+      expect(longPressed, 1);
+      expect(pressed, 0);
+      expect(find.text('Send'), findsNothing);
+    });
+
+    testWidgets('exposes a long-press action to accessibility services', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamButton.icon(
+            icon: const Icon(Icons.send),
+            tooltip: 'Send',
+            onPressed: () {},
+            onLongPress: () {},
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.byType(StreamButton)),
+        isSemantics(tooltip: 'Send', isButton: true, hasTapAction: true, hasLongPressAction: true),
+      );
+
+      handle.dispose();
+    });
+
+    testWidgets('still calls onPressed on a tap', (tester) async {
+      var pressed = 0;
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamButton.icon(
+            icon: const Icon(Icons.send),
+            tooltip: 'Send',
+            onPressed: () => pressed++,
+            onLongPress: () {},
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(StreamButton));
+
+      expect(pressed, 1);
+    });
+  });
+
   group('StreamButton (with child) a11y', () {
     testWidgets('label comes from child Text widget', (tester) async {
       final handle = tester.ensureSemantics();
