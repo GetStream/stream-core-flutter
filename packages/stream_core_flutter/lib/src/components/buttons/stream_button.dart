@@ -72,6 +72,7 @@ class StreamButton extends StatelessWidget {
     super.key,
     required Widget child,
     VoidCallback? onPressed,
+    VoidCallback? onLongPress,
     StreamButtonStyle style = .primary,
     StreamButtonType type = .solid,
     StreamButtonSize size = .medium,
@@ -84,6 +85,7 @@ class StreamButton extends StatelessWidget {
   }) : props = .new(
          child: child,
          onPressed: onPressed,
+         onLongPress: onLongPress,
          style: style,
          type: type,
          size: size,
@@ -112,6 +114,7 @@ class StreamButton extends StatelessWidget {
     super.key,
     required Widget icon,
     VoidCallback? onPressed,
+    VoidCallback? onLongPress,
     StreamButtonStyle style = .primary,
     StreamButtonType type = .solid,
     StreamButtonSize size = .medium,
@@ -122,6 +125,7 @@ class StreamButton extends StatelessWidget {
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
          onPressed: onPressed,
+         onLongPress: onLongPress,
          style: style,
          type: type,
          size: size,
@@ -165,6 +169,7 @@ class StreamButtonProps {
   const StreamButtonProps({
     this.child,
     this.onPressed,
+    this.onLongPress,
     this.style = .primary,
     this.type = .solid,
     this.size = .medium,
@@ -183,10 +188,17 @@ class StreamButtonProps {
   /// [iconLeft] as its sole icon (see [StreamButton.icon]).
   final Widget? child;
 
-  /// Called when the button is pressed.
+  /// Called when the button is tapped or otherwise activated.
   ///
-  /// If null, the button will be disabled.
+  /// If this callback and [onLongPress] are null, then the button will be
+  /// disabled.
   final VoidCallback? onPressed;
+
+  /// Called when the button is long-pressed.
+  ///
+  /// If this callback and [onPressed] are null, then the button will be
+  /// disabled.
+  final VoidCallback? onLongPress;
 
   /// The visual style variant of the button.
   ///
@@ -373,6 +385,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
       child: ElevatedButton(
         autofocus: props.autofocus,
         onPressed: props.onPressed,
+        onLongPress: props.onLongPress,
         statesController: _statesController,
         style: ButtonStyle(
           tapTargetSize: themeStyle.tapTargetSize,

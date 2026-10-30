@@ -2,6 +2,7 @@
 
 ### ✨ Features
 
+- Added `onLongPress` to `StreamButton` and `StreamButton.icon`.
 - `StreamMessageText` now links a web address written without a scheme, such
   as `example.com`, when it ends in a known top-level domain. It opens over
   `https://`.

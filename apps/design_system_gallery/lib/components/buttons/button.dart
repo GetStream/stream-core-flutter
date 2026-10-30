@@ -78,6 +78,11 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       description: 'Whether the button toggles its selected state on tap.',
     );
 
+    final hasLongPress = context.knobs.boolean(
+      label: 'Long Press',
+      description: 'Whether the button responds to a long press.',
+    );
+
     final showLeadingIcon =
         !isIconOnly &&
         context.knobs.boolean(
@@ -92,21 +97,22 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
           description: 'Show an icon after the label.',
         );
 
+    void showMessage(String message) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(message), duration: const Duration(seconds: 1)),
+        );
+    }
+
     void onTap() {
       if (isSelectable) {
         setState(() => _isSelected = !_isSelected);
       }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              isSelectable ? 'Button ${_isSelected ? 'selected' : 'deselected'}' : 'Button tapped!',
-            ),
-            duration: const Duration(seconds: 1),
-          ),
-        );
+      showMessage(isSelectable ? 'Button ${_isSelected ? 'selected' : 'deselected'}' : 'Button tapped!');
     }
+
+    final onLongPress = hasLongPress && !isDisabled ? () => showMessage('Button long-pressed!') : null;
 
     return Center(
       child: isIconOnly
@@ -118,6 +124,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
               isFloating: isFloating ? true : null,
               isSelected: isSelectable ? _isSelected : null,
               onPressed: isDisabled ? null : onTap,
+              onLongPress: onLongPress,
             )
           : StreamButton(
               style: style,
@@ -126,6 +133,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
               isFloating: isFloating ? true : null,
               isSelected: isSelectable ? _isSelected : null,
               onPressed: isDisabled ? null : onTap,
+              onLongPress: onLongPress,
               iconLeft: showLeadingIcon ? const Icon(Icons.add) : null,
               iconRight: showTrailingIcon ? const Icon(Icons.arrow_forward) : null,
               child: Text(label),
