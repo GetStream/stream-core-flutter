@@ -188,13 +188,16 @@ class StreamButtonProps {
   /// [iconLeft] as its sole icon (see [StreamButton.icon]).
   final Widget? child;
 
-  /// Called when the button is pressed.
+  /// Called when the button is tapped or otherwise activated.
   ///
-  /// If this and [onLongPress] are both null, the button will be disabled.
+  /// If this callback and [onLongPress] are null, then the button will be
+  /// disabled.
   final VoidCallback? onPressed;
 
-  /// Called when the button is long-pressed, in place of showing the
-  /// [tooltip].
+  /// Called when the button is long-pressed.
+  ///
+  /// If this callback and [onPressed] are null, then the button will be
+  /// disabled.
   final VoidCallback? onLongPress;
 
   /// The visual style variant of the button.
@@ -245,10 +248,8 @@ class StreamButtonProps {
   /// When false, the button uses normal focus traversal.
   final bool autofocus;
 
-  /// Text shown in a [Tooltip] on hover or long-press, and used as the
+  /// Text shown in a [Tooltip] on hover / long-press, and used as the
   /// button's accessibility label.
-  ///
-  /// A long press shows it only while [onLongPress] is null.
   ///
   /// Only honoured by [StreamButton.icon]; the regular [StreamButton]
   /// derives its label from its [child].
@@ -430,11 +431,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
     );
 
     if (props.tooltip case final tooltip?) {
-      button = Tooltip(
-        message: tooltip,
-        triggerMode: props.onLongPress != null ? .manual : null,
-        child: button,
-      );
+      button = Tooltip(message: tooltip, child: button);
     }
 
     return MergeSemantics(child: button);
