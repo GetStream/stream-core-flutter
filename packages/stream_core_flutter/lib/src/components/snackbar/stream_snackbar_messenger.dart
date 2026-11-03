@@ -499,7 +499,7 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
   Widget build(BuildContext context) {
     // Inside a surface, descendants share the page's snackbars instead, which
     // already rest above everything docked at the bottom of the page.
-    final insideSurface = context.getInheritedWidgetOfExactType<_SnackbarSurfaceMarker>() != null;
+    final insideSurface = _SnackbarSurfaceMarker.maybeOf(context) != null;
     if (widget.externalMessenger == null && insideSurface) return widget.child;
 
     final messenger = _effectiveMessenger;
@@ -737,6 +737,11 @@ class _SnackbarScopeMarker extends InheritedWidget {
 
   final _StreamSnackbarScopeState scope;
 
+  // The nearest scope above [context], or null if there is none.
+  static _StreamSnackbarScopeState? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_SnackbarScopeMarker>()?.scope;
+  }
+
   @override
   bool updateShouldNotify(_SnackbarScopeMarker oldWidget) => scope != oldWidget.scope;
 }
@@ -768,7 +773,7 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final scope = context.dependOnInheritedWidgetOfExactType<_SnackbarScopeMarker>()?.scope;
+    final scope = _SnackbarScopeMarker.maybeOf(context);
     if (scope == _scope) return;
     _scope?._unregister(this);
     _scope = scope?.._register(this);
@@ -785,8 +790,7 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     final scope = _scope;
     if (scope == null) return widget.builder(context, null);
 
-    final parent = context.getInheritedWidgetOfExactType<_SnackbarSurfaceMarker>();
-    final isRoot = parent?.scope != scope;
+    final isRoot = _SnackbarSurfaceMarker.maybeOf(context) != scope;
     final snackbar = isRoot ? _SnackbarView(presenter: scope._presenter, builder: _buildInlineSnackbar) : null;
 
     return _SnackbarSurfaceMarker(
@@ -801,6 +805,12 @@ class _SnackbarSurfaceMarker extends InheritedWidget {
   const _SnackbarSurfaceMarker({required this.scope, required super.child});
 
   final _StreamSnackbarScopeState scope;
+
+  // The scope of the nearest surface above [context], or null outside any
+  // surface.
+  static _StreamSnackbarScopeState? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_SnackbarSurfaceMarker>()?.scope;
+  }
 
   @override
   bool updateShouldNotify(_SnackbarSurfaceMarker oldWidget) => scope != oldWidget.scope;
