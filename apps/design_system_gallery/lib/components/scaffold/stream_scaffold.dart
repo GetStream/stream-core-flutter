@@ -80,6 +80,129 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 }
 
 // =============================================================================
+// Snackbars — rest above the bottom slot and the bottom accessory
+// =============================================================================
+
+@widgetbook.UseCase(
+  name: 'Snackbars',
+  type: StreamScaffold,
+  path: '[Components]/Scaffold',
+)
+Widget buildStreamScaffoldSnackbars(BuildContext context) {
+  final bottomSurfaceStyle = context.knobs.object.dropdown(
+    label: 'Bottom bar surfaceStyle',
+    options: StreamSurfaceStyle.values,
+    labelBuilder: (value) => value.name,
+    initialOption: StreamSurfaceStyle.regular,
+    description:
+        'regular — the bottom bar sits below the body. '
+        'floating — the bottom bar overlaps the body. Snackbars rest above it either way.',
+  );
+
+  final showAccessory = context.knobs.boolean(
+    label: 'Show bottom accessory',
+    initialValue: true,
+    description:
+        'Floats a banner just above the bottom bar. Snackbars rest above it, '
+        'and move down when it is turned off.',
+  );
+
+  // The scope owns the snackbar queue; the scaffold below it shows the
+  // snackbars above its bottom slots instead of the scope's bottom edge.
+  return StreamSnackbarScope(
+    child: StreamScaffold(
+      bottomSurfaceStyle: bottomSurfaceStyle,
+      appBar: _demoAppBar(context, floating: false),
+      bottom: _DemoBottomNav(floating: bottomSurfaceStyle == StreamSurfaceStyle.floating),
+      bottomAccessory: showAccessory ? const _DemoBanner() : null,
+      body: const _SnackbarTestBody(),
+    ),
+  );
+}
+
+/// Body for the Snackbars use-case: a button that shows a snackbar from the
+/// scaffold's body.
+class _SnackbarTestBody extends StatelessWidget {
+  const _SnackbarTestBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Show a snackbar, then toggle the bottom accessory or the bottom '
+              'bar style. The snackbar always rests above them.',
+              textAlign: TextAlign.center,
+              style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
+            ),
+            SizedBox(height: spacing.lg),
+            StreamButton(
+              onPressed: () => StreamSnackbarMessenger.of(context).show(
+                StreamSnackbar(
+                  message: const Text('Message copied to clipboard'),
+                  variant: StreamSnackbarVariant.success,
+                ),
+                replace: true,
+              ),
+              child: const Text('Show snackbar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A banner for the scaffold's bottom accessory slot, such as a count of
+/// scheduled messages.
+class _DemoBanner extends StatelessWidget {
+  const _DemoBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Padding(
+      padding: EdgeInsetsDirectional.fromSTEB(spacing.md, 0, spacing.md, spacing.md),
+      child: Material(
+        elevation: context.streamElevation.level2,
+        color: colorScheme.backgroundElevation1,
+        shape: const StadiumBorder(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.sm),
+          child: Row(
+            children: [
+              Icon(context.streamIcons.clock, size: 20),
+              SizedBox(width: spacing.xs),
+              Expanded(
+                child: Text(
+                  '3 scheduled messages',
+                  style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),
+                ),
+              ),
+              Text(
+                'View all',
+                style: textTheme.captionEmphasis.copyWith(color: colorScheme.accentPrimary),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
 // Drawers — exercises every forwarded drawer prop
 // =============================================================================
 
