@@ -23,8 +23,9 @@
 
 - `StreamMessageText` opens a `www.` address over `https://` instead of
   `http://`.
-- Snackbars from a `StreamSnackbarScope` now show inside a `StreamScaffold`,
-  above its `bottom` and `bottomAccessory`, instead of covering them.
+- Snackbars from a `StreamSnackbarScope` now show inside a mounted
+  `StreamScaffold`, above its `bottom` and `bottomAccessory`, and at the
+  scope's bottom edge only when no `StreamScaffold` is mounted.
 
 ## 0.5.3
 

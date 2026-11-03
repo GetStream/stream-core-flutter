@@ -548,7 +548,7 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
 /// Wraps a subtree with a managed [StreamSnackbarMessenger] and renders the
 /// current snackbar at the bottom of itself.
 ///
-/// While a [StreamScaffold] is mounted under the scope, the snackbar shows in
+/// While a `StreamScaffold` is mounted under the scope, the snackbar shows in
 /// the scaffold instead, above whatever the scaffold docks at its bottom. A
 /// scaffold nested in another scaffold leaves it to the outer one.
 ///

@@ -186,6 +186,31 @@ void main() {
     expect(find.text(_kMessage), findsOneWidget);
   });
 
+  testWidgets('StreamSnackbarScope shows snackbars itself again after the last StreamScaffold pops', (tester) async {
+    final plainBodyKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(body: SizedBox.expand(key: plainBodyKey)),
+    );
+    navigatorKey.currentState!
+        .push(
+          MaterialPageRoute<void>(
+            builder: (_) => const StreamScaffold(body: SizedBox.expand()),
+          ),
+        )
+        .ignore();
+    await tester.pumpAndSettle();
+    navigatorKey.currentState!.pop();
+    await tester.pumpAndSettle();
+
+    await _showSnackbar(tester, plainBodyKey);
+
+    expect(find.text(_kMessage), findsOneWidget);
+  });
+
   testWidgets('the action of a scope snackbar in a StreamScaffold dismisses that snackbar', (tester) async {
     final scopeMessenger = StreamSnackbarMessenger();
     final popupMessenger = StreamSnackbarMessenger();

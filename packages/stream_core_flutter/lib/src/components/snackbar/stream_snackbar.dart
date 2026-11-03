@@ -15,7 +15,6 @@ import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../buttons/stream_button.dart';
 import '../common/stream_loading_spinner.dart';
-import '../scaffold/stream_scaffold.dart';
 
 part 'stream_snackbar_messenger.dart';
 
