@@ -648,7 +648,7 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
   @override
   void didUpdateWidget(StreamSnackbarScope oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _presenter.messenger = _effectiveMessenger;
+    _presenter.updateMessenger(_effectiveMessenger);
   }
 
   @override
@@ -861,10 +861,12 @@ class _SnackbarPresenter extends ChangeNotifier {
 
   _HostedSnackbar? get showing => _showing;
 
-  set messenger(StreamSnackbarMessenger value) {
-    if (identical(value, _messenger)) return;
+  // Switches to playing [messenger]'s queue, dropping whatever was showing
+  // from the previous one.
+  void updateMessenger(StreamSnackbarMessenger messenger) {
+    if (identical(messenger, _messenger)) return;
     _messenger.removeListener(_sync);
-    _messenger = value..addListener(_sync);
+    _messenger = messenger..addListener(_sync);
     _timer?.cancel();
     _timer = null;
     _exiting = false;
@@ -1023,7 +1025,7 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
   @override
   void didUpdateWidget(_SnackbarStage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _presenter.messenger = widget.messenger;
+    _presenter.updateMessenger(widget.messenger);
   }
 
   @override
