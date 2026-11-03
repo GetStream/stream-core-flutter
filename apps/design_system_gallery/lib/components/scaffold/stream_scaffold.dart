@@ -107,8 +107,6 @@ Widget buildStreamScaffoldSnackbars(BuildContext context) {
         'and move down when it is turned off.',
   );
 
-  // The scope owns the snackbar queue; the scaffold below it shows the
-  // snackbars above its bottom slots instead of the scope's bottom edge.
   return StreamSnackbarScope(
     child: StreamScaffold(
       bottomSurfaceStyle: bottomSurfaceStyle,
@@ -120,8 +118,8 @@ Widget buildStreamScaffoldSnackbars(BuildContext context) {
   );
 }
 
-/// Body for the Snackbars use-case: a button that shows a snackbar from the
-/// scaffold's body.
+// Body for the Snackbars use-case: a button that shows a snackbar from the
+// scaffold's body.
 class _SnackbarTestBody extends StatelessWidget {
   const _SnackbarTestBody();
 
@@ -161,8 +159,8 @@ class _SnackbarTestBody extends StatelessWidget {
   }
 }
 
-/// A banner for the scaffold's bottom accessory slot, such as a count of
-/// scheduled messages.
+// A banner for the scaffold's bottom accessory slot, such as a count of
+// scheduled messages.
 class _DemoBanner extends StatelessWidget {
   const _DemoBanner();
 

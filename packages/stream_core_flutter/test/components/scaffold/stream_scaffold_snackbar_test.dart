@@ -164,6 +164,57 @@ void main() {
     expect(_snackbarRect(tester).bottom, lessThanOrEqualTo(_rectOf(tester, firstBottomKey).top));
   });
 
+  testWidgets('a snackbar from a plain page pushed over a StreamScaffold page shows at the scope bottom', (
+    tester,
+  ) async {
+    final plainBodyKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: const StreamScaffold(
+        body: SizedBox.expand(),
+        bottom: SizedBox(height: _kBarHeight),
+      ),
+    );
+    navigatorKey.currentState!
+        .push(
+          MaterialPageRoute<void>(
+            builder: (_) => Scaffold(body: SizedBox.expand(key: plainBodyKey)),
+          ),
+        )
+        .ignore();
+    await tester.pumpAndSettle();
+    await _showSnackbar(tester, plainBodyKey);
+
+    expect(find.text(_kMessage), findsOneWidget);
+  });
+
+  testWidgets('a snackbar shown under a dialog over a StreamScaffold shows at the scope bottom', (tester) async {
+    final dialogKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: const StreamScaffold(
+        body: SizedBox.expand(),
+        bottom: SizedBox(height: _kBarHeight),
+      ),
+    );
+    showDialog<void>(
+      context: navigatorKey.currentContext!,
+      builder: (_) => SizedBox(key: dialogKey, width: 100, height: 100),
+    ).ignore();
+    await tester.pumpAndSettle();
+    await _showSnackbar(tester, dialogKey);
+
+    final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(find.text(_kMessage), findsOneWidget);
+    expect(_snackbarRect(tester).bottom, greaterThan(screenHeight - _kBarHeight));
+  });
+
   testWidgets('a default StreamSnackbarPopup in the bottom slot shows its snackbars above the bottom', (
     tester,
   ) async {
@@ -206,6 +257,96 @@ void main() {
     );
 
     expect(find.text(_kMessage), findsOneWidget);
+
+    await tester.pumpAndSettle();
+
+    expect(find.text(_kMessage), findsOneWidget);
+  });
+
+  testWidgets('the action of a scope snackbar in a StreamScaffold dismisses that snackbar', (tester) async {
+    final scopeMessenger = StreamSnackbarMessenger();
+    final popupMessenger = StreamSnackbarMessenger();
+    addTearDown(scopeMessenger.dispose);
+    addTearDown(popupMessenger.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(extensions: [StreamTheme()]),
+        builder: (context, child) => StreamSnackbarScope.withState(messenger: scopeMessenger, child: child!),
+        home: StreamSnackbarPopup.withState(
+          messenger: popupMessenger,
+          child: const StreamScaffold(body: SizedBox.expand()),
+        ),
+      ),
+    );
+    scopeMessenger.show(
+      StreamSnackbar(
+        message: const Text(_kMessage),
+        action: StreamSnackbarAction(label: const Text('Undo'), onPressed: () {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(_kMessage), findsNothing);
+  });
+
+  testWidgets('a default StreamSnackbarPopup under a nested scope keeps its snackbars above its child', (
+    tester,
+  ) async {
+    final anchorKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      home: StreamScaffold(
+        body: StreamSnackbarScope(
+          child: Column(
+            children: [
+              const Expanded(child: SizedBox.expand()),
+              StreamSnackbarPopup(
+                child: SizedBox(key: anchorKey, height: _kBarHeight, width: double.infinity),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await _showSnackbar(tester, anchorKey);
+
+    expect(_snackbarRect(tester).bottom, lessThanOrEqualTo(_rectOf(tester, anchorKey).top));
+  });
+
+  testWidgets('StreamSnackbarScope shows the new messenger snackbar after its messenger is swapped', (
+    tester,
+  ) async {
+    final first = StreamSnackbarMessenger();
+    final second = StreamSnackbarMessenger();
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    final messenger = ValueNotifier(first);
+    addTearDown(messenger.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(extensions: [StreamTheme()]),
+        builder: (context, child) => ValueListenableBuilder(
+          valueListenable: messenger,
+          builder: (context, value, _) => StreamSnackbarScope.withState(messenger: value, child: child!),
+        ),
+        home: const StreamScaffold(body: SizedBox.expand()),
+      ),
+    );
+    first.show(StreamSnackbar(message: const Text('First')));
+    second.show(StreamSnackbar(message: const Text('Second')));
+    await tester.pumpAndSettle();
+
+    messenger.value = second;
+    await tester.pumpAndSettle();
+
+    expect(find.text('First'), findsNothing);
+    expect(find.text('Second'), findsOneWidget);
   });
 }
 

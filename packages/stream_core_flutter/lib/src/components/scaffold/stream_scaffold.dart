@@ -52,8 +52,9 @@ import '../toolbar/stream_app_bar.dart';
 /// A [bottomAccessory] floats over the body just above [bottom], and the
 /// body's `MediaQuery.padding.bottom` grows by its height.
 ///
-/// Snackbars shown through an enclosing [StreamSnackbarScope] rest above
-/// both. A scaffold nested in another scaffold leaves them to the outer one.
+/// While this scaffold's route is current, snackbars shown through an
+/// enclosing [StreamSnackbarScope] rest above both. A scaffold nested in
+/// another scaffold leaves them to the outer one.
 ///
 /// ## Drawer support
 ///
