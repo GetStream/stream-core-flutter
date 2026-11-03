@@ -6,6 +6,8 @@
 - `StreamMessageText` now links a web address written without a scheme, such
   as `example.com`, when it ends in a known top-level domain. It opens over
   `https://`.
+- Added `bottomAccessory` to `StreamScaffold`, for a widget that floats just
+  above `bottom`.
 
 ### 🐛 Bug Fixes
 
@@ -21,6 +23,10 @@
 
 - `StreamMessageText` opens a `www.` address over `https://` instead of
   `http://`.
+- Snackbars from a `StreamSnackbarScope` now show inside a `StreamScaffold`,
+  above its `bottom` and `bottomAccessory`, instead of covering them. A
+  default `StreamSnackbarPopup` inside a `StreamScaffold` shows its snackbars
+  there too.
 
 ## 0.5.3
 

@@ -352,21 +352,28 @@ class _StreamSnackbarHostState extends State<StreamSnackbarHost> {
       messenger: widget.messenger,
       child: _SnackbarStage(
         messenger: widget.messenger,
-        builder: (context, animation, child) {
-          final style = context.streamSnackbarTheme.style;
-          final defaults = _StreamSnackbarDefaults(context);
-          final effectiveMargin = (style?.margin ?? defaults.margin).resolve(Directionality.of(context));
-
-          return Padding(
-            padding: effectiveMargin,
-            child: Center(
-              child: _SnackbarTransition(animation: animation, child: child),
-            ),
-          );
-        },
+        builder: _buildInlineSnackbar,
       ),
     );
   }
+}
+
+// Lays out a snackbar inline: centered horizontally inside the theme margin.
+Widget _buildInlineSnackbar(
+  BuildContext context,
+  Animation<double> animation,
+  Widget child,
+) {
+  final style = context.streamSnackbarTheme.style;
+  final defaults = _StreamSnackbarDefaults(context);
+  final margin = style?.margin ?? defaults.margin;
+
+  return Padding(
+    padding: margin.resolve(Directionality.of(context)),
+    child: Center(
+      child: _SnackbarTransition(animation: animation, child: child),
+    ),
+  );
 }
 
 /// Where the snackbar is positioned relative to its [StreamSnackbarPopup]
@@ -430,6 +437,10 @@ enum StreamSnackbarPopupPlacement {
 class StreamSnackbarPopup extends StatefulWidget {
   /// Creates a popup with an auto-managed [StreamSnackbarMessenger].
   /// Disposed when the popup is removed from the tree.
+  ///
+  /// Inside a [StreamSnackbarSurface] the popup shows nothing itself:
+  /// descendants reach the page's snackbars, which already rest above the
+  /// page's bottom chrome.
   const StreamSnackbarPopup({
     super.key,
     required this.child,
@@ -486,6 +497,11 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
 
   @override
   Widget build(BuildContext context) {
+    // Inside a surface, descendants share the page's snackbars instead, which
+    // already rest above everything docked at the bottom of the page.
+    final insideSurface = context.getInheritedWidgetOfExactType<_SnackbarSurfaceMarker>() != null;
+    if (widget.externalMessenger == null && insideSurface) return widget.child;
+
     final messenger = _effectiveMessenger;
     return _StreamSnackbarHostProvider(
       messenger: messenger,
@@ -540,6 +556,10 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
 
 /// Wraps a subtree with a managed [StreamSnackbarMessenger] and renders the
 /// current snackbar at the bottom of itself.
+///
+/// While a [StreamScaffold] is mounted under the scope, the snackbar shows in
+/// the scaffold instead, above whatever the scaffold docks at its bottom. A
+/// scaffold nested in another scaffold leaves it to the outer one.
 ///
 /// Descendants show snackbars from anywhere via
 /// `StreamSnackbarMessenger.of(context).show(...)`. Nested scopes own
@@ -611,17 +631,66 @@ class StreamSnackbarScope extends StatefulWidget {
   State<StreamSnackbarScope> createState() => _StreamSnackbarScopeState();
 }
 
-class _StreamSnackbarScopeState extends State<StreamSnackbarScope> {
+class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTickerProviderStateMixin {
   StreamSnackbarMessenger? _ownedMessenger;
+  late final _SnackbarPresenter _presenter;
+
+  final _surfaces = <_StreamSnackbarSurfaceState>{};
+  final _showOwnHost = ValueNotifier(false);
+  var _updateScheduled = false;
 
   StreamSnackbarMessenger get _effectiveMessenger {
     return widget.externalMessenger ?? (_ownedMessenger ??= StreamSnackbarMessenger());
   }
 
   @override
+  void initState() {
+    super.initState();
+    _presenter = _SnackbarPresenter(
+      vsync: this,
+      messenger: _effectiveMessenger,
+      accessibleNavigation: () => _accessibleNavigationOf(context),
+    );
+    _scheduleSurfacesUpdate();
+  }
+
+  @override
+  void didUpdateWidget(StreamSnackbarScope oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _presenter.messenger = _effectiveMessenger;
+  }
+
+  @override
   void dispose() {
+    _showOwnHost.dispose();
+    _presenter.dispose();
     _ownedMessenger?.dispose();
     super.dispose();
+  }
+
+  void _register(_StreamSnackbarSurfaceState surface) {
+    _surfaces.add(surface);
+    _scheduleSurfacesUpdate();
+  }
+
+  void _unregister(_StreamSnackbarSurfaceState surface) {
+    final removed = _surfaces.remove(surface);
+    assert(removed, 'A surface unregistered twice.');
+    _scheduleSurfacesUpdate();
+  }
+
+  // Surfaces register while the tree builds, possibly after the scope's own
+  // host has built, so the host only shows once a frame has settled without
+  // any surface.
+  void _scheduleSurfacesUpdate() {
+    if (_updateScheduled) return;
+    _updateScheduled = true;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _updateScheduled = false;
+      if (!mounted) return;
+      _showOwnHost.value = _surfaces.isEmpty;
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
   }
 
   @override
@@ -630,24 +699,111 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> {
     // covers static insets (home indicator, side notches) but ignores the
     // soft keyboard's `viewInsets`.
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-    return _StreamSnackbarHostProvider(
-      messenger: _effectiveMessenger,
-      child: Stack(
-        children: [
-          widget.child,
-          Positioned(
-            bottom: keyboardInset,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              top: false,
-              child: StreamSnackbarHost(messenger: _effectiveMessenger),
+    return _SnackbarScopeMarker(
+      scope: this,
+      child: _StreamSnackbarHostProvider(
+        messenger: _effectiveMessenger,
+        child: Stack(
+          children: [
+            widget.child,
+            Positioned(
+              bottom: keyboardInset,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                top: false,
+                child: ValueListenableBuilder(
+                  valueListenable: _showOwnHost,
+                  builder: (context, showOwnHost, _) {
+                    if (!showOwnHost || _surfaces.isNotEmpty) return const SizedBox.shrink();
+                    return _SnackbarView(
+                      presenter: _presenter,
+                      builder: _buildInlineSnackbar,
+                    );
+                  },
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+}
+
+// Lets a StreamSnackbarSurface find the scope it shows snackbars for.
+class _SnackbarScopeMarker extends InheritedWidget {
+  const _SnackbarScopeMarker({required this.scope, required super.child});
+
+  final _StreamSnackbarScopeState scope;
+
+  @override
+  bool updateShouldNotify(_SnackbarScopeMarker oldWidget) => scope != oldWidget.scope;
+}
+
+/// A page region that shows the snackbars of the enclosing
+/// [StreamSnackbarScope] in place of the scope.
+///
+/// [builder] receives the snackbar to place, or null when there is nothing
+/// to show here. Every surface not nested in another surface of the same
+/// scope shows the scope's current snackbar. The scope shows it at its own
+/// bottom edge only while no surface is mounted.
+///
+/// An auto-managed [StreamSnackbarPopup] inside a surface shows nothing
+/// itself, so its descendants reach the scope.
+class StreamSnackbarSurface extends StatefulWidget {
+  /// Creates a surface that places the scope's snackbar through [builder].
+  const StreamSnackbarSurface({super.key, required this.builder});
+
+  /// Builds the region, placing the given snackbar where it should rest.
+  final Widget Function(BuildContext context, Widget? snackbar) builder;
+
+  @override
+  State<StreamSnackbarSurface> createState() => _StreamSnackbarSurfaceState();
+}
+
+class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
+  _StreamSnackbarScopeState? _scope;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final scope = context.dependOnInheritedWidgetOfExactType<_SnackbarScopeMarker>()?.scope;
+    if (scope == _scope) return;
+    _scope?._unregister(this);
+    _scope = scope?.._register(this);
+  }
+
+  @override
+  void dispose() {
+    _scope?._unregister(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = _scope;
+    if (scope == null) return widget.builder(context, null);
+
+    final parent = context.getInheritedWidgetOfExactType<_SnackbarSurfaceMarker>();
+    final isRoot = parent?.scope != scope;
+    final snackbar = isRoot ? _SnackbarView(presenter: scope._presenter, builder: _buildInlineSnackbar) : null;
+
+    return _SnackbarSurfaceMarker(
+      scope: scope,
+      child: Builder(builder: (context) => widget.builder(context, snackbar)),
+    );
+  }
+}
+
+// Marks a subtree covered by a StreamSnackbarSurface of [scope].
+class _SnackbarSurfaceMarker extends InheritedWidget {
+  const _SnackbarSurfaceMarker({required this.scope, required super.child});
+
+  final _StreamSnackbarScopeState scope;
+
+  @override
+  bool updateShouldNotify(_SnackbarSurfaceMarker oldWidget) => scope != oldWidget.scope;
 }
 
 // Exposes the messenger to the rendered snackbar so the action button
@@ -664,90 +820,73 @@ class _StreamSnackbarHostProvider extends InheritedWidget {
   bool updateShouldNotify(_StreamSnackbarHostProvider oldWidget) => messenger != oldWidget.messenger;
 }
 
-// Internal staging widget — owns the enter/exit animation, the timeout
-// timer, the Dismissible swipe, and the currently-showing _HostedSnackbar.
-// Shared between Host and Popup via the [builder] callback that wraps the
-// snackbar with positioning.
-class _SnackbarStage extends StatefulWidget {
-  const _SnackbarStage({
-    required this.messenger,
-    required this.builder,
-  });
+typedef _SnackbarLayoutBuilder = Widget Function(BuildContext context, Animation<double> animation, Widget child);
 
-  final StreamSnackbarMessenger messenger;
-  final Widget Function(BuildContext context, Animation<double> animation, Widget child) builder;
-
-  @override
-  State<_SnackbarStage> createState() => _SnackbarStageState();
+// No dependency on MediaQuery: the first read can come from initState.
+bool _accessibleNavigationOf(BuildContext context) {
+  final mediaQuery = context.getInheritedWidgetOfExactType<MediaQuery>();
+  return mediaQuery?.data.accessibleNavigation ?? false;
 }
 
-class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProviderStateMixin {
-  late final AnimationController _animation;
+// Plays one messenger's queue: owns the enter/exit animation, the timeout
+// timer and the currently-showing _HostedSnackbar. Kept out of the widget
+// tree so the snackbar it plays can move between surfaces mid-animation.
+class _SnackbarPresenter extends ChangeNotifier {
+  _SnackbarPresenter({
+    required TickerProvider vsync,
+    required this._messenger,
+    required this._accessibleNavigation,
+  }) : animation = AnimationController(
+         vsync: vsync,
+         duration: _enterDuration,
+         reverseDuration: _exitDuration,
+       ) {
+    animation.addStatusListener(_handleAnimationStatus);
+    _messenger.addListener(_sync);
+    _sync();
+  }
+
+  final AnimationController animation;
+  final bool Function() _accessibleNavigation;
+  StreamSnackbarMessenger _messenger;
   Timer? _timer;
   _HostedSnackbar? _showing;
   var _exiting = false;
+  var _disposed = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _animation = AnimationController(
-      vsync: this,
-      duration: _enterDuration,
-      reverseDuration: _exitDuration,
-    )..addStatusListener(_handleAnimationStatus);
-    widget.messenger.addListener(_onControllerChanged);
-    _syncWithController();
+  _HostedSnackbar? get showing => _showing;
+
+  set messenger(StreamSnackbarMessenger value) {
+    if (identical(value, _messenger)) return;
+    _messenger.removeListener(_sync);
+    _messenger = value..addListener(_sync);
+    _timer?.cancel();
+    _timer = null;
+    _exiting = false;
+    _showing = null;
+    animation.value = 0;
+    _sync();
   }
 
   // Drives the auto-dismiss timer off the enter-animation status instead
   // of chaining whenComplete onto the forward future.
   void _handleAnimationStatus(AnimationStatus status) {
-    if (!mounted) return;
+    if (_disposed) return;
     if (status == AnimationStatus.completed) {
       _startTimer();
       _showing?.snackbar.props.onVisible?.call();
     }
   }
 
-  @override
-  void didUpdateWidget(_SnackbarStage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.messenger != widget.messenger) {
-      oldWidget.messenger.removeListener(_onControllerChanged);
-      widget.messenger.addListener(_onControllerChanged);
-      _timer?.cancel();
-      _timer = null;
-      _exiting = false;
-      _showing = null;
-      _animation.value = 0;
-      _syncWithController();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.messenger.removeListener(_onControllerChanged);
-    _timer?.cancel();
-    _animation.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() => _syncWithController();
-
-  // No dependency on MediaQuery: the first read can come from initState.
-  bool get _accessibleNavigation {
-    final mediaQuery = context.getInheritedWidgetOfExactType<MediaQuery>();
-    return mediaQuery?.data.accessibleNavigation ?? false;
-  }
-
-  void _syncWithController() {
-    final next = widget.messenger._queue.isEmpty ? null : widget.messenger._queue.first;
+  void _sync() {
+    if (_disposed) return;
+    final queue = _messenger._queue;
+    final next = queue.isEmpty ? null : queue.first;
 
     if (identical(next, _showing)) {
       final hosted = _showing;
-      if (hosted != null && hosted._requestedExit != null && !_exiting) {
-        _startExit(hosted, hosted._requestedExit!);
-      }
+      final reason = hosted?._requestedExit;
+      if (hosted != null && reason != null && !_exiting) _startExit(hosted, reason);
       return;
     }
 
@@ -759,19 +898,17 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
 
     _timer?.cancel();
     _showing = next;
-    _animation.value = 0;
-    setState(() {});
-    if (next != null) {
-      if (_accessibleNavigation) {
-        _animation.value = 1;
-      } else {
-        _animation.forward(from: 0);
-      }
+    animation.value = 0;
+    notifyListeners();
+    if (next == null) return;
+    if (_accessibleNavigation()) {
+      animation.value = 1;
+    } else {
+      animation.forward(from: 0);
     }
   }
 
   void _startTimer() {
-    if (!mounted) return;
     final hosted = _showing;
     if (hosted == null) return;
     final duration = _resolveDuration(hosted.snackbar.props);
@@ -785,45 +922,114 @@ class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProvide
   }
 
   Future<void> _startExit(_HostedSnackbar hosted, StreamSnackbarClosedReason reason) async {
-    if (_exiting || !mounted) return;
-    // Capture before the await — the host's messenger may swap while the
-    // exit animation plays, and `hosted` belongs to whichever messenger
-    // owned it at the start of the exit.
-    final messenger = widget.messenger;
+    if (_exiting || _disposed) return;
+    // Capture before the await — the messenger may swap while the exit
+    // animation plays, and `hosted` belongs to whichever messenger owned it
+    // at the start of the exit.
+    final messenger = _messenger;
     _exiting = true;
     _timer?.cancel();
-    if (_accessibleNavigation) {
-      _animation.value = 0;
+    if (_accessibleNavigation()) {
+      animation.value = 0;
     } else {
-      await _animation.reverse();
+      await animation.reverse();
     }
-    if (!mounted) return;
+    if (_disposed) return;
     _showing = null;
     _exiting = false;
-    setState(() {});
+    notifyListeners();
     messenger._finalize(hosted, reason);
   }
 
-  void _handleSwipeDismissed() {
-    if (_exiting || !mounted) return;
-    // Delegate to the public API; _syncWithController picks up the new
-    // head after notifyListeners and resets the local state.
-    widget.messenger.removeCurrent(StreamSnackbarClosedReason.swipe);
+  void handleSwipeDismissed() {
+    if (_exiting || _disposed) return;
+    // Delegate to the public API; _sync picks up the new head after
+    // notifyListeners and resets the local state.
+    _messenger.removeCurrent(StreamSnackbarClosedReason.swipe);
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _messenger.removeListener(_sync);
+    _timer?.cancel();
+    animation.dispose();
+    super.dispose();
+  }
+}
+
+// Renders the snackbar a presenter is playing, wrapped by [builder] for
+// positioning.
+class _SnackbarView extends StatelessWidget {
+  const _SnackbarView({required this.presenter, required this.builder});
+
+  final _SnackbarPresenter presenter;
+  final _SnackbarLayoutBuilder builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: presenter,
+      builder: (context, _) {
+        final hosted = presenter.showing;
+        if (hosted == null) return const SizedBox.shrink();
+        final style = context.streamSnackbarTheme.style;
+        final direction = hosted.snackbar.props.dismissDirection ?? style?.dismissDirection ?? DismissDirection.down;
+        final dismissible = Dismissible(
+          key: ObjectKey(hosted),
+          direction: direction,
+          onDismissed: (_) => presenter.handleSwipeDismissed(),
+          child: hosted.snackbar,
+        );
+        return builder(context, presenter.animation, dismissible);
+      },
+    );
+  }
+}
+
+// Plays a messenger's queue in place, for Host and Popup. The [builder]
+// callback wraps the snackbar with positioning.
+class _SnackbarStage extends StatefulWidget {
+  const _SnackbarStage({
+    required this.messenger,
+    required this.builder,
+  });
+
+  final StreamSnackbarMessenger messenger;
+  final _SnackbarLayoutBuilder builder;
+
+  @override
+  State<_SnackbarStage> createState() => _SnackbarStageState();
+}
+
+class _SnackbarStageState extends State<_SnackbarStage> with SingleTickerProviderStateMixin {
+  late final _SnackbarPresenter _presenter;
+
+  @override
+  void initState() {
+    super.initState();
+    _presenter = _SnackbarPresenter(
+      vsync: this,
+      messenger: widget.messenger,
+      accessibleNavigation: () => _accessibleNavigationOf(context),
+    );
+  }
+
+  @override
+  void didUpdateWidget(_SnackbarStage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _presenter.messenger = widget.messenger;
+  }
+
+  @override
+  void dispose() {
+    _presenter.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final hosted = _showing;
-    if (hosted == null) return const SizedBox.shrink();
-    final style = context.streamSnackbarTheme.style;
-    final direction = hosted.snackbar.props.dismissDirection ?? style?.dismissDirection ?? DismissDirection.down;
-    final dismissible = Dismissible(
-      key: ObjectKey(hosted),
-      direction: direction,
-      onDismissed: (_) => _handleSwipeDismissed(),
-      child: hosted.snackbar,
-    );
-    return widget.builder(context, _animation, dismissible);
+    return _SnackbarView(presenter: _presenter, builder: widget.builder);
   }
 }
 
