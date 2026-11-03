@@ -437,10 +437,6 @@ enum StreamSnackbarPopupPlacement {
 class StreamSnackbarPopup extends StatefulWidget {
   /// Creates a popup with an auto-managed [StreamSnackbarMessenger].
   /// Disposed when the popup is removed from the tree.
-  ///
-  /// Inside a [StreamScaffold] under a [StreamSnackbarScope], the popup shows
-  /// nothing itself: snackbars from its descendants show above the scaffold's
-  /// bottom instead of over [child].
   const StreamSnackbarPopup({
     super.key,
     required this.child,
@@ -497,10 +493,6 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
 
   @override
   Widget build(BuildContext context) {
-    final surfaceScope = _SnackbarSurfaceMarker.maybeOf(context);
-    final deferToSurface = surfaceScope != null && surfaceScope == _SnackbarScopeMarker.maybeOf(context);
-    if (widget.externalMessenger == null && deferToSurface) return widget.child;
-
     final messenger = _effectiveMessenger;
     return _StreamSnackbarHostProvider(
       messenger: messenger,
@@ -556,11 +548,9 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
 /// Wraps a subtree with a managed [StreamSnackbarMessenger] and renders the
 /// current snackbar at the bottom of itself.
 ///
-/// While a [StreamScaffold] on the current route is mounted under the scope,
-/// the snackbar shows in the scaffold instead, above whatever the scaffold
-/// docks at its bottom. A scaffold nested in another scaffold leaves it to the
-/// outer one. When a page without a [StreamScaffold], or a dialog, covers the
-/// scaffold, the snackbar shows at the bottom of the scope again.
+/// While a [StreamScaffold] is mounted under the scope, the snackbar shows in
+/// the scaffold instead, above whatever the scaffold docks at its bottom. A
+/// scaffold nested in another scaffold leaves it to the outer one.
 ///
 /// Descendants show snackbars from anywhere via
 /// `StreamSnackbarMessenger.of(context).show(...)`. Nested scopes own
@@ -680,20 +670,16 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
     _scheduleSurfacesUpdate();
   }
 
-  // Whether a surface on the current route is showing the snackbar, so the
-  // scope's own host should not.
-  bool get _hasCurrentSurface => _surfaces.any((it) => it._isOnCurrentRoute);
-
-  // Surfaces register and change routes while the tree builds, possibly after
-  // the scope's own host has built, so the host only shows once a frame has
-  // settled without a surface on the current route.
+  // Surfaces register while the tree builds, possibly after the scope's own
+  // host has built, so the host only shows once a frame has settled without
+  // any surface.
   void _scheduleSurfacesUpdate() {
     if (_updateScheduled) return;
     _updateScheduled = true;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _updateScheduled = false;
       if (!mounted) return;
-      _showOwnHost.value = !_hasCurrentSurface;
+      _showOwnHost.value = _surfaces.isEmpty;
     });
     SchedulerBinding.instance.ensureVisualUpdate();
   }
@@ -720,7 +706,7 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
                 child: ValueListenableBuilder(
                   valueListenable: _showOwnHost,
                   builder: (context, showOwnHost, _) {
-                    if (!showOwnHost || _hasCurrentSurface) return const SizedBox.shrink();
+                    if (!showOwnHost || _surfaces.isNotEmpty) return const SizedBox.shrink();
                     return _SnackbarView(
                       presenter: _presenter,
                       builder: _buildInlineSnackbar,
@@ -755,13 +741,9 @@ class _SnackbarScopeMarker extends InheritedWidget {
 /// [StreamSnackbarScope] in place of the scope.
 ///
 /// [builder] receives the snackbar to place, or null when there is nothing
-/// to show here. Every surface on the current route that is not nested in
-/// another surface of the same scope shows the scope's current snackbar. The
-/// scope shows it at its own bottom edge while no such surface is mounted,
-/// such as when a page without one, or a dialog, covers it.
-///
-/// An auto-managed [StreamSnackbarPopup] inside a surface shows nothing
-/// itself, so its descendants reach the scope.
+/// to show here. Every surface not nested in another surface of the same
+/// scope shows the scope's current snackbar. The scope shows it at its own
+/// bottom edge only while no surface is mounted.
 class StreamSnackbarSurface extends StatefulWidget {
   /// Creates a surface that places the scope's snackbar through [builder].
   const StreamSnackbarSurface({super.key, required this.builder});
@@ -775,22 +757,14 @@ class StreamSnackbarSurface extends StatefulWidget {
 
 class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
   _StreamSnackbarScopeState? _scope;
-  var _isOnCurrentRoute = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final scope = _SnackbarScopeMarker.maybeOf(context);
-    final isOnCurrentRoute = ModalRoute.isCurrentOf(context) ?? true;
-    if (scope != _scope) {
-      _scope?._unregister(this);
-      _isOnCurrentRoute = isOnCurrentRoute;
-      _scope = scope?.._register(this);
-      return;
-    }
-    if (isOnCurrentRoute == _isOnCurrentRoute) return;
-    _isOnCurrentRoute = isOnCurrentRoute;
-    _scope?._scheduleSurfacesUpdate();
+    if (scope == _scope) return;
+    _scope?._unregister(this);
+    _scope = scope?.._register(this);
   }
 
   @override
@@ -805,10 +779,9 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     if (scope == null) return widget.builder(context, null);
 
     final isRoot = _SnackbarSurfaceMarker.maybeOf(context) != scope;
-    final showsSnackbar = isRoot && _isOnCurrentRoute;
     // The provider keeps the snackbar's action and dismiss on the scope's
     // messenger, whatever messenger is nearer to this surface.
-    final snackbar = showsSnackbar
+    final snackbar = isRoot
         ? _StreamSnackbarHostProvider(
             messenger: scope._effectiveMessenger,
             child: _SnackbarView(presenter: scope._presenter, builder: _buildInlineSnackbar),

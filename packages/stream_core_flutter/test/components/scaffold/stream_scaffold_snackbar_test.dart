@@ -164,83 +164,6 @@ void main() {
     expect(_snackbarRect(tester).bottom, lessThanOrEqualTo(_rectOf(tester, firstBottomKey).top));
   });
 
-  testWidgets('a snackbar from a plain page pushed over a StreamScaffold page shows at the scope bottom', (
-    tester,
-  ) async {
-    final plainBodyKey = GlobalKey();
-    final navigatorKey = GlobalKey<NavigatorState>();
-
-    await _pumpApp(
-      tester,
-      navigatorKey: navigatorKey,
-      home: const StreamScaffold(
-        body: SizedBox.expand(),
-        bottom: SizedBox(height: _kBarHeight),
-      ),
-    );
-    navigatorKey.currentState!
-        .push(
-          MaterialPageRoute<void>(
-            builder: (_) => Scaffold(body: SizedBox.expand(key: plainBodyKey)),
-          ),
-        )
-        .ignore();
-    await tester.pumpAndSettle();
-    await _showSnackbar(tester, plainBodyKey);
-
-    expect(find.text(_kMessage), findsOneWidget);
-  });
-
-  testWidgets('a snackbar shown under a dialog over a StreamScaffold shows at the scope bottom', (tester) async {
-    final dialogKey = GlobalKey();
-    final navigatorKey = GlobalKey<NavigatorState>();
-
-    await _pumpApp(
-      tester,
-      navigatorKey: navigatorKey,
-      home: const StreamScaffold(
-        body: SizedBox.expand(),
-        bottom: SizedBox(height: _kBarHeight),
-      ),
-    );
-    showDialog<void>(
-      context: navigatorKey.currentContext!,
-      builder: (_) => SizedBox(key: dialogKey, width: 100, height: 100),
-    ).ignore();
-    await tester.pumpAndSettle();
-    await _showSnackbar(tester, dialogKey);
-
-    final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
-    expect(find.text(_kMessage), findsOneWidget);
-    expect(_snackbarRect(tester).bottom, greaterThan(screenHeight - _kBarHeight));
-  });
-
-  testWidgets('a default StreamSnackbarPopup in the bottom slot shows its snackbars above the bottom', (
-    tester,
-  ) async {
-    final bottomKey = GlobalKey();
-    final anchorKey = GlobalKey();
-
-    await _pumpApp(
-      tester,
-      home: StreamScaffold(
-        body: const SizedBox.expand(),
-        bottom: StreamSnackbarPopup(
-          child: SizedBox(
-            key: bottomKey,
-            height: _kBarHeight,
-            child: SizedBox(key: anchorKey),
-          ),
-        ),
-        bottomAccessory: const SizedBox(height: _kAccessoryHeight),
-      ),
-    );
-    await _showSnackbar(tester, anchorKey);
-
-    expect(find.byType(StreamSnackbar), findsOneWidget);
-    expect(_snackbarRect(tester).bottom, lessThan(_rectOf(tester, bottomKey).top - _kAccessoryHeight));
-  });
-
   testWidgets('StreamSnackbarScope shows the snackbar once when a StreamScaffold mounts with one queued', (
     tester,
   ) async {
@@ -291,31 +214,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(_kMessage), findsNothing);
-  });
-
-  testWidgets('a default StreamSnackbarPopup under a nested scope keeps its snackbars above its child', (
-    tester,
-  ) async {
-    final anchorKey = GlobalKey();
-
-    await _pumpApp(
-      tester,
-      home: StreamScaffold(
-        body: StreamSnackbarScope(
-          child: Column(
-            children: [
-              const Expanded(child: SizedBox.expand()),
-              StreamSnackbarPopup(
-                child: SizedBox(key: anchorKey, height: _kBarHeight, width: double.infinity),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    await _showSnackbar(tester, anchorKey);
-
-    expect(_snackbarRect(tester).bottom, lessThanOrEqualTo(_rectOf(tester, anchorKey).top));
   });
 
   testWidgets('StreamSnackbarScope shows the new messenger snackbar after its messenger is swapped', (
