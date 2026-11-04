@@ -501,7 +501,26 @@ class _StreamScaffoldContentDelegate extends MultiChildLayoutDelegate {
 
     if (hasChild(_Slot.snackbar)) {
       final snackbarSize = layoutChild(_Slot.snackbar, fullWidth);
-      positionChild(_Slot.snackbar, Offset(0, size.height - inset - snackbarSize.height));
+      final snackbarTop = size.height - inset - snackbarSize.height;
+      positionChild(_Slot.snackbar, Offset(0, snackbarTop));
+
+      assert(() {
+        // An empty snackbar slot has no height and never shows.
+        if (snackbarSize.height == 0 || snackbarTop >= 0) return true;
+        throw FlutterError.fromParts([
+          ErrorSummary('StreamSnackbar presented off screen.'),
+          ErrorDescription(
+            'A snackbar shown in a StreamScaffold rests above its bottom and '
+            'bottomAccessory, but together they leave no room for it: its top '
+            'edge would sit at ${snackbarTop.toStringAsFixed(1)}, above the '
+            'top of the scaffold body.',
+          ),
+          ErrorHint(
+            'Consider making the bottom or the bottomAccessory shorter, or '
+            'giving the StreamScaffold more height.',
+          ),
+        ]);
+      }());
     }
   }
 

@@ -545,12 +545,14 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
   }
 }
 
-/// Provides a [StreamSnackbarMessenger] to its subtree and shows its snackbars.
+/// A widget that provides a [StreamSnackbarMessenger] to its subtree and shows
+/// its snackbars.
 ///
 /// Every `StreamScaffold` under the scope that is not nested in another
 /// `StreamScaffold` shows the current snackbar above whatever it docks at its
-/// bottom, including one inside a dialog. While no `StreamScaffold` is mounted,
-/// the scope shows the snackbar at its own bottom edge instead.
+/// bottom, including one inside a dialog. While the scope has no
+/// `StreamScaffold` under it, it shows the snackbar at its own bottom edge
+/// instead.
 ///
 /// A page that shows snackbars therefore needs its own `StreamScaffold`.
 /// Otherwise its snackbars show on the `StreamScaffold` beneath it: behind a
@@ -873,13 +875,14 @@ class _SnackbarScopeMarker extends InheritedWidget {
 /// [builder] receives the snackbar to place, or null when there is nothing
 /// to show here. Every surface not nested in another surface of the same
 /// scope shows the scope's current snackbar. The scope shows it at its own
-/// bottom edge only while no surface is mounted.
+/// bottom edge only while it has no surface under it.
 @internal
 class StreamSnackbarSurface extends StatefulWidget {
   /// Creates a surface that places the scope's snackbar through [builder].
   const StreamSnackbarSurface({super.key, required this.builder});
 
-  /// Builds the region, placing the given snackbar where it should rest.
+  /// The builder for the region, given the snackbar to place or null when
+  /// there is nothing to show here.
   final Widget Function(BuildContext context, Widget? snackbar) builder;
 
   @override
