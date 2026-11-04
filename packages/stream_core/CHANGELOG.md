@@ -22,6 +22,7 @@
 - Added `sortedUpsertAt`, which upserts at an index the caller already has instead of searching for one
 - Added `sortedMerge`, an O(n + m) merge for a receiver that is already sorted, which skips sorting `other` when it already arrives in order. Unlike `merge` it never re-sorts the whole result, so it stays flat as the receiver grows
 - Added `sortedWith`, a stable sort: elements the comparator calls equal keep the order they arrived in, where `sorted` reorders them once the list is longer than 32
+- Added `InFlightCache.inFlight`, which returns the call in flight for a key without starting one
 - `merge` now accepts a nullable `other`, so a list straight off a response needs no null check
 - Added `StreamWebSocketClient.optionsProvider`, which builds the options asynchronously and is given the error that closed the previous attempt, within `defaultOptionsTimeout`
 - Added `ConnectionStateEmitter.settled`, which completes once the connection is no longer in transition

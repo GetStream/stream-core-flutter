@@ -29,4 +29,10 @@ class InFlightCache<K, V> {
 
     return future;
   }
+
+  /// The [Future] in flight for [key], or null when none is.
+  ///
+  /// Starts no work: a caller that must wait for a running call before
+  /// deciding anything awaits this instead of starting one with [run].
+  Future<V>? inFlight(K key) => _inFlight[key];
 }

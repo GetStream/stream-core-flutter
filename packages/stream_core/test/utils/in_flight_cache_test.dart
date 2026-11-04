@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
@@ -95,6 +97,42 @@ void main() {
 
       expect(invocations, 2);
       expect(second, 2);
+    });
+
+    test('inFlight returns the running future for its key only', () async {
+      final cache = InFlightCache<String, int>();
+      final gate = Completer<int>();
+
+      final running = cache.run('key', () => gate.future);
+
+      expect(cache.inFlight('key'), same(running));
+      expect(cache.inFlight('other'), isNull);
+
+      gate.complete(42);
+      expect(await cache.inFlight('key'), 42);
+    });
+
+    test('inFlight is null before a call and once it settles', () async {
+      final cache = InFlightCache<String, int>();
+      var invocations = 0;
+
+      expect(cache.inFlight('key'), isNull);
+
+      await cache.run('key', () async => ++invocations);
+
+      expect(cache.inFlight('key'), isNull);
+      expect(invocations, 1);
+    });
+
+    test('inFlight is null once the call fails', () async {
+      final cache = InFlightCache<String, int>();
+
+      await expectLater(
+        cache.run('key', () async => throw StateError('boom')),
+        throwsStateError,
+      );
+
+      expect(cache.inFlight('key'), isNull);
     });
 
     test('synchronous throws inside work are wrapped as rejected futures', () async {
