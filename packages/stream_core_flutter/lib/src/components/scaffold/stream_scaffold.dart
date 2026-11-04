@@ -47,14 +47,11 @@ import '../toolbar/stream_app_bar.dart';
 /// sync, set the matching [appBarSurfaceStyle] / [bottomSurfaceStyle] here, or
 /// drive both from the ambient [StreamSurfaceStyle].
 ///
-/// ## Bottom accessory and snackbars
-///
-/// A [bottomAccessory] floats over the body just above [bottom], and the
-/// body's `MediaQuery.padding.bottom` grows by its height.
+/// ## Snackbars
 ///
 /// Snackbars shown through an enclosing [StreamSnackbarScope] rest above
-/// both, and above the on-screen keyboard while [resizeToAvoidBottomInset] is
-/// true. A scaffold nested in another scaffold leaves them to the outer one.
+/// [bottom], and above the on-screen keyboard while [resizeToAvoidBottomInset]
+/// is true. A scaffold nested in another scaffold leaves them to the outer one.
 ///
 /// ## Drawer support
 ///
@@ -95,7 +92,6 @@ class StreamScaffold extends StatelessWidget {
     this.appBar,
     required this.body,
     this.bottom,
-    this.bottomAccessory,
     this.drawer,
     this.onDrawerChanged,
     this.endDrawer,
@@ -134,13 +130,6 @@ class StreamScaffold extends StatelessWidget {
   /// being covered by it — intended for a composer, though a nav bar placed
   /// here lifts with the keyboard too.
   final Widget? bottom;
-
-  /// An optional widget that floats over the body just above [bottom], such
-  /// as a banner about the page.
-  ///
-  /// It spans the body's width and brings its own margins. Snackbars rest
-  /// above it.
-  final Widget? bottomAccessory;
 
   /// A panel displayed to the side of the [body], often hidden on mobile
   /// devices. Swipes in from either [TextDirection.ltr] start side or
@@ -262,11 +251,7 @@ class StreamScaffold extends StatelessWidget {
         builder: (context, snackbar) => _StreamScaffoldBody(
           floating: bottomFloating,
           bottom: bottom,
-          child: _StreamScaffoldContent(
-            accessory: bottomAccessory,
-            snackbar: snackbar,
-            child: body,
-          ),
+          child: _StreamScaffoldContent(snackbar: snackbar, child: body),
         ),
       ),
     );
@@ -274,7 +259,7 @@ class StreamScaffold extends StatelessWidget {
 }
 
 // Layout slot identifiers used by the body and content delegates.
-enum _Slot { body, bottom, accessory, snackbar }
+enum _Slot { body, bottom, snackbar }
 
 // Custom BoxConstraints that carries the measured bottomHeight so a
 // LayoutBuilder inside the body can read it synchronously within the same
@@ -291,8 +276,7 @@ class _BodyBoxConstraints extends BoxConstraints {
     required this.bottomHeight,
   }) : assert(bottomHeight >= 0, 'bottomHeight must be non-negative');
 
-  // The extent to publish as the body's bottom padding: the measured floating
-  // bottom slot, or the bottom inset plus any bottom accessory.
+  // The measured height of the floating bottom slot.
   final double bottomHeight;
 
   @override
@@ -383,7 +367,27 @@ class _StreamScaffoldBody extends StatelessWidget {
       children: [
         LayoutId(
           id: _Slot.body,
-          child: _InsetBody(child: child),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final bottomHeight = constraints is _BodyBoxConstraints ? constraints.bottomHeight : 0.0;
+
+              // Publish the floating bottom bar's height through
+              // MediaQuery.padding.bottom so standard scrollables (ListView /
+              // GridView) and SafeArea inset their content automatically. The top
+              // inset already arrives through MediaQuery.padding.top when the app
+              // bar floats, so only the bottom is added here. math.max never
+              // shrinks an existing system inset.
+              final mediaQuery = MediaQuery.of(context);
+              final effectivePadding = mediaQuery.padding.copyWith(
+                bottom: math.max(mediaQuery.padding.bottom, bottomHeight),
+              );
+
+              return MediaQuery(
+                data: mediaQuery.copyWith(padding: effectivePadding),
+                child: child,
+              );
+            },
+          ),
         ),
         LayoutId(id: _Slot.bottom, child: bottom!),
       ],
@@ -391,55 +395,18 @@ class _StreamScaffoldBody extends StatelessWidget {
   }
 }
 
-// Publishes the bottom extent measured by a delegate through
-// MediaQuery.padding.bottom, so standard scrollables (ListView / GridView) and
-// SafeArea inset their content automatically. The top inset already arrives
-// through MediaQuery.padding.top when the app bar floats, so only the bottom is
-// added here. math.max never shrinks an existing system inset.
-class _InsetBody extends StatelessWidget {
-  const _InsetBody({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bottomHeight = constraints is _BodyBoxConstraints ? constraints.bottomHeight : 0.0;
-
-        final mediaQuery = MediaQuery.of(context);
-        final effectivePadding = mediaQuery.padding.copyWith(
-          bottom: math.max(mediaQuery.padding.bottom, bottomHeight),
-        );
-
-        return MediaQuery(
-          data: mediaQuery.copyWith(padding: effectivePadding),
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-// Lays the body out with the bottom accessory floating over its bottom edge
-// and the snackbar resting above both.
+// Lays the body out and rests the snackbar on the body's bottom inset.
 //
-// Always built, even with neither present, so the body keeps its element when
-// they come and go.
+// Always built, even without a snackbar, so the body keeps its element when
+// one comes and goes.
 class _StreamScaffoldContent extends StatelessWidget {
-  const _StreamScaffoldContent({
-    required this.accessory,
-    required this.snackbar,
-    required this.child,
-  });
+  const _StreamScaffoldContent({required this.snackbar, required this.child});
 
-  final Widget? accessory;
   final Widget? snackbar;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final accessory = this.accessory;
     final snackbar = this.snackbar;
 
     return CustomMultiChildLayout(
@@ -447,30 +414,26 @@ class _StreamScaffoldContent extends StatelessWidget {
         bottomInset: MediaQuery.paddingOf(context).bottom,
       ),
       children: [
-        LayoutId(
-          id: _Slot.body,
-          child: _InsetBody(child: child),
-        ),
-        if (accessory != null) LayoutId(id: _Slot.accessory, child: _withoutVerticalPadding(context, accessory)),
-        if (snackbar != null) LayoutId(id: _Slot.snackbar, child: _withoutVerticalPadding(context, snackbar)),
+        LayoutId(id: _Slot.body, child: child),
+        if (snackbar != null)
+          LayoutId(
+            id: _Slot.snackbar,
+            // The snackbar is already placed clear of the vertical insets, so
+            // it must not inset itself a second time.
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              removeBottom: true,
+              child: snackbar,
+            ),
+          ),
       ],
-    );
-  }
-
-  // The accessory and the snackbar are already placed clear of the vertical
-  // insets, so they must not inset themselves a second time.
-  Widget _withoutVerticalPadding(BuildContext context, Widget child) {
-    return MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      removeBottom: true,
-      child: child,
     );
   }
 }
 
-// Stacks the accessory and then the snackbar upwards from [bottomInset], and
-// lays the body out with the accessory's height added to that inset.
+// Fills the region with the body and stacks the snackbar upwards from
+// [bottomInset].
 class _StreamScaffoldContentDelegate extends MultiChildLayoutDelegate {
   _StreamScaffoldContentDelegate({required this.bottomInset});
 
@@ -478,50 +441,27 @@ class _StreamScaffoldContentDelegate extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    var inset = bottomInset;
-    final fullWidth = BoxConstraints.tightFor(width: size.width);
-
-    if (hasChild(_Slot.accessory)) {
-      final accessorySize = layoutChild(_Slot.accessory, fullWidth);
-      inset += accessorySize.height;
-      positionChild(_Slot.accessory, Offset(0, size.height - inset));
-    }
-
-    layoutChild(
-      _Slot.body,
-      _BodyBoxConstraints(
-        minWidth: size.width,
-        maxWidth: size.width,
-        minHeight: size.height,
-        maxHeight: size.height,
-        bottomHeight: inset,
-      ),
-    );
+    layoutChild(_Slot.body, BoxConstraints.tight(size));
     positionChild(_Slot.body, Offset.zero);
 
-    if (hasChild(_Slot.snackbar)) {
-      final snackbarSize = layoutChild(_Slot.snackbar, fullWidth);
-      final snackbarTop = size.height - inset - snackbarSize.height;
-      positionChild(_Slot.snackbar, Offset(0, snackbarTop));
+    if (!hasChild(_Slot.snackbar)) return;
+    final snackbarSize = layoutChild(_Slot.snackbar, BoxConstraints.tightFor(width: size.width));
+    final snackbarTop = size.height - bottomInset - snackbarSize.height;
+    positionChild(_Slot.snackbar, Offset(0, snackbarTop));
 
-      assert(() {
-        // An empty snackbar slot has no height and never shows.
-        if (snackbarSize.height == 0 || snackbarTop >= 0) return true;
-        throw FlutterError.fromParts([
-          ErrorSummary('StreamSnackbar presented off screen.'),
-          ErrorDescription(
-            'A snackbar shown in a StreamScaffold rests above its bottom and '
-            'bottomAccessory, but together they leave no room for it: its top '
-            'edge would sit at ${snackbarTop.toStringAsFixed(1)}, above the '
-            'top of the scaffold body.',
-          ),
-          ErrorHint(
-            'Consider making the bottom or the bottomAccessory shorter, or '
-            'giving the StreamScaffold more height.',
-          ),
-        ]);
-      }());
-    }
+    assert(() {
+      // An empty snackbar slot has no height and never shows.
+      if (snackbarSize.height == 0 || snackbarTop >= 0) return true;
+      throw FlutterError.fromParts([
+        ErrorSummary('StreamSnackbar presented off screen.'),
+        ErrorDescription(
+          'A snackbar shown in a StreamScaffold rests above its bottom, but '
+          'the bottom leaves no room for it: its top edge would sit at '
+          '${snackbarTop.toStringAsFixed(1)}, above the top of the scaffold body.',
+        ),
+        ErrorHint('Consider making the bottom shorter, or giving the StreamScaffold more height.'),
+      ]);
+    }());
   }
 
   @override

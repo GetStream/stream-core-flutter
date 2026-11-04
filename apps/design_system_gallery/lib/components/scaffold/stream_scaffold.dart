@@ -80,7 +80,7 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 }
 
 // =============================================================================
-// Snackbars — rest above the bottom slot and the bottom accessory
+// Snackbars — rest above the bottom slot
 // =============================================================================
 
 @widgetbook.UseCase(
@@ -99,20 +99,11 @@ Widget buildStreamScaffoldSnackbars(BuildContext context) {
         'floating — the bottom bar overlaps the body. Snackbars rest above it either way.',
   );
 
-  final showAccessory = context.knobs.boolean(
-    label: 'Show bottom accessory',
-    initialValue: true,
-    description:
-        'Floats a banner just above the bottom bar. Snackbars rest above it, '
-        'and move down when it is turned off.',
-  );
-
   return StreamSnackbarScope(
     child: StreamScaffold(
       bottomSurfaceStyle: bottomSurfaceStyle,
       appBar: _demoAppBar(context, floating: false),
       bottom: _DemoBottomNav(floating: bottomSurfaceStyle == StreamSurfaceStyle.floating),
-      bottomAccessory: showAccessory ? const _DemoBanner() : null,
       body: const _SnackbarDemoBody(),
     ),
   );
@@ -136,8 +127,8 @@ class _SnackbarDemoBody extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Show a snackbar, then toggle the bottom accessory or the bottom '
-              'bar style. The snackbar always rests above them.',
+              'Show a snackbar, then toggle the bottom bar style. The snackbar '
+              'always rests above the bottom bar.',
               textAlign: TextAlign.center,
               style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
             ),
@@ -153,47 +144,6 @@ class _SnackbarDemoBody extends StatelessWidget {
               child: const Text('Show snackbar'),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// A banner for the scaffold's bottom accessory slot, such as a count of
-// scheduled messages.
-class _DemoBanner extends StatelessWidget {
-  const _DemoBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    final textTheme = context.streamTextTheme;
-    final spacing = context.streamSpacing;
-
-    return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(spacing.md, 0, spacing.md, spacing.md),
-      child: Material(
-        elevation: context.streamElevation.level2,
-        color: colorScheme.backgroundElevation1,
-        shape: const StadiumBorder(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.sm),
-          child: Row(
-            children: [
-              Icon(context.streamIcons.clock, size: 20),
-              SizedBox(width: spacing.xs),
-              Expanded(
-                child: Text(
-                  '3 scheduled messages',
-                  style: textTheme.bodyDefault.copyWith(color: colorScheme.textPrimary),
-                ),
-              ),
-              Text(
-                'View all',
-                style: textTheme.captionEmphasis.copyWith(color: colorScheme.accentPrimary),
-              ),
-            ],
-          ),
         ),
       ),
     );

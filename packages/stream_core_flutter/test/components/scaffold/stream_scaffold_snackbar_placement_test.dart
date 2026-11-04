@@ -37,23 +37,6 @@ void main() {
     expect(_snackbarRect(tester).bottom, _rectOf(tester, bottomKey).top - _kMargin);
   });
 
-  testWidgets('StreamScaffold shows a scope snackbar above the bottom accessory', (tester) async {
-    final accessoryKey = GlobalKey();
-    final bodyKey = GlobalKey();
-
-    await _pumpApp(
-      tester,
-      home: StreamScaffold(
-        body: SizedBox.expand(key: bodyKey),
-        bottom: const SizedBox(height: _kBarHeight),
-        bottomAccessory: SizedBox(key: accessoryKey, height: _kAccessoryHeight),
-      ),
-    );
-    await _showSnackbar(tester, bodyKey);
-
-    expect(_snackbarRect(tester).bottom, _rectOf(tester, accessoryKey).top - _kMargin);
-  });
-
   testWidgets('StreamScaffold without a bottom shows a scope snackbar above the bottom inset', (tester) async {
     final bodyKey = GlobalKey();
     _setViewPadding(tester, bottom: _kHomeIndicator);
@@ -126,34 +109,17 @@ void main() {
     expect((snackbarPadding!.top, snackbarPadding!.bottom), (0.0, 0.0));
   });
 
-  testWidgets('StreamScaffold gives the bottom accessory no vertical padding', (tester) async {
-    EdgeInsets? accessoryPadding;
-    _setViewPadding(tester, top: _kStatusBar, bottom: _kHomeIndicator);
-
-    await _pumpApp(
-      tester,
-      home: _floatingScaffold(
-        body: const SizedBox.expand(),
-        bottomAccessory: Builder(
-          builder: (context) {
-            accessoryPadding = MediaQuery.paddingOf(context);
-            return const SizedBox(height: _kAccessoryHeight);
-          },
-        ),
-      ),
-    );
-
-    expect((accessoryPadding!.top, accessoryPadding!.bottom), (0.0, 0.0));
-  });
-
-  testWidgets('StreamScaffold reports a scope snackbar its bottom chrome leaves no room for', (tester) async {
+  testWidgets('StreamScaffold reports a scope snackbar its bottom leaves no room for', (tester) async {
     final bodyKey = GlobalKey();
 
+    // A floating bottom overlaps the body instead of shrinking it, so an
+    // oversized one leaves the body full height but no room above the bottom.
     await _pumpApp(
       tester,
       home: StreamScaffold(
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
         body: SizedBox.expand(key: bodyKey),
-        bottomAccessory: SizedBox(height: _screenHeight(tester) - _kAccessoryHeight / 2),
+        bottom: SizedBox(height: _screenHeight(tester) - _kMargin),
       ),
     );
     StreamSnackbarMessenger.of(bodyKey.currentContext!).show(StreamSnackbar(message: const Text(_kMessage)));
@@ -169,73 +135,10 @@ void main() {
       ),
     );
   });
-
-  testWidgets('StreamScaffold floats the bottom accessory just above a docked bottom', (tester) async {
-    final accessoryKey = GlobalKey();
-    final bottomKey = GlobalKey();
-
-    await _pumpApp(
-      tester,
-      home: StreamScaffold(
-        body: const SizedBox.expand(),
-        bottom: SizedBox(key: bottomKey, height: _kBarHeight),
-        bottomAccessory: SizedBox(key: accessoryKey, height: _kAccessoryHeight),
-      ),
-    );
-
-    expect(_rectOf(tester, accessoryKey).bottom, _rectOf(tester, bottomKey).top);
-  });
-
-  testWidgets('StreamScaffold adds the bottom accessory height to the body bottom padding', (tester) async {
-    double? bodyBottomPadding;
-
-    await _pumpApp(
-      tester,
-      home: StreamScaffold(
-        body: Builder(
-          builder: (context) {
-            bodyBottomPadding = MediaQuery.paddingOf(context).bottom;
-            return const SizedBox.expand();
-          },
-        ),
-        bottom: const SizedBox(height: _kBarHeight),
-        bottomAccessory: const SizedBox(height: _kAccessoryHeight),
-      ),
-    );
-
-    expect(bodyBottomPadding, _kAccessoryHeight);
-  });
-
-  testWidgets('StreamScaffold moves a showing snackbar down when the bottom accessory is removed', (tester) async {
-    final bodyKey = GlobalKey();
-    final showAccessory = ValueNotifier(true);
-    addTearDown(showAccessory.dispose);
-
-    await _pumpApp(
-      tester,
-      home: ValueListenableBuilder(
-        valueListenable: showAccessory,
-        builder: (context, show, _) => StreamScaffold(
-          body: SizedBox.expand(key: bodyKey),
-          bottom: const SizedBox(height: _kBarHeight),
-          bottomAccessory: show ? const SizedBox(height: _kAccessoryHeight) : null,
-        ),
-      ),
-    );
-    await _showSnackbar(tester, bodyKey);
-    final bottomWithAccessory = _snackbarRect(tester).bottom;
-
-    showAccessory.value = false;
-    await tester.pump();
-
-    final bottomWithoutAccessory = _snackbarRect(tester).bottom;
-    expect(bottomWithoutAccessory - bottomWithAccessory, _kAccessoryHeight);
-  });
 }
 
 const _kMessage = 'Message copied';
 const double _kBarHeight = 56;
-const double _kAccessoryHeight = 40;
 const double _kMargin = 12;
 const double _kHomeIndicator = 34;
 const double _kStatusBar = 24;
@@ -266,13 +169,12 @@ Future<void> _pumpApp(
   );
 }
 
-StreamScaffold _floatingScaffold({required Widget body, Widget? bottomAccessory}) {
+StreamScaffold _floatingScaffold({required Widget body}) {
   return StreamScaffold(
     appBarSurfaceStyle: StreamSurfaceStyle.floating,
     bottomSurfaceStyle: StreamSurfaceStyle.floating,
     appBar: const PreferredSize(preferredSize: Size.fromHeight(_kBarHeight), child: SizedBox.expand()),
     bottom: const SizedBox(height: _kBarHeight),
-    bottomAccessory: bottomAccessory,
     body: body,
   );
 }

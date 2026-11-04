@@ -31,18 +31,6 @@ GoldenTestGroup _buildMatrix(Brightness brightness) {
         name: 'floating bottom',
         child: _buildScene(brightness: brightness, bottomSurfaceStyle: StreamSurfaceStyle.floating),
       ),
-      GoldenTestScenario(
-        name: 'docked bottom · accessory',
-        child: _buildScene(brightness: brightness, withAccessory: true),
-      ),
-      GoldenTestScenario(
-        name: 'floating bottom · accessory',
-        child: _buildScene(
-          brightness: brightness,
-          bottomSurfaceStyle: StreamSurfaceStyle.floating,
-          withAccessory: true,
-        ),
-      ),
     ],
   );
 }
@@ -50,7 +38,6 @@ GoldenTestGroup _buildMatrix(Brightness brightness) {
 Widget _buildScene({
   required Brightness brightness,
   StreamSurfaceStyle bottomSurfaceStyle = StreamSurfaceStyle.regular,
-  bool withAccessory = false,
 }) {
   return SizedBox(
     width: 320,
@@ -65,7 +52,6 @@ Widget _buildScene({
           bottomSurfaceStyle: bottomSurfaceStyle,
           body: const _Body(),
           bottom: const _Bottom(),
-          bottomAccessory: withAccessory ? const _Accessory() : null,
         ),
       ),
     ),
@@ -136,25 +122,6 @@ class _Bottom extends StatelessWidget {
       alignment: Alignment.center,
       color: colorScheme.backgroundSurfaceStrong,
       child: Text('Bottom', style: TextStyle(color: colorScheme.textSecondary)),
-    );
-  }
-}
-
-class _Accessory extends StatelessWidget {
-  const _Accessory();
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-    return Container(
-      height: 40,
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      alignment: Alignment.center,
-      decoration: ShapeDecoration(
-        color: colorScheme.backgroundSurfaceSubtle,
-        shape: const StadiumBorder(),
-      ),
-      child: Text('Bottom accessory', style: TextStyle(color: colorScheme.textPrimary)),
     );
   }
 }
