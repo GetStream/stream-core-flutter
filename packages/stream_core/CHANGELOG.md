@@ -4,6 +4,7 @@
 
 - Added `findLinks` and `findLinkAt`, which find the web links in a text, with
   or without a scheme, such as `https://example.com` or `example.com`.
+- Added `InFlightCache.inFlight`, which returns the call in flight for a key without starting one
 
 ## 0.5.1+1
 
