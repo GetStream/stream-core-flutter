@@ -113,15 +113,15 @@ Widget buildStreamScaffoldSnackbars(BuildContext context) {
       appBar: _demoAppBar(context, floating: false),
       bottom: _DemoBottomNav(floating: bottomSurfaceStyle == StreamSurfaceStyle.floating),
       bottomAccessory: showAccessory ? const _DemoBanner() : null,
-      body: const _SnackbarTestBody(),
+      body: const _SnackbarDemoBody(),
     ),
   );
 }
 
 // Body for the Snackbars use-case: a button that shows a snackbar from the
 // scaffold's body.
-class _SnackbarTestBody extends StatelessWidget {
-  const _SnackbarTestBody();
+class _SnackbarDemoBody extends StatelessWidget {
+  const _SnackbarDemoBody();
 
   @override
   Widget build(BuildContext context) {

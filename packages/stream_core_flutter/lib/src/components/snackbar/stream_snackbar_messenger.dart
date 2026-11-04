@@ -545,12 +545,19 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
   }
 }
 
-/// Wraps a subtree with a managed [StreamSnackbarMessenger] and renders the
-/// current snackbar at the bottom of itself.
+/// Provides a [StreamSnackbarMessenger] to its subtree and shows its snackbars.
 ///
-/// While a `StreamScaffold` is mounted under the scope, the snackbar shows in
-/// the scaffold instead, above whatever the scaffold docks at its bottom. A
-/// scaffold nested in another scaffold leaves it to the outer one.
+/// Every `StreamScaffold` under the scope that is not nested in another
+/// `StreamScaffold` shows the current snackbar above whatever it docks at its
+/// bottom, including one inside a dialog. While no `StreamScaffold` is mounted,
+/// the scope shows the snackbar at its own bottom edge instead.
+///
+/// A page that shows snackbars therefore needs its own `StreamScaffold`.
+/// Otherwise its snackbars show on the `StreamScaffold` beneath it: behind a
+/// dialog's barrier, or hidden under an opaque page.
+///
+/// A snackbar can be built in more than one place at once, so its content
+/// must not use a [GlobalKey].
 ///
 /// Descendants show snackbars from anywhere via
 /// `StreamSnackbarMessenger.of(context).show(...)`. Nested scopes own
@@ -612,7 +619,7 @@ class StreamSnackbarScope extends StatefulWidget {
     required this.child,
   }) : externalMessenger = messenger;
 
-  /// The subtree that can show snackbars via [StreamSnackbar.show].
+  /// The subtree that can show snackbars via [StreamSnackbarMessenger.show].
   final Widget child;
 
   /// External messenger used when constructed via [withState].
@@ -625,10 +632,7 @@ class StreamSnackbarScope extends StatefulWidget {
 class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTickerProviderStateMixin {
   StreamSnackbarMessenger? _ownedMessenger;
   late final _SnackbarPresenter _presenter;
-
-  final _surfaces = <_StreamSnackbarSurfaceState>{};
-  final _showOwnHost = ValueNotifier(false);
-  var _updateScheduled = false;
+  final _surfaces = _SurfaceRegistry();
 
   StreamSnackbarMessenger get _effectiveMessenger {
     return widget.externalMessenger ?? (_ownedMessenger ??= StreamSnackbarMessenger());
@@ -642,7 +646,6 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
       messenger: _effectiveMessenger,
       accessibleNavigation: () => _accessibleNavigationOf(context),
     );
-    _scheduleSurfacesUpdate();
   }
 
   @override
@@ -653,35 +656,10 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
 
   @override
   void dispose() {
-    _showOwnHost.dispose();
+    _surfaces.dispose();
     _presenter.dispose();
     _ownedMessenger?.dispose();
     super.dispose();
-  }
-
-  void _register(_StreamSnackbarSurfaceState surface) {
-    _surfaces.add(surface);
-    _scheduleSurfacesUpdate();
-  }
-
-  void _unregister(_StreamSnackbarSurfaceState surface) {
-    final removed = _surfaces.remove(surface);
-    assert(removed, 'A surface unregistered twice.');
-    _scheduleSurfacesUpdate();
-  }
-
-  // Surfaces register while the tree builds, possibly after the scope's own
-  // host has built, so the host only shows once a frame has settled without
-  // any surface.
-  void _scheduleSurfacesUpdate() {
-    if (_updateScheduled) return;
-    _updateScheduled = true;
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      _updateScheduled = false;
-      if (!mounted) return;
-      _showOwnHost.value = _surfaces.isEmpty;
-    });
-    SchedulerBinding.instance.ensureVisualUpdate();
   }
 
   @override
@@ -703,21 +681,173 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
               right: 0,
               child: SafeArea(
                 top: false,
-                child: ValueListenableBuilder(
-                  valueListenable: _showOwnHost,
-                  builder: (context, showOwnHost, _) {
-                    if (!showOwnHost || _surfaces.isNotEmpty) return const SizedBox.shrink();
-                    return _SnackbarView(
+                child: _HiddenWhileSurfaced(
+                  surfaces: _surfaces,
+                  child: _InactiveWhileSurfaced(
+                    surfaces: _surfaces,
+                    child: _SnackbarView(
                       presenter: _presenter,
                       builder: _buildInlineSnackbar,
-                    );
-                  },
+                    ),
+                  ),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+// The surfaces showing a scope's snackbars. Surfaces join and leave while the
+// tree builds, which is before the frame paints.
+class _SurfaceRegistry extends ChangeNotifier {
+  final _surfaces = <_StreamSnackbarSurfaceState>{};
+
+  bool get isEmpty => _surfaces.isEmpty;
+
+  void add(_StreamSnackbarSurfaceState surface) {
+    final added = _surfaces.add(surface);
+    assert(added, 'A surface registered twice.');
+    notifyListeners();
+  }
+
+  void remove(_StreamSnackbarSurfaceState surface) {
+    final removed = _surfaces.remove(surface);
+    assert(removed, 'A surface unregistered twice.');
+    notifyListeners();
+  }
+}
+
+// Skips painting, hit testing and semantics for [child] while any surface is
+// registered. The decision is made at paint time, so a surface that joins or
+// leaves during this frame's build is already accounted for.
+class _HiddenWhileSurfaced extends SingleChildRenderObjectWidget {
+  const _HiddenWhileSurfaced({required this.surfaces, required super.child});
+
+  final _SurfaceRegistry surfaces;
+
+  @override
+  _RenderHiddenWhileSurfaced createRenderObject(BuildContext context) {
+    return _RenderHiddenWhileSurfaced(surfaces);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderHiddenWhileSurfaced renderObject) {
+    renderObject.surfaces = surfaces;
+  }
+}
+
+class _RenderHiddenWhileSurfaced extends RenderProxyBox {
+  _RenderHiddenWhileSurfaced(this._surfaces);
+
+  _SurfaceRegistry get surfaces => _surfaces;
+  _SurfaceRegistry _surfaces;
+  set surfaces(_SurfaceRegistry value) {
+    if (identical(value, _surfaces)) return;
+    if (attached) _surfaces.removeListener(_handleSurfacesChanged);
+    _surfaces = value;
+    if (attached) _surfaces.addListener(_handleSurfacesChanged);
+    _handleSurfacesChanged();
+  }
+
+  bool get _hidden => !_surfaces.isEmpty;
+
+  void _handleSurfacesChanged() {
+    markNeedsPaint();
+    markNeedsSemanticsUpdate();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _surfaces.addListener(_handleSurfacesChanged);
+  }
+
+  @override
+  void detach() {
+    _surfaces.removeListener(_handleSurfacesChanged);
+    super.detach();
+  }
+
+  @override
+  bool paintsChild(RenderBox child) => !_hidden;
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (_hidden) return;
+    super.paint(context, offset);
+  }
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    if (_hidden) return false;
+    return super.hitTest(result, position: position);
+  }
+
+  @override
+  void visitChildrenForSemantics(RenderObjectVisitor visitor) {
+    if (_hidden) return;
+    super.visitChildrenForSemantics(visitor);
+  }
+}
+
+// Stops tickers and keeps focus out of [child] while any surface is
+// registered. Neither is visible, so this follows the registry a frame late:
+// surfaces join and leave during build, when this widget can't rebuild.
+class _InactiveWhileSurfaced extends StatefulWidget {
+  const _InactiveWhileSurfaced({required this.surfaces, required this.child});
+
+  final _SurfaceRegistry surfaces;
+  final Widget child;
+
+  @override
+  State<_InactiveWhileSurfaced> createState() => _InactiveWhileSurfacedState();
+}
+
+class _InactiveWhileSurfacedState extends State<_InactiveWhileSurfaced> {
+  var _updateScheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.surfaces.addListener(_scheduleUpdate);
+  }
+
+  @override
+  void didUpdateWidget(_InactiveWhileSurfaced oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (identical(oldWidget.surfaces, widget.surfaces)) return;
+    oldWidget.surfaces.removeListener(_scheduleUpdate);
+    widget.surfaces.addListener(_scheduleUpdate);
+  }
+
+  @override
+  void dispose() {
+    widget.surfaces.removeListener(_scheduleUpdate);
+    super.dispose();
+  }
+
+  void _scheduleUpdate() {
+    if (_updateScheduled) return;
+    _updateScheduled = true;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _updateScheduled = false;
+      if (!mounted) return;
+      setState(() {
+        // The registry changed; build reads it again.
+      });
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final active = widget.surfaces.isEmpty;
+    return TickerMode(
+      enabled: active,
+      child: ExcludeFocus(excluding: !active, child: widget.child),
     );
   }
 }
@@ -744,6 +874,7 @@ class _SnackbarScopeMarker extends InheritedWidget {
 /// to show here. Every surface not nested in another surface of the same
 /// scope shows the scope's current snackbar. The scope shows it at its own
 /// bottom edge only while no surface is mounted.
+@internal
 class StreamSnackbarSurface extends StatefulWidget {
   /// Creates a surface that places the scope's snackbar through [builder].
   const StreamSnackbarSurface({super.key, required this.builder});
@@ -763,14 +894,23 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     super.didChangeDependencies();
     final scope = _SnackbarScopeMarker.maybeOf(context);
     if (scope == _scope) return;
-    _scope?._unregister(this);
-    _scope = scope?.._register(this);
+    _scope?._surfaces.remove(this);
+    _scope = scope?.._surfaces.add(this);
+  }
+
+  // Leaving in deactivate rather than dispose: deactivation happens while the
+  // tree builds, before the frame paints, while dispose comes after it. A
+  // deactivated state is either activated again or disposed.
+  @override
+  void deactivate() {
+    _scope?._surfaces.remove(this);
+    super.deactivate();
   }
 
   @override
-  void dispose() {
-    _scope?._unregister(this);
-    super.dispose();
+  void activate() {
+    super.activate();
+    _scope?._surfaces.add(this);
   }
 
   @override
@@ -779,8 +919,6 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     if (scope == null) return widget.builder(context, null);
 
     final isRoot = _SnackbarSurfaceMarker.maybeOf(context) != scope;
-    // The provider keeps the snackbar's action and dismiss on the scope's
-    // messenger, whatever messenger is nearer to this surface.
     final snackbar = isRoot
         ? _StreamSnackbarHostProvider(
             messenger: scope._effectiveMessenger,
@@ -856,23 +994,39 @@ class _SnackbarPresenter extends ChangeNotifier {
   StreamSnackbarMessenger _messenger;
   Timer? _timer;
   _HostedSnackbar? _showing;
+  StreamSnackbarClosedReason? _exitReason;
   var _exiting = false;
   var _disposed = false;
 
   _HostedSnackbar? get showing => _showing;
 
   // Switches to playing [messenger]'s queue, dropping whatever was showing
-  // from the previous one.
+  // from the previous one. A snackbar that was already leaving is finished on
+  // its own messenger; any other stays queued there.
   void updateMessenger(StreamSnackbarMessenger messenger) {
     if (identical(messenger, _messenger)) return;
     _messenger.removeListener(_sync);
+    _finishPendingExit();
     _messenger = messenger..addListener(_sync);
     _timer?.cancel();
     _timer = null;
     _exiting = false;
+    _exitReason = null;
     _showing = null;
     animation.value = 0;
     _sync();
+  }
+
+  // Completes an exit the animation will no longer finish, because the
+  // messenger is being swapped out or the presenter disposed.
+  void _finishPendingExit() {
+    final hosted = _showing;
+    final reason = _exitReason;
+    if (!_exiting || hosted == null || reason == null) return;
+    final messenger = _messenger;
+    // Deferred: disposal runs while the widget tree is locked, and finalizing
+    // notifies the messenger's other listeners.
+    scheduleMicrotask(() => messenger._finalize(hosted, reason));
   }
 
   // Drives the auto-dismiss timer off the enter-animation status instead
@@ -935,15 +1089,22 @@ class _SnackbarPresenter extends ChangeNotifier {
     // at the start of the exit.
     final messenger = _messenger;
     _exiting = true;
+    _exitReason = reason;
     _timer?.cancel();
     if (_accessibleNavigation()) {
       animation.value = 0;
     } else {
-      await animation.reverse();
+      try {
+        await animation.reverse().orCancel;
+      } on TickerCanceled {
+        // Swapped or disposed mid-exit; _finishPendingExit finalized it.
+        return;
+      }
     }
     if (_disposed) return;
     _showing = null;
     _exiting = false;
+    _exitReason = null;
     notifyListeners();
     messenger._finalize(hosted, reason);
   }
@@ -959,6 +1120,7 @@ class _SnackbarPresenter extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _messenger.removeListener(_sync);
+    _finishPendingExit();
     _timer?.cancel();
     animation.dispose();
     super.dispose();

@@ -21,7 +21,7 @@ void main() {
 
 GoldenTestGroup _buildMatrix(Brightness brightness) {
   return GoldenTestGroup(
-    columns: 3,
+    columns: 2,
     children: [
       GoldenTestScenario(
         name: 'docked bottom',
@@ -34,6 +34,14 @@ GoldenTestGroup _buildMatrix(Brightness brightness) {
       GoldenTestScenario(
         name: 'docked bottom · accessory',
         child: _buildScene(brightness: brightness, withAccessory: true),
+      ),
+      GoldenTestScenario(
+        name: 'floating bottom · accessory',
+        child: _buildScene(
+          brightness: brightness,
+          bottomSurfaceStyle: StreamSurfaceStyle.floating,
+          withAccessory: true,
+        ),
       ),
     ],
   );
@@ -126,7 +134,7 @@ class _Bottom extends StatelessWidget {
     return Container(
       height: 56,
       alignment: Alignment.center,
-      color: colorScheme.backgroundElevation1,
+      color: colorScheme.backgroundSurfaceStrong,
       child: Text('Bottom', style: TextStyle(color: colorScheme.textSecondary)),
     );
   }

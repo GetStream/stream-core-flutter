@@ -53,7 +53,8 @@ import '../toolbar/stream_app_bar.dart';
 /// body's `MediaQuery.padding.bottom` grows by its height.
 ///
 /// Snackbars shown through an enclosing [StreamSnackbarScope] rest above
-/// both. A scaffold nested in another scaffold leaves them to the outer one.
+/// both, and above the on-screen keyboard while [resizeToAvoidBottomInset] is
+/// true. A scaffold nested in another scaffold leaves them to the outer one.
 ///
 /// ## Drawer support
 ///
@@ -290,7 +291,8 @@ class _BodyBoxConstraints extends BoxConstraints {
     required this.bottomHeight,
   }) : assert(bottomHeight >= 0, 'bottomHeight must be non-negative');
 
-  // The measured height of the floating bottom slot.
+  // The extent to publish as the body's bottom padding: the measured floating
+  // bottom slot, or the bottom inset plus any bottom accessory.
   final double bottomHeight;
 
   @override
@@ -449,9 +451,20 @@ class _StreamScaffoldContent extends StatelessWidget {
           id: _Slot.body,
           child: _InsetBody(child: child),
         ),
-        if (accessory != null) LayoutId(id: _Slot.accessory, child: accessory),
-        if (snackbar != null) LayoutId(id: _Slot.snackbar, child: snackbar),
+        if (accessory != null) LayoutId(id: _Slot.accessory, child: _withoutVerticalPadding(context, accessory)),
+        if (snackbar != null) LayoutId(id: _Slot.snackbar, child: _withoutVerticalPadding(context, snackbar)),
       ],
+    );
+  }
+
+  // The accessory and the snackbar are already placed clear of the vertical
+  // insets, so they must not inset themselves a second time.
+  Widget _withoutVerticalPadding(BuildContext context, Widget child) {
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      removeBottom: true,
+      child: child,
     );
   }
 }
