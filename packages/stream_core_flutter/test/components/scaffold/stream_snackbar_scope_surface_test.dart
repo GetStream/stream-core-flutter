@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,7 +14,10 @@ void main() {
     await _pumpApp(
       tester,
       home: StreamScaffold(
-        body: StreamScaffold(body: SizedBox.expand(key: bodyKey)),
+        body: StreamScaffold(
+          body: SizedBox.expand(key: bodyKey),
+          bottom: const SizedBox(height: _kBarHeight),
+        ),
         bottom: SizedBox(key: outerBottomKey, height: _kBarHeight),
       ),
     );
@@ -268,18 +272,326 @@ void main() {
         child: const StreamScaffold(body: SizedBox.expand()),
       ),
     );
-    scopeMessenger.show(
+    var pressed = 0;
+    StreamSnackbarClosedReason? closedReason;
+    final controller = scopeMessenger.show(
       StreamSnackbar(
         message: const Text(_kMessage),
-        action: StreamSnackbarAction(label: const Text('Undo'), onPressed: () {}),
+        action: StreamSnackbarAction(label: const Text('Undo'), onPressed: () => pressed++),
       ),
     );
+    unawaited(controller.closed.then((reason) => closedReason = reason));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Undo').hitTestable());
     await tester.pumpAndSettle();
 
-    expect(scopeMessenger.currentSnackbar, isNull);
+    expect((closedReason, pressed, scopeMessenger.currentSnackbar), (StreamSnackbarClosedReason.action, 1, null));
+  });
+
+  testWidgets('a scope snackbar moves to the StreamScaffold pushed over its page, and back on pop', (tester) async {
+    final semantics = tester.ensureSemantics();
+    final firstBottomKey = GlobalKey();
+    final secondBottomKey = GlobalKey();
+    final firstBodyKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: StreamScaffold(
+        body: SizedBox.expand(key: firstBodyKey),
+        bottom: SizedBox(key: firstBottomKey, height: _kBarHeight),
+      ),
+    );
+    StreamSnackbarMessenger.of(firstBodyKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    await _push(
+      tester,
+      navigatorKey,
+      StreamScaffold(
+        body: const SizedBox.expand(),
+        bottom: SizedBox(key: secondBottomKey, height: _kBarHeight * 2),
+      ),
+    );
+
+    expect(_paintedCopies(tester), 1);
+    expect(find.bySemanticsLabel(_kMessage), findsOneWidget);
+    expect(_snackbarRect(tester).bottom, _rectOf(tester, secondBottomKey).top - _kMargin);
+
+    navigatorKey.currentState!.pop();
+    await tester.pumpAndSettle();
+
+    expect(_paintedCopies(tester), 1);
+    expect(_snackbarRect(tester).bottom, _rectOf(tester, firstBottomKey).top - _kMargin);
+    semantics.dispose();
+  });
+
+  testWidgets('a scope snackbar flies as one copy while a StreamScaffold is pushed over its page', (tester) async {
+    final bodyKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: StreamScaffold(body: SizedBox.expand(key: bodyKey)),
+    );
+    StreamSnackbarMessenger.of(bodyKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    navigatorKey.currentState!
+        .push(
+          MaterialPageRoute<void>(
+            builder: (_) => const StreamScaffold(
+              body: SizedBox.expand(),
+              bottom: SizedBox(height: _kBarHeight),
+            ),
+          ),
+        )
+        .ignore();
+    final paintedPerFrame = <int>[];
+    for (var frame = 0; frame < 30; frame++) {
+      await tester.pump(const Duration(milliseconds: 16));
+      paintedPerFrame.add(_paintedCopies(tester));
+    }
+
+    expect(paintedPerFrame, everyElement(1));
+  });
+
+  testWidgets('a scope snackbar flies as one copy during a back swipe between StreamScaffolds', (tester) async {
+    final bodyKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: StreamScaffold(body: SizedBox.expand(key: bodyKey)),
+    );
+    navigatorKey.currentState!
+        .push(
+          CupertinoPageRoute<void>(
+            builder: (_) => const StreamScaffold(
+              body: SizedBox.expand(),
+              bottom: SizedBox(height: _kBarHeight),
+            ),
+          ),
+        )
+        .ignore();
+    await tester.pumpAndSettle();
+    StreamSnackbarMessenger.of(navigatorKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    final paintedPerFrame = <int>[];
+    final gesture = await tester.startGesture(const Offset(5, 200));
+    for (var step = 0; step < 10; step++) {
+      await gesture.moveBy(const Offset(30, 0));
+      await tester.pump(const Duration(milliseconds: 16));
+      paintedPerFrame.add(_paintedCopies(tester));
+    }
+    await gesture.up();
+    for (var frame = 0; frame < 30; frame++) {
+      await tester.pump(const Duration(milliseconds: 16));
+      paintedPerFrame.add(_paintedCopies(tester));
+    }
+
+    expect(paintedPerFrame, everyElement(1));
+  });
+
+  testWidgets('StreamScaffolds side by side keep one snackbar per pane through a push and a pop', (tester) async {
+    final leftKey = GlobalKey();
+    final rightKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Row(
+        children: [
+          Expanded(
+            child: StreamScaffold(key: leftKey, body: const SizedBox.expand()),
+          ),
+          Expanded(
+            child: StreamScaffold(key: rightKey, body: const SizedBox.expand()),
+          ),
+        ],
+      ),
+    );
+    StreamSnackbarMessenger.of(leftKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(_snackbarHeroes(leftKey), findsOneWidget);
+    expect(_snackbarHeroes(rightKey), findsNothing);
+
+    navigatorKey.currentState!
+        .push(MaterialPageRoute<void>(builder: (_) => const StreamScaffold(body: SizedBox.expand())))
+        .ignore();
+    final paintedPerPanePerFrame = <(int, int)>[];
+    for (var frame = 0; frame < 30; frame++) {
+      await tester.pump(const Duration(milliseconds: 16));
+      paintedPerPanePerFrame.add((_paintedCopiesIn(tester, leftKey), _paintedCopiesIn(tester, rightKey)));
+    }
+    navigatorKey.currentState!.pop();
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(paintedPerPanePerFrame.expand((counts) => [counts.$1, counts.$2]), everyElement(lessThanOrEqualTo(1)));
+  });
+
+  testWidgets('the remaining StreamScaffold carries the snackbar hero once its side-by-side neighbor leaves', (
+    tester,
+  ) async {
+    final rightKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final showLeft = ValueNotifier(true);
+    addTearDown(showLeft.dispose);
+    // The same instance on every build, so the right pane itself never
+    // rebuilds when the left one leaves.
+    final rightPane = Expanded(
+      key: const ValueKey('right'),
+      child: StreamScaffold(key: rightKey, body: const SizedBox.expand()),
+    );
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: ValueListenableBuilder(
+        valueListenable: showLeft,
+        builder: (context, showLeft, _) => Row(
+          children: [
+            if (showLeft)
+              const Expanded(
+                key: ValueKey('left'),
+                child: StreamScaffold(body: SizedBox.expand()),
+              ),
+            rightPane,
+          ],
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(rightKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    showLeft.value = false;
+    await tester.pumpAndSettle();
+
+    expect(_snackbarHeroes(rightKey), findsOneWidget);
+  });
+
+  testWidgets('a scope snackbar times out once when a StreamScaffold is pushed during its entrance', (tester) async {
+    final bodyKey = GlobalKey();
+    final navigatorKey = GlobalKey<NavigatorState>();
+    var visibleCount = 0;
+    StreamSnackbarClosedReason? closedReason;
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: StreamScaffold(body: SizedBox.expand(key: bodyKey)),
+    );
+    final controller = StreamSnackbarMessenger.of(bodyKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), onVisible: () => visibleCount++),
+    );
+    unawaited(controller.closed.then((reason) => closedReason = reason));
+    await tester.pump(const Duration(milliseconds: 100));
+    navigatorKey.currentState!
+        .push(MaterialPageRoute<void>(builder: (_) => const StreamScaffold(body: SizedBox.expand())))
+        .ignore();
+
+    // 250 ms to enter, 5 s on screen and 250 ms to leave.
+    await _pumpFrames(tester, const Duration(milliseconds: 5300));
+    expect(closedReason, isNull);
+    await _pumpFrames(tester, const Duration(milliseconds: 400));
+
+    expect((closedReason, visibleCount), (StreamSnackbarClosedReason.timeout, 1));
+  });
+
+  testWidgets('swiping a scope snackbar in a StreamScaffold away shows the next one', (tester) async {
+    final messenger = StreamSnackbarMessenger();
+    addTearDown(messenger.dispose);
+
+    await _pumpApp(
+      tester,
+      messenger: messenger,
+      home: const StreamScaffold(body: SizedBox.expand()),
+    );
+    StreamSnackbarClosedReason? closedReason;
+    final first = messenger.show(StreamSnackbar(message: const Text(_kMessage)));
+    unawaited(first.closed.then((reason) => closedReason = reason));
+    messenger.show(StreamSnackbar(message: const Text('Next')));
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.text(_kMessage).hitTestable(), const Offset(0, 300));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(closedReason, StreamSnackbarClosedReason.swipe);
+    expect(_paintedCopies(tester, 'Next'), 1);
+  });
+
+  testWidgets('nested scopes each show their snackbar in their own StreamScaffold', (tester) async {
+    final outerMessenger = StreamSnackbarMessenger();
+    addTearDown(outerMessenger.dispose);
+    final outerBottomKey = GlobalKey();
+    final innerBottomKey = GlobalKey();
+    final innerBodyKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      messenger: outerMessenger,
+      home: StreamScaffold(
+        body: StreamSnackbarScope(
+          child: StreamScaffold(
+            body: SizedBox.expand(key: innerBodyKey),
+            bottom: SizedBox(key: innerBottomKey, height: _kBarHeight),
+          ),
+        ),
+        bottom: SizedBox(key: outerBottomKey, height: _kBarHeight),
+      ),
+    );
+    outerMessenger.show(StreamSnackbar(message: const Text('Outer')));
+    StreamSnackbarMessenger.of(innerBodyKey.currentContext!).show(StreamSnackbar(message: const Text('Inner')));
+    await tester.pumpAndSettle();
+
+    expect((_paintedCopies(tester, 'Outer'), _paintedCopies(tester, 'Inner')), (1, 1));
+    expect(_snackbarRect(tester, 'Outer').bottom, _rectOf(tester, outerBottomKey).top - _kMargin);
+    expect(_snackbarRect(tester, 'Inner').bottom, _rectOf(tester, innerBottomKey).top - _kMargin);
+  });
+
+  testWidgets('a StreamScaffold body keeps its state and focus while a scope snackbar comes and goes', (
+    tester,
+  ) async {
+    final messenger = StreamSnackbarMessenger();
+    addTearDown(messenger.dispose);
+    final focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
+
+    await _pumpApp(
+      tester,
+      messenger: messenger,
+      home: StreamScaffold(body: TextField(focusNode: focusNode)),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+    final fieldState = tester.state(find.byType(EditableText));
+
+    messenger.show(StreamSnackbar(message: const Text(_kMessage)));
+    await tester.pumpAndSettle();
+    messenger.hideCurrent();
+    await tester.pumpAndSettle();
+
+    expect(tester.state(find.byType(EditableText)), same(fieldState));
+    expect(focusNode.hasFocus, isTrue);
   });
 }
 
@@ -330,8 +642,29 @@ Future<void> _showSnackbar(WidgetTester tester, GlobalKey key) async {
   await tester.pumpAndSettle();
 }
 
-Rect _snackbarRect(WidgetTester tester) {
-  final painted = find.byType(StreamSnackbar).evaluate().where((element) => _isPainted(element.renderObject!));
+// The snackbar heroes inside the widget with [key].
+Finder _snackbarHeroes(GlobalKey key) {
+  return find.descendant(
+    of: find.byKey(key),
+    matching: find.byWidgetPredicate((widget) => widget is Hero && widget.tag is ObjectKey),
+  );
+}
+
+int _paintedCopiesIn(WidgetTester tester, GlobalKey key) {
+  final copies = find.descendant(of: find.byKey(key), matching: find.text(_kMessage));
+  return copies.evaluate().where((element) => _isPainted(element.renderObject!)).length;
+}
+
+Future<void> _pumpFrames(WidgetTester tester, Duration duration) async {
+  const frame = Duration(milliseconds: 16);
+  for (var elapsed = Duration.zero; elapsed < duration; elapsed += frame) {
+    await tester.pump(frame);
+  }
+}
+
+Rect _snackbarRect(WidgetTester tester, [String text = _kMessage]) {
+  final snackbars = find.ancestor(of: find.text(text), matching: find.byType(StreamSnackbar));
+  final painted = snackbars.evaluate().where((element) => _isPainted(element.renderObject!));
   return tester.getRect(find.byElementPredicate(painted.contains));
 }
 

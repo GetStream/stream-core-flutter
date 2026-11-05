@@ -548,11 +548,15 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
 /// A widget that provides a [StreamSnackbarMessenger] to its subtree and shows
 /// its snackbars.
 ///
-/// Every `StreamScaffold` under the scope that is not nested in another
-/// `StreamScaffold` shows the current snackbar above whatever it docks at its
-/// bottom, including one inside a dialog. While the scope has no
-/// `StreamScaffold` under it, it shows the snackbar at its own bottom edge
-/// instead.
+/// Every `StreamScaffold` whose nearest scope is this one, and that is not
+/// nested in another such `StreamScaffold`, shows the current snackbar above
+/// whatever it docks at its bottom, including one inside a dialog. While the
+/// scope has no such `StreamScaffold`, it shows the snackbar at its own bottom
+/// edge instead.
+///
+/// Scaffolds side by side, such as a master and a detail pane, each show the
+/// snackbar. To show it once, put them in one outer `StreamScaffold` or give
+/// one of them its own scope.
 ///
 /// A page that shows snackbars therefore needs its own `StreamScaffold`.
 /// Otherwise its snackbars show on the `StreamScaffold` beneath it: behind a
@@ -706,13 +710,26 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
 // tree builds, which is before the frame paints.
 class _SurfaceRegistry extends ChangeNotifier {
   final _surfaces = <_StreamSnackbarSurfaceState>{};
+  var _nextOrder = 0;
 
   bool get isEmpty => _surfaces.isEmpty;
 
   void add(_StreamSnackbarSurfaceState surface) {
     final added = _surfaces.add(surface);
     assert(added, 'A surface registered twice.');
+    surface._order ??= _nextOrder++;
     notifyListeners();
+  }
+
+  // Whether [surface] carries the snackbar's hero. Heroes in one route need
+  // distinct tags, so of the surfaces in a route only the one that joined
+  // first carries it. A surface keeps its place in that order when it leaves
+  // and joins again, so moving a pane in the tree doesn't hand the hero to
+  // another. A surface outside any route has no route to share.
+  bool leadsRoute(_StreamSnackbarSurfaceState surface) {
+    final route = surface._route;
+    if (route == null) return true;
+    return _surfaces.every((other) => other._route != route || other._order! >= surface._order!);
   }
 
   void remove(_StreamSnackbarSurfaceState surface) {
@@ -872,17 +889,17 @@ class _SnackbarScopeMarker extends InheritedWidget {
 /// A page region that shows the snackbars of the enclosing
 /// [StreamSnackbarScope] in place of the scope.
 ///
-/// [builder] receives the snackbar to place, or null when there is nothing
-/// to show here. Every surface not nested in another surface of the same
-/// scope shows the scope's current snackbar. The scope shows it at its own
-/// bottom edge only while it has no surface under it.
+/// [builder] receives the snackbar to place, or null when this surface does
+/// not show the scope's snackbars. Every surface not nested in another surface
+/// of the same scope shows the scope's current snackbar. The scope shows it at
+/// its own bottom edge only while it has no surface under it.
 @internal
 class StreamSnackbarSurface extends StatefulWidget {
   /// Creates a surface that places the scope's snackbar through [builder].
   const StreamSnackbarSurface({super.key, required this.builder});
 
-  /// The builder for the region, given the snackbar to place or null when
-  /// there is nothing to show here.
+  /// The builder for the region, given the snackbar to place or null when this
+  /// surface does not show the scope's snackbars.
   final Widget Function(BuildContext context, Widget? snackbar) builder;
 
   @override
@@ -891,14 +908,50 @@ class StreamSnackbarSurface extends StatefulWidget {
 
 class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
   _StreamSnackbarScopeState? _scope;
+  ModalRoute<Object?>? _route;
+  // This surface's place among the scope's surfaces, set when it first joins.
+  int? _order;
+  var _flies = false;
+  var _updateScheduled = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _route = ModalRoute.of(context);
     final scope = _SnackbarScopeMarker.maybeOf(context);
     if (scope == _scope) return;
-    _scope?._surfaces.remove(this);
-    _scope = scope?.._surfaces.add(this);
+    _scope?._surfaces
+      ?..remove(this)
+      ..removeListener(_scheduleUpdate);
+    _order = null;
+    _scope = scope;
+    scope?._surfaces
+      ?..add(this)
+      ..addListener(_scheduleUpdate);
+  }
+
+  @override
+  void dispose() {
+    _scope?._surfaces.removeListener(_scheduleUpdate);
+    super.dispose();
+  }
+
+  // Which surface carries the hero changes as surfaces join and leave while
+  // the tree builds, when this surface can't rebuild. It only matters to the
+  // next page transition, so this follows a frame late.
+  void _scheduleUpdate() {
+    if (_updateScheduled) return;
+    _updateScheduled = true;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _updateScheduled = false;
+      final scope = _scope;
+      if (!mounted || scope == null) return;
+      if (scope._surfaces.leadsRoute(this) == _flies) return;
+      setState(() {
+        // The hero moved to or from this surface; build reads it again.
+      });
+    });
+    SchedulerBinding.instance.ensureVisualUpdate();
   }
 
   // Leaving in deactivate rather than dispose: deactivation happens while the
@@ -922,11 +975,9 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     if (scope == null) return widget.builder(context, null);
 
     final isRoot = _SnackbarSurfaceMarker.maybeOf(context) != scope;
+    _flies = scope._surfaces.leadsRoute(this);
     final snackbar = isRoot
-        ? _StreamSnackbarHostProvider(
-            messenger: scope._effectiveMessenger,
-            child: _SnackbarView(presenter: scope._presenter, builder: _buildInlineSnackbar),
-          )
+        ? _SnackbarView(presenter: scope._presenter, builder: _buildInlineSnackbar, flies: _flies)
         : null;
 
     return _SnackbarSurfaceMarker(
@@ -1001,6 +1052,8 @@ class _SnackbarPresenter extends ChangeNotifier {
   var _exiting = false;
   var _disposed = false;
 
+  StreamSnackbarMessenger get messenger => _messenger;
+
   _HostedSnackbar? get showing => _showing;
 
   // Switches to playing [messenger]'s queue, dropping whatever was showing
@@ -1017,6 +1070,8 @@ class _SnackbarPresenter extends ChangeNotifier {
     _exitReason = null;
     _showing = null;
     animation.value = 0;
+    // Views drop the previous snackbar even when the new queue is empty.
+    notifyListeners();
     _sync();
   }
 
@@ -1132,11 +1187,16 @@ class _SnackbarPresenter extends ChangeNotifier {
 
 // Renders the snackbar a presenter is playing, wrapped by [builder] for
 // positioning.
+//
+// When [flies] is true, the snackbar flies to the copy on the next page
+// during a page transition, rather than one copy fading out as another fades
+// in.
 class _SnackbarView extends StatelessWidget {
-  const _SnackbarView({required this.presenter, required this.builder});
+  const _SnackbarView({required this.presenter, required this.builder, this.flies = false});
 
   final _SnackbarPresenter presenter;
   final _SnackbarLayoutBuilder builder;
+  final bool flies;
 
   @override
   Widget build(BuildContext context) {
@@ -1153,7 +1213,23 @@ class _SnackbarView extends StatelessWidget {
           onDismissed: (_) => presenter.handleSwipeDismissed(),
           child: hosted.snackbar,
         );
-        return builder(context, presenter.animation, dismissible);
+        final child = flies
+            ? Hero(
+                tag: ObjectKey(hosted),
+                transitionOnUserGestures: true,
+                // Fades with the copies it flies between, so a snackbar that
+                // enters or leaves mid-flight still fades.
+                flightShuttleBuilder: (_, _, _, _, _) => _SnackbarTransition(
+                  animation: presenter.animation,
+                  child: dismissible,
+                ),
+                child: dismissible,
+              )
+            : dismissible;
+        return _StreamSnackbarHostProvider(
+          messenger: presenter.messenger,
+          child: builder(context, presenter.animation, child),
+        );
       },
     );
   }

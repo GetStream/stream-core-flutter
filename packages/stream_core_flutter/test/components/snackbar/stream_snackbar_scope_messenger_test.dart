@@ -24,6 +24,60 @@ void main() {
     await tester.pumpAndSettle();
 
     expect((_paintedCopies(tester, 'First'), _paintedCopies(tester, 'Second')), (0, 1));
+    expect(first.currentSnackbar, isNotNull);
+  });
+
+  testWidgets('StreamSnackbarScope drops the old snackbar when swapped to an empty messenger', (tester) async {
+    final first = StreamSnackbarMessenger();
+    final second = StreamSnackbarMessenger();
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    const home = StreamScaffold(body: SizedBox.expand());
+    var pressed = 0;
+
+    await _pumpApp(tester, messenger: first, home: home);
+    first.show(
+      StreamSnackbar(
+        message: const Text(_kMessage),
+        action: StreamSnackbarAction(label: const Text('Undo'), onPressed: () => pressed++),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final undoCenter = tester.getCenter(find.text('Undo').hitTestable());
+
+    await _pumpApp(tester, messenger: second, home: home);
+    await tester.pumpAndSettle();
+    await tester.tapAt(undoCenter);
+    await tester.pump();
+
+    expect(find.text('Undo').hitTestable(), findsNothing);
+    expect(pressed, 0);
+  });
+
+  testWidgets('the action of a snackbar dismisses it on the messenger the scope was swapped to', (tester) async {
+    final first = StreamSnackbarMessenger();
+    final second = StreamSnackbarMessenger();
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    const home = StreamScaffold(body: SizedBox.expand());
+
+    StreamSnackbarClosedReason? closedReason;
+
+    await _pumpApp(tester, messenger: first, home: home);
+    await _pumpApp(tester, messenger: second, home: home);
+    final controller = second.show(
+      StreamSnackbar(
+        message: const Text(_kMessage),
+        action: StreamSnackbarAction(label: const Text('Undo'), onPressed: () {}),
+      ),
+    );
+    unawaited(controller.closed.then((reason) => closedReason = reason));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Undo').hitTestable());
+    await tester.pumpAndSettle();
+
+    expect((closedReason, second.currentSnackbar), (StreamSnackbarClosedReason.action, null));
   });
 
   testWidgets('StreamSnackbarScope finishes a leaving snackbar when its messenger is swapped', (tester) async {
@@ -73,22 +127,28 @@ void main() {
 const _kMessage = 'Message copied';
 const double _kMargin = 12;
 
+// Shared across pumps, so pumping again with another messenger rebuilds only
+// the scope.
+final _theme = ThemeData(
+  extensions: [
+    StreamTheme(
+      snackbarTheme: const StreamSnackbarThemeData(
+        style: StreamSnackbarStyle(margin: EdgeInsets.all(_kMargin)),
+      ),
+    ),
+  ],
+);
+
 Future<void> _pumpApp(
   WidgetTester tester, {
   required Widget home,
   GlobalKey<NavigatorState>? navigatorKey,
   StreamSnackbarMessenger? messenger,
 }) {
-  final streamTheme = StreamTheme(
-    snackbarTheme: const StreamSnackbarThemeData(
-      style: StreamSnackbarStyle(margin: EdgeInsets.all(_kMargin)),
-    ),
-  );
-
   return tester.pumpWidget(
     MaterialApp(
       navigatorKey: navigatorKey,
-      theme: ThemeData(extensions: [streamTheme]),
+      theme: _theme,
       builder: (context, child) => switch (messenger) {
         final messenger? => StreamSnackbarScope.withState(messenger: messenger, child: child!),
         null => StreamSnackbarScope(child: child!),

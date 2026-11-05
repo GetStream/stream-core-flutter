@@ -21,10 +21,9 @@
 
 - `StreamMessageText` opens a `www.` address over `https://` instead of
   `http://`.
-- Snackbars from a `StreamSnackbarScope` now show in every top-level
-  `StreamScaffold`, above its `bottom`. A page without its own `StreamScaffold`
-  shows them on the one beneath it, and with `resizeToAvoidBottomInset: false`
-  they sit behind the keyboard.
+- Snackbars from a `StreamSnackbarScope` now show inside the `StreamScaffold`
+  under it, above its `bottom`. A page without its own `StreamScaffold` shows
+  them on the one beneath it.
 
 ## 0.5.3
 

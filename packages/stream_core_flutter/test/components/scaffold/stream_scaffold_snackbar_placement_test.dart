@@ -109,6 +109,48 @@ void main() {
     expect((snackbarPadding!.top, snackbarPadding!.bottom), (0.0, 0.0));
   });
 
+  testWidgets('StreamScaffold without a bottom lays out a shrink-wrapping body at its own size', (tester) async {
+    final bodyKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      home: StreamScaffold(body: SizedBox(key: bodyKey, width: 100, height: 100)),
+    );
+
+    expect(_rectOf(tester, bodyKey), const Rect.fromLTWH(0, 0, 100, 100));
+  });
+
+  testWidgets('StreamScaffold fills only the height above a docked bottom with a narrow body', (tester) async {
+    final bodyKey = GlobalKey();
+    final bottomKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      home: StreamScaffold(
+        body: SizedBox(key: bodyKey, width: 100, height: 100),
+        bottom: SizedBox(key: bottomKey, height: _kBarHeight, width: 50),
+      ),
+    );
+
+    final bottomTop = _rectOf(tester, bottomKey).top;
+    expect(_rectOf(tester, bodyKey), Rect.fromLTRB(0, 0, 100, bottomTop));
+  });
+
+  testWidgets('StreamScaffold stretches a narrow body behind a floating bottom', (tester) async {
+    final bodyKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      home: StreamScaffold(
+        bottomSurfaceStyle: StreamSurfaceStyle.floating,
+        body: SizedBox(key: bodyKey, width: 100, height: 100),
+        bottom: const SizedBox(height: _kBarHeight),
+      ),
+    );
+
+    expect(_rectOf(tester, bodyKey), Offset.zero & tester.view.physicalSize / tester.view.devicePixelRatio);
+  });
+
   testWidgets('StreamScaffold reports a scope snackbar its bottom leaves no room for', (tester) async {
     final bodyKey = GlobalKey();
 

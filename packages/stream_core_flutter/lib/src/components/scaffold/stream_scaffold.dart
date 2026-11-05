@@ -49,9 +49,11 @@ import '../toolbar/stream_app_bar.dart';
 ///
 /// ## Snackbars
 ///
-/// Snackbars shown through an enclosing [StreamSnackbarScope] rest above
-/// [bottom], and above the on-screen keyboard while [resizeToAvoidBottomInset]
-/// is true. A scaffold nested in another scaffold leaves them to the outer one.
+/// Snackbars shown through the nearest enclosing [StreamSnackbarScope] rest
+/// above [bottom], and above the on-screen keyboard while
+/// [resizeToAvoidBottomInset] is true. A scaffold nested in another scaffold
+/// under the same scope leaves them to the outer one, while scaffolds side by
+/// side each show them.
 ///
 /// ## Drawer support
 ///
@@ -432,16 +434,33 @@ class _StreamScaffoldContent extends StatelessWidget {
   }
 }
 
-// Fills the region with the body and stacks the snackbar upwards from
-// [bottomInset].
+// Fills the region, lays the body out within the region's constraints and
+// stacks the snackbar upwards from [bottomInset].
 class _StreamScaffoldContentDelegate extends MultiChildLayoutDelegate {
   _StreamScaffoldContentDelegate({required this.bottomInset});
 
   final double bottomInset;
 
+  // The constraints the region was given, recorded for the body.
+  var _constraints = const BoxConstraints();
+
+  @override
+  Size getSize(BoxConstraints constraints) {
+    _constraints = constraints;
+    return super.getSize(constraints);
+  }
+
   @override
   void performLayout(Size size) {
-    layoutChild(_Slot.body, BoxConstraints.tight(size));
+    // The body takes the region's constraints as they came, so a body that
+    // shrink-wraps does so exactly as it would without the snackbar slot.
+    final bodyConstraints = BoxConstraints(
+      minWidth: _constraints.minWidth,
+      maxWidth: size.width,
+      minHeight: _constraints.minHeight,
+      maxHeight: size.height,
+    );
+    layoutChild(_Slot.body, bodyConstraints);
     positionChild(_Slot.body, Offset.zero);
 
     if (!hasChild(_Slot.snackbar)) return;
