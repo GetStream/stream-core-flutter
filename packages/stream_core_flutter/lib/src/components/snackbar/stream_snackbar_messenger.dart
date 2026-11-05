@@ -710,26 +710,13 @@ class _StreamSnackbarScopeState extends State<StreamSnackbarScope> with SingleTi
 // tree builds, which is before the frame paints.
 class _SurfaceRegistry extends ChangeNotifier {
   final _surfaces = <_StreamSnackbarSurfaceState>{};
-  var _nextOrder = 0;
 
   bool get isEmpty => _surfaces.isEmpty;
 
   void add(_StreamSnackbarSurfaceState surface) {
     final added = _surfaces.add(surface);
     assert(added, 'A surface registered twice.');
-    surface._order ??= _nextOrder++;
     notifyListeners();
-  }
-
-  // Whether [surface] carries the snackbar's hero. Heroes in one route need
-  // distinct tags, so of the surfaces in a route only the one that joined
-  // first carries it. A surface keeps its place in that order when it leaves
-  // and joins again, so moving a pane in the tree doesn't hand the hero to
-  // another. A surface outside any route has no route to share.
-  bool leadsRoute(_StreamSnackbarSurfaceState surface) {
-    final route = surface._route;
-    if (route == null) return true;
-    return _surfaces.every((other) => other._route != route || other._order! >= surface._order!);
   }
 
   void remove(_StreamSnackbarSurfaceState surface) {
@@ -737,6 +724,10 @@ class _SurfaceRegistry extends ChangeNotifier {
     assert(removed, 'A surface unregistered twice.');
     notifyListeners();
   }
+
+  // Tells the surfaces that one of them changed what decides which carries
+  // the snackbar's hero.
+  void heroChanged() => notifyListeners();
 }
 
 // Skips painting, hit testing and semantics for [child] while any surface is
@@ -909,25 +900,33 @@ class StreamSnackbarSurface extends StatefulWidget {
 class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
   _StreamSnackbarScopeState? _scope;
   ModalRoute<Object?>? _route;
-  // This surface's place among the scope's surfaces, set when it first joins.
-  int? _order;
+  // The overlay entries of the routes this surface sits in, innermost first.
+  var _routeEntries = const <Element>[];
+  var _isRoot = false;
+  var _visible = true;
   var _flies = false;
   var _updateScheduled = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _route = ModalRoute.of(context);
     final scope = _SnackbarScopeMarker.maybeOf(context);
-    if (scope == _scope) return;
-    _scope?._surfaces
-      ?..remove(this)
-      ..removeListener(_scheduleUpdate);
-    _order = null;
-    _scope = scope;
-    scope?._surfaces
-      ?..add(this)
-      ..addListener(_scheduleUpdate);
+    if (scope != _scope) {
+      _scope?._surfaces
+        ?..remove(this)
+        ..removeListener(_scheduleUpdate);
+      _scope = scope;
+      scope?._surfaces
+        ?..add(this)
+        ..addListener(_scheduleUpdate);
+    }
+    _route = ModalRoute.of(context);
+    _routeEntries = _routeEntriesOf(context);
+    _isRoot = scope != null && _SnackbarSurfaceMarker.maybeOf(context) != scope;
+    // A page covered by another has its tickers off; a tab it hides keeps
+    // them on but is not visible.
+    _visible = TickerMode.valuesOf(context).enabled && Visibility.of(context);
+    scope?._surfaces.heroChanged();
   }
 
   @override
@@ -936,17 +935,45 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     super.dispose();
   }
 
-  // Which surface carries the hero changes as surfaces join and leave while
-  // the tree builds, when this surface can't rebuild. It only matters to the
-  // next page transition, so this follows a frame late.
+  // The routes whose page transitions collect this surface's hero, as their
+  // overlay entries. A transition collects the heroes of its own page, and of
+  // the current page of every navigator nested in it.
+  Iterable<Element> get _collectedBy {
+    if (!_isRoot || _routeEntries.isEmpty) return const [];
+    final route = _route;
+    final current = route is PageRoute && route.isCurrent;
+    return current ? _routeEntries : _routeEntries.take(1);
+  }
+
+  bool _collectedWith(_StreamSnackbarSurfaceState other) {
+    final collectedBy = _collectedBy.toSet();
+    return other._collectedBy.any(collectedBy.contains);
+  }
+
+  // Whether this surface carries the snackbar's hero. Every hero one page
+  // transition collects needs its own tag, so of the surfaces collected
+  // together only one carries it. A visible surface takes it from a hidden
+  // one; otherwise the one carrying it keeps it, so a page covered by another
+  // still flies back when uncovered. A surface only takes the hero once no
+  // surface collected with it carries one, so two never carry it at once.
+  bool _carriesHero() {
+    if (!_isRoot) return false;
+    final others = _scope!._surfaces._surfaces.where((other) => other != this && other._collectedWith(this));
+    final outranked = others.any((other) => other._visible && !_visible);
+    if (_flies) return !outranked;
+    return !outranked && !others.any((other) => other._flies);
+  }
+
+  // Which surface carries the hero changes while the tree builds, when this
+  // surface can't rebuild. It only matters to the next page transition, so
+  // this follows a frame late.
   void _scheduleUpdate() {
     if (_updateScheduled) return;
     _updateScheduled = true;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _updateScheduled = false;
-      final scope = _scope;
-      if (!mounted || scope == null) return;
-      if (scope._surfaces.leadsRoute(this) == _flies) return;
+      if (!mounted || _scope == null) return;
+      if (_carriesHero() == _flies) return;
       setState(() {
         // The hero moved to or from this surface; build reads it again.
       });
@@ -974,9 +1001,12 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     final scope = _scope;
     if (scope == null) return widget.builder(context, null);
 
-    final isRoot = _SnackbarSurfaceMarker.maybeOf(context) != scope;
-    _flies = scope._surfaces.leadsRoute(this);
-    final snackbar = isRoot
+    final flies = _carriesHero();
+    if (flies != _flies) {
+      _flies = flies;
+      scope._surfaces.heroChanged();
+    }
+    final snackbar = _isRoot
         ? _SnackbarView(presenter: scope._presenter, builder: _buildInlineSnackbar, flies: _flies)
         : null;
 
@@ -985,6 +1015,34 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
       child: Builder(builder: (context) => widget.builder(context, snackbar)),
     );
   }
+}
+
+// The overlay entries of the navigator routes [context] sits in, innermost
+// first. Reads each entry as the element two levels below its overlay; if
+// overlays ever wrap their entries in more layers, surfaces share an entry
+// and fewer of them fly, but two still never carry the hero at once.
+List<Element> _routeEntriesOf(BuildContext context) {
+  final entries = <Element>[];
+  Element? child;
+  Element? grandchild;
+  OverlayState? overlay;
+  Element? entry;
+  context.visitAncestorElements((element) {
+    if (element case StatefulElement(:final state)) {
+      if (state is OverlayState) {
+        // An overlay builds its entries under a single child.
+        overlay = state;
+        entry = grandchild;
+      } else if (state is NavigatorState && overlay != null && state.overlay == overlay) {
+        entries.add(entry!);
+        overlay = null;
+      }
+    }
+    grandchild = child;
+    child = element;
+    return true;
+  });
+  return entries;
 }
 
 // Marks a subtree covered by a StreamSnackbarSurface of [scope].

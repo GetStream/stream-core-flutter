@@ -488,6 +488,277 @@ void main() {
     expect(_snackbarHeroes(rightKey), findsOneWidget);
   });
 
+  testWidgets('the visible tab of tabs with their own navigators flies the snackbar through a root push and pop', (
+    tester,
+  ) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final tabKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(
+        body: IndexedStack(
+          children: [
+            _TabNavigator(
+              page: StreamScaffold(key: tabKey, body: const SizedBox.expand()),
+            ),
+            const _TabNavigator(page: StreamScaffold(body: SizedBox.expand())),
+          ],
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(tabKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(painted, everyElement(1));
+    expect(_paintedCopies(tester), 1);
+  });
+
+  testWidgets(
+    'the active branch of branches hidden by Offstage and TickerMode flies the snackbar through a root push and pop',
+    (tester) async {
+      final navigatorKey = GlobalKey<NavigatorState>();
+      final tabKey = GlobalKey();
+
+      Widget branch({required bool active, required Widget page}) {
+        return Offstage(
+          offstage: !active,
+          child: TickerMode(
+            enabled: active,
+            child: _TabNavigator(page: page),
+          ),
+        );
+      }
+
+      await _pumpApp(
+        tester,
+        navigatorKey: navigatorKey,
+        home: Scaffold(
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              branch(active: false, page: const StreamScaffold(body: SizedBox.expand())),
+              branch(
+                active: true,
+                page: StreamScaffold(key: tabKey, body: const SizedBox.expand()),
+              ),
+            ],
+          ),
+        ),
+      );
+      StreamSnackbarMessenger.of(tabKey.currentContext!).show(
+        StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+      );
+      await tester.pumpAndSettle();
+
+      final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+      expect(tester.takeException(), isNull);
+      expect(painted, everyElement(1));
+      expect(_paintedCopies(tester), 1);
+    },
+  );
+
+  testWidgets('a tab with a page pushed inside it flies the snackbar through a root push and pop', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final tabNavigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(
+        body: IndexedStack(
+          children: [
+            _TabNavigator(
+              navigatorKey: tabNavigatorKey,
+              page: const StreamScaffold(body: SizedBox.expand()),
+            ),
+            const _TabNavigator(page: StreamScaffold(body: SizedBox.expand())),
+          ],
+        ),
+      ),
+    );
+    await _push(tester, tabNavigatorKey, const StreamScaffold(body: SizedBox.expand()));
+    StreamSnackbarMessenger.of(tabNavigatorKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(painted, everyElement(1));
+    expect(_paintedCopies(tester), 1);
+  });
+
+  testWidgets('a StreamScaffold around tabs with their own navigators shows and flies the only copy', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final shellKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: StreamScaffold(
+        key: shellKey,
+        body: const IndexedStack(
+          children: [
+            _TabNavigator(page: StreamScaffold(body: SizedBox.expand())),
+            _TabNavigator(page: StreamScaffold(body: SizedBox.expand())),
+          ],
+        ),
+        bottom: const SizedBox(height: _kBarHeight),
+      ),
+    );
+    StreamSnackbarMessenger.of(shellKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(_snackbarHeroes(shellKey), findsOneWidget);
+    expect(find.byType(Hero), findsOneWidget);
+
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(painted, everyElement(1));
+  });
+
+  testWidgets('a page pushed inside a nested navigator flies the snackbar', (tester) async {
+    final tabNavigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      home: Scaffold(
+        body: _TabNavigator(
+          navigatorKey: tabNavigatorKey,
+          page: const StreamScaffold(body: SizedBox.expand()),
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(tabNavigatorKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    final painted = await _paintedThroughPushAndPop(tester, tabNavigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(painted, everyElement(1));
+  });
+
+  testWidgets('a page in a nested navigator flies the snackbar through a root push and pop', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final tabNavigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(
+        body: _TabNavigator(
+          navigatorKey: tabNavigatorKey,
+          page: const StreamScaffold(body: SizedBox.expand()),
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(tabNavigatorKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(painted, everyElement(1));
+  });
+
+  testWidgets('a back swipe inside a nested navigator flies the snackbar', (tester) async {
+    final tabNavigatorKey = GlobalKey<NavigatorState>();
+
+    await _pumpApp(
+      tester,
+      home: Scaffold(
+        body: _TabNavigator(
+          navigatorKey: tabNavigatorKey,
+          page: const StreamScaffold(body: SizedBox.expand()),
+        ),
+      ),
+    );
+    tabNavigatorKey.currentState!
+        .push(CupertinoPageRoute<void>(builder: (_) => const StreamScaffold(body: SizedBox.expand())))
+        .ignore();
+    await tester.pumpAndSettle();
+    StreamSnackbarMessenger.of(tabNavigatorKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    final paintedPerFrame = <int>[];
+    final gesture = await tester.startGesture(const Offset(5, 200));
+    for (var step = 0; step < 10; step++) {
+      await gesture.moveBy(const Offset(30, 0));
+      await tester.pump(const Duration(milliseconds: 16));
+      paintedPerFrame.add(_paintedCopies(tester));
+    }
+    await gesture.up();
+    for (var frame = 0; frame < 30; frame++) {
+      await tester.pump(const Duration(milliseconds: 16));
+      paintedPerFrame.add(_paintedCopies(tester));
+    }
+
+    expect(tester.takeException(), isNull);
+    expect(paintedPerFrame, everyElement(1));
+  });
+
+  testWidgets('after switching tabs, the newly visible tab flies the snackbar through a root push', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final firstTabKey = GlobalKey();
+    final secondTabKey = GlobalKey();
+    final index = ValueNotifier(0);
+    addTearDown(index.dispose);
+    // Built once, so switching tabs rebuilds only the stack.
+    final tabs = [
+      _TabNavigator(
+        page: StreamScaffold(key: firstTabKey, body: const SizedBox.expand()),
+      ),
+      _TabNavigator(
+        page: StreamScaffold(key: secondTabKey, body: const SizedBox.expand()),
+      ),
+    ];
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(
+        body: ValueListenableBuilder(
+          valueListenable: index,
+          builder: (context, index, _) => IndexedStack(index: index, children: tabs),
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(firstTabKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+    expect(_snackbarHeroes(firstTabKey), findsOneWidget);
+
+    index.value = 1;
+    await tester.pumpAndSettle();
+
+    expect(_snackbarHeroes(firstTabKey), findsNothing);
+    expect(_snackbarHeroes(secondTabKey), findsOneWidget);
+
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(painted, everyElement(1));
+  });
+
   testWidgets('a scope snackbar times out once when a StreamScaffold is pushed during its entrance', (tester) async {
     final bodyKey = GlobalKey();
     final navigatorKey = GlobalKey<NavigatorState>();
@@ -640,6 +911,66 @@ Future<void> _showDialog(WidgetTester tester, GlobalKey<NavigatorState> navigato
 Future<void> _showSnackbar(WidgetTester tester, GlobalKey key) async {
   StreamSnackbarMessenger.of(key.currentContext!).show(StreamSnackbar(message: const Text(_kMessage)));
   await tester.pumpAndSettle();
+}
+
+// Pushes a StreamScaffold onto [navigatorKey] and pops it again, returning
+// the number of painted snackbar copies in each frame.
+Future<List<int>> _paintedThroughPushAndPop(WidgetTester tester, GlobalKey<NavigatorState> navigatorKey) async {
+  final painted = <int>[];
+  Future<void> recordFrames() async {
+    for (var frame = 0; frame < 30; frame++) {
+      await tester.pump(const Duration(milliseconds: 16));
+      painted.add(_paintedCopies(tester));
+    }
+  }
+
+  navigatorKey.currentState!
+      .push(
+        MaterialPageRoute<void>(
+          builder: (_) => const StreamScaffold(
+            body: SizedBox.expand(),
+            bottom: SizedBox(height: _kBarHeight),
+          ),
+        ),
+      )
+      .ignore();
+  await recordFrames();
+  navigatorKey.currentState!.pop();
+  await recordFrames();
+  return painted;
+}
+
+// A tab that keeps its own navigator, starting on [page]. Its pages fly
+// heroes, as go_router's nested navigators do.
+class _TabNavigator extends StatefulWidget {
+  const _TabNavigator({this.navigatorKey, required this.page});
+
+  final GlobalKey<NavigatorState>? navigatorKey;
+  final Widget page;
+
+  @override
+  State<_TabNavigator> createState() => _TabNavigatorState();
+}
+
+class _TabNavigatorState extends State<_TabNavigator> {
+  final _heroController = MaterialApp.createMaterialHeroController();
+
+  @override
+  void dispose() {
+    _heroController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HeroControllerScope(
+      controller: _heroController,
+      child: Navigator(
+        key: widget.navigatorKey,
+        onGenerateRoute: (_) => MaterialPageRoute<void>(builder: (_) => widget.page),
+      ),
+    );
+  }
 }
 
 // The snackbar heroes inside the widget with [key].
