@@ -9,6 +9,10 @@ repositories link here, or to a single section, rather than keeping their own co
 It is part of the [stream-core-flutter style guide](../STYLE_GUIDE.md), which wins
 where the two disagree.
 
+The rules apply to new public API. Existing shapes that break them stay as they are
+until the next major release, when they move to the shape described here; don't change
+one in a minor release just to follow this guide.
+
 ## Design for the second version
 
 Most breaking changes are not bugs; they come from an API that could not grow. When
@@ -22,12 +26,19 @@ What counts as breaking is wider than "a signature changed". All of these break 
 consumer who compiled fine before:
 
 - adding a parameter to a function type (typedef, callback, builder);
+- adding a parameter, even an optional one, to a method consumers override;
 - adding a value to an enum, or a subclass to a `sealed` class, that consumers switch
   on exhaustively;
 - adding an abstract member to a class consumers `implements` or `extends`;
+- adding a class modifier (`final`, `base`, `interface`, `sealed`) to an existing
+  public class;
 - adding a required parameter, or reordering or renaming a positional one;
 - changing a return type (`void` → `Future<void>`, `T` → `T?`) or a field type;
-- renaming or adding a field on a record type that appears in the public API.
+- renaming or adding a field on a record type that appears in the public API;
+- overriding `==` on a type consumers use as a `const` map key or `const` set element.
+
+Changing a default value breaks consumers too, without a compile error: their app
+behaves differently and nothing tells them.
 
 ## Pass callbacks and builders a single details object
 
@@ -40,8 +51,10 @@ callback will never learn anything else.
 // BAD: the next piece of information is a breaking change.
 typedef StreamAttachmentTapCallback = void Function(Message message, Attachment attachment);
 
-// GOOD: new information is a new field on StreamAttachmentTapDetails.
-typedef StreamAttachmentTapCallback = void Function(BuildContext context, StreamAttachmentTapDetails details);
+// GOOD: new information is a new field on StreamAttachmentTapDetails, and the SDK
+// can tell whether the tap was handled.
+typedef StreamAttachmentTapCallback =
+    FutureOr<bool> Function(BuildContext context, StreamAttachmentTapDetails details);
 ```
 
 The same applies to callbacks that start with no arguments: a `VoidCallback` that
@@ -50,9 +63,10 @@ payload, start with a details object, even an empty one.
 
 Name the object after its role: `…Details` for callback payloads (Flutter's own
 `TapUpDetails`, `DragEndDetails`) and `…Props` for builder inputs, matching
-`StreamComponentBuilder<T> = Widget Function(BuildContext context, T props)`. Give the
-class a `const` constructor, make every field added after the first release optional
-or defaulted, and add `copyWith` when consumers are expected to tweak and forward it.
+`StreamComponentBuilder<T> = Widget Function(BuildContext context, T props)`. Make it a
+`final class` with a `const` constructor, so nobody can implement it or override its
+`copyWith`; make every field added after the first release optional or defaulted, and
+add `copyWith` when consumers are expected to tweak and forward it.
 
 Builders that let a consumer wrap or adjust the default rendering should receive the
 default's inputs (`props`) from day one, so they can rebuild the default widget with a
@@ -65,32 +79,32 @@ implementation.
 
 History:
 
-- Chat's attachment tap callback went from `void Function(Message message, Attachment
-  attachment)` to `FutureOr<bool> Function(BuildContext context, Message message,
-  Attachment attachment)` in one breaking change (v10, #2426): it gained a context
-  and a return value.
-- Chat's message builder changed shape three times (1.x added a default widget
-  argument, 9.x renamed its type, 10.0 replaced it with `(context, message, props)`),
-  and 5.2.0 had to add `bottomRowBuilderWithDefaultWidget` next to `bottomRowBuilder`
-  because the original typedef could not grow.
-- Video's ten `Widget Function(BuildContext, Call, CallState)` builders were each
-  deprecated and replaced by a parallel `*WidgetBuilder` (0.10.0, removed in 1.0.0).
-  The replacement, `CallWidgetBuilderWithData<T extends CallbackData>`, carries the
-  lesson in its own doc comment: add properties to the data object, never to the
-  function. Livestream builders added afterwards repeated the mistake and were
-  deprecated again (#1118).
+- Chat's attachment tap callback on `StreamMessageWidget` went from
+  `void Function(Message message, Attachment attachment)` to
+  `FutureOr<bool> Function(BuildContext context, Message message, Attachment attachment)`
+  in one breaking change (10.0.1, [chat#2426]): it gained a context and a return value.
+- Chat's message builder changed shape twice: 2.0.0 added a default widget argument,
+  and v10 replaced it with `(context, message, defaultProps)`, renamed once more before
+  10.0.1 ([chat#2643]). 5.2.0 added `bottomRowBuilderWithDefaultWidget` next to
+  `bottomRowBuilder` rather than give the original typedef a third argument.
+- Video's `(context, call, callState)`-style call-screen builders were deprecated and
+  replaced by parallel `*WidgetBuilder` typedefs (0.10.0, [video#983], removed in
+  1.0.0). The participants builders became
+  `CallWidgetBuilderWithData<T extends CallbackData>`, whose doc comment carries the
+  lesson: add properties to the data object, never to the function. The livestream
+  builders kept the old shape and were deprecated separately ([video#1118]).
 - Video's `onCallDisconnected` went from `VoidCallback` to
-  `void Function(CallDisconnectedProperties)` (0.9.0). By contrast,
-  `LivestreamNotConnectedBuilder` shipped with a properties object and later gained
-  `isMigrating` and `isReconnecting` without a break.
+  `void Function(CallDisconnectedProperties)` (0.9.0).
 - Core's `MarkdownTapMentionCallback = void Function(String displayText, String id)`
-  could not take a mention type, so #120 added `MarkdownTapAnyMentionCallback` next
-  to it instead of extending it.
+  could not take a mention type, so [core#120] added `MarkdownTapAnyMentionCallback`
+  next to it — with three positional arguments, so the next piece of mention
+  information needs a third typedef.
 
 ## Decide whether a set of values is closed before using an enum or `sealed`
 
-Consumers switch exhaustively on public enums and sealed classes — the style guide
-tells them to ([Avoid `if` chains or `?:` with enum values](../STYLE_GUIDE.md#avoid-if-chains-or--with-enum-values)).
+Consumers switch exhaustively on public enums and sealed classes, as our own style
+guide tells us to
+([Avoid `if` chains or `?:` with enum values](../STYLE_GUIDE.md#avoid-if-chains-or--with-enum-values)).
 That makes adding a value or subclass a breaking change for them. Use an `enum` or
 `sealed` hierarchy only when the set is closed, or when adding a member is something
 we are willing to ship in a major release.
@@ -105,7 +119,8 @@ For sets that will grow, pick a type consumers cannot switch on exhaustively:
 
 - **Design scales** (sizes, variants, emphasis levels): an `@immutable` class with a
   public `const` constructor and `static const` presets, where each preset carries
-  the metrics that go with it.
+  the metrics that go with it. `StreamAvatarSize` is still an enum today; this is the
+  shape it moves to.
 
   ```dart
   @immutable
@@ -127,11 +142,29 @@ For sets that will grow, pick a type consumers cannot switch on exhaustively:
   parameters take over the job of the exhaustive `switch`: a size cannot be added
   without its metrics. A class can also be lerped in a theme, which an enum cannot.
   Turning an existing enum into this shape keeps `StreamAvatarSize.lg` and `.lg`
-  compiling; only `switch`, `.values`, `.name`, and `.index` break.
+  compiling; `switch`, `.values`, `.name`, and `.index` break, and so does using a
+  preset as a `const` map key or `const` set element, because the class overrides
+  `==`.
 - **Values that come from the backend** (reasons, types, roles, statuses): an
   extension type over `String` with `static const` instances, like
-  `StreamMentionType`. Unknown values from a newer backend still round-trip instead
-  of failing to parse, and adding a constant is not breaking.
+  `StreamMentionType`.
+
+  ```dart
+  extension type const StreamMentionType(String value) implements String {
+    static const user = StreamMentionType('user');
+    static const channel = StreamMentionType('channel');
+  }
+  ```
+
+  Unknown values from a newer backend still round-trip instead of failing to parse,
+  and adding a constant is not breaking: a `switch` over the type is checked against
+  `String`, so the compiler makes every consumer keep a wildcard (`_`) branch. Values
+  keep primitive equality, so they still work as `const` map keys. Keep
+  `implements String` when the value is passed straight into string APIs; drop it to
+  keep the type opaque. An extension type has no runtime identity — any `String` is
+  one — and no `.values`, so add a `static const values` list if the UI needs to show
+  the options, and use a class instead when each value has to carry more than its
+  name.
 - **Values consumers may add themselves**: a non-sealed class (or `abstract` class)
   with `static const` instances or subclasses, so a custom value is a subclass rather
   than a fork.
@@ -145,54 +178,55 @@ enforce this, so it is a fallback, not a substitute for choosing an open type.
 History:
 
 - Core's `enum StreamAvatarSize` was treated as closed because it matched the design
-  spec, until the ringing screens needed a 104px avatar (#189). The same PR added
-  sizes to the avatar group and online indicator enums. Our own gallery stopped
-  analyzing because its size tables switch exhaustively — as would any consumer's
-  `switch`. A 64px avatar that sat between two named sizes also needed an internal
-  diameter override, which a constructible size would not.
-
-- Chat's `enum MessageSendingStatus` could not carry whether a delete was hard, so it
-  was replaced by a freezed `MessageState` (6.7.0, removed in 7.0.0).
+  spec, until the ringing screens needed a 104px avatar ([core#189]). The same PR
+  added sizes to the avatar group, online indicator and badge count enums, and broke
+  every exhaustive `switch` over them, our own gallery's and chat's included
+  ([chat#2974]).
+- Chat's `enum MessageSendingStatus` was replaced by a freezed `MessageState` (6.7.0,
+  removed in 7.0.0), whose states can carry data, such as whether a delete is hard,
+  that an enum value cannot.
 - Chat's `enum AttachmentPickerType` became a `sealed class` with an open
-  `CustomAttachmentPickerType` subclass (v10, #2293), once consumers needed their own
-  picker types.
+  `CustomAttachmentPickerType` subclass (10.0.1, [chat#2293]), once consumers needed
+  their own picker types.
 - Video added `ActionCallIncomingFailed` to the sealed `RingingEvent` in a minor
-  release (1.6.0, #1323) — breaking for every exhaustive `switch (event)`.
+  release (1.6.0, [video#1323]) — breaking for every exhaustive `switch (event)`.
 
 ## Model modes, not flags
 
 A `bool` holds two states and its name fixes which one is `true`. When a third state
 arrives, the parameter has to change type. Prefer an enum (or class, per the section
 above) whenever a setting is a mode rather than an on/off switch, and name booleans
-positively (`showX`, `includeX`) so the default never has to flip.
+positively (`showX`, `includeX`) so they never need renaming.
 
 History:
 
 - Chat's `MessageState.deleting({required bool hard})` became
-  `deleting({required MessageDeleteScope scope})` when "delete for me" arrived (v10,
-  #2394), breaking every `whenOrNull(deleting: (hard) => …)`.
+  `deleting({required MessageDeleteScope scope})` when "delete for me" arrived
+  (10.0.1, [chat#2394]), breaking every `whenOrNull(deleting: (hard) => …)`.
 - Video renamed `ignoreLocalParticipantVideo` to `includeLocalParticipantVideo`
-  (0.8.0, #857), flipping both name and default.
+  (0.8.0, [video#857]). Both default to `true`, so the rename silently changed the
+  default behaviour from hiding local video to showing it.
 
 ## Group configuration into an options object
 
 When a constructor or method takes a growing list of tuning knobs or builders, put
-them on a dedicated options class (`…Options`, `…Configuration`, `…Builders`) with a
-`const` constructor, defaults for every field, and `copyWith`. Adding a knob is then a
-new optional field. This only works if the object can grow: required fields and
-positional constructor parameters on the options class bring the problem back.
+them on a dedicated options class (`…Options`, `…Configuration`, `…Builders`): a
+`final class` with a `const` constructor, defaults for every field, and `copyWith`.
+Adding a knob is then a new optional field. This only works if the object can grow:
+required fields and positional constructor parameters on the options class bring the
+problem back.
 
 Separately, take the model or value object when the parameters describe an entity,
 rather than spreading its fields over the signature.
 
 History:
 
-- Chat moved ~17 `*Builder` parameters and the behaviour flags off
+- Chat moved 17 `*Builder` parameters and 14 behaviour flags off
   `StreamMessageListView` into `StreamMessageListViewBuilders` and
-  `StreamMessageListViewConfiguration` (v10, #2674).
+  `StreamMessageListViewConfiguration` (10.0.1, [chat#2674]).
 - Chat's `sendReaction(Message message, String type, {int score, Map extraData, …})`
   became `sendReaction(Message message, Reaction reaction, …)` when reactions gained
-  `emojiCode` (v10, #2326).
+  `emojiCode` (10.0.1, [chat#2326]).
 - Video moved `maxDuration` and `maxParticipants` on `Call.getOrCreate` into
   `StreamLimitsSettings` (0.6.0), which later gained two fields without a break, and
   moved `StreamVideo` constructor flags into `StreamVideoOptions` (0.1.0).
@@ -203,21 +237,28 @@ Optional positional parameters (`[Message? message]`) cannot be followed by name
 ones and cannot be reordered, so the second optional argument forces a break. Public
 methods use named parameters for everything optional.
 
-History: chat's `addMembers(List<String> memberIds, [Message? message])` became
-`addMembers(memberIds, {Message? message, bool hideHistory = false})` (5.0.0), along
-with `removeMembers`, `inviteMembers`, and `update`.
+History: chat's `addMembers(List<String> memberIds, [Message? message])` gained a
+second optional positional in 4.5.0 (`[Message? message, bool hideHistory = false]`),
+and 5.0.0 had to break it to make both named:
+`addMembers(memberIds, {Message? message, bool hideHistory = false})`, along with
+`removeMembers`, `inviteMembers`, and `update`.
 
 ## Don't add abstract members to types consumers implement
 
 Every class a consumer may `implements` is frozen: a new abstract member breaks every
-implementation. Choose the class modifier deliberately:
+implementation. Adding a modifier later is itself a breaking change, so the choice is
+made once, at first release. Default new public classes to `final`, and loosen only
+when consumers need more:
 
 - `final class` for types consumers only use. We can add anything.
 - `base class` (or `abstract base class`) for types consumers extend. New members
-  ship with a default implementation, so subclasses keep compiling.
-- `interface class` or plain `abstract class` only for genuinely small contracts that
-  will not grow. If one has to grow, add the member with a default in a mixin or base
-  class consumers extend, or add a separate capability interface.
+  ship with a default implementation, so subclasses keep compiling — unless one
+  already declares a member with that name, so prefer specific names. Adding a
+  parameter to a method subclasses override still breaks them.
+- `abstract interface class` only for genuinely small contracts that will not grow.
+  A plain `abstract class` can be both extended and implemented, the widest surface
+  of all. If an interface has to grow, add the member with a default in a mixin or
+  base class consumers extend, or add a separate capability interface.
 
 Configuration that consumers override piecemeal belongs in an options object with
 `copyWith`, not an interface.
@@ -225,8 +266,8 @@ Configuration that consumers override piecemeal belongs in an options object wit
 
 History:
 
-- Chat added four abstract methods to `AttachmentFileUploader` (v10, #2396), and
-  earlier six to `ChatPersistenceClient` (3.0.0).
+- Chat added four abstract methods to `AttachmentFileUploader` (10.0.1, [chat#2396]),
+  and earlier six to `ChatPersistenceClient` (3.0.0).
 - Video's `abstract class CallPreferences` has gained about a dozen abstract getters
   over time; the 1.7.0 changelog tells implementers to "add the getter to your
   implementation".
@@ -245,6 +286,45 @@ History:
 - Chat's `StreamAttachmentPickerController extends ValueNotifier<List<Attachment>>`
   became a controller of `AttachmentPickerValue` when polls were added (9.0.0).
 - Video's `Call.stats` returned a record whose fields were renamed and retyped
-  (0.11.0, #1053).
+  (0.11.0, [video#1053]).
 - Video's `setScreenShareEnabled` went from `Future<Result<None>>` to
-  `Future<Result<RtcLocalTrack>>` (0.9.0, #915).
+  `Future<Result<RtcLocalTrack>>` (0.9.0, [video#915]).
+
+## Tolerate values from a newer backend
+
+An app version stays installed for years against an API that keeps growing. Parsing
+must not fail on anything a newer backend can send:
+
+- an unknown value of a backend-defined set parses to a value (an extension type over
+  `String` does this for free) or a documented fallback, never an exception;
+- unknown keys in a response are ignored, and a missing optional key takes its
+  default;
+- a `sealed` hierarchy of events or states parsed from the wire has an `Unknown…`
+  case that keeps the raw data, so a new event type is skipped rather than dropped
+  with an error.
+
+## When a break is unavoidable
+
+Ship the new API next to the old one in a minor release and mark the old one
+`@Deprecated('Use X instead.')`. Keep it for at least one minor release, and remove it
+only in a major. When an old and a new parameter coexist, `assert` that at most one is
+set and let the new one win. Record the deprecation in the package's `CHANGELOG.md`
+with the migration spelled out, following the repository's deprecation policy
+([Clearly mark deprecated APIs](../STYLE_GUIDE.md#clearly-mark-deprecated-apis)).
+
+[core#120]: https://github.com/GetStream/stream-core-flutter/pull/120
+[core#189]: https://github.com/GetStream/stream-core-flutter/pull/189
+[chat#2293]: https://github.com/GetStream/stream-chat-flutter/pull/2293
+[chat#2326]: https://github.com/GetStream/stream-chat-flutter/pull/2326
+[chat#2394]: https://github.com/GetStream/stream-chat-flutter/pull/2394
+[chat#2396]: https://github.com/GetStream/stream-chat-flutter/pull/2396
+[chat#2426]: https://github.com/GetStream/stream-chat-flutter/pull/2426
+[chat#2643]: https://github.com/GetStream/stream-chat-flutter/pull/2643
+[chat#2674]: https://github.com/GetStream/stream-chat-flutter/pull/2674
+[chat#2974]: https://github.com/GetStream/stream-chat-flutter/pull/2974
+[video#857]: https://github.com/GetStream/stream-video-flutter/pull/857
+[video#915]: https://github.com/GetStream/stream-video-flutter/pull/915
+[video#983]: https://github.com/GetStream/stream-video-flutter/pull/983
+[video#1053]: https://github.com/GetStream/stream-video-flutter/pull/1053
+[video#1118]: https://github.com/GetStream/stream-video-flutter/pull/1118
+[video#1323]: https://github.com/GetStream/stream-video-flutter/pull/1323

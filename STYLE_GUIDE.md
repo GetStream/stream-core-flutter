@@ -59,13 +59,9 @@ document; the section link is provided.
   [Public barrel contract](#public-barrel-contract)
 - `stream_core` (the pure-Dart LLC) never depends on Flutter. Anything visual or
   widget-related belongs in `stream_core_flutter`.
-- Callbacks and builders take `(context, details)` — one object, never a growing list
-  of positional values. → [Pass callbacks and builders a single details object](style_guides/API_DESIGN.md#pass-callbacks-and-builders-a-single-details-object)
-- Use an `enum` or `sealed` type only for a set closed by definition. Design scales
-  (sizes, variants) are a class with `const` presets; values from the backend are an
-  extension type over `String`. → [Decide whether a set of values is closed](style_guides/API_DESIGN.md#decide-whether-a-set-of-values-is-closed-before-using-an-enum-or-sealed)
-- No new abstract members on types consumers implement; pick `final` / `base` /
-  `interface` deliberately. → [Don't add abstract members to types consumers implement](style_guides/API_DESIGN.md#dont-add-abstract-members-to-types-consumers-implement)
+- Public API must be able to grow in a minor release: details objects for callbacks,
+  open types instead of enums for sets that will grow, deliberate class modifiers. →
+  [`style_guides/API_DESIGN.md`](style_guides/API_DESIGN.md)
 
 **Code**
 
