@@ -628,6 +628,31 @@ void main() {
       expect(find.text('Swipe up'), findsNothing);
       expect(await controller.closed, StreamSnackbarClosedReason.swipe);
     });
+
+    testWidgets('shows a snackbar that replaces one animating out', (tester) async {
+      final messenger = StreamSnackbarMessenger();
+      addTearDown(messenger.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StreamTheme.light()]),
+          home: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: StreamSnackbarHost(messenger: messenger),
+              ),
+            ],
+          ),
+        ),
+      );
+      await _replaceWhileExiting(tester, messenger);
+
+      expect(find.text('Next'), findsOneWidget);
+      expect((messenger.currentSnackbar?.props.message as Text?)?.data, 'Next');
+    });
   });
 
   group('StreamSnackbarScope', () {
@@ -954,4 +979,14 @@ void main() {
       expect(await controller.closed, StreamSnackbarClosedReason.dismiss);
     });
   });
+}
+
+// Shows a snackbar, starts hiding it, and replaces it while it animates out.
+Future<void> _replaceWhileExiting(WidgetTester tester, StreamSnackbarMessenger messenger) async {
+  messenger.show(StreamSnackbar(message: const Text('First')));
+  await tester.pumpAndSettle();
+  messenger.hideCurrent();
+  await tester.pump(const Duration(milliseconds: 100));
+  messenger.show(StreamSnackbar(message: const Text('Next')), replace: true);
+  await tester.pumpAndSettle();
 }

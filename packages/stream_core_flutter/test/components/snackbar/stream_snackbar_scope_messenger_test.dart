@@ -122,6 +122,21 @@ void main() {
 
     expect((closedReason, messenger.currentSnackbar), (StreamSnackbarClosedReason.dismiss, null));
   });
+
+  testWidgets('StreamSnackbarScope shows a snackbar that replaces one animating out', (tester) async {
+    final messenger = StreamSnackbarMessenger();
+    addTearDown(messenger.dispose);
+
+    await _pumpApp(
+      tester,
+      messenger: messenger,
+      home: const StreamScaffold(body: SizedBox.expand()),
+    );
+    await _replaceWhileExiting(tester, messenger);
+
+    expect(_paintedCopies(tester, 'Next'), 1);
+    expect((messenger.currentSnackbar?.props.message as Text?)?.data, 'Next');
+  });
 }
 
 const _kMessage = 'Message copied';
@@ -156,6 +171,16 @@ Future<void> _pumpApp(
       home: home,
     ),
   );
+}
+
+// Shows a snackbar, starts hiding it, and replaces it while it animates out.
+Future<void> _replaceWhileExiting(WidgetTester tester, StreamSnackbarMessenger messenger) async {
+  messenger.show(StreamSnackbar(message: const Text(_kMessage)));
+  await tester.pumpAndSettle();
+  messenger.hideCurrent();
+  await tester.pump(const Duration(milliseconds: 100));
+  messenger.show(StreamSnackbar(message: const Text('Next')), replace: true);
+  await tester.pumpAndSettle();
 }
 
 // The number of copies of [text] the last frame painted: onstage, not inside a

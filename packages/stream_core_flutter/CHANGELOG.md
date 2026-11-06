@@ -16,6 +16,8 @@
 - Fixed `StreamSnackbarHost` and `StreamSnackbarPopup` throwing in debug when
   they mount with a snackbar already queued on their messenger, for example
   after the widget holding them is rebuilt.
+- Fixed a snackbar shown with `replace: true` while the previous one was
+  animating out never appearing.
 
 ### 🔄 Changed
 

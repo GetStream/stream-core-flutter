@@ -1211,6 +1211,7 @@ class _SnackbarPresenter extends ChangeNotifier {
     _exitReason = null;
     notifyListeners();
     messenger._finalize(hosted, reason);
+    if (identical(messenger, _messenger)) _sync();
   }
 
   void handleSwipeDismissed() {
