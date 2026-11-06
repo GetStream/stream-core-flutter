@@ -5,7 +5,8 @@ committed today is one we have to keep supporting until we ship a major version 
 This guide is about choosing shapes that let an API grow in a minor release.
 
 It applies to every Stream Flutter SDK (core, chat, video, feeds). The other
-repositories link here, or to a single section, rather than keeping their own copy.
+repositories carry a copy, which the `sync_style_guides` workflow updates by pull
+request whenever this file changes on `main`; edit it here, never in a copy.
 It is part of the [stream-core-flutter style guide](../STYLE_GUIDE.md), which wins
 where the two disagree.
 

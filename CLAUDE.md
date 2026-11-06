@@ -59,6 +59,10 @@ Never hand-edit the generated Dart, the font, or the log.
 upstream, the naming and size conventions, RTL mirroring, deprecations, and the
 file-type assets.
 
+### Shared style guides
+
+`style_guides/` holds the guides every Stream Flutter SDK follows (today `API_DESIGN.md`). The other SDKs carry a copy: on every change to `main`, the `sync_style_guides` workflow runs `scripts/sync_style_guides.dart` against stream-chat-flutter (`master`), stream-video-flutter (`v2`) and stream-feeds-flutter (`main`), and opens a PR in each whose copy changed. Edit the guides here only. A new file in the folder is synced automatically; a new target repository is a new entry in the workflow's matrix.
+
 ## Design
 
 UI components are designed in **Figma**. When implementing or modifying components, use the **Figma MCP** to inspect designs directly — check spacing, colors, typography, and component structure from the source rather than guessing.
