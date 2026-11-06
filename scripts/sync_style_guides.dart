@@ -98,7 +98,7 @@ Iterable<String> _linksLeavingFolder(File guide) sync* {
   for (var i = 0; i < lines.length; i++) {
     for (final match in _linkTarget.allMatches(lines[i])) {
       final link = match[1]!;
-      if (link.startsWith('#') || Uri.tryParse(link)?.hasScheme ?? false) continue;
+      if (link.startsWith('#') || (Uri.tryParse(link)?.hasScheme ?? false)) continue;
       final path = link.split('#').first;
       if (p.isWithin(_sourceDir, p.normalize(p.join(_sourceDir, path)))) continue;
       yield '${guide.path}:${i + 1}: $link';
