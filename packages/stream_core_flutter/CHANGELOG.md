@@ -16,11 +16,16 @@
 - Fixed `StreamSnackbarHost` and `StreamSnackbarPopup` throwing in debug when
   they mount with a snackbar already queued on their messenger, for example
   after the widget holding them is rebuilt.
+- Fixed a snackbar shown with `replace: true` while the previous one was
+  animating out never appearing.
 
 ### 🔄 Changed
 
 - `StreamMessageText` opens a `www.` address over `https://` instead of
   `http://`.
+- Snackbars from a `StreamSnackbarScope` now show inside the `StreamScaffold`
+  under it, above its `bottom`. A page without its own `StreamScaffold` shows
+  them on the one beneath it.
 
 ## 0.5.3
 

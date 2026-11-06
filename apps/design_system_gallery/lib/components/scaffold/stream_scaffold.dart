@@ -80,6 +80,77 @@ Widget buildStreamScaffoldPlayground(BuildContext context) {
 }
 
 // =============================================================================
+// Snackbars — rest above the bottom slot
+// =============================================================================
+
+@widgetbook.UseCase(
+  name: 'Snackbars',
+  type: StreamScaffold,
+  path: '[Components]/Scaffold',
+)
+Widget buildStreamScaffoldSnackbars(BuildContext context) {
+  final bottomSurfaceStyle = context.knobs.object.dropdown(
+    label: 'Bottom bar surfaceStyle',
+    options: StreamSurfaceStyle.values,
+    labelBuilder: (value) => value.name,
+    initialOption: StreamSurfaceStyle.regular,
+    description:
+        'regular — the bottom bar sits below the body. '
+        'floating — the bottom bar overlaps the body. Snackbars rest above it either way.',
+  );
+
+  return StreamSnackbarScope(
+    child: StreamScaffold(
+      bottomSurfaceStyle: bottomSurfaceStyle,
+      appBar: _demoAppBar(context, floating: false),
+      bottom: _DemoBottomNav(floating: bottomSurfaceStyle == StreamSurfaceStyle.floating),
+      body: const _SnackbarDemoBody(),
+    ),
+  );
+}
+
+// Body for the Snackbars use-case: a button that shows a snackbar from the
+// scaffold's body.
+class _SnackbarDemoBody extends StatelessWidget {
+  const _SnackbarDemoBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.streamColorScheme;
+    final textTheme = context.streamTextTheme;
+    final spacing = context.streamSpacing;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Show a snackbar, then toggle the bottom bar style. The snackbar '
+              'always rests above the bottom bar.',
+              textAlign: TextAlign.center,
+              style: textTheme.bodyDefault.copyWith(color: colorScheme.textSecondary),
+            ),
+            SizedBox(height: spacing.lg),
+            StreamButton(
+              onPressed: () => StreamSnackbarMessenger.of(context).show(
+                StreamSnackbar(
+                  message: const Text('Message copied to clipboard'),
+                  variant: StreamSnackbarVariant.success,
+                ),
+                replace: true,
+              ),
+              child: const Text('Show snackbar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
 // Drawers — exercises every forwarded drawer prop
 // =============================================================================
 

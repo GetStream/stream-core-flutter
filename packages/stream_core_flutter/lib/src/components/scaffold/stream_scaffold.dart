@@ -7,6 +7,7 @@ import '../../theme/components/stream_app_bar_theme.dart';
 import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/stream_surface_style.dart';
 import '../../theme/stream_theme_extensions.dart';
+import '../snackbar/stream_snackbar.dart';
 import '../toolbar/stream_app_bar.dart';
 
 /// A scaffold for full-page surfaces in the Stream design system.
@@ -45,6 +46,14 @@ import '../toolbar/stream_app_bar.dart';
 /// keeps the slot docked and publishes no inset. To keep the layout and chrome in
 /// sync, set the matching [appBarSurfaceStyle] / [bottomSurfaceStyle] here, or
 /// drive both from the ambient [StreamSurfaceStyle].
+///
+/// ## Snackbars
+///
+/// Snackbars shown through the nearest enclosing [StreamSnackbarScope] rest
+/// above [bottom], and above the on-screen keyboard while
+/// [resizeToAvoidBottomInset] is true. A scaffold nested in another scaffold
+/// under the same scope leaves them to the outer one, while scaffolds side by
+/// side each show them.
 ///
 /// ## Drawer support
 ///
@@ -240,17 +249,19 @@ class StreamScaffold extends StatelessWidget {
       // visually.
       extendBody: true,
       extendBodyBehindAppBar: appBarFloating,
-      body: _StreamScaffoldBody(
-        floating: bottomFloating,
-        bottom: bottom,
-        child: body,
+      body: StreamSnackbarSurface(
+        builder: (context, snackbar) => _StreamScaffoldBody(
+          floating: bottomFloating,
+          bottom: bottom,
+          child: _StreamScaffoldContent(snackbar: snackbar, child: body),
+        ),
       ),
     );
   }
 }
 
-// Layout slot identifiers used by the body delegate.
-enum _Slot { body, bottom }
+// Layout slot identifiers used by the body and content delegates.
+enum _Slot { body, bottom, snackbar }
 
 // Custom BoxConstraints that carries the measured bottomHeight so a
 // LayoutBuilder inside the body can read it synchronously within the same
@@ -384,4 +395,94 @@ class _StreamScaffoldBody extends StatelessWidget {
       ],
     );
   }
+}
+
+// Lays the body out and rests the snackbar on the body's bottom inset.
+//
+// Always built, even without a snackbar, so the body keeps its element when
+// one comes and goes.
+class _StreamScaffoldContent extends StatelessWidget {
+  const _StreamScaffoldContent({required this.snackbar, required this.child});
+
+  final Widget? snackbar;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final snackbar = this.snackbar;
+
+    return CustomMultiChildLayout(
+      delegate: _StreamScaffoldContentDelegate(
+        bottomInset: MediaQuery.paddingOf(context).bottom,
+      ),
+      children: [
+        LayoutId(id: _Slot.body, child: child),
+        if (snackbar != null)
+          LayoutId(
+            id: _Slot.snackbar,
+            // The snackbar is already placed clear of the vertical insets, so
+            // it must not inset itself a second time.
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              removeBottom: true,
+              child: snackbar,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// Fills the region, lays the body out within the region's constraints and
+// stacks the snackbar upwards from [bottomInset].
+class _StreamScaffoldContentDelegate extends MultiChildLayoutDelegate {
+  _StreamScaffoldContentDelegate({required this.bottomInset});
+
+  final double bottomInset;
+
+  // The constraints the region was given, recorded for the body.
+  var _constraints = const BoxConstraints();
+
+  @override
+  Size getSize(BoxConstraints constraints) {
+    _constraints = constraints;
+    return super.getSize(constraints);
+  }
+
+  @override
+  void performLayout(Size size) {
+    // The body takes the region's constraints as they came, so a body that
+    // shrink-wraps does so exactly as it would without the snackbar slot.
+    final bodyConstraints = BoxConstraints(
+      minWidth: _constraints.minWidth,
+      maxWidth: size.width,
+      minHeight: _constraints.minHeight,
+      maxHeight: size.height,
+    );
+    layoutChild(_Slot.body, bodyConstraints);
+    positionChild(_Slot.body, Offset.zero);
+
+    if (!hasChild(_Slot.snackbar)) return;
+    final snackbarSize = layoutChild(_Slot.snackbar, BoxConstraints.tightFor(width: size.width));
+    final snackbarTop = size.height - bottomInset - snackbarSize.height;
+    positionChild(_Slot.snackbar, Offset(0, snackbarTop));
+
+    assert(() {
+      // An empty snackbar slot has no height and never shows.
+      if (snackbarSize.height == 0 || snackbarTop >= 0) return true;
+      throw FlutterError.fromParts([
+        ErrorSummary('StreamSnackbar presented off screen.'),
+        ErrorDescription(
+          'A snackbar shown in a StreamScaffold rests above its bottom, but '
+          'the bottom leaves no room for it: its top edge would sit at '
+          '${snackbarTop.toStringAsFixed(1)}, above the top of the scaffold body.',
+        ),
+        ErrorHint('Consider making the bottom shorter, or giving the StreamScaffold more height.'),
+      ]);
+    }());
+  }
+
+  @override
+  bool shouldRelayout(_StreamScaffoldContentDelegate oldDelegate) => bottomInset != oldDelegate.bottomInset;
 }

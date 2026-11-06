@@ -335,6 +335,10 @@ Rules enforced by `melos run check:barrels` (config at
    excluded from coverage. Use this for figma-generated tokens and other
    implementation-only artefacts (currently: `lib/src/theme/primitives/internal`).
 
+A class under `lib/src/` that other component libraries share but that is not
+public API is hidden from its barrel export (`export '…' hide Foo;`) and
+annotated `@internal`.
+
 When adding a new public widget or theme: create the file under `lib/src/…`, then
 add an `export 'src/…/my_file.dart';` line to the appropriate barrel — `core.dart`
 if the widget is product-agnostic, `chat.dart` if it's chat-specific, or a new

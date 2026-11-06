@@ -56,7 +56,7 @@ export 'src/components/list/stream_list_tile.dart';
 export 'src/components/media_viewer/stream_media_viewer.dart';
 export 'src/components/scaffold/stream_scaffold.dart';
 export 'src/components/sheet/stream_sheet.dart';
-export 'src/components/snackbar/stream_snackbar.dart';
+export 'src/components/snackbar/stream_snackbar.dart' hide StreamSnackbarSurface;
 export 'src/components/toolbar/stream_app_bar.dart';
 export 'src/components/toolbar/stream_bottom_app_bar.dart';
 export 'src/components/toolbar/stream_bottom_nav_bar.dart';

@@ -1192,6 +1192,12 @@ final directories = <_widgetbook.WidgetbookNode>[
                     _design_system_gallery_components_scaffold_stream_scaffold
                         .buildStreamScaffoldDrawers,
               ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Snackbars',
+                builder:
+                    _design_system_gallery_components_scaffold_stream_scaffold
+                        .buildStreamScaffoldSnackbars,
+              ),
             ],
           ),
         ],
