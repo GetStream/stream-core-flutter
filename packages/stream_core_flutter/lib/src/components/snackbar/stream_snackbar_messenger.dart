@@ -554,13 +554,13 @@ class _StreamSnackbarPopupState extends State<StreamSnackbarPopup> {
 /// scope has no such `StreamScaffold`, it shows the snackbar at its own bottom
 /// edge instead.
 ///
-/// Scaffolds side by side, such as a master and a detail pane, each show the
-/// snackbar. To show it once, put them in one outer `StreamScaffold` or give
-/// one of them its own scope.
-///
 /// A page that shows snackbars therefore needs its own `StreamScaffold`.
 /// Otherwise its snackbars show on the `StreamScaffold` beneath it: behind a
 /// dialog's barrier, or hidden under an opaque page.
+///
+/// Scaffolds side by side, such as a master and a detail pane, each show the
+/// snackbar. To show it once, put them in one outer `StreamScaffold` or give
+/// one of them its own scope.
 ///
 /// A snackbar can be built in more than one place at once, so its content
 /// must not use a [GlobalKey].
@@ -925,6 +925,21 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     scope?._surfaces.collectionChanged();
   }
 
+  // Leaving in deactivate rather than dispose: deactivation happens while the
+  // tree builds, before the frame paints, while dispose comes after it. A
+  // deactivated state is either activated again or disposed.
+  @override
+  void deactivate() {
+    _scope?._surfaces.remove(this);
+    super.deactivate();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    _scope?._surfaces.add(this);
+  }
+
   @override
   void dispose() {
     _scope?._surfaces.removeListener(_scheduleUpdate);
@@ -971,21 +986,6 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
       });
     });
     SchedulerBinding.instance.ensureVisualUpdate();
-  }
-
-  // Leaving in deactivate rather than dispose: deactivation happens while the
-  // tree builds, before the frame paints, while dispose comes after it. A
-  // deactivated state is either activated again or disposed.
-  @override
-  void deactivate() {
-    _scope?._surfaces.remove(this);
-    super.deactivate();
-  }
-
-  @override
-  void activate() {
-    super.activate();
-    _scope?._surfaces.add(this);
   }
 
   @override
