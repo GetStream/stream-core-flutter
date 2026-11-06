@@ -61,7 +61,7 @@ file-type assets.
 
 ### Shared style guides
 
-`style_guides/` holds the guides every Stream Flutter SDK follows (today `API_DESIGN.md`). The other SDKs carry a copy: on every change to `main`, the `sync_style_guides` workflow runs `scripts/sync_style_guides.dart` against stream-chat-flutter (`master`), stream-video-flutter (`v2`) and stream-feeds-flutter (`main`), and opens a PR in each whose copy changed. Edit the guides here only. A new file in the folder is synced automatically; a new target repository is a new entry in the workflow's matrix.
+`style_guides/` holds the guides every Stream Flutter SDK follows (today `API_DESIGN.md`). The other SDKs carry a copy: on every change to `main`, the `sync_style_guides` workflow runs `scripts/sync_style_guides.dart` against stream-chat-flutter (`master`), stream-video-flutter (`v2`) and stream-feeds-flutter (`main`), and opens a PR in each whose copy changed. Edit the guides here only. They are self-contained: `STYLE_GUIDE.md` points at them, never the reverse, and a relative link out of `style_guides/` fails the workflow's PR check. A new file in the folder is synced automatically; a new target repository is a new entry in the workflow's matrix.
 
 ## Design
 

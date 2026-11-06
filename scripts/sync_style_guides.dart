@@ -6,45 +6,42 @@
 // The `sync_style_guides` workflow runs this script against each of them and
 // opens a pull request when the copy changes.
 //
-// Each copy gets a header saying where it came from, and every relative link
-// that leaves `style_guides/` (such as `../STYLE_GUIDE.md#…`) is rewritten to
-// an absolute link into this repository, since the target has no such file. A
-// copied guide that no longer exists here is deleted from the target, but only
-// if it carries the header, so a target's own files in `style_guides/` are
-// never touched.
+// The guides are self-contained: they may link to each other and to absolute
+// URLs, but never to a file outside `style_guides/` (such as
+// `../STYLE_GUIDE.md`). This repository's style guide points at them, not the
+// other way around, and the copies land in repositories that have no such
+// file. A relative link that leaves the folder fails the run.
 //
-// Run with `dart run scripts/sync_style_guides.dart <target-repo-dir>`.
+// Each copy gets a header saying where it came from. A copied guide that no
+// longer exists here is deleted from the target, but only if it carries the
+// header, so a target's own files in `style_guides/` are never touched.
+//
+// Run with `dart run scripts/sync_style_guides.dart <target-repo-dir>`, or with
+// `--check` instead of a target to only validate the links.
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
 const _sourceDir = 'style_guides';
-const _upstreamBlobUrl = 'https://github.com/GetStream/stream-core-flutter/blob/main';
 const _syncMarker = '<!-- Synced from GetStream/stream-core-flutter';
 
 String _header(String fileName) =>
     '$_syncMarker/$_sourceDir/$fileName. '
     'Do not edit this copy; change it upstream and the sync opens a PR here. -->\n\n';
 
-// Matches the target of an inline markdown link or a reference definition that
-// starts with `../`, e.g. `](../STYLE_GUIDE.md#x)` or `]: ../STYLE_GUIDE.md`.
-final _parentLink = RegExp(r'(\]\(|\]:\s*)\.\./([^)\s]+)');
+// Matches the target of an inline markdown link or a reference definition, e.g.
+// `](../STYLE_GUIDE.md#x)` or `]: ../STYLE_GUIDE.md`.
+final _linkTarget = RegExp(r'(?:\]\(|\]:[ \t]*)([^)\s]+)');
 
 void main(List<String> args) {
   if (args.length != 1) {
-    stderr.writeln('Usage: dart run scripts/sync_style_guides.dart <target-repo-dir>');
+    stderr.writeln('Usage: dart run scripts/sync_style_guides.dart (<target-repo-dir> | --check)');
     exit(64);
   }
 
   final source = Directory(_sourceDir);
   if (!source.existsSync()) {
     stderr.writeln('No `$_sourceDir/` here; run this from the stream-core-flutter root.');
-    exit(1);
-  }
-
-  final targetRoot = Directory(args.single);
-  if (!Directory(p.join(targetRoot.path, '.git')).existsSync() && !File(p.join(targetRoot.path, '.git')).existsSync()) {
-    stderr.writeln('`${targetRoot.path}` is not a git checkout.');
     exit(1);
   }
 
@@ -55,16 +52,32 @@ void main(List<String> args) {
     exit(1);
   }
 
+  final escaping = [for (final guide in guides) ..._linksLeavingFolder(guide)];
+  if (escaping.isNotEmpty) {
+    stderr
+      ..writeln('Guides in `$_sourceDir/` must not link outside the folder; use an absolute URL or drop the link:')
+      ..writeAll(escaping.map((e) => '  $e\n'));
+    exit(1);
+  }
+
+  if (args.single == '--check') {
+    stdout.writeln('${guides.length} guide(s) checked; no links leave `$_sourceDir/`.');
+    return;
+  }
+
+  final targetRoot = Directory(args.single);
+  if (!FileSystemEntity.isDirectorySync(p.join(targetRoot.path, '.git')) &&
+      !FileSystemEntity.isFileSync(p.join(targetRoot.path, '.git'))) {
+    stderr.writeln('`${targetRoot.path}` is not a git checkout.');
+    exit(1);
+  }
+
   final target = Directory(p.join(targetRoot.path, _sourceDir))..createSync(recursive: true);
   final copied = <String>{};
 
   for (final guide in guides) {
     final name = p.basename(guide.path);
-    final body = guide.readAsStringSync().replaceAllMapped(
-      _parentLink,
-      (m) => '${m[1]}$_upstreamBlobUrl/${m[2]}',
-    );
-    File(p.join(target.path, name)).writeAsStringSync(_header(name) + body);
+    File(p.join(target.path, name)).writeAsStringSync(_header(name) + guide.readAsStringSync());
     copied.add(name);
     stdout.writeln('copied $name');
   }
@@ -75,5 +88,20 @@ void main(List<String> args) {
     if (!stale.readAsStringSync().startsWith(_syncMarker)) continue;
     stale.deleteSync();
     stdout.writeln('deleted $name');
+  }
+}
+
+// Returns `file:line: target` for every relative link in [guide] that resolves
+// outside `style_guides/`.
+Iterable<String> _linksLeavingFolder(File guide) sync* {
+  final lines = guide.readAsLinesSync();
+  for (var i = 0; i < lines.length; i++) {
+    for (final match in _linkTarget.allMatches(lines[i])) {
+      final link = match[1]!;
+      if (link.startsWith('#') || Uri.tryParse(link)?.hasScheme ?? false) continue;
+      final path = link.split('#').first;
+      if (p.isWithin(_sourceDir, p.normalize(p.join(_sourceDir, path)))) continue;
+      yield '${guide.path}:${i + 1}: $link';
+    }
   }
 }

@@ -10,13 +10,34 @@ on:
       - 'style_guides/**'
       - 'scripts/sync_style_guides.dart'
       - '.github/workflows/sync_style_guides.yml'
+  pull_request:
+    paths:
+      - 'style_guides/**'
+      - 'scripts/sync_style_guides.dart'
+      - '.github/workflows/sync_style_guides.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  # The guides are copied into repositories that have none of this repo's
+  # other files, so a link out of `style_guides/` must fail before merge.
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v6
+
+      - name: 🎯 Install Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: 🔗 Check Guide Links
+        run: dart run scripts/sync_style_guides.dart --check
+
   sync:
+    if: github.event_name != 'pull_request'
+    needs: check
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

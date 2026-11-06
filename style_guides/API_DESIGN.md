@@ -5,10 +5,8 @@ committed today is one we have to keep supporting until we ship a major version 
 This guide is about choosing shapes that let an API grow in a minor release.
 
 It applies to every Stream Flutter SDK (core, chat, video, feeds). The other
-repositories carry a copy, which the `sync_style_guides` workflow updates by pull
-request whenever this file changes on `main`; edit it here, never in a copy.
-It is part of the [stream-core-flutter style guide](../STYLE_GUIDE.md), which wins
-where the two disagree.
+repositories carry a copy, which the `sync_style_guides` workflow in
+stream-core-flutter keeps up to date; edit it there, never in a copy.
 
 The rules apply to new public API. Existing shapes that break them stay as they are
 until the next major release, when they move to the shape described here; don't change
@@ -103,10 +101,8 @@ History:
 
 ## Decide whether a set of values is closed before using an enum or `sealed`
 
-Consumers switch exhaustively on public enums and sealed classes, as our own style
-guide tells us to
-([Avoid `if` chains or `?:` with enum values](../STYLE_GUIDE.md#avoid-if-chains-or--with-enum-values)).
-That makes adding a value or subclass a breaking change for them. Use an `enum` or
+Consumers switch exhaustively on public enums and sealed classes, because the
+analyzer then reminds them of every case they missed. That makes adding a value or subclass a breaking change for them. Use an `enum` or
 `sealed` hierarchy only when the set is closed, or when adding a member is something
 we are willing to ship in a major release.
 
@@ -310,8 +306,7 @@ Ship the new API next to the old one in a minor release and mark the old one
 `@Deprecated('Use X instead.')`. Keep it for at least one minor release, and remove it
 only in a major. When an old and a new parameter coexist, `assert` that at most one is
 set and let the new one win. Record the deprecation in the package's `CHANGELOG.md`
-with the migration spelled out, following the repository's deprecation policy
-([Clearly mark deprecated APIs](../STYLE_GUIDE.md#clearly-mark-deprecated-apis)).
+with the migration spelled out, following the repository's deprecation policy.
 
 [core#120]: https://github.com/GetStream/stream-core-flutter/pull/120
 [core#189]: https://github.com/GetStream/stream-core-flutter/pull/189
