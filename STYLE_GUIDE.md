@@ -29,6 +29,8 @@ linter.
 Sections below cover:
 
 - [Quick rules](#quick-rules) — the short checklist to skim before every change
+- [Public API stability](#public-api-stability) — designing APIs that can grow without
+  breaking changes; shared by all Stream Flutter SDKs
 - [Philosophy](#philosophy) — the "why" behind the rules
 - [Repository structure](#repository-structure) — monorepo layout, Melos, barrel contract
 - [Documentation](#documentation) — dartdoc conventions
@@ -57,6 +59,9 @@ document; the section link is provided.
   [Public barrel contract](#public-barrel-contract)
 - `stream_core` (the pure-Dart LLC) never depends on Flutter. Anything visual or
   widget-related belongs in `stream_core_flutter`.
+- Public API must be able to grow in a minor release: details objects for callbacks,
+  open types instead of enums for sets that will grow, deliberate class modifiers. →
+  [`style_guides/API_DESIGN.md`](style_guides/API_DESIGN.md)
 
 **Code**
 
@@ -119,6 +124,11 @@ An SDK API is for years, not just for the one PR you are working on. A design sy
 is even worse — every widget lands in downstream apps, and each field of each theme
 becomes a compat constraint. A signature committed today is one we have to keep
 supporting until we ship a major version bump.
+
+How to design APIs that can grow without a breaking change — details objects for
+callbacks, closed vs open enums, class modifiers, options objects — lives in
+[`style_guides/API_DESIGN.md`](style_guides/API_DESIGN.md), which the other Stream
+Flutter SDKs share.
 
 
 ## Philosophy
@@ -642,6 +652,9 @@ constant. Global constants that _do_ need to exist should be prefixed with `k`.
 Use `switch` (statement or expression) with exhaustive cases when examining an enum;
 the analyzer will warn if you miss a value. Avoid `default:` unless the switched
 value isn't statically known — a default clause silences the exhaustiveness check.
+
+Consumers write the same switches over our public enums, which is why adding a value
+to one is a breaking change. → [Decide whether a set of values is closed](style_guides/API_DESIGN.md#decide-whether-a-set-of-values-is-closed-before-using-an-enum-or-sealed)
 
 ```dart
 // GOOD:

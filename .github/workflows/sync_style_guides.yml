@@ -1,0 +1,90 @@
+name: sync_style_guides
+
+# Copies `style_guides/` into the other Stream Flutter SDKs and opens a pull
+# request in each one whose copy changed. See scripts/sync_style_guides.dart.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'style_guides/**'
+      - 'scripts/sync_style_guides.dart'
+      - '.github/workflows/sync_style_guides.yml'
+  pull_request:
+    paths:
+      - 'style_guides/**'
+      - 'scripts/sync_style_guides.dart'
+      - '.github/workflows/sync_style_guides.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # The guides are copied into repositories that have none of this repo's
+  # other files, so a link out of `style_guides/` must fail before merge.
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v6
+
+      - name: 🎯 Install Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: 🔗 Check Guide Links
+        run: dart run scripts/sync_style_guides.dart --check
+
+  sync:
+    if: github.event_name != 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - repository: GetStream/stream-chat-flutter
+            branch: master
+          - repository: GetStream/stream-video-flutter
+            branch: v2
+          - repository: GetStream/stream-feeds-flutter
+            branch: main
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v6
+
+      - name: 📚 Checkout ${{ matrix.repository }}
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.branch }}
+          path: target
+          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
+
+      - name: 🎯 Install Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: 📝 Copy Style Guides
+        run: dart run scripts/sync_style_guides.dart target
+
+      # Opened with the bot's token so the pull request's checks run, which
+      # they don't for one opened with the workflow's own token. Nothing is
+      # opened when the copy is already up to date, and an open sync PR is
+      # updated in place rather than duplicated.
+      - name: 📤 Open Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          path: target
+          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
+          base: ${{ matrix.branch }}
+          branch: chore/sync-style-guides
+          delete-branch: true
+          add-paths: style_guides/**
+          commit-message: 'docs(repo): sync the shared style guides from stream-core-flutter'
+          title: 'docs(repo): sync the shared style guides from stream-core-flutter'
+          body: |
+            Copies `style_guides/` from [GetStream/stream-core-flutter@${{ github.sha }}](https://github.com/GetStream/stream-core-flutter/commit/${{ github.sha }}).
+
+            These files are generated; change them in stream-core-flutter, not here.
+          committer: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
+          author: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
