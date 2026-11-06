@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Before writing or reviewing code, read [`STYLE_GUIDE.md`](STYLE_GUIDE.md).** It is the source of truth for coding conventions, the barrel contract, theming, testing, and changelog policy. See [`TESTING.md`](TESTING.md) for guidance on writing effective tests, and [`EFFECTIVE_DART_DOC.md`](EFFECTIVE_DART_DOC.md) — a vendored copy of Effective Dart's documentation guide — before writing any dartdoc; the style guide wins where they disagree. This file is a repo overview; the style guide is the rulebook.
+> **Before writing or reviewing code, read [`STYLE_GUIDE.md`](STYLE_GUIDE.md).** It is the source of truth for coding conventions, the barrel contract, theming, testing, and changelog policy. Before adding or changing public API, read [`style_guides/API_DESIGN.md`](style_guides/API_DESIGN.md), the forward-compatibility rules shared with the other Stream Flutter SDKs. See [`TESTING.md`](TESTING.md) for guidance on writing effective tests, and [`EFFECTIVE_DART_DOC.md`](EFFECTIVE_DART_DOC.md) — a vendored copy of Effective Dart's documentation guide — before writing any dartdoc; the style guide wins where they disagree. This file is a repo overview; the style guide is the rulebook.
 
 ## Project Overview
 
