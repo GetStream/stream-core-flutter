@@ -165,9 +165,9 @@ For sets that will grow, pick a type consumers cannot switch on exhaustively:
   one — and no `.values`, so add a `static const values` list if the UI needs to show
   the options, and use a class instead when each value has to carry more than its
   name.
-- **Values consumers may add themselves**: a non-sealed class (or `abstract` class)
-  with `static const` instances or subclasses, so a custom value is a subclass rather
-  than a fork.
+- **Values consumers may add themselves**: a non-sealed `base` class (or `abstract base`
+  class) with `static const` instances or subclasses, so a custom value is a subclass
+  rather than a fork.
 - **States that may need to carry data**: a class hierarchy from the start. An enum
   value cannot hold a payload; a subclass can.
 
