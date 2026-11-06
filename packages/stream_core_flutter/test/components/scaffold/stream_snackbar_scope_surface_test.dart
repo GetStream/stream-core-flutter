@@ -404,7 +404,7 @@ void main() {
     expect(paintedPerFrame, everyElement(1));
   });
 
-  testWidgets('StreamScaffolds side by side keep one snackbar per pane through a push and a pop', (tester) async {
+  testWidgets('StreamScaffolds side by side each keep their snackbar through a push and a pop', (tester) async {
     final leftKey = GlobalKey();
     final rightKey = GlobalKey();
     final navigatorKey = GlobalKey<NavigatorState>();
@@ -428,8 +428,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(_snackbarHeroes(leftKey), findsOneWidget);
-    expect(_snackbarHeroes(rightKey), findsNothing);
+    expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
 
     navigatorKey.currentState!
         .push(MaterialPageRoute<void>(builder: (_) => const StreamScaffold(body: SizedBox.expand())))
@@ -488,7 +487,7 @@ void main() {
     expect(_snackbarHeroes(rightKey), findsOneWidget);
   });
 
-  testWidgets('the visible tab of tabs with their own navigators flies the snackbar through a root push and pop', (
+  testWidgets('tabs with their own navigators cross-fade the snackbar through a root push and pop', (
     tester,
   ) async {
     final navigatorKey = GlobalKey<NavigatorState>();
@@ -516,12 +515,13 @@ void main() {
     final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
 
     expect(tester.takeException(), isNull);
-    expect(painted, everyElement(1));
+    expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
+    expect(painted, everyElement(lessThanOrEqualTo(2)));
     expect(_paintedCopies(tester), 1);
   });
 
   testWidgets(
-    'the active branch of branches hidden by Offstage and TickerMode flies the snackbar through a root push and pop',
+    'branches hidden by Offstage and TickerMode cross-fade the snackbar through a root push and pop',
     (tester) async {
       final navigatorKey = GlobalKey<NavigatorState>();
       final tabKey = GlobalKey();
@@ -560,12 +560,13 @@ void main() {
       final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
 
       expect(tester.takeException(), isNull);
-      expect(painted, everyElement(1));
+      expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
+      expect(painted, everyElement(lessThanOrEqualTo(2)));
       expect(_paintedCopies(tester), 1);
     },
   );
 
-  testWidgets('a tab with a page pushed inside it flies the snackbar through a root push and pop', (tester) async {
+  testWidgets('tabs with a page pushed inside one cross-fade the snackbar through a root push and pop', (tester) async {
     final navigatorKey = GlobalKey<NavigatorState>();
     final tabNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -593,7 +594,8 @@ void main() {
     final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
 
     expect(tester.takeException(), isNull);
-    expect(painted, everyElement(1));
+    expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
+    expect(painted, everyElement(lessThanOrEqualTo(2)));
     expect(_paintedCopies(tester), 1);
   });
 
@@ -715,48 +717,220 @@ void main() {
     expect(paintedPerFrame, everyElement(1));
   });
 
-  testWidgets('after switching tabs, the newly visible tab flies the snackbar through a root push', (tester) async {
+  testWidgets('side-by-side navigators cross-fade the snackbar after a plain page is pushed and popped in one', (
+    tester,
+  ) async {
     final navigatorKey = GlobalKey<NavigatorState>();
-    final firstTabKey = GlobalKey();
-    final secondTabKey = GlobalKey();
+    final leftNavigatorKey = GlobalKey<NavigatorState>();
+    final leftKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(
+        body: Row(
+          children: [
+            Expanded(
+              child: _Pane(navigatorKey: leftNavigatorKey, scaffoldKey: leftKey),
+            ),
+            const Expanded(child: _Pane()),
+          ],
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(leftKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    await _push(tester, leftNavigatorKey, const ColoredBox(color: Colors.white));
+    leftNavigatorKey.currentState!.pop();
+    await tester.pumpAndSettle();
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
+    expect(painted, everyElement(lessThanOrEqualTo(3)));
+  });
+
+  testWidgets('side-by-side navigators cross-fade the snackbar after a dialog opens and closes in one', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final leftNavigatorKey = GlobalKey<NavigatorState>();
+    final leftKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(
+        body: Row(
+          children: [
+            Expanded(
+              child: _Pane(navigatorKey: leftNavigatorKey, scaffoldKey: leftKey),
+            ),
+            const Expanded(child: _Pane()),
+          ],
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(leftKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    showDialog<void>(
+      context: leftNavigatorKey.currentContext!,
+      useRootNavigator: false,
+      builder: (_) => const SizedBox(width: 100, height: 100),
+    ).ignore();
+    await tester.pumpAndSettle();
+    leftNavigatorKey.currentState!.pop();
+    await tester.pumpAndSettle();
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
+    expect(painted, everyElement(lessThanOrEqualTo(3)));
+  });
+
+  testWidgets('side-by-side navigators cross-fade the snackbar after a back swipe in one', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final leftNavigatorKey = GlobalKey<NavigatorState>();
+    final leftKey = GlobalKey();
+
+    await _pumpApp(
+      tester,
+      navigatorKey: navigatorKey,
+      home: Scaffold(
+        body: Row(
+          children: [
+            Expanded(
+              child: _Pane(navigatorKey: leftNavigatorKey, scaffoldKey: leftKey),
+            ),
+            const Expanded(child: _Pane()),
+          ],
+        ),
+      ),
+    );
+    StreamSnackbarMessenger.of(leftKey.currentContext!).show(
+      StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
+    );
+    await tester.pumpAndSettle();
+
+    leftNavigatorKey.currentState!
+        .push(CupertinoPageRoute<void>(builder: (_) => const ColoredBox(color: Colors.white)))
+        .ignore();
+    await tester.pumpAndSettle();
+    final gesture = await tester.startGesture(const Offset(5, 200));
+    await gesture.moveBy(const Offset(300, 0));
+    await gesture.up();
+    await tester.pumpAndSettle();
+    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
+    expect(painted, everyElement(lessThanOrEqualTo(3)));
+  });
+
+  testWidgets('two colliding StreamScaffolds that mount in one frame never carry the hero together', (tester) async {
+    final messenger = StreamSnackbarMessenger();
+    addTearDown(messenger.dispose);
+    messenger.show(StreamSnackbar(message: const Text(_kMessage)));
+    // Skips the entry fade, so the first frame builds the snackbar outright.
+    tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+      accessibleNavigation: true,
+    );
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
+    await _pumpApp(
+      tester,
+      messenger: messenger,
+      home: const Scaffold(
+        body: Row(
+          children: [
+            Expanded(child: _Pane()),
+            Expanded(child: _Pane()),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.byWidgetPredicate(_isSnackbarHero).evaluate().length, lessThanOrEqualTo(1));
+    await tester.pumpAndSettle();
+    expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing);
+  });
+
+  testWidgets('side-by-side panes and tabs cross-fade the snackbar through a sequence of navigations', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final paneNavigatorKey = GlobalKey<NavigatorState>();
+    final tabNavigatorKeys = [GlobalKey<NavigatorState>(), GlobalKey<NavigatorState>()];
+    final paneKey = GlobalKey();
     final index = ValueNotifier(0);
     addTearDown(index.dispose);
-    // Built once, so switching tabs rebuilds only the stack.
     final tabs = [
-      _TabNavigator(
-        page: StreamScaffold(key: firstTabKey, body: const SizedBox.expand()),
-      ),
-      _TabNavigator(
-        page: StreamScaffold(key: secondTabKey, body: const SizedBox.expand()),
-      ),
+      for (final key in tabNavigatorKeys) _Pane(navigatorKey: key),
     ];
 
     await _pumpApp(
       tester,
       navigatorKey: navigatorKey,
       home: Scaffold(
-        body: ValueListenableBuilder(
-          valueListenable: index,
-          builder: (context, index, _) => IndexedStack(index: index, children: tabs),
+        body: Row(
+          children: [
+            Expanded(
+              child: _Pane(navigatorKey: paneNavigatorKey, scaffoldKey: paneKey),
+            ),
+            Expanded(
+              child: ValueListenableBuilder(
+                valueListenable: index,
+                builder: (context, index, _) => IndexedStack(index: index, children: tabs),
+              ),
+            ),
+          ],
         ),
       ),
     );
-    StreamSnackbarMessenger.of(firstTabKey.currentContext!).show(
+    StreamSnackbarMessenger.of(paneKey.currentContext!).show(
       StreamSnackbar(message: const Text(_kMessage), duration: const Duration(minutes: 1)),
     );
     await tester.pumpAndSettle();
-    expect(_snackbarHeroes(firstTabKey), findsOneWidget);
 
-    index.value = 1;
-    await tester.pumpAndSettle();
+    Future<void> pushAndPop(GlobalKey<NavigatorState> key, Widget page) async {
+      await _push(tester, key, page);
+      key.currentState!.pop();
+      await tester.pumpAndSettle();
+    }
 
-    expect(_snackbarHeroes(firstTabKey), findsNothing);
-    expect(_snackbarHeroes(secondTabKey), findsOneWidget);
+    const plainPage = ColoredBox(color: Colors.white);
+    const scaffoldPage = StreamScaffold(body: SizedBox.expand());
+    final steps = <String, Future<void> Function()>{
+      'plain page in the pane': () => pushAndPop(paneNavigatorKey, plainPage),
+      'StreamScaffold page in the pane': () => pushAndPop(paneNavigatorKey, scaffoldPage),
+      'plain page in the first tab': () => pushAndPop(tabNavigatorKeys[0], plainPage),
+      'StreamScaffold page in the first tab': () => pushAndPop(tabNavigatorKeys[0], scaffoldPage),
+      'switch to the second tab': () async {
+        index.value = 1;
+        await tester.pumpAndSettle();
+      },
+      'plain page in the second tab': () => pushAndPop(tabNavigatorKeys[1], plainPage),
+      'plain page pushed in the pane and left there': () => _push(tester, paneNavigatorKey, plainPage),
+      'switch back to the first tab': () async {
+        index.value = 0;
+        await tester.pumpAndSettle();
+      },
+      'pane page popped': () async {
+        paneNavigatorKey.currentState!.pop();
+        await tester.pumpAndSettle();
+      },
+    };
 
-    final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
+    for (final MapEntry(key: step, value: run) in steps.entries) {
+      await run();
+      final painted = await _paintedThroughPushAndPop(tester, navigatorKey);
 
-    expect(tester.takeException(), isNull);
-    expect(painted, everyElement(1));
+      expect(tester.takeException(), isNull, reason: 'after: $step');
+      expect(find.byWidgetPredicate(_isSnackbarHero), findsNothing, reason: 'after: $step');
+      expect(painted, everyElement(lessThanOrEqualTo(3)), reason: 'after: $step');
+    }
   });
 
   testWidgets('a scope snackbar times out once when a StreamScaffold is pushed during its entrance', (tester) async {
@@ -973,11 +1147,31 @@ class _TabNavigatorState extends State<_TabNavigator> {
   }
 }
 
+bool _isSnackbarHero(Widget widget) => widget is Hero && widget.tag is ObjectKey;
+
+// A pane with its own navigator, starting on a StreamScaffold.
+class _Pane extends StatelessWidget {
+  const _Pane({this.navigatorKey, this.scaffoldKey});
+
+  final GlobalKey<NavigatorState>? navigatorKey;
+  final Key? scaffoldKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Navigator(
+      key: navigatorKey,
+      onGenerateRoute: (_) => MaterialPageRoute<void>(
+        builder: (_) => StreamScaffold(key: scaffoldKey, body: const SizedBox.expand()),
+      ),
+    );
+  }
+}
+
 // The snackbar heroes inside the widget with [key].
 Finder _snackbarHeroes(GlobalKey key) {
   return find.descendant(
     of: find.byKey(key),
-    matching: find.byWidgetPredicate((widget) => widget is Hero && widget.tag is ObjectKey),
+    matching: find.byWidgetPredicate(_isSnackbarHero),
   );
 }
 

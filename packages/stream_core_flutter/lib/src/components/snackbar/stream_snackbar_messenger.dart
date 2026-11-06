@@ -725,9 +725,9 @@ class _SurfaceRegistry extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Tells the surfaces that one of them changed what decides which carries
-  // the snackbar's hero.
-  void heroChanged() => notifyListeners();
+  // Tells the surfaces that one of them may now be collected by other page
+  // transitions.
+  void collectionChanged() => notifyListeners();
 }
 
 // Skips painting, hit testing and semantics for [child] while any surface is
@@ -903,7 +903,6 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
   // The overlay entries of the routes this surface sits in, innermost first.
   var _routeEntries = const <Element>[];
   var _isRoot = false;
-  var _visible = true;
   var _flies = false;
   var _updateScheduled = false;
 
@@ -923,10 +922,7 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     _route = ModalRoute.of(context);
     _routeEntries = _routeEntriesOf(context);
     _isRoot = scope != null && _SnackbarSurfaceMarker.maybeOf(context) != scope;
-    // A page covered by another has its tickers off; a tab it hides keeps
-    // them on but is not visible.
-    _visible = TickerMode.valuesOf(context).enabled && Visibility.of(context);
-    scope?._surfaces.heroChanged();
+    scope?._surfaces.collectionChanged();
   }
 
   @override
@@ -950,18 +946,14 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     return other._collectedBy.any(collectedBy.contains);
   }
 
-  // Whether this surface carries the snackbar's hero. Every hero one page
-  // transition collects needs its own tag, so of the surfaces collected
-  // together only one carries it. A visible surface takes it from a hidden
-  // one; otherwise the one carrying it keeps it, so a page covered by another
-  // still flies back when uncovered. A surface only takes the hero once no
-  // surface collected with it carries one, so two never carry it at once.
+  // Whether this surface carries the snackbar's hero: only while no other
+  // surface is collected by the same page transitions. Every hero one
+  // transition collects needs its own tag, so surfaces collected together all
+  // leave the hero out and cross-fade instead. If they come to be collected
+  // together mid-flight, the flight ends rather than reversing.
   bool _carriesHero() {
     if (!_isRoot) return false;
-    final others = _scope!._surfaces._surfaces.where((other) => other != this && other._collectedWith(this));
-    final outranked = others.any((other) => other._visible && !_visible);
-    if (_flies) return !outranked;
-    return !outranked && !others.any((other) => other._flies);
+    return !_scope!._surfaces._surfaces.any((other) => other != this && other._collectedWith(this));
   }
 
   // Which surface carries the hero changes while the tree builds, when this
@@ -1001,11 +993,7 @@ class _StreamSnackbarSurfaceState extends State<StreamSnackbarSurface> {
     final scope = _scope;
     if (scope == null) return widget.builder(context, null);
 
-    final flies = _carriesHero();
-    if (flies != _flies) {
-      _flies = flies;
-      scope._surfaces.heroChanged();
-    }
+    _flies = _carriesHero();
     final snackbar = _isRoot
         ? _SnackbarView(presenter: scope._presenter, builder: _buildInlineSnackbar, flies: _flies)
         : null;
