@@ -150,3 +150,5 @@ grid-default-fill;2026-08-27
 phone-fill;2026-08-27
 livestream-fill;2026-08-27
 low-bandwidth-fill;2026-09-08
+calendar;2026-11-09
+clock-fill;2026-11-09

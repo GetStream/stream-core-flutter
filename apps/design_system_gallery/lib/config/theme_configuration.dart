@@ -32,6 +32,10 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _accentWarning;
   Color? _accentError;
   Color? _accentNeutral;
+  Color? _accentPrimarySubtle;
+  Color? _accentSuccessSubtle;
+  Color? _accentWarningSubtle;
+  Color? _accentErrorSubtle;
 
   // =========================================================================
   // Text Colors
@@ -62,6 +66,10 @@ class ThemeConfiguration extends ChangeNotifier {
   Color? _backgroundPressed;
   Color? _backgroundSelected;
   Color? _backgroundInverse;
+  Color? _backgroundInfoSubtle;
+  Color? _backgroundSuccessSubtle;
+  Color? _backgroundWarningSubtle;
+  Color? _backgroundErrorSubtle;
   Color? _backgroundElevation0;
   Color? _backgroundElevation1;
   Color? _backgroundElevation2;
@@ -121,6 +129,10 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get accentWarning => _accentWarning ?? _themeData.colorScheme.accentWarning;
   Color get accentError => _accentError ?? _themeData.colorScheme.accentError;
   Color get accentNeutral => _accentNeutral ?? _themeData.colorScheme.accentNeutral;
+  Color get accentPrimarySubtle => _accentPrimarySubtle ?? _themeData.colorScheme.accentPrimarySubtle;
+  Color get accentSuccessSubtle => _accentSuccessSubtle ?? _themeData.colorScheme.accentSuccessSubtle;
+  Color get accentWarningSubtle => _accentWarningSubtle ?? _themeData.colorScheme.accentWarningSubtle;
+  Color get accentErrorSubtle => _accentErrorSubtle ?? _themeData.colorScheme.accentErrorSubtle;
 
   // =========================================================================
   // Getters - Text
@@ -151,6 +163,10 @@ class ThemeConfiguration extends ChangeNotifier {
   Color get backgroundPressed => _backgroundPressed ?? _themeData.colorScheme.backgroundPressed;
   Color get backgroundSelected => _backgroundSelected ?? _themeData.colorScheme.backgroundSelected;
   Color get backgroundInverse => _backgroundInverse ?? _themeData.colorScheme.backgroundInverse;
+  Color get backgroundInfoSubtle => _backgroundInfoSubtle ?? _themeData.colorScheme.backgroundInfoSubtle;
+  Color get backgroundSuccessSubtle => _backgroundSuccessSubtle ?? _themeData.colorScheme.backgroundSuccessSubtle;
+  Color get backgroundWarningSubtle => _backgroundWarningSubtle ?? _themeData.colorScheme.backgroundWarningSubtle;
+  Color get backgroundErrorSubtle => _backgroundErrorSubtle ?? _themeData.colorScheme.backgroundErrorSubtle;
   Color get backgroundElevation0 => _backgroundElevation0 ?? _themeData.colorScheme.backgroundElevation0;
   Color get backgroundElevation1 => _backgroundElevation1 ?? _themeData.colorScheme.backgroundElevation1;
   Color get backgroundElevation2 => _backgroundElevation2 ?? _themeData.colorScheme.backgroundElevation2;
@@ -219,6 +235,10 @@ class ThemeConfiguration extends ChangeNotifier {
   void setAccentWarning(Color color) => _update(() => _accentWarning = color);
   void setAccentError(Color color) => _update(() => _accentError = color);
   void setAccentNeutral(Color color) => _update(() => _accentNeutral = color);
+  void setAccentPrimarySubtle(Color color) => _update(() => _accentPrimarySubtle = color);
+  void setAccentSuccessSubtle(Color color) => _update(() => _accentSuccessSubtle = color);
+  void setAccentWarningSubtle(Color color) => _update(() => _accentWarningSubtle = color);
+  void setAccentErrorSubtle(Color color) => _update(() => _accentErrorSubtle = color);
 
   // Text
   void setTextPrimary(Color color) => _update(() => _textPrimary = color);
@@ -245,6 +265,10 @@ class ThemeConfiguration extends ChangeNotifier {
   void setBackgroundPressed(Color color) => _update(() => _backgroundPressed = color);
   void setBackgroundSelected(Color color) => _update(() => _backgroundSelected = color);
   void setBackgroundInverse(Color color) => _update(() => _backgroundInverse = color);
+  void setBackgroundInfoSubtle(Color color) => _update(() => _backgroundInfoSubtle = color);
+  void setBackgroundSuccessSubtle(Color color) => _update(() => _backgroundSuccessSubtle = color);
+  void setBackgroundWarningSubtle(Color color) => _update(() => _backgroundWarningSubtle = color);
+  void setBackgroundErrorSubtle(Color color) => _update(() => _backgroundErrorSubtle = color);
   void setBackgroundElevation0(Color color) => _update(() => _backgroundElevation0 = color);
   void setBackgroundElevation1(Color color) => _update(() => _backgroundElevation1 = color);
   void setBackgroundElevation2(Color color) => _update(() => _backgroundElevation2 = color);
@@ -321,6 +345,10 @@ class ThemeConfiguration extends ChangeNotifier {
   bool get accentWarningIsCustom => _accentWarning != null;
   bool get accentErrorIsCustom => _accentError != null;
   bool get accentNeutralIsCustom => _accentNeutral != null;
+  bool get accentPrimarySubtleIsCustom => _accentPrimarySubtle != null;
+  bool get accentSuccessSubtleIsCustom => _accentSuccessSubtle != null;
+  bool get accentWarningSubtleIsCustom => _accentWarningSubtle != null;
+  bool get accentErrorSubtleIsCustom => _accentErrorSubtle != null;
 
   // Text
   bool get textPrimaryIsCustom => _textPrimary != null;
@@ -347,6 +375,10 @@ class ThemeConfiguration extends ChangeNotifier {
   bool get backgroundPressedIsCustom => _backgroundPressed != null;
   bool get backgroundSelectedIsCustom => _backgroundSelected != null;
   bool get backgroundInverseIsCustom => _backgroundInverse != null;
+  bool get backgroundInfoSubtleIsCustom => _backgroundInfoSubtle != null;
+  bool get backgroundSuccessSubtleIsCustom => _backgroundSuccessSubtle != null;
+  bool get backgroundWarningSubtleIsCustom => _backgroundWarningSubtle != null;
+  bool get backgroundErrorSubtleIsCustom => _backgroundErrorSubtle != null;
   bool get backgroundElevation0IsCustom => _backgroundElevation0 != null;
   bool get backgroundElevation1IsCustom => _backgroundElevation1 != null;
   bool get backgroundElevation2IsCustom => _backgroundElevation2 != null;
@@ -394,6 +426,10 @@ class ThemeConfiguration extends ChangeNotifier {
   void resetAccentWarning() => _update(() => _accentWarning = null);
   void resetAccentError() => _update(() => _accentError = null);
   void resetAccentNeutral() => _update(() => _accentNeutral = null);
+  void resetAccentPrimarySubtle() => _update(() => _accentPrimarySubtle = null);
+  void resetAccentSuccessSubtle() => _update(() => _accentSuccessSubtle = null);
+  void resetAccentWarningSubtle() => _update(() => _accentWarningSubtle = null);
+  void resetAccentErrorSubtle() => _update(() => _accentErrorSubtle = null);
 
   // Text
   void resetTextPrimary() => _update(() => _textPrimary = null);
@@ -420,6 +456,10 @@ class ThemeConfiguration extends ChangeNotifier {
   void resetBackgroundPressed() => _update(() => _backgroundPressed = null);
   void resetBackgroundSelected() => _update(() => _backgroundSelected = null);
   void resetBackgroundInverse() => _update(() => _backgroundInverse = null);
+  void resetBackgroundInfoSubtle() => _update(() => _backgroundInfoSubtle = null);
+  void resetBackgroundSuccessSubtle() => _update(() => _backgroundSuccessSubtle = null);
+  void resetBackgroundWarningSubtle() => _update(() => _backgroundWarningSubtle = null);
+  void resetBackgroundErrorSubtle() => _update(() => _backgroundErrorSubtle = null);
   void resetBackgroundElevation0() => _update(() => _backgroundElevation0 = null);
   void resetBackgroundElevation1() => _update(() => _backgroundElevation1 = null);
   void resetBackgroundElevation2() => _update(() => _backgroundElevation2 = null);
@@ -471,6 +511,10 @@ class ThemeConfiguration extends ChangeNotifier {
     _accentWarning = null;
     _accentError = null;
     _accentNeutral = null;
+    _accentPrimarySubtle = null;
+    _accentSuccessSubtle = null;
+    _accentWarningSubtle = null;
+    _accentErrorSubtle = null;
     // Text
     _textPrimary = null;
     _textSecondary = null;
@@ -495,6 +539,10 @@ class ThemeConfiguration extends ChangeNotifier {
     _backgroundPressed = null;
     _backgroundSelected = null;
     _backgroundInverse = null;
+    _backgroundInfoSubtle = null;
+    _backgroundSuccessSubtle = null;
+    _backgroundWarningSubtle = null;
+    _backgroundErrorSubtle = null;
     _backgroundElevation0 = null;
     _backgroundElevation1 = null;
     _backgroundElevation2 = null;
@@ -561,6 +609,10 @@ class ThemeConfiguration extends ChangeNotifier {
       accentWarning: _accentWarning,
       accentError: _accentError,
       accentNeutral: _accentNeutral,
+      accentPrimarySubtle: _accentPrimarySubtle,
+      accentSuccessSubtle: _accentSuccessSubtle,
+      accentWarningSubtle: _accentWarningSubtle,
+      accentErrorSubtle: _accentErrorSubtle,
       // Text
       textPrimary: _textPrimary,
       textSecondary: _textSecondary,
@@ -585,6 +637,10 @@ class ThemeConfiguration extends ChangeNotifier {
       backgroundPressed: _backgroundPressed,
       backgroundSelected: _backgroundSelected,
       backgroundInverse: _backgroundInverse,
+      backgroundInfoSubtle: _backgroundInfoSubtle,
+      backgroundSuccessSubtle: _backgroundSuccessSubtle,
+      backgroundWarningSubtle: _backgroundWarningSubtle,
+      backgroundErrorSubtle: _backgroundErrorSubtle,
       backgroundElevation0: _backgroundElevation0,
       backgroundElevation1: _backgroundElevation1,
       backgroundElevation2: _backgroundElevation2,

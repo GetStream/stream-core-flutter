@@ -6,6 +6,8 @@
 - `StreamMessageText` now links a web address written without a scheme, such
   as `example.com`, when it ends in a known top-level domain. It opens over
   `https://`.
+- Added `StreamColorScheme.accent{Primary,Success,Warning,Error}Subtle` and `background{Info,Success,Warning,Error}Subtle`.
+- Added the `calendar` and `clockFill` icons to `StreamIcons`.
 
 ### 🐛 Bug Fixes
 

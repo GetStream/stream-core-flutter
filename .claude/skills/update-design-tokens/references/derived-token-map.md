@@ -4,9 +4,9 @@
 
 | | |
 | --- | --- |
-| upstream commit | `4ef9b54bf93f2e42f346340690296dfca480ebc9` |
-| upstream PR | [design-system-tokens#73](https://github.com/GetStream/design-system-tokens/pull/73) |
-| date | 2026-09-10 |
+| upstream commit | `76bbd69c18deed80e2df34a465c0dae7483fb3f9` |
+| upstream PR | [design-system-tokens#80](https://github.com/GetStream/design-system-tokens/pull/80) |
+| date | 2026-11-03 |
 
 **Update this on every sync.** Nothing in the repo records which upstream state the
 vendored tokens correspond to, and unlike a token's readers it cannot be recovered

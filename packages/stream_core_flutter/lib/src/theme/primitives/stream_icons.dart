@@ -75,6 +75,7 @@ class StreamIcons with _$StreamIcons {
     this.blurFill = StreamIconData.blurFill,
     this.bolt = StreamIconData.bolt,
     this.boltFill = StreamIconData.boltFill,
+    this.calendar = StreamIconData.calendar,
     this.camera = StreamIconData.camera,
     this.cameraFlipFill = StreamIconData.cameraFlipFill,
     this.cameraLarge = StreamIconData.cameraLarge,
@@ -88,6 +89,7 @@ class StreamIcons with _$StreamIcons {
     this.chevronRight = StreamIconData.chevronRight,
     this.chevronUp = StreamIconData.chevronUp,
     this.clock = StreamIconData.clock,
+    this.clockFill = StreamIconData.clockFill,
     this.command = StreamIconData.command,
     this.copy = StreamIconData.copy,
     this.copyFill = StreamIconData.copyFill,
@@ -260,6 +262,9 @@ class StreamIcons with _$StreamIcons {
   /// The bolt fill icon.
   final IconData boltFill;
 
+  /// The calendar icon.
+  final IconData calendar;
+
   /// The camera icon.
   final IconData camera;
 
@@ -298,6 +303,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The clock icon.
   final IconData clock;
+
+  /// The clock fill icon.
+  final IconData clockFill;
 
   /// The command icon.
   final IconData command;
@@ -702,6 +710,7 @@ class StreamIcons with _$StreamIcons {
     'blurFill': blurFill,
     'bolt': bolt,
     'boltFill': boltFill,
+    'calendar': calendar,
     'camera': camera,
     'cameraFlipFill': cameraFlipFill,
     'cameraLarge': cameraLarge,
@@ -715,6 +724,7 @@ class StreamIcons with _$StreamIcons {
     'chevronRight': chevronRight,
     'chevronUp': chevronUp,
     'clock': clock,
+    'clockFill': clockFill,
     'command': command,
     'copy': copy,
     'copyFill': copyFill,
