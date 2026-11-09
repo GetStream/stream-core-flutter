@@ -309,9 +309,19 @@ Map<String, String> _readSvgFiles(
   }
   final logContent = logFile.readAsStringSync();
   final logEntries = <String, String>{};
+  final datePattern = RegExp(r'^\d{4}-\d{2}-\d{2}$');
   for (final line in logContent.split('\n')) {
     final parts = line.split(';');
     if (parts.length == 2) {
+      // Glyphs are ordered by comparing these dates as text, so an unpadded
+      // date would sort out of chronological order and shift code points.
+      if (!datePattern.hasMatch(parts[1])) {
+        throw IconGeneratorException(
+          'Invalid date "${parts[1]}" for icon "${parts[0]}" in ${p.relative(logFilePath, from: scriptDir)}. '
+          'Dates must be zero-padded yyyy-mm-dd.',
+          exitCode: 2,
+        );
+      }
       logEntries[parts[0]] = parts[1];
     }
   }
@@ -323,7 +333,9 @@ Map<String, String> _readSvgFiles(
       return logEntries[fileName]!;
     }
     final now = DateTime.now();
-    newAdditions[fileName] = '${now.year}${now.month}${now.day}';
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    newAdditions[fileName] = '${now.year}-$month-$day';
     return newAdditions[fileName]!;
   }
 
