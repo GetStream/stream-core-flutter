@@ -80,7 +80,7 @@ Widget buildStreamBannerShowcase(BuildContext context) {
           SizedBox(height: spacing.xl),
           _Section(
             label: 'LONG TITLE',
-            caption: 'The title wraps and stays centered',
+            caption: 'The title wraps; the icon and text stay centered together',
             children: [
               StreamBanner(
                 type: StreamBannerType.error,
