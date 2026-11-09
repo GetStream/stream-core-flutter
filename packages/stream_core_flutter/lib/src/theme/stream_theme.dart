@@ -7,6 +7,7 @@ import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
+import 'components/stream_banner_theme.dart';
 import 'components/stream_bottom_app_bar_theme.dart';
 import 'components/stream_bottom_nav_bar_theme.dart';
 import 'components/stream_button_theme.dart';
@@ -17,6 +18,7 @@ import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_error_badge_theme.dart';
+import 'components/stream_inline_notification_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_media_viewer_theme.dart';
@@ -126,6 +128,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
+    StreamBannerThemeData? bannerTheme,
     StreamBottomAppBarThemeData? bottomAppBarTheme,
     StreamBottomNavBarThemeData? bottomNavBarTheme,
     StreamButtonThemeData? buttonTheme,
@@ -136,6 +139,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
+    StreamInlineNotificationThemeData? inlineNotificationTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
     StreamMediaViewerThemeData? mediaViewerTheme,
@@ -190,6 +194,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     avatarTheme ??= const StreamAvatarThemeData();
     badgeCountTheme ??= const StreamBadgeCountThemeData();
     badgeNotificationTheme ??= const StreamBadgeNotificationThemeData();
+    bannerTheme ??= const StreamBannerThemeData();
     bottomAppBarTheme ??= const StreamBottomAppBarThemeData();
     bottomNavBarTheme ??= const StreamBottomNavBarThemeData();
     buttonTheme ??= const StreamButtonThemeData();
@@ -200,6 +205,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     emojiChipTheme ??= const StreamEmojiChipThemeData();
     errorBadgeTheme ??= const StreamErrorBadgeThemeData();
+    inlineNotificationTheme ??= const StreamInlineNotificationThemeData();
     jumpToUnreadButtonTheme ??= const StreamJumpToUnreadButtonThemeData();
     listTileTheme ??= const StreamListTileThemeData();
     mediaViewerTheme ??= const StreamMediaViewerThemeData();
@@ -242,6 +248,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
+      bannerTheme: bannerTheme,
       bottomAppBarTheme: bottomAppBarTheme,
       bottomNavBarTheme: bottomNavBarTheme,
       buttonTheme: buttonTheme,
@@ -252,6 +259,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme,
+      inlineNotificationTheme: inlineNotificationTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
       mediaViewerTheme: mediaViewerTheme,
@@ -308,6 +316,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.avatarTheme,
     required this.badgeCountTheme,
     required this.badgeNotificationTheme,
+    required this.bannerTheme,
     required this.bottomAppBarTheme,
     required this.bottomNavBarTheme,
     required this.buttonTheme,
@@ -318,6 +327,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.emojiButtonTheme,
     required this.emojiChipTheme,
     required this.errorBadgeTheme,
+    required this.inlineNotificationTheme,
     required this.jumpToUnreadButtonTheme,
     required this.listTileTheme,
     required this.mediaViewerTheme,
@@ -431,6 +441,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The badge notification theme for this theme.
   final StreamBadgeNotificationThemeData badgeNotificationTheme;
 
+  /// The banner theme for this theme.
+  final StreamBannerThemeData bannerTheme;
+
   /// The bottom app bar theme for this theme.
   final StreamBottomAppBarThemeData bottomAppBarTheme;
 
@@ -460,6 +473,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The error badge theme for this theme.
   final StreamErrorBadgeThemeData errorBadgeTheme;
+
+  /// The inline notification theme for this theme.
+  final StreamInlineNotificationThemeData inlineNotificationTheme;
 
   /// The jump-to-unread button theme for this theme.
   final StreamJumpToUnreadButtonThemeData jumpToUnreadButtonTheme;
@@ -574,6 +590,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       avatarTheme: avatarTheme,
       badgeCountTheme: badgeCountTheme,
       badgeNotificationTheme: badgeNotificationTheme,
+      bannerTheme: bannerTheme,
       bottomAppBarTheme: bottomAppBarTheme,
       bottomNavBarTheme: bottomNavBarTheme,
       buttonTheme: buttonTheme,
@@ -584,6 +601,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme,
+      inlineNotificationTheme: inlineNotificationTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme,
       mediaViewerTheme: mediaViewerTheme,

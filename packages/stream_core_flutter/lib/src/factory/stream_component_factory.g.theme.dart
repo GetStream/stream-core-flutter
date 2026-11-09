@@ -39,6 +39,7 @@ mixin _$StreamComponentBuilders {
       avatarStack: t < 0.5 ? a.avatarStack : b.avatarStack,
       badgeCount: t < 0.5 ? a.badgeCount : b.badgeCount,
       badgeNotification: t < 0.5 ? a.badgeNotification : b.badgeNotification,
+      banner: t < 0.5 ? a.banner : b.banner,
       button: t < 0.5 ? a.button : b.button,
       checkbox: t < 0.5 ? a.checkbox : b.checkbox,
       commandChip: t < 0.5 ? a.commandChip : b.commandChip,
@@ -49,6 +50,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: t < 0.5 ? a.emojiChipBar : b.emojiChipBar,
       errorBadge: t < 0.5 ? a.errorBadge : b.errorBadge,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
+      inlineNotification: t < 0.5 ? a.inlineNotification : b.inlineNotification,
       listTile: t < 0.5 ? a.listTile : b.listTile,
       loadingSpinner: t < 0.5 ? a.loadingSpinner : b.loadingSpinner,
       mediaViewer: t < 0.5 ? a.mediaViewer : b.mediaViewer,
@@ -114,6 +116,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamBadgeCountProps)? badgeCount,
     Widget Function(BuildContext, StreamBadgeNotificationProps)?
     badgeNotification,
+    Widget Function(BuildContext, StreamBannerProps)? banner,
     Widget Function(BuildContext, StreamButtonProps)? button,
     Widget Function(BuildContext, StreamCheckboxProps)? checkbox,
     Widget Function(BuildContext, StreamCommandChipProps)? commandChip,
@@ -126,6 +129,8 @@ mixin _$StreamComponentBuilders {
     emojiChipBar,
     Widget Function(BuildContext, StreamErrorBadgeProps)? errorBadge,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
+    Widget Function(BuildContext, StreamInlineNotificationProps)?
+    inlineNotification,
     Widget Function(BuildContext, StreamListTileProps)? listTile,
     Widget Function(BuildContext, StreamLoadingSpinnerProps)? loadingSpinner,
     Widget Function(BuildContext, StreamMediaViewerProps)? mediaViewer,
@@ -193,6 +198,7 @@ mixin _$StreamComponentBuilders {
       avatarStack: avatarStack ?? _this.avatarStack,
       badgeCount: badgeCount ?? _this.badgeCount,
       badgeNotification: badgeNotification ?? _this.badgeNotification,
+      banner: banner ?? _this.banner,
       button: button ?? _this.button,
       checkbox: checkbox ?? _this.checkbox,
       commandChip: commandChip ?? _this.commandChip,
@@ -203,6 +209,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar ?? _this.emojiChipBar,
       errorBadge: errorBadge ?? _this.errorBadge,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
+      inlineNotification: inlineNotification ?? _this.inlineNotification,
       listTile: listTile ?? _this.listTile,
       loadingSpinner: loadingSpinner ?? _this.loadingSpinner,
       mediaViewer: mediaViewer ?? _this.mediaViewer,
@@ -272,6 +279,7 @@ mixin _$StreamComponentBuilders {
       avatarStack: other.avatarStack,
       badgeCount: other.badgeCount,
       badgeNotification: other.badgeNotification,
+      banner: other.banner,
       button: other.button,
       checkbox: other.checkbox,
       commandChip: other.commandChip,
@@ -282,6 +290,7 @@ mixin _$StreamComponentBuilders {
       emojiChipBar: other.emojiChipBar,
       errorBadge: other.errorBadge,
       fileTypeIcon: other.fileTypeIcon,
+      inlineNotification: other.inlineNotification,
       listTile: other.listTile,
       loadingSpinner: other.loadingSpinner,
       mediaViewer: other.mediaViewer,
@@ -343,6 +352,7 @@ mixin _$StreamComponentBuilders {
         _other.avatarStack == _this.avatarStack &&
         _other.badgeCount == _this.badgeCount &&
         _other.badgeNotification == _this.badgeNotification &&
+        _other.banner == _this.banner &&
         _other.button == _this.button &&
         _other.checkbox == _this.checkbox &&
         _other.commandChip == _this.commandChip &&
@@ -353,6 +363,7 @@ mixin _$StreamComponentBuilders {
         _other.emojiChipBar == _this.emojiChipBar &&
         _other.errorBadge == _this.errorBadge &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
+        _other.inlineNotification == _this.inlineNotification &&
         _other.listTile == _this.listTile &&
         _other.loadingSpinner == _this.loadingSpinner &&
         _other.mediaViewer == _this.mediaViewer &&
@@ -409,6 +420,7 @@ mixin _$StreamComponentBuilders {
       _this.avatarStack,
       _this.badgeCount,
       _this.badgeNotification,
+      _this.banner,
       _this.button,
       _this.checkbox,
       _this.commandChip,
@@ -419,6 +431,7 @@ mixin _$StreamComponentBuilders {
       _this.emojiChipBar,
       _this.errorBadge,
       _this.fileTypeIcon,
+      _this.inlineNotification,
       _this.listTile,
       _this.loadingSpinner,
       _this.mediaViewer,

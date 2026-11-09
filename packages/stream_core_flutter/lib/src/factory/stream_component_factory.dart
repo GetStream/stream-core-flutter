@@ -12,6 +12,7 @@ import '../components/badge/stream_error_badge.dart';
 import '../components/badge/stream_image_source_badge.dart';
 import '../components/badge/stream_online_indicator.dart';
 import '../components/badge/stream_retry_badge.dart';
+import '../components/banner/stream_banner.dart';
 import '../components/buttons/stream_button.dart';
 import '../components/buttons/stream_emoji_button.dart';
 import '../components/buttons/stream_jump_to_unread_button.dart';
@@ -30,6 +31,7 @@ import '../components/controls/stream_emoji_chip_bar.dart';
 import '../components/controls/stream_playback_speed_toggle.dart';
 import '../components/controls/stream_stepper.dart';
 import '../components/controls/stream_switch.dart';
+import '../components/inline_notification/stream_inline_notification.dart';
 import '../components/list/stream_list_tile.dart';
 import '../components/media_viewer/stream_media_viewer.dart';
 import '../components/message/stream_message_annotation.dart';
@@ -189,6 +191,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamAvatarStackProps>? avatarStack,
     StreamComponentBuilder<StreamBadgeCountProps>? badgeCount,
     StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification,
+    StreamComponentBuilder<StreamBannerProps>? banner,
     StreamComponentBuilder<StreamButtonProps>? button,
     StreamComponentBuilder<StreamCheckboxProps>? checkbox,
     StreamComponentBuilder<StreamCommandChipProps>? commandChip,
@@ -199,6 +202,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
     StreamComponentBuilder<StreamErrorBadgeProps>? errorBadge,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
+    StreamComponentBuilder<StreamInlineNotificationProps>? inlineNotification,
     StreamComponentBuilder<StreamListTileProps>? listTile,
     StreamComponentBuilder<StreamLoadingSpinnerProps>? loadingSpinner,
     StreamComponentBuilder<StreamMediaViewerProps>? mediaViewer,
@@ -245,6 +249,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       avatarStack: avatarStack,
       badgeCount: badgeCount,
       badgeNotification: badgeNotification,
+      banner: banner,
       button: button,
       checkbox: checkbox,
       commandChip: commandChip,
@@ -255,6 +260,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiChipBar: emojiChipBar,
       errorBadge: errorBadge,
       fileTypeIcon: fileTypeIcon,
+      inlineNotification: inlineNotification,
       listTile: listTile,
       loadingSpinner: loadingSpinner,
       mediaViewer: mediaViewer,
@@ -302,6 +308,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.avatarStack,
     required this.badgeCount,
     required this.badgeNotification,
+    required this.banner,
     required this.button,
     required this.checkbox,
     required this.commandChip,
@@ -312,6 +319,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiChipBar,
     required this.errorBadge,
     required this.fileTypeIcon,
+    required this.inlineNotification,
     required this.listTile,
     required this.loadingSpinner,
     required this.mediaViewer,
@@ -408,6 +416,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// [DefaultStreamBadgeNotification].
   final StreamComponentBuilder<StreamBadgeNotificationProps>? badgeNotification;
 
+  /// Custom builder for banner widgets.
+  ///
+  /// When null, [StreamBanner] uses [DefaultStreamBanner].
+  final StreamComponentBuilder<StreamBannerProps>? banner;
+
   /// Custom builder for button widgets.
   ///
   /// When null, [StreamButton] uses [DefaultStreamButton].
@@ -457,6 +470,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamFileTypeIcon] uses [DefaultStreamFileTypeIcon].
   final StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon;
+
+  /// Custom builder for inline notification widgets.
+  ///
+  /// When null, [StreamInlineNotification] uses [DefaultStreamInlineNotification].
+  final StreamComponentBuilder<StreamInlineNotificationProps>? inlineNotification;
 
   /// Custom builder for list tile widgets.
   ///

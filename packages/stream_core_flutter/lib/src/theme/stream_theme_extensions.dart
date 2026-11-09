@@ -5,6 +5,7 @@ import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
 import 'components/stream_badge_count_theme.dart';
 import 'components/stream_badge_notification_theme.dart';
+import 'components/stream_banner_theme.dart';
 import 'components/stream_bottom_app_bar_theme.dart';
 import 'components/stream_bottom_nav_bar_theme.dart';
 import 'components/stream_button_theme.dart';
@@ -15,6 +16,7 @@ import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
 import 'components/stream_error_badge_theme.dart';
+import 'components/stream_inline_notification_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
 import 'components/stream_list_tile_theme.dart';
 import 'components/stream_media_viewer_theme.dart';
@@ -117,6 +119,9 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamBadgeNotificationThemeData] from the nearest ancestor.
   StreamBadgeNotificationThemeData get streamBadgeNotificationTheme => StreamBadgeNotificationTheme.of(this);
 
+  /// Returns the [StreamBannerThemeData] from the nearest ancestor.
+  StreamBannerThemeData get streamBannerTheme => StreamBannerTheme.of(this);
+
   /// Returns the [StreamBottomAppBarThemeData] from the nearest ancestor.
   StreamBottomAppBarThemeData get streamBottomAppBarTheme => StreamBottomAppBarTheme.of(this);
 
@@ -146,6 +151,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamErrorBadgeThemeData] from the nearest ancestor.
   StreamErrorBadgeThemeData get streamErrorBadgeTheme => StreamErrorBadgeTheme.of(this);
+
+  /// Returns the [StreamInlineNotificationThemeData] from the nearest ancestor.
+  StreamInlineNotificationThemeData get streamInlineNotificationTheme => StreamInlineNotificationTheme.of(this);
 
   /// Returns the [StreamJumpToUnreadButtonThemeData] from the nearest ancestor.
   StreamJumpToUnreadButtonThemeData get streamJumpToUnreadButtonTheme => StreamJumpToUnreadButtonTheme.of(this);
