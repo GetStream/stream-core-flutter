@@ -56,6 +56,26 @@ void main() {
     expect(_scrimFill(tester).color, context.streamColorScheme.backgroundScrim);
   });
 
+  for (final useMaterial3 in [true, false]) {
+    testWidgets('paints exactly the background color in dark mode (useMaterial3: $useMaterial3)', (tester) async {
+      final streamTheme = StreamTheme(brightness: Brightness.dark);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(brightness: Brightness.dark, useMaterial3: useMaterial3, extensions: [streamTheme]),
+          home: StreamModalDialog(child: const Text('body')),
+        ),
+      );
+
+      // The elevated PhysicalShape the surface's Material paints: its color is
+      // the background after any elevation tint or overlay.
+      final painted = tester.widget<PhysicalShape>(
+        find.descendant(of: find.byType(Dialog), matching: find.byType(PhysicalShape)).first,
+      );
+      expect(painted.color, streamTheme.colorScheme.backgroundElevation1);
+      expect(painted.elevation, streamTheme.elevation.level4);
+    });
+  }
+
   testWidgets('applies the surface values from StreamTheme', (tester) async {
     const shape = RoundedRectangleBorder();
 
