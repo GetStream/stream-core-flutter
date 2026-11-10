@@ -7,8 +7,7 @@ part 'stream_banner_theme.g.theme.dart';
 
 /// The kinds of state a [StreamBanner] can report.
 ///
-/// Each type picks the default leading icon and the [StreamBannerThemeStyle]
-/// that sets the background, icon color and title style.
+/// Each type has its own leading icon and style.
 ///
 /// See also:
 ///
@@ -125,8 +124,6 @@ class StreamBannerThemeData with _$StreamBannerThemeData {
   final StreamBannerThemeStyle? error;
 
   /// The shape of the banner.
-  ///
-  /// When null, it is a rectangle.
   final OutlinedBorder? shape;
 
   /// The padding between the banner edge and its content.
@@ -136,8 +133,6 @@ class StreamBannerThemeData with _$StreamBannerThemeData {
   final double? spacing;
 
   /// Constraints on the banner's size.
-  ///
-  /// When null, its height hugs its content.
   final BoxConstraints? constraints;
 
   /// Linearly interpolate between two [StreamBannerThemeData] objects.

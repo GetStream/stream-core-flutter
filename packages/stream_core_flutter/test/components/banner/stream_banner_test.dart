@@ -396,8 +396,6 @@ Material _surfaceOf(WidgetTester tester) {
 
 Color? _backgroundColorOf(WidgetTester tester) => _surfaceOf(tester).color;
 
-// The spinner paints its own color and ignores the IconTheme, so it is read
-// from the spinner itself.
 Color? _leadingIconColorOf(WidgetTester tester) {
   final banner = find.byType(DefaultStreamBanner);
   final spinner = find.descendant(of: banner, matching: find.byType(StreamLoadingSpinner));

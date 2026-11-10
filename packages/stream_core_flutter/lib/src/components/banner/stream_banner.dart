@@ -13,12 +13,11 @@ import '../common/stream_loading_spinner.dart';
 ///
 /// Banners are for states that block the experience until they are resolved,
 /// such as a lost connection or content that failed to load. The banner shows
-/// its `title` centered on a neutral surface, with a leading icon picked by
-/// its `type`. Takes the full width of its parent.
+/// its `title` centered, with a leading icon for its `type`. Takes the full
+/// width of its parent.
 ///
-/// The banner is marked as a live region, so assistive technologies may
-/// announce changes to its title. The default icons have no label, so let the
-/// title say what kind of state it is.
+/// Screen readers announce changes to the title, but not the `type`, so the
+/// title should say what kind of state it is.
 ///
 /// {@tool snippet}
 ///
@@ -196,11 +195,6 @@ class DefaultStreamBanner extends StatelessWidget {
 }
 
 // Default theme values for [StreamBanner].
-//
-// Used when the theme doesn't provide a value. Each type's colors and text
-// style come from [_StreamBannerStyleDefaults]. There is no default shape, and
-// the constraints are unbounded: the banner is a full-width rectangle whose
-// height hugs its content.
 class _StreamBannerThemeDefaults extends StreamBannerThemeData {
   _StreamBannerThemeDefaults(this._context);
 
@@ -231,9 +225,6 @@ class _StreamBannerThemeDefaults extends StreamBannerThemeData {
 }
 
 // Default colors and text style for one [StreamBannerType].
-//
-// The types differ only in their icon color; they share the same background
-// and text style.
 class _StreamBannerStyleDefaults extends StreamBannerThemeStyle {
   _StreamBannerStyleDefaults(this._context, this._type);
 

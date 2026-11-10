@@ -18,10 +18,10 @@ import '../../theme/stream_theme_extensions.dart';
 /// transient feedback, consider [StreamSnackbar]. Takes the full width of its
 /// parent.
 ///
-/// The notification is marked as a live region, so assistive technologies may
-/// announce it when it appears and when its text changes. Show it in response
-/// to something, such as a failed action, rather than as a static note. The
-/// default icons have no label, so let the text say what kind of message it is.
+/// Screen readers announce the notification when it appears and when its text
+/// changes, so show it in response to something, such as a failed action,
+/// rather than as a static note. They don't announce the `type`, so the text
+/// should say what kind of message it is.
 ///
 /// {@tool snippet}
 ///
@@ -215,9 +215,6 @@ class DefaultStreamInlineNotification extends StatelessWidget {
 }
 
 // Default theme values for [StreamInlineNotification].
-//
-// Used when the theme doesn't provide a value. Each type's colors and text
-// styles come from [_StreamInlineNotificationStyleDefaults].
 class _StreamInlineNotificationThemeDefaults extends StreamInlineNotificationThemeData {
   _StreamInlineNotificationThemeDefaults(this._context);
 
@@ -247,14 +244,11 @@ class _StreamInlineNotificationThemeDefaults extends StreamInlineNotificationThe
   @override
   double get spacing => _spacing.xs;
 
-  // Taller than the padding and icon need (44), to match the design.
   @override
   BoxConstraints get constraints => const BoxConstraints(minHeight: 46);
 }
 
 // Default colors and text styles for one [StreamInlineNotificationType].
-//
-// The types differ only in their colors; they share the same text styles.
 class _StreamInlineNotificationStyleDefaults extends StreamInlineNotificationThemeStyle {
   _StreamInlineNotificationStyleDefaults(this._context, this._type);
 
