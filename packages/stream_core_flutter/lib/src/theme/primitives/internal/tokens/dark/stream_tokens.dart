@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 class StreamTokens {
   StreamTokens._();
 
-  static const baseTransparent0 = Color(0x00FFFFFF);
   static const baseTransparentWhite10 = Color(0x1AFFFFFF);
   static const baseTransparentWhite20 = Color(0x33FFFFFF);
   static const baseTransparentWhite30 = Color(0x4DFFFFFF);
