@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import 'components/stream_adaptive_menu_anchor_theme.dart';
 import 'components/stream_app_bar_theme.dart';
 import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
@@ -126,6 +127,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
     // Components themes
+    StreamAdaptiveMenuAnchorThemeData? adaptiveMenuAnchorTheme,
     StreamAppBarThemeData? appBarTheme,
     StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
@@ -195,6 +197,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     // Components
     surfaceStyle ??= StreamSurfaceStyle.regular;
+    adaptiveMenuAnchorTheme ??= const StreamAdaptiveMenuAnchorThemeData();
     appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
@@ -252,6 +255,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       colorScheme: colorScheme,
       textTheme: textTheme,
       boxShadow: boxShadow,
+      adaptiveMenuAnchorTheme: adaptiveMenuAnchorTheme,
       appBarTheme: appBarTheme,
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,
@@ -323,6 +327,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.colorScheme,
     required this.textTheme,
     required this.boxShadow,
+    required this.adaptiveMenuAnchorTheme,
     required this.appBarTheme,
     required this.audioWaveformTheme,
     required this.avatarTheme,
@@ -440,6 +445,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The box shadow (elevation) values for this theme.
   final StreamBoxShadow boxShadow;
+
+  /// The adaptive menu anchor theme for this theme.
+  final StreamAdaptiveMenuAnchorThemeData adaptiveMenuAnchorTheme;
 
   /// The app bar theme for this theme.
   final StreamAppBarThemeData appBarTheme;
@@ -609,6 +617,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       colorScheme: colorScheme,
       textTheme: newTextTheme,
       boxShadow: boxShadow,
+      adaptiveMenuAnchorTheme: adaptiveMenuAnchorTheme,
       appBarTheme: appBarTheme,
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,

@@ -2,6 +2,8 @@
 
 ### ✨ Features
 
+- Added `StreamAdaptiveMenuAnchor` and `StreamAdaptiveMenuAnchorTheme`, which present menu sections as an
+  anchored menu on desktop and web and as a bottom sheet on Android and iOS, to `video.dart`.
 - Added `StreamContextMenuAnchor` and `StreamContextMenuAnchorTheme`, which open a
   `StreamContextMenu` from an anchor widget, to `video.dart`.
 - Added `StreamContextMenuHeading` and `StreamContextMenuHeadingTheme`, the heading of a section in a

@@ -22,6 +22,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamColorScheme? colorScheme,
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
+    StreamAdaptiveMenuAnchorThemeData? adaptiveMenuAnchorTheme,
     StreamAppBarThemeData? appBarTheme,
     StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
@@ -87,6 +88,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       colorScheme: colorScheme ?? _this.colorScheme,
       textTheme: textTheme ?? _this.textTheme,
       boxShadow: boxShadow ?? _this.boxShadow,
+      adaptiveMenuAnchorTheme:
+          adaptiveMenuAnchorTheme ?? _this.adaptiveMenuAnchorTheme,
       appBarTheme: appBarTheme ?? _this.appBarTheme,
       audioWaveformTheme: audioWaveformTheme ?? _this.audioWaveformTheme,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
@@ -179,6 +182,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       colorScheme: _this.colorScheme.lerp(other.colorScheme, t),
       textTheme: _this.textTheme.lerp(other.textTheme, t),
       boxShadow: StreamBoxShadow.lerp(_this.boxShadow, other.boxShadow, t)!,
+      adaptiveMenuAnchorTheme: StreamAdaptiveMenuAnchorThemeData.lerp(
+        _this.adaptiveMenuAnchorTheme,
+        other.adaptiveMenuAnchorTheme,
+        t,
+      )!,
       appBarTheme: StreamAppBarThemeData.lerp(
         _this.appBarTheme,
         other.appBarTheme,
@@ -437,6 +445,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.colorScheme == _this.colorScheme &&
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
+        _other.adaptiveMenuAnchorTheme == _this.adaptiveMenuAnchorTheme &&
         _other.appBarTheme == _this.appBarTheme &&
         _other.audioWaveformTheme == _this.audioWaveformTheme &&
         _other.avatarTheme == _this.avatarTheme &&
@@ -507,6 +516,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.colorScheme,
       _this.textTheme,
       _this.boxShadow,
+      _this.adaptiveMenuAnchorTheme,
       _this.appBarTheme,
       _this.audioWaveformTheme,
       _this.avatarTheme,

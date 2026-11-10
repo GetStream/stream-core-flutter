@@ -24,6 +24,7 @@ import '../components/common/stream_progress_bar.dart';
 import '../components/common/stream_skeleton_loading.dart';
 import '../components/common/stream_text_input.dart';
 import '../components/common/stream_typing_indicator_dots.dart';
+import '../components/context_menu/stream_adaptive_menu_anchor.dart';
 import '../components/context_menu/stream_context_menu_action.dart';
 import '../components/context_menu/stream_context_menu_anchor.dart';
 import '../components/context_menu/stream_context_menu_heading.dart';
@@ -186,6 +187,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// [extensions] accepts an [Iterable] of [StreamComponentBuilderExtension] instances, which are
   /// converted to a map keyed by [StreamComponentBuilderExtension.type] internally.
   factory StreamComponentBuilders({
+    StreamComponentBuilder<StreamAdaptiveMenuAnchorProps>? adaptiveMenuAnchor,
     StreamComponentBuilder<StreamAppBarProps>? appBar,
     StreamComponentBuilder<StreamAvatarProps>? avatar,
     StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar,
@@ -247,6 +249,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
 
     return .raw(
+      adaptiveMenuAnchor: adaptiveMenuAnchor,
       appBar: appBar,
       avatar: avatar,
       bottomAppBar: bottomAppBar,
@@ -309,6 +312,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
 
   /// Creates component builders from a pre-built extensions map.
   const StreamComponentBuilders.raw({
+    required this.adaptiveMenuAnchor,
     required this.appBar,
     required this.avatar,
     required this.bottomAppBar,
@@ -386,6 +390,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// See [extensions].
   StreamComponentBuilder<T>? extension<T>() => (extensions[T] as StreamComponentBuilderExtension<T>?)?.call;
+
+  /// Custom builder for adaptive menu anchor widgets.
+  ///
+  /// When null, [StreamAdaptiveMenuAnchor] uses [DefaultStreamAdaptiveMenuAnchor].
+  final StreamComponentBuilder<StreamAdaptiveMenuAnchorProps>? adaptiveMenuAnchor;
 
   /// Custom builder for app bar widgets.
   ///

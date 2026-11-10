@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'components/stream_adaptive_menu_anchor_theme.dart';
 import 'components/stream_app_bar_theme.dart';
 import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
@@ -106,6 +107,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamBoxShadow] from the current theme.
   StreamBoxShadow get streamBoxShadow => streamTheme.boxShadow;
+
+  /// Returns the [StreamAdaptiveMenuAnchorThemeData] from the nearest ancestor.
+  StreamAdaptiveMenuAnchorThemeData get streamAdaptiveMenuAnchorTheme => StreamAdaptiveMenuAnchorTheme.of(this);
 
   /// Returns the [StreamAppBarThemeData] from the nearest ancestor.
   StreamAppBarThemeData get streamAppBarTheme => StreamAppBarTheme.of(this);

@@ -31,6 +31,7 @@ mixin _$StreamComponentBuilders {
 
     return StreamComponentBuilders.raw(
       extensions: t < 0.5 ? a.extensions : b.extensions,
+      adaptiveMenuAnchor: t < 0.5 ? a.adaptiveMenuAnchor : b.adaptiveMenuAnchor,
       appBar: t < 0.5 ? a.appBar : b.appBar,
       avatar: t < 0.5 ? a.avatar : b.avatar,
       bottomAppBar: t < 0.5 ? a.bottomAppBar : b.bottomAppBar,
@@ -110,6 +111,8 @@ mixin _$StreamComponentBuilders {
 
   StreamComponentBuilders copyWith({
     Map<Object, StreamComponentBuilderExtension<Object>>? extensions,
+    Widget Function(BuildContext, StreamAdaptiveMenuAnchorProps)?
+    adaptiveMenuAnchor,
     Widget Function(BuildContext, StreamAppBarProps)? appBar,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
     Widget Function(BuildContext, StreamBottomAppBarProps)? bottomAppBar,
@@ -198,6 +201,7 @@ mixin _$StreamComponentBuilders {
 
     return StreamComponentBuilders.raw(
       extensions: extensions ?? _this.extensions,
+      adaptiveMenuAnchor: adaptiveMenuAnchor ?? _this.adaptiveMenuAnchor,
       appBar: appBar ?? _this.appBar,
       avatar: avatar ?? _this.avatar,
       bottomAppBar: bottomAppBar ?? _this.bottomAppBar,
@@ -282,6 +286,7 @@ mixin _$StreamComponentBuilders {
 
     return copyWith(
       extensions: other.extensions,
+      adaptiveMenuAnchor: other.adaptiveMenuAnchor,
       appBar: other.appBar,
       avatar: other.avatar,
       bottomAppBar: other.bottomAppBar,
@@ -358,6 +363,7 @@ mixin _$StreamComponentBuilders {
     final _other = (other as StreamComponentBuilders);
 
     return _other.extensions == _this.extensions &&
+        _other.adaptiveMenuAnchor == _this.adaptiveMenuAnchor &&
         _other.appBar == _this.appBar &&
         _other.avatar == _this.avatar &&
         _other.bottomAppBar == _this.bottomAppBar &&
@@ -429,6 +435,7 @@ mixin _$StreamComponentBuilders {
     return Object.hashAll([
       runtimeType,
       _this.extensions,
+      _this.adaptiveMenuAnchor,
       _this.appBar,
       _this.avatar,
       _this.bottomAppBar,
