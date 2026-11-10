@@ -4,6 +4,8 @@
 
 - Added `StreamContextMenuAnchor` and `StreamContextMenuAnchorTheme`, which open a
   `StreamContextMenu` from an anchor widget, to `video.dart`.
+- Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
+  modal with a header and footer over a blurred scrim, to `video.dart`.
 
 ## 0.5.4
 

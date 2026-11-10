@@ -31,6 +31,7 @@ import 'components/stream_message_composer_media_attachment_theme.dart';
 import 'components/stream_message_composer_reply_attachment_theme.dart';
 import 'components/stream_message_composer_unsupported_attachment_theme.dart';
 import 'components/stream_message_item_theme.dart';
+import 'components/stream_modal_dialog_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
@@ -153,6 +154,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamMessageComposerReplyAttachmentThemeData? messageComposerReplyAttachmentTheme,
     StreamMessageComposerUnsupportedAttachmentThemeData? messageComposerUnsupportedAttachmentTheme,
     StreamMessageItemThemeData? messageItemTheme,
+    StreamModalDialogThemeData? modalDialogTheme,
     StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
@@ -220,6 +222,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     messageComposerReplyAttachmentTheme ??= const StreamMessageComposerReplyAttachmentThemeData();
     messageComposerUnsupportedAttachmentTheme ??= const StreamMessageComposerUnsupportedAttachmentThemeData();
     messageItemTheme ??= const StreamMessageItemThemeData();
+    modalDialogTheme ??= const StreamModalDialogThemeData();
     textInputTheme ??= const StreamTextInputThemeData();
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     playbackSpeedToggleTheme ??= const StreamPlaybackSpeedToggleThemeData();
@@ -275,6 +278,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       messageComposerReplyAttachmentTheme: messageComposerReplyAttachmentTheme,
       messageComposerUnsupportedAttachmentTheme: messageComposerUnsupportedAttachmentTheme,
       messageItemTheme: messageItemTheme,
+      modalDialogTheme: modalDialogTheme,
       textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
@@ -344,6 +348,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.messageComposerReplyAttachmentTheme,
     required this.messageComposerUnsupportedAttachmentTheme,
     required this.messageItemTheme,
+    required this.modalDialogTheme,
     required this.textInputTheme,
     required this.onlineIndicatorTheme,
     required this.playbackSpeedToggleTheme,
@@ -520,6 +525,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// Provides resolver-based styling for message sub-components.
   final StreamMessageItemThemeData messageItemTheme;
 
+  /// The modal dialog theme for this theme.
+  final StreamModalDialogThemeData modalDialogTheme;
+
   /// The text input theme for this theme.
   final StreamTextInputThemeData textInputTheme;
 
@@ -622,6 +630,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       messageComposerReplyAttachmentTheme: messageComposerReplyAttachmentTheme,
       messageComposerUnsupportedAttachmentTheme: messageComposerUnsupportedAttachmentTheme,
       messageItemTheme: messageItemTheme,
+      modalDialogTheme: modalDialogTheme,
       textInputTheme: textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,

@@ -32,6 +32,7 @@ import '../components/controls/stream_emoji_chip_bar.dart';
 import '../components/controls/stream_playback_speed_toggle.dart';
 import '../components/controls/stream_stepper.dart';
 import '../components/controls/stream_switch.dart';
+import '../components/dialog/stream_modal_dialog.dart';
 import '../components/inline_notification/stream_inline_notification.dart';
 import '../components/list/stream_list_tile.dart';
 import '../components/media_viewer/stream_media_viewer.dart';
@@ -221,6 +222,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
     StreamComponentBuilder<StreamMessageTextProps>? messageText,
+    StreamComponentBuilder<StreamModalDialogProps>? modalDialog,
     StreamComponentBuilder<StreamNetworkImageProps>? networkImage,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle,
@@ -280,6 +282,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
       messageText: messageText,
+      modalDialog: modalDialog,
       networkImage: networkImage,
       onlineIndicator: onlineIndicator,
       playbackSpeedToggle: playbackSpeedToggle,
@@ -340,6 +343,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageMetadata,
     required this.messageReplies,
     required this.messageText,
+    required this.modalDialog,
     required this.networkImage,
     required this.onlineIndicator,
     required this.playbackSpeedToggle,
@@ -571,6 +575,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamMessageText] uses [DefaultStreamMessageText].
   final StreamComponentBuilder<StreamMessageTextProps>? messageText;
+
+  /// Custom builder for modal dialog widgets.
+  ///
+  /// When null, [StreamModalDialog] uses [DefaultStreamModalDialog].
+  final StreamComponentBuilder<StreamModalDialogProps>? modalDialog;
 
   /// Custom builder for network image widgets.
   ///
