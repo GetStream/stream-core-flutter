@@ -2,8 +2,8 @@
 
 ### ✨ Features
 
-- Added `StreamRadioIndicator` and `StreamRadioIndicatorTheme`, a non-interactive radio dot that marks
-  the selected row of a group, to `video.dart`.
+- Added `StreamRadioButton` and `StreamRadioButtonTheme`, a radio button in sm, md and lg sizes with a
+  `decorative` variant for rows that own the tap, to `video.dart`.
 - Added `StreamContextMenuHeading`, a section heading for `StreamContextMenu`, and
   `StreamContextMenuHeadingTheme` to `video.dart`.
 - Added `StreamContextMenuAnchor` and `StreamContextMenuAnchorTheme`, which open a

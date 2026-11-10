@@ -3,18 +3,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, unused_element
 
-part of 'stream_radio_indicator_theme.dart';
+part of 'stream_radio_button_theme.dart';
 
 // **************************************************************************
 // ThemeGenGenerator
 // **************************************************************************
 
-mixin _$StreamRadioIndicatorThemeData {
+mixin _$StreamRadioButtonThemeData {
   bool get canMerge => true;
 
-  static StreamRadioIndicatorThemeData? lerp(
-    StreamRadioIndicatorThemeData? a,
-    StreamRadioIndicatorThemeData? b,
+  static StreamRadioButtonThemeData? lerp(
+    StreamRadioButtonThemeData? a,
+    StreamRadioButtonThemeData? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -29,19 +29,19 @@ mixin _$StreamRadioIndicatorThemeData {
       return t == 0.0 ? a : null;
     }
 
-    return StreamRadioIndicatorThemeData(
-      style: StreamRadioIndicatorStyle.lerp(a.style, b.style, t),
+    return StreamRadioButtonThemeData(
+      style: StreamRadioButtonStyle.lerp(a.style, b.style, t),
     );
   }
 
-  StreamRadioIndicatorThemeData copyWith({StreamRadioIndicatorStyle? style}) {
-    final _this = (this as StreamRadioIndicatorThemeData);
+  StreamRadioButtonThemeData copyWith({StreamRadioButtonStyle? style}) {
+    final _this = (this as StreamRadioButtonThemeData);
 
-    return StreamRadioIndicatorThemeData(style: style ?? _this.style);
+    return StreamRadioButtonThemeData(style: style ?? _this.style);
   }
 
-  StreamRadioIndicatorThemeData merge(StreamRadioIndicatorThemeData? other) {
-    final _this = (this as StreamRadioIndicatorThemeData);
+  StreamRadioButtonThemeData merge(StreamRadioButtonThemeData? other) {
+    final _this = (this as StreamRadioButtonThemeData);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -64,26 +64,26 @@ mixin _$StreamRadioIndicatorThemeData {
       return false;
     }
 
-    final _this = (this as StreamRadioIndicatorThemeData);
-    final _other = (other as StreamRadioIndicatorThemeData);
+    final _this = (this as StreamRadioButtonThemeData);
+    final _other = (other as StreamRadioButtonThemeData);
 
     return _other.style == _this.style;
   }
 
   @override
   int get hashCode {
-    final _this = (this as StreamRadioIndicatorThemeData);
+    final _this = (this as StreamRadioButtonThemeData);
 
     return Object.hash(runtimeType, _this.style);
   }
 }
 
-mixin _$StreamRadioIndicatorStyle {
+mixin _$StreamRadioButtonStyle {
   bool get canMerge => true;
 
-  static StreamRadioIndicatorStyle? lerp(
-    StreamRadioIndicatorStyle? a,
-    StreamRadioIndicatorStyle? b,
+  static StreamRadioButtonStyle? lerp(
+    StreamRadioButtonStyle? a,
+    StreamRadioButtonStyle? b,
     double t,
   ) {
     if (identical(a, b)) {
@@ -98,8 +98,8 @@ mixin _$StreamRadioIndicatorStyle {
       return t == 0.0 ? a : null;
     }
 
-    return StreamRadioIndicatorStyle(
-      size: lerpDouble$(a.size, b.size, t),
+    return StreamRadioButtonStyle(
+      size: t < 0.5 ? a.size : b.size,
       dotSize: lerpDouble$(a.dotSize, b.dotSize, t),
       fillColor: WidgetStateProperty.lerp<Color?>(
         a.fillColor,
@@ -113,30 +113,38 @@ mixin _$StreamRadioIndicatorStyle {
         t,
         Color.lerp,
       ),
+      overlayColor: WidgetStateProperty.lerp<Color?>(
+        a.overlayColor,
+        b.overlayColor,
+        t,
+        Color.lerp,
+      ),
       side: t < 0.5 ? a.side : b.side,
     );
   }
 
-  StreamRadioIndicatorStyle copyWith({
-    double? size,
+  StreamRadioButtonStyle copyWith({
+    StreamRadioButtonSize? size,
     double? dotSize,
     WidgetStateProperty<Color?>? fillColor,
     WidgetStateProperty<Color?>? dotColor,
+    WidgetStateProperty<Color?>? overlayColor,
     WidgetStateBorderSide? side,
   }) {
-    final _this = (this as StreamRadioIndicatorStyle);
+    final _this = (this as StreamRadioButtonStyle);
 
-    return StreamRadioIndicatorStyle(
+    return StreamRadioButtonStyle(
       size: size ?? _this.size,
       dotSize: dotSize ?? _this.dotSize,
       fillColor: fillColor ?? _this.fillColor,
       dotColor: dotColor ?? _this.dotColor,
+      overlayColor: overlayColor ?? _this.overlayColor,
       side: side ?? _this.side,
     );
   }
 
-  StreamRadioIndicatorStyle merge(StreamRadioIndicatorStyle? other) {
-    final _this = (this as StreamRadioIndicatorStyle);
+  StreamRadioButtonStyle merge(StreamRadioButtonStyle? other) {
+    final _this = (this as StreamRadioButtonStyle);
 
     if (other == null || identical(_this, other)) {
       return _this;
@@ -151,6 +159,7 @@ mixin _$StreamRadioIndicatorStyle {
       dotSize: other.dotSize,
       fillColor: other.fillColor,
       dotColor: other.dotColor,
+      overlayColor: other.overlayColor,
       side: other.side,
     );
   }
@@ -165,19 +174,20 @@ mixin _$StreamRadioIndicatorStyle {
       return false;
     }
 
-    final _this = (this as StreamRadioIndicatorStyle);
-    final _other = (other as StreamRadioIndicatorStyle);
+    final _this = (this as StreamRadioButtonStyle);
+    final _other = (other as StreamRadioButtonStyle);
 
     return _other.size == _this.size &&
         _other.dotSize == _this.dotSize &&
         _other.fillColor == _this.fillColor &&
         _other.dotColor == _this.dotColor &&
+        _other.overlayColor == _this.overlayColor &&
         _other.side == _this.side;
   }
 
   @override
   int get hashCode {
-    final _this = (this as StreamRadioIndicatorStyle);
+    final _this = (this as StreamRadioButtonStyle);
 
     return Object.hash(
       runtimeType,
@@ -185,6 +195,7 @@ mixin _$StreamRadioIndicatorStyle {
       _this.dotSize,
       _this.fillColor,
       _this.dotColor,
+      _this.overlayColor,
       _this.side,
     );
   }
