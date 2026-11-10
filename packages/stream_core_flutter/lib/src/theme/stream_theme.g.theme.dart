@@ -69,6 +69,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamSplitButtonThemeData? splitButtonTheme,
     StreamStepperThemeData? stepperTheme,
     StreamSwitchThemeData? switchTheme,
+    StreamTabBarThemeData? tabBarTheme,
     StreamTypingIndicatorDotsThemeData? typingIndicatorDotsTheme,
   }) {
     final _this = (this as StreamTheme);
@@ -144,6 +145,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       splitButtonTheme: splitButtonTheme ?? _this.splitButtonTheme,
       stepperTheme: stepperTheme ?? _this.stepperTheme,
       switchTheme: switchTheme ?? _this.switchTheme,
+      tabBarTheme: tabBarTheme ?? _this.tabBarTheme,
       typingIndicatorDotsTheme:
           typingIndicatorDotsTheme ?? _this.typingIndicatorDotsTheme,
     );
@@ -383,6 +385,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.switchTheme,
         t,
       )!,
+      tabBarTheme: StreamTabBarThemeData.lerp(
+        _this.tabBarTheme,
+        other.tabBarTheme,
+        t,
+      )!,
       typingIndicatorDotsTheme: StreamTypingIndicatorDotsThemeData.lerp(
         _this.typingIndicatorDotsTheme,
         other.typingIndicatorDotsTheme,
@@ -462,6 +469,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.splitButtonTheme == _this.splitButtonTheme &&
         _other.stepperTheme == _this.stepperTheme &&
         _other.switchTheme == _this.switchTheme &&
+        _other.tabBarTheme == _this.tabBarTheme &&
         _other.typingIndicatorDotsTheme == _this.typingIndicatorDotsTheme;
   }
 
@@ -522,6 +530,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.splitButtonTheme,
       _this.stepperTheme,
       _this.switchTheme,
+      _this.tabBarTheme,
       _this.typingIndicatorDotsTheme,
     ]);
   }
