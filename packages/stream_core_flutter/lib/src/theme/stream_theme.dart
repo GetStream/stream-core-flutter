@@ -17,6 +17,7 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
+import 'components/stream_empty_state_theme.dart';
 import 'components/stream_error_badge_theme.dart';
 import 'components/stream_inline_notification_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
@@ -150,6 +151,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
+    StreamEmptyStateThemeData? emptyStateTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
     StreamInlineNotificationThemeData? inlineNotificationTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
@@ -220,6 +222,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     contextMenuActionTheme ??= const StreamContextMenuActionThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     emojiChipTheme ??= const StreamEmojiChipThemeData();
+    emptyStateTheme ??= const StreamEmptyStateThemeData();
     errorBadgeTheme ??= const StreamErrorBadgeThemeData();
     inlineNotificationTheme ??= const StreamInlineNotificationThemeData();
     jumpToUnreadButtonTheme ??= const StreamJumpToUnreadButtonThemeData();
@@ -274,6 +277,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuActionTheme: contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
+      emptyStateTheme: emptyStateTheme,
       errorBadgeTheme: errorBadgeTheme,
       inlineNotificationTheme: inlineNotificationTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,
@@ -342,6 +346,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.contextMenuActionTheme,
     required this.emojiButtonTheme,
     required this.emojiChipTheme,
+    required this.emptyStateTheme,
     required this.errorBadgeTheme,
     required this.inlineNotificationTheme,
     required this.jumpToUnreadButtonTheme,
@@ -520,6 +525,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The emoji chip theme for this theme.
   final StreamEmojiChipThemeData emojiChipTheme;
 
+  /// The empty state theme for this theme.
+  final StreamEmptyStateThemeData emptyStateTheme;
+
   /// The error badge theme for this theme.
   final StreamErrorBadgeThemeData errorBadgeTheme;
 
@@ -653,6 +661,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuActionTheme: contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
+      emptyStateTheme: emptyStateTheme,
       errorBadgeTheme: errorBadgeTheme,
       inlineNotificationTheme: inlineNotificationTheme,
       jumpToUnreadButtonTheme: jumpToUnreadButtonTheme,

@@ -7,4 +7,7 @@ export 'core.dart';
 
 // Move to SplitButton to core when stable
 export 'src/components/buttons/stream_split_button.dart';
+// Move EmptyState to core when stable
+export 'src/components/common/stream_empty_state.dart';
+export 'src/theme/components/stream_empty_state_theme.dart';
 export 'src/theme/components/stream_split_button_theme.dart';
