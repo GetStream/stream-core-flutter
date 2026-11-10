@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_ignore
+
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
@@ -230,6 +232,8 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
+      // ignore: avoid_redundant_argument_values
+      brightness: .light,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,
