@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamSelectInput` and `StreamSelectInputTheme`, a select field with outline and ghost
+  types, to `video.dart`.
+
 ## 0.5.4
 
 ### ✨ Features

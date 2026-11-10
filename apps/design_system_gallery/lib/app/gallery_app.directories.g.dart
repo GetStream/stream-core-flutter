@@ -57,6 +57,8 @@ import 'package:design_system_gallery/components/common/stream_network_image.dar
     as _design_system_gallery_components_common_stream_network_image;
 import 'package:design_system_gallery/components/common/stream_progress_bar.dart'
     as _design_system_gallery_components_common_stream_progress_bar;
+import 'package:design_system_gallery/components/common/stream_select_input.dart'
+    as _design_system_gallery_components_common_stream_select_input;
 import 'package:design_system_gallery/components/common/stream_skeleton_loading.dart'
     as _design_system_gallery_components_common_stream_skeleton_loading;
 import 'package:design_system_gallery/components/common/stream_tap_target_padding.dart'
@@ -666,6 +668,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_common_stream_progress_bar
                         .buildStreamProgressBarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSelectInput',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_select_input
+                        .buildStreamSelectInputPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_select_input
+                        .buildStreamSelectInputShowcase,
               ),
             ],
           ),
