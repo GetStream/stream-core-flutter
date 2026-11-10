@@ -10,6 +10,8 @@
   `StreamContextMenu`, to `video.dart`.
 - Added `StreamRadioIndicator` and `StreamRadioIndicatorTheme`, a non-interactive radio dot that marks
   the selected row of a group, to `video.dart`.
+- Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
+  modal with a header and footer over a blurred scrim, to `video.dart`.
 
 ## 0.5.4
 
