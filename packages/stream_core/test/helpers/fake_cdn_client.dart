@@ -43,7 +43,7 @@ class FakeCdnClient implements CdnClient {
   /// Completes once [attachment] has been handed over for upload.
   Future<FakeUpload> awaitUpload(StreamAttachment attachment) {
     final upload = _uploads[attachment.file];
-    if (upload != null && !upload.isSettled) return Future.value(upload);
+    if (upload != null && !upload.isSettled) return Future.syncValue(upload);
     return (_awaited[attachment.file] ??= Completer<FakeUpload>()).future;
   }
 

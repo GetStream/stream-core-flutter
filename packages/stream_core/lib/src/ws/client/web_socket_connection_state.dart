@@ -485,6 +485,6 @@ extension ConnectionStateWaits on ConnectionStateEmitter {
       return Future.any([waitFor<Connected>(), waitFor<Disconnected>()]);
     }
 
-    return Future.value(state);
+    return Future.syncValue(state);
   }
 }

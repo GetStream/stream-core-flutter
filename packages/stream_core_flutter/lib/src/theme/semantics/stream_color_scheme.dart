@@ -230,7 +230,6 @@ class StreamColorScheme with _$StreamColorScheme {
     ];
 
     return .raw(
-      brightness: .light,
       brand: brand,
       chrome: chrome,
       accentPrimary: accentPrimary,

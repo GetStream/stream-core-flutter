@@ -139,7 +139,7 @@ _subject({
         tokenProvider ??
         TokenProvider.dynamic((id) {
           loads++;
-          return loader?.call(id, loads) ?? Future.value(generateTestUserToken(id, nonce: '$loads'));
+          return loader?.call(id, loads) ?? Future.syncValue(generateTestUserToken(id, nonce: '$loads'));
         }),
   );
 
