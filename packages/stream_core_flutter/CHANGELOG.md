@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamContextMenuHeading` and `StreamContextMenuHeadingTheme`, the heading of a section in a
+  `StreamContextMenu`, to `video.dart`.
+
 ## 0.5.4
 
 ### ✨ Features
