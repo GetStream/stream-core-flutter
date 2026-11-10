@@ -69,7 +69,7 @@ class StreamEmptyStateTheme extends InheritedTheme {
 /// StreamTheme(
 ///   emptyStateTheme: StreamEmptyStateThemeData(
 ///     iconSize: 48,
-///     maxTextWidth: 400,
+///     maxTextWidth: 320,
 ///   ),
 /// )
 /// ```
@@ -89,8 +89,9 @@ class StreamEmptyStateThemeData with _$StreamEmptyStateThemeData {
     this.titleTextStyle,
     this.descriptionTextStyle,
     this.padding,
-    this.spacing,
+    this.iconSpacing,
     this.textSpacing,
+    this.actionSpacing,
     this.maxTextWidth,
   });
 
@@ -111,16 +112,18 @@ class StreamEmptyStateThemeData with _$StreamEmptyStateThemeData {
   /// The padding between the empty state's edge and its content.
   final EdgeInsetsGeometry? padding;
 
-  /// The gap between the icon, the text and the action.
-  final double? spacing;
+  /// The gap between the icon and the text.
+  final double? iconSpacing;
 
   /// The gap between the title and the description.
   final double? textSpacing;
 
-  /// The width the title and description wrap at, in logical pixels.
+  /// The gap between the text and the action.
+  final double? actionSpacing;
+
+  /// The widest the title and description grow, in logical pixels.
   ///
-  /// The text wraps sooner when the empty state is offered less room. Falls
-  /// back to 320.
+  /// When null, the text takes up to the full width the empty state is given.
   final double? maxTextWidth;
 
   /// Linearly interpolate between two [StreamEmptyStateThemeData] objects.

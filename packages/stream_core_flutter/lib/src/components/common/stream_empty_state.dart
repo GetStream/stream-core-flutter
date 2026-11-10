@@ -7,12 +7,14 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
-/// What a place shows while it has nothing in it: an icon over a title, an
-/// optional description and an optional action, centred.
+/// What a place shows while it has nothing in it: an icon over a title, a
+/// description and an optional action, centred.
 ///
-/// Mirrors the `Web / Empty State` component from the design. The title and
-/// description are centred and wrap at [StreamEmptyStateThemeData.maxTextWidth].
-/// Screen readers announce the title as a heading.
+/// Mirrors the `Core / Mobile / Empty State` component from the design. Either
+/// the title or the description can be left out, but not both. The text is
+/// centred and wraps at the available width, or sooner when
+/// [StreamEmptyStateThemeData.maxTextWidth] is set. Screen readers announce the
+/// title as a heading.
 ///
 /// {@tool snippet}
 ///
@@ -23,6 +25,18 @@ import '../../theme/stream_theme_extensions.dart';
 ///   icon: Icon(context.streamIcons.folder),
 ///   title: const Text('No files yet'),
 ///   description: const Text('Files you add show up here.'),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// A single line of text under the icon:
+///
+/// ```dart
+/// StreamEmptyState(
+///   icon: Icon(context.streamIcons.search),
+///   description: const Text('No results'),
 /// )
 /// ```
 /// {@end-tool}
@@ -51,10 +65,12 @@ import '../../theme/stream_theme_extensions.dart';
 ///  * [StreamEmptyStateTheme], for customizing the appearance.
 class StreamEmptyState extends StatelessWidget {
   /// Creates an empty state.
+  ///
+  /// At least one of [title] and [description] must be non-null.
   StreamEmptyState({
     super.key,
     required Widget icon,
-    required Widget title,
+    Widget? title,
     Widget? description,
     Widget? action,
   }) : props = .new(
@@ -86,12 +102,14 @@ class StreamEmptyState extends StatelessWidget {
 ///  * [DefaultStreamEmptyState], the default implementation.
 class StreamEmptyStateProps {
   /// Creates properties for an empty state.
+  ///
+  /// At least one of [title] and [description] must be non-null.
   const StreamEmptyStateProps({
     required this.icon,
-    required this.title,
+    this.title,
     this.description,
     this.action,
-  });
+  }) : assert(title != null || description != null, 'An empty state needs a title, a description or both.');
 
   /// The icon at the top.
   ///
@@ -101,8 +119,9 @@ class StreamEmptyStateProps {
   /// What is missing.
   ///
   /// Typically a [Text]; the empty state provides its text style, centres it
-  /// and marks it as a heading for screen readers.
-  final Widget title;
+  /// and marks it as a heading for screen readers. When null, the description
+  /// sits right under the icon.
+  final Widget? title;
 
   /// Why it is missing, or what would fill it.
   ///
@@ -139,34 +158,36 @@ class DefaultStreamEmptyState extends StatelessWidget {
     final effectiveTitleTextStyle = theme.titleTextStyle ?? defaults.titleTextStyle;
     final effectiveDescriptionTextStyle = theme.descriptionTextStyle ?? defaults.descriptionTextStyle;
     final effectivePadding = theme.padding ?? defaults.padding;
-    final effectiveSpacing = theme.spacing ?? defaults.spacing;
+    final effectiveIconSpacing = theme.iconSpacing ?? defaults.iconSpacing;
     final effectiveTextSpacing = theme.textSpacing ?? defaults.textSpacing;
-    final effectiveMaxTextWidth = theme.maxTextWidth ?? defaults.maxTextWidth;
+    final effectiveActionSpacing = theme.actionSpacing ?? defaults.actionSpacing;
+    final effectiveMaxTextWidth = theme.maxTextWidth ?? double.infinity;
 
     return Padding(
       padding: effectivePadding,
       child: Column(
         mainAxisSize: .min,
-        spacing: effectiveSpacing,
         children: [
           IconTheme.merge(
             data: IconThemeData(size: effectiveIconSize, color: effectiveIconColor),
             child: props.icon,
           ),
+          SizedBox(height: effectiveIconSpacing),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: effectiveMaxTextWidth),
             child: Column(
               mainAxisSize: .min,
               spacing: effectiveTextSpacing,
               children: [
-                Semantics(
-                  header: true,
-                  child: DefaultTextStyle.merge(
-                    textAlign: .center,
-                    style: effectiveTitleTextStyle,
-                    child: props.title,
+                if (props.title case final title?)
+                  Semantics(
+                    header: true,
+                    child: DefaultTextStyle.merge(
+                      textAlign: .center,
+                      style: effectiveTitleTextStyle,
+                      child: title,
+                    ),
                   ),
-                ),
                 if (props.description case final description?)
                   DefaultTextStyle.merge(
                     textAlign: .center,
@@ -176,7 +197,10 @@ class DefaultStreamEmptyState extends StatelessWidget {
               ],
             ),
           ),
-          ?props.action,
+          if (props.action case final action?) ...[
+            SizedBox(height: effectiveActionSpacing),
+            action,
+          ],
         ],
       ),
     );
@@ -197,23 +221,23 @@ class _StreamEmptyStateThemeDefaults extends StreamEmptyStateThemeData {
   double get iconSize => 32;
 
   @override
-  Color get iconColor => _colorScheme.textSecondary;
+  Color get iconColor => _colorScheme.textTertiary;
 
   @override
-  TextStyle get titleTextStyle => _textTheme.headingXs.copyWith(color: _colorScheme.textPrimary);
+  TextStyle get titleTextStyle => _textTheme.headingSm.copyWith(color: _colorScheme.textPrimary);
 
   @override
-  TextStyle get descriptionTextStyle => _textTheme.captionDefault.copyWith(color: _colorScheme.textSecondary);
+  TextStyle get descriptionTextStyle => _textTheme.bodyDefault.copyWith(color: _colorScheme.textSecondary);
 
   @override
-  EdgeInsetsGeometry get padding => EdgeInsets.symmetric(horizontal: _spacing.xl, vertical: _spacing.xxxl);
+  EdgeInsetsGeometry get padding => EdgeInsets.symmetric(horizontal: _spacing.md, vertical: _spacing.xxxl);
 
   @override
-  double get spacing => _spacing.sm;
+  double get iconSpacing => _spacing.sm;
 
   @override
-  double get textSpacing => _spacing.xxs;
+  double get textSpacing => _spacing.xs;
 
   @override
-  double get maxTextWidth => 320;
+  double get actionSpacing => _spacing.md;
 }
