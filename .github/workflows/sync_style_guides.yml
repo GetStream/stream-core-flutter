@@ -20,6 +20,12 @@ on:
 permissions:
   contents: read
 
+# Two merges close together would otherwise race to force-update the same
+# sync branch in each target, and the older run could finish last.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # The guides are copied into repositories that have none of this repo's
   # other files, so a link out of `style_guides/` must fail before merge.
@@ -35,8 +41,10 @@ jobs:
       - name: 🔗 Check Guide Links
         run: dart run scripts/sync_style_guides.dart --check
 
+  # Only `main` syncs, so a manual run on another branch cannot push its
+  # unreviewed guides into the other repositories with the bot's token.
   sync:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: check
     runs-on: ubuntu-latest
     strategy:

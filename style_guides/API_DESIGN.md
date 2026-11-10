@@ -6,7 +6,9 @@ This guide is about choosing shapes that let an API grow in a minor release.
 
 It applies to every Stream Flutter SDK (core, chat, video, feeds). The other
 repositories carry a copy, which the `sync_style_guides` workflow in
-stream-core-flutter keeps up to date; edit it there, never in a copy.
+stream-core-flutter keeps up to date; edit it there, never in a copy. On the shape of
+public API it takes precedence over a repository's own style guide; raise a
+disagreement here rather than diverging locally.
 
 The rules apply to new public API. Existing shapes that break them stay as they are
 until the next major release, when they move to the shape described here; don't change
@@ -130,6 +132,9 @@ For sets that will grow, pick a type consumers cannot switch on exhaustively:
     static const sm = StreamAvatarSize(diameter: 24, borderWidth: 1);
     static const lg = StreamAvatarSize(diameter: 40, borderWidth: 1);
 
+    /// The predefined sizes, in ascending order.
+    static const List<StreamAvatarSize> values = [sm, lg];
+
     final double diameter;
     final double borderWidth;
 
@@ -141,10 +146,12 @@ For sets that will grow, pick a type consumers cannot switch on exhaustively:
   presets constructs one instead of waiting for a release. Required constructor
   parameters take over the job of the exhaustive `switch`: a size cannot be added
   without its metrics. A class can also be lerped in a theme, which an enum cannot.
-  Turning an existing enum into this shape keeps `StreamAvatarSize.lg` and `.lg`
-  compiling; `switch`, `.values`, `.name`, and `.index` break, and so does using a
-  preset as a `const` map key or `const` set element, because the class overrides
-  `==`.
+  Keep a hand-maintained `values` list of the presets: tests and the gallery can
+  check that every preset is covered, and adding one to the list never breaks a
+  consumer's `switch`. Turning an existing enum into this shape keeps
+  `StreamAvatarSize.lg`, `.lg` and `.values` compiling; `switch`, `.name`, and
+  `.index` break, and so does using a preset as a `const` map key or `const` set
+  element, because the class overrides `==`.
 - **Values that come from the backend** (reasons, types, roles, statuses): an
   extension type over `String` with `static const` instances, like
   `StreamMentionType`.

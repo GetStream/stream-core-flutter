@@ -168,6 +168,10 @@ scripts:
     run: dart run scripts/check_tokens.dart
     description: Fail if a vendored design token is unreferenced, or if light/ and dark/ disagree.
 
+  check:style_guides:
+    run: dart run scripts/sync_style_guides.dart --check
+    description: Fail if a shared style guide links outside style_guides/ or is itself a synced copy.
+
   generate:dart:
     run: melos exec -c 1 --depends-on="build_runner" --no-flutter -- "dart run build_runner build --delete-conflicting-outputs"
     description: Build all generated files for Dart packages in this project.

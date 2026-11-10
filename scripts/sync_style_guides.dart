@@ -1,23 +1,36 @@
-// Copies the shared style guides into another Stream Flutter SDK checkout.
-//
-// `style_guides/` holds the guides every Stream Flutter SDK follows. The other
-// repositories carry a copy rather than a link, so their contributors and
-// agents read the rules locally instead of fetching them from this repository.
-// The `sync_style_guides` workflow runs this script against each of them and
-// opens a pull request when the copy changes.
-//
-// The guides are self-contained: they may link to each other and to absolute
-// URLs, but never to a file outside `style_guides/` (such as
-// `../STYLE_GUIDE.md`). This repository's style guide points at them, not the
-// other way around, and the copies land in repositories that have no such
-// file. A relative link that leaves the folder fails the run.
-//
-// Each copy gets a header saying where it came from. A copied guide that no
-// longer exists here is deleted from the target, but only if it carries the
-// header, so a target's own files in `style_guides/` are never touched.
-//
-// Run with `dart run scripts/sync_style_guides.dart <target-repo-dir>`, or with
-// `--check` instead of a target to only validate the links.
+/// Style Guide Sync
+///
+/// Copies the shared style guides in `style_guides/` into another Stream
+/// Flutter SDK checkout. The other repositories carry a copy rather than a
+/// link, so their contributors and agents read the rules locally instead of
+/// fetching them from this repository.
+///
+/// The guides are self-contained: they may link to each other and to absolute
+/// URLs, but never to a file outside `style_guides/` (such as
+/// `../STYLE_GUIDE.md`), because the copies land in repositories that have no
+/// such file.
+///
+/// Usage (from anywhere in the monorepo):
+///   melos run check:style_guides
+///
+/// Or directly:
+///   dart run scripts/sync_style_guides.dart --check
+///   dart run scripts/sync_style_guides.dart `<target-repo-dir>`
+///
+/// The `sync_style_guides` workflow runs it against each target on every
+/// change to `main`, and opens a pull request in each one whose copy changed.
+///
+/// Steps:
+///   1. Fails if a guide is itself a synced copy, or links to a relative path
+///      outside `style_guides/`. With `--check`, stops there.
+///   2. Writes each guide into `<target>/style_guides/` under a header naming
+///      its source.
+///   3. Deletes a guide from the target that no longer exists here, but only
+///      if it carries that header, so a target's own files are never touched.
+///
+/// Exits 0 on success, 1 on failure, and 64 on a usage error.
+library;
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -30,7 +43,9 @@ String _header(String fileName) =>
     'Do not edit this copy; change it upstream and the sync opens a PR here. -->\n\n';
 
 // Matches the target of an inline markdown link or a reference definition, e.g.
-// `](../STYLE_GUIDE.md#x)` or `]: ../STYLE_GUIDE.md`.
+// `](../STYLE_GUIDE.md#x)` or `]: ../STYLE_GUIDE.md`. Angle-bracket targets
+// (`](<../x.md>)`) and raw HTML links are not matched, and a target inside the
+// folder is not checked to exist.
 final _linkTarget = RegExp(r'(?:\]\(|\]:[ \t]*)([^)\s]+)');
 
 void main(List<String> args) {
@@ -39,9 +54,13 @@ void main(List<String> args) {
     exit(64);
   }
 
-  final source = Directory(_sourceDir);
+  // Resolved from the script's own location rather than the caller's cwd, so
+  // running it from a repository that holds synced copies cannot pick those up
+  // as the source.
+  final repoRoot = p.dirname(p.dirname(p.fromUri(Platform.script)));
+  final source = Directory(p.join(repoRoot, _sourceDir));
   if (!source.existsSync()) {
-    stderr.writeln('No `$_sourceDir/` here; run this from the stream-core-flutter root.');
+    stderr.writeln('No `$_sourceDir/` in $repoRoot.');
     exit(1);
   }
 
@@ -52,7 +71,18 @@ void main(List<String> args) {
     exit(1);
   }
 
-  final escaping = [for (final guide in guides) ..._linksLeavingFolder(guide)];
+  final copies = [
+    for (final guide in guides)
+      if (guide.readAsStringSync().startsWith(_syncMarker)) p.relative(guide.path, from: repoRoot),
+  ];
+  if (copies.isNotEmpty) {
+    stderr
+      ..writeln('These are synced copies, not sources; edit the guides in stream-core-flutter:')
+      ..writeAll(copies.map((c) => '  $c\n'));
+    exit(1);
+  }
+
+  final escaping = [for (final guide in guides) ..._linksLeavingFolder(guide, source.path, repoRoot)];
   if (escaping.isNotEmpty) {
     stderr
       ..writeln('Guides in `$_sourceDir/` must not link outside the folder; use an absolute URL or drop the link:')
@@ -61,7 +91,7 @@ void main(List<String> args) {
   }
 
   if (args.single == '--check') {
-    stdout.writeln('${guides.length} guide(s) checked; no links leave `$_sourceDir/`.');
+    stdout.writeln('Checked ${guides.length} guide(s); no links leave $_sourceDir/');
     return;
   }
 
@@ -79,7 +109,7 @@ void main(List<String> args) {
     final name = p.basename(guide.path);
     File(p.join(target.path, name)).writeAsStringSync(_header(name) + guide.readAsStringSync());
     copied.add(name);
-    stdout.writeln('copied $name');
+    stdout.writeln('Wrote $_sourceDir/$name');
   }
 
   for (final stale in target.listSync().whereType<File>()) {
@@ -87,21 +117,21 @@ void main(List<String> args) {
     if (copied.contains(name) || !name.endsWith('.md')) continue;
     if (!stale.readAsStringSync().startsWith(_syncMarker)) continue;
     stale.deleteSync();
-    stdout.writeln('deleted $name');
+    stdout.writeln('Deleted $_sourceDir/$name');
   }
 }
 
 // Returns `file:line: target` for every relative link in [guide] that resolves
-// outside `style_guides/`.
-Iterable<String> _linksLeavingFolder(File guide) sync* {
+// outside [sourceDir].
+Iterable<String> _linksLeavingFolder(File guide, String sourceDir, String repoRoot) sync* {
   final lines = guide.readAsLinesSync();
   for (var i = 0; i < lines.length; i++) {
     for (final match in _linkTarget.allMatches(lines[i])) {
       final link = match[1]!;
       if (link.startsWith('#') || (Uri.tryParse(link)?.hasScheme ?? false)) continue;
       final path = link.split('#').first;
-      if (p.isWithin(_sourceDir, p.normalize(p.join(_sourceDir, path)))) continue;
-      yield '${guide.path}:${i + 1}: $link';
+      if (p.isWithin(sourceDir, p.normalize(p.join(sourceDir, path)))) continue;
+      yield '${p.relative(guide.path, from: repoRoot)}:${i + 1}: $link';
     }
   }
 }
