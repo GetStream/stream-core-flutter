@@ -39,8 +39,9 @@ mixin _$StreamEmptyStateThemeData {
         t,
       ),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
-      spacing: lerpDouble$(a.spacing, b.spacing, t),
+      iconSpacing: lerpDouble$(a.iconSpacing, b.iconSpacing, t),
       textSpacing: lerpDouble$(a.textSpacing, b.textSpacing, t),
+      actionSpacing: lerpDouble$(a.actionSpacing, b.actionSpacing, t),
       maxTextWidth: lerpDouble$(a.maxTextWidth, b.maxTextWidth, t),
     );
   }
@@ -51,8 +52,9 @@ mixin _$StreamEmptyStateThemeData {
     TextStyle? titleTextStyle,
     TextStyle? descriptionTextStyle,
     EdgeInsetsGeometry? padding,
-    double? spacing,
+    double? iconSpacing,
     double? textSpacing,
+    double? actionSpacing,
     double? maxTextWidth,
   }) {
     final _this = (this as StreamEmptyStateThemeData);
@@ -63,8 +65,9 @@ mixin _$StreamEmptyStateThemeData {
       titleTextStyle: titleTextStyle ?? _this.titleTextStyle,
       descriptionTextStyle: descriptionTextStyle ?? _this.descriptionTextStyle,
       padding: padding ?? _this.padding,
-      spacing: spacing ?? _this.spacing,
+      iconSpacing: iconSpacing ?? _this.iconSpacing,
       textSpacing: textSpacing ?? _this.textSpacing,
+      actionSpacing: actionSpacing ?? _this.actionSpacing,
       maxTextWidth: maxTextWidth ?? _this.maxTextWidth,
     );
   }
@@ -90,8 +93,9 @@ mixin _$StreamEmptyStateThemeData {
           _this.descriptionTextStyle?.merge(other.descriptionTextStyle) ??
           other.descriptionTextStyle,
       padding: other.padding,
-      spacing: other.spacing,
+      iconSpacing: other.iconSpacing,
       textSpacing: other.textSpacing,
+      actionSpacing: other.actionSpacing,
       maxTextWidth: other.maxTextWidth,
     );
   }
@@ -114,8 +118,9 @@ mixin _$StreamEmptyStateThemeData {
         _other.titleTextStyle == _this.titleTextStyle &&
         _other.descriptionTextStyle == _this.descriptionTextStyle &&
         _other.padding == _this.padding &&
-        _other.spacing == _this.spacing &&
+        _other.iconSpacing == _this.iconSpacing &&
         _other.textSpacing == _this.textSpacing &&
+        _other.actionSpacing == _this.actionSpacing &&
         _other.maxTextWidth == _this.maxTextWidth;
   }
 
@@ -130,8 +135,9 @@ mixin _$StreamEmptyStateThemeData {
       _this.titleTextStyle,
       _this.descriptionTextStyle,
       _this.padding,
-      _this.spacing,
+      _this.iconSpacing,
       _this.textSpacing,
+      _this.actionSpacing,
       _this.maxTextWidth,
     );
   }

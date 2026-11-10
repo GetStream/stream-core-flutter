@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stream_core_flutter/video.dart';
+import 'package:stream_core_flutter/core.dart';
 
 void main() {
   testWidgets('StreamEmptyState draws the icon, title and description', (tester) async {
@@ -33,7 +33,7 @@ void main() {
     );
 
     final descriptionBottom = tester.getBottomLeft(find.text('Description')).dy;
-    expect(tester.getTopLeft(find.text('Action')).dy - descriptionBottom, 12);
+    expect(tester.getTopLeft(find.text('Action')).dy - descriptionBottom, 16);
   });
 
   testWidgets('StreamEmptyState stacks the icon, title and description with the default gaps', (tester) async {
@@ -52,7 +52,20 @@ void main() {
     final titleBottom = tester.getBottomLeft(find.text('Title')).dy;
     final descriptionTop = tester.getTopLeft(find.text('Description')).dy;
     expect(titleTop - iconBottom, 12);
-    expect(descriptionTop - titleBottom, 4);
+    expect(descriptionTop - titleBottom, 8);
+  });
+
+  testWidgets('StreamEmptyState draws a description without a title', (tester) async {
+    await tester.pumpWidget(
+      _wrap(StreamEmptyState(icon: const Icon(Icons.inbox), description: const Text('No results'))),
+    );
+
+    final iconBottom = tester.getBottomLeft(find.byIcon(Icons.inbox)).dy;
+    expect(tester.getTopLeft(find.text('No results')).dy - iconBottom, 12);
+  });
+
+  testWidgets('StreamEmptyState asserts that it has a title or a description', (tester) async {
+    expect(() => StreamEmptyState(icon: const Icon(Icons.inbox)), throwsAssertionError);
   });
 
   testWidgets('StreamEmptyState leaves no gap for a missing description and action', (tester) async {
@@ -64,10 +77,23 @@ void main() {
   });
 
   testWidgets('StreamEmptyState pads its content with the default padding', (tester) async {
-    await tester.pumpWidget(_wrap(StreamEmptyState(icon: const Icon(Icons.inbox), title: const Text('Title'))));
+    await tester.pumpWidget(
+      _wrap(
+        SizedBox(
+          width: 400,
+          child: StreamEmptyState(
+            icon: const Icon(Icons.inbox),
+            description: const Text('A description long enough to fill the whole width of the empty state'),
+          ),
+        ),
+      ),
+    );
 
-    final emptyStateTop = tester.getTopLeft(find.byType(StreamEmptyState)).dy;
-    expect(tester.getTopLeft(find.byIcon(Icons.inbox)).dy - emptyStateTop, 40);
+    final emptyState = tester.getRect(find.byType(StreamEmptyState));
+    final description = tester.getRect(find.byType(Text));
+    expect(tester.getTopLeft(find.byIcon(Icons.inbox)).dy - emptyState.top, 40);
+    expect(description.left - emptyState.left, 16);
+    expect(emptyState.right - description.right, 16);
   });
 
   testWidgets('StreamEmptyState centres its content horizontally', (tester) async {
@@ -85,25 +111,25 @@ void main() {
     expect(tester.getCenter(find.text('Title')).dx, moreOrLessEquals(centre, epsilon: 0.5));
   });
 
-  testWidgets('StreamEmptyState draws the icon at 32px in the secondary text color', (tester) async {
+  testWidgets('StreamEmptyState draws the icon at 32px in the tertiary text color', (tester) async {
     await tester.pumpWidget(_wrap(StreamEmptyState(icon: const Icon(Icons.inbox), title: const Text('Title'))));
 
     final iconTheme = IconTheme.of(tester.element(find.byIcon(Icons.inbox)));
     expect(iconTheme.size, 32);
-    expect(iconTheme.color, _colorSchemeOf(tester).textSecondary);
+    expect(iconTheme.color, _colorSchemeOf(tester).textTertiary);
   });
 
-  testWidgets('StreamEmptyState styles the title as headingXs in the primary text color', (tester) async {
+  testWidgets('StreamEmptyState styles the title as headingSm in the primary text color', (tester) async {
     await tester.pumpWidget(_wrap(StreamEmptyState(icon: const Icon(Icons.inbox), title: const Text('Title'))));
 
     final style = _textStyleOf(tester, 'Title');
     final textTheme = _streamThemeOf(tester).textTheme;
-    expect(style?.fontSize, textTheme.headingXs.fontSize);
-    expect(style?.fontWeight, textTheme.headingXs.fontWeight);
+    expect(style?.fontSize, textTheme.headingSm.fontSize);
+    expect(style?.fontWeight, textTheme.headingSm.fontWeight);
     expect(style?.color, _colorSchemeOf(tester).textPrimary);
   });
 
-  testWidgets('StreamEmptyState styles the description as captionDefault in the secondary text color', (
+  testWidgets('StreamEmptyState styles the description as bodyDefault in the secondary text color', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -118,8 +144,8 @@ void main() {
 
     final style = _textStyleOf(tester, 'Description');
     final textTheme = _streamThemeOf(tester).textTheme;
-    expect(style?.fontSize, textTheme.captionDefault.fontSize);
-    expect(style?.fontWeight, textTheme.captionDefault.fontWeight);
+    expect(style?.fontSize, textTheme.bodyDefault.fontSize);
+    expect(style?.fontWeight, textTheme.bodyDefault.fontWeight);
     expect(style?.color, _colorSchemeOf(tester).textSecondary);
   });
 
@@ -139,8 +165,8 @@ void main() {
     expect(tester.renderObject<RenderParagraph>(find.text(description)).textAlign, TextAlign.center);
   });
 
-  testWidgets('StreamEmptyState wraps the text at 320px when given more room', (tester) async {
-    const description = 'A description long enough to need far more than three hundred and twenty pixels';
+  testWidgets('StreamEmptyState lets the text take the full width when no maximum is themed', (tester) async {
+    const description = 'A description long enough to need far more than three hundred and twenty pixels, so it wraps';
 
     await tester.pumpWidget(
       _wrap(
@@ -155,7 +181,9 @@ void main() {
       ),
     );
 
-    expect(tester.getSize(find.text(description)).width, lessThanOrEqualTo(320));
+    // 800px less 16px of padding on each side.
+    expect(tester.getSize(find.text(description)).width, greaterThan(320));
+    expect(tester.getSize(find.text(description)).width, lessThanOrEqualTo(768));
   });
 
   testWidgets('StreamEmptyState grows taller without overflowing at a large text scale', (tester) async {
@@ -179,6 +207,17 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(tester.getSize(find.byType(StreamEmptyState)).height, greaterThan(unscaledHeight));
+  });
+
+  testWidgets('StreamEmptyState leaves no heading when there is no title', (tester) async {
+    final handle = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      _wrap(StreamEmptyState(icon: const Icon(Icons.inbox), description: const Text('No results'))),
+    );
+
+    expect(tester.semantics.find(find.text('No results')), isSemantics(label: 'No results', isHeader: false));
+    handle.dispose();
   });
 
   testWidgets('StreamEmptyState marks the title as a heading', (tester) async {
@@ -327,7 +366,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         StreamEmptyStateTheme(
-          data: const StreamEmptyStateThemeData(spacing: 20, textSpacing: 10),
+          data: const StreamEmptyStateThemeData(iconSpacing: 20, textSpacing: 10, actionSpacing: 30),
           child: StreamEmptyState(
             icon: const Icon(Icons.inbox),
             title: const Text('Title'),
@@ -343,7 +382,7 @@ void main() {
     final descriptionBottom = tester.getBottomLeft(find.text('Description')).dy;
     expect(tester.getTopLeft(find.text('Title')).dy - iconBottom, 20);
     expect(tester.getTopLeft(find.text('Description')).dy - titleBottom, 10);
-    expect(tester.getTopLeft(find.text('Action')).dy - descriptionBottom, 20);
+    expect(tester.getTopLeft(find.text('Action')).dy - descriptionBottom, 30);
   });
 
   testWidgets('StreamEmptyStateTheme overrides the width the text wraps at', (tester) async {

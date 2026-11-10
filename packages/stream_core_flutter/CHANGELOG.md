@@ -4,8 +4,8 @@
 
 - Added a `mark` slot to `StreamMessageMetadata`, styled by new `mark*` and
   `separator*` fields on `StreamMessageMetadataStyle`.
-- Added `StreamEmptyState` and `StreamEmptyStateTheme`, an icon over a title, description and action for a place
-  with nothing in it, to `video.dart`.
+- Added `StreamEmptyState` and `StreamEmptyStateTheme`, an icon over a title, a description and an optional
+  action for a place with nothing in it.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.

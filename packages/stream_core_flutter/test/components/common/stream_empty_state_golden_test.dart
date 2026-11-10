@@ -1,7 +1,7 @@
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stream_core_flutter/video.dart';
+import 'package:stream_core_flutter/core.dart';
 
 void main() {
   group('StreamEmptyState Golden Tests', () {
@@ -13,6 +13,13 @@ void main() {
           columns: 1,
           scenarioConstraints: const BoxConstraints(maxWidth: 400),
           children: [
+            GoldenTestScenario(
+              name: 'description only',
+              child: _buildInTheme(
+                StreamEmptyState(icon: const Icon(Icons.search), description: const Text('No results')),
+                brightness: brightness,
+              ),
+            ),
             GoldenTestScenario(
               name: 'title only',
               child: _buildInTheme(

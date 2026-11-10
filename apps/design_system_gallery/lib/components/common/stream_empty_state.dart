@@ -1,7 +1,5 @@
-// ignore_for_file: experimental_member_use
-
 import 'package:flutter/material.dart';
-import 'package:stream_core_flutter/video.dart';
+import 'package:stream_core_flutter/core.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
@@ -15,6 +13,12 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
   path: '[Components]/Common',
 )
 Widget buildStreamEmptyStatePlayground(BuildContext context) {
+  final showTitle = context.knobs.boolean(
+    label: 'Show Title',
+    initialValue: true,
+    description: 'Whether to show a title. Leave it out for a single line of text under the icon.',
+  );
+
   final title = context.knobs.string(
     label: 'Title',
     initialValue: 'No recordings yet',
@@ -47,8 +51,9 @@ Widget buildStreamEmptyStatePlayground(BuildContext context) {
   return Center(
     child: StreamEmptyState(
       icon: Icon(context.streamIcons.recordLibraryFill),
-      title: Text(title),
-      description: showDescription ? Text(description) : null,
+      // An empty state needs a title or a description, so the description stays when both are switched off.
+      title: showTitle ? Text(title) : null,
+      description: showDescription || !showTitle ? Text(description) : null,
       action: showAction
           ? StreamButton(
               style: StreamButtonStyle.secondary,
@@ -85,6 +90,14 @@ Widget buildStreamEmptyStateShowcase(BuildContext context) {
         spacing: spacing.xl,
         children: [
           _Section(
+            label: 'DESCRIPTION ONLY',
+            caption: 'A single line of secondary text under the icon',
+            child: StreamEmptyState(
+              icon: Icon(icons.search),
+              description: const Text('No results'),
+            ),
+          ),
+          _Section(
             label: 'TITLE ONLY',
             caption: 'An icon over a title',
             child: StreamEmptyState(
@@ -118,7 +131,7 @@ Widget buildStreamEmptyStateShowcase(BuildContext context) {
           ),
           _Section(
             label: 'LONG DESCRIPTION',
-            caption: 'The text wraps at 320px and stays centred',
+            caption: 'The text wraps at the available width and stays centred',
             child: StreamEmptyState(
               icon: Icon(icons.folder),
               title: const Text('No files in this folder'),
