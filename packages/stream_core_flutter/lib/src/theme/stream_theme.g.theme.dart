@@ -62,6 +62,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamRadioIndicatorThemeData? radioIndicatorTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
@@ -141,6 +142,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       playbackSpeedToggleTheme:
           playbackSpeedToggleTheme ?? _this.playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
+      radioIndicatorTheme: radioIndicatorTheme ?? _this.radioIndicatorTheme,
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme ?? _this.sheetHeaderTheme,
@@ -354,6 +356,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.progressBarTheme,
         t,
       )!,
+      radioIndicatorTheme: StreamRadioIndicatorThemeData.lerp(
+        _this.radioIndicatorTheme,
+        other.radioIndicatorTheme,
+        t,
+      )!,
       reactionPickerTheme: StreamReactionPickerThemeData.lerp(
         _this.reactionPickerTheme,
         other.reactionPickerTheme,
@@ -471,6 +478,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.playbackSpeedToggleTheme == _this.playbackSpeedToggleTheme &&
         _other.progressBarTheme == _this.progressBarTheme &&
+        _other.radioIndicatorTheme == _this.radioIndicatorTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
         _other.sheetHeaderTheme == _this.sheetHeaderTheme &&
@@ -533,6 +541,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.onlineIndicatorTheme,
       _this.playbackSpeedToggleTheme,
       _this.progressBarTheme,
+      _this.radioIndicatorTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,
       _this.sheetHeaderTheme,

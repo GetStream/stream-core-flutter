@@ -33,6 +33,7 @@ import 'components/stream_message_item_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
+import 'components/stream_radio_indicator_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
@@ -214,6 +215,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamProgressBarThemeData] from the nearest ancestor.
   StreamProgressBarThemeData get streamProgressBarTheme => StreamProgressBarTheme.of(this);
+
+  /// Returns the [StreamRadioIndicatorThemeData] from the nearest ancestor.
+  StreamRadioIndicatorThemeData get streamRadioIndicatorTheme => StreamRadioIndicatorTheme.of(this);
 
   /// Returns the [StreamReactionPickerThemeData] from the nearest ancestor.
   StreamReactionPickerThemeData get streamReactionPickerTheme => StreamReactionPickerTheme.of(this);
