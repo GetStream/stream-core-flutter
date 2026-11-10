@@ -1711,8 +1711,12 @@ class _StreamSheetDefaults extends StreamSheetThemeData {
   @override
   Size get dragHandleSize => const Size(36, 5);
 
+  // Must be exactly `Colors.transparent`: Material 3 skips the elevation tint
+  // only for that value. `StreamColors.transparent` is transparent *white*,
+  // which Material treats as a real tint and blends in at the sheet's
+  // elevation, lifting the dark surface from #1c1c1c to ~#282828.
   @override
-  Color get surfaceTintColor => StreamColors.transparent;
+  Color get surfaceTintColor => Colors.transparent;
 
   @override
   Color get shadowColor => StreamColors.transparent;
