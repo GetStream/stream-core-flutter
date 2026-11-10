@@ -1,3 +1,10 @@
+## Upcoming
+
+### 🐛 Bug Fixes
+
+- Fixed `StreamButton` labels ignoring the app's font family, such as
+  `ThemeData.fontFamily`, when the text theme sets none.
+
 ## 0.5.4
 
 ### ✨ Features
