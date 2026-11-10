@@ -8,8 +8,8 @@
   `StreamContextMenu` from an anchor widget, to `video.dart`.
 - Added `StreamContextMenuHeading` and `StreamContextMenuHeadingTheme`, the heading of a section in a
   `StreamContextMenu`, to `video.dart`.
-- Added `StreamRadioIndicator` and `StreamRadioIndicatorTheme`, a non-interactive radio dot that marks
-  the selected row of a group, to `video.dart`.
+- Added `StreamRadioButton` and `StreamRadioButtonTheme`, a radio button in sm, md and lg sizes with a
+  `decorative` variant for rows that own the tap, to `video.dart`.
 
 ## 0.5.4
 
