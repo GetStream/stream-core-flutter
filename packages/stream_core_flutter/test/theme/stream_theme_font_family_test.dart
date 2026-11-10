@@ -9,6 +9,23 @@ Widget _app({required ThemeData theme, required Widget child}) {
   );
 }
 
+// The StreamTheme a widget under [theme] resolves.
+Future<StreamTheme> _resolve(WidgetTester tester, ThemeData theme) async {
+  late StreamTheme resolved;
+  await tester.pumpWidget(
+    _app(
+      theme: theme,
+      child: Builder(
+        builder: (context) {
+          resolved = StreamTheme.of(context);
+          return const SizedBox();
+        },
+      ),
+    ),
+  );
+  return resolved;
+}
+
 // The style the text is painted with, after every DefaultTextStyle above it.
 String? _familyOf(WidgetTester tester, String text) {
   final richText = find.descendant(of: find.text(text), matching: find.byType(RichText));
@@ -44,57 +61,35 @@ void main() {
 
   group('StreamTheme.of', () {
     testWidgets("takes ThemeData's font family when the text theme sets none", (tester) async {
-      late StreamTheme resolved;
-      await tester.pumpWidget(
-        _app(
-          theme: ThemeData(fontFamily: 'AppFont', extensions: [StreamTheme()]),
-          child: Builder(
-            builder: (context) {
-              resolved = StreamTheme.of(context);
-              return const SizedBox();
-            },
-          ),
-        ),
-      );
+      final resolved = await _resolve(tester, ThemeData(fontFamily: 'AppFont', extensions: [StreamTheme()]));
 
       expect(resolved.textTheme.bodyDefault.fontFamily, 'AppFont');
     });
 
     testWidgets("takes ThemeData's font family without a StreamTheme extension", (tester) async {
-      late StreamTheme resolved;
-      await tester.pumpWidget(
-        _app(
-          theme: ThemeData(fontFamily: 'AppFont'),
-          child: Builder(
-            builder: (context) {
-              resolved = StreamTheme.of(context);
-              return const SizedBox();
-            },
-          ),
-        ),
-      );
+      final resolved = await _resolve(tester, ThemeData(fontFamily: 'AppFont'));
 
       expect(resolved.textTheme.bodyDefault.fontFamily, 'AppFont');
     });
 
     testWidgets("prefers StreamTheme's font family over ThemeData's", (tester) async {
-      late StreamTheme resolved;
-      await tester.pumpWidget(
-        _app(
-          theme: ThemeData(
-            fontFamily: 'AppFont',
-            extensions: [StreamTheme(fontFamily: 'StreamFont')],
-          ),
-          child: Builder(
-            builder: (context) {
-              resolved = StreamTheme.of(context);
-              return const SizedBox();
-            },
-          ),
+      final resolved = await _resolve(
+        tester,
+        ThemeData(
+          fontFamily: 'AppFont',
+          extensions: [StreamTheme(fontFamily: 'StreamFont')],
         ),
       );
 
       expect(resolved.textTheme.bodyDefault.fontFamily, 'StreamFont');
+    });
+
+    testWidgets("follows Material's default font family when the app sets none", (tester) async {
+      final theme = ThemeData(extensions: [StreamTheme()]);
+
+      final resolved = await _resolve(tester, theme);
+
+      expect(resolved.textTheme.bodyDefault.fontFamily, theme.textTheme.bodyMedium!.fontFamily);
     });
 
     testWidgets('returns the same theme on every lookup', (tester) async {
@@ -115,12 +110,30 @@ void main() {
 
       expect(identical(lookups[0], lookups[1]), isTrue);
     });
+
+    testWidgets('follows a ThemeData font family change for the same StreamTheme', (tester) async {
+      final streamTheme = StreamTheme();
+      final families = <String?>[];
+      Widget lookUp(String fontFamily) => Theme(
+        data: ThemeData(fontFamily: fontFamily, extensions: [streamTheme]),
+        child: Builder(
+          builder: (context) {
+            families.add(StreamTheme.of(context).textTheme.bodyDefault.fontFamily);
+            return const SizedBox();
+          },
+        ),
+      );
+
+      await tester.pumpWidget(Column(children: [lookUp('FirstFont'), lookUp('SecondFont'), lookUp('FirstFont')]));
+
+      expect(families, ['FirstFont', 'SecondFont', 'FirstFont']);
+    });
   });
 
   group("components with ThemeData's font family", () {
     final theme = ThemeData(fontFamily: 'AppFont', extensions: [StreamTheme()]);
 
-    testWidgets('StreamButton', (tester) async {
+    testWidgets('StreamButton label uses the app font', (tester) async {
       await tester.pumpWidget(
         _app(
           theme: theme,
@@ -131,7 +144,7 @@ void main() {
       expect(_familyOf(tester, 'Label'), 'AppFont');
     });
 
-    testWidgets('StreamListTile', (tester) async {
+    testWidgets('StreamListTile title uses the app font', (tester) async {
       await tester.pumpWidget(
         _app(
           theme: theme,
@@ -142,7 +155,7 @@ void main() {
       expect(_familyOf(tester, 'Title'), 'AppFont');
     });
 
-    testWidgets('StreamContextMenuAction', (tester) async {
+    testWidgets('StreamContextMenuAction label uses the app font', (tester) async {
       await tester.pumpWidget(
         _app(
           theme: theme,
@@ -153,7 +166,7 @@ void main() {
       expect(_familyOf(tester, 'Action'), 'AppFont');
     });
 
-    testWidgets('StreamAppBar', (tester) async {
+    testWidgets('StreamAppBar title uses the app font', (tester) async {
       await tester.pumpWidget(
         _app(
           theme: theme,
@@ -164,7 +177,7 @@ void main() {
       expect(_familyOf(tester, 'App bar'), 'AppFont');
     });
 
-    testWidgets('StreamPlaybackSpeedToggle', (tester) async {
+    testWidgets('StreamPlaybackSpeedToggle label uses the app font', (tester) async {
       await tester.pumpWidget(
         _app(
           theme: theme,

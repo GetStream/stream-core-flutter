@@ -111,6 +111,11 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// effect when [textTheme] is provided. Without them, [StreamTheme.of]
   /// takes the family of the ambient [ThemeData.textTheme].
   ///
+  /// A single family suits fonts that hold every weight in one family. For
+  /// fonts registered as one family per weight, such as `google_fonts`, pass
+  /// a [textTheme] built by the font package instead, or the heavier styles
+  /// are drawn with synthesized bold.
+  ///
   /// See also:
   ///
   ///  * [StreamTheme.light], which creates a light theme.
@@ -413,32 +418,20 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   StreamTheme _withAmbientFontFamily(TextStyle? materialStyle) {
     if (textTheme.bodyDefault.fontFamily != null) return this;
 
-    final fontFamily = materialStyle?.fontFamily;
+    final TextStyle(:fontFamily, :fontFamilyFallback) = materialStyle ?? const TextStyle();
     if (fontFamily == null) return this;
-    final fontFamilyFallback = materialStyle?.fontFamilyFallback;
 
     final cached = _ambientFontFamilyCache[this];
-    if (cached != null &&
-        cached.fontFamily == fontFamily &&
-        listEquals(cached.fontFamilyFallback, fontFamilyFallback)) {
-      return cached.theme;
-    }
+    if (cached != null && cached.matches(fontFamily, fontFamilyFallback)) return cached.theme;
 
-    final themed =
-        copyWith(
-              textTheme: textTheme.apply(fontFamily: fontFamily, fontFamilyFallback: fontFamilyFallback),
-            )
-            as StreamTheme;
-    _ambientFontFamilyCache[this] = (
-      fontFamily: fontFamily,
-      fontFamilyFallback: fontFamilyFallback,
-      theme: themed,
-    );
+    final themed = _copyWithTextTheme(textTheme.apply(fontFamily: fontFamily, fontFamilyFallback: fontFamilyFallback));
+    _ambientFontFamilyCache[this] = (fontFamily: fontFamily, fontFamilyFallback: fontFamilyFallback, theme: themed);
     return themed;
   }
 
-  static final _ambientFontFamilyCache =
-      Expando<({String fontFamily, List<String>? fontFamilyFallback, StreamTheme theme})>();
+  StreamTheme _copyWithTextTheme(StreamTextTheme textTheme) => copyWith(textTheme: textTheme) as StreamTheme;
+
+  static final _ambientFontFamilyCache = Expando<_AmbientFontFamilyTheme>();
 
   /// The brightness of this theme.
   ///
@@ -689,4 +682,11 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       typingIndicatorDotsTheme: typingIndicatorDotsTheme,
     );
   }
+}
+
+typedef _AmbientFontFamilyTheme = ({String fontFamily, List<String>? fontFamilyFallback, StreamTheme theme});
+
+extension on _AmbientFontFamilyTheme {
+  bool matches(String fontFamily, List<String>? fontFamilyFallback) =>
+      this.fontFamily == fontFamily && listEquals(this.fontFamilyFallback, fontFamilyFallback);
 }
