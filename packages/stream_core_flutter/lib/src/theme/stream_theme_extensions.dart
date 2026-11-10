@@ -13,6 +13,7 @@ import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
 import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_anchor_theme.dart';
+import 'components/stream_context_menu_heading_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
@@ -146,6 +147,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamContextMenuAnchorThemeData] from the nearest ancestor.
   StreamContextMenuAnchorThemeData get streamContextMenuAnchorTheme => StreamContextMenuAnchorTheme.of(this);
+
+  /// Returns the [StreamContextMenuHeadingThemeData] from the nearest ancestor.
+  StreamContextMenuHeadingThemeData get streamContextMenuHeadingTheme => StreamContextMenuHeadingTheme.of(this);
 
   /// Returns the [StreamEmojiButtonThemeData] from the nearest ancestor.
   StreamEmojiButtonThemeData get streamEmojiButtonTheme => StreamEmojiButtonTheme.of(this);
