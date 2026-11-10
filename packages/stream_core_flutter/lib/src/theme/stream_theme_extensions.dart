@@ -28,6 +28,7 @@ import 'components/stream_message_composer_media_attachment_theme.dart';
 import 'components/stream_message_composer_reply_attachment_theme.dart';
 import 'components/stream_message_composer_unsupported_attachment_theme.dart';
 import 'components/stream_message_item_theme.dart';
+import 'components/stream_modal_dialog_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
@@ -197,6 +198,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamTextInputThemeData] from the nearest ancestor.
   StreamTextInputThemeData get streamTextInputTheme => StreamTextInputTheme.of(this);
+
+  /// Returns the [StreamModalDialogThemeData] from the nearest ancestor.
+  StreamModalDialogThemeData get streamModalDialogTheme => StreamModalDialogTheme.of(this);
 
   /// Returns the [StreamOnlineIndicatorThemeData] from the nearest ancestor.
   StreamOnlineIndicatorThemeData get streamOnlineIndicatorTheme => StreamOnlineIndicatorTheme.of(this);

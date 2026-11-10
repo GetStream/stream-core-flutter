@@ -56,6 +56,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamMessageComposerUnsupportedAttachmentThemeData?
     messageComposerUnsupportedAttachmentTheme,
     StreamMessageItemThemeData? messageItemTheme,
+    StreamModalDialogThemeData? modalDialogTheme,
     StreamTextInputThemeData? textInputTheme,
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
@@ -130,6 +131,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           messageComposerUnsupportedAttachmentTheme ??
           _this.messageComposerUnsupportedAttachmentTheme,
       messageItemTheme: messageItemTheme ?? _this.messageItemTheme,
+      modalDialogTheme: modalDialogTheme ?? _this.modalDialogTheme,
       textInputTheme: textInputTheme ?? _this.textInputTheme,
       onlineIndicatorTheme: onlineIndicatorTheme ?? _this.onlineIndicatorTheme,
       playbackSpeedToggleTheme:
@@ -318,6 +320,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.messageItemTheme,
         t,
       )!,
+      modalDialogTheme: StreamModalDialogThemeData.lerp(
+        _this.modalDialogTheme,
+        other.modalDialogTheme,
+        t,
+      )!,
       textInputTheme: StreamTextInputThemeData.lerp(
         _this.textInputTheme,
         other.textInputTheme,
@@ -449,6 +456,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.messageComposerUnsupportedAttachmentTheme ==
             _this.messageComposerUnsupportedAttachmentTheme &&
         _other.messageItemTheme == _this.messageItemTheme &&
+        _other.modalDialogTheme == _this.modalDialogTheme &&
         _other.textInputTheme == _this.textInputTheme &&
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.playbackSpeedToggleTheme == _this.playbackSpeedToggleTheme &&
@@ -509,6 +517,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.messageComposerReplyAttachmentTheme,
       _this.messageComposerUnsupportedAttachmentTheme,
       _this.messageItemTheme,
+      _this.modalDialogTheme,
       _this.textInputTheme,
       _this.onlineIndicatorTheme,
       _this.playbackSpeedToggleTheme,

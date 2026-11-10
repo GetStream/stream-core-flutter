@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
+  modal with a header and footer over a blurred scrim, to `video.dart`.
+
 ## 0.5.4
 
 ### ✨ Features
