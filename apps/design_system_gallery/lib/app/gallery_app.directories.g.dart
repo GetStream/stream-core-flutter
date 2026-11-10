@@ -75,6 +75,8 @@ import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart
     as _design_system_gallery_components_controls_stream_emoji_chip;
 import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.dart'
     as _design_system_gallery_components_controls_stream_emoji_chip_bar;
+import 'package:design_system_gallery/components/controls/stream_radio_indicator.dart'
+    as _design_system_gallery_components_controls_stream_radio_indicator;
 import 'package:design_system_gallery/components/controls/stream_remove_control.dart'
     as _design_system_gallery_components_controls_stream_remove_control;
 import 'package:design_system_gallery/components/controls/stream_stepper.dart'
@@ -823,6 +825,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_controls_playback_speed_toggle
                         .buildStreamPlaybackSpeedToggleShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamRadioIndicator',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_radio_indicator
+                        .buildStreamRadioIndicatorPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_stream_radio_indicator
+                        .buildStreamRadioIndicatorShowcase,
               ),
             ],
           ),

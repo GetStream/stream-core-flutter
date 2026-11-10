@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamRadioIndicator` and `StreamRadioIndicatorTheme`, a non-interactive radio dot that marks
+  the selected row of a group, to `video.dart`.
+
 ## 0.5.4
 
 ### ✨ Features
