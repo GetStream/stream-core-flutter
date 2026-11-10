@@ -32,7 +32,7 @@ import '../components/controls/stream_command_chip.dart';
 import '../components/controls/stream_emoji_chip.dart';
 import '../components/controls/stream_emoji_chip_bar.dart';
 import '../components/controls/stream_playback_speed_toggle.dart';
-import '../components/controls/stream_radio_indicator.dart';
+import '../components/controls/stream_radio_button.dart';
 import '../components/controls/stream_stepper.dart';
 import '../components/controls/stream_switch.dart';
 import '../components/dialog/stream_modal_dialog.dart';
@@ -234,7 +234,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
-    StreamComponentBuilder<StreamRadioIndicatorProps>? radioIndicator,
+    StreamComponentBuilder<StreamRadioButtonProps>? radioButton,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
@@ -298,7 +298,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       onlineIndicator: onlineIndicator,
       playbackSpeedToggle: playbackSpeedToggle,
       progressBar: progressBar,
-      radioIndicator: radioIndicator,
+      radioButton: radioButton,
       reactionPicker: reactionPicker,
       reactions: reactions,
       retryBadge: retryBadge,
@@ -363,7 +363,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.onlineIndicator,
     required this.playbackSpeedToggle,
     required this.progressBar,
-    required this.radioIndicator,
+    required this.radioButton,
     required this.reactionPicker,
     required this.reactions,
     required this.retryBadge,
@@ -633,10 +633,10 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
   final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
 
-  /// Custom builder for radio indicator widgets.
+  /// Custom builder for radio button widgets.
   ///
-  /// When null, [StreamRadioIndicator] uses [DefaultStreamRadioIndicator].
-  final StreamComponentBuilder<StreamRadioIndicatorProps>? radioIndicator;
+  /// When null, [StreamRadioButton] uses [DefaultStreamRadioButton].
+  final StreamComponentBuilder<StreamRadioButtonProps>? radioButton;
 
   /// Custom builder for reaction picker widgets.
   ///
