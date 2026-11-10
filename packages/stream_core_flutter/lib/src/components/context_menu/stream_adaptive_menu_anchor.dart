@@ -8,8 +8,9 @@ import '../../theme/components/stream_adaptive_menu_anchor_theme.dart';
 import '../../theme/components/stream_context_menu_action_theme.dart';
 import '../../theme/components/stream_context_menu_heading_theme.dart';
 import '../../theme/components/stream_list_tile_theme.dart';
+import '../../theme/components/stream_radio_button_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
-import '../controls/stream_radio_indicator.dart';
+import '../controls/stream_radio_button.dart';
 import '../list/stream_list_tile.dart';
 import '../sheet/stream_sheet.dart';
 import '../toolbar/stream_sheet_header.dart';
@@ -55,7 +56,7 @@ class StreamMenuOption {
 
   /// Drawn before the label.
   ///
-  /// If null, defaults to a [StreamRadioIndicator] when [selected] is set, and
+  /// If null, defaults to a decorative [StreamRadioButton] when [selected] is set, and
   /// to nothing otherwise.
   final Widget? leading;
 
@@ -619,6 +620,17 @@ class _DefaultStreamAdaptiveMenuAnchorState extends State<DefaultStreamAdaptiveM
   Widget _anchoredOption(StreamMenuOption option) {
     final onSelected = option.onSelected;
 
+    // The radio button is decorative, so the row announces the choice itself,
+    // as the sheet's [StreamListTile] does through its selected state.
+    return MergeSemantics(
+      child: Semantics(
+        selected: option.selected,
+        child: _anchoredAction(option, onSelected),
+      ),
+    );
+  }
+
+  Widget _anchoredAction(StreamMenuOption option, VoidCallback? onSelected) {
     return StreamContextMenuAction<void>(
       // A row with nothing to press leaves the menu up.
       closeOnActivate: onSelected != null && option.closesMenu,
@@ -636,10 +648,12 @@ class _DefaultStreamAdaptiveMenuAnchorState extends State<DefaultStreamAdaptiveM
 }
 
 // What a row draws before its label: whatever it was given, or the radio
-// indicator a choice implies.
+// button a choice implies.
 Widget? _leadingOf(StreamMenuOption option) {
   if (option.leading case final leading?) return leading;
-  if (option.selected case final selected?) return StreamRadioIndicator(selected: selected);
+  if (option.selected case final selected?) {
+    return StreamRadioButton.decorative(selected: selected, size: StreamRadioButtonSize.sm);
+  }
   return null;
 }
 
