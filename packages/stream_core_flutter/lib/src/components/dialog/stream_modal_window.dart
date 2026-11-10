@@ -231,11 +231,13 @@ class _DefaultStreamModalWindowState extends State<DefaultStreamModalWindow> {
     final defaults = _StreamModalWindowStyleDefaults(context);
     final tab = props.tabs[_selectedIndex];
 
+    // The window's own color wins over the modal dialog theme's, which wins
+    // over the default.
+    final backgroundColor = style?.backgroundColor ?? resolveStreamModalDialogTheme(context).backgroundColor!;
+
     return StreamModalSurface(
       constraints: props.constraints,
-      // Wins over the modal dialog theme's color, which the surface falls back
-      // to on its own.
-      backgroundColor: style?.backgroundColor,
+      backgroundColor: backgroundColor,
       child: SizedBox.expand(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -248,7 +250,7 @@ class _DefaultStreamModalWindowState extends State<DefaultStreamModalWindow> {
                   tabs: props.tabs,
                   selectedIndex: _selectedIndex,
                   collapsed: collapsed,
-                  backgroundColor: style?.sidebarBackgroundColor,
+                  backgroundColor: style?.sidebarBackgroundColor ?? backgroundColor,
                   style: style,
                   defaults: defaults,
                   onSelected: _select,
@@ -302,8 +304,7 @@ class _Sidebar extends StatelessWidget {
   final List<StreamModalWindowTab> tabs;
   final int selectedIndex;
   final bool collapsed;
-  // Null to show the window's surface through.
-  final Color? backgroundColor;
+  final Color backgroundColor;
   final StreamModalWindowStyle? style;
   final _StreamModalWindowStyleDefaults defaults;
   final ValueChanged<int> onSelected;
@@ -320,10 +321,8 @@ class _Sidebar extends StatelessWidget {
       ),
       // A Material rather than a colored box: the rows draw their selected
       // fill as ink, which paints on the nearest Material and would be
-      // covered by a box painted above it. Transparent without a color of its
-      // own, so the sidebar is exactly the surface it sits on.
+      // covered by a box painted above it.
       child: Material(
-        type: backgroundColor == null ? MaterialType.transparency : MaterialType.canvas,
         color: backgroundColor,
         child: SizedBox(
           width: collapsed ? null : style?.sidebarWidth ?? defaults.sidebarWidth,

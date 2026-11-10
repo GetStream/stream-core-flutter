@@ -61,7 +61,7 @@ void main() {
     final context = tester.element(find.text('Device content'));
     expect(_sidebarWidth(tester), 200);
     expect(_surface(tester).backgroundColor, context.streamColorScheme.backgroundElevation1);
-    expect(_sidebarMaterial(tester).type, MaterialType.transparency);
+    expect(_sidebarMaterial(tester).color, context.streamColorScheme.backgroundElevation1);
     expect(_sidebarBorder(tester)?.right.color, context.streamColorScheme.borderSubtle);
 
     final scroll = tester.widget<SingleChildScrollView>(
@@ -76,6 +76,34 @@ void main() {
       ),
     );
   });
+
+  for (final useMaterial3 in [true, false]) {
+    testWidgets('the sidebar and the surface paint one color in dark mode (useMaterial3: $useMaterial3)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final streamTheme = StreamTheme(brightness: Brightness.dark);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(brightness: Brightness.dark, useMaterial3: useMaterial3, extensions: [streamTheme]),
+          home: Material(child: StreamModalWindow(tabs: _tabs())),
+        ),
+      );
+
+      // The colors the Materials paint, after any elevation tint or overlay.
+      final surface = tester.widget<PhysicalShape>(
+        find.descendant(of: find.byType(Dialog), matching: find.byType(PhysicalShape)).first,
+      );
+      final sidebar = tester.widget<PhysicalShape>(
+        find.ancestor(of: _sidebar(), matching: find.byType(PhysicalShape)).first,
+      );
+      expect(surface.color, streamTheme.colorScheme.backgroundElevation1);
+      expect(sidebar.color, surface.color);
+    });
+  }
 
   testWidgets('applies the values from StreamTheme', (tester) async {
     await _pump(
@@ -181,8 +209,8 @@ void main() {
       expect(surface.backgroundColor, Colors.orange);
       expect(surface.elevation, 2);
       expect(surface.shape, shape);
-      // The sidebar shows the surface it sits on.
-      expect(_sidebarMaterial(tester).type, MaterialType.transparency);
+      // The sidebar follows the surface color it sits on.
+      expect(_sidebarMaterial(tester).color, Colors.orange);
       expect(tester.getSize(_surfaceMaterial()), const Size(600, 400));
     });
 
@@ -197,6 +225,7 @@ void main() {
       );
 
       expect(_surface(tester).backgroundColor, Colors.red);
+      expect(_sidebarMaterial(tester).color, Colors.red);
     });
 
     testWidgets('the header title style comes from the dialog theme', (tester) async {
