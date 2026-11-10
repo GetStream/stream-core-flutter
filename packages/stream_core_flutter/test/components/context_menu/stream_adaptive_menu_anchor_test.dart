@@ -82,7 +82,7 @@ void main() {
         expect(find.text('Rene'), findsOneWidget);
         expect(find.byIcon(Icons.person), findsOneWidget);
         // No choice, so no radio and no heading.
-        expect(find.byType(StreamRadioIndicator), findsNothing);
+        expect(find.byType(StreamRadioButton), findsNothing);
         expect(find.byType(StreamContextMenuHeading), findsNothing);
       });
     }
@@ -941,7 +941,7 @@ void main() {
       // The heading's label starts where the row's content does.
       expect(
         tester.getTopLeft(find.text('Microphone')).dx,
-        tester.getTopLeft(find.byType(StreamRadioIndicator).first).dx,
+        tester.getTopLeft(find.byType(StreamRadioButton).first).dx,
       );
     });
 
@@ -964,7 +964,7 @@ void main() {
       expect(tester.getSize(find.byType(StreamContextMenuHeading).first).height, 48);
       expect(
         tester.getTopLeft(find.text('Microphone')).dx,
-        tester.getTopLeft(find.byType(StreamRadioIndicator).first).dx,
+        tester.getTopLeft(find.byType(StreamRadioButton).first).dx,
       );
     });
 
@@ -995,7 +995,7 @@ void main() {
 
       expect(
         tester.getTopLeft(find.text('Speaker')).dx,
-        tester.getTopLeft(find.byType(StreamRadioIndicator).last).dx,
+        tester.getTopLeft(find.byType(StreamRadioButton).last).dx,
       );
     });
 
@@ -1060,6 +1060,28 @@ void main() {
       expect(heading.props.onTap, isNull);
     });
   });
+
+  // The radio button in a row is decorative, so the row itself carries the
+  // choice: announced once, as selected or not, and never as a radio as well.
+  for (final platform in [TargetPlatform.android, TargetPlatform.macOS]) {
+    testWidgets('announces a choice row as selected once on ${platform.name}', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await tester.pumpWidget(_TestWrapper(platform: platform, child: const _Menu()));
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getSemantics(find.text('MacBook Pro Microphone')),
+        containsSemantics(hasSelectedState: true, isSelected: true, hasCheckedState: false),
+      );
+      expect(
+        tester.getSemantics(find.text('Jabra Evolve2 65')),
+        containsSemantics(hasSelectedState: true, isSelected: false, hasCheckedState: false),
+      );
+      semantics.dispose();
+    });
+  }
 
   group('StreamAdaptiveMenuAnchor theming', () {
     Color? rowFill(WidgetTester tester, String label) {
