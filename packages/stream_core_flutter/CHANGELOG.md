@@ -1,3 +1,9 @@
+## Upcoming
+
+### 🐛 Bug Fixes
+
+- Fixed `StreamSheet` painting lighter than `backgroundElevation1` in dark mode under Material 3.
+
 ## 0.5.4
 
 ### ✨ Features

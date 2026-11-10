@@ -722,4 +722,26 @@ void main() {
       handle.dispose();
     });
   });
+
+  group('StreamSheet', () {
+    for (final useMaterial3 in [true, false]) {
+      testWidgets('paints exactly the background color in dark mode (useMaterial3: $useMaterial3)', (tester) async {
+        final streamTheme = StreamTheme(brightness: Brightness.dark);
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(brightness: Brightness.dark, useMaterial3: useMaterial3, extensions: [streamTheme]),
+            home: const StreamSheet(child: SizedBox(height: 100)),
+          ),
+        );
+
+        // The elevated PhysicalShape the sheet's Material paints: its color is
+        // the background after any elevation tint or overlay.
+        final painted = tester.widget<PhysicalShape>(
+          find.descendant(of: find.byType(StreamSheet), matching: find.byType(PhysicalShape)).first,
+        );
+        expect(painted.color, streamTheme.colorScheme.backgroundElevation1);
+        expect(painted.elevation, 1);
+      });
+    }
+  });
 }
