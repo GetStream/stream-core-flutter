@@ -33,7 +33,7 @@ import 'components/stream_message_item_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
-import 'components/stream_radio_indicator_theme.dart';
+import 'components/stream_radio_button_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
@@ -156,7 +156,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
-    StreamRadioIndicatorThemeData? radioIndicatorTheme,
+    StreamRadioButtonThemeData? radioButtonTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
@@ -223,7 +223,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     playbackSpeedToggleTheme ??= const StreamPlaybackSpeedToggleThemeData();
     progressBarTheme ??= const StreamProgressBarThemeData();
-    radioIndicatorTheme ??= const StreamRadioIndicatorThemeData();
+    radioButtonTheme ??= const StreamRadioButtonThemeData();
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
     sheetHeaderTheme ??= const StreamSheetHeaderThemeData();
@@ -278,7 +278,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
-      radioIndicatorTheme: radioIndicatorTheme,
+      radioButtonTheme: radioButtonTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme,
@@ -347,7 +347,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.onlineIndicatorTheme,
     required this.playbackSpeedToggleTheme,
     required this.progressBarTheme,
-    required this.radioIndicatorTheme,
+    required this.radioButtonTheme,
     required this.reactionPickerTheme,
     required this.reactionsTheme,
     required this.sheetHeaderTheme,
@@ -529,8 +529,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The progress bar theme for this theme.
   final StreamProgressBarThemeData progressBarTheme;
 
-  /// The radio indicator theme for this theme.
-  final StreamRadioIndicatorThemeData radioIndicatorTheme;
+  /// The radio button theme for this theme.
+  final StreamRadioButtonThemeData radioButtonTheme;
 
   /// The reaction picker theme for this theme.
   final StreamReactionPickerThemeData reactionPickerTheme;
@@ -625,7 +625,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
-      radioIndicatorTheme: radioIndicatorTheme,
+      radioButtonTheme: radioButtonTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme,
