@@ -154,8 +154,7 @@ class StreamModalWindowStyle with _$StreamModalWindowStyle {
 
   /// The color of the sidebar.
   ///
-  /// Defaults to none, which shows the window's surface through: see
-  /// [backgroundColor].
+  /// Defaults to the color of the window's surface: see [backgroundColor].
   final Color? sidebarBackgroundColor;
 
   /// The color of the line between the sidebar and the selected tab.
