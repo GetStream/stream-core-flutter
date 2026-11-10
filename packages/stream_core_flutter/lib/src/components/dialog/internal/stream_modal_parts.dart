@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../theme/components/stream_modal_dialog_theme.dart';
-import '../../../theme/primitives/stream_colors.dart';
 import '../../../theme/primitives/stream_spacing.dart';
 import '../../../theme/semantics/stream_color_scheme.dart';
 import '../../../theme/semantics/stream_text_theme.dart';
@@ -57,7 +56,11 @@ class StreamModalSurface extends StatelessWidget {
 
     return Dialog(
       backgroundColor: backgroundColor ?? theme.backgroundColor,
-      surfaceTintColor: StreamColors.transparent,
+      // Must be exactly `Colors.transparent`: Material 3 skips the elevation
+      // tint only for that value. `StreamColors.transparent` is transparent
+      // *white*, which Material treats as a real tint and blends in at the
+      // surface's elevation, lifting the dark surface from #1c1c1c to ~#383838.
+      surfaceTintColor: Colors.transparent,
       elevation: theme.elevation,
       clipBehavior: Clip.antiAlias,
       insetPadding: theme.insetPadding,
