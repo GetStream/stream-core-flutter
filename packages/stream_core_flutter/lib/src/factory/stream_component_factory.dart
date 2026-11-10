@@ -36,6 +36,7 @@ import '../components/controls/stream_radio_indicator.dart';
 import '../components/controls/stream_stepper.dart';
 import '../components/controls/stream_switch.dart';
 import '../components/dialog/stream_modal_dialog.dart';
+import '../components/dialog/stream_modal_window.dart';
 import '../components/inline_notification/stream_inline_notification.dart';
 import '../components/list/stream_list_tile.dart';
 import '../components/media_viewer/stream_media_viewer.dart';
@@ -228,6 +229,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
     StreamComponentBuilder<StreamMessageTextProps>? messageText,
     StreamComponentBuilder<StreamModalDialogProps>? modalDialog,
+    StreamComponentBuilder<StreamModalWindowProps>? modalWindow,
     StreamComponentBuilder<StreamNetworkImageProps>? networkImage,
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle,
@@ -291,6 +293,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageReplies: messageReplies,
       messageText: messageText,
       modalDialog: modalDialog,
+      modalWindow: modalWindow,
       networkImage: networkImage,
       onlineIndicator: onlineIndicator,
       playbackSpeedToggle: playbackSpeedToggle,
@@ -355,6 +358,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageReplies,
     required this.messageText,
     required this.modalDialog,
+    required this.modalWindow,
     required this.networkImage,
     required this.onlineIndicator,
     required this.playbackSpeedToggle,
@@ -602,6 +606,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamModalDialog] uses [DefaultStreamModalDialog].
   final StreamComponentBuilder<StreamModalDialogProps>? modalDialog;
+
+  /// Custom builder for modal window widgets.
+  ///
+  /// When null, [StreamModalWindow] uses [DefaultStreamModalWindow].
+  final StreamComponentBuilder<StreamModalWindowProps>? modalWindow;
 
   /// Custom builder for network image widgets.
   ///

@@ -12,6 +12,8 @@
   the selected row of a group, to `video.dart`.
 - Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
   modal with a header and footer over a blurred scrim, to `video.dart`.
+- Added `StreamModalWindow`, `StreamModalWindowTab` and `StreamModalWindowTheme`, a modal with a sidebar of tabs that
+  shows one tab at a time, to `video.dart`.
 
 ## 0.5.4
 
