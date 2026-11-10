@@ -307,10 +307,9 @@ Map<String, String> _readSvgFiles(
       exitCode: 2,
     );
   }
-  final logContent = logFile.readAsStringSync();
   final logEntries = <String, String>{};
   final datePattern = RegExp(r'^\d{4}-\d{2}-\d{2}$');
-  for (final line in logContent.split('\n')) {
+  for (final line in logFile.readAsLinesSync()) {
     final parts = line.split(';');
     if (parts.length == 2) {
       // Glyphs are ordered by comparing these dates as text, so an unpadded

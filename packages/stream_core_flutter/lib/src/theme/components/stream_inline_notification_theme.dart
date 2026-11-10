@@ -15,7 +15,7 @@ part 'stream_inline_notification_theme.g.theme.dart';
 ///  * [StreamInlineNotificationProps.type], which selects one of these types.
 ///  * [StreamInlineNotificationThemeData], which styles each type.
 enum StreamInlineNotificationType {
-  /// Neutral, informational context, such as how a value is interpreted.
+  /// General informational context, such as how a value is interpreted.
   info,
 
   /// A positive or completed outcome.
@@ -143,6 +143,8 @@ class StreamInlineNotificationThemeData with _$StreamInlineNotificationThemeData
   final StreamInlineNotificationThemeStyle? error;
 
   /// The shape of the notification container.
+  ///
+  /// When null, a superellipse with a medium corner radius.
   final OutlinedBorder? shape;
 
   /// The padding between the container edge and its content.
@@ -152,6 +154,8 @@ class StreamInlineNotificationThemeData with _$StreamInlineNotificationThemeData
   final double? spacing;
 
   /// Size constraints for the notification container.
+  ///
+  /// When null, a minimum height of 46.
   final BoxConstraints? constraints;
 
   /// Linearly interpolate between two [StreamInlineNotificationThemeData]

@@ -109,9 +109,12 @@ Widget buildStreamInlineNotificationShowcase(BuildContext context) {
           ],
           _Section(
             label: 'IN CONTEXT',
-            caption: 'A note beside a form, and an error explaining what went wrong',
+            caption: 'A confirmation after saving, and an error explaining what went wrong',
             children: [
-              StreamInlineNotification(title: const Text('Changes are saved automatically')),
+              StreamInlineNotification(
+                type: StreamInlineNotificationType.success,
+                title: const Text('Changes saved'),
+              ),
               StreamInlineNotification(
                 type: StreamInlineNotificationType.error,
                 title: const Text("Couldn't load content"),

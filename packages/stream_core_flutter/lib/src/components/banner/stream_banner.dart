@@ -17,7 +17,8 @@ import '../common/stream_loading_spinner.dart';
 /// its `type`. Takes the full width of its parent.
 ///
 /// The banner is marked as a live region, so assistive technologies may
-/// announce changes to its title.
+/// announce changes to its title. The default icons have no label, so let the
+/// title say what kind of state it is.
 ///
 /// {@tool snippet}
 ///
@@ -97,15 +98,19 @@ class StreamBannerProps {
   /// Typically a [Text]; the banner provides its text style and lets it wrap.
   final Widget title;
 
-  /// The kind of state, which picks the leading icon.
+  /// The kind of state, which picks the leading icon and the style.
   final StreamBannerType type;
 
   /// A leading icon that replaces the default one for [type].
   ///
-  /// Typically an [Icon]; the banner provides its size and color.
+  /// Typically an [Icon]; the banner provides its size and color. For
+  /// [StreamBannerType.loading] it replaces the spinner, so pass something
+  /// that still shows progress.
   final Widget? icon;
 
   /// Whether to show the leading icon.
+  ///
+  /// When false, [icon] is ignored.
   final bool showIcon;
 }
 

@@ -10,7 +10,9 @@
   message box with info, success, warning and error types.
 - Added `StreamBanner` and `StreamBannerTheme`, a full-width strip for
   system-level states such as a lost connection.
-- Added `StreamColorScheme.accent{Primary,Success,Warning,Error}Subtle` and `background{Info,Success,Warning,Error}Subtle`.
+- Added `accentPrimarySubtle`, `accentSuccessSubtle`, `accentWarningSubtle`,
+  `accentErrorSubtle`, `backgroundInfoSubtle`, `backgroundSuccessSubtle`,
+  `backgroundWarningSubtle` and `backgroundErrorSubtle` to `StreamColorScheme`.
 - Added the `calendar` and `clockFill` icons to `StreamIcons`.
 
 ### 🐛 Bug Fixes

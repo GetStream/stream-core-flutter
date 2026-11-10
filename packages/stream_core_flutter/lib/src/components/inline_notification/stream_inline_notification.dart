@@ -19,15 +19,18 @@ import '../../theme/stream_theme_extensions.dart';
 /// parent.
 ///
 /// The notification is marked as a live region, so assistive technologies may
-/// announce changes to its text.
+/// announce it when it appears and when its text changes. Show it in response
+/// to something, such as a failed action, rather than as a static note. The
+/// default icons have no label, so let the text say what kind of message it is.
 ///
 /// {@tool snippet}
 ///
-/// Add context to a form:
+/// Confirm that a change was saved:
 ///
 /// ```dart
 /// StreamInlineNotification(
-///   title: const Text('Changes are saved automatically'),
+///   type: StreamInlineNotificationType.success,
+///   title: const Text('Changes saved'),
 /// )
 /// ```
 /// {@end-tool}
@@ -117,6 +120,8 @@ class StreamInlineNotificationProps {
   final Widget? icon;
 
   /// Whether to show the leading icon.
+  ///
+  /// When false, [icon] is ignored.
   final bool showIcon;
 }
 
@@ -242,6 +247,7 @@ class _StreamInlineNotificationThemeDefaults extends StreamInlineNotificationThe
   @override
   double get spacing => _spacing.xs;
 
+  // Taller than the padding and icon need (44), to match the design.
   @override
   BoxConstraints get constraints => const BoxConstraints(minHeight: 46);
 }

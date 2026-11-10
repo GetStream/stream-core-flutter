@@ -117,7 +117,7 @@ generated `stream_icons.dart` / `stream_icons.g.dart`, the font, or the log.
 The log records the date each icon was first seen and the generator orders glyphs
 by it, which is what preserves code points across runs. Reordering it reshuffles
 the font. Dates are zero-padded `yyyy-mm-dd` because the generator compares
-them as text; an unpadded date such as `2026119` sorts out of chronological
+them as text; an unpadded date such as `2026-1-19` sorts out of chronological
 order and shifts code points.
 
 ## Broken or odd-looking source SVGs

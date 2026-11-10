@@ -14,7 +14,7 @@ by grepping — you would have to bisect upstream comparing values. One line her
 turns the next sync into a mechanical diff:
 
 ```bash
-python3 <skill>/scripts/flatten_tokens.py --diff 4ef9b54 origin/main tokens/core/semantics/light.json
+python3 <skill>/scripts/flatten_tokens.py --diff 76bbd69 origin/main tokens/core/semantics/light.json
 ```
 
 Read it as *"every semantic change up to here has been triaged"*, not *"the vendored

@@ -88,9 +88,54 @@ void main() {
     await tester.pumpWidget(
       _wrap(SizedBox(width: 370, child: StreamInlineNotification(title: const Text('Title')))),
     );
+    final titleOnlyHeight = tester.getSize(find.byType(StreamInlineNotification)).height;
 
-    final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
-    expect(tester.getSize(find.byType(StreamInlineNotification)).height, lessThan(screenHeight));
+    await tester.pumpWidget(
+      _wrap(
+        SizedBox(
+          width: 370,
+          child: StreamInlineNotification(title: const Text('Title'), description: const Text('Description')),
+        ),
+      ),
+    );
+
+    final descriptionHeight = tester.getSize(find.text('Description')).height;
+    final gap = const StreamSpacing().xxxs;
+    expect(titleOnlyHeight, 46);
+    expect(
+      tester.getSize(find.byType(StreamInlineNotification)).height,
+      tester.getSize(find.text('Title')).height + gap + descriptionHeight + 2 * const StreamSpacing().sm,
+    );
+  });
+
+  testWidgets('StreamInlineNotification styles the description with the secondary text color', (tester) async {
+    await tester.pumpWidget(
+      _wrap(StreamInlineNotification(title: const Text('Title'), description: const Text('Description'))),
+    );
+
+    final context = tester.element(find.text('Description'));
+    final textTheme = StreamTheme.of(context).textTheme;
+    expect(
+      DefaultTextStyle.of(context).style,
+      textTheme.metadataDefault.copyWith(color: _colorSchemeOf(tester).textSecondary),
+    );
+  });
+
+  testWidgets('StreamInlineNotificationTheme overrides the description style', (tester) async {
+    const descriptionStyle = TextStyle(fontSize: 21, color: Color(0xFF444444));
+
+    await tester.pumpWidget(
+      _wrap(
+        StreamInlineNotificationTheme(
+          data: const StreamInlineNotificationThemeData(
+            info: StreamInlineNotificationThemeStyle(descriptionTextStyle: descriptionStyle),
+          ),
+          child: StreamInlineNotification(title: const Text('Title'), description: const Text('Description')),
+        ),
+      ),
+    );
+
+    expect(DefaultTextStyle.of(tester.element(find.text('Description'))).style, descriptionStyle);
   });
 
   testWidgets('StreamInlineNotification grows taller without overflowing at a large text scale', (tester) async {

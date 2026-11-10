@@ -7,7 +7,8 @@ part 'stream_banner_theme.g.theme.dart';
 
 /// The kinds of state a [StreamBanner] can report.
 ///
-/// Each type picks the default leading icon.
+/// Each type picks the default leading icon and the [StreamBannerThemeStyle]
+/// that sets the background, icon color and title style.
 ///
 /// See also:
 ///

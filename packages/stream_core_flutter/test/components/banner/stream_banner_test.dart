@@ -143,6 +143,28 @@ void main() {
     expect(find.byIcon(StreamIconData.exclamationCircle), findsNothing);
   });
 
+  testWidgets('StreamBanner replaces the spinner with a custom icon for the loading type', (tester) async {
+    await tester.pumpWidget(
+      _wrap(StreamBanner(type: .loading, icon: const Icon(Icons.wifi_off), title: const Text('Title'))),
+    );
+
+    expect(find.byIcon(Icons.wifi_off), findsOneWidget);
+    expect(find.byType(StreamLoadingSpinner), findsNothing);
+  });
+
+  testWidgets('StreamBannerTheme colors the loading spinner', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamBannerTheme(
+          data: const StreamBannerThemeData(loading: StreamBannerThemeStyle(iconColor: Color(0xFF222222))),
+          child: StreamBanner(type: .loading, title: const Text('Title')),
+        ),
+      ),
+    );
+
+    expect(_leadingIconColorOf(tester), const Color(0xFF222222));
+  });
+
   testWidgets('StreamBanner tints a custom icon with the icon color', (tester) async {
     await tester.pumpWidget(
       _wrap(StreamBanner(type: .error, icon: const Icon(Icons.wifi_off), title: const Text('Title'))),
@@ -374,14 +396,13 @@ Material _surfaceOf(WidgetTester tester) {
 
 Color? _backgroundColorOf(WidgetTester tester) => _surfaceOf(tester).color;
 
-// The leading slot holds an Icon, or the spinner for the loading type; both
-// sit under the IconTheme that carries the icon color.
+// The spinner paints its own color and ignores the IconTheme, so it is read
+// from the spinner itself.
 Color? _leadingIconColorOf(WidgetTester tester) {
-  final finder = find.descendant(
-    of: find.byType(DefaultStreamBanner),
-    matching: find.byWidgetPredicate((widget) => widget is Icon || widget is StreamLoadingSpinner),
-  );
-  return IconTheme.of(tester.element(finder.first)).color;
+  final banner = find.byType(DefaultStreamBanner);
+  final spinner = find.descendant(of: banner, matching: find.byType(StreamLoadingSpinner));
+  if (spinner.evaluate().isNotEmpty) return tester.widget<StreamLoadingSpinner>(spinner).props.color;
+  return IconTheme.of(tester.element(find.descendant(of: banner, matching: find.byType(Icon)).first)).color;
 }
 
 // The text boxes of the first and second word, which wrap onto their own lines.
