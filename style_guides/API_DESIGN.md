@@ -32,7 +32,9 @@ consumer who compiled fine before:
 - adding a class modifier (`final`, `base`, `interface`, `sealed`) to an existing
   public class;
 - adding a required parameter, or reordering or renaming a positional one;
-- changing a return type (`void` → `Future<void>`, `T` → `T?`) or a field type;
+- changing a return type (`void` → `Future<void>`, `T` → `T?`) or a field type —
+  including widening a field from `EdgeInsets` to `EdgeInsetsGeometry`, which breaks
+  every reader of `.left` or `.top`;
 - renaming or adding a field on a record type that appears in the public API;
 - overriding `==` on a type consumers use as a `const` map key or `const` set element.
 
@@ -102,9 +104,10 @@ History:
 ## Decide whether a set of values is closed before using an enum or `sealed`
 
 Consumers switch exhaustively on public enums and sealed classes, because the
-analyzer then reminds them of every case they missed. That makes adding a value or subclass a breaking change for them. Use an `enum` or
-`sealed` hierarchy only when the set is closed, or when adding a member is something
-we are willing to ship in a major release.
+analyzer then reminds them of every case they missed. That makes adding a value or
+subclass a breaking change for them. Use an `enum` or `sealed` hierarchy only when
+the set is closed, or when adding a member is something we are willing to ship in a
+major release.
 
 A set is closed when it is **closed by definition**: no future value can exist
 (`Axis`, `TextDirection`, ascending/descending, "delete for me" vs "for everyone").
@@ -268,6 +271,39 @@ History:
 - Video's `abstract class CallPreferences` has gained about a dozen abstract getters
   over time; the 1.7.0 changelog tells implementers to "add the getter to your
   implementation".
+
+## Accept the most general type that works
+
+A theme field, constructor parameter, or property takes the most general type the
+implementation can handle, not the one today's design happens to use:
+`AlignmentGeometry` rather than `Alignment`, `EdgeInsetsGeometry` rather than
+`EdgeInsets`, `BorderRadiusGeometry` rather than `BorderRadius`, `BoxBorder` rather
+than `Border`, `Gradient` rather than `LinearGradient`, `Decoration` rather than
+`BoxDecoration`. The `…Geometry` types let a caller pass the direction-aware
+variant (`AlignmentDirectional`, `EdgeInsetsDirectional`), which RTL support needs
+sooner or later; the implementation resolves it against `Directionality` where it
+reads it.
+
+Widening later is a breaking change: a field typed `EdgeInsets` becomes
+`EdgeInsetsGeometry`, and every reader of `.left` or `.horizontal` stops compiling.
+Narrowing is never needed, because the general type already accepts every value the
+narrow one did.
+
+When wrapping a Flutter widget, take at least the type the wrapped widget takes. A
+narrower one only removes options; `Image.alignment` is `AlignmentGeometry`, so a
+widget that forwards to it is too. Use the narrow type only when the implementation
+genuinely needs the resolved values before it has a `BuildContext`, and say so in
+the dartdoc.
+
+Return types and callback arguments go the other way: hand out the most specific
+type you can, so callers get the members they need without a cast.
+
+History:
+
+- Chat's `ScrollablePositionedList.padding` changed from `EdgeInsets` to
+  `EdgeInsetsGeometry` so it could take directional padding.
+- Core alignments that started as `Alignment` had to become `AlignmentGeometry` once
+  `AlignmentDirectional` was needed for RTL.
 
 ## Wrap values that might grow
 
