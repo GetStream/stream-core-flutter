@@ -26,6 +26,7 @@ import '../components/common/stream_text_input.dart';
 import '../components/common/stream_typing_indicator_dots.dart';
 import '../components/context_menu/stream_context_menu_action.dart';
 import '../components/context_menu/stream_context_menu_anchor.dart';
+import '../components/context_menu/stream_context_menu_heading.dart';
 import '../components/controls/stream_command_chip.dart';
 import '../components/controls/stream_emoji_chip.dart';
 import '../components/controls/stream_emoji_chip_bar.dart';
@@ -199,6 +200,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamCommandChipProps>? commandChip,
     StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction,
     StreamComponentBuilder<StreamContextMenuAnchorProps>? contextMenuAnchor,
+    StreamComponentBuilder<StreamContextMenuHeadingProps>? contextMenuHeading,
     StreamComponentBuilder<StreamEmojiProps>? emoji,
     StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
     StreamComponentBuilder<StreamEmojiChipProps>? emojiChip,
@@ -259,6 +261,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       commandChip: commandChip,
       contextMenuAction: contextMenuAction,
       contextMenuAnchor: contextMenuAnchor,
+      contextMenuHeading: contextMenuHeading,
       emoji: emoji,
       emojiButton: emojiButton,
       emojiChip: emojiChip,
@@ -320,6 +323,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.commandChip,
     required this.contextMenuAction,
     required this.contextMenuAnchor,
+    required this.contextMenuHeading,
     required this.emoji,
     required this.emojiButton,
     required this.emojiChip,
@@ -453,6 +457,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamContextMenuAnchor] uses [DefaultStreamContextMenuAnchor].
   final StreamComponentBuilder<StreamContextMenuAnchorProps>? contextMenuAnchor;
+
+  /// Custom builder for context menu heading widgets.
+  ///
+  /// When null, [StreamContextMenuHeading] uses [DefaultStreamContextMenuHeading].
+  final StreamComponentBuilder<StreamContextMenuHeadingProps>? contextMenuHeading;
 
   /// Custom builder for emoji widgets.
   ///

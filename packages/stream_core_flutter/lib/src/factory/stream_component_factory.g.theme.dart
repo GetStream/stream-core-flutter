@@ -45,6 +45,7 @@ mixin _$StreamComponentBuilders {
       commandChip: t < 0.5 ? a.commandChip : b.commandChip,
       contextMenuAction: t < 0.5 ? a.contextMenuAction : b.contextMenuAction,
       contextMenuAnchor: t < 0.5 ? a.contextMenuAnchor : b.contextMenuAnchor,
+      contextMenuHeading: t < 0.5 ? a.contextMenuHeading : b.contextMenuHeading,
       emoji: t < 0.5 ? a.emoji : b.emoji,
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       emojiChip: t < 0.5 ? a.emojiChip : b.emojiChip,
@@ -126,6 +127,8 @@ mixin _$StreamComponentBuilders {
     contextMenuAction,
     Widget Function(BuildContext, StreamContextMenuAnchorProps)?
     contextMenuAnchor,
+    Widget Function(BuildContext, StreamContextMenuHeadingProps)?
+    contextMenuHeading,
     Widget Function(BuildContext, StreamEmojiProps)? emoji,
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
     Widget Function(BuildContext, StreamEmojiChipProps)? emojiChip,
@@ -209,6 +212,7 @@ mixin _$StreamComponentBuilders {
       commandChip: commandChip ?? _this.commandChip,
       contextMenuAction: contextMenuAction ?? _this.contextMenuAction,
       contextMenuAnchor: contextMenuAnchor ?? _this.contextMenuAnchor,
+      contextMenuHeading: contextMenuHeading ?? _this.contextMenuHeading,
       emoji: emoji ?? _this.emoji,
       emojiButton: emojiButton ?? _this.emojiButton,
       emojiChip: emojiChip ?? _this.emojiChip,
@@ -292,6 +296,7 @@ mixin _$StreamComponentBuilders {
       commandChip: other.commandChip,
       contextMenuAction: other.contextMenuAction,
       contextMenuAnchor: other.contextMenuAnchor,
+      contextMenuHeading: other.contextMenuHeading,
       emoji: other.emoji,
       emojiButton: other.emojiButton,
       emojiChip: other.emojiChip,
@@ -367,6 +372,7 @@ mixin _$StreamComponentBuilders {
         _other.commandChip == _this.commandChip &&
         _other.contextMenuAction == _this.contextMenuAction &&
         _other.contextMenuAnchor == _this.contextMenuAnchor &&
+        _other.contextMenuHeading == _this.contextMenuHeading &&
         _other.emoji == _this.emoji &&
         _other.emojiButton == _this.emojiButton &&
         _other.emojiChip == _this.emojiChip &&
@@ -437,6 +443,7 @@ mixin _$StreamComponentBuilders {
       _this.commandChip,
       _this.contextMenuAction,
       _this.contextMenuAnchor,
+      _this.contextMenuHeading,
       _this.emoji,
       _this.emojiButton,
       _this.emojiChip,

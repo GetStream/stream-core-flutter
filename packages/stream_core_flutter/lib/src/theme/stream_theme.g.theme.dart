@@ -36,6 +36,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamContextMenuAnchorThemeData? contextMenuAnchorTheme,
+    StreamContextMenuHeadingThemeData? contextMenuHeadingTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
@@ -103,6 +104,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           contextMenuActionTheme ?? _this.contextMenuActionTheme,
       contextMenuAnchorTheme:
           contextMenuAnchorTheme ?? _this.contextMenuAnchorTheme,
+      contextMenuHeadingTheme:
+          contextMenuHeadingTheme ?? _this.contextMenuHeadingTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme ?? _this.errorBadgeTheme,
@@ -244,6 +247,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       contextMenuAnchorTheme: StreamContextMenuAnchorThemeData.lerp(
         _this.contextMenuAnchorTheme,
         other.contextMenuAnchorTheme,
+        t,
+      )!,
+      contextMenuHeadingTheme: StreamContextMenuHeadingThemeData.lerp(
+        _this.contextMenuHeadingTheme,
+        other.contextMenuHeadingTheme,
         t,
       )!,
       emojiButtonTheme: StreamEmojiButtonThemeData.lerp(
@@ -443,6 +451,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
         _other.contextMenuAnchorTheme == _this.contextMenuAnchorTheme &&
+        _other.contextMenuHeadingTheme == _this.contextMenuHeadingTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.errorBadgeTheme == _this.errorBadgeTheme &&
@@ -512,6 +521,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.contextMenuTheme,
       _this.contextMenuActionTheme,
       _this.contextMenuAnchorTheme,
+      _this.contextMenuHeadingTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.errorBadgeTheme,
