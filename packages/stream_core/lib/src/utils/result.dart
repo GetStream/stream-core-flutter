@@ -166,7 +166,7 @@ extension PatternMatching<T> on Result<T> {
   Future<Result<R>> mapAsync<R>(Future<R> Function(T value) transform) {
     return switch (this) {
       Success<T>(:final data) => runSafely(() => transform(data)),
-      final Failure f => Future.value(f),
+      final Failure f => Future.syncValue(f),
     };
   }
 
@@ -267,7 +267,7 @@ extension PatternMatching<T> on Result<T> {
   ) {
     return switch (this) {
       Success<T>(:final data) => transform(data),
-      final Failure f => Future.value(f),
+      final Failure f => Future.syncValue(f),
     };
   }
 }

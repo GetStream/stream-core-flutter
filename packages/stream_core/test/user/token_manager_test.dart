@@ -188,7 +188,7 @@ void main() {
         var loads = 0;
         final provider = _CountingProvider((userId) {
           if (++loads == 1) return slowLoad.future;
-          return Future.value(generateTestUserToken(userId, nonce: 'fresh'));
+          return Future.syncValue(generateTestUserToken(userId, nonce: 'fresh'));
         });
         final manager = TokenManager(userId: 'user-1', tokenProvider: provider);
 
