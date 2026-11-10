@@ -35,6 +35,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamCommandChipThemeData? commandChipTheme,
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
+    StreamContextMenuAnchorThemeData? contextMenuAnchorTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
@@ -99,6 +100,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       contextMenuTheme: contextMenuTheme ?? _this.contextMenuTheme,
       contextMenuActionTheme:
           contextMenuActionTheme ?? _this.contextMenuActionTheme,
+      contextMenuAnchorTheme:
+          contextMenuAnchorTheme ?? _this.contextMenuAnchorTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme ?? _this.errorBadgeTheme,
@@ -234,6 +237,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       contextMenuActionTheme: StreamContextMenuActionThemeData.lerp(
         _this.contextMenuActionTheme,
         other.contextMenuActionTheme,
+        t,
+      )!,
+      contextMenuAnchorTheme: StreamContextMenuAnchorThemeData.lerp(
+        _this.contextMenuAnchorTheme,
+        other.contextMenuAnchorTheme,
         t,
       )!,
       emojiButtonTheme: StreamEmojiButtonThemeData.lerp(
@@ -427,6 +435,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.commandChipTheme == _this.commandChipTheme &&
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
+        _other.contextMenuAnchorTheme == _this.contextMenuAnchorTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.errorBadgeTheme == _this.errorBadgeTheme &&
@@ -494,6 +503,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.commandChipTheme,
       _this.contextMenuTheme,
       _this.contextMenuActionTheme,
+      _this.contextMenuAnchorTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.errorBadgeTheme,

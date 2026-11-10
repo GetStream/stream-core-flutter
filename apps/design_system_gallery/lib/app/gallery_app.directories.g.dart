@@ -67,6 +67,8 @@ import 'package:design_system_gallery/components/common/stream_typing_indicator_
     as _design_system_gallery_components_common_stream_typing_indicator_dots;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
+import 'package:design_system_gallery/components/context_menu/stream_context_menu_anchor.dart'
+    as _design_system_gallery_components_context_menu_stream_context_menu_anchor;
 import 'package:design_system_gallery/components/controls/playback_speed_toggle.dart'
     as _design_system_gallery_components_controls_playback_speed_toggle;
 import 'package:design_system_gallery/components/controls/stream_command_chip.dart'
@@ -750,6 +752,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_context_menu_stream_context_menu
                         .buildStreamContextMenuShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamContextMenuAnchor',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_context_menu_stream_context_menu_anchor
+                        .buildStreamContextMenuAnchorPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_context_menu_stream_context_menu_anchor
+                        .buildStreamContextMenuAnchorShowcase,
               ),
             ],
           ),
