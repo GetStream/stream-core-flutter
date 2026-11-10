@@ -1,9 +1,17 @@
 ## Upcoming
 
+### ✨ Features
+
+- Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
+
 ### 🐛 Bug Fixes
 
-- Fixed `StreamButton` labels ignoring the app's font family, such as
-  `ThemeData.fontFamily`, when the text theme sets none.
+- Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
+
+### 🔄 Changed
+
+- Stream text now follows Material's default font family when the app sets
+  none, which can render differently on web and desktop.
 
 ## 0.5.4
 

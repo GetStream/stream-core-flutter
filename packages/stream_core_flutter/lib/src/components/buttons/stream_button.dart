@@ -380,23 +380,6 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
           false => WidgetStatePropertyAll(.symmetric(horizontal: spacing.md)),
         };
 
-    // ElevatedButton applies its text style in place of the one around it
-    // rather than merging the two, so a theme style without a font family
-    // would drop the app's font. Carry the ambient family over unless the
-    // theme style sets its own.
-    final ambientStyle = DefaultTextStyle.of(context).style;
-    final themeTextStyle = themeStyle.textStyle;
-    final effectiveTextStyle = themeTextStyle == null
-        ? null
-        : WidgetStateProperty.resolveWith<TextStyle?>((states) {
-            final style = themeTextStyle.resolve(states);
-            if (style == null || style.fontFamily != null) return style;
-            return style.copyWith(
-              fontFamily: ambientStyle.fontFamily,
-              fontFamilyFallback: style.fontFamilyFallback ?? ambientStyle.fontFamilyFallback,
-            );
-          });
-
     Widget button = Semantics(
       selected: props.isSelected,
       child: ElevatedButton(
@@ -407,7 +390,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
         style: ButtonStyle(
           tapTargetSize: themeStyle.tapTargetSize,
           visualDensity: .standard,
-          textStyle: effectiveTextStyle,
+          textStyle: themeStyle.textStyle,
           iconSize: themeStyle.iconSize,
           elevation: themeStyle.elevation,
           backgroundColor: themeStyle.backgroundColor,
