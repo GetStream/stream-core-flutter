@@ -38,6 +38,26 @@ mixin _$StreamColorScheme {
       accentWarning: Color.lerp(a.accentWarning, b.accentWarning, t)!,
       accentError: Color.lerp(a.accentError, b.accentError, t)!,
       accentNeutral: Color.lerp(a.accentNeutral, b.accentNeutral, t)!,
+      accentPrimarySubtle: Color.lerp(
+        a.accentPrimarySubtle,
+        b.accentPrimarySubtle,
+        t,
+      )!,
+      accentSuccessSubtle: Color.lerp(
+        a.accentSuccessSubtle,
+        b.accentSuccessSubtle,
+        t,
+      )!,
+      accentWarningSubtle: Color.lerp(
+        a.accentWarningSubtle,
+        b.accentWarningSubtle,
+        t,
+      )!,
+      accentErrorSubtle: Color.lerp(
+        a.accentErrorSubtle,
+        b.accentErrorSubtle,
+        t,
+      )!,
       textPrimary: Color.lerp(a.textPrimary, b.textPrimary, t)!,
       textSecondary: Color.lerp(a.textSecondary, b.textSecondary, t)!,
       textTertiary: Color.lerp(a.textTertiary, b.textTertiary, t)!,
@@ -118,6 +138,26 @@ mixin _$StreamColorScheme {
         b.backgroundInverse,
         t,
       )!,
+      backgroundInfoSubtle: Color.lerp(
+        a.backgroundInfoSubtle,
+        b.backgroundInfoSubtle,
+        t,
+      )!,
+      backgroundSuccessSubtle: Color.lerp(
+        a.backgroundSuccessSubtle,
+        b.backgroundSuccessSubtle,
+        t,
+      )!,
+      backgroundWarningSubtle: Color.lerp(
+        a.backgroundWarningSubtle,
+        b.backgroundWarningSubtle,
+        t,
+      )!,
+      backgroundErrorSubtle: Color.lerp(
+        a.backgroundErrorSubtle,
+        b.backgroundErrorSubtle,
+        t,
+      )!,
       backgroundElevation0: Color.lerp(
         a.backgroundElevation0,
         b.backgroundElevation0,
@@ -188,6 +228,10 @@ mixin _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentPrimarySubtle,
+    Color? accentSuccessSubtle,
+    Color? accentWarningSubtle,
+    Color? accentErrorSubtle,
     Color? textPrimary,
     Color? textSecondary,
     Color? textTertiary,
@@ -212,6 +256,10 @@ mixin _$StreamColorScheme {
     Color? backgroundPressed,
     Color? backgroundSelected,
     Color? backgroundInverse,
+    Color? backgroundInfoSubtle,
+    Color? backgroundSuccessSubtle,
+    Color? backgroundWarningSubtle,
+    Color? backgroundErrorSubtle,
     Color? backgroundElevation0,
     Color? backgroundElevation1,
     Color? backgroundElevation2,
@@ -250,6 +298,10 @@ mixin _$StreamColorScheme {
       accentWarning: accentWarning ?? _this.accentWarning,
       accentError: accentError ?? _this.accentError,
       accentNeutral: accentNeutral ?? _this.accentNeutral,
+      accentPrimarySubtle: accentPrimarySubtle ?? _this.accentPrimarySubtle,
+      accentSuccessSubtle: accentSuccessSubtle ?? _this.accentSuccessSubtle,
+      accentWarningSubtle: accentWarningSubtle ?? _this.accentWarningSubtle,
+      accentErrorSubtle: accentErrorSubtle ?? _this.accentErrorSubtle,
       textPrimary: textPrimary ?? _this.textPrimary,
       textSecondary: textSecondary ?? _this.textSecondary,
       textTertiary: textTertiary ?? _this.textTertiary,
@@ -281,6 +333,13 @@ mixin _$StreamColorScheme {
       backgroundPressed: backgroundPressed ?? _this.backgroundPressed,
       backgroundSelected: backgroundSelected ?? _this.backgroundSelected,
       backgroundInverse: backgroundInverse ?? _this.backgroundInverse,
+      backgroundInfoSubtle: backgroundInfoSubtle ?? _this.backgroundInfoSubtle,
+      backgroundSuccessSubtle:
+          backgroundSuccessSubtle ?? _this.backgroundSuccessSubtle,
+      backgroundWarningSubtle:
+          backgroundWarningSubtle ?? _this.backgroundWarningSubtle,
+      backgroundErrorSubtle:
+          backgroundErrorSubtle ?? _this.backgroundErrorSubtle,
       backgroundElevation0: backgroundElevation0 ?? _this.backgroundElevation0,
       backgroundElevation1: backgroundElevation1 ?? _this.backgroundElevation1,
       backgroundElevation2: backgroundElevation2 ?? _this.backgroundElevation2,
@@ -331,6 +390,10 @@ mixin _$StreamColorScheme {
       accentWarning: other.accentWarning,
       accentError: other.accentError,
       accentNeutral: other.accentNeutral,
+      accentPrimarySubtle: other.accentPrimarySubtle,
+      accentSuccessSubtle: other.accentSuccessSubtle,
+      accentWarningSubtle: other.accentWarningSubtle,
+      accentErrorSubtle: other.accentErrorSubtle,
       textPrimary: other.textPrimary,
       textSecondary: other.textSecondary,
       textTertiary: other.textTertiary,
@@ -355,6 +418,10 @@ mixin _$StreamColorScheme {
       backgroundPressed: other.backgroundPressed,
       backgroundSelected: other.backgroundSelected,
       backgroundInverse: other.backgroundInverse,
+      backgroundInfoSubtle: other.backgroundInfoSubtle,
+      backgroundSuccessSubtle: other.backgroundSuccessSubtle,
+      backgroundWarningSubtle: other.backgroundWarningSubtle,
+      backgroundErrorSubtle: other.backgroundErrorSubtle,
       backgroundElevation0: other.backgroundElevation0,
       backgroundElevation1: other.backgroundElevation1,
       backgroundElevation2: other.backgroundElevation2,
@@ -405,6 +472,10 @@ mixin _$StreamColorScheme {
         _other.accentWarning == _this.accentWarning &&
         _other.accentError == _this.accentError &&
         _other.accentNeutral == _this.accentNeutral &&
+        _other.accentPrimarySubtle == _this.accentPrimarySubtle &&
+        _other.accentSuccessSubtle == _this.accentSuccessSubtle &&
+        _other.accentWarningSubtle == _this.accentWarningSubtle &&
+        _other.accentErrorSubtle == _this.accentErrorSubtle &&
         _other.textPrimary == _this.textPrimary &&
         _other.textSecondary == _this.textSecondary &&
         _other.textTertiary == _this.textTertiary &&
@@ -430,6 +501,10 @@ mixin _$StreamColorScheme {
         _other.backgroundPressed == _this.backgroundPressed &&
         _other.backgroundSelected == _this.backgroundSelected &&
         _other.backgroundInverse == _this.backgroundInverse &&
+        _other.backgroundInfoSubtle == _this.backgroundInfoSubtle &&
+        _other.backgroundSuccessSubtle == _this.backgroundSuccessSubtle &&
+        _other.backgroundWarningSubtle == _this.backgroundWarningSubtle &&
+        _other.backgroundErrorSubtle == _this.backgroundErrorSubtle &&
         _other.backgroundElevation0 == _this.backgroundElevation0 &&
         _other.backgroundElevation1 == _this.backgroundElevation1 &&
         _other.backgroundElevation2 == _this.backgroundElevation2 &&
@@ -472,6 +547,10 @@ mixin _$StreamColorScheme {
       _this.accentWarning,
       _this.accentError,
       _this.accentNeutral,
+      _this.accentPrimarySubtle,
+      _this.accentSuccessSubtle,
+      _this.accentWarningSubtle,
+      _this.accentErrorSubtle,
       _this.textPrimary,
       _this.textSecondary,
       _this.textTertiary,
@@ -496,6 +575,10 @@ mixin _$StreamColorScheme {
       _this.backgroundPressed,
       _this.backgroundSelected,
       _this.backgroundInverse,
+      _this.backgroundInfoSubtle,
+      _this.backgroundSuccessSubtle,
+      _this.backgroundWarningSubtle,
+      _this.backgroundErrorSubtle,
       _this.backgroundElevation0,
       _this.backgroundElevation1,
       _this.backgroundElevation2,

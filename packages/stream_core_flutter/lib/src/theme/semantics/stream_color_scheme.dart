@@ -55,6 +55,10 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentPrimarySubtle,
+    Color? accentSuccessSubtle,
+    Color? accentWarningSubtle,
+    Color? accentErrorSubtle,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -78,6 +82,10 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundInverse,
+    Color? backgroundInfoSubtle,
+    Color? backgroundSuccessSubtle,
+    Color? backgroundWarningSubtle,
+    Color? backgroundErrorSubtle,
 
     // Background - Elevation
     Color? backgroundElevation0,
@@ -125,6 +133,10 @@ class StreamColorScheme with _$StreamColorScheme {
     accentWarning ??= light_tokens.StreamTokens.accentWarning;
     accentError ??= light_tokens.StreamTokens.accentError;
     accentNeutral ??= chrome.shade500;
+    accentPrimarySubtle ??= brand.shade50;
+    accentSuccessSubtle ??= light_tokens.StreamTokens.accentSuccessSubtle;
+    accentWarningSubtle ??= light_tokens.StreamTokens.accentWarningSubtle;
+    accentErrorSubtle ??= light_tokens.StreamTokens.accentErrorSubtle;
 
     // Text
     textPrimary ??= chrome.shade900;
@@ -149,6 +161,10 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundOverlayDarkStrong ??= light_tokens.StreamTokens.backgroundCoreOverlayDarkStrong;
     backgroundDisabled ??= chrome.shade100;
     backgroundInverse ??= chrome[1000] ?? StreamColors.black;
+    backgroundInfoSubtle ??= accentPrimarySubtle;
+    backgroundSuccessSubtle ??= accentSuccessSubtle;
+    backgroundWarningSubtle ??= accentWarningSubtle;
+    backgroundErrorSubtle ??= accentErrorSubtle;
 
     backgroundElevation0 ??= chrome[0] ?? StreamColors.white;
     backgroundElevation1 ??= chrome[0] ?? StreamColors.white;
@@ -222,6 +238,10 @@ class StreamColorScheme with _$StreamColorScheme {
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
+      accentPrimarySubtle: accentPrimarySubtle,
+      accentSuccessSubtle: accentSuccessSubtle,
+      accentWarningSubtle: accentWarningSubtle,
+      accentErrorSubtle: accentErrorSubtle,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -243,6 +263,10 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundOverlayDarkStrong: backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
+      backgroundInfoSubtle: backgroundInfoSubtle,
+      backgroundSuccessSubtle: backgroundSuccessSubtle,
+      backgroundWarningSubtle: backgroundWarningSubtle,
+      backgroundErrorSubtle: backgroundErrorSubtle,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
@@ -286,6 +310,10 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? accentWarning,
     Color? accentError,
     Color? accentNeutral,
+    Color? accentPrimarySubtle,
+    Color? accentSuccessSubtle,
+    Color? accentWarningSubtle,
+    Color? accentErrorSubtle,
     // Text
     Color? textPrimary,
     Color? textSecondary,
@@ -309,6 +337,10 @@ class StreamColorScheme with _$StreamColorScheme {
     Color? backgroundOverlayDarkStrong,
     Color? backgroundDisabled,
     Color? backgroundInverse,
+    Color? backgroundInfoSubtle,
+    Color? backgroundSuccessSubtle,
+    Color? backgroundWarningSubtle,
+    Color? backgroundErrorSubtle,
     // Background - Elevation
     Color? backgroundElevation0,
     Color? backgroundElevation1,
@@ -355,6 +387,10 @@ class StreamColorScheme with _$StreamColorScheme {
     accentWarning ??= dark_tokens.StreamTokens.accentWarning;
     accentError ??= dark_tokens.StreamTokens.accentError;
     accentNeutral ??= chrome.shade500;
+    accentPrimarySubtle ??= brand.shade100;
+    accentSuccessSubtle ??= dark_tokens.StreamTokens.accentSuccessSubtle;
+    accentWarningSubtle ??= dark_tokens.StreamTokens.accentWarningSubtle;
+    accentErrorSubtle ??= dark_tokens.StreamTokens.accentErrorSubtle;
 
     // Text
     textPrimary ??= chrome.shade900;
@@ -379,6 +415,10 @@ class StreamColorScheme with _$StreamColorScheme {
     backgroundOverlayDarkStrong ??= dark_tokens.StreamTokens.backgroundCoreOverlayDarkStrong;
     backgroundDisabled ??= chrome.shade100;
     backgroundInverse ??= chrome[1000] ?? StreamColors.white;
+    backgroundInfoSubtle ??= accentPrimarySubtle;
+    backgroundSuccessSubtle ??= accentSuccessSubtle;
+    backgroundWarningSubtle ??= accentWarningSubtle;
+    backgroundErrorSubtle ??= accentErrorSubtle;
 
     backgroundElevation0 ??= chrome[0] ?? StreamColors.black;
     backgroundElevation1 ??= chrome.shade50;
@@ -452,6 +492,10 @@ class StreamColorScheme with _$StreamColorScheme {
       accentWarning: accentWarning,
       accentError: accentError,
       accentNeutral: accentNeutral,
+      accentPrimarySubtle: accentPrimarySubtle,
+      accentSuccessSubtle: accentSuccessSubtle,
+      accentWarningSubtle: accentWarningSubtle,
+      accentErrorSubtle: accentErrorSubtle,
       textPrimary: textPrimary,
       textSecondary: textSecondary,
       textTertiary: textTertiary,
@@ -473,6 +517,10 @@ class StreamColorScheme with _$StreamColorScheme {
       backgroundOverlayDarkStrong: backgroundOverlayDarkStrong,
       backgroundDisabled: backgroundDisabled,
       backgroundInverse: backgroundInverse,
+      backgroundInfoSubtle: backgroundInfoSubtle,
+      backgroundSuccessSubtle: backgroundSuccessSubtle,
+      backgroundWarningSubtle: backgroundWarningSubtle,
+      backgroundErrorSubtle: backgroundErrorSubtle,
       backgroundElevation0: backgroundElevation0,
       backgroundElevation1: backgroundElevation1,
       backgroundElevation2: backgroundElevation2,
@@ -541,6 +589,10 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.accentWarning,
     required this.accentError,
     required this.accentNeutral,
+    required this.accentPrimarySubtle,
+    required this.accentSuccessSubtle,
+    required this.accentWarningSubtle,
+    required this.accentErrorSubtle,
     // Text
     required this.textPrimary,
     required this.textSecondary,
@@ -564,6 +616,10 @@ class StreamColorScheme with _$StreamColorScheme {
     required this.backgroundOverlayDarkStrong,
     required this.backgroundDisabled,
     required this.backgroundInverse,
+    required this.backgroundInfoSubtle,
+    required this.backgroundSuccessSubtle,
+    required this.backgroundWarningSubtle,
+    required this.backgroundErrorSubtle,
     // Background - Elevation
     required this.backgroundElevation0,
     required this.backgroundElevation1,
@@ -635,6 +691,26 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Neutral accent for low-priority badges.
   final Color accentNeutral;
+
+  /// Subtle tinted background for informational or primary-colored states.
+  ///
+  /// Pairs with [accentPrimary].
+  final Color accentPrimarySubtle;
+
+  /// Subtle tinted background for success states.
+  ///
+  /// Pairs with [accentSuccess].
+  final Color accentSuccessSubtle;
+
+  /// Subtle tinted background for warning states.
+  ///
+  /// Pairs with [accentWarning].
+  final Color accentWarningSubtle;
+
+  /// Subtle tinted background for failure and validation error states.
+  ///
+  /// Pairs with [accentError].
+  final Color accentErrorSubtle;
 
   // ---- Text colors ----
 
@@ -717,6 +793,26 @@ class StreamColorScheme with _$StreamColorScheme {
 
   /// Inverse background used for elevated, transient, or high-attention UI surfaces that sit on top of the default app background.
   final Color backgroundInverse;
+
+  /// Subtle tinted background for informational or primary-colored states.
+  ///
+  /// Defaults to [accentPrimarySubtle].
+  final Color backgroundInfoSubtle;
+
+  /// Subtle tinted background for success states.
+  ///
+  /// Defaults to [accentSuccessSubtle].
+  final Color backgroundSuccessSubtle;
+
+  /// Subtle tinted background for warning states.
+  ///
+  /// Defaults to [accentWarningSubtle].
+  final Color backgroundWarningSubtle;
+
+  /// Subtle tinted background for failure and validation error states.
+  ///
+  /// Defaults to [accentErrorSubtle].
+  final Color backgroundErrorSubtle;
 
   // ---- Background - Elevation ----
 

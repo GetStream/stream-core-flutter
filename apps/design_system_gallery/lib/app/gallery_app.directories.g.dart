@@ -35,6 +35,8 @@ import 'package:design_system_gallery/components/badge/stream_online_indicator.d
     as _design_system_gallery_components_badge_stream_online_indicator;
 import 'package:design_system_gallery/components/badge/stream_retry_badge.dart'
     as _design_system_gallery_components_badge_stream_retry_badge;
+import 'package:design_system_gallery/components/banner/stream_banner.dart'
+    as _design_system_gallery_components_banner_stream_banner;
 import 'package:design_system_gallery/components/buttons/button.dart'
     as _design_system_gallery_components_buttons_button;
 import 'package:design_system_gallery/components/buttons/split_button.dart'
@@ -83,6 +85,8 @@ import 'package:design_system_gallery/components/controls/stream_video_play_indi
     as _design_system_gallery_components_controls_stream_video_play_indicator;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
+import 'package:design_system_gallery/components/inline_notification/stream_inline_notification.dart'
+    as _design_system_gallery_components_inline_notification_stream_inline_notification;
 import 'package:design_system_gallery/components/media_viewer/stream_media_viewer.dart'
     as _design_system_gallery_components_media_viewer_stream_media_viewer;
 import 'package:design_system_gallery/components/message/stream_message_annotation.dart'
@@ -468,6 +472,26 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_badge_stream_retry_badge
                         .buildStreamRetryBadgeShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Banner',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamBanner',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder: _design_system_gallery_components_banner_stream_banner
+                    .buildStreamBannerPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder: _design_system_gallery_components_banner_stream_banner
+                    .buildStreamBannerShowcase,
               ),
             ],
           ),
@@ -877,6 +901,28 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_emoji_stream_emoji_picker_sheet
                         .buildStreamEmojiPickerSheetDefault,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Inline Notification',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamInlineNotification',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_inline_notification_stream_inline_notification
+                        .buildStreamInlineNotificationPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_inline_notification_stream_inline_notification
+                        .buildStreamInlineNotificationShowcase,
               ),
             ],
           ),

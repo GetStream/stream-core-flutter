@@ -6,6 +6,14 @@
 - `StreamMessageText` now links a web address written without a scheme, such
   as `example.com`, when it ends in a known top-level domain. It opens over
   `https://`.
+- Added `StreamInlineNotification` and `StreamInlineNotificationTheme`, an inline
+  message box with info, success, warning and error types.
+- Added `StreamBanner` and `StreamBannerTheme`, a full-width strip for
+  system-level states such as a lost connection.
+- Added `accentPrimarySubtle`, `accentSuccessSubtle`, `accentWarningSubtle`,
+  `accentErrorSubtle`, `backgroundInfoSubtle`, `backgroundSuccessSubtle`,
+  `backgroundWarningSubtle` and `backgroundErrorSubtle` to `StreamColorScheme`.
+- Added the `calendar` and `clockFill` icons to `StreamIcons`.
 
 ### 🐛 Bug Fixes
 

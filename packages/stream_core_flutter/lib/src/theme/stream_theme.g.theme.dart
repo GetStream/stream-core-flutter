@@ -27,6 +27,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamAvatarThemeData? avatarTheme,
     StreamBadgeCountThemeData? badgeCountTheme,
     StreamBadgeNotificationThemeData? badgeNotificationTheme,
+    StreamBannerThemeData? bannerTheme,
     StreamBottomAppBarThemeData? bottomAppBarTheme,
     StreamBottomNavBarThemeData? bottomNavBarTheme,
     StreamButtonThemeData? buttonTheme,
@@ -37,6 +38,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
+    StreamInlineNotificationThemeData? inlineNotificationTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
     StreamListTileThemeData? listTileTheme,
     StreamMediaViewerThemeData? mediaViewerTheme,
@@ -88,6 +90,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       badgeCountTheme: badgeCountTheme ?? _this.badgeCountTheme,
       badgeNotificationTheme:
           badgeNotificationTheme ?? _this.badgeNotificationTheme,
+      bannerTheme: bannerTheme ?? _this.bannerTheme,
       bottomAppBarTheme: bottomAppBarTheme ?? _this.bottomAppBarTheme,
       bottomNavBarTheme: bottomNavBarTheme ?? _this.bottomNavBarTheme,
       buttonTheme: buttonTheme ?? _this.buttonTheme,
@@ -99,6 +102,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme ?? _this.errorBadgeTheme,
+      inlineNotificationTheme:
+          inlineNotificationTheme ?? _this.inlineNotificationTheme,
       jumpToUnreadButtonTheme:
           jumpToUnreadButtonTheme ?? _this.jumpToUnreadButtonTheme,
       listTileTheme: listTileTheme ?? _this.listTileTheme,
@@ -191,6 +196,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.badgeNotificationTheme,
         t,
       )!,
+      bannerTheme: StreamBannerThemeData.lerp(
+        _this.bannerTheme,
+        other.bannerTheme,
+        t,
+      )!,
       bottomAppBarTheme: StreamBottomAppBarThemeData.lerp(
         _this.bottomAppBarTheme,
         other.bottomAppBarTheme,
@@ -239,6 +249,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       errorBadgeTheme: StreamErrorBadgeThemeData.lerp(
         _this.errorBadgeTheme,
         other.errorBadgeTheme,
+        t,
+      )!,
+      inlineNotificationTheme: StreamInlineNotificationThemeData.lerp(
+        _this.inlineNotificationTheme,
+        other.inlineNotificationTheme,
         t,
       )!,
       jumpToUnreadButtonTheme: StreamJumpToUnreadButtonThemeData.lerp(
@@ -404,6 +419,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.avatarTheme == _this.avatarTheme &&
         _other.badgeCountTheme == _this.badgeCountTheme &&
         _other.badgeNotificationTheme == _this.badgeNotificationTheme &&
+        _other.bannerTheme == _this.bannerTheme &&
         _other.bottomAppBarTheme == _this.bottomAppBarTheme &&
         _other.bottomNavBarTheme == _this.bottomNavBarTheme &&
         _other.buttonTheme == _this.buttonTheme &&
@@ -414,6 +430,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.errorBadgeTheme == _this.errorBadgeTheme &&
+        _other.inlineNotificationTheme == _this.inlineNotificationTheme &&
         _other.jumpToUnreadButtonTheme == _this.jumpToUnreadButtonTheme &&
         _other.listTileTheme == _this.listTileTheme &&
         _other.mediaViewerTheme == _this.mediaViewerTheme &&
@@ -469,6 +486,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.avatarTheme,
       _this.badgeCountTheme,
       _this.badgeNotificationTheme,
+      _this.bannerTheme,
       _this.bottomAppBarTheme,
       _this.bottomNavBarTheme,
       _this.buttonTheme,
@@ -479,6 +497,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.errorBadgeTheme,
+      _this.inlineNotificationTheme,
       _this.jumpToUnreadButtonTheme,
       _this.listTileTheme,
       _this.mediaViewerTheme,

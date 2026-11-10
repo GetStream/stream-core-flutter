@@ -41,6 +41,7 @@ mixin _$StreamIcons {
       blurFill: t < 0.5 ? a.blurFill : b.blurFill,
       bolt: t < 0.5 ? a.bolt : b.bolt,
       boltFill: t < 0.5 ? a.boltFill : b.boltFill,
+      calendar: t < 0.5 ? a.calendar : b.calendar,
       camera: t < 0.5 ? a.camera : b.camera,
       cameraFlipFill: t < 0.5 ? a.cameraFlipFill : b.cameraFlipFill,
       cameraLarge: t < 0.5 ? a.cameraLarge : b.cameraLarge,
@@ -54,6 +55,7 @@ mixin _$StreamIcons {
       chevronRight: t < 0.5 ? a.chevronRight : b.chevronRight,
       chevronUp: t < 0.5 ? a.chevronUp : b.chevronUp,
       clock: t < 0.5 ? a.clock : b.clock,
+      clockFill: t < 0.5 ? a.clockFill : b.clockFill,
       command: t < 0.5 ? a.command : b.command,
       copy: t < 0.5 ? a.copy : b.copy,
       copyFill: t < 0.5 ? a.copyFill : b.copyFill,
@@ -208,6 +210,7 @@ mixin _$StreamIcons {
     IconData? blurFill,
     IconData? bolt,
     IconData? boltFill,
+    IconData? calendar,
     IconData? camera,
     IconData? cameraFlipFill,
     IconData? cameraLarge,
@@ -221,6 +224,7 @@ mixin _$StreamIcons {
     IconData? chevronRight,
     IconData? chevronUp,
     IconData? clock,
+    IconData? clockFill,
     IconData? command,
     IconData? copy,
     IconData? copyFill,
@@ -365,6 +369,7 @@ mixin _$StreamIcons {
       blurFill: blurFill ?? _this.blurFill,
       bolt: bolt ?? _this.bolt,
       boltFill: boltFill ?? _this.boltFill,
+      calendar: calendar ?? _this.calendar,
       camera: camera ?? _this.camera,
       cameraFlipFill: cameraFlipFill ?? _this.cameraFlipFill,
       cameraLarge: cameraLarge ?? _this.cameraLarge,
@@ -378,6 +383,7 @@ mixin _$StreamIcons {
       chevronRight: chevronRight ?? _this.chevronRight,
       chevronUp: chevronUp ?? _this.chevronUp,
       clock: clock ?? _this.clock,
+      clockFill: clockFill ?? _this.clockFill,
       command: command ?? _this.command,
       copy: copy ?? _this.copy,
       copyFill: copyFill ?? _this.copyFill,
@@ -536,6 +542,7 @@ mixin _$StreamIcons {
       blurFill: other.blurFill,
       bolt: other.bolt,
       boltFill: other.boltFill,
+      calendar: other.calendar,
       camera: other.camera,
       cameraFlipFill: other.cameraFlipFill,
       cameraLarge: other.cameraLarge,
@@ -549,6 +556,7 @@ mixin _$StreamIcons {
       chevronRight: other.chevronRight,
       chevronUp: other.chevronUp,
       clock: other.clock,
+      clockFill: other.clockFill,
       command: other.command,
       copy: other.copy,
       copyFill: other.copyFill,
@@ -705,6 +713,7 @@ mixin _$StreamIcons {
         _other.blurFill == _this.blurFill &&
         _other.bolt == _this.bolt &&
         _other.boltFill == _this.boltFill &&
+        _other.calendar == _this.calendar &&
         _other.camera == _this.camera &&
         _other.cameraFlipFill == _this.cameraFlipFill &&
         _other.cameraLarge == _this.cameraLarge &&
@@ -718,6 +727,7 @@ mixin _$StreamIcons {
         _other.chevronRight == _this.chevronRight &&
         _other.chevronUp == _this.chevronUp &&
         _other.clock == _this.clock &&
+        _other.clockFill == _this.clockFill &&
         _other.command == _this.command &&
         _other.copy == _this.copy &&
         _other.copyFill == _this.copyFill &&
@@ -866,6 +876,7 @@ mixin _$StreamIcons {
       _this.blurFill,
       _this.bolt,
       _this.boltFill,
+      _this.calendar,
       _this.camera,
       _this.cameraFlipFill,
       _this.cameraLarge,
@@ -879,6 +890,7 @@ mixin _$StreamIcons {
       _this.chevronRight,
       _this.chevronUp,
       _this.clock,
+      _this.clockFill,
       _this.command,
       _this.copy,
       _this.copyFill,

@@ -267,6 +267,9 @@ class StreamTokens {
   static const accentSuccess = Color(0xFF00C384);
   static const accentWarning = Color(0xFFFCD579);
   static const accentError = Color(0xFFFC526A);
+  static const accentSuccessSubtle = Color(0xFF003A25);
+  static const accentWarningSubtle = Color(0xFF5F1A05);
+  static const accentErrorSubtle = Color(0xFF68052B);
   static const brand50 = Color(0xFF091A3B);
   static const brand100 = Color(0xFF142F63);
   static const brand150 = Color(0xFF19418D);
