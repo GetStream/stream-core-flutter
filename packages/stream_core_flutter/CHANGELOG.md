@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamEmptyState` and `StreamEmptyStateTheme`, an icon over a title, description and action for a place
+  with nothing in it, to `video.dart`.
+
 ## 0.5.4
 
 ### ✨ Features

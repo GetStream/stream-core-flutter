@@ -47,6 +47,8 @@ import 'package:design_system_gallery/components/buttons/stream_jump_to_unread_b
     as _design_system_gallery_components_buttons_stream_jump_to_unread_button;
 import 'package:design_system_gallery/components/common/stream_checkbox.dart'
     as _design_system_gallery_components_common_stream_checkbox;
+import 'package:design_system_gallery/components/common/stream_empty_state.dart'
+    as _design_system_gallery_components_common_stream_empty_state;
 import 'package:design_system_gallery/components/common/stream_flex.dart'
     as _design_system_gallery_components_common_stream_flex;
 import 'package:design_system_gallery/components/common/stream_intrinsic_flex.dart'
@@ -583,6 +585,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_common_stream_checkbox
                         .buildStreamCheckboxShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamEmptyState',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_empty_state
+                        .buildStreamEmptyStatePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_empty_state
+                        .buildStreamEmptyStateShowcase,
               ),
             ],
           ),
