@@ -1,6 +1,6 @@
 name: stream_core_flutter
 description: "Stream Design System for Flutter and cross-SDK utilities that depend on Flutter."
-version: 0.5.3
+version: 0.5.4
 homepage: https://github.com/GetStream/stream-core-flutter
 
 environment:
@@ -20,7 +20,7 @@ dependencies:
   path: ^1.9.0
   path_provider: ^2.1.5
   shimmer: ^3.0.0
-  stream_core: ^0.5.1+1
+  stream_core: ^0.5.2
   svg_icon_widget: ^0.0.1+1
   theme_extensions_builder_annotation: ^7.1.0
 
