@@ -4,6 +4,8 @@
 
 - Added `StreamContextMenuHeading` and `StreamContextMenuHeadingTheme`, the heading of a section in a
   `StreamContextMenu`, to `video.dart`.
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
 
 ## 0.5.4
 
