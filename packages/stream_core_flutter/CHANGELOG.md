@@ -1,3 +1,10 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
+
 ## 0.5.4
 
 ### ✨ Features
