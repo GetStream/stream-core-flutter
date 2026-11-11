@@ -12,6 +12,8 @@
   `decorative` variant for rows that own the tap, to `video.dart`.
 - Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
   modal with a header and footer over a blurred scrim, to `video.dart`.
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
 
 ## 0.5.4
 
