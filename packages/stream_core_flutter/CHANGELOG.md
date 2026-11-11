@@ -4,6 +4,8 @@
 
 - Added `StreamSelectInput` and `StreamSelectInputTheme`, a select field with outline and ghost
   types, to `video.dart`.
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
 
 ## 0.5.4
 
