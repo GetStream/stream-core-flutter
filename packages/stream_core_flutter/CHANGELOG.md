@@ -3,6 +3,8 @@
 ### ✨ Features
 
 - Added `StreamTabBar` and `StreamTabBarTheme`, a row of equal-width tabs, to `video.dart`.
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
 
 ## 0.5.4
 
