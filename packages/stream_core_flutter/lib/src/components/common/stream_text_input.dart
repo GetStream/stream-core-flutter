@@ -96,6 +96,8 @@ class StreamTextInput extends StatelessWidget {
     Widget? trailing,
     String? labelText,
     String? hintText,
+    String? semanticLabel,
+    String? semanticHint,
     String? helperText,
     StreamHelperState? helperState,
     StreamTextInputStyle? style,
@@ -124,6 +126,8 @@ class StreamTextInput extends StatelessWidget {
          trailing: trailing,
          labelText: labelText,
          hintText: hintText,
+         semanticLabel: semanticLabel,
+         semanticHint: semanticHint,
          helperText: helperText,
          helperState: helperState,
          style: style,
@@ -179,6 +183,8 @@ class StreamTextInputProps {
     this.trailing,
     this.labelText,
     this.hintText,
+    this.semanticLabel,
+    this.semanticHint,
     this.helperText,
     this.helperState,
     this.style,
@@ -242,6 +248,23 @@ class StreamTextInputProps {
   /// When [labelText] is null, this also serves as the field's semantic
   /// label while the field is empty.
   final String? hintText;
+
+  /// The label announced by screen readers for this field.
+  ///
+  /// Replaces [labelText] as the announced label without changing what is
+  /// drawn, and is announced whether the field is empty or filled. When set,
+  /// [hintText] is announced as the field's hint, as it is with [labelText].
+  /// When null, the field is labelled by [labelText] or [hintText].
+  final String? semanticLabel;
+
+  /// A description announced by screen readers after the field's label.
+  ///
+  /// Replaces [hintText] as the announced hint without changing the visible
+  /// placeholder. Screen-reader users can turn hints off, so do not put
+  /// essential information here.
+  /// When null, [hintText] is announced as the hint when the field has a
+  /// label.
+  final String? semanticHint;
 
   /// Helper message displayed below the text input with animation.
   ///
@@ -494,7 +517,8 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
     return ListenableBuilder(
       listenable: .merge([_effectiveFocusNode, _effectiveController]),
       builder: (context, child) {
-        final hasLabel = props.labelText != null;
+        final label = props.semanticLabel ?? props.labelText;
+        final hasLabel = label != null;
         return Semantics(
           container: true,
           explicitChildNodes: true,
@@ -502,9 +526,9 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
           focusable: true,
           readOnly: props.readOnly,
           enabled: props.enabled,
-          label: hasLabel ? props.labelText : (_effectiveController.text.isEmpty ? props.hintText : null),
+          label: hasLabel ? label : (_effectiveController.text.isEmpty ? props.hintText : null),
           value: _effectiveController.text,
-          hint: hasLabel ? props.hintText : null,
+          hint: props.semanticHint ?? (hasLabel ? props.hintText : null),
           maxValueLength: _semanticsMaxValueLength,
           currentValueLength: _currentLength,
           onTap: switch (props.readOnly) {

@@ -426,4 +426,133 @@ void main() {
       },
     );
   });
+
+  group('StreamTextInput semanticLabel and semanticHint', () {
+    testWidgets('semanticLabel replaces labelText without changing what is drawn', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamTextInput(
+            labelText: 'Email',
+            semanticLabel: 'Work email address',
+            hintText: 'name@example.com',
+          ),
+        ),
+      );
+
+      final node = tester.semantics.find(find.byType(StreamTextInput));
+      expect(node, isSemantics(label: 'Work email address', hint: 'name@example.com', isTextField: true));
+      // The visible label is still drawn, and not announced on its own.
+      expect(find.text('Email'), findsOneWidget);
+      expect(find.bySemanticsLabel('Email'), findsNothing);
+
+      handle.dispose();
+    });
+
+    testWidgets('semanticLabel stays the label once the field is filled', (tester) async {
+      final handle = tester.ensureSemantics();
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamTextInput(
+            semanticLabel: 'Your name',
+            hintText: 'Enter your name',
+            controller: controller,
+          ),
+        ),
+      );
+
+      var node = tester.semantics.find(find.byType(StreamTextInput));
+      expect(node.label, 'Your name');
+      expect(node.hint, 'Enter your name');
+
+      controller.text = 'Ada';
+      await tester.pump();
+
+      node = tester.semantics.find(find.byType(StreamTextInput));
+      expect(node.label, 'Your name');
+      expect(node.value, 'Ada');
+
+      handle.dispose();
+    });
+
+    testWidgets('semanticHint replaces hintText as the announced hint', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamTextInput(
+            labelText: 'Email',
+            hintText: 'name@example.com',
+            semanticHint: 'We only use it to send receipts',
+          ),
+        ),
+      );
+
+      final node = tester.semantics.find(find.byType(StreamTextInput));
+      expect(node.label, 'Email');
+      expect(node.hint, 'We only use it to send receipts');
+      // The placeholder is still drawn.
+      expect(find.text('name@example.com'), findsOneWidget);
+
+      handle.dispose();
+    });
+
+    testWidgets('semanticHint is announced on a field labelled by its hintText', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamTextInput(
+            hintText: 'Search',
+            semanticHint: 'Searches all channels',
+          ),
+        ),
+      );
+
+      final node = tester.semantics.find(find.byType(StreamTextInput));
+      expect(node.label, 'Search');
+      expect(node.hint, 'Searches all channels');
+
+      handle.dispose();
+    });
+
+    testWidgets('without them, the hintText-only field has no hint', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _withStreamTheme(StreamTextInput(hintText: 'Search')),
+      );
+
+      final node = tester.semantics.find(find.byType(StreamTextInput));
+      expect(node.label, 'Search');
+      expect(node.hint, isEmpty);
+
+      handle.dispose();
+    });
+
+    testWidgets('semantic props reach a custom builder', (tester) async {
+      StreamTextInputProps? received;
+
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamComponentFactory(
+            builders: StreamComponentBuilders(
+              textInput: (context, props) {
+                received = props;
+                return const SizedBox();
+              },
+            ),
+            child: StreamTextInput(semanticLabel: 'Label', semanticHint: 'Hint'),
+          ),
+        ),
+      );
+
+      expect(received?.semanticLabel, 'Label');
+      expect(received?.semanticHint, 'Hint');
+    });
+  });
 }

@@ -23,7 +23,8 @@ import '../../theme/stream_theme_extensions.dart';
 /// single-selection (radio-like) patterns.
 ///
 /// The widget wraps its content with [Semantics] for accessibility support.
-/// Provide a [semanticLabel] to give screen readers a meaningful description.
+/// Provide a [semanticLabel] to give screen readers a meaningful label, and
+/// a [semanticHint] to describe it further.
 ///
 /// {@tool snippet}
 ///
@@ -64,12 +65,14 @@ class StreamCheckbox extends StatelessWidget {
     StreamCheckboxSize? size,
     OutlinedBorder? shape,
     String? semanticLabel,
+    String? semanticHint,
   }) : props = .new(
          value: value,
          onChanged: onChanged,
          size: size,
          shape: shape,
          semanticLabel: semanticLabel,
+         semanticHint: semanticHint,
        );
 
   /// Creates a circular Stream checkbox (radio check).
@@ -82,12 +85,14 @@ class StreamCheckbox extends StatelessWidget {
     required ValueChanged<bool>? onChanged,
     StreamCheckboxSize? size,
     String? semanticLabel,
+    String? semanticHint,
   }) : props = .new(
          value: value,
          onChanged: onChanged,
          size: size,
          shape: const CircleBorder(),
          semanticLabel: semanticLabel,
+         semanticHint: semanticHint,
        );
 
   /// The props controlling the appearance and behavior of this checkbox.
@@ -118,6 +123,7 @@ class StreamCheckboxProps {
     this.size,
     this.shape,
     this.semanticLabel,
+    this.semanticHint,
   });
 
   /// Whether this checkbox is checked.
@@ -149,6 +155,13 @@ class StreamCheckboxProps {
   ///
   /// This label does not show in the UI.
   final String? semanticLabel;
+
+  /// A description announced by screen readers after [semanticLabel].
+  ///
+  /// Screen-reader users can turn hints off, so do not put essential
+  /// information here. This hint does not show in the UI.
+  /// When null, no hint is announced.
+  final String? semanticHint;
 }
 
 /// Default implementation of [StreamCheckbox].
@@ -181,6 +194,7 @@ class DefaultStreamCheckbox extends StatelessWidget {
 
     return Semantics(
       label: props.semanticLabel,
+      hint: props.semanticHint,
       checked: props.value,
       child: IconButton(
         onPressed: switch (props.onChanged) {
