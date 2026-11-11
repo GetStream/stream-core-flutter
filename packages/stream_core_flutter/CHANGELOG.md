@@ -12,6 +12,8 @@
 
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
 
 ## 0.5.4
 
