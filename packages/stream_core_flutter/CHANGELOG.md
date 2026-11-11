@@ -2,9 +2,8 @@
 
 ### ✨ Features
 
-- Added `semanticLabel` and `semanticHint` to `StreamButton`, `StreamButton.icon`
-  and `StreamTextInput`, to set what screen readers announce.
-- Added `semanticHint` to `StreamCheckbox` and `StreamSwitch`.
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
 
 ## 0.5.4
 

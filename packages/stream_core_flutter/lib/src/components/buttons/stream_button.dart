@@ -81,8 +81,6 @@ class StreamButton extends StatelessWidget {
     bool? isFloating,
     bool? isSelected,
     bool autofocus = false,
-    String? semanticLabel,
-    String? semanticHint,
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
          child: child,
@@ -96,8 +94,6 @@ class StreamButton extends StatelessWidget {
          isFloating: isFloating,
          isSelected: isSelected,
          autofocus: autofocus,
-         semanticLabel: semanticLabel,
-         semanticHint: semanticHint,
          themeStyle: themeStyle,
        );
 
@@ -126,8 +122,6 @@ class StreamButton extends StatelessWidget {
     bool? isSelected,
     bool autofocus = false,
     String? tooltip,
-    String? semanticLabel,
-    String? semanticHint,
     StreamButtonThemeStyle? themeStyle,
   }) : props = .new(
          onPressed: onPressed,
@@ -140,8 +134,6 @@ class StreamButton extends StatelessWidget {
          isSelected: isSelected,
          autofocus: autofocus,
          tooltip: tooltip,
-         semanticLabel: semanticLabel,
-         semanticHint: semanticHint,
          themeStyle: themeStyle,
        );
 
@@ -187,8 +179,6 @@ class StreamButtonProps {
     this.isSelected,
     this.autofocus = false,
     this.tooltip,
-    this.semanticLabel,
-    this.semanticHint,
     this.themeStyle,
   });
 
@@ -264,26 +254,7 @@ class StreamButtonProps {
   /// Only honoured by [StreamButton.icon]; the regular [StreamButton]
   /// derives its label from its [child].
   /// When null, the icon button has no tooltip.
-  ///
-  /// When [semanticLabel] is also set, the tooltip is only shown visually
-  /// and [semanticLabel] is announced instead, so the button is not read
-  /// twice.
   final String? tooltip;
-
-  /// The label announced by screen readers for this button.
-  ///
-  /// Replaces what the button would otherwise be read as: the text of its
-  /// [child], or the [tooltip] of an icon-only button. The visible content
-  /// and the [tooltip] are unchanged.
-  /// When null, the button is read from its [child] or [tooltip].
-  final String? semanticLabel;
-
-  /// A description announced by screen readers after the button's label.
-  ///
-  /// Use it to describe what activating the button does. Screen-reader
-  /// users can turn hints off, so do not put essential information here.
-  /// When null, no hint is announced.
-  final String? semanticHint;
 
   /// Per-instance style overrides for this button.
   ///
@@ -443,7 +414,7 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
             _ => null,
           },
         ),
-        child: _withSemantics(switch (isIconButton) {
+        child: switch (isIconButton) {
           true => props.iconLeft,
           false => Row(
             mainAxisSize: MainAxisSize.min,
@@ -455,34 +426,14 @@ class _DefaultStreamButtonState extends State<DefaultStreamButton> {
               ?props.iconRight,
             ],
           ),
-        }),
+        },
       ),
     );
 
     if (props.tooltip case final tooltip?) {
-      button = Tooltip(
-        message: tooltip,
-        // The semantic label replaces the tooltip as the announced label.
-        excludeFromSemantics: props.semanticLabel != null,
-        child: button,
-      );
+      button = Tooltip(message: tooltip, child: button);
     }
 
     return MergeSemantics(child: button);
-  }
-
-  // Applies the semantic label and hint inside the button, so they merge
-  // into the button's own node. A label replaces the content's semantics.
-  Widget? _withSemantics(Widget? content) {
-    final label = props.semanticLabel;
-    final hint = props.semanticHint;
-    if (label == null && hint == null) return content;
-
-    return Semantics(
-      label: label,
-      hint: hint,
-      excludeSemantics: label != null,
-      child: content,
-    );
   }
 }

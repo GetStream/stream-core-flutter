@@ -55,13 +55,11 @@ class StreamSwitch extends StatelessWidget {
     required ValueChanged<bool>? onChanged,
     StreamSwitchStyle? style,
     String? semanticLabel,
-    String? semanticHint,
   }) : props = .new(
          value: value,
          onChanged: onChanged,
          style: style,
          semanticLabel: semanticLabel,
-         semanticHint: semanticHint,
        );
 
   /// The props controlling the appearance and behavior of this switch.
@@ -91,7 +89,6 @@ class StreamSwitchProps {
     required this.onChanged,
     this.style,
     this.semanticLabel,
-    this.semanticHint,
   });
 
   /// Whether this switch is on.
@@ -116,13 +113,6 @@ class StreamSwitchProps {
   ///
   /// This label does not show in the UI.
   final String? semanticLabel;
-
-  /// A description announced by screen readers after [semanticLabel].
-  ///
-  /// Screen-reader users can turn hints off, so do not put essential
-  /// information here. This hint does not show in the UI.
-  /// When null, no hint is announced.
-  final String? semanticHint;
 }
 
 /// Default implementation of [StreamSwitch].
@@ -170,9 +160,9 @@ class DefaultStreamSwitch extends StatelessWidget {
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
 
-    if (props.semanticLabel != null || props.semanticHint != null) {
+    if (props.semanticLabel case final label?) {
       result = MergeSemantics(
-        child: Semantics(label: props.semanticLabel, hint: props.semanticHint, child: result),
+        child: Semantics(label: label, child: result),
       );
     }
 

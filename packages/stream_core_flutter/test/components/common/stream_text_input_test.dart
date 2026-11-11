@@ -427,7 +427,7 @@ void main() {
     );
   });
 
-  group('StreamTextInput semanticLabel and semanticHint', () {
+  group('StreamTextInput semanticLabel', () {
     testWidgets('semanticLabel replaces labelText without changing what is drawn', (tester) async {
       final handle = tester.ensureSemantics();
 
@@ -479,48 +479,7 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('semanticHint replaces hintText as the announced hint', (tester) async {
-      final handle = tester.ensureSemantics();
-
-      await tester.pumpWidget(
-        _withStreamTheme(
-          StreamTextInput(
-            labelText: 'Email',
-            hintText: 'name@example.com',
-            semanticHint: 'We only use it to send receipts',
-          ),
-        ),
-      );
-
-      final node = tester.semantics.find(find.byType(StreamTextInput));
-      expect(node.label, 'Email');
-      expect(node.hint, 'We only use it to send receipts');
-      // The placeholder is still drawn.
-      expect(find.text('name@example.com'), findsOneWidget);
-
-      handle.dispose();
-    });
-
-    testWidgets('semanticHint is announced on a field labelled by its hintText', (tester) async {
-      final handle = tester.ensureSemantics();
-
-      await tester.pumpWidget(
-        _withStreamTheme(
-          StreamTextInput(
-            hintText: 'Search',
-            semanticHint: 'Searches all channels',
-          ),
-        ),
-      );
-
-      final node = tester.semantics.find(find.byType(StreamTextInput));
-      expect(node.label, 'Search');
-      expect(node.hint, 'Searches all channels');
-
-      handle.dispose();
-    });
-
-    testWidgets('without them, the hintText-only field has no hint', (tester) async {
+    testWidgets('without semanticLabel, the hintText-only field is unchanged', (tester) async {
       final handle = tester.ensureSemantics();
 
       await tester.pumpWidget(
@@ -534,7 +493,7 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('semantic props reach a custom builder', (tester) async {
+    testWidgets('semanticLabel reaches a custom builder', (tester) async {
       StreamTextInputProps? received;
 
       await tester.pumpWidget(
@@ -546,13 +505,12 @@ void main() {
                 return const SizedBox();
               },
             ),
-            child: StreamTextInput(semanticLabel: 'Label', semanticHint: 'Hint'),
+            child: StreamTextInput(semanticLabel: 'Label'),
           ),
         ),
       );
 
       expect(received?.semanticLabel, 'Label');
-      expect(received?.semanticHint, 'Hint');
     });
   });
 }

@@ -97,7 +97,6 @@ class StreamTextInput extends StatelessWidget {
     String? labelText,
     String? hintText,
     String? semanticLabel,
-    String? semanticHint,
     String? helperText,
     StreamHelperState? helperState,
     StreamTextInputStyle? style,
@@ -127,7 +126,6 @@ class StreamTextInput extends StatelessWidget {
          labelText: labelText,
          hintText: hintText,
          semanticLabel: semanticLabel,
-         semanticHint: semanticHint,
          helperText: helperText,
          helperState: helperState,
          style: style,
@@ -184,7 +182,6 @@ class StreamTextInputProps {
     this.labelText,
     this.hintText,
     this.semanticLabel,
-    this.semanticHint,
     this.helperText,
     this.helperState,
     this.style,
@@ -256,15 +253,6 @@ class StreamTextInputProps {
   /// [hintText] is announced as the field's hint, as it is with [labelText].
   /// When null, the field is labelled by [labelText] or [hintText].
   final String? semanticLabel;
-
-  /// A description announced by screen readers after the field's label.
-  ///
-  /// Replaces [hintText] as the announced hint without changing the visible
-  /// placeholder. Screen-reader users can turn hints off, so do not put
-  /// essential information here.
-  /// When null, [hintText] is announced as the hint when the field has a
-  /// label.
-  final String? semanticHint;
 
   /// Helper message displayed below the text input with animation.
   ///
@@ -528,7 +516,7 @@ class _DefaultStreamTextInputState extends State<DefaultStreamTextInput> {
           enabled: props.enabled,
           label: hasLabel ? label : (_effectiveController.text.isEmpty ? props.hintText : null),
           value: _effectiveController.text,
-          hint: props.semanticHint ?? (hasLabel ? props.hintText : null),
+          hint: hasLabel ? props.hintText : null,
           maxValueLength: _semanticsMaxValueLength,
           currentValueLength: _currentLength,
           onTap: switch (props.readOnly) {
