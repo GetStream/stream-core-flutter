@@ -14,6 +14,8 @@
   modal with a header and footer over a blurred scrim, to `video.dart`.
 - Added `StreamModalWindow`, `StreamModalWindowTab` and `StreamModalWindowTheme`, a modal with a sidebar of tabs that
   shows one tab at a time, to `video.dart`.
+- Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
+  replaces `labelText` without changing what is drawn.
 
 ## 0.5.4
 
