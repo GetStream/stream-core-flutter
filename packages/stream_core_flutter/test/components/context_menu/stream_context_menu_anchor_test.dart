@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/video.dart';
 
@@ -203,6 +204,38 @@ void main() {
     final anchor = tester.getRect(find.widgetWithText(TextButton, 'open'));
     final menu = tester.getRect(find.byType(StreamContextMenu));
     expect(menu.top - anchor.bottom, 8);
+  });
+
+  testWidgets('StreamContextMenuAnchor in a dialog closes only the menu on Escape', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        child: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showDialog<void>(
+              context: context,
+              builder: (_) => Dialog(child: _anchor()),
+            ),
+            child: const Text('show dialog'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('show dialog'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.text('Microphone'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Microphone'), findsNothing);
+    expect(find.byType(Dialog), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Dialog), findsNothing);
   });
 
   testWidgets('StreamContextMenuAnchor defers to a StreamComponentFactory builder', (tester) async {
