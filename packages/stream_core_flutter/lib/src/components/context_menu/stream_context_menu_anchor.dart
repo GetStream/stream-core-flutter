@@ -221,12 +221,36 @@ class StreamContextMenuAnchorProps {
 ///  * [StreamContextMenuAnchor], the public API widget.
 ///  * [StreamContextMenuAnchorProps], which configures this widget.
 @experimental
-class DefaultStreamContextMenuAnchor extends StatelessWidget {
+class DefaultStreamContextMenuAnchor extends StatefulWidget {
   /// Creates a default menu anchor with the given [props].
   const DefaultStreamContextMenuAnchor({super.key, required this.props});
 
   /// The properties that configure this menu anchor.
   final StreamContextMenuAnchorProps props;
+
+  @override
+  State<DefaultStreamContextMenuAnchor> createState() => _DefaultStreamContextMenuAnchorState();
+}
+
+class _DefaultStreamContextMenuAnchorState extends State<DefaultStreamContextMenuAnchor> {
+  // A menu opened by a tap leaves focus where it was, often on the enclosing
+  // route. Escape then reaches the route's DismissAction and pops a dialog
+  // instead of closing the menu. Focusing the anchor when the menu opens puts
+  // the menu's own dismiss action on the focus path.
+  final _anchorFocusNode = FocusNode(debugLabel: 'StreamContextMenuAnchor', skipTraversal: true);
+
+  StreamContextMenuAnchorProps get props => widget.props;
+
+  void _handleOpen() {
+    if (!_anchorFocusNode.hasFocus) _anchorFocusNode.requestFocus();
+    props.onOpen?.call();
+  }
+
+  @override
+  void dispose() {
+    _anchorFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,10 +268,14 @@ class DefaultStreamContextMenuAnchor extends StatelessWidget {
       // its own bounds, most visibly along the bottom edge. The menu draws its
       // own surface and clips its own content, so the panel needs no clip.
       clipBehavior: Clip.none,
-      onOpen: props.onOpen,
+      childFocusNode: _anchorFocusNode,
+      onOpen: _handleOpen,
       onClose: props.onClose,
       style: StreamContextMenuAnchor.menuStyle,
-      builder: props.builder,
+      builder: (context, controller, child) => Focus(
+        focusNode: _anchorFocusNode,
+        child: props.builder(context, controller, child),
+      ),
       menuChildren: [
         // The panel and the menu both scroll vertically, and on mobile both
         // would attach to the PrimaryScrollController, which trips the
