@@ -21,6 +21,7 @@ import '../components/common/stream_checkbox.dart';
 import '../components/common/stream_loading_spinner.dart';
 import '../components/common/stream_network_image.dart';
 import '../components/common/stream_progress_bar.dart';
+import '../components/common/stream_select_input.dart';
 import '../components/common/stream_skeleton_loading.dart';
 import '../components/common/stream_text_input.dart';
 import '../components/common/stream_typing_indicator_dots.dart';
@@ -226,6 +227,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
+    StreamComponentBuilder<StreamSelectInputProps>? selectInput,
     StreamComponentBuilder<StreamSheetHeaderProps>? sheetHeader,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     StreamComponentBuilder<StreamSnackbarProps>? snackbar,
@@ -284,6 +286,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       reactionPicker: reactionPicker,
       reactions: reactions,
       retryBadge: retryBadge,
+      selectInput: selectInput,
       sheetHeader: sheetHeader,
       skeletonLoading: skeletonLoading,
       snackbar: snackbar,
@@ -343,6 +346,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.reactionPicker,
     required this.reactions,
     required this.retryBadge,
+    required this.selectInput,
     required this.sheetHeader,
     required this.skeletonLoading,
     required this.snackbar,
@@ -598,6 +602,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamRetryBadge] uses [DefaultStreamRetryBadge].
   final StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge;
+
+  /// Custom builder for select input widgets.
+  ///
+  /// When null, [StreamSelectInput] uses [DefaultStreamSelectInput].
+  final StreamComponentBuilder<StreamSelectInputProps>? selectInput;
 
   /// Custom builder for sheet header widgets.
   ///
