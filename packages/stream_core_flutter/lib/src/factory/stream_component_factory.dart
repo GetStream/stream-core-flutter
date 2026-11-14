@@ -24,12 +24,15 @@ import '../components/common/stream_progress_bar.dart';
 import '../components/common/stream_skeleton_loading.dart';
 import '../components/common/stream_text_input.dart';
 import '../components/common/stream_typing_indicator_dots.dart';
+import '../components/context_menu/stream_adaptive_menu_anchor.dart';
 import '../components/context_menu/stream_context_menu_action.dart';
 import '../components/context_menu/stream_context_menu_anchor.dart';
+import '../components/context_menu/stream_context_menu_heading.dart';
 import '../components/controls/stream_command_chip.dart';
 import '../components/controls/stream_emoji_chip.dart';
 import '../components/controls/stream_emoji_chip_bar.dart';
 import '../components/controls/stream_playback_speed_toggle.dart';
+import '../components/controls/stream_radio_button.dart';
 import '../components/controls/stream_stepper.dart';
 import '../components/controls/stream_switch.dart';
 import '../components/dialog/stream_modal_dialog.dart';
@@ -185,6 +188,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   /// [extensions] accepts an [Iterable] of [StreamComponentBuilderExtension] instances, which are
   /// converted to a map keyed by [StreamComponentBuilderExtension.type] internally.
   factory StreamComponentBuilders({
+    StreamComponentBuilder<StreamAdaptiveMenuAnchorProps>? adaptiveMenuAnchor,
     StreamComponentBuilder<StreamAppBarProps>? appBar,
     StreamComponentBuilder<StreamAvatarProps>? avatar,
     StreamComponentBuilder<StreamBottomAppBarProps>? bottomAppBar,
@@ -199,6 +203,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamCommandChipProps>? commandChip,
     StreamComponentBuilder<StreamContextMenuActionProps>? contextMenuAction,
     StreamComponentBuilder<StreamContextMenuAnchorProps>? contextMenuAnchor,
+    StreamComponentBuilder<StreamContextMenuHeadingProps>? contextMenuHeading,
     StreamComponentBuilder<StreamEmojiProps>? emoji,
     StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
     StreamComponentBuilder<StreamEmojiChipProps>? emojiChip,
@@ -227,6 +232,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
+    StreamComponentBuilder<StreamRadioButtonProps>? radioButton,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
@@ -245,6 +251,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     extensions ??= <StreamComponentBuilderExtension<Object>>[];
 
     return .raw(
+      adaptiveMenuAnchor: adaptiveMenuAnchor,
       appBar: appBar,
       avatar: avatar,
       bottomAppBar: bottomAppBar,
@@ -259,6 +266,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       commandChip: commandChip,
       contextMenuAction: contextMenuAction,
       contextMenuAnchor: contextMenuAnchor,
+      contextMenuHeading: contextMenuHeading,
       emoji: emoji,
       emojiButton: emojiButton,
       emojiChip: emojiChip,
@@ -287,6 +295,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       onlineIndicator: onlineIndicator,
       playbackSpeedToggle: playbackSpeedToggle,
       progressBar: progressBar,
+      radioButton: radioButton,
       reactionPicker: reactionPicker,
       reactions: reactions,
       retryBadge: retryBadge,
@@ -306,6 +315,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
 
   /// Creates component builders from a pre-built extensions map.
   const StreamComponentBuilders.raw({
+    required this.adaptiveMenuAnchor,
     required this.appBar,
     required this.avatar,
     required this.bottomAppBar,
@@ -320,6 +330,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.commandChip,
     required this.contextMenuAction,
     required this.contextMenuAnchor,
+    required this.contextMenuHeading,
     required this.emoji,
     required this.emojiButton,
     required this.emojiChip,
@@ -348,6 +359,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.onlineIndicator,
     required this.playbackSpeedToggle,
     required this.progressBar,
+    required this.radioButton,
     required this.reactionPicker,
     required this.reactions,
     required this.retryBadge,
@@ -382,6 +394,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// See [extensions].
   StreamComponentBuilder<T>? extension<T>() => (extensions[T] as StreamComponentBuilderExtension<T>?)?.call;
+
+  /// Custom builder for adaptive menu anchor widgets.
+  ///
+  /// When null, [StreamAdaptiveMenuAnchor] uses [DefaultStreamAdaptiveMenuAnchor].
+  final StreamComponentBuilder<StreamAdaptiveMenuAnchorProps>? adaptiveMenuAnchor;
 
   /// Custom builder for app bar widgets.
   ///
@@ -453,6 +470,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamContextMenuAnchor] uses [DefaultStreamContextMenuAnchor].
   final StreamComponentBuilder<StreamContextMenuAnchorProps>? contextMenuAnchor;
+
+  /// Custom builder for context menu heading widgets.
+  ///
+  /// When null, [StreamContextMenuHeading] uses [DefaultStreamContextMenuHeading].
+  final StreamComponentBuilder<StreamContextMenuHeadingProps>? contextMenuHeading;
 
   /// Custom builder for emoji widgets.
   ///
@@ -601,6 +623,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamProgressBar] uses [DefaultStreamProgressBar].
   final StreamComponentBuilder<StreamProgressBarProps>? progressBar;
+
+  /// Custom builder for radio button widgets.
+  ///
+  /// When null, [StreamRadioButton] uses [DefaultStreamRadioButton].
+  final StreamComponentBuilder<StreamRadioButtonProps>? radioButton;
 
   /// Custom builder for reaction picker widgets.
   ///

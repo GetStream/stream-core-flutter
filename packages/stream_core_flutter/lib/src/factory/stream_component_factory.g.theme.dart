@@ -31,6 +31,7 @@ mixin _$StreamComponentBuilders {
 
     return StreamComponentBuilders.raw(
       extensions: t < 0.5 ? a.extensions : b.extensions,
+      adaptiveMenuAnchor: t < 0.5 ? a.adaptiveMenuAnchor : b.adaptiveMenuAnchor,
       appBar: t < 0.5 ? a.appBar : b.appBar,
       avatar: t < 0.5 ? a.avatar : b.avatar,
       bottomAppBar: t < 0.5 ? a.bottomAppBar : b.bottomAppBar,
@@ -45,6 +46,7 @@ mixin _$StreamComponentBuilders {
       commandChip: t < 0.5 ? a.commandChip : b.commandChip,
       contextMenuAction: t < 0.5 ? a.contextMenuAction : b.contextMenuAction,
       contextMenuAnchor: t < 0.5 ? a.contextMenuAnchor : b.contextMenuAnchor,
+      contextMenuHeading: t < 0.5 ? a.contextMenuHeading : b.contextMenuHeading,
       emoji: t < 0.5 ? a.emoji : b.emoji,
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       emojiChip: t < 0.5 ? a.emojiChip : b.emojiChip,
@@ -89,6 +91,7 @@ mixin _$StreamComponentBuilders {
           ? a.playbackSpeedToggle
           : b.playbackSpeedToggle,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
+      radioButton: t < 0.5 ? a.radioButton : b.radioButton,
       reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
       retryBadge: t < 0.5 ? a.retryBadge : b.retryBadge,
@@ -109,6 +112,8 @@ mixin _$StreamComponentBuilders {
 
   StreamComponentBuilders copyWith({
     Map<Object, StreamComponentBuilderExtension<Object>>? extensions,
+    Widget Function(BuildContext, StreamAdaptiveMenuAnchorProps)?
+    adaptiveMenuAnchor,
     Widget Function(BuildContext, StreamAppBarProps)? appBar,
     Widget Function(BuildContext, StreamAvatarProps)? avatar,
     Widget Function(BuildContext, StreamBottomAppBarProps)? bottomAppBar,
@@ -126,6 +131,8 @@ mixin _$StreamComponentBuilders {
     contextMenuAction,
     Widget Function(BuildContext, StreamContextMenuAnchorProps)?
     contextMenuAnchor,
+    Widget Function(BuildContext, StreamContextMenuHeadingProps)?
+    contextMenuHeading,
     Widget Function(BuildContext, StreamEmojiProps)? emoji,
     Widget Function(BuildContext, StreamEmojiButtonProps)? emojiButton,
     Widget Function(BuildContext, StreamEmojiChipProps)? emojiChip,
@@ -174,6 +181,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamPlaybackSpeedToggleProps)?
     playbackSpeedToggle,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
+    Widget Function(BuildContext, StreamRadioButtonProps)? radioButton,
     Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
     Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,
@@ -195,6 +203,7 @@ mixin _$StreamComponentBuilders {
 
     return StreamComponentBuilders.raw(
       extensions: extensions ?? _this.extensions,
+      adaptiveMenuAnchor: adaptiveMenuAnchor ?? _this.adaptiveMenuAnchor,
       appBar: appBar ?? _this.appBar,
       avatar: avatar ?? _this.avatar,
       bottomAppBar: bottomAppBar ?? _this.bottomAppBar,
@@ -209,6 +218,7 @@ mixin _$StreamComponentBuilders {
       commandChip: commandChip ?? _this.commandChip,
       contextMenuAction: contextMenuAction ?? _this.contextMenuAction,
       contextMenuAnchor: contextMenuAnchor ?? _this.contextMenuAnchor,
+      contextMenuHeading: contextMenuHeading ?? _this.contextMenuHeading,
       emoji: emoji ?? _this.emoji,
       emojiButton: emojiButton ?? _this.emojiButton,
       emojiChip: emojiChip ?? _this.emojiChip,
@@ -249,6 +259,7 @@ mixin _$StreamComponentBuilders {
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       playbackSpeedToggle: playbackSpeedToggle ?? _this.playbackSpeedToggle,
       progressBar: progressBar ?? _this.progressBar,
+      radioButton: radioButton ?? _this.radioButton,
       reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
       retryBadge: retryBadge ?? _this.retryBadge,
@@ -278,6 +289,7 @@ mixin _$StreamComponentBuilders {
 
     return copyWith(
       extensions: other.extensions,
+      adaptiveMenuAnchor: other.adaptiveMenuAnchor,
       appBar: other.appBar,
       avatar: other.avatar,
       bottomAppBar: other.bottomAppBar,
@@ -292,6 +304,7 @@ mixin _$StreamComponentBuilders {
       commandChip: other.commandChip,
       contextMenuAction: other.contextMenuAction,
       contextMenuAnchor: other.contextMenuAnchor,
+      contextMenuHeading: other.contextMenuHeading,
       emoji: other.emoji,
       emojiButton: other.emojiButton,
       emojiChip: other.emojiChip,
@@ -323,6 +336,7 @@ mixin _$StreamComponentBuilders {
       onlineIndicator: other.onlineIndicator,
       playbackSpeedToggle: other.playbackSpeedToggle,
       progressBar: other.progressBar,
+      radioButton: other.radioButton,
       reactionPicker: other.reactionPicker,
       reactions: other.reactions,
       retryBadge: other.retryBadge,
@@ -353,6 +367,7 @@ mixin _$StreamComponentBuilders {
     final _other = (other as StreamComponentBuilders);
 
     return _other.extensions == _this.extensions &&
+        _other.adaptiveMenuAnchor == _this.adaptiveMenuAnchor &&
         _other.appBar == _this.appBar &&
         _other.avatar == _this.avatar &&
         _other.bottomAppBar == _this.bottomAppBar &&
@@ -367,6 +382,7 @@ mixin _$StreamComponentBuilders {
         _other.commandChip == _this.commandChip &&
         _other.contextMenuAction == _this.contextMenuAction &&
         _other.contextMenuAnchor == _this.contextMenuAnchor &&
+        _other.contextMenuHeading == _this.contextMenuHeading &&
         _other.emoji == _this.emoji &&
         _other.emojiButton == _this.emojiButton &&
         _other.emojiChip == _this.emojiChip &&
@@ -401,6 +417,7 @@ mixin _$StreamComponentBuilders {
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.playbackSpeedToggle == _this.playbackSpeedToggle &&
         _other.progressBar == _this.progressBar &&
+        _other.radioButton == _this.radioButton &&
         _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions &&
         _other.retryBadge == _this.retryBadge &&
@@ -423,6 +440,7 @@ mixin _$StreamComponentBuilders {
     return Object.hashAll([
       runtimeType,
       _this.extensions,
+      _this.adaptiveMenuAnchor,
       _this.appBar,
       _this.avatar,
       _this.bottomAppBar,
@@ -437,6 +455,7 @@ mixin _$StreamComponentBuilders {
       _this.commandChip,
       _this.contextMenuAction,
       _this.contextMenuAnchor,
+      _this.contextMenuHeading,
       _this.emoji,
       _this.emojiButton,
       _this.emojiChip,
@@ -465,6 +484,7 @@ mixin _$StreamComponentBuilders {
       _this.onlineIndicator,
       _this.playbackSpeedToggle,
       _this.progressBar,
+      _this.radioButton,
       _this.reactionPicker,
       _this.reactions,
       _this.retryBadge,

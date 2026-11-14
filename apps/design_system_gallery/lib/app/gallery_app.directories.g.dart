@@ -65,10 +65,14 @@ import 'package:design_system_gallery/components/common/stream_text_input.dart'
     as _design_system_gallery_components_common_stream_text_input;
 import 'package:design_system_gallery/components/common/stream_typing_indicator_dots.dart'
     as _design_system_gallery_components_common_stream_typing_indicator_dots;
+import 'package:design_system_gallery/components/context_menu/stream_adaptive_menu_anchor.dart'
+    as _design_system_gallery_components_context_menu_stream_adaptive_menu_anchor;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu;
 import 'package:design_system_gallery/components/context_menu/stream_context_menu_anchor.dart'
     as _design_system_gallery_components_context_menu_stream_context_menu_anchor;
+import 'package:design_system_gallery/components/context_menu/stream_context_menu_heading.dart'
+    as _design_system_gallery_components_context_menu_stream_context_menu_heading;
 import 'package:design_system_gallery/components/controls/playback_speed_toggle.dart'
     as _design_system_gallery_components_controls_playback_speed_toggle;
 import 'package:design_system_gallery/components/controls/stream_command_chip.dart'
@@ -77,6 +81,8 @@ import 'package:design_system_gallery/components/controls/stream_emoji_chip.dart
     as _design_system_gallery_components_controls_stream_emoji_chip;
 import 'package:design_system_gallery/components/controls/stream_emoji_chip_bar.dart'
     as _design_system_gallery_components_controls_stream_emoji_chip_bar;
+import 'package:design_system_gallery/components/controls/stream_radio_button.dart'
+    as _design_system_gallery_components_controls_stream_radio_button;
 import 'package:design_system_gallery/components/controls/stream_remove_control.dart'
     as _design_system_gallery_components_controls_stream_remove_control;
 import 'package:design_system_gallery/components/controls/stream_stepper.dart'
@@ -741,6 +747,23 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'Context Menu',
         children: [
           _widgetbook.WidgetbookComponent(
+            name: 'StreamAdaptiveMenuAnchor',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_context_menu_stream_adaptive_menu_anchor
+                        .buildStreamAdaptiveMenuAnchorPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_context_menu_stream_adaptive_menu_anchor
+                        .buildStreamAdaptiveMenuAnchorShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StreamContextMenu',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -771,6 +794,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_context_menu_stream_context_menu_anchor
                         .buildStreamContextMenuAnchorShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamContextMenuHeading',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_context_menu_stream_context_menu_heading
+                        .buildStreamContextMenuHeadingPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_context_menu_stream_context_menu_heading
+                        .buildStreamContextMenuHeadingShowcase,
               ),
             ],
           ),
@@ -844,6 +884,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_controls_playback_speed_toggle
                         .buildStreamPlaybackSpeedToggleShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamRadioButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_controls_stream_radio_button
+                        .buildStreamRadioButtonPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_controls_stream_radio_button
+                        .buildStreamRadioButtonShowcase,
               ),
             ],
           ),

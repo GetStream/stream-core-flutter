@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
+import 'components/stream_adaptive_menu_anchor_theme.dart';
 import 'components/stream_app_bar_theme.dart';
 import 'components/stream_audio_waveform_theme.dart';
 import 'components/stream_avatar_theme.dart';
@@ -15,6 +16,7 @@ import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
 import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_anchor_theme.dart';
+import 'components/stream_context_menu_heading_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
@@ -35,6 +37,7 @@ import 'components/stream_modal_dialog_theme.dart';
 import 'components/stream_online_indicator_theme.dart';
 import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
+import 'components/stream_radio_button_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
@@ -125,6 +128,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
     // Components themes
+    StreamAdaptiveMenuAnchorThemeData? adaptiveMenuAnchorTheme,
     StreamAppBarThemeData? appBarTheme,
     StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
@@ -139,6 +143,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamContextMenuAnchorThemeData? contextMenuAnchorTheme,
+    StreamContextMenuHeadingThemeData? contextMenuHeadingTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
@@ -159,6 +164,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamRadioButtonThemeData? radioButtonTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
@@ -193,6 +199,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     // Components
     surfaceStyle ??= StreamSurfaceStyle.regular;
+    adaptiveMenuAnchorTheme ??= const StreamAdaptiveMenuAnchorThemeData();
     appBarTheme ??= const StreamAppBarThemeData();
     audioWaveformTheme ??= const StreamAudioWaveformThemeData();
     avatarTheme ??= const StreamAvatarThemeData();
@@ -207,6 +214,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     contextMenuTheme ??= const StreamContextMenuThemeData();
     contextMenuActionTheme ??= const StreamContextMenuActionThemeData();
     contextMenuAnchorTheme ??= const StreamContextMenuAnchorThemeData();
+    contextMenuHeadingTheme ??= const StreamContextMenuHeadingThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     emojiChipTheme ??= const StreamEmojiChipThemeData();
     errorBadgeTheme ??= const StreamErrorBadgeThemeData();
@@ -227,6 +235,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     onlineIndicatorTheme ??= const StreamOnlineIndicatorThemeData();
     playbackSpeedToggleTheme ??= const StreamPlaybackSpeedToggleThemeData();
     progressBarTheme ??= const StreamProgressBarThemeData();
+    radioButtonTheme ??= const StreamRadioButtonThemeData();
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
     sheetHeaderTheme ??= const StreamSheetHeaderThemeData();
@@ -249,6 +258,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       colorScheme: colorScheme,
       textTheme: textTheme,
       boxShadow: boxShadow,
+      adaptiveMenuAnchorTheme: adaptiveMenuAnchorTheme,
       appBarTheme: appBarTheme,
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,
@@ -263,6 +273,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuTheme: contextMenuTheme,
       contextMenuActionTheme: contextMenuActionTheme,
       contextMenuAnchorTheme: contextMenuAnchorTheme,
+      contextMenuHeadingTheme: contextMenuHeadingTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme,
@@ -283,6 +294,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
+      radioButtonTheme: radioButtonTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme,
@@ -319,6 +331,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.colorScheme,
     required this.textTheme,
     required this.boxShadow,
+    required this.adaptiveMenuAnchorTheme,
     required this.appBarTheme,
     required this.audioWaveformTheme,
     required this.avatarTheme,
@@ -333,6 +346,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.contextMenuTheme,
     required this.contextMenuActionTheme,
     required this.contextMenuAnchorTheme,
+    required this.contextMenuHeadingTheme,
     required this.emojiButtonTheme,
     required this.emojiChipTheme,
     required this.errorBadgeTheme,
@@ -353,6 +367,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.onlineIndicatorTheme,
     required this.playbackSpeedToggleTheme,
     required this.progressBarTheme,
+    required this.radioButtonTheme,
     required this.reactionPickerTheme,
     required this.reactionsTheme,
     required this.sheetHeaderTheme,
@@ -436,6 +451,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The box shadow (elevation) values for this theme.
   final StreamBoxShadow boxShadow;
 
+  /// The adaptive menu anchor theme for this theme.
+  final StreamAdaptiveMenuAnchorThemeData adaptiveMenuAnchorTheme;
+
   /// The app bar theme for this theme.
   final StreamAppBarThemeData appBarTheme;
 
@@ -477,6 +495,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
   /// The context menu anchor theme for this theme.
   final StreamContextMenuAnchorThemeData contextMenuAnchorTheme;
+
+  /// The context menu heading theme for this theme.
+  final StreamContextMenuHeadingThemeData contextMenuHeadingTheme;
 
   /// The emoji button theme for this theme.
   final StreamEmojiButtonThemeData emojiButtonTheme;
@@ -540,6 +561,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The progress bar theme for this theme.
   final StreamProgressBarThemeData progressBarTheme;
 
+  /// The radio button theme for this theme.
+  final StreamRadioButtonThemeData radioButtonTheme;
+
   /// The reaction picker theme for this theme.
   final StreamReactionPickerThemeData reactionPickerTheme;
 
@@ -601,6 +625,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       colorScheme: colorScheme,
       textTheme: newTextTheme,
       boxShadow: boxShadow,
+      adaptiveMenuAnchorTheme: adaptiveMenuAnchorTheme,
       appBarTheme: appBarTheme,
       audioWaveformTheme: audioWaveformTheme,
       avatarTheme: avatarTheme,
@@ -615,6 +640,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       contextMenuTheme: contextMenuTheme,
       contextMenuActionTheme: contextMenuActionTheme,
       contextMenuAnchorTheme: contextMenuAnchorTheme,
+      contextMenuHeadingTheme: contextMenuHeadingTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme,
@@ -635,6 +661,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       onlineIndicatorTheme: onlineIndicatorTheme,
       playbackSpeedToggleTheme: playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme,
+      radioButtonTheme: radioButtonTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme,
