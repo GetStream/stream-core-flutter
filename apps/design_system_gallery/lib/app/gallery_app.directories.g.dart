@@ -83,6 +83,8 @@ import 'package:design_system_gallery/components/controls/stream_switch.dart'
     as _design_system_gallery_components_controls_stream_switch;
 import 'package:design_system_gallery/components/controls/stream_video_play_indicator.dart'
     as _design_system_gallery_components_controls_stream_video_play_indicator;
+import 'package:design_system_gallery/components/dialog/stream_modal_dialog.dart'
+    as _design_system_gallery_components_dialog_stream_modal_dialog;
 import 'package:design_system_gallery/components/emoji/stream_emoji_picker_sheet.dart'
     as _design_system_gallery_components_emoji_stream_emoji_picker_sheet;
 import 'package:design_system_gallery/components/inline_notification/stream_inline_notification.dart'
@@ -885,6 +887,28 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_controls_stream_video_play_indicator
                         .buildStreamVideoPlayIndicatorShowcase,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'Dialog',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamModalDialog',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_dialog_stream_modal_dialog
+                        .buildStreamModalDialogPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_dialog_stream_modal_dialog
+                        .buildStreamModalDialogShowcase,
               ),
             ],
           ),
