@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Before writing or reviewing code, read [`STYLE_GUIDE.md`](STYLE_GUIDE.md).** It is the source of truth for coding conventions, the barrel contract, theming, testing, and changelog policy. See [`TESTING.md`](TESTING.md) for guidance on writing effective tests, and [`EFFECTIVE_DART_DOC.md`](EFFECTIVE_DART_DOC.md) — a vendored copy of Effective Dart's documentation guide — before writing any dartdoc; the style guide wins where they disagree. This file is a repo overview; the style guide is the rulebook.
+> **Before writing or reviewing code, read [`STYLE_GUIDE.md`](STYLE_GUIDE.md).** It is the source of truth for coding conventions, the barrel contract, theming, testing, and changelog policy. Before adding or changing public API, read [`style_guides/API_DESIGN.md`](style_guides/API_DESIGN.md), the forward-compatibility rules shared with the other Stream Flutter SDKs. See [`TESTING.md`](TESTING.md) for guidance on writing effective tests, and [`EFFECTIVE_DART_DOC.md`](EFFECTIVE_DART_DOC.md) — a vendored copy of Effective Dart's documentation guide — before writing any dartdoc; the style guide wins where they disagree. This file is a repo overview; the style guide is the rulebook.
 
 ## Project Overview
 
@@ -58,6 +58,10 @@ Never hand-edit the generated Dart, the font, or the log.
 **Use the `update-icons` skill** for any icon work — it covers finding an icon
 upstream, the naming and size conventions, RTL mirroring, deprecations, and the
 file-type assets.
+
+### Shared style guides
+
+`style_guides/` holds the guides every Stream Flutter SDK follows (today `API_DESIGN.md`). The other SDKs carry a copy: on every change to `main`, the `sync_style_guides` workflow runs `scripts/sync_style_guides.dart` against stream-chat-flutter (`master`), stream-video-flutter (`v2`) and stream-feeds-flutter (`main`), and opens a PR in each whose copy changed. Edit the guides here only. They are self-contained: `STYLE_GUIDE.md` points at them, never the reverse, and a relative link out of `style_guides/` fails the workflow's PR check. A new file in the folder is synced automatically; a new target repository is a new entry in the workflow's matrix.
 
 ## Design
 
