@@ -66,6 +66,11 @@ jobs:
     needs: analyze
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      # Codecov authenticates the coverage upload with a GitHub OIDC token.
+      id-token: write
     env:
       IS_CI: 'true'
     steps:
@@ -98,5 +103,5 @@ jobs:
       - name: Upload Coverage
         uses: codecov/codecov-action@v5
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
+          use_oidc: true
           files: packages/*/coverage/lcov.info
