@@ -106,6 +106,16 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   ///
   /// If [typography] is provided, it will be used to build [textTheme].
   ///
+  /// [fontFamily] and [fontFamilyFallback] are applied to the default
+  /// [textTheme], as [ThemeData.fontFamily] is to Material's. They have no
+  /// effect when [textTheme] is provided. Without them, [StreamTheme.of]
+  /// takes the family of the ambient [ThemeData.textTheme].
+  ///
+  /// A single family suits fonts that hold every weight in one family. For
+  /// fonts registered as one family per weight, such as `google_fonts`, pass
+  /// a [textTheme] built by the font package instead, or the heavier styles
+  /// are drawn with synthesized bold.
+  ///
   /// See also:
   ///
   ///  * [StreamTheme.light], which creates a light theme.
@@ -119,6 +129,8 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamRadius? radius,
     StreamSpacing? spacing,
     StreamTypography? typography,
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
     StreamColorScheme? colorScheme,
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
@@ -184,7 +196,11 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
 
     // Semantics
     colorScheme ??= isDark ? StreamColorScheme.dark() : StreamColorScheme.light();
-    textTheme ??= StreamTextTheme(typography: typography).apply(color: colorScheme.systemText);
+    textTheme ??= StreamTextTheme(typography: typography).apply(
+      color: colorScheme.systemText,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+    );
     boxShadow ??= isDark ? StreamBoxShadow.dark() : StreamBoxShadow.light();
 
     // Components
@@ -360,6 +376,10 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// If no [StreamTheme] is found in the widget tree, a default theme is
   /// returned based on the current [Theme]'s brightness (light or dark).
   ///
+  /// When the theme's [textTheme] sets no font family, the returned theme
+  /// takes the family of the ambient [ThemeData.textTheme], so an app that
+  /// sets only [ThemeData.fontFamily] gets its font in Stream text too.
+  ///
   /// {@tool snippet}
   ///
   /// Access the theme in a widget:
@@ -378,11 +398,40 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// {@end-tool}
   static StreamTheme of(BuildContext context) {
     final theme = Theme.of(context);
+    final materialStyle = theme.textTheme.bodyMedium;
     final streamTheme = theme.extension<StreamTheme>();
-    if (streamTheme != null) return streamTheme;
+    if (streamTheme == null) {
+      return StreamTheme(
+        brightness: theme.brightness,
+        fontFamily: materialStyle?.fontFamily,
+        fontFamilyFallback: materialStyle?.fontFamilyFallback,
+      );
+    }
 
-    return StreamTheme(brightness: theme.brightness);
+    return streamTheme._withAmbientFontFamily(materialStyle);
   }
+
+  // Components replace the ambient text style with a StreamTextTheme style
+  // rather than merging into it, so a style without a family drops the app's
+  // font. Material avoids this by baking ThemeData.fontFamily into its text
+  // theme; this does the same at lookup, once per theme and family.
+  StreamTheme _withAmbientFontFamily(TextStyle? materialStyle) {
+    if (textTheme.bodyDefault.fontFamily != null) return this;
+
+    final TextStyle(:fontFamily, :fontFamilyFallback) = materialStyle ?? const TextStyle();
+    if (fontFamily == null) return this;
+
+    final cached = _ambientFontFamilyCache[this];
+    if (cached != null && cached.matches(fontFamily, fontFamilyFallback)) return cached.theme;
+
+    final themed = _copyWithTextTheme(textTheme.apply(fontFamily: fontFamily, fontFamilyFallback: fontFamilyFallback));
+    _ambientFontFamilyCache[this] = (fontFamily: fontFamily, fontFamilyFallback: fontFamilyFallback, theme: themed);
+    return themed;
+  }
+
+  StreamTheme _copyWithTextTheme(StreamTextTheme textTheme) => copyWith(textTheme: textTheme) as StreamTheme;
+
+  static final _ambientFontFamilyCache = Expando<_AmbientFontFamilyTheme>();
 
   /// The brightness of this theme.
   ///
@@ -571,7 +620,11 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// {@end-tool}
   StreamTheme applyPlatform(TargetPlatform platform) {
     final newTypography = StreamTypography(platform: platform);
-    final newTextTheme = StreamTextTheme(typography: newTypography).apply(color: colorScheme.systemText);
+    final newTextTheme = StreamTextTheme(typography: newTypography).apply(
+      color: colorScheme.systemText,
+      fontFamily: textTheme.bodyDefault.fontFamily,
+      fontFamilyFallback: textTheme.bodyDefault.fontFamilyFallback,
+    );
 
     return StreamTheme.raw(
       // ignore: deprecated_member_use_from_same_package
@@ -629,4 +682,11 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       typingIndicatorDotsTheme: typingIndicatorDotsTheme,
     );
   }
+}
+
+typedef _AmbientFontFamilyTheme = ({String fontFamily, List<String>? fontFamilyFallback, StreamTheme theme});
+
+extension on _AmbientFontFamilyTheme {
+  bool matches(String fontFamily, List<String>? fontFamilyFallback) =>
+      this.fontFamily == fontFamily && listEquals(this.fontFamilyFallback, fontFamilyFallback);
 }
