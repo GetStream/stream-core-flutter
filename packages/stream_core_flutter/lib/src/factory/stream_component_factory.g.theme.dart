@@ -95,6 +95,7 @@ mixin _$StreamComponentBuilders {
       snackbar: t < 0.5 ? a.snackbar : b.snackbar,
       splitButton: t < 0.5 ? a.splitButton : b.splitButton,
       stepper: t < 0.5 ? a.stepper : b.stepper,
+      tabBar: t < 0.5 ? a.tabBar : b.tabBar,
       textInput: t < 0.5 ? a.textInput : b.textInput,
       toggleSwitch: t < 0.5 ? a.toggleSwitch : b.toggleSwitch,
       typingIndicatorDots: t < 0.5
@@ -177,6 +178,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamSnackbarProps)? snackbar,
     Widget Function(BuildContext, StreamSplitButtonProps)? splitButton,
     Widget Function(BuildContext, StreamStepperProps)? stepper,
+    Widget Function(BuildContext, StreamTabBarProps)? tabBar,
     Widget Function(BuildContext, StreamTextInputProps)? textInput,
     Widget Function(BuildContext, StreamSwitchProps)? toggleSwitch,
     Widget Function(BuildContext, StreamTypingIndicatorDotsProps)?
@@ -250,6 +252,7 @@ mixin _$StreamComponentBuilders {
       snackbar: snackbar ?? _this.snackbar,
       splitButton: splitButton ?? _this.splitButton,
       stepper: stepper ?? _this.stepper,
+      tabBar: tabBar ?? _this.tabBar,
       textInput: textInput ?? _this.textInput,
       toggleSwitch: toggleSwitch ?? _this.toggleSwitch,
       typingIndicatorDots: typingIndicatorDots ?? _this.typingIndicatorDots,
@@ -322,6 +325,7 @@ mixin _$StreamComponentBuilders {
       snackbar: other.snackbar,
       splitButton: other.splitButton,
       stepper: other.stepper,
+      tabBar: other.tabBar,
       textInput: other.textInput,
       toggleSwitch: other.toggleSwitch,
       typingIndicatorDots: other.typingIndicatorDots,
@@ -398,6 +402,7 @@ mixin _$StreamComponentBuilders {
         _other.snackbar == _this.snackbar &&
         _other.splitButton == _this.splitButton &&
         _other.stepper == _this.stepper &&
+        _other.tabBar == _this.tabBar &&
         _other.textInput == _this.textInput &&
         _other.toggleSwitch == _this.toggleSwitch &&
         _other.typingIndicatorDots == _this.typingIndicatorDots &&
@@ -460,6 +465,7 @@ mixin _$StreamComponentBuilders {
       _this.snackbar,
       _this.splitButton,
       _this.stepper,
+      _this.tabBar,
       _this.textInput,
       _this.toggleSwitch,
       _this.typingIndicatorDots,
