@@ -18,6 +18,7 @@ import '../components/buttons/stream_emoji_button.dart';
 import '../components/buttons/stream_jump_to_unread_button.dart';
 import '../components/buttons/stream_split_button.dart';
 import '../components/common/stream_checkbox.dart';
+import '../components/common/stream_empty_state.dart';
 import '../components/common/stream_loading_spinner.dart';
 import '../components/common/stream_network_image.dart';
 import '../components/common/stream_progress_bar.dart';
@@ -200,6 +201,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
     StreamComponentBuilder<StreamEmojiChipProps>? emojiChip,
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
+    StreamComponentBuilder<StreamEmptyStateProps>? emptyState,
     StreamComponentBuilder<StreamErrorBadgeProps>? errorBadge,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamInlineNotificationProps>? inlineNotification,
@@ -258,6 +260,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiButton: emojiButton,
       emojiChip: emojiChip,
       emojiChipBar: emojiChipBar,
+      emptyState: emptyState,
       errorBadge: errorBadge,
       fileTypeIcon: fileTypeIcon,
       inlineNotification: inlineNotification,
@@ -317,6 +320,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiButton,
     required this.emojiChip,
     required this.emojiChipBar,
+    required this.emptyState,
     required this.errorBadge,
     required this.fileTypeIcon,
     required this.inlineNotification,
@@ -460,6 +464,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamEmojiChipBar] uses [DefaultStreamEmojiChipBar].
   final StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar;
+
+  /// Custom builder for empty state widgets.
+  ///
+  /// When null, [StreamEmptyState] uses [DefaultStreamEmptyState].
+  final StreamComponentBuilder<StreamEmptyStateProps>? emptyState;
 
   /// Custom builder for error badge widgets.
   ///

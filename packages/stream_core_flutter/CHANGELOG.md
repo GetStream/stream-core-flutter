@@ -2,6 +2,8 @@
 
 ### ✨ Features
 
+- Added `StreamEmptyState` and `StreamEmptyStateTheme`, an icon over a title, a description and an optional
+  action for a place with nothing in it.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
 - Added the `fullscreen` icon to `StreamIcons`.

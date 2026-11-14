@@ -15,6 +15,7 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
+import 'components/stream_empty_state_theme.dart';
 import 'components/stream_error_badge_theme.dart';
 import 'components/stream_inline_notification_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
@@ -148,6 +149,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamEmojiChipThemeData] from the nearest ancestor.
   StreamEmojiChipThemeData get streamEmojiChipTheme => StreamEmojiChipTheme.of(this);
+
+  /// Returns the [StreamEmptyStateThemeData] from the nearest ancestor.
+  StreamEmptyStateThemeData get streamEmptyStateTheme => StreamEmptyStateTheme.of(this);
 
   /// Returns the [StreamErrorBadgeThemeData] from the nearest ancestor.
   StreamErrorBadgeThemeData get streamErrorBadgeTheme => StreamErrorBadgeTheme.of(this);
