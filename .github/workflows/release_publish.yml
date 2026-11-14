@@ -203,4 +203,4 @@ jobs:
           body_path: ${{ steps.notes.outputs.path }}
           prerelease: ${{ steps.parse.outputs.prerelease }}
           make_latest: false # independent versioning: no single "latest" release
-          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
+          token: ${{ secrets.CI_BOT_GITHUB_TOKEN }}
