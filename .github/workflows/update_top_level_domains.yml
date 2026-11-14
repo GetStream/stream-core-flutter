@@ -29,7 +29,7 @@ jobs:
       - name: 📤 Open Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
+          token: ${{ secrets.CI_BOT_GITHUB_TOKEN }}
           branch: chore/update-top-level-domains
           delete-branch: true
           commit-message: 'chore(repo): update the IANA top-level domains'
