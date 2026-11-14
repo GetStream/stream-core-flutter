@@ -8,7 +8,7 @@ import '../../../theme/stream_theme_extensions.dart';
 import '../../buttons/stream_button.dart';
 import '../stream_modal_dialog.dart';
 
-// The parts of a modal shared by `StreamModalDialog` and, later,
+// The parts of a modal shared by `StreamModalDialog` and
 // `StreamModalWindow`: the surface, the header and its close button. They
 // resolve their look from [StreamModalDialogTheme], so every modal shares one
 // surface and one header and a modal only themes what it adds.
