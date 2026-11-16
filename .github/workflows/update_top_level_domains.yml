@@ -24,17 +24,24 @@ jobs:
       - name: 🌐 Regenerate Top-Level Domains
         run: dart run scripts/generate_top_level_domains.dart
 
-      # Opened with the bot's token so the pull request's checks run, which
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+
+      # Opened with the CI bot's app token so the pull request's checks run, which
       # they don't for one opened with the workflow's own token.
       - name: 📤 Open Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.CI_BOT_GITHUB_TOKEN }}
+          token: ${{ steps.ci-bot-token.outputs.token }}
           branch: chore/update-top-level-domains
           delete-branch: true
           commit-message: 'chore(repo): update the IANA top-level domains'
           title: 'chore(repo): update the IANA top-level domains'
           body: |
             Regenerates the top-level domains `findLinks` recognizes from the IANA root zone list with `melos run generate:tlds`.
-          committer: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
-          author: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
+          committer: stream-flutter-ci-bot[bot] <357444665+stream-flutter-ci-bot[bot]@users.noreply.github.com>
+          author: stream-flutter-ci-bot[bot] <357444665+stream-flutter-ci-bot[bot]@users.noreply.github.com>
