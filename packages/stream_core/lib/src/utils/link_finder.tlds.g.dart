@@ -11,7 +11,6 @@ part of 'link_finder.dart';
 // Internationalized domains are in both their ASCII and Unicode forms, each
 // commented with the other.
 const _kIanaTopLevelDomains = <String>{
-  'aaa',
   'aarp',
   'abb',
   'abbott',
