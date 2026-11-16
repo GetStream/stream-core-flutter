@@ -1,0 +1,101 @@
+name: Parse Bot Command
+description: >
+  Reads `/<command> [argument]` from the first line of a pull request comment,
+  checks that the commenter may run it and resolves the pull request it runs on.
+  `/help` answers with the list of commands.
+
+# Run it from a job triggered by `issue_comment`, with `pull-requests: write`.
+
+inputs:
+  commands:
+    description: >
+      JSON object mapping each command name to its `description` and, optionally,
+      the `arguments` it accepts. The first argument is the default.
+    required: true
+  token:
+    description: Token used to read the pull request and answer the comment.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  command:
+    description: The command to run; empty when there is nothing to run.
+    value: ${{ steps.parse.outputs.command }}
+  argument:
+    description: The argument, or the command's default one.
+    value: ${{ steps.parse.outputs.argument }}
+  ref:
+    description: The pull request's branch.
+    value: ${{ steps.parse.outputs.ref }}
+  sha:
+    description: The pull request's head commit when the command was given.
+    value: ${{ steps.parse.outputs.sha }}
+
+runs:
+  using: composite
+  steps:
+    - name: 🎯 Parse the command
+      id: parse
+      uses: actions/github-script@v9
+      env:
+        COMMANDS: ${{ inputs.commands }}
+      with:
+        github-token: ${{ inputs.token }}
+        script: |
+          const COMMANDS = JSON.parse(process.env.COMMANDS);
+          const { owner, repo } = context.repo;
+          const comment = context.payload.comment;
+          const reply = (body) => github.rest.issues.createComment({
+            owner, repo, issue_number: context.issue.number, body,
+          });
+          const reject = async (reason) => {
+            core.setFailed(reason);
+            await reply(`Can't run the command: ${reason}`);
+          };
+
+          if (!context.payload.issue?.pull_request) return;
+          const [name, argument] = comment.body.trim().split('\n')[0].trim().split(/\s+/);
+          if (!name.startsWith('/')) return;
+          const commandName = name.slice(1);
+
+          if (commandName === 'help') {
+            const lines = Object.entries(COMMANDS).map(([key, { arguments: args, description }]) => {
+              const usage = args ? `/${key} [${args.join('|')}]` : `/${key}`;
+              return `- \`${usage}\`: ${description}`;
+            });
+            return reply(['Comment one of these on the first line:', '', ...lines].join('\n'));
+          }
+
+          // Other comments starting with `/` are not meant for the bot.
+          if (!Object.hasOwn(COMMANDS, commandName)) return;
+          const args = COMMANDS[commandName].arguments ?? [];
+          if (argument && !args.includes(argument)) {
+            if (!args.length) return reject(`\`/${commandName}\` takes no argument.`);
+            const allowed = args.map((a) => `\`${a}\``).join(', ');
+            return reject(`\`/${commandName}\` takes ${allowed}, not \`${argument}\`.`);
+          }
+
+          const { data: { permission } } = await github.rest.repos.getCollaboratorPermissionLevel({
+            owner, repo, username: comment.user.login,
+          });
+          if (!['admin', 'write'].includes(permission)) {
+            return reject('only collaborators with write access can run bot commands.');
+          }
+
+          const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: context.issue.number });
+          if (pr.state !== 'open') return reject('the pull request is not open.');
+          if (pr.head.repo?.full_name !== `${owner}/${repo}`) {
+            return reject('the bot cannot push to branches of a fork.');
+          }
+
+          core.setOutput('command', commandName);
+          core.setOutput('argument', argument ?? args[0] ?? '');
+          core.setOutput('ref', pr.head.ref);
+          core.setOutput('sha', pr.head.sha);
+          try {
+            await github.rest.reactions.createForIssueComment({
+              owner, repo, comment_id: comment.id, content: 'eyes',
+            });
+          } catch (error) {
+            core.warning(`Could not react to the comment: ${error.message}`);
+          }

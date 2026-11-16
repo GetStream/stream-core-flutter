@@ -1,0 +1,48 @@
+name: Report Bot Command
+description: >
+  Answers a bot command's comment with the `message` output of the job that ran
+  it, or with a link to the run when that job did not succeed.
+
+# Run it from a job that needs the parse job and every command job, with
+# `if: always() && needs.<parse>.outputs.command != ''` and `pull-requests: write`.
+
+inputs:
+  command:
+    description: The command that ran.
+    required: true
+  results:
+    description: "`toJSON(needs)` of the calling job; every job except the parse job is a command job."
+    required: true
+  parse-job:
+    description: The id of the parse job in `results`.
+    required: false
+    default: parse
+  token:
+    description: Token used to answer the comment.
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: 💬 Answer the comment
+      uses: actions/github-script@v9
+      env:
+        COMMAND: ${{ inputs.command }}
+        RESULTS: ${{ inputs.results }}
+        PARSE_JOB: ${{ inputs.parse-job }}
+      with:
+        github-token: ${{ inputs.token }}
+        script: |
+          const { COMMAND, RESULTS, PARSE_JOB } = process.env;
+          const { [PARSE_JOB]: _, ...commands } = JSON.parse(RESULTS);
+          const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+          const job = Object.values(commands).find((job) => job.result !== 'skipped');
+
+          let body;
+          if (job?.result !== 'success') body = `\`/${COMMAND}\` failed, see the [run](${run}).`;
+          else body = job.outputs?.message || `\`/${COMMAND}\` finished, see the [run](${run}).`;
+
+          await github.rest.issues.createComment({
+            owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body,
+          });

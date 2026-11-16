@@ -1,6 +1,22 @@
 name: update_goldens
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  # Run by the `/update-goldens` bot command, see bot_commands.yml.
+  workflow_call:
+    inputs:
+      ref:
+        description: "Branch the goldens are pushed to"
+        type: string
+        required: true
+      sha:
+        description: "Commit the goldens are generated from; nothing is pushed if the branch moved past it"
+        type: string
+        required: true
+    outputs:
+      message:
+        description: "Reply to the command"
+        value: ${{ jobs.summarize.outputs.message }}
 
 permissions:
   contents: read
@@ -8,18 +24,14 @@ permissions:
 jobs:
   update_goldens:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.detect.outputs.changed }}
+      update: ${{ steps.update.outcome }}
     steps:
-      - name: 🔑 Mint CI Bot Token
-        id: ci-bot-token
-        uses: actions/create-github-app-token@v3
-        with:
-          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
-
       - name: 📚 Checkout branch
         uses: actions/checkout@v6
         with:
-          token: ${{ steps.ci-bot-token.outputs.token }}
+          ref: ${{ inputs.sha }}
 
       - name: 🐦 Install Flutter
         uses: subosito/flutter-action@v2
@@ -36,13 +48,113 @@ jobs:
         run: melos bootstrap --verbose
 
       - name: 🖼️ Update Goldens
+        id: update
         continue-on-error: true
         run: melos run update:goldens
 
+      - name: 🔍 Detect changed goldens
+        id: detect
+        run: |
+          if [[ -z "$(git status --porcelain -- '**/test/**/goldens/*.png')" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 📦 Bundle goldens
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          find packages -path '*/test/*/goldens/*' -name '*.png' -print0 \
+            | tar --null -czf goldens.tgz -T -
+
+      - name: 📤 Upload goldens artifact
+        if: steps.detect.outputs.changed == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: goldens
+          path: goldens.tgz
+          retention-days: 1
+
+  # Runs apart from the job above so the bot token never shares a job with the
+  # pull request's code.
+  commit_goldens:
+    needs: update_goldens
+    if: needs.update_goldens.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit.outputs.commit_hash }}
+      moved: ${{ steps.verify.outputs.moved }}
+    steps:
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+
+      - name: 📚 Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+          token: ${{ steps.ci-bot-token.outputs.token }}
+
+      - name: 🔍 Verify the branch has not moved
+        id: verify
+        env:
+          SHA: ${{ inputs.sha }}
+        run: |
+          if [[ -n "$SHA" && "$(git rev-parse HEAD)" != "$SHA" ]]; then
+            echo "moved=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 📥 Download goldens
+        if: steps.verify.outputs.moved != 'true'
+        uses: actions/download-artifact@v8
+        with:
+          name: goldens
+
+      - name: 📦 Extract goldens
+        if: steps.verify.outputs.moved != 'true'
+        run: |
+          # The archive comes from the pull request's code, so only goldens are extracted.
+          tar -xzf goldens.tgz --wildcards --wildcards-match-slash '*/goldens/*.png'
+          rm goldens.tgz
+
       - name: 📤 Commit Changes
+        id: commit
+        if: steps.verify.outputs.moved != 'true'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: Update Goldens"
           file_pattern: "**/test/**/goldens/*.png"
           commit_user_name: "stream-flutter-ci-bot[bot]"
           commit_user_email: "357444665+stream-flutter-ci-bot[bot]@users.noreply.github.com"
+
+  summarize:
+    needs: [update_goldens, commit_goldens]
+    if: always()
+    runs-on: ubuntu-latest
+    outputs:
+      message: ${{ steps.summarize.outputs.message }}
+    steps:
+      - name: 📝 Summarize
+        id: summarize
+        env:
+          COMMIT: ${{ needs.commit_goldens.outputs.commit }}
+          MOVED: ${{ needs.commit_goldens.outputs.moved }}
+          TESTS_FAILED: ${{ needs.update_goldens.outputs.update == 'failure' }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          tests_note="some golden tests failed to run, see the [run]($RUN)."
+          if [[ "$MOVED" == "true" ]]; then
+            message="The branch moved while the goldens were updating, so nothing was pushed. Run the command again."
+          elif [[ -n "$COMMIT" && "$TESTS_FAILED" == "true" ]]; then
+            message="Updated the goldens in $COMMIT, but $tests_note"
+          elif [[ -n "$COMMIT" ]]; then
+            message="Updated the goldens in $COMMIT."
+          elif [[ "$TESTS_FAILED" == "true" ]]; then
+            message="No goldens changed, but $tests_note"
+          else
+            message="The goldens are already up to date ([run]($RUN))."
+          fi
+          echo "message=$message" >> "$GITHUB_OUTPUT"

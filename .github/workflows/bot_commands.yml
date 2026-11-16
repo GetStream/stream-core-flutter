@@ -1,0 +1,74 @@
+name: bot_commands
+
+# Runs `/<command> [argument]` from the first line of a pull request comment.
+#
+# To add a command:
+#   1. Write a workflow with a `workflow_call` trigger whose `ref` and `sha`
+#      inputs receive the pull request's branch and head commit, and whose
+#      `message` output is the reply posted back on the pull request.
+#   2. Add the command to `commands` in the `parse` job.
+#   3. Add a job calling the workflow below, and list it in `report.needs`.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+
+jobs:
+  parse:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Required to react to and answer the comment
+    outputs:
+      command: ${{ steps.parse.outputs.command }}
+      argument: ${{ steps.parse.outputs.argument }}
+      ref: ${{ steps.parse.outputs.ref }}
+      sha: ${{ steps.parse.outputs.sha }}
+    steps:
+      - name: 📚 Checkout the bot actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/actions
+
+      - name: 🎯 Parse the command
+        id: parse
+        uses: ./.github/actions/bot-command-parse
+        with:
+          commands: |
+            {
+              "update-goldens": {
+                "description": "Updates the goldens on this branch and pushes them."
+              }
+            }
+
+  update_goldens:
+    needs: parse
+    if: needs.parse.outputs.command == 'update-goldens'
+    uses: ./.github/workflows/update_goldens.yml
+    secrets: inherit
+    with:
+      ref: ${{ needs.parse.outputs.ref }}
+      sha: ${{ needs.parse.outputs.sha }}
+
+  report:
+    needs: [parse, update_goldens]
+    if: always() && needs.parse.outputs.command != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Required to answer the comment
+    steps:
+      - name: 📚 Checkout the bot actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/actions
+
+      - name: 💬 Answer the comment
+        uses: ./.github/actions/bot-command-report
+        with:
+          command: ${{ needs.parse.outputs.command }}
+          results: ${{ toJSON(needs) }}
