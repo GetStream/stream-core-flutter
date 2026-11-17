@@ -7,8 +7,8 @@ description: >
 inputs:
   files:
     description: >
-      Patterns, one per line, of the files that may be committed. Nothing outside
-      them is ever committed.
+      The files that may be committed: a path or pattern such as `README.md`, or
+      several, one per line. Nothing outside them is ever committed.
     required: true
   message:
     description: The commit message; lines after the first become its body.
