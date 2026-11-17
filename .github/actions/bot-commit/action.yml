@@ -7,8 +7,9 @@ description: >
 inputs:
   files:
     description: >
-      The files that may be committed: a path or pattern such as `README.md`, or
-      several, one per line. Nothing outside them is ever committed.
+      The files that may be committed: a path or glob pattern such as `README.md`,
+      or several, one per line. A line starting with `!` excludes its matches.
+      Nothing outside them is ever committed.
     required: true
   message:
     description: The commit message; lines after the first become its body.
@@ -26,10 +27,11 @@ inputs:
     default: ${{ github.event.pull_request.head.sha || github.sha }}
   detect-changes:
     description: >
-      `true` commits only the files `git status` reports as added, modified or
-      deleted in the workspace checkout. `false` commits every file matching
-      `files`, for a workspace that is not a checkout, such as one holding files
-      downloaded from another job.
+      `true` commits the files `git status` reports as added, modified or deleted
+      in the workspace, which must be a checkout of `expected-head-sha`. `false`
+      commits the files matching `files` whose contents differ from the branch,
+      for a workspace that is not a checkout, such as one holding files downloaded
+      from another job.
     required: false
     default: "true"
 
@@ -59,6 +61,7 @@ runs:
       with:
         github-token: ${{ inputs.token }}
         script: |
+          const crypto = require('crypto');
           const fs = require('fs');
           const path = require('path');
           const { execFileSync } = require('child_process');
@@ -69,8 +72,20 @@ runs:
           const additions = [];
           const deletions = [];
           if (DETECT_CHANGES === 'true') {
+            let head;
+            try {
+              head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workspace }).toString().trim();
+            } catch (error) {
+              return core.setFailed('detect-changes needs a checkout in the workspace; pass `detect-changes: false` otherwise.');
+            }
+            if (head !== SHA) {
+              return core.setFailed(`The checkout is at ${head}, not ${SHA}; check out ${SHA} so only its changes are committed.`);
+            }
+
+            // Git matches `:(glob)` pathspecs the way the no-checkout mode matches `files`.
+            const pathspecs = patterns.map((p) => (p.startsWith('!') ? `:(exclude,glob)${p.slice(1)}` : `:(glob)${p}`));
             // Entries are `XY path`; a rename or copy is followed by its original path.
-            const entries = execFileSync('git', ['status', '--porcelain', '-z', '-uall', '--', ...patterns], {
+            const entries = execFileSync('git', ['status', '--porcelain', '-z', '-uall', '--', ...pathspecs], {
               cwd: workspace,
             }).toString().split('\0');
             for (let i = 0; i < entries.length; i++) {
@@ -85,7 +100,17 @@ runs:
             }
           } else {
             const files = await (await glob.create(patterns.join('\n'), { matchDirectories: false })).glob();
-            additions.push(...files.map((file) => path.relative(workspace, file)));
+            // Files whose git blob matches the branch's are left out, so an unchanged file never makes a commit.
+            const { data: { tree, truncated } } = await github.rest.git.getTree({
+              ...context.repo, tree_sha: SHA, recursive: 'true',
+            });
+            const blobs = new Map(tree.filter((entry) => entry.type === 'blob').map((entry) => [entry.path, entry.sha]));
+            for (const file of files) {
+              const relative = path.relative(workspace, file);
+              const contents = fs.readFileSync(file);
+              const blob = crypto.createHash('sha1').update(`blob ${contents.length}\0`).update(contents).digest('hex');
+              if (truncated || blobs.get(relative) !== blob) additions.push(relative);
+            }
           }
 
           if (!additions.length && !deletions.length) {
