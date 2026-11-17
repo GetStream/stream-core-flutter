@@ -1,7 +1,8 @@
 name: Report Bot Command
 description: >
-  Answers a bot command's comment with the `message` output of the job that ran
-  it, or with a link to the run when that job did not succeed.
+  Updates the bot's reply to a command with the `message` output of the job that
+  ran it, or with a link to the run when that job did not succeed, and reacts to
+  the command with 🚀 or 😕.
 
 # Run it from a job that needs the parse job and every command job, with
 # `if: always() && needs.<parse>.outputs.command != ''` and `pull-requests: write`.
@@ -9,6 +10,12 @@ description: >
 inputs:
   command:
     description: The command that ran.
+    required: true
+  request:
+    description: The `request` output of `bot-command-parse`.
+    required: true
+  reply-id:
+    description: The `reply-id` output of `bot-command-parse`.
     required: true
   results:
     description: "`toJSON(needs)` of the calling job; every job except the parse job is a command job."
@@ -29,20 +36,31 @@ runs:
       uses: actions/github-script@v9
       env:
         COMMAND: ${{ inputs.command }}
+        REQUEST: ${{ inputs.request }}
+        REPLY_ID: ${{ inputs.reply-id }}
         RESULTS: ${{ inputs.results }}
         PARSE_JOB: ${{ inputs.parse-job }}
       with:
         github-token: ${{ inputs.token }}
         script: |
-          const { COMMAND, RESULTS, PARSE_JOB } = process.env;
+          const { COMMAND, REQUEST, REPLY_ID, RESULTS, PARSE_JOB } = process.env;
+          const { owner, repo } = context.repo;
           const { [PARSE_JOB]: _, ...commands } = JSON.parse(RESULTS);
-          const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+          const run = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
           const job = Object.values(commands).find((job) => job.result !== 'skipped');
+          const succeeded = job?.result === 'success';
 
-          let body;
-          if (job?.result !== 'success') body = `\`/${COMMAND}\` failed, see the [run](${run}).`;
-          else body = job.outputs?.message || `\`/${COMMAND}\` finished, see the [run](${run}).`;
-
-          await github.rest.issues.createComment({
-            owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body,
+          const message = succeeded
+            ? job.outputs?.message || `\`${COMMAND}\` finished, see the [run](${run}).`
+            : `\`${COMMAND}\` failed, see the [run](${run}).`;
+          await github.rest.issues.updateComment({
+            owner, repo, comment_id: Number(REPLY_ID), body: `> ${REQUEST}\n\n${message}`,
           });
+
+          try {
+            await github.rest.reactions.createForIssueComment({
+              owner, repo, comment_id: context.payload.comment.id, content: succeeded ? 'rocket' : 'confused',
+            });
+          } catch (error) {
+            core.warning(`Could not react to the comment: ${error.message}`);
+          }

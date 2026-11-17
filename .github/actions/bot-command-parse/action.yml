@@ -1,8 +1,9 @@
 name: Parse Bot Command
 description: >
-  Reads `/<command> [argument]` from the first line of a pull request comment,
-  checks that the commenter may run it and resolves the pull request it runs on.
-  `/help` answers with the list of commands.
+  Reads a bot command from the first line of a pull request comment, checks that
+  the commenter may run it and resolves the pull request it runs on. Accepts
+  `@<bot> <command> [argument]`, `@<bot> /<command> [argument]` and
+  `/<command> [argument]`. Mentioning the bot alone, or `help`, lists the commands.
 
 # Run it from a job triggered by `issue_comment`, with `pull-requests: write`.
 
@@ -12,6 +13,10 @@ inputs:
       JSON object mapping each command name to its `description` and, optionally,
       the `arguments` it accepts. The first argument is the default.
     required: true
+  bot-name:
+    description: The bot's login without `[bot]`, used to recognise mentions.
+    required: false
+    default: stream-flutter-ci-bot
   token:
     description: Token used to read the pull request and answer the comment.
     required: false
@@ -30,6 +35,12 @@ outputs:
   sha:
     description: The pull request's head commit when the command was given.
     value: ${{ steps.parse.outputs.sha }}
+  request:
+    description: The command line as written, quoted in the replies.
+    value: ${{ steps.parse.outputs.request }}
+  reply-id:
+    description: The bot's reply, which `bot-command-report` updates with the result.
+    value: ${{ steps.parse.outputs.reply-id }}
 
 runs:
   using: composite
@@ -39,40 +50,54 @@ runs:
       uses: actions/github-script@v9
       env:
         COMMANDS: ${{ inputs.commands }}
+        BOT_NAME: ${{ inputs.bot-name }}
       with:
         github-token: ${{ inputs.token }}
         script: |
           const COMMANDS = JSON.parse(process.env.COMMANDS);
+          const bot = `@${process.env.BOT_NAME.toLowerCase()}`;
           const { owner, repo } = context.repo;
           const comment = context.payload.comment;
+          const run = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+
+          if (!context.payload.issue?.pull_request) return;
+          const request = comment.body.trim().split('\n')[0].trim();
           const reply = (body) => github.rest.issues.createComment({
-            owner, repo, issue_number: context.issue.number, body,
+            owner, repo, issue_number: context.issue.number, body: `> ${request}\n\n${body}`,
           });
           const reject = async (reason) => {
             core.setFailed(reason);
             await reply(`Can't run the command: ${reason}`);
           };
-
-          if (!context.payload.issue?.pull_request) return;
-          const [name, argument] = comment.body.trim().split('\n')[0].trim().split(/\s+/);
-          if (!name.startsWith('/')) return;
-          const commandName = name.slice(1);
-
-          if (commandName === 'help') {
+          const help = () => {
             const lines = Object.entries(COMMANDS).map(([key, { arguments: args, description }]) => {
-              const usage = args ? `/${key} [${args.join('|')}]` : `/${key}`;
-              return `- \`${usage}\`: ${description}`;
+              const usage = args ? `${key} [${args.join('|')}]` : key;
+              return `- \`${bot} ${usage}\`: ${description}`;
             });
-            return reply(['Comment one of these on the first line:', '', ...lines].join('\n'));
+            return ['Commands, on the first line of a comment:', '', ...lines, '',
+              `\`/<command>\` works in place of \`${bot} <command>\`.`].join('\n');
+          };
+
+          // Matches `@bot`, `@bot[bot]`, then an optional `/` before the command.
+          let words = request.toLowerCase().replace(/[.!?]+$/, '').split(/\s+/);
+          const mentioned = words[0] === bot || words[0] === `${bot}[bot]`;
+          if (mentioned) words = words.slice(1);
+          else if (!words[0].startsWith('/')) return;
+          const [name = 'help', argument] = words;
+          const commandName = name.replace(/^\//, '');
+
+          if (commandName === 'help') return reply(help());
+          if (!Object.hasOwn(COMMANDS, commandName)) {
+            // A bare `/<word>` may be meant for someone else; only a mention is answered.
+            if (mentioned) await reply(`I don't know \`${commandName}\`.\n\n${help()}`);
+            return;
           }
 
-          // Other comments starting with `/` are not meant for the bot.
-          if (!Object.hasOwn(COMMANDS, commandName)) return;
           const args = COMMANDS[commandName].arguments ?? [];
           if (argument && !args.includes(argument)) {
-            if (!args.length) return reject(`\`/${commandName}\` takes no argument.`);
+            if (!args.length) return reject(`\`${commandName}\` takes no argument.`);
             const allowed = args.map((a) => `\`${a}\``).join(', ');
-            return reject(`\`/${commandName}\` takes ${allowed}, not \`${argument}\`.`);
+            return reject(`\`${commandName}\` takes ${allowed}, not \`${argument}\`.`);
           }
 
           const { data: { permission } } = await github.rest.repos.getCollaboratorPermissionLevel({
@@ -92,6 +117,9 @@ runs:
           core.setOutput('argument', argument ?? args[0] ?? '');
           core.setOutput('ref', pr.head.ref);
           core.setOutput('sha', pr.head.sha);
+          core.setOutput('request', request);
+          const { data: answer } = await reply(`Running \`${commandName}\`, see the [run](${run}).`);
+          core.setOutput('reply-id', answer.id);
           try {
             await github.rest.reactions.createForIssueComment({
               owner, repo, comment_id: comment.id, content: 'eyes',
