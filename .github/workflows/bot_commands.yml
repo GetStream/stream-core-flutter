@@ -16,14 +16,6 @@ on:
 
 permissions: {}
 
-# Commands on one pull request run one at a time; other comments get a group of
-# their own, so they never queue behind a command.
-concurrency:
-  group: >-
-    ${{ github.workflow }}-${{
-    (startsWith(github.event.comment.body, '/') || startsWith(github.event.comment.body, '@stream-flutter-ci-bot'))
-    && github.event.issue.number || github.run_id }}
-
 jobs:
   parse:
     if: |
@@ -32,7 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write # Required to react to and answer the comment
     outputs:
       command: ${{ steps.parse.outputs.command }}
       argument: ${{ steps.parse.outputs.argument }}
@@ -46,10 +37,20 @@ jobs:
         with:
           sparse-checkout: .github/actions
 
+      # Answers as the bot, so replies come from the app the comment mentions.
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+          permission-pull-requests: write
+
       - name: 🎯 Parse the command
         id: parse
         uses: ./.github/actions/bot-command-parse
         with:
+          token: ${{ steps.ci-bot-token.outputs.token }}
           commands: |
             {
               "update-goldens": {
@@ -63,27 +64,37 @@ jobs:
     permissions:
       actions: read # Required to find the CI run and download its artifact
     uses: ./.github/workflows/apply_goldens.yml
-    secrets: inherit
+    secrets:
+      FLUTTER_CI_BOT_PRIVATE_KEY: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
     with:
       ref: ${{ needs.parse.outputs.ref }}
       sha: ${{ needs.parse.outputs.sha }}
 
   report:
     needs: [parse, update_goldens]
-    if: always() && needs.parse.outputs.command != ''
+    if: always() && needs.parse.outputs.reply-id != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write # Required to answer the comment
     steps:
       - name: 📚 Checkout the bot actions
         uses: actions/checkout@v6
         with:
           sparse-checkout: .github/actions
 
+      # Answers as the bot, so replies come from the app the comment mentions.
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+          permission-pull-requests: write
+
       - name: 💬 Answer the comment
         uses: ./.github/actions/bot-command-report
         with:
+          token: ${{ steps.ci-bot-token.outputs.token }}
           command: ${{ needs.parse.outputs.command }}
           request: ${{ needs.parse.outputs.request }}
           reply-id: ${{ needs.parse.outputs.reply-id }}

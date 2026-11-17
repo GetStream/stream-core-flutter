@@ -15,6 +15,9 @@ on:
         description: "Head commit whose CI run regenerated the goldens; nothing is pushed if the branch moved past it"
         type: string
         required: true
+    secrets:
+      FLUTTER_CI_BOT_PRIVATE_KEY:
+        required: true
     outputs:
       message:
         description: "Reply to the command"
@@ -35,28 +38,38 @@ jobs:
         id: find
         uses: actions/github-script@v9
         env:
+          REF: ${{ inputs.ref }}
           SHA: ${{ inputs.sha }}
         with:
           script: |
-            // The CI run can still be going when the command is given, so wait for it.
-            const deadline = Date.now() + 20 * 60 * 1000;
+            const { owner, repo } = context.repo;
+            const start = Date.now();
             for (;;) {
               const { data: { workflow_runs: runs } } = await github.rest.actions.listWorkflowRuns({
-                ...context.repo, workflow_id: 'stream_core_flutter_workflow.yml',
-                event: 'pull_request', head_sha: process.env.SHA, per_page: 1,
+                owner, repo, workflow_id: 'stream_core_flutter_workflow.yml',
+                event: 'pull_request', branch: process.env.REF, head_sha: process.env.SHA, per_page: 10,
               });
-              const run = runs[0];
+              // A fork's pull request can carry the same commit, so only this repository's branch counts.
+              const run = runs.find((candidate) => candidate.head_repository?.full_name === `${owner}/${repo}`);
               if (run?.status === 'completed') {
-                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
-                  ...context.repo, run_id: run.id, name: 'updated-goldens',
-                });
-                core.setOutput('run-id', run.id);
                 core.setOutput('run-url', run.html_url);
                 core.setOutput('conclusion', run.conclusion);
-                core.setOutput('artifact', artifacts.some((artifact) => !artifact.expired));
+                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                  owner, repo, run_id: run.id, name: 'updated-goldens',
+                });
+                // A re-run keeps the artifacts of earlier attempts, so only the latest attempt's count.
+                const latest = artifacts.filter((artifact) => new Date(artifact.created_at) >= new Date(run.run_started_at));
+                if (run.conclusion === 'failure' && latest.some((artifact) => !artifact.expired)) {
+                  core.setOutput('run-id', run.id);
+                  core.setOutput('artifact', 'true');
+                } else if (latest.some((artifact) => artifact.expired)) {
+                  core.setOutput('expired', 'true');
+                }
                 return;
               }
-              if (Date.now() > deadline) return core.setOutput('timed-out', 'true');
+              // No run a few minutes after the command usually means none is coming, such as on a merge conflict.
+              if (!run && Date.now() - start > 3 * 60 * 1000) return core.setOutput('no-run', 'true');
+              if (Date.now() - start > 20 * 60 * 1000) return core.setOutput('timed-out', 'true');
               await new Promise((resolve) => setTimeout(resolve, 20 * 1000));
             }
 
@@ -75,6 +88,7 @@ jobs:
         with:
           client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
           private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+          permission-contents: write
 
       - name: 📤 Commit the goldens
         if: steps.find.outputs.artifact == 'true'
@@ -93,7 +107,9 @@ jobs:
         if: always()
         env:
           SHA: ${{ inputs.sha }}
+          NO_RUN: ${{ steps.find.outputs.no-run }}
           TIMED_OUT: ${{ steps.find.outputs.timed-out }}
+          EXPIRED: ${{ steps.find.outputs.expired }}
           CONCLUSION: ${{ steps.find.outputs.conclusion }}
           ARTIFACT: ${{ steps.find.outputs.artifact }}
           CI_RUN: ${{ steps.find.outputs.run-url }}
@@ -104,6 +120,8 @@ jobs:
         run: |
           if [[ "$FAILED" == "true" ]]; then
             message="Updating the goldens failed, see the [run]($RUN)."
+          elif [[ "$NO_RUN" == "true" ]]; then
+            message="CI has not run on ${SHA:0:7}, for example because of a merge conflict; run the command again once it has."
           elif [[ "$TIMED_OUT" == "true" ]]; then
             message="CI has not finished on ${SHA:0:7}; run the command again once it has."
           elif [[ "$MOVED" == "true" ]]; then
@@ -112,6 +130,10 @@ jobs:
             message="Updated the goldens in $COMMIT from the [CI run]($CI_RUN)."
           elif [[ "$ARTIFACT" == "true" ]]; then
             message="The goldens from the [CI run]($CI_RUN) match the branch already."
+          elif [[ "$EXPIRED" == "true" ]]; then
+            message="The goldens from the [CI run]($CI_RUN) have expired; re-run CI and run the command again."
+          elif [[ "$CONCLUSION" == "cancelled" ]]; then
+            message="The [CI run]($CI_RUN) on ${SHA:0:7} was cancelled, usually by a newer push; run the command again on the latest commit."
           elif [[ "$CONCLUSION" == "success" ]]; then
             message="The goldens are already up to date: [CI]($CI_RUN) passed on ${SHA:0:7}."
           else

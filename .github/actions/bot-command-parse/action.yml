@@ -80,6 +80,7 @@ runs:
 
           // Matches `@bot`, `@bot[bot]`, then an optional `/` before the command.
           let words = request.toLowerCase().replace(/[.!?]+$/, '').split(/\s+/);
+          words[0] = words[0].replace(/[,:]+$/, '');
           const mentioned = words[0] === bot || words[0] === `${bot}[bot]`;
           if (mentioned) words = words.slice(1);
           else if (!words[0].startsWith('/')) return;
@@ -112,14 +113,21 @@ runs:
           if (pr.head.repo?.full_name !== `${owner}/${repo}`) {
             return reject('the bot cannot push to branches of a fork.');
           }
+          // Protected branches change through reviewed pull requests, never through the bot.
+          const { data: branch } = await github.rest.repos.getBranch({ owner, repo, branch: pr.head.ref });
+          const { data: rules } = await github.rest.repos.getBranchRules({ owner, repo, branch: pr.head.ref });
+          const guarded = rules.some((rule) => ['pull_request', 'update'].includes(rule.type));
+          if (pr.head.ref === context.payload.repository.default_branch || branch.protected || guarded) {
+            return reject(`the bot does not push to the protected branch \`${pr.head.ref}\`.`);
+          }
 
+          const { data: answer } = await reply(`Running \`${commandName}\`, see the [run](${run}).`);
+          core.setOutput('reply-id', answer.id);
           core.setOutput('command', commandName);
           core.setOutput('argument', argument ?? args[0] ?? '');
           core.setOutput('ref', pr.head.ref);
           core.setOutput('sha', pr.head.sha);
           core.setOutput('request', request);
-          const { data: answer } = await reply(`Running \`${commandName}\`, see the [run](${run}).`);
-          core.setOutput('reply-id', answer.id);
           try {
             await github.rest.reactions.createForIssueComment({
               owner, repo, comment_id: comment.id, content: 'eyes',
