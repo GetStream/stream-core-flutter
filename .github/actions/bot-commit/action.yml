@@ -6,7 +6,9 @@ description: >
 
 inputs:
   files:
-    description: Glob patterns, one per line, of the workspace files to commit.
+    description: >
+      Glob patterns, one per line, of the workspace files to commit. Every match is
+      committed, so a caller working in a checkout passes only the changed paths.
     required: true
   branch:
     description: The branch to commit to.
@@ -47,6 +49,7 @@ runs:
           const path = require('path');
           const { FILES, BRANCH, SHA, MESSAGE } = process.env;
 
+          if (!FILES.trim()) return core.info('Nothing to commit.');
           const files = await (await glob.create(FILES)).glob();
           if (!files.length) return core.info('Nothing to commit.');
           const additions = files.map((file) => ({
