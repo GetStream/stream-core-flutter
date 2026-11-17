@@ -1,29 +1,44 @@
 name: Bot Commit
 description: >
-  Commits files from the workspace to a branch through the GitHub API, so the
-  commit is signed by GitHub and no checkout of the branch is needed. The
-  commit is refused if the branch moved past `expected-head-sha`.
+  Commits changed files to a branch through the GitHub API, so the commit is
+  signed by GitHub and attributed to the app whose token is used. The commit is
+  refused if the branch moved past `expected-head-sha`.
 
 inputs:
   files:
     description: >
-      Glob patterns, one per line, of the workspace files to commit. Every match is
-      committed, so a caller working in a checkout passes only the changed paths.
-    required: true
-  branch:
-    description: The branch to commit to.
-    required: true
-  expected-head-sha:
-    description: The commit the files were generated from; nothing is committed if the branch moved past it.
+      The files that may be committed: a path or glob pattern such as `README.md`,
+      or several, one per line. A line starting with `!` excludes its matches.
+      Nothing outside them is ever committed.
     required: true
   message:
-    description: The commit message.
+    description: The commit message; lines after the first become its body.
     required: true
   token:
     description: Token with write access to the repository's contents, such as a GitHub App token.
     required: true
+  branch:
+    description: The branch to commit to.
+    required: false
+    default: ${{ github.head_ref || github.ref_name }}
+  expected-head-sha:
+    description: The commit the changes were made on; nothing is committed if the branch moved past it.
+    required: false
+    default: ${{ github.event.pull_request.head.sha || github.sha }}
+  detect-changes:
+    description: >
+      `true` commits the files `git status` reports as added, modified or deleted
+      in the workspace, which must be a checkout of `expected-head-sha`. `false`
+      commits the files matching `files` whose contents differ from the branch,
+      for a workspace that is not a checkout, such as one holding files downloaded
+      from another job.
+    required: false
+    default: "true"
 
 outputs:
+  changed:
+    description: "`true` when there was something to commit."
+    value: ${{ steps.commit.outputs.changed }}
   commit:
     description: The new commit; empty when there was nothing to commit or the branch moved.
     value: ${{ steps.commit.outputs.commit }}
@@ -39,23 +54,70 @@ runs:
       uses: actions/github-script@v9
       env:
         FILES: ${{ inputs.files }}
+        MESSAGE: ${{ inputs.message }}
         BRANCH: ${{ inputs.branch }}
         SHA: ${{ inputs.expected-head-sha }}
-        MESSAGE: ${{ inputs.message }}
+        DETECT_CHANGES: ${{ inputs.detect-changes }}
       with:
         github-token: ${{ inputs.token }}
         script: |
+          const crypto = require('crypto');
           const fs = require('fs');
           const path = require('path');
-          const { FILES, BRANCH, SHA, MESSAGE } = process.env;
+          const { execFileSync } = require('child_process');
+          const { FILES, MESSAGE, BRANCH, SHA, DETECT_CHANGES } = process.env;
+          const workspace = process.env.GITHUB_WORKSPACE;
 
-          if (!FILES.trim()) return core.info('Nothing to commit.');
-          const files = await (await glob.create(FILES)).glob();
-          if (!files.length) return core.info('Nothing to commit.');
-          const additions = files.map((file) => ({
-            path: path.relative(process.env.GITHUB_WORKSPACE, file),
-            contents: fs.readFileSync(file).toString('base64'),
-          }));
+          const patterns = FILES.split('\n').map((line) => line.trim()).filter(Boolean);
+          const additions = [];
+          const deletions = [];
+          if (DETECT_CHANGES === 'true') {
+            let head;
+            try {
+              head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workspace }).toString().trim();
+            } catch (error) {
+              return core.setFailed('detect-changes needs a checkout in the workspace; pass `detect-changes: false` otherwise.');
+            }
+            if (head !== SHA) {
+              return core.setFailed(`The checkout is at ${head}, not ${SHA}; check out ${SHA} so only its changes are committed.`);
+            }
+
+            // Git matches `:(glob)` pathspecs the way the no-checkout mode matches `files`.
+            const pathspecs = patterns.map((p) => (p.startsWith('!') ? `:(exclude,glob)${p.slice(1)}` : `:(glob)${p}`));
+            // Entries are `XY path`; a rename or copy is followed by its original path.
+            const entries = execFileSync('git', ['status', '--porcelain', '-z', '-uall', '--', ...pathspecs], {
+              cwd: workspace,
+            }).toString().split('\0');
+            for (let i = 0; i < entries.length; i++) {
+              if (!entries[i]) continue;
+              const [status, file] = [entries[i].slice(0, 2), entries[i].slice(3)];
+              if (status[0] === 'R' || status[0] === 'C') {
+                const original = entries[++i];
+                if (status[0] === 'R') deletions.push(original);
+              }
+              if (status.includes('D')) deletions.push(file);
+              else additions.push(file);
+            }
+          } else {
+            const files = await (await glob.create(patterns.join('\n'), { matchDirectories: false })).glob();
+            // Files whose git blob matches the branch's are left out, so an unchanged file never makes a commit.
+            const { data: { tree, truncated } } = await github.rest.git.getTree({
+              ...context.repo, tree_sha: SHA, recursive: 'true',
+            });
+            const blobs = new Map(tree.filter((entry) => entry.type === 'blob').map((entry) => [entry.path, entry.sha]));
+            for (const file of files) {
+              const relative = path.relative(workspace, file);
+              const contents = fs.readFileSync(file);
+              const blob = crypto.createHash('sha1').update(`blob ${contents.length}\0`).update(contents).digest('hex');
+              if (truncated || blobs.get(relative) !== blob) additions.push(relative);
+            }
+          }
+
+          if (!additions.length && !deletions.length) {
+            core.setOutput('changed', 'false');
+            return core.info('Nothing to commit.');
+          }
+          core.setOutput('changed', 'true');
 
           const [headline, ...body] = MESSAGE.split('\n');
           try {
@@ -67,11 +129,19 @@ runs:
                 branch: { repositoryNameWithOwner: `${context.repo.owner}/${context.repo.repo}`, branchName: BRANCH },
                 expectedHeadOid: SHA,
                 message: { headline, body: body.join('\n').trim() || undefined },
-                fileChanges: { additions },
+                fileChanges: {
+                  additions: additions.map((file) => ({
+                    path: file,
+                    contents: fs.readFileSync(path.join(workspace, file)).toString('base64'),
+                  })),
+                  deletions: deletions.map((file) => ({ path: file })),
+                },
               },
             });
             core.setOutput('commit', commit.oid);
+            core.info(`Committed ${commit.oid}: ${additions.length} added or changed, ${deletions.length} deleted.`);
           } catch (error) {
             if (!/expected branch to point to/i.test(error.message)) throw error;
             core.setOutput('moved', 'true');
+            core.warning(`${BRANCH} moved past ${SHA}, so nothing was committed.`);
           }
