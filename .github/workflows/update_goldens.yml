@@ -33,13 +33,13 @@ jobs:
         with:
           ref: ${{ inputs.sha }}
 
+      # The pull request's code runs in this job, so it writes no caches the default
+      # branch would restore.
       - name: 🐦 Install Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.x"
           channel: stable
-          cache: true
-          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
 
       - name: 📦 Install Tools
         run: flutter pub global activate melos
