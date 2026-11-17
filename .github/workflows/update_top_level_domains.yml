@@ -43,5 +43,5 @@ jobs:
           title: 'chore(repo): update the IANA top-level domains'
           body: |
             Regenerates the top-level domains `findLinks` recognizes from the IANA root zone list with `melos run generate:tlds`.
-          committer: stream-flutter-ci-bot[bot] <357444665+stream-flutter-ci-bot[bot]@users.noreply.github.com>
-          author: stream-flutter-ci-bot[bot] <357444665+stream-flutter-ci-bot[bot]@users.noreply.github.com>
+          # Commits through the API as the app, so GitHub signs them.
+          sign-commits: true
