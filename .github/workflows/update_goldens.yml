@@ -32,6 +32,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.sha }}
+          persist-credentials: false
 
       # The pull request's code runs in this job, so it writes no caches the default
       # branch would restore.
@@ -107,7 +108,7 @@ jobs:
         id: commit
         uses: GetStream/stream-core-flutter/.github/actions/bot-commit@68fdf0bf3c779f640dbb10a1ecf7945d872408f7
         with:
-          files: "**/goldens/**/*.png"
+          files: "**/test/**/goldens/**/*.png"
           branch: ${{ inputs.ref || github.ref_name }}
           expected-head-sha: ${{ inputs.sha || github.sha }}
           message: "chore: Update Goldens"
