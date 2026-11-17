@@ -72,7 +72,9 @@ runs:
           const patterns = FILES.split('\n').map((line) => line.trim()).filter(Boolean);
           // A link could point anywhere on the runner, such as this process's environment.
           const irregular = (files) => files.filter((file) => !fs.lstatSync(path.join(workspace, file)).isFile());
-          const refuse = (files) => core.setFailed(`Refusing to commit files that are not regular files: ${files.join(', ')}`);
+          const refuse = (files) => core.setFailed(
+            `Refusing to commit ${files.join(', ')}: only regular files are committed, since a link's target would be read as its contents.`,
+          );
           const additions = [];
           const deletions = [];
           if (DETECT_CHANGES === 'true') {
