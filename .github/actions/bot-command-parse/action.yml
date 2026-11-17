@@ -5,7 +5,8 @@ description: >
   `@<bot> <command> [argument]`, `@<bot> /<command> [argument]` and
   `/<command> [argument]`. Mentioning the bot alone, or `help`, lists the commands.
 
-# Run it from a job triggered by `issue_comment`, with `pull-requests: write`.
+# Run it from a job triggered by `issue_comment`, with a `token` that can write pull
+# requests and read contents.
 
 inputs:
   commands:
@@ -101,24 +102,29 @@ runs:
             return reject(`\`${commandName}\` takes ${allowed}, not \`${argument}\`.`);
           }
 
-          const { data: { permission } } = await github.rest.repos.getCollaboratorPermissionLevel({
-            owner, repo, username: comment.user.login,
-          });
-          if (!['admin', 'write'].includes(permission)) {
-            return reject('only collaborators with write access can run bot commands.');
-          }
+          let pr;
+          try {
+            const { data: { permission } } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner, repo, username: comment.user.login,
+            });
+            if (!['admin', 'write'].includes(permission)) {
+              return reject('only collaborators with write access can run bot commands.');
+            }
 
-          const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: context.issue.number });
-          if (pr.state !== 'open') return reject('the pull request is not open.');
-          if (pr.head.repo?.full_name !== `${owner}/${repo}`) {
-            return reject('the bot cannot push to branches of a fork.');
-          }
-          // Protected branches change through reviewed pull requests, never through the bot.
-          const { data: branch } = await github.rest.repos.getBranch({ owner, repo, branch: pr.head.ref });
-          const { data: rules } = await github.rest.repos.getBranchRules({ owner, repo, branch: pr.head.ref });
-          const guarded = rules.some((rule) => ['pull_request', 'update'].includes(rule.type));
-          if (pr.head.ref === context.payload.repository.default_branch || branch.protected || guarded) {
-            return reject(`the bot does not push to the protected branch \`${pr.head.ref}\`.`);
+            ({ data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: context.issue.number }));
+            if (pr.state !== 'open') return reject('the pull request is not open.');
+            if (pr.head.repo?.full_name !== `${owner}/${repo}`) {
+              return reject('the bot cannot push to branches of a fork.');
+            }
+            // Protected branches change through reviewed pull requests, never through the bot.
+            const { data: branch } = await github.rest.repos.getBranch({ owner, repo, branch: pr.head.ref });
+            const { data: rules } = await github.rest.repos.getBranchRules({ owner, repo, branch: pr.head.ref });
+            const guarded = rules.some((rule) => ['pull_request', 'update'].includes(rule.type));
+            if (pr.head.ref === context.payload.repository.default_branch || branch.protected || guarded) {
+              return reject(`the bot does not push to the protected branch \`${pr.head.ref}\`.`);
+            }
+          } catch (error) {
+            return reject(`checking the pull request failed: ${error.message}`);
           }
 
           const { data: answer } = await reply(`Running \`${commandName}\`, see the [run](${run}).`);

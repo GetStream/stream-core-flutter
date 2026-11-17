@@ -5,7 +5,8 @@ description: >
   the command with 🚀 or 😕.
 
 # Run it from a job that needs the parse job and every command job, with
-# `if: always() && needs.<parse>.outputs.command != ''` and `pull-requests: write`.
+# `if: always() && needs.<parse>.outputs.reply-id != ''` and a `token` that can
+# write pull requests.
 
 inputs:
   command:
