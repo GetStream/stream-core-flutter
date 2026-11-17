@@ -85,11 +85,6 @@ jobs:
       commit: ${{ steps.commit.outputs.commit }}
       moved: ${{ steps.commit.outputs.moved }}
     steps:
-      - name: 📚 Checkout the bot actions
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout: .github/actions
-
       - name: 📥 Download goldens
         uses: actions/download-artifact@v8
         with:
@@ -110,13 +105,14 @@ jobs:
 
       - name: 📤 Commit the goldens
         id: commit
-        uses: ./.github/actions/bot-commit
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@e371bd980d64c744cfd09437c34c1ee1c15c5dc5
         with:
           files: "**/goldens/**/*.png"
           branch: ${{ inputs.ref || github.ref_name }}
           expected-head-sha: ${{ inputs.sha || github.sha }}
           message: "chore: Update Goldens"
           token: ${{ steps.ci-bot-token.outputs.token }}
+          detect-changes: false
 
   summarize:
     needs: [update_goldens, commit_goldens]
