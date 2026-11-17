@@ -84,7 +84,7 @@ runs:
               else additions.push(file);
             }
           } else {
-            const files = await (await glob.create(patterns.join('\n'))).glob();
+            const files = await (await glob.create(patterns.join('\n'), { matchDirectories: false })).glob();
             additions.push(...files.map((file) => path.relative(workspace, file)));
           }
 

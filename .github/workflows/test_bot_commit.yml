@@ -1,6 +1,6 @@
 name: test_bot_commit
 
-# Temporary: exercises the bot-commit action before it merges. Removed before merging.
+# Temporary (run 2): exercises the bot-commit action before it merges. Removed before merging.
 # Runs only when this file changes, so the bot's own commits don't start it again.
 on:
   push:
