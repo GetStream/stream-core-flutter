@@ -9,7 +9,8 @@ inputs:
     description: >
       The files that may be committed: a path or glob pattern such as `README.md`,
       or several, one per line. A line starting with `!` excludes its matches.
-      Nothing outside them is ever committed.
+      Nothing outside them is ever committed, and only regular files are: a
+      symbolic link or other special file fails the step.
     required: true
   message:
     description: The commit message; lines after the first become its body.
@@ -69,6 +70,11 @@ runs:
           const workspace = process.env.GITHUB_WORKSPACE;
 
           const patterns = FILES.split('\n').map((line) => line.trim()).filter(Boolean);
+          // A link could point anywhere on the runner, such as this process's environment.
+          const irregular = (files) => files.filter((file) => !fs.lstatSync(path.join(workspace, file)).isFile());
+          const refuse = (files) => core.setFailed(
+            `Refusing to commit ${files.join(', ')}: only regular files are committed, since a link's target would be read as its contents.`,
+          );
           const additions = [];
           const deletions = [];
           if (DETECT_CHANGES === 'true') {
@@ -98,18 +104,20 @@ runs:
               if (status.includes('D')) deletions.push(file);
               else additions.push(file);
             }
+            if (irregular(additions).length) return refuse(irregular(additions));
           } else {
-            const files = await (await glob.create(patterns.join('\n'), { matchDirectories: false })).glob();
+            const globber = await glob.create(patterns.join('\n'), { matchDirectories: false, followSymbolicLinks: false });
+            const files = (await globber.glob()).map((file) => path.relative(workspace, file));
+            if (irregular(files).length) return refuse(irregular(files));
             // Files whose git blob matches the branch's are left out, so an unchanged file never makes a commit.
             const { data: { tree, truncated } } = await github.rest.git.getTree({
               ...context.repo, tree_sha: SHA, recursive: 'true',
             });
             const blobs = new Map(tree.filter((entry) => entry.type === 'blob').map((entry) => [entry.path, entry.sha]));
             for (const file of files) {
-              const relative = path.relative(workspace, file);
-              const contents = fs.readFileSync(file);
+              const contents = fs.readFileSync(path.join(workspace, file));
               const blob = crypto.createHash('sha1').update(`blob ${contents.length}\0`).update(contents).digest('hex');
-              if (truncated || blobs.get(relative) !== blob) additions.push(relative);
+              if (truncated || blobs.get(file) !== blob) additions.push(file);
             }
           }
 
