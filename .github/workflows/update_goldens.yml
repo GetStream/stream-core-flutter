@@ -1,22 +1,6 @@
 name: update_goldens
 
-on:
-  workflow_dispatch:
-  # Run by the `/update-goldens` bot command, see bot_commands.yml.
-  workflow_call:
-    inputs:
-      ref:
-        description: "Branch the goldens are pushed to"
-        type: string
-        required: true
-      sha:
-        description: "Commit the goldens are generated from; nothing is pushed if the branch moved past it"
-        type: string
-        required: true
-    outputs:
-      message:
-        description: "Reply to the command"
-        value: ${{ jobs.summarize.outputs.message }}
+on: workflow_dispatch
 
 permissions:
   contents: read
@@ -24,23 +8,26 @@ permissions:
 jobs:
   update_goldens:
     runs-on: ubuntu-latest
-    outputs:
-      changed: ${{ steps.detect.outputs.changed }}
-      update: ${{ steps.update.outcome }}
     steps:
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+
       - name: 📚 Checkout branch
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.sha }}
           persist-credentials: false
 
-      # The pull request's code runs in this job, so it writes no caches the default
-      # branch would restore.
       - name: 🐦 Install Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.x"
           channel: stable
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
 
       - name: 📦 Install Tools
         run: flutter pub global activate melos
@@ -49,101 +36,12 @@ jobs:
         run: melos bootstrap --verbose
 
       - name: 🖼️ Update Goldens
-        id: update
         continue-on-error: true
         run: melos run update:goldens
 
-      - name: 🔍 Detect changed goldens
-        id: detect
-        run: |
-          if [[ -z "$(git status --porcelain -- '**/test/**/goldens/*.png')" ]]; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: 📦 Bundle goldens
-        if: steps.detect.outputs.changed == 'true'
-        run: |
-          git ls-files -z --modified --others --exclude-standard -- '**/test/**/goldens/*.png' \
-            | tar --null -czf goldens.tgz -T -
-
-      - name: 📤 Upload goldens artifact
-        if: steps.detect.outputs.changed == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: goldens
-          path: goldens.tgz
-          retention-days: 1
-
-  # Runs apart from the job above so the bot token never shares a job with the
-  # pull request's code.
-  commit_goldens:
-    needs: update_goldens
-    if: needs.update_goldens.outputs.changed == 'true'
-    runs-on: ubuntu-latest
-    outputs:
-      commit: ${{ steps.commit.outputs.commit }}
-      moved: ${{ steps.commit.outputs.moved }}
-    steps:
-      - name: 📥 Download goldens
-        uses: actions/download-artifact@v8
-        with:
-          name: goldens
-
-      - name: 📦 Extract goldens
-        run: |
-          # The archive comes from the pull request's code, so only goldens are extracted.
-          tar -xzf goldens.tgz --wildcards --wildcards-match-slash '*/goldens/*.png'
-          rm goldens.tgz
-
-      - name: 🔑 Mint CI Bot Token
-        id: ci-bot-token
-        uses: actions/create-github-app-token@v3
-        with:
-          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
-
-      - name: 📤 Commit the goldens
-        id: commit
+      - name: 📤 Commit Changes
         uses: GetStream/stream-core-flutter/.github/actions/bot-commit@68fdf0bf3c779f640dbb10a1ecf7945d872408f7
         with:
           files: "**/test/**/goldens/**/*.png"
-          branch: ${{ inputs.ref || github.ref_name }}
-          expected-head-sha: ${{ inputs.sha || github.sha }}
           message: "chore: Update Goldens"
           token: ${{ steps.ci-bot-token.outputs.token }}
-          detect-changes: false
-
-  summarize:
-    needs: [update_goldens, commit_goldens]
-    if: always()
-    runs-on: ubuntu-latest
-    outputs:
-      message: ${{ steps.summarize.outputs.message }}
-    steps:
-      - name: 📝 Summarize
-        id: summarize
-        env:
-          COMMIT: ${{ needs.commit_goldens.outputs.commit }}
-          MOVED: ${{ needs.commit_goldens.outputs.moved }}
-          TESTS_FAILED: ${{ needs.update_goldens.outputs.update == 'failure' }}
-          FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
-          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          if [[ "$FAILED" == "true" ]]; then
-            message="Updating the goldens failed, see the [run]($RUN)."
-          elif [[ "$MOVED" == "true" ]]; then
-            message="The branch moved while the goldens were updating, so nothing was pushed. Run the command again."
-          elif [[ -n "$COMMIT" ]]; then
-            message="Updated the goldens in $COMMIT."
-          elif [[ "$TESTS_FAILED" == "true" ]]; then
-            message="No goldens changed."
-          else
-            message="The goldens are already up to date."
-          fi
-          if [[ "$TESTS_FAILED" == "true" ]]; then
-            message="$message Some golden tests could not run, see the [run]($RUN)."
-          fi
-          echo "$message" >> "$GITHUB_STEP_SUMMARY"
-          echo "message=$message" >> "$GITHUB_OUTPUT"

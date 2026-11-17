@@ -14,8 +14,15 @@ on:
   issue_comment:
     types: [created]
 
-permissions:
-  contents: read
+permissions: {}
+
+# Commands on one pull request run one at a time; other comments get a group of
+# their own, so they never queue behind a command.
+concurrency:
+  group: >-
+    ${{ github.workflow }}-${{
+    (startsWith(github.event.comment.body, '/') || startsWith(github.event.comment.body, '@stream-flutter-ci-bot'))
+    && github.event.issue.number || github.run_id }}
 
 jobs:
   parse:
@@ -46,14 +53,16 @@ jobs:
           commands: |
             {
               "update-goldens": {
-                "description": "Updates the goldens on this branch and pushes them."
+                "description": "Commits the goldens this pull request's CI regenerated when its golden tests failed."
               }
             }
 
   update_goldens:
     needs: parse
     if: needs.parse.outputs.command == 'update-goldens'
-    uses: ./.github/workflows/update_goldens.yml
+    permissions:
+      actions: read # Required to find the CI run and download its artifact
+    uses: ./.github/workflows/apply_goldens.yml
     secrets: inherit
     with:
       ref: ${{ needs.parse.outputs.ref }}

@@ -1,0 +1,121 @@
+name: apply_goldens
+
+# Run by the `update-goldens` bot command, see bot_commands.yml. Commits the goldens
+# the pull request's CI regenerated when its golden tests failed. None of the pull
+# request's code runs here: the goldens come from the CI run's artifact.
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Branch the goldens are pushed to"
+        type: string
+        required: true
+      sha:
+        description: "Head commit whose CI run regenerated the goldens; nothing is pushed if the branch moved past it"
+        type: string
+        required: true
+    outputs:
+      message:
+        description: "Reply to the command"
+        value: ${{ jobs.apply_goldens.outputs.message }}
+
+permissions: {}
+
+jobs:
+  apply_goldens:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      actions: read # Required to find the CI run and download its artifact
+    outputs:
+      message: ${{ steps.summarize.outputs.message }}
+    steps:
+      - name: ⏳ Find the CI run
+        id: find
+        uses: actions/github-script@v9
+        env:
+          SHA: ${{ inputs.sha }}
+        with:
+          script: |
+            // The CI run can still be going when the command is given, so wait for it.
+            const deadline = Date.now() + 20 * 60 * 1000;
+            for (;;) {
+              const { data: { workflow_runs: runs } } = await github.rest.actions.listWorkflowRuns({
+                ...context.repo, workflow_id: 'stream_core_flutter_workflow.yml',
+                event: 'pull_request', head_sha: process.env.SHA, per_page: 1,
+              });
+              const run = runs[0];
+              if (run?.status === 'completed') {
+                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                  ...context.repo, run_id: run.id, name: 'updated-goldens',
+                });
+                core.setOutput('run-id', run.id);
+                core.setOutput('run-url', run.html_url);
+                core.setOutput('conclusion', run.conclusion);
+                core.setOutput('artifact', artifacts.some((artifact) => !artifact.expired));
+                return;
+              }
+              if (Date.now() > deadline) return core.setOutput('timed-out', 'true');
+              await new Promise((resolve) => setTimeout(resolve, 20 * 1000));
+            }
+
+      - name: 📥 Download the updated goldens
+        if: steps.find.outputs.artifact == 'true'
+        uses: actions/download-artifact@v8
+        with:
+          name: updated-goldens
+          run-id: ${{ steps.find.outputs.run-id }}
+          github-token: ${{ github.token }}
+
+      - name: 🔑 Mint CI Bot Token
+        if: steps.find.outputs.artifact == 'true'
+        id: ci-bot-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+
+      - name: 📤 Commit the goldens
+        if: steps.find.outputs.artifact == 'true'
+        id: commit
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@68fdf0bf3c779f640dbb10a1ecf7945d872408f7
+        with:
+          files: "**/test/**/goldens/**/*.png"
+          branch: ${{ inputs.ref }}
+          expected-head-sha: ${{ inputs.sha }}
+          message: "chore: Update Goldens"
+          token: ${{ steps.ci-bot-token.outputs.token }}
+          detect-changes: false
+
+      - name: 📝 Summarize
+        id: summarize
+        if: always()
+        env:
+          SHA: ${{ inputs.sha }}
+          TIMED_OUT: ${{ steps.find.outputs.timed-out }}
+          CONCLUSION: ${{ steps.find.outputs.conclusion }}
+          ARTIFACT: ${{ steps.find.outputs.artifact }}
+          CI_RUN: ${{ steps.find.outputs.run-url }}
+          COMMIT: ${{ steps.commit.outputs.commit }}
+          MOVED: ${{ steps.commit.outputs.moved }}
+          FAILED: ${{ job.status == 'failure' }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [[ "$FAILED" == "true" ]]; then
+            message="Updating the goldens failed, see the [run]($RUN)."
+          elif [[ "$TIMED_OUT" == "true" ]]; then
+            message="CI has not finished on ${SHA:0:7}; run the command again once it has."
+          elif [[ "$MOVED" == "true" ]]; then
+            message="The branch moved past ${SHA:0:7}, so nothing was pushed. Run the command again once CI has run on the new commit."
+          elif [[ -n "$COMMIT" ]]; then
+            message="Updated the goldens in $COMMIT from the [CI run]($CI_RUN)."
+          elif [[ "$ARTIFACT" == "true" ]]; then
+            message="The goldens from the [CI run]($CI_RUN) match the branch already."
+          elif [[ "$CONCLUSION" == "success" ]]; then
+            message="The goldens are already up to date: [CI]($CI_RUN) passed on ${SHA:0:7}."
+          else
+            message="[CI]($CI_RUN) did not produce updated goldens on ${SHA:0:7} (conclusion: $CONCLUSION), so there is nothing to commit."
+          fi
+          echo "$message" >> "$GITHUB_STEP_SUMMARY"
+          echo "message=$message" >> "$GITHUB_OUTPUT"
