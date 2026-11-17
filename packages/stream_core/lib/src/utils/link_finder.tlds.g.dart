@@ -1448,7 +1448,6 @@ const _kIanaTopLevelDomains = <String>{
   'zm',
   'zone',
   'zuerich',
-  'zw',
   'ελ', // xn--qxam
   'ευ', // xn--qxa6a
   'бг', // xn--90ae
