@@ -105,7 +105,7 @@ jobs:
 
       - name: 📤 Commit the goldens
         id: commit
-        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@e371bd980d64c744cfd09437c34c1ee1c15c5dc5
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@68fdf0bf3c779f640dbb10a1ecf7945d872408f7
         with:
           files: "**/goldens/**/*.png"
           branch: ${{ inputs.ref || github.ref_name }}
