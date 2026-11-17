@@ -1,0 +1,74 @@
+name: Bot Commit
+description: >
+  Commits files from the workspace to a branch through the GitHub API, so the
+  commit is signed by GitHub and no checkout of the branch is needed. The
+  commit is refused if the branch moved past `expected-head-sha`.
+
+inputs:
+  files:
+    description: Glob patterns, one per line, of the workspace files to commit.
+    required: true
+  branch:
+    description: The branch to commit to.
+    required: true
+  expected-head-sha:
+    description: The commit the files were generated from; nothing is committed if the branch moved past it.
+    required: true
+  message:
+    description: The commit message.
+    required: true
+  token:
+    description: Token with write access to the repository's contents, such as a GitHub App token.
+    required: true
+
+outputs:
+  commit:
+    description: The new commit; empty when there was nothing to commit or the branch moved.
+    value: ${{ steps.commit.outputs.commit }}
+  moved:
+    description: "`true` when the branch moved past `expected-head-sha`, so nothing was committed."
+    value: ${{ steps.commit.outputs.moved }}
+
+runs:
+  using: composite
+  steps:
+    - name: 📤 Commit through the API
+      id: commit
+      uses: actions/github-script@v9
+      env:
+        FILES: ${{ inputs.files }}
+        BRANCH: ${{ inputs.branch }}
+        SHA: ${{ inputs.expected-head-sha }}
+        MESSAGE: ${{ inputs.message }}
+      with:
+        github-token: ${{ inputs.token }}
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const { FILES, BRANCH, SHA, MESSAGE } = process.env;
+
+          const files = await (await glob.create(FILES)).glob();
+          if (!files.length) return core.info('Nothing to commit.');
+          const additions = files.map((file) => ({
+            path: path.relative(process.env.GITHUB_WORKSPACE, file),
+            contents: fs.readFileSync(file).toString('base64'),
+          }));
+
+          const [headline, ...body] = MESSAGE.split('\n');
+          try {
+            const { createCommitOnBranch: { commit } } = await github.graphql(`
+              mutation($input: CreateCommitOnBranchInput!) {
+                createCommitOnBranch(input: $input) { commit { oid } }
+              }`, {
+              input: {
+                branch: { repositoryNameWithOwner: `${context.repo.owner}/${context.repo.repo}`, branchName: BRANCH },
+                expectedHeadOid: SHA,
+                message: { headline, body: body.join('\n').trim() || undefined },
+                fileChanges: { additions },
+              },
+            });
+            core.setOutput('commit', commit.oid);
+          } catch (error) {
+            if (!/expected branch to point to/i.test(error.message)) throw error;
+            core.setOutput('moved', 'true');
+          }

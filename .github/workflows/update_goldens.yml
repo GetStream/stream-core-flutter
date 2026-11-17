@@ -85,6 +85,11 @@ jobs:
       commit: ${{ steps.commit.outputs.commit }}
       moved: ${{ steps.commit.outputs.moved }}
     steps:
+      - name: 📚 Checkout the bot actions
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/actions
+
       - name: 📥 Download goldens
         uses: actions/download-artifact@v8
         with:
@@ -103,45 +108,15 @@ jobs:
           client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
           private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
 
-      # Committing through the API signs the commit, and `expectedHeadOid` refuses it
-      # if the branch moved past the commit the goldens were generated from.
       - name: 📤 Commit the goldens
         id: commit
-        uses: actions/github-script@v9
-        env:
-          BRANCH: ${{ inputs.ref || github.ref_name }}
-          SHA: ${{ inputs.sha || github.sha }}
+        uses: ./.github/actions/bot-commit
         with:
-          github-token: ${{ steps.ci-bot-token.outputs.token }}
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            const files = await (await glob.create('**/goldens/**/*.png')).glob();
-            const additions = files.map((file) => ({
-              path: path.relative(process.env.GITHUB_WORKSPACE, file),
-              contents: fs.readFileSync(file).toString('base64'),
-            }));
-
-            try {
-              const { createCommitOnBranch: { commit } } = await github.graphql(`
-                mutation($input: CreateCommitOnBranchInput!) {
-                  createCommitOnBranch(input: $input) { commit { oid } }
-                }`, {
-                input: {
-                  branch: {
-                    repositoryNameWithOwner: `${context.repo.owner}/${context.repo.repo}`,
-                    branchName: process.env.BRANCH,
-                  },
-                  expectedHeadOid: process.env.SHA,
-                  message: { headline: 'chore: Update Goldens' },
-                  fileChanges: { additions },
-                },
-              });
-              core.setOutput('commit', commit.oid);
-            } catch (error) {
-              if (!/expected branch to point to/i.test(error.message)) throw error;
-              core.setOutput('moved', 'true');
-            }
+          files: "**/goldens/**/*.png"
+          branch: ${{ inputs.ref || github.ref_name }}
+          expected-head-sha: ${{ inputs.sha || github.sha }}
+          message: "chore: Update Goldens"
+          token: ${{ steps.ci-bot-token.outputs.token }}
 
   summarize:
     needs: [update_goldens, commit_goldens]
