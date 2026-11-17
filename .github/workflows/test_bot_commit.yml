@@ -1,0 +1,165 @@
+name: test_bot_commit
+
+# Temporary: exercises the bot-commit action before it merges. Removed before merging.
+# Runs only when this file changes, so the bot's own commits don't start it again.
+on:
+  push:
+    branches: [ci/bot-commit-action]
+    paths: [.github/workflows/test_bot_commit.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  checkout_mode:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          echo changed > tmp-bot-commit-test/modify.txt
+          rm tmp-bot-commit-test/delete.txt
+          echo new > tmp-bot-commit-test/add.txt
+          echo skipped > tmp-bot-commit-test/excluded.txt
+          echo outside >> README.md
+      - id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+      - id: commit
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@ci/bot-commit-action
+        with:
+          files: |
+            tmp-bot-commit-test/**
+            !tmp-bot-commit-test/excluded.txt
+          message: "test: checkout mode"
+          token: ${{ steps.token.outputs.token }}
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ steps.commit.outputs.commit }}
+        run: |
+          files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$COMMIT" --jq '[.files[] | "\(.status):\(.filename)"] | sort | join(" ")')
+          echo "$files"
+          test "$files" = "added:tmp-bot-commit-test/add.txt modified:tmp-bot-commit-test/modify.txt removed:tmp-bot-commit-test/delete.txt"
+          test "$(gh api "repos/$GITHUB_REPOSITORY/commits/$COMMIT" --jq .commit.verification.verified)" = true
+
+  artifact_mode:
+    needs: checkout_mode
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit.outputs.commit }}
+    steps:
+      - run: |
+          mkdir -p tmp-bot-commit-test
+          echo artifact > tmp-bot-commit-test/artifact.txt
+          echo same > tmp-bot-commit-test/same.txt
+      - id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+      - id: commit
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@ci/bot-commit-action
+        with:
+          files: tmp-bot-commit-test/**
+          message: "test: artifact mode"
+          token: ${{ steps.token.outputs.token }}
+          expected-head-sha: ${{ needs.checkout_mode.outputs.commit }}
+          detect-changes: false
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ steps.commit.outputs.commit }}
+        run: |
+          files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$COMMIT" --jq '[.files[] | "\(.status):\(.filename)"] | join(" ")')
+          echo "$files"
+          test "$files" = "added:tmp-bot-commit-test/artifact.txt"
+
+  unchanged:
+    needs: artifact_mode
+    runs-on: ubuntu-latest
+    steps:
+      - run: mkdir -p tmp-bot-commit-test && echo same > tmp-bot-commit-test/same.txt
+      - id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+      - id: commit
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@ci/bot-commit-action
+        with:
+          files: tmp-bot-commit-test/**
+          message: "test: unchanged"
+          token: ${{ steps.token.outputs.token }}
+          expected-head-sha: ${{ needs.artifact_mode.outputs.commit }}
+          detect-changes: false
+      - env:
+          CHANGED: ${{ steps.commit.outputs.changed }}
+          COMMIT: ${{ steps.commit.outputs.commit }}
+        run: test "$CHANGED" = false && test -z "$COMMIT"
+
+  wrong_checkout:
+    needs: unchanged
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: echo changed-again > tmp-bot-commit-test/modify.txt
+      - id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+      - id: commit
+        continue-on-error: true
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@ci/bot-commit-action
+        with:
+          files: tmp-bot-commit-test/**
+          message: "test: wrong checkout"
+          token: ${{ steps.token.outputs.token }}
+          expected-head-sha: 0000000000000000000000000000000000000000
+      - env:
+          OUTCOME: ${{ steps.commit.outcome }}
+        run: test "$OUTCOME" = failure
+
+  no_checkout:
+    needs: wrong_checkout
+    runs-on: ubuntu-latest
+    steps:
+      - id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+      - id: commit
+        continue-on-error: true
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@ci/bot-commit-action
+        with:
+          files: tmp-bot-commit-test/**
+          message: "test: no checkout"
+          token: ${{ steps.token.outputs.token }}
+      - env:
+          OUTCOME: ${{ steps.commit.outcome }}
+        run: test "$OUTCOME" = failure
+
+  moved:
+    needs: no_checkout
+    runs-on: ubuntu-latest
+    steps:
+      - run: mkdir -p tmp-bot-commit-test && echo stale > tmp-bot-commit-test/stale.txt
+      - id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+      - id: commit
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@ci/bot-commit-action
+        with:
+          files: tmp-bot-commit-test/**
+          message: "test: moved"
+          token: ${{ steps.token.outputs.token }}
+          detect-changes: false
+      - env:
+          MOVED: ${{ steps.commit.outputs.moved }}
+          COMMIT: ${{ steps.commit.outputs.commit }}
+        run: test "$MOVED" = true && test -z "$COMMIT"
