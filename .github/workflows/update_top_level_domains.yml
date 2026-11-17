@@ -39,9 +39,8 @@ jobs:
           token: ${{ steps.ci-bot-token.outputs.token }}
           branch: chore/update-top-level-domains
           delete-branch: true
+          sign-commits: true
           commit-message: 'chore(repo): update the IANA top-level domains'
           title: 'chore(repo): update the IANA top-level domains'
           body: |
             Regenerates the top-level domains `findLinks` recognizes from the IANA root zone list with `melos run generate:tlds`.
-          # Commits through the API as the app, so GitHub signs them.
-          sign-commits: true
