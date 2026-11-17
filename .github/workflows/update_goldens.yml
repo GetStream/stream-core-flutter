@@ -45,4 +45,3 @@ jobs:
           files: "**/test/**/goldens/**/*.png"
           message: "chore: Update Goldens"
           token: ${{ steps.ci-bot-token.outputs.token }}
-          commit_user_email: "357444665+stream-flutter-ci-bot[bot]@users.noreply.github.com"
