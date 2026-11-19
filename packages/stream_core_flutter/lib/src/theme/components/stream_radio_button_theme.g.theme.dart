@@ -99,8 +99,7 @@ mixin _$StreamRadioButtonStyle {
     }
 
     return StreamRadioButtonStyle(
-      size: t < 0.5 ? a.size : b.size,
-      dotSize: lerpDouble$(a.dotSize, b.dotSize, t),
+      size: StreamRadioButtonSize.lerp(a.size, b.size, t),
       fillColor: WidgetStateProperty.lerp<Color?>(
         a.fillColor,
         b.fillColor,
@@ -125,7 +124,6 @@ mixin _$StreamRadioButtonStyle {
 
   StreamRadioButtonStyle copyWith({
     StreamRadioButtonSize? size,
-    double? dotSize,
     WidgetStateProperty<Color?>? fillColor,
     WidgetStateProperty<Color?>? dotColor,
     WidgetStateProperty<Color?>? overlayColor,
@@ -135,7 +133,6 @@ mixin _$StreamRadioButtonStyle {
 
     return StreamRadioButtonStyle(
       size: size ?? _this.size,
-      dotSize: dotSize ?? _this.dotSize,
       fillColor: fillColor ?? _this.fillColor,
       dotColor: dotColor ?? _this.dotColor,
       overlayColor: overlayColor ?? _this.overlayColor,
@@ -156,7 +153,6 @@ mixin _$StreamRadioButtonStyle {
 
     return copyWith(
       size: other.size,
-      dotSize: other.dotSize,
       fillColor: other.fillColor,
       dotColor: other.dotColor,
       overlayColor: other.overlayColor,
@@ -178,7 +174,6 @@ mixin _$StreamRadioButtonStyle {
     final _other = (other as StreamRadioButtonStyle);
 
     return _other.size == _this.size &&
-        _other.dotSize == _this.dotSize &&
         _other.fillColor == _this.fillColor &&
         _other.dotColor == _this.dotColor &&
         _other.overlayColor == _this.overlayColor &&
@@ -192,7 +187,6 @@ mixin _$StreamRadioButtonStyle {
     return Object.hash(
       runtimeType,
       _this.size,
-      _this.dotSize,
       _this.fillColor,
       _this.dotColor,
       _this.overlayColor,

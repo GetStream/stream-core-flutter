@@ -9,6 +9,12 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 // Playground
 // =============================================================================
 
+final _sizeNames = {
+  StreamRadioButtonSize.sm: 'sm',
+  StreamRadioButtonSize.md: 'md',
+  StreamRadioButtonSize.lg: 'lg',
+};
+
 @widgetbook.UseCase(
   name: 'Playground',
   type: StreamRadioButton,
@@ -19,7 +25,7 @@ Widget buildStreamRadioButtonPlayground(BuildContext context) {
     label: 'Size',
     options: StreamRadioButtonSize.values,
     initialOption: StreamRadioButtonSize.lg,
-    labelBuilder: (option) => '${option.name} (${option.value.toInt()}px)',
+    labelBuilder: (option) => '${_sizeNames[option]} (${option.diameter.toInt()}px)',
     description: 'Diameter of the radio button.',
   );
 
@@ -134,7 +140,7 @@ class _SizesSection extends StatelessWidget {
             Row(
               spacing: spacing.md,
               children: [
-                SizedBox(width: 40, child: Text(size.name)),
+                SizedBox(width: 40, child: Text(_sizeNames[size]!)),
                 StreamRadioButton(selected: true, size: size, onChanged: (_) {}),
                 StreamRadioButton(selected: false, size: size, onChanged: (_) {}),
               ],
@@ -218,7 +224,9 @@ class _ThemedSection extends StatelessWidget {
 
     return _ExampleCard(
       title: 'Themed',
-      description: 'StreamRadioButtonStyle.from overrides the selected fill and the unselected border.',
+      description:
+          'StreamRadioButtonStyle.from overrides the selected fill and the unselected border. '
+          'Tab onto them: the focus ring still shows.',
       child: StreamRadioButtonTheme(
         data: StreamRadioButtonThemeData(
           style: StreamRadioButtonStyle.from(

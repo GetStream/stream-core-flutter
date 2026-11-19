@@ -22,7 +22,8 @@ import '../../theme/stream_theme_extensions.dart';
 /// `onChanged` is null the radio button is displayed as disabled.
 ///
 /// Screen readers announce it as a radio button in a group that is either
-/// checked or not. Provide a `semanticLabel` to describe the entry.
+/// checked or not. Consider setting [StreamRadioButtonProps.semanticLabel] to
+/// describe the entry.
 ///
 /// Use [StreamRadioButton.decorative] when the radio button only marks the
 /// selection inside a row that owns the tap target and the semantics, such
@@ -73,7 +74,7 @@ class StreamRadioButton extends StatelessWidget {
   StreamRadioButton({
     super.key,
     required bool selected,
-    ValueChanged<bool>? onChanged,
+    required ValueChanged<bool>? onChanged,
     StreamRadioButtonSize? size,
     String? semanticLabel,
   }) : props = .new(
@@ -116,22 +117,30 @@ class StreamRadioButton extends StatelessWidget {
 ///
 ///  * [StreamRadioButton], which uses these properties.
 ///  * [DefaultStreamRadioButton], the default implementation.
-class StreamRadioButtonProps {
+@immutable
+final class StreamRadioButtonProps {
   /// Creates properties for a radio button.
+  ///
+  /// A [decorative] radio button takes no [onChanged] or [semanticLabel].
   const StreamRadioButtonProps({
     required this.selected,
     this.onChanged,
     this.size,
     this.semanticLabel,
     this.decorative = false,
-  });
+  }) : assert(
+         !decorative || (onChanged == null && semanticLabel == null),
+         'A decorative radio button takes no onChanged or semanticLabel.',
+       );
 
   /// Whether this radio button is the selected entry of its group.
   final bool selected;
 
-  /// Called with `true` when the user selects this radio button.
+  /// Called when the user selects this radio button.
   ///
-  /// It is not called when the radio button is already [selected].
+  /// The value is always `true`: it is not called when the radio button is
+  /// already [selected], because a radio button is deselected by selecting
+  /// another entry.
   ///
   /// If null, the radio button is displayed as disabled, unless it is
   /// [decorative].
@@ -152,16 +161,37 @@ class StreamRadioButtonProps {
   /// Whether the radio button only shows [selected], without interaction or
   /// semantics of its own.
   ///
+  /// A custom [StreamComponentBuilders.radioButton] must honor this flag, so
+  /// that rows using [StreamRadioButton.decorative] are not announced twice.
+  ///
   /// See [StreamRadioButton.decorative].
   final bool decorative;
+
+  /// Creates a copy of these props with the given fields replaced.
+  StreamRadioButtonProps copyWith({
+    bool? selected,
+    ValueChanged<bool>? onChanged,
+    StreamRadioButtonSize? size,
+    String? semanticLabel,
+    bool? decorative,
+  }) {
+    return StreamRadioButtonProps(
+      selected: selected ?? this.selected,
+      onChanged: onChanged ?? this.onChanged,
+      size: size ?? this.size,
+      semanticLabel: semanticLabel ?? this.semanticLabel,
+      decorative: decorative ?? this.decorative,
+    );
+  }
 }
 
 /// Default implementation of [StreamRadioButton].
 ///
-/// Renders an interactive radio button using [IconButton] wrapped in
-/// [Semantics], or a plain decoration when [StreamRadioButtonProps.decorative]
-/// is true. Styling is resolved from widget props, theme, and built-in
-/// defaults in that order.
+/// Renders an interactive radio button, or a non-interactive one when
+/// [StreamRadioButtonProps.decorative] is true. The size comes from
+/// [StreamRadioButtonProps.size], then the theme, then
+/// [StreamRadioButtonSize.lg]; every other style property comes from the
+/// theme, falling back to the built-in default for each state.
 class DefaultStreamRadioButton extends StatelessWidget {
   /// Creates a default radio button.
   const DefaultStreamRadioButton({super.key, required this.props});
@@ -174,30 +204,45 @@ class DefaultStreamRadioButton extends StatelessWidget {
     final radioStyle = context.streamRadioButtonTheme.style;
     final defaults = _StreamRadioButtonStyleDefaults(context);
 
-    final effectiveSize = props.size ?? radioStyle?.size ?? defaults.size;
-    final effectiveDotSize = radioStyle?.dotSize ?? _defaultDotSize(effectiveSize);
-    final effectiveFillColor = radioStyle?.fillColor ?? defaults.fillColor;
-    final effectiveDotColor = radioStyle?.dotColor ?? defaults.dotColor;
-    final effectiveOverlayColor = radioStyle?.overlayColor ?? defaults.overlayColor;
-    final effectiveSide = radioStyle?.side ?? defaults.side;
+    final size = props.size ?? radioStyle?.size ?? defaults.size;
 
-    final dimension = effectiveSize.value;
+    // The button never sees WidgetState.selected: IconButton.isSelected would
+    // also mark the node as "selected" for screen readers, on top of
+    // "checked". The selected state is added here instead.
+    WidgetStateProperty<T?> withSelected<T>(WidgetStateProperty<T?>? themed, WidgetStateProperty<T?> fallback) {
+      return WidgetStateProperty.resolveWith((states) {
+        final effective = {...states, if (props.selected) WidgetState.selected};
+        return themed?.resolve(effective) ?? fallback.resolve(effective);
+      });
+    }
+
+    final fillColor = withSelected(radioStyle?.fillColor, defaults.fillColor);
+    final dotColor = withSelected(radioStyle?.dotColor, defaults.dotColor);
+    final overlayColor = withSelected(radioStyle?.overlayColor, defaults.overlayColor);
+    final themedSide = withSelected(radioStyle?.side, defaults.side);
 
     if (props.decorative) {
-      final states = {if (props.selected) WidgetState.selected};
+      const states = <WidgetState>{};
       return ExcludeSemantics(
         child: Container(
-          width: dimension,
-          height: dimension,
+          width: size.diameter,
+          height: size.diameter,
           alignment: Alignment.center,
           decoration: ShapeDecoration(
-            shape: CircleBorder(side: effectiveSide.resolve(states) ?? BorderSide.none),
-            color: effectiveFillColor.resolve(states),
+            shape: CircleBorder(side: themedSide.resolve(states) ?? BorderSide.none),
+            color: fillColor.resolve(states),
           ),
-          child: _Dot(size: effectiveDotSize, color: effectiveDotColor.resolve(states)),
+          child: _Dot(size: size.dotDiameter, color: dotColor.resolve(states)),
         ),
       );
     }
+
+    // The focus ring replaces the border whatever the theme sets, so a themed
+    // side never hides keyboard focus.
+    final side = WidgetStateBorderSide.resolveWith((states) {
+      if (states.contains(WidgetState.focused)) return defaults.focusSide;
+      return themedSide.resolve(states) ?? BorderSide.none;
+    });
 
     return MergeSemantics(
       child: Semantics(
@@ -211,35 +256,28 @@ class DefaultStreamRadioButton extends StatelessWidget {
             },
             _ => null,
           },
-          isSelected: props.selected,
           icon: Builder(
             // The button resolves dotColor for the current states and hands
             // it down as the icon color.
-            builder: (context) => _Dot(size: effectiveDotSize, color: IconTheme.of(context).color),
+            builder: (context) => _Dot(size: size.dotDiameter, color: IconTheme.of(context).color),
           ),
           style: ButtonStyle(
             tapTargetSize: .shrinkWrap,
             visualDensity: .standard,
-            fixedSize: .all(.square(dimension)),
-            minimumSize: .all(.square(dimension)),
-            maximumSize: .all(.square(dimension)),
+            fixedSize: .all(.square(size.diameter)),
+            minimumSize: .all(.square(size.diameter)),
+            maximumSize: .all(.square(size.diameter)),
             padding: .all(.zero),
             shape: .all(const CircleBorder()),
-            backgroundColor: effectiveFillColor,
-            foregroundColor: effectiveDotColor,
-            overlayColor: effectiveOverlayColor,
-            side: effectiveSide,
+            backgroundColor: fillColor,
+            foregroundColor: dotColor,
+            overlayColor: overlayColor,
+            side: side,
           ),
         ),
       ),
     );
   }
-
-  // The dot of the large size is 10px; the smaller sizes share an 8px dot.
-  double _defaultDotSize(StreamRadioButtonSize size) => switch (size) {
-    .sm || .md => 8,
-    .lg => 10,
-  };
 }
 
 class _Dot extends StatelessWidget {
@@ -294,13 +332,15 @@ class _StreamRadioButtonStyleDefaults extends StreamRadioButtonStyle {
     return StreamColors.transparent;
   });
 
+  // Drawn in place of side while the radio button has keyboard focus.
+  BorderSide get focusSide => BorderSide(color: _colorScheme.borderFocus, width: 2);
+
   @override
   WidgetStateBorderSide get side => WidgetStateBorderSide.resolveWith((states) {
     if (states.contains(WidgetState.disabled)) {
       if (states.contains(WidgetState.selected)) return BorderSide.none;
       return BorderSide(color: _colorScheme.borderDisabled);
     }
-    if (states.contains(WidgetState.focused)) return BorderSide(color: _colorScheme.borderFocus, width: 2);
     if (states.contains(WidgetState.selected)) return BorderSide.none;
     return BorderSide(color: _colorScheme.borderDefault);
   });

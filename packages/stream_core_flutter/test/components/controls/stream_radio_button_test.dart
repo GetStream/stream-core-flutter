@@ -14,7 +14,7 @@ ButtonStyle _styleOf(WidgetTester tester) => tester.widget<IconButton>(find.byTy
 
 Size _sizeOf(WidgetTester tester) => tester.getSize(find.byType(StreamRadioButton));
 
-/// The size of the dot, which is the innermost decorated box.
+// The size of the dot, which is the innermost decorated box.
 Size _dotSizeOf(WidgetTester tester) {
   return tester.getSize(
     find.descendant(of: find.byType(DefaultStreamRadioButton), matching: find.byType(DecoratedBox)).last,
@@ -25,25 +25,50 @@ const _selected = {WidgetState.selected};
 const _disabled = {WidgetState.disabled};
 const _disabledSelected = {WidgetState.disabled, WidgetState.selected};
 
+// The shape the button paints, which carries the resolved border.
+OutlinedBorder? _paintedShapeOf(WidgetTester tester) {
+  return tester.widget<Material>(find.descendant(of: find.byType(IconButton), matching: find.byType(Material))).shape
+      as OutlinedBorder?;
+}
+
 void main() {
   final colorScheme = StreamColorScheme.light();
 
   group('StreamRadioButton sizes', () {
-    const expected = {
-      StreamRadioButtonSize.sm: (16.0, 8.0),
-      StreamRadioButtonSize.md: (20.0, 8.0),
-      StreamRadioButtonSize.lg: (24.0, 10.0),
-    };
+    const expected = [
+      ('sm', StreamRadioButtonSize.sm, 16.0, 8.0),
+      ('md', StreamRadioButtonSize.md, 20.0, 8.0),
+      ('lg', StreamRadioButtonSize.lg, 24.0, 10.0),
+    ];
 
-    for (final MapEntry(key: size, value: (diameter, dot)) in expected.entries) {
-      testWidgets('${size.name} is ${diameter}px with a ${dot}px dot', (tester) async {
+    test('values lists every preset from small to large', () {
+      expect(StreamRadioButtonSize.values, [for (final (_, size, _, _) in expected) size]);
+    });
+
+    test('lerps the diameter and the dot', () {
+      expect(
+        StreamRadioButtonSize.lerp(StreamRadioButtonSize.sm, StreamRadioButtonSize.lg, 0.5),
+        const StreamRadioButtonSize(diameter: 20, dotDiameter: 9),
+      );
+    });
+
+    testWidgets('renders a custom size', (tester) async {
+      const size = StreamRadioButtonSize(diameter: 32, dotDiameter: 12);
+      await tester.pumpWidget(_withStreamTheme(StreamRadioButton(selected: true, size: size, onChanged: (_) {})));
+
+      expect(_sizeOf(tester), const Size.square(32));
+      expect(_dotSizeOf(tester), const Size.square(12));
+    });
+
+    for (final (name, size, diameter, dot) in expected) {
+      testWidgets('$name is ${diameter}px with a ${dot}px dot', (tester) async {
         await tester.pumpWidget(_withStreamTheme(StreamRadioButton(selected: true, size: size, onChanged: (_) {})));
 
         expect(_sizeOf(tester), Size.square(diameter));
         expect(_dotSizeOf(tester), Size.square(dot));
       });
 
-      testWidgets('decorative ${size.name} is ${diameter}px with a ${dot}px dot', (tester) async {
+      testWidgets('decorative $name is ${diameter}px with a ${dot}px dot', (tester) async {
         await tester.pumpWidget(_withStreamTheme(StreamRadioButton.decorative(selected: true, size: size)));
 
         expect(_sizeOf(tester), Size.square(diameter));
@@ -128,7 +153,7 @@ void main() {
     });
 
     testWidgets('is disabled when onChanged is null', (tester) async {
-      await tester.pumpWidget(_withStreamTheme(StreamRadioButton(selected: true)));
+      await tester.pumpWidget(_withStreamTheme(StreamRadioButton(selected: true, onChanged: null)));
 
       expect(tester.widget<IconButton>(find.byType(IconButton)).onPressed, isNull);
     });
@@ -166,6 +191,11 @@ void main() {
           isFocusable: true,
         ),
       );
+      // Checked, not also "selected", so screen readers announce it once.
+      expect(
+        tester.getSemantics(find.byType(StreamRadioButton)),
+        containsSemantics(hasSelectedState: false),
+      );
       handle.dispose();
     });
 
@@ -182,7 +212,7 @@ void main() {
 
     testWidgets('announces a disabled radio button', (tester) async {
       final handle = tester.ensureSemantics();
-      await tester.pumpWidget(_withStreamTheme(StreamRadioButton(selected: false)));
+      await tester.pumpWidget(_withStreamTheme(StreamRadioButton(selected: false, onChanged: null)));
 
       expect(
         tester.getSemantics(find.byType(StreamRadioButton)),
@@ -215,6 +245,42 @@ void main() {
         isNot(containsSemantics(isInMutuallyExclusiveGroup: true)),
       );
       handle.dispose();
+    });
+
+    testWidgets('takes no tap and no focus of its own', (tester) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamListTile(
+            leading: StreamRadioButton.decorative(selected: false),
+            title: const Text('USB headset'),
+            onTap: () => taps++,
+          ),
+        ),
+      );
+
+      expect(find.descendant(of: find.byType(StreamRadioButton), matching: find.byType(Focus)), findsNothing);
+
+      await tester.tap(find.byType(StreamRadioButton));
+      expect(taps, 1);
+    });
+
+    testWidgets('uses the theme', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamRadioButtonTheme(
+            data: StreamRadioButtonThemeData(style: StreamRadioButtonStyle.from(selectedFillColor: Colors.green)),
+            child: StreamRadioButton.decorative(selected: true),
+          ),
+        ),
+      );
+
+      final ring = tester
+          .widgetList<DecoratedBox>(
+            find.descendant(of: find.byType(DefaultStreamRadioButton), matching: find.byType(DecoratedBox)),
+          )
+          .first;
+      expect((ring.decoration as ShapeDecoration).color, Colors.green);
     });
 
     testWidgets('has the enabled selected look', (tester) async {
@@ -252,8 +318,7 @@ void main() {
           streamTheme: StreamTheme(
             radioButtonTheme: StreamRadioButtonThemeData(
               style: StreamRadioButtonStyle.from(
-                size: StreamRadioButtonSize.sm,
-                dotSize: 6,
+                size: const StreamRadioButtonSize(diameter: 16, dotDiameter: 6),
                 selectedFillColor: Colors.green,
                 selectedDotColor: Colors.black,
               ),
@@ -266,6 +331,29 @@ void main() {
       expect(_dotSizeOf(tester), const Size.square(6));
       expect(_styleOf(tester).backgroundColor!.resolve(_selected), Colors.green);
       expect(_styleOf(tester).foregroundColor!.resolve(_selected), Colors.black);
+    });
+
+    testWidgets('keeps the focus ring when the theme sets the border', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamRadioButtonTheme(
+            data: StreamRadioButtonThemeData(
+              style: StreamRadioButtonStyle.from(
+                side: const BorderSide(color: Colors.green, width: 2),
+                selectedSide: BorderSide.none,
+              ),
+            ),
+            child: StreamRadioButton(selected: false, onChanged: (_) {}),
+          ),
+        ),
+      );
+
+      expect(_paintedShapeOf(tester)?.side, const BorderSide(color: Colors.green, width: 2));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      expect(_paintedShapeOf(tester)?.side, BorderSide(color: colorScheme.borderFocus, width: 2));
     });
 
     testWidgets('a local theme beats the global theme', (tester) async {
@@ -316,6 +404,91 @@ void main() {
       expect(_sizeOf(tester), const Size.square(20));
       expect(_dotSizeOf(tester), const Size.square(8));
       expect(_styleOf(tester).backgroundColor!.resolve(_selected), colorScheme.accentPrimary);
+    });
+  });
+
+  group('StreamRadioButtonStyle.from', () {
+    test('sets each value for its own state only', () {
+      final style = StreamRadioButtonStyle.from(
+        fillColor: Colors.red,
+        selectedFillColor: Colors.green,
+        disabledFillColor: Colors.grey,
+        dotColor: Colors.black,
+        selectedDotColor: Colors.white,
+        disabledDotColor: Colors.blueGrey,
+        overlayColor: Colors.yellow,
+        hoveredOverlayColor: Colors.orange,
+        pressedOverlayColor: Colors.purple,
+        side: const BorderSide(color: Colors.red),
+        selectedSide: const BorderSide(color: Colors.green),
+        disabledSide: const BorderSide(color: Colors.grey),
+      );
+
+      expect(style.fillColor!.resolve({}), Colors.red);
+      expect(style.fillColor!.resolve(_selected), Colors.green);
+      expect(style.fillColor!.resolve(_disabledSelected), Colors.grey);
+      expect(style.dotColor!.resolve({}), Colors.black);
+      expect(style.dotColor!.resolve(_selected), Colors.white);
+      expect(style.dotColor!.resolve(_disabledSelected), Colors.blueGrey);
+      expect(style.overlayColor!.resolve({}), Colors.yellow);
+      expect(style.overlayColor!.resolve({WidgetState.hovered}), Colors.orange);
+      expect(style.overlayColor!.resolve({WidgetState.hovered, WidgetState.pressed}), Colors.purple);
+      expect(style.side!.resolve({}), const BorderSide(color: Colors.red));
+      expect(style.side!.resolve(_selected), const BorderSide(color: Colors.green));
+      expect(style.side!.resolve(_disabled), const BorderSide(color: Colors.grey));
+    });
+
+    test('leaves every property null when no value is given', () {
+      final style = StreamRadioButtonStyle.from();
+
+      expect(style.fillColor, isNull);
+      expect(style.dotColor, isNull);
+      expect(style.overlayColor, isNull);
+      expect(style.side, isNull);
+    });
+
+    testWidgets('keeps the default for every state it does not set', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamRadioButtonTheme(
+            data: StreamRadioButtonThemeData(
+              style: StreamRadioButtonStyle.from(
+                selectedFillColor: Colors.green,
+                selectedSide: const BorderSide(color: Colors.green),
+              ),
+            ),
+            child: StreamRadioButton(selected: false, onChanged: (_) {}),
+          ),
+        ),
+      );
+
+      final style = _styleOf(tester);
+      expect(style.backgroundColor!.resolve(_selected), Colors.green);
+      expect(style.backgroundColor!.resolve({}), StreamColors.transparent);
+      expect(style.backgroundColor!.resolve(_disabledSelected), colorScheme.backgroundDisabled);
+      expect(style.side!.resolve(_selected), const BorderSide(color: Colors.green));
+      expect(style.side!.resolve({}), BorderSide(color: colorScheme.borderDefault));
+      expect(style.side!.resolve(_disabled), BorderSide(color: colorScheme.borderDisabled));
+    });
+  });
+
+  group('StreamRadioButtonProps', () {
+    test('rejects onChanged or a semanticLabel on a decorative radio button', () {
+      expect(() => StreamRadioButtonProps(selected: true, decorative: true, onChanged: (_) {}), throwsAssertionError);
+      expect(
+        () => StreamRadioButtonProps(selected: true, decorative: true, semanticLabel: 'USB headset'),
+        throwsAssertionError,
+      );
+    });
+
+    test('copyWith replaces only the given fields', () {
+      const props = StreamRadioButtonProps(selected: false, size: StreamRadioButtonSize.sm, semanticLabel: 'USB');
+      final copy = props.copyWith(selected: true);
+
+      expect(copy.selected, isTrue);
+      expect(copy.size, StreamRadioButtonSize.sm);
+      expect(copy.semanticLabel, 'USB');
+      expect(copy.decorative, isFalse);
     });
   });
 
