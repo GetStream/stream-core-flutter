@@ -1,0 +1,16 @@
+name: PR Labels
+
+on:
+  pull_request:
+    types: [labeled, ready_for_review, converted_to_draft]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  review_labels:
+    uses: ./.github/workflows/pr_review_labels.yml

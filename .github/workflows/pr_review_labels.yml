@@ -1,0 +1,186 @@
+name: PR Review Labels
+
+# Reusable workflow that keeps three status labels in sync with the review
+# state of a pull request:
+#
+#   ready    - the pull request is waiting for a review. Added when it leaves
+#              draft, or by hand once review feedback has been addressed.
+#              Adding it removes "pending"; converting to draft removes it.
+#   pending  - replaces "ready" as soon as a reviewer leaves a comment or
+#              requests changes without approving.
+#   approved - replaces "ready" when a reviewer approves. Removed when a
+#              reviewer requests changes, or when the approval is dismissed
+#              and no other approval remains.
+#
+# Comments made by the pull request author or by bots never change the labels.
+# Missing labels are created on first use.
+#
+# Call it from a workflow that runs on `pull_request_review` with the types
+# `submitted` and `dismissed`, and on `pull_request` with the types `labeled`,
+# `ready_for_review` and `converted_to_draft`, and grants `contents: read`,
+# `issues: write` and `pull-requests: write`.
+#
+# Fork pull requests get a read-only token, so they aren't labelled.
+
+on:
+  workflow_call:
+
+jobs:
+  # The author marked the pull request "ready" again, so review feedback is addressed.
+  drop_pending:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.action == 'labeled' && github.event.label.name == 'ready'
+    permissions:
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            try {
+              await github.rest.issues.removeLabel({
+                owner, repo, issue_number: context.payload.pull_request.number, name: 'pending',
+              });
+              core.info('Removed "pending"');
+            } catch (e) {
+              if (e.status !== 404) throw e;
+              core.info('"pending" not set, nothing to do');
+            }
+
+  sync_labels:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event_name == 'pull_request_review' ||
+        github.event.action == 'ready_for_review' ||
+        github.event.action == 'converted_to_draft')
+    # One run per pull request at a time; a newer event cancels the in-flight
+    # run. Job-level so unrelated label events never cancel it.
+    concurrency:
+      group: pr-review-labels-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const READY = 'ready';
+            const PENDING = 'pending';
+            const APPROVED = 'approved';
+
+            const LABEL_DEFS = {
+              [READY]: { color: '1B5D7D', description: 'Pull request ready to be reviewed' },
+              [PENDING]: { color: 'FBCA04', description: 'Review comments waiting to be addressed' },
+              [APPROVED]: { color: '2EA44F', description: 'Approved by a reviewer' },
+            };
+
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const number = pr.number;
+            const author = pr.user.login;
+
+            const isExternal = (user) =>
+              user && user.login !== author && user.type !== 'Bot';
+
+            async function ensureLabel(name) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (e) {
+                if (e.status !== 404) throw e;
+                await github.rest.issues.createLabel({ owner, repo, name, ...LABEL_DEFS[name] });
+              }
+            }
+
+            async function currentLabels() {
+              const labels = await github.paginate(github.rest.issues.listLabelsOnIssue, {
+                owner, repo, issue_number: number, per_page: 100,
+              });
+              return new Set(labels.map((l) => l.name));
+            }
+
+            async function addLabel(name) {
+              await ensureLabel(name);
+              await github.rest.issues.addLabels({ owner, repo, issue_number: number, labels: [name] });
+              core.info(`Added "${name}"`);
+            }
+
+            async function removeLabel(name) {
+              try {
+                await github.rest.issues.removeLabel({ owner, repo, issue_number: number, name });
+                core.info(`Removed "${name}"`);
+              } catch (e) {
+                if (e.status !== 404) throw e;
+              }
+            }
+
+            // "ready" -> "pending" when a reviewer comments without approving.
+            // With `dropApproved`, an existing "approved" is also replaced by "pending".
+            async function markPending({ dropApproved = false } = {}) {
+              const labels = await currentLabels();
+              const wasReady = labels.has(READY);
+              const wasApproved = dropApproved && labels.has(APPROVED);
+              if (!wasReady && !wasApproved) {
+                core.info('Neither "ready" nor a droppable "approved" is set, nothing to do');
+                return;
+              }
+              if (wasReady) await removeLabel(READY);
+              if (wasApproved) await removeLabel(APPROVED);
+              await addLabel(PENDING);
+            }
+
+            // True when at least one reviewer's latest review is an approval.
+            async function hasActiveApproval() {
+              const reviews = await github.paginate(github.rest.pulls.listReviews, {
+                owner, repo, pull_number: number, per_page: 100,
+              });
+              const latest = new Map();
+              for (const r of reviews) {
+                if (!isExternal(r.user)) continue;
+                // A plain comment review does not change the reviewer's verdict.
+                if (r.state === 'COMMENTED') continue;
+                latest.set(r.user.login, r.state);
+              }
+              return [...latest.values()].includes('APPROVED');
+            }
+
+            if (context.eventName === 'pull_request') {
+              if (context.payload.action === 'converted_to_draft') {
+                await removeLabel(READY);
+                return;
+              }
+              // ready_for_review. Labels added by this workflow don't trigger
+              // drop_pending, so "pending" is removed here too.
+              if ((await currentLabels()).has(APPROVED)) {
+                core.info('Already approved, nothing to do');
+                return;
+              }
+              await addLabel(READY);
+              await removeLabel(PENDING);
+              return;
+            }
+
+            const review = context.payload.review;
+            if (context.payload.action === 'dismissed') {
+              if (!(await hasActiveApproval())) await removeLabel(APPROVED);
+              return;
+            }
+            if (!isExternal(review.user)) {
+              core.info('Review by the pull request author or a bot, ignoring');
+              return;
+            }
+            if (review.state === 'approved') {
+              await addLabel(APPROVED);
+              await removeLabel(READY);
+              await removeLabel(PENDING);
+            } else {
+              // "commented" or "changes_requested"
+              await markPending({ dropApproved: review.state === 'changes_requested' });
+            }
