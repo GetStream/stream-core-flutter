@@ -42,7 +42,7 @@ jobs:
         run: dart run scripts/sync_style_guides.dart --check
 
   # Only `main` syncs, so a manual run on another branch cannot push its
-  # unreviewed guides into the other repositories with the bot's token.
+  # unreviewed guides into the other repositories with the CI bot's token.
   sync:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: check
@@ -51,23 +51,34 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - repository: GetStream/stream-chat-flutter
+          - repository: stream-chat-flutter
             branch: master
-          - repository: GetStream/stream-video-flutter
+          - repository: stream-video-flutter
             branch: v2
-          - repository: GetStream/stream-feeds-flutter
+          - repository: stream-feeds-flutter
             branch: main
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v6
 
+      # An app token covers only the repositories it is minted for, so each
+      # job asks for its own target rather than this repository.
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ matrix.repository }}
+
       - name: 📚 Checkout ${{ matrix.repository }}
         uses: actions/checkout@v6
         with:
-          repository: ${{ matrix.repository }}
+          repository: ${{ github.repository_owner }}/${{ matrix.repository }}
           ref: ${{ matrix.branch }}
           path: target
-          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
+          token: ${{ steps.ci-bot-token.outputs.token }}
 
       - name: 🎯 Install Dart
         uses: dart-lang/setup-dart@v1
@@ -75,15 +86,16 @@ jobs:
       - name: 📝 Copy Style Guides
         run: dart run scripts/sync_style_guides.dart target
 
-      # Opened with the bot's token so the pull request's checks run, which
-      # they don't for one opened with the workflow's own token. Nothing is
+      # Opened with the CI bot's app token so the pull request's checks run,
+      # which they don't for one opened with the workflow's own token. Nothing is
       # opened when the copy is already up to date, and an open sync PR is
       # updated in place rather than duplicated.
       - name: 📤 Open Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           path: target
-          token: ${{ secrets.BOT_GITHUB_API_TOKEN }}
+          token: ${{ steps.ci-bot-token.outputs.token }}
+          sign-commits: true
           base: ${{ matrix.branch }}
           branch: chore/sync-style-guides
           delete-branch: true
@@ -94,5 +106,3 @@ jobs:
             Copies `style_guides/` from [GetStream/stream-core-flutter@${{ github.sha }}](https://github.com/GetStream/stream-core-flutter/commit/${{ github.sha }}).
 
             These files are generated; change them in stream-core-flutter, not here.
-          committer: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
-          author: Stream SDK Bot <60655709+Stream-SDK-Bot@users.noreply.github.com>
