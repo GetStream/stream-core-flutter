@@ -153,3 +153,9 @@ low-bandwidth-fill;2026-09-08
 calendar;2026-11-09
 clock-fill;2026-11-09
 fullscreen;2026-11-12
+blur-off-fill;2026-11-19
+effects-fill;2026-11-19
+fullscreen-exit;2026-11-19
+language-fill;2026-11-19
+unflag;2026-11-19
+qr-code-fill;2026-11-19
