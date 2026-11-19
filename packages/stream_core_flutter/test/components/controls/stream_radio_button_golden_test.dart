@@ -11,15 +11,19 @@ void main() {
         fileName: 'stream_radio_button_${brightness.name}',
         builder: () => GoldenTestGroup(
           columns: 4,
-          // The radio button is at most 24px wide, which is narrower than its
-          // own scenario label; without a floor the columns overlap.
+          // The radio button is narrower than its own scenario label; without
+          // a floor the columns overlap.
           scenarioConstraints: const BoxConstraints.tightFor(width: 140),
           children: [
-            for (final size in StreamRadioButtonSize.values) ...[
+            for (final (name, size) in [
+              ('sm', StreamRadioButtonSize.sm),
+              ('md', StreamRadioButtonSize.md),
+              ('lg', StreamRadioButtonSize.lg),
+            ]) ...[
               for (final enabled in [true, false])
                 for (final selected in [true, false])
                   GoldenTestScenario(
-                    name: '${size.name} ${enabled ? 'enabled' : 'disabled'} ${selected ? 'on' : 'off'}',
+                    name: '$name ${enabled ? 'enabled' : 'disabled'} ${selected ? 'on' : 'off'}',
                     child: _buildInTheme(
                       StreamRadioButton(selected: selected, size: size, onChanged: enabled ? (_) {} : null),
                       brightness: brightness,
