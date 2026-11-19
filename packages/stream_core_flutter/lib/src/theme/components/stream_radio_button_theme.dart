@@ -1,39 +1,69 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
-import '../widget_state_utils.dart';
 
 part 'stream_radio_button_theme.g.theme.dart';
 
-/// Predefined sizes for [StreamRadioButton].
+/// The size of a [StreamRadioButton].
 ///
-/// Each size corresponds to a specific diameter in logical pixels.
+/// Each size pairs the diameter of the radio button with the diameter of the
+/// dot it shows when selected. Use one of the presets, or create a size for a
+/// diameter the presets don't cover.
 ///
 /// See also:
 ///
-///  * [StreamRadioButtonStyle.size], for setting a global default size.
-enum StreamRadioButtonSize {
-  /// Small radio button (16px).
-  sm(16),
+///  * [StreamRadioButtonStyle.size], for setting a default size in a theme.
+@immutable
+class StreamRadioButtonSize {
+  /// Creates a radio button size with the given [diameter] and [dotDiameter].
+  const StreamRadioButtonSize({required this.diameter, required this.dotDiameter});
 
-  /// Medium radio button (20px).
-  md(20),
+  /// Small radio button: 16px with an 8px dot.
+  static const sm = StreamRadioButtonSize(diameter: 16, dotDiameter: 8);
 
-  /// Large radio button (24px).
-  lg(24);
+  /// Medium radio button: 20px with an 8px dot.
+  static const md = StreamRadioButtonSize(diameter: 20, dotDiameter: 8);
 
-  /// Constructs a [StreamRadioButtonSize] with the given diameter.
-  const StreamRadioButtonSize(this.value);
+  /// Large radio button: 24px with a 10px dot.
+  static const lg = StreamRadioButtonSize(diameter: 24, dotDiameter: 10);
+
+  /// The predefined sizes, from small to large.
+  static const List<StreamRadioButtonSize> values = [sm, md, lg];
 
   /// The diameter of the radio button in logical pixels.
-  final double value;
+  final double diameter;
+
+  /// The diameter of the dot shown when selected, in logical pixels.
+  final double dotDiameter;
+
+  /// Linearly interpolates between two [StreamRadioButtonSize]s.
+  static StreamRadioButtonSize? lerp(StreamRadioButtonSize? a, StreamRadioButtonSize? b, double t) {
+    if (identical(a, b)) return a;
+    if (a == null || b == null) return t < 0.5 ? a : b;
+    return StreamRadioButtonSize(
+      diameter: lerpDouble(a.diameter, b.diameter, t)!,
+      dotDiameter: lerpDouble(a.dotDiameter, b.dotDiameter, t)!,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is StreamRadioButtonSize && other.diameter == diameter && other.dotDiameter == dotDiameter;
+
+  @override
+  int get hashCode => Object.hash(diameter, dotDiameter);
+
+  @override
+  String toString() => 'StreamRadioButtonSize(diameter: $diameter, dotDiameter: $dotDiameter)';
 }
 
 /// Applies a radio button theme to descendant [StreamRadioButton] widgets.
 ///
-/// Wrap a subtree with [StreamRadioButtonTheme] to override radio button
-/// styling. Access the merged theme using
+/// A [StreamRadioButtonTheme] overrides the radio button styling of its
+/// subtree. Access the merged theme using
 /// [BuildContext.streamRadioButtonTheme].
 ///
 /// {@tool snippet}
@@ -118,8 +148,6 @@ class StreamRadioButtonThemeData with _$StreamRadioButtonThemeData {
   const StreamRadioButtonThemeData({this.style});
 
   /// The visual styling for radio buttons.
-  ///
-  /// Contains size, dot size, fill color, dot color, overlay color and border.
   final StreamRadioButtonStyle? style;
 
   /// Linearly interpolate between two [StreamRadioButtonThemeData] objects.
@@ -134,9 +162,13 @@ class StreamRadioButtonThemeData with _$StreamRadioButtonThemeData {
 ///
 /// Defines the appearance of radio buttons including size, colors and border.
 /// Color and border properties are [WidgetStateProperty]-based for
-/// state-dependent styling (default, hover, pressed, focused, disabled,
-/// selected). [WidgetState.selected] means the radio button is the selected
-/// entry of its group.
+/// state-dependent styling (default, hover, pressed, disabled, selected).
+/// [WidgetState.selected] means the radio button is the selected entry of its
+/// group.
+///
+/// A property that is null, or that resolves to null for a state, uses the
+/// built-in default for that state. The keyboard focus ring is drawn on top of
+/// [side] and is not part of this style.
 ///
 /// See also:
 ///
@@ -148,24 +180,31 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   /// Creates radio button style properties.
   ///
   /// Color and border properties are [WidgetStateProperty]-based for full
-  /// state-level control. For a simpler API that accepts plain values and
-  /// builds state properties internally, use [StreamRadioButtonStyle.from].
+  /// state-level control. [StreamRadioButtonStyle.from] builds them from plain
+  /// values instead.
   const StreamRadioButtonStyle({
     this.size,
-    this.dotSize,
     this.fillColor,
     this.dotColor,
     this.overlayColor,
-    WidgetStateProperty<BorderSide?>? side,
-  }) : side = side as WidgetStateBorderSide?;
+    this.side,
+  });
 
   /// Creates a [StreamRadioButtonStyle] from simple values.
   ///
-  /// Wraps plain colors and border sides into [WidgetStateProperty] values.
+  /// Each parameter sets the value for one state:
   ///
-  /// State-specific parameters (prefixed with `selected`, `disabled`,
-  /// `hovered` or `pressed`) take precedence for their respective states;
-  /// unprefixed parameters are used as the default for all other states.
+  ///  * Unprefixed parameters apply to an enabled, unselected radio button
+  ///    (and, for [overlayColor], one that is neither hovered nor pressed).
+  ///  * `selected` parameters apply to an enabled, selected radio button.
+  ///  * `disabled` parameters apply to a disabled radio button, selected or
+  ///    not.
+  ///  * `hovered` and `pressed` parameters apply to the overlay in those
+  ///    states; pressed wins over hovered.
+  ///
+  /// A state whose parameter is null keeps the built-in default, so
+  /// `StreamRadioButtonStyle.from(selectedFillColor: Colors.green)` changes
+  /// only the fill of an enabled, selected radio button.
   ///
   /// {@tool snippet}
   ///
@@ -173,17 +212,14 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   ///
   /// ```dart
   /// StreamRadioButtonStyle.from(
-  ///   fillColor: Colors.transparent,
   ///   selectedFillColor: Colors.green,
-  ///   dotColor: Colors.white,
+  ///   selectedDotColor: Colors.white,
   ///   side: BorderSide(color: Colors.grey),
-  ///   selectedSide: BorderSide.none,
   /// )
   /// ```
   /// {@end-tool}
   factory StreamRadioButtonStyle.from({
     StreamRadioButtonSize? size,
-    double? dotSize,
     Color? fillColor,
     Color? selectedFillColor,
     Color? disabledFillColor,
@@ -199,57 +235,65 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   }) {
     return StreamRadioButtonStyle(
       size: size,
-      dotSize: dotSize,
-      fillColor: WidgetStateUtils.resolveWith(fillColor, selectedFillColor, disabledFillColor),
-      dotColor: WidgetStateUtils.resolveWith(dotColor, selectedDotColor, disabledDotColor),
-      overlayColor: WidgetStateUtils.resolveOverlay(overlayColor, hoveredOverlayColor, pressedOverlayColor),
-      side: WidgetStateUtils.resolveSide(side, selectedSide, disabledSide),
+      fillColor: _byState(fillColor, selectedFillColor, disabledFillColor),
+      dotColor: _byState(dotColor, selectedDotColor, disabledDotColor),
+      overlayColor: switch ((overlayColor, hoveredOverlayColor, pressedOverlayColor)) {
+        (null, null, null) => null,
+        _ => WidgetStateProperty<Color?>.fromMap({
+          WidgetState.pressed: pressedOverlayColor,
+          WidgetState.hovered: hoveredOverlayColor,
+          WidgetState.any: overlayColor,
+        }),
+      },
+      side: switch (_byState(side, selectedSide, disabledSide)) {
+        final byState? => WidgetStateBorderSide.resolveWith(byState.resolve),
+        null => null,
+      },
     );
+  }
+
+  // Maps each value to its own state only, leaving null (the default) for
+  // every state whose value is not given. Disabled wins over selected.
+  static WidgetStateProperty<T?>? _byState<T>(T? value, T? selected, T? disabled) {
+    if (value == null && selected == null && disabled == null) return null;
+    return WidgetStateProperty<T?>.fromMap({
+      WidgetState.disabled: disabled,
+      WidgetState.selected: selected,
+      WidgetState.any: value,
+    });
   }
 
   /// The size of radio buttons.
   ///
-  /// Falls back to [StreamRadioButtonSize.lg].
+  /// If null, defaults to [StreamRadioButtonSize.lg].
   final StreamRadioButtonSize? size;
-
-  /// The diameter of the dot inside the radio button.
-  ///
-  /// If null, defaults to 10 for [StreamRadioButtonSize.lg] and 8 for the
-  /// smaller sizes.
-  final double? dotSize;
 
   /// The color that fills the radio button, resolved per [WidgetState].
   ///
-  /// Resolves based on:
-  ///  * [WidgetState.selected] -- accent color.
-  ///  * [WidgetState.disabled] + [WidgetState.selected] -- disabled
-  ///    background.
-  ///
-  /// Transparent when not selected, giving a border-only appearance.
+  /// If null, defaults to the accent color when selected, the disabled
+  /// background when selected and disabled, and transparent when not
+  /// selected.
   final WidgetStateProperty<Color?>? fillColor;
 
   /// The color of the dot inside the radio button, resolved per
   /// [WidgetState].
   ///
-  /// Resolves based on:
-  ///  * [WidgetState.selected] -- high-contrast color against the fill.
-  ///  * [WidgetState.disabled] + [WidgetState.selected] -- muted color.
-  ///
-  /// Transparent when not selected so the dot is hidden.
+  /// If null, defaults to a color that contrasts with the accent fill when
+  /// selected, a muted color when selected and disabled, and transparent when
+  /// not selected, which hides the dot.
   final WidgetStateProperty<Color?>? dotColor;
 
   /// The overlay color for interaction feedback, resolved per [WidgetState].
   ///
-  /// Resolves based on:
-  ///  * [WidgetState.hovered] -- hover overlay.
-  ///  * [WidgetState.pressed] -- pressed overlay.
+  /// If null, defaults to the hover overlay when hovered, the pressed overlay
+  /// when pressed, and transparent otherwise.
   final WidgetStateProperty<Color?>? overlayColor;
 
   /// The border of the radio button, resolved per [WidgetState].
   ///
-  /// Visible when not selected, [BorderSide.none] when selected, a wider
-  /// focus ring when focused, and uses the disabled border color when
-  /// disabled.
+  /// If null, defaults to the default border color when not selected, the
+  /// disabled border color when disabled and not selected, and
+  /// [BorderSide.none] when selected.
   final WidgetStateBorderSide? side;
 
   /// Linearly interpolate between two [StreamRadioButtonStyle] objects.
