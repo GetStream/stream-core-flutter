@@ -73,6 +73,7 @@ class StreamIcons with _$StreamIcons {
     this.bell = StreamIconData.bell,
     this.bellOff = StreamIconData.bellOff,
     this.blurFill = StreamIconData.blurFill,
+    this.blurOffFill = StreamIconData.blurOffFill,
     this.bolt = StreamIconData.bolt,
     this.boltFill = StreamIconData.boltFill,
     this.calendar = StreamIconData.calendar,
@@ -97,6 +98,7 @@ class StreamIcons with _$StreamIcons {
     this.delete = StreamIconData.delete,
     this.download = StreamIconData.download,
     this.edit = StreamIconData.edit,
+    this.effectsFill = StreamIconData.effectsFill,
     this.emoji = StreamIconData.emoji,
     this.emojiAdd = StreamIconData.emojiAdd,
     this.emojiAddFill = StreamIconData.emojiAddFill,
@@ -112,6 +114,7 @@ class StreamIcons with _$StreamIcons {
     this.folderLarge = StreamIconData.folderLarge,
     this.fullBlurFill = StreamIconData.fullBlurFill,
     this.fullscreen = StreamIconData.fullscreen,
+    this.fullscreenExit = StreamIconData.fullscreenExit,
     this.fullscreenFill = StreamIconData.fullscreenFill,
     this.gallery = StreamIconData.gallery,
     this.gridDefaultFill = StreamIconData.gridDefaultFill,
@@ -121,6 +124,7 @@ class StreamIcons with _$StreamIcons {
     this.imageLarge = StreamIconData.imageLarge,
     this.info = StreamIconData.info,
     this.language = StreamIconData.language,
+    this.languageFill = StreamIconData.languageFill,
     this.leave = StreamIconData.leave,
     this.leftToRight = StreamIconData.leftToRight,
     this.lightMode = StreamIconData.lightMode,
@@ -160,6 +164,7 @@ class StreamIcons with _$StreamIcons {
     this.pollLarge = StreamIconData.pollLarge,
     this.presentDesktopFill = StreamIconData.presentDesktopFill,
     this.presentMobileFill = StreamIconData.presentMobileFill,
+    this.qrCodeFill = StreamIconData.qrCodeFill,
     this.questionCircleFill = StreamIconData.questionCircleFill,
     this.quote = StreamIconData.quote,
     this.raiseHandFill = StreamIconData.raiseHandFill,
@@ -190,6 +195,7 @@ class StreamIcons with _$StreamIcons {
     this.threadFill = StreamIconData.threadFill,
     this.translate = StreamIconData.translate,
     this.trophy = StreamIconData.trophy,
+    this.unflag = StreamIconData.unflag,
     this.unlock = StreamIconData.unlock,
     this.unpin = StreamIconData.unpin,
     this.unpinFill = StreamIconData.unpinFill,
@@ -256,6 +262,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The blur fill icon.
   final IconData blurFill;
+
+  /// The blur off fill icon.
+  final IconData blurOffFill;
 
   /// The bolt icon.
   final IconData bolt;
@@ -329,6 +338,9 @@ class StreamIcons with _$StreamIcons {
   /// The edit icon.
   final IconData edit;
 
+  /// The effects fill icon.
+  final IconData effectsFill;
+
   /// The emoji icon.
   final IconData emoji;
 
@@ -374,6 +386,9 @@ class StreamIcons with _$StreamIcons {
   /// The fullscreen icon.
   final IconData fullscreen;
 
+  /// The fullscreen exit icon.
+  final IconData fullscreenExit;
+
   /// The fullscreen fill icon.
   final IconData fullscreenFill;
 
@@ -400,6 +415,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The language icon.
   final IconData language;
+
+  /// The language fill icon.
+  final IconData languageFill;
 
   /// The leave icon.
   final IconData leave;
@@ -519,6 +537,9 @@ class StreamIcons with _$StreamIcons {
   /// The present mobile fill icon.
   final IconData presentMobileFill;
 
+  /// The qr code fill icon.
+  final IconData qrCodeFill;
+
   /// The question circle fill icon.
   final IconData questionCircleFill;
 
@@ -608,6 +629,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The trophy icon.
   final IconData trophy;
+
+  /// The unflag icon.
+  final IconData unflag;
 
   /// The unlock icon.
   final IconData unlock;
@@ -712,6 +736,7 @@ class StreamIcons with _$StreamIcons {
     'bell': bell,
     'bellOff': bellOff,
     'blurFill': blurFill,
+    'blurOffFill': blurOffFill,
     'bolt': bolt,
     'boltFill': boltFill,
     'calendar': calendar,
@@ -736,6 +761,7 @@ class StreamIcons with _$StreamIcons {
     'delete': delete,
     'download': download,
     'edit': edit,
+    'effectsFill': effectsFill,
     'emoji': emoji,
     'emojiAdd': emojiAdd,
     'emojiAddFill': emojiAddFill,
@@ -751,6 +777,7 @@ class StreamIcons with _$StreamIcons {
     'folderLarge': folderLarge,
     'fullBlurFill': fullBlurFill,
     'fullscreen': fullscreen,
+    'fullscreenExit': fullscreenExit,
     'fullscreenFill': fullscreenFill,
     'gallery': gallery,
     'gridDefaultFill': gridDefaultFill,
@@ -760,6 +787,7 @@ class StreamIcons with _$StreamIcons {
     'imageLarge': imageLarge,
     'info': info,
     'language': language,
+    'languageFill': languageFill,
     'leave': leave,
     'leftToRight': leftToRight,
     'lightMode': lightMode,
@@ -799,6 +827,7 @@ class StreamIcons with _$StreamIcons {
     'pollLarge': pollLarge,
     'presentDesktopFill': presentDesktopFill,
     'presentMobileFill': presentMobileFill,
+    'qrCodeFill': qrCodeFill,
     'questionCircleFill': questionCircleFill,
     'quote': quote,
     'raiseHandFill': raiseHandFill,
@@ -829,6 +858,7 @@ class StreamIcons with _$StreamIcons {
     'threadFill': threadFill,
     'translate': translate,
     'trophy': trophy,
+    'unflag': unflag,
     'unlock': unlock,
     'unpin': unpin,
     'unpinFill': unpinFill,

@@ -5,6 +5,8 @@
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
 - Added the `fullscreen` icon to `StreamIcons`.
+- Added the `blurOffFill`, `effectsFill`, `fullscreenExit`, `languageFill`,
+  `qrCodeFill` and `unflag` icons to `StreamIcons`.
 
 ## 0.5.4
 
