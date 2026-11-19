@@ -424,7 +424,7 @@ git pull                                              # picks up "chore: Update 
 ```
 
 It bootstraps the workspace, runs `melos run update:goldens`, and commits every
-changed PNG back to the branch you dispatched, as the Stream SDK Bot. Dispatching
+changed PNG back to the branch you dispatched, committed by the `stream-flutter-ci-bot` app. Dispatching
 it is also the cheapest way to *see* what a color change did — the bot's diff is a
 before/after of every affected component, which is worth attaching to the PR when
 the change is a value move rather than a new token.

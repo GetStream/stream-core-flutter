@@ -83,6 +83,7 @@ mixin _$StreamIcons {
       folder: t < 0.5 ? a.folder : b.folder,
       folderLarge: t < 0.5 ? a.folderLarge : b.folderLarge,
       fullBlurFill: t < 0.5 ? a.fullBlurFill : b.fullBlurFill,
+      fullscreen: t < 0.5 ? a.fullscreen : b.fullscreen,
       fullscreenFill: t < 0.5 ? a.fullscreenFill : b.fullscreenFill,
       gallery: t < 0.5 ? a.gallery : b.gallery,
       gridDefaultFill: t < 0.5 ? a.gridDefaultFill : b.gridDefaultFill,
@@ -246,6 +247,7 @@ mixin _$StreamIcons {
     IconData? folder,
     IconData? folderLarge,
     IconData? fullBlurFill,
+    IconData? fullscreen,
     IconData? fullscreenFill,
     IconData? gallery,
     IconData? gridDefaultFill,
@@ -407,6 +409,7 @@ mixin _$StreamIcons {
       folder: folder ?? _this.folder,
       folderLarge: folderLarge ?? _this.folderLarge,
       fullBlurFill: fullBlurFill ?? _this.fullBlurFill,
+      fullscreen: fullscreen ?? _this.fullscreen,
       fullscreenFill: fullscreenFill ?? _this.fullscreenFill,
       gallery: gallery ?? _this.gallery,
       gridDefaultFill: gridDefaultFill ?? _this.gridDefaultFill,
@@ -578,6 +581,7 @@ mixin _$StreamIcons {
       folder: other.folder,
       folderLarge: other.folderLarge,
       fullBlurFill: other.fullBlurFill,
+      fullscreen: other.fullscreen,
       fullscreenFill: other.fullscreenFill,
       gallery: other.gallery,
       gridDefaultFill: other.gridDefaultFill,
@@ -749,6 +753,7 @@ mixin _$StreamIcons {
         _other.folder == _this.folder &&
         _other.folderLarge == _this.folderLarge &&
         _other.fullBlurFill == _this.fullBlurFill &&
+        _other.fullscreen == _this.fullscreen &&
         _other.fullscreenFill == _this.fullscreenFill &&
         _other.gallery == _this.gallery &&
         _other.gridDefaultFill == _this.gridDefaultFill &&
@@ -912,6 +917,7 @@ mixin _$StreamIcons {
       _this.folder,
       _this.folderLarge,
       _this.fullBlurFill,
+      _this.fullscreen,
       _this.fullscreenFill,
       _this.gallery,
       _this.gridDefaultFill,

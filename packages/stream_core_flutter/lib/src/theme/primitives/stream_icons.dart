@@ -111,6 +111,7 @@ class StreamIcons with _$StreamIcons {
     this.folder = StreamIconData.folder,
     this.folderLarge = StreamIconData.folderLarge,
     this.fullBlurFill = StreamIconData.fullBlurFill,
+    this.fullscreen = StreamIconData.fullscreen,
     this.fullscreenFill = StreamIconData.fullscreenFill,
     this.gallery = StreamIconData.gallery,
     this.gridDefaultFill = StreamIconData.gridDefaultFill,
@@ -369,6 +370,9 @@ class StreamIcons with _$StreamIcons {
 
   /// The full blur fill icon.
   final IconData fullBlurFill;
+
+  /// The fullscreen icon.
+  final IconData fullscreen;
 
   /// The fullscreen fill icon.
   final IconData fullscreenFill;
@@ -746,6 +750,7 @@ class StreamIcons with _$StreamIcons {
     'folder': folder,
     'folderLarge': folderLarge,
     'fullBlurFill': fullBlurFill,
+    'fullscreen': fullscreen,
     'fullscreenFill': fullscreenFill,
     'gallery': gallery,
     'gridDefaultFill': gridDefaultFill,

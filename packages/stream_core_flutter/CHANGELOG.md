@@ -6,6 +6,7 @@
   `decorative` variant for rows that own the tap, to `video.dart`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
+- Added the `fullscreen` icon to `StreamIcons`.
 
 ## 0.5.4
 
