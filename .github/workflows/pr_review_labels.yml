@@ -179,8 +179,10 @@ jobs:
                 await removeLabel(READY);
                 return;
               }
-              if (context.payload.action === 'opened' && pr.draft) {
-                core.info('Opened as a draft, nothing to do');
+              // This run may start after a later draft change; use the live pull request.
+              const { data: live } = await github.rest.pulls.get({ owner, repo, pull_number: number });
+              if (live.draft) {
+                core.info('Draft, nothing to do');
                 return;
               }
               // Opened or ready_for_review. Labels added by this workflow don't
