@@ -1,4 +1,4 @@
-name: PR Version Labels
+name: pr_version_labels
 
 # Reusable workflow that labels a pull request with the major version it
 # targets, such as `v10`:
@@ -41,15 +41,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/github-script@v9
+      - name: 🏷️ Label Version
+        uses: actions/github-script@v9
         env:
           VERSION_FILE: ${{ inputs.version-file }}
         with:
           script: |
             const { owner, repo } = context.repo;
-            const pr = context.payload.pull_request;
             const defaultBranch = context.payload.repository.default_branch;
             const isVersionLabel = (name) => /^v\d+$/.test(name);
+
+            // This run may start after a later base change; use the live pull request.
+            const { data: pr } = await github.rest.pulls.get({
+              owner, repo, pull_number: context.payload.pull_request.number,
+            });
 
             // A stacked pull request targets the branch of the one below it,
             // so follow the open pull requests down to the stack's base.
@@ -73,7 +78,7 @@ jobs:
                 owner, repo, ref: base, path: process.env.VERSION_FILE,
               });
               const pubspec = Buffer.from(data.content, 'base64').toString();
-              const major = pubspec.match(/^version:\s*(\d+)\./m)?.[1];
+              const major = pubspec.match(/^version:\s*['"]?(\d+)\./m)?.[1];
               if (!major) {
                 core.setFailed(`No version found in ${process.env.VERSION_FILE} on ${base}`);
                 return;

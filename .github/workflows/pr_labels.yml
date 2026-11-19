@@ -1,10 +1,19 @@
-name: PR Labels
+name: pr_labels
+
+# Keeps the review-state labels (ready, pending, approved) of this repository's
+# pull requests in sync. See pr_review_labels.yml.
 
 on:
   pull_request:
-    types: [labeled, ready_for_review, converted_to_draft]
+    types:
+      - opened
+      - labeled
+      - ready_for_review
+      - converted_to_draft
   pull_request_review:
-    types: [submitted, dismissed]
+    types:
+      - submitted
+      - dismissed
 
 permissions:
   contents: read
