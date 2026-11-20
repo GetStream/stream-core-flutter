@@ -18,6 +18,9 @@ jobs:
     # Publishing waits for a flutter-developers approval, and pub.dev only
     # accepts uploads from this environment.
     environment: pub.dev
+    outputs:
+      package: ${{ steps.parse.outputs.package }}
+      prerelease: ${{ steps.parse.outputs.prerelease }}
     permissions:
       contents: write # create the GitHub Release
       id-token: write # OIDC auth to pub.dev
@@ -214,3 +217,21 @@ jobs:
           prerelease: ${{ steps.parse.outputs.prerelease }}
           make_latest: false # independent versioning: no single "latest" release
           token: ${{ steps.ci-bot-token.outputs.token }}
+
+  # The gallery shows stream_core_flutter's components, so prod follows its
+  # releases: only once the approval, the pub.dev publish and the GitHub
+  # Release have gone through. Pre-releases are skipped. To redeploy prod, run
+  # this workflow again on the tag: a version already on pub.dev is skipped.
+  gallery:
+    name: Deploy the Gallery to flutter.getstream.io
+    needs: release
+    if: needs.release.outputs.package == 'stream_core_flutter' && needs.release.outputs.prerelease == 'false'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/web_deploy.yml
+    with:
+      app: design-system
+      flavor: prod
+      working-directory: apps/design_system_gallery
+      bootstrap: true

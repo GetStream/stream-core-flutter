@@ -67,7 +67,7 @@ file-type assets.
 
 The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`. Two reusable workflows here deploy them, for this repository and for the other SDKs: `web_deploy.yml` deploys prod (`/<app>/`) or beta (`/<app>/beta/`), and `web_deploy_pr.yml` deploys a pull request labeled `build` to `/<app>/pr/<number>/`. Other repositories call them pinned to a commit, so a change here reaches them only when they bump the pin. Each calling repository needs two GitHub environments: `flutter-web`, limited to the branches and tags that publish, and `flutter-web-pr`, without branch rules. Pull request builds deploy through the second, as an account that can only write under `/<app>/pr/`.
 
-The gallery deploys as `design-system`: beta on every push to `main` (`publish_gallery.yml`), prod on a `stream_core_flutter-vX.Y.Z` tag, and pull request builds through `pr_web_build.yml`.
+The gallery deploys as `design-system`: beta on every push to `main` (`publish_gallery.yml`), prod once a `stream_core_flutter` release is on pub.dev (`release_publish.yml`, after the `pub.dev` approval), and pull request builds through `pr_web_build.yml`.
 
 All apps share one origin, so one browser storage. A build gets `WEB_STORAGE_PREFIX` as a dart-define, and an app that stores anything in the browser prefixes every key with it.
 
