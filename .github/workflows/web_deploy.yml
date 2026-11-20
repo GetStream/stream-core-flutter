@@ -17,8 +17,9 @@ name: web_deploy
 #
 # The caller decides when to deploy and with which flavor. It needs the GitHub
 # environment `flutter-web`, which the identity provider requires, and grants
-# `contents: read` and `id-token: write`. Fork pull requests can't deploy: their
-# runs get no identity token.
+# `contents: read` and `id-token: write`. The environment's branch and tag rules
+# must allow every ref the caller deploys from, release tags included. Fork pull
+# requests can't deploy: their runs get no identity token.
 
 on:
   workflow_call:

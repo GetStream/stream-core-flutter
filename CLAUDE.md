@@ -65,7 +65,7 @@ file-type assets.
 
 ### Web deploys
 
-The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`. Two reusable workflows here deploy them, for this repository and for the other SDKs: `web_deploy.yml` deploys prod (`/<app>/`) or beta (`/<app>/beta/`), and `web_deploy_pr.yml` deploys a pull request labeled `build` to `/<app>/pr/<number>/`. Other repositories call them pinned to a commit, so a change here reaches them only when they bump the pin. Each calling repository needs a GitHub environment named `flutter-web`.
+The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`. Two reusable workflows here deploy them, for this repository and for the other SDKs: `web_deploy.yml` deploys prod (`/<app>/`) or beta (`/<app>/beta/`), and `web_deploy_pr.yml` deploys a pull request labeled `build` to `/<app>/pr/<number>/`. Other repositories call them pinned to a commit, so a change here reaches them only when they bump the pin. Each calling repository needs two GitHub environments: `flutter-web`, limited to the branches and tags that publish, and `flutter-web-pr`, without branch rules. Pull request builds deploy through the second, as an account that can only write under `/<app>/pr/`.
 
 The gallery deploys as `design-system`: beta on every push to `main` (`publish_gallery.yml`), prod on a `stream_core_flutter-vX.Y.Z` tag, and pull request builds through `pr_web_build.yml`.
 
