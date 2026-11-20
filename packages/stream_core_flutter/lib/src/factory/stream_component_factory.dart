@@ -54,6 +54,7 @@ import '../components/toolbar/stream_app_bar.dart';
 import '../components/toolbar/stream_bottom_app_bar.dart';
 import '../components/toolbar/stream_bottom_nav_bar.dart';
 import '../components/toolbar/stream_sheet_header.dart';
+import '../components/toolbar/stream_tab_bar.dart';
 
 part 'stream_component_factory.g.theme.dart';
 
@@ -231,6 +232,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamSnackbarProps>? snackbar,
     StreamComponentBuilder<StreamSplitButtonProps>? splitButton,
     StreamComponentBuilder<StreamStepperProps>? stepper,
+    StreamComponentBuilder<StreamTabBarProps>? tabBar,
     StreamComponentBuilder<StreamTextInputProps>? textInput,
     StreamComponentBuilder<StreamSwitchProps>? toggleSwitch,
     StreamComponentBuilder<StreamTypingIndicatorDotsProps>? typingIndicatorDots,
@@ -289,6 +291,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       snackbar: snackbar,
       splitButton: splitButton,
       stepper: stepper,
+      tabBar: tabBar,
       textInput: textInput,
       toggleSwitch: toggleSwitch,
       typingIndicatorDots: typingIndicatorDots,
@@ -348,6 +351,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.snackbar,
     required this.splitButton,
     required this.stepper,
+    required this.tabBar,
     required this.textInput,
     required this.toggleSwitch,
     required this.typingIndicatorDots,
@@ -626,6 +630,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamStepper] uses [DefaultStreamStepper].
   final StreamComponentBuilder<StreamStepperProps>? stepper;
+
+  /// Custom builder for tab bar widgets.
+  ///
+  /// When null, [StreamTabBar] uses [DefaultStreamTabBar].
+  final StreamComponentBuilder<StreamTabBarProps>? tabBar;
 
   /// Custom builder for text input widgets.
   ///

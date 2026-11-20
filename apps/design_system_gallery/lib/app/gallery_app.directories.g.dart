@@ -135,6 +135,8 @@ import 'package:design_system_gallery/components/toolbar/stream_bottom_nav_bar.d
     as _design_system_gallery_components_toolbar_stream_bottom_nav_bar;
 import 'package:design_system_gallery/components/toolbar/stream_sheet_header.dart'
     as _design_system_gallery_components_toolbar_stream_sheet_header;
+import 'package:design_system_gallery/components/toolbar/stream_tab_bar.dart'
+    as _design_system_gallery_components_toolbar_stream_tab_bar;
 import 'package:design_system_gallery/components/toolbar/stream_toolbar_button.dart'
     as _design_system_gallery_components_toolbar_stream_toolbar_button;
 import 'package:design_system_gallery/primitives/colors.dart'
@@ -1380,6 +1382,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_toolbar_stream_sheet_header
                         .buildStreamSheetHeaderShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamTabBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_tab_bar
+                        .buildStreamTabBarPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_toolbar_stream_tab_bar
+                        .buildStreamTabBarShowcase,
               ),
             ],
           ),
