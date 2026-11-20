@@ -166,8 +166,15 @@ jobs:
       - name: 🧹 Remove Pull Request Builds Older Than 30 Days
         run: |
           cutoff=$(date -u -d '30 days ago' +%s)
-          # The listing fails when there is no pull request build.
-          builds=$(gcloud storage ls --long "gs://stream-flutter-web/$APP/pr/*/index.html" 2>/dev/null || true)
+          # With no pull request build the listing fails with "matched no
+          # objects". Any other failure is a warning: the deploy itself is done.
+          errors=$(mktemp)
+          if ! builds=$(gcloud storage ls --long "gs://stream-flutter-web/$APP/pr/*/index.html" 2>"$errors"); then
+            if ! grep -qiE 'matched no objects|no urls matched' "$errors"; then
+              echo "::warning::Could not list the pull request builds, so none were removed: $(tr '\n' ' ' < "$errors")"
+            fi
+            builds=
+          fi
           while read -r _ updated url; do
             [[ $url == gs://*/index.html ]] || continue
             if (( $(date -u -d "$updated" +%s) < cutoff )); then
