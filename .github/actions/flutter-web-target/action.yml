@@ -19,6 +19,10 @@ description: >
 #                       index.html for unknown paths under /<app>/ and
 #                       /<app>/beta/ only, so a pull request build keeps its
 #                       routes after a `#`.
+#   WEB_PR_NUMBER       the pull request's number on a pull request build,
+#                       unset otherwise. Nothing removes a build's browser
+#                       storage, so an app can skip storing what grows, such as
+#                       an offline cache, in pull request builds.
 
 inputs:
   app:
@@ -84,7 +88,7 @@ runs:
             fi
             path=$APP/pr/$PR_NUMBER
             account=flutter-web-pr-deployer
-            defines+=(--dart-define=WEB_FLAVOR=beta "--dart-define=WEB_STORAGE_PREFIX=${prefix}pr_${PR_NUMBER}_" --dart-define=WEB_HASH_URLS=true)
+            defines+=(--dart-define=WEB_FLAVOR=beta "--dart-define=WEB_STORAGE_PREFIX=${prefix}pr_${PR_NUMBER}_" --dart-define=WEB_HASH_URLS=true "--dart-define=WEB_PR_NUMBER=$PR_NUMBER")
             ;;
           *)
             echo "::error::flavor must be prod, beta or pr, got '$FLAVOR'"

@@ -67,7 +67,7 @@ file-type assets.
 
 The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`: prod at `/<app>/`, beta at `/<app>/beta/`, and pull requests labeled `build` at `/<app>/pr/<number>/`. Four composite actions in `.github/actions/` hold what every repository must do the same way, for this repository and for the other SDKs:
 
-- `flutter-web-target` turns an app and flavor (`prod`, `beta`, `pr`) into the bucket path, the URL, the account to deploy as, and the `flutter build web` arguments: the base href and the `WEB_FLAVOR`, `WEB_STORAGE_PREFIX` and `WEB_HASH_URLS` dart-defines.
+- `flutter-web-target` turns an app and flavor (`prod`, `beta`, `pr`) into the bucket path, the URL, the account to deploy as, and the `flutter build web` arguments: the base href and the `WEB_FLAVOR`, `WEB_STORAGE_PREFIX`, `WEB_HASH_URLS` and `WEB_PR_NUMBER` dart-defines.
 - `flutter-web-deploy` signs in, uploads the build, and on prod and beta removes the app's pull request builds last deployed over 30 days ago.
 - `flutter-web-remove` removes a pull request build, and `flutter-web-pr-comment` keeps the link comment on the pull request.
 
