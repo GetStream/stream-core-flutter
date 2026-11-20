@@ -14,6 +14,7 @@ import 'components/stream_button_theme.dart';
 import 'components/stream_checkbox_theme.dart';
 import 'components/stream_command_chip_theme.dart';
 import 'components/stream_context_menu_action_theme.dart';
+import 'components/stream_context_menu_anchor_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
@@ -137,6 +138,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamCommandChipThemeData? commandChipTheme,
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
+    StreamContextMenuAnchorThemeData? contextMenuAnchorTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
@@ -204,6 +206,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     commandChipTheme ??= const StreamCommandChipThemeData();
     contextMenuTheme ??= const StreamContextMenuThemeData();
     contextMenuActionTheme ??= const StreamContextMenuActionThemeData();
+    contextMenuAnchorTheme ??= const StreamContextMenuAnchorThemeData();
     emojiButtonTheme ??= const StreamEmojiButtonThemeData();
     emojiChipTheme ??= const StreamEmojiChipThemeData();
     errorBadgeTheme ??= const StreamErrorBadgeThemeData();
@@ -259,6 +262,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       commandChipTheme: commandChipTheme,
       contextMenuTheme: contextMenuTheme,
       contextMenuActionTheme: contextMenuActionTheme,
+      contextMenuAnchorTheme: contextMenuAnchorTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme,
@@ -328,6 +332,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.commandChipTheme,
     required this.contextMenuTheme,
     required this.contextMenuActionTheme,
+    required this.contextMenuAnchorTheme,
     required this.emojiButtonTheme,
     required this.emojiChipTheme,
     required this.errorBadgeTheme,
@@ -470,6 +475,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The context menu action theme for this theme.
   final StreamContextMenuActionThemeData contextMenuActionTheme;
 
+  /// The context menu anchor theme for this theme.
+  final StreamContextMenuAnchorThemeData contextMenuAnchorTheme;
+
   /// The emoji button theme for this theme.
   final StreamEmojiButtonThemeData emojiButtonTheme;
 
@@ -606,6 +614,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       commandChipTheme: commandChipTheme,
       contextMenuTheme: contextMenuTheme,
       contextMenuActionTheme: contextMenuActionTheme,
+      contextMenuAnchorTheme: contextMenuAnchorTheme,
       emojiButtonTheme: emojiButtonTheme,
       emojiChipTheme: emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme,
