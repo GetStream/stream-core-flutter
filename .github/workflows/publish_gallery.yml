@@ -61,12 +61,42 @@ jobs:
 
   deploy_hosted:
     name: Deploy to flutter.getstream.io
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: web-deploy-design-system-beta
+      cancel-in-progress: true
+    environment:
+      name: flutter-web
+      url: ${{ steps.target.outputs.url }}
     permissions:
       contents: read
       id-token: write
-    uses: ./.github/workflows/web_deploy.yml
-    with:
-      app: design-system
-      flavor: beta
-      working-directory: apps/design_system_gallery
-      bootstrap: true
+    steps:
+      - name: 📚 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🧩 Bootstrap Workspace
+        uses: ./.github/actions/bootstrap
+
+      - name: 🎯 Target
+        id: target
+        uses: ./.github/actions/flutter-web-target
+        with:
+          app: design-system
+          flavor: beta
+
+      - name: 🏗️ Build
+        working-directory: apps/design_system_gallery
+        env:
+          BUILD_ARGS: ${{ steps.target.outputs.build-args }}
+        run: |
+          read -ra args <<< "$BUILD_ARGS"
+          flutter build web --release --wasm "${args[@]}"
+
+      - name: 🚀 Deploy
+        uses: ./.github/actions/flutter-web-deploy
+        with:
+          path: ${{ steps.target.outputs.path }}
+          service-account: ${{ steps.target.outputs.service-account }}
+          build-dir: apps/design_system_gallery/build/web

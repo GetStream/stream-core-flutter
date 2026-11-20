@@ -1,0 +1,99 @@
+name: Flutter Web Target
+description: >
+  Works out where a Flutter web build deploys on https://flutter.getstream.io,
+  and the arguments to build it with. Run it before `flutter build web`, then
+  pass its outputs to flutter-web-deploy or flutter-web-remove.
+
+# The host (GetStream/chat, infra/flutter-web) serves every app from one
+# origin, so every build shares one browser storage. `build-args` gives each
+# build these defines:
+#
+#   WEB_FLAVOR          prod, or beta for beta and pull request builds.
+#   WEB_STORAGE_PREFIX  <app>_ on prod, <app>_beta_ on beta and
+#                       <app>_pr_<number>_ on a pull request build, with dashes
+#                       in <app> replaced by underscores. Prefix every key the
+#                       app stores in the browser with it. Each pull request
+#                       gets its own, so builds with different storage formats
+#                       (a database schema) can't break each other.
+#   WEB_HASH_URLS       true on a pull request build. The host serves an app's
+#                       index.html for unknown paths under /<app>/ and
+#                       /<app>/beta/ only, so a pull request build keeps its
+#                       routes after a `#`.
+
+inputs:
+  app:
+    description: The top-level folder on the host, such as `video`, `chat` or `design-system`.
+    required: true
+  flavor:
+    description: "`prod` for /<app>/, `beta` for /<app>/beta/, `pr` for /<app>/pr/<pr-number>/."
+    required: true
+  pr-number:
+    description: The pull request number, for the `pr` flavor.
+    required: false
+    default: ${{ github.event.pull_request.number }}
+
+outputs:
+  path:
+    description: The build's folder in the bucket, such as `chat/beta`.
+    value: ${{ steps.target.outputs.path }}
+  url:
+    description: The URL the build is served at.
+    value: ${{ steps.target.outputs.url }}
+  build-args:
+    description: Arguments for `flutter build web`, separated by spaces, none containing one.
+    value: ${{ steps.target.outputs.build-args }}
+  service-account:
+    description: >
+      The account to deploy as: flutter-web-deployer for prod and beta, which
+      needs the GitHub environment `flutter-web`, and flutter-web-pr-deployer
+      for pull request builds, which needs `flutter-web-pr`.
+    value: ${{ steps.target.outputs.service-account }}
+
+runs:
+  using: composite
+  steps:
+    - name: 🎯 Resolve Target
+      id: target
+      shell: bash
+      env:
+        APP: ${{ inputs.app }}
+        FLAVOR: ${{ inputs.flavor }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+      run: |
+        set -euo pipefail
+        if [[ ! $APP =~ ^[a-z0-9-]+$ ]]; then
+          echo "::error::app must be a lowercase folder name, got '$APP'"
+          exit 1
+        fi
+        prefix=${APP//-/_}_
+        account=flutter-web-deployer
+        defines=()
+        case $FLAVOR in
+          prod)
+            path=$APP
+            defines+=(--dart-define=WEB_FLAVOR=prod "--dart-define=WEB_STORAGE_PREFIX=$prefix")
+            ;;
+          beta)
+            path=$APP/beta
+            defines+=(--dart-define=WEB_FLAVOR=beta "--dart-define=WEB_STORAGE_PREFIX=${prefix}beta_")
+            ;;
+          pr)
+            if [[ ! $PR_NUMBER =~ ^[0-9]+$ ]]; then
+              echo "::error::pr-number must be a pull request number, got '$PR_NUMBER'"
+              exit 1
+            fi
+            path=$APP/pr/$PR_NUMBER
+            account=flutter-web-pr-deployer
+            defines+=(--dart-define=WEB_FLAVOR=beta "--dart-define=WEB_STORAGE_PREFIX=${prefix}pr_${PR_NUMBER}_" --dart-define=WEB_HASH_URLS=true)
+            ;;
+          *)
+            echo "::error::flavor must be prod, beta or pr, got '$FLAVOR'"
+            exit 1
+            ;;
+        esac
+        {
+          echo "path=$path"
+          echo "url=https://flutter.getstream.io/$path/"
+          echo "build-args=--base-href /$path/ ${defines[*]}"
+          echo "service-account=$account@stream-gcp-2026-v2.iam.gserviceaccount.com"
+        } >> "$GITHUB_OUTPUT"

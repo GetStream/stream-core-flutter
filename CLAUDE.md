@@ -65,11 +65,19 @@ file-type assets.
 
 ### Web deploys
 
-The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`. Two reusable workflows here deploy them, for this repository and for the other SDKs: `web_deploy.yml` deploys prod (`/<app>/`) or beta (`/<app>/beta/`), and `web_deploy_pr.yml` deploys a pull request labeled `build` to `/<app>/pr/<number>/`. Other repositories call them pinned to a commit, so a change here reaches them only when they bump the pin. Each calling repository needs two GitHub environments: `flutter-web`, limited to the branches and tags that publish, and `flutter-web-pr`, without branch rules. Pull request builds deploy through the second, as an account that can only write under `/<app>/pr/`.
+The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`: prod at `/<app>/`, beta at `/<app>/beta/`, and pull requests labeled `build` at `/<app>/pr/<number>/`. Four composite actions in `.github/actions/` hold what every repository must do the same way, for this repository and for the other SDKs:
+
+- `flutter-web-target` turns an app and flavor (`prod`, `beta`, `pr`) into the bucket path, the URL, the account to deploy as, and the `flutter build web` arguments: the base href and the `WEB_FLAVOR`, `WEB_STORAGE_PREFIX` and `WEB_HASH_URLS` dart-defines.
+- `flutter-web-deploy` signs in, uploads the build, and on prod and beta removes the app's pull request builds last deployed over 30 days ago.
+- `flutter-web-remove` removes a pull request build, and `flutter-web-pr-comment` keeps the link comment on the pull request.
+
+Each repository writes its own jobs around them: checkout, its own Flutter setup and build, and the job settings (environment, permissions, concurrency and, for pull request builds, the label conditions; `pr_web_build.yml` is the example to copy). Prod and beta jobs run in the GitHub environment `flutter-web`, limited to the branches and tags that publish; pull request jobs run in `flutter-web-pr`, without branch rules, as an account that can only write under `/<app>/pr/`.
+
+Other repositories reference the actions as `GetStream/stream-core-flutter/.github/actions/<name>@<commit>`, so a change here reaches them only when they bump the commit: stream-video-flutter (`app-distribute.yml`, `pr_web_build.yml`) and stream-chat-flutter (`distribute_web.yml`, `pr_web_build.yml`). Keep changes to the actions' inputs and outputs backward compatible.
 
 The gallery deploys as `design-system`: beta on every push to `main` (`publish_gallery.yml`), prod once a `stream_core_flutter` release is on pub.dev (`release_publish.yml`, after the `pub.dev` approval), and pull request builds through `pr_web_build.yml`.
 
-All apps share one origin, so one browser storage. A build gets `WEB_STORAGE_PREFIX` as a dart-define, and an app that stores anything in the browser prefixes every key with it.
+All apps share one origin, so one browser storage. An app that stores anything in the browser prefixes every key with `WEB_STORAGE_PREFIX`.
 
 ## Design
 
