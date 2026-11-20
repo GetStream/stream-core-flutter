@@ -74,7 +74,8 @@ runs:
         app=${WEB_PATH%%/*}
         cutoff=$(date -u -d '30 days ago' +%s)
         # With no pull request build the listing fails with "matched no
-        # objects". Any other failure is a warning: the deploy itself is done.
+        # objects". Any other failure, here or removing a build, is a warning:
+        # the deploy itself is done.
         errors=$(mktemp)
         if ! builds=$(gcloud storage ls --long "gs://stream-flutter-web/$app/pr/*/index.html" 2>"$errors"); then
           if ! grep -qiE 'matched no objects|no urls matched' "$errors"; then
@@ -86,6 +87,6 @@ runs:
           [[ $url == gs://*/index.html ]] || continue
           if (( $(date -u -d "$updated" +%s) < cutoff )); then
             echo "Removing ${url%index.html}, last deployed $updated"
-            gcloud storage rm --recursive "${url%index.html}"
+            gcloud storage rm --recursive "${url%index.html}" || echo "::warning::Could not remove ${url%index.html}"
           fi
         done <<< "$builds"
