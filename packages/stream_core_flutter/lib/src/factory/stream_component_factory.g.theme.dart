@@ -87,6 +87,7 @@ mixin _$StreamComponentBuilders {
           ? a.playbackSpeedToggle
           : b.playbackSpeedToggle,
       progressBar: t < 0.5 ? a.progressBar : b.progressBar,
+      radioButton: t < 0.5 ? a.radioButton : b.radioButton,
       reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
       retryBadge: t < 0.5 ? a.retryBadge : b.retryBadge,
@@ -169,6 +170,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamPlaybackSpeedToggleProps)?
     playbackSpeedToggle,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
+    Widget Function(BuildContext, StreamRadioButtonProps)? radioButton,
     Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
     Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,
@@ -242,6 +244,7 @@ mixin _$StreamComponentBuilders {
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       playbackSpeedToggle: playbackSpeedToggle ?? _this.playbackSpeedToggle,
       progressBar: progressBar ?? _this.progressBar,
+      radioButton: radioButton ?? _this.radioButton,
       reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
       retryBadge: retryBadge ?? _this.retryBadge,
@@ -314,6 +317,7 @@ mixin _$StreamComponentBuilders {
       onlineIndicator: other.onlineIndicator,
       playbackSpeedToggle: other.playbackSpeedToggle,
       progressBar: other.progressBar,
+      radioButton: other.radioButton,
       reactionPicker: other.reactionPicker,
       reactions: other.reactions,
       retryBadge: other.retryBadge,
@@ -390,6 +394,7 @@ mixin _$StreamComponentBuilders {
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.playbackSpeedToggle == _this.playbackSpeedToggle &&
         _other.progressBar == _this.progressBar &&
+        _other.radioButton == _this.radioButton &&
         _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions &&
         _other.retryBadge == _this.retryBadge &&
@@ -452,6 +457,7 @@ mixin _$StreamComponentBuilders {
       _this.onlineIndicator,
       _this.playbackSpeedToggle,
       _this.progressBar,
+      _this.radioButton,
       _this.reactionPicker,
       _this.reactions,
       _this.retryBadge,
