@@ -9,15 +9,15 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../message_layout/stream_message_layout.dart';
+import 'stream_message_mark.dart';
 
 /// The bottom metadata row of a chat message bubble.
 ///
-/// Displays a [timestamp], and optional [status] icon, [username], and
-/// [edited] indicator in a horizontal row with themed styling.
+/// Displays a [timestamp], and optional [username], [mark], [status] icon,
+/// and [edited] indicator in a horizontal row with themed styling.
 ///
-/// All content is provided by the caller via widget slots. The provided
-/// widgets are automatically styled according to
-/// [StreamMessageMetadataStyle].
+/// All content is provided by the caller via widget slots. Every slot except
+/// [mark] is styled according to [StreamMessageMetadataStyle].
 ///
 /// {@tool snippet}
 ///
@@ -48,6 +48,7 @@ import '../message_layout/stream_message_layout.dart';
 ///
 ///  * [StreamMessageMetadataStyle], for customizing metadata appearance.
 ///  * [StreamMessageItemTheme], for theming via the widget tree.
+///  * [StreamMessageMark], which is typically placed in the [mark] slot.
 class StreamMessageMetadata extends StatelessWidget {
   /// Creates a message metadata row.
   ///
@@ -58,12 +59,14 @@ class StreamMessageMetadata extends StatelessWidget {
     required Widget timestamp,
     Widget? status,
     Widget? username,
+    Widget? mark,
     Widget? edited,
     StreamMessageMetadataStyle? style,
   }) : props = .new(
          timestamp: timestamp,
          status: status,
          username: username,
+         mark: mark,
          edited: edited,
          style: style,
        );
@@ -90,6 +93,7 @@ class StreamMessageMetadataProps {
     required this.timestamp,
     this.status,
     this.username,
+    this.mark,
     this.edited,
     this.style,
   });
@@ -114,6 +118,11 @@ class StreamMessageMetadataProps {
   /// Styled by [StreamMessageMetadataStyle.usernameTextStyle] and
   /// [StreamMessageMetadataStyle.usernameColor].
   final Widget? username;
+
+  /// An optional mark widget, shown before the [status] and [timestamp].
+  ///
+  /// Typically a [StreamMessageMark], which styles itself.
+  final Widget? mark;
 
   /// An optional edited indicator widget.
   ///
@@ -214,7 +223,7 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: effectiveSpacing,
-        children: [?usernameWidget, statusTimestampWidget, ?editedWidget],
+        children: [?usernameWidget, ?props.mark, statusTimestampWidget, ?editedWidget],
       ),
     );
   }
