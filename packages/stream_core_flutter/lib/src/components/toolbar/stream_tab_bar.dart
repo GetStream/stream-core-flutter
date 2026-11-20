@@ -293,7 +293,13 @@ class _RenderEqualTabsRow extends RenderBox
 
     var index = 0;
     for (var child = firstChild; child != null; child = childAfter(child), index += 1) {
-      child.layout(BoxConstraints.tightFor(width: tabWidth, height: height));
+      // Loose in height and with parentUsesSize, so a tab is not a relayout
+      // boundary: when its content resizes (a text scale change, a late font
+      // load), the row lays out again and remeasures every tab.
+      child.layout(
+        BoxConstraints(minWidth: tabWidth, maxWidth: tabWidth, minHeight: height, maxHeight: constraints.maxHeight),
+        parentUsesSize: true,
+      );
       final slot = textDirection == TextDirection.rtl ? childCount - 1 - index : index;
       (child.parentData! as _EqualTabsRowParentData).offset = Offset(slot * tabWidth, 0);
     }
