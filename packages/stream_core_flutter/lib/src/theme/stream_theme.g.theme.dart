@@ -22,6 +22,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamColorScheme? colorScheme,
     StreamTextTheme? textTheme,
     StreamBoxShadow? boxShadow,
+    StreamAdaptiveMenuAnchorThemeData? adaptiveMenuAnchorTheme,
     StreamAppBarThemeData? appBarTheme,
     StreamAudioWaveformThemeData? audioWaveformTheme,
     StreamAvatarThemeData? avatarTheme,
@@ -36,6 +37,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamContextMenuThemeData? contextMenuTheme,
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamContextMenuAnchorThemeData? contextMenuAnchorTheme,
+    StreamContextMenuHeadingThemeData? contextMenuHeadingTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
@@ -62,6 +64,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamOnlineIndicatorThemeData? onlineIndicatorTheme,
     StreamPlaybackSpeedToggleThemeData? playbackSpeedToggleTheme,
     StreamProgressBarThemeData? progressBarTheme,
+    StreamRadioButtonThemeData? radioButtonTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
@@ -86,6 +89,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       colorScheme: colorScheme ?? _this.colorScheme,
       textTheme: textTheme ?? _this.textTheme,
       boxShadow: boxShadow ?? _this.boxShadow,
+      adaptiveMenuAnchorTheme:
+          adaptiveMenuAnchorTheme ?? _this.adaptiveMenuAnchorTheme,
       appBarTheme: appBarTheme ?? _this.appBarTheme,
       audioWaveformTheme: audioWaveformTheme ?? _this.audioWaveformTheme,
       avatarTheme: avatarTheme ?? _this.avatarTheme,
@@ -103,6 +108,8 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           contextMenuActionTheme ?? _this.contextMenuActionTheme,
       contextMenuAnchorTheme:
           contextMenuAnchorTheme ?? _this.contextMenuAnchorTheme,
+      contextMenuHeadingTheme:
+          contextMenuHeadingTheme ?? _this.contextMenuHeadingTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
       errorBadgeTheme: errorBadgeTheme ?? _this.errorBadgeTheme,
@@ -140,6 +147,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       playbackSpeedToggleTheme:
           playbackSpeedToggleTheme ?? _this.playbackSpeedToggleTheme,
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
+      radioButtonTheme: radioButtonTheme ?? _this.radioButtonTheme,
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
       sheetHeaderTheme: sheetHeaderTheme ?? _this.sheetHeaderTheme,
@@ -176,6 +184,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       colorScheme: _this.colorScheme.lerp(other.colorScheme, t),
       textTheme: _this.textTheme.lerp(other.textTheme, t),
       boxShadow: StreamBoxShadow.lerp(_this.boxShadow, other.boxShadow, t)!,
+      adaptiveMenuAnchorTheme: StreamAdaptiveMenuAnchorThemeData.lerp(
+        _this.adaptiveMenuAnchorTheme,
+        other.adaptiveMenuAnchorTheme,
+        t,
+      )!,
       appBarTheme: StreamAppBarThemeData.lerp(
         _this.appBarTheme,
         other.appBarTheme,
@@ -244,6 +257,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       contextMenuAnchorTheme: StreamContextMenuAnchorThemeData.lerp(
         _this.contextMenuAnchorTheme,
         other.contextMenuAnchorTheme,
+        t,
+      )!,
+      contextMenuHeadingTheme: StreamContextMenuHeadingThemeData.lerp(
+        _this.contextMenuHeadingTheme,
+        other.contextMenuHeadingTheme,
         t,
       )!,
       emojiButtonTheme: StreamEmojiButtonThemeData.lerp(
@@ -353,6 +371,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.progressBarTheme,
         t,
       )!,
+      radioButtonTheme: StreamRadioButtonThemeData.lerp(
+        _this.radioButtonTheme,
+        other.radioButtonTheme,
+        t,
+      )!,
       reactionPickerTheme: StreamReactionPickerThemeData.lerp(
         _this.reactionPickerTheme,
         other.reactionPickerTheme,
@@ -429,6 +452,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.colorScheme == _this.colorScheme &&
         _other.textTheme == _this.textTheme &&
         _other.boxShadow == _this.boxShadow &&
+        _other.adaptiveMenuAnchorTheme == _this.adaptiveMenuAnchorTheme &&
         _other.appBarTheme == _this.appBarTheme &&
         _other.audioWaveformTheme == _this.audioWaveformTheme &&
         _other.avatarTheme == _this.avatarTheme &&
@@ -443,6 +467,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.contextMenuTheme == _this.contextMenuTheme &&
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
         _other.contextMenuAnchorTheme == _this.contextMenuAnchorTheme &&
+        _other.contextMenuHeadingTheme == _this.contextMenuHeadingTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
         _other.errorBadgeTheme == _this.errorBadgeTheme &&
@@ -470,6 +495,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.onlineIndicatorTheme == _this.onlineIndicatorTheme &&
         _other.playbackSpeedToggleTheme == _this.playbackSpeedToggleTheme &&
         _other.progressBarTheme == _this.progressBarTheme &&
+        _other.radioButtonTheme == _this.radioButtonTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
         _other.sheetHeaderTheme == _this.sheetHeaderTheme &&
@@ -498,6 +524,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.colorScheme,
       _this.textTheme,
       _this.boxShadow,
+      _this.adaptiveMenuAnchorTheme,
       _this.appBarTheme,
       _this.audioWaveformTheme,
       _this.avatarTheme,
@@ -512,6 +539,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.contextMenuTheme,
       _this.contextMenuActionTheme,
       _this.contextMenuAnchorTheme,
+      _this.contextMenuHeadingTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
       _this.errorBadgeTheme,
@@ -532,6 +560,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.onlineIndicatorTheme,
       _this.playbackSpeedToggleTheme,
       _this.progressBarTheme,
+      _this.radioButtonTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,
       _this.sheetHeaderTheme,
