@@ -7,6 +7,8 @@ description: >
 # The job needs `id-token: write` and the GitHub environment that
 # flutter-web-target names for the account: the identity provider only admits
 # runs in it. Fork pull requests can't deploy: their runs get no identity token.
+# It needs a Linux runner: the cleanup of old pull request builds uses GNU
+# `date -d`.
 
 inputs:
   path:
