@@ -30,7 +30,7 @@ mixin _$StreamTabBarThemeData {
     }
 
     return StreamTabBarThemeData(
-      height: lerpDouble$(a.height, b.height, t),
+      minHeight: lerpDouble$(a.minHeight, b.minHeight, t),
       indicatorWeight: lerpDouble$(a.indicatorWeight, b.indicatorWeight, t),
       indicatorColor: WidgetStateProperty.lerp<Color?>(
         a.indicatorColor,
@@ -57,7 +57,7 @@ mixin _$StreamTabBarThemeData {
   }
 
   StreamTabBarThemeData copyWith({
-    double? height,
+    double? minHeight,
     double? indicatorWeight,
     WidgetStateProperty<Color?>? indicatorColor,
     TextStyle? labelStyle,
@@ -69,7 +69,7 @@ mixin _$StreamTabBarThemeData {
     final _this = (this as StreamTabBarThemeData);
 
     return StreamTabBarThemeData(
-      height: height ?? _this.height,
+      minHeight: minHeight ?? _this.minHeight,
       indicatorWeight: indicatorWeight ?? _this.indicatorWeight,
       indicatorColor: indicatorColor ?? _this.indicatorColor,
       labelStyle: labelStyle ?? _this.labelStyle,
@@ -92,7 +92,7 @@ mixin _$StreamTabBarThemeData {
     }
 
     return copyWith(
-      height: other.height,
+      minHeight: other.minHeight,
       indicatorWeight: other.indicatorWeight,
       indicatorColor: other.indicatorColor,
       labelStyle: _this.labelStyle?.merge(other.labelStyle) ?? other.labelStyle,
@@ -116,7 +116,7 @@ mixin _$StreamTabBarThemeData {
     final _this = (this as StreamTabBarThemeData);
     final _other = (other as StreamTabBarThemeData);
 
-    return _other.height == _this.height &&
+    return _other.minHeight == _this.minHeight &&
         _other.indicatorWeight == _this.indicatorWeight &&
         _other.indicatorColor == _this.indicatorColor &&
         _other.labelStyle == _this.labelStyle &&
@@ -132,7 +132,7 @@ mixin _$StreamTabBarThemeData {
 
     return Object.hash(
       runtimeType,
-      _this.height,
+      _this.minHeight,
       _this.indicatorWeight,
       _this.indicatorColor,
       _this.labelStyle,

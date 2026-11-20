@@ -7,7 +7,12 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 const _labels = ['Entire Screen', 'Window', 'Application', 'Tab'];
 
-List<StreamTabBarItem> _tabs(BuildContext context, {required int count, required bool showIcons}) {
+List<StreamTabBarItem> _tabs(
+  BuildContext context, {
+  required int count,
+  required bool showIcons,
+  int? disabledIndex,
+}) {
   final icons = context.streamIcons;
   final tabIcons = [icons.presentDesktopFill, icons.gridFill, icons.sidebar, icons.link];
   return [
@@ -15,6 +20,7 @@ List<StreamTabBarItem> _tabs(BuildContext context, {required int count, required
       StreamTabBarItem(
         label: _labels[index],
         icon: showIcons ? Icon(tabIcons[index]) : null,
+        enabled: index != disabledIndex,
       ),
   ];
 }
@@ -57,6 +63,11 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       description: 'Draw an icon before each label.',
     );
 
+    final disableLast = context.knobs.boolean(
+      label: 'Disable last tab',
+      description: 'Draw the last tab in the disabled colors and ignore taps on it.',
+    );
+
     final width = context.knobs.double.slider(
       label: 'Width',
       initialValue: 480,
@@ -73,7 +84,12 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
         child: StreamTabBar(
           selectedIndex: selectedIndex,
           onSelected: (index) => setState(() => _selectedIndex = index),
-          tabs: _tabs(context, count: tabCount, showIcons: showIcons),
+          tabs: _tabs(
+            context,
+            count: tabCount,
+            showIcons: showIcons,
+            disabledIndex: disableLast ? tabCount - 1 : null,
+          ),
         ),
       ),
     );
@@ -112,6 +128,12 @@ Widget buildStreamTabBarShowcase(BuildContext context) {
             description: 'An icon before the label takes the same color as the label.',
             showIcons: true,
           ),
+          _ExampleSection(
+            title: 'Disabled tab',
+            description: 'A disabled tab takes the disabled colors for its label and underline and ignores taps.',
+            showIcons: false,
+            disabledIndex: 2,
+          ),
           _TruncationSection(),
           _ThemedSection(),
         ],
@@ -121,11 +143,17 @@ Widget buildStreamTabBarShowcase(BuildContext context) {
 }
 
 class _ExampleSection extends StatefulWidget {
-  const _ExampleSection({required this.title, required this.description, required this.showIcons});
+  const _ExampleSection({
+    required this.title,
+    required this.description,
+    required this.showIcons,
+    this.disabledIndex,
+  });
 
   final String title;
   final String description;
   final bool showIcons;
+  final int? disabledIndex;
 
   @override
   State<_ExampleSection> createState() => _ExampleSectionState();
@@ -142,7 +170,7 @@ class _ExampleSectionState extends State<_ExampleSection> {
       child: StreamTabBar(
         selectedIndex: _selectedIndex,
         onSelected: (index) => setState(() => _selectedIndex = index),
-        tabs: _tabs(context, count: 3, showIcons: widget.showIcons),
+        tabs: _tabs(context, count: 3, showIcons: widget.showIcons, disabledIndex: widget.disabledIndex),
       ),
     );
   }
@@ -197,7 +225,7 @@ class _ThemedSectionState extends State<_ThemedSection> {
       description: 'A StreamTabBarTheme with a taller bar, a thicker underline and no border under unselected tabs.',
       child: StreamTabBarTheme(
         data: StreamTabBarThemeData(
-          height: 56,
+          minHeight: 56,
           indicatorWeight: 3,
           indicatorColor: WidgetStateProperty.resolveWith(
             (states) => states.contains(WidgetState.selected) ? colorScheme.accentPrimary : Colors.transparent,

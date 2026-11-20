@@ -13,13 +13,18 @@ Widget _withStreamTheme(Widget child, {StreamTheme? streamTheme}) {
   );
 }
 
-StreamTabBar _tabBar({int selectedIndex = 0, ValueChanged<int>? onSelected, Widget? icon}) {
+StreamTabBar _tabBar({
+  int? selectedIndex = 0,
+  ValueChanged<int>? onSelected,
+  Widget? icon,
+  bool windowEnabled = true,
+}) {
   return StreamTabBar(
     selectedIndex: selectedIndex,
     onSelected: onSelected ?? (_) {},
     tabs: [
       StreamTabBarItem(label: 'Entire Screen', icon: icon),
-      const StreamTabBarItem(label: 'Window'),
+      StreamTabBarItem(label: 'Window', enabled: windowEnabled),
     ],
   );
 }
@@ -32,6 +37,10 @@ BorderSide _indicatorOf(WidgetTester tester, String label) {
     find.ancestor(of: find.text(label), matching: find.byType(DecoratedBox)).first,
   );
   return ((box.decoration as BoxDecoration).border! as Border).bottom;
+}
+
+InkWell _inkWellOf(WidgetTester tester, String label) {
+  return tester.widget<InkWell>(find.ancestor(of: find.text(label), matching: find.byType(InkWell)));
 }
 
 StreamColorScheme _colorSchemeOf(WidgetTester tester) {
@@ -73,17 +82,96 @@ void main() {
     expect(tapped, [1]);
   });
 
+  testWidgets('reports the tab that is already selected too', (tester) async {
+    final tapped = <int>[];
+    await tester.pumpWidget(_withStreamTheme(_tabBar(onSelected: tapped.add)));
+
+    await tester.tap(find.text('Entire Screen'));
+    await tester.pumpAndSettle();
+
+    expect(tapped, [0]);
+  });
+
   testWidgets('gives every tab an equal share of the width', (tester) async {
     await tester.pumpWidget(_withStreamTheme(_tabBar()));
 
-    expect(tester.getSize(find.text('Entire Screen')).width, lessThan(200));
-    expect(tester.getTopLeft(find.text('Window')).dx, greaterThanOrEqualTo(200));
+    Rect tabRect(String label) => tester.getRect(find.ancestor(of: find.text(label), matching: find.byType(InkWell)));
+    expect(tabRect('Entire Screen').width, 200);
+    expect(tabRect('Window').width, 200);
+    expect(tabRect('Window').left, tabRect('Entire Screen').right);
   });
 
   testWidgets('is 48 tall by default', (tester) async {
     await tester.pumpWidget(_withStreamTheme(_tabBar()));
 
-    expect(tester.getSize(find.byType(StreamTabBar)).height, StreamTabBar.height);
+    expect(tester.getSize(find.byType(StreamTabBar)).height, 48);
+  });
+
+  testWidgets('leaves every tab unselected without a selected index', (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_withStreamTheme(_tabBar(selectedIndex: null)));
+
+    final colorScheme = _colorSchemeOf(tester);
+    for (final label in ['Entire Screen', 'Window']) {
+      expect(_labelColorOf(tester, label), colorScheme.textSecondary);
+      expect(_indicatorOf(tester, label).color, colorScheme.borderDefault);
+      expect(tester.semantics.find(find.text(label)), isSemantics(hasSelectedState: true, isSelected: false));
+    }
+    handle.dispose();
+  });
+
+  test('rejects empty tabs and a selected index outside them', () {
+    void onSelected(int _) {}
+    const tabs = [StreamTabBarItem(label: 'Only')];
+
+    expect(() => StreamTabBarProps(tabs: const [], onSelected: onSelected), throwsAssertionError);
+    expect(() => StreamTabBarProps(tabs: tabs, selectedIndex: 1, onSelected: onSelected), throwsAssertionError);
+    expect(() => StreamTabBarProps(tabs: tabs, selectedIndex: -1, onSelected: onSelected), throwsAssertionError);
+  });
+
+  testWidgets('draws a disabled tab in the disabled colors and ignores taps on it', (tester) async {
+    final tapped = <int>[];
+    await tester.pumpWidget(_withStreamTheme(_tabBar(onSelected: tapped.add, windowEnabled: false)));
+
+    final colorScheme = _colorSchemeOf(tester);
+    expect(_labelColorOf(tester, 'Window'), colorScheme.textDisabled);
+    expect(_indicatorOf(tester, 'Window').color, colorScheme.borderDisabled);
+
+    await tester.tap(find.text('Window'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    expect(tapped, isEmpty);
+  });
+
+  testWidgets('announces a disabled tab and skips it with the keyboard', (tester) async {
+    final handle = tester.ensureSemantics();
+    final tapped = <int>[];
+    await tester.pumpWidget(_withStreamTheme(_tabBar(onSelected: tapped.add, windowEnabled: false)));
+
+    expect(
+      tester.semantics.find(find.text('Window')),
+      isSemantics(role: SemanticsRole.tab, hasEnabledState: true, isEnabled: false, hasTapAction: false),
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(tapped, isNot(contains(1)));
+    handle.dispose();
+  });
+
+  testWidgets('keeps the underline below the label', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        streamTheme: StreamTheme(
+          tabBarTheme: const StreamTabBarThemeData(tabPadding: EdgeInsets.zero, indicatorWeight: 6),
+        ),
+        _tabBar(),
+      ),
+    );
+
+    final tabBottom = tester.getRect(find.ancestor(of: find.text('Window'), matching: find.byType(InkWell))).bottom;
+    expect(tester.getRect(find.text('Window')).bottom, lessThanOrEqualTo(tabBottom - 6));
   });
 
   testWidgets('grows past its height when the text is scaled up', (tester) async {
@@ -97,7 +185,7 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(tester.getSize(find.byType(StreamTabBar)).height, greaterThan(StreamTabBar.height));
+    expect(tester.getSize(find.byType(StreamTabBar)).height, greaterThan(48));
   });
 
   testWidgets('lays the icon out after the label in RTL', (tester) async {
@@ -166,18 +254,19 @@ void main() {
   testWidgets('applies the tab bar theme from StreamTheme', (tester) async {
     const selected = Color(0xFF00FF00);
     const unselected = Color(0xFFFF0000);
+    final bySelection = WidgetStateProperty.resolveWith(
+      (states) => states.contains(WidgetState.selected) ? selected : unselected,
+    );
 
     await tester.pumpWidget(
       _withStreamTheme(
         streamTheme: StreamTheme(
           tabBarTheme: StreamTabBarThemeData(
-            height: 64,
+            minHeight: 64,
             indicatorWeight: 4,
-            indicatorColor: const WidgetStatePropertyAll(selected),
+            indicatorColor: bySelection,
             labelStyle: const TextStyle(fontSize: 20),
-            foregroundColor: WidgetStateProperty.resolveWith(
-              (states) => states.contains(WidgetState.selected) ? selected : unselected,
-            ),
+            foregroundColor: bySelection,
           ),
         ),
         _tabBar(),
@@ -186,10 +275,59 @@ void main() {
 
     expect(tester.getSize(find.byType(StreamTabBar)).height, 64);
     expect(_indicatorOf(tester, 'Window').width, 4);
-    expect(_indicatorOf(tester, 'Window').color, selected);
+    expect(_indicatorOf(tester, 'Entire Screen').color, selected);
+    expect(_indicatorOf(tester, 'Window').color, unselected);
     expect(_labelColorOf(tester, 'Entire Screen'), selected);
     expect(_labelColorOf(tester, 'Window'), unselected);
-    expect(tester.widget<Text>(find.text('Window')).style!.fontSize, 20);
+
+    final labelStyle = tester.widget<Text>(find.text('Window')).style!;
+    final defaultStyle = StreamTheme.of(tester.element(find.byType(StreamTabBar))).textTheme.captionEmphasis;
+    expect(labelStyle.fontSize, 20);
+    expect(labelStyle.fontWeight, defaultStyle.fontWeight, reason: 'the theme label style merges over the default');
+  });
+
+  testWidgets('falls back to the default color for states the theme leaves null', (tester) async {
+    const selected = Color(0xFF00FF00);
+    final onlySelected = WidgetStateProperty.resolveWith<Color?>(
+      (states) => states.contains(WidgetState.selected) ? selected : null,
+    );
+
+    await tester.pumpWidget(
+      _withStreamTheme(
+        streamTheme: StreamTheme(
+          tabBarTheme: StreamTabBarThemeData(
+            indicatorColor: onlySelected,
+            foregroundColor: onlySelected,
+            overlayColor: onlySelected,
+          ),
+        ),
+        _tabBar(icon: const Icon(Icons.monitor), selectedIndex: 1),
+      ),
+    );
+
+    final colorScheme = _colorSchemeOf(tester);
+    expect(_labelColorOf(tester, 'Window'), selected);
+    expect(_indicatorOf(tester, 'Window').color, selected);
+    expect(_labelColorOf(tester, 'Entire Screen'), colorScheme.textSecondary);
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.monitor))).color, colorScheme.textSecondary);
+    expect(_indicatorOf(tester, 'Entire Screen').color, colorScheme.borderDefault);
+    expect(
+      _inkWellOf(tester, 'Entire Screen').overlayColor!.resolve({WidgetState.pressed}),
+      colorScheme.backgroundPressed,
+    );
+  });
+
+  testWidgets('paints the default overlay for interaction states only', (tester) async {
+    await tester.pumpWidget(_withStreamTheme(_tabBar()));
+
+    final colorScheme = _colorSchemeOf(tester);
+    for (final label in ['Entire Screen', 'Window']) {
+      final overlay = _inkWellOf(tester, label).overlayColor!;
+      expect(overlay.resolve({WidgetState.pressed}), colorScheme.backgroundPressed, reason: label);
+      expect(overlay.resolve({WidgetState.hovered}), colorScheme.backgroundHover, reason: label);
+      expect(overlay.resolve({WidgetState.focused}), colorScheme.backgroundHover, reason: label);
+      expect(overlay.resolve({}), StreamColors.transparent, reason: label);
+    }
   });
 
   testWidgets('applies the theme padding and icon spacing', (tester) async {
@@ -208,7 +346,7 @@ void main() {
     expect(row.spacing, 13);
 
     final padding = tester.widget<Padding>(find.ancestor(of: row.asFinder, matching: find.byType(Padding)).first);
-    expect(padding.padding, const EdgeInsets.all(3));
+    expect(padding.padding, const EdgeInsets.fromLTRB(3, 3, 3, 5), reason: 'the underline is added below the padding');
   });
 
   testWidgets('resolves the theme overlay color with the selected state', (tester) async {
@@ -228,19 +366,16 @@ void main() {
       ),
     );
 
-    InkWell inkWellOf(String label) =>
-        tester.widget<InkWell>(find.ancestor(of: find.text(label), matching: find.byType(InkWell)));
-
-    expect(inkWellOf('Entire Screen').overlayColor!.resolve({WidgetState.pressed}), selectedOverlay);
-    expect(inkWellOf('Window').overlayColor!.resolve({WidgetState.pressed}), otherOverlay);
+    expect(_inkWellOf(tester, 'Entire Screen').overlayColor!.resolve({WidgetState.pressed}), selectedOverlay);
+    expect(_inkWellOf(tester, 'Window').overlayColor!.resolve({WidgetState.pressed}), otherOverlay);
   });
 
   testWidgets('a local StreamTabBarTheme beats the one on StreamTheme', (tester) async {
     await tester.pumpWidget(
       _withStreamTheme(
-        streamTheme: StreamTheme(tabBarTheme: const StreamTabBarThemeData(height: 64, indicatorWeight: 4)),
+        streamTheme: StreamTheme(tabBarTheme: const StreamTabBarThemeData(minHeight: 64, indicatorWeight: 4)),
         StreamTabBarTheme(
-          data: const StreamTabBarThemeData(height: 56),
+          data: const StreamTabBarThemeData(minHeight: 56),
           child: _tabBar(),
         ),
       ),

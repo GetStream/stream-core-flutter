@@ -23,7 +23,8 @@ import '../../theme/stream_theme_extensions.dart';
 /// reload. For tabs that swipe between pages, consider Material's [TabBar].
 ///
 /// Screen readers announce the bar as a tab bar and each tab as a tab with
-/// its selected state. Every tab is a keyboard focus stop.
+/// its selected state. Every enabled tab is a keyboard focus stop, and Enter
+/// or Space selects the focused tab.
 ///
 /// {@tool snippet}
 ///
@@ -49,23 +50,17 @@ import '../../theme/stream_theme_extensions.dart';
 class StreamTabBar extends StatelessWidget {
   /// Creates a tab bar.
   ///
-  /// [tabs] must not be empty.
+  /// [tabs] must not be empty, and [selectedIndex], when given, must be an
+  /// index into [tabs].
   StreamTabBar({
     super.key,
     required List<StreamTabBarItem> tabs,
-    required int selectedIndex,
+    int? selectedIndex,
     required ValueChanged<int> onSelected,
-  }) : assert(tabs.isNotEmpty, 'A tab bar needs at least one tab.'),
-       props = .new(tabs: tabs, selectedIndex: selectedIndex, onSelected: onSelected);
+  }) : props = .new(tabs: tabs, selectedIndex: selectedIndex, onSelected: onSelected);
 
   /// The props controlling the appearance and behavior of this tab bar.
   final StreamTabBarProps props;
-
-  /// The default height of the bar in logical pixels, underline included.
-  ///
-  /// [StreamTabBarThemeData.height] overrides it. The bar grows past its
-  /// height when the text scale needs more room.
-  static const height = 48.0;
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +73,9 @@ class StreamTabBar extends StatelessWidget {
 /// One tab of a [StreamTabBar].
 @immutable
 @experimental
-class StreamTabBarItem {
+final class StreamTabBarItem {
   /// Creates a tab.
-  const StreamTabBarItem({required this.label, this.icon});
+  const StreamTabBarItem({required this.label, this.icon, this.enabled = true});
 
   /// The tab's label, which is also what screen readers announce for it.
   final String label;
@@ -89,6 +84,12 @@ class StreamTabBarItem {
   ///
   /// It takes the tab's foreground color through [IconTheme].
   final Widget? icon;
+
+  /// Whether the tab can be selected.
+  ///
+  /// A disabled tab ignores taps, is skipped by keyboard focus, and is drawn
+  /// in the disabled colors. It can still be the selected tab.
+  final bool enabled;
 }
 
 /// Properties for configuring a [StreamTabBar].
@@ -100,26 +101,34 @@ class StreamTabBarItem {
 ///
 ///  * [StreamTabBar], which uses these properties.
 ///  * [DefaultStreamTabBar], the default implementation.
+@immutable
 @experimental
-class StreamTabBarProps {
+final class StreamTabBarProps {
   /// Creates properties for a tab bar.
+  ///
+  /// [tabs] must not be empty, and [selectedIndex], when given, must be an
+  /// index into [tabs].
   const StreamTabBarProps({
     required this.tabs,
-    required this.selectedIndex,
+    this.selectedIndex,
     required this.onSelected,
-  });
+  }) : assert(tabs.length > 0, 'A tab bar needs at least one tab.'),
+       assert(
+         selectedIndex == null || (selectedIndex >= 0 && selectedIndex < tabs.length),
+         'selectedIndex must be null or an index into tabs.',
+       );
 
   /// The tabs to draw, in order.
   final List<StreamTabBarItem> tabs;
 
-  /// The index into [tabs] of the selected tab.
-  ///
-  /// An index outside [tabs] leaves every tab unselected.
-  final int selectedIndex;
+  /// The index into [tabs] of the selected tab, or null when no tab is
+  /// selected.
+  final int? selectedIndex;
 
-  /// Called with the index of the tapped tab.
+  /// Called with the index of the tab the user activates, by tap or keyboard.
   ///
-  /// Also called for the tab that is already selected.
+  /// Also called for the tab that is already selected, and never for a
+  /// disabled tab.
   final ValueChanged<int> onSelected;
 }
 
@@ -146,15 +155,20 @@ class DefaultStreamTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.streamTabBarTheme;
     final defaults = _StreamTabBarThemeDefaults(context);
+    // Every field is non-null on the defaults, so it is non-null after the
+    // merge too. The colors are merged per state below instead: the merge
+    // swaps a whole WidgetStateProperty, which would let a theme's null for
+    // one state replace the default color for it.
+    final effective = defaults.merge(theme);
 
     final style = _StreamTabStyle(
-      indicatorWeight: theme.indicatorWeight ?? defaults.indicatorWeight,
-      indicatorColor: theme.indicatorColor ?? defaults.indicatorColor,
-      labelStyle: theme.labelStyle ?? defaults.labelStyle,
-      foregroundColor: theme.foregroundColor ?? defaults.foregroundColor,
-      overlayColor: theme.overlayColor ?? defaults.overlayColor,
-      tabPadding: theme.tabPadding ?? defaults.tabPadding,
-      spacing: theme.spacing ?? defaults.spacing,
+      indicatorWeight: effective.indicatorWeight!,
+      indicatorColor: _withDefault(theme.indicatorColor, defaults.indicatorColor),
+      labelStyle: effective.labelStyle!,
+      foregroundColor: _withDefault(theme.foregroundColor, defaults.foregroundColor),
+      overlayColor: _withDefault(theme.overlayColor, defaults.overlayColor),
+      tabPadding: effective.tabPadding!,
+      spacing: effective.spacing!,
     );
 
     final tabCount = props.tabs.length;
@@ -164,7 +178,7 @@ class DefaultStreamTabBar extends StatelessWidget {
       container: true,
       explicitChildNodes: true,
       child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: theme.height ?? defaults.height),
+        constraints: BoxConstraints(minHeight: effective.minHeight!),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: .stretch,
@@ -186,6 +200,16 @@ class DefaultStreamTabBar extends StatelessWidget {
       ),
     );
   }
+
+  // Resolves [theme] where it gives a color and [fallback] where it gives
+  // null, so a theme can override some states and keep the rest.
+  static WidgetStateProperty<Color> _withDefault(
+    WidgetStateProperty<Color?>? theme,
+    WidgetStateProperty<Color> fallback,
+  ) {
+    if (theme == null) return fallback;
+    return .resolveWith((states) => theme.resolve(states) ?? fallback.resolve(states));
+  }
 }
 
 // The resolved visual values every tab of one bar shares.
@@ -201,10 +225,10 @@ class _StreamTabStyle {
   });
 
   final double indicatorWeight;
-  final WidgetStateProperty<Color?> indicatorColor;
+  final WidgetStateProperty<Color> indicatorColor;
   final TextStyle labelStyle;
-  final WidgetStateProperty<Color?> foregroundColor;
-  final WidgetStateProperty<Color?> overlayColor;
+  final WidgetStateProperty<Color> foregroundColor;
+  final WidgetStateProperty<Color> overlayColor;
   final EdgeInsetsGeometry tabPadding;
   final double spacing;
 }
@@ -228,9 +252,12 @@ class _StreamTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final states = <WidgetState>{if (selected) WidgetState.selected};
+    final states = <WidgetState>{
+      if (selected) WidgetState.selected,
+      if (!item.enabled) WidgetState.disabled,
+    };
     final foregroundColor = style.foregroundColor.resolve(states);
-    final indicatorColor = style.indicatorColor.resolve(states) ?? StreamColors.transparent;
+    final indicatorColor = style.indicatorColor.resolve(states);
 
     // The position is spelled out for native screen readers, which do not
     // announce it from the tab role alone. The web maps the role to ARIA,
@@ -244,8 +271,12 @@ class _StreamTab extends StatelessWidget {
 
     return MergeSemantics(
       child: InkWell(
-        onTap: onPressed,
-        overlayColor: _withSelected(style.overlayColor),
+        onTap: item.enabled ? onPressed : null,
+        // The ink well only reports interaction states, so the tab's own
+        // states are added before resolving the theme's overlay.
+        overlayColor: WidgetStateProperty.resolveWith(
+          (interaction) => style.overlayColor.resolve({...interaction, ...states}),
+        ),
         child: Semantics(
           role: SemanticsRole.tab,
           child: Stack(
@@ -257,8 +288,10 @@ class _StreamTab extends StatelessWidget {
                     bottom: BorderSide(width: style.indicatorWeight, color: indicatorColor),
                   ),
                 ),
+                // The border does not inset its child, so the padding makes
+                // room for the underline below the label.
                 child: Padding(
-                  padding: style.tabPadding,
+                  padding: style.tabPadding.add(EdgeInsets.only(bottom: style.indicatorWeight)),
                   child: Row(
                     mainAxisAlignment: .center,
                     spacing: style.spacing,
@@ -280,19 +313,12 @@ class _StreamTab extends StatelessWidget {
                   ),
                 ),
               ),
-              Semantics(selected: selected, label: positionLabel),
+              Semantics(selected: selected, enabled: item.enabled, label: positionLabel),
             ],
           ),
         ),
       ),
     );
-  }
-
-  // The ink well only reports interaction states, so the selected state is
-  // added before resolving the theme's overlay.
-  WidgetStateProperty<Color?> _withSelected(WidgetStateProperty<Color?> overlayColor) {
-    if (!selected) return overlayColor;
-    return .resolveWith((states) => overlayColor.resolve({...states, WidgetState.selected}));
   }
 }
 
@@ -308,13 +334,14 @@ class _StreamTabBarThemeDefaults extends StreamTabBarThemeData {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  double get height => StreamTabBar.height;
+  double get minHeight => 48;
 
   @override
   double get indicatorWeight => 2;
 
   @override
   WidgetStateProperty<Color> get indicatorColor => .resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.borderDisabled;
     if (states.contains(WidgetState.selected)) return _colorScheme.accentPrimary;
     return _colorScheme.borderDefault;
   });
@@ -324,12 +351,14 @@ class _StreamTabBarThemeDefaults extends StreamTabBarThemeData {
 
   @override
   WidgetStateProperty<Color> get foregroundColor => .resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
     if (states.contains(WidgetState.selected)) return _colorScheme.accentPrimary;
     return _colorScheme.textSecondary;
   });
 
   @override
   WidgetStateProperty<Color> get overlayColor => .resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     if (states.contains(WidgetState.pressed)) return _colorScheme.backgroundPressed;
     if (states.contains(WidgetState.hovered)) return _colorScheme.backgroundHover;
     if (states.contains(WidgetState.focused)) return _colorScheme.backgroundHover;
