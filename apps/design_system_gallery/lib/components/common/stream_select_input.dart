@@ -7,6 +7,18 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 const _languages = ['English', 'Dutch', 'German', 'Spanish', 'Japanese'];
 
+// The select's visual variants, as the gallery offers them. The component has
+// no such enum: each variant is a StreamSelectInputStyle, so a new one is a new
+// entry here.
+enum _SelectInputStyle {
+  outline(null),
+  ghost(StreamSelectInputStyle.ghost());
+
+  const _SelectInputStyle(this.style);
+
+  final StreamSelectInputStyle? style;
+}
+
 // =============================================================================
 // Playground
 // =============================================================================
@@ -20,9 +32,12 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
   final icons = context.streamIcons;
   final spacing = context.streamSpacing;
 
-  final ghost = context.knobs.boolean(
-    label: 'Ghost',
-    description: 'Uses StreamSelectInputStyle.ghost: only state borders and rings show.',
+  final style = context.knobs.object.dropdown<_SelectInputStyle>(
+    label: 'Style',
+    options: _SelectInputStyle.values,
+    initialOption: _SelectInputStyle.outline,
+    labelBuilder: (option) => option.name,
+    description: 'Outline is bordered; ghost (StreamSelectInputStyle.ghost) only shows state borders and rings.',
   );
 
   final labelText = context.knobs.stringOrNull(
@@ -76,7 +91,7 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
       child: SizedBox(
         width: 320,
         child: StreamSelectInput(
-          style: ghost ? const StreamSelectInputStyle.ghost() : null,
+          style: style.style,
           labelText: labelText,
           value: value,
           hintText: hintText,
@@ -112,10 +127,7 @@ Widget buildStreamSelectInputShowcase(BuildContext context) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final (name, style) in const [
-            ('outline', null),
-            ('ghost', StreamSelectInputStyle.ghost()),
-          ]) ...[
+          for (final _SelectInputStyle(:name, :style) in _SelectInputStyle.values) ...[
             _Section(
               label: name.toUpperCase(),
               caption: 'Placeholder, value, open, error and disabled in the $name style. Hover or tab to see the rings',
