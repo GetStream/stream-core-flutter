@@ -290,7 +290,7 @@ latest stable either way. If they do, that is a signal to investigate, not to re
 Linux-rendered. Regenerating locally therefore produces macOS pixels the repo does not even track. Locally you may
 **compare** (`GITHUB_ACTIONS=true flutter test`) to see which goldens moved — never write them.
 
-`update_goldens.yml` checks out with `secrets.BOT_SSH_PRIVATE_KEY` and commits `**/test/**/goldens/*.png` back to
+`update_goldens.yml` checks out with the `stream-flutter-ci-bot` app token and commits `**/test/**/goldens/*.png` back to
 whatever branch you dispatch against, so **push the branch first**. It has no inputs — it always regenerates
 everything, on `ubuntu-latest`, with `flutter-version: "3.x"` (the new stable, automatically).
 

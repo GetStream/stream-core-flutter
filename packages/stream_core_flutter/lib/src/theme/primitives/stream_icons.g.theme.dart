@@ -39,6 +39,7 @@ mixin _$StreamIcons {
       bell: t < 0.5 ? a.bell : b.bell,
       bellOff: t < 0.5 ? a.bellOff : b.bellOff,
       blurFill: t < 0.5 ? a.blurFill : b.blurFill,
+      blurOffFill: t < 0.5 ? a.blurOffFill : b.blurOffFill,
       bolt: t < 0.5 ? a.bolt : b.bolt,
       boltFill: t < 0.5 ? a.boltFill : b.boltFill,
       calendar: t < 0.5 ? a.calendar : b.calendar,
@@ -63,6 +64,7 @@ mixin _$StreamIcons {
       delete: t < 0.5 ? a.delete : b.delete,
       download: t < 0.5 ? a.download : b.download,
       edit: t < 0.5 ? a.edit : b.edit,
+      effectsFill: t < 0.5 ? a.effectsFill : b.effectsFill,
       emoji: t < 0.5 ? a.emoji : b.emoji,
       emojiAdd: t < 0.5 ? a.emojiAdd : b.emojiAdd,
       emojiAddFill: t < 0.5 ? a.emojiAddFill : b.emojiAddFill,
@@ -83,6 +85,8 @@ mixin _$StreamIcons {
       folder: t < 0.5 ? a.folder : b.folder,
       folderLarge: t < 0.5 ? a.folderLarge : b.folderLarge,
       fullBlurFill: t < 0.5 ? a.fullBlurFill : b.fullBlurFill,
+      fullscreen: t < 0.5 ? a.fullscreen : b.fullscreen,
+      fullscreenExit: t < 0.5 ? a.fullscreenExit : b.fullscreenExit,
       fullscreenFill: t < 0.5 ? a.fullscreenFill : b.fullscreenFill,
       gallery: t < 0.5 ? a.gallery : b.gallery,
       gridDefaultFill: t < 0.5 ? a.gridDefaultFill : b.gridDefaultFill,
@@ -92,6 +96,7 @@ mixin _$StreamIcons {
       imageLarge: t < 0.5 ? a.imageLarge : b.imageLarge,
       info: t < 0.5 ? a.info : b.info,
       language: t < 0.5 ? a.language : b.language,
+      languageFill: t < 0.5 ? a.languageFill : b.languageFill,
       leave: t < 0.5 ? a.leave : b.leave,
       leftToRight: t < 0.5 ? a.leftToRight : b.leftToRight,
       lightMode: t < 0.5 ? a.lightMode : b.lightMode,
@@ -133,6 +138,7 @@ mixin _$StreamIcons {
       pollLarge: t < 0.5 ? a.pollLarge : b.pollLarge,
       presentDesktopFill: t < 0.5 ? a.presentDesktopFill : b.presentDesktopFill,
       presentMobileFill: t < 0.5 ? a.presentMobileFill : b.presentMobileFill,
+      qrCodeFill: t < 0.5 ? a.qrCodeFill : b.qrCodeFill,
       questionCircleFill: t < 0.5 ? a.questionCircleFill : b.questionCircleFill,
       quote: t < 0.5 ? a.quote : b.quote,
       raiseHandFill: t < 0.5 ? a.raiseHandFill : b.raiseHandFill,
@@ -163,6 +169,7 @@ mixin _$StreamIcons {
       threadFill: t < 0.5 ? a.threadFill : b.threadFill,
       translate: t < 0.5 ? a.translate : b.translate,
       trophy: t < 0.5 ? a.trophy : b.trophy,
+      unflag: t < 0.5 ? a.unflag : b.unflag,
       unlock: t < 0.5 ? a.unlock : b.unlock,
       unpin: t < 0.5 ? a.unpin : b.unpin,
       unpinFill: t < 0.5 ? a.unpinFill : b.unpinFill,
@@ -208,6 +215,7 @@ mixin _$StreamIcons {
     IconData? bell,
     IconData? bellOff,
     IconData? blurFill,
+    IconData? blurOffFill,
     IconData? bolt,
     IconData? boltFill,
     IconData? calendar,
@@ -232,6 +240,7 @@ mixin _$StreamIcons {
     IconData? delete,
     IconData? download,
     IconData? edit,
+    IconData? effectsFill,
     IconData? emoji,
     IconData? emojiAdd,
     IconData? emojiAddFill,
@@ -246,6 +255,8 @@ mixin _$StreamIcons {
     IconData? folder,
     IconData? folderLarge,
     IconData? fullBlurFill,
+    IconData? fullscreen,
+    IconData? fullscreenExit,
     IconData? fullscreenFill,
     IconData? gallery,
     IconData? gridDefaultFill,
@@ -255,6 +266,7 @@ mixin _$StreamIcons {
     IconData? imageLarge,
     IconData? info,
     IconData? language,
+    IconData? languageFill,
     IconData? leave,
     IconData? leftToRight,
     IconData? lightMode,
@@ -294,6 +306,7 @@ mixin _$StreamIcons {
     IconData? pollLarge,
     IconData? presentDesktopFill,
     IconData? presentMobileFill,
+    IconData? qrCodeFill,
     IconData? questionCircleFill,
     IconData? quote,
     IconData? raiseHandFill,
@@ -324,6 +337,7 @@ mixin _$StreamIcons {
     IconData? threadFill,
     IconData? translate,
     IconData? trophy,
+    IconData? unflag,
     IconData? unlock,
     IconData? unpin,
     IconData? unpinFill,
@@ -367,6 +381,7 @@ mixin _$StreamIcons {
       bell: bell ?? _this.bell,
       bellOff: bellOff ?? _this.bellOff,
       blurFill: blurFill ?? _this.blurFill,
+      blurOffFill: blurOffFill ?? _this.blurOffFill,
       bolt: bolt ?? _this.bolt,
       boltFill: boltFill ?? _this.boltFill,
       calendar: calendar ?? _this.calendar,
@@ -391,6 +406,7 @@ mixin _$StreamIcons {
       delete: delete ?? _this.delete,
       download: download ?? _this.download,
       edit: edit ?? _this.edit,
+      effectsFill: effectsFill ?? _this.effectsFill,
       emoji: emoji ?? _this.emoji,
       emojiAdd: emojiAdd ?? _this.emojiAdd,
       emojiAddFill: emojiAddFill ?? _this.emojiAddFill,
@@ -407,6 +423,8 @@ mixin _$StreamIcons {
       folder: folder ?? _this.folder,
       folderLarge: folderLarge ?? _this.folderLarge,
       fullBlurFill: fullBlurFill ?? _this.fullBlurFill,
+      fullscreen: fullscreen ?? _this.fullscreen,
+      fullscreenExit: fullscreenExit ?? _this.fullscreenExit,
       fullscreenFill: fullscreenFill ?? _this.fullscreenFill,
       gallery: gallery ?? _this.gallery,
       gridDefaultFill: gridDefaultFill ?? _this.gridDefaultFill,
@@ -416,6 +434,7 @@ mixin _$StreamIcons {
       imageLarge: imageLarge ?? _this.imageLarge,
       info: info ?? _this.info,
       language: language ?? _this.language,
+      languageFill: languageFill ?? _this.languageFill,
       leave: leave ?? _this.leave,
       leftToRight: leftToRight ?? _this.leftToRight,
       lightMode: lightMode ?? _this.lightMode,
@@ -455,6 +474,7 @@ mixin _$StreamIcons {
       pollLarge: pollLarge ?? _this.pollLarge,
       presentDesktopFill: presentDesktopFill ?? _this.presentDesktopFill,
       presentMobileFill: presentMobileFill ?? _this.presentMobileFill,
+      qrCodeFill: qrCodeFill ?? _this.qrCodeFill,
       questionCircleFill: questionCircleFill ?? _this.questionCircleFill,
       quote: quote ?? _this.quote,
       raiseHandFill: raiseHandFill ?? _this.raiseHandFill,
@@ -485,6 +505,7 @@ mixin _$StreamIcons {
       threadFill: threadFill ?? _this.threadFill,
       translate: translate ?? _this.translate,
       trophy: trophy ?? _this.trophy,
+      unflag: unflag ?? _this.unflag,
       unlock: unlock ?? _this.unlock,
       unpin: unpin ?? _this.unpin,
       unpinFill: unpinFill ?? _this.unpinFill,
@@ -540,6 +561,7 @@ mixin _$StreamIcons {
       bell: other.bell,
       bellOff: other.bellOff,
       blurFill: other.blurFill,
+      blurOffFill: other.blurOffFill,
       bolt: other.bolt,
       boltFill: other.boltFill,
       calendar: other.calendar,
@@ -564,6 +586,7 @@ mixin _$StreamIcons {
       delete: other.delete,
       download: other.download,
       edit: other.edit,
+      effectsFill: other.effectsFill,
       emoji: other.emoji,
       emojiAdd: other.emojiAdd,
       emojiAddFill: other.emojiAddFill,
@@ -578,6 +601,8 @@ mixin _$StreamIcons {
       folder: other.folder,
       folderLarge: other.folderLarge,
       fullBlurFill: other.fullBlurFill,
+      fullscreen: other.fullscreen,
+      fullscreenExit: other.fullscreenExit,
       fullscreenFill: other.fullscreenFill,
       gallery: other.gallery,
       gridDefaultFill: other.gridDefaultFill,
@@ -587,6 +612,7 @@ mixin _$StreamIcons {
       imageLarge: other.imageLarge,
       info: other.info,
       language: other.language,
+      languageFill: other.languageFill,
       leave: other.leave,
       leftToRight: other.leftToRight,
       lightMode: other.lightMode,
@@ -626,6 +652,7 @@ mixin _$StreamIcons {
       pollLarge: other.pollLarge,
       presentDesktopFill: other.presentDesktopFill,
       presentMobileFill: other.presentMobileFill,
+      qrCodeFill: other.qrCodeFill,
       questionCircleFill: other.questionCircleFill,
       quote: other.quote,
       raiseHandFill: other.raiseHandFill,
@@ -656,6 +683,7 @@ mixin _$StreamIcons {
       threadFill: other.threadFill,
       translate: other.translate,
       trophy: other.trophy,
+      unflag: other.unflag,
       unlock: other.unlock,
       unpin: other.unpin,
       unpinFill: other.unpinFill,
@@ -711,6 +739,7 @@ mixin _$StreamIcons {
         _other.bell == _this.bell &&
         _other.bellOff == _this.bellOff &&
         _other.blurFill == _this.blurFill &&
+        _other.blurOffFill == _this.blurOffFill &&
         _other.bolt == _this.bolt &&
         _other.boltFill == _this.boltFill &&
         _other.calendar == _this.calendar &&
@@ -735,6 +764,7 @@ mixin _$StreamIcons {
         _other.delete == _this.delete &&
         _other.download == _this.download &&
         _other.edit == _this.edit &&
+        _other.effectsFill == _this.effectsFill &&
         _other.emoji == _this.emoji &&
         _other.emojiAdd == _this.emojiAdd &&
         _other.emojiAddFill == _this.emojiAddFill &&
@@ -749,6 +779,8 @@ mixin _$StreamIcons {
         _other.folder == _this.folder &&
         _other.folderLarge == _this.folderLarge &&
         _other.fullBlurFill == _this.fullBlurFill &&
+        _other.fullscreen == _this.fullscreen &&
+        _other.fullscreenExit == _this.fullscreenExit &&
         _other.fullscreenFill == _this.fullscreenFill &&
         _other.gallery == _this.gallery &&
         _other.gridDefaultFill == _this.gridDefaultFill &&
@@ -758,6 +790,7 @@ mixin _$StreamIcons {
         _other.imageLarge == _this.imageLarge &&
         _other.info == _this.info &&
         _other.language == _this.language &&
+        _other.languageFill == _this.languageFill &&
         _other.leave == _this.leave &&
         _other.leftToRight == _this.leftToRight &&
         _other.lightMode == _this.lightMode &&
@@ -797,6 +830,7 @@ mixin _$StreamIcons {
         _other.pollLarge == _this.pollLarge &&
         _other.presentDesktopFill == _this.presentDesktopFill &&
         _other.presentMobileFill == _this.presentMobileFill &&
+        _other.qrCodeFill == _this.qrCodeFill &&
         _other.questionCircleFill == _this.questionCircleFill &&
         _other.quote == _this.quote &&
         _other.raiseHandFill == _this.raiseHandFill &&
@@ -827,6 +861,7 @@ mixin _$StreamIcons {
         _other.threadFill == _this.threadFill &&
         _other.translate == _this.translate &&
         _other.trophy == _this.trophy &&
+        _other.unflag == _this.unflag &&
         _other.unlock == _this.unlock &&
         _other.unpin == _this.unpin &&
         _other.unpinFill == _this.unpinFill &&
@@ -874,6 +909,7 @@ mixin _$StreamIcons {
       _this.bell,
       _this.bellOff,
       _this.blurFill,
+      _this.blurOffFill,
       _this.bolt,
       _this.boltFill,
       _this.calendar,
@@ -898,6 +934,7 @@ mixin _$StreamIcons {
       _this.delete,
       _this.download,
       _this.edit,
+      _this.effectsFill,
       _this.emoji,
       _this.emojiAdd,
       _this.emojiAddFill,
@@ -912,6 +949,8 @@ mixin _$StreamIcons {
       _this.folder,
       _this.folderLarge,
       _this.fullBlurFill,
+      _this.fullscreen,
+      _this.fullscreenExit,
       _this.fullscreenFill,
       _this.gallery,
       _this.gridDefaultFill,
@@ -921,6 +960,7 @@ mixin _$StreamIcons {
       _this.imageLarge,
       _this.info,
       _this.language,
+      _this.languageFill,
       _this.leave,
       _this.leftToRight,
       _this.lightMode,
@@ -960,6 +1000,7 @@ mixin _$StreamIcons {
       _this.pollLarge,
       _this.presentDesktopFill,
       _this.presentMobileFill,
+      _this.qrCodeFill,
       _this.questionCircleFill,
       _this.quote,
       _this.raiseHandFill,
@@ -990,6 +1031,7 @@ mixin _$StreamIcons {
       _this.threadFill,
       _this.translate,
       _this.trophy,
+      _this.unflag,
       _this.unlock,
       _this.unpin,
       _this.unpinFill,
