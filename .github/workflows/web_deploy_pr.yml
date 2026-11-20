@@ -13,10 +13,12 @@ name: web_deploy_pr
 #
 #   WEB_FLAVOR          beta.
 #   WEB_HASH_URLS       true. Use the hash URL strategy when it is set.
-#   WEB_STORAGE_PREFIX  <app>_pr_, with dashes in <app> replaced by
-#                       underscores, shared by every pull request build of the
-#                       app. Prefix every key the app stores in the browser
-#                       with it.
+#   WEB_STORAGE_PREFIX  <app>_pr_<number>_, with dashes in <app> replaced by
+#                       underscores. Prefix every key the app stores in the
+#                       browser with it. Each pull request gets its own, so
+#                       builds with different storage formats (a database
+#                       schema) can't break each other; the cost is signing
+#                       in again per pull request.
 #
 # Call it from a workflow that runs on `pull_request` with the types `labeled`,
 # `unlabeled`, `synchronize`, `reopened` and `closed`, and grants
@@ -100,7 +102,7 @@ jobs:
             exit 1
           fi
           echo "WEB_PATH=$APP/pr/$PR_NUMBER" >> "$GITHUB_ENV"
-          echo "WEB_STORAGE_PREFIX=${APP//-/_}_pr_" >> "$GITHUB_ENV"
+          echo "WEB_STORAGE_PREFIX=${APP//-/_}_pr_${PR_NUMBER}_" >> "$GITHUB_ENV"
 
       - name: 📚 Checkout
         uses: actions/checkout@v6
