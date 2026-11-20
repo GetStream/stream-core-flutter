@@ -62,6 +62,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
+    StreamSelectInputThemeData? selectInputTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
@@ -137,6 +138,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
+      selectInputTheme: selectInputTheme ?? _this.selectInputTheme,
       sheetHeaderTheme: sheetHeaderTheme ?? _this.sheetHeaderTheme,
       sheetTheme: sheetTheme ?? _this.sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
@@ -348,6 +350,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.reactionsTheme,
         t,
       )!,
+      selectInputTheme: StreamSelectInputThemeData.lerp(
+        _this.selectInputTheme,
+        other.selectInputTheme,
+        t,
+      )!,
       sheetHeaderTheme: StreamSheetHeaderThemeData.lerp(
         _this.sheetHeaderTheme,
         other.sheetHeaderTheme,
@@ -455,6 +462,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.progressBarTheme == _this.progressBarTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
+        _other.selectInputTheme == _this.selectInputTheme &&
         _other.sheetHeaderTheme == _this.sheetHeaderTheme &&
         _other.sheetTheme == _this.sheetTheme &&
         _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
@@ -515,6 +523,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.progressBarTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,
+      _this.selectInputTheme,
       _this.sheetHeaderTheme,
       _this.sheetTheme,
       _this.skeletonLoadingTheme,

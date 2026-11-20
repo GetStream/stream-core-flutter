@@ -35,6 +35,7 @@ import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
+import 'components/stream_select_input_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
@@ -157,6 +158,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
+    StreamSelectInputThemeData? selectInputTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
@@ -223,6 +225,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     progressBarTheme ??= const StreamProgressBarThemeData();
     reactionPickerTheme ??= const StreamReactionPickerThemeData();
     reactionsTheme ??= const StreamReactionsThemeData();
+    selectInputTheme ??= const StreamSelectInputThemeData();
     sheetHeaderTheme ??= const StreamSheetHeaderThemeData();
     sheetTheme ??= const StreamSheetThemeData();
     skeletonLoadingTheme ??= const StreamSkeletonLoadingThemeData();
@@ -277,6 +280,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
+      selectInputTheme: selectInputTheme,
       sheetHeaderTheme: sheetHeaderTheme,
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
@@ -345,6 +349,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
     required this.progressBarTheme,
     required this.reactionPickerTheme,
     required this.reactionsTheme,
+    required this.selectInputTheme,
     required this.sheetHeaderTheme,
     required this.sheetTheme,
     required this.skeletonLoadingTheme,
@@ -530,6 +535,9 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
   /// The reaction theme for this theme.
   final StreamReactionsThemeData reactionsTheme;
 
+  /// The select input theme for this theme.
+  final StreamSelectInputThemeData selectInputTheme;
+
   /// The sheet header theme for this theme.
   final StreamSheetHeaderThemeData sheetHeaderTheme;
 
@@ -619,6 +627,7 @@ class StreamTheme extends ThemeExtension<StreamTheme> with _$StreamTheme {
       progressBarTheme: progressBarTheme,
       reactionPickerTheme: reactionPickerTheme,
       reactionsTheme: reactionsTheme,
+      selectInputTheme: selectInputTheme,
       sheetHeaderTheme: sheetHeaderTheme,
       sheetTheme: sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme,
