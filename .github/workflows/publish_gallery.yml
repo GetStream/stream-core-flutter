@@ -1,9 +1,19 @@
 name: Publish Design System Gallery
 
+# Deploys the gallery to https://flutter.getstream.io/design-system/beta/ on
+# every push to main, and to https://flutter.getstream.io/design-system/ when
+# stream_core_flutter is released, since the gallery shows its components.
+# Pre-release tags are not deployed. A manual run deploys prod from a
+# stream_core_flutter tag and beta from any other ref.
+#
+# Pushes to main also publish the gallery to GitHub Pages.
+
 on:
   push:
     branches:
       - main
+    tags:
+      - 'stream_core_flutter-v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
 
 env:
@@ -14,12 +24,15 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build_and_deploy_gallery:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -48,3 +61,15 @@ jobs:
         with:
           baseHref: /stream-core-flutter/
           workingDir: apps/design_system_gallery
+
+  deploy_hosted:
+    name: Deploy to flutter.getstream.io
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/web_deploy.yml
+    with:
+      app: design-system
+      flavor: ${{ startsWith(github.ref, 'refs/tags/stream_core_flutter-v') && 'prod' || 'beta' }}
+      working-directory: apps/design_system_gallery
+      bootstrap: true

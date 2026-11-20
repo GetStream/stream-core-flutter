@@ -63,6 +63,14 @@ file-type assets.
 
 `style_guides/` holds the guides every Stream Flutter SDK follows (today `API_DESIGN.md`). The other SDKs carry a copy: on every change to `main`, the `sync_style_guides` workflow runs `scripts/sync_style_guides.dart` against stream-chat-flutter (`master`), stream-video-flutter (`v2`) and stream-feeds-flutter (`main`), and opens a PR in each whose copy changed. Edit the guides here only. They are self-contained: `STYLE_GUIDE.md` points at them, never the reverse, and a relative link out of `style_guides/` fails the workflow's PR check. A new file in the folder is synced automatically; a new target repository is a new entry in the workflow's matrix.
 
+### Web deploys
+
+The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`. Two reusable workflows here deploy them, for this repository and for the other SDKs: `web_deploy.yml` deploys prod (`/<app>/`) or beta (`/<app>/beta/`), and `web_deploy_pr.yml` deploys a pull request labeled `build` to `/<app>/pr/<number>/`. Other repositories call them pinned to a commit, so a change here reaches them only when they bump the pin. Each calling repository needs a GitHub environment named `flutter-web`.
+
+The gallery deploys as `design-system`: beta on every push to `main` (`publish_gallery.yml`), prod on a `stream_core_flutter-vX.Y.Z` tag, and pull request builds through `pr_web_build.yml`.
+
+All apps share one origin, so one browser storage. A build gets `WEB_STORAGE_PREFIX` as a dart-define, and an app that stores anything in the browser prefixes every key with it.
+
 ## Design
 
 UI components are designed in **Figma**. When implementing or modifying components, use the **Figma MCP** to inspect designs directly — check spacing, colors, typography, and component structure from the source rather than guessing.
