@@ -2,8 +2,8 @@
 
 ### ✨ Features
 
-- Added `StreamContextMenuHeading` and `StreamContextMenuHeadingTheme`, the heading of a section in a
-  `StreamContextMenu`, to `video.dart`.
+- Added `StreamContextMenuHeading`, a section heading for `StreamContextMenu`, and
+  `StreamContextMenuHeadingTheme` to `video.dart`.
 - Added `StreamContextMenuAnchor` and `StreamContextMenuAnchorTheme`, which open a
   `StreamContextMenu` from an anchor widget, to `video.dart`.
 - Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
