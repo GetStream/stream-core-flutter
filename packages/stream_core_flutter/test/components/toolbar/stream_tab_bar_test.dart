@@ -174,6 +174,30 @@ void main() {
     expect(tester.getRect(find.text('Window')).bottom, lessThanOrEqualTo(tabBottom - 6));
   });
 
+  testWidgets('gives every tab the height of the tallest one', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        Column(children: [_tabBar(icon: const SizedBox(width: 16, height: 80))]),
+      ),
+    );
+
+    Rect tabRect(String label) => tester.getRect(find.ancestor(of: find.text(label), matching: find.byType(InkWell)));
+    expect(tabRect('Entire Screen').height, greaterThan(80));
+    expect(tabRect('Window').height, tabRect('Entire Screen').height);
+    expect(tabRect('Window').bottom, tabRect('Entire Screen').bottom);
+  });
+
+  testWidgets('lays out an icon that cannot report its intrinsic size', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        _tabBar(icon: LayoutBuilder(builder: (context, constraints) => const SizedBox.square(dimension: 16))),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(StreamTabBar)).height, 48);
+  });
+
   testWidgets('grows past its height when the text is scaled up', (tester) async {
     await tester.pumpWidget(
       _withStreamTheme(

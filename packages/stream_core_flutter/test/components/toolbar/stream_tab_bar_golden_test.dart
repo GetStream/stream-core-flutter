@@ -46,6 +46,21 @@ void main() {
                 brightness: brightness,
               ),
             ),
+            GoldenTestScenario(
+              name: 'disabled tabs',
+              child: _buildInTheme(
+                StreamTabBar(
+                  selectedIndex: 1,
+                  onSelected: (_) {},
+                  tabs: const [
+                    StreamTabBarItem(label: 'All'),
+                    StreamTabBarItem(label: 'Unread', enabled: false),
+                    StreamTabBarItem(label: 'Mentions', enabled: false),
+                  ],
+                ),
+                brightness: brightness,
+              ),
+            ),
           ],
         ),
       );

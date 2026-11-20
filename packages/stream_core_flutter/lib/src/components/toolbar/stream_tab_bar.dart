@@ -1,6 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
+import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 
 import '../../factory/stream_component_factory.dart';
@@ -179,23 +181,19 @@ class DefaultStreamTabBar extends StatelessWidget {
       explicitChildNodes: true,
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: effective.minHeight!),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: .stretch,
-            children: [
-              for (final (index, tab) in props.tabs.indexed)
-                Expanded(
-                  child: _StreamTab(
-                    item: tab,
-                    index: index,
-                    tabCount: tabCount,
-                    selected: index == props.selectedIndex,
-                    style: style,
-                    onPressed: () => props.onSelected(index),
-                  ),
-                ),
-            ],
-          ),
+        child: _EqualTabsRow(
+          textDirection: Directionality.of(context),
+          children: [
+            for (final (index, tab) in props.tabs.indexed)
+              _StreamTab(
+                item: tab,
+                index: index,
+                tabCount: tabCount,
+                selected: index == props.selectedIndex,
+                style: style,
+                onPressed: () => props.onSelected(index),
+              ),
+          ],
         ),
       ),
     );
@@ -210,6 +208,134 @@ class DefaultStreamTabBar extends StatelessWidget {
     if (theme == null) return fallback;
     return .resolveWith((states) => theme.resolve(states) ?? fallback.resolve(states));
   }
+}
+
+// Lays its children out side by side at equal widths, then gives them all
+// the height of the tallest, so every tab's underline sits on the bar's
+// bottom edge.
+//
+// A Row of Expanded children in an IntrinsicHeight would do the same, but
+// asks every tab for its intrinsic height, which throws for an icon built
+// with a LayoutBuilder.
+class _EqualTabsRow extends MultiChildRenderObjectWidget {
+  const _EqualTabsRow({required this.textDirection, required super.children});
+
+  final TextDirection textDirection;
+
+  @override
+  _RenderEqualTabsRow createRenderObject(BuildContext context) => _RenderEqualTabsRow(textDirection);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderEqualTabsRow renderObject) {
+    renderObject.textDirection = textDirection;
+  }
+}
+
+class _EqualTabsRowParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _RenderEqualTabsRow extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _EqualTabsRowParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _EqualTabsRowParentData> {
+  _RenderEqualTabsRow(this._textDirection);
+
+  TextDirection get textDirection => _textDirection;
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (_textDirection == value) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _EqualTabsRowParentData) child.parentData = _EqualTabsRowParentData();
+  }
+
+  double _tabWidth(BoxConstraints constraints) {
+    assert(constraints.hasBoundedWidth, 'A StreamTabBar needs a bounded width.');
+    return constraints.maxWidth / childCount;
+  }
+
+  // The height every tab is given: the tallest tab's own height, within
+  // [constraints].
+  double _rowHeight(BoxConstraints constraints, Size Function(RenderBox child, BoxConstraints constraints) sizeOf) {
+    final tabConstraints = BoxConstraints(
+      minWidth: _tabWidth(constraints),
+      maxWidth: _tabWidth(constraints),
+      maxHeight: constraints.maxHeight,
+    );
+    var height = constraints.minHeight;
+    for (var child = firstChild; child != null; child = childAfter(child)) {
+      height = math.max(height, sizeOf(child, tabConstraints).height);
+    }
+    return constraints.constrainHeight(height);
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    if (childCount == 0) return constraints.smallest;
+    final height = _rowHeight(constraints, (child, constraints) => child.getDryLayout(constraints));
+    return Size(constraints.maxWidth, height);
+  }
+
+  @override
+  void performLayout() {
+    if (childCount == 0) {
+      size = constraints.smallest;
+      return;
+    }
+    final tabWidth = _tabWidth(constraints);
+    final height = _rowHeight(constraints, (child, constraints) {
+      child.layout(constraints, parentUsesSize: true);
+      return child.size;
+    });
+
+    var index = 0;
+    for (var child = firstChild; child != null; child = childAfter(child), index += 1) {
+      child.layout(BoxConstraints.tightFor(width: tabWidth, height: height));
+      final slot = textDirection == TextDirection.rtl ? childCount - 1 - index : index;
+      (child.parentData! as _EqualTabsRowParentData).offset = Offset(slot * tabWidth, 0);
+    }
+    size = Size(constraints.maxWidth, height);
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) => _sumOfWidest((child) => child.getMinIntrinsicWidth(height));
+
+  @override
+  double computeMaxIntrinsicWidth(double height) => _sumOfWidest((child) => child.getMaxIntrinsicWidth(height));
+
+  // Every tab is as wide as the widest, so the row needs that many times it.
+  double _sumOfWidest(double Function(RenderBox child) widthOf) {
+    var widest = 0.0;
+    for (var child = firstChild; child != null; child = childAfter(child)) {
+      widest = math.max(widest, widthOf(child));
+    }
+    return widest * childCount;
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _tallest((child) => child.getMinIntrinsicHeight(width));
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => _tallest((child) => child.getMaxIntrinsicHeight(width));
+
+  double _tallest(double Function(RenderBox child) heightOf) {
+    var tallest = 0.0;
+    for (var child = firstChild; child != null; child = childAfter(child)) {
+      tallest = math.max(tallest, heightOf(child));
+    }
+    return tallest;
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    return defaultHitTestChildren(result, position: position);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) => defaultPaint(context, offset);
 }
 
 // The resolved visual values every tab of one bar shares.
@@ -279,8 +405,10 @@ class _StreamTab extends StatelessWidget {
         ),
         child: Semantics(
           role: SemanticsRole.tab,
+          // Passthrough lets the tab size to its content when the row
+          // measures it, then fill the row's height when it is placed.
           child: Stack(
-            fit: .expand,
+            fit: .passthrough,
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
