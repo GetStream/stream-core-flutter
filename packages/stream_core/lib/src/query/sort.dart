@@ -171,8 +171,11 @@ class SortComparator<T extends Object, V extends Object> {
   /// - `NullOrdering.nullsLast`: Null values are considered greater than any
   /// non-null value, regardless of sort direction.
   int call(T? a, T? b, SortDirection direction, NullOrdering nullOrdering) {
-    final aValue = a?.let(value)?.let(ComparableField.fromValue);
-    final bValue = b?.let(value)?.let(ComparableField.fromValue);
+    // Called directly rather than passed as `.let(ComparableField.fromValue)`:
+    // that tear-off makes Dart 3.14's AOT compiler abort on `--analyze-size`
+    // once two sort fields are in use.
+    final aValue = ComparableField.fromValue(a?.let(value));
+    final bValue = ComparableField.fromValue(b?.let(value));
 
     // Handle nulls first, independent of sort direction
     if (aValue == null && bValue == null) return 0;

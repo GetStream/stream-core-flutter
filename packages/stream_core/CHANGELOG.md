@@ -1,3 +1,9 @@
+## Upcoming
+
+### 🐞 Fixed
+
+- Fixed `flutter build --analyze-size` crashing in the AOT compiler (`Request to create artificial node for object with cid 58`) in apps that use two or more `SortField`s.
+
 ## 0.5.2
 
 ### ✨ Features
