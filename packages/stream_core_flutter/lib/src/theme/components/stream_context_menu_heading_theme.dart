@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
@@ -14,19 +15,28 @@ part 'stream_context_menu_heading_theme.g.theme.dart';
 ///
 /// {@tool snippet}
 ///
-/// Use the denser row metrics of a desktop menu for the headings of one menu:
+/// Use the denser row metrics of a desktop menu for one menu. The actions get
+/// the same metrics, so the headings keep lining up with them:
 ///
 /// ```dart
-/// StreamContextMenuHeadingTheme(
-///   data: StreamContextMenuHeadingThemeData(
-///     minimumSize: Size(200, 32),
-///     padding: EdgeInsets.symmetric(horizontal: 8),
+/// StreamContextMenuActionTheme(
+///   data: StreamContextMenuActionThemeData(
+///     style: StreamContextMenuActionStyle(
+///       minimumSize: WidgetStatePropertyAll(Size(200, 32)),
+///       padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+///     ),
 ///   ),
-///   child: StreamContextMenu(
-///     children: [
-///       StreamContextMenuHeading(label: Text('Microphone')),
-///       StreamContextMenuAction(label: Text('Built-in microphone')),
-///     ],
+///   child: StreamContextMenuHeadingTheme(
+///     data: StreamContextMenuHeadingThemeData(
+///       minimumSize: Size(200, 32),
+///       padding: EdgeInsets.symmetric(horizontal: 8),
+///     ),
+///     child: StreamContextMenu(
+///       children: [
+///         StreamContextMenuHeading(label: Text('Microphone')),
+///         StreamContextMenuAction(label: Text('Built-in microphone')),
+///       ],
+///     ),
 ///   ),
 /// )
 /// ```
@@ -36,6 +46,7 @@ part 'stream_context_menu_heading_theme.g.theme.dart';
 ///
 ///  * [StreamContextMenuHeadingThemeData], which describes the heading theme.
 ///  * [StreamContextMenuHeading], the widget affected by this theme.
+@experimental
 class StreamContextMenuHeadingTheme extends InheritedTheme {
   /// Creates a context menu heading theme that controls descendant headings.
   const StreamContextMenuHeadingTheme({
@@ -69,7 +80,8 @@ class StreamContextMenuHeadingTheme extends InheritedTheme {
 /// Theme data for customizing [StreamContextMenuHeading] widgets.
 ///
 /// The defaults line a heading up with the default metrics of a
-/// [StreamContextMenuAction]: the same minimum size, padding and shape. A menu
+/// [StreamContextMenuAction]: the same minimum and maximum size, padding and
+/// shape. A menu
 /// that restyles its actions through [StreamContextMenuActionTheme] should set
 /// the matching values here so the heading keeps sharing the row metrics.
 ///
@@ -93,6 +105,7 @@ class StreamContextMenuHeadingTheme extends InheritedTheme {
 ///  * [StreamContextMenuHeadingTheme], for overriding theme in a widget subtree.
 @themeGen
 @immutable
+@experimental
 class StreamContextMenuHeadingThemeData with _$StreamContextMenuHeadingThemeData {
   /// Creates a context menu heading theme with optional style overrides.
   const StreamContextMenuHeadingThemeData({
@@ -101,6 +114,7 @@ class StreamContextMenuHeadingThemeData with _$StreamContextMenuHeadingThemeData
     this.iconSize,
     this.overlayColor,
     this.minimumSize,
+    this.maximumSize,
     this.padding,
     this.spacing,
     this.shape,
@@ -137,10 +151,17 @@ class StreamContextMenuHeadingThemeData with _$StreamContextMenuHeadingThemeData
   /// [StreamContextMenuAction].
   final Size? minimumSize;
 
+  /// The maximum size of the heading.
+  ///
+  /// If null, defaults to [Size.infinite], the maximum size of a
+  /// [StreamContextMenuAction].
+  final Size? maximumSize;
+
   /// The padding inside the heading.
   ///
-  /// If null, defaults to the padding of a [StreamContextMenuAction], derived
-  /// from [StreamSpacing].
+  /// If null, defaults to the padding of a [StreamContextMenuAction]:
+  /// horizontal [StreamSpacing.sm] and vertical [StreamSpacing.xs] +
+  /// [StreamSpacing.xxxs].
   final EdgeInsetsGeometry? padding;
 
   /// The gap between the label and the trailing widget.

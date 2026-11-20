@@ -40,6 +40,7 @@ mixin _$StreamContextMenuHeadingThemeData {
         Color.lerp,
       ),
       minimumSize: Size.lerp(a.minimumSize, b.minimumSize, t),
+      maximumSize: Size.lerp(a.maximumSize, b.maximumSize, t),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       spacing: lerpDouble$(a.spacing, b.spacing, t),
       shape: OutlinedBorder.lerp(a.shape, b.shape, t),
@@ -52,6 +53,7 @@ mixin _$StreamContextMenuHeadingThemeData {
     double? iconSize,
     WidgetStateProperty<Color?>? overlayColor,
     Size? minimumSize,
+    Size? maximumSize,
     EdgeInsetsGeometry? padding,
     double? spacing,
     OutlinedBorder? shape,
@@ -64,6 +66,7 @@ mixin _$StreamContextMenuHeadingThemeData {
       iconSize: iconSize ?? _this.iconSize,
       overlayColor: overlayColor ?? _this.overlayColor,
       minimumSize: minimumSize ?? _this.minimumSize,
+      maximumSize: maximumSize ?? _this.maximumSize,
       padding: padding ?? _this.padding,
       spacing: spacing ?? _this.spacing,
       shape: shape ?? _this.shape,
@@ -89,6 +92,7 @@ mixin _$StreamContextMenuHeadingThemeData {
       iconSize: other.iconSize,
       overlayColor: other.overlayColor,
       minimumSize: other.minimumSize,
+      maximumSize: other.maximumSize,
       padding: other.padding,
       spacing: other.spacing,
       shape: other.shape,
@@ -113,6 +117,7 @@ mixin _$StreamContextMenuHeadingThemeData {
         _other.iconSize == _this.iconSize &&
         _other.overlayColor == _this.overlayColor &&
         _other.minimumSize == _this.minimumSize &&
+        _other.maximumSize == _this.maximumSize &&
         _other.padding == _this.padding &&
         _other.spacing == _this.spacing &&
         _other.shape == _this.shape;
@@ -129,6 +134,7 @@ mixin _$StreamContextMenuHeadingThemeData {
       _this.iconSize,
       _this.overlayColor,
       _this.minimumSize,
+      _this.maximumSize,
       _this.padding,
       _this.spacing,
       _this.shape,

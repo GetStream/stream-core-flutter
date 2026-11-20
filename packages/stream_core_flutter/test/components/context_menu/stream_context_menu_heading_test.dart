@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/video.dart';
 
 void main() {
-  testWidgets('StreamContextMenuHeading without onTap is not interactive', (tester) async {
+  testWidgets('StreamContextMenuHeading without onTap takes no keyboard focus', (tester) async {
     await tester.pumpWidget(_wrap(StreamContextMenuHeading(label: const Text('Microphone'))));
 
     // The heading shares the row metrics of a menu item, so it is easy to
-    // mistake for one; nothing in it should respond to a press.
-    expect(
-      find.descendant(of: find.byType(StreamContextMenuHeading), matching: find.byType(GestureDetector)),
-      findsNothing,
+    // mistake for one; keyboard traversal should skip it.
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+
+    expect(_headingHasFocus(tester), isFalse);
+  });
+
+  testWidgets('StreamContextMenuHeading with onTap is activated from the keyboard', (tester) async {
+    var taps = 0;
+    await tester.pumpWidget(
+      _wrap(StreamContextMenuHeading(label: const Text('Devices'), onTap: () => taps += 1)),
     );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(_headingHasFocus(tester), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(taps, 1);
   });
 
   testWidgets('StreamContextMenuHeading calls onTap when tapped', (tester) async {
@@ -137,18 +153,24 @@ void main() {
     handle.dispose();
   });
 
-  testWidgets('StreamContextMenuHeading without onTap reports no expanded state', (tester) async {
+  testWidgets('StreamContextMenuHeading reports an expanded section', (tester) async {
     final handle = tester.ensureSemantics();
-    await tester.pumpWidget(_wrap(StreamContextMenuHeading(label: const Text('Devices'), expanded: true)));
+    await tester.pumpWidget(
+      _wrap(StreamContextMenuHeading(label: const Text('Devices'), expanded: true, onTap: () {})),
+    );
 
     expect(
       tester.semantics.find(find.byType(StreamContextMenuHeading)),
-      isSemantics(label: 'Devices', hasExpandedState: false),
+      isSemantics(label: 'Devices', hasExpandedState: true, isExpanded: true),
     );
     handle.dispose();
   });
 
-  testWidgets('StreamContextMenuHeading applies the StreamTheme heading theme', (tester) async {
+  test('StreamContextMenuHeading rejects expanded without onTap', () {
+    expect(() => StreamContextMenuHeading(label: const Text('Devices'), expanded: true), throwsAssertionError);
+  });
+
+  testWidgets('StreamContextMenuHeading applies the StreamTheme label style', (tester) async {
     await tester.pumpWidget(
       _wrap(
         StreamContextMenuHeading(label: const Text('Mic')),
@@ -156,8 +178,6 @@ void main() {
           contextMenuHeadingTheme: const StreamContextMenuHeadingThemeData(
             foregroundColor: Color(0xFF111111),
             textStyle: TextStyle(fontSize: 20),
-            minimumSize: Size(200, 32),
-            padding: EdgeInsets.zero,
           ),
         ),
       ),
@@ -166,7 +186,88 @@ void main() {
     final style = _labelStyleOf(tester, 'Mic');
     expect(style.color, const Color(0xFF111111));
     expect(style.fontSize, 20);
-    expect(tester.getSize(find.byType(StreamContextMenuHeading)), const Size(200, 32));
+  });
+
+  testWidgets('StreamContextMenuHeading applies a themed minimum size', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeadingTheme(
+          data: const StreamContextMenuHeadingThemeData(minimumSize: Size(300, 64)),
+          child: StreamContextMenuHeading(label: const Text('Mic')),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(StreamContextMenuHeading)), const Size(300, 64));
+  });
+
+  testWidgets('StreamContextMenuHeading applies a themed maximum size', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeadingTheme(
+          data: const StreamContextMenuHeadingThemeData(minimumSize: Size.zero, maximumSize: Size(120, 40)),
+          child: StreamContextMenuHeading(label: const Text('A very long heading that would not fit')),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(StreamContextMenuHeading)).width, 120);
+  });
+
+  testWidgets('StreamContextMenuHeading applies themed padding', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeadingTheme(
+          data: const StreamContextMenuHeadingThemeData(padding: EdgeInsetsDirectional.only(start: 30)),
+          child: StreamContextMenuHeading(label: const Text('Mic')),
+        ),
+      ),
+    );
+
+    final headingLeft = tester.getTopLeft(find.byType(StreamContextMenuHeading)).dx;
+    expect(tester.getTopLeft(find.text('Mic')).dx - headingLeft, 30);
+  });
+
+  testWidgets('StreamContextMenuHeading applies themed spacing before the trailing widget', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeadingTheme(
+          data: const StreamContextMenuHeadingThemeData(spacing: 24),
+          child: StreamContextMenuHeading(label: const Text('Mic'), trailing: const Icon(Icons.expand_more)),
+        ),
+      ),
+    );
+
+    // The label is Expanded, so the gap is measured from its box, not its text.
+    final labelRight = tester.getTopRight(find.byType(Expanded)).dx;
+    expect(tester.getTopLeft(find.byType(Icon)).dx - labelRight, 24);
+  });
+
+  testWidgets('StreamContextMenuHeading applies a themed icon size', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeadingTheme(
+          data: const StreamContextMenuHeadingThemeData(iconSize: 24),
+          child: StreamContextMenuHeading(label: const Text('Mic'), trailing: const Icon(Icons.expand_more)),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(Icon)), const Size.square(24));
+  });
+
+  testWidgets('StreamContextMenuHeading uses the themed shape for its highlight', (tester) async {
+    const shape = StadiumBorder();
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeadingTheme(
+          data: const StreamContextMenuHeadingThemeData(shape: shape),
+          child: StreamContextMenuHeading(label: const Text('Devices'), onTap: () {}),
+        ),
+      ),
+    );
+
+    expect(tester.widget<InkWell>(find.byType(InkWell)).customBorder, shape);
   });
 
   testWidgets('StreamContextMenuHeadingTheme beats the StreamTheme heading theme', (tester) async {
@@ -206,6 +307,17 @@ void main() {
     expect(inkWell.overlayColor!.resolve({WidgetState.pressed}), const Color(0xFF333333));
   });
 
+  testWidgets('StreamContextMenuHeading highlights pressed, hovered and focused states by default', (tester) async {
+    await tester.pumpWidget(_wrap(StreamContextMenuHeading(label: const Text('Devices'), onTap: () {})));
+
+    final colorScheme = _streamThemeOf(tester).colorScheme;
+    final overlay = tester.widget<InkWell>(find.byType(InkWell)).overlayColor!;
+    expect(overlay.resolve({WidgetState.pressed}), colorScheme.backgroundPressed);
+    expect(overlay.resolve({WidgetState.hovered}), colorScheme.backgroundHover);
+    expect(overlay.resolve({WidgetState.focused}), colorScheme.backgroundHover);
+    expect(overlay.resolve({}), isNot(colorScheme.backgroundHover));
+  });
+
   testWidgets('StreamComponentFactory replaces the default context menu heading', (tester) async {
     await tester.pumpWidget(
       _wrap(
@@ -219,6 +331,15 @@ void main() {
     expect(find.text('custom'), findsOneWidget);
     expect(find.byType(DefaultStreamContextMenuHeading), findsNothing);
   });
+}
+
+bool _headingHasFocus(WidgetTester tester) {
+  final focused = FocusManager.instance.primaryFocus?.context;
+  if (focused == null) return false;
+  return find
+      .descendant(of: find.byType(StreamContextMenuHeading), matching: find.byElementPredicate((e) => e == focused))
+      .evaluate()
+      .isNotEmpty;
 }
 
 StreamTheme _streamThemeOf(WidgetTester tester) => StreamTheme.of(tester.element(find.byType(Scaffold)));
