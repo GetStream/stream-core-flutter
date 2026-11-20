@@ -322,10 +322,15 @@ class _RenderEqualTabsRow extends RenderBox
   }
 
   @override
-  double computeMinIntrinsicHeight(double width) => _tallest((child) => child.getMinIntrinsicHeight(width));
+  double computeMinIntrinsicHeight(double width) =>
+      _tallest((child) => child.getMinIntrinsicHeight(_tabWidthFor(width)));
 
   @override
-  double computeMaxIntrinsicHeight(double width) => _tallest((child) => child.getMaxIntrinsicHeight(width));
+  double computeMaxIntrinsicHeight(double width) =>
+      _tallest((child) => child.getMaxIntrinsicHeight(_tabWidthFor(width)));
+
+  // The width each tab gets out of a row [width] wide, as in [performLayout].
+  double _tabWidthFor(double width) => width.isFinite ? width / childCount : width;
 
   double _tallest(double Function(RenderBox child) heightOf) {
     var tallest = 0.0;
