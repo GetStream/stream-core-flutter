@@ -119,8 +119,13 @@ class StreamSelectInputThemeData with _$StreamSelectInputThemeData {
 /// Hover and focus do not change it; they draw a ring over the field instead,
 /// centered on its outer edge.
 ///
-/// Helper text is rendered by [StreamHelperText], which takes its styling from
-/// [StreamTextInputStyle].
+/// Every text style, color and border side is resolved against the field's
+/// [WidgetState]s ([WidgetState.disabled], [WidgetState.hovered],
+/// [WidgetState.focused] and [WidgetState.error]), so each accepts a
+/// [WidgetStateTextStyle], [WidgetStateColor] or [WidgetStateBorderSide].
+///
+/// Helper text is rendered by [StreamHelperText], which is styled by the
+/// ambient [StreamTextInputTheme], not by this style.
 ///
 /// See also:
 ///
@@ -147,9 +152,34 @@ class StreamSelectInputStyle with _$StreamSelectInputStyle {
     this.contentPadding,
   });
 
+  /// Creates a style for a borderless field.
+  ///
+  /// Fixes [border] to a transparent 1px side, so the field keeps its size but
+  /// only the disabled, error and active borders and the interaction rings
+  /// show.
+  ///
+  /// Useful where the surrounding surface already frames the field, such as a
+  /// toolbar or a settings row.
+  const StreamSelectInputStyle.ghost({
+    this.textStyle,
+    this.hintStyle,
+    this.labelStyle,
+    this.iconColor,
+    this.iconSize,
+    this.borderRadius,
+    this.activeBorder,
+    this.errorBorder,
+    this.disabledBorder,
+    this.hoverRing,
+    this.focusRing,
+    this.fillColor,
+    this.contentPadding,
+  }) : border = const BorderSide(color: Color(0x00000000));
+
   /// The text style for the selected value.
   ///
-  /// Supports [WidgetStateTextStyle] for per-state styling (e.g. disabled).
+  /// Supports [WidgetStateTextStyle] for per-state styling (e.g. disabled or
+  /// hovered).
   /// When the field is disabled, the default resolves to
   /// [StreamColorScheme.textDisabled].
   ///
@@ -159,7 +189,8 @@ class StreamSelectInputStyle with _$StreamSelectInputStyle {
 
   /// The text style for the hint shown while nothing is selected.
   ///
-  /// Supports [WidgetStateTextStyle] for per-state styling (e.g. disabled).
+  /// Supports [WidgetStateTextStyle] for per-state styling (e.g. disabled or
+  /// hovered).
   /// When the field is disabled, the default resolves to
   /// [StreamColorScheme.textDisabled].
   ///
@@ -169,7 +200,8 @@ class StreamSelectInputStyle with _$StreamSelectInputStyle {
 
   /// The text style for the persistent label rendered above the field.
   ///
-  /// Supports [WidgetStateTextStyle] for per-state styling (e.g. disabled).
+  /// Supports [WidgetStateTextStyle] for per-state styling (e.g. disabled or
+  /// hovered).
   /// When the field is disabled, the default resolves to
   /// [StreamColorScheme.textDisabled].
   ///
@@ -177,16 +209,18 @@ class StreamSelectInputStyle with _$StreamSelectInputStyle {
   /// [StreamColorScheme.textPrimary].
   final TextStyle? labelStyle;
 
-  /// The color for the leading widget and the caret.
+  /// The color for an [Icon] leading widget and the caret.
   ///
-  /// Supports [WidgetStateColor] for per-state styling (e.g. disabled).
+  /// Applied through an [IconTheme], so a leading widget that does not read
+  /// the icon theme keeps its own color. Supports [WidgetStateColor] for
+  /// per-state styling (e.g. disabled).
   ///
   /// Defaults to the color of the text the field currently shows: the
   /// [textStyle] color when a value is selected, the [hintStyle] color
   /// otherwise.
   final Color? iconColor;
 
-  /// The size for the leading widget and the caret.
+  /// The size for an [Icon] leading widget and the caret.
   ///
   /// Defaults to `20`.
   final double? iconSize;
@@ -198,8 +232,8 @@ class StreamSelectInputStyle with _$StreamSelectInputStyle {
 
   /// The border side while no other state applies.
   ///
-  /// [StreamSelectInputType.ghost] draws this side transparent, so only the
-  /// other states show a border.
+  /// [StreamSelectInputStyle.ghost] fixes this to a transparent side, so only
+  /// the other states show a border.
   ///
   /// Defaults to `BorderSide(color: StreamColorScheme.borderDefault)`.
   final BorderSide? border;
@@ -225,16 +259,18 @@ class StreamSelectInputStyle with _$StreamSelectInputStyle {
 
   /// The ring drawn over the field while a pointer hovers it.
   ///
-  /// The ring is centered on the field's outer edge, so half of its width
-  /// paints outside the field.
+  /// The ring is centered on the field's outer edge whatever its
+  /// [BorderSide.strokeAlign], so half of its width paints outside the field.
   ///
   /// Defaults to `BorderSide(color: StreamColorScheme.borderHover, width: 2)`.
   final BorderSide? hoverRing;
 
-  /// The ring drawn over the field while it has keyboard focus.
+  /// The ring drawn over the field while it is focused and focus highlights
+  /// are shown, as during keyboard navigation.
   ///
   /// Takes precedence over [hoverRing]. The ring is centered on the field's
-  /// outer edge, so half of its width paints outside the field.
+  /// outer edge whatever its [BorderSide.strokeAlign], so half of its width
+  /// paints outside the field.
   ///
   /// Defaults to `BorderSide(color: StreamColorScheme.borderFocus, width: 2)`.
   final BorderSide? focusRing;

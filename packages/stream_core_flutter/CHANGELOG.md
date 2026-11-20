@@ -6,8 +6,8 @@
   `separator*` fields on `StreamMessageMetadataStyle`.
 - Added `StreamEmptyState` and `StreamEmptyStateTheme`, a placeholder for a place that has nothing in it yet:
   an optional icon over a title, a description and an optional action.
-- Added `StreamSelectInput` and `StreamSelectInputTheme`, a select field with outline and ghost
-  types, to `video.dart`.
+- Added `StreamSelectInput`, a select field with a borderless `StreamSelectInputStyle.ghost`
+  variant, and `StreamSelectInputTheme`, both exported from `video.dart`.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
