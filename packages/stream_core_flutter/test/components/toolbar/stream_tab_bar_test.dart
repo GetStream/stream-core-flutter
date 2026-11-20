@@ -212,6 +212,29 @@ void main() {
     expect(tester.getSize(find.byType(StreamTabBar)).height, greaterThan(48));
   });
 
+  testWidgets('grows when the text scale changes after the first layout', (tester) async {
+    Widget scaled(double scale) => _withStreamTheme(
+      MediaQuery(
+        data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+        child: _tabBar(),
+      ),
+    );
+
+    await tester.pumpWidget(scaled(1));
+    expect(tester.getSize(find.byType(StreamTabBar)).height, 48);
+
+    await tester.pumpWidget(scaled(4));
+    final grown = tester.getSize(find.byType(StreamTabBar)).height;
+    expect(grown, greaterThan(48));
+    expect(
+      tester.getRect(find.text('Window')).bottom,
+      lessThanOrEqualTo(tester.getRect(find.byType(StreamTabBar)).bottom),
+    );
+
+    await tester.pumpWidget(scaled(1));
+    expect(tester.getSize(find.byType(StreamTabBar)).height, 48, reason: 'it shrinks back too');
+  });
+
   testWidgets('lays the icon out after the label in RTL', (tester) async {
     await tester.pumpWidget(
       _withStreamTheme(
