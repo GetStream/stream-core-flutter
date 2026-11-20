@@ -7,6 +7,8 @@
 - Added the `fullscreen` icon to `StreamIcons`.
 - Added the `blurOffFill`, `effectsFill`, `fullscreenExit`, `languageFill`,
   `qrCodeFill` and `unflag` icons to `StreamIcons`.
+- Added `StreamMessageMark` and `StreamMessageMarkStyle`, a short label such
+  as "Played by 3" for the new `mark` slot of `StreamMessageMetadata`.
 
 ## 0.5.4
 

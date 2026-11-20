@@ -97,6 +97,8 @@ import 'package:design_system_gallery/components/message/stream_message_bubble.d
     as _design_system_gallery_components_message_stream_message_bubble;
 import 'package:design_system_gallery/components/message/stream_message_content.dart'
     as _design_system_gallery_components_message_stream_message_content;
+import 'package:design_system_gallery/components/message/stream_message_mark.dart'
+    as _design_system_gallery_components_message_stream_message_mark;
 import 'package:design_system_gallery/components/message/stream_message_metadata.dart'
     as _design_system_gallery_components_message_stream_message_metadata;
 import 'package:design_system_gallery/components/message/stream_message_replies.dart'
@@ -1018,6 +1020,17 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_message_stream_message_content
                         .buildStreamMessageContentShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamMessageMark',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_message_stream_message_mark
+                        .buildStreamMessageMarkPlayground,
               ),
             ],
           ),
