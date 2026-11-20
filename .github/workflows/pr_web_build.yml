@@ -1,0 +1,126 @@
+name: pr_web_build
+
+# Deploys the gallery of a pull request labeled `build` to
+# https://flutter.getstream.io/design-system/pr/<number>/ and comments the
+# link. Every push deploys again; removing the label or closing the pull
+# request removes the build. Builds left behind are removed after 30 days by
+# the next prod or beta deploy. Fork pull requests are skipped: their runs get
+# no identity token.
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - reopened
+      - closed
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    # Any label change starts this workflow, so a `labeled` run only builds
+    # when the label added is `build`. A closed pull request gets no build:
+    # no `closed` event would come to remove it.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.state == 'open' &&
+      github.event.action != 'closed' &&
+      github.event.action != 'unlabeled' &&
+      contains(github.event.pull_request.labels.*.name, 'build') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'build')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # On the jobs rather than the workflow, so a run that skips both (another
+    # label added) leaves a running deploy alone.
+    concurrency:
+      group: pr-web-build-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    environment:
+      name: flutter-web-pr
+      url: ${{ steps.target.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    steps:
+      - name: 📚 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🧩 Bootstrap Workspace
+        uses: ./.github/actions/bootstrap
+
+      - name: 🎯 Target
+        id: target
+        uses: ./.github/actions/flutter-web-target
+        with:
+          app: design-system
+          flavor: pr
+
+      - name: 🏗️ Build
+        working-directory: apps/design_system_gallery
+        env:
+          BUILD_ARGS: ${{ steps.target.outputs.build-args }}
+        run: |
+          read -ra args <<< "$BUILD_ARGS"
+          flutter build web --release --wasm "${args[@]}"
+
+      - name: 🚀 Deploy
+        uses: ./.github/actions/flutter-web-deploy
+        with:
+          path: ${{ steps.target.outputs.path }}
+          service-account: ${{ steps.target.outputs.service-account }}
+          build-dir: apps/design_system_gallery/build/web
+
+      - name: 💬 Comment the Link
+        uses: ./.github/actions/flutter-web-pr-comment
+        with:
+          app: design-system
+          url: ${{ steps.target.outputs.url }}
+
+  remove:
+    name: Remove Build
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      ((github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, 'build')) ||
+      (github.event.action == 'unlabeled' && github.event.label.name == 'build'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Shares the deploy's group, so it stops a deploy that is still running.
+    concurrency:
+      group: pr-web-build-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    environment:
+      name: flutter-web-pr
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    steps:
+      # Only for the local actions; other repositories use them without a
+      # checkout.
+      - name: 📚 Checkout
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/actions
+
+      - name: 🎯 Target
+        id: target
+        uses: ./.github/actions/flutter-web-target
+        with:
+          app: design-system
+          flavor: pr
+
+      - name: 🗑️ Remove
+        uses: ./.github/actions/flutter-web-remove
+        with:
+          path: ${{ steps.target.outputs.path }}
+          service-account: ${{ steps.target.outputs.service-account }}
+
+      - name: 💬 Update the Comment
+        uses: ./.github/actions/flutter-web-pr-comment
+        with:
+          app: design-system

@@ -1,0 +1,94 @@
+name: Flutter Web Deploy
+description: >
+  Uploads a Flutter web build to https://flutter.getstream.io. Take `path` and
+  `service-account` from flutter-web-target. Prod and beta deploys also remove
+  the app's pull request builds that were last deployed over 30 days ago.
+
+# The job needs `id-token: write` and the GitHub environment that
+# flutter-web-target names for the account: the identity provider only admits
+# runs in it. Fork pull requests can't deploy: their runs get no identity token.
+# It needs a Linux runner: the cleanup of old pull request builds uses GNU
+# `date -d`.
+
+inputs:
+  path:
+    description: The build's folder in the bucket, the `path` output of flutter-web-target.
+    required: true
+  service-account:
+    description: The account to deploy as, the `service-account` output of flutter-web-target.
+    required: true
+  build-dir:
+    description: The built app, such as `sample_app/build/web`.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: 🎯 Check Target
+      shell: bash
+      env:
+        WEB_PATH: ${{ inputs.path }}
+      run: |
+        if [[ ! $WEB_PATH =~ ^[a-z0-9-]+(/beta|/pr/[0-9]+)?$ ]]; then
+          echo "::error::path must come from flutter-web-target, got '$WEB_PATH'"
+          exit 1
+        fi
+
+    - name: 🔑 Authenticate to Google Cloud
+      uses: google-github-actions/auth@v3
+      with:
+        workload_identity_provider: projects/675676272957/locations/global/workloadIdentityPools/github-actions/providers/github-flutter
+        service_account: ${{ inputs.service-account }}
+
+    - name: ☁️ Setup gcloud
+      uses: google-github-actions/setup-gcloud@v3
+
+    # A prod folder holds the beta build in beta/ and the pull request builds
+    # in pr/, so the sync leaves those alone.
+    #
+    # index.html is also served for every app route, and a revalidation of
+    # such a route comes back as an empty 200. It is uploaded last, after the
+    # files it loads, and never stored by the browser.
+    - name: 🚀 Deploy
+      shell: bash
+      env:
+        WEB_PATH: ${{ inputs.path }}
+        BUILD_DIR: ${{ inputs.build-dir }}
+      run: |
+        set -euo pipefail
+        gcloud storage rsync "$BUILD_DIR" "gs://stream-flutter-web/$WEB_PATH" \
+          --recursive --delete-unmatched-destination-objects \
+          --exclude='^beta/|^pr/|^index\.html$' \
+          --cache-control="public, max-age=60"
+        gcloud storage cp "$BUILD_DIR/index.html" "gs://stream-flutter-web/$WEB_PATH/index.html" \
+          --cache-control="no-store"
+
+    # flutter-web-remove removes a build with its pull request; this removes
+    # the ones left behind. Every deploy uploads index.html again, so its date
+    # is the build's last deploy.
+    - name: 🧹 Remove Pull Request Builds Older Than 30 Days
+      if: ${{ !contains(inputs.path, '/pr/') }}
+      shell: bash
+      env:
+        WEB_PATH: ${{ inputs.path }}
+      run: |
+        set -euo pipefail
+        app=${WEB_PATH%%/*}
+        cutoff=$(date -u -d '30 days ago' +%s)
+        # With no pull request build the listing fails with "matched no
+        # objects". Any other failure, here or removing a build, is a warning:
+        # the deploy itself is done.
+        errors=$(mktemp)
+        if ! builds=$(gcloud storage ls --long "gs://stream-flutter-web/$app/pr/*/index.html" 2>"$errors"); then
+          if ! grep -qiE 'matched no objects|no urls matched' "$errors"; then
+            echo "::warning::Could not list the pull request builds, so none were removed: $(tr '\n' ' ' < "$errors")"
+          fi
+          builds=
+        fi
+        while read -r _ updated url; do
+          [[ $url == gs://*/index.html ]] || continue
+          if (( $(date -u -d "$updated" +%s) < cutoff )); then
+            echo "Removing ${url%index.html}, last deployed $updated"
+            gcloud storage rm --recursive "${url%index.html}" || echo "::warning::Could not remove ${url%index.html}"
+          fi
+        done <<< "$builds"
