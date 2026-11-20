@@ -68,23 +68,30 @@ class StreamTabBarTheme extends InheritedTheme {
 /// Theme data for customizing [StreamTabBar] widgets.
 ///
 /// Every property is null by default; the tab bar resolves the design-system
-/// value for anything left unset.
+/// value for anything left unset. A color property that resolves to null for
+/// some state falls back to the design-system color for that state, so a
+/// theme can override just the selected tab.
 ///
-/// The color properties resolve against the tab's [WidgetState]s:
-/// [WidgetState.selected] for the selected tab, plus [WidgetState.hovered],
-/// [WidgetState.focused] and [WidgetState.pressed] while the pointer or the
-/// keyboard is interacting with it.
+/// The color properties resolve against [WidgetState.selected] for the
+/// selected tab and [WidgetState.disabled] for a disabled one. Only
+/// [overlayColor] also receives [WidgetState.hovered], [WidgetState.focused]
+/// and [WidgetState.pressed] while the pointer or the keyboard is interacting
+/// with the tab.
 ///
 /// {@tool snippet}
 ///
-/// Customize tab bar appearance globally via [StreamTheme]:
+/// Customize tab bar appearance globally via [StreamTheme]. Returning null
+/// for the unselected tabs keeps their default underline:
 ///
 /// ```dart
+/// final colorScheme = StreamColorScheme.light();
+///
 /// StreamTheme(
+///   colorScheme: colorScheme,
 ///   tabBarTheme: StreamTabBarThemeData(
-///     height: 40,
+///     minHeight: 40,
 ///     indicatorColor: WidgetStateProperty.resolveWith(
-///       (states) => states.contains(WidgetState.selected) ? Colors.purple : Colors.transparent,
+///       (states) => states.contains(WidgetState.selected) ? colorScheme.accentSuccess : null,
 ///     ),
 ///   ),
 /// )
@@ -101,7 +108,7 @@ class StreamTabBarTheme extends InheritedTheme {
 class StreamTabBarThemeData with _$StreamTabBarThemeData {
   /// Creates tab bar theme data with optional property overrides.
   const StreamTabBarThemeData({
-    this.height,
+    this.minHeight,
     this.indicatorWeight,
     this.indicatorColor,
     this.labelStyle,
@@ -111,10 +118,10 @@ class StreamTabBarThemeData with _$StreamTabBarThemeData {
     this.spacing,
   });
 
-  /// The height of the bar in logical pixels, underline included.
+  /// The minimum height of the bar in logical pixels, underline included.
   ///
-  /// Defaults to [StreamTabBar.height] (48).
-  final double? height;
+  /// The bar grows taller when the text scale needs more room. Defaults to 48.
+  final double? minHeight;
 
   /// The thickness of the underline along the bottom of every tab, in logical
   /// pixels.
@@ -126,18 +133,22 @@ class StreamTabBarThemeData with _$StreamTabBarThemeData {
   ///
   /// Every tab draws the underline, so unselected tabs together form the bar's
   /// bottom border. Defaults to [StreamColorScheme.accentPrimary] for the
-  /// selected tab and [StreamColorScheme.borderDefault] for the others.
+  /// selected tab, [StreamColorScheme.borderDisabled] for a disabled tab and
+  /// [StreamColorScheme.borderDefault] for the others.
   final WidgetStateProperty<Color?>? indicatorColor;
 
   /// The text style of each tab's label.
   ///
-  /// This only controls typography. Color comes from [foregroundColor].
+  /// It is merged over the default, so setting only `fontSize` keeps the
+  /// default font family and weight. This only controls typography. Color
+  /// comes from [foregroundColor].
   /// Defaults to [StreamTextTheme.captionEmphasis].
   final TextStyle? labelStyle;
 
   /// The color of each tab's label and icon.
   ///
-  /// Defaults to [StreamColorScheme.accentPrimary] for the selected tab and
+  /// Defaults to [StreamColorScheme.accentPrimary] for the selected tab,
+  /// [StreamColorScheme.textDisabled] for a disabled tab and
   /// [StreamColorScheme.textSecondary] for the others.
   final WidgetStateProperty<Color?>? foregroundColor;
 
@@ -148,6 +159,8 @@ class StreamTabBarThemeData with _$StreamTabBarThemeData {
   final WidgetStateProperty<Color?>? overlayColor;
 
   /// The padding around each tab's icon and label, inside the tab.
+  ///
+  /// The underline sits below this padding, so it never covers the label.
   ///
   /// Defaults to [StreamSpacing.sm] on every side.
   final EdgeInsetsGeometry? tabPadding;
