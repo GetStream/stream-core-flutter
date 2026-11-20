@@ -10,39 +10,32 @@ import '../../theme/stream_theme_extensions.dart';
 import 'stream_flex.dart';
 import 'stream_text_input.dart';
 
-/// The visual treatment of a [StreamSelectInput]'s field.
-enum StreamSelectInputType {
-  /// A bordered field.
-  outline,
-
-  /// A borderless field that only shows its interaction ring and the border of
-  /// the disabled, error and active states.
-  ghost,
-}
-
 /// A select field styled for the Stream design system.
 ///
-/// This is the field only: it renders the current [value] (or [hintText] when
-/// nothing is selected) between a [leading] widget and a caret, and reports
-/// presses through [onPressed]. Opening a menu is the caller's job, typically
-/// with a menu anchor such as `StreamContextMenuAnchor`. That is what lets one
-/// field drive more than one selection, for example a single audio field whose
-/// menu picks both a microphone and a speaker.
+/// This is the field only: it renders the current `value` (or `hintText` when
+/// nothing is selected) between a `leading` widget and a caret, and reports
+/// presses through `onPressed`. Opening a menu is the caller's job, for example
+/// with a [MenuAnchor] whose builder toggles its controller from `onPressed`.
+/// That is what lets one field drive more than one selection, for example a
+/// single audio field whose menu picks both a microphone and a speaker.
 ///
-/// Set [expanded] while that menu is open to get the active border and the
+/// Set `expanded` while that menu is open to get the active border and the
 /// caret-up glyph.
 ///
 /// The base border carries the disabled, error and active states, while hover
-/// and focus draw a 2px ring. The ring paints 1px *outside* the field, so a
-/// caller that clips this widget, or packs fields edge to edge, clips it.
+/// and focus draw a ring centered on the field's outer edge, so half its width
+/// (1px for the default 2px ring) paints outside the field. A clipping ancestor
+/// cuts that part off, and a sibling packed edge to edge can paint over it.
 ///
-/// The density matches [StreamTextInput], so a select and a text input in the
-/// same form line up.
+/// The field's height and padding match [StreamTextInput], so a select and a
+/// text input in the same form line up. For a borderless field, pass
+/// [StreamSelectInputStyle.ghost] as the `style`.
 ///
 /// Visual properties are resolved in order:
-/// 1. Per-instance [style] overrides
+/// 1. Per-instance `style` overrides
 /// 2. [StreamSelectInputTheme] from the widget tree
-/// 3. Design token fallbacks from [StreamColorScheme] and [StreamTextTheme]
+/// 3. Design token fallbacks from [StreamColorScheme], [StreamTextTheme],
+///    [StreamSpacing] and [StreamRadius]
 ///
 /// {@tool snippet}
 ///
@@ -72,6 +65,20 @@ enum StreamSelectInputType {
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// A borderless select:
+///
+/// ```dart
+/// StreamSelectInput(
+///   value: 'MacBook Pro Microphone',
+///   semanticLabel: 'Microphone',
+///   style: const StreamSelectInputStyle.ghost(),
+///   onPressed: openMenu,
+/// )
+/// ```
+/// {@end-tool}
+///
 /// See also:
 ///
 ///  * [StreamSelectInputTheme], for customizing select input appearance.
@@ -85,7 +92,7 @@ class StreamSelectInput extends StatelessWidget {
     Widget? leading,
     String? value,
     String? hintText,
-    StreamSelectInputType type = StreamSelectInputType.outline,
+    String? semanticLabel,
     bool expanded = false,
     String? helperText,
     StreamHelperState? helperState,
@@ -97,7 +104,7 @@ class StreamSelectInput extends StatelessWidget {
          leading: leading,
          value: value,
          hintText: hintText,
-         type: type,
+         semanticLabel: semanticLabel,
          expanded: expanded,
          helperText: helperText,
          helperState: helperState,
@@ -133,7 +140,7 @@ class StreamSelectInputProps {
     this.leading,
     this.value,
     this.hintText,
-    this.type = StreamSelectInputType.outline,
+    this.semanticLabel,
     this.expanded = false,
     this.helperText,
     this.helperState,
@@ -144,7 +151,8 @@ class StreamSelectInputProps {
 
   /// Persistent label rendered above the field.
   ///
-  /// When provided, also becomes the field's accessibility label.
+  /// When provided, also becomes the field's semantic label, unless
+  /// [semanticLabel] is set.
   final String? labelText;
 
   /// An optional widget shown before the value, typically an [Icon].
@@ -156,12 +164,17 @@ class StreamSelectInputProps {
   final String? value;
 
   /// Placeholder text shown while [value] is null.
+  ///
+  /// While nothing is selected it is announced as the field's hint, or as its
+  /// semantic label when neither [labelText] nor [semanticLabel] is set.
   final String? hintText;
 
-  /// Whether the field is bordered.
+  /// The label announced by screen readers for this field.
   ///
-  /// Defaults to [StreamSelectInputType.outline].
-  final StreamSelectInputType type;
+  /// Replaces [labelText] as the announced label without changing what is
+  /// drawn. Set it when the field has no visible label, for example a device
+  /// picker that only shows an icon and the selected device.
+  final String? semanticLabel;
 
   /// Whether the field's menu is open.
   ///
@@ -185,7 +198,9 @@ class StreamSelectInputProps {
   /// When null, the field is disabled.
   final VoidCallback? onPressed;
 
-  /// Focus node for the field.
+  /// An optional focus node for the field.
+  ///
+  /// If null, the field creates and manages its own.
   final FocusNode? focusNode;
 
   /// Per-instance style overrides.
@@ -196,8 +211,8 @@ class StreamSelectInputProps {
 
 /// Default implementation of [StreamSelectInput].
 ///
-/// Renders the label, the bordered field with its leading widget, value and
-/// caret, the hover and focus ring, and [StreamHelperText].
+/// Renders the label, the field with its leading widget, value and caret, the
+/// hover and focus ring, and [StreamHelperText].
 ///
 /// Styling is resolved from per-instance [StreamSelectInputStyle], inherited
 /// [StreamSelectInputTheme], and design token fallbacks in that order.
@@ -224,6 +239,17 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
   StreamSelectInputProps get props => widget.props;
 
   bool get _enabled => props.onPressed != null;
+
+  @override
+  void didUpdateWidget(DefaultStreamSelectInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A new focus node rebuilds the FocusableActionDetector (it is keyed on the
+    // node), which reports hover and focus afresh, so drop the old highlights.
+    if (oldWidget.props.focusNode != props.focusNode) {
+      _hovered = false;
+      _focused = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -264,25 +290,29 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
     };
     final effectiveIconSize = style?.iconSize ?? themeStyle?.iconSize ?? defaults.iconSize;
     final effectiveBorderRadius = style?.borderRadius ?? themeStyle?.borderRadius ?? defaults.borderRadius;
-    final effectiveFillColor = style?.fillColor ?? themeStyle?.fillColor ?? defaults.fillColor;
+    final effectiveFillColor = WidgetStateProperty.resolveAs(
+      style?.fillColor ?? themeStyle?.fillColor ?? defaults.fillColor,
+      states,
+    );
     final effectiveContentPadding = style?.contentPadding ?? themeStyle?.contentPadding ?? defaults.contentPadding;
 
-    final effectiveBorder = switch ((_enabled, hasError, props.expanded)) {
-      (false, _, _) => style?.disabledBorder ?? themeStyle?.disabledBorder ?? defaults.disabledBorder,
-      (_, true, _) => style?.errorBorder ?? themeStyle?.errorBorder ?? defaults.errorBorder,
-      (_, _, true) => style?.activeBorder ?? themeStyle?.activeBorder ?? defaults.activeBorder,
-      _ => switch ((style?.border ?? themeStyle?.border ?? defaults.border, props.type)) {
-        (final border, .outline) => border,
-        (final border, .ghost) => border.copyWith(color: Colors.transparent),
+    final effectiveBorder = _resolveSide(
+      switch ((_enabled, hasError, props.expanded)) {
+        (false, _, _) => style?.disabledBorder ?? themeStyle?.disabledBorder ?? defaults.disabledBorder,
+        (_, true, _) => style?.errorBorder ?? themeStyle?.errorBorder ?? defaults.errorBorder,
+        (_, _, true) => style?.activeBorder ?? themeStyle?.activeBorder ?? defaults.activeBorder,
+        _ => style?.border ?? themeStyle?.border ?? defaults.border,
       },
-    };
+      states,
+    );
 
-    final effectiveRing = switch ((_enabled, _focused, _hovered)) {
+    final ringSide = switch ((_enabled, _focused, _hovered)) {
       (false, _, _) => null,
       (_, true, _) => style?.focusRing ?? themeStyle?.focusRing ?? defaults.focusRing,
       (_, _, true) => style?.hoverRing ?? themeStyle?.hoverRing ?? defaults.hoverRing,
       _ => null,
     };
+    final effectiveRing = ringSide == null ? null : _resolveSide(ringSide, states);
 
     final field = Container(
       decoration: ShapeDecoration(
@@ -315,12 +345,18 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
       ),
     );
 
+    final semanticLabel = props.semanticLabel ?? props.labelText;
+    final hasSemanticLabel = semanticLabel != null;
+
     return Semantics(
+      container: true,
       button: true,
       enabled: _enabled,
       expanded: props.expanded,
-      label: props.labelText,
-      value: props.value ?? props.hintText,
+      label: hasSemanticLabel ? semanticLabel : (hasValue ? null : props.hintText),
+      value: props.value,
+      hint: hasSemanticLabel && !hasValue ? props.hintText : null,
+      onTap: props.onPressed,
       child: StreamColumn(
         spacing: spacing.xs,
         mainAxisAlignment: .center,
@@ -336,6 +372,7 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
               ),
             ),
           FocusableActionDetector(
+            key: ObjectKey(props.focusNode),
             enabled: _enabled,
             focusNode: props.focusNode,
             mouseCursor: _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
@@ -357,11 +394,15 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
                 children: [
                   field,
                   if (effectiveRing case final ring?)
+                    // Offsets the ring's box so the stroke is centered on the
+                    // field's outer edge whatever its strokeAlign: an inside
+                    // stroke grows the box by half the width, an outside one
+                    // shrinks it by the same.
                     Positioned.fill(
-                      left: -ring.width / 2,
-                      top: -ring.width / 2,
-                      right: -ring.width / 2,
-                      bottom: -ring.width / 2,
+                      left: ring.width * ring.strokeAlign / 2,
+                      top: ring.width * ring.strokeAlign / 2,
+                      right: ring.width * ring.strokeAlign / 2,
+                      bottom: ring.width * ring.strokeAlign / 2,
                       child: IgnorePointer(
                         child: DecoratedBox(
                           decoration: ShapeDecoration(
@@ -384,12 +425,20 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
   }
 }
 
+// Resolves a side that may be a WidgetStateBorderSide. That class is a
+// WidgetStateProperty<BorderSide?>, so WidgetStateProperty.resolveAs<BorderSide>
+// would not see it; a side that resolves to null draws nothing.
+BorderSide _resolveSide(BorderSide side, Set<WidgetState> states) {
+  return WidgetStateProperty.resolveAs<BorderSide?>(side, states) ?? BorderSide.none;
+}
+
 // Default theme values for [StreamSelectInput].
 //
 // These defaults are used when no explicit value is provided via
-// [StreamSelectInputStyle] or [StreamSelectInputThemeData]. The text styles,
-// icon size, radius and padding match the ones [StreamTextInput] falls back
-// to, so the two fields line up in a form.
+// [StreamSelectInputStyle] or [StreamSelectInputThemeData]. The value and hint
+// styles, icon size, radius and padding match the ones [StreamTextInput] falls
+// back to, so the two fields line up in a form. The label differs: it uses
+// headingXs, as the select design does, and dims when the field is disabled.
 class _StreamSelectInputDefaults extends StreamSelectInputStyle {
   _StreamSelectInputDefaults(this.context);
 

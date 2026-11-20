@@ -15,19 +15,31 @@ Widget _wrap(Widget child, {StreamTheme? streamTheme}) {
   );
 }
 
-BorderSide? _sideOfWidth(WidgetTester tester, double width) {
-  for (final box in tester.widgetList<DecoratedBox>(find.byType(DecoratedBox))) {
-    final decoration = box.decoration;
-    if (decoration is! ShapeDecoration) continue;
-    final shape = decoration.shape;
-    if (shape is! RoundedSuperellipseBorder) continue;
-    if (shape.side.width == width) return shape.side;
-  }
-  return null;
+BorderSide? _sideOf(DecoratedBox box) {
+  final decoration = box.decoration;
+  if (decoration is! ShapeDecoration) return null;
+  final shape = decoration.shape;
+  return shape is RoundedSuperellipseBorder ? shape.side : null;
 }
 
-BorderSide? _border(WidgetTester tester) => _sideOfWidth(tester, 1);
-BorderSide? _ring(WidgetTester tester) => _sideOfWidth(tester, 2);
+// The ring is the only decorated box the field paints under an IgnorePointer.
+Finder _ringBox() => find.descendant(
+  of: find.descendant(of: find.byType(StreamSelectInput), matching: find.byType(IgnorePointer)),
+  matching: find.byType(DecoratedBox),
+);
+
+BorderSide? _ring(WidgetTester tester) {
+  final boxes = tester.widgetList<DecoratedBox>(_ringBox());
+  return boxes.isEmpty ? null : _sideOf(boxes.single);
+}
+
+BorderSide? _border(WidgetTester tester) {
+  final rings = tester.widgetList<DecoratedBox>(_ringBox()).toSet();
+  final boxes = tester.widgetList<DecoratedBox>(
+    find.descendant(of: find.byType(StreamSelectInput), matching: find.byType(DecoratedBox)),
+  );
+  return boxes.where((box) => !rings.contains(box)).map(_sideOf).nonNulls.single;
+}
 
 // Flutter suppresses hover and focus highlights while the last interaction was
 // a touch, which is what a widget test starts out as.
@@ -78,15 +90,61 @@ void main() {
     expect(_border(tester)?.color, _colorScheme.borderError);
   });
 
-  testWidgets('disabled uses the disabled border and ignores taps', (tester) async {
+  testWidgets('disabled uses the disabled border', (tester) async {
     await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default')));
 
     expect(_border(tester)?.color, _colorScheme.borderDisabled);
+  });
+
+  group('border precedence', () {
+    testWidgets('disabled beats error', (tester) async {
+      await tester.pumpWidget(_wrap(StreamSelectInput(value: 'Mic', helperState: StreamHelperState.error)));
+
+      expect(_border(tester)?.color, _colorScheme.borderDisabled);
+    });
+
+    testWidgets('disabled beats expanded', (tester) async {
+      await tester.pumpWidget(_wrap(StreamSelectInput(value: 'Mic', expanded: true)));
+
+      expect(_border(tester)?.color, _colorScheme.borderDisabled);
+    });
+
+    testWidgets('error beats expanded', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamSelectInput(
+            value: 'Mic',
+            expanded: true,
+            helperState: StreamHelperState.error,
+            onPressed: () {},
+          ),
+        ),
+      );
+
+      expect(_border(tester)?.color, _colorScheme.borderError);
+    });
+  });
+
+  testWidgets('tapping the field calls onPressed once', (tester) async {
+    var pressed = 0;
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', onPressed: () => pressed += 1)));
 
     await tester.tap(find.byType(StreamSelectInput));
     await tester.pump();
 
-    expect(_ring(tester), isNull);
+    expect(pressed, 1);
+  });
+
+  testWidgets('the caret follows the hint color while nothing is selected', (tester) async {
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', onPressed: () {})));
+
+    expect(IconTheme.of(tester.element(find.byIcon(StreamIconData.caretDown))).color, _colorScheme.textTertiary);
+  });
+
+  testWidgets('the caret uses the disabled text color when disabled', (tester) async {
+    await tester.pumpWidget(_wrap(StreamSelectInput(value: 'Mic')));
+
+    expect(IconTheme.of(tester.element(find.byIcon(StreamIconData.caretDown))).color, _colorScheme.textDisabled);
   });
 
   testWidgets('shows the hint in the hint color while nothing is selected', (tester) async {
@@ -111,20 +169,25 @@ void main() {
     expect(find.text('Pick one'), findsOneWidget);
   });
 
-  testWidgets('hover draws the hover ring', (tester) async {
+  testWidgets('hover draws the hover ring over the default border', (tester) async {
     _useTraditionalHighlights(tester);
 
-    var pressed = 0;
-    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', onPressed: () => pressed += 1)));
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', onPressed: () {})));
 
     await _hover(tester);
 
     expect(_ring(tester)?.color, _colorScheme.borderHover);
     expect(_border(tester)?.color, _colorScheme.borderDefault);
+  });
 
-    await tester.tap(find.byType(StreamSelectInput));
-    await tester.pump();
-    expect(pressed, 1);
+  testWidgets('hovering a disabled field draws no ring', (tester) async {
+    _useTraditionalHighlights(tester);
+
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default')));
+
+    await _hover(tester);
+
+    expect(_ring(tester), isNull);
   });
 
   testWidgets('the ring paints half its width outside the field', (tester) async {
@@ -133,73 +196,261 @@ void main() {
     await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', onPressed: () {})));
     await _hover(tester);
 
-    final ringBox = find.byWidgetPredicate((widget) {
-      if (widget is! DecoratedBox) return false;
-      final decoration = widget.decoration;
-      return decoration is ShapeDecoration && (decoration.shape as RoundedSuperellipseBorder).side.width == 2;
-    });
     final fieldRect = tester.getRect(
       find.descendant(of: find.byType(StreamSelectInput), matching: find.byType(Container)).first,
     );
-    final ringRect = tester.getRect(ringBox);
-    expect(ringRect, fieldRect.inflate(1));
+    expect(tester.getRect(_ringBox()), fieldRect.inflate(1));
   });
 
-  testWidgets('focus draws the focus ring and Enter activates', (tester) async {
+  testWidgets('an outside-aligned ring is still centered on the field edge', (tester) async {
     _useTraditionalHighlights(tester);
 
-    var pressed = 0;
+    await tester.pumpWidget(
+      _wrap(
+        StreamSelectInput(
+          hintText: 'Default',
+          style: const StreamSelectInputStyle(
+            hoverRing: BorderSide(width: 4, strokeAlign: BorderSide.strokeAlignOutside),
+          ),
+          onPressed: () {},
+        ),
+      ),
+    );
+    await _hover(tester);
+
+    final fieldRect = tester.getRect(
+      find.descendant(of: find.byType(StreamSelectInput), matching: find.byType(Container)).first,
+    );
+    // An outside stroke paints beyond its box, so the box shrinks by half the
+    // width to keep the stroke centered on the field's edge.
+    expect(tester.getRect(_ringBox()), fieldRect.deflate(2));
+  });
+
+  testWidgets('focus draws the focus ring', (tester) async {
+    _useTraditionalHighlights(tester);
+
     final focusNode = FocusNode();
     addTearDown(focusNode.dispose);
 
-    await tester.pumpWidget(
-      _wrap(StreamSelectInput(hintText: 'Default', focusNode: focusNode, onPressed: () => pressed += 1)),
-    );
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', focusNode: focusNode, onPressed: () {})));
 
     focusNode.requestFocus();
     await tester.pumpAndSettle();
 
     expect(_ring(tester)?.color, _colorScheme.borderFocus);
-
-    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-    await tester.pump();
-
-    expect(pressed, 1);
   });
 
-  testWidgets('ghost has no base border until a state applies', (tester) async {
-    await tester.pumpWidget(
-      _wrap(StreamSelectInput(type: StreamSelectInputType.ghost, hintText: 'Default', onPressed: () {})),
-    );
+  testWidgets('the focus ring beats the hover ring', (tester) async {
+    _useTraditionalHighlights(tester);
 
-    expect(_border(tester)?.color, Colors.transparent);
+    final focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
+
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', focusNode: focusNode, onPressed: () {})));
+
+    focusNode.requestFocus();
+    await _hover(tester);
+
+    expect(_ring(tester)?.color, _colorScheme.borderFocus);
   });
 
-  testWidgets('ghost shows the active border while expanded', (tester) async {
-    await tester.pumpWidget(
-      _wrap(StreamSelectInput(type: StreamSelectInputType.ghost, value: 'Mic', expanded: true, onPressed: () {})),
-    );
+  testWidgets('swapping the focus node clears the focus ring', (tester) async {
+    _useTraditionalHighlights(tester);
 
-    expect(_border(tester)?.color, _colorScheme.borderActive);
+    final first = FocusNode();
+    final second = FocusNode();
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', focusNode: first, onPressed: () {})));
+    first.requestFocus();
+    await tester.pumpAndSettle();
+
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', focusNode: second, onPressed: () {})));
+    await tester.pumpAndSettle();
+
+    expect(_ring(tester), isNull);
   });
 
-  testWidgets('exposes a button with its label, value and expanded state to semantics', (tester) async {
-    await tester.pumpWidget(
-      _wrap(StreamSelectInput(labelText: 'Microphone', value: 'Mic', expanded: true, onPressed: () {})),
-    );
+  testWidgets('a disabled field does not take focus', (tester) async {
+    final focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
 
-    expect(
-      tester.getSemantics(find.byType(StreamSelectInput)),
-      isSemantics(
-        label: 'Microphone',
-        value: 'Mic',
-        isButton: true,
-        hasEnabledState: true,
-        isEnabled: true,
-        hasExpandedState: true,
-        isExpanded: true,
-      ),
-    );
+    await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Default', focusNode: focusNode)));
+
+    focusNode.requestFocus();
+    await tester.pumpAndSettle();
+
+    expect(focusNode.hasFocus, isFalse);
+  });
+
+  for (final key in [LogicalKeyboardKey.enter, LogicalKeyboardKey.space]) {
+    testWidgets('${key.keyLabel} activates the focused field', (tester) async {
+      var pressed = 0;
+      final focusNode = FocusNode();
+      addTearDown(focusNode.dispose);
+
+      await tester.pumpWidget(
+        _wrap(StreamSelectInput(hintText: 'Default', focusNode: focusNode, onPressed: () => pressed += 1)),
+      );
+
+      focusNode.requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(key);
+      await tester.pump();
+
+      expect(pressed, 1);
+    });
+  }
+
+  group('ghost style', () {
+    testWidgets('has no base border until a state applies', (tester) async {
+      await tester.pumpWidget(
+        _wrap(StreamSelectInput(style: const StreamSelectInputStyle.ghost(), hintText: 'Default', onPressed: () {})),
+      );
+
+      expect(_border(tester)?.color, const Color(0x00000000));
+    });
+
+    testWidgets('shows the active border while expanded', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamSelectInput(
+            style: const StreamSelectInputStyle.ghost(),
+            value: 'Mic',
+            expanded: true,
+            onPressed: () {},
+          ),
+        ),
+      );
+
+      expect(_border(tester)?.color, _colorScheme.borderActive);
+    });
+
+    testWidgets('shows the error border', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamSelectInput(
+            style: const StreamSelectInputStyle.ghost(),
+            value: 'Mic',
+            helperState: StreamHelperState.error,
+            onPressed: () {},
+          ),
+        ),
+      );
+
+      expect(_border(tester)?.color, _colorScheme.borderError);
+    });
+
+    testWidgets('shows the disabled border', (tester) async {
+      await tester.pumpWidget(_wrap(StreamSelectInput(style: const StreamSelectInputStyle.ghost(), value: 'Mic')));
+
+      expect(_border(tester)?.color, _colorScheme.borderDisabled);
+    });
+
+    testWidgets('applies from the theme to every field in the subtree', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamSelectInputTheme(
+            data: const StreamSelectInputThemeData(style: StreamSelectInputStyle.ghost()),
+            child: StreamSelectInput(hintText: 'Default', onPressed: () {}),
+          ),
+        ),
+      );
+
+      expect(_border(tester)?.color, const Color(0x00000000));
+    });
+  });
+
+  group('semantics', () {
+    testWidgets('meets accessibility guidelines', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(_wrap(StreamSelectInput(labelText: 'Language', value: 'English', onPressed: () {})));
+
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(textContrastGuideline));
+
+      handle.dispose();
+    });
+
+    testWidgets('exposes a button with its label, value and expanded state', (tester) async {
+      await tester.pumpWidget(
+        _wrap(StreamSelectInput(labelText: 'Microphone', value: 'Mic', expanded: true, onPressed: () {})),
+      );
+
+      expect(
+        tester.getSemantics(find.byType(StreamSelectInput)),
+        isSemantics(
+          label: 'Microphone',
+          value: 'Mic',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasExpandedState: true,
+          isExpanded: true,
+          isFocusable: true,
+          hasTapAction: true,
+          hasFocusAction: true,
+        ),
+      );
+    });
+
+    testWidgets('a semantic tap calls onPressed', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      var pressed = 0;
+      await tester.pumpWidget(_wrap(StreamSelectInput(labelText: 'Microphone', onPressed: () => pressed += 1)));
+
+      tester.semantics.tap(find.semantics.byLabel('Microphone'));
+      await tester.pump();
+
+      expect(pressed, 1);
+
+      handle.dispose();
+    });
+
+    testWidgets('a disabled field has no tap action', (tester) async {
+      await tester.pumpWidget(_wrap(StreamSelectInput(labelText: 'Microphone', value: 'Mic')));
+
+      expect(
+        tester.getSemantics(find.byType(StreamSelectInput)),
+        isSemantics(label: 'Microphone', isButton: true, hasEnabledState: true, isEnabled: false, hasTapAction: false),
+      );
+    });
+
+    testWidgets('announces the hint as the hint while nothing is selected', (tester) async {
+      await tester.pumpWidget(
+        _wrap(StreamSelectInput(labelText: 'Language', hintText: 'Choose a language', onPressed: () {})),
+      );
+
+      expect(
+        tester.getSemantics(find.byType(StreamSelectInput)),
+        isSemantics(label: 'Language', value: '', hint: 'Choose a language', isButton: true),
+      );
+    });
+
+    testWidgets('without a label, announces the hint as the label', (tester) async {
+      await tester.pumpWidget(_wrap(StreamSelectInput(hintText: 'Choose a language', onPressed: () {})));
+
+      expect(
+        tester.getSemantics(find.byType(StreamSelectInput)),
+        isSemantics(label: 'Choose a language', value: '', isButton: true),
+      );
+    });
+
+    testWidgets('semanticLabel replaces labelText without changing what is drawn', (tester) async {
+      await tester.pumpWidget(
+        _wrap(StreamSelectInput(labelText: 'Mic', semanticLabel: 'Microphone', value: 'Jabra', onPressed: () {})),
+      );
+
+      expect(find.text('Mic'), findsOneWidget);
+      expect(
+        tester.getSemantics(find.byType(StreamSelectInput)),
+        isSemantics(label: 'Microphone', value: 'Jabra', isButton: true),
+      );
+    });
   });
 
   testWidgets('a factory builder replaces the default implementation', (tester) async {
@@ -281,7 +532,7 @@ void main() {
         _wrap(
           StreamSelectInputTheme(
             data: const StreamSelectInputThemeData(
-              style: StreamSelectInputStyle(focusRing: BorderSide(color: Colors.green, width: 2)),
+              style: StreamSelectInputStyle(focusRing: BorderSide(color: Colors.green)),
             ),
             child: StreamSelectInput(hintText: 'Default', focusNode: focusNode, onPressed: () {}),
           ),
@@ -333,6 +584,50 @@ void main() {
       );
 
       expect(IconTheme.of(tester.element(find.byIcon(StreamIconData.caretDown))).color, Colors.green);
+    });
+
+    testWidgets('resolves a WidgetStateBorderSide against the field state', (tester) async {
+      _useTraditionalHighlights(tester);
+
+      await tester.pumpWidget(
+        _wrap(
+          StreamSelectInput(
+            hintText: 'Default',
+            style: StreamSelectInputStyle(
+              border: WidgetStateBorderSide.resolveWith(
+                (states) => BorderSide(color: states.contains(WidgetState.hovered) ? Colors.green : Colors.grey),
+              ),
+            ),
+            onPressed: () {},
+          ),
+        ),
+      );
+
+      expect(_border(tester)?.color, Colors.grey);
+
+      await _hover(tester);
+
+      expect(_border(tester)?.color, Colors.green);
+    });
+
+    testWidgets('resolves a WidgetStateColor fill against the field state', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          StreamSelectInput(
+            value: 'Mic',
+            style: StreamSelectInputStyle(
+              fillColor: WidgetStateColor.resolveWith(
+                (states) => states.contains(WidgetState.disabled) ? Colors.grey : Colors.green,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final container = tester.widget<Container>(
+        find.descendant(of: find.byType(StreamSelectInput), matching: find.byType(Container)).first,
+      );
+      expect((container.decoration! as ShapeDecoration).color, Colors.grey);
     });
 
     testWidgets('the widget icon color beats the theme', (tester) async {

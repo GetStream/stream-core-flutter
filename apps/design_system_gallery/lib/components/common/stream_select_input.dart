@@ -20,12 +20,9 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
   final icons = context.streamIcons;
   final spacing = context.streamSpacing;
 
-  final type = context.knobs.object.dropdown<StreamSelectInputType>(
-    label: 'Type',
-    options: StreamSelectInputType.values,
-    initialOption: StreamSelectInputType.outline,
-    labelBuilder: (option) => option.name,
-    description: 'Whether the field is bordered.',
+  final ghost = context.knobs.boolean(
+    label: 'Ghost',
+    description: 'Uses StreamSelectInputStyle.ghost: only state borders and rings show.',
   );
 
   final labelText = context.knobs.stringOrNull(
@@ -79,7 +76,7 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
       child: SizedBox(
         width: 320,
         child: StreamSelectInput(
-          type: type,
+          style: ghost ? const StreamSelectInputStyle.ghost() : null,
           labelText: labelText,
           value: value,
           hintText: hintText,
@@ -115,22 +112,25 @@ Widget buildStreamSelectInputShowcase(BuildContext context) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final type in StreamSelectInputType.values) ...[
+          for (final (name, style) in const [
+            ('outline', null),
+            ('ghost', StreamSelectInputStyle.ghost()),
+          ]) ...[
             _Section(
-              label: type.name.toUpperCase(),
-              caption: 'Every state of the ${type.name} type',
+              label: name.toUpperCase(),
+              caption: 'Placeholder, value, open, error and disabled in the $name style. Hover or tab to see the rings',
               children: [
-                StreamSelectInput(type: type, hintText: 'Placeholder', onPressed: () {}),
-                StreamSelectInput(type: type, value: 'English', onPressed: () {}),
-                StreamSelectInput(type: type, value: 'English', expanded: true, onPressed: () {}),
+                StreamSelectInput(style: style, hintText: 'Placeholder', onPressed: () {}),
+                StreamSelectInput(style: style, value: 'English', onPressed: () {}),
+                StreamSelectInput(style: style, value: 'English', expanded: true, onPressed: () {}),
                 StreamSelectInput(
-                  type: type,
+                  style: style,
                   value: 'English',
                   helperText: 'This language is no longer available',
                   helperState: StreamHelperState.error,
                   onPressed: () {},
                 ),
-                StreamSelectInput(type: type, value: 'English'),
+                StreamSelectInput(style: style, value: 'English'),
               ],
             ),
             SizedBox(height: spacing.xl),
@@ -143,7 +143,7 @@ Widget buildStreamSelectInputShowcase(BuildContext context) {
           SizedBox(height: spacing.xl),
           _Section(
             label: 'IN A FORM',
-            caption: 'The density matches StreamTextInput, so the two line up',
+            caption: 'The field height and padding match StreamTextInput, so the two line up',
             children: [
               StreamTextInput(labelText: 'Name', hintText: 'Your name'),
               StreamSelectInput(labelText: 'Language', hintText: 'Choose a language', onPressed: () {}),

@@ -76,7 +76,11 @@ void main() {
             GoldenTestScenario(
               name: 'ghost',
               child: _buildInTheme(
-                StreamSelectInput(type: StreamSelectInputType.ghost, value: 'Jabra Evolve2 65', onPressed: () {}),
+                StreamSelectInput(
+                  style: const StreamSelectInputStyle.ghost(),
+                  value: 'Jabra Evolve2 65',
+                  onPressed: () {},
+                ),
                 brightness: brightness,
               ),
             ),
