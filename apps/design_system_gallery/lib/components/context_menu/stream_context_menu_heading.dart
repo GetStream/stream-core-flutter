@@ -41,7 +41,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
     final collapsible = context.knobs.boolean(
       label: 'Collapsible',
       initialValue: true,
-      description: 'Give the heading an onTap and a chevron that folds its section away.',
+      description: 'Give the heading an onTap and expanded state so it folds its section away.',
     );
 
     final showTrailing = context.knobs.boolean(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 
 import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_context_menu_heading_theme.dart';
@@ -14,12 +15,12 @@ import 'stream_context_menu_action.dart';
 /// The heading of a section inside a [StreamContextMenu], such as
 /// "Microphone".
 ///
-/// A heading shares the row metrics of a [StreamContextMenuAction] but draws
+/// A heading shares the default row metrics of a [StreamContextMenuAction] but draws
 /// its [label] in a smaller, tertiary style. It is announced as a header to
 /// screen readers.
 ///
-/// A heading is not interactive unless given an [onTap], as the heading of a
-/// section that collapses is. A tappable heading is also announced as a
+/// A heading is not interactive unless given an [onTap], typically to collapse
+/// its section. A tappable heading is also announced as a
 /// button, and reports whether its section is [expanded] when that is given.
 ///
 /// A tappable heading draws its highlight on the nearest [Material] ancestor,
@@ -45,6 +46,8 @@ import 'stream_context_menu_action.dart';
 /// Fold a section away behind its heading:
 ///
 /// ```dart
+/// final icons = context.streamIcons;
+///
 /// StreamContextMenuHeading(
 ///   label: Text('Advanced'),
 ///   trailing: Icon(collapsed ? icons.chevronDown : icons.chevronUp),
@@ -59,6 +62,7 @@ import 'stream_context_menu_action.dart';
 ///  * [StreamContextMenu], which contains these headings.
 ///  * [StreamContextMenuAction], the rows a heading labels.
 ///  * [StreamContextMenuHeadingTheme], for customizing heading appearance.
+@experimental
 class StreamContextMenuHeading extends StatelessWidget {
   /// Creates a context menu heading.
   StreamContextMenuHeading({
@@ -90,22 +94,25 @@ class StreamContextMenuHeading extends StatelessWidget {
 /// This class holds all the configuration options for a context menu heading,
 /// allowing them to be passed through the [StreamComponentFactory].
 ///
-/// A custom implementation should keep announcing the heading as a header,
-/// and a tappable one as a button carrying [expanded].
+/// Consider keeping a custom implementation announced as a header, and a
+/// tappable one as a button carrying [expanded]. A tappable heading's highlight
+/// needs a [Material] ancestor, which a [StreamContextMenu] provides.
 ///
 /// See also:
 ///
 ///  * [StreamContextMenuHeading], which uses these properties.
 ///  * [DefaultStreamContextMenuHeading], the default implementation.
 @immutable
-class StreamContextMenuHeadingProps {
+final class StreamContextMenuHeadingProps {
   /// Creates properties for a context menu heading.
+  ///
+  /// [expanded] is only meaningful for a heading with an [onTap].
   const StreamContextMenuHeadingProps({
     required this.label,
     this.trailing,
     this.onTap,
     this.expanded,
-  });
+  }) : assert(expanded == null || onTap != null, 'expanded is only reported for a heading with an onTap.');
 
   /// The heading widget, typically a [Text].
   ///
@@ -122,14 +129,14 @@ class StreamContextMenuHeadingProps {
 
   /// Called when the heading is tapped.
   ///
-  /// If null, the heading is inert, which is what an ordinary heading wants.
+  /// If null, the heading is not interactive.
   final VoidCallback? onTap;
 
   /// Whether the section this heading folds is expanded.
   ///
   /// Reported to screen readers as the expanded or collapsed state of a
   /// tappable heading. Leave it null for a heading that does not fold a
-  /// section.
+  /// section. Must be null when [onTap] is null.
   final bool? expanded;
 }
 
@@ -137,8 +144,8 @@ class StreamContextMenuHeadingProps {
 ///
 /// Lays out the [StreamContextMenuHeadingProps.label] and the optional
 /// [StreamContextMenuHeadingProps.trailing] in a row, styled from
-/// [StreamContextMenuHeadingTheme] with fallback to defaults that match a
-/// [StreamContextMenuAction].
+/// [StreamContextMenuHeadingTheme] with fallback to defaults that share the row
+/// size, padding and shape of a [StreamContextMenuAction].
 ///
 /// See also:
 ///
@@ -161,6 +168,7 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
     final effectiveIconSize = theme.iconSize ?? defaults.iconSize;
     final effectiveOverlayColor = theme.overlayColor ?? defaults.overlayColor;
     final effectiveMinimumSize = theme.minimumSize ?? defaults.minimumSize;
+    final effectiveMaximumSize = theme.maximumSize ?? defaults.maximumSize;
     final effectivePadding = theme.padding ?? defaults.padding;
     final effectiveSpacing = theme.spacing ?? defaults.spacing;
     final effectiveShape = theme.shape ?? defaults.shape;
@@ -169,6 +177,8 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
       constraints: BoxConstraints(
         minWidth: effectiveMinimumSize.width,
         minHeight: effectiveMinimumSize.height,
+        maxWidth: effectiveMaximumSize.width,
+        maxHeight: effectiveMaximumSize.height,
       ),
       child: Padding(
         padding: effectivePadding,
@@ -247,6 +257,9 @@ class _StreamContextMenuHeadingThemeDefaults extends StreamContextMenuHeadingThe
 
   @override
   Size get minimumSize => const Size(242, 40);
+
+  @override
+  Size get maximumSize => Size.infinite;
 
   @override
   EdgeInsetsGeometry get padding => .symmetric(horizontal: _spacing.sm, vertical: _spacing.xs + _spacing.xxxs);

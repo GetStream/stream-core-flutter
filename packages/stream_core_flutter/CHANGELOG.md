@@ -4,8 +4,8 @@
 
 - Added a `mark` slot to `StreamMessageMetadata`, styled by new `mark*` and
   `separator*` fields on `StreamMessageMetadataStyle`.
-- Added `StreamContextMenuHeading` and `StreamContextMenuHeadingTheme`, the heading of a section in a
-  `StreamContextMenu`, to `video.dart`.
+- Added `StreamContextMenuHeading`, a section heading for `StreamContextMenu`, and
+  `StreamContextMenuHeadingTheme` to `video.dart`.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
