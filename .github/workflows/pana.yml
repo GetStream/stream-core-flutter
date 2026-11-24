@@ -19,7 +19,7 @@ permissions:
 jobs:
   stream_core:
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
 
   stream_core_flutter:
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
 
   stream_thumbnail:
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4

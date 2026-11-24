@@ -31,7 +31,7 @@ jobs:
   # other files, so a link out of `style_guides/` must fail before merge.
   check:
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v6
@@ -48,7 +48,7 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: check
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     strategy:
       fail-fast: false
       matrix:

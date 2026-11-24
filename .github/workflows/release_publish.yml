@@ -25,7 +25,7 @@ jobs:
       contents: write # create the GitHub Release
       id-token: write # OIDC auth to pub.dev
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     steps:
       - name: 📚 Checkout branch
         # Default GITHUB_TOKEN: this job never pushes to git (the release step
@@ -228,7 +228,7 @@ jobs:
     needs: release
     if: needs.release.outputs.package == 'stream_core_flutter' && needs.release.outputs.prerelease == 'false'
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     timeout-minutes: 20
     concurrency:
       group: web-deploy-design-system-prod
