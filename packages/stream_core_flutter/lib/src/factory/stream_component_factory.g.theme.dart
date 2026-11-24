@@ -85,6 +85,7 @@ mixin _$StreamComponentBuilders {
       messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
       messageText: t < 0.5 ? a.messageText : b.messageText,
       modalDialog: t < 0.5 ? a.modalDialog : b.modalDialog,
+      modalWindow: t < 0.5 ? a.modalWindow : b.modalWindow,
       networkImage: t < 0.5 ? a.networkImage : b.networkImage,
       onlineIndicator: t < 0.5 ? a.onlineIndicator : b.onlineIndicator,
       playbackSpeedToggle: t < 0.5
@@ -176,6 +177,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
     Widget Function(BuildContext, StreamMessageTextProps)? messageText,
     Widget Function(BuildContext, StreamModalDialogProps)? modalDialog,
+    Widget Function(BuildContext, StreamModalWindowProps)? modalWindow,
     Widget Function(BuildContext, StreamNetworkImageProps)? networkImage,
     Widget Function(BuildContext, StreamOnlineIndicatorProps)? onlineIndicator,
     Widget Function(BuildContext, StreamPlaybackSpeedToggleProps)?
@@ -255,6 +257,7 @@ mixin _$StreamComponentBuilders {
       messageReplies: messageReplies ?? _this.messageReplies,
       messageText: messageText ?? _this.messageText,
       modalDialog: modalDialog ?? _this.modalDialog,
+      modalWindow: modalWindow ?? _this.modalWindow,
       networkImage: networkImage ?? _this.networkImage,
       onlineIndicator: onlineIndicator ?? _this.onlineIndicator,
       playbackSpeedToggle: playbackSpeedToggle ?? _this.playbackSpeedToggle,
@@ -332,6 +335,7 @@ mixin _$StreamComponentBuilders {
       messageReplies: other.messageReplies,
       messageText: other.messageText,
       modalDialog: other.modalDialog,
+      modalWindow: other.modalWindow,
       networkImage: other.networkImage,
       onlineIndicator: other.onlineIndicator,
       playbackSpeedToggle: other.playbackSpeedToggle,
@@ -413,6 +417,7 @@ mixin _$StreamComponentBuilders {
         _other.messageReplies == _this.messageReplies &&
         _other.messageText == _this.messageText &&
         _other.modalDialog == _this.modalDialog &&
+        _other.modalWindow == _this.modalWindow &&
         _other.networkImage == _this.networkImage &&
         _other.onlineIndicator == _this.onlineIndicator &&
         _other.playbackSpeedToggle == _this.playbackSpeedToggle &&
@@ -480,6 +485,7 @@ mixin _$StreamComponentBuilders {
       _this.messageReplies,
       _this.messageText,
       _this.modalDialog,
+      _this.modalWindow,
       _this.networkImage,
       _this.onlineIndicator,
       _this.playbackSpeedToggle,
