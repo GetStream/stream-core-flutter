@@ -16,7 +16,7 @@ jobs:
     # (no regex in GH expressions). A manual run tags whatever is unpublished.
     if: "${{ github.event_name == 'workflow_dispatch' || (startsWith(github.event.head_commit.message, 'chore(') && contains(github.event.head_commit.message, '): release')) }}"
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     permissions:
       contents: write
     steps:

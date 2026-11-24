@@ -34,7 +34,7 @@ jobs:
   android:
     timeout-minutes: 20
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
@@ -107,7 +107,7 @@ jobs:
   linux:
     timeout-minutes: 20
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
@@ -131,7 +131,7 @@ jobs:
   web:
     timeout-minutes: 20
     runs-on:
-      group: github-public-ubuntu-static
+      group: github-public-amd64
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
