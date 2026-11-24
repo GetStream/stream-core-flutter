@@ -2,9 +2,8 @@
 
 ### ✨ Features
 
-- Added a `mark` slot to `StreamMessageMetadata` for labels such as
-  "Played by 3", set apart by `StreamMessageMetadata.separator` and styled
-  through `StreamMessageMetadataStyle`.
+- Added a `mark` slot to `StreamMessageMetadata`, styled by new `mark*` and
+  `separator*` fields on `StreamMessageMetadataStyle`.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
@@ -20,7 +19,8 @@
 ### 🔄 Changed
 
 - `StreamMessageMetadata` reverses an end-aligned row to edited, status and
-  timestamp, then username (previously username first).
+  timestamp, then username (previously username first). Start-aligned rows
+  are unchanged.
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)

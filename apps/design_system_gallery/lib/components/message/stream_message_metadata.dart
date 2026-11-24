@@ -214,20 +214,26 @@ class _SlotCombinationsSection extends StatelessWidget {
         ),
         _ExampleCard(
           label: 'Mark + status',
-          child: StreamMessageMetadata(
-            timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.checks),
-            mark: const Text('Played by 3'),
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(alignment: StreamMessageAlignment.end),
+            child: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.checks),
+              mark: const Text('Played by 3'),
+            ),
           ),
         ),
         _ExampleCard(
           label: 'All slots',
-          child: StreamMessageMetadata(
-            timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.checks),
-            username: const Text('Alice'),
-            mark: const Text('Played'),
-            edited: const Text('Edited'),
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(alignment: StreamMessageAlignment.end),
+            child: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.checks),
+              username: const Text('Alice'),
+              mark: const Text('Played'),
+              edited: const Text('Edited'),
+            ),
           ),
         ),
       ],

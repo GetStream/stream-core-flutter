@@ -9,10 +9,10 @@ part 'stream_message_metadata_theme.g.theme.dart';
 /// Visual styling properties for a message metadata row.
 ///
 /// Defines the appearance of metadata rows including username, timestamp,
-/// status icon, edited indicator, mark, separator, and spacing. All properties use
-/// [StreamMessageLayoutProperty] for placement-aware resolution.
-/// Use [StreamMessageMetadataStyle.from] for uniform values across all
-/// placements.
+/// status icon, edited indicator, mark, separator, and spacing. All
+/// properties use [StreamMessageLayoutProperty] for placement-aware
+/// resolution. Use [StreamMessageMetadataStyle.from] for uniform values
+/// across all placements.
 ///
 /// {@tool snippet}
 ///

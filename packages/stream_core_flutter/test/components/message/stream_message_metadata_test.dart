@@ -13,7 +13,7 @@ void main() {
       mark: const Text('Played'),
       edited: const Text('Edited'),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     final status = tester.getTopLeft(find.byType(Icon)).dx;
     expect(_left(tester, 'Played'), lessThan(_left(tester, '·')));
@@ -43,18 +43,50 @@ void main() {
     expect(_left(tester, '·'), lessThan(_left(tester, 'Played')));
   });
 
-  testWidgets('a right-to-left row mirrors the order', (tester) async {
+  testWidgets('a right-to-left end-aligned row mirrors the left-to-right end-aligned order', (
+    tester,
+  ) async {
     final metadata = Directionality(
       textDirection: TextDirection.rtl,
       child: StreamMessageMetadata(
         timestamp: const Text('09:41'),
+        status: const Icon(StreamIconData.checks),
+        username: const Text('Alice'),
         mark: const Text('Played'),
+        edited: const Text('Edited'),
       ),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
-    expect(_left(tester, '09:41'), lessThan(_left(tester, '·')));
+    final status = tester.getTopLeft(find.byType(Icon)).dx;
+    expect(_left(tester, 'Alice'), lessThan(_left(tester, '09:41')));
+    expect(_left(tester, '09:41'), lessThan(status));
+    expect(status, lessThan(_left(tester, 'Edited')));
+    expect(_left(tester, 'Edited'), lessThan(_left(tester, '·')));
     expect(_left(tester, '·'), lessThan(_left(tester, 'Played')));
+  });
+
+  testWidgets('a right-to-left start-aligned row mirrors the left-to-right start-aligned order', (
+    tester,
+  ) async {
+    final metadata = Directionality(
+      textDirection: TextDirection.rtl,
+      child: StreamMessageMetadata(
+        timestamp: const Text('09:41'),
+        status: const Icon(StreamIconData.checks),
+        username: const Text('Alice'),
+        mark: const Text('Played'),
+        edited: const Text('Edited'),
+      ),
+    );
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.start);
+
+    final status = tester.getTopLeft(find.byType(Icon)).dx;
+    expect(_left(tester, 'Played'), lessThan(_left(tester, '·')));
+    expect(_left(tester, '·'), lessThan(_left(tester, 'Edited')));
+    expect(_left(tester, 'Edited'), lessThan(_left(tester, '09:41')));
+    expect(_left(tester, '09:41'), lessThan(status));
+    expect(status, lessThan(_left(tester, 'Alice')));
   });
 
   testWidgets('the mark uses the accent color by default', (tester) async {
@@ -62,7 +94,7 @@ void main() {
       timestamp: const Text('09:41'),
       mark: const Text('Played by 2'),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     final style = _textStyle(tester, 'Played by 2');
     expect(style?.color, _colorScheme(tester).accentPrimary);
@@ -79,7 +111,7 @@ void main() {
         mark: const Text('Played'),
       ),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     expect(_textStyle(tester, 'Played')?.color, themedColor);
   });
@@ -93,7 +125,7 @@ void main() {
         markTextStyle: const TextStyle(fontSize: fontSize),
       ),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     expect(_textStyle(tester, 'Played')?.fontSize, fontSize);
   });
@@ -107,14 +139,14 @@ void main() {
         separatorTextStyle: const TextStyle(fontSize: fontSize),
       ),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     expect(_textStyle(tester, '·')?.fontSize, fontSize);
   });
 
   testWidgets('no separator shows without a mark', (tester) async {
     final metadata = StreamMessageMetadata(timestamp: const Text('09:41'));
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     expect(find.text('·'), findsNothing);
   });
@@ -124,7 +156,7 @@ void main() {
       timestamp: const Text('09:41'),
       mark: const Text('Played'),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     expect(_textStyle(tester, '·')?.color, _colorScheme(tester).textTertiary);
   });
@@ -136,7 +168,7 @@ void main() {
       mark: const Text('Played'),
       style: StreamMessageMetadataStyle.from(separatorColor: separatorColor),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     expect(_textStyle(tester, '·')?.color, separatorColor);
   });
@@ -147,7 +179,7 @@ void main() {
       timestamp: const Text('09:41'),
       mark: const Text('Played'),
     );
-    await _pumpMetadata(tester, metadata);
+    await _pumpMetadata(tester, metadata, alignment: StreamMessageAlignment.end);
 
     expect(find.bySemanticsLabel('·'), findsNothing);
     expect(find.bySemanticsLabel('Played'), findsOneWidget);
@@ -160,7 +192,7 @@ void main() {
 Future<void> _pumpMetadata(
   WidgetTester tester,
   Widget metadata, {
-  StreamMessageAlignment alignment = StreamMessageAlignment.end,
+  required StreamMessageAlignment alignment,
 }) {
   return tester.pumpWidget(
     MaterialApp(

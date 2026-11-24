@@ -53,11 +53,12 @@ void main() {
           status: const Icon(Icons.done_all),
           timestamp: const Text('09:41'),
           edited: const Text('Edited'),
+          mark: const Text('Played'),
         ),
       );
     }
 
-    testWidgets('uses muted colors for a standard presentation', (tester) async {
+    testWidgets('uses muted colors and an accent mark for a standard presentation', (tester) async {
       await tester.pumpWidget(subject(StreamMessagePresentation.standard));
       final colorScheme = colorSchemeOf(tester);
 
@@ -65,6 +66,8 @@ void main() {
       expect(textColorOf(tester, '09:41'), colorScheme.textTertiary);
       expect(textColorOf(tester, 'Edited'), colorScheme.textTertiary);
       expect(iconColorOf(tester, Icons.done_all), colorScheme.textTertiary);
+      expect(textColorOf(tester, 'Played'), colorScheme.accentPrimary);
+      expect(textColorOf(tester, '·'), colorScheme.textTertiary);
     });
 
     testWidgets('uses the on-scrim color for a preview presentation', (tester) async {
@@ -75,6 +78,8 @@ void main() {
       expect(textColorOf(tester, '09:41'), colorScheme.textOnAccent);
       expect(textColorOf(tester, 'Edited'), colorScheme.textOnAccent);
       expect(iconColorOf(tester, Icons.done_all), colorScheme.textOnAccent);
+      expect(textColorOf(tester, 'Played'), colorScheme.textOnAccent);
+      expect(textColorOf(tester, '·'), colorScheme.textOnAccent);
     });
 
     testWidgets('uses the on-scrim color for a preview presentation in dark mode', (tester) async {

@@ -15,10 +15,9 @@ import '../message_layout/stream_message_layout.dart';
 /// Displays a [timestamp], and optional [status] icon, [username], [mark],
 /// and [edited] indicator in a horizontal row with themed styling.
 ///
-/// A start-aligned row reads username, status and timestamp, edited,
-/// separator, then mark. An end-aligned row reads the same items in reverse,
-/// with the status still before the timestamp. The separator only shows with
-/// a mark.
+/// Counting from the edge the row is aligned to, items read username, status
+/// and timestamp, edited, separator, then mark. The status always precedes
+/// the timestamp in reading order, and the separator only shows with a mark.
 ///
 /// All content is provided by the caller via widget slots. The provided
 /// widgets are automatically styled according to
@@ -43,8 +42,21 @@ import '../message_layout/stream_message_layout.dart';
 /// ```dart
 /// StreamMessageMetadata(
 ///   timestamp: Text('09:41'),
-///   status: Icon(StreamIcons.doupleCheckmark1Small),
+///   status: Icon(StreamIconData.checks),
 ///   edited: Text('Edited'),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Outgoing voice message someone played:
+///
+/// ```dart
+/// StreamMessageMetadata(
+///   timestamp: Text('09:41'),
+///   status: Icon(StreamIconData.checks),
+///   mark: Text('Played by 3'),
 /// )
 /// ```
 /// {@end-tool}
@@ -77,10 +89,10 @@ class StreamMessageMetadata extends StatelessWidget {
 
   /// The middle dot drawn between the mark and the rest of the row.
   ///
-  /// The default row styles it with
+  /// [DefaultStreamMessageMetadata] styles it with
   /// [StreamMessageMetadataStyle.separatorTextStyle] and
-  /// [StreamMessageMetadataStyle.separatorColor], and hides it from screen
-  /// readers.
+  /// [StreamMessageMetadataStyle.separatorColor] and hides it from screen
+  /// readers. A custom metadata builder can use it to draw the same dot.
   static const Widget separator = Text('·');
 
   /// The properties that configure this metadata row.
@@ -131,10 +143,10 @@ class StreamMessageMetadataProps {
   /// [StreamMessageMetadataStyle.usernameColor].
   final Widget? username;
 
-  /// An optional mark, such as "Played by 3".
+  /// An optional label about the message, such as "Played by 3".
   ///
-  /// Shown last in a start-aligned row and first in an end-aligned one, set
-  /// apart by a [StreamMessageMetadata.separator]. Styled by
+  /// Always the item farthest from the edge the row is aligned to, set apart
+  /// by a [StreamMessageMetadata.separator]. Styled by
   /// [StreamMessageMetadataStyle.markTextStyle] and
   /// [StreamMessageMetadataStyle.markColor].
   final Widget? mark;
@@ -247,10 +259,12 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
           child: StreamMessageMetadata.separator,
         ),
       );
-      markWidget = AnimatedDefaultTextStyle(
-        style: effectiveMarkTextStyle.copyWith(color: effectiveMarkColor),
-        duration: kThemeChangeDuration,
-        child: mark,
+      markWidget = Flexible(
+        child: AnimatedDefaultTextStyle(
+          style: effectiveMarkTextStyle.copyWith(color: effectiveMarkColor),
+          duration: kThemeChangeDuration,
+          child: mark,
+        ),
       );
     }
 
