@@ -62,6 +62,9 @@ class StreamModalSurface extends StatelessWidget {
       // surface's elevation, lifting the dark surface from #1c1c1c to ~#383838.
       surfaceTintColor: Colors.transparent,
       elevation: theme.elevation,
+      // Passed explicitly: Material 3's dialog defaults draw no shadow, and an
+      // app's own `DialogTheme` would otherwise decide it.
+      shadowColor: theme.shadowColor,
       clipBehavior: Clip.antiAlias,
       insetPadding: theme.insetPadding,
       shape: theme.shape,
@@ -101,7 +104,7 @@ class StreamModalHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: style.titleTextStyle,
               child: switch (title) {
-                final title? => Semantics(header: true, child: title),
+                final title? => Semantics(header: true, namesRoute: true, child: title),
                 null => const SizedBox.shrink(),
               },
             ),
@@ -154,6 +157,9 @@ class _StreamModalDialogThemeDefaults extends StreamModalDialogThemeData {
 
   @override
   double get elevation => _context.streamElevation.level4;
+
+  @override
+  Color get shadowColor => Theme.of(_context).colorScheme.shadow;
 
   @override
   ShapeBorder get shape => RoundedRectangleBorder(borderRadius: BorderRadius.all(_context.streamRadius.xl));
