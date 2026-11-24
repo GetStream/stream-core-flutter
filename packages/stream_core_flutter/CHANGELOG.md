@@ -2,6 +2,12 @@
 
 ### ✨ Features
 
+- Added `StreamAdaptiveMenuAnchor` and `StreamAdaptiveMenuAnchorTheme`, which present menu sections as an
+  anchored menu on desktop and web and as a bottom sheet on Android and iOS, to `video.dart`.
+- Added `StreamRadioButton` and `StreamRadioButtonTheme`, a radio button in sm, md and lg sizes with a
+  `decorative` variant for rows that own the tap, to `video.dart`.
+- Added `StreamContextMenuHeading`, a section heading for `StreamContextMenu`, and
+  `StreamContextMenuHeadingTheme` to `video.dart`.
 - Added `StreamContextMenuAnchor` and `StreamContextMenuAnchorTheme`, which open a
   `StreamContextMenu` from an anchor widget, to `video.dart`.
 - Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
