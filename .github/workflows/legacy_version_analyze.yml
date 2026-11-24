@@ -30,7 +30,8 @@ jobs:
   # never reports and leaves a required check waiting forever. See
   # https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks
   gate:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     outputs:
       should_run: ${{ github.event_name == 'push' || (steps.filter.outputs.packages == 'true' && github.event.pull_request.draft != true) }}
     steps:
@@ -57,7 +58,8 @@ jobs:
     needs: gate
     if: needs.gate.outputs.should_run == 'true'
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     steps:
       - name: "Git Checkout"
         uses: actions/checkout@v3

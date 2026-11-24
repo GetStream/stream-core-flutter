@@ -18,7 +18,8 @@ permissions:
 
 jobs:
   stream_core:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4
@@ -29,7 +30,8 @@ jobs:
           min_score: 120  # Missing 10 points for no example, 10 points for no license, 10 points for static analysis issues, and 10 points for outdated dependencies (cross_file 0.4.0 requires Flutter).
 
   stream_core_flutter:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4
@@ -40,7 +42,8 @@ jobs:
           min_score: 110  # Missing 10 points for no license, 10 points for no example, 20 points for static analysis issues (including the path dependency on stream_core that the pana action sets up), and 10 points for outdated dependencies (shimmer 4.0.0).
 
   stream_thumbnail:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4

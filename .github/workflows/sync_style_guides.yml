@@ -30,7 +30,8 @@ jobs:
   # The guides are copied into repositories that have none of this repo's
   # other files, so a link out of `style_guides/` must fail before merge.
   check:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v6
@@ -46,7 +47,8 @@ jobs:
   sync:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: check
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     strategy:
       fail-fast: false
       matrix:

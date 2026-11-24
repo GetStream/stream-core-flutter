@@ -35,7 +35,8 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     timeout-minutes: 5
     steps:
       - name: 🏷️ Remove Pending
@@ -82,7 +83,8 @@ jobs:
       contents: read
       issues: write
       pull-requests: write
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     timeout-minutes: 5
     steps:
       - name: 🏷️ Sync Review Labels
