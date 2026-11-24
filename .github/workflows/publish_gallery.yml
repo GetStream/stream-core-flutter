@@ -26,7 +26,8 @@ permissions:
 jobs:
   build_and_deploy_gallery:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     timeout-minutes: 10
     permissions:
       contents: write
@@ -61,7 +62,8 @@ jobs:
 
   deploy_hosted:
     name: Deploy to flutter.getstream.io
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     timeout-minutes: 20
     concurrency:
       group: web-deploy-design-system-beta

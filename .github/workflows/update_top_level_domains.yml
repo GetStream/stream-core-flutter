@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   update_top_level_domains:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-ubuntu-static
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v6
