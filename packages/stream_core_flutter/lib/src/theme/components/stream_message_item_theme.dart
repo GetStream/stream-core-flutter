@@ -6,7 +6,6 @@ import 'stream_avatar_theme.dart';
 import 'stream_message_annotation_theme.dart';
 import 'stream_message_attachment_theme.dart';
 import 'stream_message_bubble_theme.dart';
-import 'stream_message_mark_theme.dart';
 import 'stream_message_metadata_theme.dart';
 import 'stream_message_replies_theme.dart';
 import 'stream_message_style_property.dart';
@@ -80,8 +79,7 @@ class StreamMessageItemTheme extends InheritedTheme {
 ///     [metadataVisibility], [repliesVisibility], [padding], [spacing],
 ///     [avatarSize]).
 ///  2. **Sub-component styles** — grouped style overrides for each child
-///     component ([text], [bubble], [annotation], [metadata], [mark],
-///     [replies]).
+///     component ([text], [bubble], [annotation], [metadata], [replies]).
 ///
 /// A `null` field means "use defaults."
 ///
@@ -107,7 +105,6 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
     this.attachment,
     this.annotation,
     this.metadata,
-    this.mark,
     this.replies,
   });
 
@@ -189,9 +186,6 @@ class StreamMessageItemThemeData with _$StreamMessageItemThemeData {
 
   /// Style overrides for the message metadata.
   final StreamMessageMetadataStyle? metadata;
-
-  /// Style overrides for the message mark.
-  final StreamMessageMarkStyle? mark;
 
   /// Style overrides for the message replies.
   final StreamMessageRepliesStyle? replies;

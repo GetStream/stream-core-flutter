@@ -9,7 +9,7 @@ part 'stream_message_metadata_theme.g.theme.dart';
 /// Visual styling properties for a message metadata row.
 ///
 /// Defines the appearance of metadata rows including username, timestamp,
-/// edited indicator, status icon, and spacing. All properties use
+/// status icon, edited indicator, mark, separator, and spacing. All properties use
 /// [StreamMessageLayoutProperty] for placement-aware resolution.
 /// Use [StreamMessageMetadataStyle.from] for uniform values across all
 /// placements.
@@ -52,6 +52,10 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
   const StreamMessageMetadataStyle({
     this.usernameTextStyle,
     this.usernameColor,
+    this.markTextStyle,
+    this.markColor,
+    this.separatorTextStyle,
+    this.separatorColor,
     this.timestampTextStyle,
     this.timestampColor,
     this.editedTextStyle,
@@ -82,6 +86,10 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
   factory StreamMessageMetadataStyle.from({
     TextStyle? usernameTextStyle,
     Color? usernameColor,
+    TextStyle? markTextStyle,
+    Color? markColor,
+    TextStyle? separatorTextStyle,
+    Color? separatorColor,
     TextStyle? timestampTextStyle,
     Color? timestampColor,
     TextStyle? editedTextStyle,
@@ -96,6 +104,10 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
     return StreamMessageMetadataStyle(
       usernameTextStyle: usernameTextStyle?.let(StreamMessageLayoutProperty.all),
       usernameColor: usernameColor?.let(StreamMessageLayoutProperty.all),
+      markTextStyle: markTextStyle?.let(StreamMessageLayoutProperty.all),
+      markColor: markColor?.let(StreamMessageLayoutProperty.all),
+      separatorTextStyle: separatorTextStyle?.let(StreamMessageLayoutProperty.all),
+      separatorColor: separatorColor?.let(StreamMessageLayoutProperty.all),
       timestampTextStyle: timestampTextStyle?.let(StreamMessageLayoutProperty.all),
       timestampColor: timestampColor?.let(StreamMessageLayoutProperty.all),
       editedTextStyle: editedTextStyle?.let(StreamMessageLayoutProperty.all),
@@ -114,6 +126,18 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
 
   /// The color for the username text.
   final StreamMessageLayoutProperty<Color?>? usernameColor;
+
+  /// The text style for the mark, such as "Played by 3".
+  final StreamMessageLayoutProperty<TextStyle?>? markTextStyle;
+
+  /// The color for the mark text.
+  final StreamMessageLayoutProperty<Color?>? markColor;
+
+  /// The text style for the separator that sets the mark apart.
+  final StreamMessageLayoutProperty<TextStyle?>? separatorTextStyle;
+
+  /// The color for the separator that sets the mark apart.
+  final StreamMessageLayoutProperty<Color?>? separatorColor;
 
   /// The text style for the timestamp.
   final StreamMessageLayoutProperty<TextStyle?>? timestampTextStyle;
@@ -136,7 +160,8 @@ class StreamMessageMetadataStyle with _$StreamMessageMetadataStyle {
   /// The size for the status icon.
   final StreamMessageLayoutProperty<double?>? statusIconSize;
 
-  /// The gap between main elements (username, timestamp group, edited).
+  /// The gap between main elements (username, timestamp group, edited,
+  /// separator, mark).
   final StreamMessageLayoutProperty<double?>? spacing;
 
   /// The gap between the status icon and the timestamp.

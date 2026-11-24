@@ -2,13 +2,19 @@
 
 ### ✨ Features
 
+- Added a `mark` slot to `StreamMessageMetadata` for labels such as
+  "Played by 3", set apart by `StreamMessageMetadata.separator` and styled
+  through `StreamMessageMetadataStyle`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
 - Added the `fullscreen` icon to `StreamIcons`.
 - Added the `blurOffFill`, `effectsFill`, `fullscreenExit`, `languageFill`,
   `qrCodeFill` and `unflag` icons to `StreamIcons`.
-- Added `StreamMessageMark` and `StreamMessageMarkStyle`, a short label such
-  as "Played by 3" for the new `mark` slot of `StreamMessageMetadata`.
+
+### 🔄 Changed
+
+- `StreamMessageMetadata` reverses an end-aligned row to edited, status and
+  timestamp, then username (previously username first).
 
 ## 0.5.4
 

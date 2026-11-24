@@ -72,7 +72,6 @@ mixin _$StreamMessageItemThemeData {
         t,
       ),
       metadata: StreamMessageMetadataStyle.lerp(a.metadata, b.metadata, t),
-      mark: StreamMessageMarkStyle.lerp(a.mark, b.mark, t),
       replies: StreamMessageRepliesStyle.lerp(a.replies, b.replies, t),
     );
   }
@@ -92,7 +91,6 @@ mixin _$StreamMessageItemThemeData {
     StreamMessageAttachmentStyle? attachment,
     StreamMessageAnnotationStyle? annotation,
     StreamMessageMetadataStyle? metadata,
-    StreamMessageMarkStyle? mark,
     StreamMessageRepliesStyle? replies,
   }) {
     final _this = (this as StreamMessageItemThemeData);
@@ -112,7 +110,6 @@ mixin _$StreamMessageItemThemeData {
       attachment: attachment ?? _this.attachment,
       annotation: annotation ?? _this.annotation,
       metadata: metadata ?? _this.metadata,
-      mark: mark ?? _this.mark,
       replies: replies ?? _this.replies,
     );
   }
@@ -143,7 +140,6 @@ mixin _$StreamMessageItemThemeData {
       attachment: _this.attachment?.merge(other.attachment) ?? other.attachment,
       annotation: _this.annotation?.merge(other.annotation) ?? other.annotation,
       metadata: _this.metadata?.merge(other.metadata) ?? other.metadata,
-      mark: _this.mark?.merge(other.mark) ?? other.mark,
       replies: _this.replies?.merge(other.replies) ?? other.replies,
     );
   }
@@ -175,7 +171,6 @@ mixin _$StreamMessageItemThemeData {
         _other.attachment == _this.attachment &&
         _other.annotation == _this.annotation &&
         _other.metadata == _this.metadata &&
-        _other.mark == _this.mark &&
         _other.replies == _this.replies;
   }
 
@@ -199,7 +194,6 @@ mixin _$StreamMessageItemThemeData {
       _this.attachment,
       _this.annotation,
       _this.metadata,
-      _this.mark,
       _this.replies,
     );
   }

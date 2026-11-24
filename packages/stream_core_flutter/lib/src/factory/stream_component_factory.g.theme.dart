@@ -78,7 +78,6 @@ mixin _$StreamComponentBuilders {
           ? a.messageComposerUnsupportedAttachment
           : b.messageComposerUnsupportedAttachment,
       messageContent: t < 0.5 ? a.messageContent : b.messageContent,
-      messageMark: t < 0.5 ? a.messageMark : b.messageMark,
       messageMetadata: t < 0.5 ? a.messageMetadata : b.messageMetadata,
       messageReplies: t < 0.5 ? a.messageReplies : b.messageReplies,
       messageText: t < 0.5 ? a.messageText : b.messageText,
@@ -162,7 +161,6 @@ mixin _$StreamComponentBuilders {
     )?
     messageComposerUnsupportedAttachment,
     Widget Function(BuildContext, StreamMessageContentProps)? messageContent,
-    Widget Function(BuildContext, StreamMessageMarkProps)? messageMark,
     Widget Function(BuildContext, StreamMessageMetadataProps)? messageMetadata,
     Widget Function(BuildContext, StreamMessageRepliesProps)? messageReplies,
     Widget Function(BuildContext, StreamMessageTextProps)? messageText,
@@ -237,7 +235,6 @@ mixin _$StreamComponentBuilders {
           messageComposerUnsupportedAttachment ??
           _this.messageComposerUnsupportedAttachment,
       messageContent: messageContent ?? _this.messageContent,
-      messageMark: messageMark ?? _this.messageMark,
       messageMetadata: messageMetadata ?? _this.messageMetadata,
       messageReplies: messageReplies ?? _this.messageReplies,
       messageText: messageText ?? _this.messageText,
@@ -310,7 +307,6 @@ mixin _$StreamComponentBuilders {
       messageComposerUnsupportedAttachment:
           other.messageComposerUnsupportedAttachment,
       messageContent: other.messageContent,
-      messageMark: other.messageMark,
       messageMetadata: other.messageMetadata,
       messageReplies: other.messageReplies,
       messageText: other.messageText,
@@ -387,7 +383,6 @@ mixin _$StreamComponentBuilders {
         _other.messageComposerUnsupportedAttachment ==
             _this.messageComposerUnsupportedAttachment &&
         _other.messageContent == _this.messageContent &&
-        _other.messageMark == _this.messageMark &&
         _other.messageMetadata == _this.messageMetadata &&
         _other.messageReplies == _this.messageReplies &&
         _other.messageText == _this.messageText &&
@@ -450,7 +445,6 @@ mixin _$StreamComponentBuilders {
       _this.messageComposerReplyAttachment,
       _this.messageComposerUnsupportedAttachment,
       _this.messageContent,
-      _this.messageMark,
       _this.messageMetadata,
       _this.messageReplies,
       _this.messageText,

@@ -18,7 +18,6 @@ export 'src/components/message/stream_message_annotation.dart';
 export 'src/components/message/stream_message_attachment.dart';
 export 'src/components/message/stream_message_bubble.dart';
 export 'src/components/message/stream_message_content.dart';
-export 'src/components/message/stream_message_mark.dart';
 export 'src/components/message/stream_message_metadata.dart';
 export 'src/components/message/stream_message_replies.dart';
 export 'src/components/message/stream_message_text.dart';
@@ -52,7 +51,6 @@ export 'src/theme/components/stream_message_composer_media_attachment_theme.dart
 export 'src/theme/components/stream_message_composer_reply_attachment_theme.dart';
 export 'src/theme/components/stream_message_composer_unsupported_attachment_theme.dart';
 export 'src/theme/components/stream_message_item_theme.dart';
-export 'src/theme/components/stream_message_mark_theme.dart';
 export 'src/theme/components/stream_message_metadata_theme.dart';
 export 'src/theme/components/stream_message_replies_theme.dart';
 export 'src/theme/components/stream_message_style_property.dart';

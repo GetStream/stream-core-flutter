@@ -37,7 +37,6 @@ import '../components/media_viewer/stream_media_viewer.dart';
 import '../components/message/stream_message_annotation.dart';
 import '../components/message/stream_message_bubble.dart';
 import '../components/message/stream_message_content.dart';
-import '../components/message/stream_message_mark.dart';
 import '../components/message/stream_message_metadata.dart';
 import '../components/message/stream_message_replies.dart';
 import '../components/message/stream_message_text.dart';
@@ -217,7 +216,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamMessageComposerReplyAttachmentProps>? messageComposerReplyAttachment,
     StreamComponentBuilder<StreamMessageComposerUnsupportedAttachmentProps>? messageComposerUnsupportedAttachment,
     StreamComponentBuilder<StreamMessageContentProps>? messageContent,
-    StreamComponentBuilder<StreamMessageMarkProps>? messageMark,
     StreamComponentBuilder<StreamMessageMetadataProps>? messageMetadata,
     StreamComponentBuilder<StreamMessageRepliesProps>? messageReplies,
     StreamComponentBuilder<StreamMessageTextProps>? messageText,
@@ -276,7 +274,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       messageComposerReplyAttachment: messageComposerReplyAttachment,
       messageComposerUnsupportedAttachment: messageComposerUnsupportedAttachment,
       messageContent: messageContent,
-      messageMark: messageMark,
       messageMetadata: messageMetadata,
       messageReplies: messageReplies,
       messageText: messageText,
@@ -336,7 +333,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.messageComposerReplyAttachment,
     required this.messageComposerUnsupportedAttachment,
     required this.messageContent,
-    required this.messageMark,
     required this.messageMetadata,
     required this.messageReplies,
     required this.messageText,
@@ -551,11 +547,6 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamMessageContent] uses [DefaultStreamMessageContent].
   final StreamComponentBuilder<StreamMessageContentProps>? messageContent;
-
-  /// Custom builder for message mark widgets.
-  ///
-  /// When null, [StreamMessageMark] uses [DefaultStreamMessageMark].
-  final StreamComponentBuilder<StreamMessageMarkProps>? messageMark;
 
   /// Custom builder for message metadata widgets.
   ///
