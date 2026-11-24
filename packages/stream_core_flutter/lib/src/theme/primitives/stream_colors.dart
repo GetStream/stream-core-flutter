@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/material.dart';
 
 import 'internal/stream_color_swatch_helper.dart';
 import 'internal/tokens/light/stream_tokens.dart' as tokens;
@@ -37,7 +36,7 @@ abstract final class StreamColors {
   const StreamColors._();
 
   /// The fully transparent color.
-  static const transparent = tokens.StreamTokens.baseTransparent0;
+  static const transparent = Colors.transparent;
 
   /// The pure white color.
   static const white = tokens.StreamTokens.baseWhite;

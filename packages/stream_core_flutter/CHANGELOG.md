@@ -12,11 +12,14 @@
 ### 🐛 Bug Fixes
 
 - Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
+- Fixed `StreamSheet` painting lighter than `backgroundElevation1` in dark mode under Material 3.
 
 ### 🔄 Changed
 
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
+- `StreamColors.transparent` is now `Colors.transparent` (transparent black)
+  instead of transparent white.
 
 ## 0.5.4
 
