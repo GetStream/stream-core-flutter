@@ -26,7 +26,8 @@ permissions:
 jobs:
   analyze:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-amd64
     env:
       IS_CI: 'true'
     steps:
@@ -65,7 +66,8 @@ jobs:
   test:
     needs: analyze
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-amd64
     permissions:
       contents: read
       pull-requests: read

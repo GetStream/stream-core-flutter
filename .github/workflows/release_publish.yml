@@ -18,10 +18,14 @@ jobs:
     # Publishing waits for a flutter-developers approval, and pub.dev only
     # accepts uploads from this environment.
     environment: pub.dev
+    outputs:
+      package: ${{ steps.parse.outputs.package }}
+      prerelease: ${{ steps.parse.outputs.prerelease }}
     permissions:
       contents: write # create the GitHub Release
       id-token: write # OIDC auth to pub.dev
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-public-amd64
     steps:
       - name: 📚 Checkout branch
         # Default GITHUB_TOKEN: this job never pushes to git (the release step
@@ -214,3 +218,52 @@ jobs:
           prerelease: ${{ steps.parse.outputs.prerelease }}
           make_latest: false # independent versioning: no single "latest" release
           token: ${{ steps.ci-bot-token.outputs.token }}
+
+  # The gallery shows stream_core_flutter's components, so prod follows its
+  # releases: only once the approval, the pub.dev publish and the GitHub
+  # Release have gone through. Pre-releases are skipped. To redeploy prod, run
+  # this workflow again on the tag: a version already on pub.dev is skipped.
+  gallery:
+    name: Deploy the Gallery to flutter.getstream.io
+    needs: release
+    if: needs.release.outputs.package == 'stream_core_flutter' && needs.release.outputs.prerelease == 'false'
+    runs-on:
+      group: github-public-amd64
+    timeout-minutes: 20
+    concurrency:
+      group: web-deploy-design-system-prod
+      cancel-in-progress: true
+    environment:
+      name: flutter-web
+      url: ${{ steps.target.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: 📚 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🧩 Bootstrap Workspace
+        uses: ./.github/actions/bootstrap
+
+      - name: 🎯 Target
+        id: target
+        uses: ./.github/actions/flutter-web-target
+        with:
+          app: design-system
+          flavor: prod
+
+      - name: 🏗️ Build
+        working-directory: apps/design_system_gallery
+        env:
+          BUILD_ARGS: ${{ steps.target.outputs.build-args }}
+        run: |
+          read -ra args <<< "$BUILD_ARGS"
+          flutter build web --release --wasm "${args[@]}"
+
+      - name: 🚀 Deploy
+        uses: ./.github/actions/flutter-web-deploy
+        with:
+          path: ${{ steps.target.outputs.path }}
+          service-account: ${{ steps.target.outputs.service-account }}
+          build-dir: apps/design_system_gallery/build/web

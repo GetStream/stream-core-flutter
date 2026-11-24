@@ -63,6 +63,22 @@ file-type assets.
 
 `style_guides/` holds the guides every Stream Flutter SDK follows (today `API_DESIGN.md`). The other SDKs carry a copy: on every change to `main`, the `sync_style_guides` workflow runs `scripts/sync_style_guides.dart` against stream-chat-flutter (`master`), stream-video-flutter (`v2`) and stream-feeds-flutter (`main`), and opens a PR in each whose copy changed. Edit the guides here only. They are self-contained: `STYLE_GUIDE.md` points at them, never the reverse, and a relative link out of `style_guides/` fails the workflow's PR check. A new file in the folder is synced automatically; a new target repository is a new entry in the workflow's matrix.
 
+### Web deploys
+
+The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`: prod at `/<app>/`, beta at `/<app>/beta/`, and pull requests labeled `build` at `/<app>/pr/<number>/`. Four composite actions in `.github/actions/` hold what every repository must do the same way, for this repository and for the other SDKs:
+
+- `flutter-web-target` turns an app and flavor (`prod`, `beta`, `pr`) into the bucket path, the URL, the account to deploy as, and the `flutter build web` arguments: the base href and the `WEB_FLAVOR`, `WEB_STORAGE_PREFIX`, `WEB_HASH_URLS` and `WEB_PR_NUMBER` dart-defines.
+- `flutter-web-deploy` signs in, uploads the build, and on prod and beta removes the app's pull request builds last deployed over 30 days ago.
+- `flutter-web-remove` removes a pull request build, and `flutter-web-pr-comment` keeps the link comment on the pull request.
+
+Each repository writes its own jobs around them: checkout, its own Flutter setup and build, and the job settings (environment, permissions, concurrency and, for pull request builds, the label conditions; `pr_web_build.yml` is the example to copy). Prod and beta jobs run in the GitHub environment `flutter-web`, limited to the branches and tags that publish; pull request jobs run in `flutter-web-pr`, without branch rules, as an account that can only write under `/<app>/pr/`.
+
+Other repositories reference the actions as `GetStream/stream-core-flutter/.github/actions/<name>@<commit>`, so a change here reaches them only when they bump the commit: stream-video-flutter (`app-distribute.yml`, `pr_web_build.yml`) and stream-chat-flutter (`distribute_web.yml`, `pr_web_build.yml`). Keep changes to the actions' inputs and outputs backward compatible.
+
+The gallery deploys as `design-system`: beta on every push to `main` (`publish_gallery.yml`), prod once a `stream_core_flutter` release is on pub.dev (`release_publish.yml`, after the `pub.dev` approval), and pull request builds through `pr_web_build.yml`.
+
+All apps share one origin, so one browser storage. An app that stores anything in the browser prefixes every key with `WEB_STORAGE_PREFIX`.
+
 ## Design
 
 UI components are designed in **Figma**. When implementing or modifying components, use the **Figma MCP** to inspect designs directly — check spacing, colors, typography, and component structure from the source rather than guessing.
