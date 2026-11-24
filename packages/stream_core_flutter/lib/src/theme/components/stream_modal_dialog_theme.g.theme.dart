@@ -32,6 +32,7 @@ mixin _$StreamModalDialogThemeData {
     return StreamModalDialogThemeData(
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       elevation: lerpDouble$(a.elevation, b.elevation, t),
+      shadowColor: Color.lerp(a.shadowColor, b.shadowColor, t),
       shape: ShapeBorder.lerp(a.shape, b.shape, t),
       insetPadding: EdgeInsets.lerp(a.insetPadding, b.insetPadding, t),
       constraints: BoxConstraints.lerp(a.constraints, b.constraints, t),
@@ -53,6 +54,7 @@ mixin _$StreamModalDialogThemeData {
   StreamModalDialogThemeData copyWith({
     Color? backgroundColor,
     double? elevation,
+    Color? shadowColor,
     ShapeBorder? shape,
     EdgeInsets? insetPadding,
     BoxConstraints? constraints,
@@ -66,6 +68,7 @@ mixin _$StreamModalDialogThemeData {
     return StreamModalDialogThemeData(
       backgroundColor: backgroundColor ?? _this.backgroundColor,
       elevation: elevation ?? _this.elevation,
+      shadowColor: shadowColor ?? _this.shadowColor,
       shape: shape ?? _this.shape,
       insetPadding: insetPadding ?? _this.insetPadding,
       constraints: constraints ?? _this.constraints,
@@ -90,6 +93,7 @@ mixin _$StreamModalDialogThemeData {
     return copyWith(
       backgroundColor: other.backgroundColor,
       elevation: other.elevation,
+      shadowColor: other.shadowColor,
       shape: other.shape,
       insetPadding: other.insetPadding,
       constraints: other.constraints,
@@ -117,6 +121,7 @@ mixin _$StreamModalDialogThemeData {
 
     return _other.backgroundColor == _this.backgroundColor &&
         _other.elevation == _this.elevation &&
+        _other.shadowColor == _this.shadowColor &&
         _other.shape == _this.shape &&
         _other.insetPadding == _this.insetPadding &&
         _other.constraints == _this.constraints &&
@@ -134,6 +139,7 @@ mixin _$StreamModalDialogThemeData {
       runtimeType,
       _this.backgroundColor,
       _this.elevation,
+      _this.shadowColor,
       _this.shape,
       _this.insetPadding,
       _this.constraints,

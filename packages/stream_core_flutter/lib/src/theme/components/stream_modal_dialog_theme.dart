@@ -101,6 +101,7 @@ class StreamModalDialogThemeData with _$StreamModalDialogThemeData {
   const StreamModalDialogThemeData({
     this.backgroundColor,
     this.elevation,
+    this.shadowColor,
     this.shape,
     this.insetPadding,
     this.constraints,
@@ -119,6 +120,11 @@ class StreamModalDialogThemeData with _$StreamModalDialogThemeData {
   ///
   /// Defaults to [StreamElevation.level4].
   final double? elevation;
+
+  /// The color of the shadow the dialog's surface casts at [elevation].
+  ///
+  /// Defaults to the [ColorScheme.shadow] of the ambient [Theme].
+  final Color? shadowColor;
 
   /// The shape of the dialog's surface.
   ///

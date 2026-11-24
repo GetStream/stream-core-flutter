@@ -87,6 +87,15 @@ void main() {
     expect(tester.getSemantics(find.text('Settings')), containsSemantics(isHeader: true));
   });
 
+  testWidgets('names its route after the title', (tester) async {
+    await _openDialog(
+      tester,
+      builder: (context) => StreamModalDialog(title: const Text('Settings'), child: const Text('body')),
+    );
+
+    expect(tester.getSemantics(find.text('Settings')), containsSemantics(namesRoute: true));
+  });
+
   testWidgets('the close button dismisses with no value', (tester) async {
     String? result;
     var popped = false;

@@ -48,6 +48,7 @@ void main() {
     final surface = _surface(tester);
     expect(surface.backgroundColor, context.streamColorScheme.backgroundElevation1);
     expect(surface.elevation, context.streamElevation.level4);
+    expect(surface.shadowColor, Theme.of(context).colorScheme.shadow);
     expect(surface.insetPadding, EdgeInsets.all(context.streamSpacing.xxl));
     expect(
       surface.shape,
@@ -74,6 +75,25 @@ void main() {
       expect(painted.color, streamTheme.colorScheme.backgroundElevation1);
       expect(painted.elevation, streamTheme.elevation.level4);
     });
+
+    testWidgets('casts a shadow whatever the app dialog theme says (useMaterial3: $useMaterial3)', (tester) async {
+      final theme = ThemeData(
+        useMaterial3: useMaterial3,
+        dialogTheme: const DialogThemeData(shadowColor: Colors.transparent),
+        extensions: [StreamTheme()],
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: theme,
+          home: StreamModalDialog(child: const Text('body')),
+        ),
+      );
+
+      final painted = tester.widget<PhysicalShape>(
+        find.descendant(of: find.byType(Dialog), matching: find.byType(PhysicalShape)).first,
+      );
+      expect(painted.shadowColor, theme.colorScheme.shadow);
+    });
   }
 
   testWidgets('applies the surface values from StreamTheme', (tester) async {
@@ -84,6 +104,7 @@ void main() {
         modalDialogTheme: const StreamModalDialogThemeData(
           backgroundColor: Colors.red,
           elevation: 2,
+          shadowColor: Colors.green,
           shape: shape,
           insetPadding: EdgeInsets.all(4),
           constraints: BoxConstraints(maxWidth: 300),
@@ -96,6 +117,7 @@ void main() {
     final surface = _surface(tester);
     expect(surface.backgroundColor, Colors.red);
     expect(surface.elevation, 2);
+    expect(surface.shadowColor, Colors.green);
     expect(surface.shape, shape);
     expect(surface.insetPadding, const EdgeInsets.all(4));
     expect(tester.getSize(_surfaceMaterial()).width, lessThanOrEqualTo(300));
