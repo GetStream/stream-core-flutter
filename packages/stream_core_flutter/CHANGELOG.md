@@ -2,11 +2,21 @@
 
 ### ✨ Features
 
+- Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
 - Added the `fullscreen` icon to `StreamIcons`.
 - Added the `blurOffFill`, `effectsFill`, `fullscreenExit`, `languageFill`,
   `qrCodeFill` and `unflag` icons to `StreamIcons`.
+
+### 🐛 Bug Fixes
+
+- Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
+
+### 🔄 Changed
+
+- Stream text now follows Material's default font family when the app sets
+  none, which can render differently on web and desktop.
 
 ## 0.5.4
 
