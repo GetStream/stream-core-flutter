@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../errors.dart';
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -24,16 +23,14 @@ WebSocketChannel _createWebSocket(WebSocketOptions options) {
   return WebSocketChannel.connect(uri, protocols: options.protocols);
 }
 
-/// A [WebSocketEngine] over a [WebSocketChannel].
+/// A WebSocket engine implementation that handles low-level WebSocket operations.
 ///
-/// Frames are encoded and decoded by a [WebSocketMessageCodec], and connection events go to a
-/// [WebSocketEngineListener]. A connection that fails to open is reported as a [StreamNetworkException]
-/// reading `The WebSocket connection failed`.
+/// Manages the WebSocket connection lifecycle, message encoding/decoding, and event notification.
+/// This engine provides the foundation for higher-level WebSocket client functionality by handling
+/// the transport layer concerns.
 ///
-/// See also:
-///
-///  * [WebSocketOptions], which configures the connection.
-///  * [WebSocketEngineListener], which receives the engine's events.
+/// The engine supports both text and binary message formats through the [WebSocketMessageCodec]
+/// and provides callbacks through [WebSocketEngineListener] for connection events.
 class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   /// Creates a new instance of [StreamWebSocketEngine].
   StreamWebSocketEngine({
@@ -71,16 +68,10 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
         _onData,
         onDone: _onDone,
         cancelOnError: false,
-        onError: (Object error, StackTrace stackTrace) {
-          _listener?.onError(_withoutConnectionText(error), stackTrace);
-        },
+        onError: _listener?.onError,
       );
 
-      try {
-        await ws.ready;
-      } catch (error, stackTrace) {
-        Error.throwWithStackTrace(_withoutConnectionText(error), stackTrace);
-      }
+      await ws.ready;
 
       // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
       if (_ws == ws) _listener?.onOpen();
@@ -149,9 +140,4 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
       return ws.sink.add(data);
     });
   }
-
-  static Object _withoutConnectionText(Object error) => switch (error) {
-    WebSocketChannelException(inner: _?) => const StreamNetworkException(message: 'The WebSocket connection failed'),
-    _ => error,
-  };
 }
