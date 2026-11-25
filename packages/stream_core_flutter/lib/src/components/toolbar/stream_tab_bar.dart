@@ -13,20 +13,18 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
-/// A row of tabs, each taking an equal share of the width, marking the
-/// selected one with an accent label over an accent underline.
+/// A row of equal-width tabs that underlines the selected one.
 ///
-/// Mirrors the `Web / Tab Bar` component from the design.
-///
-/// The bar carries no controller and no page view: [StreamTabBarProps.selectedIndex]
-/// comes from the caller and [StreamTabBarProps.onSelected] reports a tap. A
-/// tab switch is a plain state change, which suits a tab bar over
-/// already-loaded content — there is nothing to animate between and nothing to
-/// reload. For tabs that swipe between pages, consider Material's [TabBar].
+/// The bar carries no controller: [StreamTabBarProps.selectedIndex] comes from
+/// the caller and [StreamTabBarProps.onTap] reports a tap.
 ///
 /// Screen readers announce the bar as a tab bar and each tab as a tab with
 /// its selected state. Every enabled tab is a keyboard focus stop, and Enter
 /// or Space selects the focused tab.
+///
+/// The bar is a [PreferredSizeWidget], so it can be an [AppBar.bottom]. Its
+/// [preferredSize] is the default height, so wrap it in a [PreferredSize]
+/// when a theme changes [StreamTabBarThemeData.minHeight].
 ///
 /// {@tool snippet}
 ///
@@ -35,7 +33,7 @@ import '../../theme/stream_theme_extensions.dart';
 /// ```dart
 /// StreamTabBar(
 ///   selectedIndex: selectedIndex,
-///   onSelected: (index) => setState(() => selectedIndex = index),
+///   onTap: (index) => setState(() => selectedIndex = index),
 ///   tabs: [
 ///     StreamTabBarItem(label: 'Photos', icon: Icon(context.streamIcons.image)),
 ///     StreamTabBarItem(label: 'Files', icon: Icon(context.streamIcons.file)),
@@ -44,12 +42,55 @@ import '../../theme/stream_theme_extensions.dart';
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// Drive a [TabBarView] from a [TabController] the parent owns, so a swipe
+/// between pages moves the selection too:
+///
+/// ```dart
+/// class _InboxState extends State<Inbox> with SingleTickerProviderStateMixin {
+///   late final _controller = TabController(length: 2, vsync: this);
+///
+///   @override
+///   void dispose() {
+///     _controller.dispose();
+///     super.dispose();
+///   }
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Column(
+///       children: [
+///         ListenableBuilder(
+///           listenable: _controller,
+///           builder: (context, _) => StreamTabBar(
+///             selectedIndex: _controller.index,
+///             onTap: _controller.animateTo,
+///             tabs: const [
+///               StreamTabBarItem(label: 'Photos'),
+///               StreamTabBarItem(label: 'Files'),
+///             ],
+///           ),
+///         ),
+///         Expanded(
+///           child: TabBarView(
+///             controller: _controller,
+///             children: const [PhotoGrid(), FileList()],
+///           ),
+///         ),
+///       ],
+///     );
+///   }
+/// }
+/// ```
+/// {@end-tool}
+///
 /// See also:
 ///
 ///  * [StreamTabBarItem], which describes one tab.
 ///  * [StreamTabBarTheme], for customizing tab bar appearance.
 @experimental
-class StreamTabBar extends StatelessWidget {
+class StreamTabBar extends StatelessWidget implements PreferredSizeWidget {
   /// Creates a tab bar.
   ///
   /// [tabs] must not be empty, and [selectedIndex], when given, must be an
@@ -58,11 +99,14 @@ class StreamTabBar extends StatelessWidget {
     super.key,
     required List<StreamTabBarItem> tabs,
     int? selectedIndex,
-    required ValueChanged<int> onSelected,
-  }) : props = .new(tabs: tabs, selectedIndex: selectedIndex, onSelected: onSelected);
+    required ValueChanged<int> onTap,
+  }) : props = .new(tabs: tabs, selectedIndex: selectedIndex, onTap: onTap);
 
   /// The props controlling the appearance and behavior of this tab bar.
   final StreamTabBarProps props;
+
+  @override
+  Size get preferredSize => const .fromHeight(kMinInteractiveDimension);
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +157,7 @@ final class StreamTabBarProps {
   const StreamTabBarProps({
     required this.tabs,
     this.selectedIndex,
-    required this.onSelected,
+    required this.onTap,
   }) : assert(tabs.length > 0, 'A tab bar needs at least one tab.'),
        assert(
          selectedIndex == null || (selectedIndex >= 0 && selectedIndex < tabs.length),
@@ -131,7 +175,7 @@ final class StreamTabBarProps {
   ///
   /// Also called for the tab that is already selected, and never for a
   /// disabled tab.
-  final ValueChanged<int> onSelected;
+  final ValueChanged<int> onTap;
 }
 
 /// The default implementation of [StreamTabBar].
@@ -157,10 +201,6 @@ class DefaultStreamTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.streamTabBarTheme;
     final defaults = _StreamTabBarThemeDefaults(context);
-    // Every field is non-null on the defaults, so it is non-null after the
-    // merge too. The colors are merged per state below instead: the merge
-    // swaps a whole WidgetStateProperty, which would let a theme's null for
-    // one state replace the default color for it.
     final effective = defaults.merge(theme);
 
     final style = _StreamTabStyle(
@@ -169,7 +209,9 @@ class DefaultStreamTabBar extends StatelessWidget {
       labelStyle: effective.labelStyle!,
       foregroundColor: _withDefault(theme.foregroundColor, defaults.foregroundColor),
       overlayColor: _withDefault(theme.overlayColor, defaults.overlayColor),
-      tabPadding: effective.tabPadding!,
+      overlaySide: _withDefault(theme.overlaySide, defaults.overlaySide),
+      overlayInsets: .symmetric(vertical: context.streamSpacing.xs),
+      labelPadding: effective.labelPadding!,
       spacing: effective.spacing!,
     );
 
@@ -179,31 +221,41 @@ class DefaultStreamTabBar extends StatelessWidget {
       role: SemanticsRole.tabBar,
       container: true,
       explicitChildNodes: true,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: effective.minHeight!),
-        child: _EqualTabsRow(
-          textDirection: Directionality.of(context),
-          children: [
-            for (final (index, tab) in props.tabs.indexed)
-              _StreamTab(
-                item: tab,
-                index: index,
-                tabCount: tabCount,
-                selected: index == props.selectedIndex,
-                style: style,
-                onPressed: () => props.onSelected(index),
-              ),
-          ],
+      child: Material(
+        type: .transparency,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(width: effective.dividerHeight!, color: effective.dividerColor!),
+            ),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: effective.minHeight!),
+            child: _EqualTabsRow(
+              textDirection: Directionality.of(context),
+              children: [
+                for (final (index, tab) in props.tabs.indexed)
+                  _StreamTab(
+                    item: tab,
+                    index: index,
+                    tabCount: tabCount,
+                    selected: index == props.selectedIndex,
+                    style: style,
+                    onTap: () => props.onTap(index),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  // Resolves [theme] where it gives a color and [fallback] where it gives
+  // Resolves [theme] where it gives a value and [fallback] where it gives
   // null, so a theme can override some states and keep the rest.
-  static WidgetStateProperty<Color> _withDefault(
-    WidgetStateProperty<Color?>? theme,
-    WidgetStateProperty<Color> fallback,
+  static WidgetStateProperty<T> _withDefault<T>(
+    WidgetStateProperty<T?>? theme,
+    WidgetStateProperty<T> fallback,
   ) {
     if (theme == null) return fallback;
     return .resolveWith((states) => theme.resolve(states) ?? fallback.resolve(states));
@@ -293,9 +345,7 @@ class _RenderEqualTabsRow extends RenderBox
 
     var index = 0;
     for (var child = firstChild; child != null; child = childAfter(child), index += 1) {
-      // Loose in height and with parentUsesSize, so a tab is not a relayout
-      // boundary: when its content resizes (a text scale change, a late font
-      // load), the row lays out again and remeasures every tab.
+      // Loose in height with parentUsesSize, so a resized tab relays the whole row out.
       child.layout(
         BoxConstraints(minWidth: tabWidth, maxWidth: tabWidth, minHeight: height, maxHeight: constraints.maxHeight),
         parentUsesSize: true,
@@ -357,7 +407,9 @@ class _StreamTabStyle {
     required this.labelStyle,
     required this.foregroundColor,
     required this.overlayColor,
-    required this.tabPadding,
+    required this.overlaySide,
+    required this.overlayInsets,
+    required this.labelPadding,
     required this.spacing,
   });
 
@@ -366,18 +418,20 @@ class _StreamTabStyle {
   final TextStyle labelStyle;
   final WidgetStateProperty<Color> foregroundColor;
   final WidgetStateProperty<Color> overlayColor;
-  final EdgeInsetsGeometry tabPadding;
+  final WidgetStateProperty<BorderSide> overlaySide;
+  final EdgeInsetsGeometry overlayInsets;
+  final EdgeInsetsGeometry labelPadding;
   final double spacing;
 }
 
-class _StreamTab extends StatelessWidget {
+class _StreamTab extends StatefulWidget {
   const _StreamTab({
     required this.item,
     required this.index,
     required this.tabCount,
     required this.selected,
     required this.style,
-    required this.onPressed,
+    required this.onTap,
   });
 
   final StreamTabBarItem item;
@@ -385,74 +439,100 @@ class _StreamTab extends StatelessWidget {
   final int tabCount;
   final bool selected;
   final _StreamTabStyle style;
-  final VoidCallback onPressed;
+  final VoidCallback onTap;
+
+  @override
+  State<_StreamTab> createState() => _StreamTabState();
+}
+
+class _StreamTabState extends State<_StreamTab> {
+  final _interactionStates = WidgetStatesController();
+
+  @override
+  void dispose() {
+    _interactionStates.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+    final style = widget.style;
     final states = <WidgetState>{
-      if (selected) WidgetState.selected,
+      if (widget.selected) WidgetState.selected,
       if (!item.enabled) WidgetState.disabled,
     };
     final foregroundColor = style.foregroundColor.resolve(states);
-    final indicatorColor = style.indicatorColor.resolve(states);
 
-    // The position is spelled out for native screen readers, which do not
-    // announce it from the tab role alone. The web maps the role to ARIA,
-    // which carries the position itself.
+    // Native screen readers do not announce the position from the tab role; ARIA on the web does.
     final positionLabel = kIsWeb
         ? null
         : Localizations.of<MaterialLocalizations>(
             context,
             MaterialLocalizations,
-          )?.tabLabel(tabIndex: index + 1, tabCount: tabCount);
+          )?.tabLabel(tabIndex: widget.index + 1, tabCount: widget.tabCount);
 
     return MergeSemantics(
       child: InkWell(
-        onTap: item.enabled ? onPressed : null,
-        // The ink well only reports interaction states, so the tab's own
-        // states are added before resolving the theme's overlay.
-        overlayColor: WidgetStateProperty.resolveWith(
-          (interaction) => style.overlayColor.resolve({...interaction, ...states}),
-        ),
+        onTap: item.enabled ? widget.onTap : null,
+        statesController: _interactionStates,
+        overlayColor: const WidgetStatePropertyAll(StreamColors.transparent),
+        splashFactory: NoSplash.splashFactory,
         child: Semantics(
           role: SemanticsRole.tab,
-          // Passthrough lets the tab size to its content when the row
-          // measures it, then fill the row's height when it is placed.
           child: Stack(
             fit: .passthrough,
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(width: style.indicatorWeight, color: indicatorColor),
-                  ),
-                ),
-                // The border does not inset its child, so the padding makes
-                // room for the underline below the label.
-                child: Padding(
-                  padding: style.tabPadding.add(EdgeInsets.only(bottom: style.indicatorWeight)),
-                  child: Row(
-                    mainAxisAlignment: .center,
-                    spacing: style.spacing,
-                    children: [
-                      if (item.icon case final icon?)
-                        IconTheme.merge(
-                          data: IconThemeData(color: foregroundColor),
-                          child: icon,
-                        ),
-                      Flexible(
-                        child: Text(
-                          item.label,
-                          maxLines: 1,
-                          overflow: .ellipsis,
-                          style: style.labelStyle.copyWith(color: foregroundColor),
-                        ),
+              Padding(
+                padding: style.labelPadding,
+                child: Row(
+                  mainAxisAlignment: .center,
+                  spacing: style.spacing,
+                  children: [
+                    if (item.icon case final icon?)
+                      IconTheme.merge(
+                        data: IconThemeData(color: foregroundColor),
+                        child: icon,
                       ),
-                    ],
+                    Flexible(
+                      child: Text(
+                        item.label,
+                        maxLines: 1,
+                        overflow: .ellipsis,
+                        style: style.labelStyle.copyWith(color: foregroundColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (widget.selected)
+                PositionedDirectional(
+                  start: 0,
+                  end: 0,
+                  bottom: 0,
+                  height: style.indicatorWeight,
+                  child: ColoredBox(color: style.indicatorColor.resolve(states)),
+                ),
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Padding(
+                    padding: style.overlayInsets,
+                    child: ValueListenableBuilder(
+                      valueListenable: _interactionStates,
+                      builder: (context, interaction, _) {
+                        final overlayStates = {...interaction, ...states};
+                        return DecoratedBox(
+                          decoration: ShapeDecoration(
+                            color: style.overlayColor.resolve(overlayStates),
+                            shape: StadiumBorder(side: style.overlaySide.resolve(overlayStates)),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-              Semantics(selected: selected, enabled: item.enabled, label: positionLabel),
+              Semantics(selected: widget.selected, enabled: item.enabled, label: positionLabel),
             ],
           ),
         ),
@@ -473,7 +553,7 @@ class _StreamTabBarThemeDefaults extends StreamTabBarThemeData {
   late final StreamSpacing _spacing = _context.streamSpacing;
 
   @override
-  double get minHeight => 48;
+  double get minHeight => kMinInteractiveDimension;
 
   @override
   double get indicatorWeight => 2;
@@ -481,9 +561,14 @@ class _StreamTabBarThemeDefaults extends StreamTabBarThemeData {
   @override
   WidgetStateProperty<Color> get indicatorColor => .resolveWith((states) {
     if (states.contains(WidgetState.disabled)) return _colorScheme.borderDisabled;
-    if (states.contains(WidgetState.selected)) return _colorScheme.accentPrimary;
-    return _colorScheme.borderDefault;
+    return _colorScheme.accentPrimary;
   });
+
+  @override
+  double get dividerHeight => 1;
+
+  @override
+  Color get dividerColor => _colorScheme.borderDefault;
 
   @override
   TextStyle get labelStyle => _textTheme.captionEmphasis;
@@ -500,12 +585,18 @@ class _StreamTabBarThemeDefaults extends StreamTabBarThemeData {
     if (states.contains(WidgetState.disabled)) return StreamColors.transparent;
     if (states.contains(WidgetState.pressed)) return _colorScheme.backgroundPressed;
     if (states.contains(WidgetState.hovered)) return _colorScheme.backgroundHover;
-    if (states.contains(WidgetState.focused)) return _colorScheme.backgroundHover;
     return StreamColors.transparent;
   });
 
   @override
-  EdgeInsetsGeometry get tabPadding => .all(_spacing.sm);
+  WidgetStateProperty<BorderSide> get overlaySide => .resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return BorderSide.none;
+    if (states.contains(WidgetState.focused)) return BorderSide(width: 2, color: _colorScheme.borderFocus);
+    return BorderSide.none;
+  });
+
+  @override
+  EdgeInsetsGeometry get labelPadding => .symmetric(horizontal: _spacing.sm, vertical: _spacing.sm + _spacing.xxxs);
 
   @override
   double get spacing => _spacing.xs;

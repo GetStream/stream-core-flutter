@@ -83,7 +83,7 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
         width: width,
         child: StreamTabBar(
           selectedIndex: selectedIndex,
-          onSelected: (index) => setState(() => _selectedIndex = index),
+          onTap: (index) => setState(() => _selectedIndex = index),
           tabs: _tabs(
             context,
             count: tabCount,
@@ -130,7 +130,7 @@ Widget buildStreamTabBarShowcase(BuildContext context) {
           ),
           _ExampleSection(
             title: 'Disabled tab',
-            description: 'A disabled tab takes the disabled colors for its label and underline and ignores taps.',
+            description: 'A disabled tab takes the disabled colors for its label and ignores taps.',
             showIcons: false,
             disabledIndex: 2,
           ),
@@ -169,7 +169,7 @@ class _ExampleSectionState extends State<_ExampleSection> {
       description: widget.description,
       child: StreamTabBar(
         selectedIndex: _selectedIndex,
-        onSelected: (index) => setState(() => _selectedIndex = index),
+        onTap: (index) => setState(() => _selectedIndex = index),
         tabs: _tabs(context, count: 3, showIcons: widget.showIcons, disabledIndex: widget.disabledIndex),
       ),
     );
@@ -195,7 +195,7 @@ class _TruncationSectionState extends State<_TruncationSection> {
         width: 280,
         child: StreamTabBar(
           selectedIndex: _selectedIndex,
-          onSelected: (index) => setState(() => _selectedIndex = index),
+          onTap: (index) => setState(() => _selectedIndex = index),
           tabs: const [
             StreamTabBarItem(label: 'Recently shared with you'),
             StreamTabBarItem(label: 'Mine'),
@@ -218,22 +218,18 @@ class _ThemedSectionState extends State<_ThemedSection> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.streamColorScheme;
-
     return _ExampleCard(
       title: 'Themed',
-      description: 'A StreamTabBarTheme with a taller bar, a thicker underline and no border under unselected tabs.',
+      description: 'A StreamTabBarTheme with a taller bar, a thicker underline and no divider under the bar.',
       child: StreamTabBarTheme(
-        data: StreamTabBarThemeData(
+        data: const StreamTabBarThemeData(
           minHeight: 56,
           indicatorWeight: 3,
-          indicatorColor: WidgetStateProperty.resolveWith(
-            (states) => states.contains(WidgetState.selected) ? colorScheme.accentPrimary : Colors.transparent,
-          ),
+          dividerColor: Colors.transparent,
         ),
         child: StreamTabBar(
           selectedIndex: _selectedIndex,
-          onSelected: (index) => setState(() => _selectedIndex = index),
+          onTap: (index) => setState(() => _selectedIndex = index),
           tabs: _tabs(context, count: 3, showIcons: false),
         ),
       ),

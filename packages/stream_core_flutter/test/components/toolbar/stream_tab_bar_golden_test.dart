@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:alchemist/alchemist.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -37,7 +38,7 @@ void main() {
               child: _buildInTheme(
                 StreamTabBar(
                   selectedIndex: 0,
-                  onSelected: (_) {},
+                  onTap: (_) {},
                   tabs: const [
                     StreamTabBarItem(label: 'Entire Screen', icon: Icon(StreamIconData.presentDesktopFill)),
                     StreamTabBarItem(label: 'Window', icon: Icon(StreamIconData.gridFill)),
@@ -51,7 +52,7 @@ void main() {
               child: _buildInTheme(
                 StreamTabBar(
                   selectedIndex: 1,
-                  onSelected: (_) {},
+                  onTap: (_) {},
                   tabs: const [
                     StreamTabBarItem(label: 'All'),
                     StreamTabBarItem(label: 'Unread', enabled: false),
@@ -60,6 +61,28 @@ void main() {
                 ),
                 brightness: brightness,
               ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    for (final (state, interaction) in [
+      ('hovered', _hover(find.text('Unread'))),
+      ('pressed', press(find.text('Unread'))),
+      ('focused', _focus(find.text('Unread'))),
+    ]) {
+      goldenTest(
+        'draws the $state overlay',
+        fileName: 'stream_tab_bar_$state',
+        whilePerforming: interaction,
+        builder: () => GoldenTestGroup(
+          columns: 1,
+          scenarioConstraints: const BoxConstraints(maxWidth: 400),
+          children: [
+            GoldenTestScenario(
+              name: state,
+              child: _buildInTheme(_labelTabBar(selectedIndex: 0)),
             ),
           ],
         ),
@@ -78,7 +101,7 @@ void main() {
             child: _buildInTheme(
               StreamTabBar(
                 selectedIndex: 1,
-                onSelected: (_) {},
+                onTap: (_) {},
                 tabs: const [
                   StreamTabBarItem(label: 'A label far too long to fit its share'),
                   StreamTabBarItem(label: 'Short'),
@@ -92,10 +115,27 @@ void main() {
   });
 }
 
+Interaction _hover(Finder finder) => (tester) async {
+  final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+  await gesture.addPointer(location: tester.getCenter(finder));
+  await tester.pump();
+  return gesture.removePointer;
+};
+
+Interaction _focus(Finder finder) => (tester) async {
+  FocusManager.instance.highlightStrategy = FocusHighlightStrategy.alwaysTraditional;
+  Focus.of(tester.element(finder)).requestFocus();
+  await tester.pump();
+  return () {
+    FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
+    return Future<void>.value();
+  };
+};
+
 StreamTabBar _labelTabBar({required int selectedIndex}) {
   return StreamTabBar(
     selectedIndex: selectedIndex,
-    onSelected: (_) {},
+    onTap: (_) {},
     tabs: const [
       StreamTabBarItem(label: 'All'),
       StreamTabBarItem(label: 'Unread'),

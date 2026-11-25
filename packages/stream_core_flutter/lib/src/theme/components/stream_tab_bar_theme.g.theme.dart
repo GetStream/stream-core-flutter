@@ -38,6 +38,8 @@ mixin _$StreamTabBarThemeData {
         t,
         Color.lerp,
       ),
+      dividerHeight: lerpDouble$(a.dividerHeight, b.dividerHeight, t),
+      dividerColor: Color.lerp(a.dividerColor, b.dividerColor, t),
       labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
       foregroundColor: WidgetStateProperty.lerp<Color?>(
         a.foregroundColor,
@@ -51,7 +53,8 @@ mixin _$StreamTabBarThemeData {
         t,
         Color.lerp,
       ),
-      tabPadding: EdgeInsetsGeometry.lerp(a.tabPadding, b.tabPadding, t),
+      overlaySide: t < 0.5 ? a.overlaySide : b.overlaySide,
+      labelPadding: EdgeInsetsGeometry.lerp(a.labelPadding, b.labelPadding, t),
       spacing: lerpDouble$(a.spacing, b.spacing, t),
     );
   }
@@ -60,10 +63,13 @@ mixin _$StreamTabBarThemeData {
     double? minHeight,
     double? indicatorWeight,
     WidgetStateProperty<Color?>? indicatorColor,
+    double? dividerHeight,
+    Color? dividerColor,
     TextStyle? labelStyle,
     WidgetStateProperty<Color?>? foregroundColor,
     WidgetStateProperty<Color?>? overlayColor,
-    EdgeInsetsGeometry? tabPadding,
+    WidgetStateProperty<BorderSide?>? overlaySide,
+    EdgeInsetsGeometry? labelPadding,
     double? spacing,
   }) {
     final _this = (this as StreamTabBarThemeData);
@@ -72,10 +78,13 @@ mixin _$StreamTabBarThemeData {
       minHeight: minHeight ?? _this.minHeight,
       indicatorWeight: indicatorWeight ?? _this.indicatorWeight,
       indicatorColor: indicatorColor ?? _this.indicatorColor,
+      dividerHeight: dividerHeight ?? _this.dividerHeight,
+      dividerColor: dividerColor ?? _this.dividerColor,
       labelStyle: labelStyle ?? _this.labelStyle,
       foregroundColor: foregroundColor ?? _this.foregroundColor,
       overlayColor: overlayColor ?? _this.overlayColor,
-      tabPadding: tabPadding ?? _this.tabPadding,
+      overlaySide: overlaySide ?? _this.overlaySide,
+      labelPadding: labelPadding ?? _this.labelPadding,
       spacing: spacing ?? _this.spacing,
     );
   }
@@ -95,10 +104,13 @@ mixin _$StreamTabBarThemeData {
       minHeight: other.minHeight,
       indicatorWeight: other.indicatorWeight,
       indicatorColor: other.indicatorColor,
+      dividerHeight: other.dividerHeight,
+      dividerColor: other.dividerColor,
       labelStyle: _this.labelStyle?.merge(other.labelStyle) ?? other.labelStyle,
       foregroundColor: other.foregroundColor,
       overlayColor: other.overlayColor,
-      tabPadding: other.tabPadding,
+      overlaySide: other.overlaySide,
+      labelPadding: other.labelPadding,
       spacing: other.spacing,
     );
   }
@@ -119,10 +131,13 @@ mixin _$StreamTabBarThemeData {
     return _other.minHeight == _this.minHeight &&
         _other.indicatorWeight == _this.indicatorWeight &&
         _other.indicatorColor == _this.indicatorColor &&
+        _other.dividerHeight == _this.dividerHeight &&
+        _other.dividerColor == _this.dividerColor &&
         _other.labelStyle == _this.labelStyle &&
         _other.foregroundColor == _this.foregroundColor &&
         _other.overlayColor == _this.overlayColor &&
-        _other.tabPadding == _this.tabPadding &&
+        _other.overlaySide == _this.overlaySide &&
+        _other.labelPadding == _this.labelPadding &&
         _other.spacing == _this.spacing;
   }
 
@@ -135,10 +150,13 @@ mixin _$StreamTabBarThemeData {
       _this.minHeight,
       _this.indicatorWeight,
       _this.indicatorColor,
+      _this.dividerHeight,
+      _this.dividerColor,
       _this.labelStyle,
       _this.foregroundColor,
       _this.overlayColor,
-      _this.tabPadding,
+      _this.overlaySide,
+      _this.labelPadding,
       _this.spacing,
     );
   }
