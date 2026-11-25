@@ -5,19 +5,14 @@ import '../../factory/stream_component_factory.dart';
 import '../../theme/components/stream_context_menu_action_theme.dart';
 import '../../theme/components/stream_context_menu_anchor_theme.dart';
 import '../../theme/components/stream_context_menu_theme.dart';
-import '../../theme/primitives/stream_spacing.dart';
 import '../../theme/stream_theme_extensions.dart';
 import 'stream_context_menu.dart';
 import 'stream_context_menu_action.dart';
 
-/// Anchors a [StreamContextMenu] to the widget built by [builder].
+/// Opens a [StreamContextMenu] from the widget built by [builder].
 ///
-/// Wraps [MenuAnchor] with the plumbing every Stream-styled dropdown needs:
-/// [MenuAnchor]'s own Material panel is neutralized (see [menuStyle]) so that
-/// [StreamContextMenu] supplies the whole surface, the panel is bounded by
-/// `constraints`, and descendant [StreamContextMenuAction]s are sized and
-/// styled like the `Web / Menu Item` component in the design (see
-/// [defaultActionStyle]).
+/// Works like [MenuAnchor]: open and close it through the [MenuController]
+/// passed to [builder].
 ///
 /// [StreamContextMenu] sizes itself to its widest child, so labels that can be
 /// arbitrarily long need [TextOverflow.ellipsis] to truncate rather than wrap.
@@ -41,6 +36,25 @@ import 'stream_context_menu_action.dart';
 /// ```
 /// {@end-tool}
 ///
+/// {@tool snippet}
+///
+/// A long press that opens the menu where the finger is:
+///
+/// ```dart
+/// StreamContextMenuAnchor(
+///   menuChildren: [
+///     StreamContextMenuAction(label: Text('Copy'), onTap: copy),
+///     StreamContextMenuAction(label: Text('Delete'), onTap: delete),
+///   ],
+///   child: messageBubble,
+///   builder: (context, controller, child) => GestureDetector(
+///     onLongPressStart: (details) => controller.open(position: details.localPosition),
+///     child: child,
+///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
 /// See also:
 ///
 ///  * [StreamContextMenu], the menu surface this anchors.
@@ -54,9 +68,14 @@ class StreamContextMenuAnchor extends StatelessWidget {
     super.key,
     required List<Widget> menuChildren,
     required MenuAnchorChildBuilder builder,
+    Widget? child,
     MenuController? controller,
+    FocusNode? childFocusNode,
     BoxConstraints? constraints,
     Offset? alignmentOffset,
+    EdgeInsetsGeometry? reservedPadding,
+    bool consumeOutsideTap = false,
+    bool useRootOverlay = false,
     StreamContextMenuActionStyle? actionStyle,
     double? elevation,
     VoidCallback? onOpen,
@@ -64,9 +83,14 @@ class StreamContextMenuAnchor extends StatelessWidget {
   }) : props = .new(
          menuChildren: menuChildren,
          builder: builder,
+         child: child,
          controller: controller,
+         childFocusNode: childFocusNode,
          constraints: constraints,
          alignmentOffset: alignmentOffset,
+         reservedPadding: reservedPadding,
+         consumeOutsideTap: consumeOutsideTap,
+         useRootOverlay: useRootOverlay,
          actionStyle: actionStyle,
          elevation: elevation,
          onOpen: onOpen,
@@ -75,8 +99,7 @@ class StreamContextMenuAnchor extends StatelessWidget {
 
   /// The default bounds of the menu panel.
   ///
-  /// The minimum width comes from the menu items themselves, which carry the
-  /// design's 200px minimum.
+  /// The minimum width comes from the menu items themselves.
   static const defaultConstraints = BoxConstraints(
     maxWidth: 320,
     maxHeight: 360,
@@ -85,39 +108,33 @@ class StreamContextMenuAnchor extends StatelessWidget {
   /// A [MenuStyle] that hides [MenuAnchor]'s own Material panel.
   ///
   /// Use it on a plain [MenuAnchor] when the menu content already draws its
-  /// own surface, as [StreamContextMenu] does: background, border, radius and
-  /// elevation all come from the content instead.
-  static const menuStyle = MenuStyle(
+  /// own surface, as [StreamContextMenu] does: background, border, radius,
+  /// elevation and size all come from the content instead, whatever the
+  /// enclosing [MenuTheme] sets.
+  static const transparentPanelStyle = MenuStyle(
     backgroundColor: WidgetStatePropertyAll(Colors.transparent),
     shadowColor: WidgetStatePropertyAll(Colors.transparent),
     surfaceTintColor: WidgetStatePropertyAll(Colors.transparent),
     elevation: WidgetStatePropertyAll(0),
     padding: WidgetStatePropertyAll(EdgeInsets.zero),
+    side: WidgetStatePropertyAll(BorderSide.none),
+    shape: WidgetStatePropertyAll(RoundedRectangleBorder()),
+    minimumSize: WidgetStatePropertyAll(Size.zero),
+    maximumSize: WidgetStatePropertyAll(Size.infinite),
+    visualDensity: VisualDensity.standard,
   );
 
-  /// The row style every action in an anchored menu starts from.
+  /// The row style every action in an anchored menu at [context] starts from.
   ///
-  /// This is the design's `Web / Menu Item`: a 32px tall row with a 200px
-  /// minimum width, a caption/emphasis label and 16px icons, where a plain
-  /// [StreamContextMenu] uses a 40px tall row with a 242px minimum width, a
-  /// body/emphasis label and 20px icons. The row is inset horizontally by
-  /// [StreamSpacing.xs] on top of the menu's own padding, which puts the
-  /// content 12px from the panel edge and leaves the row's rounded highlight
-  /// 4px inside it.
-  ///
-  /// The [StreamContextMenuAnchorThemeData.actionStyle] in effect at [context]
-  /// is merged over those metrics, so the result is what every row of a
-  /// [StreamContextMenuAnchor] there gets before the anchor's own
-  /// `actionStyle`.
-  ///
-  /// [StreamContextMenuActionTheme.of] reads only the nearest theme, so
-  /// anything that varies a single row — wrapping it in its own
-  /// [StreamContextMenuActionTheme] — has to merge its override over this
-  /// style, or that row falls back to the plain context menu metrics while
-  /// its siblings keep the design's.
+  /// Anchored rows are denser than those of a plain [StreamContextMenu]. The
+  /// [StreamContextMenuActionTheme] and then the
+  /// [StreamContextMenuAnchorThemeData.actionStyle] in effect at [context] are
+  /// merged over those metrics.
   static StreamContextMenuActionStyle defaultActionStyle(BuildContext context) {
     final designStyle = _StreamContextMenuAnchorThemeDefaults(context).actionStyle;
-    return designStyle.merge(context.streamContextMenuAnchorTheme.actionStyle);
+    return designStyle
+        .merge(context.streamContextMenuActionTheme.style)
+        .merge(context.streamContextMenuAnchorTheme.actionStyle);
   }
 
   /// The properties that configure this menu anchor.
@@ -146,9 +163,14 @@ class StreamContextMenuAnchorProps {
   const StreamContextMenuAnchorProps({
     required this.menuChildren,
     required this.builder,
+    this.child,
     this.controller,
+    this.childFocusNode,
     this.constraints,
     this.alignmentOffset,
+    this.reservedPadding,
+    this.consumeOutsideTap = false,
+    this.useRootOverlay = false,
     this.actionStyle,
     this.elevation,
     this.onOpen,
@@ -167,13 +189,28 @@ class StreamContextMenuAnchorProps {
   /// Builds the widget the menu is anchored to.
   ///
   /// The builder receives the [MenuController] that opens and closes the
-  /// menu, whether or not [controller] is given.
+  /// menu, whether or not [controller] is given, and [child].
   final MenuAnchorChildBuilder builder;
+
+  /// A widget passed to [builder] unchanged.
+  ///
+  /// Use it for the part of the anchor that does not depend on the menu being
+  /// open, so it is not rebuilt when the menu opens or closes.
+  final Widget? child;
 
   /// The controller opening and closing the menu.
   ///
   /// If null, the anchor creates its own, which is handed to [builder].
   final MenuController? controller;
+
+  /// The focus node of the focusable widget built by [builder].
+  ///
+  /// It takes focus when the menu opens, so keyboard traversal out of the
+  /// menu and Escape lead back to it.
+  ///
+  /// If null, focus moves to the anchor as a whole when the menu opens rather
+  /// than to the widget built by [builder].
+  final FocusNode? childFocusNode;
 
   /// The bounds of the menu panel.
   ///
@@ -191,20 +228,35 @@ class StreamContextMenuAnchorProps {
   /// then falls back to [Offset.zero].
   final Offset? alignmentOffset;
 
+  /// The space the menu keeps from the edges of the safe area.
+  ///
+  /// If null, uses the default of [MenuAnchor.reservedPadding].
+  final EdgeInsetsGeometry? reservedPadding;
+
+  /// Whether a tap outside the open menu only closes it.
+  ///
+  /// If false, the tap closes the menu and also reaches the widget under it.
+  ///
+  /// Defaults to false.
+  final bool consumeOutsideTap;
+
+  /// Whether the menu is shown in the root [Overlay] rather than the nearest
+  /// one.
+  ///
+  /// Defaults to false.
+  final bool useRootOverlay;
+
   /// Overrides for the rows inside the menu.
   ///
-  /// Merged over [StreamContextMenuAnchor.defaultActionStyle], which already
-  /// carries [StreamContextMenuAnchorThemeData.actionStyle]. That style is
-  /// sized for a 16px icon beside a caption; a menu whose rows carry something
-  /// bigger — an avatar, a thumbnail — needs a taller row and a wider inset, or
-  /// its content fills the row edge to edge.
+  /// Merged over [StreamContextMenuAnchor.defaultActionStyle]. A menu whose
+  /// rows carry something bigger than an icon, such as an avatar, needs a
+  /// taller row here.
   final StreamContextMenuActionStyle? actionStyle;
 
   /// How high the menu floats above the page.
   ///
-  /// If null, resolves from [StreamContextMenuStyle.elevation], then falls
-  /// back to `3`. Pass 0 for a menu that sits flat on the page and is
-  /// separated from it by its border alone.
+  /// If null, resolves from [StreamContextMenuStyle.elevation]. Pass 0 for a
+  /// menu that sits flat on the page, separated from it by its border alone.
   final double? elevation;
 
   /// Called when the menu opens.
@@ -233,22 +285,14 @@ class DefaultStreamContextMenuAnchor extends StatefulWidget {
 }
 
 class _DefaultStreamContextMenuAnchorState extends State<DefaultStreamContextMenuAnchor> {
-  // A menu opened by a tap leaves focus where it was, often on the enclosing
-  // route. Escape then reaches the route's DismissAction and pops a dialog
-  // instead of closing the menu. Focusing the anchor when the menu opens puts
-  // the menu's own dismiss action on the focus path.
-  final _anchorFocusNode = FocusNode(debugLabel: 'StreamContextMenuAnchor', skipTraversal: true);
+  // Focused on open when no childFocusNode is given, so Escape closes the menu before an enclosing route.
+  FocusNode? _fallbackFocusNode;
 
   StreamContextMenuAnchorProps get props => widget.props;
 
-  void _handleOpen() {
-    if (!_anchorFocusNode.hasFocus) _anchorFocusNode.requestFocus();
-    props.onOpen?.call();
-  }
-
   @override
   void dispose() {
-    _anchorFocusNode.dispose();
+    _fallbackFocusNode?.dispose();
     super.dispose();
   }
 
@@ -261,25 +305,30 @@ class _DefaultStreamContextMenuAnchorState extends State<DefaultStreamContextMen
     final effectiveAlignmentOffset = props.alignmentOffset ?? anchorTheme.alignmentOffset ?? defaults.alignmentOffset;
     final effectiveActionStyle = StreamContextMenuAnchor.defaultActionStyle(context).merge(props.actionStyle);
 
+    final childFocusNode = props.childFocusNode;
+    final fallbackFocusNode = childFocusNode != null
+        ? null
+        : _fallbackFocusNode ??= FocusNode(debugLabel: 'StreamContextMenuAnchor', skipTraversal: true);
+
     return MenuAnchor(
       controller: props.controller,
+      childFocusNode: childFocusNode ?? fallbackFocusNode,
       alignmentOffset: effectiveAlignmentOffset,
-      // The panel's default clip cuts off the shadow the menu draws outside
-      // its own bounds, most visibly along the bottom edge. The menu draws its
-      // own surface and clips its own content, so the panel needs no clip.
+      reservedPadding: props.reservedPadding,
+      consumeOutsideTap: props.consumeOutsideTap,
+      useRootOverlay: props.useRootOverlay,
+      // The menu draws its own shadow outside its bounds.
       clipBehavior: Clip.none,
-      childFocusNode: _anchorFocusNode,
-      onOpen: _handleOpen,
+      onOpen: props.onOpen,
       onClose: props.onClose,
-      style: StreamContextMenuAnchor.menuStyle,
-      builder: (context, controller, child) => Focus(
-        focusNode: _anchorFocusNode,
-        child: props.builder(context, controller, child),
-      ),
+      style: StreamContextMenuAnchor.transparentPanelStyle,
+      builder: (context, controller, child) {
+        final anchor = props.builder(context, controller, child);
+        if (fallbackFocusNode == null) return anchor;
+        return Focus(focusNode: fallbackFocusNode, child: anchor);
+      },
       menuChildren: [
-        // The panel and the menu both scroll vertically, and on mobile both
-        // would attach to the PrimaryScrollController, which trips the
-        // panel's Scrollbar assertion. The panel keeps the primary controller.
+        // The menu scrolls itself, so it must not share the panel's primary scroll controller.
         PrimaryScrollController.none(
           child: ConstrainedBox(
             constraints: effectiveConstraints,
@@ -293,12 +342,13 @@ class _DefaultStreamContextMenuAnchorState extends State<DefaultStreamContextMen
           ),
         ),
       ],
+      child: props.child,
     );
   }
 }
 
 // Default values for [StreamContextMenuAnchorThemeData], resolved from the
-// design's `Web / Menu Item` and the current spacing and text theme.
+// current spacing, radius, color scheme and text theme.
 class _StreamContextMenuAnchorThemeDefaults extends StreamContextMenuAnchorThemeData {
   const _StreamContextMenuAnchorThemeDefaults(this.context);
 
@@ -311,10 +361,21 @@ class _StreamContextMenuAnchorThemeDefaults extends StreamContextMenuAnchorTheme
   Offset get alignmentOffset => Offset.zero;
 
   @override
-  StreamContextMenuActionStyle get actionStyle => StreamContextMenuActionStyle(
-    textStyle: WidgetStatePropertyAll(context.streamTextTheme.captionEmphasis),
-    iconSize: const WidgetStatePropertyAll(16),
-    minimumSize: const WidgetStatePropertyAll(Size(200, 32)),
-    padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: context.streamSpacing.xs)),
-  );
+  StreamContextMenuActionStyle get actionStyle {
+    final focusRing = BorderSide(color: context.streamColorScheme.borderFocus, width: 2);
+    final borderRadius = BorderRadius.all(context.streamRadius.md);
+
+    return StreamContextMenuActionStyle(
+      textStyle: WidgetStatePropertyAll(context.streamTextTheme.captionEmphasis),
+      iconSize: const WidgetStatePropertyAll(16),
+      minimumSize: const WidgetStatePropertyAll(Size(200, 32)),
+      padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: context.streamSpacing.xs)),
+      shape: WidgetStateProperty.resolveWith(
+        (states) => RoundedRectangleBorder(
+          borderRadius: borderRadius,
+          side: states.contains(WidgetState.focused) ? focusRing : BorderSide.none,
+        ),
+      ),
+    );
+  }
 }

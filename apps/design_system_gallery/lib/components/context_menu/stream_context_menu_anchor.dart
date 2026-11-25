@@ -120,7 +120,7 @@ Widget buildStreamContextMenuAnchorShowcase(BuildContext context) {
         children: [
           _ExampleCard(
             title: 'Default',
-            description: 'Rows use the denser Web / Menu Item metrics: 32px tall, a 200px minimum width, 16px icons.',
+            description: 'Anchored rows are denser than a plain context menu: 32px tall, 16px icons.',
             child: _MenuButton(
               label: 'Options',
               alignmentOffset: const Offset(0, 8),
@@ -153,6 +153,26 @@ Widget buildStreamContextMenuAnchorShowcase(BuildContext context) {
               label: 'Choose',
               alignmentOffset: const Offset(0, 8),
               menuChildren: _menuChildren(context, itemCount: 20),
+            ),
+          ),
+          _ExampleCard(
+            title: 'Long press',
+            description: 'Opens where the finger lands, through controller.open(position: ...).',
+            child: StreamContextMenuAnchor(
+              menuChildren: _menuChildren(context, itemCount: 3, showDestructive: true),
+              child: Container(
+                padding: EdgeInsets.all(spacing.lg),
+                decoration: BoxDecoration(
+                  color: colorScheme.backgroundSurface,
+                  borderRadius: BorderRadius.all(context.streamRadius.md),
+                  border: Border.all(color: colorScheme.borderDefault),
+                ),
+                child: const Text('Long press anywhere here'),
+              ),
+              builder: (context, controller, child) => GestureDetector(
+                onLongPressStart: (details) => controller.open(position: details.localPosition),
+                child: child,
+              ),
             ),
           ),
           _ExampleCard(

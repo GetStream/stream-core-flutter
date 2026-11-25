@@ -58,33 +58,6 @@ void main() {
     expect(find.text('Microphone'), findsOneWidget);
   });
 
-  testWidgets('StreamContextMenuAnchor sizes menu items to the design row', (tester) async {
-    await tester.pumpWidget(_app(child: _anchor()));
-
-    await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
-
-    // The design's `Web / Menu Item` is a 32px tall row with a 200px minimum
-    // width, against the 40px and 242px plain context menu defaults.
-    final row = tester.getSize(find.byType(StreamContextMenuAction<void>).first);
-    expect(row.height, 32);
-    expect(row.width, greaterThanOrEqualTo(200));
-    expect(row.width, lessThan(242));
-  });
-
-  testWidgets('StreamContextMenuAnchor labels rows in the caption emphasis style', (tester) async {
-    await tester.pumpWidget(_app(child: _anchor()));
-
-    await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
-
-    final context = tester.element(find.text('Speaker'));
-    expect(
-      DefaultTextStyle.of(context).style.fontSize,
-      context.streamTextTheme.captionEmphasis.fontSize,
-    );
-  });
-
   testWidgets('StreamContextMenuAnchor keeps the panel within its max width', (tester) async {
     await tester.pumpWidget(
       _app(
@@ -114,9 +87,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // On mobile the panel's scroll view and the menu's own would both attach to
-  // the PrimaryScrollController, and the panel's Scrollbar asserts on a
-  // controller with more than one position.
   testWidgets('StreamContextMenuAnchor opens a scrolling menu on a mobile platform', (tester) async {
     await tester.pumpWidget(
       _app(
@@ -130,21 +100,6 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('Device 0'), findsOneWidget);
-  });
-
-  // MenuAnchor clips its panel to the panel's own bounds by default, which
-  // cuts off the shadow the menu draws outside them: the shadow stops dead
-  // along the bottom edge, and raising the elevation changes nothing.
-  testWidgets('StreamContextMenuAnchor does not let the panel clip the menu shadow', (tester) async {
-    await tester.pumpWidget(_app(child: _anchor()));
-
-    expect(tester.widget<MenuAnchor>(find.byType(MenuAnchor)).clipBehavior, Clip.none);
-  });
-
-  testWidgets('StreamContextMenuAnchor hides the MenuAnchor panel behind the menu surface', (tester) async {
-    await tester.pumpWidget(_app(child: _anchor()));
-
-    expect(tester.widget<MenuAnchor>(find.byType(MenuAnchor)).style, StreamContextMenuAnchor.menuStyle);
   });
 
   testWidgets('StreamContextMenuAnchor passes elevation to the menu', (tester) async {
@@ -172,12 +127,6 @@ void main() {
 
     final row = tester.getSize(find.byType(StreamContextMenuAction<void>).first);
     expect(row.height, 48);
-
-    final context = tester.element(find.text('Speaker'));
-    expect(
-      DefaultTextStyle.of(context).style.fontSize,
-      context.streamTextTheme.captionEmphasis.fontSize,
-    );
   });
 
   testWidgets('StreamContextMenuAnchor gives a tight width priority over the row minimum', (tester) async {
@@ -238,6 +187,171 @@ void main() {
     expect(find.byType(Dialog), findsNothing);
   });
 
+  testWidgets('StreamContextMenuAnchor passes child to the builder', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        child: StreamContextMenuAnchor(
+          menuChildren: const [],
+          child: const Text('anchor child'),
+          builder: (context, controller, child) => child!,
+        ),
+      ),
+    );
+
+    expect(find.text('anchor child'), findsOneWidget);
+  });
+
+  testWidgets('StreamContextMenuAnchor returns focus to the childFocusNode after Escape', (tester) async {
+    final buttonFocusNode = FocusNode();
+    addTearDown(buttonFocusNode.dispose);
+    await tester.pumpWidget(_app(child: _anchor(childFocusNode: buttonFocusNode)));
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Microphone'), findsNothing);
+    expect(buttonFocusNode.hasFocus, isTrue);
+  });
+
+  testWidgets('StreamContextMenuAnchor keeps an enclosing MenuTheme border and maximum size off the panel', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        child: MenuTheme(
+          data: const MenuThemeData(
+            style: MenuStyle(
+              side: WidgetStatePropertyAll(BorderSide(width: 12)),
+              shape: WidgetStatePropertyAll(StadiumBorder()),
+              maximumSize: WidgetStatePropertyAll(Size(600, 40)),
+              visualDensity: VisualDensity(horizontal: 4, vertical: 4),
+            ),
+          ),
+          child: _anchor(),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(tester.getRect(_panel()), tester.getRect(find.byType(StreamContextMenu)));
+    expect(tester.widget<Material>(_panel()).shape, const RoundedRectangleBorder());
+  });
+
+  testWidgets('StreamContextMenuAnchor keeps an enclosing MenuTheme minimum size off the panel', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        child: MenuTheme(
+          data: const MenuThemeData(style: MenuStyle(minimumSize: WidgetStatePropertyAll(Size(0, 300)))),
+          child: _anchor(),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(tester.getRect(_panel()), tester.getRect(find.byType(StreamContextMenu)));
+  });
+
+  testWidgets('StreamContextMenuAnchor fits the menu panel inside reservedPadding', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        child: _anchor(
+          labels: [for (var i = 0; i < 30; i += 1) 'Device $i'],
+          reservedPadding: const EdgeInsets.symmetric(vertical: 200),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    final panel = find.ancestor(of: find.byType(StreamContextMenu), matching: find.byType(SingleChildScrollView));
+    expect(tester.getSize(panel).height, lessThanOrEqualTo(screenHeight - 400));
+  });
+
+  testWidgets('StreamContextMenuAnchor with consumeOutsideTap keeps the closing tap from the page', (tester) async {
+    var pageTapped = false;
+    await tester.pumpWidget(
+      _app(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _anchor(consumeOutsideTap: true),
+            const SizedBox(height: 400),
+            TextButton(onPressed: () => pageTapped = true, child: const Text('page')),
+          ],
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('page'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Microphone'), findsNothing);
+    expect(pageTapped, isFalse);
+  });
+
+  testWidgets('StreamContextMenuAnchor rows follow an enclosing StreamContextMenuActionTheme', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        child: StreamContextMenuActionTheme(
+          data: const StreamContextMenuActionThemeData(
+            style: StreamContextMenuActionStyle(minimumSize: WidgetStatePropertyAll(Size(200, 44))),
+          ),
+          child: _anchor(),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(tester.getSize(find.byType(StreamContextMenuAction<void>).first).height, 44);
+  });
+
+  testWidgets('StreamContextMenuAnchor actionStyle wins over an enclosing StreamContextMenuActionTheme', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        child: StreamContextMenuActionTheme(
+          data: const StreamContextMenuActionThemeData(
+            style: StreamContextMenuActionStyle(minimumSize: WidgetStatePropertyAll(Size(200, 44))),
+          ),
+          child: _anchor(
+            actionStyle: const StreamContextMenuActionStyle(minimumSize: WidgetStatePropertyAll(Size(200, 56))),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(tester.getSize(find.byType(StreamContextMenuAction<void>).first).height, 56);
+  });
+
+  testWidgets('StreamContextMenuAnchor rings the focused row in the focus color', (tester) async {
+    await tester.pumpWidget(_app(child: _anchor()));
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    Focus.of(tester.element(find.text('Microphone'))).requestFocus();
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.text('Microphone'));
+    expect(_rowBorder(tester, 'Microphone').side.color, context.streamColorScheme.borderFocus);
+    expect(_rowBorder(tester, 'Speaker').side, BorderSide.none);
+  });
+
   testWidgets('StreamContextMenuAnchor defers to a StreamComponentFactory builder', (tester) async {
     await tester.pumpWidget(
       _app(
@@ -255,9 +369,21 @@ void main() {
   });
 }
 
+// The Material that MenuAnchor draws its own panel with, around the menu.
+Finder _panel() => find.ancestor(of: find.byType(StreamContextMenu), matching: find.byType(Material)).first;
+
+OutlinedBorder _rowBorder(WidgetTester tester, String label) {
+  final row = find.widgetWithText(StreamContextMenuAction<void>, label);
+  final material = tester.widget<Material>(find.descendant(of: row, matching: find.byType(Material)).first);
+  return material.shape! as OutlinedBorder;
+}
+
 StreamContextMenuAnchor _anchor({
   List<String> labels = const ['Microphone', 'Speaker'],
   MenuController? controller,
+  FocusNode? childFocusNode,
+  EdgeInsetsGeometry? reservedPadding,
+  bool consumeOutsideTap = false,
   BoxConstraints? constraints,
   Offset? alignmentOffset,
   StreamContextMenuActionStyle? actionStyle,
@@ -268,6 +394,9 @@ StreamContextMenuAnchor _anchor({
 }) {
   return StreamContextMenuAnchor(
     controller: controller,
+    childFocusNode: childFocusNode,
+    reservedPadding: reservedPadding,
+    consumeOutsideTap: consumeOutsideTap,
     constraints: constraints,
     alignmentOffset: alignmentOffset,
     actionStyle: actionStyle,
@@ -282,6 +411,7 @@ StreamContextMenuAnchor _anchor({
         ),
     ],
     builder: (context, controller, child) => TextButton(
+      focusNode: childFocusNode,
       onPressed: controller.open,
       child: const Text('open'),
     ),

@@ -123,9 +123,9 @@ class StreamContextMenuAnchorThemeData with _$StreamContextMenuAnchorThemeData {
 
   /// Overrides for the rows inside the menu.
   ///
-  /// Merged over the design's `Web / Menu Item` metrics, so only the
-  /// properties set here change. See
-  /// [StreamContextMenuAnchor.defaultActionStyle] for those metrics.
+  /// Merged over the anchored row metrics and the [StreamContextMenuActionTheme]
+  /// in effect, so only the properties set here change. See
+  /// [StreamContextMenuAnchor.defaultActionStyle].
   final StreamContextMenuActionStyle? actionStyle;
 
   /// Linearly interpolate between two [StreamContextMenuAnchorThemeData]
