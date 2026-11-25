@@ -129,6 +129,16 @@ void main() {
       expect(handler.messages.join(), isNot(contains(token)));
     });
 
+    test('redacts the Authorization header by default whatever its case', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(requestHeader: true, logPrint: logPrint),
+        headers: const {'authorization': 'authorization-value'},
+      );
+
+      expect(log, contains('authorization: ██'));
+      expect(log, isNot(contains('authorization-value')));
+    });
+
     test('redacts the headers it is given along with the default ones', () async {
       final log = await _linesOf(
         (logPrint) => LoggingInterceptor(

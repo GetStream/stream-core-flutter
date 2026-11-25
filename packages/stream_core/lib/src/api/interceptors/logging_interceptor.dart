@@ -86,7 +86,7 @@ class LoggingInterceptor extends Interceptor {
   final LogPrint? logPrint;
 
   /// The headers whose values are reported as `██` when the constructor is given no others.
-  static const defaultRedactedHeaders = {'authorization'};
+  static const defaultRedactedHeaders = {'Authorization'};
 
   static const _redacted = '██';
 
