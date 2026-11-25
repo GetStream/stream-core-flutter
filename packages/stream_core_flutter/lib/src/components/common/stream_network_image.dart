@@ -379,7 +379,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       filterQuality: props.filterQuality,
       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
         if (frame != null || wasSynchronouslyLoaded) return child;
-        if (!_showPlaceholder) return SizedBox(width: props.width, height: props.height);
+        if (!_showPlaceholder) return child;
         if (props.placeholderBuilder case final builder?) return builder(context);
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
