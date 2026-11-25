@@ -1,6 +1,7 @@
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../cache/internal/bounded_image.dart';
 import '../../cache/internal/stream_image_cache.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -24,7 +25,8 @@ typedef StreamNetworkImageErrorBuilder = Widget Function(BuildContext context, O
 ///
 /// [StreamNetworkImage] loads and displays an image from a URL with built-in
 /// caching. If the image fails to load, it shows an error widget that can be
-/// tapped to retry the request.
+/// tapped to retry the request. An image larger than 8192 by 8192 pixels
+/// fails to load.
 ///
 /// {@tool snippet}
 ///
@@ -186,16 +188,18 @@ class StreamNetworkImageProps {
   /// If null, the image's intrinsic height is used.
   final double? height;
 
-  /// The target width for caching the image in memory.
+  /// The largest width, in physical pixels, to decode the image to.
   ///
-  /// The image will be decoded at this width to save memory. If null,
-  /// the image is decoded at its full resolution.
+  /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
+  /// aspect ratio and never enlarged. If null, it is decoded no wider than
+  /// [width] in physical pixels. It is never decoded wider than 4096 pixels.
   final int? cacheWidth;
 
-  /// The target height for caching the image in memory.
+  /// The largest height, in physical pixels, to decode the image to.
   ///
-  /// The image will be decoded at this height to save memory. If null,
-  /// the image is decoded at its full resolution.
+  /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
+  /// aspect ratio and never enlarged. If null, it is decoded no taller than
+  /// [height] in physical pixels. It is never decoded taller than 4096 pixels.
   final int? cacheHeight;
 
   /// How the image should be inscribed into the space allocated for it.
@@ -328,29 +332,42 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   Widget build(BuildContext context) {
     final props = widget.props;
 
-    return CachedNetworkImage(
+    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+    int decodeBound(int? cacheExtent, double? extent) {
+      final pixels = switch ((cacheExtent, extent)) {
+        (final cacheExtent?, _) => cacheExtent,
+        (_, final extent?) when extent.isFinite => (extent * devicePixelRatio).ceil(),
+        _ => maxImageDecodeSize,
+      };
+      return pixels.clamp(1, maxImageDecodeSize);
+    }
+
+    return Image(
       key: ValueKey(_retryKey),
-      imageUrl: props.url,
-      cacheManager: StreamImageCache.manager,
-      httpHeaders: props.httpHeaders,
+      image: BoundedImage(
+        CachedNetworkImageProvider(
+          props.url,
+          headers: props.httpHeaders,
+          cacheKey: props.cacheKey,
+          cacheManager: StreamImageCache.manager,
+        ),
+        maxWidth: decodeBound(props.cacheWidth, props.width),
+        maxHeight: decodeBound(props.cacheHeight, props.height),
+      ),
       width: props.width,
       height: props.height,
-      memCacheWidth: props.cacheWidth,
-      memCacheHeight: props.cacheHeight,
       fit: props.fit,
       alignment: props.alignment,
       color: props.color,
       colorBlendMode: props.colorBlendMode,
       filterQuality: props.filterQuality,
-      cacheKey: props.cacheKey,
-      fadeOutDuration: Duration.zero,
-      fadeInDuration: Duration.zero,
-      errorListener: (_) => _hasError = true,
-      placeholder: (context, _) {
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (frame != null || wasSynchronouslyLoaded) return child;
         if (props.placeholderBuilder case final builder?) return builder(context);
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
       errorBuilder: (context, error, _) {
+        _hasError = true;
         if (props.errorBuilder case final builder?) return builder(context, error, _retry);
         return StreamImageErrorPlaceholder(width: props.width, height: props.height, onRetry: _retry);
       },
