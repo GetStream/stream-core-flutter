@@ -4,8 +4,8 @@
 
 - Added a `mark` slot to `StreamMessageMetadata`, styled by new `mark*` and
   `separator*` fields on `StreamMessageMetadataStyle`.
-- Added `StreamRadioButton` and `StreamRadioButtonTheme`, a radio button in sm, md and lg sizes with a
-  `decorative` variant for rows that own the tap, to `video.dart`.
+- Added `StreamRadioButton<T>`, used under a `RadioGroup<T>`, `StreamRadioIndicator` for rows that own
+  the tap, and `StreamRadioButtonTheme` to `video.dart`.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.

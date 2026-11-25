@@ -32,25 +32,25 @@ Widget buildStreamRadioButtonPlayground(BuildContext context) {
   final enabled = context.knobs.boolean(
     label: 'Enabled',
     initialValue: true,
-    description: 'Passes a null onChanged when off, which gives the disabled look.',
+    description: 'Passes enabled: false when off, which gives the disabled look.',
   );
 
-  final decorative = context.knobs.boolean(
-    label: 'Decorative',
-    description: 'Use StreamRadioButton.decorative: no tap, focus or semantics of its own.',
+  final toggleable = context.knobs.boolean(
+    label: 'Toggleable',
+    description: 'Tapping the selected radio button deselects it.',
   );
 
   return Center(
-    child: _RadioGroupDemo(size: size, enabled: enabled, decorative: decorative),
+    child: _RadioGroupDemo(size: size, enabled: enabled, toggleable: toggleable),
   );
 }
 
 class _RadioGroupDemo extends StatefulWidget {
-  const _RadioGroupDemo({required this.size, required this.enabled, required this.decorative});
+  const _RadioGroupDemo({required this.size, required this.enabled, required this.toggleable});
 
   final StreamRadioButtonSize size;
   final bool enabled;
-  final bool decorative;
+  final bool toggleable;
 
   @override
   State<_RadioGroupDemo> createState() => _RadioGroupDemoState();
@@ -59,33 +59,35 @@ class _RadioGroupDemo extends StatefulWidget {
 class _RadioGroupDemoState extends State<_RadioGroupDemo> {
   static const _options = ['Small', 'Medium', 'Large'];
 
-  var _selected = _options.first;
+  String? _selected = _options.first;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.streamSpacing;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: spacing.lg,
-      children: [
-        for (final option in _options)
-          Row(
-            spacing: spacing.xs,
-            children: [
-              if (widget.decorative)
-                StreamRadioButton.decorative(selected: option == _selected, size: widget.size)
-              else
+    return RadioGroup<String>(
+      groupValue: _selected,
+      onChanged: (option) => setState(() => _selected = option),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: spacing.lg,
+        children: [
+          for (final option in _options)
+            Row(
+              spacing: spacing.xs,
+              children: [
                 StreamRadioButton(
-                  selected: option == _selected,
+                  value: option,
                   size: widget.size,
+                  enabled: widget.enabled,
+                  toggleable: widget.toggleable,
                   semanticLabel: option,
-                  onChanged: widget.enabled ? (_) => setState(() => _selected = option) : null,
                 ),
-              Text(option),
-            ],
-          ),
-      ],
+                Text(option),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }
@@ -114,7 +116,7 @@ Widget buildStreamRadioButtonShowcase(BuildContext context) {
         children: const [
           _SizesSection(),
           _StatesSection(),
-          _DecorativeSection(),
+          _IndicatorSection(),
           _ThemedSection(),
         ],
       ),
@@ -131,7 +133,7 @@ class _SizesSection extends StatelessWidget {
 
     return _ExampleCard(
       title: 'Sizes',
-      description: 'sm 16px, md 20px and lg 24px. The lg dot is 10px; the others share an 8px dot.',
+      description: 'sm 16px, md 20px and lg 24px. The lg indicator is 10px; the others share an 8px indicator.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: spacing.md,
@@ -141,8 +143,8 @@ class _SizesSection extends StatelessWidget {
               spacing: spacing.md,
               children: [
                 SizedBox(width: 40, child: Text(_sizeNames[size]!)),
-                StreamRadioButton(selected: true, size: size, onChanged: (_) {}),
-                StreamRadioButton(selected: false, size: size, onChanged: (_) {}),
+                _StaticRadio(selected: true, size: size),
+                _StaticRadio(selected: false, size: size),
               ],
             ),
         ],
@@ -170,8 +172,8 @@ class _StatesSection extends StatelessWidget {
               spacing: spacing.md,
               children: [
                 SizedBox(width: 72, child: Text(enabled ? 'enabled' : 'disabled')),
-                StreamRadioButton(selected: true, onChanged: enabled ? (_) {} : null),
-                StreamRadioButton(selected: false, onChanged: enabled ? (_) {} : null),
+                _StaticRadio(selected: true, enabled: enabled),
+                _StaticRadio(selected: false, enabled: enabled),
               ],
             ),
         ],
@@ -180,14 +182,14 @@ class _StatesSection extends StatelessWidget {
   }
 }
 
-class _DecorativeSection extends StatefulWidget {
-  const _DecorativeSection();
+class _IndicatorSection extends StatefulWidget {
+  const _IndicatorSection();
 
   @override
-  State<_DecorativeSection> createState() => _DecorativeSectionState();
+  State<_IndicatorSection> createState() => _IndicatorSectionState();
 }
 
-class _DecorativeSectionState extends State<_DecorativeSection> {
+class _IndicatorSectionState extends State<_IndicatorSection> {
   static const _options = ['Built-in microphone', 'USB headset', 'Bluetooth earbuds'];
 
   var _selected = _options.first;
@@ -195,15 +197,15 @@ class _DecorativeSectionState extends State<_DecorativeSection> {
   @override
   Widget build(BuildContext context) {
     return _ExampleCard(
-      title: 'Decorative',
+      title: 'Indicator',
       description:
-          'StreamRadioButton.decorative inside a row: the row owns the tap target and the semantics, '
+          'StreamRadioIndicator inside a row: the row owns the tap target and the semantics, '
           'so screen readers announce each entry once.',
       child: Column(
         children: [
           for (final option in _options)
             StreamListTile(
-              leading: StreamRadioButton.decorative(selected: option == _selected, size: StreamRadioButtonSize.sm),
+              leading: StreamRadioIndicator(selected: option == _selected, size: StreamRadioButtonSize.sm),
               title: Text(option),
               selected: option == _selected,
               onTap: () => setState(() => _selected = option),
@@ -225,24 +227,43 @@ class _ThemedSection extends StatelessWidget {
     return _ExampleCard(
       title: 'Themed',
       description:
-          'StreamRadioButtonStyle.from overrides the selected fill and the unselected border. '
+          'StreamRadioButtonStyle.from overrides the selected background and the unselected border. '
           'Tab onto them: the focus ring still shows.',
       child: StreamRadioButtonTheme(
         data: StreamRadioButtonThemeData(
           style: StreamRadioButtonStyle.from(
-            selectedFillColor: colorScheme.accentSuccess,
+            selectedBackgroundColor: colorScheme.accentSuccess,
             side: BorderSide(color: colorScheme.accentSuccess, width: 2),
             selectedSide: BorderSide.none,
           ),
         ),
         child: Row(
           spacing: spacing.xl,
-          children: [
-            StreamRadioButton(selected: true, onChanged: (_) {}),
-            StreamRadioButton(selected: false, onChanged: (_) {}),
+          children: const [
+            _StaticRadio(selected: true),
+            _StaticRadio(selected: false),
           ],
         ),
       ),
+    );
+  }
+}
+
+// A radio button shown selected or not, in a group of its own that ignores
+// changes.
+class _StaticRadio extends StatelessWidget {
+  const _StaticRadio({required this.selected, this.enabled = true, this.size});
+
+  final bool selected;
+  final bool enabled;
+  final StreamRadioButtonSize? size;
+
+  @override
+  Widget build(BuildContext context) {
+    return RadioGroup<bool>(
+      groupValue: true,
+      onChanged: (_) {},
+      child: StreamRadioButton(value: selected, enabled: enabled, size: size),
     );
   }
 }

@@ -224,7 +224,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamOnlineIndicatorProps>? onlineIndicator,
     StreamComponentBuilder<StreamPlaybackSpeedToggleProps>? playbackSpeedToggle,
     StreamComponentBuilder<StreamProgressBarProps>? progressBar,
-    StreamComponentBuilder<StreamRadioButtonProps>? radioButton,
+    StreamComponentBuilder<StreamRadioButtonProps<Object?>>? radioButton,
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
@@ -590,8 +590,12 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
 
   /// Custom builder for radio button widgets.
   ///
+  /// Receives the props of a [StreamRadioButton] of any value type. Pass them
+  /// on to [DefaultStreamRadioButton] unchanged to keep the radio button
+  /// working with its [RadioGroup].
+  ///
   /// When null, [StreamRadioButton] uses [DefaultStreamRadioButton].
-  final StreamComponentBuilder<StreamRadioButtonProps>? radioButton;
+  final StreamComponentBuilder<StreamRadioButtonProps<Object?>>? radioButton;
 
   /// Custom builder for reaction picker widgets.
   ///

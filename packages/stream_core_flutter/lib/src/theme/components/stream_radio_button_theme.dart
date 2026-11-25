@@ -7,28 +7,29 @@ import '../stream_theme.dart';
 
 part 'stream_radio_button_theme.g.theme.dart';
 
-/// The size of a [StreamRadioButton].
+/// The size of a [StreamRadioButton] or [StreamRadioIndicator].
 ///
 /// Each size pairs the diameter of the radio button with the diameter of the
-/// dot it shows when selected. Use one of the presets, or create a size for a
-/// diameter the presets don't cover.
+/// indicator it shows when selected. Use one of the presets, or create a size
+/// for a diameter the presets don't cover.
 ///
 /// See also:
 ///
 ///  * [StreamRadioButtonStyle.size], for setting a default size in a theme.
 @immutable
 class StreamRadioButtonSize {
-  /// Creates a radio button size with the given [diameter] and [dotDiameter].
-  const StreamRadioButtonSize({required this.diameter, required this.dotDiameter});
+  /// Creates a radio button size with the given [diameter] and
+  /// [indicatorDiameter].
+  const StreamRadioButtonSize({required this.diameter, required this.indicatorDiameter});
 
-  /// Small radio button: 16px with an 8px dot.
-  static const sm = StreamRadioButtonSize(diameter: 16, dotDiameter: 8);
+  /// Small radio button: 16px with an 8px indicator.
+  static const sm = StreamRadioButtonSize(diameter: 16, indicatorDiameter: 8);
 
-  /// Medium radio button: 20px with an 8px dot.
-  static const md = StreamRadioButtonSize(diameter: 20, dotDiameter: 8);
+  /// Medium radio button: 20px with an 8px indicator.
+  static const md = StreamRadioButtonSize(diameter: 20, indicatorDiameter: 8);
 
-  /// Large radio button: 24px with a 10px dot.
-  static const lg = StreamRadioButtonSize(diameter: 24, dotDiameter: 10);
+  /// Large radio button: 24px with a 10px indicator.
+  static const lg = StreamRadioButtonSize(diameter: 24, indicatorDiameter: 10);
 
   /// The predefined sizes, from small to large.
   static const List<StreamRadioButtonSize> values = [sm, md, lg];
@@ -36,8 +37,8 @@ class StreamRadioButtonSize {
   /// The diameter of the radio button in logical pixels.
   final double diameter;
 
-  /// The diameter of the dot shown when selected, in logical pixels.
-  final double dotDiameter;
+  /// The diameter of the indicator shown when selected, in logical pixels.
+  final double indicatorDiameter;
 
   /// Linearly interpolates between two [StreamRadioButtonSize]s.
   static StreamRadioButtonSize? lerp(StreamRadioButtonSize? a, StreamRadioButtonSize? b, double t) {
@@ -45,22 +46,23 @@ class StreamRadioButtonSize {
     if (a == null || b == null) return t < 0.5 ? a : b;
     return StreamRadioButtonSize(
       diameter: lerpDouble(a.diameter, b.diameter, t)!,
-      dotDiameter: lerpDouble(a.dotDiameter, b.dotDiameter, t)!,
+      indicatorDiameter: lerpDouble(a.indicatorDiameter, b.indicatorDiameter, t)!,
     );
   }
 
   @override
   bool operator ==(Object other) =>
-      other is StreamRadioButtonSize && other.diameter == diameter && other.dotDiameter == dotDiameter;
+      other is StreamRadioButtonSize && other.diameter == diameter && other.indicatorDiameter == indicatorDiameter;
 
   @override
-  int get hashCode => Object.hash(diameter, dotDiameter);
+  int get hashCode => Object.hash(diameter, indicatorDiameter);
 
   @override
-  String toString() => 'StreamRadioButtonSize(diameter: $diameter, dotDiameter: $dotDiameter)';
+  String toString() => 'StreamRadioButtonSize(diameter: $diameter, indicatorDiameter: $indicatorDiameter)';
 }
 
-/// Applies a radio button theme to descendant [StreamRadioButton] widgets.
+/// Applies a radio button theme to descendant [StreamRadioButton] and
+/// [StreamRadioIndicator] widgets.
 ///
 /// A [StreamRadioButtonTheme] overrides the radio button styling of its
 /// subtree. Access the merged theme using
@@ -75,10 +77,7 @@ class StreamRadioButtonSize {
 ///   data: StreamRadioButtonThemeData(
 ///     style: StreamRadioButtonStyle(size: StreamRadioButtonSize.sm),
 ///   ),
-///   child: StreamRadioButton(
-///     selected: true,
-///     onChanged: (_) {},
-///   ),
+///   child: StreamRadioButton(value: option),
 /// )
 /// ```
 /// {@end-tool}
@@ -86,7 +85,8 @@ class StreamRadioButtonSize {
 /// See also:
 ///
 ///  * [StreamRadioButtonThemeData], which describes the radio button theme.
-///  * [StreamRadioButton], the widget affected by this theme.
+///  * [StreamRadioButton] and [StreamRadioIndicator], the widgets affected by
+///    this theme.
 class StreamRadioButtonTheme extends InheritedTheme {
   /// Creates a radio button theme that controls descendant radio buttons.
   const StreamRadioButtonTheme({
@@ -117,7 +117,8 @@ class StreamRadioButtonTheme extends InheritedTheme {
   bool updateShouldNotify(StreamRadioButtonTheme oldWidget) => data != oldWidget.data;
 }
 
-/// Theme data for customizing [StreamRadioButton] widgets.
+/// Theme data for customizing [StreamRadioButton] and [StreamRadioIndicator]
+/// widgets.
 ///
 /// {@tool snippet}
 ///
@@ -128,7 +129,7 @@ class StreamRadioButtonTheme extends InheritedTheme {
 ///   radioButtonTheme: StreamRadioButtonThemeData(
 ///     style: StreamRadioButtonStyle(
 ///       size: StreamRadioButtonSize.sm,
-///       fillColor: WidgetStateProperty.resolveWith((states) {
+///       backgroundColor: WidgetStateProperty.resolveWith((states) {
 ///         if (states.contains(WidgetState.selected)) return Colors.green;
 ///         return Colors.transparent;
 ///       }),
@@ -167,13 +168,13 @@ class StreamRadioButtonThemeData with _$StreamRadioButtonThemeData {
 /// group.
 ///
 /// A property that is null, or that resolves to null for a state, uses the
-/// built-in default for that state. The keyboard focus ring is drawn on top of
-/// [side] and is not part of this style.
+/// built-in default for that state. While the radio button has keyboard focus,
+/// a focus ring replaces [side]; the ring is not part of this style.
 ///
 /// See also:
 ///
 ///  * [StreamRadioButtonThemeData], which wraps this style for theming.
-///  * [StreamRadioButton], which uses this styling.
+///  * [StreamRadioButton] and [StreamRadioIndicator], which use this styling.
 @themeGen
 @immutable
 class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
@@ -184,8 +185,8 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   /// values instead.
   const StreamRadioButtonStyle({
     this.size,
-    this.fillColor,
-    this.dotColor,
+    this.backgroundColor,
+    this.indicatorColor,
     this.overlayColor,
     this.side,
   });
@@ -203,29 +204,30 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   ///    states; pressed wins over hovered.
   ///
   /// A state whose parameter is null keeps the built-in default, so
-  /// `StreamRadioButtonStyle.from(selectedFillColor: Colors.green)` changes
-  /// only the fill of an enabled, selected radio button.
+  /// `StreamRadioButtonStyle.from(selectedBackgroundColor: Colors.green)`
+  /// changes only the background of an enabled, selected radio button.
   ///
   /// {@tool snippet}
   ///
-  /// Create a style with a green fill when selected and a grey ring when not:
+  /// Create a style with a green background when selected and a grey ring
+  /// when not:
   ///
   /// ```dart
   /// StreamRadioButtonStyle.from(
-  ///   selectedFillColor: Colors.green,
-  ///   selectedDotColor: Colors.white,
+  ///   selectedBackgroundColor: Colors.green,
+  ///   selectedIndicatorColor: Colors.white,
   ///   side: BorderSide(color: Colors.grey),
   /// )
   /// ```
   /// {@end-tool}
   factory StreamRadioButtonStyle.from({
     StreamRadioButtonSize? size,
-    Color? fillColor,
-    Color? selectedFillColor,
-    Color? disabledFillColor,
-    Color? dotColor,
-    Color? selectedDotColor,
-    Color? disabledDotColor,
+    Color? backgroundColor,
+    Color? selectedBackgroundColor,
+    Color? disabledBackgroundColor,
+    Color? indicatorColor,
+    Color? selectedIndicatorColor,
+    Color? disabledIndicatorColor,
     Color? overlayColor,
     Color? hoveredOverlayColor,
     Color? pressedOverlayColor,
@@ -235,8 +237,8 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   }) {
     return StreamRadioButtonStyle(
       size: size,
-      fillColor: _byState(fillColor, selectedFillColor, disabledFillColor),
-      dotColor: _byState(dotColor, selectedDotColor, disabledDotColor),
+      backgroundColor: _byState(backgroundColor, selectedBackgroundColor, disabledBackgroundColor),
+      indicatorColor: _byState(indicatorColor, selectedIndicatorColor, disabledIndicatorColor),
       overlayColor: switch ((overlayColor, hoveredOverlayColor, pressedOverlayColor)) {
         (null, null, null) => null,
         _ => WidgetStateProperty<Color?>.fromMap({
@@ -273,15 +275,15 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   /// If null, defaults to the accent color when selected, the disabled
   /// background when selected and disabled, and transparent when not
   /// selected.
-  final WidgetStateProperty<Color?>? fillColor;
+  final WidgetStateProperty<Color?>? backgroundColor;
 
-  /// The color of the dot inside the radio button, resolved per
+  /// The color of the indicator inside the radio button, resolved per
   /// [WidgetState].
   ///
-  /// If null, defaults to a color that contrasts with the accent fill when
-  /// selected, a muted color when selected and disabled, and transparent when
-  /// not selected, which hides the dot.
-  final WidgetStateProperty<Color?>? dotColor;
+  /// If null, defaults to a color that contrasts with the accent background
+  /// when selected, a muted color when selected and disabled, and transparent
+  /// when not selected, which hides the indicator.
+  final WidgetStateProperty<Color?>? indicatorColor;
 
   /// The overlay color for interaction feedback, resolved per [WidgetState].
   ///
@@ -293,7 +295,8 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   ///
   /// If null, defaults to the default border color when not selected, the
   /// disabled border color when disabled and not selected, and
-  /// [BorderSide.none] when selected.
+  /// [BorderSide.none] when selected. While the radio button has keyboard
+  /// focus, a focus ring replaces this border.
   final WidgetStateBorderSide? side;
 
   /// Linearly interpolate between two [StreamRadioButtonStyle] objects.

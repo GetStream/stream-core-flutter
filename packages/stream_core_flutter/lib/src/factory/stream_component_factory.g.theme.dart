@@ -170,7 +170,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamPlaybackSpeedToggleProps)?
     playbackSpeedToggle,
     Widget Function(BuildContext, StreamProgressBarProps)? progressBar,
-    Widget Function(BuildContext, StreamRadioButtonProps)? radioButton,
+    Widget Function(BuildContext, StreamRadioButtonProps<Object?>)? radioButton,
     Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
     Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,

@@ -100,15 +100,15 @@ mixin _$StreamRadioButtonStyle {
 
     return StreamRadioButtonStyle(
       size: StreamRadioButtonSize.lerp(a.size, b.size, t),
-      fillColor: WidgetStateProperty.lerp<Color?>(
-        a.fillColor,
-        b.fillColor,
+      backgroundColor: WidgetStateProperty.lerp<Color?>(
+        a.backgroundColor,
+        b.backgroundColor,
         t,
         Color.lerp,
       ),
-      dotColor: WidgetStateProperty.lerp<Color?>(
-        a.dotColor,
-        b.dotColor,
+      indicatorColor: WidgetStateProperty.lerp<Color?>(
+        a.indicatorColor,
+        b.indicatorColor,
         t,
         Color.lerp,
       ),
@@ -124,8 +124,8 @@ mixin _$StreamRadioButtonStyle {
 
   StreamRadioButtonStyle copyWith({
     StreamRadioButtonSize? size,
-    WidgetStateProperty<Color?>? fillColor,
-    WidgetStateProperty<Color?>? dotColor,
+    WidgetStateProperty<Color?>? backgroundColor,
+    WidgetStateProperty<Color?>? indicatorColor,
     WidgetStateProperty<Color?>? overlayColor,
     WidgetStateBorderSide? side,
   }) {
@@ -133,8 +133,8 @@ mixin _$StreamRadioButtonStyle {
 
     return StreamRadioButtonStyle(
       size: size ?? _this.size,
-      fillColor: fillColor ?? _this.fillColor,
-      dotColor: dotColor ?? _this.dotColor,
+      backgroundColor: backgroundColor ?? _this.backgroundColor,
+      indicatorColor: indicatorColor ?? _this.indicatorColor,
       overlayColor: overlayColor ?? _this.overlayColor,
       side: side ?? _this.side,
     );
@@ -153,8 +153,8 @@ mixin _$StreamRadioButtonStyle {
 
     return copyWith(
       size: other.size,
-      fillColor: other.fillColor,
-      dotColor: other.dotColor,
+      backgroundColor: other.backgroundColor,
+      indicatorColor: other.indicatorColor,
       overlayColor: other.overlayColor,
       side: other.side,
     );
@@ -174,8 +174,8 @@ mixin _$StreamRadioButtonStyle {
     final _other = (other as StreamRadioButtonStyle);
 
     return _other.size == _this.size &&
-        _other.fillColor == _this.fillColor &&
-        _other.dotColor == _this.dotColor &&
+        _other.backgroundColor == _this.backgroundColor &&
+        _other.indicatorColor == _this.indicatorColor &&
         _other.overlayColor == _this.overlayColor &&
         _other.side == _this.side;
   }
@@ -187,8 +187,8 @@ mixin _$StreamRadioButtonStyle {
     return Object.hash(
       runtimeType,
       _this.size,
-      _this.fillColor,
-      _this.dotColor,
+      _this.backgroundColor,
+      _this.indicatorColor,
       _this.overlayColor,
       _this.side,
     );
