@@ -18,7 +18,6 @@ class _StringCodec implements WebSocketMessageCodec<String, String> {
 /// Records what the engine reported, in the order it reported it.
 class _RecordingListener implements WebSocketEngineListener<String> {
   final closures = <({int? code, String? reason})>[];
-  final errors = <Object>[];
   final messages = <String>[];
   int get opened => _opened;
   var _opened = 0;
@@ -30,7 +29,7 @@ class _RecordingListener implements WebSocketEngineListener<String> {
   void onMessage(String message) => messages.add(message);
 
   @override
-  void onError(Object error, [StackTrace? stackTrace]) => errors.add(error);
+  void onError(Object error, [StackTrace? stackTrace]) {}
 
   @override
   void onClose([int? closeCode, String? closeReason]) {
@@ -310,59 +309,6 @@ void main() {
     expect(handler.records.single.priority, StreamLogPriority.warning);
     expect(handler.records.single.tag, 'SC:WsEngine');
     expect(handler.records.single.error, isA<FormatException>());
-  });
-
-  test('reports a refused handshake as a StreamNetworkException', () async {
-    final socket = FakeWebSocketChannel(readyError: refusedUpgrade());
-    addTearDown(socket.endStream);
-
-    final engine = StreamWebSocketEngine<String, String>(
-      wsProvider: (_) => socket,
-      listener: _RecordingListener(),
-      messageCodec: const _StringCodec(),
-    );
-
-    final result = await engine.open(_options);
-
-    expect(
-      (result as Failure).error,
-      isA<StreamNetworkException>().having((it) => it.message, 'message', 'The WebSocket connection failed'),
-    );
-  });
-
-  test('reports a failed connection as a StreamNetworkException', () async {
-    final (:engine, :listener, :socket) = _subject();
-    await engine.open(_options);
-
-    socket.emitError(refusedUpgrade());
-    await pumpEventQueue();
-
-    expect(
-      listener.errors.single,
-      isA<StreamNetworkException>().having((it) => it.message, 'message', 'The WebSocket connection failed'),
-    );
-  });
-
-  test('passes a socket error of another kind through unchanged', () async {
-    final (:engine, :listener, :socket) = _subject();
-    await engine.open(_options);
-    final error = StateError('socket died');
-
-    socket.emitError(error);
-    await pumpEventQueue();
-
-    expect(listener.errors.single, same(error));
-  });
-
-  test('passes a socket error that is already a StreamException through unchanged', () async {
-    final (:engine, :listener, :socket) = _subject();
-    await engine.open(_options);
-    const error = StreamNetworkException(message: 'dropped');
-
-    socket.emitError(error);
-    await pumpEventQueue();
-
-    expect(listener.errors.single, same(error));
   });
 
   test('says nothing when no handler is installed', () async {

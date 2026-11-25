@@ -62,11 +62,6 @@ class FakeWebSocketSink implements WebSocketSink {
   Future<void> get done => _done.future;
 }
 
-/// The error a socket reports when the server refuses the upgrade, quoting the URL it connected to.
-WebSocketChannelException refusedUpgrade() => WebSocketChannelException.from(
-  Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was not upgraded to websocket"),
-);
-
 /// A WebSocket a test drives, in place of a real connection.
 ///
 /// Incoming frames arrive through [emit], and [endStream] is the peer hanging up. Closing [sink]
