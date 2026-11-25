@@ -181,12 +181,6 @@ void main() {
         'imageFormat': StreamThumbnailFormat.webp,
       });
     });
-
-    test('thumbnailData rejects a call without a source', () {
-      useFakePlatform();
-
-      expect(StreamThumbnail.thumbnailData, throwsArgumentError);
-    });
   });
 
   group('StreamThumbnail with an unsupported source', () {
@@ -231,72 +225,6 @@ void main() {
         await StreamThumbnail.thumbnailData(source: StreamThumbnailSource.network(Uri.parse(url)));
         expect(fake.lastDataCall, isNotNull, reason: url);
       }
-    });
-  });
-
-  group('StreamThumbnail with a deprecated video string', () {
-    Future<StreamThumbnailSource?> sourceFor(String video, {Map<String, String>? headers}) async {
-      final fake = useFakePlatform();
-      // ignore: deprecated_member_use_from_same_package
-      await StreamThumbnail.thumbnailData(video: video, headers: headers);
-      return fake.lastDataCall?['source'] as StreamThumbnailSource?;
-    }
-
-    test('an https URL becomes a network source carrying the headers', () async {
-      const headers = {'X-Client': 'example'};
-
-      expect(
-        await sourceFor('https://cdn.example.com/a.mp4', headers: headers),
-        StreamThumbnailSource.network(Uri.parse('https://cdn.example.com/a.mp4'), headers: headers),
-      );
-    });
-
-    test('an http URL is recognised regardless of scheme case', () async {
-      expect(
-        await sourceFor('HTTP://cdn.example.com/a.mp4'),
-        StreamThumbnailSource.network(Uri.parse('http://cdn.example.com/a.mp4')),
-      );
-    });
-
-    test('a path or file URI is opened as a file', () async {
-      expect(await sourceFor('/videos/a.mp4'), StreamThumbnailSource.file('/videos/a.mp4'));
-      expect(await sourceFor('file:///videos/a.mp4'), StreamThumbnailSource.file('file:///videos/a.mp4'));
-    });
-
-    test('a content URI is opened through a content resolver', () async {
-      expect(
-        await sourceFor('content://media/external/video/1'),
-        StreamThumbnailSource.contentUri(Uri.parse('content://media/external/video/1')),
-      );
-    });
-
-    test('a URL with any other scheme is passed on as a file', () async {
-      for (final video in ['rtsp://example.com/a', 'ftp://example.com/a.mp4']) {
-        expect(await sourceFor(video), StreamThumbnailSource.file(video), reason: video);
-      }
-    });
-
-    test('an http URL without a host fails without reaching the platform', () async {
-      final fake = useFakePlatform();
-
-      await expectLater(
-        // ignore: deprecated_member_use_from_same_package
-        StreamThumbnail.thumbnailData(video: 'https:/a.mp4'),
-        throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE')),
-      );
-      expect(fake.lastDataCall, isNull);
-    });
-
-    test('thumbnailFiles maps every video', () async {
-      final fake = useFakePlatform();
-
-      // ignore: deprecated_member_use_from_same_package
-      await StreamThumbnail.thumbnailFiles(videos: ['/a.mp4', 'https://cdn.example.com/b.mp4']);
-
-      expect(fake.lastFilesCall?['sources'], [
-        StreamThumbnailSource.file('/a.mp4'),
-        StreamThumbnailSource.network(Uri.parse('https://cdn.example.com/b.mp4')),
-      ]);
     });
   });
 
