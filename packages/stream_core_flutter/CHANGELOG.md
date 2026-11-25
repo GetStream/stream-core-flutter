@@ -6,6 +6,8 @@
   `separator*` fields on `StreamMessageMetadataStyle`.
 - Added `StreamEmptyState` and `StreamEmptyStateTheme`, a placeholder for a place that has nothing in it yet:
   an optional icon over a title, a description and an optional action.
+- Added `StreamSelectInput`, a select field with a borderless `StreamSelectInputStyle.ghost`
+  variant, and `StreamSelectInputTheme`, both exported from `video.dart`.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
@@ -23,6 +25,7 @@
 - `StreamMessageMetadata` reverses an end-aligned row to edited, status and
   timestamp, then username (previously username first). Start-aligned rows
   are unchanged.
+- `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)

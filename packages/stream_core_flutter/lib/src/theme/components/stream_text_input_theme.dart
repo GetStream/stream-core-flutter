@@ -307,7 +307,7 @@ class StreamTextInputStyle with _$StreamTextInputStyle {
 
   /// The border radius of the text input.
   ///
-  /// Defaults to [StreamRadius.lg].
+  /// Defaults to [StreamRadius.xl].
   final BorderRadiusGeometry? borderRadius;
 
   /// The border side in the default/enabled state.
