@@ -45,6 +45,17 @@ Widget buildStreamMessageMetadataPlayground(BuildContext context) {
     description: 'The username text.',
   );
 
+  final showMark = context.knobs.boolean(
+    label: 'Show Mark',
+    description: 'Whether to show a mark such as "Played by 3".',
+  );
+
+  final markText = context.knobs.string(
+    label: 'Mark Text',
+    initialValue: 'Played by 3',
+    description: 'The mark text.',
+  );
+
   final showEdited = context.knobs.boolean(
     label: 'Show Edited',
     initialValue: true,
@@ -74,6 +85,17 @@ Widget buildStreamMessageMetadataPlayground(BuildContext context) {
     description: 'Minimum height of the metadata row.',
   );
 
+  final alignment = context.knobs.object.dropdown<StreamMessageAlignment>(
+    label: 'Alignment',
+    options: StreamMessageAlignment.values,
+    initialOption: StreamMessageAlignment.end,
+    labelBuilder: (v) => switch (v) {
+      .start => 'start (incoming)',
+      .end => 'end (outgoing)',
+    },
+    description: 'Which side the message sits on. An end-aligned row is reversed.',
+  );
+
   final presentation = context.knobs.object.dropdown<StreamMessagePresentation>(
     label: 'Presentation',
     options: StreamMessagePresentation.values,
@@ -90,6 +112,7 @@ Widget buildStreamMessageMetadataPlayground(BuildContext context) {
     timestamp: Text(timestamp),
     status: showStatus ? Icon(statusOption.iconData) : null,
     username: showUsername ? Text(username) : null,
+    mark: showMark ? Text(markText) : null,
     edited: showEdited ? Text(editedText) : null,
     style: StreamMessageMetadataStyle.from(
       spacing: spacing,
@@ -110,7 +133,10 @@ Widget buildStreamMessageMetadataPlayground(BuildContext context) {
     presentation: presentation,
     child: Center(
       child: StreamMessageLayout(
-        data: StreamMessageLayoutData(presentation: presentation),
+        data: StreamMessageLayoutData(
+          alignment: alignment,
+          presentation: presentation,
+        ),
         child: child,
       ),
     ),
@@ -139,6 +165,7 @@ Widget buildStreamMessageMetadataShowcase(BuildContext context) {
         spacing: 32,
         children: [
           _SlotCombinationsSection(),
+          _MessageMarkSection(),
           _DeliveryStatusSection(),
           _PresentationSection(),
           _RealWorldSection(),
@@ -186,12 +213,27 @@ class _SlotCombinationsSection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
+          label: 'Mark + status',
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(alignment: StreamMessageAlignment.end),
+            child: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.checks),
+              mark: const Text('Played by 3'),
+            ),
+          ),
+        ),
+        _ExampleCard(
           label: 'All slots',
-          child: StreamMessageMetadata(
-            timestamp: const Text('09:41'),
-            status: const Icon(StreamIconData.checks),
-            username: const Text('Alice'),
-            edited: const Text('Edited'),
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(alignment: StreamMessageAlignment.end),
+            child: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.checks),
+              username: const Text('Alice'),
+              mark: const Text('Played'),
+              edited: const Text('Edited'),
+            ),
           ),
         ),
       ],
@@ -246,6 +288,121 @@ class _DeliveryStatusSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _MessageMarkSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _Section(
+      label: 'MESSAGE MARK',
+      description:
+          'A mark such as "Played by 3", set apart from the rest of the row by a dot. '
+          'An outgoing row reads in reverse, so the mark leads it.',
+      children: [
+        _ExampleCard(
+          label: 'Outgoing, one other member',
+          child: _MarkExample(
+            alignment: StreamMessageAlignment.end,
+            bubbleText: 'Voice message',
+            metadata: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.checks),
+              mark: const Text('Played'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Outgoing, group',
+          child: _MarkExample(
+            alignment: StreamMessageAlignment.end,
+            bubbleText: 'Voice message',
+            metadata: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.checks),
+              mark: const Text('Played by 3'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Outgoing, with username and edited',
+          child: _MarkExample(
+            alignment: StreamMessageAlignment.end,
+            bubbleText: 'Video',
+            metadata: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              status: const Icon(StreamIconData.checks),
+              username: const Text('You'),
+              mark: const Text('Played by 99+'),
+              edited: const Text('Edited'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Incoming, with username and edited',
+          child: _MarkExample(
+            alignment: StreamMessageAlignment.start,
+            bubbleText: 'Voice message',
+            metadata: StreamMessageMetadata(
+              timestamp: const Text('09:41'),
+              username: const Text('Alice'),
+              mark: const Text('Played'),
+              edited: const Text('Edited'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Right-to-left',
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: _MarkExample(
+              alignment: StreamMessageAlignment.end,
+              bubbleText: 'رسالة صوتية',
+              metadata: StreamMessageMetadata(
+                timestamp: const Text('09:41'),
+                status: const Icon(StreamIconData.checks),
+                mark: const Text('Played by 2'),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MarkExample extends StatelessWidget {
+  const _MarkExample({
+    required this.alignment,
+    required this.bubbleText,
+    required this.metadata,
+  });
+
+  final StreamMessageAlignment alignment;
+  final String bubbleText;
+  final Widget metadata;
+
+  @override
+  Widget build(BuildContext context) {
+    final crossAxisAlignment = switch (alignment) {
+      .start => CrossAxisAlignment.start,
+      .end => CrossAxisAlignment.end,
+    };
+
+    return StreamMessageLayout(
+      data: StreamMessageLayoutData(alignment: alignment),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: crossAxisAlignment,
+          spacing: 4,
+          children: [
+            StreamMessageBubble(child: StreamMessageText(bubbleText)),
+            metadata,
+          ],
+        ),
+      ),
     );
   }
 }

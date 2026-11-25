@@ -12,8 +12,12 @@ import '../message_layout/stream_message_layout.dart';
 
 /// The bottom metadata row of a chat message bubble.
 ///
-/// Displays a [timestamp], and optional [status] icon, [username], and
-/// [edited] indicator in a horizontal row with themed styling.
+/// Displays a [timestamp], and optional [status] icon, [username], [mark],
+/// and [edited] indicator in a horizontal row with themed styling.
+///
+/// Counting from the edge the row is aligned to, items read username, status
+/// and timestamp, edited, separator, then mark. The status always precedes
+/// the timestamp in reading order, and the separator only shows with a mark.
 ///
 /// All content is provided by the caller via widget slots. The provided
 /// widgets are automatically styled according to
@@ -38,8 +42,21 @@ import '../message_layout/stream_message_layout.dart';
 /// ```dart
 /// StreamMessageMetadata(
 ///   timestamp: Text('09:41'),
-///   status: Icon(StreamIcons.doupleCheckmark1Small),
+///   status: Icon(StreamIconData.checks),
 ///   edited: Text('Edited'),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet}
+///
+/// Outgoing voice message someone played:
+///
+/// ```dart
+/// StreamMessageMetadata(
+///   timestamp: Text('09:41'),
+///   status: Icon(StreamIconData.checks),
+///   mark: Text('Played by 3'),
 /// )
 /// ```
 /// {@end-tool}
@@ -58,15 +75,25 @@ class StreamMessageMetadata extends StatelessWidget {
     required Widget timestamp,
     Widget? status,
     Widget? username,
+    Widget? mark,
     Widget? edited,
     StreamMessageMetadataStyle? style,
   }) : props = .new(
          timestamp: timestamp,
          status: status,
          username: username,
+         mark: mark,
          edited: edited,
          style: style,
        );
+
+  /// The middle dot drawn between the mark and the rest of the row.
+  ///
+  /// [DefaultStreamMessageMetadata] styles it with
+  /// [StreamMessageMetadataStyle.separatorTextStyle] and
+  /// [StreamMessageMetadataStyle.separatorColor] and hides it from screen
+  /// readers. A custom metadata builder can use it to draw the same dot.
+  static const Widget separator = Text('·');
 
   /// The properties that configure this metadata row.
   final StreamMessageMetadataProps props;
@@ -90,6 +117,7 @@ class StreamMessageMetadataProps {
     required this.timestamp,
     this.status,
     this.username,
+    this.mark,
     this.edited,
     this.style,
   });
@@ -114,6 +142,14 @@ class StreamMessageMetadataProps {
   /// Styled by [StreamMessageMetadataStyle.usernameTextStyle] and
   /// [StreamMessageMetadataStyle.usernameColor].
   final Widget? username;
+
+  /// An optional label about the message, such as "Played by 3".
+  ///
+  /// Always the item farthest from the edge the row is aligned to, set apart
+  /// by a [StreamMessageMetadata.separator]. Styled by
+  /// [StreamMessageMetadataStyle.markTextStyle] and
+  /// [StreamMessageMetadataStyle.markColor].
+  final Widget? mark;
 
   /// An optional edited indicator widget.
   ///
@@ -153,6 +189,10 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
     final effectiveUsernameColor = resolve((s) => s?.usernameColor);
     final effectiveTimestampTextStyle = resolve((s) => s?.timestampTextStyle);
     final effectiveTimestampColor = resolve((s) => s?.timestampColor);
+    final effectiveMarkTextStyle = resolve((s) => s?.markTextStyle);
+    final effectiveMarkColor = resolve((s) => s?.markColor);
+    final effectiveSeparatorTextStyle = resolve((s) => s?.separatorTextStyle);
+    final effectiveSeparatorColor = resolve((s) => s?.separatorColor);
     final effectiveEditedTextStyle = resolve((s) => s?.editedTextStyle);
     final effectiveEditedColor = resolve((s) => s?.editedColor);
     final effectiveStatusTextStyle = resolve((s) => s?.statusTextStyle);
@@ -209,12 +249,42 @@ class DefaultStreamMessageMetadata extends StatelessWidget {
       );
     }
 
+    Widget? separatorWidget;
+    Widget? markWidget;
+    if (props.mark case final mark?) {
+      separatorWidget = ExcludeSemantics(
+        child: AnimatedDefaultTextStyle(
+          style: effectiveSeparatorTextStyle.copyWith(color: effectiveSeparatorColor),
+          duration: kThemeChangeDuration,
+          child: StreamMessageMetadata.separator,
+        ),
+      );
+      markWidget = Flexible(
+        child: AnimatedDefaultTextStyle(
+          style: effectiveMarkTextStyle.copyWith(color: effectiveMarkColor),
+          duration: kThemeChangeDuration,
+          child: mark,
+        ),
+      );
+    }
+
+    final children = [
+      ?usernameWidget,
+      statusTimestampWidget,
+      ?editedWidget,
+      ?separatorWidget,
+      ?markWidget,
+    ];
+
     return ConstrainedBox(
       constraints: .new(minHeight: effectiveMinHeight),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: effectiveSpacing,
-        children: [?usernameWidget, statusTimestampWidget, ?editedWidget],
+        children: switch (layout.alignment) {
+          .start => children,
+          .end => children.reversed.toList(),
+        },
       ),
     );
   }
@@ -249,6 +319,18 @@ class _StreamMessageMetadataDefaults extends StreamMessageMetadataStyle {
 
   @override
   StreamMessageLayoutProperty<Color> get timestampColor => _presentationAware(_colorScheme.textTertiary);
+
+  @override
+  StreamMessageLayoutProperty<TextStyle> get markTextStyle => .all(_textTheme.metadataDefault);
+
+  @override
+  StreamMessageLayoutProperty<Color> get markColor => _presentationAware(_colorScheme.accentPrimary);
+
+  @override
+  StreamMessageLayoutProperty<TextStyle> get separatorTextStyle => .all(_textTheme.metadataDefault);
+
+  @override
+  StreamMessageLayoutProperty<Color> get separatorColor => _presentationAware(_colorScheme.textTertiary);
 
   @override
   StreamMessageLayoutProperty<TextStyle> get editedTextStyle => .all(_textTheme.metadataDefault);

@@ -42,6 +42,30 @@ mixin _$StreamMessageMetadataStyle {
         t,
         Color.lerp,
       ),
+      markTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.markTextStyle,
+        b.markTextStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      markColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.markColor,
+        b.markColor,
+        t,
+        Color.lerp,
+      ),
+      separatorTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
+        a.separatorTextStyle,
+        b.separatorTextStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      separatorColor: StreamMessageLayoutProperty.lerp<Color?>(
+        a.separatorColor,
+        b.separatorColor,
+        t,
+        Color.lerp,
+      ),
       timestampTextStyle: StreamMessageLayoutProperty.lerp<TextStyle?>(
         a.timestampTextStyle,
         b.timestampTextStyle,
@@ -108,6 +132,10 @@ mixin _$StreamMessageMetadataStyle {
   StreamMessageMetadataStyle copyWith({
     StreamMessageLayoutProperty<TextStyle?>? usernameTextStyle,
     StreamMessageLayoutProperty<Color?>? usernameColor,
+    StreamMessageLayoutProperty<TextStyle?>? markTextStyle,
+    StreamMessageLayoutProperty<Color?>? markColor,
+    StreamMessageLayoutProperty<TextStyle?>? separatorTextStyle,
+    StreamMessageLayoutProperty<Color?>? separatorColor,
     StreamMessageLayoutProperty<TextStyle?>? timestampTextStyle,
     StreamMessageLayoutProperty<Color?>? timestampColor,
     StreamMessageLayoutProperty<TextStyle?>? editedTextStyle,
@@ -124,6 +152,10 @@ mixin _$StreamMessageMetadataStyle {
     return StreamMessageMetadataStyle(
       usernameTextStyle: usernameTextStyle ?? _this.usernameTextStyle,
       usernameColor: usernameColor ?? _this.usernameColor,
+      markTextStyle: markTextStyle ?? _this.markTextStyle,
+      markColor: markColor ?? _this.markColor,
+      separatorTextStyle: separatorTextStyle ?? _this.separatorTextStyle,
+      separatorColor: separatorColor ?? _this.separatorColor,
       timestampTextStyle: timestampTextStyle ?? _this.timestampTextStyle,
       timestampColor: timestampColor ?? _this.timestampColor,
       editedTextStyle: editedTextStyle ?? _this.editedTextStyle,
@@ -151,6 +183,10 @@ mixin _$StreamMessageMetadataStyle {
     return copyWith(
       usernameTextStyle: other.usernameTextStyle,
       usernameColor: other.usernameColor,
+      markTextStyle: other.markTextStyle,
+      markColor: other.markColor,
+      separatorTextStyle: other.separatorTextStyle,
+      separatorColor: other.separatorColor,
       timestampTextStyle: other.timestampTextStyle,
       timestampColor: other.timestampColor,
       editedTextStyle: other.editedTextStyle,
@@ -179,6 +215,10 @@ mixin _$StreamMessageMetadataStyle {
 
     return _other.usernameTextStyle == _this.usernameTextStyle &&
         _other.usernameColor == _this.usernameColor &&
+        _other.markTextStyle == _this.markTextStyle &&
+        _other.markColor == _this.markColor &&
+        _other.separatorTextStyle == _this.separatorTextStyle &&
+        _other.separatorColor == _this.separatorColor &&
         _other.timestampTextStyle == _this.timestampTextStyle &&
         _other.timestampColor == _this.timestampColor &&
         _other.editedTextStyle == _this.editedTextStyle &&
@@ -199,6 +239,10 @@ mixin _$StreamMessageMetadataStyle {
       runtimeType,
       _this.usernameTextStyle,
       _this.usernameColor,
+      _this.markTextStyle,
+      _this.markColor,
+      _this.separatorTextStyle,
+      _this.separatorColor,
       _this.timestampTextStyle,
       _this.timestampColor,
       _this.editedTextStyle,
