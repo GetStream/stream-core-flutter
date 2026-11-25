@@ -125,7 +125,7 @@ void main() {
       );
 
       expect(handler.messages.join(), contains('Authorization'));
-      expect(handler.messages.join(), contains('██'));
+      expect(handler.messages.join(), contains('***'));
       expect(handler.messages.join(), isNot(contains(token)));
     });
 
@@ -135,7 +135,7 @@ void main() {
         headers: const {'authorization': 'authorization-value'},
       );
 
-      expect(log, contains('authorization: ██'));
+      expect(log, contains('authorization: ***'));
       expect(log, isNot(contains('authorization-value')));
     });
 
@@ -168,7 +168,7 @@ void main() {
         path: '/test?api_key=key-value&page=2',
       );
 
-      expect(log, contains('api_key=██&page=2'));
+      expect(log, contains('api_key=***&page=2'));
       expect(log, isNot(contains('key-value')));
     });
 
@@ -179,7 +179,7 @@ void main() {
         path: '/test?filter%5Bid%5D=filter-value',
       );
 
-      expect(log, contains('filter%5Bid%5D=██'));
+      expect(log, contains('filter%5Bid%5D=***'));
       expect(log, isNot(contains('filter-value')));
     });
 
@@ -189,7 +189,7 @@ void main() {
         path: '/test?a=1&b=2&a=3',
       );
 
-      expect(log, contains('/test?a=1&b=██&a=3'));
+      expect(log, contains('/test?a=1&b=***&a=3'));
     });
 
     test('keeps the encoding of the query parameters it does not redact', () async {
@@ -198,7 +198,7 @@ void main() {
         path: '/test?q=a%20b&api_key=key-value',
       );
 
-      expect(log, contains('/test?q=a%20b&api_key=██'));
+      expect(log, contains('/test?q=a%20b&api_key=***'));
     });
 
     test('redacts a response header it is given', () async {

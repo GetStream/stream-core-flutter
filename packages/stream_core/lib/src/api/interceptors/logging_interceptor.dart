@@ -31,7 +31,7 @@ class LoggingInterceptor extends Interceptor {
   /// Creates an interceptor that reports each request it sees.
   ///
   /// The values of the headers in [redactedHeaders] and of the query parameters in [redactedQueryParameters] are
-  /// reported as `██`, matching names regardless of case. [redactedHeaders] replaces [defaultRedactedHeaders], so
+  /// reported as `***`, matching names regardless of case. [redactedHeaders] replaces [defaultRedactedHeaders], so
   /// consider spreading it in when adding a header. An empty collection reports every header as is.
   LoggingInterceptor({
     this.request = true,
@@ -85,10 +85,10 @@ class LoggingInterceptor extends Interceptor {
   /// Takes each line instead of the logger, for a caller routing them somewhere of its own.
   final LogPrint? logPrint;
 
-  /// The headers whose values are reported as `██` when the constructor is given no others.
+  /// The headers whose values are reported as `***` when the constructor is given no others.
   static const defaultRedactedHeaders = {'Authorization'};
 
-  static const _redacted = '██';
+  static const _redacted = '***';
 
   final Set<String> _headersToRedact;
 
