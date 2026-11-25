@@ -52,7 +52,7 @@ jobs:
 
   ios:
     timeout-minutes: 20
-    runs-on: macos-latest
+    runs-on: { group: scaleway-macos }
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
@@ -70,7 +70,7 @@ jobs:
 
   macos:
     timeout-minutes: 20
-    runs-on: macos-latest
+    runs-on: { group: scaleway-macos }
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
