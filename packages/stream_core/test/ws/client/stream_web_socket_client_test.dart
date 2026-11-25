@@ -5,6 +5,7 @@ import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/fake_server.dart';
+import '../../helpers/web_socket.dart';
 import '../../helpers/ws_client_tester.dart';
 
 /// A connect that is expected not to establish anything, so nothing is asserted about the outcome.
@@ -183,6 +184,30 @@ void main() {
         );
       },
     );
+
+    test('reports a failed connection as a StreamNetworkException', () {
+      fakeAsync((async) {
+        final tester = buildTester();
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.server.socket.emitError(refusedUpgrade());
+        async.flushMicrotasks();
+
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having(
+            (it) => it.source,
+            'source',
+            isA<SystemInitiated>().having(
+              (it) => it.error,
+              'error',
+              isA<StreamNetworkException>().having((it) => it.message, 'message', 'The WebSocket connection failed'),
+            ),
+          ),
+        );
+      });
+    });
   });
 
   group('send', () {

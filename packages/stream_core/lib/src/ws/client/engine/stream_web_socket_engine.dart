@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../errors.dart';
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -23,14 +24,16 @@ WebSocketChannel _createWebSocket(WebSocketOptions options) {
   return WebSocketChannel.connect(uri, protocols: options.protocols);
 }
 
-/// A WebSocket engine implementation that handles low-level WebSocket operations.
+/// A [WebSocketEngine] over a [WebSocketChannel].
 ///
-/// Manages the WebSocket connection lifecycle, message encoding/decoding, and event notification.
-/// This engine provides the foundation for higher-level WebSocket client functionality by handling
-/// the transport layer concerns.
+/// Frames are encoded and decoded by a [WebSocketMessageCodec], and connection events go to a
+/// [WebSocketEngineListener]. A connection that fails to open is reported as a [StreamNetworkException]
+/// reading `The WebSocket connection failed`.
 ///
-/// The engine supports both text and binary message formats through the [WebSocketMessageCodec]
-/// and provides callbacks through [WebSocketEngineListener] for connection events.
+/// See also:
+///
+///  * [WebSocketOptions], which configures the connection.
+///  * [WebSocketEngineListener], which receives the engine's events.
 class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   /// Creates a new instance of [StreamWebSocketEngine].
   StreamWebSocketEngine({
@@ -68,14 +71,22 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
         _onData,
         onDone: _onDone,
         cancelOnError: false,
-        onError: _listener?.onError,
+        onError: _onError,
       );
 
-      await ws.ready;
+      try {
+        await ws.ready;
+      } catch (error, stackTrace) {
+        Error.throwWithStackTrace(_withoutConnectionUrl(error), stackTrace);
+      }
 
       // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
       if (_ws == ws) _listener?.onOpen();
     });
+  }
+
+  void _onError(Object error, StackTrace stackTrace) {
+    _listener?.onError(_withoutConnectionUrl(error), stackTrace);
   }
 
   void _onDone() {
@@ -140,4 +151,9 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
       return ws.sink.add(data);
     });
   }
+
+  static Object _withoutConnectionUrl(Object error) => switch (error) {
+    WebSocketChannelException(inner: _?) => const StreamNetworkException(message: 'The WebSocket connection failed'),
+    _ => error,
+  };
 }

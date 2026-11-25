@@ -8,6 +8,8 @@
 ### 🔄 Changed
 
 - `LoggingInterceptor` reports the `Authorization` header as `██` when it logs headers.
+- A WebSocket connection that fails to open is reported as a `StreamNetworkException` reading
+  `The WebSocket connection failed`, in place of a `WebSocketChannelException`.
 - `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` no longer include `rawValue`.
 
 ### 🐞 Fixed

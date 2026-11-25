@@ -162,6 +162,35 @@ void main() {
       expect(log, isNot(contains('key-value')));
     });
 
+    test('redacts a query parameter whose name is encoded in the URL', () async {
+      final log = await _linesOf(
+        (logPrint) =>
+            LoggingInterceptor(requestHeader: true, redactedQueryParameters: {'filter[id]'}, logPrint: logPrint),
+        path: '/test?filter%5Bid%5D=filter-value',
+      );
+
+      expect(log, contains('filter%5Bid%5D=██'));
+      expect(log, isNot(contains('filter-value')));
+    });
+
+    test('keeps the order of repeated query parameters it redacts around', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(redactedQueryParameters: {'b'}, logPrint: logPrint),
+        path: '/test?a=1&b=2&a=3',
+      );
+
+      expect(log, contains('/test?a=1&b=██&a=3'));
+    });
+
+    test('keeps the encoding of the query parameters it does not redact', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(redactedQueryParameters: {'api_key'}, logPrint: logPrint),
+        path: '/test?q=a%20b&api_key=key-value',
+      );
+
+      expect(log, contains('/test?q=a%20b&api_key=██'));
+    });
+
     test('redacts a response header it is given', () async {
       final log = await _linesOf(
         (logPrint) => LoggingInterceptor(responseHeader: true, redactedHeaders: {'Content-Type'}, logPrint: logPrint),

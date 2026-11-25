@@ -5,6 +5,7 @@ import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/logger.dart';
+import '../../helpers/web_socket.dart';
 import '../../helpers/ws_client_tester.dart';
 
 void main() {
@@ -62,6 +63,25 @@ void main() {
           handler.records.where((it) => it.tag == 'SC:WsClient').map((it) => it.message),
           contains(contains('-> Connected')),
         );
+      });
+    });
+
+    test('records a socket error without the description the socket gave', () {
+      fakeAsync((async) {
+        final handler = RecordingLogHandler();
+        final tester = buildTester();
+
+        withStreamLogger(handler: handler, () {
+          tester.client.connect().ignore();
+          async.flushMicrotasks();
+
+          tester.server.socket.emitError(refusedUpgrade());
+          async.flushMicrotasks();
+        });
+
+        final logged = handler.records.map((it) => '${it.message} ${it.error}');
+        expect(logged, contains(contains('The WebSocket connection failed')));
+        expect(logged, everyElement(isNot(contains('version=1'))));
       });
     });
 

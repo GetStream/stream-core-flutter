@@ -107,13 +107,15 @@ class LoggingInterceptor extends Interceptor {
   String _redactUrl(Uri uri) {
     if (_queryParametersToRedact.isEmpty || !uri.hasQuery) return '$uri';
 
-    final query = [
-      for (final MapEntry(:key, :value) in uri.queryParametersAll.entries)
-        for (final item in value)
-          '${Uri.encodeQueryComponent(key)}=${_redactQueryParameter(key, Uri.encodeQueryComponent(item))}',
-    ].join('&');
+    final query = uri.query.split('&').map(_redactQueryPair).join('&');
+    return '$uri'.replaceFirst('?${uri.query}', '?$query');
+  }
 
-    return '${uri.scheme}://${uri.authority}${uri.path}?$query';
+  String _redactQueryPair(String pair) {
+    final [name, ...] = pair.split('=');
+    if (!_queryParametersToRedact.contains(Uri.decodeQueryComponent(name))) return pair;
+
+    return '$name=$_redacted';
   }
 
   // Consulted before a line is formatted, so a request costs nothing while nothing wants it.
