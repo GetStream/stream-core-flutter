@@ -191,15 +191,17 @@ class StreamNetworkImageProps {
   /// The largest width, in physical pixels, to decode the image to.
   ///
   /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
-  /// aspect ratio, and is never enlarged. If null, it is decoded for [width]
-  /// times the device pixel ratio. It is never decoded wider than 4096 pixels.
+  /// aspect ratio, and is never enlarged. If both are null, it is decoded for
+  /// [width] and [height] times the device pixel ratio. It is never decoded
+  /// wider than 4096 pixels.
   final int? cacheWidth;
 
   /// The largest height, in physical pixels, to decode the image to.
   ///
   /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
-  /// aspect ratio, and is never enlarged. If null, it is decoded for [height]
-  /// times the device pixel ratio. It is never decoded taller than 4096 pixels.
+  /// aspect ratio, and is never enlarged. If both are null, it is decoded for
+  /// [width] and [height] times the device pixel ratio. It is never decoded
+  /// taller than 4096 pixels.
   final int? cacheHeight;
 
   /// How the image should be inscribed into the space allocated for it.
@@ -351,22 +353,8 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   Widget build(BuildContext context) {
     final props = widget.props;
 
-    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
-    int decodeBound(int? cacheExtent, double? extent) {
-      final pixels = switch ((cacheExtent, extent)) {
-        (final cacheExtent?, _) => cacheExtent,
-        (_, final extent?) when extent.isFinite => (extent * devicePixelRatio).ceil(),
-        _ => StreamBoundedImage.maxDecodeSize,
-      };
-      return pixels.clamp(1, StreamBoundedImage.maxDecodeSize);
-    }
-
-    final boundsFromSize = props.cacheWidth == null && props.cacheHeight == null;
-    final boxFit = switch ((props.width, props.height, props.fit)) {
-      (_, _, BoxFit.none) => BoxFit.none,
-      (final width?, final height?, final fit?) when boundsFromSize && width.isFinite && height.isFinite => fit,
-      _ => BoxFit.contain,
-    };
+    final hasCacheSize = props.cacheWidth != null || props.cacheHeight != null;
+    int? logicalExtent(double? extent) => extent != null && extent.isFinite ? extent.ceil() : null;
 
     return Image(
       key: ValueKey(_retryKey),
@@ -377,9 +365,10 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
           cacheKey: props.cacheKey,
           cacheManager: StreamImageCache.manager,
         ),
-        maxWidth: decodeBound(props.cacheWidth, props.width),
-        maxHeight: decodeBound(props.cacheHeight, props.height),
-        fit: boxFit,
+        width: hasCacheSize ? props.cacheWidth : logicalExtent(props.width),
+        height: hasCacheSize ? props.cacheHeight : logicalExtent(props.height),
+        fit: hasCacheSize ? BoxFit.contain : props.fit ?? BoxFit.contain,
+        useLogicalSize: !hasCacheSize,
       ),
       width: props.width,
       height: props.height,

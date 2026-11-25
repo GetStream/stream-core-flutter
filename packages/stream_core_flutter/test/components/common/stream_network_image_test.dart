@@ -30,25 +30,22 @@ void main() {
         ),
       );
 
-      final first = _imageOf(tester).provider as CachedNetworkImageProvider;
-      final second = _imageOf(tester, index: 1).provider as CachedNetworkImageProvider;
+      final first = _imageOf(tester).imageProvider as CachedNetworkImageProvider;
+      final second = _imageOf(tester, index: 1).imageProvider as CachedNetworkImageProvider;
 
       expect(first.cacheManager, isNotNull);
       expect(first.cacheManager, same(second.cacheManager));
     });
   });
 
-  testWidgets('decodes no larger than its size in physical pixels', (tester) async {
-    tester.view.devicePixelRatio = 3;
-    addTearDown(tester.view.resetDevicePixelRatio);
-
+  testWidgets('decodes for its size times the device pixel ratio', (tester) async {
     await tester.pumpWidget(_withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 20)));
 
     final image = _imageOf(tester);
-    expect((image.maxWidth, image.maxHeight), (120, 60));
+    expect((image.width, image.height, image.useLogicalSize), (40, 20, true));
   });
 
-  testWidgets('decodes no larger than the cache size it is given', (tester) async {
+  testWidgets('decodes to fit within the cache size it is given', (tester) async {
     await tester.pumpWidget(
       _withStreamTheme(
         StreamNetworkImage('https://example.com/a.png', width: 40, height: 40, cacheWidth: 64, cacheHeight: 32),
@@ -56,16 +53,7 @@ void main() {
     );
 
     final image = _imageOf(tester);
-    expect((image.maxWidth, image.maxHeight), (64, 32));
-  });
-
-  testWidgets('decodes no larger than 4096 pixels on a side', (tester) async {
-    await tester.pumpWidget(
-      _withStreamTheme(StreamNetworkImage('https://example.com/a.png', cacheWidth: 10000)),
-    );
-
-    final image = _imageOf(tester);
-    expect((image.maxWidth, image.maxHeight), (4096, 4096));
+    expect((image.width, image.height, image.useLogicalSize, image.fit), (64, 32, false, BoxFit.contain));
   });
 
   testWidgets('decodes to fill a box it covers', (tester) async {

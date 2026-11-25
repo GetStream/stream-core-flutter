@@ -20,38 +20,48 @@ class StreamImageTooLargeException implements Exception {
   String toString() => 'StreamImageTooLargeException: a ${width}x$height image is too large to display.';
 }
 
-/// An image provider that decodes [provider] to fit [maxWidth] by [maxHeight].
+/// An image provider that decodes [imageProvider] for a box of [width] by
+/// [height], at most [maxDecodeSize] pixels on a side.
 ///
-/// The image keeps its aspect ratio, is never enlarged, and is at most
-/// [maxDecodeSize] pixels on a side. With a [fit] that fills the box, such as
-/// [BoxFit.cover], it is decoded large enough to fill it, and with [BoxFit.none]
-/// it is decoded at its own size. An image with more
-/// pixels than [maxSourcePixels] fails with an [StreamImageTooLargeException].
+/// Like [ResizeImage] with [ResizeImagePolicy.fit], the image keeps its aspect
+/// ratio and is never enlarged. A null [width] or [height] leaves that side
+/// unbounded. With a [fit] that fills the box, such as [BoxFit.cover], the image
+/// is decoded large enough to fill it, and with [BoxFit.none] it is decoded at
+/// its own size.
+///
+/// An image with more pixels than [maxSourcePixels] fails with a
+/// [StreamImageTooLargeException].
 ///
 /// See also:
 ///
-///  * [ResizeImage], which resizes an image without limiting its source size.
+///  * [ResizeImage], which resizes an image without limiting its size.
 @immutable
 class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
-  /// Creates a provider that bounds the decoded size of [provider].
+  /// Creates a provider that decodes [imageProvider] for a box of [width] by
+  /// [height].
   const StreamBoundedImage(
-    this.provider, {
-    required this.maxWidth,
-    required this.maxHeight,
+    this.imageProvider, {
+    this.width,
+    this.height,
     this.fit = BoxFit.contain,
+    this.useLogicalSize = false,
   });
 
   /// The image to decode.
-  final ImageProvider<Object> provider;
+  final ImageProvider<Object> imageProvider;
 
-  /// The width of the box to decode the image for.
-  final int maxWidth;
+  /// The width of the box the image is decoded for, or null for no limit.
+  final int? width;
 
-  /// The height of the box to decode the image for.
-  final int maxHeight;
+  /// The height of the box the image is decoded for, or null for no limit.
+  final int? height;
 
-  /// How the decoded image is placed in the box.
+  /// How the image is placed in the box.
   final BoxFit fit;
+
+  /// Whether [width] and [height] are in logical pixels, to be multiplied by
+  /// the device pixel ratio, rather than in physical pixels.
+  final bool useLogicalSize;
 
   /// The largest number of pixels an image can have and still be decoded.
   static const maxSourcePixels = 8192 * 8192;
@@ -61,10 +71,14 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
 
   @override
   Future<StreamBoundedImageKey> obtainKey(ImageConfiguration configuration) {
+    final devicePixelRatio = useLogicalSize ? (configuration.devicePixelRatio ?? 1.0) : 1.0;
+    final effectiveWidth = width != null ? (width! * devicePixelRatio).ceil() : null;
+    final effectiveHeight = height != null ? (height! * devicePixelRatio).ceil() : null;
+
     Completer<StreamBoundedImageKey>? completer;
     SynchronousFuture<StreamBoundedImageKey>? result;
-    provider.obtainKey(configuration).then((providerKey) {
-      final key = StreamBoundedImageKey._(providerKey, maxWidth, maxHeight, fit);
+    imageProvider.obtainKey(configuration).then((providerKey) {
+      final key = StreamBoundedImageKey._(providerKey, effectiveWidth, effectiveHeight, fit);
       if (completer == null) {
         result = SynchronousFuture(key);
       } else {
@@ -80,10 +94,14 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
   @override
   ImageStreamCompleter loadImage(StreamBoundedImageKey key, ImageDecoderCallback decode) {
     Future<ui.Codec> decodeBounded(ui.ImmutableBuffer buffer, {ui.TargetImageSizeCallback? getTargetSize}) {
+      assert(
+        getTargetSize == null,
+        'StreamBoundedImage cannot be composed with another ImageProvider that applies getTargetSize.',
+      );
       return decode(buffer, getTargetSize: (width, height) => _targetSize(width, height, key));
     }
 
-    return provider.loadImage(key.providerKey, decodeBounded)..addEphemeralErrorListener(
+    return imageProvider.loadImage(key._providerKey, decodeBounded)..addEphemeralErrorListener(
       (_, _) => scheduleMicrotask(() => PaintingBinding.instance.imageCache.evict(key)),
     );
   }
@@ -91,66 +109,64 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
   static ui.TargetImageSize _targetSize(int width, int height, StreamBoundedImageKey key) {
     if (width * height > maxSourcePixels) throw StreamImageTooLargeException(width, height);
 
-    final widthScale = key.maxWidth / width;
-    final heightScale = key.maxHeight / height;
-    final boxScale = switch (key.fit) {
-      BoxFit.cover || BoxFit.fill => math.max(widthScale, heightScale),
-      BoxFit.fitWidth => widthScale,
-      BoxFit.fitHeight => heightScale,
+    final scales = [
+      if (key._width case final boxWidth?) boxWidth / width,
+      if (key._height case final boxHeight?) boxHeight / height,
+    ];
+    final boxScale = switch (key._fit) {
+      _ when scales.isEmpty => 1.0,
       BoxFit.none => 1.0,
-      BoxFit.contain || BoxFit.scaleDown => math.min(widthScale, heightScale),
+      BoxFit.contain || BoxFit.scaleDown => scales.reduce(math.min),
+      BoxFit.cover || BoxFit.fill || BoxFit.fitWidth || BoxFit.fitHeight => scales.reduce(math.max),
     };
     final scale = [1.0, boxScale, maxDecodeSize / width, maxDecodeSize / height].reduce(math.min);
     if (scale >= 1) return ui.TargetImageSize(width: width, height: height);
 
     return ui.TargetImageSize(
-      width: math.max(1, (width * scale).round()),
-      height: math.max(1, (height * scale).round()),
+      width: math.max(1, (width * scale).floor()),
+      height: math.max(1, (height * scale).floor()),
     );
   }
 
   @override
   bool operator ==(Object other) {
     return other is StreamBoundedImage &&
-        other.provider == provider &&
-        other.maxWidth == maxWidth &&
-        other.maxHeight == maxHeight &&
-        other.fit == fit;
+        other.imageProvider == imageProvider &&
+        other.width == width &&
+        other.height == height &&
+        other.fit == fit &&
+        other.useLogicalSize == useLogicalSize;
   }
 
   @override
-  int get hashCode => Object.hash(provider, maxWidth, maxHeight, fit);
+  int get hashCode => Object.hash(imageProvider, width, height, fit, useLogicalSize);
 
   @override
-  String toString() => '${objectRuntimeType(this, 'StreamBoundedImage')}($provider, $maxWidth x $maxHeight, $fit)';
+  String toString() {
+    return '${objectRuntimeType(this, 'StreamBoundedImage')}('
+        '$imageProvider, width: $width, height: $height, fit: $fit, useLogicalSize: $useLogicalSize)';
+  }
 }
 
 /// The cache key of a [StreamBoundedImage], distinct for each decoded size.
 @immutable
 class StreamBoundedImageKey {
-  const StreamBoundedImageKey._(this.providerKey, this.maxWidth, this.maxHeight, this.fit);
+  const StreamBoundedImageKey._(this._providerKey, this._width, this._height, this._fit);
 
-  /// The key of the image that is decoded.
-  final Object providerKey;
-
-  /// The width of the box the image is decoded for.
-  final int maxWidth;
-
-  /// The height of the box the image is decoded for.
-  final int maxHeight;
-
-  /// How the decoded image is placed in the box.
-  final BoxFit fit;
+  final Object _providerKey;
+  final int? _width;
+  final int? _height;
+  final BoxFit _fit;
 
   @override
   bool operator ==(Object other) {
     return other is StreamBoundedImageKey &&
-        other.providerKey == providerKey &&
-        other.maxWidth == maxWidth &&
-        other.maxHeight == maxHeight &&
-        other.fit == fit;
+        other._providerKey == _providerKey &&
+        other._width == _width &&
+        other._height == _height &&
+        other._fit == _fit;
   }
 
   @override
-  int get hashCode => Object.hash(providerKey, maxWidth, maxHeight, fit);
+  int get hashCode => Object.hash(_providerKey, _width, _height, _fit);
 }
