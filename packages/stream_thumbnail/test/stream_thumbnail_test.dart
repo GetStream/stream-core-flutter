@@ -184,29 +184,29 @@ void main() {
   });
 
   group('StreamThumbnail with an unsupported source', () {
-    final unsupported = [
+    final unsupported = StreamThumbnailSource.network(Uri.parse('ftp://example.com/a.mp4'));
+    final isUnsupported = throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE'));
+
+    for (final source in [
+      unsupported,
       StreamThumbnailSource.network(Uri.parse('file:///videos/a.mp4')),
-      StreamThumbnailSource.network(Uri.parse('ftp://example.com/a.mp4')),
       StreamThumbnailSource.network(Uri.parse('https:/a.mp4')),
       StreamThumbnailSource.contentUri(Uri.parse('file:///videos/a.mp4')),
       StreamThumbnailSource.file('https://cdn.example.com/a.mp4'),
       StreamThumbnailSource.file('//example.com/share/a.mp4'),
-    ];
-    final isUnsupported = throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE'));
-
-    test('thumbnailData fails without reaching the platform', () async {
-      for (final source in unsupported) {
+    ]) {
+      test('thumbnailData fails for $source without reaching the platform', () async {
         final fake = useFakePlatform();
 
-        await expectLater(StreamThumbnail.thumbnailData(source: source), isUnsupported, reason: '$source');
-        expect(fake.lastDataCall, isNull, reason: '$source');
-      }
-    });
+        await expectLater(StreamThumbnail.thumbnailData(source: source), isUnsupported);
+        expect(fake.lastDataCall, isNull);
+      });
+    }
 
     test('thumbnailFile fails without reaching the platform', () async {
       final fake = useFakePlatform();
 
-      await expectLater(StreamThumbnail.thumbnailFile(source: unsupported.first), isUnsupported);
+      await expectLater(StreamThumbnail.thumbnailFile(source: unsupported), isUnsupported);
       expect(fake.lastFileCall, isNull);
     });
 
@@ -214,35 +214,31 @@ void main() {
       final fake = useFakePlatform();
 
       await expectLater(
-        StreamThumbnail.thumbnailFiles(sources: [StreamThumbnailSource.file('/videos/a.mp4'), unsupported.first]),
+        StreamThumbnail.thumbnailFiles(sources: [StreamThumbnailSource.file('/videos/a.mp4'), unsupported]),
         isUnsupported,
       );
       expect(fake.filesCalled, isFalse);
     });
+  });
 
-    test('http and https URLs with a host are accepted', () async {
-      for (final url in ['http://cdn.example.com/a.mp4', 'HTTPS://cdn.example.com/a.mp4']) {
+  group('StreamThumbnail with a supported source', () {
+    for (final source in [
+      StreamThumbnailSource.network(Uri.parse('http://cdn.example.com/a.mp4')),
+      StreamThumbnailSource.network(Uri.parse('HTTPS://cdn.example.com/b.mp4')),
+      StreamThumbnailSource.file('/videos/a.mp4'),
+      StreamThumbnailSource.file('file:///videos/a.mp4'),
+      StreamThumbnailSource.file(r'C:\videos\a.mp4'),
+      StreamThumbnailSource.file('C:/videos/a.mp4'),
+      StreamThumbnailSource.file('blob:https://example.com/0f8e'),
+    ]) {
+      test('thumbnailData forwards $source to the platform', () async {
         final fake = useFakePlatform();
 
-        await StreamThumbnail.thumbnailData(source: StreamThumbnailSource.network(Uri.parse(url)));
-        expect(fake.lastDataCall, isNotNull, reason: url);
-      }
-    });
+        await StreamThumbnail.thumbnailData(source: source);
 
-    test('local paths, file URIs and object URLs are accepted as files', () async {
-      for (final path in [
-        '/videos/a.mp4',
-        'file:///videos/a.mp4',
-        r'C:\videos\a.mp4',
-        'C:/videos/a.mp4',
-        'blob:https://example.com/0f8e',
-      ]) {
-        final fake = useFakePlatform();
-
-        await StreamThumbnail.thumbnailData(source: StreamThumbnailSource.file(path));
-        expect(fake.lastDataCall, isNotNull, reason: path);
-      }
-    });
+        expect(fake.lastDataCall?['source'], source);
+      });
+    }
   });
 
   group('MethodChannelStreamThumbnail', () {

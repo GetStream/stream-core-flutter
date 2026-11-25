@@ -230,25 +230,44 @@ void main() {
     }
   });
 
-  testWidgets('a file source given an https URL fails', (tester) async {
+  testWidgets('a file source given an https URL fails with UNSUPPORTED_SOURCE', (tester) async {
     await expectLater(
       StreamThumbnail.thumbnailData(source: StreamThumbnailSource.file(_remoteVideo)),
-      throwsA(isA<PlatformException>()),
+      throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE')),
     );
   });
 
-  testWidgets('a file source naming a network share fails', (tester) async {
-    await expectLater(
-      StreamThumbnail.thumbnailData(source: StreamThumbnailSource.file(r'\\example.invalid\share\a.mp4')),
-      throwsA(
-        isA<PlatformException>().having(
-          (e) => e.code,
-          'code',
-          Platform.isWindows ? 'UNSUPPORTED_SOURCE' : isNotEmpty,
+  testWidgets(
+    'a relative file path fails with UNSUPPORTED_SOURCE on Windows',
+    (tester) async {
+      await expectLater(
+        StreamThumbnail.thumbnailData(source: StreamThumbnailSource.file(r'videos\a.mp4')),
+        throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE')),
+      );
+    },
+    skip: !Platform.isWindows,
+  );
+
+  testWidgets(
+    'a file request naming a network share fails on Windows with UNSUPPORTED_SOURCE',
+    (tester) async {
+      await expectLater(
+        StreamThumbnailHostApi().thumbnailData(
+          ThumbnailRequest(
+            video: r'\\example.invalid\share\a.mp4',
+            sourceKind: ThumbnailSourceKind.file,
+            format: ThumbnailFormat.png,
+            maxHeight: 0,
+            maxWidth: 0,
+            timeMs: 0,
+            quality: 10,
+          ),
         ),
-      ),
-    );
-  });
+        throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE')),
+      );
+    },
+    skip: !Platform.isWindows,
+  );
 
   testWidgets(
     'a content URI is rejected outside Android',

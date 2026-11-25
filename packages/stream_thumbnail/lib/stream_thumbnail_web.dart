@@ -137,12 +137,11 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     required int quality,
     int timeMs = 0,
   }) async {
-    if (source.kind == StreamThumbnailSourceKind.contentUri) {
-      throw PlatformException(code: 'UNSUPPORTED_SOURCE', message: 'Content URIs are only supported on Android.');
-    }
-    final fileUri = source.kind == StreamThumbnailSourceKind.file ? Uri.tryParse(source.location) : null;
-    if (fileUri != null && (fileUri.isScheme('http') || fileUri.isScheme('https'))) {
-      throw PlatformException(code: 'UNSUPPORTED_SOURCE', message: 'A file video must not be an http or https URL.');
+    switch (source.kind) {
+      case StreamThumbnailSourceKind.contentUri:
+        throw PlatformException(code: 'UNSUPPORTED_SOURCE', message: 'Content URIs are only supported on Android.');
+      case StreamThumbnailSourceKind.network || StreamThumbnailSourceKind.file:
+        if (source.unsupportedReason case final reason?) throw reason;
     }
 
     final videoSrc = source.location;

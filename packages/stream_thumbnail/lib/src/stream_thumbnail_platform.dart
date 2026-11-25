@@ -33,7 +33,7 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  /// Generates a thumbnail file for each of the given `sources`.
+  /// Generates a thumbnail file for each of [sources].
   Future<List<XFile>> thumbnailFiles({
     required List<StreamThumbnailSource> sources,
     required StreamThumbnailFormat imageFormat,
@@ -45,7 +45,7 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
     throw UnimplementedError('thumbnailFiles() has not been implemented.');
   }
 
-  /// Generates a thumbnail file for the given `source`.
+  /// Generates a thumbnail file for [source].
   Future<XFile> thumbnailFile({
     required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
@@ -57,7 +57,7 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
     throw UnimplementedError('thumbnailFile() has not been implemented.');
   }
 
-  /// Generates a thumbnail for the given `source` as in-memory bytes.
+  /// Generates a thumbnail for [source] as in-memory bytes.
   Future<Uint8List> thumbnailData({
     required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,

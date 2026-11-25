@@ -39,9 +39,10 @@ final class StreamThumbnailSource {
   ///
   /// [headers] are sent with the request, except on Windows, which cannot
   /// attach them.
-  StreamThumbnailSource.network(Uri url, {this.headers})
+  StreamThumbnailSource.network(Uri url, {Map<String, String>? headers})
     : kind = StreamThumbnailSourceKind.network,
-      location = url.toString();
+      location = url.toString(),
+      headers = headers == null ? null : Map<String, String>.unmodifiable(headers);
 
   /// A video stored on this device at [path].
   ///
@@ -78,6 +79,7 @@ final class StreamThumbnailSource {
 
   /// The HTTP headers sent when fetching a [StreamThumbnailSource.network]
   /// video, or `null` for other sources.
+  @internal
   final Map<String, String>? headers;
 
   /// Why this source can't be opened on any platform, or `null` if it can.
@@ -96,7 +98,9 @@ final class StreamThumbnailSource {
         code: 'UNSUPPORTED_SOURCE',
         message: 'A content video must be a content URI.',
       ),
-      _ => null,
+      StreamThumbnailSourceKind.network ||
+      StreamThumbnailSourceKind.file ||
+      StreamThumbnailSourceKind.contentUri => null,
     };
   }
 

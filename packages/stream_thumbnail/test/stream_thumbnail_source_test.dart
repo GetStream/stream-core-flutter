@@ -15,6 +15,17 @@ void main() {
     expect(first.hashCode, second.hashCode);
   });
 
+  test('a network source keeps its headers when the map it was given changes', () {
+    final headers = {'a': '1'};
+    final source = StreamThumbnailSource.network(Uri.parse('https://cdn.example.com/a.mp4'), headers: headers);
+    final hashCode = source.hashCode;
+
+    headers['b'] = '2';
+
+    expect(source.headers, {'a': '1'});
+    expect(source.hashCode, hashCode);
+  });
+
   test('network sources with different headers are not equal', () {
     final url = Uri.parse('https://cdn.example.com/a.mp4');
 
