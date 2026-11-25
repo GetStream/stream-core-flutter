@@ -39,10 +39,18 @@ final class StreamThumbnailSource {
   ///
   /// [headers] are sent with the request, except on Windows, which cannot
   /// attach them.
+  ///
+  /// Throws an [ArgumentError] if [headers] has a name that isn't a valid HTTP
+  /// header name, or a value containing a line break.
   StreamThumbnailSource.network(Uri url, {Map<String, String>? headers})
     : kind = StreamThumbnailSourceKind.network,
       location = url.toString(),
-      headers = headers == null ? null : Map<String, String>.unmodifiable(headers);
+      headers = headers == null ? null : Map<String, String>.unmodifiable(headers) {
+    for (final MapEntry(:key, :value) in {...?headers}.entries) {
+      if (!_headerName.hasMatch(key)) throw ArgumentError.value(key, 'headers', 'Not a valid HTTP header name');
+      if (value.contains(_lineBreak)) throw ArgumentError('The value of the "$key" header contains a line break.');
+    }
+  }
 
   /// A video stored on this device at [path].
   ///
@@ -68,6 +76,9 @@ final class StreamThumbnailSource {
     : kind = StreamThumbnailSourceKind.contentUri,
       location = uri.toString(),
       headers = null;
+
+  static final _headerName = RegExp(r"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$");
+  static final _lineBreak = RegExp('[\r\n\x00]');
 
   /// Where the video is read from.
   @internal

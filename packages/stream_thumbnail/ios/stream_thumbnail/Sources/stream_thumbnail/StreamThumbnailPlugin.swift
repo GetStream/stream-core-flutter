@@ -106,20 +106,15 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
   private static func writeThumbnailFile(request: ThumbnailRequest) throws -> String {
     let data = try generateThumbnailData(request: request)
 
-    // The file name comes from the video, so a directory per request is what
-    // keeps two same-named videos from different folders off each other.
     let outputDir = FileManager.default.temporaryDirectory
       .appendingPathComponent("stream_thumbnail", isDirectory: true)
-      .appendingPathComponent(UUID().uuidString, isDirectory: true)
-
-    let stem = try videoURL(for: request).deletingPathExtension().lastPathComponent
     let thumbnailURL = outputDir
-      .appendingPathComponent(stem.isEmpty ? "thumbnail" : stem)
+      .appendingPathComponent(UUID().uuidString)
       .appendingPathExtension(fileExtension(for: request.format))
 
     do {
       try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
-      try data.write(to: thumbnailURL, options: .atomic)
+      try data.write(to: thumbnailURL, options: .withoutOverwriting)
     } catch {
       throw ThumbnailError.writeFailed(error as NSError)
     }

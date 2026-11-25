@@ -48,4 +48,29 @@ void main() {
 
     expect(source.toString(), 'StreamThumbnailSource.network(https://cdn.example.com/a.mp4)');
   });
+
+  test('network rejects a header name that is not a valid HTTP token', () {
+    expect(
+      () => StreamThumbnailSource.network(_url, headers: const {'X-Client Id': 'example'}),
+      throwsArgumentError,
+    );
+  });
+
+  test('network rejects a header value with a line break', () {
+    for (final value in ['example\r\nX-Other: 1', 'example\n', 'example\x00']) {
+      expect(
+        () => StreamThumbnailSource.network(_url, headers: {'X-Client': value}),
+        throwsArgumentError,
+        reason: value,
+      );
+    }
+  });
+
+  test('network keeps valid headers as given', () {
+    const headers = {'X-Client': 'example', 'Accept': 'video/mp4; q=0.9'};
+
+    expect(StreamThumbnailSource.network(_url, headers: headers).headers, headers);
+  });
 }
+
+final _url = Uri.parse('https://cdn.example.com/a.mp4');

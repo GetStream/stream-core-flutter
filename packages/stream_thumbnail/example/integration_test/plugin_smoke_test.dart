@@ -100,25 +100,40 @@ void main() {
     skip: !_networkTests,
   );
 
-  testWidgets('thumbnailFile writes a png named after the video', (tester) async {
+  testWidgets('thumbnailFile writes a png with a generated name', (tester) async {
     final thumbnail = await StreamThumbnail.thumbnailFile(source: StreamThumbnailSource.file(video), maxWidth: 300);
 
     final written = File(thumbnail.path);
     expect(written.existsSync(), isTrue, reason: 'the reported path must be the file that was written');
     expect(await written.length(), greaterThan(0));
-    expect(thumbnail.name, 'stream_thumbnail_sample_video.png');
+    expect(thumbnail.name, endsWith('.png'));
+    expect(thumbnail.name, isNot(contains('sample_video')));
     expect((await written.readAsBytes()).take(4), [0x89, 0x50, 0x4E, 0x47]);
   });
 
-  testWidgets('thumbnailFile gives each call its own directory', (tester) async {
+  testWidgets('thumbnailFile gives each call its own file', (tester) async {
     final first = await StreamThumbnail.thumbnailFile(source: StreamThumbnailSource.file(video), maxWidth: 300);
     final second = await StreamThumbnail.thumbnailFile(source: StreamThumbnailSource.file(video), maxWidth: 300);
 
-    // Same video, so the same file name — only the directory keeps them apart.
-    expect(first.name, second.name);
     expect(first.path, isNot(second.path));
     expect(File(first.path).existsSync(), isTrue);
     expect(File(second.path).existsSync(), isTrue);
+  });
+
+  testWidgets('thumbnailFile names the file independently of the video path', (tester) async {
+    final nested = Directory('${Directory.systemTemp.path}/stream thumbnail nested')..createSync();
+    final awkward = File('${nested.path}/..%2F..%2Fescaped.mp4');
+    await awkward.writeAsBytes(await File(video).readAsBytes(), flush: true);
+    addTearDown(() => nested.deleteSync(recursive: true));
+
+    final thumbnail = await StreamThumbnail.thumbnailFile(
+      source: StreamThumbnailSource.file('file://${awkward.path}'),
+      maxWidth: 300,
+    );
+
+    expect(thumbnail.name, isNot(contains('escaped')));
+    expect(thumbnail.name, isNot(contains('..')));
+    expect(File(thumbnail.path).existsSync(), isTrue);
   });
 
   testWidgets(
@@ -134,7 +149,6 @@ void main() {
       );
 
       expect(File(thumbnail.path).existsSync(), isTrue);
-      expect(thumbnail.name, 'stream thumbnail spaced.png');
     },
     skip: !_percentDecodesFileUrls,
   );
