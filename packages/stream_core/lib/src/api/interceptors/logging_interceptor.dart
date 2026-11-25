@@ -1,6 +1,7 @@
 // coverage:ignore-file
 
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
@@ -34,9 +35,8 @@ class LoggingInterceptor extends Interceptor {
   /// reported as `***`, matching names regardless of case. [redactedHeaders] replaces [defaultRedactedHeaders], so
   /// consider spreading it in when adding a header. An empty collection reports every header as is.
   ///
-  /// Logging headers or bodies can expose sensitive data, such as the contents of requests and responses, so consider
-  /// enabling [requestHeader], [responseHeader], [requestBody] and [responseBody] only in a controlled or non-production
-  /// environment.
+  /// Headers and bodies can contain sensitive data, such as credentials and the contents of messages, so consider
+  /// reporting them only in a controlled or non-production environment.
   LoggingInterceptor({
     this.request = true,
     this.requestHeader = false,
@@ -90,7 +90,7 @@ class LoggingInterceptor extends Interceptor {
   final LogPrint? logPrint;
 
   /// The headers whose values are reported as `***` when the constructor is given no others.
-  static const defaultRedactedHeaders = {'Authorization'};
+  static const Iterable<String> defaultRedactedHeaders = {'Authorization'};
 
   static const _redacted = '***';
 
@@ -117,7 +117,8 @@ class LoggingInterceptor extends Interceptor {
 
   String _redactQueryPair(String pair) {
     final [name, ...] = pair.split('=');
-    if (!_queryParametersToRedact.contains(Uri.decodeQueryComponent(name))) return pair;
+    final decodedName = Uri.decodeQueryComponent(name, encoding: const Utf8Codec(allowMalformed: true));
+    if (!_queryParametersToRedact.contains(decodedName)) return pair;
 
     return '$name=$_redacted';
   }

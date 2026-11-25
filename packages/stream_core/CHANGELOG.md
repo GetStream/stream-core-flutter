@@ -2,12 +2,12 @@
 
 ### ✨ Features
 
-- Added `redactedHeaders`, `redactedQueryParameters` and `defaultRedactedHeaders` to `LoggingInterceptor`; it reports
-  their values as `***`.
+- Added `redactedHeaders` and `redactedQueryParameters` to `LoggingInterceptor`, naming the headers and query
+  parameters it logs as `***`, and `LoggingInterceptor.defaultRedactedHeaders`.
 
 ### 🔄 Changed
 
-- `LoggingInterceptor` reports the `Authorization` header as `***` when it logs headers.
+- `LoggingInterceptor` logs the `Authorization` header as `***`. Pass `redactedHeaders: const {}` to log it as is.
 - `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` no longer include `rawValue`.
 
 ### 🐞 Fixed

@@ -60,13 +60,14 @@ Future<String> _linesOf(
   LoggingInterceptor Function(LogPrint logPrint) create, {
   String path = '/test',
   Map<String, Object?> headers = const {},
+  Map<String, Object?>? queryParameters,
 }) async {
   final lines = <String>[];
   final dio = Dio(BaseOptions(baseUrl: 'https://example.com', headers: headers))
     ..httpClientAdapter = _FakeApi()
     ..interceptors.add(create((_, line) => lines.add('$line')));
 
-  await dio.get<void>(path);
+  await dio.get<void>(path, queryParameters: queryParameters);
   return lines.join('\n');
 }
 
@@ -124,8 +125,7 @@ void main() {
         },
       );
 
-      expect(handler.messages.join(), contains('Authorization'));
-      expect(handler.messages.join(), contains('***'));
+      expect(handler.messages.join(), contains('Authorization: ***'));
       expect(handler.messages.join(), isNot(contains(token)));
     });
 
@@ -183,7 +183,7 @@ void main() {
       expect(log, isNot(contains('filter-value')));
     });
 
-    test('keeps the order of repeated query parameters it redacts around', () async {
+    test('keeps repeated query parameters in the order they were sent', () async {
       final log = await _linesOf(
         (logPrint) => LoggingInterceptor(redactedQueryParameters: {'b'}, logPrint: logPrint),
         path: '/test?a=1&b=2&a=3',
@@ -199,6 +199,26 @@ void main() {
       );
 
       expect(log, contains('/test?q=a%20b&api_key=***'));
+    });
+
+    test('redacts a query parameter passed apart from the path', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(requestHeader: true, redactedQueryParameters: {'api_key'}, logPrint: logPrint),
+        queryParameters: const {'api_key': 'key-value'},
+      );
+
+      expect(log, contains('api_key: ***'));
+      expect(log, contains('api_key=***'));
+      expect(log, isNot(contains('key-value')));
+    });
+
+    test('reports a query parameter whose name is not valid UTF-8', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(redactedQueryParameters: {'api_key'}, logPrint: logPrint),
+        path: '/test?name%FF=1&api_key=key-value',
+      );
+
+      expect(log, contains('/test?name%FF=1&api_key=***'));
     });
 
     test('redacts a response header it is given', () async {
