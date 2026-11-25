@@ -55,6 +55,21 @@ Map<String, Object?> _bulkyBody() => {
   'next': 'W3sibmFtZSI6Imhhc191bnJlYWQiLCJ2YWx1ZSI6ZmFsc2UsImRpcmVjdGlvbiI6LTF9' * 4,
 };
 
+/// Sends one GET through [create]'s interceptor and returns every line it reported.
+Future<String> _linesOf(
+  LoggingInterceptor Function(LogPrint logPrint) create, {
+  String path = '/test',
+  Map<String, Object?> headers = const {},
+}) async {
+  final lines = <String>[];
+  final dio = Dio(BaseOptions(baseUrl: 'https://example.com', headers: headers))
+    ..httpClientAdapter = _FakeApi()
+    ..interceptors.add(create((_, line) => lines.add('$line')));
+
+  await dio.get<void>(path);
+  return lines.join('\n');
+}
+
 void main() {
   group('LoggingInterceptor', () {
     test('writes nothing until an app installs a handler', () async {
@@ -110,8 +125,46 @@ void main() {
       );
 
       expect(handler.messages.join(), contains('Authorization'));
-      expect(handler.messages.join(), contains('<redacted>'));
+      expect(handler.messages.join(), contains(LoggingInterceptor.redacted));
       expect(handler.messages.join(), isNot(contains(token)));
+    });
+
+    test('redacts the headers it is given in place of Authorization', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(requestHeader: true, redactHeaders: {'x-session'}, logPrint: logPrint),
+        headers: const {'X-Session': 'session-value', 'Authorization': 'authorization-value'},
+      );
+
+      expect(log, isNot(contains('session-value')));
+      expect(log, contains('authorization-value'));
+    });
+
+    test('reports every header as is when no header is to be redacted', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(requestHeader: true, redactHeaders: const {}, logPrint: logPrint),
+        headers: const {'Authorization': 'authorization-value'},
+      );
+
+      expect(log, contains('authorization-value'));
+    });
+
+    test('redacts the query parameters it is given, whatever their case', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(requestHeader: true, redactQueryParams: {'API_KEY'}, logPrint: logPrint),
+        path: '/test?api_key=key-value&page=2',
+      );
+
+      expect(log, contains('api_key=${LoggingInterceptor.redacted}&page=2'));
+      expect(log, isNot(contains('key-value')));
+    });
+
+    test('redacts a response header it is given', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(responseHeader: true, redactHeaders: {'Content-Type'}, logPrint: logPrint),
+      );
+
+      expect(log, contains('content-type'));
+      expect(log, isNot(contains(Headers.jsonContentType)));
     });
 
     test('reports the request once a handler wants it', () async {

@@ -1,10 +1,15 @@
 ## Upcoming
 
+### ✨ Features
+
+- Added `redactHeaders` and `redactQueryParams` to `LoggingInterceptor`, which report the values of the named headers and
+  query parameters as `LoggingInterceptor.redacted`.
+
 ### 🔄 Changed
 
 - A WebSocket that fails to connect or errors mid-stream is now reported as `The WebSocket connection failed`, without
   the socket's own description.
-- `LoggingInterceptor` with `requestHeader` now reports the `Authorization` header as `<redacted>`.
+- `LoggingInterceptor` reports the `Authorization` header as `██`.
 - `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` no longer include the raw token.
 
 ### 🐞 Fixed
