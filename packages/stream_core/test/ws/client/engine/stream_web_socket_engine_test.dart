@@ -314,7 +314,9 @@ void main() {
 
   test('reports a refused handshake without the query string of the URL it connected to', () async {
     final socket = FakeWebSocketChannel(
-      readyError: Exception("Connection to 'https://example.com/connect?session=abc123#' was not upgraded"),
+      readyError: Exception(
+        "Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was not upgraded to websocket",
+      ),
     );
     addTearDown(socket.endStream);
 
@@ -326,22 +328,17 @@ void main() {
 
     final result = await engine.open(_options);
 
-    final error = (result as Failure).error;
-    expect(error, isA<StreamNetworkException>());
-    expect('$error', contains('https://example.com/connect'));
-    expect('$error', isNot(contains('abc123')));
+    expect('${(result as Failure).error}', contains("'http://example.com:443/connect?<redacted>#'"));
   });
 
   test('reports a socket error without the query string of the URL it connected to', () async {
     final (:engine, :listener, :socket) = _subject();
     await engine.open(_options);
 
-    socket.emitError(Exception("Connection to 'https://example.com/connect?session=abc123#' was closed"));
+    socket.emitError(Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was closed"));
     await pumpEventQueue();
 
-    expect(listener.errors.single, isA<StreamNetworkException>());
-    expect('${listener.errors.single}', contains('https://example.com/connect'));
-    expect('${listener.errors.single}', isNot(contains('abc123')));
+    expect('${listener.errors.single}', contains("'http://example.com:443/connect?<redacted>#'"));
   });
 
   test('passes a socket error that names no URL query through unchanged', () async {

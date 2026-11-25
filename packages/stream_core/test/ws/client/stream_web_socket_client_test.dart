@@ -183,6 +183,32 @@ void main() {
         );
       },
     );
+
+    test('reports a socket error without the query string of the URL it connected to', () {
+      fakeAsync((async) {
+        final tester = buildTester();
+        tester.client.connect().ignore();
+        async.flushMicrotasks();
+
+        tester.server.socket.emitError(
+          Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was closed"),
+        );
+        async.flushMicrotasks();
+
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having(
+            (it) => it.source,
+            'source',
+            isA<SystemInitiated>().having(
+              (it) => '${it.error}',
+              'error',
+              allOf(contains('The connection reported an error'), isNot(contains('version=1'))),
+            ),
+          ),
+        );
+      });
+    });
   });
 
   group('send', () {

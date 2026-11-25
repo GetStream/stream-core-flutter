@@ -32,6 +32,8 @@ WebSocketChannel _createWebSocket(WebSocketOptions options) {
 ///
 /// The engine supports both text and binary message formats through the [WebSocketMessageCodec]
 /// and provides callbacks through [WebSocketEngineListener] for connection events.
+///
+/// An error that quotes a URL reports it with the query string replaced by `<redacted>`.
 class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   /// Creates a new instance of [StreamWebSocketEngine].
   StreamWebSocketEngine({
@@ -156,7 +158,15 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     final description = error.toString();
     if (!_urlQuery.hasMatch(description)) return error;
 
-    final redacted = description.replaceAllMapped(_urlQuery, (match) => '${match[1]}?<redacted>');
-    return StreamNetworkException(message: redacted);
+    return _RedactedException(description.replaceAllMapped(_urlQuery, (match) => '${match[1]}?<redacted>'));
   }
+}
+
+final class _RedactedException implements Exception {
+  const _RedactedException(this._description);
+
+  final String _description;
+
+  @override
+  String toString() => _description;
 }

@@ -53,7 +53,6 @@ class WebSocketOptions {
   /// Query parameters to append to the connection URL.
   ///
   /// These parameters are added to the WebSocket URL during connection
-  /// establishment. Commonly used for authentication tokens, API versions,
-  /// or other connection-specific configuration.
+  /// establishment, for API versions or other connection-specific configuration.
   final Map<String, Object>? queryParameters;
 }

@@ -75,18 +75,14 @@ void main() {
           async.flushMicrotasks();
 
           tester.server.socket.emitError(
-            Exception("Connection to 'https://example.com/connect?session=abc123#' was closed"),
+            Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was closed"),
           );
           async.flushMicrotasks();
         });
 
         final logged = handler.records.map((it) => '${it.message} ${it.error}');
-        expect(logged, contains(contains('https://example.com/connect')));
-        expect(logged, everyElement(isNot(contains('abc123'))));
-        expect(
-          tester.connectionState,
-          isA<Disconnected>().having((it) => '${it.source}', 'source', isNot(contains('abc123'))),
-        );
+        expect(logged, contains(contains("'http://example.com:443/connect?<redacted>#'")));
+        expect(logged, everyElement(isNot(contains('version=1'))));
       });
     });
 

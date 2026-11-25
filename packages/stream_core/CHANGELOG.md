@@ -2,10 +2,9 @@
 
 ### 🔄 Changed
 
-- A WebSocket error that quotes the connection URL now comes with the URL's query string replaced by `<redacted>`, in the
-  logs and in the reported `StreamNetworkException`.
+- WebSocket errors that quote the connection URL now report it with the query string replaced by `<redacted>`.
 - `LoggingInterceptor` with `requestHeader` now reports the `Authorization` header as `<redacted>`.
-- `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` no longer include the raw token.
+- `UserToken.toString()` and the errors `UserToken` throws for an invalid token no longer include the raw token.
 
 ### 🐞 Fixed
 

@@ -74,8 +74,6 @@ void main() {
       final printed = capturePrints(() => dio.get<void>('/test'));
       await pumpEventQueue();
 
-      // `requestHeader` puts `Authorization` in the record, and the request is signed before this
-      // interceptor sees it, so a log written unasked carries the user's token.
       expect(printed.join(), isNot(contains(token)));
     });
 
@@ -93,8 +91,6 @@ void main() {
         },
       );
 
-      // What a product gets by constructing the interceptor without arguments: turning `requestHeader`
-      // on is what puts the signed `Authorization` in a record, and nothing else does.
       expect(handler.records, isNotEmpty, reason: 'the request was reported');
       expect(handler.messages.join(), isNot(contains(token)));
     });

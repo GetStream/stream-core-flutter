@@ -26,9 +26,6 @@ typedef LogPrint = void Function(InterceptStep step, Object object);
 /// Records go out under `SC:Http`, at [StreamLogPriority.debug], or [StreamLogPriority.warning]
 /// for a request that failed. Nothing is written, or even formatted, until an app installs a
 /// [StreamLogHandler].
-///
-/// [requestHeader] reports the request's headers with the `Authorization` value replaced by
-/// `<redacted>`.
 class LoggingInterceptor extends Interceptor {
   /// Creates a new [LoggingInterceptor].
   LoggingInterceptor({
@@ -50,6 +47,8 @@ class LoggingInterceptor extends Interceptor {
   final bool request;
 
   /// Whether to report the request's headers, query parameters and extras.
+  ///
+  /// The `Authorization` header is reported as `<redacted>`.
   final bool requestHeader;
 
   /// Whether to report the request body.
