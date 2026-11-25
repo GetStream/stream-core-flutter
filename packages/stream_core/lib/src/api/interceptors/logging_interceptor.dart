@@ -33,6 +33,10 @@ class LoggingInterceptor extends Interceptor {
   /// The values of the headers in [redactedHeaders] and of the query parameters in [redactedQueryParameters] are
   /// reported as `***`, matching names regardless of case. [redactedHeaders] replaces [defaultRedactedHeaders], so
   /// consider spreading it in when adding a header. An empty collection reports every header as is.
+  ///
+  /// Logging headers or bodies can expose sensitive data, such as the contents of requests and responses, so consider
+  /// enabling [requestHeader], [responseHeader], [requestBody] and [responseBody] only in a controlled or non-production
+  /// environment.
   LoggingInterceptor({
     this.request = true,
     this.requestHeader = false,
