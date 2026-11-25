@@ -27,7 +27,22 @@ void main() {
                   builder: (context) => StreamContextMenuHeading(
                     label: const Text('Devices'),
                     trailing: Icon(context.streamIcons.chevronDown),
-                    expanded: false,
+                    isExpanded: false,
+                    onTap: () {},
+                  ),
+                ),
+                brightness: brightness,
+              ),
+            ),
+            GoldenTestScenario(
+              name: 'disabled',
+              child: _buildInTheme(
+                Builder(
+                  builder: (context) => StreamContextMenuHeading(
+                    label: const Text('Devices'),
+                    trailing: Icon(context.streamIcons.chevronDown),
+                    isExpanded: false,
+                    enabled: false,
                     onTap: () {},
                   ),
                 ),
@@ -47,7 +62,7 @@ void main() {
                       builder: (context) => StreamContextMenuHeading(
                         label: const Text('Speaker'),
                         trailing: Icon(context.streamIcons.chevronUp),
-                        expanded: true,
+                        isExpanded: true,
                         onTap: () {},
                       ),
                     ),

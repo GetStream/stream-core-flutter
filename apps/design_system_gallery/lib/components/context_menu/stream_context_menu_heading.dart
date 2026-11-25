@@ -44,6 +44,12 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       description: 'Give the heading an onTap and expanded state so it folds its section away.',
     );
 
+    final enabled = context.knobs.boolean(
+      label: 'Enabled',
+      initialValue: true,
+      description: 'Draw the heading disabled and ignore taps when off.',
+    );
+
     final showTrailing = context.knobs.boolean(
       label: 'Trailing',
       initialValue: true,
@@ -64,7 +70,8 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
           StreamContextMenuHeading(
             label: Text(label),
             trailing: showTrailing ? Icon(isCollapsed ? icons.chevronDown : icons.chevronUp) : null,
-            expanded: collapsible ? !isCollapsed : null,
+            isExpanded: collapsible ? !isCollapsed : null,
+            enabled: enabled,
             onTap: collapsible ? () => setState(() => _collapsed = !_collapsed) : null,
           ),
           if (!isCollapsed) ...[
@@ -129,7 +136,7 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
       yield StreamContextMenuHeading(
         label: Text(heading),
         trailing: Icon(collapsed ? icons.chevronDown : icons.chevronUp),
-        expanded: !collapsed,
+        isExpanded: !collapsed,
         onTap: () => setState(() => collapsed ? _collapsed.remove(heading) : _collapsed.add(heading)),
       );
       if (collapsed) return;
@@ -176,6 +183,21 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
             ),
           ),
           _Labeled(
+            title: 'Disabled',
+            textStyle: textTheme.captionEmphasis.copyWith(color: colorScheme.textSecondary),
+            child: StreamContextMenu(
+              children: [
+                StreamContextMenuHeading(
+                  label: const Text('Camera'),
+                  trailing: Icon(icons.chevronDown),
+                  isExpanded: false,
+                  enabled: false,
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+          _Labeled(
             title: 'Dense metrics via theme',
             textStyle: textTheme.captionEmphasis.copyWith(color: colorScheme.textSecondary),
             child: StreamContextMenuActionTheme(
@@ -187,18 +209,12 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
                   ),
                 ),
               ),
-              child: StreamContextMenuHeadingTheme(
-                data: StreamContextMenuHeadingThemeData(
-                  minimumSize: const Size(200, 32),
-                  padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: spacing.xxs),
-                ),
-                child: StreamContextMenu(
-                  children: [
-                    StreamContextMenuHeading(label: const Text('Microphone')),
-                    StreamContextMenuAction<void>(label: const Text('Built-in microphone'), onTap: () {}),
-                    StreamContextMenuAction<void>(label: const Text('External microphone'), onTap: () {}),
-                  ],
-                ),
+              child: StreamContextMenu(
+                children: [
+                  StreamContextMenuHeading(label: const Text('Microphone')),
+                  StreamContextMenuAction<void>(label: const Text('Built-in microphone'), onTap: () {}),
+                  StreamContextMenuAction<void>(label: const Text('External microphone'), onTap: () {}),
+                ],
               ),
             ),
           ),

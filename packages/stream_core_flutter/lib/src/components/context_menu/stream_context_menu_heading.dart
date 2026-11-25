@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import '../../factory/stream_component_factory.dart';
+import '../../theme/components/stream_context_menu_action_theme.dart';
 import '../../theme/components/stream_context_menu_heading_theme.dart';
 import '../../theme/primitives/stream_colors.dart';
 import '../../theme/primitives/stream_radius.dart';
@@ -12,19 +13,17 @@ import '../../theme/stream_theme_extensions.dart';
 import 'stream_context_menu.dart';
 import 'stream_context_menu_action.dart';
 
-/// The heading of a section inside a [StreamContextMenu], such as
-/// "Microphone".
+/// The heading of a section in a [StreamContextMenu].
 ///
-/// A heading shares the default row metrics of a [StreamContextMenuAction] but draws
-/// its [label] in a smaller, tertiary style. It is announced as a header to
-/// screen readers.
+/// A heading names the actions that follow it, such as "Microphone" above a
+/// list of microphones. It shares the row size and padding of a
+/// [StreamContextMenuAction] but draws its [label] in a tertiary style, and it
+/// is announced as a header to screen readers.
 ///
 /// A heading is not interactive unless given an [onTap], typically to collapse
-/// its section. A tappable heading is also announced as a
-/// button, and reports whether its section is [expanded] when that is given.
-///
-/// A tappable heading draws its highlight on the nearest [Material] ancestor,
-/// which a [StreamContextMenu] provides.
+/// its section. A tappable heading is also announced as a button, and reports
+/// whether its section is expanded when [isExpanded] is given. Set [enabled] to
+/// false to draw the heading disabled and ignore taps.
 ///
 /// {@tool snippet}
 ///
@@ -51,7 +50,7 @@ import 'stream_context_menu_action.dart';
 /// StreamContextMenuHeading(
 ///   label: Text('Advanced'),
 ///   trailing: Icon(collapsed ? icons.chevronDown : icons.chevronUp),
-///   expanded: !collapsed,
+///   isExpanded: !collapsed,
 ///   onTap: () => setState(() => collapsed = !collapsed),
 /// )
 /// ```
@@ -70,12 +69,14 @@ class StreamContextMenuHeading extends StatelessWidget {
     required Widget label,
     Widget? trailing,
     VoidCallback? onTap,
-    bool? expanded,
+    bool enabled = true,
+    bool? isExpanded,
   }) : props = .new(
          label: label,
          trailing: trailing,
          onTap: onTap,
-         expanded: expanded,
+         enabled: enabled,
+         isExpanded: isExpanded,
        );
 
   /// The props controlling the appearance and behavior of this heading.
@@ -95,36 +96,46 @@ class StreamContextMenuHeading extends StatelessWidget {
 /// allowing them to be passed through the [StreamComponentFactory].
 ///
 /// Consider keeping a custom implementation announced as a header, and a
-/// tappable one as a button carrying [expanded]. A tappable heading's highlight
-/// needs a [Material] ancestor, which a [StreamContextMenu] provides.
+/// tappable one as a button carrying [isExpanded].
 ///
 /// See also:
 ///
 ///  * [StreamContextMenuHeading], which uses these properties.
 ///  * [DefaultStreamContextMenuHeading], the default implementation.
 @immutable
+@experimental
 final class StreamContextMenuHeadingProps {
   /// Creates properties for a context menu heading.
-  ///
-  /// [expanded] is only meaningful for a heading with an [onTap].
   const StreamContextMenuHeadingProps({
     required this.label,
     this.trailing,
     this.onTap,
-    this.expanded,
-  }) : assert(expanded == null || onTap != null, 'expanded is only reported for a heading with an onTap.');
+    this.enabled = true,
+    this.isExpanded,
+  });
 
   /// The heading widget, typically a [Text].
   ///
-  /// Its text style and color come from [StreamContextMenuHeadingThemeData].
+  /// The label fills the available horizontal space, so text wrapping and
+  /// overflow behavior are controlled by the consumer. If the text may be long,
+  /// use [TextOverflow.ellipsis] on the [Text.overflow] property to truncate
+  /// rather than wrap:
+  ///
+  /// ```dart
+  /// StreamContextMenuHeading(
+  ///   label: Text('Very long heading text', overflow: TextOverflow.ellipsis),
+  /// )
+  /// ```
+  ///
+  /// Its text style and color come from [StreamContextMenuHeadingStyle].
   final Widget label;
 
   /// An optional widget drawn at the far end of the heading, typically the
   /// chevron of a section that collapses.
   ///
   /// An [Icon] here takes its color and size from
-  /// [StreamContextMenuHeadingThemeData.foregroundColor] and
-  /// [StreamContextMenuHeadingThemeData.iconSize].
+  /// [StreamContextMenuHeadingStyle.foregroundColor] and
+  /// [StreamContextMenuHeadingStyle.iconSize].
   final Widget? trailing;
 
   /// Called when the heading is tapped.
@@ -132,20 +143,28 @@ final class StreamContextMenuHeadingProps {
   /// If null, the heading is not interactive.
   final VoidCallback? onTap;
 
+  /// Whether this heading is enabled.
+  ///
+  /// When false, the heading is drawn in the disabled style and [onTap] is
+  /// not called. A tappable heading is then announced as a disabled button.
+  ///
+  /// Defaults to true.
+  final bool enabled;
+
   /// Whether the section this heading folds is expanded.
   ///
-  /// Reported to screen readers as the expanded or collapsed state of a
-  /// tappable heading. Leave it null for a heading that does not fold a
-  /// section. Must be null when [onTap] is null.
-  final bool? expanded;
+  /// Reported to screen readers as the expanded or collapsed state of the
+  /// heading. Leave it null for a heading that does not fold a section.
+  final bool? isExpanded;
 }
 
 /// The default implementation of [StreamContextMenuHeading].
 ///
 /// Lays out the [StreamContextMenuHeadingProps.label] and the optional
 /// [StreamContextMenuHeadingProps.trailing] in a row, styled from
-/// [StreamContextMenuHeadingTheme] with fallback to defaults that share the row
-/// size, padding and shape of a [StreamContextMenuAction].
+/// [StreamContextMenuHeadingTheme]. The row size and padding fall back to
+/// [StreamContextMenuActionTheme], so a heading lines up with the actions of
+/// its menu.
 ///
 /// See also:
 ///
@@ -160,76 +179,97 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.streamContextMenuHeadingTheme;
-    final defaults = _StreamContextMenuHeadingThemeDefaults(context);
+    final style = context.streamContextMenuHeadingTheme.style;
+    final actionStyle = context.streamContextMenuActionTheme.style;
+    final defaults = _StreamContextMenuHeadingStyleDefaults(context);
 
-    final effectiveTextStyle = theme.textStyle ?? defaults.textStyle;
-    final effectiveForegroundColor = theme.foregroundColor ?? defaults.foregroundColor;
-    final effectiveIconSize = theme.iconSize ?? defaults.iconSize;
-    final effectiveOverlayColor = theme.overlayColor ?? defaults.overlayColor;
-    final effectiveMinimumSize = theme.minimumSize ?? defaults.minimumSize;
-    final effectiveMaximumSize = theme.maximumSize ?? defaults.maximumSize;
-    final effectivePadding = theme.padding ?? defaults.padding;
-    final effectiveSpacing = theme.spacing ?? defaults.spacing;
-    final effectiveShape = theme.shape ?? defaults.shape;
+    final effectiveForegroundColor = style?.foregroundColor ?? defaults.foregroundColor;
+    final effectiveOverlayColor = style?.overlayColor ?? defaults.overlayColor;
+    final effectiveSide = style?.side ?? defaults.side;
+    final effectiveTextStyle = style?.textStyle ?? defaults.textStyle;
+    final effectiveIconSize = style?.iconSize ?? defaults.iconSize;
+    final effectiveMinimumSize = style?.minimumSize ?? actionStyle?.minimumSize ?? defaults.minimumSize;
+    final effectiveMaximumSize = style?.maximumSize ?? actionStyle?.maximumSize ?? defaults.maximumSize;
+    final effectivePadding = style?.padding ?? actionStyle?.padding ?? defaults.padding;
+    final effectiveShape = style?.shape ?? defaults.shape;
 
-    Widget heading = ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: effectiveMinimumSize.width,
-        minHeight: effectiveMinimumSize.height,
-        maxWidth: effectiveMaximumSize.width,
-        maxHeight: effectiveMaximumSize.height,
+    final content = switch (props.trailing) {
+      final trailing? => Row(
+        spacing: context.streamSpacing.xs,
+        children: [
+          Expanded(child: props.label),
+          trailing,
+        ],
       ),
-      child: Padding(
-        padding: effectivePadding,
-        child: Align(
+      null => props.label,
+    };
+
+    final Widget heading;
+    if (props.onTap case final onTap?) {
+      heading = TextButton(
+        onPressed: props.enabled ? onTap : null,
+        style: ButtonStyle(
+          tapTargetSize: .shrinkWrap,
+          visualDensity: .standard,
           alignment: AlignmentDirectional.centerStart,
-          widthFactor: 1,
-          heightFactor: 1,
-          child: IconTheme.merge(
-            data: IconThemeData(color: effectiveForegroundColor, size: effectiveIconSize),
-            child: DefaultTextStyle.merge(
-              style: effectiveTextStyle.copyWith(color: effectiveForegroundColor),
-              child: switch (props.trailing) {
-                final trailing? => Row(
-                  spacing: effectiveSpacing,
-                  children: [
-                    Expanded(child: props.label),
-                    trailing,
-                  ],
-                ),
-                null => props.label,
-              },
+          foregroundColor: effectiveForegroundColor,
+          iconColor: effectiveForegroundColor,
+          overlayColor: effectiveOverlayColor,
+          side: effectiveSide,
+          textStyle: effectiveTextStyle,
+          iconSize: effectiveIconSize,
+          minimumSize: effectiveMinimumSize,
+          maximumSize: effectiveMaximumSize,
+          padding: effectivePadding,
+          shape: effectiveShape,
+        ),
+        child: content,
+      );
+    } else {
+      final states = {if (!props.enabled) WidgetState.disabled};
+      final foregroundColor = effectiveForegroundColor.resolve(states);
+      final minimumSize = effectiveMinimumSize.resolve(states) ?? Size.zero;
+      final maximumSize = effectiveMaximumSize.resolve(states) ?? Size.infinite;
+
+      heading = ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: minimumSize.width,
+          minHeight: minimumSize.height,
+          maxWidth: maximumSize.width,
+          maxHeight: maximumSize.height,
+        ),
+        child: Padding(
+          padding: effectivePadding.resolve(states) ?? EdgeInsets.zero,
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            widthFactor: 1,
+            heightFactor: 1,
+            child: IconTheme.merge(
+              data: IconThemeData(color: foregroundColor, size: effectiveIconSize.resolve(states)),
+              child: DefaultTextStyle.merge(
+                style: (effectiveTextStyle.resolve(states) ?? const TextStyle()).copyWith(color: foregroundColor),
+                child: content,
+              ),
             ),
           ),
         ),
-      ),
-    );
-
-    if (props.onTap case final onTap?) {
-      heading = InkWell(
-        onTap: onTap,
-        overlayColor: effectiveOverlayColor,
-        customBorder: effectiveShape,
-        child: heading,
       );
     }
 
-    final isTappable = props.onTap != null;
-    return Semantics(
-      container: true,
-      header: true,
-      button: isTappable,
-      expanded: isTappable ? props.expanded : null,
-      child: heading,
+    return MergeSemantics(
+      child: Semantics(
+        header: true,
+        expanded: props.isExpanded,
+        child: heading,
+      ),
     );
   }
 }
 
-// Provides default values for [StreamContextMenuHeadingThemeData] that line a
-// heading up with the defaults of a [StreamContextMenuAction].
-class _StreamContextMenuHeadingThemeDefaults extends StreamContextMenuHeadingThemeData {
-  _StreamContextMenuHeadingThemeDefaults(this.context);
+// Provides default values for [StreamContextMenuHeadingStyle], following the
+// mobile menu heading of the design system.
+class _StreamContextMenuHeadingStyleDefaults extends StreamContextMenuHeadingStyle {
+  _StreamContextMenuHeadingStyleDefaults(this.context);
 
   final BuildContext context;
 
@@ -239,34 +279,43 @@ class _StreamContextMenuHeadingThemeDefaults extends StreamContextMenuHeadingThe
   late final StreamRadius _radius = context.streamRadius;
 
   @override
-  TextStyle get textStyle => _textTheme.captionEmphasis;
-
-  @override
-  Color get foregroundColor => _colorScheme.textTertiary;
-
-  @override
-  double get iconSize => 16;
+  WidgetStateProperty<Color> get foregroundColor => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    return _colorScheme.textTertiary;
+  });
 
   @override
   WidgetStateProperty<Color> get overlayColor => WidgetStateProperty.resolveWith((states) {
     if (states.contains(WidgetState.pressed)) return _colorScheme.backgroundPressed;
     if (states.contains(WidgetState.hovered)) return _colorScheme.backgroundHover;
-    if (states.contains(WidgetState.focused)) return _colorScheme.backgroundHover;
     return StreamColors.transparent;
   });
 
   @override
-  Size get minimumSize => const Size(242, 40);
+  WidgetStateProperty<BorderSide> get side => WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.focused)) return BorderSide(color: _colorScheme.borderFocus, width: 2);
+    return BorderSide.none;
+  });
 
   @override
-  Size get maximumSize => Size.infinite;
+  WidgetStateProperty<TextStyle> get textStyle => WidgetStatePropertyAll(_textTheme.bodyEmphasis);
 
   @override
-  EdgeInsetsGeometry get padding => .symmetric(horizontal: _spacing.sm, vertical: _spacing.xs + _spacing.xxxs);
+  WidgetStateProperty<double> get iconSize => const WidgetStatePropertyAll(20);
 
   @override
-  double get spacing => _spacing.xs;
+  WidgetStateProperty<Size> get minimumSize => const WidgetStatePropertyAll(Size(242, 40));
 
   @override
-  OutlinedBorder get shape => RoundedRectangleBorder(borderRadius: .all(_radius.md));
+  WidgetStateProperty<Size> get maximumSize => const WidgetStatePropertyAll(Size.infinite);
+
+  @override
+  WidgetStateProperty<EdgeInsetsGeometry> get padding => WidgetStatePropertyAll(
+    .symmetric(horizontal: _spacing.sm, vertical: _spacing.xs + _spacing.xxxs),
+  );
+
+  @override
+  WidgetStateProperty<OutlinedBorder> get shape => WidgetStatePropertyAll(
+    RoundedRectangleBorder(borderRadius: .all(_radius.lg)),
+  );
 }

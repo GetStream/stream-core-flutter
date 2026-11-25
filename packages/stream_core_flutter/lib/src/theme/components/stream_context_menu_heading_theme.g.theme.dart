@@ -30,47 +30,16 @@ mixin _$StreamContextMenuHeadingThemeData {
     }
 
     return StreamContextMenuHeadingThemeData(
-      textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
-      foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
-      iconSize: lerpDouble$(a.iconSize, b.iconSize, t),
-      overlayColor: WidgetStateProperty.lerp<Color?>(
-        a.overlayColor,
-        b.overlayColor,
-        t,
-        Color.lerp,
-      ),
-      minimumSize: Size.lerp(a.minimumSize, b.minimumSize, t),
-      maximumSize: Size.lerp(a.maximumSize, b.maximumSize, t),
-      padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
-      spacing: lerpDouble$(a.spacing, b.spacing, t),
-      shape: OutlinedBorder.lerp(a.shape, b.shape, t),
+      style: StreamContextMenuHeadingStyle.lerp(a.style, b.style, t),
     );
   }
 
   StreamContextMenuHeadingThemeData copyWith({
-    TextStyle? textStyle,
-    Color? foregroundColor,
-    double? iconSize,
-    WidgetStateProperty<Color?>? overlayColor,
-    Size? minimumSize,
-    Size? maximumSize,
-    EdgeInsetsGeometry? padding,
-    double? spacing,
-    OutlinedBorder? shape,
+    StreamContextMenuHeadingStyle? style,
   }) {
     final _this = (this as StreamContextMenuHeadingThemeData);
 
-    return StreamContextMenuHeadingThemeData(
-      textStyle: textStyle ?? _this.textStyle,
-      foregroundColor: foregroundColor ?? _this.foregroundColor,
-      iconSize: iconSize ?? _this.iconSize,
-      overlayColor: overlayColor ?? _this.overlayColor,
-      minimumSize: minimumSize ?? _this.minimumSize,
-      maximumSize: maximumSize ?? _this.maximumSize,
-      padding: padding ?? _this.padding,
-      spacing: spacing ?? _this.spacing,
-      shape: shape ?? _this.shape,
-    );
+    return StreamContextMenuHeadingThemeData(style: style ?? _this.style);
   }
 
   StreamContextMenuHeadingThemeData merge(
@@ -86,17 +55,7 @@ mixin _$StreamContextMenuHeadingThemeData {
       return other;
     }
 
-    return copyWith(
-      textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
-      foregroundColor: other.foregroundColor,
-      iconSize: other.iconSize,
-      overlayColor: other.overlayColor,
-      minimumSize: other.minimumSize,
-      maximumSize: other.maximumSize,
-      padding: other.padding,
-      spacing: other.spacing,
-      shape: other.shape,
-    );
+    return copyWith(style: _this.style?.merge(other.style) ?? other.style);
   }
 
   @override
@@ -112,31 +71,178 @@ mixin _$StreamContextMenuHeadingThemeData {
     final _this = (this as StreamContextMenuHeadingThemeData);
     final _other = (other as StreamContextMenuHeadingThemeData);
 
-    return _other.textStyle == _this.textStyle &&
-        _other.foregroundColor == _this.foregroundColor &&
-        _other.iconSize == _this.iconSize &&
-        _other.overlayColor == _this.overlayColor &&
-        _other.minimumSize == _this.minimumSize &&
-        _other.maximumSize == _this.maximumSize &&
-        _other.padding == _this.padding &&
-        _other.spacing == _this.spacing &&
-        _other.shape == _this.shape;
+    return _other.style == _this.style;
   }
 
   @override
   int get hashCode {
     final _this = (this as StreamContextMenuHeadingThemeData);
 
+    return Object.hash(runtimeType, _this.style);
+  }
+}
+
+mixin _$StreamContextMenuHeadingStyle {
+  bool get canMerge => true;
+
+  static StreamContextMenuHeadingStyle? lerp(
+    StreamContextMenuHeadingStyle? a,
+    StreamContextMenuHeadingStyle? b,
+    double t,
+  ) {
+    if (identical(a, b)) {
+      return a;
+    }
+
+    if (a == null) {
+      return t == 1.0 ? b : null;
+    }
+
+    if (b == null) {
+      return t == 0.0 ? a : null;
+    }
+
+    return StreamContextMenuHeadingStyle(
+      foregroundColor: WidgetStateProperty.lerp<Color?>(
+        a.foregroundColor,
+        b.foregroundColor,
+        t,
+        Color.lerp,
+      ),
+      overlayColor: WidgetStateProperty.lerp<Color?>(
+        a.overlayColor,
+        b.overlayColor,
+        t,
+        Color.lerp,
+      ),
+      side: t < 0.5 ? a.side : b.side,
+      textStyle: WidgetStateProperty.lerp<TextStyle?>(
+        a.textStyle,
+        b.textStyle,
+        t,
+        TextStyle.lerp,
+      ),
+      iconSize: WidgetStateProperty.lerp<double?>(
+        a.iconSize,
+        b.iconSize,
+        t,
+        lerpDouble$,
+      ),
+      minimumSize: WidgetStateProperty.lerp<Size?>(
+        a.minimumSize,
+        b.minimumSize,
+        t,
+        Size.lerp,
+      ),
+      maximumSize: WidgetStateProperty.lerp<Size?>(
+        a.maximumSize,
+        b.maximumSize,
+        t,
+        Size.lerp,
+      ),
+      padding: WidgetStateProperty.lerp<EdgeInsetsGeometry?>(
+        a.padding,
+        b.padding,
+        t,
+        EdgeInsetsGeometry.lerp,
+      ),
+      shape: WidgetStateProperty.lerp<OutlinedBorder?>(
+        a.shape,
+        b.shape,
+        t,
+        OutlinedBorder.lerp,
+      ),
+    );
+  }
+
+  StreamContextMenuHeadingStyle copyWith({
+    WidgetStateProperty<Color?>? foregroundColor,
+    WidgetStateProperty<Color?>? overlayColor,
+    WidgetStateProperty<BorderSide?>? side,
+    WidgetStateProperty<TextStyle?>? textStyle,
+    WidgetStateProperty<double?>? iconSize,
+    WidgetStateProperty<Size?>? minimumSize,
+    WidgetStateProperty<Size?>? maximumSize,
+    WidgetStateProperty<EdgeInsetsGeometry?>? padding,
+    WidgetStateProperty<OutlinedBorder?>? shape,
+  }) {
+    final _this = (this as StreamContextMenuHeadingStyle);
+
+    return StreamContextMenuHeadingStyle(
+      foregroundColor: foregroundColor ?? _this.foregroundColor,
+      overlayColor: overlayColor ?? _this.overlayColor,
+      side: side ?? _this.side,
+      textStyle: textStyle ?? _this.textStyle,
+      iconSize: iconSize ?? _this.iconSize,
+      minimumSize: minimumSize ?? _this.minimumSize,
+      maximumSize: maximumSize ?? _this.maximumSize,
+      padding: padding ?? _this.padding,
+      shape: shape ?? _this.shape,
+    );
+  }
+
+  StreamContextMenuHeadingStyle merge(StreamContextMenuHeadingStyle? other) {
+    final _this = (this as StreamContextMenuHeadingStyle);
+
+    if (other == null || identical(_this, other)) {
+      return _this;
+    }
+
+    if (!other.canMerge) {
+      return other;
+    }
+
+    return copyWith(
+      foregroundColor: other.foregroundColor,
+      overlayColor: other.overlayColor,
+      side: other.side,
+      textStyle: other.textStyle,
+      iconSize: other.iconSize,
+      minimumSize: other.minimumSize,
+      maximumSize: other.maximumSize,
+      padding: other.padding,
+      shape: other.shape,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final _this = (this as StreamContextMenuHeadingStyle);
+    final _other = (other as StreamContextMenuHeadingStyle);
+
+    return _other.foregroundColor == _this.foregroundColor &&
+        _other.overlayColor == _this.overlayColor &&
+        _other.side == _this.side &&
+        _other.textStyle == _this.textStyle &&
+        _other.iconSize == _this.iconSize &&
+        _other.minimumSize == _this.minimumSize &&
+        _other.maximumSize == _this.maximumSize &&
+        _other.padding == _this.padding &&
+        _other.shape == _this.shape;
+  }
+
+  @override
+  int get hashCode {
+    final _this = (this as StreamContextMenuHeadingStyle);
+
     return Object.hash(
       runtimeType,
-      _this.textStyle,
       _this.foregroundColor,
-      _this.iconSize,
       _this.overlayColor,
+      _this.side,
+      _this.textStyle,
+      _this.iconSize,
       _this.minimumSize,
       _this.maximumSize,
       _this.padding,
-      _this.spacing,
       _this.shape,
     );
   }
