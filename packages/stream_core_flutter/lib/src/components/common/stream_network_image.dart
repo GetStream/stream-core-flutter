@@ -296,6 +296,11 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   var _hasError = false;
   var _showPlaceholder = false;
   var _cacheCheck = 0;
+  ImageStream? _imageStream;
+  late final _imageStreamListener = ImageStreamListener(
+    (_, _) => _hasError = false,
+    onError: (_, _) => _hasError = true,
+  );
 
   @override
   void initState() {
@@ -315,6 +320,40 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       _showPlaceholder = false;
       _showPlaceholderUnlessCached();
     }
+    _listenToImage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _listenToImage();
+  }
+
+  ImageProvider<Object> get _image {
+    final props = widget.props;
+    final hasCacheSize = props.cacheWidth != null || props.cacheHeight != null;
+    int? logicalExtent(double? extent) => extent != null && extent.isFinite ? extent.ceil() : null;
+
+    return StreamBoundedImage(
+      CachedNetworkImageProvider(
+        props.url,
+        headers: props.httpHeaders,
+        cacheKey: props.cacheKey,
+        cacheManager: StreamImageCache.manager,
+      ),
+      width: hasCacheSize ? props.cacheWidth : logicalExtent(props.width),
+      height: hasCacheSize ? props.cacheHeight : logicalExtent(props.height),
+      fit: hasCacheSize ? BoxFit.contain : props.fit ?? BoxFit.contain,
+      useLogicalSize: !hasCacheSize,
+    );
+  }
+
+  void _listenToImage() {
+    final stream = _image.resolve(createLocalImageConfiguration(context));
+    if (stream.key == _imageStream?.key) return;
+
+    _imageStream?.removeListener(_imageStreamListener);
+    _imageStream = stream..addListener(_imageStreamListener);
   }
 
   Future<void> _showPlaceholderUnlessCached() async {
@@ -331,6 +370,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   @override
   void dispose() {
     widget.props.retryListenable?.removeListener(_onRetryListenableNotified);
+    _imageStream?.removeListener(_imageStreamListener);
     super.dispose();
   }
 
@@ -347,29 +387,16 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       _hasError = false;
       _showPlaceholder = true;
     });
+    _listenToImage();
   }
 
   @override
   Widget build(BuildContext context) {
     final props = widget.props;
 
-    final hasCacheSize = props.cacheWidth != null || props.cacheHeight != null;
-    int? logicalExtent(double? extent) => extent != null && extent.isFinite ? extent.ceil() : null;
-
     return Image(
       key: ValueKey(_retryKey),
-      image: StreamBoundedImage(
-        CachedNetworkImageProvider(
-          props.url,
-          headers: props.httpHeaders,
-          cacheKey: props.cacheKey,
-          cacheManager: StreamImageCache.manager,
-        ),
-        width: hasCacheSize ? props.cacheWidth : logicalExtent(props.width),
-        height: hasCacheSize ? props.cacheHeight : logicalExtent(props.height),
-        fit: hasCacheSize ? BoxFit.contain : props.fit ?? BoxFit.contain,
-        useLogicalSize: !hasCacheSize,
-      ),
+      image: _image,
       width: props.width,
       height: props.height,
       fit: props.fit,
@@ -384,7 +411,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
       errorBuilder: (context, error, _) {
-        _hasError = true;
         if (props.errorBuilder case final builder?) return builder(context, error, _retry);
         return StreamImageErrorPlaceholder(width: props.width, height: props.height, onRetry: _retry);
       },
