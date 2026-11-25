@@ -39,9 +39,7 @@ class GalleryShell extends StatefulWidget {
 class _GalleryShellState extends State<GalleryShell> {
   final _previewMode = PreviewModeIntegration();
 
-  // Keeps the Widgetbook state (route, knobs) when the chrome around it is
-  // added or removed on entering or leaving preview mode.
-  final _widgetbookKey = GlobalKey();
+  final _retainedWidgetbookKey = GlobalKey();
 
   @override
   void dispose() {
@@ -55,7 +53,7 @@ class _GalleryShellState extends State<GalleryShell> {
     final isDark = materialTheme.brightness == .dark;
 
     final widgetbook = Widgetbook.material(
-      key: _widgetbookKey,
+      key: _retainedWidgetbookKey,
       lightTheme: materialTheme,
       darkTheme: materialTheme,
       themeMode: isDark ? .dark : .light,
@@ -67,7 +65,8 @@ class _GalleryShellState extends State<GalleryShell> {
 
     return ValueListenableBuilder(
       valueListenable: _previewMode.isPreview,
-      builder: (context, isPreview, _) {
+      child: widgetbook,
+      builder: (context, isPreview, widgetbook) {
         if (isPreview) {
           return Scaffold(
             backgroundColor: context.streamColorScheme.backgroundApp,
@@ -78,14 +77,14 @@ class _GalleryShellState extends State<GalleryShell> {
         return _GalleryChrome(
           showThemePanel: widget.showThemePanel,
           onToggleThemePanel: widget.onToggleThemePanel,
-          child: widgetbook,
+          child: widgetbook!,
         );
       },
     );
   }
 }
 
-/// The toolbar and theme customization panel around the [child] widgetbook.
+// The toolbar and theme customization panel around the [child] widgetbook.
 class _GalleryChrome extends StatelessWidget {
   const _GalleryChrome({
     required this.showThemePanel,
