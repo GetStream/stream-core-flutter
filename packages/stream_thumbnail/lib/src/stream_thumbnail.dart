@@ -1,20 +1,29 @@
 // ignore_for_file: avoid_classes_with_only_static_members
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
 
+import 'network_redirects.dart';
 import 'stream_thumbnail_format.dart';
 import 'stream_thumbnail_platform.dart';
 import 'stream_thumbnail_source.dart';
 
 /// Creates thumbnails from a local video file or from a video URL.
+///
+/// At most three thumbnails are generated at a time; further calls wait for
+/// one to finish. A thumbnail is at most 4096 pixels on its longest side, and
+/// a video more than 8192 pixels on a side fails with a `THUMBNAIL_ERROR`
+/// [PlatformException].
 abstract final class StreamThumbnail {
+  static final _pool = _TaskPool(3);
+
   /// Generates a thumbnail file for each of [sources], in order.
   ///
   /// Use [maxHeight] and [maxWidth] to bound the size, or `0` to keep the
-  /// source resolution. A lower [quality] reduces image quality but is ignored
+  /// source resolution, up to 4096 pixels. A lower [quality] reduces image quality but is ignored
   /// for [StreamThumbnailFormat.png]. The videos are processed one at a time.
   ///
   /// Each thumbnail is written to a new, uniquely named file in a temporary
@@ -40,20 +49,22 @@ abstract final class StreamThumbnail {
       if (source.unsupportedReason case final reason?) throw reason;
     }
 
-    return StreamThumbnailPlatform.instance.thumbnailFiles(
-      sources: sources,
-      imageFormat: imageFormat,
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      timeMs: timeMs,
-      quality: quality,
+    return _pool.run(
+      () async => StreamThumbnailPlatform.instance.thumbnailFiles(
+        sources: [for (final source in sources) await resolveRedirects(source)],
+        imageFormat: imageFormat,
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        timeMs: timeMs,
+        quality: quality,
+      ),
     );
   }
 
   /// Generates a thumbnail file for [source].
   ///
   /// Use [maxHeight] and [maxWidth] to bound the size, or `0` to keep the
-  /// source resolution. A lower [quality] reduces image quality but is ignored
+  /// source resolution, up to 4096 pixels. A lower [quality] reduces image quality but is ignored
   /// for [StreamThumbnailFormat.png].
   ///
   /// The thumbnail is written to a new, uniquely named file in a temporary
@@ -76,13 +87,15 @@ abstract final class StreamThumbnail {
   }) {
     if (source.unsupportedReason case final reason?) return Future.error(reason);
 
-    return StreamThumbnailPlatform.instance.thumbnailFile(
-      source: source,
-      imageFormat: imageFormat,
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      timeMs: timeMs,
-      quality: quality,
+    return _pool.run(
+      () async => StreamThumbnailPlatform.instance.thumbnailFile(
+        source: await resolveRedirects(source),
+        imageFormat: imageFormat,
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        timeMs: timeMs,
+        quality: quality,
+      ),
     );
   }
 
@@ -90,7 +103,7 @@ abstract final class StreamThumbnail {
   ///
   /// The returned bytes can be rendered directly with `Image.memory`. Use
   /// [maxHeight] and [maxWidth] to bound the size, or `0` to keep the source
-  /// resolution. A lower [quality] reduces image quality but is ignored for
+  /// resolution, up to 4096 pixels. A lower [quality] reduces image quality but is ignored for
   /// [StreamThumbnailFormat.png].
   ///
   /// Fails with an `UNSUPPORTED_SOURCE` [PlatformException] if [source] can't
@@ -105,13 +118,43 @@ abstract final class StreamThumbnail {
   }) {
     if (source.unsupportedReason case final reason?) return Future.error(reason);
 
-    return StreamThumbnailPlatform.instance.thumbnailData(
-      source: source,
-      imageFormat: imageFormat,
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      timeMs: timeMs,
-      quality: quality,
+    return _pool.run(
+      () async => StreamThumbnailPlatform.instance.thumbnailData(
+        source: await resolveRedirects(source),
+        imageFormat: imageFormat,
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        timeMs: timeMs,
+        quality: quality,
+      ),
     );
+  }
+}
+
+final class _TaskPool {
+  _TaskPool(this._capacity);
+
+  final int _capacity;
+  final _waiting = Queue<Completer<void>>();
+  var _running = 0;
+
+  Future<T> run<T>(Future<T> Function() task) async {
+    if (_running < _capacity) {
+      _running++;
+    } else {
+      final turn = Completer<void>();
+      _waiting.add(turn);
+      await turn.future;
+    }
+
+    try {
+      return await task();
+    } finally {
+      if (_waiting.isEmpty) {
+        _running--;
+      } else {
+        _waiting.removeFirst().complete();
+      }
+    }
   }
 }

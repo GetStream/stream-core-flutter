@@ -33,6 +33,9 @@ namespace stream_thumbnail {
 
 namespace {
 
+constexpr UINT32 kMaxSourceSize = 8192;
+constexpr double kMaxOutputSize = 4096;
+
 // A generation failure that couldn't produce a frame/encode, or a failure
 // writing the encoded thumbnail to disk.
 class ThumbnailException : public std::runtime_error {
@@ -171,6 +174,9 @@ DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
   if (FAILED(hr) || width == 0 || height == 0) {
     throw ThumbnailException("THUMBNAIL_ERROR", "Failed to read the video's frame size.");
   }
+  if (width > kMaxSourceSize || height > kMaxSourceSize) {
+    throw ThumbnailException("THUMBNAIL_ERROR", "The video is larger than 8192 pixels on a side.");
+  }
 
   // Seek, if possible; `time_ms` is already platform-normalized (never
   // negative) on the Dart side. Seek failures are non-fatal — fall back to
@@ -214,24 +220,29 @@ DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
 }
 
 // Computes the output size for `frame`, honoring `max_width`/`max_height`
-// (<= 0 keeps the source resolution), preserving aspect ratio.
+// (<= 0 keeps the source resolution), preserving aspect ratio, and at most
+// kMaxOutputSize on the longest side.
 void ScaledSize(const DecodedFrame &frame, int64_t max_width, int64_t max_height, UINT *out_width,
                  UINT *out_height) {
-  if (max_width <= 0 && max_height <= 0) {
-    *out_width = frame.width;
-    *out_height = frame.height;
-    return;
-  }
   const double aspect = static_cast<double>(frame.width) / static_cast<double>(frame.height);
-  double width = max_width > 0 ? static_cast<double>(max_width) : max_height * aspect;
-  double height = max_height > 0 ? static_cast<double>(max_height) : max_width / aspect;
-  if (max_width > 0 && max_height > 0 && width / aspect > height) {
-    width = height * aspect;
-  } else if (max_width > 0 && max_height > 0) {
-    height = width / aspect;
+  double width = frame.width;
+  double height = frame.height;
+  if (max_width > 0 || max_height > 0) {
+    width = max_width > 0 ? static_cast<double>(max_width) : max_height * aspect;
+    height = max_height > 0 ? static_cast<double>(max_height) : max_width / aspect;
+    if (max_width > 0 && max_height > 0 && width / aspect > height) {
+      width = height * aspect;
+    } else if (max_width > 0 && max_height > 0) {
+      height = width / aspect;
+    }
   }
-  *out_width = static_cast<UINT>(width);
-  *out_height = static_cast<UINT>(height);
+  const double longest = width > height ? width : height;
+  if (longest > kMaxOutputSize) {
+    width = width * kMaxOutputSize / longest;
+    height = height * kMaxOutputSize / longest;
+  }
+  *out_width = width < 1 ? 1 : static_cast<UINT>(width);
+  *out_height = height < 1 ? 1 : static_cast<UINT>(height);
 }
 
 // Encodes `frame` as jpeg/png into `stream` via WIC. `quality` (0-100) only

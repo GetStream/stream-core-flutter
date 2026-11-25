@@ -13,6 +13,7 @@ extern "C" {
 #include <glib/gstdio.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <cerrno>
 
 #include <map>
@@ -89,6 +90,12 @@ struct InputSpec {
 // concat, ...) are not supported.
 constexpr char kFormatWhitelist[] = "mov,matroska,avi,flv,mpegts,mpeg,ogg,asf";
 
+constexpr int kMaxSourceSize = 8192;
+constexpr int kMaxOutputSize = 4096;
+
+// FFmpeg reads rw_timeout in microseconds.
+constexpr char kReadTimeoutMicroseconds[] = "30000000";
+
 // A network video is fetched over http(s), with tls/tcp as the transports https
 // and http sit on. A file is opened through the `file:` protocol only.
 InputSpec ResolveInput(const std::string &video, StreamThumbnailThumbnailSourceKind kind) {
@@ -138,6 +145,7 @@ FramePtr DecodeFrame(const InputSpec &input, const std::map<std::string, std::st
     av_dict_set(&options, "max_redirects", "0", 0);
   }
 
+  av_dict_set(&options, "rw_timeout", kReadTimeoutMicroseconds, 0);
   av_dict_set(&options, "protocol_whitelist", input.protocol_whitelist.c_str(), 0);
   av_dict_set(&options, "format_whitelist", kFormatWhitelist, 0);
 
@@ -160,6 +168,9 @@ FramePtr DecodeFrame(const InputSpec &input, const std::map<std::string, std::st
   }
 
   AVStream *stream = format_ctx->streams[stream_index];
+  if (std::max(stream->codecpar->width, stream->codecpar->height) > kMaxSourceSize) {
+    throw ThumbnailException("THUMBNAIL_ERROR", "The video is larger than 8192 pixels on a side.");
+  }
   CodecContextPtr codec_ctx(avcodec_alloc_context3(decoder));
   if (!codec_ctx || avcodec_parameters_to_context(codec_ctx.get(), stream->codecpar) < 0) {
     throw ThumbnailException("THUMBNAIL_ERROR", "Failed to configure the video decoder.");
@@ -199,26 +210,31 @@ FramePtr DecodeFrame(const InputSpec &input, const std::map<std::string, std::st
 }
 
 // Computes the output size, honoring max_width/max_height (<= 0 keeps the
-// source resolution), preserving aspect ratio.
+// source resolution), preserving aspect ratio, and at most kMaxOutputSize on
+// the longest side.
 void ScaledSize(int src_width, int src_height, int64_t max_width, int64_t max_height, int *out_width,
                  int *out_height) {
-  if (max_width <= 0 && max_height <= 0) {
-    *out_width = src_width;
-    *out_height = src_height;
-    return;
-  }
   const double aspect = static_cast<double>(src_width) / static_cast<double>(src_height);
-  double width = max_width > 0 ? static_cast<double>(max_width) : max_height * aspect;
-  double height = max_height > 0 ? static_cast<double>(max_height) : max_width / aspect;
-  if (max_width > 0 && max_height > 0) {
-    if (width / aspect > height) {
-      width = height * aspect;
-    } else {
-      height = width / aspect;
+  double width = src_width;
+  double height = src_height;
+  if (max_width > 0 || max_height > 0) {
+    width = max_width > 0 ? static_cast<double>(max_width) : max_height * aspect;
+    height = max_height > 0 ? static_cast<double>(max_height) : max_width / aspect;
+    if (max_width > 0 && max_height > 0) {
+      if (width / aspect > height) {
+        width = height * aspect;
+      } else {
+        height = width / aspect;
+      }
     }
   }
-  *out_width = static_cast<int>(width);
-  *out_height = static_cast<int>(height);
+  const double longest = std::max(width, height);
+  if (longest > kMaxOutputSize) {
+    width = width * kMaxOutputSize / longest;
+    height = height * kMaxOutputSize / longest;
+  }
+  *out_width = std::max(1, static_cast<int>(width));
+  *out_height = std::max(1, static_cast<int>(height));
 }
 
 // Scales `src` into a newly-allocated frame in `dst_format` at

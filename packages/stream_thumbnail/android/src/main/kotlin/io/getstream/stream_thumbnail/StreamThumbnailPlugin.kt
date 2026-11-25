@@ -27,6 +27,14 @@ private class UnsupportedSourceException(message: String) : IllegalArgumentExcep
 class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
     private val TAG = "ThumbnailPlugin"
 
+    private companion object {
+        const val MAX_SOURCE_SIZE = 8192
+        const val MAX_OUTPUT_SIZE = 4096
+
+        /** Makes the media stack fail a redirect to another host instead of sending it the headers. */
+        const val CROSS_DOMAIN_REDIRECTS = "android-allow-cross-domain-redirect"
+    }
+
     private var context: Context? = null
     private var executor = Executors.newCachedThreadPool()
 
@@ -62,7 +70,7 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
                 Result.success(block())
             } catch (e: UnsupportedSourceException) {
                 Result.failure(FlutterError("UNSUPPORTED_SOURCE", e.message, null))
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Result.failure(FlutterError("THUMBNAIL_ERROR", e.message, e.stackTraceToString()))
             }
             Handler(Looper.getMainLooper()).post { callback(result) }
@@ -117,94 +125,81 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
         targetW: Int,
         timeMs: Int
     ): Bitmap? {
-        var bitmap: Bitmap?
-        var retriever: MediaMetadataRetriever? = null
-
+        val retriever = MediaMetadataRetriever()
         try {
             val filePath = if (sourceKind == ThumbnailSourceKind.FILE) video.removePrefix("file://") else null
-            val fitsBothBounds = targetW > 0 && targetH > 0
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && filePath != null && timeMs == -1 && fitsBothBounds) {
-                bitmap =
-                    ThumbnailUtils.createVideoThumbnail(File(filePath), Size(targetW, targetH), null)
-            } else {
-                retriever = MediaMetadataRetriever()
-                when (sourceKind) {
-                    ThumbnailSourceKind.FILE -> setDataSource(filePath!!, retriever)
-                    ThumbnailSourceKind.CONTENT_URI -> {
-                        val uri = Uri.parse(video)
-                        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
-                            throw UnsupportedSourceException("A content video must be a content URI.")
-                        }
-                        val contentResolver: ContentResolver = context!!.contentResolver
-                        val assetFileDescriptor = contentResolver.openAssetFileDescriptor(uri, "r")
-                            ?: throw IOException("Failed to open the content URI.")
-                        assetFileDescriptor.use { retriever.setDataSource(it.fileDescriptor) }
+            when (sourceKind) {
+                ThumbnailSourceKind.FILE -> setDataSource(filePath!!, retriever)
+                ThumbnailSourceKind.CONTENT_URI -> {
+                    val uri = Uri.parse(video)
+                    if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+                        throw UnsupportedSourceException("A content video must be a content URI.")
                     }
-                    ThumbnailSourceKind.NETWORK -> {
-                        val uri = Uri.parse(video)
-                        val scheme = uri.scheme?.lowercase()
-                        if ((scheme != "http" && scheme != "https") || uri.host.isNullOrEmpty()) {
-                            throw UnsupportedSourceException("A network video must be an http or https URL.")
-                        }
-                        retriever.setDataSource(video, headers)
-                    }
+                    val contentResolver: ContentResolver = context!!.contentResolver
+                    val assetFileDescriptor = contentResolver.openAssetFileDescriptor(uri, "r")
+                        ?: throw IOException("Failed to open the content URI.")
+                    assetFileDescriptor.use { retriever.setDataSource(it.fileDescriptor) }
                 }
-
-                if (targetH != 0 || targetW != 0) {
-                    if (Build.VERSION.SDK_INT >= 27 && targetH != 0 && targetW != 0) {
-                        bitmap = retriever.getScaledFrameAtTime(
-                            timeMs * 1000L,
-                            MediaMetadataRetriever.OPTION_CLOSEST,
-                            targetW,
-                            targetH
-                        )
-                        if (bitmap == null) {
-                            bitmap = retriever.getScaledFrameAtTime(
-                                timeMs * 1000L,
-                                MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
-                                targetW,
-                                targetH
-                            )
-                        }
-                    } else {
-                        bitmap = retriever.getFrameAtTime(
-                            timeMs * 1000L,
-                            MediaMetadataRetriever.OPTION_CLOSEST
-                        )
-                        if (bitmap == null) {
-                            bitmap = retriever.getFrameAtTime(
-                                timeMs * 1000L,
-                                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-                            )
-                        }
-                        if (bitmap != null) {
-                            val width = bitmap.width
-                            val height = bitmap.height
-                            val scaledW = targetW.takeIf { it != 0 }
-                                ?: ((targetH.toFloat() / height) * width).toInt()
-                            val scaledH = targetH.takeIf { it != 0 }
-                                ?: ((targetW.toFloat() / width) * height).toInt()
-                            bitmap = Bitmap.createScaledBitmap(bitmap, scaledW, scaledH, true)
-                        }
+                ThumbnailSourceKind.NETWORK -> {
+                    val uri = Uri.parse(video)
+                    val scheme = uri.scheme?.lowercase()
+                    if ((scheme != "http" && scheme != "https") || uri.host.isNullOrEmpty()) {
+                        throw UnsupportedSourceException("A network video must be an http or https URL.")
                     }
-                } else {
-                    bitmap = retriever.getFrameAtTime(
-                        timeMs * 1000L,
-                        MediaMetadataRetriever.OPTION_CLOSEST
-                    )
-                    if (bitmap == null) {
-                        bitmap = retriever.getFrameAtTime(
-                            timeMs * 1000L,
-                            MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-                        )
-                    }
+                    val requestHeaders = if (headers.isEmpty()) headers else headers + (CROSS_DOMAIN_REDIRECTS to "false")
+                    retriever.setDataSource(video, requestHeaders)
                 }
             }
+
+            val sourceW = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
+            val sourceH = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 0
+            if (maxOf(sourceW, sourceH) > MAX_SOURCE_SIZE) {
+                throw IOException("The video is larger than $MAX_SOURCE_SIZE pixels on a side.")
+            }
+
+            val (boundW, boundH) = if (targetW == 0 && targetH == 0 && maxOf(sourceW, sourceH) > MAX_OUTPUT_SIZE) {
+                MAX_OUTPUT_SIZE to MAX_OUTPUT_SIZE
+            } else {
+                minOf(targetW, MAX_OUTPUT_SIZE) to minOf(targetH, MAX_OUTPUT_SIZE)
+            }
+
+            val fitsBothBounds = boundW > 0 && boundH > 0
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && filePath != null && timeMs == -1 && fitsBothBounds) {
+                ThumbnailUtils.createVideoThumbnail(File(filePath), Size(boundW, boundH), null)
+            } else {
+                frameAt(retriever, timeMs, boundW, boundH)
+            }
+            return bitmap?.let { capToMaxOutputSize(it) }
         } finally {
-            retriever?.release()
+            retriever.release()
+        }
+    }
+
+    private fun frameAt(retriever: MediaMetadataRetriever, timeMs: Int, targetW: Int, targetH: Int): Bitmap? {
+        val timeUs = timeMs * 1000L
+        if (Build.VERSION.SDK_INT >= 27 && targetH != 0 && targetW != 0) {
+            return retriever.getScaledFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST, targetW, targetH)
+                ?: retriever.getScaledFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, targetW, targetH)
         }
 
-        return bitmap
+        val frame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST)
+            ?: retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+            ?: return null
+        if (targetH == 0 && targetW == 0) return frame
+
+        val scaledW = targetW.takeIf { it != 0 } ?: ((targetH.toFloat() / frame.height) * frame.width).toInt()
+        val scaledH = targetH.takeIf { it != 0 } ?: ((targetW.toFloat() / frame.width) * frame.height).toInt()
+        return Bitmap.createScaledBitmap(frame, scaledW, scaledH, true)
+    }
+
+    private fun capToMaxOutputSize(bitmap: Bitmap): Bitmap {
+        val longest = maxOf(bitmap.width, bitmap.height)
+        if (longest <= MAX_OUTPUT_SIZE) return bitmap
+
+        val scale = MAX_OUTPUT_SIZE.toFloat() / longest
+        val width = maxOf(1, (bitmap.width * scale).toInt())
+        val height = maxOf(1, (bitmap.height * scale).toInt())
+        return Bitmap.createScaledBitmap(bitmap, width, height, true)
     }
 
     private fun setDataSource(video: String, retriever: MediaMetadataRetriever) {

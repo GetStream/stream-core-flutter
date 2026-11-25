@@ -36,6 +36,9 @@ const _kErrorValueToErrorDescription = <int, String>{
 // See: https://developer.mozilla.org/en-US/docs/Web/API/MediaError/message
 const _kDefaultErrorMessage = 'No further diagnostic information can be determined or provided.';
 
+const _maxSourceSize = 8192;
+const _maxOutputSize = 4096;
+
 /// A web implementation of the [StreamThumbnailPlatform].
 class StreamThumbnailWeb extends StreamThumbnailPlatform {
   /// Constructs a [StreamThumbnailWeb].
@@ -167,17 +170,21 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
       'seeked',
       (web.Event e) {
         if (!completer.isCompleted) {
+          if (math.max(video.videoWidth, video.videoHeight) > _maxSourceSize) {
+            completer.completeError(
+              PlatformException(code: 'THUMBNAIL_ERROR', message: 'The video is larger than 8192 pixels on a side.'),
+            );
+            return;
+          }
+
           final canvas = web.document.createElement('canvas') as web.HTMLCanvasElement;
           final ctx = canvas.getContext('2d')! as web.CanvasRenderingContext2D;
 
-          if (maxWidth == 0 && maxHeight == 0) {
-            canvas
-              ..width = video.videoWidth
-              ..height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-          } else {
-            var width = maxWidth;
-            var height = maxHeight;
+          var width = video.videoWidth;
+          var height = video.videoHeight;
+          if (maxWidth != 0 || maxHeight != 0) {
+            width = maxWidth;
+            height = maxHeight;
             final aspectRatio = video.videoWidth / video.videoHeight;
             if (width == 0) {
               width = (height * aspectRatio).round();
@@ -191,12 +198,18 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
             } else {
               width = (height * aspectRatio).round();
             }
-
-            canvas
-              ..width = width
-              ..height = height;
-            ctx.drawImage(video, 0, 0, width, height);
           }
+
+          final longest = math.max(width, height);
+          if (longest > _maxOutputSize) {
+            width = math.max(1, (width * _maxOutputSize / longest).round());
+            height = math.max(1, (height * _maxOutputSize / longest).round());
+          }
+
+          canvas
+            ..width = width
+            ..height = height;
+          ctx.drawImage(video, 0, 0, width, height);
 
           try {
             canvas.toBlob(
