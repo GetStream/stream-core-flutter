@@ -27,8 +27,8 @@ typedef LogPrint = void Function(InterceptStep step, Object object);
 /// for a request that failed. Nothing is written, or even formatted, until an app installs a
 /// [StreamLogHandler].
 ///
-/// [requestHeader] puts the `Authorization` header in the record along with the rest, so consider
-/// what reads these before turning it on.
+/// [requestHeader] reports the request's headers with the `Authorization` value replaced by
+/// `<redacted>`.
 class LoggingInterceptor extends Interceptor {
   /// Creates a new [LoggingInterceptor].
   LoggingInterceptor({
@@ -110,7 +110,10 @@ class LoggingInterceptor extends Interceptor {
         options.queryParameters,
         header: 'Query Parameters',
       );
-      final requestHeaders = <String, Object?>{...options.headers};
+      final requestHeaders = <String, Object?>{
+        for (final MapEntry(:key, :value) in options.headers.entries)
+          key: key.toLowerCase() == 'authorization' ? '<redacted>' : value,
+      };
       requestHeaders['contentType'] = options.contentType?.toString();
       requestHeaders['responseType'] = options.responseType.toString();
       requestHeaders['followRedirects'] = options.followRedirects;

@@ -65,6 +65,31 @@ void main() {
       });
     });
 
+    test('records a socket error without the query string of the URL it connected to', () {
+      fakeAsync((async) {
+        final handler = RecordingLogHandler();
+        final tester = buildTester();
+
+        withStreamLogger(handler: handler, () {
+          tester.client.connect().ignore();
+          async.flushMicrotasks();
+
+          tester.server.socket.emitError(
+            Exception("Connection to 'https://example.com/connect?session=abc123#' was closed"),
+          );
+          async.flushMicrotasks();
+        });
+
+        final logged = handler.records.map((it) => '${it.message} ${it.error}');
+        expect(logged, contains(contains('https://example.com/connect')));
+        expect(logged, everyElement(isNot(contains('abc123'))));
+        expect(
+          tester.connectionState,
+          isA<Disconnected>().having((it) => '${it.source}', 'source', isNot(contains('abc123'))),
+        );
+      });
+    });
+
     test('says nothing at all when no handler is installed', () {
       fakeAsync((async) {
         final tester = buildTester();

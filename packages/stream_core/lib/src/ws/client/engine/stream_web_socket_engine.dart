@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../errors.dart';
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -68,10 +69,16 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
         _onData,
         onDone: _onDone,
         cancelOnError: false,
-        onError: _listener?.onError,
+        onError: (Object error, StackTrace stackTrace) {
+          _listener?.onError(_withoutUrlQueries(error), stackTrace);
+        },
       );
 
-      await ws.ready;
+      try {
+        await ws.ready;
+      } catch (error, stackTrace) {
+        Error.throwWithStackTrace(_withoutUrlQueries(error), stackTrace);
+      }
 
       // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
       if (_ws == ws) _listener?.onOpen();
@@ -139,5 +146,17 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
       final data = _messageCodec.encode(message);
       return ws.sink.add(data);
     });
+  }
+
+  static final _urlQuery = RegExp(r'''([a-zA-Z][a-zA-Z0-9+.-]*://[^\s'"?#]*)\?[^\s'"#]*''');
+
+  static Object _withoutUrlQueries(Object error) {
+    if (error is StreamException) return error;
+
+    final description = error.toString();
+    if (!_urlQuery.hasMatch(description)) return error;
+
+    final redacted = description.replaceAllMapped(_urlQuery, (match) => '${match[1]}?<redacted>');
+    return StreamNetworkException(message: redacted);
   }
 }

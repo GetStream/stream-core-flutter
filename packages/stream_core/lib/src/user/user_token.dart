@@ -46,11 +46,7 @@ class UserToken extends Equatable {
     final claims = JsonWebToken.unverified(rawValue).claims;
     final userId = claims.getTyped<String>('user_id');
     if (userId == null || userId.isEmpty) {
-      throw ArgumentError.value(
-        rawValue,
-        'rawValue',
-        'Invalid JWT token: missing or empty user_id claim',
-      );
+      throw ArgumentError('Invalid JWT token: missing or empty user_id claim', 'rawValue');
     }
 
     return UserToken._(
@@ -142,6 +138,10 @@ class UserToken extends Equatable {
 
   @override
   List<Object?> get props => [rawValue, userId, authType, expiresAt];
+
+  /// A description of this token that leaves out [rawValue].
+  @override
+  String toString() => 'UserToken(userId: $userId, authType: ${authType.name}, expiresAt: $expiresAt)';
 }
 
 /// Represents the types of authentication available for API access.

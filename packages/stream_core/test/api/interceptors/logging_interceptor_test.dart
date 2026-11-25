@@ -99,6 +99,25 @@ void main() {
       expect(handler.messages.join(), isNot(contains(token)));
     });
 
+    test('reports the headers with the Authorization value redacted', () async {
+      final handler = RecordingLogHandler();
+      final dio = _subject();
+      final token = generateTestUserToken('user-1').rawValue;
+
+      await withStreamLogger(
+        handler: handler,
+        filter: const StreamLogFilter.always(),
+        () async {
+          await dio.get<void>('/test');
+          await pumpEventQueue();
+        },
+      );
+
+      expect(handler.messages.join(), contains('Authorization'));
+      expect(handler.messages.join(), contains('<redacted>'));
+      expect(handler.messages.join(), isNot(contains(token)));
+    });
+
     test('reports the request once a handler wants it', () async {
       final handler = RecordingLogHandler();
       final dio = _subject();

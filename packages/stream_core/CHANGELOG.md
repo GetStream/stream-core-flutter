@@ -1,5 +1,12 @@
 ## Upcoming
 
+### 🔄 Changed
+
+- A WebSocket error that quotes the connection URL now comes with the URL's query string replaced by `<redacted>`, in the
+  logs and in the reported `StreamNetworkException`.
+- `LoggingInterceptor` with `requestHeader` now reports the `Authorization` header as `<redacted>`.
+- `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` no longer include the raw token.
+
 ### 🐞 Fixed
 
 - Fixed `flutter build --analyze-size` crashing in the AOT compiler (`Request to create artificial node for object with cid 58`) in apps that use two or more `SortField`s.

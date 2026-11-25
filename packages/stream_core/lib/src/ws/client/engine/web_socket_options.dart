@@ -13,7 +13,6 @@ import 'web_socket_engine.dart';
 ///   connectTimeout: Duration(seconds: 10),
 ///   protocols: ['chat', 'superchat'],
 ///   queryParameters: {
-///     'token': 'abc123',
 ///     'version': '1.0',
 ///   },
 /// );
