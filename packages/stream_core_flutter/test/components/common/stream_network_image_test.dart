@@ -38,35 +38,58 @@ void main() {
     });
   });
 
-  group('StreamNetworkImage decode size', () {
-    testWidgets('decodes no larger than its size in physical pixels', (tester) async {
-      tester.view.devicePixelRatio = 3;
-      addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('decodes no larger than its size in physical pixels', (tester) async {
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(_withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 20)));
+    await tester.pumpWidget(_withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 20)));
 
-      final image = _imageOf(tester);
-      expect((image.maxWidth, image.maxHeight), (120, 60));
-    });
+    final image = _imageOf(tester);
+    expect((image.maxWidth, image.maxHeight), (120, 60));
+  });
 
-    testWidgets('decodes no larger than the cache size it is given', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(
-          StreamNetworkImage('https://example.com/a.png', width: 40, height: 40, cacheWidth: 64, cacheHeight: 32),
+  testWidgets('decodes no larger than the cache size it is given', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        StreamNetworkImage('https://example.com/a.png', width: 40, height: 40, cacheWidth: 64, cacheHeight: 32),
+      ),
+    );
+
+    final image = _imageOf(tester);
+    expect((image.maxWidth, image.maxHeight), (64, 32));
+  });
+
+  testWidgets('decodes no larger than 4096 pixels on a side', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(StreamNetworkImage('https://example.com/a.png', cacheWidth: 10000)),
+    );
+
+    final image = _imageOf(tester);
+    expect((image.maxWidth, image.maxHeight), (4096, 4096));
+  });
+
+  testWidgets('decodes to fill a box it covers', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 40, fit: BoxFit.cover)),
+    );
+
+    expect(_imageOf(tester).fit, BoxFit.cover);
+  });
+
+  testWidgets('decodes to fit within the cache size it is given, even when covering its box', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        StreamNetworkImage(
+          'https://example.com/a.png',
+          width: 40,
+          height: 40,
+          cacheWidth: 64,
+          cacheHeight: 64,
+          fit: BoxFit.cover,
         ),
-      );
+      ),
+    );
 
-      final image = _imageOf(tester);
-      expect((image.maxWidth, image.maxHeight), (64, 32));
-    });
-
-    testWidgets('decodes no larger than 4096 pixels on a side', (tester) async {
-      await tester.pumpWidget(
-        _withStreamTheme(StreamNetworkImage('https://example.com/a.png', cacheWidth: 10000)),
-      );
-
-      final image = _imageOf(tester);
-      expect((image.maxWidth, image.maxHeight), (4096, 4096));
-    });
+    expect(_imageOf(tester).fit, BoxFit.contain);
   });
 }

@@ -5,55 +5,65 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
-/// The largest image, in pixels, that is decoded at all.
-///
-/// Formats such as PNG are decoded at full size before being scaled, so this
-/// bounds the memory a single image can take while it decodes.
-const maxImageSourcePixels = 8192 * 8192;
-
-/// The largest width or height an image is decoded to.
-const maxImageDecodeSize = 4096;
-
-/// Thrown when an image is larger than [maxImageSourcePixels].
+/// Thrown when an image has more pixels than [BoundedImage.maxSourcePixels].
 class ImageTooLargeException implements Exception {
   /// Creates an exception for an image of [width] by [height] pixels.
   const ImageTooLargeException(this.width, this.height);
 
-  /// The width the image declares.
+  /// The width of the image.
   final int width;
 
-  /// The height the image declares.
+  /// The height of the image.
   final int height;
 
   @override
   String toString() => 'ImageTooLargeException: a ${width}x$height image is too large to display.';
 }
 
-/// Decodes the image of [provider] no larger than [maxWidth] by [maxHeight],
-/// keeping its aspect ratio and never enlarging it.
+/// An image provider that decodes [provider] to fit [maxWidth] by [maxHeight].
 ///
-/// Images larger than [maxImageSourcePixels] fail with an
-/// [ImageTooLargeException] before any pixels are decoded.
+/// The image keeps its aspect ratio, is never enlarged, and is at most
+/// [maxDecodeSize] pixels on a side. With a [fit] that fills the box, such as
+/// [BoxFit.cover], it is decoded large enough to fill it. An image with more
+/// pixels than [maxSourcePixels] fails with an [ImageTooLargeException].
+///
+/// See also:
+///
+///  * [ResizeImage], which resizes an image without limiting its source size.
 @immutable
 class BoundedImage extends ImageProvider<BoundedImageKey> {
   /// Creates a provider that bounds the decoded size of [provider].
-  const BoundedImage(this.provider, {required this.maxWidth, required this.maxHeight});
+  const BoundedImage(
+    this.provider, {
+    required this.maxWidth,
+    required this.maxHeight,
+    this.fit = BoxFit.contain,
+  });
 
   /// The image to decode.
   final ImageProvider<Object> provider;
 
-  /// The largest width to decode the image to.
+  /// The width of the box to decode the image for.
   final int maxWidth;
 
-  /// The largest height to decode the image to.
+  /// The height of the box to decode the image for.
   final int maxHeight;
+
+  /// How the decoded image is placed in the box.
+  final BoxFit fit;
+
+  /// The largest number of pixels an image can have and still be decoded.
+  static const maxSourcePixels = 8192 * 8192;
+
+  /// The largest width or height an image is decoded to.
+  static const maxDecodeSize = 4096;
 
   @override
   Future<BoundedImageKey> obtainKey(ImageConfiguration configuration) {
     Completer<BoundedImageKey>? completer;
     SynchronousFuture<BoundedImageKey>? result;
     provider.obtainKey(configuration).then((providerKey) {
-      final key = BoundedImageKey._(providerKey, maxWidth, maxHeight);
+      final key = BoundedImageKey._(providerKey, maxWidth, maxHeight, fit);
       if (completer == null) {
         result = SynchronousFuture(key);
       } else {
@@ -68,24 +78,27 @@ class BoundedImage extends ImageProvider<BoundedImageKey> {
 
   @override
   ImageStreamCompleter loadImage(BoundedImageKey key, ImageDecoderCallback decode) {
-    Future<ui.Codec> decodeBounded(ui.ImmutableBuffer buffer, {ui.TargetImageSizeCallback? getTargetSize}) async {
-      final descriptor = await ui.ImageDescriptor.encoded(buffer);
-      final (width, height) = (descriptor.width, descriptor.height);
-      descriptor.dispose();
-
-      if (width * height > maxImageSourcePixels) {
-        buffer.dispose();
-        throw ImageTooLargeException(width, height);
-      }
-
-      return decode(buffer, getTargetSize: (width, height) => _fit(width, height, key.maxWidth, key.maxHeight));
+    Future<ui.Codec> decodeBounded(ui.ImmutableBuffer buffer, {ui.TargetImageSizeCallback? getTargetSize}) {
+      return decode(buffer, getTargetSize: (width, height) => _targetSize(width, height, key));
     }
 
-    return provider.loadImage(key.providerKey, decodeBounded);
+    return provider.loadImage(key.providerKey, decodeBounded)..addEphemeralErrorListener(
+      (_, _) => scheduleMicrotask(() => PaintingBinding.instance.imageCache.evict(key)),
+    );
   }
 
-  static ui.TargetImageSize _fit(int width, int height, int maxWidth, int maxHeight) {
-    final scale = math.min(1, math.min(maxWidth / width, maxHeight / height));
+  static ui.TargetImageSize _targetSize(int width, int height, BoundedImageKey key) {
+    if (width * height > maxSourcePixels) throw ImageTooLargeException(width, height);
+
+    final widthScale = key.maxWidth / width;
+    final heightScale = key.maxHeight / height;
+    final boxScale = switch (key.fit) {
+      BoxFit.cover || BoxFit.fill => math.max(widthScale, heightScale),
+      BoxFit.fitWidth => widthScale,
+      BoxFit.fitHeight => heightScale,
+      BoxFit.contain || BoxFit.scaleDown || BoxFit.none => math.min(widthScale, heightScale),
+    };
+    final scale = [1.0, boxScale, maxDecodeSize / width, maxDecodeSize / height].reduce(math.min);
     if (scale >= 1) return ui.TargetImageSize(width: width, height: height);
 
     return ui.TargetImageSize(
@@ -99,38 +112,43 @@ class BoundedImage extends ImageProvider<BoundedImageKey> {
     return other is BoundedImage &&
         other.provider == provider &&
         other.maxWidth == maxWidth &&
-        other.maxHeight == maxHeight;
+        other.maxHeight == maxHeight &&
+        other.fit == fit;
   }
 
   @override
-  int get hashCode => Object.hash(provider, maxWidth, maxHeight);
+  int get hashCode => Object.hash(provider, maxWidth, maxHeight, fit);
 
   @override
-  String toString() => '${objectRuntimeType(this, 'BoundedImage')}($provider, $maxWidth x $maxHeight)';
+  String toString() => '${objectRuntimeType(this, 'BoundedImage')}($provider, $maxWidth x $maxHeight, $fit)';
 }
 
-/// The key of a [BoundedImage], so that each decoded size is cached apart.
+/// The cache key of a [BoundedImage], distinct for each decoded size.
 @immutable
 class BoundedImageKey {
-  const BoundedImageKey._(this.providerKey, this.maxWidth, this.maxHeight);
+  const BoundedImageKey._(this.providerKey, this.maxWidth, this.maxHeight, this.fit);
 
   /// The key of the image that is decoded.
   final Object providerKey;
 
-  /// The largest width the image is decoded to.
+  /// The width of the box the image is decoded for.
   final int maxWidth;
 
-  /// The largest height the image is decoded to.
+  /// The height of the box the image is decoded for.
   final int maxHeight;
+
+  /// How the decoded image is placed in the box.
+  final BoxFit fit;
 
   @override
   bool operator ==(Object other) {
     return other is BoundedImageKey &&
         other.providerKey == providerKey &&
         other.maxWidth == maxWidth &&
-        other.maxHeight == maxHeight;
+        other.maxHeight == maxHeight &&
+        other.fit == fit;
   }
 
   @override
-  int get hashCode => Object.hash(providerKey, maxWidth, maxHeight);
+  int get hashCode => Object.hash(providerKey, maxWidth, maxHeight, fit);
 }

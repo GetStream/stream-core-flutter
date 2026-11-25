@@ -3,11 +3,12 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/src/cache/internal/bounded_image.dart';
 
-/// Encodes a solid image of [width] by [height] pixels as a PNG.
+// Encodes a solid image of [width] by [height] pixels as a PNG.
 Future<Uint8List> _png(int width, int height) async {
   final recorder = ui.PictureRecorder();
   ui.Canvas(recorder).drawColor(const ui.Color(0xFFFF0000), ui.BlendMode.src);
@@ -17,8 +18,7 @@ Future<Uint8List> _png(int width, int height) async {
   return bytes!.buffer.asUint8List();
 }
 
-/// A blank 1-bit greyscale PNG of [width] by [height] pixels, which stays a
-/// few kilobytes however large it is.
+// A blank 1-bit greyscale PNG of [width] by [height] pixels.
 Uint8List _blankPng(int width, int height) {
   Uint8List chunk(String type, List<int> data) {
     return (BytesBuilder()
@@ -73,10 +73,29 @@ Future<ui.Image> _load(ImageProvider provider) {
   return completer.future;
 }
 
+class _FailsOnceImage extends ImageProvider<_FailsOnceImage> {
+  _FailsOnceImage(this.bytes);
+
+  final Uint8List bytes;
+  var _loads = 0;
+
+  @override
+  Future<_FailsOnceImage> obtainKey(ImageConfiguration configuration) => SynchronousFuture(this);
+
+  @override
+  ImageStreamCompleter loadImage(_FailsOnceImage key, ImageDecoderCallback decode) {
+    _loads += 1;
+    final fails = _loads == 1;
+    return OneFrameImageStreamCompleter(() async {
+      if (fails) throw Exception('offline');
+      final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+      return ImageInfo(image: (await codec.getNextFrame()).image);
+    }());
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUp(() => PaintingBinding.instance.imageCache.clear());
 
   test('decodes an image larger than its bounds to fit them, keeping its aspect ratio', () async {
     final image = await _load(BoundedImage(MemoryImage(await _png(400, 200)), maxWidth: 100, maxHeight: 100));
@@ -96,11 +115,25 @@ void main() {
     expect((image.width, image.height), (1, 100));
   });
 
-  test('refuses an image larger than 8192 by 8192 pixels before decoding it', () async {
+  test('fails to load an image with more pixels than 8192 by 8192', () async {
     await expectLater(
       _load(BoundedImage(MemoryImage(_blankPng(8193, 8193)), maxWidth: 100, maxHeight: 100)),
       throwsA(isA<ImageTooLargeException>().having((e) => (e.width, e.height), 'size', (8193, 8193))),
     );
+  });
+
+  test('decodes an image to fill a box it covers, keeping its aspect ratio', () async {
+    final image = await _load(
+      BoundedImage(MemoryImage(await _png(400, 200)), maxWidth: 100, maxHeight: 100, fit: BoxFit.cover),
+    );
+
+    expect((image.width, image.height), (200, 100));
+  });
+
+  test('decodes an image no larger than 4096 pixels on a side', () async {
+    final image = await _load(BoundedImage(MemoryImage(await _png(5000, 100)), maxWidth: 10000, maxHeight: 10000));
+
+    expect((image.width, image.height), (4096, 82));
   });
 
   test('caches each decoded size of the same image apart', () async {
@@ -110,5 +143,15 @@ void main() {
     final large = await _load(BoundedImage(provider, maxWidth: 200, maxHeight: 200));
 
     expect((small.width, large.width), (50, 200));
+  });
+
+  test('loads an image again after a failed load', () async {
+    final provider = _FailsOnceImage(await _png(40, 20));
+    await expectLater(_load(BoundedImage(provider, maxWidth: 100, maxHeight: 100)), throwsException);
+    await Future<void>.delayed(Duration.zero);
+
+    final image = await _load(BoundedImage(provider, maxWidth: 100, maxHeight: 100));
+
+    expect((image.width, image.height), (40, 20));
   });
 }

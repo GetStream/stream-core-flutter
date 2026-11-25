@@ -19,8 +19,8 @@
 
 - Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
 - Fixed `StreamSheet` painting lighter than `backgroundElevation1` in dark mode under Material 3.
-- Fixed `StreamNetworkImage`, and so `StreamAvatar`, decoding an image at its full size whatever size it is shown at.
-  It now decodes no larger than it is shown, and at most 4096 pixels on a side.
+- Fixed `StreamNetworkImage`, and so `StreamAvatar`, decoding images at full size instead of at the size shown,
+  capped at 4096 pixels on a side.
 
 ### 🔄 Changed
 
@@ -30,7 +30,7 @@
 - `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
-- `StreamNetworkImage` shows its error placeholder for an image larger than 8192 by 8192 pixels.
+- `StreamNetworkImage` fails to load an image with more pixels than 8192 by 8192, except on web.
 - `StreamNetworkImage` given both `cacheWidth` and `cacheHeight` fits the image within them, keeping its aspect ratio,
   instead of stretching it to that size.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)

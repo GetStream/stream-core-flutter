@@ -25,8 +25,8 @@ typedef StreamNetworkImageErrorBuilder = Widget Function(BuildContext context, O
 ///
 /// [StreamNetworkImage] loads and displays an image from a URL with built-in
 /// caching. If the image fails to load, it shows an error widget that can be
-/// tapped to retry the request. An image larger than 8192 by 8192 pixels
-/// fails to load.
+/// tapped to retry the request. Except on web, an image with more pixels than
+/// 8192 by 8192 fails to load.
 ///
 /// {@tool snippet}
 ///
@@ -191,15 +191,15 @@ class StreamNetworkImageProps {
   /// The largest width, in physical pixels, to decode the image to.
   ///
   /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
-  /// aspect ratio and never enlarged. If null, it is decoded no wider than
-  /// [width] in physical pixels. It is never decoded wider than 4096 pixels.
+  /// aspect ratio, and is never enlarged. If null, it is decoded for [width]
+  /// times the device pixel ratio. It is never decoded wider than 4096 pixels.
   final int? cacheWidth;
 
   /// The largest height, in physical pixels, to decode the image to.
   ///
   /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
-  /// aspect ratio and never enlarged. If null, it is decoded no taller than
-  /// [height] in physical pixels. It is never decoded taller than 4096 pixels.
+  /// aspect ratio, and is never enlarged. If null, it is decoded for [height]
+  /// times the device pixel ratio. It is never decoded taller than 4096 pixels.
   final int? cacheHeight;
 
   /// How the image should be inscribed into the space allocated for it.
@@ -292,11 +292,14 @@ class DefaultStreamNetworkImage extends StatefulWidget {
 class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   var _retryKey = 0;
   var _hasError = false;
+  var _showPlaceholder = false;
+  var _cacheCheck = 0;
 
   @override
   void initState() {
     super.initState();
     widget.props.retryListenable?.addListener(_onRetryListenableNotified);
+    _showPlaceholderUnlessCached();
   }
 
   @override
@@ -306,6 +309,21 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       oldWidget.props.retryListenable?.removeListener(_onRetryListenableNotified);
       widget.props.retryListenable?.addListener(_onRetryListenableNotified);
     }
+    if (oldWidget.props.url != widget.props.url || oldWidget.props.cacheKey != widget.props.cacheKey) {
+      _showPlaceholder = false;
+      _showPlaceholderUnlessCached();
+    }
+  }
+
+  Future<void> _showPlaceholderUnlessCached() async {
+    final check = ++_cacheCheck;
+    final props = widget.props;
+    try {
+      final cached = await StreamImageCache.manager.getFileFromCache(props.cacheKey ?? props.url);
+      if (cached != null) return;
+    } on Object catch (_) {}
+
+    if (check == _cacheCheck && mounted) setState(() => _showPlaceholder = true);
   }
 
   @override
@@ -325,6 +343,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     setState(() {
       _retryKey++;
       _hasError = false;
+      _showPlaceholder = true;
     });
   }
 
@@ -337,10 +356,16 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       final pixels = switch ((cacheExtent, extent)) {
         (final cacheExtent?, _) => cacheExtent,
         (_, final extent?) when extent.isFinite => (extent * devicePixelRatio).ceil(),
-        _ => maxImageDecodeSize,
+        _ => BoundedImage.maxDecodeSize,
       };
-      return pixels.clamp(1, maxImageDecodeSize);
+      return pixels.clamp(1, BoundedImage.maxDecodeSize);
     }
+
+    final boundsFromSize = props.cacheWidth == null && props.cacheHeight == null;
+    final boxFit = switch ((props.width, props.height, props.fit)) {
+      (final width?, final height?, final fit?) when boundsFromSize && width.isFinite && height.isFinite => fit,
+      _ => BoxFit.contain,
+    };
 
     return Image(
       key: ValueKey(_retryKey),
@@ -353,6 +378,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
         ),
         maxWidth: decodeBound(props.cacheWidth, props.width),
         maxHeight: decodeBound(props.cacheHeight, props.height),
+        fit: boxFit,
       ),
       width: props.width,
       height: props.height,
@@ -363,6 +389,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       filterQuality: props.filterQuality,
       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
         if (frame != null || wasSynchronouslyLoaded) return child;
+        if (!_showPlaceholder) return SizedBox(width: props.width, height: props.height);
         if (props.placeholderBuilder case final builder?) return builder(context);
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
