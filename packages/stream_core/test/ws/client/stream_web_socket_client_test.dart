@@ -5,6 +5,7 @@ import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/fake_server.dart';
+import '../../helpers/web_socket.dart';
 import '../../helpers/ws_client_tester.dart';
 
 /// A connect that is expected not to establish anything, so nothing is asserted about the outcome.
@@ -184,15 +185,13 @@ void main() {
       },
     );
 
-    test('reports a socket error without the query string of the URL it connected to', () {
+    test('reports a socket error without the description the socket gave', () {
       fakeAsync((async) {
         final tester = buildTester();
         tester.client.connect().ignore();
         async.flushMicrotasks();
 
-        tester.server.socket.emitError(
-          Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was closed"),
-        );
+        tester.server.socket.emitError(refusedUpgrade());
         async.flushMicrotasks();
 
         expect(
@@ -203,7 +202,7 @@ void main() {
             isA<SystemInitiated>().having(
               (it) => '${it.error}',
               'error',
-              allOf(contains('The connection reported an error'), isNot(contains('version=1'))),
+              allOf(contains('The connection reported an error'), contains('The WebSocket connection failed')),
             ),
           ),
         );

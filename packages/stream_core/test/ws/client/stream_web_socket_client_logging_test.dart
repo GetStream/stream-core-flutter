@@ -5,6 +5,7 @@ import 'package:stream_core/stream_core.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/logger.dart';
+import '../../helpers/web_socket.dart';
 import '../../helpers/ws_client_tester.dart';
 
 void main() {
@@ -65,7 +66,7 @@ void main() {
       });
     });
 
-    test('records a socket error without the query string of the URL it connected to', () {
+    test('records a socket error without the description the socket gave', () {
       fakeAsync((async) {
         final handler = RecordingLogHandler();
         final tester = buildTester();
@@ -74,14 +75,12 @@ void main() {
           tester.client.connect().ignore();
           async.flushMicrotasks();
 
-          tester.server.socket.emitError(
-            Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was closed"),
-          );
+          tester.server.socket.emitError(refusedUpgrade());
           async.flushMicrotasks();
         });
 
         final logged = handler.records.map((it) => '${it.message} ${it.error}');
-        expect(logged, contains(contains("'http://example.com:443/connect?<redacted>#'")));
+        expect(logged, contains(contains('The WebSocket connection failed')));
         expect(logged, everyElement(isNot(contains('version=1'))));
       });
     });

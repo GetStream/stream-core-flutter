@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:web_socket/web_socket.dart' as web_socket;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../errors.dart';
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -33,7 +33,8 @@ WebSocketChannel _createWebSocket(WebSocketOptions options) {
 /// The engine supports both text and binary message formats through the [WebSocketMessageCodec]
 /// and provides callbacks through [WebSocketEngineListener] for connection events.
 ///
-/// An error that quotes a URL reports it with the query string replaced by `<redacted>`.
+/// A failure of the WebSocket itself is reported as an [Exception] that reads
+/// `The WebSocket connection failed`, without the socket's own description.
 class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   /// Creates a new instance of [StreamWebSocketEngine].
   StreamWebSocketEngine({
@@ -72,14 +73,14 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
         onDone: _onDone,
         cancelOnError: false,
         onError: (Object error, StackTrace stackTrace) {
-          _listener?.onError(_withoutUrlQueries(error), stackTrace);
+          _listener?.onError(_withoutConnectionText(error), stackTrace);
         },
       );
 
       try {
         await ws.ready;
       } catch (error, stackTrace) {
-        Error.throwWithStackTrace(_withoutUrlQueries(error), stackTrace);
+        Error.throwWithStackTrace(_withoutConnectionText(error), stackTrace);
       }
 
       // A handshake already in flight outlives `close`, so a late one must not report a stale socket.
@@ -150,23 +151,16 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
     });
   }
 
-  static final _urlQuery = RegExp(r'''([a-zA-Z][a-zA-Z0-9+.-]*://[^\s'"?#]*)\?[^\s'"#]*''');
-
-  static Object _withoutUrlQueries(Object error) {
-    if (error is StreamException) return error;
-
-    final description = error.toString();
-    if (!_urlQuery.hasMatch(description)) return error;
-
-    return _RedactedException(description.replaceAllMapped(_urlQuery, (match) => '${match[1]}?<redacted>'));
-  }
+  static Object _withoutConnectionText(Object error) => switch (error) {
+    WebSocketChannelException(inner: web_socket.WebSocketException()) ||
+    web_socket.WebSocketException() => const _WebSocketFailure(),
+    _ => error,
+  };
 }
 
-final class _RedactedException implements Exception {
-  const _RedactedException(this._description);
-
-  final String _description;
+final class _WebSocketFailure implements Exception {
+  const _WebSocketFailure();
 
   @override
-  String toString() => _description;
+  String toString() => 'The WebSocket connection failed';
 }

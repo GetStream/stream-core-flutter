@@ -312,12 +312,8 @@ void main() {
     expect(handler.records.single.error, isA<FormatException>());
   });
 
-  test('reports a refused handshake without the query string of the URL it connected to', () async {
-    final socket = FakeWebSocketChannel(
-      readyError: Exception(
-        "Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was not upgraded to websocket",
-      ),
-    );
+  test('reports a refused handshake without the description the socket gave', () async {
+    final socket = FakeWebSocketChannel(readyError: refusedUpgrade());
     addTearDown(socket.endStream);
 
     final engine = StreamWebSocketEngine<String, String>(
@@ -328,20 +324,20 @@ void main() {
 
     final result = await engine.open(_options);
 
-    expect('${(result as Failure).error}', contains("'http://example.com:443/connect?<redacted>#'"));
+    expect('${(result as Failure).error}', 'The WebSocket connection failed');
   });
 
-  test('reports a socket error without the query string of the URL it connected to', () async {
+  test('reports a socket error without the description the socket gave', () async {
     final (:engine, :listener, :socket) = _subject();
     await engine.open(_options);
 
-    socket.emitError(Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was closed"));
+    socket.emitError(refusedUpgrade());
     await pumpEventQueue();
 
-    expect('${listener.errors.single}', contains("'http://example.com:443/connect?<redacted>#'"));
+    expect('${listener.errors.single}', 'The WebSocket connection failed');
   });
 
-  test('passes a socket error that names no URL query through unchanged', () async {
+  test('passes a socket error of another kind through unchanged', () async {
     final (:engine, :listener, :socket) = _subject();
     await engine.open(_options);
     final error = StateError('socket died');
