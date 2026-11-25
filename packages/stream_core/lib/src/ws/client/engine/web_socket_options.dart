@@ -13,6 +13,7 @@ import 'web_socket_engine.dart';
 ///   connectTimeout: Duration(seconds: 10),
 ///   protocols: ['chat', 'superchat'],
 ///   queryParameters: {
+///     'token': 'abc123',
 ///     'version': '1.0',
 ///   },
 /// );
@@ -50,6 +51,10 @@ class WebSocketOptions {
   /// if it supports any of them.
   final Iterable<String>? protocols;
 
-  /// Query parameters to append to the connection URL, such as an API version.
+  /// Query parameters to append to the connection URL.
+  ///
+  /// These parameters are added to the WebSocket URL during connection
+  /// establishment. Commonly used for authentication tokens, API versions,
+  /// or other connection-specific configuration.
   final Map<String, Object>? queryParameters;
 }
