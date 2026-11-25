@@ -1,7 +1,7 @@
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../cache/internal/bounded_image.dart';
+import '../../cache/internal/stream_bounded_image.dart';
 import '../../cache/internal/stream_image_cache.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -356,20 +356,21 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       final pixels = switch ((cacheExtent, extent)) {
         (final cacheExtent?, _) => cacheExtent,
         (_, final extent?) when extent.isFinite => (extent * devicePixelRatio).ceil(),
-        _ => BoundedImage.maxDecodeSize,
+        _ => StreamBoundedImage.maxDecodeSize,
       };
-      return pixels.clamp(1, BoundedImage.maxDecodeSize);
+      return pixels.clamp(1, StreamBoundedImage.maxDecodeSize);
     }
 
     final boundsFromSize = props.cacheWidth == null && props.cacheHeight == null;
     final boxFit = switch ((props.width, props.height, props.fit)) {
+      (_, _, BoxFit.none) => BoxFit.none,
       (final width?, final height?, final fit?) when boundsFromSize && width.isFinite && height.isFinite => fit,
       _ => BoxFit.contain,
     };
 
     return Image(
       key: ValueKey(_retryKey),
-      image: BoundedImage(
+      image: StreamBoundedImage(
         CachedNetworkImageProvider(
           props.url,
           headers: props.httpHeaders,

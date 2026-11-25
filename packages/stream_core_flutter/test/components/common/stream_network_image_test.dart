@@ -2,7 +2,7 @@ import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
-import 'package:stream_core_flutter/src/cache/internal/bounded_image.dart';
+import 'package:stream_core_flutter/src/cache/internal/stream_bounded_image.dart';
 
 Widget _withStreamTheme(Widget child) {
   return MaterialApp(
@@ -11,9 +11,9 @@ Widget _withStreamTheme(Widget child) {
   );
 }
 
-BoundedImage _imageOf(WidgetTester tester, {int index = 0}) {
+StreamBoundedImage _imageOf(WidgetTester tester, {int index = 0}) {
   final images = tester.widgetList<Image>(find.byType(Image)).toList();
-  return images[index].image as BoundedImage;
+  return images[index].image as StreamBoundedImage;
 }
 
 void main() {
@@ -91,5 +91,27 @@ void main() {
     );
 
     expect(_imageOf(tester).fit, BoxFit.contain);
+  });
+
+  testWidgets('keeps the same image when rebuilt with the same properties', (tester) async {
+    late StateSetter rebuild;
+    await tester.pumpWidget(
+      _withStreamTheme(
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return StreamNetworkImage('https://example.com/a.png', width: 40, height: 40);
+          },
+        ),
+      ),
+    );
+    final before = _imageOf(tester);
+
+    rebuild(() {});
+    await tester.pump();
+
+    final after = _imageOf(tester);
+    expect(after, isNot(same(before)));
+    expect(after, before);
   });
 }

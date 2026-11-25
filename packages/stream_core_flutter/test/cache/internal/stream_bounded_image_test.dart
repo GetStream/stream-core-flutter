@@ -6,7 +6,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stream_core_flutter/src/cache/internal/bounded_image.dart';
+import 'package:stream_core_flutter/src/cache/internal/stream_bounded_image.dart';
 
 // Encodes a solid image of [width] by [height] pixels as a PNG.
 Future<Uint8List> _png(int width, int height) async {
@@ -98,40 +98,50 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('decodes an image larger than its bounds to fit them, keeping its aspect ratio', () async {
-    final image = await _load(BoundedImage(MemoryImage(await _png(400, 200)), maxWidth: 100, maxHeight: 100));
+    final image = await _load(StreamBoundedImage(MemoryImage(await _png(400, 200)), maxWidth: 100, maxHeight: 100));
 
     expect((image.width, image.height), (100, 50));
   });
 
   test('decodes an image smaller than its bounds at its own size', () async {
-    final image = await _load(BoundedImage(MemoryImage(await _png(40, 20)), maxWidth: 100, maxHeight: 100));
+    final image = await _load(StreamBoundedImage(MemoryImage(await _png(40, 20)), maxWidth: 100, maxHeight: 100));
 
     expect((image.width, image.height), (40, 20));
   });
 
   test('decodes a tall image within both bounds', () async {
-    final image = await _load(BoundedImage(MemoryImage(await _png(10, 1000)), maxWidth: 100, maxHeight: 100));
+    final image = await _load(StreamBoundedImage(MemoryImage(await _png(10, 1000)), maxWidth: 100, maxHeight: 100));
 
     expect((image.width, image.height), (1, 100));
   });
 
   test('fails to load an image with more pixels than 8192 by 8192', () async {
     await expectLater(
-      _load(BoundedImage(MemoryImage(_blankPng(8193, 8193)), maxWidth: 100, maxHeight: 100)),
-      throwsA(isA<ImageTooLargeException>().having((e) => (e.width, e.height), 'size', (8193, 8193))),
+      _load(StreamBoundedImage(MemoryImage(_blankPng(8193, 8193)), maxWidth: 100, maxHeight: 100)),
+      throwsA(isA<StreamImageTooLargeException>().having((e) => (e.width, e.height), 'size', (8193, 8193))),
     );
   });
 
   test('decodes an image to fill a box it covers, keeping its aspect ratio', () async {
     final image = await _load(
-      BoundedImage(MemoryImage(await _png(400, 200)), maxWidth: 100, maxHeight: 100, fit: BoxFit.cover),
+      StreamBoundedImage(MemoryImage(await _png(400, 200)), maxWidth: 100, maxHeight: 100, fit: BoxFit.cover),
     );
 
     expect((image.width, image.height), (200, 100));
   });
 
+  test('decodes an image placed at its own size at that size', () async {
+    final image = await _load(
+      StreamBoundedImage(MemoryImage(await _png(400, 200)), maxWidth: 100, maxHeight: 100, fit: BoxFit.none),
+    );
+
+    expect((image.width, image.height), (400, 200));
+  });
+
   test('decodes an image no larger than 4096 pixels on a side', () async {
-    final image = await _load(BoundedImage(MemoryImage(await _png(5000, 100)), maxWidth: 10000, maxHeight: 10000));
+    final image = await _load(
+      StreamBoundedImage(MemoryImage(await _png(5000, 100)), maxWidth: 10000, maxHeight: 10000),
+    );
 
     expect((image.width, image.height), (4096, 82));
   });
@@ -139,18 +149,18 @@ void main() {
   test('caches each decoded size of the same image apart', () async {
     final provider = MemoryImage(await _png(400, 400));
 
-    final small = await _load(BoundedImage(provider, maxWidth: 50, maxHeight: 50));
-    final large = await _load(BoundedImage(provider, maxWidth: 200, maxHeight: 200));
+    final small = await _load(StreamBoundedImage(provider, maxWidth: 50, maxHeight: 50));
+    final large = await _load(StreamBoundedImage(provider, maxWidth: 200, maxHeight: 200));
 
     expect((small.width, large.width), (50, 200));
   });
 
   test('loads an image again after a failed load', () async {
     final provider = _FailsOnceImage(await _png(40, 20));
-    await expectLater(_load(BoundedImage(provider, maxWidth: 100, maxHeight: 100)), throwsException);
+    await expectLater(_load(StreamBoundedImage(provider, maxWidth: 100, maxHeight: 100)), throwsException);
     await Future<void>.delayed(Duration.zero);
 
-    final image = await _load(BoundedImage(provider, maxWidth: 100, maxHeight: 100));
+    final image = await _load(StreamBoundedImage(provider, maxWidth: 100, maxHeight: 100));
 
     expect((image.width, image.height), (40, 20));
   });
