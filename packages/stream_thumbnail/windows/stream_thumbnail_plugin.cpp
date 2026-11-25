@@ -16,6 +16,7 @@
 
 #include <flutter/plugin_registrar_windows.h>
 
+#include <cctype>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -72,9 +73,16 @@ bool HasHttpScheme(const std::string &video) {
   return _strnicmp(video.c_str(), "http://", 7) == 0 || _strnicmp(video.c_str(), "https://", 8) == 0;
 }
 
+// An absolute path on a local drive, such as `C:\videos\a.mp4`. Network shares
+// (`\\host\share`, `//host/share`), device paths and relative paths don't qualify.
+bool IsDriveLetterPath(const std::string &path) {
+  return path.size() >= 3 && std::isalpha(static_cast<unsigned char>(path[0])) && path[1] == ':' &&
+         (path[2] == '\\' || path[2] == '/');
+}
+
 // The URL or path Media Foundation is given for `video`. Media Foundation picks a
 // scheme handler from whatever it is handed, so a network video must name http(s)
-// and a file must not name a scheme at all.
+// and a file must be a path on a local drive.
 std::string ResolveInput(const std::string &video, ThumbnailSourceKind kind) {
   switch (kind) {
     case ThumbnailSourceKind::kNetwork:
@@ -83,9 +91,10 @@ std::string ResolveInput(const std::string &video, ThumbnailSourceKind kind) {
       }
       return video;
     case ThumbnailSourceKind::kFile: {
-      const std::string path = VideoPath(video);
-      if (path.find("://") != std::string::npos) {
-        throw ThumbnailException("UNSUPPORTED_SOURCE", "A file video must be a local path.");
+      std::string path = VideoPath(video);
+      if (path.size() >= 4 && path[0] == '/' && IsDriveLetterPath(path.substr(1))) path.erase(0, 1);
+      if (!IsDriveLetterPath(path)) {
+        throw ThumbnailException("UNSUPPORTED_SOURCE", "A file video must be an absolute path on a local drive.");
       }
       return path;
     }

@@ -237,6 +237,19 @@ void main() {
     );
   });
 
+  testWidgets('a file source naming a network share fails', (tester) async {
+    await expectLater(
+      StreamThumbnail.thumbnailData(source: StreamThumbnailSource.file(r'\\example.invalid\share\a.mp4')),
+      throwsA(
+        isA<PlatformException>().having(
+          (e) => e.code,
+          'code',
+          Platform.isWindows ? 'UNSUPPORTED_SOURCE' : isNotEmpty,
+        ),
+      ),
+    );
+  });
+
   testWidgets(
     'a content URI is rejected outside Android',
     (tester) async {

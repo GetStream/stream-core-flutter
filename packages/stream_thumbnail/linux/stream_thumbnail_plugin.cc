@@ -75,17 +75,15 @@ bool HasHttpScheme(const std::string &video) {
          g_ascii_strncasecmp(video.c_str(), "https://", 8) == 0;
 }
 
-// What FFmpeg is allowed to open for one request. An empty format whitelist
-// allows every demuxer.
+// What FFmpeg is allowed to open for one request.
 struct InputSpec {
   std::string url;
   std::string protocol_whitelist;
-  std::string format_whitelist;
 };
 
 // Single-file containers only; playlist and concatenating demuxers (hls, dash,
-// concat, ...) are not supported for network videos.
-constexpr char kNetworkFormatWhitelist[] = "mov,matroska,avi,flv,mpegts,mpeg,ogg,asf";
+// concat, ...) are not supported.
+constexpr char kFormatWhitelist[] = "mov,matroska,avi,flv,mpegts,mpeg,ogg,asf";
 
 // A network video is fetched over http(s), with tls/tcp as the transports https
 // and http sit on. A file is opened through the `file:` protocol only.
@@ -95,9 +93,9 @@ InputSpec ResolveInput(const std::string &video, StreamThumbnailThumbnailSourceK
       if (!HasHttpScheme(video)) {
         throw ThumbnailException("UNSUPPORTED_SOURCE", "A network video must be an http or https URL.");
       }
-      return {video, "http,https,tls,tcp", kNetworkFormatWhitelist};
+      return {video, "http,https,tls,tcp"};
     case STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_FILE:
-      return {"file:" + VideoPath(video), "file", ""};
+      return {"file:" + VideoPath(video), "file"};
     case STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_CONTENT_URI:
       throw ThumbnailException("UNSUPPORTED_SOURCE", "Content URIs are only supported on Android.");
   }
@@ -145,9 +143,7 @@ FramePtr DecodeFrame(const InputSpec &input, const std::map<std::string, std::st
   }
 
   av_dict_set(&options, "protocol_whitelist", input.protocol_whitelist.c_str(), 0);
-  if (!input.format_whitelist.empty()) {
-    av_dict_set(&options, "format_whitelist", input.format_whitelist.c_str(), 0);
-  }
+  av_dict_set(&options, "format_whitelist", kFormatWhitelist, 0);
 
   AVFormatContext *raw_format_ctx = nullptr;
   const int open_result = avformat_open_input(&raw_format_ctx, input.url.c_str(), nullptr, &options);

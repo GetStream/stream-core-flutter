@@ -9,8 +9,9 @@
 
 - Only `http` and `https` URLs are fetched; a URL with any other scheme fails with an `UNSUPPORTED_SOURCE`
   `PlatformException`.
-- On Linux, network videos are read only from single-file containers; playlists such as HLS and DASH are not
-  supported.
+- On Linux, videos are read only from single-file containers; playlists such as HLS and DASH are not supported.
+- A file source naming a host, such as an `https` URL, fails with `UNSUPPORTED_SOURCE`. On Windows, a file source must
+  be an absolute path on a local drive.
 
 ### 🛑 Breaking / Removals
 

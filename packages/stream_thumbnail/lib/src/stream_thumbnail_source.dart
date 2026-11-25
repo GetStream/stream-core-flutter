@@ -48,6 +48,10 @@ final class StreamThumbnailSource {
   /// [path] is a file system path or a `file:` URI. On web, where there is no
   /// file system, it is the object URL of the video, such as the `path` of a
   /// picked `XFile`.
+  ///
+  /// Generating a thumbnail fails with an `UNSUPPORTED_SOURCE`
+  /// [PlatformException] for a URL naming a host, such as an `https` URL, and
+  /// on Windows for anything other than an absolute path on a local drive.
   StreamThumbnailSource.file(String path)
     : assert(path.isNotEmpty, 'path must not be empty'),
       kind = StreamThumbnailSourceKind.file,
@@ -84,6 +88,10 @@ final class StreamThumbnailSource {
       StreamThumbnailSourceKind.network
           when uri == null || !(uri.isScheme('http') || uri.isScheme('https')) || uri.host.isEmpty =>
         PlatformException(code: 'UNSUPPORTED_SOURCE', message: 'A network video must be an http or https URL.'),
+      StreamThumbnailSourceKind.file when uri != null && uri.hasAuthority && !uri.isScheme('file') => PlatformException(
+        code: 'UNSUPPORTED_SOURCE',
+        message: 'A file video must be a path on this device.',
+      ),
       StreamThumbnailSourceKind.contentUri when uri == null || !uri.isScheme('content') => PlatformException(
         code: 'UNSUPPORTED_SOURCE',
         message: 'A content video must be a content URI.',

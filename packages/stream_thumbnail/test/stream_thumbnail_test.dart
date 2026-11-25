@@ -189,6 +189,8 @@ void main() {
       StreamThumbnailSource.network(Uri.parse('ftp://example.com/a.mp4')),
       StreamThumbnailSource.network(Uri.parse('https:/a.mp4')),
       StreamThumbnailSource.contentUri(Uri.parse('file:///videos/a.mp4')),
+      StreamThumbnailSource.file('https://cdn.example.com/a.mp4'),
+      StreamThumbnailSource.file('//example.com/share/a.mp4'),
     ];
     final isUnsupported = throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE'));
 
@@ -224,6 +226,21 @@ void main() {
 
         await StreamThumbnail.thumbnailData(source: StreamThumbnailSource.network(Uri.parse(url)));
         expect(fake.lastDataCall, isNotNull, reason: url);
+      }
+    });
+
+    test('local paths, file URIs and object URLs are accepted as files', () async {
+      for (final path in [
+        '/videos/a.mp4',
+        'file:///videos/a.mp4',
+        r'C:\videos\a.mp4',
+        'C:/videos/a.mp4',
+        'blob:https://example.com/0f8e',
+      ]) {
+        final fake = useFakePlatform();
+
+        await StreamThumbnail.thumbnailData(source: StreamThumbnailSource.file(path));
+        expect(fake.lastDataCall, isNotNull, reason: path);
       }
     });
   });
