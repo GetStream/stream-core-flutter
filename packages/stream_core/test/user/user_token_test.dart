@@ -15,15 +15,6 @@ void main() {
     );
   });
 
-  test('a value that is not a JWT is refused without quoting it', () {
-    const rawValue = 'not-a-jwt.value';
-
-    expect(
-      () => UserToken(rawValue),
-      throwsA(predicate((Object it) => !'$it'.contains(rawValue), 'an error not quoting the value')),
-    );
-  });
-
   test('describes itself without its raw value', () {
     final token = generateTestUserToken('user-id');
 

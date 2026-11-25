@@ -5,7 +5,7 @@
 - A WebSocket that fails to connect or errors mid-stream is now reported as `The WebSocket connection failed`, without
   the socket's own description.
 - `LoggingInterceptor` with `requestHeader` now reports the `Authorization` header as `<redacted>`.
-- `UserToken.toString()` and the errors `UserToken` throws for an invalid token no longer include the raw token.
+- `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` no longer include the raw token.
 
 ### 🐞 Fixed
 

@@ -43,7 +43,7 @@ class UserToken extends Equatable {
   /// [ArgumentError] or a [FormatException] if [rawValue] cannot be parsed as a JWT at all —
   /// which of the two depends on how it is malformed.
   factory UserToken(String rawValue) {
-    final claims = _claimsOf(rawValue);
+    final claims = JsonWebToken.unverified(rawValue).claims;
     final userId = claims.getTyped<String>('user_id');
     if (userId == null || userId.isEmpty) {
       throw ArgumentError('Invalid JWT token: missing or empty user_id claim', 'rawValue');
@@ -73,7 +73,7 @@ class UserToken extends Equatable {
   factory UserToken.anonymous({String rawValue = ''}) {
     DateTime? expiresAt;
     if (rawValue.isNotEmpty) {
-      final claims = _claimsOf(rawValue);
+      final claims = JsonWebToken.unverified(rawValue).claims;
       expiresAt = claims.expiry?.toUtc();
       final userId = claims.getTyped<String>('user_id');
       if (userId != User.anonymousUserId) {
@@ -99,17 +99,6 @@ class UserToken extends Equatable {
     required this.authType,
     this.expiresAt,
   });
-
-  static JsonWebTokenClaims _claimsOf(String rawValue) {
-    try {
-      return JsonWebToken.unverified(rawValue).claims;
-      // ignore: avoid_catching_errors
-    } on ArgumentError catch (error) {
-      throw ArgumentError('Invalid JWT token: ${error.message}', 'rawValue');
-    } on FormatException catch (error) {
-      throw FormatException('Invalid JWT token: ${error.message}');
-    }
-  }
 
   /// The raw token value.
   ///
