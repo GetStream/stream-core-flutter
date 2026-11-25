@@ -37,7 +37,7 @@ void main() {
               child: _buildInTheme(
                 StreamSelectInput(
                   leading: const Icon(StreamIconData.voiceFill),
-                  value: 'MacBook Pro Microphone',
+                  valueText: 'MacBook Pro Microphone',
                   onPressed: () {},
                 ),
                 brightness: brightness,
@@ -46,14 +46,14 @@ void main() {
             GoldenTestScenario(
               name: 'label',
               child: _buildInTheme(
-                StreamSelectInput(labelText: 'Microphone', value: 'Jabra Evolve2 65', onPressed: () {}),
+                StreamSelectInput(labelText: 'Microphone', valueText: 'Jabra Evolve2 65', onPressed: () {}),
                 brightness: brightness,
               ),
             ),
             GoldenTestScenario(
-              name: 'expanded',
+              name: 'open',
               child: _buildInTheme(
-                StreamSelectInput(value: 'Jabra Evolve2 65', expanded: true, onPressed: () {}),
+                StreamSelectInput(valueText: 'Jabra Evolve2 65', isOpen: true, onPressed: () {}),
                 brightness: brightness,
               ),
             ),
@@ -61,7 +61,7 @@ void main() {
               name: 'error with helper text',
               child: _buildInTheme(
                 StreamSelectInput(
-                  value: 'Jabra Evolve2 65',
+                  valueText: 'Jabra Evolve2 65',
                   helperText: 'This device is no longer available',
                   helperState: StreamHelperState.error,
                   onPressed: () {},
@@ -78,9 +78,42 @@ void main() {
               child: _buildInTheme(
                 StreamSelectInput(
                   style: const StreamSelectInputStyle.ghost(),
-                  value: 'Jabra Evolve2 65',
+                  valueText: 'Jabra Evolve2 65',
                   onPressed: () {},
                 ),
+                brightness: brightness,
+              ),
+            ),
+            GoldenTestScenario(
+              name: 'ghost open',
+              child: _buildInTheme(
+                StreamSelectInput(
+                  style: const StreamSelectInputStyle.ghost(),
+                  valueText: 'Jabra Evolve2 65',
+                  isOpen: true,
+                  onPressed: () {},
+                ),
+                brightness: brightness,
+              ),
+            ),
+            GoldenTestScenario(
+              name: 'ghost error with label and helper text',
+              child: _buildInTheme(
+                StreamSelectInput(
+                  style: const StreamSelectInputStyle.ghost(),
+                  labelText: 'Microphone',
+                  valueText: 'Jabra Evolve2 65',
+                  helperText: 'This device is no longer available',
+                  helperState: StreamHelperState.error,
+                  onPressed: () {},
+                ),
+                brightness: brightness,
+              ),
+            ),
+            GoldenTestScenario(
+              name: 'ghost disabled',
+              child: _buildInTheme(
+                StreamSelectInput(style: const StreamSelectInputStyle.ghost(), valueText: 'Jabra Evolve2 65'),
                 brightness: brightness,
               ),
             ),
@@ -88,7 +121,7 @@ void main() {
               name: 'overflowing value',
               child: _buildInTheme(
                 StreamSelectInput(
-                  value: 'Studio Display Microphone (Conference Room, 4th floor)',
+                  valueText: 'Studio Display Microphone (Conference Room, 4th floor)',
                   onPressed: () {},
                 ),
                 brightness: brightness,
@@ -99,9 +132,7 @@ void main() {
       );
 
       goldenTest(
-        // Hover draws the same ring in a different color, so this covers the
-        // geometry of both: 2px, painted 1px outside the field.
-        'draws the focus ring outside the field in ${brightness.name} theme',
+        'draws the focus ring centered on the field edge in ${brightness.name} theme',
         fileName: 'stream_select_input_focused_${brightness.name}',
         constraints: const BoxConstraints.tightFor(width: 260, height: 80),
         // The ring is suppressed while the last interaction was a touch, as it
@@ -117,7 +148,7 @@ void main() {
           Center(
             child: SizedBox(
               width: 220,
-              child: StreamSelectInput(value: 'Jabra Evolve2 65', onPressed: () {}),
+              child: StreamSelectInput(valueText: 'Jabra Evolve2 65', onPressed: () {}),
             ),
           ),
           brightness: brightness,

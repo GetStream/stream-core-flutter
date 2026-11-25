@@ -37,7 +37,7 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
     options: _SelectInputStyle.values,
     initialOption: _SelectInputStyle.outline,
     labelBuilder: (option) => option.name,
-    description: 'Outline is bordered; ghost (StreamSelectInputStyle.ghost) only shows state borders and rings.',
+    description: 'Outline is bordered; ghost (StreamSelectInputStyle.ghost) has no border, only the rings.',
   );
 
   final labelText = context.knobs.stringOrNull(
@@ -46,10 +46,10 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
     description: 'Persistent label rendered above the field.',
   );
 
-  final value = context.knobs.stringOrNull(
-    label: 'Value',
+  final valueText = context.knobs.stringOrNull(
+    label: 'Value Text',
     initialValue: 'English',
-    description: 'The current selection. Clear it to show the hint.',
+    description: 'The current selection. Clear or empty it to show the hint.',
   );
 
   final hintText = context.knobs.string(
@@ -63,8 +63,8 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
     description: 'Whether to show an icon before the value.',
   );
 
-  final expanded = context.knobs.boolean(
-    label: 'Expanded',
+  final isOpen = context.knobs.boolean(
+    label: 'Is Open',
     description: 'Whether the menu is open: active border and caret up.',
   );
 
@@ -93,10 +93,10 @@ Widget buildStreamSelectInputPlayground(BuildContext context) {
         child: StreamSelectInput(
           style: style.style,
           labelText: labelText,
-          value: value,
+          valueText: valueText,
           hintText: hintText,
           leading: showLeading ? Icon(icons.language) : null,
-          expanded: expanded,
+          isOpen: isOpen,
           helperText: helperText,
           helperState: helperState,
           onPressed: isDisabled ? null : () {},
@@ -133,29 +133,29 @@ Widget buildStreamSelectInputShowcase(BuildContext context) {
               caption: 'Placeholder, value, open, error and disabled in the $name style. Hover or tab to see the rings',
               children: [
                 StreamSelectInput(style: style, hintText: 'Placeholder', onPressed: () {}),
-                StreamSelectInput(style: style, value: 'English', onPressed: () {}),
-                StreamSelectInput(style: style, value: 'English', expanded: true, onPressed: () {}),
+                StreamSelectInput(style: style, valueText: 'English', onPressed: () {}),
+                StreamSelectInput(style: style, valueText: 'English', isOpen: true, onPressed: () {}),
                 StreamSelectInput(
                   style: style,
-                  value: 'English',
+                  valueText: 'English',
                   helperText: 'This language is no longer available',
                   helperState: StreamHelperState.error,
                   onPressed: () {},
                 ),
-                StreamSelectInput(style: style, value: 'English'),
+                StreamSelectInput(style: style, valueText: 'English'),
               ],
             ),
             SizedBox(height: spacing.xl),
           ],
           const _Section(
             label: 'WITH A MENU',
-            caption: 'The field opens a menu; expanded follows whether it is showing',
+            caption: 'The field opens a menu; isOpen follows whether it is showing',
             children: [_MenuDemo()],
           ),
           SizedBox(height: spacing.xl),
           _Section(
             label: 'IN A FORM',
-            caption: 'The field height and padding match StreamTextInput, so the two line up',
+            caption: 'The horizontal padding, radius and text styles match StreamTextInput, so the two line up',
             children: [
               StreamTextInput(labelText: 'Name', hintText: 'Your name'),
               StreamSelectInput(labelText: 'Language', hintText: 'Choose a language', onPressed: () {}),
@@ -193,8 +193,8 @@ class _MenuDemoState extends State<_MenuDemo> {
       builder: (context, controller, child) => StreamSelectInput(
         labelText: 'Language',
         hintText: 'Choose a language',
-        value: _selected,
-        expanded: _open,
+        valueText: _selected,
+        isOpen: _open,
         onPressed: () => controller.isOpen ? controller.close() : controller.open(),
       ),
     );

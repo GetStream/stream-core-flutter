@@ -12,24 +12,12 @@ import 'stream_text_input.dart';
 
 /// A select field styled for the Stream design system.
 ///
-/// This is the field only: it renders the current `value` (or `hintText` when
-/// nothing is selected) between a `leading` widget and a caret, and reports
-/// presses through `onPressed`. Opening a menu is the caller's job, for example
-/// with a [MenuAnchor] whose builder toggles its controller from `onPressed`.
-/// That is what lets one field drive more than one selection, for example a
-/// single audio field whose menu picks both a microphone and a speaker.
+/// The caller opens the menu from [onPressed] and sets `isOpen` while it shows.
 ///
-/// Set `expanded` while that menu is open to get the active border and the
-/// caret-up glyph.
-///
-/// The base border carries the disabled, error and active states, while hover
-/// and focus draw a ring centered on the field's outer edge, so half its width
-/// (1px for the default 2px ring) paints outside the field. A clipping ancestor
-/// cuts that part off, and a sibling packed edge to edge can paint over it.
-///
-/// The field's height and padding match [StreamTextInput], so a select and a
-/// text input in the same form line up. For a borderless field, pass
-/// [StreamSelectInputStyle.ghost] as the `style`.
+/// The field's horizontal padding, radius and text styles match
+/// [StreamTextInput], so a select and a text input in the same form line up.
+/// For a borderless field,
+/// pass [StreamSelectInputStyle.ghost] as the `style`.
 ///
 /// Visual properties are resolved in order:
 /// 1. Per-instance `style` overrides
@@ -44,8 +32,8 @@ import 'stream_text_input.dart';
 /// ```dart
 /// StreamSelectInput(
 ///   labelText: 'Language',
-///   value: 'English',
-///   expanded: isMenuOpen,
+///   valueText: 'English',
+///   isOpen: isMenuOpen,
 ///   onPressed: toggleMenu,
 /// )
 /// ```
@@ -71,7 +59,7 @@ import 'stream_text_input.dart';
 ///
 /// ```dart
 /// StreamSelectInput(
-///   value: 'MacBook Pro Microphone',
+///   valueText: 'MacBook Pro Microphone',
 ///   semanticLabel: 'Microphone',
 ///   style: const StreamSelectInputStyle.ghost(),
 ///   onPressed: openMenu,
@@ -90,26 +78,28 @@ class StreamSelectInput extends StatelessWidget {
     super.key,
     String? labelText,
     Widget? leading,
-    String? value,
+    String? valueText,
     String? hintText,
     String? semanticLabel,
-    bool expanded = false,
+    bool isOpen = false,
     String? helperText,
     StreamHelperState? helperState,
     VoidCallback? onPressed,
     FocusNode? focusNode,
+    bool autofocus = false,
     StreamSelectInputStyle? style,
   }) : props = .new(
          labelText: labelText,
          leading: leading,
-         value: value,
+         valueText: valueText,
          hintText: hintText,
          semanticLabel: semanticLabel,
-         expanded: expanded,
+         isOpen: isOpen,
          helperText: helperText,
          helperState: helperState,
          onPressed: onPressed,
          focusNode: focusNode,
+         autofocus: autofocus,
          style: style,
        );
 
@@ -138,14 +128,15 @@ class StreamSelectInputProps {
   const StreamSelectInputProps({
     this.labelText,
     this.leading,
-    this.value,
+    this.valueText,
     this.hintText,
     this.semanticLabel,
-    this.expanded = false,
+    this.isOpen = false,
     this.helperText,
     this.helperState,
     this.onPressed,
     this.focusNode,
+    this.autofocus = false,
     this.style,
   });
 
@@ -160,10 +151,10 @@ class StreamSelectInputProps {
 
   /// The text of the current selection.
   ///
-  /// When null, [hintText] is shown in the hint style instead.
-  final String? value;
+  /// When null or empty, [hintText] is shown in the hint style instead.
+  final String? valueText;
 
-  /// Placeholder text shown while [value] is null.
+  /// Placeholder text shown while [valueText] is null or empty.
   ///
   /// While nothing is selected it is announced as the field's hint, or as its
   /// semantic label when neither [labelText] nor [semanticLabel] is set.
@@ -178,9 +169,13 @@ class StreamSelectInputProps {
 
   /// Whether the field's menu is open.
   ///
-  /// When true, the field shows the active border and a caret pointing up.
+  /// While true, the caret points up and the field's styles resolve with
+  /// [WidgetState.selected], which the default border and icon color turn into
+  /// their active colors. Screen readers can then collapse the field, and
+  /// expand it while false, both through [onPressed].
+  ///
   /// Defaults to false.
-  final bool expanded;
+  final bool isOpen;
 
   /// Helper message displayed below the field.
   ///
@@ -189,8 +184,8 @@ class StreamSelectInputProps {
 
   /// The semantic state of [helperText].
   ///
-  /// [StreamHelperState.error] also drives the field's error border, whether or
-  /// not [helperText] is set.
+  /// [StreamHelperState.error] also drives the field's error border, whether
+  /// [helperText] is set or not.
   final StreamHelperState? helperState;
 
   /// Called when the field is pressed or activated from the keyboard.
@@ -202,6 +197,12 @@ class StreamSelectInputProps {
   ///
   /// If null, the field creates and manages its own.
   final FocusNode? focusNode;
+
+  /// Whether the field focuses itself when first built, if nothing else is
+  /// focused.
+  ///
+  /// Defaults to false.
+  final bool autofocus;
 
   /// Per-instance style overrides.
   ///
@@ -251,6 +252,8 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
     }
   }
 
+  void _activate() => props.onPressed?.call();
+
   @override
   Widget build(BuildContext context) {
     final icons = context.streamIcons;
@@ -261,12 +264,14 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
     final defaults = _StreamSelectInputDefaults(context);
 
     final hasError = props.helperState == StreamHelperState.error;
-    final hasValue = props.value != null;
+    final valueText = props.valueText;
+    final hasValue = valueText?.isNotEmpty ?? false;
 
     final states = <WidgetState>{
       if (!_enabled) WidgetState.disabled,
       if (_enabled && _hovered) WidgetState.hovered,
       if (_enabled && _focused) WidgetState.focused,
+      if (props.isOpen) WidgetState.selected,
       if (hasError) WidgetState.error,
     };
 
@@ -282,12 +287,10 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
       style?.labelStyle ?? themeStyle?.labelStyle ?? defaults.labelStyle,
       states,
     );
-
-    final contentStyle = hasValue ? effectiveTextStyle : effectiveHintStyle;
-    final effectiveIconColor = switch (style?.iconColor ?? themeStyle?.iconColor) {
-      final iconColor? => WidgetStateProperty.resolveAs(iconColor, states),
-      _ => contentStyle.color,
-    };
+    final effectiveIconColor = WidgetStateProperty.resolveAs(
+      style?.iconColor ?? themeStyle?.iconColor ?? defaults.iconColor,
+      states,
+    );
     final effectiveIconSize = style?.iconSize ?? themeStyle?.iconSize ?? defaults.iconSize;
     final effectiveBorderRadius = style?.borderRadius ?? themeStyle?.borderRadius ?? defaults.borderRadius;
     final effectiveFillColor = WidgetStateProperty.resolveAs(
@@ -295,16 +298,9 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
       states,
     );
     final effectiveContentPadding = style?.contentPadding ?? themeStyle?.contentPadding ?? defaults.contentPadding;
-
-    final effectiveBorder = _resolveSide(
-      switch ((_enabled, hasError, props.expanded)) {
-        (false, _, _) => style?.disabledBorder ?? themeStyle?.disabledBorder ?? defaults.disabledBorder,
-        (_, true, _) => style?.errorBorder ?? themeStyle?.errorBorder ?? defaults.errorBorder,
-        (_, _, true) => style?.activeBorder ?? themeStyle?.activeBorder ?? defaults.activeBorder,
-        _ => style?.border ?? themeStyle?.border ?? defaults.border,
-      },
-      states,
-    );
+    final effectiveLabelPadding = style?.labelPadding ?? themeStyle?.labelPadding ?? defaults.labelPadding;
+    final effectiveHelperPadding = style?.helperPadding ?? themeStyle?.helperPadding ?? defaults.helperPadding;
+    final effectiveBorder = _resolveSide(style?.border ?? themeStyle?.border ?? defaults.border, states);
 
     final ringSide = switch ((_enabled, _focused, _hovered)) {
       (false, _, _) => null,
@@ -314,7 +310,9 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
     };
     final effectiveRing = ringSide == null ? null : _resolveSide(ringSide, states);
 
-    final field = Container(
+    // The border paints inside the box without padding it, so its width never
+    // changes the field's size.
+    final field = DecoratedBox(
       decoration: ShapeDecoration(
         color: effectiveFillColor,
         shape: RoundedSuperellipseBorder(
@@ -322,25 +320,27 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
           borderRadius: effectiveBorderRadius,
         ),
       ),
-      padding: effectiveContentPadding,
-      child: IconTheme(
-        data: IconThemeData(size: effectiveIconSize, color: effectiveIconColor),
-        child: StreamRow(
-          spacing: spacing.xs,
-          children: [
-            ?props.leading,
-            Expanded(
-              child: ExcludeSemantics(
-                child: Text(
-                  props.value ?? props.hintText ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: contentStyle,
+      child: Padding(
+        padding: effectiveContentPadding,
+        child: IconTheme(
+          data: IconThemeData(size: effectiveIconSize, color: effectiveIconColor),
+          child: StreamRow(
+            spacing: spacing.xs,
+            children: [
+              ?props.leading,
+              Expanded(
+                child: ExcludeSemantics(
+                  child: Text(
+                    hasValue ? valueText! : props.hintText ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: hasValue ? effectiveTextStyle : effectiveHintStyle,
+                  ),
                 ),
               ),
-            ),
-            Icon(props.expanded ? icons.caretUp : icons.caretDown),
-          ],
+              Icon(props.isOpen ? icons.caretUp : icons.caretDown),
+            ],
+          ),
         ),
       ),
     );
@@ -352,39 +352,42 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
       container: true,
       button: true,
       enabled: _enabled,
-      expanded: props.expanded,
+      expanded: props.isOpen,
       label: hasSemanticLabel ? semanticLabel : (hasValue ? null : props.hintText),
-      value: props.value,
+      value: hasValue ? valueText : null,
       hint: hasSemanticLabel && !hasValue ? props.hintText : null,
       onTap: props.onPressed,
+      onExpand: props.isOpen ? null : props.onPressed,
+      onCollapse: props.isOpen ? props.onPressed : null,
       child: StreamColumn(
         spacing: spacing.xs,
         mainAxisAlignment: .center,
         crossAxisAlignment: .start,
         children: [
           if (props.labelText case final labelText?)
-            ExcludeSemantics(
-              child: Text(
-                labelText,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: effectiveLabelStyle,
+            Padding(
+              padding: effectiveLabelPadding,
+              child: ExcludeSemantics(
+                child: Text(
+                  labelText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: effectiveLabelStyle,
+                ),
               ),
             ),
           FocusableActionDetector(
             key: ObjectKey(props.focusNode),
             enabled: _enabled,
             focusNode: props.focusNode,
+            autofocus: props.autofocus,
             mouseCursor: _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
             onShowHoverHighlight: (value) => setState(() => _hovered = value),
             onShowFocusHighlight: (value) => setState(() => _focused = value),
             actions: {
-              ActivateIntent: CallbackAction<ActivateIntent>(
-                onInvoke: (_) {
-                  props.onPressed?.call();
-                  return null;
-                },
-              ),
+              ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => _activate()),
+              // Enter maps to this intent instead of ActivateIntent on the web.
+              ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) => _activate()),
             },
             child: GestureDetector(
               onTap: props.onPressed,
@@ -394,15 +397,7 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
                 children: [
                   field,
                   if (effectiveRing case final ring?)
-                    // Offsets the ring's box so the stroke is centered on the
-                    // field's outer edge whatever its strokeAlign: an inside
-                    // stroke grows the box by half the width, an outside one
-                    // shrinks it by the same.
                     Positioned.fill(
-                      left: ring.width * ring.strokeAlign / 2,
-                      top: ring.width * ring.strokeAlign / 2,
-                      right: ring.width * ring.strokeAlign / 2,
-                      bottom: ring.width * ring.strokeAlign / 2,
                       child: IgnorePointer(
                         child: DecoratedBox(
                           decoration: ShapeDecoration(
@@ -418,7 +413,11 @@ class _DefaultStreamSelectInputState extends State<DefaultStreamSelectInput> {
               ),
             ),
           ),
-          if (props.helperText case final helperText?) StreamHelperText(text: helperText, state: props.helperState),
+          if (props.helperText case final helperText?)
+            Padding(
+              padding: effectiveHelperPadding,
+              child: StreamHelperText(text: helperText, state: props.helperState),
+            ),
         ],
       ),
     );
@@ -436,9 +435,8 @@ BorderSide _resolveSide(BorderSide side, Set<WidgetState> states) {
 //
 // These defaults are used when no explicit value is provided via
 // [StreamSelectInputStyle] or [StreamSelectInputThemeData]. The value and hint
-// styles, icon size, radius and padding match the ones [StreamTextInput] falls
-// back to, so the two fields line up in a form. The label differs: it uses
-// headingXs, as the select design does, and dims when the field is disabled.
+// styles, label style and horizontal padding match the ones [StreamTextInput]
+// falls back to.
 class _StreamSelectInputDefaults extends StreamSelectInputStyle {
   _StreamSelectInputDefaults(this.context);
 
@@ -462,35 +460,48 @@ class _StreamSelectInputDefaults extends StreamSelectInputStyle {
   });
 
   @override
-  TextStyle get labelStyle => WidgetStateTextStyle.resolveWith((states) {
-    final color = states.contains(WidgetState.disabled) ? _colorScheme.textDisabled : _colorScheme.textPrimary;
-    return _textTheme.headingXs.copyWith(color: color);
+  TextStyle get labelStyle => _textTheme.headingSm.copyWith(color: _colorScheme.textPrimary);
+
+  @override
+  Color get iconColor => WidgetStateColor.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return _colorScheme.textDisabled;
+    if (states.contains(WidgetState.selected)) return _colorScheme.textPrimary;
+    return _colorScheme.textTertiary;
   });
 
   @override
   double get iconSize => 20;
 
   @override
-  BorderRadiusGeometry get borderRadius => BorderRadius.all(_radius.lg);
+  BorderRadiusGeometry get borderRadius => BorderRadius.all(_radius.xl);
 
   @override
-  BorderSide get border => BorderSide(color: _colorScheme.borderDefault);
+  BorderSide get border => WidgetStateBorderSide.resolveWith((states) {
+    if (states.contains(WidgetState.disabled)) return BorderSide(color: _colorScheme.borderDisabled);
+    if (states.contains(WidgetState.error)) return BorderSide(color: _colorScheme.borderError);
+    if (states.contains(WidgetState.selected)) return BorderSide(color: _colorScheme.borderActive);
+    return BorderSide(color: _colorScheme.borderDefault);
+  });
 
   @override
-  BorderSide get activeBorder => BorderSide(color: _colorScheme.borderActive);
+  BorderSide get hoverRing => BorderSide(color: _colorScheme.borderHover);
 
   @override
-  BorderSide get errorBorder => BorderSide(color: _colorScheme.borderError);
+  BorderSide get focusRing => BorderSide(
+    color: _colorScheme.borderFocus,
+    width: 2,
+    strokeAlign: BorderSide.strokeAlignCenter,
+  );
 
   @override
-  BorderSide get disabledBorder => BorderSide(color: _colorScheme.borderDisabled);
+  EdgeInsetsGeometry get contentPadding => .symmetric(
+    vertical: _spacing.sm + _spacing.xxxs,
+    horizontal: _spacing.md,
+  );
 
   @override
-  BorderSide get hoverRing => BorderSide(color: _colorScheme.borderHover, width: 2);
+  EdgeInsetsGeometry get labelPadding => EdgeInsets.zero;
 
   @override
-  BorderSide get focusRing => BorderSide(color: _colorScheme.borderFocus, width: 2);
-
-  @override
-  EdgeInsetsGeometry get contentPadding => .symmetric(vertical: _spacing.sm, horizontal: _spacing.md);
+  EdgeInsetsGeometry get helperPadding => EdgeInsets.zero;
 }

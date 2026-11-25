@@ -892,7 +892,7 @@ class _StreamTextInputDefaults extends StreamTextInputStyle {
   BorderSide get errorBorder => BorderSide(color: _colorScheme.borderError);
 
   @override
-  BorderRadiusGeometry get borderRadius => BorderRadius.all(_radius.lg);
+  BorderRadiusGeometry get borderRadius => BorderRadius.all(_radius.xl);
 
   @override
   TextStyle get textStyle => WidgetStateTextStyle.resolveWith((states) {

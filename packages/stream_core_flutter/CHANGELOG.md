@@ -25,6 +25,7 @@
 - `StreamMessageMetadata` reverses an end-aligned row to edited, status and
   timestamp, then username (previously username first). Start-aligned rows
   are unchanged.
+- `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)
@@ -61,6 +62,7 @@
 
 ### 🔄 Changed
 
+- `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - `StreamMessageText` opens a `www.` address over `https://` instead of
   `http://`.
 - Snackbars from a `StreamSnackbarScope` now show inside the `StreamScaffold`
@@ -82,6 +84,7 @@
 
 ### 🔄 Changed
 
+- `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - Improved `StreamMessageText` build performance in long message lists.
 - Tapping a `StreamContextMenuAction` in a `MenuAnchor` now closes the menu.
   Pass `closeOnActivate: false` to keep it open.
@@ -112,6 +115,7 @@
 
 ### 🔄 Changed
 
+- `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - `StreamColorScheme.accentWarning` — and `borderWarning`, which defaults to it —
   moved from orange to yellow: `#F26D10` → `#F6BF57` light, `#FA922B` → `#FCD579`
   dark. Pair it with a dark foreground.
@@ -151,6 +155,7 @@
 
 ### 🔄 Changed
 
+- `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - Raised the minimum Flutter version to `>=3.44.0` and the Dart SDK to `^3.12.0`.
 
 ### 🛑 Breaking / Removals

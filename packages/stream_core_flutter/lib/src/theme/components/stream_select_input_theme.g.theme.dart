@@ -114,21 +114,6 @@ mixin _$StreamSelectInputStyle {
                 ? a.border
                 : b.border
           : BorderSide.lerp(a.border!, b.border!, t),
-      activeBorder: a.activeBorder == null || b.activeBorder == null
-          ? t < 0.5
-                ? a.activeBorder
-                : b.activeBorder
-          : BorderSide.lerp(a.activeBorder!, b.activeBorder!, t),
-      errorBorder: a.errorBorder == null || b.errorBorder == null
-          ? t < 0.5
-                ? a.errorBorder
-                : b.errorBorder
-          : BorderSide.lerp(a.errorBorder!, b.errorBorder!, t),
-      disabledBorder: a.disabledBorder == null || b.disabledBorder == null
-          ? t < 0.5
-                ? a.disabledBorder
-                : b.disabledBorder
-          : BorderSide.lerp(a.disabledBorder!, b.disabledBorder!, t),
       hoverRing: a.hoverRing == null || b.hoverRing == null
           ? t < 0.5
                 ? a.hoverRing
@@ -145,6 +130,12 @@ mixin _$StreamSelectInputStyle {
         b.contentPadding,
         t,
       ),
+      labelPadding: EdgeInsetsGeometry.lerp(a.labelPadding, b.labelPadding, t),
+      helperPadding: EdgeInsetsGeometry.lerp(
+        a.helperPadding,
+        b.helperPadding,
+        t,
+      ),
     );
   }
 
@@ -156,13 +147,12 @@ mixin _$StreamSelectInputStyle {
     double? iconSize,
     BorderRadiusGeometry? borderRadius,
     BorderSide? border,
-    BorderSide? activeBorder,
-    BorderSide? errorBorder,
-    BorderSide? disabledBorder,
     BorderSide? hoverRing,
     BorderSide? focusRing,
     Color? fillColor,
     EdgeInsetsGeometry? contentPadding,
+    EdgeInsetsGeometry? labelPadding,
+    EdgeInsetsGeometry? helperPadding,
   }) {
     final _this = (this as StreamSelectInputStyle);
 
@@ -174,13 +164,12 @@ mixin _$StreamSelectInputStyle {
       iconSize: iconSize ?? _this.iconSize,
       borderRadius: borderRadius ?? _this.borderRadius,
       border: border ?? _this.border,
-      activeBorder: activeBorder ?? _this.activeBorder,
-      errorBorder: errorBorder ?? _this.errorBorder,
-      disabledBorder: disabledBorder ?? _this.disabledBorder,
       hoverRing: hoverRing ?? _this.hoverRing,
       focusRing: focusRing ?? _this.focusRing,
       fillColor: fillColor ?? _this.fillColor,
       contentPadding: contentPadding ?? _this.contentPadding,
+      labelPadding: labelPadding ?? _this.labelPadding,
+      helperPadding: helperPadding ?? _this.helperPadding,
     );
   }
 
@@ -207,21 +196,6 @@ mixin _$StreamSelectInputStyle {
           : other.border == null
           ? _this.border
           : BorderSide.merge(_this.border!, other.border!),
-      activeBorder: _this.activeBorder == null
-          ? other.activeBorder
-          : other.activeBorder == null
-          ? _this.activeBorder
-          : BorderSide.merge(_this.activeBorder!, other.activeBorder!),
-      errorBorder: _this.errorBorder == null
-          ? other.errorBorder
-          : other.errorBorder == null
-          ? _this.errorBorder
-          : BorderSide.merge(_this.errorBorder!, other.errorBorder!),
-      disabledBorder: _this.disabledBorder == null
-          ? other.disabledBorder
-          : other.disabledBorder == null
-          ? _this.disabledBorder
-          : BorderSide.merge(_this.disabledBorder!, other.disabledBorder!),
       hoverRing: _this.hoverRing == null
           ? other.hoverRing
           : other.hoverRing == null
@@ -234,6 +208,8 @@ mixin _$StreamSelectInputStyle {
           : BorderSide.merge(_this.focusRing!, other.focusRing!),
       fillColor: other.fillColor,
       contentPadding: other.contentPadding,
+      labelPadding: other.labelPadding,
+      helperPadding: other.helperPadding,
     );
   }
 
@@ -257,13 +233,12 @@ mixin _$StreamSelectInputStyle {
         _other.iconSize == _this.iconSize &&
         _other.borderRadius == _this.borderRadius &&
         _other.border == _this.border &&
-        _other.activeBorder == _this.activeBorder &&
-        _other.errorBorder == _this.errorBorder &&
-        _other.disabledBorder == _this.disabledBorder &&
         _other.hoverRing == _this.hoverRing &&
         _other.focusRing == _this.focusRing &&
         _other.fillColor == _this.fillColor &&
-        _other.contentPadding == _this.contentPadding;
+        _other.contentPadding == _this.contentPadding &&
+        _other.labelPadding == _this.labelPadding &&
+        _other.helperPadding == _this.helperPadding;
   }
 
   @override
@@ -279,13 +254,12 @@ mixin _$StreamSelectInputStyle {
       _this.iconSize,
       _this.borderRadius,
       _this.border,
-      _this.activeBorder,
-      _this.errorBorder,
-      _this.disabledBorder,
       _this.hoverRing,
       _this.focusRing,
       _this.fillColor,
       _this.contentPadding,
+      _this.labelPadding,
+      _this.helperPadding,
     );
   }
 }
