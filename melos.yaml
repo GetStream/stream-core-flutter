@@ -47,7 +47,6 @@ command:
       unicode_emojis: ^0.5.1
       uuid: ^4.5.1
       web: ^1.1.1
-      web_socket: '>=0.1.5 <2.0.0'
       web_socket_channel: ^3.0.1
 
     # List of all the dev_dependencies used in the project.

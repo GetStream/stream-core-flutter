@@ -2,6 +2,7 @@ import 'package:clock/clock.dart';
 import 'package:equatable/equatable.dart';
 import 'package:jose/jose.dart';
 
+import '../utils/object.dart';
 import 'user.dart';
 
 /// A function that loads user tokens.
@@ -139,9 +140,12 @@ class UserToken extends Equatable {
   @override
   List<Object?> get props => [rawValue, userId, authType, expiresAt];
 
-  /// A description of this token that leaves out [rawValue].
+  /// A description of this token, without its [rawValue].
   @override
-  String toString() => 'UserToken(userId: $userId, authType: ${authType.name}, expiresAt: $expiresAt)';
+  String toString() {
+    final type = objectRuntimeType(this, 'UserToken');
+    return '$type(userId: $userId, authType: ${authType.name}, expiresAt: $expiresAt)';
+  }
 }
 
 /// Represents the types of authentication available for API access.

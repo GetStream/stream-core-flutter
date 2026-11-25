@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:stream_channel/stream_channel.dart';
-import 'package:web_socket/web_socket.dart' as web_socket;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// A socket a test drives, recording what was sent to the peer.
@@ -65,9 +64,7 @@ class FakeWebSocketSink implements WebSocketSink {
 
 /// The error a socket reports when the server refuses the upgrade, quoting the URL it connected to.
 WebSocketChannelException refusedUpgrade() => WebSocketChannelException.from(
-  web_socket.WebSocketException(
-    "Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was not upgraded to websocket",
-  ),
+  Exception("Connection to 'http://example.com:443/connect?json=%7B%7D&version=1#' was not upgraded to websocket"),
 );
 
 /// A WebSocket a test drives, in place of a real connection.

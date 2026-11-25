@@ -312,7 +312,7 @@ void main() {
     expect(handler.records.single.error, isA<FormatException>());
   });
 
-  test('reports a refused handshake without the description the socket gave', () async {
+  test('reports a refused handshake as a StreamNetworkException', () async {
     final socket = FakeWebSocketChannel(readyError: refusedUpgrade());
     addTearDown(socket.endStream);
 
@@ -324,17 +324,23 @@ void main() {
 
     final result = await engine.open(_options);
 
-    expect('${(result as Failure).error}', 'The WebSocket connection failed');
+    expect(
+      (result as Failure).error,
+      isA<StreamNetworkException>().having((it) => it.message, 'message', 'The WebSocket connection failed'),
+    );
   });
 
-  test('reports a socket error without the description the socket gave', () async {
+  test('reports a failed connection as a StreamNetworkException', () async {
     final (:engine, :listener, :socket) = _subject();
     await engine.open(_options);
 
     socket.emitError(refusedUpgrade());
     await pumpEventQueue();
 
-    expect('${listener.errors.single}', 'The WebSocket connection failed');
+    expect(
+      listener.errors.single,
+      isA<StreamNetworkException>().having((it) => it.message, 'message', 'The WebSocket connection failed'),
+    );
   });
 
   test('passes a socket error of another kind through unchanged', () async {

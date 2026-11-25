@@ -185,7 +185,7 @@ void main() {
       },
     );
 
-    test('reports a socket error without the description the socket gave', () {
+    test('reports a failed connection as a StreamNetworkException', () {
       fakeAsync((async) {
         final tester = buildTester();
         tester.client.connect().ignore();
@@ -200,9 +200,9 @@ void main() {
             (it) => it.source,
             'source',
             isA<SystemInitiated>().having(
-              (it) => '${it.error}',
+              (it) => it.error,
               'error',
-              allOf(contains('The connection reported an error'), contains('The WebSocket connection failed')),
+              isA<StreamNetworkException>().having((it) => it.message, 'message', 'The WebSocket connection failed'),
             ),
           ),
         );

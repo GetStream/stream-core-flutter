@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:web_socket/web_socket.dart' as web_socket;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../errors.dart';
 import '../../../logger.dart';
 import '../../../utils.dart';
 import 'web_socket_engine.dart';
@@ -24,17 +24,16 @@ WebSocketChannel _createWebSocket(WebSocketOptions options) {
   return WebSocketChannel.connect(uri, protocols: options.protocols);
 }
 
-/// A WebSocket engine implementation that handles low-level WebSocket operations.
+/// A [WebSocketEngine] over a [WebSocketChannel].
 ///
-/// Manages the WebSocket connection lifecycle, message encoding/decoding, and event notification.
-/// This engine provides the foundation for higher-level WebSocket client functionality by handling
-/// the transport layer concerns.
+/// Frames are encoded and decoded by a [WebSocketMessageCodec], and connection events go to a
+/// [WebSocketEngineListener]. A connection that fails to open is reported as a [StreamNetworkException]
+/// reading `The WebSocket connection failed`.
 ///
-/// The engine supports both text and binary message formats through the [WebSocketMessageCodec]
-/// and provides callbacks through [WebSocketEngineListener] for connection events.
+/// See also:
 ///
-/// A failure of the WebSocket itself is reported as an [Exception] that reads
-/// `The WebSocket connection failed`, without the socket's own description.
+///  * [WebSocketOptions], which configures the connection.
+///  * [WebSocketEngineListener], which receives the engine's events.
 class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   /// Creates a new instance of [StreamWebSocketEngine].
   StreamWebSocketEngine({
@@ -152,15 +151,7 @@ class StreamWebSocketEngine<Inc, Out> implements WebSocketEngine<Out> {
   }
 
   static Object _withoutConnectionText(Object error) => switch (error) {
-    WebSocketChannelException(inner: web_socket.WebSocketException()) ||
-    web_socket.WebSocketException() => const _WebSocketFailure(),
+    WebSocketChannelException(inner: _?) => const StreamNetworkException(message: 'The WebSocket connection failed'),
     _ => error,
   };
-}
-
-final class _WebSocketFailure implements Exception {
-  const _WebSocketFailure();
-
-  @override
-  String toString() => 'The WebSocket connection failed';
 }

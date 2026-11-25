@@ -50,9 +50,6 @@ class WebSocketOptions {
   /// if it supports any of them.
   final Iterable<String>? protocols;
 
-  /// Query parameters to append to the connection URL.
-  ///
-  /// These parameters are added to the WebSocket URL during connection
-  /// establishment, for API versions or other connection-specific configuration.
+  /// Query parameters to append to the connection URL, such as an API version.
   final Map<String, Object>? queryParameters;
 }
