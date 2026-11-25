@@ -25,6 +25,7 @@
   none, which can render differently on web and desktop.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)
   instead of transparent white.
+- Added `StreamTabBar` and `StreamTabBarTheme`, a row of equal-width tabs, to `video.dart`.
 
 ## 0.5.4
 
