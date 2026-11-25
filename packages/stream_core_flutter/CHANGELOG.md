@@ -4,6 +4,8 @@
 
 - Added a `mark` slot to `StreamMessageMetadata`, styled by new `mark*` and
   `separator*` fields on `StreamMessageMetadataStyle`.
+- Added `StreamEmptyState` and `StreamEmptyStateTheme`, a placeholder for a place that has nothing in it yet:
+  an optional icon over a title, a description and an optional action.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
