@@ -64,16 +64,30 @@ void main() {
     expect(tester.getTopLeft(find.text('No results')).dy - iconBottom, 12);
   });
 
-  testWidgets('StreamEmptyState asserts that it has a title or a description', (tester) async {
+  test('StreamEmptyState asserts that it has a title or a description', () {
     expect(() => StreamEmptyState(icon: const Icon(Icons.inbox)), throwsAssertionError);
+  });
+
+  testWidgets('StreamEmptyState starts with the text and leaves no icon gap when there is no icon', (tester) async {
+    await tester.pumpWidget(_wrap(StreamEmptyState(title: const Text('Title'))));
+
+    const verticalPadding = 40.0;
+    final emptyStateTop = tester.getTopLeft(find.byType(StreamEmptyState)).dy;
+    expect(find.byType(Icon), findsNothing);
+    expect(tester.getTopLeft(find.text('Title')).dy - emptyStateTop, verticalPadding);
   });
 
   testWidgets('StreamEmptyState leaves no gap for a missing description and action', (tester) async {
     await tester.pumpWidget(_wrap(StreamEmptyState(icon: const Icon(Icons.inbox), title: const Text('Title'))));
 
+    const verticalPadding = 40.0;
+    const iconSize = 32.0;
+    const iconSpacing = 12.0;
     final titleHeight = tester.getSize(find.text('Title')).height;
-    // 40px vertical padding on each side, a 32px icon and a 12px gap.
-    expect(tester.getSize(find.byType(StreamEmptyState)).height, 40 + 32 + 12 + titleHeight + 40);
+    expect(
+      tester.getSize(find.byType(StreamEmptyState)).height,
+      verticalPadding + iconSize + iconSpacing + titleHeight + verticalPadding,
+    );
   });
 
   testWidgets('StreamEmptyState pads its content with the default padding', (tester) async {
@@ -165,13 +179,16 @@ void main() {
     expect(tester.renderObject<RenderParagraph>(find.text(description)).textAlign, TextAlign.center);
   });
 
-  testWidgets('StreamEmptyState lets the text take the full width when no maximum is themed', (tester) async {
+  testWidgets('StreamEmptyState lets the text take the full width when no constraints are themed', (tester) async {
     const description = 'A description long enough to need far more than three hundred and twenty pixels, so it wraps';
+    const width = 800.0;
+    const horizontalPadding = 16.0;
+    const availableTextWidth = width - 2 * horizontalPadding;
 
     await tester.pumpWidget(
       _wrap(
         SizedBox(
-          width: 800,
+          width: width,
           child: StreamEmptyState(
             icon: const Icon(Icons.inbox),
             title: const Text('Title'),
@@ -181,14 +198,12 @@ void main() {
       ),
     );
 
-    // 800px less 16px of padding on each side.
     expect(tester.getSize(find.text(description)).width, greaterThan(320));
-    expect(tester.getSize(find.text(description)).width, lessThanOrEqualTo(768));
+    expect(tester.getSize(find.text(description)).width, lessThanOrEqualTo(availableTextWidth));
   });
 
   testWidgets('StreamEmptyState grows taller without overflowing at a large text scale', (tester) async {
-    // Scrollable so that only an overflow inside the empty state fails the test.
-    final emptyState = SingleChildScrollView(
+    final emptyStateWithRoomToGrow = SingleChildScrollView(
       child: SizedBox(
         width: 320,
         child: StreamEmptyState(
@@ -200,13 +215,37 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(_wrap(emptyState));
+    await tester.pumpWidget(_wrap(emptyStateWithRoomToGrow));
     final unscaledHeight = tester.getSize(find.byType(StreamEmptyState)).height;
 
-    await tester.pumpWidget(_wrap(emptyState, textScale: 2));
+    await tester.pumpWidget(_wrap(emptyStateWithRoomToGrow, textScale: 2));
 
     expect(tester.takeException(), isNull);
     expect(tester.getSize(find.byType(StreamEmptyState)).height, greaterThan(unscaledHeight));
+  });
+
+  testWidgets('StreamEmptyState fits a box shorter than its content when the caller scrolls it', (tester) async {
+    const boxHeight = 120.0;
+
+    await tester.pumpWidget(
+      _wrap(
+        SizedBox(
+          width: 320,
+          height: boxHeight,
+          child: SingleChildScrollView(
+            child: StreamEmptyState(
+              icon: const Icon(Icons.inbox),
+              title: const Text("Couldn't load files"),
+              description: const Text('Check your connection and try again.'),
+              action: const Text('Try again'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(StreamEmptyState)).height, greaterThan(boxHeight));
   });
 
   testWidgets('StreamEmptyState leaves no heading when there is no title', (tester) async {
@@ -264,12 +303,16 @@ void main() {
     });
 
     testWidgets('StreamEmptyState applies a directional padding to the start on the right', (tester) async {
+      const width = 400.0;
+      const startPadding = 40.0;
+      const centreOfContentArea = (width - startPadding) / 2;
+
       await tester.pumpWidget(
         _wrap(
           StreamEmptyStateTheme(
-            data: const StreamEmptyStateThemeData(padding: EdgeInsetsDirectional.only(start: 40)),
+            data: const StreamEmptyStateThemeData(padding: EdgeInsetsDirectional.only(start: startPadding)),
             child: SizedBox(
-              width: 400,
+              width: width,
               child: StreamEmptyState(icon: const Icon(Icons.inbox), title: const Text('Title')),
             ),
           ),
@@ -277,9 +320,8 @@ void main() {
         ),
       );
 
-      // The 40px start padding sits on the right, so the content centres in the left 360px.
       final left = tester.getTopLeft(find.byType(StreamEmptyState)).dx;
-      expect(tester.getCenter(find.byIcon(Icons.inbox)).dx - left, moreOrLessEquals(180, epsilon: 0.5));
+      expect(tester.getCenter(find.byIcon(Icons.inbox)).dx - left, moreOrLessEquals(centreOfContentArea, epsilon: 0.5));
     });
   });
 
@@ -330,6 +372,32 @@ void main() {
 
     expect(_textStyleOf(tester, 'Title')?.color, const Color(0xFF222222));
     expect(_textStyleOf(tester, 'Description')?.color, const Color(0xFF333333));
+  });
+
+  testWidgets('StreamEmptyStateTheme keeps the default font size and weight for a color-only style', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamEmptyStateTheme(
+          data: const StreamEmptyStateThemeData(
+            titleTextStyle: TextStyle(color: Color(0xFF222222)),
+            descriptionTextStyle: TextStyle(color: Color(0xFF333333)),
+          ),
+          child: StreamEmptyState(
+            icon: const Icon(Icons.inbox),
+            title: const Text('Title'),
+            description: const Text('Description'),
+          ),
+        ),
+      ),
+    );
+
+    final textTheme = _streamThemeOf(tester).textTheme;
+    final titleStyle = _textStyleOf(tester, 'Title');
+    final descriptionStyle = _textStyleOf(tester, 'Description');
+    expect(titleStyle?.fontSize, textTheme.headingSm.fontSize);
+    expect(titleStyle?.fontWeight, textTheme.headingSm.fontWeight);
+    expect(descriptionStyle?.fontSize, textTheme.bodyDefault.fontSize);
+    expect(descriptionStyle?.fontWeight, textTheme.bodyDefault.fontWeight);
   });
 
   testWidgets('StreamEmptyState lets a style passed to the text win over the theme', (tester) async {
@@ -385,13 +453,14 @@ void main() {
     expect(tester.getTopLeft(find.text('Action')).dy - descriptionBottom, 30);
   });
 
-  testWidgets('StreamEmptyStateTheme overrides the width the text wraps at', (tester) async {
+  testWidgets('StreamEmptyStateTheme constraints set the width the text wraps at', (tester) async {
     const description = 'A description long enough to need more than two hundred pixels';
+    const maxWidth = 200.0;
 
     await tester.pumpWidget(
       _wrap(
         StreamEmptyStateTheme(
-          data: const StreamEmptyStateThemeData(maxTextWidth: 200),
+          data: const StreamEmptyStateThemeData(constraints: BoxConstraints(maxWidth: maxWidth)),
           child: SizedBox(
             width: 800,
             child: StreamEmptyState(
@@ -404,7 +473,7 @@ void main() {
       ),
     );
 
-    expect(tester.getSize(find.text(description)).width, lessThanOrEqualTo(200));
+    expect(tester.getSize(find.text(description)).width, lessThanOrEqualTo(maxWidth));
   });
 
   testWidgets('StreamEmptyStateTheme merges over the root StreamTheme', (tester) async {

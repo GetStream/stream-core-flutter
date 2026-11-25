@@ -69,7 +69,7 @@ class StreamEmptyStateTheme extends InheritedTheme {
 /// StreamTheme(
 ///   emptyStateTheme: StreamEmptyStateThemeData(
 ///     iconSize: 48,
-///     maxTextWidth: 320,
+///     constraints: BoxConstraints(maxWidth: 320),
 ///   ),
 /// )
 /// ```
@@ -92,39 +92,60 @@ class StreamEmptyStateThemeData with _$StreamEmptyStateThemeData {
     this.iconSpacing,
     this.textSpacing,
     this.actionSpacing,
-    this.maxTextWidth,
+    this.constraints,
   });
 
   /// The size of the icon, in logical pixels.
   ///
-  /// Falls back to 32.
+  /// Defaults to 32.
   final double? iconSize;
 
   /// The color of the icon.
+  ///
+  /// Defaults to [StreamColorScheme.textTertiary].
   final Color? iconColor;
 
-  /// The text style of the title, including its color.
+  /// The text style of the title, merged over the default.
+  ///
+  /// Defaults to [StreamTextTheme.headingSm] in
+  /// [StreamColorScheme.textPrimary]. A style that sets only some properties,
+  /// such as a color, keeps the default for the rest.
   final TextStyle? titleTextStyle;
 
-  /// The text style of the description, including its color.
+  /// The text style of the description, merged over the default.
+  ///
+  /// Defaults to [StreamTextTheme.bodyDefault] in
+  /// [StreamColorScheme.textSecondary]. A style that sets only some properties,
+  /// such as a color, keeps the default for the rest.
   final TextStyle? descriptionTextStyle;
 
-  /// The padding between the empty state's edge and its content.
+  /// The padding around the content.
+  ///
+  /// Defaults to [StreamSpacing.md] horizontally and [StreamSpacing.xxxl]
+  /// vertically.
   final EdgeInsetsGeometry? padding;
 
   /// The gap between the icon and the text.
+  ///
+  /// Defaults to [StreamSpacing.sm].
   final double? iconSpacing;
 
   /// The gap between the title and the description.
+  ///
+  /// Defaults to [StreamSpacing.xs].
   final double? textSpacing;
 
   /// The gap between the text and the action.
+  ///
+  /// Defaults to [StreamSpacing.md].
   final double? actionSpacing;
 
-  /// The widest the title and description grow, in logical pixels.
+  /// Constraints on the size of the content inside the [padding].
   ///
-  /// When null, the text takes up to the full width the empty state is given.
-  final double? maxTextWidth;
+  /// A `maxWidth` makes the text wrap sooner than the available width.
+  /// Defaults to unconstrained, so the content takes up to the full width the
+  /// empty state is given.
+  final BoxConstraints? constraints;
 
   /// Linearly interpolate between two [StreamEmptyStateThemeData] objects.
   static StreamEmptyStateThemeData? lerp(

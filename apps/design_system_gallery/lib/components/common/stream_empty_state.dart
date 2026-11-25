@@ -13,6 +13,12 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
   path: '[Components]/Common',
 )
 Widget buildStreamEmptyStatePlayground(BuildContext context) {
+  final showIcon = context.knobs.boolean(
+    label: 'Show Icon',
+    initialValue: true,
+    description: 'Whether to show an icon above the text.',
+  );
+
   final showTitle = context.knobs.boolean(
     label: 'Show Title',
     initialValue: true,
@@ -50,7 +56,7 @@ Widget buildStreamEmptyStatePlayground(BuildContext context) {
 
   return Center(
     child: StreamEmptyState(
-      icon: Icon(context.streamIcons.recordLibraryFill),
+      icon: showIcon ? Icon(context.streamIcons.recordLibraryFill) : null,
       // An empty state needs a title or a description, so the description stays when both are switched off.
       title: showTitle ? Text(title) : null,
       description: showDescription || !showTitle ? Text(description) : null,
@@ -110,6 +116,14 @@ Widget buildStreamEmptyStateShowcase(BuildContext context) {
             caption: 'The description says why, or what would fill the place',
             child: StreamEmptyState(
               icon: Icon(icons.recordLibraryFill),
+              title: const Text('No recordings yet'),
+              description: const Text('Recordings you make show up here.'),
+            ),
+          ),
+          _Section(
+            label: 'WITHOUT ICON',
+            caption: 'Text alone, where an icon would add nothing',
+            child: StreamEmptyState(
               title: const Text('No recordings yet'),
               description: const Text('Recordings you make show up here.'),
             ),

@@ -16,22 +16,38 @@ void main() {
             GoldenTestScenario(
               name: 'description only',
               child: _buildInTheme(
-                StreamEmptyState(icon: const Icon(Icons.search), description: const Text('No results')),
+                (context) => StreamEmptyState(
+                  icon: Icon(context.streamIcons.search),
+                  description: const Text('No results'),
+                ),
                 brightness: brightness,
               ),
             ),
             GoldenTestScenario(
               name: 'title only',
               child: _buildInTheme(
-                StreamEmptyState(icon: const Icon(Icons.inbox), title: const Text('No recordings')),
+                (context) => StreamEmptyState(
+                  icon: Icon(context.streamIcons.recordLibraryFill),
+                  title: const Text('No recordings'),
+                ),
                 brightness: brightness,
               ),
             ),
             GoldenTestScenario(
               name: 'with description',
               child: _buildInTheme(
-                StreamEmptyState(
-                  icon: const Icon(Icons.inbox),
+                (context) => StreamEmptyState(
+                  icon: Icon(context.streamIcons.recordLibraryFill),
+                  title: const Text('No recordings'),
+                  description: const Text('Recordings you make show up here.'),
+                ),
+                brightness: brightness,
+              ),
+            ),
+            GoldenTestScenario(
+              name: 'without icon',
+              child: _buildInTheme(
+                (context) => StreamEmptyState(
                   title: const Text('No recordings'),
                   description: const Text('Recordings you make show up here.'),
                 ),
@@ -41,8 +57,8 @@ void main() {
             GoldenTestScenario(
               name: 'with action',
               child: _buildInTheme(
-                StreamEmptyState(
-                  icon: const Icon(Icons.error_outline),
+                (context) => StreamEmptyState(
+                  icon: Icon(context.streamIcons.exclamationCircleFill),
                   title: const Text("Couldn't load recordings"),
                   description: const Text('Check your connection and try again.'),
                   action: StreamButton(
@@ -70,8 +86,8 @@ void main() {
           GoldenTestScenario(
             name: 'narrow',
             child: _buildInTheme(
-              StreamEmptyState(
-                icon: const Icon(Icons.inbox),
+              (context) => StreamEmptyState(
+                icon: Icon(context.streamIcons.recordLibraryFill),
                 title: const Text('No recordings'),
                 description: const Text(
                   'Recordings you make during this call show up here once they have finished processing.',
@@ -85,14 +101,14 @@ void main() {
   });
 }
 
-Widget _buildInTheme(Widget child, {Brightness brightness = Brightness.light}) {
+Widget _buildInTheme(WidgetBuilder builder, {Brightness brightness = Brightness.light}) {
   final streamTheme = StreamTheme(brightness: brightness);
   return Theme(
     data: ThemeData(brightness: brightness, extensions: [streamTheme]),
     child: Builder(
       builder: (context) => Material(
         color: StreamTheme.of(context).colorScheme.backgroundApp,
-        child: child,
+        child: builder(context),
       ),
     ),
   );

@@ -42,7 +42,7 @@ mixin _$StreamEmptyStateThemeData {
       iconSpacing: lerpDouble$(a.iconSpacing, b.iconSpacing, t),
       textSpacing: lerpDouble$(a.textSpacing, b.textSpacing, t),
       actionSpacing: lerpDouble$(a.actionSpacing, b.actionSpacing, t),
-      maxTextWidth: lerpDouble$(a.maxTextWidth, b.maxTextWidth, t),
+      constraints: BoxConstraints.lerp(a.constraints, b.constraints, t),
     );
   }
 
@@ -55,7 +55,7 @@ mixin _$StreamEmptyStateThemeData {
     double? iconSpacing,
     double? textSpacing,
     double? actionSpacing,
-    double? maxTextWidth,
+    BoxConstraints? constraints,
   }) {
     final _this = (this as StreamEmptyStateThemeData);
 
@@ -68,7 +68,7 @@ mixin _$StreamEmptyStateThemeData {
       iconSpacing: iconSpacing ?? _this.iconSpacing,
       textSpacing: textSpacing ?? _this.textSpacing,
       actionSpacing: actionSpacing ?? _this.actionSpacing,
-      maxTextWidth: maxTextWidth ?? _this.maxTextWidth,
+      constraints: constraints ?? _this.constraints,
     );
   }
 
@@ -96,7 +96,7 @@ mixin _$StreamEmptyStateThemeData {
       iconSpacing: other.iconSpacing,
       textSpacing: other.textSpacing,
       actionSpacing: other.actionSpacing,
-      maxTextWidth: other.maxTextWidth,
+      constraints: other.constraints,
     );
   }
 
@@ -121,7 +121,7 @@ mixin _$StreamEmptyStateThemeData {
         _other.iconSpacing == _this.iconSpacing &&
         _other.textSpacing == _this.textSpacing &&
         _other.actionSpacing == _this.actionSpacing &&
-        _other.maxTextWidth == _this.maxTextWidth;
+        _other.constraints == _this.constraints;
   }
 
   @override
@@ -138,7 +138,7 @@ mixin _$StreamEmptyStateThemeData {
       _this.iconSpacing,
       _this.textSpacing,
       _this.actionSpacing,
-      _this.maxTextWidth,
+      _this.constraints,
     );
   }
 }

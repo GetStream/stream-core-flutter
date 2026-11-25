@@ -7,14 +7,18 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 
-/// What a place shows while it has nothing in it: an icon over a title, a
-/// description and an optional action, centred.
+/// A placeholder for a place that has nothing in it yet.
 ///
-/// Mirrors the `Core / Mobile / Empty State` component from the design. Either
-/// the title or the description can be left out, but not both. The text is
-/// centred and wraps at the available width, or sooner when
-/// [StreamEmptyStateThemeData.maxTextWidth] is set. Screen readers announce the
-/// title as a heading.
+/// Shows an optional icon over a title, a description and an optional action,
+/// centred. Either the title or the description can be left out, but not both.
+/// The content wraps at the available width, or sooner when
+/// [StreamEmptyStateThemeData.constraints] limits it. Screen readers announce
+/// the title as a heading.
+///
+/// The empty state takes the height its content needs and does not scroll. The
+/// caller owns the height and the scrolling: where the space can be shorter than
+/// the content, such as in landscape, with the keyboard up or at a large text
+/// scale, consider placing it in a scroll view.
 ///
 /// {@tool snippet}
 ///
@@ -69,7 +73,7 @@ class StreamEmptyState extends StatelessWidget {
   /// At least one of [title] and [description] must be non-null.
   StreamEmptyState({
     super.key,
-    required Widget icon,
+    Widget? icon,
     Widget? title,
     Widget? description,
     Widget? action,
@@ -105,7 +109,7 @@ class StreamEmptyStateProps {
   ///
   /// At least one of [title] and [description] must be non-null.
   const StreamEmptyStateProps({
-    required this.icon,
+    this.icon,
     this.title,
     this.description,
     this.action,
@@ -113,14 +117,15 @@ class StreamEmptyStateProps {
 
   /// The icon at the top.
   ///
-  /// Typically an [Icon]; the empty state provides its size and color.
-  final Widget icon;
+  /// Typically an [Icon]; the empty state provides its size and color. When
+  /// null, the text starts at the top.
+  final Widget? icon;
 
   /// What is missing.
   ///
   /// Typically a [Text]; the empty state provides its text style, centres it
   /// and marks it as a heading for screen readers. When null, the description
-  /// sits right under the icon.
+  /// takes its place.
   final Widget? title;
 
   /// Why it is missing, or what would fill it.
@@ -155,53 +160,60 @@ class DefaultStreamEmptyState extends StatelessWidget {
 
     final effectiveIconSize = theme.iconSize ?? defaults.iconSize;
     final effectiveIconColor = theme.iconColor ?? defaults.iconColor;
-    final effectiveTitleTextStyle = theme.titleTextStyle ?? defaults.titleTextStyle;
-    final effectiveDescriptionTextStyle = theme.descriptionTextStyle ?? defaults.descriptionTextStyle;
+    final effectiveTitleTextStyle = defaults.titleTextStyle.merge(theme.titleTextStyle);
+    final effectiveDescriptionTextStyle = defaults.descriptionTextStyle.merge(theme.descriptionTextStyle);
     final effectivePadding = theme.padding ?? defaults.padding;
     final effectiveIconSpacing = theme.iconSpacing ?? defaults.iconSpacing;
     final effectiveTextSpacing = theme.textSpacing ?? defaults.textSpacing;
     final effectiveActionSpacing = theme.actionSpacing ?? defaults.actionSpacing;
-    final effectiveMaxTextWidth = theme.maxTextWidth ?? double.infinity;
+    final effectiveConstraints = theme.constraints ?? defaults.constraints;
 
     return Padding(
       padding: effectivePadding,
-      child: Column(
-        mainAxisSize: .min,
-        children: [
-          IconTheme.merge(
-            data: IconThemeData(size: effectiveIconSize, color: effectiveIconColor),
-            child: props.icon,
-          ),
-          SizedBox(height: effectiveIconSpacing),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: effectiveMaxTextWidth),
-            child: Column(
-              mainAxisSize: .min,
-              spacing: effectiveTextSpacing,
-              children: [
-                if (props.title case final title?)
-                  Semantics(
-                    header: true,
-                    child: DefaultTextStyle.merge(
-                      textAlign: .center,
-                      style: effectiveTitleTextStyle,
-                      child: title,
-                    ),
-                  ),
-                if (props.description case final description?)
-                  DefaultTextStyle.merge(
-                    textAlign: .center,
-                    style: effectiveDescriptionTextStyle,
-                    child: description,
-                  ),
+      child: Align(
+        alignment: .topCenter,
+        widthFactor: 1,
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: effectiveConstraints,
+          child: Column(
+            mainAxisSize: .min,
+            children: [
+              if (props.icon case final icon?) ...[
+                IconTheme.merge(
+                  data: IconThemeData(size: effectiveIconSize, color: effectiveIconColor),
+                  child: icon,
+                ),
+                SizedBox(height: effectiveIconSpacing),
               ],
-            ),
+              Column(
+                mainAxisSize: .min,
+                spacing: effectiveTextSpacing,
+                children: [
+                  if (props.title case final title?)
+                    Semantics(
+                      header: true,
+                      child: DefaultTextStyle.merge(
+                        textAlign: .center,
+                        style: effectiveTitleTextStyle,
+                        child: title,
+                      ),
+                    ),
+                  if (props.description case final description?)
+                    DefaultTextStyle.merge(
+                      textAlign: .center,
+                      style: effectiveDescriptionTextStyle,
+                      child: description,
+                    ),
+                ],
+              ),
+              if (props.action case final action?) ...[
+                SizedBox(height: effectiveActionSpacing),
+                action,
+              ],
+            ],
           ),
-          if (props.action case final action?) ...[
-            SizedBox(height: effectiveActionSpacing),
-            action,
-          ],
-        ],
+        ),
       ),
     );
   }
@@ -240,4 +252,7 @@ class _StreamEmptyStateThemeDefaults extends StreamEmptyStateThemeData {
 
   @override
   double get actionSpacing => _spacing.md;
+
+  @override
+  BoxConstraints get constraints => const BoxConstraints();
 }
