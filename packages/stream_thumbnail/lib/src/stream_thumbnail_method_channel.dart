@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'messages.g.dart';
 import 'stream_thumbnail_format.dart';
 import 'stream_thumbnail_platform.dart';
+import 'stream_thumbnail_source.dart';
 
 /// An implementation of [StreamThumbnailPlatform] that uses a Pigeon-generated
 /// platform channel.
@@ -32,8 +33,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
   }
 
   ThumbnailRequest _request({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -41,8 +41,13 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
     required int quality,
   }) {
     return ThumbnailRequest(
-      video: video,
-      headers: headers,
+      video: source.location,
+      sourceKind: switch (source.kind) {
+        StreamThumbnailSourceKind.network => ThumbnailSourceKind.network,
+        StreamThumbnailSourceKind.file => ThumbnailSourceKind.file,
+        StreamThumbnailSourceKind.contentUri => ThumbnailSourceKind.contentUri,
+      },
+      headers: source.headers,
       format: _wireFormat(imageFormat),
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -53,8 +58,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
 
   @override
   Future<List<XFile>> thumbnailFiles({
-    required List<String> videos,
-    required Map<String, String>? headers,
+    required List<StreamThumbnailSource> sources,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -63,11 +67,10 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
   }) async {
     final results = <XFile>[];
 
-    for (final video in videos) {
+    for (final source in sources) {
       results.add(
         await thumbnailFile(
-          video: video,
-          headers: headers,
+          source: source,
           imageFormat: imageFormat,
           maxHeight: maxHeight,
           maxWidth: maxWidth,
@@ -82,8 +85,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
 
   @override
   Future<XFile> thumbnailFile({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -92,8 +94,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
   }) async {
     final path = await _hostApi.thumbnailFile(
       _request(
-        video: video,
-        headers: headers,
+        source: source,
         imageFormat: imageFormat,
         maxHeight: maxHeight,
         maxWidth: maxWidth,
@@ -106,8 +107,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
 
   @override
   Future<Uint8List> thumbnailData({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -116,8 +116,7 @@ class MethodChannelStreamThumbnail extends StreamThumbnailPlatform {
   }) {
     return _hostApi.thumbnailData(
       _request(
-        video: video,
-        headers: headers,
+        source: source,
         imageFormat: imageFormat,
         maxHeight: maxHeight,
         maxWidth: maxWidth,

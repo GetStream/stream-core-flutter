@@ -1,3 +1,27 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamThumbnailSource` and a `source`/`sources` parameter on every `StreamThumbnail` method to pass a
+  video as a network URL, a local file or an Android content URI.
+
+### 🔄 Changed
+
+- Only `http` and `https` URLs are fetched; a URL with any other scheme fails with an `UNSUPPORTED_SOURCE`
+  `PlatformException`.
+- On Linux, network videos are read only from single-file containers; playlists such as HLS and DASH are not
+  supported.
+
+### 🐛 Bug Fixes
+
+- On Android 10 and later, a local video with `maxWidth` or `maxHeight` left at `0` now produces a
+  thumbnail instead of failing.
+
+### 🛑 Breaking / Removals
+
+- Deprecated the `video`, `videos` and `headers` parameters. Pass `source`/`sources` with
+  `StreamThumbnailSource.network(url, headers: ...)`, `.file(path)` or `.contentUri(uri)` instead.
+
 ## 0.2.0
 
 ### ✨ Features

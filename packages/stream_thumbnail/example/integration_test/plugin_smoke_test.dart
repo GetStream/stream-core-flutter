@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:stream_thumbnail/src/messages.g.dart';
 import 'package:stream_thumbnail/stream_thumbnail.dart';
 import 'package:stream_thumbnail_example/main.dart';
 
@@ -40,7 +41,7 @@ void main() {
 
   testWidgets('thumbnailData generates real jpeg bytes from a local video', (tester) async {
     final bytes = await StreamThumbnail.thumbnailData(
-      video: video,
+      source: StreamThumbnailSource.file(video),
       imageFormat: StreamThumbnailFormat.jpeg,
       maxWidth: 300,
       quality: 75,
@@ -54,7 +55,7 @@ void main() {
 
   testWidgets('thumbnailData generates real png bytes from a local video', (tester) async {
     final bytes = await StreamThumbnail.thumbnailData(
-      video: video,
+      source: StreamThumbnailSource.file(video),
       maxWidth: 300,
     );
 
@@ -67,7 +68,7 @@ void main() {
     'thumbnailData generates real webp bytes from a local video',
     (tester) async {
       final bytes = await StreamThumbnail.thumbnailData(
-        video: video,
+        source: StreamThumbnailSource.file(video),
         imageFormat: StreamThumbnailFormat.webp,
         maxWidth: 300,
         quality: 80,
@@ -85,7 +86,7 @@ void main() {
     'thumbnailData generates real jpeg bytes from a remote video',
     (tester) async {
       final bytes = await StreamThumbnail.thumbnailData(
-        video: _remoteVideo,
+        source: StreamThumbnailSource.network(Uri.parse(_remoteVideo)),
         imageFormat: StreamThumbnailFormat.jpeg,
         maxWidth: 300,
         quality: 75,
@@ -100,7 +101,7 @@ void main() {
   );
 
   testWidgets('thumbnailFile writes a png named after the video', (tester) async {
-    final thumbnail = await StreamThumbnail.thumbnailFile(video: video, maxWidth: 300);
+    final thumbnail = await StreamThumbnail.thumbnailFile(source: StreamThumbnailSource.file(video), maxWidth: 300);
 
     final written = File(thumbnail.path);
     expect(written.existsSync(), isTrue, reason: 'the reported path must be the file that was written');
@@ -110,8 +111,8 @@ void main() {
   });
 
   testWidgets('thumbnailFile gives each call its own directory', (tester) async {
-    final first = await StreamThumbnail.thumbnailFile(video: video, maxWidth: 300);
-    final second = await StreamThumbnail.thumbnailFile(video: video, maxWidth: 300);
+    final first = await StreamThumbnail.thumbnailFile(source: StreamThumbnailSource.file(video), maxWidth: 300);
+    final second = await StreamThumbnail.thumbnailFile(source: StreamThumbnailSource.file(video), maxWidth: 300);
 
     // Same video, so the same file name — only the directory keeps them apart.
     expect(first.name, second.name);
@@ -128,7 +129,7 @@ void main() {
       addTearDown(spaced.deleteSync);
 
       final thumbnail = await StreamThumbnail.thumbnailFile(
-        video: 'file://${Uri.encodeFull(spaced.path)}',
+        source: StreamThumbnailSource.file('file://${Uri.encodeFull(spaced.path)}'),
         maxWidth: 300,
       );
 
@@ -146,7 +147,10 @@ void main() {
     // The unencoded form callers usually build. Before iOS 17 / macOS 14 `URL(string:)`
     // rejects the space outright, so on those versions this is the raw-path fallback;
     // on newer ones URL parsing accepts it. Both must resolve to the same file.
-    final thumbnail = await StreamThumbnail.thumbnailFile(video: 'file://${spaced.path}', maxWidth: 300);
+    final thumbnail = await StreamThumbnail.thumbnailFile(
+      source: StreamThumbnailSource.file('file://${spaced.path}'),
+      maxWidth: 300,
+    );
 
     expect(File(thumbnail.path).existsSync(), isTrue);
   });
@@ -160,7 +164,10 @@ void main() {
       await awkward.writeAsBytes(await File(video).readAsBytes(), flush: true);
       addTearDown(awkward.deleteSync);
 
-      final thumbnail = await StreamThumbnail.thumbnailFile(video: 'file://${awkward.path}', maxWidth: 300);
+      final thumbnail = await StreamThumbnail.thumbnailFile(
+        source: StreamThumbnailSource.file('file://${awkward.path}'),
+        maxWidth: 300,
+      );
 
       expect(File(thumbnail.path).existsSync(), isTrue, reason: '$name must resolve to the real file');
       expect(await File(thumbnail.path).length(), greaterThan(0));
@@ -178,7 +185,7 @@ void main() {
       addTearDown(awkward.deleteSync);
 
       final thumbnail = await StreamThumbnail.thumbnailFile(
-        video: 'file://localhost${awkward.path}',
+        source: StreamThumbnailSource.file('file://localhost${awkward.path}'),
         maxWidth: 300,
       );
 
@@ -188,7 +195,10 @@ void main() {
   );
 
   testWidgets('thumbnailFiles returns one file per video', (tester) async {
-    final thumbnails = await StreamThumbnail.thumbnailFiles(videos: [video, video], maxWidth: 300);
+    final thumbnails = await StreamThumbnail.thumbnailFiles(
+      sources: [StreamThumbnailSource.file(video), StreamThumbnailSource.file(video)],
+      maxWidth: 300,
+    );
 
     expect(thumbnails, hasLength(2));
     expect(thumbnails.map((it) => it.path).toSet(), hasLength(2));
@@ -218,5 +228,42 @@ void main() {
       expect(find.byType(Image), findsOneWidget, reason: '"$button" must render a preview');
       expect(pathLabel, showsPath ? findsOneWidget : findsNothing, reason: '"$button" path label');
     }
+  });
+
+  testWidgets('a file source given an https URL fails', (tester) async {
+    await expectLater(
+      StreamThumbnail.thumbnailData(source: StreamThumbnailSource.file(_remoteVideo)),
+      throwsA(isA<PlatformException>()),
+    );
+  });
+
+  testWidgets(
+    'a content URI is rejected outside Android',
+    (tester) async {
+      await expectLater(
+        StreamThumbnail.thumbnailData(source: StreamThumbnailSource.contentUri(Uri.parse('content://media/1'))),
+        throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE')),
+      );
+    },
+    skip: Platform.isAndroid,
+  );
+
+  testWidgets('a network request that is not http or https fails on the platform with UNSUPPORTED_SOURCE', (
+    tester,
+  ) async {
+    await expectLater(
+      StreamThumbnailHostApi().thumbnailData(
+        ThumbnailRequest(
+          video: 'file://$video',
+          sourceKind: ThumbnailSourceKind.network,
+          format: ThumbnailFormat.png,
+          maxHeight: 0,
+          maxWidth: 0,
+          timeMs: 0,
+          quality: 10,
+        ),
+      ),
+      throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE')),
+    );
   });
 }

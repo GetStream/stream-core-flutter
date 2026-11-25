@@ -10,6 +10,7 @@ import 'package:stream_thumbnail/src/stream_thumbnail.dart';
 import 'package:stream_thumbnail/src/stream_thumbnail_format.dart';
 import 'package:stream_thumbnail/src/stream_thumbnail_method_channel.dart';
 import 'package:stream_thumbnail/src/stream_thumbnail_platform.dart';
+import 'package:stream_thumbnail/src/stream_thumbnail_source.dart';
 
 /// A fake platform that records the last call it received and returns canned
 /// results. Extending [StreamThumbnailPlatform] inherits its token, so it
@@ -39,8 +40,7 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
 
   @override
   Future<Uint8List> thumbnailData({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -48,8 +48,7 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
     required int quality,
   }) async {
     lastDataCall = {
-      'video': video,
-      'headers': headers,
+      'source': source,
       'imageFormat': imageFormat,
       'maxHeight': maxHeight,
       'maxWidth': maxWidth,
@@ -61,8 +60,7 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
 
   @override
   Future<XFile> thumbnailFile({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -70,7 +68,7 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
     required int quality,
   }) async {
     lastFileCall = {
-      'video': video,
+      'source': source,
       'imageFormat': imageFormat,
     };
     return _file;
@@ -78,8 +76,7 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
 
   @override
   Future<List<XFile>> thumbnailFiles({
-    required List<String> videos,
-    required Map<String, String>? headers,
+    required List<StreamThumbnailSource> sources,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -88,7 +85,7 @@ class FakeStreamThumbnailPlatform extends StreamThumbnailPlatform {
   }) async {
     _filesCalled = true;
     lastFilesCall = {
-      'videos': videos,
+      'sources': sources,
       'imageFormat': imageFormat,
     };
     return [];
@@ -116,6 +113,7 @@ void main() {
     registerFallbackValue(
       ThumbnailRequest(
         video: '',
+        sourceKind: ThumbnailSourceKind.file,
         format: ThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,
@@ -126,10 +124,12 @@ void main() {
   });
 
   group('StreamThumbnail', () {
+    final video = StreamThumbnailSource.file('/videos/a.mp4');
+
     test('thumbnailData forwards to the platform and returns its bytes', () async {
       final fake = useFakePlatform();
 
-      final result = await StreamThumbnail.thumbnailData(video: 'a.mp4');
+      final result = await StreamThumbnail.thumbnailData(source: video);
 
       expect(result, same(fake.data));
     });
@@ -137,11 +137,10 @@ void main() {
     test('thumbnailData applies the documented default options', () async {
       final fake = useFakePlatform();
 
-      await StreamThumbnail.thumbnailData(video: 'a.mp4');
+      await StreamThumbnail.thumbnailData(source: video);
 
       expect(fake.lastDataCall, {
-        'video': 'a.mp4',
-        'headers': null,
+        'source': video,
         'imageFormat': StreamThumbnailFormat.png,
         'maxHeight': 0,
         'maxWidth': 0,
@@ -153,42 +152,151 @@ void main() {
     test('thumbnailFile forwards to the platform and returns its file', () async {
       final fake = useFakePlatform();
 
-      final result = await StreamThumbnail.thumbnailFile(video: 'a.mp4');
+      final result = await StreamThumbnail.thumbnailFile(source: video);
 
       expect(result, same(fake.file));
-      expect(fake.lastFileCall?['video'], 'a.mp4');
+      expect(fake.lastFileCall?['source'], video);
     });
 
-    test('thumbnailFiles returns an empty list without hitting the platform for no videos', () async {
+    test('thumbnailFiles returns an empty list without hitting the platform for no sources', () async {
       final fake = useFakePlatform();
 
-      final result = await StreamThumbnail.thumbnailFiles(videos: []);
+      final result = await StreamThumbnail.thumbnailFiles(sources: []);
 
       expect(result, isEmpty);
       expect(fake.filesCalled, isFalse);
     });
 
-    test('thumbnailFiles forwards every video to the platform', () async {
+    test('thumbnailFiles forwards every source to the platform', () async {
       final fake = useFakePlatform();
+      final other = StreamThumbnailSource.network(Uri.parse('https://cdn.example.com/b.mp4'));
 
       await StreamThumbnail.thumbnailFiles(
-        videos: ['a.mp4', 'b.mp4'],
+        sources: [video, other],
         imageFormat: StreamThumbnailFormat.webp,
       );
 
       expect(fake.lastFilesCall, {
-        'videos': ['a.mp4', 'b.mp4'],
+        'sources': [video, other],
         'imageFormat': StreamThumbnailFormat.webp,
       });
     });
 
-    test('thumbnailData rejects an empty video path', () {
+    test('thumbnailData rejects a call without a source', () {
       useFakePlatform();
 
-      expect(
-        () => StreamThumbnail.thumbnailData(video: ''),
-        throwsA(isA<AssertionError>()),
+      expect(StreamThumbnail.thumbnailData, throwsArgumentError);
+    });
+  });
+
+  group('StreamThumbnail with an unsupported source', () {
+    final unsupported = [
+      StreamThumbnailSource.network(Uri.parse('file:///videos/a.mp4')),
+      StreamThumbnailSource.network(Uri.parse('ftp://example.com/a.mp4')),
+      StreamThumbnailSource.network(Uri.parse('https:/a.mp4')),
+      StreamThumbnailSource.contentUri(Uri.parse('file:///videos/a.mp4')),
+    ];
+    final isUnsupported = throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE'));
+
+    test('thumbnailData fails without reaching the platform', () async {
+      for (final source in unsupported) {
+        final fake = useFakePlatform();
+
+        await expectLater(StreamThumbnail.thumbnailData(source: source), isUnsupported, reason: '$source');
+        expect(fake.lastDataCall, isNull, reason: '$source');
+      }
+    });
+
+    test('thumbnailFile fails without reaching the platform', () async {
+      final fake = useFakePlatform();
+
+      await expectLater(StreamThumbnail.thumbnailFile(source: unsupported.first), isUnsupported);
+      expect(fake.lastFileCall, isNull);
+    });
+
+    test('thumbnailFiles fails without reaching the platform if any source is unsupported', () async {
+      final fake = useFakePlatform();
+
+      await expectLater(
+        StreamThumbnail.thumbnailFiles(sources: [StreamThumbnailSource.file('/videos/a.mp4'), unsupported.first]),
+        isUnsupported,
       );
+      expect(fake.filesCalled, isFalse);
+    });
+
+    test('http and https URLs with a host are accepted', () async {
+      for (final url in ['http://cdn.example.com/a.mp4', 'HTTPS://cdn.example.com/a.mp4']) {
+        final fake = useFakePlatform();
+
+        await StreamThumbnail.thumbnailData(source: StreamThumbnailSource.network(Uri.parse(url)));
+        expect(fake.lastDataCall, isNotNull, reason: url);
+      }
+    });
+  });
+
+  group('StreamThumbnail with a deprecated video string', () {
+    Future<StreamThumbnailSource?> sourceFor(String video, {Map<String, String>? headers}) async {
+      final fake = useFakePlatform();
+      // ignore: deprecated_member_use_from_same_package
+      await StreamThumbnail.thumbnailData(video: video, headers: headers);
+      return fake.lastDataCall?['source'] as StreamThumbnailSource?;
+    }
+
+    test('an https URL becomes a network source carrying the headers', () async {
+      const headers = {'X-Client': 'example'};
+
+      expect(
+        await sourceFor('https://cdn.example.com/a.mp4', headers: headers),
+        StreamThumbnailSource.network(Uri.parse('https://cdn.example.com/a.mp4'), headers: headers),
+      );
+    });
+
+    test('an http URL is recognised regardless of scheme case', () async {
+      expect(
+        await sourceFor('HTTP://cdn.example.com/a.mp4'),
+        StreamThumbnailSource.network(Uri.parse('http://cdn.example.com/a.mp4')),
+      );
+    });
+
+    test('a path or file URI is opened as a file', () async {
+      expect(await sourceFor('/videos/a.mp4'), StreamThumbnailSource.file('/videos/a.mp4'));
+      expect(await sourceFor('file:///videos/a.mp4'), StreamThumbnailSource.file('file:///videos/a.mp4'));
+    });
+
+    test('a content URI is opened through a content resolver', () async {
+      expect(
+        await sourceFor('content://media/external/video/1'),
+        StreamThumbnailSource.contentUri(Uri.parse('content://media/external/video/1')),
+      );
+    });
+
+    test('a URL with any other scheme is passed on as a file', () async {
+      for (final video in ['rtsp://example.com/a', 'ftp://example.com/a.mp4']) {
+        expect(await sourceFor(video), StreamThumbnailSource.file(video), reason: video);
+      }
+    });
+
+    test('an http URL without a host fails without reaching the platform', () async {
+      final fake = useFakePlatform();
+
+      await expectLater(
+        // ignore: deprecated_member_use_from_same_package
+        StreamThumbnail.thumbnailData(video: 'https:/a.mp4'),
+        throwsA(isA<PlatformException>().having((e) => e.code, 'code', 'UNSUPPORTED_SOURCE')),
+      );
+      expect(fake.lastDataCall, isNull);
+    });
+
+    test('thumbnailFiles maps every video', () async {
+      final fake = useFakePlatform();
+
+      // ignore: deprecated_member_use_from_same_package
+      await StreamThumbnail.thumbnailFiles(videos: ['/a.mp4', 'https://cdn.example.com/b.mp4']);
+
+      expect(fake.lastFilesCall?['sources'], [
+        StreamThumbnailSource.file('/a.mp4'),
+        StreamThumbnailSource.network(Uri.parse('https://cdn.example.com/b.mp4')),
+      ]);
     });
   });
 
@@ -206,8 +314,7 @@ void main() {
       when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => data);
 
       final result = await channel.thumbnailData(
-        video: 'a.mp4',
-        headers: null,
+        source: StreamThumbnailSource.file('a.mp4'),
         imageFormat: StreamThumbnailFormat.webp,
         maxHeight: 10,
         maxWidth: 20,
@@ -218,6 +325,7 @@ void main() {
       expect(result, data);
       final request = verify(() => hostApi.thumbnailData(captureAny())).captured.single as ThumbnailRequest;
       expect(request.video, 'a.mp4');
+      expect(request.sourceKind, ThumbnailSourceKind.file);
       expect(request.format, ThumbnailFormat.webp);
       expect(request.maxHeight, 10);
       expect(request.maxWidth, 20);
@@ -229,8 +337,7 @@ void main() {
       when(() => hostApi.thumbnailFile(any())).thenAnswer((_) async => '/tmp/thumb.png');
 
       final result = await channel.thumbnailFile(
-        video: 'a.mp4',
-        headers: null,
+        source: StreamThumbnailSource.file('a.mp4'),
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,
@@ -247,8 +354,7 @@ void main() {
 
       await expectLater(
         channel.thumbnailData(
-          video: 'a.mp4',
-          headers: null,
+          source: StreamThumbnailSource.file('a.mp4'),
           imageFormat: StreamThumbnailFormat.png,
           maxHeight: 0,
           maxWidth: 0,
@@ -264,8 +370,9 @@ void main() {
       when(() => hostApi.thumbnailFile(any())).thenAnswer((_) async => paths[index++]);
 
       final result = await channel.thumbnailFiles(
-        videos: ['a.mp4', 'b.mp4', 'c.mp4'],
-        headers: null,
+        sources: [
+          for (final v in ['a.mp4', 'b.mp4', 'c.mp4']) StreamThumbnailSource.file(v),
+        ],
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,
@@ -288,8 +395,9 @@ void main() {
 
       await expectLater(
         channel.thumbnailFiles(
-          videos: ['a.mp4', 'b.mp4', 'c.mp4'],
-          headers: null,
+          sources: [
+            for (final v in ['a.mp4', 'b.mp4', 'c.mp4']) StreamThumbnailSource.file(v),
+          ],
           imageFormat: StreamThumbnailFormat.png,
           maxHeight: 0,
           maxWidth: 0,
@@ -309,8 +417,9 @@ void main() {
       });
 
       final result = channel.thumbnailFiles(
-        videos: ['a.mp4', 'b.mp4', 'c.mp4'],
-        headers: null,
+        sources: [
+          for (final v in ['a.mp4', 'b.mp4', 'c.mp4']) StreamThumbnailSource.file(v),
+        ],
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,
@@ -334,14 +443,67 @@ void main() {
       expect((await result).map((file) => file.path), ['/a.png', '/b.png', '/c.png']);
     });
 
+    test('a network source is sent as network with its URL and headers', () async {
+      when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => Uint8List(0));
+
+      await channel.thumbnailData(
+        source: StreamThumbnailSource.network(
+          Uri.parse('https://cdn.example.com/a.mp4?w=640'),
+          headers: const {'X-Client': 'example'},
+        ),
+        imageFormat: StreamThumbnailFormat.png,
+        maxHeight: 0,
+        maxWidth: 0,
+        quality: 10,
+      );
+
+      final request = verify(() => hostApi.thumbnailData(captureAny())).captured.single as ThumbnailRequest;
+      expect(request.sourceKind, ThumbnailSourceKind.network);
+      expect(request.video, 'https://cdn.example.com/a.mp4?w=640');
+      expect(request.headers, const {'X-Client': 'example'});
+    });
+
+    test('a file source is sent as file with its path', () async {
+      when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => Uint8List(0));
+
+      await channel.thumbnailData(
+        source: StreamThumbnailSource.file('/videos/a.mp4'),
+        imageFormat: StreamThumbnailFormat.png,
+        maxHeight: 0,
+        maxWidth: 0,
+        quality: 10,
+      );
+
+      final request = verify(() => hostApi.thumbnailData(captureAny())).captured.single as ThumbnailRequest;
+      expect(request.sourceKind, ThumbnailSourceKind.file);
+      expect(request.video, '/videos/a.mp4');
+      expect(request.headers, isNull);
+    });
+
+    test('a content URI source is sent as contentUri with its URI', () async {
+      when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => Uint8List(0));
+
+      await channel.thumbnailData(
+        source: StreamThumbnailSource.contentUri(Uri.parse('content://media/1')),
+        imageFormat: StreamThumbnailFormat.png,
+        maxHeight: 0,
+        maxWidth: 0,
+        quality: 10,
+      );
+
+      final request = verify(() => hostApi.thumbnailData(captureAny())).captured.single as ThumbnailRequest;
+      expect(request.sourceKind, ThumbnailSourceKind.contentUri);
+      expect(request.video, 'content://media/1');
+      expect(request.headers, isNull);
+    });
+
     test('a null timeMs is sent as -1 on Android', () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
       when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => Uint8List(0));
 
       await channel.thumbnailData(
-        video: 'a.mp4',
-        headers: null,
+        source: StreamThumbnailSource.file('a.mp4'),
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,
@@ -358,8 +520,7 @@ void main() {
       when(() => hostApi.thumbnailData(any())).thenAnswer((_) async => Uint8List(0));
 
       await channel.thumbnailData(
-        video: 'a.mp4',
-        headers: null,
+        source: StreamThumbnailSource.file('a.mp4'),
         imageFormat: StreamThumbnailFormat.png,
         maxHeight: 0,
         maxWidth: 0,

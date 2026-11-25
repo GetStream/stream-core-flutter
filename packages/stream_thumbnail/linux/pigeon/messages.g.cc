@@ -290,6 +290,7 @@ struct _StreamThumbnailThumbnailRequest {
   GObject parent_instance;
 
   gchar* video;
+  StreamThumbnailThumbnailSourceKind source_kind;
   FlValue* headers;
   StreamThumbnailThumbnailFormat format;
   int64_t max_height;
@@ -314,9 +315,10 @@ static void stream_thumbnail_thumbnail_request_class_init(StreamThumbnailThumbna
   G_OBJECT_CLASS(klass)->dispose = stream_thumbnail_thumbnail_request_dispose;
 }
 
-StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality) {
+StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, StreamThumbnailThumbnailSourceKind source_kind, FlValue* headers, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality) {
   StreamThumbnailThumbnailRequest* self = STREAM_THUMBNAIL_THUMBNAIL_REQUEST(g_object_new(stream_thumbnail_thumbnail_request_get_type(), nullptr));
   self->video = g_strdup(video);
+  self->source_kind = source_kind;
   if (headers != nullptr) {
     self->headers = fl_value_ref(headers);
   }
@@ -334,6 +336,11 @@ StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gc
 const gchar* stream_thumbnail_thumbnail_request_get_video(StreamThumbnailThumbnailRequest* self) {
   g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), nullptr);
   return self->video;
+}
+
+StreamThumbnailThumbnailSourceKind stream_thumbnail_thumbnail_request_get_source_kind(StreamThumbnailThumbnailRequest* self) {
+  g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), static_cast<StreamThumbnailThumbnailSourceKind>(0));
+  return self->source_kind;
 }
 
 FlValue* stream_thumbnail_thumbnail_request_get_headers(StreamThumbnailThumbnailRequest* self) {
@@ -369,6 +376,7 @@ int64_t stream_thumbnail_thumbnail_request_get_quality(StreamThumbnailThumbnailR
 static FlValue* stream_thumbnail_thumbnail_request_to_list(StreamThumbnailThumbnailRequest* self) {
   FlValue* values = fl_value_new_list();
   fl_value_append_take(values, fl_value_new_string(self->video));
+  fl_value_append_take(values, fl_value_new_custom(stream_thumbnail_thumbnail_source_kind_type_id, fl_value_new_int(self->source_kind), (GDestroyNotify)fl_value_unref));
   fl_value_append_take(values, self->headers != nullptr ? fl_value_ref(self->headers) : fl_value_new_null());
   fl_value_append_take(values, fl_value_new_custom(stream_thumbnail_thumbnail_format_type_id, fl_value_new_int(self->format), (GDestroyNotify)fl_value_unref));
   fl_value_append_take(values, fl_value_new_int(self->max_height));
@@ -382,21 +390,23 @@ static StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new_f
   FlValue* value0 = fl_value_get_list_value(values, 0);
   const gchar* video = fl_value_get_string(value0);
   FlValue* value1 = fl_value_get_list_value(values, 1);
-  FlValue* headers = nullptr;
-  if (fl_value_get_type(value1) != FL_VALUE_TYPE_NULL) {
-    headers = value1;
-  }
+  StreamThumbnailThumbnailSourceKind source_kind = static_cast<StreamThumbnailThumbnailSourceKind>(fl_value_get_int(reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value1)))));
   FlValue* value2 = fl_value_get_list_value(values, 2);
-  StreamThumbnailThumbnailFormat format = static_cast<StreamThumbnailThumbnailFormat>(fl_value_get_int(reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value2)))));
+  FlValue* headers = nullptr;
+  if (fl_value_get_type(value2) != FL_VALUE_TYPE_NULL) {
+    headers = value2;
+  }
   FlValue* value3 = fl_value_get_list_value(values, 3);
-  int64_t max_height = fl_value_get_int(value3);
+  StreamThumbnailThumbnailFormat format = static_cast<StreamThumbnailThumbnailFormat>(fl_value_get_int(reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value3)))));
   FlValue* value4 = fl_value_get_list_value(values, 4);
-  int64_t max_width = fl_value_get_int(value4);
+  int64_t max_height = fl_value_get_int(value4);
   FlValue* value5 = fl_value_get_list_value(values, 5);
-  int64_t time_ms = fl_value_get_int(value5);
+  int64_t max_width = fl_value_get_int(value5);
   FlValue* value6 = fl_value_get_list_value(values, 6);
-  int64_t quality = fl_value_get_int(value6);
-  return stream_thumbnail_thumbnail_request_new(video, headers, format, max_height, max_width, time_ms, quality);
+  int64_t time_ms = fl_value_get_int(value6);
+  FlValue* value7 = fl_value_get_list_value(values, 7);
+  int64_t quality = fl_value_get_int(value7);
+  return stream_thumbnail_thumbnail_request_new(video, source_kind, headers, format, max_height, max_width, time_ms, quality);
 }
 
 gboolean stream_thumbnail_thumbnail_request_equals(StreamThumbnailThumbnailRequest* a, StreamThumbnailThumbnailRequest* b) {
@@ -407,6 +417,9 @@ gboolean stream_thumbnail_thumbnail_request_equals(StreamThumbnailThumbnailReque
     return FALSE;
   }
   if (g_strcmp0(a->video, b->video) != 0) {
+    return FALSE;
+  }
+  if (a->source_kind != b->source_kind) {
     return FALSE;
   }
   if (!flpigeon_deep_equals(a->headers, b->headers)) {
@@ -434,6 +447,7 @@ guint stream_thumbnail_thumbnail_request_hash(StreamThumbnailThumbnailRequest* s
   g_return_val_if_fail(STREAM_THUMBNAIL_IS_THUMBNAIL_REQUEST(self), 0);
   guint result = 0;
   result = result * 31 + (self->video != nullptr ? g_str_hash(self->video) : 0);
+  result = result * 31 + static_cast<guint>(self->source_kind);
   result = result * 31 + flpigeon_deep_hash(self->headers);
   result = result * 31 + static_cast<guint>(self->format);
   result = result * 31 + static_cast<guint>(self->max_height);
@@ -453,6 +467,8 @@ gchar* stream_thumbnail_thumbnail_request_to_string(StreamThumbnailThumbnailRequ
   else {
     g_string_append(str, "null");
   }
+  g_string_append(str, ", source_kind: ");
+  g_string_append_printf(str, "%d", static_cast<int>(self->source_kind));
   g_string_append(str, ", headers: ");
   if (self->headers != nullptr) {
     gchar* val_str = flpigeon_to_string(self->headers);
@@ -484,10 +500,17 @@ struct _StreamThumbnailMessageCodec {
 G_DEFINE_TYPE(StreamThumbnailMessageCodec, stream_thumbnail_message_codec, fl_standard_message_codec_get_type())
 
 const int stream_thumbnail_thumbnail_format_type_id = 129;
-const int stream_thumbnail_thumbnail_request_type_id = 130;
+const int stream_thumbnail_thumbnail_source_kind_type_id = 130;
+const int stream_thumbnail_thumbnail_request_type_id = 131;
 
 static gboolean stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_format(FlStandardMessageCodec* codec, GByteArray* buffer, FlValue* value, GError** error) {
   uint8_t type = stream_thumbnail_thumbnail_format_type_id;
+  g_byte_array_append(buffer, &type, sizeof(uint8_t));
+  return fl_standard_message_codec_write_value(codec, buffer, value, error);
+}
+
+static gboolean stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_source_kind(FlStandardMessageCodec* codec, GByteArray* buffer, FlValue* value, GError** error) {
+  uint8_t type = stream_thumbnail_thumbnail_source_kind_type_id;
   g_byte_array_append(buffer, &type, sizeof(uint8_t));
   return fl_standard_message_codec_write_value(codec, buffer, value, error);
 }
@@ -504,6 +527,8 @@ static gboolean stream_thumbnail_message_codec_write_value(FlStandardMessageCode
     switch (fl_value_get_custom_type(value)) {
       case stream_thumbnail_thumbnail_format_type_id:
         return stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_format(codec, buffer, reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value))), error);
+      case stream_thumbnail_thumbnail_source_kind_type_id:
+        return stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_source_kind(codec, buffer, reinterpret_cast<FlValue*>(const_cast<gpointer>(fl_value_get_custom_value(value))), error);
       case stream_thumbnail_thumbnail_request_type_id:
         return stream_thumbnail_message_codec_write_stream_thumbnail_thumbnail_request(codec, buffer, STREAM_THUMBNAIL_THUMBNAIL_REQUEST(fl_value_get_custom_value_object(value)), error);
     }
@@ -514,6 +539,10 @@ static gboolean stream_thumbnail_message_codec_write_value(FlStandardMessageCode
 
 static FlValue* stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_format(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, GError** error) {
   return fl_value_new_custom(stream_thumbnail_thumbnail_format_type_id, fl_standard_message_codec_read_value(codec, buffer, offset, error), (GDestroyNotify)fl_value_unref);
+}
+
+static FlValue* stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_source_kind(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, GError** error) {
+  return fl_value_new_custom(stream_thumbnail_thumbnail_source_kind_type_id, fl_standard_message_codec_read_value(codec, buffer, offset, error), (GDestroyNotify)fl_value_unref);
 }
 
 static FlValue* stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_request(FlStandardMessageCodec* codec, GBytes* buffer, size_t* offset, GError** error) {
@@ -535,6 +564,8 @@ static FlValue* stream_thumbnail_message_codec_read_value_of_type(FlStandardMess
   switch (type) {
     case stream_thumbnail_thumbnail_format_type_id:
       return stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_format(codec, buffer, offset, error);
+    case stream_thumbnail_thumbnail_source_kind_type_id:
+      return stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_source_kind(codec, buffer, offset, error);
     case stream_thumbnail_thumbnail_request_type_id:
       return stream_thumbnail_message_codec_read_stream_thumbnail_thumbnail_request(codec, buffer, offset, error);
     default:

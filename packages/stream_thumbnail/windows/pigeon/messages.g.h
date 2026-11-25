@@ -64,6 +64,17 @@ enum class ThumbnailFormat {
   kWebp = 2
 };
 
+// Where [ThumbnailRequest.video] is read from, and so how it may be opened.
+//
+// `network` must only be fetched over http or https, `file` must only be
+// opened as a local path, and `contentUri` only through an Android content
+// resolver.
+enum class ThumbnailSourceKind {
+  kNetwork = 0,
+  kFile = 1,
+  kContentUri = 2
+};
+
 
 // A single thumbnail generation request sent to the native platform.
 //
@@ -73,6 +84,7 @@ class ThumbnailRequest {
   // Constructs an object setting all non-nullable fields.
   explicit ThumbnailRequest(
     const std::string& video,
+    const ThumbnailSourceKind& source_kind,
     const ThumbnailFormat& format,
     int64_t max_height,
     int64_t max_width,
@@ -82,6 +94,7 @@ class ThumbnailRequest {
   // Constructs an object setting all fields.
   explicit ThumbnailRequest(
     const std::string& video,
+    const ThumbnailSourceKind& source_kind,
     const ::flutter::EncodableMap* headers,
     const ThumbnailFormat& format,
     int64_t max_height,
@@ -91,6 +104,9 @@ class ThumbnailRequest {
 
   const std::string& video() const;
   void set_video(std::string_view value_arg);
+
+  const ThumbnailSourceKind& source_kind() const;
+  void set_source_kind(const ThumbnailSourceKind& value_arg);
 
   const ::flutter::EncodableMap* headers() const;
   void set_headers(const ::flutter::EncodableMap* value_arg);
@@ -123,6 +139,7 @@ class ThumbnailRequest {
   friend class StreamThumbnailHostApi;
   friend class PigeonInternalCodecSerializer;
   std::string video_;
+  ThumbnailSourceKind source_kind_;
   std::optional<::flutter::EncodableMap> headers_;
   ThumbnailFormat format_;
   int64_t max_height_;

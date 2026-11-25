@@ -22,10 +22,18 @@ import 'package:pigeon/pigeon.dart';
 /// Wire representation of the image format for a generated thumbnail.
 enum ThumbnailFormat { jpeg, png, webp }
 
+/// Where [ThumbnailRequest.video] is read from, and so how it may be opened.
+///
+/// `network` must only be fetched over http or https, `file` must only be
+/// opened as a local path, and `contentUri` only through an Android content
+/// resolver.
+enum ThumbnailSourceKind { network, file, contentUri }
+
 /// A single thumbnail generation request sent to the native platform.
 class ThumbnailRequest {
   ThumbnailRequest({
     required this.video,
+    required this.sourceKind,
     required this.headers,
     required this.format,
     required this.maxHeight,
@@ -35,6 +43,7 @@ class ThumbnailRequest {
   });
 
   final String video;
+  final ThumbnailSourceKind sourceKind;
   final Map<String, String>? headers;
   final ThumbnailFormat format;
   final int maxHeight;

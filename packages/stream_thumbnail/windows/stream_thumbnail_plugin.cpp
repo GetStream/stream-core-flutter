@@ -10,6 +10,7 @@
 #include <objbase.h>
 #include <propvarutil.h>
 #include <shlwapi.h>
+#include <string.h>
 #include <wincodec.h>
 #include <wrl/client.h>
 
@@ -25,6 +26,7 @@ using stream_thumbnail_windows::ErrorOr;
 using stream_thumbnail_windows::FlutterError;
 using stream_thumbnail_windows::ThumbnailFormat;
 using stream_thumbnail_windows::ThumbnailRequest;
+using stream_thumbnail_windows::ThumbnailSourceKind;
 
 namespace stream_thumbnail {
 
@@ -66,6 +68,33 @@ std::string VideoPath(const std::string &video) {
   return video;
 }
 
+bool HasHttpScheme(const std::string &video) {
+  return _strnicmp(video.c_str(), "http://", 7) == 0 || _strnicmp(video.c_str(), "https://", 8) == 0;
+}
+
+// The URL or path Media Foundation is given for `video`. Media Foundation picks a
+// scheme handler from whatever it is handed, so a network video must name http(s)
+// and a file must not name a scheme at all.
+std::string ResolveInput(const std::string &video, ThumbnailSourceKind kind) {
+  switch (kind) {
+    case ThumbnailSourceKind::kNetwork:
+      if (!HasHttpScheme(video)) {
+        throw ThumbnailException("UNSUPPORTED_SOURCE", "A network video must be an http or https URL.");
+      }
+      return video;
+    case ThumbnailSourceKind::kFile: {
+      const std::string path = VideoPath(video);
+      if (path.find("://") != std::string::npos) {
+        throw ThumbnailException("UNSUPPORTED_SOURCE", "A file video must be a local path.");
+      }
+      return path;
+    }
+    case ThumbnailSourceKind::kContentUri:
+      throw ThumbnailException("UNSUPPORTED_SOURCE", "Content URIs are only supported on Android.");
+  }
+  throw ThumbnailException("UNSUPPORTED_SOURCE", "Unknown video source.");
+}
+
 std::string FileExtension(ThumbnailFormat format) {
   switch (format) {
     case ThumbnailFormat::kJpeg:
@@ -86,12 +115,12 @@ struct DecodedFrame {
   LONG stride = 0;
 };
 
-// Decodes a single frame from `video` at `time_ms` via Media Foundation.
+// Decodes a single frame from `input` at `time_ms` via Media Foundation.
 //
 // NOTE: unlike AVFoundation (iOS/macOS) and MediaMetadataRetriever (Android),
 // IMFSourceReader has no simple way to attach custom HTTP headers to a remote
 // URL, so `request.headers()` is not applied on Windows.
-DecodedFrame DecodeFrame(const std::string &video, int64_t time_ms) {
+DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
   ComPtr<IMFAttributes> attributes;
   ComPtr<IMFSourceReader> reader;
   ComPtr<IMFMediaType> type;
@@ -104,7 +133,7 @@ DecodedFrame DecodeFrame(const std::string &video, int64_t time_ms) {
     hr = attributes->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE);
   }
 
-  const std::wstring wide_path = Utf8ToWide(VideoPath(video));
+  const std::wstring wide_path = Utf8ToWide(input);
   if (SUCCEEDED(hr)) {
     hr = MFCreateSourceReaderFromURL(wide_path.c_str(), attributes.Get(), &reader);
   }
@@ -277,7 +306,7 @@ std::vector<uint8_t> GenerateThumbnailData(const ThumbnailRequest &request) {
     throw ThumbnailException("UNSUPPORTED_FORMAT", "WebP is not yet supported on Windows.");
   }
 
-  const DecodedFrame frame = DecodeFrame(request.video(), request.time_ms());
+  const DecodedFrame frame = DecodeFrame(ResolveInput(request.video(), request.source_kind()), request.time_ms());
 
   ComPtr<IStream> stream;
   HRESULT hr = CreateStreamOnHGlobal(nullptr, TRUE, &stream);
