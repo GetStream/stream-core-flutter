@@ -52,9 +52,76 @@ void main() {
     expect(surface.insetPadding, EdgeInsets.all(context.streamSpacing.xxl));
     expect(
       surface.shape,
-      RoundedRectangleBorder(borderRadius: BorderRadius.all(context.streamRadius.xl)),
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(context.streamRadius.xl),
+        side: const BorderSide(color: StreamColors.black5),
+      ),
     );
     expect(_scrimFill(tester).color, context.streamColorScheme.backgroundScrim);
+  });
+
+  testWidgets('outlines the surface in borderOpacityStrong in dark mode', (tester) async {
+    final streamTheme = StreamTheme(brightness: Brightness.dark);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(brightness: Brightness.dark, extensions: [streamTheme]),
+        home: StreamModalDialog(child: const Text('body')),
+      ),
+    );
+
+    final shape = _surface(tester).shape! as RoundedRectangleBorder;
+    expect(shape.side.color, streamTheme.colorScheme.borderOpacityStrong);
+  });
+
+  testWidgets('applies the content padding from StreamTheme', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        modalDialogTheme: const StreamModalDialogThemeData(contentPadding: EdgeInsets.all(9)),
+        child: _opener((context) => StreamModalDialog(child: const Text('body'))),
+      ),
+    );
+    await _open(tester);
+
+    final paddings = tester.widgetList<Padding>(find.ancestor(of: find.text('body'), matching: find.byType(Padding)));
+    expect(paddings.map((padding) => padding.padding), contains(const EdgeInsets.all(9)));
+  });
+
+  testWidgets('the contentPadding parameter beats the theme', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        modalDialogTheme: const StreamModalDialogThemeData(contentPadding: EdgeInsets.all(9)),
+        child: _opener(
+          (context) => StreamModalDialog(contentPadding: const EdgeInsets.all(3), child: const Text('body')),
+        ),
+      ),
+    );
+    await _open(tester);
+
+    final paddings = tester.widgetList<Padding>(find.ancestor(of: find.text('body'), matching: find.byType(Padding)));
+    expect(paddings.map((padding) => padding.padding), contains(const EdgeInsets.all(3)));
+    expect(paddings.map((padding) => padding.padding), isNot(contains(const EdgeInsets.all(9))));
+  });
+
+  testWidgets('expandActions from StreamTheme beats the platform default', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        modalDialogTheme: const StreamModalDialogThemeData(
+          footerStyle: StreamModalDialogFooterStyle(expandActions: false),
+        ),
+        child: _opener(
+          (context) => StreamModalDialog(
+            actions: [
+              StreamButton(onPressed: () {}, child: const Text('OK')),
+              StreamButton(onPressed: () {}, child: const Text('Discard all changes')),
+            ],
+            child: const Text('body'),
+          ),
+        ),
+      ),
+    );
+    await _open(tester);
+
+    expect(find.ancestor(of: find.text('OK'), matching: find.byType(Expanded)), findsNothing);
   });
 
   for (final useMaterial3 in [true, false]) {
@@ -165,10 +232,10 @@ void main() {
     expect(footerPaddings.map((padding) => padding.padding), contains(const EdgeInsets.all(5)));
   });
 
-  testWidgets('applies the scrim values from StreamTheme', (tester) async {
+  testWidgets('applies the barrier values from StreamTheme', (tester) async {
     await tester.pumpWidget(
       _app(
-        modalDialogTheme: const StreamModalDialogThemeData(scrimColor: Colors.purple, scrimBlurSigma: 4),
+        modalDialogTheme: const StreamModalDialogThemeData(barrierColor: Colors.purple, barrierBlurSigma: 4),
         child: _opener((context) => StreamModalDialog(child: const Text('body'))),
       ),
     );
@@ -184,9 +251,9 @@ void main() {
   testWidgets('a StreamModalDialogTheme around the caller reaches the dialog and the scrim', (tester) async {
     await tester.pumpWidget(
       _app(
-        modalDialogTheme: const StreamModalDialogThemeData(backgroundColor: Colors.red, scrimColor: Colors.red),
+        modalDialogTheme: const StreamModalDialogThemeData(backgroundColor: Colors.red, barrierColor: Colors.red),
         child: StreamModalDialogTheme(
-          data: const StreamModalDialogThemeData(backgroundColor: Colors.blue, scrimColor: Colors.blue),
+          data: const StreamModalDialogThemeData(backgroundColor: Colors.blue, barrierColor: Colors.blue),
           child: _opener((context) => StreamModalDialog(child: const Text('body'))),
         ),
       ),
@@ -230,10 +297,10 @@ void main() {
     expect(tester.getSize(_surfaceMaterial()), const Size(400, 200));
   });
 
-  testWidgets('the scrim parameters beat the theme', (tester) async {
+  testWidgets('the scrim parameters beat the barrier values of the theme', (tester) async {
     await tester.pumpWidget(
       _app(
-        modalDialogTheme: const StreamModalDialogThemeData(scrimColor: Colors.purple, scrimBlurSigma: 4),
+        modalDialogTheme: const StreamModalDialogThemeData(barrierColor: Colors.purple, barrierBlurSigma: 4),
         child: const StreamBlurScrim(color: Colors.orange, blurSigma: 0),
       ),
     );

@@ -19,11 +19,11 @@ void main() {
     return anchor;
   }
 
-  testWidgets('trailingTopAnchorOf is the top-right corner left to right', (tester) async {
+  testWidgets('the default anchor is the top-right corner left to right', (tester) async {
     expect(await anchorIn(tester, TextDirection.ltr), const Offset(double.maxFinite, 0));
   });
 
-  testWidgets('trailingTopAnchorOf is the top-left corner right to left', (tester) async {
+  testWidgets('the default anchor is the top-left corner right to left', (tester) async {
     expect(await anchorIn(tester, TextDirection.rtl), Offset.zero);
   });
 }

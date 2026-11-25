@@ -36,6 +36,11 @@ mixin _$StreamModalDialogThemeData {
       shape: ShapeBorder.lerp(a.shape, b.shape, t),
       insetPadding: EdgeInsets.lerp(a.insetPadding, b.insetPadding, t),
       constraints: BoxConstraints.lerp(a.constraints, b.constraints, t),
+      contentPadding: EdgeInsetsGeometry.lerp(
+        a.contentPadding,
+        b.contentPadding,
+        t,
+      ),
       headerStyle: StreamModalDialogHeaderStyle.lerp(
         a.headerStyle,
         b.headerStyle,
@@ -46,8 +51,8 @@ mixin _$StreamModalDialogThemeData {
         b.footerStyle,
         t,
       ),
-      scrimColor: Color.lerp(a.scrimColor, b.scrimColor, t),
-      scrimBlurSigma: lerpDouble$(a.scrimBlurSigma, b.scrimBlurSigma, t),
+      barrierColor: Color.lerp(a.barrierColor, b.barrierColor, t),
+      barrierBlurSigma: lerpDouble$(a.barrierBlurSigma, b.barrierBlurSigma, t),
     );
   }
 
@@ -58,10 +63,11 @@ mixin _$StreamModalDialogThemeData {
     ShapeBorder? shape,
     EdgeInsets? insetPadding,
     BoxConstraints? constraints,
+    EdgeInsetsGeometry? contentPadding,
     StreamModalDialogHeaderStyle? headerStyle,
     StreamModalDialogFooterStyle? footerStyle,
-    Color? scrimColor,
-    double? scrimBlurSigma,
+    Color? barrierColor,
+    double? barrierBlurSigma,
   }) {
     final _this = (this as StreamModalDialogThemeData);
 
@@ -72,10 +78,11 @@ mixin _$StreamModalDialogThemeData {
       shape: shape ?? _this.shape,
       insetPadding: insetPadding ?? _this.insetPadding,
       constraints: constraints ?? _this.constraints,
+      contentPadding: contentPadding ?? _this.contentPadding,
       headerStyle: headerStyle ?? _this.headerStyle,
       footerStyle: footerStyle ?? _this.footerStyle,
-      scrimColor: scrimColor ?? _this.scrimColor,
-      scrimBlurSigma: scrimBlurSigma ?? _this.scrimBlurSigma,
+      barrierColor: barrierColor ?? _this.barrierColor,
+      barrierBlurSigma: barrierBlurSigma ?? _this.barrierBlurSigma,
     );
   }
 
@@ -97,12 +104,13 @@ mixin _$StreamModalDialogThemeData {
       shape: other.shape,
       insetPadding: other.insetPadding,
       constraints: other.constraints,
+      contentPadding: other.contentPadding,
       headerStyle:
           _this.headerStyle?.merge(other.headerStyle) ?? other.headerStyle,
       footerStyle:
           _this.footerStyle?.merge(other.footerStyle) ?? other.footerStyle,
-      scrimColor: other.scrimColor,
-      scrimBlurSigma: other.scrimBlurSigma,
+      barrierColor: other.barrierColor,
+      barrierBlurSigma: other.barrierBlurSigma,
     );
   }
 
@@ -125,10 +133,11 @@ mixin _$StreamModalDialogThemeData {
         _other.shape == _this.shape &&
         _other.insetPadding == _this.insetPadding &&
         _other.constraints == _this.constraints &&
+        _other.contentPadding == _this.contentPadding &&
         _other.headerStyle == _this.headerStyle &&
         _other.footerStyle == _this.footerStyle &&
-        _other.scrimColor == _this.scrimColor &&
-        _other.scrimBlurSigma == _this.scrimBlurSigma;
+        _other.barrierColor == _this.barrierColor &&
+        _other.barrierBlurSigma == _this.barrierBlurSigma;
   }
 
   @override
@@ -143,10 +152,11 @@ mixin _$StreamModalDialogThemeData {
       _this.shape,
       _this.insetPadding,
       _this.constraints,
+      _this.contentPadding,
       _this.headerStyle,
       _this.footerStyle,
-      _this.scrimColor,
-      _this.scrimBlurSigma,
+      _this.barrierColor,
+      _this.barrierBlurSigma,
     );
   }
 }
@@ -272,18 +282,21 @@ mixin _$StreamModalDialogFooterStyle {
     return StreamModalDialogFooterStyle(
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       actionsSpacing: lerpDouble$(a.actionsSpacing, b.actionsSpacing, t),
+      expandActions: t < 0.5 ? a.expandActions : b.expandActions,
     );
   }
 
   StreamModalDialogFooterStyle copyWith({
     EdgeInsetsGeometry? padding,
     double? actionsSpacing,
+    bool? expandActions,
   }) {
     final _this = (this as StreamModalDialogFooterStyle);
 
     return StreamModalDialogFooterStyle(
       padding: padding ?? _this.padding,
       actionsSpacing: actionsSpacing ?? _this.actionsSpacing,
+      expandActions: expandActions ?? _this.expandActions,
     );
   }
 
@@ -301,6 +314,7 @@ mixin _$StreamModalDialogFooterStyle {
     return copyWith(
       padding: other.padding,
       actionsSpacing: other.actionsSpacing,
+      expandActions: other.expandActions,
     );
   }
 
@@ -318,13 +332,19 @@ mixin _$StreamModalDialogFooterStyle {
     final _other = (other as StreamModalDialogFooterStyle);
 
     return _other.padding == _this.padding &&
-        _other.actionsSpacing == _this.actionsSpacing;
+        _other.actionsSpacing == _this.actionsSpacing &&
+        _other.expandActions == _this.expandActions;
   }
 
   @override
   int get hashCode {
     final _this = (this as StreamModalDialogFooterStyle);
 
-    return Object.hash(runtimeType, _this.padding, _this.actionsSpacing);
+    return Object.hash(
+      runtimeType,
+      _this.padding,
+      _this.actionsSpacing,
+      _this.expandActions,
+    );
   }
 }

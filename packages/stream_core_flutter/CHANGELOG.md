@@ -6,6 +6,7 @@
   `separator*` fields on `StreamMessageMetadataStyle`.
 - Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
   modal with a header and footer over a blurred scrim, to `video.dart`.
+- `StreamModalDialog` uses the design's mobile metrics on Android and iOS and its web metrics on desktop and the web.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.

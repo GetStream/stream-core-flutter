@@ -1,13 +1,15 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/video.dart';
 
-Widget _app({required Widget child, Brightness brightness = Brightness.light}) {
+Widget _app({required Widget child, Brightness brightness = Brightness.light, TargetPlatform? platform}) {
   return MaterialApp(
     theme: ThemeData(
       brightness: brightness,
+      platform: platform,
       extensions: [StreamTheme(brightness: brightness)],
     ),
     home: Scaffold(body: Center(child: child)),
@@ -22,14 +24,20 @@ Future<void> _openDialog(
   WidgetTester tester, {
   required WidgetBuilder builder,
   ValueChanged<String?>? onResult,
+  TargetPlatform? platform,
+  Color? barrierColor,
+  bool useSafeArea = true,
 }) async {
   await tester.pumpWidget(
     _app(
+      platform: platform,
       child: Builder(
         builder: (context) => TextButton(
           onPressed: () async {
             final result = await showStreamModalDialog<String>(
               context: context,
+              barrierColor: barrierColor,
+              useSafeArea: useSafeArea,
               builder: builder,
             );
             onResult?.call(result);
@@ -117,6 +125,226 @@ void main() {
     expect(result, isNull);
   });
 
+  testWidgets('the close button respects a PopScope that blocks the pop', (tester) async {
+    await _openDialog(
+      tester,
+      builder: (context) => PopScope(
+        canPop: false,
+        child: StreamModalDialog(child: const Text('body')),
+      ),
+    );
+
+    await tester.tap(find.byIcon(const StreamIcons().xmark));
+    await tester.pumpAndSettle();
+
+    expect(find.text('body'), findsOneWidget);
+  });
+
+  testWidgets('an untitled dialog is named Alert on Android', (tester) async {
+    await _openDialog(
+      tester,
+      platform: TargetPlatform.android,
+      builder: (context) => StreamModalDialog(child: const Text('body')),
+    );
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Alert')),
+      containsSemantics(label: 'Alert', namesRoute: true, scopesRoute: true),
+    );
+  });
+
+  testWidgets('an untitled dialog is left unnamed on iOS', (tester) async {
+    await _openDialog(
+      tester,
+      platform: TargetPlatform.iOS,
+      builder: (context) => StreamModalDialog(child: const Text('body')),
+    );
+
+    expect(find.bySemanticsLabel('Alert'), findsNothing);
+  });
+
+  testWidgets('a titled dialog is named after its title, not Alert, on Android', (tester) async {
+    await _openDialog(
+      tester,
+      platform: TargetPlatform.android,
+      builder: (context) => StreamModalDialog(title: const Text('Settings'), child: const Text('body')),
+    );
+
+    expect(tester.getSemantics(find.text('Settings')), containsSemantics(namesRoute: true));
+    expect(find.bySemanticsLabel('Alert'), findsNothing);
+  });
+
+  testWidgets('semanticLabel names the dialog instead of the title', (tester) async {
+    await _openDialog(
+      tester,
+      builder: (context) => StreamModalDialog(
+        title: const Text('Settings'),
+        semanticLabel: 'Call settings',
+        child: const Text('body'),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Call settings')),
+      containsSemantics(label: 'Call settings', namesRoute: true, scopesRoute: true),
+    );
+    expect(tester.getSemantics(find.text('Settings')), containsSemantics(isHeader: true, namesRoute: false));
+  });
+
+  testWidgets('Tab keeps focus inside the dialog, whatever the navigator defaults to', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        child: Navigator(
+          routeTraversalEdgeBehavior: TraversalEdgeBehavior.leaveFlutterView,
+          onGenerateRoute: (settings) => MaterialPageRoute<void>(
+            builder: (context) => TextButton(
+              onPressed: () => showStreamModalDialog<void>(
+                context: context,
+                useRootNavigator: false,
+                builder: (context) => StreamModalDialog(
+                  actions: [
+                    StreamButton(onPressed: () {}, child: const Text('one')),
+                    StreamButton(onPressed: () {}, child: const Text('two')),
+                  ],
+                  child: const Text('body'),
+                ),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    final dialog = find.byType(StreamModalDialog);
+    for (var i = 0; i < 6; i += 1) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      final focused = primaryFocus?.context;
+      expect(focused, isNotNull);
+      expect(find.ancestor(of: find.byElementPredicate((e) => e == focused), matching: dialog), findsOneWidget);
+    }
+  });
+
+  testWidgets('keeps the dialog clear of the safe area', (tester) async {
+    tester.view
+      ..devicePixelRatio = 1
+      ..physicalSize = const Size(800, 600)
+      ..padding = const FakeViewPadding(top: 100);
+    addTearDown(tester.view.reset);
+
+    await _openDialog(
+      tester,
+      builder: (context) => StreamModalDialog(
+        child: ListView(children: [for (var i = 0; i < 100; i += 1) Text('row $i')]),
+      ),
+    );
+
+    expect(tester.getRect(_surfaceMaterial()).top, greaterThanOrEqualTo(100));
+  });
+
+  testWidgets('ignores the safe area when useSafeArea is false', (tester) async {
+    tester.view
+      ..devicePixelRatio = 1
+      ..physicalSize = const Size(800, 600)
+      ..padding = const FakeViewPadding(top: 100);
+    addTearDown(tester.view.reset);
+
+    await _openDialog(
+      tester,
+      useSafeArea: false,
+      builder: (context) => StreamModalDialog(
+        child: ListView(children: [for (var i = 0; i < 100; i += 1) Text('row $i')]),
+      ),
+    );
+
+    expect(tester.getRect(_surfaceMaterial()).top, lessThan(100));
+  });
+
+  testWidgets('barrierColor overrides the scrim color', (tester) async {
+    await _openDialog(
+      tester,
+      barrierColor: Colors.orange,
+      builder: (context) => StreamModalDialog(child: const Text('body')),
+    );
+
+    expect(_scrimFill(tester).color, Colors.orange);
+  });
+
+  testWidgets('contentPadding pads the body', (tester) async {
+    await _openDialog(
+      tester,
+      builder: (context) => StreamModalDialog(
+        showCloseButton: false,
+        contentPadding: const EdgeInsets.all(10),
+        child: const SizedBox(width: 50, height: 50),
+      ),
+    );
+
+    final body = tester.getRect(find.byType(SizedBox).last);
+    final surface = tester.getRect(_surfaceMaterial());
+    expect(surface.bottom - body.bottom, 10);
+  });
+
+  testWidgets('on the web and desktop, a header with no title or buttons is 88 high', (tester) async {
+    await _openDialog(
+      tester,
+      platform: TargetPlatform.macOS,
+      builder: (context) => StreamModalDialog(showCloseButton: false, child: const SizedBox.shrink()),
+    );
+
+    expect(tester.getSize(_surfaceMaterial()).height, 88);
+  });
+
+  testWidgets('on Android and iOS, a header with no title or buttons is 72 high', (tester) async {
+    await _openDialog(
+      tester,
+      platform: TargetPlatform.iOS,
+      builder: (context) => StreamModalDialog(showCloseButton: false, child: const SizedBox.shrink()),
+    );
+
+    expect(tester.getSize(_surfaceMaterial()).height, 72);
+  });
+
+  testWidgets('on Android and iOS, the footer actions share its width equally', (tester) async {
+    await _openDialog(
+      tester,
+      platform: TargetPlatform.android,
+      builder: (context) => StreamModalDialog(
+        actions: [
+          StreamButton(onPressed: () {}, child: const Text('OK')),
+          StreamButton(onPressed: () {}, child: const Text('Discard all changes')),
+        ],
+        child: const Text('body'),
+      ),
+    );
+
+    final ok = tester.getSize(find.widgetWithText(StreamButton, 'OK'));
+    final discard = tester.getSize(find.widgetWithText(StreamButton, 'Discard all changes'));
+    expect(ok.width, discard.width);
+  });
+
+  testWidgets('on the web and desktop, the footer actions keep their own width', (tester) async {
+    await _openDialog(
+      tester,
+      platform: TargetPlatform.windows,
+      builder: (context) => StreamModalDialog(
+        actions: [
+          StreamButton(onPressed: () {}, child: const Text('OK')),
+          StreamButton(onPressed: () {}, child: const Text('Discard all changes')),
+        ],
+        child: const Text('body'),
+      ),
+    );
+
+    final ok = tester.getSize(find.widgetWithText(StreamButton, 'OK'));
+    final discard = tester.getSize(find.widgetWithText(StreamButton, 'Discard all changes'));
+    expect(ok.width, lessThan(discard.width));
+  });
+
   testWidgets('the close button calls onClose instead of popping when given', (tester) async {
     var closed = 0;
 
@@ -179,8 +407,8 @@ void main() {
     );
 
     final size = tester.getSize(_surfaceMaterial());
-    expect(size.width, lessThanOrEqualTo(StreamModalDialog.defaultConstraints.maxWidth));
-    expect(size.height, lessThanOrEqualTo(StreamModalDialog.defaultConstraints.maxHeight));
+    expect(size.width, lessThanOrEqualTo(720));
+    expect(size.height, lessThanOrEqualTo(640));
   });
 
   testWidgets('the scrim follows a theme change while it is open', (tester) async {
@@ -298,8 +526,15 @@ void main() {
   });
 
   group('StreamBlurScrim', () {
-    testWidgets('blurs what is behind it by default', (tester) async {
-      await tester.pumpWidget(_app(child: const StreamBlurScrim()));
+    testWidgets('blurs by 25 on Android and iOS', (tester) async {
+      await tester.pumpWidget(_app(platform: TargetPlatform.android, child: const StreamBlurScrim()));
+
+      final filter = tester.widget<BackdropFilter>(find.byType(BackdropFilter));
+      expect(filter.filter, ImageFilter.blur(sigmaX: 25, sigmaY: 25));
+    });
+
+    testWidgets('blurs by 12.5 on the web and desktop', (tester) async {
+      await tester.pumpWidget(_app(platform: TargetPlatform.macOS, child: const StreamBlurScrim()));
 
       final filter = tester.widget<BackdropFilter>(find.byType(BackdropFilter));
       expect(filter.filter, ImageFilter.blur(sigmaX: 12.5, sigmaY: 12.5));

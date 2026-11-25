@@ -7,8 +7,10 @@ import '../stream_theme.dart';
 
 part 'stream_modal_dialog_theme.g.theme.dart';
 
-/// Applies a modal dialog theme to descendant [StreamModalDialog] widgets and
-/// to the [StreamBlurScrim] that [showStreamModalDialog] draws behind them.
+/// Applies a modal dialog theme to descendant [StreamModalDialog] widgets.
+///
+/// The theme also reaches the [StreamBlurScrim] that [showStreamModalDialog]
+/// draws behind them.
 ///
 /// Wrap a subtree with [StreamModalDialogTheme] to override modal dialog
 /// styling. Access the merged theme using
@@ -25,7 +27,7 @@ part 'stream_modal_dialog_theme.g.theme.dart';
 /// StreamModalDialogTheme(
 ///   data: StreamModalDialogThemeData(
 ///     shape: RoundedRectangleBorder(),
-///     scrimBlurSigma: 0,
+///     barrierBlurSigma: 0,
 ///   ),
 ///   child: child,
 /// )
@@ -73,6 +75,18 @@ class StreamModalDialogTheme extends InheritedTheme {
 /// the [StreamBlurScrim] behind it. A property left null falls back to the
 /// design system default.
 ///
+/// The design has a mobile and a web variant. Android and iOS get the mobile
+/// defaults; desktop and the web share the web ones. These fields differ
+/// between the two:
+///
+///  * [barrierBlurSigma]
+///  * [StreamModalDialogHeaderStyle.padding]
+///  * [StreamModalDialogHeaderStyle.spacing]
+///  * [StreamModalDialogFooterStyle.padding]
+///  * [StreamModalDialogFooterStyle.expandActions]
+///
+/// Set any of them to use one value on every platform.
+///
 /// {@tool snippet}
 ///
 /// Customize modal dialogs globally:
@@ -105,10 +119,11 @@ class StreamModalDialogThemeData with _$StreamModalDialogThemeData {
     this.shape,
     this.insetPadding,
     this.constraints,
+    this.contentPadding,
     this.headerStyle,
     this.footerStyle,
-    this.scrimColor,
-    this.scrimBlurSigma,
+    this.barrierColor,
+    this.barrierBlurSigma,
   });
 
   /// The color of the dialog's surface.
@@ -128,7 +143,9 @@ class StreamModalDialogThemeData with _$StreamModalDialogThemeData {
 
   /// The shape of the dialog's surface.
   ///
-  /// Defaults to a [RoundedRectangleBorder] with [StreamRadius.xl] corners.
+  /// Defaults to a [RoundedRectangleBorder] with [StreamRadius.xl] corners and
+  /// a 1px outline: [StreamColors.black5] in light mode and
+  /// [StreamColorScheme.borderOpacityStrong] in dark mode.
   final ShapeBorder? shape;
 
   /// The room kept between the dialog and the edges of the window.
@@ -138,8 +155,14 @@ class StreamModalDialogThemeData with _$StreamModalDialogThemeData {
 
   /// The bounds of the dialog.
   ///
-  /// Defaults to [StreamModalDialog.defaultConstraints].
+  /// Defaults to at most 720 wide and 640 high. The dialog shrinks with the
+  /// window, and takes only the height its content needs.
   final BoxConstraints? constraints;
+
+  /// The padding around the dialog's body, between the header and the footer.
+  ///
+  /// Defaults to none.
+  final EdgeInsetsGeometry? contentPadding;
 
   /// The style of the dialog's header: the title and the header actions.
   final StreamModalDialogHeaderStyle? headerStyle;
@@ -147,16 +170,17 @@ class StreamModalDialogThemeData with _$StreamModalDialogThemeData {
   /// The style of the dialog's footer: the row of actions at the bottom.
   final StreamModalDialogFooterStyle? footerStyle;
 
-  /// The fill of the scrim drawn behind the dialog.
+  /// The fill of the barrier drawn behind the dialog.
   ///
   /// Defaults to [StreamColorScheme.backgroundScrim].
-  final Color? scrimColor;
+  final Color? barrierColor;
 
-  /// The blur the scrim applies to whatever sits behind it.
+  /// The blur the barrier applies to whatever sits behind it.
   ///
-  /// Defaults to 12.5. Set to `0` to skip the blur, which costs a render layer
-  /// the size of the window.
-  final double? scrimBlurSigma;
+  /// Defaults to 25 on Android and iOS, and to 12.5 on desktop and the web.
+  /// Set to `0` to skip the blur, which costs a render layer the size of the
+  /// window.
+  final double? barrierBlurSigma;
 
   /// Linearly interpolate between two [StreamModalDialogThemeData] objects.
   static StreamModalDialogThemeData? lerp(
@@ -185,7 +209,8 @@ class StreamModalDialogHeaderStyle with _$StreamModalDialogHeaderStyle {
 
   /// The padding around the header.
   ///
-  /// Defaults to [StreamSpacing.xl] on every side.
+  /// Defaults to [StreamSpacing.md] on every side on Android and iOS, and to
+  /// [StreamSpacing.xl] on desktop and the web.
   final EdgeInsetsGeometry? padding;
 
   /// The text style of the title, including its color.
@@ -196,7 +221,8 @@ class StreamModalDialogHeaderStyle with _$StreamModalDialogHeaderStyle {
 
   /// The gap between the title and the header actions.
   ///
-  /// Defaults to [StreamSpacing.md].
+  /// Defaults to [StreamSpacing.sm] on Android and iOS, and to
+  /// [StreamSpacing.md] on desktop and the web.
   final double? spacing;
 
   /// The gap between adjacent header actions, including the close button.
@@ -225,17 +251,26 @@ class StreamModalDialogFooterStyle with _$StreamModalDialogFooterStyle {
   const StreamModalDialogFooterStyle({
     this.padding,
     this.actionsSpacing,
+    this.expandActions,
   });
 
   /// The padding around the footer.
   ///
-  /// Defaults to [StreamSpacing.xl] on every side.
+  /// Defaults to [StreamSpacing.md] on every side on Android and iOS, and to
+  /// [StreamSpacing.xl] on desktop and the web.
   final EdgeInsetsGeometry? padding;
 
   /// The gap between adjacent footer actions.
   ///
   /// Defaults to [StreamSpacing.xs].
   final double? actionsSpacing;
+
+  /// Whether the footer actions share the footer's width equally.
+  ///
+  /// When false, the actions keep their own width and sit at the trailing
+  /// edge. Defaults to true on Android and iOS, and to false on desktop and
+  /// the web.
+  final bool? expandActions;
 
   /// Linearly interpolate between two [StreamModalDialogFooterStyle] objects.
   static StreamModalDialogFooterStyle? lerp(

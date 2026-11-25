@@ -16,74 +16,99 @@ void main() {
   });
 
   group('StreamModalDialog Golden Tests', () {
-    for (final brightness in Brightness.values) {
-      goldenTest(
-        'renders the variants in ${brightness.name} theme',
-        fileName: 'stream_modal_dialog_${brightness.name}_matrix',
-        builder: () => GoldenTestGroup(
-          columns: 1,
-          children: [
-            GoldenTestScenario(
-              name: 'title and body',
-              child: _buildInTheme(
-                StreamModalDialog(title: const Text('Settings'), child: _body()),
-                brightness: brightness,
-              ),
-            ),
-            GoldenTestScenario(
-              name: 'header and footer actions',
-              child: _buildInTheme(
-                Builder(
-                  builder: (context) => StreamModalDialog(
-                    title: const Text('Choose what to share'),
-                    headerActions: [
-                      StreamButton.icon(
-                        icon: Icon(context.streamIcons.refresh),
-                        style: StreamButtonStyle.secondary,
-                        type: StreamButtonType.ghost,
-                        onPressed: () {},
-                      ),
-                    ],
-                    actions: [
-                      StreamButton(
-                        style: StreamButtonStyle.secondary,
-                        type: StreamButtonType.ghost,
-                        onPressed: () {},
-                        child: const Text('Cancel'),
-                      ),
-                      StreamButton(onPressed: () {}, child: const Text('Share')),
-                    ],
+    for (final variant in _Variant.values) {
+      for (final brightness in Brightness.values) {
+        goldenTest(
+          'renders the ${variant.name} variants in ${brightness.name} theme',
+          fileName: switch (variant) {
+            _Variant.web => 'stream_modal_dialog_${brightness.name}_matrix',
+            _Variant.mobile => 'stream_modal_dialog_mobile_${brightness.name}_matrix',
+          },
+          builder: () => GoldenTestGroup(
+            columns: 1,
+            children: [
+              GoldenTestScenario(
+                name: 'title and body',
+                child: _buildInTheme(
+                  StreamModalDialog(
+                    title: const Text('Settings'),
+                    contentPadding: variant.contentPadding,
                     child: _body(),
                   ),
+                  variant: variant,
+                  brightness: brightness,
                 ),
-                brightness: brightness,
               ),
-            ),
-            GoldenTestScenario(
-              name: 'no title, no close button',
-              child: _buildInTheme(
-                StreamModalDialog(showCloseButton: false, child: _body()),
-                brightness: brightness,
+              GoldenTestScenario(
+                name: 'header and footer actions',
+                child: _buildInTheme(
+                  Builder(
+                    builder: (context) => StreamModalDialog(
+                      title: const Text('Choose what to share'),
+                      contentPadding: variant.contentPadding,
+                      headerActions: [
+                        StreamButton.icon(
+                          icon: Icon(context.streamIcons.refresh),
+                          style: StreamButtonStyle.secondary,
+                          type: StreamButtonType.ghost,
+                          onPressed: () {},
+                        ),
+                      ],
+                      actions: [
+                        StreamButton(
+                          style: StreamButtonStyle.secondary,
+                          type: StreamButtonType.ghost,
+                          onPressed: () {},
+                          child: const Text('Cancel'),
+                        ),
+                        StreamButton(onPressed: () {}, child: const Text('Share')),
+                      ],
+                      child: _body(),
+                    ),
+                  ),
+                  variant: variant,
+                  brightness: brightness,
+                ),
               ),
-            ),
-          ],
-        ),
-      );
+              GoldenTestScenario(
+                name: 'no title, no close button',
+                child: _buildInTheme(
+                  StreamModalDialog(
+                    showCloseButton: false,
+                    contentPadding: variant.contentPadding,
+                    child: _body(),
+                  ),
+                  variant: variant,
+                  brightness: brightness,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
     }
   });
 }
 
-Widget _body() {
-  return const Padding(
-    padding: EdgeInsets.symmetric(horizontal: 24),
-    child: Text('Changes apply to everyone in the conversation.'),
-  );
+// The design's two sizes: Android and iOS get the mobile one, desktop and the
+// web share the web one.
+enum _Variant {
+  web(platform: TargetPlatform.macOS, width: 480, contentPadding: EdgeInsets.symmetric(horizontal: 24)),
+  mobile(platform: TargetPlatform.iOS, width: 360, contentPadding: EdgeInsets.symmetric(horizontal: 16));
+
+  const _Variant({required this.platform, required this.width, required this.contentPadding});
+
+  final TargetPlatform platform;
+  final double width;
+  final EdgeInsets contentPadding;
 }
 
-Widget _buildInTheme(Widget child, {Brightness brightness = Brightness.light}) {
+Widget _body() => const Text('Changes apply to everyone in the conversation.');
+
+Widget _buildInTheme(Widget child, {required _Variant variant, Brightness brightness = Brightness.light}) {
   final streamTheme = StreamTheme(brightness: brightness);
   return Theme(
-    data: ThemeData(brightness: brightness, extensions: [streamTheme]),
+    data: ThemeData(brightness: brightness, platform: variant.platform, extensions: [streamTheme]),
     child: Builder(
       // On the scrim, the way showStreamModalDialog draws it. Clipped, so the
       // blur stays inside the scenario.
@@ -91,7 +116,7 @@ Widget _buildInTheme(Widget child, {Brightness brightness = Brightness.light}) {
         child: ColoredBox(
           color: StreamTheme.of(context).colorScheme.backgroundApp,
           child: SizedBox(
-            width: 480,
+            width: variant.width,
             height: 280,
             child: Stack(
               children: [

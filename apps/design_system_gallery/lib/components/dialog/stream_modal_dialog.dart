@@ -49,7 +49,7 @@ Widget buildStreamModalDialogPlayground(BuildContext context) {
   final blur = context.knobs.boolean(
     label: 'Blur',
     initialValue: true,
-    description: 'Whether the scrim blurs what is behind it.',
+    description: 'Whether the barrier blurs what is behind it. The blur is stronger on Android and iOS.',
   );
 
   final barrierDismissible = context.knobs.boolean(
@@ -64,6 +64,7 @@ Widget buildStreamModalDialogPlayground(BuildContext context) {
 
     return StreamModalDialog(
       title: title.isEmpty ? null : Text(title),
+      contentPadding: EdgeInsets.symmetric(horizontal: context.streamSpacing.xl),
       headerActions: [
         for (var i = 0; i < headerActions; i += 1)
           StreamButton.icon(
@@ -101,7 +102,7 @@ Widget buildStreamModalDialogPlayground(BuildContext context) {
 
   return Center(
     child: StreamModalDialogTheme(
-      data: StreamModalDialogThemeData(scrimBlurSigma: blur ? null : 0),
+      data: StreamModalDialogThemeData(barrierBlurSigma: blur ? null : 0),
       child: Builder(
         builder: (context) => StreamButton(
           onPressed: () async {
@@ -141,7 +142,11 @@ Widget buildStreamModalDialogShowcase(BuildContext context) {
         _Example(
           label: 'TITLE AND BODY',
           caption: 'A title, a close button and a short body',
-          child: StreamModalDialog(title: const Text('Settings'), child: const _ShortBody()),
+          child: StreamModalDialog(
+            title: const Text('Settings'),
+            contentPadding: EdgeInsets.symmetric(horizontal: spacing.xl),
+            child: const _ShortBody(),
+          ),
         ),
         _Example(
           label: 'HEADER AND FOOTER ACTIONS',
@@ -149,6 +154,7 @@ Widget buildStreamModalDialogShowcase(BuildContext context) {
           child: Builder(
             builder: (context) => StreamModalDialog(
               title: const Text('Choose what to share'),
+              contentPadding: EdgeInsets.symmetric(horizontal: spacing.xl),
               headerActions: [
                 StreamButton.icon(
                   icon: Icon(context.streamIcons.refresh),
@@ -176,6 +182,7 @@ Widget buildStreamModalDialogShowcase(BuildContext context) {
           child: StreamModalDialog(
             title: const Text('Discard changes?'),
             showCloseButton: false,
+            contentPadding: EdgeInsets.symmetric(horizontal: spacing.xl),
             actions: [
               StreamButton(
                 style: StreamButtonStyle.secondary,
@@ -206,14 +213,9 @@ class _ShortBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacing = context.streamSpacing;
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: spacing.xl),
-      child: Text(
-        'Changes apply to everyone in the conversation.',
-        style: context.streamTextTheme.bodyDefault.copyWith(color: context.streamColorScheme.textPrimary),
-      ),
+    return Text(
+      'Changes apply to everyone in the conversation.',
+      style: context.streamTextTheme.bodyDefault.copyWith(color: context.streamColorScheme.textPrimary),
     );
   }
 }
@@ -227,7 +229,6 @@ class _LongBody extends StatelessWidget {
 
     return ListView.builder(
       shrinkWrap: true,
-      padding: EdgeInsets.symmetric(horizontal: spacing.xl),
       itemCount: 40,
       itemBuilder: (context, index) => Padding(
         padding: EdgeInsets.symmetric(vertical: spacing.xs),
