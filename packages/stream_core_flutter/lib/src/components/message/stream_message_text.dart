@@ -312,7 +312,7 @@ class StreamMessageTextProps {
   ///
   /// Images it rejects, every image when it is null, and images that are not `http` or `https` are shown as links
   /// labelled with their alt text, and are not loaded. It is called while the text is built, so consider keeping it
-  /// cheap and comparing [Uri.scheme] and [Uri.host] exactly.
+  /// cheap and comparing [Uri.scheme] and [Uri.host] exactly. A new [showImage] applies once the text changes.
   ///
   /// ```dart
   /// StreamMessageText(
@@ -405,7 +405,7 @@ class DefaultStreamMessageText extends StatelessWidget {
     final effectiveInlineSyntaxes = [
       _mentionSyntax,
       ...?props.inlineSyntaxes,
-      if (props.showImage case final showImage?) _StreamImageSyntax(showImage: showImage) else _imageSyntax,
+      _StreamImageSyntax(showImage: props.showImage),
       _linkSyntax,
     ];
 
@@ -451,7 +451,6 @@ class DefaultStreamMessageText extends StatelessWidget {
   // Stateless, so shared instead of recompiling its pattern on every build.
   static final _mentionSyntax = _StreamMentionSyntax();
   static final _linkSyntax = _StreamLinkSyntax();
-  static final _imageSyntax = _StreamImageSyntax();
 
   static Widget _buildImage(Uri uri, String? title, String? alt) {
     return StreamNetworkImage(uri.toString(), semanticLabel: alt);
@@ -644,7 +643,13 @@ class _StreamLinkSyntax extends md.LinkSyntax {
 // Parses markdown images as images only when [showImage] allows them, and as
 // links to the image otherwise.
 class _StreamImageSyntax extends md.ImageSyntax {
-  _StreamImageSyntax({this.showImage});
+  factory _StreamImageSyntax({StreamMarkdownImagePredicate? showImage}) {
+    return showImage == null ? _shared : _StreamImageSyntax._(showImage);
+  }
+
+  _StreamImageSyntax._(this.showImage);
+
+  static final _shared = _StreamImageSyntax._(null);
 
   final StreamMarkdownImagePredicate? showImage;
 
