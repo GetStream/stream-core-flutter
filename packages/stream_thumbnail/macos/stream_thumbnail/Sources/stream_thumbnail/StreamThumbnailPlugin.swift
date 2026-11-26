@@ -3,11 +3,12 @@ import Cocoa
 import FlutterMacOS
 import libwebp
 
-/// A generation failure that couldn't produce a frame/encode, or a failure
-/// writing the encoded thumbnail to disk.
+/// A generation failure that couldn't produce a frame/encode, a failure
+/// writing the encoded thumbnail to disk, or a video this platform won't open.
 private enum ThumbnailError: Error {
   case generationFailed
   case writeFailed(NSError)
+  case unsupportedSource(String)
 }
 
 public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHostApi {
@@ -48,6 +49,8 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
     case ThumbnailError.generationFailed:
       return PigeonError(
         code: "THUMBNAIL_ERROR", message: "Failed to generate a thumbnail for the video.", details: nil)
+    case ThumbnailError.unsupportedSource(let message):
+      return PigeonError(code: "UNSUPPORTED_SOURCE", message: message, details: nil)
     case ThumbnailError.writeFailed(let nsError):
       return PigeonError(code: "Error \(nsError.code)", message: nsError.domain, details: nsError.localizedDescription)
     default:
@@ -55,7 +58,24 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
     }
   }
 
-  private static func videoURL(for video: String) throws -> URL {
+  private static func videoURL(for request: ThumbnailRequest) throws -> URL {
+    switch request.sourceKind {
+    case .network:
+      guard let url = URL(string: request.video),
+        let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https",
+        let host = url.host, !host.isEmpty
+      else {
+        throw ThumbnailError.unsupportedSource("A network video must be an http or https URL.")
+      }
+      return url
+    case .file:
+      return fileURL(for: request.video)
+    case .contentUri:
+      throw ThumbnailError.unsupportedSource("Content URIs are only supported on Android.")
+    }
+  }
+
+  private static func fileURL(for video: String) -> URL {
     if video.hasPrefix("file://") {
       // Parsed as a URL first, so percent-encoding is decoded: `file:///tmp/a%20b.mp4`
       // names `a b.mp4`, not a literal `a%20b.mp4`. The raw path is the fallback for
@@ -79,12 +99,8 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
       var path = String(video.dropFirst(7))
       if path.hasPrefix("localhost/") { path = String(path.dropFirst(9)) }
       return URL(fileURLWithPath: path)
-    } else if video.hasPrefix("/") {
-      return URL(fileURLWithPath: video)
-    } else if let url = URL(string: video) {
-      return url
     }
-    throw ThumbnailError.generationFailed
+    return URL(fileURLWithPath: video)
   }
 
   private static func writeThumbnailFile(request: ThumbnailRequest) throws -> String {
@@ -96,7 +112,7 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
       .appendingPathComponent("stream_thumbnail", isDirectory: true)
       .appendingPathComponent(UUID().uuidString, isDirectory: true)
 
-    let stem = try videoURL(for: request.video).deletingPathExtension().lastPathComponent
+    let stem = try videoURL(for: request).deletingPathExtension().lastPathComponent
     let thumbnailURL = outputDir
       .appendingPathComponent(stem.isEmpty ? "thumbnail" : stem)
       .appendingPathExtension(fileExtension(for: request.format))
@@ -112,7 +128,7 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
   }
 
   private static func generateThumbnailData(request: ThumbnailRequest) throws -> Data {
-    let url = try videoURL(for: request.video)
+    let url = try videoURL(for: request)
 
     var options: [String: Any]?
     if let headers = request.headers, !headers.isEmpty {

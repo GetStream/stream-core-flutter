@@ -14,12 +14,14 @@ import android.util.Size
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.UUID
 import java.util.concurrent.Executors
+
+/** A video the request's source kind doesn't allow this plugin to open. */
+private class UnsupportedSourceException(message: String) : IllegalArgumentException(message)
 
 /** StreamThumbnailPlugin */
 class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
@@ -58,6 +60,8 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
         executor.execute {
             val result = try {
                 Result.success(block())
+            } catch (e: UnsupportedSourceException) {
+                Result.failure(FlutterError("UNSUPPORTED_SOURCE", e.message, null))
             } catch (e: Exception) {
                 Result.failure(FlutterError("THUMBNAIL_ERROR", e.message, e.stackTraceToString()))
             }
@@ -68,6 +72,7 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
     private fun buildThumbnailData(request: ThumbnailRequest): ByteArray {
         val bitmap = createVideoThumbnail(
             request.video,
+            request.sourceKind,
             request.headers ?: emptyMap(),
             request.maxHeight.toInt(),
             request.maxWidth.toInt(),
@@ -109,13 +114,15 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
      * Create a video thumbnail for a video. May return null if the video is corrupt
      * or the format is not supported.
      *
-     * @param video   the URI of video
-     * @param targetH the max height of the thumbnail
-     * @param targetW the max width of the thumbnail
+     * @param video      the URL, path or content URI of the video
+     * @param sourceKind how [video] may be opened
+     * @param targetH    the max height of the thumbnail
+     * @param targetW    the max width of the thumbnail
      */
     @Throws(IOException::class)
-    fun createVideoThumbnail(
+    private fun createVideoThumbnail(
         video: String,
+        sourceKind: ThumbnailSourceKind,
         headers: Map<String, String>,
         targetH: Int,
         targetW: Int,
@@ -125,26 +132,33 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
         var retriever: MediaMetadataRetriever? = null
 
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && video.startsWith("/") && timeMs == -1) {
+            val filePath = if (sourceKind == ThumbnailSourceKind.FILE) video.removePrefix("file://") else null
+            val fitsBothBounds = targetW > 0 && targetH > 0
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && filePath != null && timeMs == -1 && fitsBothBounds) {
                 bitmap =
-                    ThumbnailUtils.createVideoThumbnail(File(video), Size(targetW, targetH), null)
+                    ThumbnailUtils.createVideoThumbnail(File(filePath), Size(targetW, targetH), null)
             } else {
                 retriever = MediaMetadataRetriever()
-                if (video.startsWith("/")) {
-                    setDataSource(video, retriever)
-                } else if (video.startsWith("file://")) {
-                    setDataSource(video.substring(7), retriever)
-                } else if (video.startsWith("content://")) {
-                    val contentResolver: ContentResolver = context!!.contentResolver
-                    val assetFileDescriptor =
-                        contentResolver.openAssetFileDescriptor(Uri.parse(video), "r")
-                    if (assetFileDescriptor != null) {
-                        val fileDescriptor: FileDescriptor = assetFileDescriptor.fileDescriptor
-                        retriever.setDataSource(fileDescriptor)
-                        assetFileDescriptor.close()
+                when (sourceKind) {
+                    ThumbnailSourceKind.FILE -> setDataSource(filePath!!, retriever)
+                    ThumbnailSourceKind.CONTENT_URI -> {
+                        val uri = Uri.parse(video)
+                        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+                            throw UnsupportedSourceException("A content video must be a content URI.")
+                        }
+                        val contentResolver: ContentResolver = context!!.contentResolver
+                        val assetFileDescriptor = contentResolver.openAssetFileDescriptor(uri, "r")
+                            ?: throw IOException("Failed to open the content URI.")
+                        assetFileDescriptor.use { retriever.setDataSource(it.fileDescriptor) }
                     }
-                } else {
-                    retriever.setDataSource(video, headers)
+                    ThumbnailSourceKind.NETWORK -> {
+                        val uri = Uri.parse(video)
+                        val scheme = uri.scheme?.lowercase()
+                        if ((scheme != "http" && scheme != "https") || uri.host.isNullOrEmpty()) {
+                            throw UnsupportedSourceException("A network video must be an http or https URL.")
+                        }
+                        retriever.setDataSource(video, headers)
+                    }
                 }
 
                 if (targetH != 0 || targetW != 0) {

@@ -8,6 +8,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'stream_thumbnail_format.dart';
 import 'stream_thumbnail_method_channel.dart';
+import 'stream_thumbnail_source.dart';
 
 /// The interface that platform-specific implementations of
 /// `stream_thumbnail` must implement.
@@ -32,10 +33,9 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  /// Generates a thumbnail file for each of the given `videos`.
+  /// Generates a thumbnail file for each of [sources].
   Future<List<XFile>> thumbnailFiles({
-    required List<String> videos,
-    required Map<String, String>? headers,
+    required List<StreamThumbnailSource> sources,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -45,10 +45,9 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
     throw UnimplementedError('thumbnailFiles() has not been implemented.');
   }
 
-  /// Generates a thumbnail file for the given `video`.
+  /// Generates a thumbnail file for [source].
   Future<XFile> thumbnailFile({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -58,10 +57,9 @@ abstract class StreamThumbnailPlatform extends PlatformInterface {
     throw UnimplementedError('thumbnailFile() has not been implemented.');
   }
 
-  /// Generates a thumbnail for the given `video` as in-memory bytes.
+  /// Generates a thumbnail for [source] as in-memory bytes.
   Future<Uint8List> thumbnailData({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
