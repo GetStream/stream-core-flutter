@@ -1,55 +1,22 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
-Widget _withStreamTheme(Widget child) {
-  return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme()]),
-    home: Scaffold(body: Center(child: child)),
-  );
-}
+import 'recovering_image_server.dart';
 
 void main() {
-  testWidgets('retries every image of a failed URL when the retry listenable notifies', (tester) async {
-    final retry = ChangeNotifier();
-    addTearDown(retry.dispose);
-    HttpOverrides.global = null;
-    final cacheDirectory = Directory.systemTemp.createTempSync('stream_network_image_retry_test');
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/path_provider'),
-      (_) async => cacheDirectory.path,
-    );
-    final server = (await tester.runAsync(() => HttpServer.bind(InternetAddress.loopbackIPv4, 0)))!
-      ..listen(
-        (request) => request.response
-          ..statusCode = HttpStatus.notFound
-          ..close(),
-      );
-    addTearDown(() => tester.runAsync(() => server.close(force: true)));
-    final url = 'http://127.0.0.1:${server.port}/failing.png';
+  testWidgets('shows the image after the retry badge is tapped once the server recovers', (tester) async {
+    final server = await RecoveringImageServer.start(tester);
 
-    await tester.pumpWidget(
-      _withStreamTheme(
-        Column(
-          children: [
-            StreamNetworkImage(url, width: 40, height: 40, retryListenable: retry),
-            StreamNetworkImage(url, width: 40, height: 40, retryListenable: retry),
-          ],
-        ),
-      ),
-    );
-    for (var i = 0; i < 100 && find.byType(StreamImageErrorPlaceholder).evaluate().length < 2; i++) {
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
-      await tester.pump();
-    }
-    expect(find.byType(StreamImageErrorPlaceholder), findsNWidgets(2));
+    await tester.pumpWidget(withStreamTheme(StreamNetworkImage(server.url('tapped.png'), width: 40, height: 40)));
+    await pumpUntil(tester, () => find.byType(StreamImageErrorPlaceholder).evaluate().isNotEmpty);
+    expect(find.byType(StreamImageErrorPlaceholder), findsOneWidget);
 
-    retry.notifyListeners();
-    await tester.pump();
+    server.recover();
+    await tester.tap(find.byType(StreamImageErrorPlaceholder));
+    await pumpUntil(tester, () => shownImages(tester) == 1);
 
+    expect(shownImages(tester), 1);
     expect(find.byType(StreamImageErrorPlaceholder), findsNothing);
+    await disposeAndFlushTimers(tester);
   });
 }
