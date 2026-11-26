@@ -870,10 +870,35 @@ class _ExtensibilitySection extends StatelessWidget {
           ),
         ),
         _ExampleCard(
+          label: 'Markdown images',
+          subtitle: 'Shown as links to the image unless showImage allows them.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              'Here is the ![Flutter logo](https://avatars.githubusercontent.com/u/14101776?s=200) '
+              'and one with no alt text: '
+              '![](https://avatars.githubusercontent.com/u/14101776?s=200)',
+              onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
+            ),
+          ),
+        ),
+        _ExampleCard(
+          label: 'Allowed markdown images',
+          subtitle: 'showImage allows one host; images from other hosts stay links.',
+          child: Builder(
+            builder: (context) => StreamMessageText(
+              '![Flutter logo](https://avatars.githubusercontent.com/u/14101776?s=200)\n\n'
+              'From elsewhere: ![a photo](https://example.com/photo.png)',
+              showImage: (image) => image.uri.scheme == 'https' && image.uri.host == 'avatars.githubusercontent.com',
+              onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
+            ),
+          ),
+        ),
+        _ExampleCard(
           label: 'Custom image builder',
-          subtitle: 'Markdown images with rounded corners and placeholder.',
+          subtitle: 'Images from an allowed host, with rounded corners and placeholder.',
           child: StreamMessageText(
-            '![Flutter logo](https://storage.googleapis.com/cms-storage-bucket/c823e53b3a1a7b0d36a9.png)',
+            '![Flutter logo](https://avatars.githubusercontent.com/u/14101776?s=200)',
+            showImage: (image) => image.uri.scheme == 'https' && image.uri.host == 'avatars.githubusercontent.com',
             imageBuilder: (uri, title, alt) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(8),

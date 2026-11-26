@@ -12,6 +12,7 @@ import '../../theme/semantics/stream_color_scheme.dart';
 import '../../theme/semantics/stream_text_theme.dart';
 import '../../theme/stream_theme_extensions.dart';
 import '../accessories/stream_emoji.dart';
+import '../common/stream_network_image.dart';
 import '../message_layout/stream_message_layout.dart';
 
 /// The default protocol prefix used to identify mention links.
@@ -73,6 +74,36 @@ typedef MarkdownTapAnyMentionCallback =
       String id,
     );
 
+/// Decides whether a markdown [image] in a [StreamMessageText] is shown as an image.
+///
+/// See also:
+///
+///  * [StreamMessageTextProps.showImage], which takes this.
+typedef StreamMarkdownImagePredicate = bool Function(StreamMarkdownImage image);
+
+/// A markdown image in a [StreamMessageText].
+///
+/// For `![a cat](https://example.com/cat.png "Our cat")`, [uri] is the address,
+/// [alt] is `a cat` and [title] is `Our cat`.
+///
+/// See also:
+///
+///  * [StreamMessageTextProps.showImage], which decides whether it is shown as an image.
+@immutable
+final class StreamMarkdownImage {
+  /// Creates a description of a markdown image.
+  const StreamMarkdownImage({required this.uri, this.alt = '', this.title});
+
+  /// The address of the image.
+  final Uri uri;
+
+  /// The image's alt text, or empty if it has none.
+  final String alt;
+
+  /// The image's title, if it has one.
+  final String? title;
+}
+
 // Matches characters that render as emoji — either those with default emoji
 // presentation, or text-default characters forced to emoji via VS16 (U+FE0F).
 //
@@ -128,6 +159,7 @@ class StreamMessageText extends StatelessWidget {
     MarkdownTapAnyMentionCallback? onTapAnyMention,
     VoidCallback? onTapText,
     MarkdownImageBuilder? imageBuilder,
+    StreamMarkdownImagePredicate? showImage,
     SyntaxHighlighter? syntaxHighlighter,
     Map<String, MarkdownElementBuilder>? builders,
     Map<String, MarkdownPaddingBuilder>? paddingBuilders,
@@ -147,6 +179,7 @@ class StreamMessageText extends StatelessWidget {
          onTapAnyMention: onTapAnyMention,
          onTapText: onTapText,
          imageBuilder: imageBuilder,
+         showImage: showImage,
          syntaxHighlighter: syntaxHighlighter,
          builders: builders,
          paddingBuilders: paddingBuilders,
@@ -218,6 +251,7 @@ class StreamMessageTextProps {
     this.onTapAnyMention,
     this.onTapText,
     this.imageBuilder,
+    this.showImage,
     this.syntaxHighlighter,
     this.builders,
     this.paddingBuilders,
@@ -269,8 +303,24 @@ class StreamMessageTextProps {
   /// Called when non-link text is tapped.
   final VoidCallback? onTapText;
 
-  /// Custom image builder.
+  /// Builds the markdown images that [showImage] allows.
+  ///
+  /// Defaults to a [StreamNetworkImage] of the image.
   final MarkdownImageBuilder? imageBuilder;
+
+  /// Whether a markdown image is shown as an image rather than as a link.
+  ///
+  /// Images it rejects, every image when it is null, and images that are not `http` or `https` are shown as links
+  /// labelled with their alt text, and are not loaded. It is called while the text is built, so consider keeping it
+  /// cheap and comparing [Uri.scheme] and [Uri.host] exactly.
+  ///
+  /// ```dart
+  /// StreamMessageText(
+  ///   text,
+  ///   showImage: (image) => image.uri.scheme == 'https' && image.uri.host == 'cdn.example.com',
+  /// )
+  /// ```
+  final StreamMarkdownImagePredicate? showImage;
 
   /// Syntax highlighter for code blocks.
   final SyntaxHighlighter? syntaxHighlighter;
@@ -355,6 +405,7 @@ class DefaultStreamMessageText extends StatelessWidget {
     final effectiveInlineSyntaxes = [
       _mentionSyntax,
       ...?props.inlineSyntaxes,
+      if (props.showImage case final showImage?) _StreamImageSyntax(showImage: showImage) else _imageSyntax,
       _linkSyntax,
     ];
 
@@ -385,7 +436,7 @@ class DefaultStreamMessageText extends StatelessWidget {
         syntaxHighlighter: props.syntaxHighlighter,
         onTapLink: props.onTapLink,
         onTapText: props.onTapText,
-        imageBuilder: props.imageBuilder,
+        imageBuilder: props.imageBuilder ?? _buildImage,
         builders: effectiveBuilders,
         paddingBuilders: props.paddingBuilders ?? const {},
         blockSyntaxes: props.blockSyntaxes,
@@ -400,6 +451,11 @@ class DefaultStreamMessageText extends StatelessWidget {
   // Stateless, so shared instead of recompiling its pattern on every build.
   static final _mentionSyntax = _StreamMentionSyntax();
   static final _linkSyntax = _StreamLinkSyntax();
+  static final _imageSyntax = _StreamImageSyntax();
+
+  static Widget _buildImage(Uri uri, String? title, String? alt) {
+    return StreamNetworkImage(uri.toString(), semanticLabel: alt);
+  }
 
   // Shared across messages because building a sheet is costly.
   // The caller's sheet is merged after the lookup, not keyed on, because
@@ -582,6 +638,43 @@ class _StreamLinkSyntax extends md.LinkSyntax {
   static md.Element _withoutLinksIn(md.Element element) {
     final children = _withoutLinks(element.children!);
     return md.Element(element.tag, children)..attributes.addAll(element.attributes);
+  }
+}
+
+// Parses markdown images as images only when [showImage] allows them, and as
+// links to the image otherwise.
+class _StreamImageSyntax extends md.ImageSyntax {
+  _StreamImageSyntax({this.showImage});
+
+  final StreamMarkdownImagePredicate? showImage;
+
+  static const _maxLabelLength = 48;
+
+  @override
+  md.Element createNode(
+    String destination,
+    String? title, {
+    required List<md.Node> Function() getChildren,
+  }) {
+    final image = super.createNode(destination, title, getChildren: getChildren);
+    final src = image.attributes['src']!;
+    final alt = image.attributes['alt'] ?? '';
+    final imageTitle = image.attributes['title'];
+    final uri = Uri.tryParse(src);
+
+    if (uri != null && (uri.isScheme('http') || uri.isScheme('https'))) {
+      final markdownImage = StreamMarkdownImage(uri: uri, alt: alt, title: imageTitle);
+      if (showImage?.call(markdownImage) ?? false) return image;
+    }
+
+    var label = alt;
+    if (label.isEmpty) {
+      label = src.length > _maxLabelLength ? '${src.substring(0, _maxLabelLength - 1)}…' : src;
+    }
+
+    return md.Element.text('a', label)
+      ..attributes['href'] = src
+      ..attributes.addAll({'title': ?imageTitle});
   }
 }
 
