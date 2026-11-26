@@ -40,6 +40,13 @@ Widget buildStreamNetworkImagePlayground(BuildContext context) {
     description: 'The height of the image.',
   );
 
+  final opacity = context.knobs.double.slider(
+    label: 'Opacity',
+    initialValue: 1,
+    max: 1,
+    description: 'How opaque the image is painted.',
+  );
+
   final clearCache = context.knobs.boolean(
     label: 'Clear Cache',
     description: 'Evict the demo image from cache.',
@@ -70,6 +77,7 @@ Widget buildStreamNetworkImagePlayground(BuildContext context) {
                 width: width,
                 height: height,
                 fit: fit,
+                opacity: AlwaysStoppedAnimation(opacity),
               ),
             ),
           ),

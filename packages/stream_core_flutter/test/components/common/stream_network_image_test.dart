@@ -102,4 +102,37 @@ void main() {
     expect(after, isNot(same(before)));
     expect(after, before);
   });
+
+  testWidgets('labels the image for screen readers with its semantic label', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 40, semanticLabel: 'Avatar')),
+    );
+
+    expect(find.bySemanticsLabel('Avatar'), findsOneWidget);
+  });
+
+  testWidgets('leaves the image out of the semantics tree when asked to', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        StreamNetworkImage(
+          'https://example.com/a.png',
+          width: 40,
+          height: 40,
+          semanticLabel: 'Avatar',
+          excludeFromSemantics: true,
+        ),
+      ),
+    );
+
+    expect(find.bySemanticsLabel('Avatar'), findsNothing);
+  });
+
+  testWidgets('paints the image with the opacity it is given', (tester) async {
+    const opacity = AlwaysStoppedAnimation(0.5);
+    await tester.pumpWidget(
+      _withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 40, opacity: opacity)),
+    );
+
+    expect(tester.widget<RawImage>(find.byType(RawImage)).opacity, opacity);
+  });
 }

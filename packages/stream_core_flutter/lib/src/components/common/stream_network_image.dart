@@ -410,8 +410,11 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       fit: props.fit,
       alignment: props.alignment,
       color: props.color,
+      opacity: props.opacity,
       colorBlendMode: props.colorBlendMode,
       filterQuality: props.filterQuality,
+      semanticLabel: props.semanticLabel,
+      excludeFromSemantics: props.excludeFromSemantics,
       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
         if (frame != null || wasSynchronouslyLoaded || _state != .loading) return child;
         if (props.placeholderBuilder case final builder?) return builder(context);
