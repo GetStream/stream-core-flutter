@@ -127,6 +127,7 @@ class StreamNetworkImage extends StatelessWidget {
   /// This is intended for development and testing purposes only.
   @visibleForTesting
   static Future<bool> evictFromCache(String url, {String? cacheKey}) {
+    StreamBoundedImage.evictAll(CachedNetworkImageProvider(url, cacheKey: cacheKey));
     return CachedNetworkImage.evictFromCache(url, cacheKey: cacheKey, cacheManager: StreamImageCache.manager);
   }
 

@@ -69,6 +69,15 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
   /// The largest width or height an image is decoded to.
   static const maxDecodeSize = 4096;
 
+  static final _keysByProviderKey = <Object, Set<StreamBoundedImageKey>>{};
+
+  /// Evicts every decoded size of the image with [providerKey], the key of
+  /// its [imageProvider], from the image cache.
+  static void evictAll(Object providerKey) {
+    final keys = _keysByProviderKey.remove(providerKey) ?? const <StreamBoundedImageKey>{};
+    keys.forEach(PaintingBinding.instance.imageCache.evict);
+  }
+
   @override
   Future<StreamBoundedImageKey> obtainKey(ImageConfiguration configuration) {
     final devicePixelRatio = useLogicalSize ? (configuration.devicePixelRatio ?? 1.0) : 1.0;
@@ -79,6 +88,7 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
     SynchronousFuture<StreamBoundedImageKey>? result;
     imageProvider.obtainKey(configuration).then((providerKey) {
       final key = StreamBoundedImageKey._(providerKey, effectiveWidth, effectiveHeight, fit);
+      (_keysByProviderKey[providerKey] ??= {}).add(key);
       if (completer == null) {
         result = SynchronousFuture(key);
       } else {
