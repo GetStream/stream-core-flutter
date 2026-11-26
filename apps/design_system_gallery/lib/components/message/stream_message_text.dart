@@ -34,6 +34,11 @@ Widget buildStreamMessageTextPlayground(BuildContext context) {
     description: 'Size to fit content vs expand to parent.',
   );
 
+  final showImages = context.knobs.boolean(
+    label: 'Show Images',
+    description: 'Show markdown images from avatars.githubusercontent.com as images; others stay links.',
+  );
+
   // -- Theme props ------------------------------------------------------------
 
   final textColor = context.knobs.object.dropdown<_ColorOption>(
@@ -106,6 +111,7 @@ Widget buildStreamMessageTextPlayground(BuildContext context) {
             selectable: selectable,
             softLineBreak: softLineBreak,
             fitContent: fitContent,
+            showImages: showImages,
           ),
       ],
     ),
@@ -250,6 +256,13 @@ const _conversationMessages = [
     alignment: StreamMessageAlignment.end,
     stackPosition: StreamMessageStackPosition.single,
   ),
+  _ChatMessage(
+    text:
+        'Our logo ![Flutter logo](https://avatars.githubusercontent.com/u/14101776?s=200) '
+        'and one from elsewhere ![a photo](https://example.com/photo.png)',
+    alignment: StreamMessageAlignment.start,
+    stackPosition: StreamMessageStackPosition.single,
+  ),
 ];
 
 class _ConversationMessage extends StatelessWidget {
@@ -258,12 +271,14 @@ class _ConversationMessage extends StatelessWidget {
     required this.selectable,
     required this.softLineBreak,
     required this.fitContent,
+    required this.showImages,
   });
 
   final _ChatMessage message;
   final bool selectable;
   final bool softLineBreak;
   final bool fitContent;
+  final bool showImages;
 
   @override
   Widget build(BuildContext context) {
@@ -294,11 +309,13 @@ class _ConversationMessage extends StatelessWidget {
 
                 Widget text = StreamMessageText(
                   message.text,
+                  key: ValueKey(showImages),
                   selectable: selectable,
                   softLineBreak: softLineBreak,
                   fitContent: fitContent,
                   onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
                   onTapAnyMention: (displayText, type, id) => _showSnack(context, '$type: $displayText (id: $id)'),
+                  showImage: showImages ? _isGalleryImage : null,
                 );
 
                 if (!hideBubble) {
@@ -313,6 +330,10 @@ class _ConversationMessage extends StatelessWidget {
       ),
     );
   }
+}
+
+bool _isGalleryImage(StreamMarkdownImage image) {
+  return image.uri.scheme == 'https' && image.uri.host == 'avatars.githubusercontent.com';
 }
 
 // =============================================================================
