@@ -35,6 +35,19 @@ void main() {
               ),
             ),
             GoldenTestScenario(
+              name: 'submenu parent',
+              child: _buildInTheme(
+                Builder(
+                  builder: (context) => StreamContextMenuHeading(
+                    label: const Text('Video quality'),
+                    leading: Icon(context.streamIcons.chevronLeft),
+                    onTap: () {},
+                  ),
+                ),
+                brightness: brightness,
+              ),
+            ),
+            GoldenTestScenario(
               name: 'disabled',
               child: _buildInTheme(
                 Builder(

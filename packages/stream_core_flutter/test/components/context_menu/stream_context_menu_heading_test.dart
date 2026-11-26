@@ -135,7 +135,6 @@ void main() {
     final headingRect = tester.getRect(find.byType(StreamContextMenuHeading));
     final actionRect = tester.getRect(find.byType(StreamContextMenuAction<void>));
     expect(headingRect.height, actionRect.height);
-    expect(headingRect.width, actionRect.width);
     expect(tester.getTopLeft(find.text('Microphone')).dx, tester.getTopLeft(find.text('Built-in')).dx);
   });
 
@@ -154,8 +153,108 @@ void main() {
     final headingRect = tester.getRect(find.byType(StreamContextMenuHeading));
     final actionRect = tester.getRect(find.byType(StreamContextMenuAction<void>));
     expect(headingRect.height, actionRect.height);
-    expect(headingRect.width, actionRect.width);
     expect(tester.getTopLeft(find.text('Devices')).dx, tester.getTopLeft(find.text('Built-in')).dx);
+  });
+
+  testWidgets('StreamContextMenuHeading sizes its menu to the default action size of 242 by 40', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenu(
+          children: [StreamContextMenuHeading(label: const Text('Microphone'))],
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(StreamContextMenuHeading)), const Size(242, 40));
+  });
+
+  testWidgets('StreamContextMenuHeading with onTap sizes its menu to the default action size of 242 by 40', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenu(
+          children: [StreamContextMenuHeading(label: const Text('Devices'), onTap: () {})],
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(StreamContextMenuHeading)), const Size(242, 40));
+  });
+
+  testWidgets('StreamContextMenuHeading colors and sizes a leading icon like its label', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeading(label: const Text('Video quality'), leading: const Icon(Icons.chevron_left)),
+      ),
+    );
+
+    expect(_iconColorOf(tester), _streamThemeOf(tester).colorScheme.textTertiary);
+    expect(tester.getSize(find.byType(Icon)), const Size.square(20));
+  });
+
+  testWidgets('StreamContextMenuHeading with onTap colors and sizes a leading icon like its label', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeading(
+          label: const Text('Video quality'),
+          leading: const Icon(Icons.chevron_left),
+          onTap: () {},
+        ),
+      ),
+    );
+
+    expect(_iconColorOf(tester), _streamThemeOf(tester).colorScheme.textTertiary);
+    expect(tester.getSize(find.byType(Icon)), const Size.square(20));
+  });
+
+  testWidgets('StreamContextMenuHeading lines up a leading widget with the leading of an action', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenu(
+          children: [
+            StreamContextMenuHeading(
+              label: const Text('Video quality'),
+              leading: const Icon(Icons.chevron_left),
+              onTap: () {},
+            ),
+            StreamContextMenuAction<void>(label: const Text('Auto'), leading: const Icon(Icons.check)),
+          ],
+        ),
+      ),
+    );
+
+    expect(tester.getTopLeft(find.byIcon(Icons.chevron_left)).dx, tester.getTopLeft(find.byIcon(Icons.check)).dx);
+    expect(tester.getTopLeft(find.text('Video quality')).dx, tester.getTopLeft(find.text('Auto')).dx);
+  });
+
+  testWidgets('StreamContextMenuHeading puts the leading widget 8 before the label', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeading(label: const Text('Video quality'), leading: const Icon(Icons.chevron_left)),
+      ),
+    );
+
+    final iconRect = tester.getRect(find.byIcon(Icons.chevron_left));
+    final headingRect = tester.getRect(find.byType(StreamContextMenuHeading));
+    expect(iconRect.left - headingRect.left, 12);
+    expect(tester.getTopLeft(find.text('Video quality')).dx - iconRect.right, 8);
+  });
+
+  testWidgets('StreamContextMenuHeading puts the leading widget at the start edge, on the right, in RTL', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        StreamContextMenuHeading(label: const Text('Video quality'), leading: const Icon(Icons.chevron_left)),
+        rtl: true,
+      ),
+    );
+
+    expect(
+      tester.getTopLeft(find.byIcon(Icons.chevron_left)).dx,
+      greaterThan(tester.getTopRight(find.text('Video quality')).dx),
+    );
   });
 
   testWidgets('StreamContextMenuHeading puts the trailing widget at the far end', (tester) async {
@@ -313,7 +412,9 @@ void main() {
       _wrap(
         _headingTheme(
           const StreamContextMenuHeadingStyle(minimumSize: WidgetStatePropertyAll(Size(300, 64))),
-          child: StreamContextMenuHeading(label: const Text('Mic')),
+          child: StreamContextMenu(
+            children: [StreamContextMenuHeading(label: const Text('Mic'))],
+          ),
         ),
       ),
     );
@@ -369,7 +470,9 @@ void main() {
       _wrap(
         _actionTheme(
           const StreamContextMenuActionStyle(minimumSize: WidgetStatePropertyAll(Size(200, 32))),
-          child: StreamContextMenuHeading(label: const Text('Mic')),
+          child: StreamContextMenu(
+            children: [StreamContextMenuHeading(label: const Text('Mic'))],
+          ),
         ),
       ),
     );
@@ -398,7 +501,9 @@ void main() {
           const StreamContextMenuActionStyle(minimumSize: WidgetStatePropertyAll(Size(200, 32))),
           child: _headingTheme(
             const StreamContextMenuHeadingStyle(minimumSize: WidgetStatePropertyAll(Size(300, 64))),
-            child: StreamContextMenuHeading(label: const Text('Mic')),
+            child: StreamContextMenu(
+              children: [StreamContextMenuHeading(label: const Text('Mic'))],
+            ),
           ),
         ),
       ),
@@ -545,7 +650,12 @@ Widget _actionTheme(StreamContextMenuActionStyle style, {required Widget child})
   );
 }
 
-Widget _wrap(Widget child, {bool rtl = false, double textScale = 1, StreamTheme? streamTheme}) {
+Widget _wrap(
+  Widget child, {
+  bool rtl = false,
+  double textScale = 1,
+  StreamTheme? streamTheme,
+}) {
   return MaterialApp(
     theme: ThemeData(extensions: [streamTheme ?? StreamTheme()]),
     home: Directionality(

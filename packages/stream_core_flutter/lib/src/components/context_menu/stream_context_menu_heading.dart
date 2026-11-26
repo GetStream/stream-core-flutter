@@ -20,6 +20,9 @@ import 'stream_context_menu_action.dart';
 /// [StreamContextMenuAction] but draws its [label] in a tertiary style, and it
 /// is announced as a header to screen readers.
 ///
+/// A [leading] widget, such as a back chevron, turns the heading into the
+/// "‹ Parent" row of a submenu.
+///
 /// A heading is not interactive unless given an [onTap], typically to collapse
 /// its section. A tappable heading is also announced as a button, and reports
 /// whether its section is expanded when [isExpanded] is given. Set [enabled] to
@@ -49,7 +52,11 @@ import 'stream_context_menu_action.dart';
 ///
 /// StreamContextMenuHeading(
 ///   label: Text('Advanced'),
-///   trailing: Icon(collapsed ? icons.chevronDown : icons.chevronUp),
+///   trailing: AnimatedRotation(
+///     turns: collapsed ? 0.5 : 0,
+///     duration: const Duration(milliseconds: 200),
+///     child: Icon(icons.chevronUp),
+///   ),
 ///   isExpanded: !collapsed,
 ///   onTap: () => setState(() => collapsed = !collapsed),
 /// )
@@ -67,12 +74,14 @@ class StreamContextMenuHeading extends StatelessWidget {
   StreamContextMenuHeading({
     super.key,
     required Widget label,
+    Widget? leading,
     Widget? trailing,
     VoidCallback? onTap,
     bool enabled = true,
     bool? isExpanded,
   }) : props = .new(
          label: label,
+         leading: leading,
          trailing: trailing,
          onTap: onTap,
          enabled: enabled,
@@ -108,6 +117,7 @@ final class StreamContextMenuHeadingProps {
   /// Creates properties for a context menu heading.
   const StreamContextMenuHeadingProps({
     required this.label,
+    this.leading,
     this.trailing,
     this.onTap,
     this.enabled = true,
@@ -129,6 +139,14 @@ final class StreamContextMenuHeadingProps {
   ///
   /// Its text style and color come from [StreamContextMenuHeadingStyle].
   final Widget label;
+
+  /// An optional widget drawn before the [label], typically the back chevron
+  /// of a submenu.
+  ///
+  /// An [Icon] here takes its color and size from
+  /// [StreamContextMenuHeadingStyle.foregroundColor] and
+  /// [StreamContextMenuHeadingStyle.iconSize].
+  final Widget? leading;
 
   /// An optional widget drawn at the far end of the heading, typically the
   /// chevron of a section that collapses.
@@ -160,7 +178,8 @@ final class StreamContextMenuHeadingProps {
 
 /// The default implementation of [StreamContextMenuHeading].
 ///
-/// Lays out the [StreamContextMenuHeadingProps.label] and the optional
+/// Lays out the optional [StreamContextMenuHeadingProps.leading], the
+/// [StreamContextMenuHeadingProps.label] and the optional
 /// [StreamContextMenuHeadingProps.trailing] in a row, styled from
 /// [StreamContextMenuHeadingTheme]. The row size and padding fall back to
 /// [StreamContextMenuActionTheme], so a heading lines up with the actions of
@@ -181,7 +200,7 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = context.streamContextMenuHeadingTheme.style;
     final actionStyle = context.streamContextMenuActionTheme.style;
-    final defaults = _StreamContextMenuHeadingStyleDefaults(context);
+    final defaults = _ContextMenuHeadingThemeDefaults(context);
 
     final effectiveForegroundColor = style?.foregroundColor ?? defaults.foregroundColor;
     final effectiveOverlayColor = style?.overlayColor ?? defaults.overlayColor;
@@ -193,16 +212,15 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
     final effectivePadding = style?.padding ?? actionStyle?.padding ?? defaults.padding;
     final effectiveShape = style?.shape ?? defaults.shape;
 
-    final content = switch (props.trailing) {
-      final trailing? => Row(
-        spacing: context.streamSpacing.xs,
-        children: [
-          Expanded(child: props.label),
-          trailing,
-        ],
-      ),
-      null => props.label,
-    };
+    final content = Row(
+      spacing: context.streamSpacing.xs,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ?props.leading,
+        Expanded(child: props.label),
+        ?props.trailing,
+      ],
+    );
 
     final Widget heading;
     if (props.onTap case final onTap?) {
@@ -230,6 +248,9 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
       final foregroundColor = effectiveForegroundColor.resolve(states);
       final minimumSize = effectiveMinimumSize.resolve(states) ?? Size.zero;
       final maximumSize = effectiveMaximumSize.resolve(states) ?? Size.infinite;
+      final padding = effectivePadding.resolve(states) ?? EdgeInsets.zero;
+      final iconSize = effectiveIconSize.resolve(states);
+      final textStyle = effectiveTextStyle.resolve(states) ?? const TextStyle();
 
       heading = ConstrainedBox(
         constraints: BoxConstraints(
@@ -239,15 +260,15 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
           maxHeight: maximumSize.height,
         ),
         child: Padding(
-          padding: effectivePadding.resolve(states) ?? EdgeInsets.zero,
+          padding: padding,
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             widthFactor: 1,
             heightFactor: 1,
             child: IconTheme.merge(
-              data: IconThemeData(color: foregroundColor, size: effectiveIconSize.resolve(states)),
-              child: DefaultTextStyle.merge(
-                style: (effectiveTextStyle.resolve(states) ?? const TextStyle()).copyWith(color: foregroundColor),
+              data: IconThemeData(color: foregroundColor, size: iconSize),
+              child: DefaultTextStyle(
+                style: textStyle.copyWith(color: foregroundColor),
                 child: content,
               ),
             ),
@@ -268,8 +289,8 @@ class DefaultStreamContextMenuHeading extends StatelessWidget {
 
 // Provides default values for [StreamContextMenuHeadingStyle], following the
 // mobile menu heading of the design system.
-class _StreamContextMenuHeadingStyleDefaults extends StreamContextMenuHeadingStyle {
-  _StreamContextMenuHeadingStyleDefaults(this.context);
+class _ContextMenuHeadingThemeDefaults extends StreamContextMenuHeadingStyle {
+  _ContextMenuHeadingThemeDefaults(this.context);
 
   final BuildContext context;
 

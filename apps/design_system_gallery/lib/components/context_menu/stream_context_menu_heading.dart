@@ -50,6 +50,11 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
       description: 'Draw the heading disabled and ignore taps when off.',
     );
 
+    final showLeading = context.knobs.boolean(
+      label: 'Leading',
+      description: 'Show a leading back chevron, as on the parent row of a submenu.',
+    );
+
     final showTrailing = context.knobs.boolean(
       label: 'Trailing',
       initialValue: true,
@@ -69,7 +74,14 @@ class _PlaygroundDemoState extends State<_PlaygroundDemo> {
         children: [
           StreamContextMenuHeading(
             label: Text(label),
-            trailing: showTrailing ? Icon(isCollapsed ? icons.chevronDown : icons.chevronUp) : null,
+            leading: showLeading ? Icon(icons.chevronLeft) : null,
+            trailing: showTrailing
+                ? AnimatedRotation(
+                    turns: isCollapsed ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(icons.chevronUp),
+                  )
+                : null,
             isExpanded: collapsible ? !isCollapsed : null,
             enabled: enabled,
             onTap: collapsible ? () => setState(() => _collapsed = !_collapsed) : null,
@@ -135,7 +147,11 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
       final collapsed = _collapsed.contains(heading);
       yield StreamContextMenuHeading(
         label: Text(heading),
-        trailing: Icon(collapsed ? icons.chevronDown : icons.chevronUp),
+        trailing: AnimatedRotation(
+          turns: collapsed ? 0.5 : 0,
+          duration: const Duration(milliseconds: 200),
+          child: Icon(icons.chevronUp),
+        ),
         isExpanded: !collapsed,
         onTap: () => setState(() => collapsed ? _collapsed.remove(heading) : _collapsed.add(heading)),
       );
@@ -183,6 +199,21 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
             ),
           ),
           _Labeled(
+            title: 'Submenu parent',
+            textStyle: textTheme.captionEmphasis.copyWith(color: colorScheme.textSecondary),
+            child: StreamContextMenu(
+              children: [
+                StreamContextMenuHeading(
+                  label: const Text('Video quality'),
+                  leading: Icon(icons.chevronLeft),
+                  onTap: () {},
+                ),
+                StreamContextMenuAction<void>(label: const Text('Auto'), onTap: () {}),
+                StreamContextMenuAction<void>(label: const Text('1080p'), onTap: () {}),
+              ],
+            ),
+          ),
+          _Labeled(
             title: 'Disabled',
             textStyle: textTheme.captionEmphasis.copyWith(color: colorScheme.textSecondary),
             child: StreamContextMenu(
@@ -225,7 +256,11 @@ class _ShowcaseDemoState extends State<_ShowcaseDemo> {
 }
 
 class _Labeled extends StatelessWidget {
-  const _Labeled({required this.title, required this.textStyle, required this.child});
+  const _Labeled({
+    required this.title,
+    required this.textStyle,
+    required this.child,
+  });
 
   final String title;
   final TextStyle textStyle;
