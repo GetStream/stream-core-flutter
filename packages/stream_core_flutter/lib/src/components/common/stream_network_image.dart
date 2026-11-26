@@ -297,23 +297,12 @@ enum _LoadState { checkingCache, loading, loaded, failed }
 class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   _LoadState _state = .checkingCache;
   var _generation = 0;
-  ImageStream? _imageStream;
-  late final _imageStreamListener = ImageStreamListener(
-    (_, _) => _moveTo(.loaded),
-    onError: (_, _) => _moveTo(.failed),
-  );
 
   @override
   void initState() {
     super.initState();
     widget.props.retryListenable?.addListener(_onRetryListenableNotified);
     _checkCache(_generation);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _listenToImage();
   }
 
   @override
@@ -326,7 +315,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     if (_imageFor(oldWidget.props) != _imageFor(widget.props)) {
       _generation++;
       _state = .checkingCache;
-      _listenToImage();
       _checkCache(_generation);
     }
   }
@@ -334,7 +322,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   @override
   void dispose() {
     widget.props.retryListenable?.removeListener(_onRetryListenableNotified);
-    _imageStream?.removeListener(_imageStreamListener);
     super.dispose();
   }
 
@@ -344,7 +331,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     final allowed = switch ((_state, next)) {
       (.checkingCache, .loading) => true,
       (.failed, .loading) => true,
-      (_, .loaded || .failed) => true,
       _ => false,
     };
     if (allowed && next != _state) setState(() => _state = next);
@@ -378,14 +364,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     );
   }
 
-  void _listenToImage() {
-    final stream = _imageFor(widget.props).resolve(createLocalImageConfiguration(context));
-    if (stream.key == _imageStream?.key) return;
-
-    _imageStream?.removeListener(_imageStreamListener);
-    _imageStream = stream..addListener(_imageStreamListener);
-  }
-
   void _onRetryListenableNotified() => _retry();
 
   void _retry() {
@@ -395,7 +373,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     StreamNetworkImage.evictFromCache(props.url, cacheKey: props.cacheKey);
     _generation++;
     _moveTo(.loading);
-    _listenToImage();
   }
 
   @override
@@ -416,11 +393,16 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       semanticLabel: props.semanticLabel,
       excludeFromSemantics: props.excludeFromSemantics,
       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-        if (frame != null || wasSynchronouslyLoaded || _state != .loading) return child;
+        if (frame != null || wasSynchronouslyLoaded) {
+          _state = .loaded;
+          return child;
+        }
+        if (_state != .loading) return child;
         if (props.placeholderBuilder case final builder?) return builder(context);
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
       errorBuilder: (context, error, _) {
+        _state = .failed;
         if (props.errorBuilder case final builder?) return builder(context, error, _retry);
         return StreamImageErrorPlaceholder(width: props.width, height: props.height, onRetry: _retry);
       },

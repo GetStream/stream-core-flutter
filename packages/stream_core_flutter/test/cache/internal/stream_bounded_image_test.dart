@@ -173,4 +173,16 @@ void main() {
 
     expect((image.width, image.height), (40, 20));
   });
+
+  test('forgets decoded sizes of images no longer cached once more are tracked than the cache holds', () async {
+    final cache = PaintingBinding.instance.imageCache;
+    for (var i = 0; i < cache.maximumSize * 3; i++) {
+      await StreamBoundedImage(
+        MemoryImage(Uint8List.fromList([i, i >> 8])),
+        width: 10,
+      ).obtainKey(ImageConfiguration.empty);
+    }
+
+    expect(StreamBoundedImage.debugTrackedImageCount, lessThanOrEqualTo(cache.maximumSize * 2 + 1));
+  });
 }

@@ -70,6 +70,22 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
   static const maxDecodeSize = 4096;
 
   static final _keysByProviderKey = <Object, Set<StreamBoundedImageKey>>{};
+  static var _pruneAt = 0;
+
+  /// The number of images whose decoded sizes are being tracked for [evictAll].
+  @visibleForTesting
+  static int get debugTrackedImageCount => _keysByProviderKey.length;
+
+  // Remembers [key] for [evictAll]. Once more images are tracked than the image
+  // cache can hold, those no longer in it are forgotten first.
+  static void _track(Object providerKey, StreamBoundedImageKey key) {
+    if (_keysByProviderKey.length > _pruneAt) {
+      final cache = PaintingBinding.instance.imageCache;
+      _keysByProviderKey.removeWhere((_, keys) => (keys..removeWhere((it) => !cache.containsKey(it))).isEmpty);
+      _pruneAt = math.max(2 * _keysByProviderKey.length, cache.maximumSize);
+    }
+    (_keysByProviderKey[providerKey] ??= {}).add(key);
+  }
 
   /// Evicts every decoded size of the image with [providerKey], the key of
   /// its [imageProvider], from the image cache.
@@ -88,7 +104,7 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
     SynchronousFuture<StreamBoundedImageKey>? result;
     imageProvider.obtainKey(configuration).then((providerKey) {
       final key = StreamBoundedImageKey._(providerKey, effectiveWidth, effectiveHeight, fit);
-      (_keysByProviderKey[providerKey] ??= {}).add(key);
+      _track(providerKey, key);
       if (completer == null) {
         result = SynchronousFuture(key);
       } else {
