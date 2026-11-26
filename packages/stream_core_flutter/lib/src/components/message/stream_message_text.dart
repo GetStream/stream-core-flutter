@@ -520,10 +520,23 @@ class _StreamMentionSyntax extends md.InlineSyntax {
     final rawId = match.group(3)!;
 
     final el = md.Element.text('mention', displayText);
-    el.attributes['id'] = Uri.decodeComponent(rawId);
+    el.attributes['id'] = _decodeId(rawId);
     el.attributes['type'] = type;
     parser.addNode(el);
     return true;
+  }
+
+  static final _malformedEscape = RegExp('%(?![0-9A-Fa-f]{2})');
+
+  // The percent-decoded [rawId], or [rawId] itself if it isn't valid
+  // percent-encoded UTF-8.
+  static String _decodeId(String rawId) {
+    if (rawId.contains(_malformedEscape)) return rawId;
+    try {
+      return Uri.decodeComponent(rawId);
+    } on FormatException {
+      return rawId;
+    }
   }
 }
 
