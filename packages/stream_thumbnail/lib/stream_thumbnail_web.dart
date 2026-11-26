@@ -71,7 +71,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
         XFile(
           web.URL.createObjectURL(blob),
           mimeType: blob.type,
-          name: _thumbnailName(source.location, imageFormat),
+          name: _thumbnailName(imageFormat),
         ),
       );
     }
@@ -100,7 +100,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     return XFile(
       web.URL.createObjectURL(blob),
       mimeType: blob.type,
-      name: _thumbnailName(source.location, imageFormat),
+      name: _thumbnailName(imageFormat),
     );
   }
 
@@ -341,29 +341,17 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     }
   }
 
-  /// The video's own file name, carrying the thumbnail's extension instead.
+  /// The name a downloaded thumbnail is saved under.
   ///
   /// An object URL carries no name of its own, so without this the returned
   /// [XFile] has an empty [XFile.name] and `saveTo` downloads an unnamed file.
-  /// Derived the same way the native implementations derive theirs.
-  String _thumbnailName(String videoSrc, StreamThumbnailFormat imageFormat) {
+  String _thumbnailName(StreamThumbnailFormat imageFormat) {
     final ext = switch (imageFormat) {
       StreamThumbnailFormat.jpeg => 'jpg',
       StreamThumbnailFormat.png => 'png',
       StreamThumbnailFormat.webp => 'webp',
     };
 
-    // A data/blob URL's body is the payload itself, so there is no name to take.
-    if (videoSrc.startsWith('data:') || videoSrc.startsWith('blob:')) return 'thumbnail.$ext';
-
-    var path = videoSrc;
-    final query = path.indexOf(RegExp('[?#]'));
-    if (query != -1) path = path.substring(0, query);
-
-    final segment = path.split('/').last;
-    final dot = segment.lastIndexOf('.');
-    final stem = dot > 0 ? segment.substring(0, dot) : segment;
-
-    return '${stem.isEmpty ? 'thumbnail' : stem}.$ext';
+    return 'thumbnail.$ext';
   }
 }

@@ -10,6 +10,10 @@ extern "C" {
 #include <webp/encode.h>
 
 #include <flutter_linux/flutter_linux.h>
+#include <glib/gstdio.h>
+#include <unistd.h>
+
+#include <cerrno>
 
 #include <map>
 #include <memory>
@@ -114,21 +118,6 @@ std::string FileExtension(StreamThumbnailThumbnailFormat format) {
   return "jpg";
 }
 
-// The video's own file name, carrying `ext` instead of its own extension.
-std::string OutputFileName(const std::string &video, const std::string &ext) {
-  std::string path = VideoPath(video);
-  const size_t query = path.find_first_of("?#");
-  if (query != std::string::npos) path.erase(query);
-
-  g_autofree gchar *base = g_path_get_basename(path.c_str());
-  std::string stem(base);
-  const size_t dot = stem.find_last_of('.');
-  if (dot != std::string::npos && dot > 0) stem.erase(dot);
-  if (stem.empty() || stem == "." || stem == "/") stem = "thumbnail";
-
-  return stem + "." + ext;
-}
-
 // Decodes a single frame from `input` at `time_ms`, at its native resolution
 // and pixel format. Unlike Media Foundation (Windows), FFmpeg's http(s)
 // protocol handler has a simple, direct way to attach custom headers.
@@ -137,9 +126,16 @@ FramePtr DecodeFrame(const InputSpec &input, const std::map<std::string, std::st
   if (headers != nullptr && !headers->empty()) {
     std::string header_lines;
     for (const auto &[key, value] : *headers) {
+      if (key.find_first_of("\r\n:") != std::string::npos || value.find_first_of("\r\n") != std::string::npos) {
+        throw ThumbnailException("INVALID_HEADER", "A header name or value contains a line break.");
+      }
       header_lines += key + ": " + value + "\r\n";
     }
     av_dict_set(&options, "headers", header_lines.c_str(), 0);
+    // Headers are meant for the requested host only, so a redirect elsewhere
+    // must not receive them. FFmpeg before 8.1 has no max_redirects option and
+    // ignores it, still following redirects.
+    av_dict_set(&options, "max_redirects", "0", 0);
   }
 
   av_dict_set(&options, "protocol_whitelist", input.protocol_whitelist.c_str(), 0);
@@ -333,27 +329,34 @@ std::string WriteThumbnailFile(const std::string &video, StreamThumbnailThumbnai
   const std::vector<uint8_t> data =
       GenerateThumbnailData(video, kind, headers, format, max_width, max_height, time_ms, quality);
 
-  // The file name comes from the video, so a directory per request is what keeps
-  // two same-named videos from different folders off each other. g_dir_make_tmp
-  // creates it 0700 directly under the temp dir: no fixed-name parent for another
-  // local user to pre-create in world-writable /tmp and then swap underneath us.
-  GError *dir_error = nullptr;
-  g_autofree gchar *dir = g_dir_make_tmp("stream_thumbnail_XXXXXX", &dir_error);
-  if (dir == nullptr) {
-    const std::string message =
-        dir_error != nullptr ? dir_error->message : "Failed to create a directory for the thumbnail.";
-    if (dir_error != nullptr) g_error_free(dir_error);
-    throw ThumbnailException("WRITE_ERROR", message);
-  }
-
-  g_autofree gchar *full_path_c = g_build_filename(dir, OutputFileName(video, FileExtension(format)).c_str(), nullptr);
-  const std::string full_path(full_path_c);
-
+  // g_file_open_tmp creates the file with O_EXCL and mode 0600, so another local
+  // user can't pre-create or swap it in a world-writable temp dir.
+  const std::string tmpl = "stream_thumbnail_XXXXXX." + FileExtension(format);
+  gchar *full_path_c = nullptr;
   GError *error = nullptr;
-  if (!g_file_set_contents(full_path.c_str(), reinterpret_cast<const gchar *>(data.data()), data.size(), &error)) {
-    const std::string message = error != nullptr ? error->message : "Failed to write the thumbnail to disk.";
+  const gint fd = g_file_open_tmp(tmpl.c_str(), &full_path_c, &error);
+  if (fd == -1) {
+    const std::string message = error != nullptr ? error->message : "Failed to create the thumbnail file.";
     if (error != nullptr) g_error_free(error);
     throw ThumbnailException("WRITE_ERROR", message);
+  }
+  const std::string full_path(full_path_c);
+  g_free(full_path_c);
+
+  size_t written = 0;
+  while (written < data.size()) {
+    const ssize_t result = write(fd, data.data() + written, data.size() - written);
+    if (result < 0 && errno == EINTR) continue;
+    if (result <= 0) {
+      g_close(fd, nullptr);
+      g_unlink(full_path.c_str());
+      throw ThumbnailException("WRITE_ERROR", "Failed to write the thumbnail to disk.");
+    }
+    written += static_cast<size_t>(result);
+  }
+  if (!g_close(fd, nullptr)) {
+    g_unlink(full_path.c_str());
+    throw ThumbnailException("WRITE_ERROR", "Failed to write the thumbnail to disk.");
   }
 
   return full_path;

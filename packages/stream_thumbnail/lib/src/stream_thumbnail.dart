@@ -17,9 +17,9 @@ abstract final class StreamThumbnail {
   /// source resolution. A lower [quality] reduces image quality but is ignored
   /// for [StreamThumbnailFormat.png]. The videos are processed one at a time.
   ///
-  /// Each thumbnail is written to its own temporary directory. Use
-  /// [XFile.saveTo] to copy one somewhere permanent; the temporary file is left
-  /// behind for the platform to reclaim.
+  /// Each thumbnail is written to a new, uniquely named file in a temporary
+  /// directory. Use [XFile.saveTo] to copy one somewhere permanent; the
+  /// temporary file is left behind for the platform to reclaim.
   ///
   /// On web there is no file system: each [XFile] wraps an object URL that the
   /// caller owns and should release with `URL.revokeObjectURL` once the bytes
@@ -56,9 +56,9 @@ abstract final class StreamThumbnail {
   /// source resolution. A lower [quality] reduces image quality but is ignored
   /// for [StreamThumbnailFormat.png].
   ///
-  /// The thumbnail is written to its own temporary directory. Use [XFile.saveTo]
-  /// to copy it somewhere permanent; the temporary file is left behind for the
-  /// platform to reclaim.
+  /// The thumbnail is written to a new, uniquely named file in a temporary
+  /// directory. Use [XFile.saveTo] to copy it somewhere permanent; the
+  /// temporary file is left behind for the platform to reclaim.
   ///
   /// On web there is no file system: the [XFile] wraps an object URL that the
   /// caller owns and should release with `URL.revokeObjectURL` once the bytes
