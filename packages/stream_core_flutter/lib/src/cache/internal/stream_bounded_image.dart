@@ -43,7 +43,7 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
     this.imageProvider, {
     this.width,
     this.height,
-    this.fit = BoxFit.contain,
+    this.fit = .contain,
     this.useLogicalSize = false,
   });
 
@@ -125,9 +125,9 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
     ];
     final boxScale = switch (key._fit) {
       _ when scales.isEmpty => 1.0,
-      BoxFit.none => 1.0,
-      BoxFit.contain || BoxFit.scaleDown => scales.reduce(math.min),
-      BoxFit.cover || BoxFit.fill || BoxFit.fitWidth || BoxFit.fitHeight => scales.reduce(math.max),
+      .none => 1.0,
+      .contain || .scaleDown => scales.reduce(math.min),
+      .cover || .fill || .fitWidth || .fitHeight => scales.reduce(math.max),
     };
     final scale = [1.0, boxScale, maxDecodeSize / width, maxDecodeSize / height].reduce(math.min);
     if (scale >= 1) return ui.TargetImageSize(width: width, height: height);

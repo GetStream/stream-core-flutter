@@ -295,12 +295,12 @@ class DefaultStreamNetworkImage extends StatefulWidget {
 enum _LoadState { checkingCache, loading, loaded, failed }
 
 class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
-  var _state = _LoadState.checkingCache;
+  _LoadState _state = .checkingCache;
   var _generation = 0;
   ImageStream? _imageStream;
   late final _imageStreamListener = ImageStreamListener(
-    (_, _) => _moveTo(_LoadState.loaded),
-    onError: (_, _) => _moveTo(_LoadState.failed),
+    (_, _) => _moveTo(.loaded),
+    onError: (_, _) => _moveTo(.failed),
   );
 
   @override
@@ -325,7 +325,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     }
     if (_imageFor(oldWidget.props) != _imageFor(widget.props)) {
       _generation++;
-      _state = _LoadState.checkingCache;
+      _state = .checkingCache;
       _listenToImage();
       _checkCache(_generation);
     }
@@ -342,9 +342,9 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     if (!mounted || (generation != null && generation != _generation)) return;
 
     final allowed = switch ((_state, next)) {
-      (_LoadState.checkingCache, _LoadState.loading) => true,
-      (_LoadState.failed, _LoadState.loading) => true,
-      (_, _LoadState.loaded || _LoadState.failed) => true,
+      (.checkingCache, .loading) => true,
+      (.failed, .loading) => true,
+      (_, .loaded || .failed) => true,
       _ => false,
     };
     if (allowed && next != _state) setState(() => _state = next);
@@ -357,7 +357,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       if (cached != null) return;
     } on Object catch (_) {}
 
-    _moveTo(_LoadState.loading, generation: generation);
+    _moveTo(.loading, generation: generation);
   }
 
   ImageProvider<Object> _imageFor(StreamNetworkImageProps props) {
@@ -373,7 +373,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       ),
       width: hasCacheSize ? props.cacheWidth : logicalExtent(props.width),
       height: hasCacheSize ? props.cacheHeight : logicalExtent(props.height),
-      fit: hasCacheSize ? BoxFit.contain : props.fit ?? BoxFit.contain,
+      fit: hasCacheSize ? .contain : props.fit ?? .contain,
       useLogicalSize: !hasCacheSize,
     );
   }
@@ -389,12 +389,12 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   void _onRetryListenableNotified() => _retry();
 
   void _retry() {
-    if (_state != _LoadState.failed) return;
+    if (_state != .failed) return;
 
     final props = widget.props;
     StreamNetworkImage.evictFromCache(props.url, cacheKey: props.cacheKey);
     _generation++;
-    _moveTo(_LoadState.loading);
+    _moveTo(.loading);
     _listenToImage();
   }
 
@@ -413,7 +413,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       colorBlendMode: props.colorBlendMode,
       filterQuality: props.filterQuality,
       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-        if (frame != null || wasSynchronouslyLoaded || _state != _LoadState.loading) return child;
+        if (frame != null || wasSynchronouslyLoaded || _state != .loading) return child;
         if (props.placeholderBuilder case final builder?) return builder(context);
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
