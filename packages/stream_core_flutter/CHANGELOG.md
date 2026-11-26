@@ -6,6 +6,7 @@
   `separator*` fields on `StreamMessageMetadataStyle`.
 - Added `StreamContextMenuAnchor` and `StreamContextMenuAnchorTheme`, which open a
   `StreamContextMenu` from an anchor widget the way `MenuAnchor` does, to `video.dart`.
+- Added `side` to `StreamContextMenuActionStyle`. A focused `StreamContextMenuAction` now shows a focus ring.
 - Added `StreamModalDialog`, `showStreamModalDialog`, `StreamBlurScrim` and `StreamModalDialogTheme`, a centered
   modal with a header and footer over a blurred scrim, to `video.dart`.
 - `StreamModalDialog` uses the design's mobile metrics on Android and iOS and its web metrics on desktop and the web.

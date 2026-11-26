@@ -273,6 +273,33 @@ void main() {
     final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
     final panel = find.ancestor(of: find.byType(StreamContextMenu), matching: find.byType(SingleChildScrollView));
     expect(tester.getSize(panel).height, lessThanOrEqualTo(screenHeight - 400));
+    // The menu scrolls its own rows rather than the panel scrolling the whole menu.
+    expect(tester.getSize(find.byType(StreamContextMenu)).height, lessThanOrEqualTo(screenHeight - 400));
+    expect(tester.getSize(find.byType(StreamContextMenu)).height, tester.getSize(panel).height);
+  });
+
+  testWidgets('StreamContextMenuAnchor keeps the builder state when childFocusNode changes', (tester) async {
+    final buttonFocusNode = FocusNode();
+    addTearDown(buttonFocusNode.dispose);
+
+    Widget build(FocusNode? focusNode) => _app(
+      child: StreamContextMenuAnchor(
+        childFocusNode: focusNode,
+        menuChildren: [StreamContextMenuAction<void>(label: const Text('Microphone'))],
+        builder: (context, controller, child) => _Counter(focusNode: focusNode),
+      ),
+    );
+
+    await tester.pumpWidget(build(null));
+    await tester.tap(find.byType(_Counter));
+    await tester.pump();
+    expect(find.text('1'), findsOneWidget);
+
+    await tester.pumpWidget(build(buttonFocusNode));
+    expect(find.text('1'), findsOneWidget);
+
+    await tester.pumpWidget(build(null));
+    expect(find.text('1'), findsOneWidget);
   });
 
   testWidgets('StreamContextMenuAnchor with consumeOutsideTap keeps the closing tap from the page', (tester) async {
@@ -352,6 +379,50 @@ void main() {
     expect(_rowBorder(tester, 'Speaker').side, BorderSide.none);
   });
 
+  testWidgets('StreamContextMenuAnchor keeps the focus ring under a themed shape', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        child: _anchor(
+          actionStyle: const StreamContextMenuActionStyle(
+            shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4)))),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    Focus.of(tester.element(find.text('Microphone'))).requestFocus();
+    await tester.pumpAndSettle();
+
+    final border = _rowBorder(tester, 'Microphone') as RoundedRectangleBorder;
+    expect(border.borderRadius, const BorderRadius.all(Radius.circular(4)));
+    expect(border.side.color, tester.element(find.text('Microphone')).streamColorScheme.borderFocus);
+  });
+
+  testWidgets('StreamContextMenuAnchor rings the focused row with a themed side', (tester) async {
+    const side = BorderSide(color: Color(0xFF00FF00), width: 3);
+    await tester.pumpWidget(
+      _app(
+        child: _anchor(
+          actionStyle: StreamContextMenuActionStyle(
+            side: WidgetStateBorderSide.resolveWith(
+              (states) => states.contains(WidgetState.focused) ? side : BorderSide.none,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    Focus.of(tester.element(find.text('Microphone'))).requestFocus();
+    await tester.pumpAndSettle();
+
+    expect(_rowBorder(tester, 'Microphone').side, side);
+    expect(_rowBorder(tester, 'Speaker').side, BorderSide.none);
+  });
+
   testWidgets('StreamContextMenuAnchor defers to a StreamComponentFactory builder', (tester) async {
     await tester.pumpWidget(
       _app(
@@ -427,4 +498,26 @@ Widget _app({required Widget child, TargetPlatform platform = TargetPlatform.mac
       body: Align(alignment: Alignment.topLeft, child: child),
     ),
   );
+}
+
+class _Counter extends StatefulWidget {
+  const _Counter({this.focusNode});
+
+  final FocusNode? focusNode;
+
+  @override
+  State<_Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<_Counter> {
+  var _count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      focusNode: widget.focusNode,
+      onPressed: () => setState(() => _count += 1),
+      child: Text('$_count'),
+    );
+  }
 }

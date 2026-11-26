@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -230,6 +232,9 @@ class StreamContextMenuAnchorProps {
 
   /// The space the menu keeps from the edges of the safe area.
   ///
+  /// The menu is never taller than the screen minus this padding, whatever
+  /// [constraints] allows, so it scrolls its own rows on short screens.
+  ///
   /// If null, uses the default of [MenuAnchor.reservedPadding].
   final EdgeInsetsGeometry? reservedPadding;
 
@@ -285,14 +290,18 @@ class DefaultStreamContextMenuAnchor extends StatefulWidget {
 }
 
 class _DefaultStreamContextMenuAnchorState extends State<DefaultStreamContextMenuAnchor> {
+  // The space MenuAnchor keeps around its panel when no reservedPadding is given.
+  static const _defaultReservedPadding = EdgeInsets.all(8);
+
   // Focused on open when no childFocusNode is given, so Escape closes the menu before an enclosing route.
-  FocusNode? _fallbackFocusNode;
+  // Always in the tree, so switching childFocusNode does not remount the anchor.
+  late final _fallbackFocusNode = FocusNode(debugLabel: 'StreamContextMenuAnchor', skipTraversal: true);
 
   StreamContextMenuAnchorProps get props => widget.props;
 
   @override
   void dispose() {
-    _fallbackFocusNode?.dispose();
+    _fallbackFocusNode.dispose();
     super.dispose();
   }
 
@@ -305,16 +314,18 @@ class _DefaultStreamContextMenuAnchorState extends State<DefaultStreamContextMen
     final effectiveAlignmentOffset = props.alignmentOffset ?? anchorTheme.alignmentOffset ?? defaults.alignmentOffset;
     final effectiveActionStyle = StreamContextMenuAnchor.defaultActionStyle(context).merge(props.actionStyle);
 
+    // MenuAnchor's panel is the screen minus the reserved padding, and scrolls as a whole once the menu outgrows it.
+    final reservedPadding = props.reservedPadding ?? _defaultReservedPadding;
+    final availableHeight = math.max<double>(0, MediaQuery.sizeOf(context).height - reservedPadding.vertical);
+    final menuConstraints = effectiveConstraints.enforce(BoxConstraints(maxHeight: availableHeight));
+
     final childFocusNode = props.childFocusNode;
-    final fallbackFocusNode = childFocusNode != null
-        ? null
-        : _fallbackFocusNode ??= FocusNode(debugLabel: 'StreamContextMenuAnchor', skipTraversal: true);
 
     return MenuAnchor(
       controller: props.controller,
-      childFocusNode: childFocusNode ?? fallbackFocusNode,
+      childFocusNode: childFocusNode ?? _fallbackFocusNode,
       alignmentOffset: effectiveAlignmentOffset,
-      reservedPadding: props.reservedPadding,
+      reservedPadding: reservedPadding,
       consumeOutsideTap: props.consumeOutsideTap,
       useRootOverlay: props.useRootOverlay,
       // The menu draws its own shadow outside its bounds.
@@ -323,15 +334,17 @@ class _DefaultStreamContextMenuAnchorState extends State<DefaultStreamContextMen
       onClose: props.onClose,
       style: StreamContextMenuAnchor.transparentPanelStyle,
       builder: (context, controller, child) {
-        final anchor = props.builder(context, controller, child);
-        if (fallbackFocusNode == null) return anchor;
-        return Focus(focusNode: fallbackFocusNode, child: anchor);
+        return Focus(
+          focusNode: _fallbackFocusNode,
+          canRequestFocus: childFocusNode == null,
+          child: props.builder(context, controller, child),
+        );
       },
       menuChildren: [
         // The menu scrolls itself, so it must not share the panel's primary scroll controller.
         PrimaryScrollController.none(
           child: ConstrainedBox(
-            constraints: effectiveConstraints,
+            constraints: menuConstraints,
             child: StreamContextMenuActionTheme(
               data: StreamContextMenuActionThemeData(style: effectiveActionStyle),
               child: StreamContextMenu(
@@ -362,20 +375,12 @@ class _StreamContextMenuAnchorThemeDefaults extends StreamContextMenuAnchorTheme
 
   @override
   StreamContextMenuActionStyle get actionStyle {
-    final focusRing = BorderSide(color: context.streamColorScheme.borderFocus, width: 2);
-    final borderRadius = BorderRadius.all(context.streamRadius.md);
-
     return StreamContextMenuActionStyle(
       textStyle: WidgetStatePropertyAll(context.streamTextTheme.captionEmphasis),
       iconSize: const WidgetStatePropertyAll(16),
       minimumSize: const WidgetStatePropertyAll(Size(200, 32)),
       padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: context.streamSpacing.xs)),
-      shape: WidgetStateProperty.resolveWith(
-        (states) => RoundedRectangleBorder(
-          borderRadius: borderRadius,
-          side: states.contains(WidgetState.focused) ? focusRing : BorderSide.none,
-        ),
-      ),
+      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: .all(context.streamRadius.md))),
     );
   }
 }

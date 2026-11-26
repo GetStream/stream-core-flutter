@@ -163,6 +163,7 @@ mixin _$StreamContextMenuActionStyle {
         t,
         OutlinedBorder.lerp,
       ),
+      side: t < 0.5 ? a.side : b.side,
     );
   }
 
@@ -177,6 +178,7 @@ mixin _$StreamContextMenuActionStyle {
     WidgetStateProperty<Size?>? maximumSize,
     WidgetStateProperty<EdgeInsetsGeometry?>? padding,
     WidgetStateProperty<OutlinedBorder?>? shape,
+    WidgetStateProperty<BorderSide?>? side,
   }) {
     final _this = (this as StreamContextMenuActionStyle);
 
@@ -191,6 +193,7 @@ mixin _$StreamContextMenuActionStyle {
       maximumSize: maximumSize ?? _this.maximumSize,
       padding: padding ?? _this.padding,
       shape: shape ?? _this.shape,
+      side: side ?? _this.side,
     );
   }
 
@@ -216,6 +219,7 @@ mixin _$StreamContextMenuActionStyle {
       maximumSize: other.maximumSize,
       padding: other.padding,
       shape: other.shape,
+      side: other.side,
     );
   }
 
@@ -241,7 +245,8 @@ mixin _$StreamContextMenuActionStyle {
         _other.minimumSize == _this.minimumSize &&
         _other.maximumSize == _this.maximumSize &&
         _other.padding == _this.padding &&
-        _other.shape == _this.shape;
+        _other.shape == _this.shape &&
+        _other.side == _this.side;
   }
 
   @override
@@ -260,6 +265,7 @@ mixin _$StreamContextMenuActionStyle {
       _this.maximumSize,
       _this.padding,
       _this.shape,
+      _this.side,
     );
   }
 }

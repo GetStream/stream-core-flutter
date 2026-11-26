@@ -138,6 +138,7 @@ class StreamContextMenuActionStyle with _$StreamContextMenuActionStyle {
     this.maximumSize,
     this.padding,
     this.shape,
+    this.side,
   });
 
   /// The background color of the action.
@@ -195,6 +196,14 @@ class StreamContextMenuActionStyle with _$StreamContextMenuActionStyle {
   /// If null, defaults to a [RoundedRectangleBorder] with
   /// [StreamRadius.md] border radius.
   final WidgetStateProperty<OutlinedBorder?>? shape;
+
+  /// The outline of the action's [shape].
+  ///
+  /// Overrides the side of [shape], so a themed [shape] keeps this outline.
+  ///
+  /// If null, defaults to a 2px [StreamColorScheme.borderFocus] outline while
+  /// the action is focused and none otherwise.
+  final WidgetStateProperty<BorderSide?>? side;
 
   /// Linearly interpolate between two [StreamContextMenuActionStyle] values.
   static StreamContextMenuActionStyle? lerp(

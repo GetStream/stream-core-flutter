@@ -3,6 +3,35 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
 void main() {
+  testWidgets('StreamContextMenuAction rings a focused row in an inline menu', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(extensions: [StreamTheme()]),
+        home: Scaffold(
+          body: StreamContextMenu(
+            children: [
+              StreamContextMenuAction<void>(label: const Text('Reply')),
+              StreamContextMenuAction<void>(label: const Text('Delete')),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    Focus.of(tester.element(find.text('Reply'))).requestFocus();
+    await tester.pumpAndSettle();
+
+    OutlinedBorder border(String label) {
+      final row = find.widgetWithText(StreamContextMenuAction<void>, label);
+      return tester.widget<Material>(find.descendant(of: row, matching: find.byType(Material)).first).shape!
+          as OutlinedBorder;
+    }
+
+    final focusColor = tester.element(find.text('Reply')).streamColorScheme.borderFocus;
+    expect(border('Reply').side, BorderSide(color: focusColor, width: 2));
+    expect(border('Delete').side, BorderSide.none);
+  });
+
   testWidgets('StreamContextMenuAction pops the popup route it is shown in with its value', (
     tester,
   ) async {

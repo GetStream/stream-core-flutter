@@ -374,6 +374,7 @@ class DefaultStreamContextMenuAction<T> extends StatelessWidget {
     final effectiveMaximumSize = themeStyle?.maximumSize ?? defaults.maximumSize;
     final effectivePadding = themeStyle?.padding ?? defaults.padding;
     final effectiveShape = themeStyle?.shape ?? defaults.shape;
+    final effectiveSide = themeStyle?.side ?? defaults.side;
 
     void handleTap() {
       // Close the menu first so that onTap can safely push a new route
@@ -410,6 +411,7 @@ class DefaultStreamContextMenuAction<T> extends StatelessWidget {
         maximumSize: effectiveMaximumSize,
         padding: effectivePadding,
         shape: effectiveShape,
+        side: effectiveSide,
       ),
       child: Row(
         spacing: spacing.xs,
@@ -480,4 +482,10 @@ class _ContextMenuActionThemeDefaults extends StreamContextMenuActionStyle {
   WidgetStateProperty<OutlinedBorder> get shape => WidgetStatePropertyAll(
     RoundedRectangleBorder(borderRadius: .all(_radius.md)),
   );
+
+  @override
+  WidgetStateProperty<BorderSide?> get side => WidgetStateBorderSide.resolveWith((states) {
+    if (states.contains(WidgetState.focused)) return BorderSide(color: _colorScheme.borderFocus, width: 2);
+    return BorderSide.none;
+  });
 }
