@@ -296,11 +296,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   var _hasError = false;
   var _showPlaceholder = false;
   var _cacheCheck = 0;
-  ImageStream? _imageStream;
-  late final _imageStreamListener = ImageStreamListener(
-    (_, _) => _hasError = false,
-    onError: (_, _) => _hasError = true,
-  );
 
   @override
   void initState() {
@@ -317,16 +312,10 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       widget.props.retryListenable?.addListener(_onRetryListenableNotified);
     }
     if (oldWidget.props.url != widget.props.url || oldWidget.props.cacheKey != widget.props.cacheKey) {
+      _hasError = false;
       _showPlaceholder = false;
       _showPlaceholderUnlessCached();
     }
-    _listenToImage();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _listenToImage();
   }
 
   ImageProvider<Object> get _image {
@@ -348,14 +337,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     );
   }
 
-  void _listenToImage() {
-    final stream = _image.resolve(createLocalImageConfiguration(context));
-    if (stream.key == _imageStream?.key) return;
-
-    _imageStream?.removeListener(_imageStreamListener);
-    _imageStream = stream..addListener(_imageStreamListener);
-  }
-
   Future<void> _showPlaceholderUnlessCached() async {
     final check = ++_cacheCheck;
     final props = widget.props;
@@ -370,7 +351,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   @override
   void dispose() {
     widget.props.retryListenable?.removeListener(_onRetryListenableNotified);
-    _imageStream?.removeListener(_imageStreamListener);
     super.dispose();
   }
 
@@ -387,7 +367,6 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       _hasError = false;
       _showPlaceholder = true;
     });
-    _listenToImage();
   }
 
   @override
@@ -411,6 +390,7 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
       errorBuilder: (context, error, _) {
+        _hasError = true;
         if (props.errorBuilder case final builder?) return builder(context, error, _retry);
         return StreamImageErrorPlaceholder(width: props.width, height: props.height, onRetry: _retry);
       },
