@@ -14,21 +14,21 @@ import 'stream_thumbnail_source.dart';
 /// Creates thumbnails from a local video file or from a video URL.
 ///
 /// At most three thumbnails are generated at a time; further calls wait for
-/// one to finish. A thumbnail that takes longer than a minute fails with a
-/// `THUMBNAIL_ERROR` [PlatformException], and frees its place for the next
-/// call. A thumbnail is at most 4096 pixels on its longest side, and
+/// one to finish. A thumbnail that takes longer than a minute, or a minute per
+/// video for [thumbnailFiles], fails with a `THUMBNAIL_ERROR`
+/// [PlatformException], and frees its place for the next call. A thumbnail is at most 4096 pixels on its longest side, and
 /// a video more than 8192 pixels on a side fails with a `THUMBNAIL_ERROR`
 /// [PlatformException].
 abstract final class StreamThumbnail {
   static final _pool = Pool(3);
 
-  static Future<T> _generate<T>(Future<T> Function() task) {
+  static Future<T> _generate<T>(Future<T> Function() task, {int videos = 1}) {
     return _pool.withResource(
       () => task().timeout(
-        const Duration(minutes: 1),
+        const Duration(minutes: 1) * videos,
         onTimeout: () => throw PlatformException(
           code: 'THUMBNAIL_ERROR',
-          message: 'Generating the thumbnail took longer than a minute.',
+          message: 'Generating the thumbnail took longer than a minute per video.',
         ),
       ),
     );
@@ -72,6 +72,7 @@ abstract final class StreamThumbnail {
         timeMs: timeMs,
         quality: quality,
       ),
+      videos: sources.length,
     );
   }
 

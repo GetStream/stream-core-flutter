@@ -22,6 +22,22 @@ class _GatedPlatform extends StreamThumbnailPlatform {
     pending.add(completer);
     return completer.future;
   }
+
+  final pendingFiles = <Completer<List<XFile>>>[];
+
+  @override
+  Future<List<XFile>> thumbnailFiles({
+    required List<StreamThumbnailSource> sources,
+    required StreamThumbnailFormat imageFormat,
+    required int maxHeight,
+    required int maxWidth,
+    int? timeMs,
+    required int quality,
+  }) {
+    final completer = Completer<List<XFile>>();
+    pendingFiles.add(completer);
+    return completer.future;
+  }
 }
 
 void main() {
@@ -53,5 +69,27 @@ void main() {
       if (!completer.isCompleted) completer.complete(Uint8List(0));
     }
     await tester.pump(const Duration(minutes: 1));
+  });
+
+  testWidgets('gives thumbnailFiles a minute per video', (tester) async {
+    final original = StreamThumbnailPlatform.instance;
+    final platform = _GatedPlatform();
+    StreamThumbnailPlatform.instance = platform;
+    addTearDown(() => StreamThumbnailPlatform.instance = original);
+
+    var failed = false;
+    StreamThumbnail.thumbnailFiles(
+      sources: [StreamThumbnailSource.file('/a.mp4'), StreamThumbnailSource.file('/b.mp4')],
+    ).catchError((Object _) {
+      failed = true;
+      return <XFile>[];
+    }).ignore();
+    await tester.pump();
+
+    await tester.pump(const Duration(seconds: 90));
+    expect(failed, isFalse);
+
+    await tester.pump(const Duration(seconds: 31));
+    expect(failed, isTrue);
   });
 }

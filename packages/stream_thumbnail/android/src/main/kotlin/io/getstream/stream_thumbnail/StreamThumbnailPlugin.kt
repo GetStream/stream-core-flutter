@@ -189,7 +189,9 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
 
         val scaledW = targetW.takeIf { it != 0 } ?: ((targetH.toFloat() / frame.height) * frame.width).toInt()
         val scaledH = targetH.takeIf { it != 0 } ?: ((targetW.toFloat() / frame.width) * frame.height).toInt()
-        return Bitmap.createScaledBitmap(frame, scaledW, scaledH, true)
+        val scaled = Bitmap.createScaledBitmap(frame, scaledW, scaledH, true)
+        if (scaled !== frame) frame.recycle()
+        return scaled
     }
 
     private fun capToMaxOutputSize(bitmap: Bitmap): Bitmap {
@@ -199,7 +201,9 @@ class StreamThumbnailPlugin : FlutterPlugin, StreamThumbnailHostApi {
         val scale = MAX_OUTPUT_SIZE.toFloat() / longest
         val width = maxOf(1, (bitmap.width * scale).toInt())
         val height = maxOf(1, (bitmap.height * scale).toInt())
-        return Bitmap.createScaledBitmap(bitmap, width, height, true)
+        val scaled = Bitmap.createScaledBitmap(bitmap, width, height, true)
+        if (scaled !== bitmap) bitmap.recycle()
+        return scaled
     }
 
     private fun setDataSource(video: String, retriever: MediaMetadataRetriever) {

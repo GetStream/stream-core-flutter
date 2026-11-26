@@ -21,7 +21,7 @@
 - A thumbnail is at most 4096 pixels on its longest side, including when `maxWidth` and `maxHeight` are left at `0`.
   A video more than 8192 pixels on a side fails with a `THUMBNAIL_ERROR` `PlatformException`.
 - At most three thumbnails are generated at a time; further calls wait for one to finish. A thumbnail that takes
-  longer than a minute fails with a `THUMBNAIL_ERROR` `PlatformException`.
+  longer than a minute, or a minute per video for `thumbnailFiles`, fails with a `THUMBNAIL_ERROR` `PlatformException`.
 - A network video sent with headers that redirects to another scheme, host or port, including from `http` to `https`,
   is fetched from there without the `Authorization`, `Cookie` and `Proxy-Authorization` headers. On web, the browser
   follows redirects itself.
