@@ -32,7 +32,6 @@ void main() {
                 child: _buildInTheme(
                   StreamModalDialog(
                     title: const Text('Settings'),
-                    contentPadding: variant.contentPadding,
                     child: _body(),
                   ),
                   variant: variant,
@@ -45,7 +44,6 @@ void main() {
                   Builder(
                     builder: (context) => StreamModalDialog(
                       title: const Text('Choose what to share'),
-                      contentPadding: variant.contentPadding,
                       headerActions: [
                         StreamButton.icon(
                           icon: Icon(context.streamIcons.refresh),
@@ -75,7 +73,6 @@ void main() {
                 child: _buildInTheme(
                   StreamModalDialog(
                     showCloseButton: false,
-                    contentPadding: variant.contentPadding,
                     child: _body(),
                   ),
                   variant: variant,
@@ -93,14 +90,16 @@ void main() {
 // The design's two sizes: Android and iOS get the mobile one, desktop and the
 // web share the web one.
 enum _Variant {
-  web(platform: TargetPlatform.macOS, width: 480, contentPadding: EdgeInsets.symmetric(horizontal: 24)),
-  mobile(platform: TargetPlatform.iOS, width: 360, contentPadding: EdgeInsets.symmetric(horizontal: 16));
+  web(platform: TargetPlatform.macOS, width: 480),
+  mobile(platform: TargetPlatform.iOS, width: 360);
 
-  const _Variant({required this.platform, required this.width, required this.contentPadding});
+  const _Variant({
+    required this.platform,
+    required this.width,
+  });
 
   final TargetPlatform platform;
   final double width;
-  final EdgeInsets contentPadding;
 }
 
 Widget _body() => const Text('Changes apply to everyone in the conversation.');

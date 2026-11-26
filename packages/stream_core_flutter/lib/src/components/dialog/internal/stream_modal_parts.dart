@@ -56,9 +56,11 @@ class StreamModalSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = resolveStreamModalDialogTheme(context);
+    final effectiveBackgroundColor = backgroundColor ?? theme.backgroundColor;
+    final effectiveConstraints = constraints ?? theme.constraints;
 
     return Dialog(
-      backgroundColor: backgroundColor ?? theme.backgroundColor,
+      backgroundColor: effectiveBackgroundColor,
       // Material 3 skips its elevation tint only for exactly this value.
       surfaceTintColor: Colors.transparent,
       elevation: theme.elevation,
@@ -67,7 +69,7 @@ class StreamModalSurface extends StatelessWidget {
       insetPadding: theme.insetPadding,
       shape: theme.shape,
       alignment: Alignment.center,
-      constraints: constraints ?? theme.constraints,
+      constraints: effectiveConstraints,
       child: child,
     );
   }
@@ -189,8 +191,13 @@ class _StreamModalDialogThemeDefaults extends StreamModalDialogThemeData {
   @override
   BoxConstraints get constraints => _kDefaultConstraints;
 
+  // The gap above the footer belongs to the body, as in [AlertDialog], so a
+  // dialog without a footer still ends with padding.
   @override
-  EdgeInsetsGeometry get contentPadding => EdgeInsets.zero;
+  EdgeInsetsGeometry get contentPadding {
+    final padding = _isDesktopOrWeb ? _spacing.xl : _spacing.md;
+    return EdgeInsets.fromLTRB(padding, 0, padding, padding);
+  }
 
   @override
   StreamModalDialogHeaderStyle get headerStyle => _StreamModalDialogHeaderStyleDefaults(_context);
@@ -236,7 +243,10 @@ class _StreamModalDialogFooterStyleDefaults extends StreamModalDialogFooterStyle
   late final bool _isDesktopOrWeb = isDesktopOrWeb(_context);
 
   @override
-  EdgeInsetsGeometry get padding => EdgeInsets.all(_isDesktopOrWeb ? _spacing.xl : _spacing.md);
+  EdgeInsetsGeometry get padding {
+    final padding = _isDesktopOrWeb ? _spacing.xl : _spacing.md;
+    return EdgeInsets.fromLTRB(padding, 0, padding, padding);
+  }
 
   @override
   double get actionsSpacing => _spacing.xs;

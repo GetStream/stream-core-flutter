@@ -80,6 +80,7 @@ class StreamModalDialogTheme extends InheritedTheme {
 /// between the two:
 ///
 ///  * [barrierBlurSigma]
+///  * [contentPadding]
 ///  * [StreamModalDialogHeaderStyle.padding]
 ///  * [StreamModalDialogHeaderStyle.spacing]
 ///  * [StreamModalDialogFooterStyle.padding]
@@ -161,7 +162,11 @@ class StreamModalDialogThemeData with _$StreamModalDialogThemeData {
 
   /// The padding around the dialog's body, between the header and the footer.
   ///
-  /// Defaults to none.
+  /// Defaults to [StreamSpacing.md] at the sides and bottom on Android and
+  /// iOS, and to [StreamSpacing.xl] on desktop and the web, with none at the
+  /// top. The bottom padding is the gap above the footer, and keeps the body
+  /// off the dialog's edge when there is no footer. Pass [EdgeInsets.zero] for
+  /// a body that runs edge to edge.
   final EdgeInsetsGeometry? contentPadding;
 
   /// The style of the dialog's header: the title and the header actions.
@@ -256,8 +261,9 @@ class StreamModalDialogFooterStyle with _$StreamModalDialogFooterStyle {
 
   /// The padding around the footer.
   ///
-  /// Defaults to [StreamSpacing.md] on every side on Android and iOS, and to
-  /// [StreamSpacing.xl] on desktop and the web.
+  /// Defaults to [StreamSpacing.md] at the sides and bottom on Android and
+  /// iOS, and to [StreamSpacing.xl] on desktop and the web, with none at the
+  /// top: the body's bottom padding is the gap above the footer.
   final EdgeInsetsGeometry? padding;
 
   /// The gap between adjacent footer actions.

@@ -37,6 +37,11 @@ import 'internal/stream_modal_parts.dart';
 /// trailing half; a Flutter route with no anchor point goes to the leading
 /// half instead.
 ///
+/// The dialog fades and scales in while the scrim fades in and its blur grows.
+/// [animationStyle] overrides the transition's duration, 150 milliseconds by
+/// default, and its curves, [Curves.easeOutCubic] by default, as it does for
+/// [showDialog]. Its reverse duration is ignored.
+///
 /// Returns the value the dialog was popped with, or null when it was
 /// dismissed.
 ///
@@ -57,48 +62,119 @@ Future<T?> showStreamModalDialog<T>({
   Offset? anchorPoint,
   TraversalEdgeBehavior? traversalEdgeBehavior,
   bool? requestFocus,
+  AnimationStyle? animationStyle,
 }) {
   final navigator = Navigator.of(context, rootNavigator: useRootNavigator);
   final themes = InheritedTheme.capture(from: context, to: navigator.context);
 
   return navigator.push<T>(
-    RawDialogRoute<T>(
+    _StreamModalDialogRoute<T>(
+      builder: builder,
+      themes: themes,
+      scrimColor: barrierColor,
+      useSafeArea: useSafeArea,
+      animationStyle: animationStyle,
       settings: routeSettings,
       anchorPoint: anchorPoint ?? trailingTopAnchorOf(context),
       barrierDismissible: barrierDismissible,
       barrierLabel: barrierLabel ?? MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      // The transition draws the scrim instead, so that it can blur.
-      barrierColor: null,
       traversalEdgeBehavior: traversalEdgeBehavior ?? TraversalEdgeBehavior.closedLoop,
       requestFocus: requestFocus,
-      transitionDuration: const Duration(milliseconds: 150),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        final dialog = Builder(builder: builder);
-        if (!useSafeArea) return dialog;
-        return SafeArea(child: dialog);
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curve = CurveTween(curve: Curves.easeOutCubic).animate(animation);
-
-        return FadeTransition(
-          opacity: curve,
-          child: themes.wrap(
-            Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(child: StreamBlurScrim(color: barrierColor)),
-                ),
-                ScaleTransition(
-                  scale: Tween<double>(begin: 0.96, end: 1).animate(curve),
-                  child: child,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     ),
   );
+}
+
+// Fades and scales the dialog in over a [StreamBlurScrim] whose blur grows
+// with it. The transition is the one the video SDK's modal shipped with.
+class _StreamModalDialogRoute<T> extends RawDialogRoute<T> {
+  _StreamModalDialogRoute({
+    required WidgetBuilder builder,
+    required this.themes,
+    required this.scrimColor,
+    required bool useSafeArea,
+    required this.animationStyle,
+    super.settings,
+    super.anchorPoint,
+    super.barrierDismissible,
+    super.barrierLabel,
+    super.traversalEdgeBehavior,
+    super.requestFocus,
+  }) : super(
+         // The transition draws the scrim instead, so that it can blur.
+         barrierColor: null,
+         transitionDuration: animationStyle?.duration ?? _kTransitionDuration,
+         pageBuilder: (context, animation, secondaryAnimation) {
+           final dialog = Builder(builder: builder);
+           if (!useSafeArea) return dialog;
+           return SafeArea(child: dialog);
+         },
+       );
+
+  static const _kTransitionDuration = Duration(milliseconds: 150);
+
+  final CapturedThemes themes;
+  final Color? scrimColor;
+  final AnimationStyle? animationStyle;
+
+  CurvedAnimation? _curvedAnimation;
+
+  CurvedAnimation _curve(Animation<double> animation) {
+    if (_curvedAnimation?.parent != animation) {
+      _curvedAnimation?.dispose();
+      _curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: animationStyle?.curve ?? Curves.easeOutCubic,
+        reverseCurve: animationStyle?.reverseCurve,
+      );
+    }
+    return _curvedAnimation!;
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final curve = _curve(animation);
+
+    return FadeTransition(
+      opacity: curve,
+      child: themes.wrap(
+        Stack(
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: curve,
+                  // Resolves the theme as it builds, so that it follows a
+                  // change to the app's theme while the dialog is open.
+                  builder: (context, _) {
+                    final blurSigma = resolveStreamModalDialogTheme(context).barrierBlurSigma!;
+                    return StreamBlurScrim(
+                      color: scrimColor,
+                      blurSigma: blurSigma * curve.value,
+                    );
+                  },
+                ),
+              ),
+            ),
+            ScaleTransition(
+              scale: Tween<double>(begin: 0.96, end: 1).animate(curve),
+              child: child,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _curvedAnimation?.dispose();
+    super.dispose();
+  }
 }
 
 /// A translucent fill over a blur of whatever is behind it.
@@ -113,7 +189,11 @@ Future<T?> showStreamModalDialog<T>({
 @experimental
 class StreamBlurScrim extends StatelessWidget {
   /// Creates a blur scrim.
-  const StreamBlurScrim({super.key, this.color, this.blurSigma});
+  const StreamBlurScrim({
+    super.key,
+    this.color,
+    this.blurSigma,
+  });
 
   /// The fill drawn over the blur.
   ///
@@ -131,9 +211,10 @@ class StreamBlurScrim extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = resolveStreamModalDialogTheme(context);
+    final effectiveColor = color ?? theme.barrierColor!;
     final effectiveBlurSigma = blurSigma ?? theme.barrierBlurSigma!;
 
-    final fill = ColoredBox(color: color ?? theme.barrierColor!);
+    final fill = ColoredBox(color: effectiveColor);
 
     if (effectiveBlurSigma <= 0) return fill;
 
@@ -155,25 +236,23 @@ class StreamBlurScrim extends StatelessWidget {
 /// {@tool snippet}
 ///
 /// ```dart
-/// final confirmed = await showStreamModalDialog<bool>(
+/// final layout = await showStreamModalDialog<String>(
 ///   context: context,
 ///   builder: (context) => StreamModalDialog(
-///     title: const Text('Discard changes?'),
-///     contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+///     title: const Text('Choose a layout'),
 ///     actions: [
 ///       StreamButton(
 ///         style: StreamButtonStyle.secondary,
 ///         type: StreamButtonType.ghost,
-///         onPressed: () => Navigator.pop(context, false),
-///         child: const Text('Keep editing'),
+///         onPressed: () => Navigator.pop(context, 'grid'),
+///         child: const Text('Grid'),
 ///       ),
 ///       StreamButton(
-///         style: StreamButtonStyle.destructive,
-///         onPressed: () => Navigator.pop(context, true),
-///         child: const Text('Discard'),
+///         onPressed: () => Navigator.pop(context, 'spotlight'),
+///         child: const Text('Spotlight'),
 ///       ),
 ///     ],
-///     child: const Text('Your edits will be lost.'),
+///     child: const Text('Pick how participants are arranged.'),
 ///   ),
 /// );
 /// ```
@@ -273,7 +352,10 @@ class StreamModalDialogProps {
 
   /// The padding around [child].
   ///
-  /// Defaults to [StreamModalDialogThemeData.contentPadding], and then to none.
+  /// Defaults to [StreamModalDialogThemeData.contentPadding], and then to 24
+  /// at the sides and bottom on desktop and the web, and 16 on Android and
+  /// iOS, with none at the top. Pass [EdgeInsets.zero] for a body that runs
+  /// edge to edge.
   final EdgeInsetsGeometry? contentPadding;
 
   /// The bounds of the dialog.
@@ -310,6 +392,7 @@ class DefaultStreamModalDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = resolveStreamModalDialogTheme(context);
+    final effectiveContentPadding = props.contentPadding ?? theme.contentPadding!;
     final label = props.semanticLabel ?? (props.title == null ? _fallbackLabel(context) : null);
 
     Widget dialog = StreamModalSurface(
@@ -328,7 +411,7 @@ class DefaultStreamModalDialog extends StatelessWidget {
           ),
           Flexible(
             child: Padding(
-              padding: props.contentPadding ?? theme.contentPadding!,
+              padding: effectiveContentPadding,
               child: props.child,
             ),
           ),

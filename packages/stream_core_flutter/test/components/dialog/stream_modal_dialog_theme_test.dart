@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/video.dart';
 
-Widget _app({required Widget child, StreamModalDialogThemeData? modalDialogTheme}) {
+Widget _app({
+  required Widget child,
+  StreamModalDialogThemeData? modalDialogTheme,
+}) {
   return MaterialApp(
     theme: ThemeData(extensions: [StreamTheme(modalDialogTheme: modalDialogTheme)]),
     home: Scaffold(body: child),

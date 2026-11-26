@@ -64,7 +64,6 @@ Widget buildStreamModalDialogPlayground(BuildContext context) {
 
     return StreamModalDialog(
       title: title.isEmpty ? null : Text(title),
-      contentPadding: EdgeInsets.symmetric(horizontal: context.streamSpacing.xl),
       headerActions: [
         for (var i = 0; i < headerActions; i += 1)
           StreamButton.icon(
@@ -109,6 +108,9 @@ Widget buildStreamModalDialogPlayground(BuildContext context) {
             final messenger = ScaffoldMessenger.maybeOf(context);
             final result = await showStreamModalDialog<String>(
               context: context,
+              // Opens in the preview, so the toolbar's device, text scale and
+              // direction reach the dialog.
+              useRootNavigator: false,
               barrierDismissible: barrierDismissible,
               builder: buildDialog,
             );
@@ -144,59 +146,37 @@ Widget buildStreamModalDialogShowcase(BuildContext context) {
           caption: 'A title, a close button and a short body',
           child: StreamModalDialog(
             title: const Text('Settings'),
-            contentPadding: EdgeInsets.symmetric(horizontal: spacing.xl),
             child: const _ShortBody(),
           ),
         ),
-        _Example(
+        const _Example(
           label: 'HEADER AND FOOTER ACTIONS',
           caption: 'Icon buttons before the close button, and a row of actions at the trailing edge',
-          child: Builder(
-            builder: (context) => StreamModalDialog(
-              title: const Text('Choose what to share'),
-              contentPadding: EdgeInsets.symmetric(horizontal: spacing.xl),
-              headerActions: [
-                StreamButton.icon(
-                  icon: Icon(context.streamIcons.refresh),
-                  style: StreamButtonStyle.secondary,
-                  type: StreamButtonType.ghost,
-                  onPressed: () {},
-                ),
-              ],
-              actions: [
-                StreamButton(
-                  style: StreamButtonStyle.secondary,
-                  type: StreamButtonType.ghost,
-                  onPressed: () {},
-                  child: const Text('Cancel'),
-                ),
-                StreamButton(onPressed: () {}, child: const Text('Share')),
-              ],
-              child: const _ShortBody(),
-            ),
+          child: _ShareDialog(),
+        ),
+        const _MobileVariant(
+          child: _Example(
+            label: 'MOBILE',
+            caption: 'On Android and iOS: tighter padding, and footer actions that share the width',
+            child: _ShareDialog(),
           ),
         ),
         _Example(
           label: 'NO CLOSE BUTTON',
           caption: 'A dialog that has to be answered through its actions',
           child: StreamModalDialog(
-            title: const Text('Discard changes?'),
+            title: const Text('Choose a layout'),
             showCloseButton: false,
-            contentPadding: EdgeInsets.symmetric(horizontal: spacing.xl),
             actions: [
               StreamButton(
                 style: StreamButtonStyle.secondary,
                 type: StreamButtonType.ghost,
                 onPressed: () {},
-                child: const Text('Keep editing'),
+                child: const Text('Grid'),
               ),
-              StreamButton(
-                style: StreamButtonStyle.destructive,
-                onPressed: () {},
-                child: const Text('Discard'),
-              ),
+              StreamButton(onPressed: () {}, child: const Text('Spotlight')),
             ],
-            child: const _ShortBody(),
+            child: const _LayoutBody(),
           ),
         ),
       ],
@@ -216,6 +196,81 @@ class _ShortBody extends StatelessWidget {
     return Text(
       'Changes apply to everyone in the conversation.',
       style: context.streamTextTheme.bodyDefault.copyWith(color: context.streamColorScheme.textPrimary),
+    );
+  }
+}
+
+// Shows [child] as it looks on Android and iOS. The variant follows the
+// platform, and the web always gets the web one, so the theme also spells out
+// the mobile metrics for the web build of the gallery.
+class _MobileVariant extends StatelessWidget {
+  const _MobileVariant({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.streamSpacing;
+    final padding = EdgeInsets.fromLTRB(spacing.md, 0, spacing.md, spacing.md);
+
+    return Theme(
+      data: Theme.of(context).copyWith(platform: TargetPlatform.android),
+      child: StreamModalDialogTheme(
+        data: StreamModalDialogThemeData(
+          contentPadding: padding,
+          barrierBlurSigma: 25,
+          headerStyle: StreamModalDialogHeaderStyle(
+            padding: EdgeInsets.all(spacing.md),
+            spacing: spacing.sm,
+          ),
+          footerStyle: StreamModalDialogFooterStyle(
+            padding: padding,
+            expandActions: true,
+          ),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _LayoutBody extends StatelessWidget {
+  const _LayoutBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Show everyone in a grid, or the active speaker large with the others in a row.',
+      style: context.streamTextTheme.bodyDefault.copyWith(color: context.streamColorScheme.textPrimary),
+    );
+  }
+}
+
+class _ShareDialog extends StatelessWidget {
+  const _ShareDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamModalDialog(
+      title: const Text('Choose what to share'),
+      headerActions: [
+        StreamButton.icon(
+          icon: Icon(context.streamIcons.refresh),
+          style: StreamButtonStyle.secondary,
+          type: StreamButtonType.ghost,
+          onPressed: () {},
+        ),
+      ],
+      actions: [
+        StreamButton(
+          style: StreamButtonStyle.secondary,
+          type: StreamButtonType.ghost,
+          onPressed: () {},
+          child: const Text('Cancel'),
+        ),
+        StreamButton(onPressed: () {}, child: const Text('Share')),
+      ],
+      child: const _ShortBody(),
     );
   }
 }
@@ -242,9 +297,15 @@ class _LongBody extends StatelessWidget {
 }
 
 // A dialog drawn in place rather than opened, on a scrim so its surface
-// stands out from the page.
+// stands out from the page. The panel grows with the dialog, so a larger text
+// scale does not clip it, and its outline keeps it visible in dark mode, where
+// the scrim is close to the page color.
 class _Example extends StatelessWidget {
-  const _Example({required this.label, required this.caption, required this.child});
+  const _Example({
+    required this.label,
+    required this.caption,
+    required this.child,
+  });
 
   final String label;
   final String caption;
@@ -255,6 +316,7 @@ class _Example extends StatelessWidget {
     final colorScheme = context.streamColorScheme;
     final textTheme = context.streamTextTheme;
     final spacing = context.streamSpacing;
+    final radius = BorderRadius.all(context.streamRadius.lg);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,15 +324,23 @@ class _Example extends StatelessWidget {
       children: [
         Text(label, style: textTheme.captionEmphasis.copyWith(color: colorScheme.textTertiary)),
         Text(caption, style: textTheme.captionDefault.copyWith(color: colorScheme.textSecondary)),
-        ClipRRect(
-          borderRadius: BorderRadius.all(context.streamRadius.lg),
-          child: SizedBox(
-            height: 280,
-            child: Stack(
-              children: [
-                const Positioned.fill(child: StreamBlurScrim()),
-                child,
-              ],
+        DecoratedBox(
+          position: DecorationPosition.foreground,
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: Border.all(color: colorScheme.borderDefault),
+          ),
+          child: ClipRRect(
+            borderRadius: radius,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 280),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Positioned.fill(child: StreamBlurScrim()),
+                  child,
+                ],
+              ),
             ),
           ),
         ),

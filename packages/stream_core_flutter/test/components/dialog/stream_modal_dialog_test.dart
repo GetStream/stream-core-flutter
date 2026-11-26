@@ -5,7 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/video.dart';
 
-Widget _app({required Widget child, Brightness brightness = Brightness.light, TargetPlatform? platform}) {
+Widget _app({
+  required Widget child,
+  Brightness brightness = Brightness.light,
+  TargetPlatform? platform,
+}) {
   return MaterialApp(
     theme: ThemeData(
       brightness: brightness,
@@ -289,11 +293,110 @@ void main() {
     expect(surface.bottom - body.bottom, 10);
   });
 
+  for (final (platform, padding) in [(TargetPlatform.macOS, 24.0), (TargetPlatform.android, 16.0)]) {
+    testWidgets('on ${platform.name}, the body keeps $padding from the edge without a footer', (tester) async {
+      await _openDialog(
+        tester,
+        platform: platform,
+        builder: (context) => StreamModalDialog(
+          title: const Text('Settings'),
+          child: const SizedBox(width: 50, height: 50),
+        ),
+      );
+
+      final body = tester.getRect(find.byType(SizedBox).last);
+      final surface = tester.getRect(_surfaceMaterial());
+      expect(surface.bottom - body.bottom, padding);
+      expect(body.left - surface.left, padding);
+    });
+
+    testWidgets('on ${platform.name}, the body keeps $padding from the footer', (tester) async {
+      await _openDialog(
+        tester,
+        platform: platform,
+        builder: (context) => StreamModalDialog(
+          title: const Text('Settings'),
+          showCloseButton: false,
+          actions: [StreamButton(onPressed: () {}, child: const Text('Done'))],
+          child: const SizedBox(width: 50, height: 50),
+        ),
+      );
+
+      final body = tester.getRect(find.byType(SizedBox).last);
+      final button = tester.getRect(find.byType(StreamButton));
+      final surface = tester.getRect(_surfaceMaterial());
+      expect(button.top - body.bottom, padding);
+      expect(surface.bottom - button.bottom, padding);
+    });
+  }
+
+  group('transition', () {
+    Future<void> open(WidgetTester tester, {AnimationStyle? animationStyle}) async {
+      await tester.pumpWidget(
+        _app(
+          platform: TargetPlatform.android,
+          child: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showStreamModalDialog<void>(
+                context: context,
+                animationStyle: animationStyle,
+                builder: (context) => StreamModalDialog(child: const Text('body')),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pump();
+    }
+
+    double blurSigma(WidgetTester tester) {
+      final scrim = tester.widget<StreamBlurScrim>(find.byType(StreamBlurScrim));
+      return scrim.blurSigma!;
+    }
+
+    testWidgets('grows the blur with the animation', (tester) async {
+      await open(tester);
+      expect(blurSigma(tester), 0);
+
+      await tester.pump(const Duration(milliseconds: 75));
+      expect(blurSigma(tester), allOf(greaterThan(0), lessThan(25)));
+
+      await tester.pumpAndSettle();
+      expect(blurSigma(tester), 25);
+    });
+
+    testWidgets('takes 150 milliseconds by default', (tester) async {
+      await open(tester);
+      await tester.pump(const Duration(milliseconds: 150));
+
+      expect(blurSigma(tester), 25);
+    });
+
+    testWidgets('animationStyle sets the duration and the curve', (tester) async {
+      await open(
+        tester,
+        animationStyle: const AnimationStyle(duration: Duration(milliseconds: 400), curve: Curves.linear),
+      );
+
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(blurSigma(tester), moreOrLessEquals(12.5));
+
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(blurSigma(tester), 25);
+    });
+  });
+
   testWidgets('on the web and desktop, a header with no title or buttons is 88 high', (tester) async {
     await _openDialog(
       tester,
       platform: TargetPlatform.macOS,
-      builder: (context) => StreamModalDialog(showCloseButton: false, child: const SizedBox.shrink()),
+      builder: (context) => StreamModalDialog(
+        showCloseButton: false,
+        contentPadding: EdgeInsets.zero,
+        child: const SizedBox.shrink(),
+      ),
     );
 
     expect(tester.getSize(_surfaceMaterial()).height, 88);
@@ -303,7 +406,11 @@ void main() {
     await _openDialog(
       tester,
       platform: TargetPlatform.iOS,
-      builder: (context) => StreamModalDialog(showCloseButton: false, child: const SizedBox.shrink()),
+      builder: (context) => StreamModalDialog(
+        showCloseButton: false,
+        contentPadding: EdgeInsets.zero,
+        child: const SizedBox.shrink(),
+      ),
     );
 
     expect(tester.getSize(_surfaceMaterial()).height, 72);
