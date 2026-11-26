@@ -34,10 +34,18 @@ Color _labelColorOf(WidgetTester tester, String label) => tester.widget<Text>(fi
 
 Finder _tab(String label) => find.ancestor(of: find.text(label), matching: find.byType(InkWell));
 
-// The underline of the tab whose label is [label]; only the selected tab has one.
-Finder _indicator(String label) => find.descendant(of: _tab(label), matching: find.byType(ColoredBox));
+// The underline below the selected tab.
+Finder get _indicator => find.descendant(of: find.byType(AnimatedAlign), matching: find.byType(ColoredBox));
 
-Color _indicatorColorOf(WidgetTester tester, String label) => tester.widget<ColoredBox>(_indicator(label)).color;
+Color _indicatorColorOf(WidgetTester tester) => tester.widget<ColoredBox>(_indicator).color;
+
+// Whether the underline spans the tab whose label is [label].
+void _expectIndicatorUnder(WidgetTester tester, String label) {
+  final indicator = tester.getRect(_indicator);
+  final tab = tester.getRect(_tab(label));
+  expect(indicator.left, tab.left);
+  expect(indicator.right, tab.right);
+}
 
 // The divider along the bottom of the whole bar.
 BorderSide _dividerOf(WidgetTester tester) {
@@ -68,7 +76,7 @@ Future<void> _hover(WidgetTester tester, String label) async {
   final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
   await gesture.addPointer(location: tester.getCenter(find.text(label)));
   addTearDown(gesture.removePointer);
-  await tester.pump();
+  await tester.pumpAndSettle();
 }
 
 StreamColorScheme _colorSchemeOf(WidgetTester tester) {
@@ -88,10 +96,11 @@ void main() {
     await tester.pumpWidget(_withStreamTheme(_tabBar(selectedIndex: 1)));
 
     final colorScheme = _colorSchemeOf(tester);
-    expect(_indicatorColorOf(tester, 'Window'), colorScheme.accentPrimary);
-    expect(tester.getSize(_indicator('Window')).height, 2);
-    expect(tester.getRect(_indicator('Window')).bottom, tester.getRect(find.byType(StreamTabBar)).bottom);
-    expect(_indicator('Entire Screen'), findsNothing);
+    expect(_indicatorColorOf(tester), colorScheme.accentPrimary);
+    expect(tester.getSize(_indicator).height, 2);
+    expect(tester.getRect(_indicator).bottom, tester.getRect(find.byType(StreamTabBar)).bottom);
+    expect(_indicator, findsOneWidget);
+    _expectIndicatorUnder(tester, 'Window');
     expect(_dividerOf(tester), BorderSide(color: colorScheme.borderDefault));
   });
 
@@ -152,9 +161,9 @@ void main() {
     final colorScheme = _colorSchemeOf(tester);
     for (final label in ['Entire Screen', 'Window']) {
       expect(_labelColorOf(tester, label), colorScheme.textSecondary);
-      expect(_indicator(label), findsNothing);
       expect(tester.semantics.find(find.text(label)), isSemantics(hasSelectedState: true, isSelected: false));
     }
+    expect(_indicator, findsNothing);
     handle.dispose();
   });
 
@@ -172,7 +181,7 @@ void main() {
     await tester.pumpWidget(_withStreamTheme(_tabBar(onTap: tapped.add, windowEnabled: false)));
 
     expect(_labelColorOf(tester, 'Window'), _colorSchemeOf(tester).textDisabled);
-    expect(_indicator('Window'), findsNothing, reason: 'an unselected disabled tab keeps the divider');
+    _expectIndicatorUnder(tester, 'Entire Screen');
 
     await tester.tap(find.text('Window'), warnIfMissed: false);
     await tester.pumpAndSettle();
@@ -182,7 +191,7 @@ void main() {
   testWidgets('underlines a selected disabled tab in the disabled border color', (tester) async {
     await tester.pumpWidget(_withStreamTheme(_tabBar(selectedIndex: 1, windowEnabled: false)));
 
-    expect(_indicatorColorOf(tester, 'Window'), _colorSchemeOf(tester).borderDisabled);
+    expect(_indicatorColorOf(tester), _colorSchemeOf(tester).borderDisabled);
   });
 
   testWidgets('announces a disabled tab and skips it with the keyboard', (tester) async {
@@ -196,10 +205,18 @@ void main() {
     );
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(Focus.of(tester.element(find.text('Entire Screen'))).hasPrimaryFocus, isTrue);
+
+    // The next stop wraps back to the first tab, passing over the disabled one.
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(Focus.of(tester.element(find.text('Window'))).hasFocus, isFalse);
+    expect(Focus.of(tester.element(find.text('Entire Screen'))).hasPrimaryFocus, isTrue);
+
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
-    expect(tapped, isNot(contains(1)));
+    expect(tapped, [0]);
     handle.dispose();
   });
 
@@ -344,7 +361,6 @@ void main() {
       _withStreamTheme(
         streamTheme: StreamTheme(
           tabBarTheme: StreamTabBarThemeData(
-            minHeight: 64,
             indicatorWeight: 4,
             indicatorColor: bySelection,
             labelStyle: const TextStyle(fontSize: 20),
@@ -355,9 +371,8 @@ void main() {
       ),
     );
 
-    expect(tester.getSize(find.byType(StreamTabBar)).height, 64);
-    expect(tester.getSize(_indicator('Entire Screen')).height, 4);
-    expect(_indicatorColorOf(tester, 'Entire Screen'), selected);
+    expect(tester.getSize(_indicator).height, 4);
+    expect(_indicatorColorOf(tester), selected);
     expect(_labelColorOf(tester, 'Entire Screen'), selected);
     expect(_labelColorOf(tester, 'Window'), unselected);
 
@@ -388,7 +403,7 @@ void main() {
 
     final colorScheme = _colorSchemeOf(tester);
     expect(_labelColorOf(tester, 'Window'), selected);
-    expect(_indicatorColorOf(tester, 'Window'), selected);
+    expect(_indicatorColorOf(tester), selected);
     expect(_labelColorOf(tester, 'Entire Screen'), colorScheme.textSecondary);
     expect(IconTheme.of(tester.element(find.byIcon(Icons.monitor))).color, colorScheme.textSecondary);
 
@@ -416,10 +431,11 @@ void main() {
 
     final gesture = await tester.startGesture(tester.getCenter(find.text('Window')));
     await tester.pump(kPressTimeout);
+    await tester.pump(const Duration(milliseconds: 200));
     expect(_overlayOf(tester, 'Window').color, _colorSchemeOf(tester).backgroundPressed);
 
     await gesture.up();
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(_overlayOf(tester, 'Window').color, StreamColors.transparent);
   });
 
@@ -429,7 +445,7 @@ void main() {
     await tester.pumpWidget(_withStreamTheme(_tabBar()));
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     final colorScheme = _colorSchemeOf(tester);
     expect(_overlaySideOf(tester, 'Entire Screen'), BorderSide(width: 2, color: colorScheme.borderFocus));
@@ -456,6 +472,52 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(tapped, [1]);
+  });
+
+  testWidgets('underlines the selected tab on its own side in RTL', (tester) async {
+    await tester.pumpWidget(
+      _withStreamTheme(
+        Directionality(textDirection: TextDirection.rtl, child: _tabBar()),
+      ),
+    );
+
+    _expectIndicatorUnder(tester, 'Entire Screen');
+    expect(tester.getRect(_tab('Entire Screen')).left, greaterThan(tester.getRect(_tab('Window')).left));
+  });
+
+  testWidgets('slides the underline and blends the label colors to a newly selected tab', (tester) async {
+    await tester.pumpWidget(_withStreamTheme(_tabBar()));
+    final colorScheme = _colorSchemeOf(tester);
+    final start = tester.getRect(_indicator).left;
+
+    await tester.pumpWidget(_withStreamTheme(_tabBar(selectedIndex: 1)));
+    await tester.pump(kTabScrollDuration ~/ 2);
+
+    final halfway = tester.getRect(_indicator).left;
+    expect(halfway, greaterThan(start));
+    expect(halfway, lessThan(tester.getRect(_tab('Window')).left));
+    expect(_labelColorOf(tester, 'Window'), isNot(anyOf(colorScheme.textSecondary, colorScheme.accentPrimary)));
+    expect(_labelColorOf(tester, 'Entire Screen'), isNot(anyOf(colorScheme.textSecondary, colorScheme.accentPrimary)));
+
+    await tester.pumpAndSettle();
+    _expectIndicatorUnder(tester, 'Window');
+    expect(_labelColorOf(tester, 'Window'), colorScheme.accentPrimary);
+    expect(_labelColorOf(tester, 'Entire Screen'), colorScheme.textSecondary);
+  });
+
+  testWidgets('fades the hover pill in', (tester) async {
+    await tester.pumpWidget(_withStreamTheme(_tabBar()));
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: tester.getCenter(find.text('Window')));
+    addTearDown(gesture.removePointer);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 25));
+
+    final hover = _colorSchemeOf(tester).backgroundHover;
+    expect(_overlayOf(tester, 'Window').color, isNot(anyOf(hover, StreamColors.transparent)));
+
+    await tester.pumpAndSettle();
+    expect(_overlayOf(tester, 'Window').color, hover);
   });
 
   testWidgets('fits under an AppBar as its bottom', (tester) async {
@@ -517,17 +579,22 @@ void main() {
   testWidgets('a local StreamTabBarTheme beats the one on StreamTheme', (tester) async {
     await tester.pumpWidget(
       _withStreamTheme(
-        streamTheme: StreamTheme(tabBarTheme: const StreamTabBarThemeData(minHeight: 64, indicatorWeight: 4)),
+        streamTheme: StreamTheme(tabBarTheme: const StreamTabBarThemeData(dividerHeight: 3, indicatorWeight: 4)),
         StreamTabBarTheme(
-          data: const StreamTabBarThemeData(minHeight: 56),
+          data: const StreamTabBarThemeData(dividerHeight: 5),
           child: _tabBar(),
         ),
       ),
     );
 
-    expect(tester.getSize(find.byType(StreamTabBar)).height, 56);
+    expect(_dividerOf(tester).width, 5);
     expect(
-      tester.getSize(_indicator('Entire Screen')).height,
+      tester.getSize(find.byType(StreamTabBar)).height,
+      48,
+      reason: 'the underline and divider are drawn inside the bar',
+    );
+    expect(
+      tester.getSize(_indicator).height,
       4,
       reason: 'unset local fields fall back to StreamTheme',
     );

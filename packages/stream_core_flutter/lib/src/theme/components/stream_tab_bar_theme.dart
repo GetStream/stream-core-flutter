@@ -108,7 +108,6 @@ class StreamTabBarTheme extends InheritedTheme {
 class StreamTabBarThemeData with _$StreamTabBarThemeData {
   /// Creates tab bar theme data with optional property overrides.
   const StreamTabBarThemeData({
-    this.minHeight,
     this.indicatorWeight,
     this.indicatorColor,
     this.dividerHeight,
@@ -121,14 +120,9 @@ class StreamTabBarThemeData with _$StreamTabBarThemeData {
     this.spacing,
   });
 
-  /// The minimum height of the bar in logical pixels, underline included.
-  ///
-  /// The bar grows taller when the text scale needs more room. Defaults to
-  /// [kMinInteractiveDimension].
-  final double? minHeight;
-
   /// The thickness of the underline below the selected tab, in logical pixels.
   ///
+  /// The underline is drawn inside the bar's height, not added to it.
   /// Defaults to 2.
   final double? indicatorWeight;
 

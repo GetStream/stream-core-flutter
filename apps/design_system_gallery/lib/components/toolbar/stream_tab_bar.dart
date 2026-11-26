@@ -220,10 +220,9 @@ class _ThemedSectionState extends State<_ThemedSection> {
   Widget build(BuildContext context) {
     return _ExampleCard(
       title: 'Themed',
-      description: 'A StreamTabBarTheme with a taller bar, a thicker underline and no divider under the bar.',
+      description: 'A StreamTabBarTheme with a thicker underline and no divider under the bar.',
       child: StreamTabBarTheme(
         data: const StreamTabBarThemeData(
-          minHeight: 56,
           indicatorWeight: 3,
           dividerColor: Colors.transparent,
         ),

@@ -16,15 +16,17 @@ import '../../theme/stream_theme_extensions.dart';
 /// A row of equal-width tabs that underlines the selected one.
 ///
 /// The bar carries no controller: [StreamTabBarProps.selectedIndex] comes from
-/// the caller and [StreamTabBarProps.onTap] reports a tap.
+/// the caller and [StreamTabBarProps.onTap] reports a tap. When the selected
+/// index changes, the underline slides to the new tab and the label colors
+/// cross-fade, over [kTabScrollDuration].
 ///
 /// Screen readers announce the bar as a tab bar and each tab as a tab with
 /// its selected state. Every enabled tab is a keyboard focus stop, and Enter
 /// or Space selects the focused tab.
 ///
-/// The bar is a [PreferredSizeWidget], so it can be an [AppBar.bottom]. Its
-/// [preferredSize] is the default height, so wrap it in a [PreferredSize]
-/// when a theme changes [StreamTabBarThemeData.minHeight].
+/// The bar is a [PreferredSizeWidget], so it can be an [AppBar.bottom]. It is
+/// [kMinInteractiveDimension] tall, the divider and underline included, and
+/// grows only when the text scale needs more room.
 ///
 /// {@tool snippet}
 ///
@@ -121,7 +123,11 @@ class StreamTabBar extends StatelessWidget implements PreferredSizeWidget {
 @experimental
 final class StreamTabBarItem {
   /// Creates a tab.
-  const StreamTabBarItem({required this.label, this.icon, this.enabled = true});
+  const StreamTabBarItem({
+    required this.label,
+    this.icon,
+    this.enabled = true,
+  });
 
   /// The tab's label, which is also what screen readers announce for it.
   final String label;
@@ -201,21 +207,30 @@ class DefaultStreamTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.streamTabBarTheme;
     final defaults = _StreamTabBarThemeDefaults(context);
-    final effective = defaults.merge(theme);
+
+    final effectiveIndicatorWeight = theme.indicatorWeight ?? defaults.indicatorWeight;
+    final effectiveIndicatorColor = _withDefault(theme.indicatorColor, defaults.indicatorColor);
+    final effectiveDividerHeight = theme.dividerHeight ?? defaults.dividerHeight;
+    final effectiveDividerColor = theme.dividerColor ?? defaults.dividerColor;
+    final effectiveLabelStyle = defaults.labelStyle.merge(theme.labelStyle);
+    final effectiveForegroundColor = _withDefault(theme.foregroundColor, defaults.foregroundColor);
+    final effectiveOverlayColor = _withDefault(theme.overlayColor, defaults.overlayColor);
+    final effectiveOverlaySide = _withDefault(theme.overlaySide, defaults.overlaySide);
+    final effectiveLabelPadding = theme.labelPadding ?? defaults.labelPadding;
+    final effectiveSpacing = theme.spacing ?? defaults.spacing;
 
     final style = _StreamTabStyle(
-      indicatorWeight: effective.indicatorWeight!,
-      indicatorColor: _withDefault(theme.indicatorColor, defaults.indicatorColor),
-      labelStyle: effective.labelStyle!,
-      foregroundColor: _withDefault(theme.foregroundColor, defaults.foregroundColor),
-      overlayColor: _withDefault(theme.overlayColor, defaults.overlayColor),
-      overlaySide: _withDefault(theme.overlaySide, defaults.overlaySide),
+      labelStyle: effectiveLabelStyle,
+      foregroundColor: effectiveForegroundColor,
+      overlayColor: effectiveOverlayColor,
+      overlaySide: effectiveOverlaySide,
       overlayInsets: .symmetric(vertical: context.streamSpacing.xs),
-      labelPadding: effective.labelPadding!,
-      spacing: effective.spacing!,
+      labelPadding: effectiveLabelPadding,
+      spacing: effectiveSpacing,
     );
 
     final tabCount = props.tabs.length;
+    final selectedIndex = props.selectedIndex;
 
     return Semantics(
       role: SemanticsRole.tabBar,
@@ -226,22 +241,41 @@ class DefaultStreamTabBar extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(width: effective.dividerHeight!, color: effective.dividerColor!),
+              bottom: BorderSide(width: effectiveDividerHeight, color: effectiveDividerColor),
             ),
           ),
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: effective.minHeight!),
-            child: _EqualTabsRow(
-              textDirection: Directionality.of(context),
+            constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
+            child: Stack(
+              fit: .passthrough,
               children: [
-                for (final (index, tab) in props.tabs.indexed)
-                  _StreamTab(
-                    item: tab,
-                    index: index,
-                    tabCount: tabCount,
-                    selected: index == props.selectedIndex,
-                    style: style,
-                    onTap: () => props.onTap(index),
+                _EqualTabsRow(
+                  textDirection: Directionality.of(context),
+                  children: [
+                    for (final (index, tab) in props.tabs.indexed)
+                      _StreamTab(
+                        item: tab,
+                        index: index,
+                        tabCount: tabCount,
+                        selected: index == selectedIndex,
+                        style: style,
+                        onTap: () => props.onTap(index),
+                      ),
+                  ],
+                ),
+                if (selectedIndex != null)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: _StreamTabIndicator(
+                        selectedIndex: selectedIndex,
+                        tabCount: tabCount,
+                        weight: effectiveIndicatorWeight,
+                        color: effectiveIndicatorColor.resolve({
+                          WidgetState.selected,
+                          if (!props.tabs[selectedIndex].enabled) WidgetState.disabled,
+                        }),
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -259,6 +293,46 @@ class DefaultStreamTabBar extends StatelessWidget {
   ) {
     if (theme == null) return fallback;
     return .resolveWith((states) => theme.resolve(states) ?? fallback.resolve(states));
+  }
+}
+
+// The underline below the selected tab, sliding to a new tab and blending to
+// its color when the selection changes.
+class _StreamTabIndicator extends StatelessWidget {
+  const _StreamTabIndicator({
+    required this.selectedIndex,
+    required this.tabCount,
+    required this.weight,
+    required this.color,
+  });
+
+  final int selectedIndex;
+  final int tabCount;
+  final double weight;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    // -1 puts the underline under the first tab and 1 under the last, flipped in RTL.
+    final x = tabCount == 1 ? 0.0 : -1 + 2 * selectedIndex / (tabCount - 1);
+
+    return AnimatedAlign(
+      duration: kTabScrollDuration,
+      curve: Curves.ease,
+      alignment: AlignmentDirectional(x, 1),
+      child: FractionallySizedBox(
+        widthFactor: 1 / tabCount,
+        child: TweenAnimationBuilder<Color?>(
+          tween: ColorTween(end: color),
+          duration: kTabScrollDuration,
+          curve: Curves.ease,
+          builder: (context, color, _) => SizedBox(
+            height: weight,
+            child: ColoredBox(color: color!),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -402,8 +476,6 @@ class _RenderEqualTabsRow extends RenderBox
 // The resolved visual values every tab of one bar shares.
 class _StreamTabStyle {
   const _StreamTabStyle({
-    required this.indicatorWeight,
-    required this.indicatorColor,
     required this.labelStyle,
     required this.foregroundColor,
     required this.overlayColor,
@@ -413,8 +485,6 @@ class _StreamTabStyle {
     required this.spacing,
   });
 
-  final double indicatorWeight;
-  final WidgetStateProperty<Color> indicatorColor;
   final TextStyle labelStyle;
   final WidgetStateProperty<Color> foregroundColor;
   final WidgetStateProperty<Color> overlayColor;
@@ -446,6 +516,9 @@ class _StreamTab extends StatefulWidget {
 }
 
 class _StreamTabState extends State<_StreamTab> {
+  static const _overlayFadeDuration = Duration(milliseconds: 50);
+  static const _pressedFadeDuration = Duration(milliseconds: 200);
+
   final _interactionStates = WidgetStatesController();
 
   @override
@@ -483,36 +556,33 @@ class _StreamTabState extends State<_StreamTab> {
           child: Stack(
             fit: .passthrough,
             children: [
-              Padding(
-                padding: style.labelPadding,
-                child: Row(
-                  mainAxisAlignment: .center,
-                  spacing: style.spacing,
-                  children: [
-                    if (item.icon case final icon?)
-                      IconTheme.merge(
-                        data: IconThemeData(color: foregroundColor),
-                        child: icon,
+              TweenAnimationBuilder<Color?>(
+                tween: ColorTween(end: foregroundColor),
+                duration: kTabScrollDuration,
+                curve: Curves.ease,
+                builder: (context, color, _) => Padding(
+                  padding: style.labelPadding,
+                  child: Row(
+                    mainAxisAlignment: .center,
+                    spacing: style.spacing,
+                    children: [
+                      if (item.icon case final icon?)
+                        IconTheme.merge(
+                          data: IconThemeData(color: color),
+                          child: icon,
+                        ),
+                      Flexible(
+                        child: Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: .ellipsis,
+                          style: style.labelStyle.copyWith(color: color),
+                        ),
                       ),
-                    Flexible(
-                      child: Text(
-                        item.label,
-                        maxLines: 1,
-                        overflow: .ellipsis,
-                        style: style.labelStyle.copyWith(color: foregroundColor),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              if (widget.selected)
-                PositionedDirectional(
-                  start: 0,
-                  end: 0,
-                  bottom: 0,
-                  height: style.indicatorWeight,
-                  child: ColoredBox(color: style.indicatorColor.resolve(states)),
-                ),
               Positioned.fill(
                 child: IgnorePointer(
                   child: Padding(
@@ -521,7 +591,10 @@ class _StreamTabState extends State<_StreamTab> {
                       valueListenable: _interactionStates,
                       builder: (context, interaction, _) {
                         final overlayStates = {...interaction, ...states};
-                        return DecoratedBox(
+                        // As InkWell fades its overlay: slower in and out of a press than for hover and focus.
+                        final pressed = overlayStates.contains(WidgetState.pressed);
+                        return AnimatedContainer(
+                          duration: pressed ? _pressedFadeDuration : _overlayFadeDuration,
                           decoration: ShapeDecoration(
                             color: style.overlayColor.resolve(overlayStates),
                             shape: StadiumBorder(side: style.overlaySide.resolve(overlayStates)),
@@ -551,9 +624,6 @@ class _StreamTabBarThemeDefaults extends StreamTabBarThemeData {
   late final StreamColorScheme _colorScheme = _context.streamColorScheme;
   late final StreamTextTheme _textTheme = _context.streamTextTheme;
   late final StreamSpacing _spacing = _context.streamSpacing;
-
-  @override
-  double get minHeight => kMinInteractiveDimension;
 
   @override
   double get indicatorWeight => 2;
