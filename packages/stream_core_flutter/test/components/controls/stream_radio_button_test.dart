@@ -444,6 +444,84 @@ void main() {
       expect(painted.background, StreamColors.transparent);
       expect(painted.side, BorderSide(color: colorScheme.borderDefault));
     });
+
+    testWidgets('uses the disabled colors when selected and not enabled', (tester) async {
+      await tester.pumpWidget(_withStreamTheme(const StreamRadioIndicator(selected: true, enabled: false)));
+
+      final painted = _Painted(tester, find.byType(StreamRadioIndicator));
+      expect(painted.background, colorScheme.backgroundDisabled);
+      expect(painted.indicator, colorScheme.textDisabled);
+      expect(painted.side, BorderSide.none);
+    });
+
+    testWidgets('uses the disabled border when unselected and not enabled', (tester) async {
+      await tester.pumpWidget(_withStreamTheme(const StreamRadioIndicator(selected: false, enabled: false)));
+
+      expect(_Painted(tester, find.byType(StreamRadioIndicator)).side, BorderSide(color: colorScheme.borderDisabled));
+    });
+
+    testWidgets('animates a change of selected over 200ms', (tester) async {
+      Widget indicator({required bool selected}) => _withStreamTheme(StreamRadioIndicator(selected: selected));
+
+      await tester.pumpWidget(indicator(selected: false));
+      final painted = _Painted(tester, find.byType(StreamRadioIndicator));
+      expect(painted.indicatorSize, Size.zero);
+
+      await tester.pumpWidget(indicator(selected: true));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(painted.indicatorSize.width, inExclusiveRange(0, 10));
+      expect(painted.background, isNot(anyOf(StreamColors.transparent, colorScheme.accentPrimary)));
+
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(painted.indicatorSize, const Size.square(10));
+      expect(painted.background, colorScheme.accentPrimary);
+    });
+  });
+
+  group('StreamRadioButton selection animation', () {
+    testWidgets('starts at rest in its current state', (tester) async {
+      await tester.pumpWidget(_withStreamTheme(_radio(selected: true)));
+
+      expect(_paintedRadio(tester).indicatorSize, const Size.square(10));
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    testWidgets('grows the dot and blends the colors over 200ms when selected', (tester) async {
+      String? selection = 'a';
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StatefulBuilder(
+            builder: (context, setState) => _group<String>(
+              ['a', 'b'],
+              groupValue: selection,
+              onChanged: (value) => setState(() => selection = value),
+            ),
+          ),
+        ),
+      );
+      final b = _Painted(tester, find.byKey(const ValueKey('b')));
+      expect(b.indicatorSize, Size.zero);
+      expect(b.side, BorderSide(color: colorScheme.borderDefault));
+
+      await tester.tap(find.byKey(const ValueKey('b')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(b.indicatorSize.width, inExclusiveRange(0, 10));
+      expect(b.background, isNot(anyOf(StreamColors.transparent, colorScheme.accentPrimary)));
+      expect(b.side, isNot(anyOf(BorderSide.none, BorderSide(color: colorScheme.borderDefault))));
+      // The radio button losing the selection shrinks at the same time.
+      expect(_Painted(tester, find.byKey(const ValueKey('a'))).indicatorSize.width, inExclusiveRange(0, 10));
+
+      await tester.pumpAndSettle();
+
+      expect(b.indicatorSize, const Size.square(10));
+      expect(b.background, colorScheme.accentPrimary);
+      expect(b.side, BorderSide.none);
+      expect(_Painted(tester, find.byKey(const ValueKey('a'))).indicatorSize, Size.zero);
+    });
   });
 
   group('StreamRadioButton theming', () {
@@ -469,7 +547,32 @@ void main() {
       expect(_paintedRadio(tester).indicator, Colors.black);
     });
 
-    testWidgets('replaces a themed border with the focus ring', (tester) async {
+    testWidgets('themes the focus ring through side', (tester) async {
+      await tester.pumpWidget(
+        _withStreamTheme(
+          StreamRadioButtonTheme(
+            data: StreamRadioButtonThemeData(
+              style: StreamRadioButtonStyle(
+                side: WidgetStateBorderSide.resolveWith((states) {
+                  if (states.contains(WidgetState.focused)) return const BorderSide(color: Colors.purple, width: 3);
+                  return null;
+                }),
+              ),
+            ),
+            child: _radio(selected: false),
+          ),
+        ),
+      );
+
+      // States the theme leaves null keep the default border.
+      expect(_paintedRadio(tester).side, BorderSide(color: colorScheme.borderDefault));
+
+      await _focusWithKeyboard(tester);
+
+      expect(_paintedRadio(tester).side, const BorderSide(color: Colors.purple, width: 3));
+    });
+
+    testWidgets('a themed side also applies while focused', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamRadioButtonTheme(
@@ -481,11 +584,9 @@ void main() {
         ),
       );
 
-      expect(_paintedRadio(tester).side, const BorderSide(color: Colors.green, width: 2));
-
       await _focusWithKeyboard(tester);
 
-      expect(_paintedRadio(tester).side, BorderSide(color: colorScheme.borderFocus, width: 2));
+      expect(_paintedRadio(tester).side, const BorderSide(color: Colors.green, width: 2));
     });
 
     testWidgets('a local theme beats the global theme', (tester) async {
@@ -583,22 +684,28 @@ void main() {
       expect(style.side, isNull);
     });
 
-    testWidgets('keeps the default for every state it does not set', (tester) async {
+    test('uses an unprefixed value for the states without their own', () {
+      final style = StreamRadioButtonStyle.from(
+        backgroundColor: Colors.red,
+        side: const BorderSide(color: Colors.red),
+      );
+
+      expect(style.backgroundColor!.resolve(selected), Colors.red);
+      expect(style.backgroundColor!.resolve(disabledSelected), Colors.red);
+      expect(style.side!.resolve({WidgetState.focused}), const BorderSide(color: Colors.red));
+    });
+
+    testWidgets('keeps the default for every property it does not set', (tester) async {
       await tester.pumpWidget(
         _withStreamTheme(
           StreamRadioButtonTheme(
             data: StreamRadioButtonThemeData(
-              style: StreamRadioButtonStyle.from(
-                selectedBackgroundColor: Colors.green,
-                selectedSide: const BorderSide(color: Colors.green),
-              ),
+              style: StreamRadioButtonStyle.from(selectedBackgroundColor: Colors.green),
             ),
             child: Column(
               children: [
                 _radio(selected: true),
                 _radio(selected: false),
-                _radio(selected: true, enabled: false),
-                _radio(selected: false, enabled: false),
               ],
             ),
           ),
@@ -607,11 +714,9 @@ void main() {
 
       final radios = find.byType(StreamRadioButton<bool>);
       expect(_Painted(tester, radios.at(0)).background, Colors.green);
-      expect(_Painted(tester, radios.at(0)).side, const BorderSide(color: Colors.green));
-      expect(_Painted(tester, radios.at(1)).background, StreamColors.transparent);
+      expect(_Painted(tester, radios.at(0)).indicator, colorScheme.textOnAccent);
+      expect(_Painted(tester, radios.at(0)).side, BorderSide.none);
       expect(_Painted(tester, radios.at(1)).side, BorderSide(color: colorScheme.borderDefault));
-      expect(_Painted(tester, radios.at(2)).background, colorScheme.backgroundDisabled);
-      expect(_Painted(tester, radios.at(3)).side, BorderSide(color: colorScheme.borderDisabled));
     });
   });
 

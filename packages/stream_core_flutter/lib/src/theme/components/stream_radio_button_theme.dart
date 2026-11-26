@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 import '../stream_theme.dart';
+import '../widget_state_utils.dart';
 
 part 'stream_radio_button_theme.g.theme.dart';
 
@@ -168,8 +169,7 @@ class StreamRadioButtonThemeData with _$StreamRadioButtonThemeData {
 /// group.
 ///
 /// A property that is null, or that resolves to null for a state, uses the
-/// built-in default for that state. While the radio button has keyboard focus,
-/// a focus ring replaces [side]; the ring is not part of this style.
+/// built-in default for that state.
 ///
 /// See also:
 ///
@@ -193,19 +193,22 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
 
   /// Creates a [StreamRadioButtonStyle] from simple values.
   ///
-  /// Each parameter sets the value for one state:
+  /// State-specific parameters take precedence for their states, and
+  /// unprefixed parameters are the default for all other states:
   ///
-  ///  * Unprefixed parameters apply to an enabled, unselected radio button
-  ///    (and, for [overlayColor], one that is neither hovered nor pressed).
   ///  * `selected` parameters apply to an enabled, selected radio button.
   ///  * `disabled` parameters apply to a disabled radio button, selected or
   ///    not.
   ///  * `hovered` and `pressed` parameters apply to the overlay in those
   ///    states; pressed wins over hovered.
   ///
-  /// A state whose parameter is null keeps the built-in default, so
-  /// `StreamRadioButtonStyle.from(selectedBackgroundColor: Colors.green)`
-  /// changes only the background of an enabled, selected radio button.
+  /// So `StreamRadioButtonStyle.from(backgroundColor: Colors.red)` fills a
+  /// selected and a disabled radio button red too, unless
+  /// `selectedBackgroundColor` or `disabledBackgroundColor` is also given.
+  /// A property whose parameters are all null keeps the built-in default, and
+  /// a disabled radio button keeps its default side unless `disabledSide` is
+  /// given. The side parameters also apply while focused, so they replace the
+  /// default focus ring.
   ///
   /// {@tool snippet}
   ///
@@ -217,6 +220,7 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   ///   selectedBackgroundColor: Colors.green,
   ///   selectedIndicatorColor: Colors.white,
   ///   side: BorderSide(color: Colors.grey),
+  ///   selectedSide: BorderSide.none,
   /// )
   /// ```
   /// {@end-tool}
@@ -237,32 +241,11 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   }) {
     return StreamRadioButtonStyle(
       size: size,
-      backgroundColor: _byState(backgroundColor, selectedBackgroundColor, disabledBackgroundColor),
-      indicatorColor: _byState(indicatorColor, selectedIndicatorColor, disabledIndicatorColor),
-      overlayColor: switch ((overlayColor, hoveredOverlayColor, pressedOverlayColor)) {
-        (null, null, null) => null,
-        _ => WidgetStateProperty<Color?>.fromMap({
-          WidgetState.pressed: pressedOverlayColor,
-          WidgetState.hovered: hoveredOverlayColor,
-          WidgetState.any: overlayColor,
-        }),
-      },
-      side: switch (_byState(side, selectedSide, disabledSide)) {
-        final byState? => WidgetStateBorderSide.resolveWith(byState.resolve),
-        null => null,
-      },
+      backgroundColor: WidgetStateUtils.resolveWith(backgroundColor, selectedBackgroundColor, disabledBackgroundColor),
+      indicatorColor: WidgetStateUtils.resolveWith(indicatorColor, selectedIndicatorColor, disabledIndicatorColor),
+      overlayColor: WidgetStateUtils.resolveOverlay(overlayColor, hoveredOverlayColor, pressedOverlayColor),
+      side: WidgetStateUtils.resolveSide(side, selectedSide, disabledSide),
     );
-  }
-
-  // Maps each value to its own state only, leaving null (the default) for
-  // every state whose value is not given. Disabled wins over selected.
-  static WidgetStateProperty<T?>? _byState<T>(T? value, T? selected, T? disabled) {
-    if (value == null && selected == null && disabled == null) return null;
-    return WidgetStateProperty<T?>.fromMap({
-      WidgetState.disabled: disabled,
-      WidgetState.selected: selected,
-      WidgetState.any: value,
-    });
   }
 
   /// The size of radio buttons.
@@ -295,8 +278,7 @@ class StreamRadioButtonStyle with _$StreamRadioButtonStyle {
   ///
   /// If null, defaults to the default border color when not selected, the
   /// disabled border color when disabled and not selected, and
-  /// [BorderSide.none] when selected. While the radio button has keyboard
-  /// focus, a focus ring replaces this border.
+  /// [BorderSide.none] when selected, and a focus ring when focused.
   final WidgetStateBorderSide? side;
 
   /// Linearly interpolate between two [StreamRadioButtonStyle] objects.

@@ -32,11 +32,15 @@ void main() {
                     ),
                   ),
             ],
-            for (final selected in [true, false])
-              GoldenTestScenario(
-                name: 'indicator ${selected ? 'on' : 'off'}',
-                child: _buildInTheme(StreamRadioIndicator(selected: selected), brightness: brightness),
-              ),
+            for (final enabled in [true, false])
+              for (final selected in [true, false])
+                GoldenTestScenario(
+                  name: 'indicator ${enabled ? 'enabled' : 'disabled'} ${selected ? 'on' : 'off'}',
+                  child: _buildInTheme(
+                    StreamRadioIndicator(selected: selected, enabled: enabled),
+                    brightness: brightness,
+                  ),
+                ),
           ],
         ),
       );
