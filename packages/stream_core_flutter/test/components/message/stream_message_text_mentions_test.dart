@@ -26,10 +26,33 @@ void main() {
     expect(await _tapMention(tester, 'Hi [@Alice](mention:user%20123)', '@Alice'), 'user 123');
   });
 
-  for (final rawId in ['%ZZ', '%', 'user%F', '%FF', '%C3']) {
+  for (final rawId in ['%ZZ', '%', 'user%F', '%FF', '%C3', 'a%20%ZZ']) {
     testWidgets('StreamMessageText shows a mention whose id is not valid percent-encoding: $rawId', (tester) async {
       expect(await _tapMention(tester, 'Hi [@Alice](mention:$rawId)', '@Alice'), rawId);
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('StreamMessageText shows a role mention whose id is not valid percent-encoding', (tester) async {
+    (StreamMentionType, String)? tapped;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Theme(
+          data: ThemeData(extensions: [StreamTheme()]),
+          child: StreamMessageLayout(
+            data: const StreamMessageLayoutData(),
+            child: StreamMessageText(
+              'Hi [@admins](mention-role:%FF)',
+              onTapAnyMention: (_, type, id) => tapped = (type, id),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tapOnText(find.textRange.ofSubstring('@admins'));
+
+    expect(tapped, (StreamMentionType.role, '%FF'));
+    expect(tester.takeException(), isNull);
+  });
 }
