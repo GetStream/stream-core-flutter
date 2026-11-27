@@ -15,14 +15,14 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install Flutter
-      uses: subosito/flutter-action@v2
+    - name: 🐦 Install Flutter
+      uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
       with:
         cache: true
         cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
         channel: ${{ inputs.flutter-channel }}
 
-    - name: Install Melos
+    - name: 📦 Install Melos
       shell: bash
       working-directory: ${{ github.workspace }}
       run: flutter pub global activate melos
@@ -35,7 +35,7 @@ runs:
     # Invoked through `pub global run` rather than as a bare `melos`, so it does
     # not depend on the pub-cache bin directory being on PATH — that differs
     # between the ubuntu, macos and windows runners this action is used from.
-    - name: Bootstrap Workspace
+    - name: 🧩 Bootstrap Workspace
       shell: bash
       working-directory: ${{ github.workspace }}
       run: flutter pub global run melos bootstrap

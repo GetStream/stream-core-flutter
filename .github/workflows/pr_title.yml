@@ -25,7 +25,8 @@ jobs:
     runs-on:
       group: github-public-amd64
     steps:
-      - uses: amannn/action-semantic-pull-request@v5.5.3
+      - name: 🏷️ Check PR Title
+        uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
         with: 
           scopes: |
             llc
@@ -41,7 +42,8 @@ jobs:
     runs-on:
       group: github-public-amd64
     steps:
-      - uses: GetStream/verify-semantic-changelog-update@v1.1.0
+      - name: 📝 Check Changelog Update
+        uses: GetStream/verify-semantic-changelog-update@566b49e5ce5f180280336053428f7e2338a4d496 # v1.1.0
         with:
           scopes: |
             {
@@ -56,7 +58,9 @@ jobs:
   # checks that the entries went under `## Upcoming` rather than into a section
   # for a version that is already published.
   changelog_placement:
+    name: Check Changelog Placement
     runs-on:
       group: github-public-amd64
     steps:
-      - uses: GetStream/verify-semantic-changelog-update/placement@v1.1.0
+      - name: 📝 Check Changelog Placement
+        uses: GetStream/verify-semantic-changelog-update/placement@566b49e5ce5f180280336053428f7e2338a4d496 # v1.1.0

@@ -1,8 +1,8 @@
 name: Publish Design System Gallery
 
 # Deploys the gallery to https://flutter.getstream.io/design-system/beta/ on
-# every push to main, and publishes it to GitHub Pages. A manual run on main
-# deploys beta again; flutter-web refuses other branches.
+# every push to main. A manual run on main deploys beta again; flutter-web
+# refuses other branches.
 #
 # Prod (https://flutter.getstream.io/design-system/) is deployed by
 # release_publish.yml, once a stream_core_flutter release is on pub.dev.
@@ -13,9 +13,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  FLUTTER_CHANNEL: stable
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -24,46 +21,9 @@ permissions:
   contents: read
 
 jobs:
-  build_and_deploy_gallery:
-    if: github.ref == 'refs/heads/main'
-    runs-on:
-      group: github-public-amd64
-    timeout-minutes: 10
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: config git
-        run: |
-          git config --global user.email "$(git log --format='%ae' HEAD^!)"
-          git config --global user.name "$(git log --format='%an' HEAD^!)"
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ env.FLUTTER_CHANNEL }}
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-
-      - name: Install Tools
-        run: flutter pub global activate melos
-
-      - name: Bootstrap Workspace
-        run: melos bootstrap
-
-      - name: Build and Deploy
-        uses: bluefireteam/flutter-gh-pages@v9
-        with:
-          baseHref: /stream-core-flutter/
-          workingDir: apps/design_system_gallery
-
   deploy_hosted:
     name: Deploy to flutter.getstream.io
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
       group: web-deploy-design-system-beta
@@ -76,7 +36,9 @@ jobs:
       id-token: write
     steps:
       - name: 📚 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: 🧩 Bootstrap Workspace
         uses: ./.github/actions/bootstrap
