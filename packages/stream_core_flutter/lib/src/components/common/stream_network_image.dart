@@ -1,6 +1,7 @@
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../cache/internal/stream_bounded_image.dart';
 import '../../cache/internal/stream_image_cache.dart';
 import '../../factory/stream_component_factory.dart';
 import '../../theme/stream_theme_extensions.dart';
@@ -19,12 +20,12 @@ typedef StreamNetworkImagePlaceholderBuilder = WidgetBuilder;
 /// (e.g. to show a tap-to-reload button).
 typedef StreamNetworkImageErrorBuilder = Widget Function(BuildContext context, Object error, VoidCallback? retry);
 
-/// A network image component with automatic caching, error handling,
-/// and tap-to-reload support.
+/// A network image with caching, error handling and tap-to-retry.
 ///
 /// [StreamNetworkImage] loads and displays an image from a URL with built-in
 /// caching. If the image fails to load, it shows an error widget that can be
-/// tapped to retry the request.
+/// tapped to retry the request. Except on web, an image with more pixels than
+/// 8192 by 8192 fails to load.
 ///
 /// {@tool snippet}
 ///
@@ -125,6 +126,7 @@ class StreamNetworkImage extends StatelessWidget {
   /// This is intended for development and testing purposes only.
   @visibleForTesting
   static Future<bool> evictFromCache(String url, {String? cacheKey}) {
+    StreamBoundedImage.evictAll(CachedNetworkImageProvider(url, cacheKey: cacheKey));
     return CachedNetworkImage.evictFromCache(url, cacheKey: cacheKey, cacheManager: StreamImageCache.manager);
   }
 
@@ -186,16 +188,22 @@ class StreamNetworkImageProps {
   /// If null, the image's intrinsic height is used.
   final double? height;
 
-  /// The target width for caching the image in memory.
+  /// The largest width, in physical pixels, to decode the image to.
   ///
-  /// The image will be decoded at this width to save memory. If null,
-  /// the image is decoded at its full resolution.
+  /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
+  /// aspect ratio even when both are set, and is never enlarged. If both are
+  /// null, it is decoded for [width] and [height] times the device pixel
+  /// ratio. Except on web, where the image is decoded at its full size, it is
+  /// never decoded wider than 4096 pixels.
   final int? cacheWidth;
 
-  /// The target height for caching the image in memory.
+  /// The largest height, in physical pixels, to decode the image to.
   ///
-  /// The image will be decoded at this height to save memory. If null,
-  /// the image is decoded at its full resolution.
+  /// The image is fitted within [cacheWidth] and [cacheHeight], keeping its
+  /// aspect ratio even when both are set, and is never enlarged. If both are
+  /// null, it is decoded for [width] and [height] times the device pixel
+  /// ratio. Except on web, where the image is decoded at its full size, it is
+  /// never decoded taller than 4096 pixels.
   final int? cacheHeight;
 
   /// How the image should be inscribed into the space allocated for it.
@@ -247,17 +255,16 @@ class StreamNetworkImageProps {
 
   /// A builder for the error widget shown when loading fails.
   ///
-  /// The builder receives the error and an optional [retry] callback that
-  /// can be invoked to retry loading the image. If null,
-  /// [StreamImageErrorPlaceholder] is used.
+  /// The builder receives the error and a callback that retries loading the
+  /// image. If null, [StreamImageErrorPlaceholder] is used.
   final StreamNetworkImageErrorBuilder? errorBuilder;
 
   /// An optional [Listenable] that triggers a retry when notified.
   ///
-  /// When this listenable fires and the image is in an error state, the
-  /// image will automatically retry loading. This is useful for reacting
-  /// to external events like network reconnection without adding a network
-  /// dependency to the component.
+  /// When this listenable fires and the image is in an error state, the image
+  /// retries loading. This is useful for reacting to external events like
+  /// network reconnection without adding a network dependency to the
+  /// component.
   ///
   /// Example: pass a [ChangeNotifier] that is notified when connectivity
   /// is restored.
@@ -285,14 +292,17 @@ class DefaultStreamNetworkImage extends StatefulWidget {
   State<DefaultStreamNetworkImage> createState() => _DefaultStreamNetworkImageState();
 }
 
+enum _LoadState { checkingCache, loading, loaded, failed }
+
 class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
-  var _retryKey = 0;
-  var _hasError = false;
+  _LoadState _state = .checkingCache;
+  var _generation = 0;
 
   @override
   void initState() {
     super.initState();
     widget.props.retryListenable?.addListener(_onRetryListenableNotified);
+    _checkCache(_generation);
   }
 
   @override
@@ -302,6 +312,11 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
       oldWidget.props.retryListenable?.removeListener(_onRetryListenableNotified);
       widget.props.retryListenable?.addListener(_onRetryListenableNotified);
     }
+    if (_sourceFor(oldWidget.props) != _sourceFor(widget.props)) {
+      _generation++;
+      _state = .checkingCache;
+      _checkCache(_generation);
+    }
   }
 
   @override
@@ -310,17 +325,54 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
     super.dispose();
   }
 
-  void _onRetryListenableNotified() {
-    if (_hasError) _retry();
+  Future<void> _checkCache(int generation) async {
+    final props = widget.props;
+    try {
+      final cached = await StreamImageCache.manager.getFileFromCache(props.cacheKey ?? props.url);
+      if (cached != null) return;
+    } on Exception catch (_) {}
+
+    if (!mounted || generation != _generation || _state != .checkingCache) return;
+    setState(() => _state = .loading);
   }
 
-  void _retry() {
-    final props = widget.props;
-    StreamNetworkImage.evictFromCache(props.url, cacheKey: props.cacheKey);
+  CachedNetworkImageProvider _sourceFor(StreamNetworkImageProps props) {
+    return CachedNetworkImageProvider(
+      props.url,
+      headers: props.httpHeaders,
+      cacheKey: props.cacheKey,
+      cacheManager: StreamImageCache.manager,
+    );
+  }
 
+  ImageProvider<Object> _imageFor(StreamNetworkImageProps props) {
+    final hasCacheSize = props.cacheWidth != null || props.cacheHeight != null;
+    int? logicalExtent(double? extent) => extent != null && extent.isFinite ? extent.ceil() : null;
+
+    return StreamBoundedImage(
+      _sourceFor(props),
+      width: hasCacheSize ? props.cacheWidth : logicalExtent(props.width),
+      height: hasCacheSize ? props.cacheHeight : logicalExtent(props.height),
+      fit: hasCacheSize ? .contain : props.fit ?? .contain,
+      useLogicalSize: !hasCacheSize,
+    );
+  }
+
+  void _onRetryListenableNotified() => _retry();
+
+  Future<void> _retry() async {
+    if (_state != .failed) return;
+
+    final props = widget.props;
+    final generation = _generation;
+    try {
+      await StreamNetworkImage.evictFromCache(props.url, cacheKey: props.cacheKey);
+    } on Exception catch (_) {}
+
+    if (!mounted || generation != _generation || _state != .failed) return;
     setState(() {
-      _retryKey++;
-      _hasError = false;
+      _generation++;
+      _state = .loading;
     });
   }
 
@@ -328,29 +380,31 @@ class _DefaultStreamNetworkImageState extends State<DefaultStreamNetworkImage> {
   Widget build(BuildContext context) {
     final props = widget.props;
 
-    return CachedNetworkImage(
-      key: ValueKey(_retryKey),
-      imageUrl: props.url,
-      cacheManager: StreamImageCache.manager,
-      httpHeaders: props.httpHeaders,
+    return Image(
+      key: ValueKey(_generation),
+      image: _imageFor(props),
       width: props.width,
       height: props.height,
-      memCacheWidth: props.cacheWidth,
-      memCacheHeight: props.cacheHeight,
       fit: props.fit,
       alignment: props.alignment,
       color: props.color,
+      opacity: props.opacity,
       colorBlendMode: props.colorBlendMode,
       filterQuality: props.filterQuality,
-      cacheKey: props.cacheKey,
-      fadeOutDuration: Duration.zero,
-      fadeInDuration: Duration.zero,
-      errorListener: (_) => _hasError = true,
-      placeholder: (context, _) {
+      semanticLabel: props.semanticLabel,
+      excludeFromSemantics: props.excludeFromSemantics,
+      gaplessPlayback: true,
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (frame != null || wasSynchronouslyLoaded) {
+          _state = .loaded;
+          return child;
+        }
+        if (_state != .loading) return child;
         if (props.placeholderBuilder case final builder?) return builder(context);
         return StreamImageLoadingPlaceholder(width: props.width, height: props.height);
       },
       errorBuilder: (context, error, _) {
+        _state = .failed;
         if (props.errorBuilder case final builder?) return builder(context, error, _retry);
         return StreamImageErrorPlaceholder(width: props.width, height: props.height, onRetry: _retry);
       },

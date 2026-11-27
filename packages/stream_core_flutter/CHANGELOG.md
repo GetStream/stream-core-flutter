@@ -21,6 +21,9 @@
 
 - Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
 - Fixed `StreamSheet` painting lighter than `backgroundElevation1` in dark mode under Material 3.
+- Fixed `StreamNetworkImage`, and so `StreamAvatar`, decoding images at full size instead of at the size shown,
+  capped at 4096 pixels on a side, except on web.
+- Fixed `StreamNetworkImage` ignoring its `opacity`, `semanticLabel` and `excludeFromSemantics`.
 - Fixed `StreamMessageText` showing nothing when a mention's id is not valid percent-encoding. The mention now
   shows, and `onTapMention` receives the id as written.
 
@@ -34,6 +37,9 @@
   allows them; an `imageBuilder` alone no longer shows them.
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
+- `StreamNetworkImage` fails to load an image with more pixels than 8192 by 8192, except on web.
+- `StreamNetworkImage` given both `cacheWidth` and `cacheHeight` fits the image within them, keeping its aspect ratio,
+  instead of stretching it to that size.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)
   instead of transparent white.
 
