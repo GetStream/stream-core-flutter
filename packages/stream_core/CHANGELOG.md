@@ -1,5 +1,9 @@
 ## Upcoming
 
+### 🔄 Changed
+
+- `jose` now resolves to 0.3.5+2 or later (`^0.3.5+2`).
+
 ### 🐞 Fixed
 
 - Fixed `flutter build --analyze-size` crashing in the AOT compiler (`Request to create artificial node for object with cid 58`) in apps that use two or more `SortField`s.
