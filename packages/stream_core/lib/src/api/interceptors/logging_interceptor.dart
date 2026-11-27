@@ -32,7 +32,7 @@ class LoggingInterceptor extends Interceptor {
   /// Creates an interceptor that reports each request it sees.
   ///
   /// The values of the headers in `redactedHeaders` and of the query parameters in `redactedQueryParameters` are
-  /// reported as `<redacted>`, matching names regardless of case. `redactedHeaders` replaces
+  /// reported as `<redacted>`, matching names regardless of case. The `redactedHeaders` argument replaces
   /// [defaultRedactedHeaders], so consider spreading it in when adding a header. An empty collection reports every
   /// header as is.
   ///
