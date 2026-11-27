@@ -6,17 +6,11 @@ permissions:
   contents: read
 
 jobs:
-  update_goldens:
-    runs-on:
-      group: github-public-amd64
+  # Renders on a free runner. The image is pinned to the one `test` in
+  # stream_core_flutter_workflow.yml compares on; change both together.
+  render:
+    runs-on: ubuntu-24.04
     steps:
-      - name: 🔑 Mint CI Bot Token
-        id: ci-bot-token
-        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
-        with:
-          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
-
       - name: 📚 Checkout branch
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
@@ -40,9 +34,44 @@ jobs:
         continue-on-error: true
         run: melos run update:goldens
 
+      - name: 📤 Upload Goldens
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: goldens
+          path: "**/test/**/goldens/**/*.png"
+          if-no-files-found: error
+          retention-days: 1
+
+  # Committing calls the GitHub API, which the org IP allow list only permits
+  # from the static-IP runners.
+  commit:
+    needs: render
+    runs-on:
+      group: github-public-amd64
+    steps:
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+
+      # Only for the local bot-commit action.
+      - name: 📚 Checkout actions
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
+      - name: 📥 Download Goldens
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: goldens
+
       - name: 📤 Commit Changes
-        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@68fdf0bf3c779f640dbb10a1ecf7945d872408f7
+        uses: ./.github/actions/bot-commit
         with:
           files: "**/test/**/goldens/**/*.png"
           message: "chore: Update Goldens"
           token: ${{ steps.ci-bot-token.outputs.token }}
+          detect-changes: "false"

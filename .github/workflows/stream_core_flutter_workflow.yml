@@ -64,8 +64,9 @@ jobs:
   test:
     needs: analyze
     timeout-minutes: 15
-    # The image update_goldens renders on, so a golden that renders differently
-    # on another image can still be regenerated to match.
+    # The image update_goldens renders on (its `render` job), so a golden that
+    # renders differently on another image can still be regenerated to match.
+    # Change both together.
     runs-on: ubuntu-24.04
     permissions:
       contents: read
