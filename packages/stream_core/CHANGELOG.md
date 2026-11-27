@@ -13,7 +13,7 @@
 
 ### 🐞 Fixed
 
-- Fixed `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` including `rawValue`.
+- Fixed the raw token appearing in `UserToken.toString()` and in the `ArgumentError` for a token without a `user_id`.
 - Fixed `flutter build --analyze-size` crashing in the AOT compiler (`Request to create artificial node for object with cid 58`) in apps that use two or more `SortField`s.
 
 ## 0.5.2
