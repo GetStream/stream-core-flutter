@@ -41,6 +41,7 @@ jobs:
       # Anonymous checkout: the org IP allow list refuses only signed-in requests, and this job
       # makes no other GitHub call, so it runs on a free standard runner.
       - name: Git Checkout
+        working-directory: ${{ github.workspace }}
         run: |
           git init -q .
           git fetch -q --depth=1 --no-tags "https://github.com/$REPOSITORY" "$SHA"
@@ -119,6 +120,7 @@ jobs:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
+        working-directory: ${{ github.workspace }}
         run: |
           git init -q .
           git fetch -q --depth=1 --no-tags "https://github.com/$REPOSITORY" "$SHA"
@@ -148,6 +150,7 @@ jobs:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
+        working-directory: ${{ github.workspace }}
         run: |
           git init -q .
           git fetch -q --depth=1 --no-tags "https://github.com/$REPOSITORY" "$SHA"
