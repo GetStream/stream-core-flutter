@@ -89,16 +89,21 @@ class AttachmentFile {
       mimeType: mimeType,
     );
 
-    return AttachmentFile.fromXFile(file);
+    return AttachmentFile._(file, name);
   }
 
   /// Creates an [AttachmentFile] from an [XFile].
   ///
   /// This constructor is useful for integrating with packages like image_picker
   /// and file_picker that return [XFile] instances.
-  const AttachmentFile.fromXFile(this._file);
+  const AttachmentFile.fromXFile(this._file) : _name = null;
+
+  const AttachmentFile._(this._file, this._name);
 
   final XFile _file;
+
+  // The name given to [AttachmentFile.fromData], which only the web XFile keeps.
+  final String? _name;
 
   /// The file path.
   ///
@@ -109,9 +114,9 @@ class AttachmentFile {
   /// The file name including extension.
   ///
   /// Returns the name of the file, including the extension if available.
-  /// For files created with [AttachmentFile.fromData], this will be the name provided during
-  /// construction or a generated name if none was provided.
-  String get name => _file.name;
+  /// For files created with [AttachmentFile.fromData], this is the name provided during
+  /// construction, or an empty string when none was provided.
+  String get name => _name ?? _file.name;
 
   /// The file size in bytes.
   ///
@@ -129,7 +134,12 @@ class AttachmentFile {
   ///
   /// Returns the file extension (e.g., 'png', 'jpg', 'pdf') without the leading dot.
   /// Returns null if the file name doesn't contain an extension.
-  String? get extension => name.split('.').lastOrNull;
+  String? get extension {
+    final dot = name.lastIndexOf('.');
+    if (dot < 0 || dot == name.length - 1) return null;
+
+    return name.substring(dot + 1);
+  }
 
   /// The MIME type of the file.
   ///
@@ -173,7 +183,7 @@ extension AttachmentFileMultipartExtension on AttachmentFile {
   /// Returns a [Future] that completes with a [MultipartFile] ready for HTTP upload.
   Future<MultipartFile> toMultipartFile() async {
     // Try path-based creation first (more efficient for large files)
-    final result = runSafelySync(
+    final result = await runSafely<MultipartFile>(
       () => MultipartFile.fromFile(
         path,
         filename: name,
