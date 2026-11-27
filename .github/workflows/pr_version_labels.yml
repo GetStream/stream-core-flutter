@@ -24,6 +24,7 @@ on:
 
 jobs:
   version_label:
+    name: Label the Version Bump
     # Runs when a pull request opens or changes base; other events are ignored,
     # so it can share a caller with workflows triggered by more events.
     if: >-

@@ -85,6 +85,11 @@ jobs:
   comment:
     name: Comment the Link
     needs: deploy
+    # Shared with remove_comment and queued, not cancelled, so a late link
+    # comment can't overwrite "removed" for a build that is already gone.
+    concurrency:
+      group: pr-web-comment-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     runs-on:
       group: github-public-amd64
     timeout-minutes: 5
@@ -147,6 +152,9 @@ jobs:
   remove_comment:
     name: Update the Comment
     needs: remove
+    concurrency:
+      group: pr-web-comment-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     runs-on:
       group: github-public-amd64
     timeout-minutes: 5

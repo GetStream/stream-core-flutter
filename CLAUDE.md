@@ -63,6 +63,16 @@ file-type assets.
 
 `style_guides/` holds the guides every Stream Flutter SDK follows (today `API_DESIGN.md`). The other SDKs carry a copy: on every change to `main`, the `sync_style_guides` workflow runs `scripts/sync_style_guides.dart` against stream-chat-flutter (`master`), stream-video-flutter (`v2`) and stream-feeds-flutter (`main`), and opens a PR in each whose copy changed. Edit the guides here only. They are self-contained: `STYLE_GUIDE.md` points at them, never the reverse, and a relative link out of `style_guides/` fails the workflow's PR check. A new file in the folder is synced automatically; a new target repository is a new entry in the workflow's matrix.
 
+### CI runners
+
+The `GetStream` organization has an IP allow list, and it refuses every GitHub API call made with a token from GitHub's standard runners (`ubuntu-latest`, `macos-latest`), reads included; pushing with git is refused too. Checking out (a git read) and OIDC sign-in (Codecov, the Google Cloud deploys) work there. So:
+
+- A job that only checks out, builds, tests or deploys outside GitHub runs on a free standard runner.
+- A job that calls the GitHub API, or pushes, runs on the static-IP group (`runs-on: { group: github-public-amd64 }`), which is billed per minute. Keep it small: do the heavy work in a free job and hand the result over, as `update_goldens.yml` and `pr_web_build.yml` do. `bot-commit` and `flutter-web-pr-comment` are such calls.
+- To skip work for unrelated changes, use the reusable `detect_changes.yml`, which diffs with git, not `dorny/paths-filter`, which calls the API on pull requests. A gate's dependent job should still run when the gate fails, since a skipped required check passes; see the example in its header.
+
+Pin every action to a full commit SHA with its version in a comment; Dependabot (`.github/dependabot.yml`) bumps them weekly.
+
 ### Web deploys
 
 The Flutter web demos are hosted at `https://flutter.getstream.io/<app>/`, set up in `GetStream/chat` under `infra/flutter-web`: prod at `/<app>/`, beta at `/<app>/beta/`, and pull requests labeled `build` at `/<app>/pr/<number>/`. Four composite actions in `.github/actions/` hold what every repository must do the same way, for this repository and for the other SDKs:
