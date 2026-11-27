@@ -9,6 +9,7 @@ jobs:
   # Renders on a free runner, the one `test` in stream_core_flutter_workflow.yml
   # compares on; change both together.
   render:
+    name: Render Goldens
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Checkout branch
@@ -45,6 +46,7 @@ jobs:
   # Committing calls the GitHub API, which the org IP allow list only permits
   # from the static-IP runners.
   commit:
+    name: Commit Goldens
     needs: render
     runs-on:
       group: github-public-amd64
