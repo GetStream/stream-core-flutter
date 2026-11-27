@@ -55,7 +55,8 @@ extension type const StreamMentionType(String _) implements String {
 /// [displayText] is the raw display text from the link
 /// (e.g., `'@Alice'` from `[@Alice](mention:user123)`).
 /// [id] is the mention identifier (the URL-decoded portion after the
-/// `mention:` scheme).
+/// `mention:` scheme, or that portion as written if it isn't valid
+/// percent-encoding).
 ///
 /// Only invoked for user-type mentions. To handle the full set of mention
 /// kinds (channel / here / role / group) in a single callback, use
@@ -66,7 +67,8 @@ typedef MarkdownTapMentionCallback = void Function(String displayText, String id
 ///
 /// [displayText] is the raw display text from the link.
 /// [type] is the mention kind decoded from the URL scheme.
-/// [id] is the URL-decoded payload following the scheme.
+/// [id] is the URL-decoded payload following the scheme, or the payload as
+/// written if it isn't valid percent-encoding.
 typedef MarkdownTapAnyMentionCallback =
     void Function(
       String displayText,
@@ -301,7 +303,7 @@ class StreamMessageTextProps {
   /// Called when a mention of any kind is tapped.
   ///
   /// Receives the [StreamMentionType] decoded from the URL scheme along with the
-  /// display text and the URL-decoded id payload. Takes precedence over
+  /// display text and the id payload. Takes precedence over
   /// [onTapMention] when both are set.
   final MarkdownTapAnyMentionCallback? onTapAnyMention;
 
@@ -583,10 +585,23 @@ class _StreamMentionSyntax extends md.InlineSyntax {
     final rawId = match.group(3)!;
 
     final el = md.Element.text('mention', displayText);
-    el.attributes['id'] = Uri.decodeComponent(rawId);
+    el.attributes['id'] = _decodeId(rawId);
     el.attributes['type'] = type;
     parser.addNode(el);
     return true;
+  }
+
+  static final _malformedEscape = RegExp('%(?![0-9A-Fa-f]{2})');
+
+  // The percent-decoded [rawId], or [rawId] itself if it isn't valid
+  // percent-encoded UTF-8.
+  static String _decodeId(String rawId) {
+    if (rawId.contains(_malformedEscape)) return rawId;
+    try {
+      return Uri.decodeComponent(rawId);
+    } on FormatException {
+      return rawId;
+    }
   }
 }
 

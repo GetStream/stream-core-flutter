@@ -21,6 +21,8 @@
 
 - Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
 - Fixed `StreamSheet` painting lighter than `backgroundElevation1` in dark mode under Material 3.
+- Fixed `StreamMessageText` showing nothing when a mention's id is not valid percent-encoding. The mention now
+  shows, and `onTapMention` receives the id as written.
 
 ### 🔄 Changed
 
