@@ -909,7 +909,7 @@ class _ExtensibilitySection extends StatelessWidget {
             builder: (context) => StreamMessageText(
               '![Flutter logo](https://avatars.githubusercontent.com/u/14101776?s=200)\n\n'
               'From elsewhere: ![a photo](https://example.com/photo.png)',
-              showImage: (image) => image.uri.scheme == 'https' && image.uri.host == 'avatars.githubusercontent.com',
+              showImage: _isGalleryImage,
               onTapLink: (_, href, _) => _showSnack(context, 'Link: $href'),
             ),
           ),
@@ -919,7 +919,7 @@ class _ExtensibilitySection extends StatelessWidget {
           subtitle: 'Images from an allowed host, with rounded corners and placeholder.',
           child: StreamMessageText(
             '![Flutter logo](https://avatars.githubusercontent.com/u/14101776?s=200)',
-            showImage: (image) => image.uri.scheme == 'https' && image.uri.host == 'avatars.githubusercontent.com',
+            showImage: _isGalleryImage,
             imageBuilder: (uri, title, alt) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(8),

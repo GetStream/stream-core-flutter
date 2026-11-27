@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/chat.dart';
 
 void main() {
-  testWidgets('shows a markdown image as a link to it by default', (tester) async {
+  testWidgets('StreamMessageText shows a markdown image as a link to it by default', (tester) async {
     String? tapped;
     await _pump(
       tester,
@@ -20,27 +20,34 @@ void main() {
     expect(tapped, 'https://example.com/cat.png');
   });
 
-  testWidgets('labels an image link with its address when it has no alt text', (tester) async {
-    await _pump(tester, StreamMessageText('![](https://example.com/cat.png)'));
+  testWidgets('StreamMessageText labels an image link with its host when it has no alt text', (tester) async {
+    String? tapped;
+    await _pump(
+      tester,
+      StreamMessageText('![](https://cdn.example.com/uploads/cat.png)', onTapLink: (_, href, _) => tapped = href),
+    );
 
-    expect(find.textContaining('https://example.com/cat.png', findRichText: true), findsOneWidget);
+    await tester.tapOnText(find.textRange.ofSubstring('cdn.example.com'));
+
+    expect(find.textContaining('/uploads/', findRichText: true), findsNothing);
+    expect(tapped, 'https://cdn.example.com/uploads/cat.png');
   });
 
-  testWidgets('shortens a long address used as an image link label', (tester) async {
-    final url = 'https://example.com/${'a' * 500}.png';
+  testWidgets('StreamMessageText labels an image link with its shortened address when it has no host', (tester) async {
+    final url = 'data:image/png;base64,${'a' * 500}';
     await _pump(tester, StreamMessageText('![]($url)'));
 
     expect(find.textContaining('${url.substring(0, 47)}…', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('shows a reference-style image as a link', (tester) async {
+  testWidgets('StreamMessageText shows a reference-style image as a link', (tester) async {
     await _pump(tester, StreamMessageText('![a cat][cat]\n\n[cat]: https://example.com/cat.png'));
 
     expect(find.byType(Image), findsNothing);
     expect(find.textContaining('a cat', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('keeps an image inside a link as the label of that link', (tester) async {
+  testWidgets('StreamMessageText keeps an image inside a link as the label of that link', (tester) async {
     String? tapped;
     await _pump(
       tester,
@@ -54,7 +61,7 @@ void main() {
     expect(tapped, 'https://example.com/page');
   });
 
-  testWidgets('does not build images with imageBuilder unless showImage allows them', (tester) async {
+  testWidgets('StreamMessageText does not build images with imageBuilder unless showImage allows them', (tester) async {
     await _pump(
       tester,
       StreamMessageText('![a cat](https://example.com/cat.png)', imageBuilder: _fakeImage),
@@ -64,7 +71,7 @@ void main() {
     expect(find.textContaining('a cat', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('shows the images showImage allows and links the rest', (tester) async {
+  testWidgets('StreamMessageText shows the images showImage allows and links the rest', (tester) async {
     await _pump(
       tester,
       StreamMessageText(
@@ -79,7 +86,7 @@ void main() {
     expect(find.textContaining('theirs', findRichText: true), findsOneWidget);
   });
 
-  testWidgets("passes the image's address, alt text and title to showImage", (tester) async {
+  testWidgets("StreamMessageText passes the image's address, alt text and title to showImage", (tester) async {
     StreamMarkdownImage? asked;
     await _pump(
       tester,
@@ -98,26 +105,142 @@ void main() {
   });
 
   for (final url in ['data:image/png;base64,iVBORw0KGgo=', 'file:///etc/hosts', 'resource:logo.png']) {
-    testWidgets('shows an image that is not http or https as a link even when showImage allows it: $url', (
-      tester,
-    ) async {
-      var asked = false;
-      await _pump(
+    testWidgets(
+      'StreamMessageText shows an image that is not http or https as a link even when showImage allows it: $url',
+      (
         tester,
-        StreamMessageText(
-          '![logo]($url)',
-          imageBuilder: _fakeImage,
-          showImage: (_) => asked = true,
-        ),
-      );
+      ) async {
+        var asked = false;
+        await _pump(
+          tester,
+          StreamMessageText(
+            '![logo]($url)',
+            imageBuilder: _fakeImage,
+            showImage: (_) => asked = true,
+          ),
+        );
 
-      expect(asked, isFalse);
-      expect(find.byWidgetPredicate((widget) => widget.key is ValueKey<Uri>), findsNothing);
-      expect(find.textContaining('logo', findRichText: true), findsOneWidget);
-    });
+        expect(asked, isFalse);
+        expect(find.byWidgetPredicate((widget) => widget.key is ValueKey<Uri>), findsNothing);
+        expect(find.textContaining('logo', findRichText: true), findsOneWidget);
+      },
+    );
   }
 
-  testWidgets('shows an allowed image with StreamNetworkImage when no imageBuilder is set', (tester) async {
+  testWidgets('StreamMessageText passes showImage the title as plain text', (tester) async {
+    StreamMarkdownImage? asked;
+    await _pump(
+      tester,
+      StreamMessageText(
+        r'![cat](https://cdn.example.com/a.png "Tom & Jerry \"q\" <x>")',
+        showImage: (image) {
+          asked = image;
+          return false;
+        },
+      ),
+    );
+
+    expect(asked?.title, 'Tom & Jerry "q" <x>');
+  });
+
+  testWidgets('StreamMessageText decodes an entity in an image title only once', (tester) async {
+    StreamMarkdownImage? asked;
+    await _pump(
+      tester,
+      StreamMessageText(
+        '![cat](https://cdn.example.com/a.png "a &amp;lt; b")',
+        showImage: (image) {
+          asked = image;
+          return false;
+        },
+      ),
+    );
+
+    expect(asked?.title, 'a &lt; b');
+  });
+
+  testWidgets('StreamMessageText passes showImage the same address as imageBuilder', (tester) async {
+    Uri? asked;
+    Uri? built;
+    await _pump(
+      tester,
+      StreamMessageText(
+        '![cat](https://cdn.example.com/a.png#100x50)',
+        showImage: (image) {
+          asked = image.uri;
+          return true;
+        },
+        imageBuilder: (uri, title, alt) {
+          built = uri;
+          return _fakeImage(uri, title, alt);
+        },
+      ),
+    );
+
+    expect(asked, Uri.parse('https://cdn.example.com/a.png'));
+    expect(built, asked);
+  });
+
+  testWidgets('StreamMessageText shows an image whose address cannot be parsed as a link', (tester) async {
+    var asked = false;
+    String? tapped;
+    await _pump(
+      tester,
+      StreamMessageText(
+        '![logo](http://[::1)',
+        imageBuilder: _fakeImage,
+        showImage: (_) => asked = true,
+        onTapLink: (_, href, _) => tapped = href,
+      ),
+    );
+
+    await tester.tapOnText(find.textRange.ofSubstring('logo'));
+
+    expect(asked, isFalse);
+    expect(tapped, isNotNull);
+  });
+
+  testWidgets('StreamMessageText applies a new showImage when given a new key', (tester) async {
+    const text = '![cat](https://cdn.example.com/a.png)';
+    await _pump(
+      tester,
+      StreamMessageText(text, key: const ValueKey(1), imageBuilder: _fakeImage, showImage: (_) => false),
+    );
+    await _pump(
+      tester,
+      StreamMessageText(text, key: const ValueKey(2), imageBuilder: _fakeImage, showImage: (_) => true),
+    );
+
+    expect(find.byKey(ValueKey(Uri.parse('https://cdn.example.com/a.png'))), findsOneWidget);
+  });
+
+  testWidgets('StreamMessageText shortens a long host used as an image link label', (tester) async {
+    final host = '${'a' * 100}.example.com';
+    await _pump(tester, StreamMessageText('![](https://$host/cat.png)'));
+
+    expect(find.textContaining('${host.substring(0, 47)}…', findRichText: true), findsOneWidget);
+  });
+
+  testWidgets('StreamMessageText opens the outer link of an allowed image inside a link', (tester) async {
+    String? tapped;
+    await _pump(
+      tester,
+      StreamMessageText(
+        '[![cat](https://cdn.example.com/a.png)](https://example.com/page)',
+        imageBuilder: _fakeImage,
+        showImage: (_) => true,
+        onTapLink: (_, href, _) => tapped = href,
+      ),
+    );
+
+    await tester.tap(find.byKey(ValueKey(Uri.parse('https://cdn.example.com/a.png'))));
+
+    expect(tapped, 'https://example.com/page');
+  });
+
+  testWidgets('StreamMessageText shows an allowed image with StreamNetworkImage when no imageBuilder is set', (
+    tester,
+  ) async {
     await _pump(
       tester,
       StreamMessageText('![a cat](https://example.com/cat.png)', showImage: (_) => true),
@@ -140,4 +263,6 @@ Future<void> _pump(WidgetTester tester, StreamMessageText text) {
   );
 }
 
-Widget _fakeImage(Uri uri, String? title, String? alt) => SizedBox(key: ValueKey(uri), width: 10, height: 10);
+Widget _fakeImage(Uri uri, String? title, String? alt) {
+  return ColoredBox(key: ValueKey(uri), color: const Color(0xFF000000), child: const SizedBox.square(dimension: 10));
+}
