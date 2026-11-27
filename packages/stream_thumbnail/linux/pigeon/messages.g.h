@@ -23,6 +23,24 @@ typedef enum {
 } StreamThumbnailThumbnailFormat;
 
 /**
+ * StreamThumbnailThumbnailSourceKind:
+ * STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_NETWORK:
+ * STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_FILE:
+ * STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_CONTENT_URI:
+ *
+ * Where [ThumbnailRequest.video] is read from, and so how it may be opened.
+ *
+ * `network` must only be fetched over http or https, `file` must only be
+ * opened as a local path, and `contentUri` only through an Android content
+ * resolver.
+ */
+typedef enum {
+  STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_NETWORK = 0,
+  STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_FILE = 1,
+  STREAM_THUMBNAIL_THUMBNAIL_SOURCE_KIND_CONTENT_URI = 2
+} StreamThumbnailThumbnailSourceKind;
+
+/**
  * StreamThumbnailThumbnailRequest:
  *
  * A single thumbnail generation request sent to the native platform.
@@ -33,6 +51,7 @@ G_DECLARE_FINAL_TYPE(StreamThumbnailThumbnailRequest, stream_thumbnail_thumbnail
 /**
  * stream_thumbnail_thumbnail_request_new:
  * video: field in this object.
+ * source_kind: field in this object.
  * headers: field in this object.
  * format: field in this object.
  * max_height: field in this object.
@@ -44,7 +63,7 @@ G_DECLARE_FINAL_TYPE(StreamThumbnailThumbnailRequest, stream_thumbnail_thumbnail
  *
  * Returns: a new #StreamThumbnailThumbnailRequest
  */
-StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, FlValue* headers, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality);
+StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gchar* video, StreamThumbnailThumbnailSourceKind source_kind, FlValue* headers, StreamThumbnailThumbnailFormat format, int64_t max_height, int64_t max_width, int64_t time_ms, int64_t quality);
 
 /**
  * stream_thumbnail_thumbnail_request_get_video
@@ -55,6 +74,16 @@ StreamThumbnailThumbnailRequest* stream_thumbnail_thumbnail_request_new(const gc
  * Returns: the field value.
  */
 const gchar* stream_thumbnail_thumbnail_request_get_video(StreamThumbnailThumbnailRequest* object);
+
+/**
+ * stream_thumbnail_thumbnail_request_get_source_kind
+ * @object: a #StreamThumbnailThumbnailRequest.
+ *
+ * Gets the value of the sourceKind field of @object.
+ *
+ * Returns: the field value.
+ */
+StreamThumbnailThumbnailSourceKind stream_thumbnail_thumbnail_request_get_source_kind(StreamThumbnailThumbnailRequest* object);
 
 /**
  * stream_thumbnail_thumbnail_request_get_headers
@@ -157,6 +186,7 @@ G_DECLARE_FINAL_TYPE(StreamThumbnailMessageCodec, stream_thumbnail_message_codec
  * They may be used in custom object creation functions to identify the type.
  */
 extern const int stream_thumbnail_thumbnail_format_type_id;
+extern const int stream_thumbnail_thumbnail_source_kind_type_id;
 extern const int stream_thumbnail_thumbnail_request_type_id;
 
 G_DECLARE_FINAL_TYPE(StreamThumbnailStreamThumbnailHostApi, stream_thumbnail_stream_thumbnail_host_api, STREAM_THUMBNAIL, STREAM_THUMBNAIL_HOST_API, GObject)

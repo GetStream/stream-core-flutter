@@ -12,6 +12,7 @@ import 'package:web/web.dart' as web;
 
 import 'src/stream_thumbnail_format.dart';
 import 'src/stream_thumbnail_platform.dart';
+import 'src/stream_thumbnail_source.dart';
 
 // An error code value to error name Map.
 // See: https://developer.mozilla.org/en-US/docs/Web/API/MediaError/code
@@ -47,8 +48,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
 
   @override
   Future<List<XFile>> thumbnailFiles({
-    required List<String> videos,
-    required Map<String, String>? headers,
+    required List<StreamThumbnailSource> sources,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -57,10 +57,9 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
   }) async {
     final files = <XFile>[];
 
-    for (final video in videos) {
+    for (final source in sources) {
       final blob = await _createThumbnail(
-        videoSrc: video,
-        headers: headers,
+        source: source,
         imageFormat: imageFormat,
         maxHeight: maxHeight,
         maxWidth: maxWidth,
@@ -72,7 +71,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
         XFile(
           web.URL.createObjectURL(blob),
           mimeType: blob.type,
-          name: _thumbnailName(video, imageFormat),
+          name: _thumbnailName(imageFormat),
         ),
       );
     }
@@ -82,8 +81,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
 
   @override
   Future<XFile> thumbnailFile({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -91,8 +89,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     required int quality,
   }) async {
     final blob = await _createThumbnail(
-      videoSrc: video,
-      headers: headers,
+      source: source,
       imageFormat: imageFormat,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -103,14 +100,13 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     return XFile(
       web.URL.createObjectURL(blob),
       mimeType: blob.type,
-      name: _thumbnailName(video, imageFormat),
+      name: _thumbnailName(imageFormat),
     );
   }
 
   @override
   Future<Uint8List> thumbnailData({
-    required String video,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
@@ -118,8 +114,7 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     required int quality,
   }) async {
     final blob = await _createThumbnail(
-      videoSrc: video,
-      headers: headers,
+      source: source,
       imageFormat: imageFormat,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -135,14 +130,22 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
   }
 
   Future<web.Blob> _createThumbnail({
-    required String videoSrc,
-    required Map<String, String>? headers,
+    required StreamThumbnailSource source,
     required StreamThumbnailFormat imageFormat,
     required int maxHeight,
     required int maxWidth,
     required int quality,
     int timeMs = 0,
   }) async {
+    switch (source.kind) {
+      case StreamThumbnailSourceKind.contentUri:
+        throw PlatformException(code: 'UNSUPPORTED_SOURCE', message: 'Content URIs are only supported on Android.');
+      case StreamThumbnailSourceKind.network || StreamThumbnailSourceKind.file:
+        if (source.unsupportedReason case final reason?) throw reason;
+    }
+
+    final videoSrc = source.location;
+    final headers = source.headers;
     final completer = Completer<web.Blob>();
 
     final video = web.document.createElement('video') as web.HTMLVideoElement;
@@ -338,29 +341,17 @@ class StreamThumbnailWeb extends StreamThumbnailPlatform {
     }
   }
 
-  /// The video's own file name, carrying the thumbnail's extension instead.
+  /// The name a downloaded thumbnail is saved under.
   ///
   /// An object URL carries no name of its own, so without this the returned
   /// [XFile] has an empty [XFile.name] and `saveTo` downloads an unnamed file.
-  /// Derived the same way the native implementations derive theirs.
-  String _thumbnailName(String videoSrc, StreamThumbnailFormat imageFormat) {
+  String _thumbnailName(StreamThumbnailFormat imageFormat) {
     final ext = switch (imageFormat) {
       StreamThumbnailFormat.jpeg => 'jpg',
       StreamThumbnailFormat.png => 'png',
       StreamThumbnailFormat.webp => 'webp',
     };
 
-    // A data/blob URL's body is the payload itself, so there is no name to take.
-    if (videoSrc.startsWith('data:') || videoSrc.startsWith('blob:')) return 'thumbnail.$ext';
-
-    var path = videoSrc;
-    final query = path.indexOf(RegExp('[?#]'));
-    if (query != -1) path = path.substring(0, query);
-
-    final segment = path.split('/').last;
-    final dot = segment.lastIndexOf('.');
-    final stem = dot > 0 ? segment.substring(0, dot) : segment;
-
-    return '${stem.isEmpty ? 'thumbnail' : stem}.$ext';
+    return 'thumbnail.$ext';
   }
 }

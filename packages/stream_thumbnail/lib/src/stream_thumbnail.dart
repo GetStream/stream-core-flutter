@@ -7,41 +7,41 @@ import 'package:flutter/services.dart';
 
 import 'stream_thumbnail_format.dart';
 import 'stream_thumbnail_platform.dart';
+import 'stream_thumbnail_source.dart';
 
 /// Creates thumbnails from a local video file or from a video URL.
 abstract final class StreamThumbnail {
-  /// Generates a thumbnail file for each of the given `videos`.
+  /// Generates a thumbnail file for each of [sources], in order.
   ///
-  /// Each video can be a local file or a URL in an iOS/Android supported video
-  /// format. Use `maxHeight`/`maxWidth` to bound the size, or `0` to keep the
-  /// source resolution. A lower `quality` reduces image quality but is ignored
-  /// for the `PNG` format.
+  /// Use [maxHeight] and [maxWidth] to bound the size, or `0` to keep the
+  /// source resolution. A lower [quality] reduces image quality but is ignored
+  /// for [StreamThumbnailFormat.png]. The videos are processed one at a time.
   ///
-  /// The videos are processed one at a time rather than concurrently: every
-  /// platform holds a hardware video decoder open per in-flight request, and
-  /// devices cap how many can exist at once.
-  ///
-  /// Each thumbnail is written to its own temporary directory. Use
-  /// [XFile.saveTo] to copy one somewhere permanent; the temporary file is left
-  /// behind for the platform to reclaim.
+  /// Each thumbnail is written to a new, uniquely named file in a temporary
+  /// directory. Use [XFile.saveTo] to copy one somewhere permanent; the
+  /// temporary file is left behind for the platform to reclaim.
   ///
   /// On web there is no file system: each [XFile] wraps an object URL that the
   /// caller owns and should release with `URL.revokeObjectURL` once the bytes
   /// have been read via [XFile.readAsBytes].
+  ///
+  /// Fails with an `UNSUPPORTED_SOURCE` [PlatformException] if a source can't
+  /// be opened on this platform.
   static Future<List<XFile>> thumbnailFiles({
-    required List<String> videos,
-    Map<String, String>? headers,
+    required List<StreamThumbnailSource> sources,
     StreamThumbnailFormat imageFormat = StreamThumbnailFormat.png,
     int maxHeight = 0,
     int maxWidth = 0,
     int? timeMs,
     int quality = 10,
   }) async {
-    if (videos.isEmpty) return [];
+    if (sources.isEmpty) return [];
+    for (final source in sources) {
+      if (source.unsupportedReason case final reason?) throw reason;
+    }
 
     return StreamThumbnailPlatform.instance.thumbnailFiles(
-      videos: videos,
-      headers: headers,
+      sources: sources,
       imageFormat: imageFormat,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -50,34 +50,34 @@ abstract final class StreamThumbnail {
     );
   }
 
-  /// Generates a thumbnail file for the given `video`.
+  /// Generates a thumbnail file for [source].
   ///
-  /// The video can be a local file or a URL in an iOS/Android supported video
-  /// format. Use `maxHeight`/`maxWidth` to bound the size, or `0` to keep the
-  /// source resolution. A lower `quality` reduces image quality but is ignored
-  /// for the `PNG` format.
+  /// Use [maxHeight] and [maxWidth] to bound the size, or `0` to keep the
+  /// source resolution. A lower [quality] reduces image quality but is ignored
+  /// for [StreamThumbnailFormat.png].
   ///
-  /// The thumbnail is written to its own temporary directory. Use [XFile.saveTo]
-  /// to copy it somewhere permanent; the temporary file is left behind for the
-  /// platform to reclaim.
+  /// The thumbnail is written to a new, uniquely named file in a temporary
+  /// directory. Use [XFile.saveTo] to copy it somewhere permanent; the
+  /// temporary file is left behind for the platform to reclaim.
   ///
   /// On web there is no file system: the [XFile] wraps an object URL that the
   /// caller owns and should release with `URL.revokeObjectURL` once the bytes
   /// have been read via [XFile.readAsBytes].
+  ///
+  /// Fails with an `UNSUPPORTED_SOURCE` [PlatformException] if [source] can't
+  /// be opened on this platform.
   static Future<XFile> thumbnailFile({
-    required String video,
-    Map<String, String>? headers,
+    required StreamThumbnailSource source,
     StreamThumbnailFormat imageFormat = StreamThumbnailFormat.png,
     int maxHeight = 0,
     int maxWidth = 0,
     int? timeMs,
     int quality = 10,
   }) {
-    assert(video.isNotEmpty);
+    if (source.unsupportedReason case final reason?) return Future.error(reason);
 
     return StreamThumbnailPlatform.instance.thumbnailFile(
-      video: video,
-      headers: headers,
+      source: source,
       imageFormat: imageFormat,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -86,27 +86,27 @@ abstract final class StreamThumbnail {
     );
   }
 
-  /// Generates a thumbnail for the given `video` as in-memory bytes.
+  /// Generates a thumbnail for [source] as in-memory bytes.
   ///
-  /// The returned bytes can be rendered directly with `Image.memory`. The video
-  /// can be a local file or a URL in an iOS/Android supported video format. Use
-  /// `maxHeight`/`maxWidth` to bound the size, or `0` to keep the source
-  /// resolution. A lower `quality` reduces image quality but is ignored for the
-  /// `PNG` format.
+  /// The returned bytes can be rendered directly with `Image.memory`. Use
+  /// [maxHeight] and [maxWidth] to bound the size, or `0` to keep the source
+  /// resolution. A lower [quality] reduces image quality but is ignored for
+  /// [StreamThumbnailFormat.png].
+  ///
+  /// Fails with an `UNSUPPORTED_SOURCE` [PlatformException] if [source] can't
+  /// be opened on this platform.
   static Future<Uint8List> thumbnailData({
-    required String video,
-    Map<String, String>? headers,
+    required StreamThumbnailSource source,
     StreamThumbnailFormat imageFormat = StreamThumbnailFormat.png,
     int maxHeight = 0,
     int maxWidth = 0,
     int? timeMs,
     int quality = 10,
   }) {
-    assert(video.isNotEmpty);
+    if (source.unsupportedReason case final reason?) return Future.error(reason);
 
     return StreamThumbnailPlatform.instance.thumbnailData(
-      video: video,
-      headers: headers,
+      source: source,
       imageFormat: imageFormat,
       maxHeight: maxHeight,
       maxWidth: maxWidth,

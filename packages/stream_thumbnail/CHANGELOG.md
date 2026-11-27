@@ -1,3 +1,31 @@
+## Upcoming
+
+### ✨ Features
+
+- Added `StreamThumbnailSource`, which says whether a video is a network URL, a local file or an Android content
+  URI.
+
+### 💥 BREAKING CHANGES
+
+- Removed the `video`, `videos` and `headers` parameters; `source` and `sources` are now required. Pass
+  `StreamThumbnailSource.network(url, headers: ...)`, `StreamThumbnailSource.file(path)` or
+  `StreamThumbnailSource.contentUri(uri)` instead.
+- Only `http` and `https` URLs are fetched; any other scheme fails with an `UNSUPPORTED_SOURCE` `PlatformException`.
+- On Windows, a file source must be an absolute path on a local drive.
+- On Linux, videos are read only from single-file containers; playlists such as HLS and DASH are not supported.
+- On Linux with FFmpeg 8.1 or later, a request with headers no longer follows redirects. Older FFmpeg versions still
+  follow them.
+
+### 🔄 Changed
+
+- `thumbnailFile` and `thumbnailFiles` give each thumbnail a generated file name instead of the video's file name. On
+  web, the download name is `thumbnail.<ext>`.
+
+### 🐞 Fixed
+
+- On Android 10 and later, a local video with `maxWidth` or `maxHeight` left at `0` now produces a
+  thumbnail instead of failing.
+
 ## 0.2.0
 
 ### ✨ Features
