@@ -14,6 +14,8 @@
 - Added the `fullscreen` icon to `StreamIcons`.
 - Added the `blurOffFill`, `effectsFill`, `fullscreenExit`, `languageFill`,
   `qrCodeFill` and `unflag` icons to `StreamIcons`.
+- Added `showImage` to `StreamMessageText`, a `StreamMarkdownImagePredicate` that receives each markdown image as a
+  `StreamMarkdownImage` and decides whether it is shown as an image.
 
 ### 🐛 Bug Fixes
 
@@ -28,6 +30,8 @@
   timestamp, then username (previously username first). Start-aligned rows
   are unchanged.
 - `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
+- `StreamMessageText` shows markdown images as links, labelled with their alt text or host, unless `showImage`
+  allows them; an `imageBuilder` alone no longer shows them.
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)
