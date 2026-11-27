@@ -449,6 +449,14 @@ void StreamThumbnailPlugin::ReapFinishedWorkers() {
 
 void StreamThumbnailPlugin::ThumbnailData(const ThumbnailRequest &request,
                                            std::function<void(ErrorOr<std::vector<uint8_t>> reply)> result) {
+  // DEBUG: reject a bad source on the platform thread, to test whether
+  // replying from the worker thread corrupts the error reply.
+  try {
+    ResolveInput(request.video(), request.source_kind());
+  } catch (const ThumbnailException &e) {
+    result(ErrorOr<std::vector<uint8_t>>(FlutterError(e.code(), e.what())));
+    return;
+  }
   RunOnWorker([request, result]() {
     try {
       result(ErrorOr<std::vector<uint8_t>>(GenerateThumbnailData(request)));
@@ -465,6 +473,14 @@ void StreamThumbnailPlugin::ThumbnailData(const ThumbnailRequest &request,
 
 void StreamThumbnailPlugin::ThumbnailFile(const ThumbnailRequest &request,
                                            std::function<void(ErrorOr<std::string> reply)> result) {
+  // DEBUG: reject a bad source on the platform thread, to test whether
+  // replying from the worker thread corrupts the error reply.
+  try {
+    ResolveInput(request.video(), request.source_kind());
+  } catch (const ThumbnailException &e) {
+    result(ErrorOr<std::string>(FlutterError(e.code(), e.what())));
+    return;
+  }
   RunOnWorker([request, result]() {
     try {
       result(ErrorOr<std::string>(WriteThumbnailFile(request)));
