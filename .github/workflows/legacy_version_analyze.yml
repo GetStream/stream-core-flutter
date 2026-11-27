@@ -21,7 +21,6 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   # Decides whether the analysis runs: on every push, and on a pull request
@@ -30,13 +29,11 @@ jobs:
   # never reports and leaves a required check waiting forever. See
   # https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks
   gate:
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     outputs:
       should_run: ${{ github.event_name == 'push' || (steps.filter.outputs.packages == 'true' && github.event.pull_request.draft != true) }}
     steps:
-      # paths-filter diffs against git history on push events, so it needs a
-      # checkout there. On pull requests it uses the API instead.
+      # paths-filter diffs against git history, so it needs a checkout.
       - name: "Git Checkout"
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
@@ -46,6 +43,10 @@ jobs:
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
+          # No token: on pull requests it then diffs with git against the base
+          # branch instead of calling the GitHub API, which the org IP allow
+          # list refuses from standard runners.
+          token: ""
           filters: |
             packages:
               - 'packages/**'
