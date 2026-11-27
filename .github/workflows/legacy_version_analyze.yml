@@ -11,6 +11,9 @@ on:
       - main
       - develop
   pull_request:
+    # ready_for_review: a draft's skipped check stays green otherwise, so a
+    # draft marked ready would merge unanalyzed until its next push.
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
       - develop
@@ -41,10 +44,12 @@ jobs:
   # This is to minimize accidentally making changes that break old versions
   # (which we don't commit to supporting, but don't want to actively break)
   # without updating the constraints.
-  # No `name:`: the ruleset requires this check by its job ID.
+  # No `name:`: the ruleset requires this check by its job ID. Runs when the
+  # gate fails too: a skipped required check passes, so skipping then would
+  # let a broken gate wave every pull request through.
   analyze_legacy_version:
     needs: gate
-    if: github.event_name == 'push' || (needs.gate.outputs.changed == 'true' && github.event.pull_request.draft != true)
+    if: ${{ !cancelled() && (github.event_name == 'push' || needs.gate.result != 'success' || (needs.gate.outputs.changed == 'true' && github.event.pull_request.draft != true)) }}
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:

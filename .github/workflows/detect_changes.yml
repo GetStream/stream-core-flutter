@@ -14,7 +14,9 @@ name: detect_changes
 #
 #   analyze:
 #     needs: gate
-#     if: needs.gate.outputs.changed == 'true'
+#     # Runs when the gate fails too: a skipped required check passes, so
+#     # skipping then would let a broken gate wave every change through.
+#     if: ${{ !cancelled() && (needs.gate.result != 'success' || needs.gate.outputs.changed == 'true') }}
 #
 # A pull request is compared with its base branch, a push with the commit
 # before it. A new branch, a push whose previous commit is gone, and any other
