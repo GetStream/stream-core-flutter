@@ -21,7 +21,6 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   analyze:
@@ -68,7 +67,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
       # Codecov authenticates the coverage upload with a GitHub OIDC token.
       id-token: write
     env:
@@ -105,3 +103,4 @@ jobs:
         with:
           use_oidc: true
           files: packages/*/coverage/lcov.info
+          disable_search: true
