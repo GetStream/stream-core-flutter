@@ -33,7 +33,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
 
@@ -43,7 +43,7 @@ jobs:
           git config --global user.name "$(git log --format='%an' HEAD^!)"
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: ${{ env.FLUTTER_CHANNEL }}
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -55,7 +55,7 @@ jobs:
         run: melos bootstrap
 
       - name: Build and Deploy
-        uses: bluefireteam/flutter-gh-pages@v9
+        uses: bluefireteam/flutter-gh-pages@cf4a9312849577dbfd9df8f3d63d12ef6b09898e # v9
         with:
           baseHref: /stream-core-flutter/
           workingDir: apps/design_system_gallery
@@ -76,7 +76,9 @@ jobs:
       id-token: write
     steps:
       - name: 📚 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: 🧩 Bootstrap Workspace
         uses: ./.github/actions/bootstrap

@@ -23,13 +23,13 @@ runs:
     # Pana resolves the package on its own, so a dependency on a sibling package would come from pub.dev and miss
     # the changes in this checkout. Point it at the sibling's directory instead.
     - name: Resolve Sibling Packages From The Checkout
-      uses: mikefarah/yq@v4
+      uses: mikefarah/yq@f2944b823f84906a127dbd29e4c2a3e60c4e550e # v4.54.3
       with:
         cmd: |
           yq eval '(.dependencies | select(has("stream_core")) | .stream_core) = {"path": "../stream_core"}' -i packages/stream_core_flutter/pubspec.yaml
 
     - name: Install Flutter
-      uses: subosito/flutter-action@v2
+      uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
       with:
         cache: true
         channel: stable

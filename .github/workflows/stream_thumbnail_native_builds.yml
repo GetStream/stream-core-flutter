@@ -33,14 +33,15 @@ permissions:
 jobs:
   android:
     timeout-minutes: 20
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Bootstrap Workspace
         uses: ./.github/actions/bootstrap
@@ -58,7 +59,9 @@ jobs:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Bootstrap Workspace
         uses: ./.github/actions/bootstrap
@@ -76,7 +79,9 @@ jobs:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Bootstrap Workspace
         uses: ./.github/actions/bootstrap
@@ -94,7 +99,9 @@ jobs:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Bootstrap Workspace
         uses: ./.github/actions/bootstrap
@@ -106,14 +113,15 @@ jobs:
 
   linux:
     timeout-minutes: 20
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Install Linux Build Dependencies
         run: |
@@ -130,14 +138,15 @@ jobs:
 
   web:
     timeout-minutes: 20
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Bootstrap Workspace
         uses: ./.github/actions/bootstrap
