@@ -1,0 +1,101 @@
+name: detect_changes
+
+# Tells whether a pull request or push changes any of the given paths, for a
+# gate job that decides whether heavier jobs run. Diffs with git on a free
+# runner, so it needs no token: the GitHub API that dorny/paths-filter calls
+# on pull requests is refused from standard runners by the org IP allow list.
+#
+#   gate:
+#     uses: GetStream/stream-core-flutter/.github/workflows/detect_changes.yml@<sha>
+#     with:
+#       paths: |
+#         packages/**
+#         .github/workflows/my_workflow.yml
+#
+#   analyze:
+#     needs: gate
+#     if: needs.gate.outputs.changed == 'true'
+#
+# A pull request is compared with its base branch, a push with the commit
+# before it. A new branch, a push whose previous commit is gone, and any other
+# event count as changed.
+
+on:
+  workflow_call:
+    inputs:
+      paths:
+        description: >
+          Glob patterns, one per line, such as `packages/**`. `*` stays within
+          a directory and `**` crosses them, as in git's `:(glob)` pathspecs.
+        type: string
+        required: true
+    outputs:
+      changed:
+        description: "`true` when a matching file was added, changed, deleted or moved."
+        value: ${{ jobs.detect.outputs.changed }}
+
+permissions:
+  contents: read
+
+jobs:
+  detect:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.detect.outputs.changed }}
+    steps:
+      # A pull request checks out its test merge commit, whose first parent is
+      # the base branch.
+      - name: 📚 Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      # --no-renames lists a moved file under both paths, so moving one out of
+      # a watched directory still counts.
+      - name: 🔍 Detect Changes
+        id: detect
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          PATHS: ${{ inputs.paths }}
+        run: |
+          set -euo pipefail
+          specs=()
+          while IFS= read -r line; do
+            line="${line#"${line%%[![:space:]]*}"}"
+            line="${line%"${line##*[![:space:]]}"}"
+            if [ -n "$line" ]; then specs+=(":(glob)$line"); fi
+          done <<< "$PATHS"
+          if [ ${#specs[@]} -eq 0 ]; then
+            echo "::error::paths is empty"
+            exit 1
+          fi
+
+          base=
+          case "$EVENT" in
+            pull_request) base=HEAD^1 ;;
+            push)
+              if [[ ! $BEFORE =~ ^0+$ ]] && git fetch -q --depth=1 origin "$BEFORE"; then
+                base=$BEFORE
+              fi
+              ;;
+          esac
+
+          if [ -z "$base" ]; then
+            echo "No commit to compare with on $EVENT, so everything counts as changed."
+            changed=true
+          else
+            files=$(git diff --name-only --no-renames "$base" HEAD -- "${specs[@]}")
+            if [ -n "$files" ]; then
+              echo "Changed files matching paths:"
+              echo "$files"
+              changed=true
+            else
+              echo "No changed file matches paths."
+              changed=false
+            fi
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
