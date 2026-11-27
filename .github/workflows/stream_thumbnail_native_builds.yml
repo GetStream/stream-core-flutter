@@ -73,7 +73,7 @@ jobs:
 
   macos:
     timeout-minutes: 20
-    runs-on: { group: scaleway-macos }
+    runs-on: macos-latest
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
