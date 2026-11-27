@@ -27,8 +27,9 @@ jobs:
       id-token: write # OIDC auth to pub.dev
     runs-on:
       group: github-public-amd64
+    timeout-minutes: 20
     steps:
-      - name: 📚 Checkout branch
+      - name: 📚 Checkout
         # Default GITHUB_TOKEN: this job never pushes to git (the release step
         # passes its own token), so no bot PAT sits in git config during setup.
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

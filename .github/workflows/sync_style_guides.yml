@@ -32,8 +32,9 @@ jobs:
   check:
     name: Check Guide Links
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: 📚 Git Checkout
+      - name: 📚 Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -52,6 +53,7 @@ jobs:
     needs: check
     runs-on:
       group: github-public-amd64
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -63,7 +65,7 @@ jobs:
           - repository: stream-feeds-flutter
             branch: main
     steps:
-      - name: 📚 Git Checkout
+      - name: 📚 Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
