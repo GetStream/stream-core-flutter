@@ -75,11 +75,12 @@ jobs:
       - name: 🚀 Push to gh-pages
         env:
           BUILD_DIR: ${{ runner.temp }}/gallery-pages
+          SHA: ${{ github.sha }}
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git --work-tree "$BUILD_DIR" add --all
-          git commit -m "Automatic deployment by github-actions"
+          git commit -m "Deploy the gallery from $SHA"
           git push origin HEAD:gh-pages --force
 
   deploy_hosted:
