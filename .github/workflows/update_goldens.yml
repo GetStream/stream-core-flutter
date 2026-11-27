@@ -9,6 +9,7 @@ jobs:
   # Renders on a free runner, the one `test` in stream_core_flutter_workflow.yml
   # compares on; change both together.
   render:
+    name: Render Goldens
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Checkout branch
@@ -43,6 +44,7 @@ jobs:
           retention-days: 1
 
   commit:
+    name: Commit Goldens
     needs: render
     uses: ./.github/workflows/commit_artifact.yml
     with:

@@ -25,33 +25,27 @@ permissions:
 
 jobs:
   # Builds on a free runner; only the push below needs the static-IP runners.
-  build_gallery:
+  build_pages:
+    name: Build for GitHub Pages
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout code
+      - name: 📚 Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+      - name: 🧩 Bootstrap Workspace
+        uses: ./.github/actions/bootstrap
         with:
-          channel: ${{ env.FLUTTER_CHANNEL }}
-          flutter-version: ${{ env.FLUTTER_VERSION }}
+          flutter-channel: ${{ env.FLUTTER_CHANNEL }}
 
-      - name: Install Tools
-        run: flutter pub global activate melos
-
-      - name: Bootstrap Workspace
-        run: melos bootstrap
-
-      - name: Build
+      - name: 🏗️ Build
         working-directory: apps/design_system_gallery
         run: flutter build web --release --base-href /stream-core-flutter/
 
-      - name: Upload Build
+      - name: 📤 Upload Build
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: gallery-pages
@@ -61,23 +55,24 @@ jobs:
 
   # Replaces gh-pages with a commit on top of main holding only the build.
   publish_pages:
-    needs: build_gallery
+    name: Publish to GitHub Pages
+    needs: build_pages
     runs-on:
       group: github-public-amd64
     timeout-minutes: 5
     permissions:
       contents: write
     steps:
-      - name: Checkout code
+      - name: 📚 Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
-      - name: Download Build
+      - name: 📥 Download Build
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: gallery-pages
           path: ${{ runner.temp }}/gallery-pages
 
-      - name: Push to gh-pages
+      - name: 🚀 Push to gh-pages
         env:
           BUILD_DIR: ${{ runner.temp }}/gallery-pages
         run: |
