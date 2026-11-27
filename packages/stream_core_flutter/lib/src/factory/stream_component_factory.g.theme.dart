@@ -48,6 +48,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: t < 0.5 ? a.emojiButton : b.emojiButton,
       emojiChip: t < 0.5 ? a.emojiChip : b.emojiChip,
       emojiChipBar: t < 0.5 ? a.emojiChipBar : b.emojiChipBar,
+      emptyState: t < 0.5 ? a.emptyState : b.emptyState,
       errorBadge: t < 0.5 ? a.errorBadge : b.errorBadge,
       fileTypeIcon: t < 0.5 ? a.fileTypeIcon : b.fileTypeIcon,
       inlineNotification: t < 0.5 ? a.inlineNotification : b.inlineNotification,
@@ -90,6 +91,7 @@ mixin _$StreamComponentBuilders {
       reactionPicker: t < 0.5 ? a.reactionPicker : b.reactionPicker,
       reactions: t < 0.5 ? a.reactions : b.reactions,
       retryBadge: t < 0.5 ? a.retryBadge : b.retryBadge,
+      selectInput: t < 0.5 ? a.selectInput : b.selectInput,
       sheetHeader: t < 0.5 ? a.sheetHeader : b.sheetHeader,
       skeletonLoading: t < 0.5 ? a.skeletonLoading : b.skeletonLoading,
       snackbar: t < 0.5 ? a.snackbar : b.snackbar,
@@ -127,6 +129,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamEmojiChipProps)? emojiChip,
     Widget Function(BuildContext, StreamEmojiChipBarProps<Object?>)?
     emojiChipBar,
+    Widget Function(BuildContext, StreamEmptyStateProps)? emptyState,
     Widget Function(BuildContext, StreamErrorBadgeProps)? errorBadge,
     Widget Function(BuildContext, StreamFileTypeIconProps)? fileTypeIcon,
     Widget Function(BuildContext, StreamInlineNotificationProps)?
@@ -172,6 +175,7 @@ mixin _$StreamComponentBuilders {
     Widget Function(BuildContext, StreamReactionPickerProps)? reactionPicker,
     Widget Function(BuildContext, StreamReactionsProps)? reactions,
     Widget Function(BuildContext, StreamRetryBadgeProps)? retryBadge,
+    Widget Function(BuildContext, StreamSelectInputProps)? selectInput,
     Widget Function(BuildContext, StreamSheetHeaderProps)? sheetHeader,
     Widget Function(BuildContext, StreamSkeletonLoadingProps)? skeletonLoading,
     Widget Function(BuildContext, StreamSnackbarProps)? snackbar,
@@ -207,6 +211,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: emojiButton ?? _this.emojiButton,
       emojiChip: emojiChip ?? _this.emojiChip,
       emojiChipBar: emojiChipBar ?? _this.emojiChipBar,
+      emptyState: emptyState ?? _this.emptyState,
       errorBadge: errorBadge ?? _this.errorBadge,
       fileTypeIcon: fileTypeIcon ?? _this.fileTypeIcon,
       inlineNotification: inlineNotification ?? _this.inlineNotification,
@@ -245,6 +250,7 @@ mixin _$StreamComponentBuilders {
       reactionPicker: reactionPicker ?? _this.reactionPicker,
       reactions: reactions ?? _this.reactions,
       retryBadge: retryBadge ?? _this.retryBadge,
+      selectInput: selectInput ?? _this.selectInput,
       sheetHeader: sheetHeader ?? _this.sheetHeader,
       skeletonLoading: skeletonLoading ?? _this.skeletonLoading,
       snackbar: snackbar ?? _this.snackbar,
@@ -288,6 +294,7 @@ mixin _$StreamComponentBuilders {
       emojiButton: other.emojiButton,
       emojiChip: other.emojiChip,
       emojiChipBar: other.emojiChipBar,
+      emptyState: other.emptyState,
       errorBadge: other.errorBadge,
       fileTypeIcon: other.fileTypeIcon,
       inlineNotification: other.inlineNotification,
@@ -317,6 +324,7 @@ mixin _$StreamComponentBuilders {
       reactionPicker: other.reactionPicker,
       reactions: other.reactions,
       retryBadge: other.retryBadge,
+      selectInput: other.selectInput,
       sheetHeader: other.sheetHeader,
       skeletonLoading: other.skeletonLoading,
       snackbar: other.snackbar,
@@ -361,6 +369,7 @@ mixin _$StreamComponentBuilders {
         _other.emojiButton == _this.emojiButton &&
         _other.emojiChip == _this.emojiChip &&
         _other.emojiChipBar == _this.emojiChipBar &&
+        _other.emptyState == _this.emptyState &&
         _other.errorBadge == _this.errorBadge &&
         _other.fileTypeIcon == _this.fileTypeIcon &&
         _other.inlineNotification == _this.inlineNotification &&
@@ -393,6 +402,7 @@ mixin _$StreamComponentBuilders {
         _other.reactionPicker == _this.reactionPicker &&
         _other.reactions == _this.reactions &&
         _other.retryBadge == _this.retryBadge &&
+        _other.selectInput == _this.selectInput &&
         _other.sheetHeader == _this.sheetHeader &&
         _other.skeletonLoading == _this.skeletonLoading &&
         _other.snackbar == _this.snackbar &&
@@ -429,6 +439,7 @@ mixin _$StreamComponentBuilders {
       _this.emojiButton,
       _this.emojiChip,
       _this.emojiChipBar,
+      _this.emptyState,
       _this.errorBadge,
       _this.fileTypeIcon,
       _this.inlineNotification,
@@ -455,6 +466,7 @@ mixin _$StreamComponentBuilders {
       _this.reactionPicker,
       _this.reactions,
       _this.retryBadge,
+      _this.selectInput,
       _this.sheetHeader,
       _this.skeletonLoading,
       _this.snackbar,

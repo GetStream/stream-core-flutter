@@ -15,6 +15,7 @@ import 'components/stream_context_menu_action_theme.dart';
 import 'components/stream_context_menu_theme.dart';
 import 'components/stream_emoji_button_theme.dart';
 import 'components/stream_emoji_chip_theme.dart';
+import 'components/stream_empty_state_theme.dart';
 import 'components/stream_error_badge_theme.dart';
 import 'components/stream_inline_notification_theme.dart';
 import 'components/stream_jump_to_unread_button_theme.dart';
@@ -33,6 +34,7 @@ import 'components/stream_playback_speed_toggle_theme.dart';
 import 'components/stream_progress_bar_theme.dart';
 import 'components/stream_reaction_picker_theme.dart';
 import 'components/stream_reactions_theme.dart';
+import 'components/stream_select_input_theme.dart';
 import 'components/stream_sheet_header_theme.dart';
 import 'components/stream_sheet_theme.dart';
 import 'components/stream_skeleton_loading_theme.dart';
@@ -149,6 +151,9 @@ extension StreamThemeExtension on BuildContext {
   /// Returns the [StreamEmojiChipThemeData] from the nearest ancestor.
   StreamEmojiChipThemeData get streamEmojiChipTheme => StreamEmojiChipTheme.of(this);
 
+  /// Returns the [StreamEmptyStateThemeData] from the nearest ancestor.
+  StreamEmptyStateThemeData get streamEmptyStateTheme => StreamEmptyStateTheme.of(this);
+
   /// Returns the [StreamErrorBadgeThemeData] from the nearest ancestor.
   StreamErrorBadgeThemeData get streamErrorBadgeTheme => StreamErrorBadgeTheme.of(this);
 
@@ -212,6 +217,9 @@ extension StreamThemeExtension on BuildContext {
 
   /// Returns the [StreamReactionsThemeData] from the nearest ancestor.
   StreamReactionsThemeData get streamReactionsTheme => StreamReactionsTheme.of(this);
+
+  /// Returns the [StreamSelectInputThemeData] from the nearest ancestor.
+  StreamSelectInputThemeData get streamSelectInputTheme => StreamSelectInputTheme.of(this);
 
   /// Returns the [StreamSheetHeaderThemeData] from the nearest ancestor.
   StreamSheetHeaderThemeData get streamSheetHeaderTheme => StreamSheetHeaderTheme.of(this);

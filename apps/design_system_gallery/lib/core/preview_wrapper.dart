@@ -2,6 +2,7 @@ import 'package:device_frame_plus/device_frame_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_core_flutter/core.dart';
+import 'package:widgetbook/widgetbook.dart';
 
 import '../config/preview_configuration.dart';
 import '../widgets/scoped_semantics_debugger.dart';
@@ -17,6 +18,9 @@ import '../widgets/scoped_semantics_debugger.dart';
 ///
 /// A [GlobalObjectKey] is used on the [Navigator] so that toggling the device
 /// frame on/off reparents the navigator without losing state.
+///
+/// In Widgetbook's preview mode (`&preview`, used for embedding) the device
+/// frame and the surrounding sheet are skipped so only the use case renders.
 class PreviewWrapper extends StatelessWidget {
   const PreviewWrapper({super.key, required this.child});
 
@@ -65,6 +69,8 @@ class PreviewWrapper extends StatelessWidget {
       enabled: previewConfig.showSemanticsDebugger,
       child: content,
     );
+
+    if (WidgetbookState.of(context).previewMode) return content;
 
     if (previewConfig.showDeviceFrame) {
       return Center(

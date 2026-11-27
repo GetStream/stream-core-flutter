@@ -4,6 +4,10 @@
 
 - Added a `mark` slot to `StreamMessageMetadata`, styled by new `mark*` and
   `separator*` fields on `StreamMessageMetadataStyle`.
+- Added `StreamEmptyState` and `StreamEmptyStateTheme`, a placeholder for a place that has nothing in it yet:
+  an optional icon over a title, a description and an optional action.
+- Added `StreamSelectInput`, a select field with a borderless `StreamSelectInputStyle.ghost`
+  variant, and `StreamSelectInputTheme`, both exported from `video.dart`.
 - Added `fontFamily` and `fontFamilyFallback` to `StreamTheme`.
 - Added `semanticLabel` to `StreamTextInput`, a screen-reader label that
   replaces `labelText` without changing what is drawn.
@@ -15,12 +19,15 @@
 
 - Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
 - Fixed `StreamSheet` painting lighter than `backgroundElevation1` in dark mode under Material 3.
+- Fixed `StreamMessageText` showing nothing when a mention's id is not valid percent-encoding. The mention now
+  shows, and `onTapMention` receives the id as written.
 
 ### 🔄 Changed
 
 - `StreamMessageMetadata` reverses an end-aligned row to edited, status and
   timestamp, then username (previously username first). Start-aligned rows
   are unchanged.
+- `StreamTextInput`'s default border radius is now `StreamRadius.xl` (16) instead of `StreamRadius.lg` (12).
 - Stream text now follows Material's default font family when the app sets
   none, which can render differently on web and desktop.
 - `StreamColors.transparent` is now `Colors.transparent` (transparent black)

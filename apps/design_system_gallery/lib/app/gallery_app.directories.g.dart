@@ -47,6 +47,8 @@ import 'package:design_system_gallery/components/buttons/stream_jump_to_unread_b
     as _design_system_gallery_components_buttons_stream_jump_to_unread_button;
 import 'package:design_system_gallery/components/common/stream_checkbox.dart'
     as _design_system_gallery_components_common_stream_checkbox;
+import 'package:design_system_gallery/components/common/stream_empty_state.dart'
+    as _design_system_gallery_components_common_stream_empty_state;
 import 'package:design_system_gallery/components/common/stream_flex.dart'
     as _design_system_gallery_components_common_stream_flex;
 import 'package:design_system_gallery/components/common/stream_intrinsic_flex.dart'
@@ -57,6 +59,8 @@ import 'package:design_system_gallery/components/common/stream_network_image.dar
     as _design_system_gallery_components_common_stream_network_image;
 import 'package:design_system_gallery/components/common/stream_progress_bar.dart'
     as _design_system_gallery_components_common_stream_progress_bar;
+import 'package:design_system_gallery/components/common/stream_select_input.dart'
+    as _design_system_gallery_components_common_stream_select_input;
 import 'package:design_system_gallery/components/common/stream_skeleton_loading.dart'
     as _design_system_gallery_components_common_stream_skeleton_loading;
 import 'package:design_system_gallery/components/common/stream_tap_target_padding.dart'
@@ -587,6 +591,23 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'StreamEmptyState',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_empty_state
+                        .buildStreamEmptyStatePlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_empty_state
+                        .buildStreamEmptyStateShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StreamFlex',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -666,6 +687,23 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _design_system_gallery_components_common_stream_progress_bar
                         .buildStreamProgressBarShowcase,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'StreamSelectInput',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Playground',
+                builder:
+                    _design_system_gallery_components_common_stream_select_input
+                        .buildStreamSelectInputPlayground,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Showcase',
+                builder:
+                    _design_system_gallery_components_common_stream_select_input
+                        .buildStreamSelectInputShowcase,
               ),
             ],
           ),

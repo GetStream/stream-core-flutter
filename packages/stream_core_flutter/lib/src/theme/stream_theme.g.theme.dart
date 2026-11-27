@@ -37,6 +37,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamContextMenuActionThemeData? contextMenuActionTheme,
     StreamEmojiButtonThemeData? emojiButtonTheme,
     StreamEmojiChipThemeData? emojiChipTheme,
+    StreamEmptyStateThemeData? emptyStateTheme,
     StreamErrorBadgeThemeData? errorBadgeTheme,
     StreamInlineNotificationThemeData? inlineNotificationTheme,
     StreamJumpToUnreadButtonThemeData? jumpToUnreadButtonTheme,
@@ -62,6 +63,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
     StreamProgressBarThemeData? progressBarTheme,
     StreamReactionPickerThemeData? reactionPickerTheme,
     StreamReactionsThemeData? reactionsTheme,
+    StreamSelectInputThemeData? selectInputTheme,
     StreamSheetHeaderThemeData? sheetHeaderTheme,
     StreamSheetThemeData? sheetTheme,
     StreamSkeletonLoadingThemeData? skeletonLoadingTheme,
@@ -101,6 +103,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
           contextMenuActionTheme ?? _this.contextMenuActionTheme,
       emojiButtonTheme: emojiButtonTheme ?? _this.emojiButtonTheme,
       emojiChipTheme: emojiChipTheme ?? _this.emojiChipTheme,
+      emptyStateTheme: emptyStateTheme ?? _this.emptyStateTheme,
       errorBadgeTheme: errorBadgeTheme ?? _this.errorBadgeTheme,
       inlineNotificationTheme:
           inlineNotificationTheme ?? _this.inlineNotificationTheme,
@@ -137,6 +140,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       progressBarTheme: progressBarTheme ?? _this.progressBarTheme,
       reactionPickerTheme: reactionPickerTheme ?? _this.reactionPickerTheme,
       reactionsTheme: reactionsTheme ?? _this.reactionsTheme,
+      selectInputTheme: selectInputTheme ?? _this.selectInputTheme,
       sheetHeaderTheme: sheetHeaderTheme ?? _this.sheetHeaderTheme,
       sheetTheme: sheetTheme ?? _this.sheetTheme,
       skeletonLoadingTheme: skeletonLoadingTheme ?? _this.skeletonLoadingTheme,
@@ -246,6 +250,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.emojiChipTheme,
         t,
       )!,
+      emptyStateTheme: StreamEmptyStateThemeData.lerp(
+        _this.emptyStateTheme,
+        other.emptyStateTheme,
+        t,
+      )!,
       errorBadgeTheme: StreamErrorBadgeThemeData.lerp(
         _this.errorBadgeTheme,
         other.errorBadgeTheme,
@@ -348,6 +357,11 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         other.reactionsTheme,
         t,
       )!,
+      selectInputTheme: StreamSelectInputThemeData.lerp(
+        _this.selectInputTheme,
+        other.selectInputTheme,
+        t,
+      )!,
       sheetHeaderTheme: StreamSheetHeaderThemeData.lerp(
         _this.sheetHeaderTheme,
         other.sheetHeaderTheme,
@@ -429,6 +443,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.contextMenuActionTheme == _this.contextMenuActionTheme &&
         _other.emojiButtonTheme == _this.emojiButtonTheme &&
         _other.emojiChipTheme == _this.emojiChipTheme &&
+        _other.emptyStateTheme == _this.emptyStateTheme &&
         _other.errorBadgeTheme == _this.errorBadgeTheme &&
         _other.inlineNotificationTheme == _this.inlineNotificationTheme &&
         _other.jumpToUnreadButtonTheme == _this.jumpToUnreadButtonTheme &&
@@ -455,6 +470,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
         _other.progressBarTheme == _this.progressBarTheme &&
         _other.reactionPickerTheme == _this.reactionPickerTheme &&
         _other.reactionsTheme == _this.reactionsTheme &&
+        _other.selectInputTheme == _this.selectInputTheme &&
         _other.sheetHeaderTheme == _this.sheetHeaderTheme &&
         _other.sheetTheme == _this.sheetTheme &&
         _other.skeletonLoadingTheme == _this.skeletonLoadingTheme &&
@@ -496,6 +512,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.contextMenuActionTheme,
       _this.emojiButtonTheme,
       _this.emojiChipTheme,
+      _this.emptyStateTheme,
       _this.errorBadgeTheme,
       _this.inlineNotificationTheme,
       _this.jumpToUnreadButtonTheme,
@@ -515,6 +532,7 @@ mixin _$StreamTheme on ThemeExtension<StreamTheme> {
       _this.progressBarTheme,
       _this.reactionPickerTheme,
       _this.reactionsTheme,
+      _this.selectInputTheme,
       _this.sheetHeaderTheme,
       _this.sheetTheme,
       _this.skeletonLoadingTheme,

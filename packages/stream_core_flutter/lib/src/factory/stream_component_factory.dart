@@ -18,9 +18,11 @@ import '../components/buttons/stream_emoji_button.dart';
 import '../components/buttons/stream_jump_to_unread_button.dart';
 import '../components/buttons/stream_split_button.dart';
 import '../components/common/stream_checkbox.dart';
+import '../components/common/stream_empty_state.dart';
 import '../components/common/stream_loading_spinner.dart';
 import '../components/common/stream_network_image.dart';
 import '../components/common/stream_progress_bar.dart';
+import '../components/common/stream_select_input.dart';
 import '../components/common/stream_skeleton_loading.dart';
 import '../components/common/stream_text_input.dart';
 import '../components/common/stream_typing_indicator_dots.dart';
@@ -200,6 +202,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamEmojiButtonProps>? emojiButton,
     StreamComponentBuilder<StreamEmojiChipProps>? emojiChip,
     StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar,
+    StreamComponentBuilder<StreamEmptyStateProps>? emptyState,
     StreamComponentBuilder<StreamErrorBadgeProps>? errorBadge,
     StreamComponentBuilder<StreamFileTypeIconProps>? fileTypeIcon,
     StreamComponentBuilder<StreamInlineNotificationProps>? inlineNotification,
@@ -226,6 +229,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     StreamComponentBuilder<StreamReactionPickerProps>? reactionPicker,
     StreamComponentBuilder<StreamReactionsProps>? reactions,
     StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge,
+    StreamComponentBuilder<StreamSelectInputProps>? selectInput,
     StreamComponentBuilder<StreamSheetHeaderProps>? sheetHeader,
     StreamComponentBuilder<StreamSkeletonLoadingProps>? skeletonLoading,
     StreamComponentBuilder<StreamSnackbarProps>? snackbar,
@@ -258,6 +262,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       emojiButton: emojiButton,
       emojiChip: emojiChip,
       emojiChipBar: emojiChipBar,
+      emptyState: emptyState,
       errorBadge: errorBadge,
       fileTypeIcon: fileTypeIcon,
       inlineNotification: inlineNotification,
@@ -284,6 +289,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
       reactionPicker: reactionPicker,
       reactions: reactions,
       retryBadge: retryBadge,
+      selectInput: selectInput,
       sheetHeader: sheetHeader,
       skeletonLoading: skeletonLoading,
       snackbar: snackbar,
@@ -317,6 +323,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.emojiButton,
     required this.emojiChip,
     required this.emojiChipBar,
+    required this.emptyState,
     required this.errorBadge,
     required this.fileTypeIcon,
     required this.inlineNotification,
@@ -343,6 +350,7 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
     required this.reactionPicker,
     required this.reactions,
     required this.retryBadge,
+    required this.selectInput,
     required this.sheetHeader,
     required this.skeletonLoading,
     required this.snackbar,
@@ -460,6 +468,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamEmojiChipBar] uses [DefaultStreamEmojiChipBar].
   final StreamComponentBuilder<StreamEmojiChipBarProps>? emojiChipBar;
+
+  /// Custom builder for empty state widgets.
+  ///
+  /// When null, [StreamEmptyState] uses [DefaultStreamEmptyState].
+  final StreamComponentBuilder<StreamEmptyStateProps>? emptyState;
 
   /// Custom builder for error badge widgets.
   ///
@@ -598,6 +611,11 @@ class StreamComponentBuilders with _$StreamComponentBuilders {
   ///
   /// When null, [StreamRetryBadge] uses [DefaultStreamRetryBadge].
   final StreamComponentBuilder<StreamRetryBadgeProps>? retryBadge;
+
+  /// Custom builder for select input widgets.
+  ///
+  /// When null, [StreamSelectInput] uses [DefaultStreamSelectInput].
+  final StreamComponentBuilder<StreamSelectInputProps>? selectInput;
 
   /// Custom builder for sheet header widgets.
   ///
