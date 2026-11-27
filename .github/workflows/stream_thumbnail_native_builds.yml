@@ -33,14 +33,21 @@ permissions:
 jobs:
   android:
     timeout-minutes: 20
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
     steps:
+      # Anonymous checkout: the org IP allow list refuses only signed-in requests, and this job
+      # makes no other GitHub call, so it runs on a free standard runner.
       - name: Git Checkout
-        uses: actions/checkout@v6
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-tags "https://github.com/$REPOSITORY" "$SHA"
+          git checkout -q FETCH_HEAD
+        env:
+          REPOSITORY: ${{ github.repository }}
+          SHA: ${{ github.sha }}
 
       - name: Bootstrap Workspace
         uses: ./.github/actions/bootstrap
@@ -106,14 +113,19 @@ jobs:
 
   linux:
     timeout-minutes: 20
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-tags "https://github.com/$REPOSITORY" "$SHA"
+          git checkout -q FETCH_HEAD
+        env:
+          REPOSITORY: ${{ github.repository }}
+          SHA: ${{ github.sha }}
 
       - name: Install Linux Build Dependencies
         run: |
@@ -130,14 +142,19 @@ jobs:
 
   web:
     timeout-minutes: 20
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/stream_thumbnail/example
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v6
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-tags "https://github.com/$REPOSITORY" "$SHA"
+          git checkout -q FETCH_HEAD
+        env:
+          REPOSITORY: ${{ github.repository }}
+          SHA: ${{ github.sha }}
 
       - name: Bootstrap Workspace
         uses: ./.github/actions/bootstrap
