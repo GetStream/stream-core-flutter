@@ -2,11 +2,20 @@
 
 ### ✨ Features
 
+- Added `redactedHeaders` and `redactedQueryParameters` to `LoggingInterceptor`, naming the headers and query
+  parameters it logs as `<redacted>`, and `LoggingInterceptor.defaultRedactedHeaders`.
 - Added `ConnectUserDetailsRequest.privacySettings` and `PrivacySettingsRequest`, which set the user's typing indicator, read receipt and delivery receipt settings on connect
 - Added `WsAuthMessageRequest.memberCustomInclude`, which adds channel member custom data to received chat messages, and `WsAuthMessageRequest.eventProtocol`, which picks the realtime event protocol version from `EventProtocol`
 
+### 🔄 Changed
+
+- `LoggingInterceptor` logs the `Authorization`, `Cookie` and `Proxy-Authorization` headers as `<redacted>`. Pass
+  `redactedHeaders: const {}` to log them as is.
+- `jose` now resolves to 0.3.5+2 or later (`^0.3.5+2`).
+
 ### 🐞 Fixed
 
+- Fixed the raw token appearing in `UserToken.toString()` and in the `ArgumentError` for a token without a `user_id`.
 - Fixed `flutter build --analyze-size` crashing in the AOT compiler (`Request to create artificial node for object with cid 58`) in apps that use two or more `SortField`s.
 - Fixed `WsAuthMessageRequest` sending its token twice, unrelated extra keys, and `null` for unset fields; it now sends only the fields that were set
 - Fixed `WsAuthMessageRequest.toString` showing the token in debug builds

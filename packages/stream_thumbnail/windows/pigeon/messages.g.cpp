@@ -323,12 +323,14 @@ std::string PigeonInternalToString(const ::flutter::EncodableValue& v) {
 
 ThumbnailRequest::ThumbnailRequest(
   const std::string& video,
+  const ThumbnailSourceKind& source_kind,
   const ThumbnailFormat& format,
   int64_t max_height,
   int64_t max_width,
   int64_t time_ms,
   int64_t quality)
  : video_(video),
+    source_kind_(source_kind),
     format_(format),
     max_height_(max_height),
     max_width_(max_width),
@@ -337,6 +339,7 @@ ThumbnailRequest::ThumbnailRequest(
 
 ThumbnailRequest::ThumbnailRequest(
   const std::string& video,
+  const ThumbnailSourceKind& source_kind,
   const EncodableMap* headers,
   const ThumbnailFormat& format,
   int64_t max_height,
@@ -344,6 +347,7 @@ ThumbnailRequest::ThumbnailRequest(
   int64_t time_ms,
   int64_t quality)
  : video_(video),
+    source_kind_(source_kind),
     headers_(headers ? std::optional<EncodableMap>(*headers) : std::nullopt),
     format_(format),
     max_height_(max_height),
@@ -357,6 +361,15 @@ const std::string& ThumbnailRequest::video() const {
 
 void ThumbnailRequest::set_video(std::string_view value_arg) {
   video_ = value_arg;
+}
+
+
+const ThumbnailSourceKind& ThumbnailRequest::source_kind() const {
+  return source_kind_;
+}
+
+void ThumbnailRequest::set_source_kind(const ThumbnailSourceKind& value_arg) {
+  source_kind_ = value_arg;
 }
 
 
@@ -420,8 +433,9 @@ void ThumbnailRequest::set_quality(int64_t value_arg) {
 
 EncodableList ThumbnailRequest::ToEncodableList() const {
   EncodableList list;
-  list.reserve(7);
+  list.reserve(8);
   list.push_back(EncodableValue(video_));
+  list.push_back(CustomEncodableValue(source_kind_));
   list.push_back(headers_ ? EncodableValue(*headers_) : EncodableValue());
   list.push_back(CustomEncodableValue(format_));
   list.push_back(EncodableValue(max_height_));
@@ -434,12 +448,13 @@ EncodableList ThumbnailRequest::ToEncodableList() const {
 ThumbnailRequest ThumbnailRequest::FromEncodableList(const EncodableList& list) {
   ThumbnailRequest decoded(
     std::get<std::string>(list[0]),
-    std::any_cast<const ThumbnailFormat&>(std::get<CustomEncodableValue>(list[2])),
-    std::get<int64_t>(list[3]),
+    std::any_cast<const ThumbnailSourceKind&>(std::get<CustomEncodableValue>(list[1])),
+    std::any_cast<const ThumbnailFormat&>(std::get<CustomEncodableValue>(list[3])),
     std::get<int64_t>(list[4]),
     std::get<int64_t>(list[5]),
-    std::get<int64_t>(list[6]));
-  auto& encodable_headers = list[1];
+    std::get<int64_t>(list[6]),
+    std::get<int64_t>(list[7]));
+  auto& encodable_headers = list[2];
   if (!encodable_headers.IsNull()) {
     decoded.set_headers(std::get<EncodableMap>(encodable_headers));
   }
@@ -447,7 +462,7 @@ ThumbnailRequest ThumbnailRequest::FromEncodableList(const EncodableList& list) 
 }
 
 bool ThumbnailRequest::operator==(const ThumbnailRequest& other) const {
-  return PigeonInternalDeepEquals(video_, other.video_) && PigeonInternalDeepEquals(headers_, other.headers_) && PigeonInternalDeepEquals(format_, other.format_) && PigeonInternalDeepEquals(max_height_, other.max_height_) && PigeonInternalDeepEquals(max_width_, other.max_width_) && PigeonInternalDeepEquals(time_ms_, other.time_ms_) && PigeonInternalDeepEquals(quality_, other.quality_);
+  return PigeonInternalDeepEquals(video_, other.video_) && PigeonInternalDeepEquals(source_kind_, other.source_kind_) && PigeonInternalDeepEquals(headers_, other.headers_) && PigeonInternalDeepEquals(format_, other.format_) && PigeonInternalDeepEquals(max_height_, other.max_height_) && PigeonInternalDeepEquals(max_width_, other.max_width_) && PigeonInternalDeepEquals(time_ms_, other.time_ms_) && PigeonInternalDeepEquals(quality_, other.quality_);
 }
 
 bool ThumbnailRequest::operator!=(const ThumbnailRequest& other) const {
@@ -457,6 +472,7 @@ bool ThumbnailRequest::operator!=(const ThumbnailRequest& other) const {
 size_t ThumbnailRequest::Hash() const {
   size_t result = 1;
   result = result * 31 + PigeonInternalDeepHash(video_);
+  result = result * 31 + PigeonInternalDeepHash(source_kind_);
   result = result * 31 + PigeonInternalDeepHash(headers_);
   result = result * 31 + PigeonInternalDeepHash(format_);
   result = result * 31 + PigeonInternalDeepHash(max_height_);
@@ -472,6 +488,8 @@ std::ostream& operator<<(
   os << "ThumbnailRequest(";
   os << "video: ";
   os << PigeonInternalToString(obj.video_);
+  os << ", source_kind: ";
+  os << PigeonInternalToString(obj.source_kind_);
   os << ", headers: ";
   if (obj.headers_) {
     os << PigeonInternalToString(*obj.headers_);
@@ -510,6 +528,11 @@ EncodableValue PigeonInternalCodecSerializer::ReadValueOfType(
         return encodable_enum_arg.IsNull() ? EncodableValue() : CustomEncodableValue(static_cast<ThumbnailFormat>(enum_arg_value));
       }
     case 130: {
+        const auto& encodable_enum_arg = ReadValue(stream);
+        const int64_t enum_arg_value = encodable_enum_arg.IsNull() ? 0 : encodable_enum_arg.LongValue();
+        return encodable_enum_arg.IsNull() ? EncodableValue() : CustomEncodableValue(static_cast<ThumbnailSourceKind>(enum_arg_value));
+      }
+    case 131: {
         return CustomEncodableValue(ThumbnailRequest::FromEncodableList(std::get<EncodableList>(ReadValue(stream))));
       }
     default:
@@ -526,8 +549,13 @@ void PigeonInternalCodecSerializer::WriteValue(
       WriteValue(EncodableValue(static_cast<int>(std::any_cast<ThumbnailFormat>(*custom_value))), stream);
       return;
     }
-    if (custom_value->type() == typeid(ThumbnailRequest)) {
+    if (custom_value->type() == typeid(ThumbnailSourceKind)) {
       stream->WriteByte(130);
+      WriteValue(EncodableValue(static_cast<int>(std::any_cast<ThumbnailSourceKind>(*custom_value))), stream);
+      return;
+    }
+    if (custom_value->type() == typeid(ThumbnailRequest)) {
+      stream->WriteByte(131);
       WriteValue(EncodableValue(std::any_cast<ThumbnailRequest>(*custom_value).ToEncodableList()), stream);
       return;
     }

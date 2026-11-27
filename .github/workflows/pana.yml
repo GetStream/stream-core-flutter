@@ -14,15 +14,15 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   stream_core:
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     steps:
       - name: 📚 Git Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: 📊 Verify Pana Score
         uses: ./.github/actions/pana
         with:
@@ -30,11 +30,12 @@ jobs:
           min_score: 120  # Missing 10 points for no example, 10 points for no license, 10 points for static analysis issues, and 10 points for outdated dependencies (cross_file 0.4.0 requires Flutter).
 
   stream_core_flutter:
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     steps:
       - name: 📚 Git Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: 📊 Verify Pana Score
         uses: ./.github/actions/pana
         with:
@@ -42,11 +43,12 @@ jobs:
           min_score: 110  # Missing 10 points for no license, 10 points for no example, 20 points for static analysis issues (including the path dependency on stream_core that the pana action sets up), and 10 points for outdated dependencies (shimmer 4.0.0).
 
   stream_thumbnail:
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     steps:
       - name: 📚 Git Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: 📊 Verify Pana Score
         uses: ./.github/actions/pana
         with:

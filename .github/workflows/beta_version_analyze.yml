@@ -12,17 +12,17 @@ permissions:
 jobs:
   # Does a sanity check on packages for the next beta version so we are not surprised by any breaking changes.
   analyze_beta_versions:
+    name: Analyze on Flutter Beta
     timeout-minutes: 15
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     steps:
-      - name: "Git Checkout"
-        uses: actions/checkout@v4
+      - name: 📚 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
-      - name: "Install Flutter"
-        uses: subosito/flutter-action@v2
+      - name: 🐦 Install Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: beta
           cache: true
@@ -38,7 +38,8 @@ jobs:
     needs: [analyze_beta_versions]
     if: failure() && github.event_name == 'schedule'
     steps:
-      - uses: 8398a7/action-slack@v3
+      - name: 📣 Report to Slack
+        uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3.19.0
         with:
           status: failure
           text: "<@U08BMRSM8G5> & <@U05UCQ2B0CT>: The beta build for Flutter Video failed. Please check the logs."

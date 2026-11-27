@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   release:
+    name: Publish to pub.dev
     # Publishing waits for a flutter-developers approval, and pub.dev only
     # accepts uploads from this environment.
     environment: pub.dev
@@ -30,8 +31,9 @@ jobs:
       - name: 📚 Checkout branch
         # Default GITHUB_TOKEN: this job never pushes to git (the release step
         # passes its own token), so no bot PAT sits in git config during setup.
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: 🏷️ Parse package and version from tag
@@ -78,10 +80,10 @@ jobs:
 
       - name: 🎯 Setup Dart
         # Before Flutter: provides the pub.dev OIDC token.
-        uses: dart-lang/setup-dart@v1
+        uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
 
       - name: 🐦 Install Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
 
@@ -204,13 +206,13 @@ jobs:
 
       - name: 🔑 Mint CI Bot Token
         id: ci-bot-token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
         with:
           client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
           private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
 
       - name: 🚀 Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ steps.parse.outputs.package }} v${{ steps.parse.outputs.version }}
@@ -227,8 +229,8 @@ jobs:
     name: Deploy the Gallery to flutter.getstream.io
     needs: release
     if: needs.release.outputs.package == 'stream_core_flutter' && needs.release.outputs.prerelease == 'false'
-    runs-on:
-      group: github-public-amd64
+    # Builds and deploys to Google Cloud without a GitHub API call, so a free runner works.
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
       group: web-deploy-design-system-prod
@@ -241,7 +243,9 @@ jobs:
       id-token: write
     steps:
       - name: 📚 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: 🧩 Bootstrap Workspace
         uses: ./.github/actions/bootstrap

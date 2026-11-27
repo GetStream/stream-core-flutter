@@ -29,6 +29,7 @@ on:
 jobs:
   # The author marked the pull request "ready" again, so review feedback is addressed.
   drop_pending:
+    name: Drop the Pending Label
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.action == 'labeled' && github.event.label.name == 'ready'
@@ -40,7 +41,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: 🏷️ Remove Pending
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const { owner, repo } = context.repo;
@@ -63,6 +64,7 @@ jobs:
             }
 
   sync_labels:
+    name: Sync Review Labels
     # Reviews by the pull request author or by bots never change the labels,
     # so they're skipped here and can't cancel a run that does.
     if: >-
@@ -88,7 +90,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: 🏷️ Sync Review Labels
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const READY = 'ready';

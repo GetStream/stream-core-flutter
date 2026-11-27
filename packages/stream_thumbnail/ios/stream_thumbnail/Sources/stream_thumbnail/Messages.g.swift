@@ -191,11 +191,23 @@ enum ThumbnailFormat: Int, CaseIterable {
   case webp = 2
 }
 
+/// Where [ThumbnailRequest.video] is read from, and so how it may be opened.
+///
+/// `network` must only be fetched over http or https, `file` must only be
+/// opened as a local path, and `contentUri` only through an Android content
+/// resolver.
+enum ThumbnailSourceKind: Int, CaseIterable {
+  case network = 0
+  case file = 1
+  case contentUri = 2
+}
+
 /// A single thumbnail generation request sent to the native platform.
 ///
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThumbnailRequest: Hashable, CustomStringConvertible {
   var video: String
+  var sourceKind: ThumbnailSourceKind
   var headers: [String: String]? = nil
   var format: ThumbnailFormat
   var maxHeight: Int64
@@ -207,15 +219,17 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> ThumbnailRequest? {
     let video = pigeonVar_list[0] as! String
-    let headers: [String: String]? = nilOrValue(pigeonVar_list[1])
-    let format = pigeonVar_list[2] as! ThumbnailFormat
-    let maxHeight = pigeonVar_list[3] as! Int64
-    let maxWidth = pigeonVar_list[4] as! Int64
-    let timeMs = pigeonVar_list[5] as! Int64
-    let quality = pigeonVar_list[6] as! Int64
+    let sourceKind = pigeonVar_list[1] as! ThumbnailSourceKind
+    let headers: [String: String]? = nilOrValue(pigeonVar_list[2])
+    let format = pigeonVar_list[3] as! ThumbnailFormat
+    let maxHeight = pigeonVar_list[4] as! Int64
+    let maxWidth = pigeonVar_list[5] as! Int64
+    let timeMs = pigeonVar_list[6] as! Int64
+    let quality = pigeonVar_list[7] as! Int64
 
     return ThumbnailRequest(
       video: video,
+      sourceKind: sourceKind,
       headers: headers,
       format: format,
       maxHeight: maxHeight,
@@ -227,6 +241,7 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
   func toList() -> [Any?] {
     return [
       video,
+      sourceKind,
       headers,
       format,
       maxHeight,
@@ -239,12 +254,13 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.video, rhs.video) && MessagesPigeonInternal.deepEquals(lhs.headers, rhs.headers) && MessagesPigeonInternal.deepEquals(lhs.format, rhs.format) && MessagesPigeonInternal.deepEquals(lhs.maxHeight, rhs.maxHeight) && MessagesPigeonInternal.deepEquals(lhs.maxWidth, rhs.maxWidth) && MessagesPigeonInternal.deepEquals(lhs.timeMs, rhs.timeMs) && MessagesPigeonInternal.deepEquals(lhs.quality, rhs.quality)
+    return MessagesPigeonInternal.deepEquals(lhs.video, rhs.video) && MessagesPigeonInternal.deepEquals(lhs.sourceKind, rhs.sourceKind) && MessagesPigeonInternal.deepEquals(lhs.headers, rhs.headers) && MessagesPigeonInternal.deepEquals(lhs.format, rhs.format) && MessagesPigeonInternal.deepEquals(lhs.maxHeight, rhs.maxHeight) && MessagesPigeonInternal.deepEquals(lhs.maxWidth, rhs.maxWidth) && MessagesPigeonInternal.deepEquals(lhs.timeMs, rhs.timeMs) && MessagesPigeonInternal.deepEquals(lhs.quality, rhs.quality)
   }
 
   func hash(into hasher: inout Hasher) {
     hasher.combine("ThumbnailRequest")
     MessagesPigeonInternal.deepHash(value: video, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: sourceKind, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: headers, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: format, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: maxHeight, hasher: &hasher)
@@ -254,7 +270,7 @@ struct ThumbnailRequest: Hashable, CustomStringConvertible {
   }
 
   public var description: String {
-    return "ThumbnailRequest(video: \(String(describing: video)), headers: \(String(describing: headers)), format: \(String(describing: format)), maxHeight: \(String(describing: maxHeight)), maxWidth: \(String(describing: maxWidth)), timeMs: \(String(describing: timeMs)), quality: \(String(describing: quality)))"
+    return "ThumbnailRequest(video: \(String(describing: video)), sourceKind: \(String(describing: sourceKind)), headers: \(String(describing: headers)), format: \(String(describing: format)), maxHeight: \(String(describing: maxHeight)), maxWidth: \(String(describing: maxWidth)), timeMs: \(String(describing: timeMs)), quality: \(String(describing: quality)))"
   }
 }
 
@@ -268,6 +284,12 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 130:
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return ThumbnailSourceKind(rawValue: enumResultAsInt)
+      }
+      return nil
+    case 131:
       return ThumbnailRequest.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -280,8 +302,11 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     if let value = value as? ThumbnailFormat {
       super.writeByte(129)
       super.writeValue(value.rawValue)
-    } else if let value = value as? ThumbnailRequest {
+    } else if let value = value as? ThumbnailSourceKind {
       super.writeByte(130)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? ThumbnailRequest {
+      super.writeByte(131)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
