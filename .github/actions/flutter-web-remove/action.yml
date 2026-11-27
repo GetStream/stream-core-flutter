@@ -5,7 +5,8 @@ description: >
   when there is no build.
 
 # The job needs `id-token: write` and the GitHub environment `flutter-web-pr`:
-# the identity provider only admits runs in it.
+# the identity provider only admits runs in it. It makes no GitHub API call, so
+# a standard runner such as `ubuntu-latest` works.
 
 inputs:
   path:

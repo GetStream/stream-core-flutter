@@ -3,7 +3,8 @@ description: >
   Comments the link to a pull request's web build on the pull request, or
   updates that comment when the build is removed. One comment per app.
 
-# The job needs `pull-requests: write`.
+# The job needs `pull-requests: write`, and a runner in the static-IP group:
+# the org IP allow list refuses its API calls from standard runners.
 
 inputs:
   app:

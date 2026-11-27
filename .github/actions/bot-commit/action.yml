@@ -4,6 +4,9 @@ description: >
   signed by GitHub and attributed to the app whose token is used. The commit is
   refused if the branch moved past `expected-head-sha`.
 
+# The job needs a runner in the static-IP group: the org IP allow list refuses
+# its API calls from standard runners.
+
 inputs:
   files:
     description: >
