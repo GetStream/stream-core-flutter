@@ -20,7 +20,7 @@
 - Fixed component text ignoring the app's font family (`ThemeData.fontFamily`).
 - Fixed `StreamSheet` painting lighter than `backgroundElevation1` in dark mode under Material 3.
 - Fixed `StreamNetworkImage`, and so `StreamAvatar`, decoding images at full size instead of at the size shown,
-  capped at 4096 pixels on a side.
+  capped at 4096 pixels on a side, except on web.
 - Fixed `StreamNetworkImage` ignoring its `opacity`, `semanticLabel` and `excludeFromSemantics`.
 
 ### 🔄 Changed

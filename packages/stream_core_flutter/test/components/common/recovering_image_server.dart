@@ -14,24 +14,26 @@ Widget withStreamTheme(Widget child) {
   );
 }
 
-/// A local server that answers 404 until [recover] is called, then serves a
-/// PNG, with the image cache pointed at a temporary directory.
+/// A local server that answers 404 until [recover] or [serve] is called, then
+/// serves a PNG, with the image cache pointed at a temporary directory.
 class RecoveringImageServer {
   RecoveringImageServer._(this._server, this._png) {
     _server.listen((request) {
+      final path = request.uri.path.substring(1);
+      _requests[path] = requestsFor(path) + 1;
       final response = request.response;
       if (_failing) {
         response.statusCode = HttpStatus.notFound;
       } else {
         response
           ..headers.contentType = ContentType('image', 'png')
-          ..add(_png);
+          ..add(_body ?? _png);
       }
       response.close();
     });
   }
 
-  /// Starts a server that fails until [recover] is called.
+  /// Starts a server that fails until [recover] or [serve] is called.
   static Future<RecoveringImageServer> start(WidgetTester tester) async {
     HttpOverrides.global = null;
     final cacheDirectory = Directory.systemTemp.createTempSync('stream_network_image_retry_test');
@@ -54,13 +56,25 @@ class RecoveringImageServer {
 
   final HttpServer _server;
   final List<int> _png;
+  List<int>? _body;
   var _failing = true;
+
+  final _requests = <String, int>{};
+
+  /// The number of requests this server has answered for [path].
+  int requestsFor(String path) => _requests[path] ?? 0;
 
   /// The URL of [path] on this server.
   String url(String path) => 'http://127.0.0.1:${_server.port}/$path';
 
   /// Makes the server serve the image from now on.
   void recover() => _failing = false;
+
+  /// Makes the server serve [body] in place of the image from now on.
+  void serve(List<int> body) {
+    _body = body;
+    _failing = false;
+  }
 }
 
 /// Pumps real time until [condition] holds, for at most five seconds.

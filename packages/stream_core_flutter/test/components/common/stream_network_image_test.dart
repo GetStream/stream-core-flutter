@@ -4,18 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 import 'package:stream_core_flutter/src/cache/internal/stream_bounded_image.dart';
 
-Widget _withStreamTheme(Widget child) {
-  return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme()]),
-    home: Scaffold(body: Center(child: child)),
-  );
-}
-
-StreamBoundedImage _imageOf(WidgetTester tester, {int index = 0}) {
-  final images = tester.widgetList<Image>(find.byType(Image)).toList();
-  return images[index].image as StreamBoundedImage;
-}
-
 void main() {
   group('StreamNetworkImage caching', () {
     testWidgets('routes all images through one shared cache manager', (tester) async {
@@ -38,7 +26,7 @@ void main() {
     });
   });
 
-  testWidgets('decodes for its size times the device pixel ratio', (tester) async {
+  testWidgets('passes its size to the decoder in logical pixels', (tester) async {
     await tester.pumpWidget(_withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 20)));
 
     final image = _imageOf(tester);
@@ -56,7 +44,7 @@ void main() {
     expect((image.width, image.height, image.useLogicalSize, image.fit), (64, 32, false, BoxFit.contain));
   });
 
-  testWidgets('decodes to fill a box it covers', (tester) async {
+  testWidgets('passes its fit to the decoder', (tester) async {
     await tester.pumpWidget(
       _withStreamTheme(StreamNetworkImage('https://example.com/a.png', width: 40, height: 40, fit: BoxFit.cover)),
     );
@@ -94,13 +82,13 @@ void main() {
       ),
     );
     final before = _imageOf(tester);
+    final imageState = tester.state(find.byType(Image));
 
     rebuild(() {});
     await tester.pump();
 
-    final after = _imageOf(tester);
-    expect(after, isNot(same(before)));
-    expect(after, before);
+    expect(_imageOf(tester), before);
+    expect(tester.state(find.byType(Image)), same(imageState));
   });
 
   testWidgets('labels the image for screen readers with its semantic label', (tester) async {
@@ -135,4 +123,16 @@ void main() {
 
     expect(tester.widget<RawImage>(find.byType(RawImage)).opacity, opacity);
   });
+}
+
+Widget _withStreamTheme(Widget child) {
+  return MaterialApp(
+    theme: ThemeData(extensions: [StreamTheme()]),
+    home: Scaffold(body: Center(child: child)),
+  );
+}
+
+StreamBoundedImage _imageOf(WidgetTester tester, {int index = 0}) {
+  final images = tester.widgetList<Image>(find.byType(Image)).toList();
+  return images[index].image as StreamBoundedImage;
 }

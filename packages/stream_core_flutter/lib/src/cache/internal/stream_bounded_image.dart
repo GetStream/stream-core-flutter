@@ -5,19 +5,15 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
-/// Thrown when an image has more pixels than [StreamBoundedImage.maxSourcePixels].
-class StreamImageTooLargeException implements Exception {
-  /// Creates an exception for an image of [width] by [height] pixels.
-  const StreamImageTooLargeException(this.width, this.height);
+// Thrown when an image has more pixels than [StreamBoundedImage.maxSourcePixels].
+class _ImageTooLargeException implements Exception {
+  const _ImageTooLargeException(this.width, this.height);
 
-  /// The width of the image.
   final int width;
-
-  /// The height of the image.
   final int height;
 
   @override
-  String toString() => 'StreamImageTooLargeException: a ${width}x$height image is too large to display.';
+  String toString() => 'A ${width}x$height image is too large to display.';
 }
 
 /// An image provider that decodes [imageProvider] for a box of [width] by
@@ -29,8 +25,7 @@ class StreamImageTooLargeException implements Exception {
 /// is decoded large enough to fill it, and with [BoxFit.none] it is decoded at
 /// its own size.
 ///
-/// An image with more pixels than [maxSourcePixels] fails with a
-/// [StreamImageTooLargeException].
+/// An image with more pixels than [maxSourcePixels] fails to load.
 ///
 /// See also:
 ///
@@ -76,12 +71,15 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
   @visibleForTesting
   static int get debugTrackedImageCount => _keysByProviderKey.length;
 
-  // Remembers [key] for [evictAll]. Once more images are tracked than the image
-  // cache can hold, those no longer in it are forgotten first.
+  // Remembers [key] for [evictAll], forgetting keys the image cache no longer
+  // holds or shows once more are tracked than it can hold.
   static void _track(Object providerKey, StreamBoundedImageKey key) {
     if (_keysByProviderKey.length > _pruneAt) {
       final cache = PaintingBinding.instance.imageCache;
-      _keysByProviderKey.removeWhere((_, keys) => (keys..removeWhere((it) => !cache.containsKey(it))).isEmpty);
+      for (final keys in _keysByProviderKey.values) {
+        keys.removeWhere((it) => !cache.statusForKey(it).tracked);
+      }
+      _keysByProviderKey.removeWhere((_, keys) => keys.isEmpty);
       _pruneAt = math.max(2 * _keysByProviderKey.length, cache.maximumSize);
     }
     (_keysByProviderKey[providerKey] ??= {}).add(key);
@@ -104,7 +102,6 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
     SynchronousFuture<StreamBoundedImageKey>? result;
     imageProvider.obtainKey(configuration).then((providerKey) {
       final key = StreamBoundedImageKey._(providerKey, effectiveWidth, effectiveHeight, fit);
-      _track(providerKey, key);
       if (completer == null) {
         result = SynchronousFuture(key);
       } else {
@@ -119,6 +116,7 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
 
   @override
   ImageStreamCompleter loadImage(StreamBoundedImageKey key, ImageDecoderCallback decode) {
+    _track(key._providerKey, key);
     Future<ui.Codec> decodeBounded(ui.ImmutableBuffer buffer, {ui.TargetImageSizeCallback? getTargetSize}) {
       assert(
         getTargetSize == null,
@@ -133,7 +131,7 @@ class StreamBoundedImage extends ImageProvider<StreamBoundedImageKey> {
   }
 
   static ui.TargetImageSize _targetSize(int width, int height, StreamBoundedImageKey key) {
-    if (width * height > maxSourcePixels) throw StreamImageTooLargeException(width, height);
+    if (width * height > maxSourcePixels) throw _ImageTooLargeException(width, height);
 
     final scales = [
       if (key._width case final boxWidth?) boxWidth / width,

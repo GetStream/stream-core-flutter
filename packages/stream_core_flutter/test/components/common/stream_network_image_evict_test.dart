@@ -6,22 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_core_flutter/core.dart';
 
-Widget _withStreamTheme(Widget child) {
-  return MaterialApp(
-    theme: ThemeData(extensions: [StreamTheme()]),
-    home: Scaffold(body: Center(child: child)),
-  );
-}
-
-Future<List<int>> _png() async {
-  final recorder = ui.PictureRecorder();
-  ui.Canvas(recorder).drawColor(const ui.Color(0xFFFF0000), ui.BlendMode.src);
-  final image = await recorder.endRecording().toImage(8, 8);
-  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-  image.dispose();
-  return bytes!.buffer.asUint8List();
-}
-
 void main() {
   testWidgets('evictFromCache removes a shown image from the in-memory cache', (tester) async {
     HttpOverrides.global = null;
@@ -63,4 +47,20 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(minutes: 1));
   });
+}
+
+Widget _withStreamTheme(Widget child) {
+  return MaterialApp(
+    theme: ThemeData(extensions: [StreamTheme()]),
+    home: Scaffold(body: Center(child: child)),
+  );
+}
+
+Future<List<int>> _png() async {
+  final recorder = ui.PictureRecorder();
+  ui.Canvas(recorder).drawColor(const ui.Color(0xFFFF0000), ui.BlendMode.src);
+  final image = await recorder.endRecording().toImage(8, 8);
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  image.dispose();
+  return bytes!.buffer.asUint8List();
 }
