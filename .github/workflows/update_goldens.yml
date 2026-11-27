@@ -5,12 +5,19 @@ on: workflow_dispatch
 permissions:
   contents: read
 
+# A newer run on the same branch replaces an older one; the older one's commit
+# would be refused anyway once the branch moves.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Renders on a free runner, the one `test` in stream_core_flutter_workflow.yml
   # compares on; change both together.
   render:
     name: Render Goldens
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: 📚 Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
