@@ -7,15 +7,16 @@ import '../../helpers/logger.dart';
 import '../../helpers/user_token.dart';
 
 class _FakeApi implements HttpClientAdapter {
-  _FakeApi({this.body = const {'ok': true}});
+  _FakeApi({this.body = const {'ok': true}, this.statusCode = 200});
 
   final Map<String, Object?> body;
+  final int statusCode;
 
   @override
   Future<ResponseBody> fetch(RequestOptions o, Stream<Uint8List>? s, Future<void>? c) async {
     return ResponseBody.fromString(
       jsonEncode(body),
-      200,
+      statusCode,
       headers: {
         Headers.contentTypeHeader: [Headers.jsonContentType],
       },
@@ -61,13 +62,16 @@ Future<String> _linesOf(
   String path = '/test',
   Map<String, Object?> headers = const {},
   Map<String, Object?>? queryParameters,
+  int statusCode = 200,
 }) async {
   final lines = <String>[];
   final dio = Dio(BaseOptions(baseUrl: 'https://example.com', headers: headers))
-    ..httpClientAdapter = _FakeApi()
+    ..httpClientAdapter = _FakeApi(statusCode: statusCode)
     ..interceptors.add(create((_, line) => lines.add('$line')));
 
-  await dio.get<void>(path, queryParameters: queryParameters);
+  try {
+    await dio.get<void>(path, queryParameters: queryParameters);
+  } on DioException catch (_) {}
   return lines.join('\n');
 }
 
@@ -125,7 +129,7 @@ void main() {
         },
       );
 
-      expect(handler.messages.join(), contains('Authorization: ***'));
+      expect(handler.messages.join(), contains('Authorization: <redacted>'));
       expect(handler.messages.join(), isNot(contains(token)));
     });
 
@@ -135,7 +139,7 @@ void main() {
         headers: const {'authorization': 'authorization-value'},
       );
 
-      expect(log, contains('authorization: ***'));
+      expect(log, contains('authorization: <redacted>'));
       expect(log, isNot(contains('authorization-value')));
     });
 
@@ -168,8 +172,29 @@ void main() {
         path: '/test?api_key=key-value&page=2',
       );
 
-      expect(log, contains('api_key=***&page=2'));
+      expect(log, contains('api_key=<redacted>&page=2'));
       expect(log, isNot(contains('key-value')));
+    });
+
+    test('redacts the query parameters it is given in the report of a failed request', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(request: false, redactedQueryParameters: {'api_key'}, logPrint: logPrint),
+        path: '/test?api_key=key-value&page=2',
+        statusCode: 404,
+      );
+
+      expect(log, contains('api_key=<redacted>&page=2'));
+      expect(log, isNot(contains('key-value')));
+    });
+
+    test('redacts the Cookie and Proxy-Authorization headers by default', () async {
+      final log = await _linesOf(
+        (logPrint) => LoggingInterceptor(requestHeader: true, logPrint: logPrint),
+        headers: {'Cookie': 'cookie-value', 'Proxy-Authorization': 'proxy-value'},
+      );
+
+      expect(log, isNot(contains('cookie-value')));
+      expect(log, isNot(contains('proxy-value')));
     });
 
     test('redacts a query parameter whose name is encoded in the URL', () async {
@@ -179,7 +204,7 @@ void main() {
         path: '/test?filter%5Bid%5D=filter-value',
       );
 
-      expect(log, contains('filter%5Bid%5D=***'));
+      expect(log, contains('filter%5Bid%5D=<redacted>'));
       expect(log, isNot(contains('filter-value')));
     });
 
@@ -189,7 +214,7 @@ void main() {
         path: '/test?a=1&b=2&a=3',
       );
 
-      expect(log, contains('/test?a=1&b=***&a=3'));
+      expect(log, contains('/test?a=1&b=<redacted>&a=3'));
     });
 
     test('keeps the encoding of the query parameters it does not redact', () async {
@@ -198,7 +223,7 @@ void main() {
         path: '/test?q=a%20b&api_key=key-value',
       );
 
-      expect(log, contains('/test?q=a%20b&api_key=***'));
+      expect(log, contains('/test?q=a%20b&api_key=<redacted>'));
     });
 
     test('redacts a query parameter passed apart from the path', () async {
@@ -207,8 +232,8 @@ void main() {
         queryParameters: const {'api_key': 'key-value'},
       );
 
-      expect(log, contains('api_key: ***'));
-      expect(log, contains('api_key=***'));
+      expect(log, contains('api_key: <redacted>'));
+      expect(log, contains('api_key=<redacted>'));
       expect(log, isNot(contains('key-value')));
     });
 
@@ -218,7 +243,7 @@ void main() {
         path: '/test?name%FF=1&api_key=key-value',
       );
 
-      expect(log, contains('/test?name%FF=1&api_key=***'));
+      expect(log, contains('/test?name%FF=1&api_key=<redacted>'));
     });
 
     test('redacts a response header it is given', () async {

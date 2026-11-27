@@ -31,9 +31,10 @@ typedef LogPrint = void Function(InterceptStep step, Object object);
 class LoggingInterceptor extends Interceptor {
   /// Creates an interceptor that reports each request it sees.
   ///
-  /// The values of the headers in [redactedHeaders] and of the query parameters in [redactedQueryParameters] are
-  /// reported as `***`, matching names regardless of case. [redactedHeaders] replaces [defaultRedactedHeaders], so
-  /// consider spreading it in when adding a header. An empty collection reports every header as is.
+  /// The values of the headers in `redactedHeaders` and of the query parameters in `redactedQueryParameters` are
+  /// reported as `<redacted>`, matching names regardless of case. `redactedHeaders` replaces
+  /// [defaultRedactedHeaders], so consider spreading it in when adding a header. An empty collection reports every
+  /// header as is.
   ///
   /// Headers and bodies can contain sensitive data, such as credentials and the contents of messages, so consider
   /// reporting them only in a controlled or non-production environment.
@@ -89,10 +90,10 @@ class LoggingInterceptor extends Interceptor {
   /// Takes each line instead of the logger, for a caller routing them somewhere of its own.
   final LogPrint? logPrint;
 
-  /// The headers whose values are reported as `***` when the constructor is given no others.
-  static const Iterable<String> defaultRedactedHeaders = {'Authorization'};
+  /// The headers whose values are reported as `<redacted>` when the constructor is given no others.
+  static const Iterable<String> defaultRedactedHeaders = {'Authorization', 'Cookie', 'Proxy-Authorization'};
 
-  static const _redacted = '***';
+  static const _redacted = '<redacted>';
 
   final Set<String> _headersToRedact;
 

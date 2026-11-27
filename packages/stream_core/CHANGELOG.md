@@ -3,14 +3,16 @@
 ### ✨ Features
 
 - Added `redactedHeaders` and `redactedQueryParameters` to `LoggingInterceptor`, naming the headers and query
-  parameters it logs as `***`, and `LoggingInterceptor.defaultRedactedHeaders`.
+  parameters it logs as `<redacted>`, and `LoggingInterceptor.defaultRedactedHeaders`.
 
 ### 🔄 Changed
 
-- `LoggingInterceptor` logs the `Authorization` header as `***`. Pass `redactedHeaders: const {}` to log it as is.
-- `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` no longer include `rawValue`.
+- `LoggingInterceptor` logs the `Authorization`, `Cookie` and `Proxy-Authorization` headers as `<redacted>`. Pass
+  `redactedHeaders: const {}` to log them as is.
 
 ### 🐞 Fixed
+
+- Fixed `UserToken.toString()` and the `ArgumentError` for a token without a `user_id` including `rawValue`.
 
 - Fixed `flutter build --analyze-size` crashing in the AOT compiler (`Request to create artificial node for object with cid 58`) in apps that use two or more `SortField`s.
 
