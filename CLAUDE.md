@@ -68,7 +68,7 @@ file-type assets.
 The `GetStream` organization has an IP allow list, and it refuses every GitHub API call made with a token from GitHub's standard runners (`ubuntu-latest`, `macos-latest`), reads included; pushing with git is refused too. Checking out (a git read) and OIDC sign-in (Codecov, the Google Cloud deploys) work there. So:
 
 - A job that only checks out, builds, tests or deploys outside GitHub runs on a free standard runner.
-- A job that calls the GitHub API, or pushes, runs on the static-IP group (`runs-on: { group: github-public-amd64 }`), which is billed per minute. Keep it small: do the heavy work in a free job and hand the result over, as `update_goldens.yml` and `pr_web_build.yml` do. `bot-commit` and `flutter-web-pr-comment` are such calls.
+- A job that calls the GitHub API, or pushes, runs on the static-IP group (`runs-on: { group: github-public-amd64 }`), which is billed per minute. Keep it small: do the heavy work in a free job and hand the result over, as `update_goldens.yml` and `pr_web_build.yml` do. `bot-commit` and `flutter-web-pr-comment` are such calls; to commit files a free job made, upload them as an artifact and call the reusable `commit_artifact.yml`.
 - To skip work for unrelated changes, use the reusable `detect_changes.yml`, which diffs with git, not `dorny/paths-filter`, which calls the API on pull requests. A gate's dependent job should still run when the gate fails, since a skipped required check passes; see the example in its header.
 
 Pin every action to a full commit SHA with its version in a comment; Dependabot (`.github/dependabot.yml`) bumps them weekly.
