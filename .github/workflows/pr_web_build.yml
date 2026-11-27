@@ -6,6 +6,10 @@ name: pr_web_build
 # request removes the build. Builds left behind are removed after 30 days by
 # the next prod or beta deploy. Fork pull requests are skipped: their runs get
 # no identity token.
+#
+# Building and deploying make no GitHub API call, so they run on free
+# runners; only the comment jobs call the API, which the org IP allow list
+# permits from the static-IP runners alone.
 
 on:
   pull_request:
@@ -32,8 +36,7 @@ jobs:
       github.event.action != 'unlabeled' &&
       contains(github.event.pull_request.labels.*.name, 'build') &&
       (github.event.action != 'labeled' || github.event.label.name == 'build')
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     # On the jobs rather than the workflow, so a run that skips both (another
     # label added) leaves a running deploy alone.
@@ -43,10 +46,11 @@ jobs:
     environment:
       name: flutter-web-pr
       url: ${{ steps.target.outputs.url }}
+    outputs:
+      url: ${{ steps.target.outputs.url }}
     permissions:
       contents: read
       id-token: write
-      pull-requests: write
     steps:
       - name: 📚 Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -78,11 +82,28 @@ jobs:
           service-account: ${{ steps.target.outputs.service-account }}
           build-dir: apps/design_system_gallery/build/web
 
+  comment:
+    name: Comment the Link
+    needs: deploy
+    runs-on:
+      group: github-public-amd64
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # Only for the local action; other repositories use it without a checkout.
+      - name: 📚 Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
       - name: 💬 Comment the Link
         uses: ./.github/actions/flutter-web-pr-comment
         with:
           app: design-system
-          url: ${{ steps.target.outputs.url }}
+          url: ${{ needs.deploy.outputs.url }}
 
   remove:
     name: Remove Build
@@ -90,8 +111,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       ((github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, 'build')) ||
       (github.event.action == 'unlabeled' && github.event.label.name == 'build'))
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     # Shares the deploy's group, so it stops a deploy that is still running.
     concurrency:
@@ -102,7 +122,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-      pull-requests: write
     steps:
       # Only for the local actions; other repositories use them without a
       # checkout.
@@ -124,6 +143,23 @@ jobs:
         with:
           path: ${{ steps.target.outputs.path }}
           service-account: ${{ steps.target.outputs.service-account }}
+
+  remove_comment:
+    name: Update the Comment
+    needs: remove
+    runs-on:
+      group: github-public-amd64
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # Only for the local action; other repositories use it without a checkout.
+      - name: 📚 Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
 
       - name: 💬 Update the Comment
         uses: ./.github/actions/flutter-web-pr-comment

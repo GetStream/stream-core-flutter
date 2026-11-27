@@ -24,23 +24,16 @@ permissions:
   contents: read
 
 jobs:
-  build_and_deploy_gallery:
+  # Builds on a free runner; only the push below needs the static-IP runners.
+  build_gallery:
     if: github.ref == 'refs/heads/main'
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
-          fetch-depth: 0
-
-      - name: config git
-        run: |
-          git config --global user.email "$(git log --format='%ae' HEAD^!)"
-          git config --global user.name "$(git log --format='%an' HEAD^!)"
+          persist-credentials: false
 
       - name: Setup Flutter
         uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
@@ -54,16 +47,49 @@ jobs:
       - name: Bootstrap Workspace
         run: melos bootstrap
 
-      - name: Build and Deploy
-        uses: bluefireteam/flutter-gh-pages@cf4a9312849577dbfd9df8f3d63d12ef6b09898e # v9
+      - name: Build
+        working-directory: apps/design_system_gallery
+        run: flutter build web --release --base-href /stream-core-flutter/
+
+      - name: Upload Build
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          baseHref: /stream-core-flutter/
-          workingDir: apps/design_system_gallery
+          name: gallery-pages
+          path: apps/design_system_gallery/build/web
+          if-no-files-found: error
+          retention-days: 1
+
+  # Replaces gh-pages with a commit on top of main holding only the build.
+  publish_pages:
+    needs: build_gallery
+    runs-on:
+      group: github-public-amd64
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Download Build
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: gallery-pages
+          path: ${{ runner.temp }}/gallery-pages
+
+      - name: Push to gh-pages
+        env:
+          BUILD_DIR: ${{ runner.temp }}/gallery-pages
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git --work-tree "$BUILD_DIR" add --all
+          git commit -m "Automatic deployment by github-actions"
+          git push origin HEAD:gh-pages --force
 
   deploy_hosted:
     name: Deploy to flutter.getstream.io
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
       group: web-deploy-design-system-beta

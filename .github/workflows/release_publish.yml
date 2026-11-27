@@ -228,8 +228,8 @@ jobs:
     name: Deploy the Gallery to flutter.getstream.io
     needs: release
     if: needs.release.outputs.package == 'stream_core_flutter' && needs.release.outputs.prerelease == 'false'
-    runs-on:
-      group: github-public-amd64
+    # Builds and deploys to Google Cloud without a GitHub API call, so a free runner works.
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
       group: web-deploy-design-system-prod
