@@ -84,6 +84,8 @@ jobs:
         with:
           client-id: ${{ inputs.client-id }}
           private-key: ${{ secrets.private-key }}
+          # Only what bot-commit needs, whatever else the app may do.
+          permission-contents: write
 
       - name: 📥 Download Files
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -93,7 +95,7 @@ jobs:
       # By repository path: `./` would resolve against the calling repository.
       - name: 📤 Commit
         id: commit
-        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@e823bcc597a13dc9b243f53f84eaa06f08f66f97
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@ab35fa04fb78eabde311daabadc4ecccdbbd677e
         with:
           files: ${{ inputs.files }}
           message: ${{ inputs.message }}
