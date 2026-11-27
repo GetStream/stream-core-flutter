@@ -64,10 +64,10 @@ jobs:
   test:
     needs: analyze
     timeout-minutes: 15
-    # The image update_goldens renders on (its `render` job), so a golden that
+    # The runner update_goldens renders on (its `render` job), so a golden that
     # renders differently on another image can still be regenerated to match.
     # Change both together.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       # Codecov authenticates the coverage upload with a GitHub OIDC token.
