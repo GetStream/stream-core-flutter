@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   release:
+    name: Publish to pub.dev
     # Publishing waits for a flutter-developers approval, and pub.dev only
     # accepts uploads from this environment.
     environment: pub.dev

@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   update_top_level_domains:
+    name: Update Top-Level Domains
     runs-on:
       group: github-public-amd64
     steps:

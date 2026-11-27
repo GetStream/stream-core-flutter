@@ -29,6 +29,7 @@ on:
 jobs:
   # The author marked the pull request "ready" again, so review feedback is addressed.
   drop_pending:
+    name: Drop the Pending Label
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.action == 'labeled' && github.event.label.name == 'ready'
@@ -63,6 +64,7 @@ jobs:
             }
 
   sync_labels:
+    name: Sync Review Labels
     # Reviews by the pull request author or by bots never change the labels,
     # so they're skipped here and can't cancel a run that does.
     if: >-

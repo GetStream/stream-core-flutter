@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   release:
+    name: Tag Unpublished Packages
     # Manual dispatch, or a commit whose message starts `chore(<scope>): release`
     # (no regex in GH expressions). A manual run tags whatever is unpublished.
     if: "${{ github.event_name == 'workflow_dispatch' || (startsWith(github.event.head_commit.message, 'chore(') && contains(github.event.head_commit.message, '): release')) }}"

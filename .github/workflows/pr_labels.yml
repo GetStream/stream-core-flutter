@@ -22,4 +22,5 @@ permissions:
 
 jobs:
   review_labels:
+    name: Review Labels
     uses: ./.github/workflows/pr_review_labels.yml

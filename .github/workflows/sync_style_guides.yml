@@ -30,6 +30,7 @@ jobs:
   # The guides are copied into repositories that have none of this repo's
   # other files, so a link out of `style_guides/` must fail before merge.
   check:
+    name: Check Guide Links
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Git Checkout
@@ -46,6 +47,7 @@ jobs:
   # Only `main` syncs, so a manual run on another branch cannot push its
   # unreviewed guides into the other repositories with the CI bot's token.
   sync:
+    name: Sync to ${{ matrix.repository }}
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: check
     runs-on:
