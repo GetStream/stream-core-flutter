@@ -21,89 +21,89 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   analyze:
     timeout-minutes: 15
-    runs-on:
-      group: github-public-amd64
+    runs-on: ubuntu-latest
     env:
       IS_CI: 'true'
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v6
+      - name: 📚 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
+      - name: 🐦 Install Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           cache: true
           cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
           channel: ${{ env.FLUTTER_CHANNEL }}
 
-      - name: Install Tools
+      - name: 📦 Install Tools
         run: |
           flutter pub global activate melos
 
-      - name: Bootstrap Workspace
+      - name: 🧩 Bootstrap Workspace
         run: melos bootstrap --verbose
 
-      - name: Dart Analyze
+      - name: 🔍 Dart Analyze
         run: |
           melos run analyze
 
-      - name: Check barrels and tokens
+      - name: 🧱 Check Barrels and Tokens
         run: |
           melos run check:barrels
           melos run check:tokens
 
-      - name: Check formatting
+      - name: 🎨 Check Formatting
         run: |
           melos run format:verify
 
   test:
     needs: analyze
     timeout-minutes: 15
-    runs-on:
-      group: github-public-amd64
+    # The runner update_goldens renders on (its `render` job), so a golden that
+    # renders differently on another image can still be regenerated to match.
+    # Change both together.
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
       # Codecov authenticates the coverage upload with a GitHub OIDC token.
       id-token: write
     env:
       IS_CI: 'true'
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v6
+      - name: 📚 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
+      - name: 🐦 Install Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           cache: true
           cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
           channel: ${{ env.FLUTTER_CHANNEL }}
 
-      - name: Install Tools
+      - name: 📦 Install Tools
         run: |
           flutter pub global activate melos
           flutter pub global activate remove_from_coverage
 
-      - name: Bootstrap Workspace
+      - name: 🧩 Bootstrap Workspace
         run: melos bootstrap --verbose
 
-      - name: Flutter Test
+      - name: 🧪 Flutter Test
         run: melos run test:all
 
-      - name: Collect Coverage
+      - name: 📊 Collect Coverage
         run: melos run coverage:ignore-file --no-select
 
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v5
+      - name: 📤 Upload Coverage
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           use_oidc: true
           files: packages/*/coverage/lcov.info
+          disable_search: true

@@ -40,9 +40,16 @@ class _ThumbnailPageState extends State<ThumbnailPage> {
     super.dispose();
   }
 
+  StreamThumbnailSource get _source {
+    final input = _controller.text;
+    final url = Uri.tryParse(input);
+    if (url != null && (url.isScheme('http') || url.isScheme('https'))) return StreamThumbnailSource.network(url);
+    return StreamThumbnailSource.file(input);
+  }
+
   Future<Thumbnail> _generateData() async {
     final bytes = await StreamThumbnail.thumbnailData(
-      video: _controller.text,
+      source: _source,
       imageFormat: StreamThumbnailFormat.jpeg,
       maxWidth: 300,
       quality: 75,
@@ -53,7 +60,7 @@ class _ThumbnailPageState extends State<ThumbnailPage> {
 
   Future<Thumbnail> _generateFile() async {
     final file = await StreamThumbnail.thumbnailFile(
-      video: _controller.text,
+      source: _source,
       imageFormat: StreamThumbnailFormat.jpeg,
       maxWidth: 300,
       quality: 75,

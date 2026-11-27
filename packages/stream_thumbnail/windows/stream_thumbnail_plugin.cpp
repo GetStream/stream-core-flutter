@@ -10,11 +10,13 @@
 #include <objbase.h>
 #include <propvarutil.h>
 #include <shlwapi.h>
+#include <string.h>
 #include <wincodec.h>
 #include <wrl/client.h>
 
 #include <flutter/plugin_registrar_windows.h>
 
+#include <cctype>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -25,6 +27,7 @@ using stream_thumbnail_windows::ErrorOr;
 using stream_thumbnail_windows::FlutterError;
 using stream_thumbnail_windows::ThumbnailFormat;
 using stream_thumbnail_windows::ThumbnailRequest;
+using stream_thumbnail_windows::ThumbnailSourceKind;
 
 namespace stream_thumbnail {
 
@@ -66,6 +69,41 @@ std::string VideoPath(const std::string &video) {
   return video;
 }
 
+bool HasHttpScheme(const std::string &video) {
+  return _strnicmp(video.c_str(), "http://", 7) == 0 || _strnicmp(video.c_str(), "https://", 8) == 0;
+}
+
+// An absolute path on a local drive, such as `C:\videos\a.mp4`. Network shares
+// (`\\host\share`, `//host/share`), device paths and relative paths don't qualify.
+bool IsDriveLetterPath(const std::string &path) {
+  return path.size() >= 3 && std::isalpha(static_cast<unsigned char>(path[0])) && path[1] == ':' &&
+         (path[2] == '\\' || path[2] == '/');
+}
+
+// The URL or path Media Foundation is given for `video`. Media Foundation picks a
+// scheme handler from whatever it is handed, so a network video must name http(s)
+// and a file must be a path on a local drive.
+std::string ResolveInput(const std::string &video, ThumbnailSourceKind kind) {
+  switch (kind) {
+    case ThumbnailSourceKind::kNetwork:
+      if (!HasHttpScheme(video)) {
+        throw ThumbnailException("UNSUPPORTED_SOURCE", "A network video must be an http or https URL.");
+      }
+      return video;
+    case ThumbnailSourceKind::kFile: {
+      std::string path = VideoPath(video);
+      if (path.size() >= 4 && path[0] == '/' && IsDriveLetterPath(path.substr(1))) path.erase(0, 1);
+      if (!IsDriveLetterPath(path)) {
+        throw ThumbnailException("UNSUPPORTED_SOURCE", "A file video must be an absolute path on a local drive.");
+      }
+      return path;
+    }
+    case ThumbnailSourceKind::kContentUri:
+      throw ThumbnailException("UNSUPPORTED_SOURCE", "Content URIs are only supported on Android.");
+  }
+  throw ThumbnailException("UNSUPPORTED_SOURCE", "Unknown video source.");
+}
+
 std::string FileExtension(ThumbnailFormat format) {
   switch (format) {
     case ThumbnailFormat::kJpeg:
@@ -86,12 +124,12 @@ struct DecodedFrame {
   LONG stride = 0;
 };
 
-// Decodes a single frame from `video` at `time_ms` via Media Foundation.
+// Decodes a single frame from `input` at `time_ms` via Media Foundation.
 //
 // NOTE: unlike AVFoundation (iOS/macOS) and MediaMetadataRetriever (Android),
 // IMFSourceReader has no simple way to attach custom HTTP headers to a remote
 // URL, so `request.headers()` is not applied on Windows.
-DecodedFrame DecodeFrame(const std::string &video, int64_t time_ms) {
+DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
   ComPtr<IMFAttributes> attributes;
   ComPtr<IMFSourceReader> reader;
   ComPtr<IMFMediaType> type;
@@ -104,7 +142,7 @@ DecodedFrame DecodeFrame(const std::string &video, int64_t time_ms) {
     hr = attributes->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE);
   }
 
-  const std::wstring wide_path = Utf8ToWide(VideoPath(video));
+  const std::wstring wide_path = Utf8ToWide(input);
   if (SUCCEEDED(hr)) {
     hr = MFCreateSourceReaderFromURL(wide_path.c_str(), attributes.Get(), &reader);
   }
@@ -277,7 +315,7 @@ std::vector<uint8_t> GenerateThumbnailData(const ThumbnailRequest &request) {
     throw ThumbnailException("UNSUPPORTED_FORMAT", "WebP is not yet supported on Windows.");
   }
 
-  const DecodedFrame frame = DecodeFrame(request.video(), request.time_ms());
+  const DecodedFrame frame = DecodeFrame(ResolveInput(request.video(), request.source_kind()), request.time_ms());
 
   ComPtr<IStream> stream;
   HRESULT hr = CreateStreamOnHGlobal(nullptr, TRUE, &stream);
@@ -302,57 +340,38 @@ std::vector<uint8_t> GenerateThumbnailData(const ThumbnailRequest &request) {
   return bytes;
 }
 
-// A fresh directory under %TEMP% to hold one thumbnail. The file name comes
-// from the video, so a directory per request is what keeps two same-named
-// videos from different folders off each other.
-std::wstring CreateOutputDirectory() {
+// A new, uniquely named file path under %TEMP%\stream_thumbnail for one
+// thumbnail with the given extension.
+std::wstring CreateOutputPath(const std::string &ext) {
   wchar_t temp_path[MAX_PATH];
   const DWORD temp_length = GetTempPathW(MAX_PATH, temp_path);
   if (temp_length == 0 || temp_length > MAX_PATH) {
     throw ThumbnailException("WRITE_ERROR", "Failed to locate the temporary directory.");
   }
 
+  const std::wstring directory = std::wstring(temp_path, temp_length) + L"stream_thumbnail";
+  if (!CreateDirectoryW(directory.c_str(), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS) {
+    throw ThumbnailException("WRITE_ERROR", "Failed to create a directory for the thumbnail.");
+  }
+
   GUID guid;
-  wchar_t unique_name[40];
-  if (FAILED(CoCreateGuid(&guid)) || StringFromGUID2(guid, unique_name, ARRAYSIZE(unique_name)) == 0) {
-    throw ThumbnailException("WRITE_ERROR", "Failed to name a directory for the thumbnail.");
+  wchar_t guid_text[40];
+  if (FAILED(CoCreateGuid(&guid)) || StringFromGUID2(guid, guid_text, ARRAYSIZE(guid_text)) == 0) {
+    throw ThumbnailException("WRITE_ERROR", "Failed to name the thumbnail file.");
   }
+  std::wstring name(guid_text);
+  name = name.substr(1, name.size() - 2);
 
-  const std::wstring parent = std::wstring(temp_path, temp_length) + L"stream_thumbnail";
-  if (!CreateDirectoryW(parent.c_str(), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS) {
-    throw ThumbnailException("WRITE_ERROR", "Failed to create a directory for the thumbnail.");
-  }
-
-  const std::wstring directory = parent + L"\\" + unique_name;
-  if (!CreateDirectoryW(directory.c_str(), nullptr)) {
-    throw ThumbnailException("WRITE_ERROR", "Failed to create a directory for the thumbnail.");
-  }
-  return directory;
-}
-
-// The video's own file name, carrying `ext` instead of its own extension.
-std::string OutputFileName(const std::string &video, const std::string &ext) {
-  std::string path = VideoPath(video);
-  const size_t query = path.find_first_of("?#");
-  if (query != std::string::npos) path.erase(query);
-
-  const size_t slash = path.find_last_of("/\\");
-  std::string stem = slash == std::string::npos ? path : path.substr(slash + 1);
-  const size_t dot = stem.find_last_of('.');
-  if (dot != std::string::npos && dot > 0) stem.erase(dot);
-  if (stem.empty()) stem = "thumbnail";
-
-  return stem + "." + ext;
+  return directory + L"\\" + name + L"." + Utf8ToWide(ext);
 }
 
 std::string WriteThumbnailFile(const ThumbnailRequest &request) {
   const std::vector<uint8_t> data = GenerateThumbnailData(request);
 
-  const std::wstring wide_path =
-      CreateOutputDirectory() + L"\\" + Utf8ToWide(OutputFileName(request.video(), FileExtension(request.format())));
+  const std::wstring wide_path = CreateOutputPath(FileExtension(request.format()));
 
   ComPtr<IStream> file_stream;
-  HRESULT hr = SHCreateStreamOnFileEx(wide_path.c_str(), STGM_CREATE | STGM_WRITE | STGM_SHARE_EXCLUSIVE, 0, TRUE,
+  HRESULT hr = SHCreateStreamOnFileEx(wide_path.c_str(), STGM_FAILIFTHERE | STGM_WRITE | STGM_SHARE_EXCLUSIVE, 0, TRUE,
                                        nullptr, &file_stream);
   ULONG written = 0;
   if (SUCCEEDED(hr)) hr = file_stream->Write(data.data(), static_cast<ULONG>(data.size()), &written);

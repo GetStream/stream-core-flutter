@@ -206,12 +206,32 @@ enum class ThumbnailFormat(val raw: Int) {
 }
 
 /**
+ * Where [ThumbnailRequest.video] is read from, and so how it may be opened.
+ *
+ * `network` must only be fetched over http or https, `file` must only be
+ * opened as a local path, and `contentUri` only through an Android content
+ * resolver.
+ */
+enum class ThumbnailSourceKind(val raw: Int) {
+  NETWORK(0),
+  FILE(1),
+  CONTENT_URI(2);
+
+  companion object {
+    fun ofRaw(raw: Int): ThumbnailSourceKind? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+/**
  * A single thumbnail generation request sent to the native platform.
  *
  * Generated class from Pigeon that represents data sent in messages.
  */
 data class ThumbnailRequest (
   val video: String,
+  val sourceKind: ThumbnailSourceKind,
   val headers: Map<String, String>? = null,
   val format: ThumbnailFormat,
   val maxHeight: Long,
@@ -223,18 +243,20 @@ data class ThumbnailRequest (
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): ThumbnailRequest {
       val video = pigeonVar_list[0] as String
-      val headers = pigeonVar_list[1] as Map<String, String>?
-      val format = pigeonVar_list[2] as ThumbnailFormat
-      val maxHeight = pigeonVar_list[3] as Long
-      val maxWidth = pigeonVar_list[4] as Long
-      val timeMs = pigeonVar_list[5] as Long
-      val quality = pigeonVar_list[6] as Long
-      return ThumbnailRequest(video, headers, format, maxHeight, maxWidth, timeMs, quality)
+      val sourceKind = pigeonVar_list[1] as ThumbnailSourceKind
+      val headers = pigeonVar_list[2] as Map<String, String>?
+      val format = pigeonVar_list[3] as ThumbnailFormat
+      val maxHeight = pigeonVar_list[4] as Long
+      val maxWidth = pigeonVar_list[5] as Long
+      val timeMs = pigeonVar_list[6] as Long
+      val quality = pigeonVar_list[7] as Long
+      return ThumbnailRequest(video, sourceKind, headers, format, maxHeight, maxWidth, timeMs, quality)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       video,
+      sourceKind,
       headers,
       format,
       maxHeight,
@@ -251,12 +273,13 @@ data class ThumbnailRequest (
       return true
     }
     val other = other as ThumbnailRequest
-    return MessagesPigeonUtils.deepEquals(this.video, other.video) && MessagesPigeonUtils.deepEquals(this.headers, other.headers) && MessagesPigeonUtils.deepEquals(this.format, other.format) && MessagesPigeonUtils.deepEquals(this.maxHeight, other.maxHeight) && MessagesPigeonUtils.deepEquals(this.maxWidth, other.maxWidth) && MessagesPigeonUtils.deepEquals(this.timeMs, other.timeMs) && MessagesPigeonUtils.deepEquals(this.quality, other.quality)
+    return MessagesPigeonUtils.deepEquals(this.video, other.video) && MessagesPigeonUtils.deepEquals(this.sourceKind, other.sourceKind) && MessagesPigeonUtils.deepEquals(this.headers, other.headers) && MessagesPigeonUtils.deepEquals(this.format, other.format) && MessagesPigeonUtils.deepEquals(this.maxHeight, other.maxHeight) && MessagesPigeonUtils.deepEquals(this.maxWidth, other.maxWidth) && MessagesPigeonUtils.deepEquals(this.timeMs, other.timeMs) && MessagesPigeonUtils.deepEquals(this.quality, other.quality)
   }
 
   override fun hashCode(): Int {
     var result = javaClass.hashCode()
     result = 31 * result + MessagesPigeonUtils.deepHash(this.video)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.sourceKind)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.headers)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.format)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.maxHeight)
@@ -266,7 +289,7 @@ data class ThumbnailRequest (
     return result
   }
   override fun toString(): String {
-    return "ThumbnailRequest(video=$video, headers=$headers, format=$format, maxHeight=$maxHeight, maxWidth=$maxWidth, timeMs=$timeMs, quality=$quality)"
+    return "ThumbnailRequest(video=$video, sourceKind=$sourceKind, headers=$headers, format=$format, maxHeight=$maxHeight, maxWidth=$maxWidth, timeMs=$timeMs, quality=$quality)"
   }
 }
 private open class MessagesPigeonCodec : StandardMessageCodec() {
@@ -278,6 +301,11 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         }
       }
       130.toByte() -> {
+        return (readValue(buffer) as Long?)?.let {
+          ThumbnailSourceKind.ofRaw(it.toInt())
+        }
+      }
+      131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           ThumbnailRequest.fromList(it)
         }
@@ -291,8 +319,12 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.raw.toLong())
       }
-      is ThumbnailRequest -> {
+      is ThumbnailSourceKind -> {
         stream.write(130)
+        writeValue(stream, value.raw.toLong())
+      }
+      is ThumbnailRequest -> {
+        stream.write(131)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

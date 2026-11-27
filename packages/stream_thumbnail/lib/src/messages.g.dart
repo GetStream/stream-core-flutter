@@ -101,10 +101,22 @@ enum ThumbnailFormat {
   webp,
 }
 
+/// Where [ThumbnailRequest.video] is read from, and so how it may be opened.
+///
+/// `network` must only be fetched over http or https, `file` must only be
+/// opened as a local path, and `contentUri` only through an Android content
+/// resolver.
+enum ThumbnailSourceKind {
+  network,
+  file,
+  contentUri,
+}
+
 /// A single thumbnail generation request sent to the native platform.
 class ThumbnailRequest {
   ThumbnailRequest({
     required this.video,
+    required this.sourceKind,
     this.headers,
     required this.format,
     required this.maxHeight,
@@ -114,6 +126,8 @@ class ThumbnailRequest {
   });
 
   String video;
+
+  ThumbnailSourceKind sourceKind;
 
   Map<String, String>? headers;
 
@@ -130,6 +144,7 @@ class ThumbnailRequest {
   List<Object?> _toList() {
     return <Object?>[
       video,
+      sourceKind,
       headers,
       format,
       maxHeight,
@@ -147,12 +162,13 @@ class ThumbnailRequest {
     result as List<Object?>;
     return ThumbnailRequest(
       video: result[0]! as String,
-      headers: (result[1] as Map<Object?, Object?>?)?.cast<String, String>(),
-      format: result[2]! as ThumbnailFormat,
-      maxHeight: result[3]! as int,
-      maxWidth: result[4]! as int,
-      timeMs: result[5]! as int,
-      quality: result[6]! as int,
+      sourceKind: result[1]! as ThumbnailSourceKind,
+      headers: (result[2] as Map<Object?, Object?>?)?.cast<String, String>(),
+      format: result[3]! as ThumbnailFormat,
+      maxHeight: result[4]! as int,
+      maxWidth: result[5]! as int,
+      timeMs: result[6]! as int,
+      quality: result[7]! as int,
     );
   }
 
@@ -166,6 +182,7 @@ class ThumbnailRequest {
       return true;
     }
     return _deepEquals(video, other.video) &&
+        _deepEquals(sourceKind, other.sourceKind) &&
         _deepEquals(headers, other.headers) &&
         _deepEquals(format, other.format) &&
         _deepEquals(maxHeight, other.maxHeight) &&
@@ -180,7 +197,7 @@ class ThumbnailRequest {
 
   @override
   String toString() {
-    return 'ThumbnailRequest(video: $video, headers: $headers, format: $format, maxHeight: $maxHeight, maxWidth: $maxWidth, timeMs: $timeMs, quality: $quality)';
+    return 'ThumbnailRequest(video: $video, sourceKind: $sourceKind, headers: $headers, format: $format, maxHeight: $maxHeight, maxWidth: $maxWidth, timeMs: $timeMs, quality: $quality)';
   }
 }
 
@@ -194,8 +211,11 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is ThumbnailFormat) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    } else if (value is ThumbnailRequest) {
+    } else if (value is ThumbnailSourceKind) {
       buffer.putUint8(130);
+      writeValue(buffer, value.index);
+    } else if (value is ThumbnailRequest) {
+      buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -209,6 +229,9 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : ThumbnailFormat.values[value];
       case 130:
+        final value = readValue(buffer) as int?;
+        return value == null ? null : ThumbnailSourceKind.values[value];
+      case 131:
         return ThumbnailRequest.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

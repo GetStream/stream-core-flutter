@@ -8,7 +8,8 @@ description: >
 # flutter-web-target names for the account: the identity provider only admits
 # runs in it. Fork pull requests can't deploy: their runs get no identity token.
 # It needs a Linux runner: the cleanup of old pull request builds uses GNU
-# `date -d`.
+# `date -d`. It makes no GitHub API call, so a standard runner such as
+# `ubuntu-latest` works.
 
 inputs:
   path:
@@ -35,13 +36,13 @@ runs:
         fi
 
     - name: 🔑 Authenticate to Google Cloud
-      uses: google-github-actions/auth@v3
+      uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
         workload_identity_provider: projects/675676272957/locations/global/workloadIdentityPools/github-actions/providers/github-flutter
         service_account: ${{ inputs.service-account }}
 
     - name: ☁️ Setup gcloud
-      uses: google-github-actions/setup-gcloud@v3
+      uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
     # A prod folder holds the beta build in beta/ and the pull request builds
     # in pr/, so the sync leaves those alone.

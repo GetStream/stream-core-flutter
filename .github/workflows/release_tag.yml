@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   release:
+    name: Tag Unpublished Packages
     # Manual dispatch, or a commit whose message starts `chore(<scope>): release`
     # (no regex in GH expressions). A manual run tags whatever is unpublished.
     if: "${{ github.event_name == 'workflow_dispatch' || (startsWith(github.event.head_commit.message, 'chore(') && contains(github.event.head_commit.message, '): release')) }}"
@@ -22,20 +23,20 @@ jobs:
     steps:
       - name: 🔑 Mint CI Bot Token
         id: ci-bot-token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
         with:
           client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
           private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
 
       - name: 📚 Checkout branch
         # CI bot app token: GITHUB_TOKEN tag pushes don't trigger the publish workflow.
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           token: ${{ steps.ci-bot-token.outputs.token }}
 
       - name: 🐦 Install Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
 

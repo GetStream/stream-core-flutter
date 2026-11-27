@@ -23,6 +23,8 @@ description: >
 #                       unset otherwise. Nothing removes a build's browser
 #                       storage, so an app can skip storing what grows, such as
 #                       an offline cache, in pull request builds.
+#
+# It makes no network call, so it runs on any runner.
 
 inputs:
   app:
