@@ -69,6 +69,7 @@ permissions:
 
 jobs:
   commit:
+    name: Commit Files
     runs-on:
       group: github-public-amd64
     timeout-minutes: 5
