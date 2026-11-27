@@ -69,9 +69,12 @@ Future<String> _linesOf(
     ..httpClientAdapter = _FakeApi(statusCode: statusCode)
     ..interceptors.add(create((_, line) => lines.add('$line')));
 
-  try {
-    await dio.get<void>(path, queryParameters: queryParameters);
-  } on DioException catch (_) {}
+  final response = dio.get<void>(path, queryParameters: queryParameters);
+  if (statusCode >= 400) {
+    await expectLater(response, throwsA(isA<DioException>()));
+  } else {
+    await response;
+  }
   return lines.join('\n');
 }
 
@@ -190,9 +193,11 @@ void main() {
     test('redacts the Cookie and Proxy-Authorization headers by default', () async {
       final log = await _linesOf(
         (logPrint) => LoggingInterceptor(requestHeader: true, logPrint: logPrint),
-        headers: {'Cookie': 'cookie-value', 'Proxy-Authorization': 'proxy-value'},
+        headers: const {'Cookie': 'cookie-value', 'Proxy-Authorization': 'proxy-value'},
       );
 
+      expect(log, contains('Cookie: <redacted>'));
+      expect(log, contains('Proxy-Authorization: <redacted>'));
       expect(log, isNot(contains('cookie-value')));
       expect(log, isNot(contains('proxy-value')));
     });
