@@ -38,15 +38,23 @@ constexpr double kMaxOutputSize = 4096;
 
 // A generation failure that couldn't produce a frame/encode, or a failure
 // writing the encoded thumbnail to disk.
+//
+// It owns its message rather than leaving it to the base class: the Flutter
+// runner compiles every target with `_HAS_EXCEPTIONS=0`, and MSVC's
+// `std::exception` then only keeps the `const char*` it was handed, so
+// `what()` would dangle as soon as the string passed to `std::runtime_error`
+// went out of scope. Report `message()`, never `what()`.
 class ThumbnailException : public std::runtime_error {
  public:
-  ThumbnailException(std::string code, const std::string &message)
-      : std::runtime_error(message), code_(std::move(code)) {}
+  ThumbnailException(std::string code, std::string message)
+      : std::runtime_error(message), code_(std::move(code)), message_(std::move(message)) {}
 
   const std::string &code() const { return code_; }
+  const std::string &message() const { return message_; }
 
  private:
   std::string code_;
+  std::string message_;
 };
 
 std::wstring Utf8ToWide(const std::string &utf8) {
@@ -153,6 +161,20 @@ DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
     throw ThumbnailException("THUMBNAIL_ERROR", "Failed to open the video.");
   }
 
+  // Size the source before configuring the decoder: the video processor cannot
+  // be set up for an outsized video at all, so leaving this until afterwards
+  // would report that generic failure instead of the size that caused it.
+  UINT32 width = 0, height = 0;
+  ComPtr<IMFMediaType> native_type;
+  hr = reader->GetNativeMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_VIDEO_STREAM), 0, &native_type);
+  if (SUCCEEDED(hr)) hr = MFGetAttributeSize(native_type.Get(), MF_MT_FRAME_SIZE, &width, &height);
+  if (FAILED(hr) || width == 0 || height == 0) {
+    throw ThumbnailException("THUMBNAIL_ERROR", "Failed to read the video's frame size.");
+  }
+  if (width > kMaxSourceSize || height > kMaxSourceSize) {
+    throw ThumbnailException("THUMBNAIL_ERROR", "The video is larger than 8192 pixels on a side.");
+  }
+
   // Ask the source reader to hand back progressive RGB32 frames; its
   // internal video processor performs any necessary YUV -> RGB conversion.
   hr = MFCreateMediaType(&type);
@@ -168,14 +190,11 @@ DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
     throw ThumbnailException("THUMBNAIL_ERROR", "Failed to configure the video decoder.");
   }
 
-  UINT32 width = 0, height = 0;
+  // The processor may letterbox or pad, so take the size it settled on.
   hr = reader->GetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_VIDEO_STREAM), &current_type);
   if (SUCCEEDED(hr)) hr = MFGetAttributeSize(current_type.Get(), MF_MT_FRAME_SIZE, &width, &height);
   if (FAILED(hr) || width == 0 || height == 0) {
     throw ThumbnailException("THUMBNAIL_ERROR", "Failed to read the video's frame size.");
-  }
-  if (width > kMaxSourceSize || height > kMaxSourceSize) {
-    throw ThumbnailException("THUMBNAIL_ERROR", "The video is larger than 8192 pixels on a side.");
   }
 
   // Seek, if possible; `time_ms` is already platform-normalized (never
@@ -453,7 +472,7 @@ void StreamThumbnailPlugin::ThumbnailData(const ThumbnailRequest &request,
     try {
       result(ErrorOr<std::vector<uint8_t>>(GenerateThumbnailData(request)));
     } catch (const ThumbnailException &e) {
-      result(ErrorOr<std::vector<uint8_t>>(FlutterError(e.code(), e.what())));
+      result(ErrorOr<std::vector<uint8_t>>(FlutterError(e.code(), e.message())));
     } catch (const std::exception &e) {
       // Anything unexpected (std::bad_alloc, ...) must still come back as a
       // Flutter-side error: an exception escaping the worker would terminate
@@ -469,7 +488,7 @@ void StreamThumbnailPlugin::ThumbnailFile(const ThumbnailRequest &request,
     try {
       result(ErrorOr<std::string>(WriteThumbnailFile(request)));
     } catch (const ThumbnailException &e) {
-      result(ErrorOr<std::string>(FlutterError(e.code(), e.what())));
+      result(ErrorOr<std::string>(FlutterError(e.code(), e.message())));
     } catch (const std::exception &e) {
       result(ErrorOr<std::string>(FlutterError("THUMBNAIL_ERROR", e.what())));
     }

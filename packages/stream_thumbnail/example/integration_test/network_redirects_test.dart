@@ -47,6 +47,13 @@ Future<(HttpServer, List<_Received>)> _videoServer(Uint8List video, {String Func
 
 const _headers = {'Authorization': 'authorization-value', 'X-Client': 'client-value'};
 
+/// Windows reads remote videos through `IMFSourceReader`, which has no way to
+/// attach custom headers to the URL it is given, so [StreamThumbnailSource.network]
+/// sends none there (see `windows/stream_thumbnail_plugin.cpp`). Dropping the
+/// credentials across hosts still has to hold; forwarding the rest cannot be
+/// asserted.
+final _appliesHeaders = !Platform.isWindows;
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -67,7 +74,7 @@ void main() {
 
     expect(bytes, isNotEmpty);
     expect(receivedByOther, isNotEmpty);
-    expect(receivedByOther, everyElement((authorization: null, client: 'client-value')));
+    expect(receivedByOther, everyElement((authorization: null, client: _appliesHeaders ? 'client-value' : null)));
   });
 
   testWidgets('a redirect within the same host keeps every header', (tester) async {
@@ -82,5 +89,5 @@ void main() {
     expect(bytes, isNotEmpty);
     expect(received, isNotEmpty);
     expect(received, everyElement((authorization: 'authorization-value', client: 'client-value')));
-  });
+  }, skip: !_appliesHeaders);
 }

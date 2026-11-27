@@ -173,7 +173,10 @@ void main() {
     // `#` and `?` are legal in a file name but delimit a fragment/query in a URL, so
     // Apple's URL-first parsing truncates the path unless it falls back. Unlike the
     // space above, this exercises that fallback on every OS version.
-    for (final name in ['stream thumbnail #1.mp4', 'stream thumbnail ?2.mp4']) {
+    //
+    // Windows reserves `?` in file names, so there is no such file to name there.
+    final names = ['stream thumbnail #1.mp4', if (!Platform.isWindows) 'stream thumbnail ?2.mp4'];
+    for (final name in names) {
       final awkward = File('${Directory.systemTemp.path}/$name');
       await awkward.writeAsBytes(await File(video).readAsBytes(), flush: true);
       addTearDown(awkward.deleteSync);
