@@ -38,7 +38,10 @@ final class StreamThumbnailSource {
   /// [PlatformException].
   ///
   /// [headers] are sent with the request, except on Windows, which cannot
-  /// attach them.
+  /// attach them. A redirect to another scheme, host or port, including from
+  /// `http` to `https`, is followed without the `Authorization`, `Cookie` and
+  /// `Proxy-Authorization` headers, except on web, where the browser follows
+  /// redirects itself.
   ///
   /// Throws an [ArgumentError] if [headers] has a name that isn't a valid HTTP
   /// header name, or a value containing a line break.

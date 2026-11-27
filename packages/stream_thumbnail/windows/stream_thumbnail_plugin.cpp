@@ -33,17 +33,28 @@ namespace stream_thumbnail {
 
 namespace {
 
+constexpr UINT32 kMaxSourceSize = 8192;
+constexpr double kMaxOutputSize = 4096;
+
 // A generation failure that couldn't produce a frame/encode, or a failure
 // writing the encoded thumbnail to disk.
+//
+// It owns its message rather than leaving it to the base class: the Flutter
+// runner compiles every target with `_HAS_EXCEPTIONS=0`, and MSVC's
+// `std::exception` then only keeps the `const char*` it was handed, so
+// `what()` would dangle as soon as the string passed to `std::runtime_error`
+// went out of scope. Report `message()`, never `what()`.
 class ThumbnailException : public std::runtime_error {
  public:
-  ThumbnailException(std::string code, const std::string &message)
-      : std::runtime_error(message), code_(std::move(code)) {}
+  ThumbnailException(std::string code, std::string message)
+      : std::runtime_error(message), code_(std::move(code)), message_(std::move(message)) {}
 
   const std::string &code() const { return code_; }
+  const std::string &message() const { return message_; }
 
  private:
   std::string code_;
+  std::string message_;
 };
 
 std::wstring Utf8ToWide(const std::string &utf8) {
@@ -150,6 +161,20 @@ DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
     throw ThumbnailException("THUMBNAIL_ERROR", "Failed to open the video.");
   }
 
+  // Size the source before configuring the decoder: the video processor cannot
+  // be set up for an outsized video at all, so leaving this until afterwards
+  // would report that generic failure instead of the size that caused it.
+  UINT32 width = 0, height = 0;
+  ComPtr<IMFMediaType> native_type;
+  hr = reader->GetNativeMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_VIDEO_STREAM), 0, &native_type);
+  if (SUCCEEDED(hr)) hr = MFGetAttributeSize(native_type.Get(), MF_MT_FRAME_SIZE, &width, &height);
+  if (FAILED(hr) || width == 0 || height == 0) {
+    throw ThumbnailException("THUMBNAIL_ERROR", "Failed to read the video's frame size.");
+  }
+  if (width > kMaxSourceSize || height > kMaxSourceSize) {
+    throw ThumbnailException("THUMBNAIL_ERROR", "The video is larger than 8192 pixels on a side.");
+  }
+
   // Ask the source reader to hand back progressive RGB32 frames; its
   // internal video processor performs any necessary YUV -> RGB conversion.
   hr = MFCreateMediaType(&type);
@@ -165,7 +190,7 @@ DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
     throw ThumbnailException("THUMBNAIL_ERROR", "Failed to configure the video decoder.");
   }
 
-  UINT32 width = 0, height = 0;
+  // The processor may letterbox or pad, so take the size it settled on.
   hr = reader->GetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_VIDEO_STREAM), &current_type);
   if (SUCCEEDED(hr)) hr = MFGetAttributeSize(current_type.Get(), MF_MT_FRAME_SIZE, &width, &height);
   if (FAILED(hr) || width == 0 || height == 0) {
@@ -214,24 +239,29 @@ DecodedFrame DecodeFrame(const std::string &input, int64_t time_ms) {
 }
 
 // Computes the output size for `frame`, honoring `max_width`/`max_height`
-// (<= 0 keeps the source resolution), preserving aspect ratio.
+// (<= 0 keeps the source resolution), preserving aspect ratio, and at most
+// kMaxOutputSize on the longest side.
 void ScaledSize(const DecodedFrame &frame, int64_t max_width, int64_t max_height, UINT *out_width,
                  UINT *out_height) {
-  if (max_width <= 0 && max_height <= 0) {
-    *out_width = frame.width;
-    *out_height = frame.height;
-    return;
-  }
   const double aspect = static_cast<double>(frame.width) / static_cast<double>(frame.height);
-  double width = max_width > 0 ? static_cast<double>(max_width) : max_height * aspect;
-  double height = max_height > 0 ? static_cast<double>(max_height) : max_width / aspect;
-  if (max_width > 0 && max_height > 0 && width / aspect > height) {
-    width = height * aspect;
-  } else if (max_width > 0 && max_height > 0) {
-    height = width / aspect;
+  double width = frame.width;
+  double height = frame.height;
+  if (max_width > 0 || max_height > 0) {
+    width = max_width > 0 ? static_cast<double>(max_width) : max_height * aspect;
+    height = max_height > 0 ? static_cast<double>(max_height) : max_width / aspect;
+    if (max_width > 0 && max_height > 0 && width / aspect > height) {
+      width = height * aspect;
+    } else if (max_width > 0 && max_height > 0) {
+      height = width / aspect;
+    }
   }
-  *out_width = static_cast<UINT>(width);
-  *out_height = static_cast<UINT>(height);
+  const double longest = width > height ? width : height;
+  if (longest > kMaxOutputSize) {
+    width = width * kMaxOutputSize / longest;
+    height = height * kMaxOutputSize / longest;
+  }
+  *out_width = width < 1 ? 1 : static_cast<UINT>(width);
+  *out_height = height < 1 ? 1 : static_cast<UINT>(height);
 }
 
 // Encodes `frame` as jpeg/png into `stream` via WIC. `quality` (0-100) only
@@ -442,7 +472,7 @@ void StreamThumbnailPlugin::ThumbnailData(const ThumbnailRequest &request,
     try {
       result(ErrorOr<std::vector<uint8_t>>(GenerateThumbnailData(request)));
     } catch (const ThumbnailException &e) {
-      result(ErrorOr<std::vector<uint8_t>>(FlutterError(e.code(), e.what())));
+      result(ErrorOr<std::vector<uint8_t>>(FlutterError(e.code(), e.message())));
     } catch (const std::exception &e) {
       // Anything unexpected (std::bad_alloc, ...) must still come back as a
       // Flutter-side error: an exception escaping the worker would terminate
@@ -458,7 +488,7 @@ void StreamThumbnailPlugin::ThumbnailFile(const ThumbnailRequest &request,
     try {
       result(ErrorOr<std::string>(WriteThumbnailFile(request)));
     } catch (const ThumbnailException &e) {
-      result(ErrorOr<std::string>(FlutterError(e.code(), e.what())));
+      result(ErrorOr<std::string>(FlutterError(e.code(), e.message())));
     } catch (const std::exception &e) {
       result(ErrorOr<std::string>(FlutterError("THUMBNAIL_ERROR", e.what())));
     }

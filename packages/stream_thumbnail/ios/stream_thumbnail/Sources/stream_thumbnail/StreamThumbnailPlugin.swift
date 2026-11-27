@@ -9,7 +9,11 @@ private enum ThumbnailError: Error {
   case generationFailed
   case writeFailed(NSError)
   case unsupportedSource(String)
+  case videoTooLarge
 }
+
+private let maxSourceSize: CGFloat = 8192
+private let maxOutputSize: CGFloat = 4096
 
 public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHostApi {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -51,6 +55,9 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
         code: "THUMBNAIL_ERROR", message: "Failed to generate a thumbnail for the video.", details: nil)
     case ThumbnailError.unsupportedSource(let message):
       return PigeonError(code: "UNSUPPORTED_SOURCE", message: message, details: nil)
+    case ThumbnailError.videoTooLarge:
+      return PigeonError(
+        code: "THUMBNAIL_ERROR", message: "The video is larger than 8192 pixels on a side.", details: nil)
     case ThumbnailError.writeFailed(let nsError):
       return PigeonError(code: "Error \(nsError.code)", message: nsError.domain, details: nsError.localizedDescription)
     default:
@@ -131,9 +138,15 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
     }
 
     let asset = AVURLAsset(url: url, options: options)
+    if let size = asset.tracks(withMediaType: .video).first?.naturalSize,
+      max(abs(size.width), abs(size.height)) > maxSourceSize
+    {
+      throw ThumbnailError.videoTooLarge
+    }
+
     let generator = AVAssetImageGenerator(asset: asset)
     generator.appliesPreferredTrackTransform = true
-    generator.maximumSize = CGSize(width: CGFloat(request.maxWidth), height: CGFloat(request.maxHeight))
+    generator.maximumSize = CGSize(width: outputBound(request.maxWidth), height: outputBound(request.maxHeight))
     generator.requestedTimeToleranceBefore = .zero
     generator.requestedTimeToleranceAfter = CMTime(value: 100, timescale: 1000)
 
@@ -159,6 +172,10 @@ public class StreamThumbnailPlugin: NSObject, FlutterPlugin, StreamThumbnailHost
     case .webp:
       return try encodeWebP(cgImage: cgImage, quality: Int(request.quality))
     }
+  }
+
+  private static func outputBound(_ requested: Int64) -> CGFloat {
+    requested > 0 ? min(CGFloat(requested), maxOutputSize) : maxOutputSize
   }
 
   private static func encodeWebP(cgImage: CGImage, quality: Int) throws -> Data {

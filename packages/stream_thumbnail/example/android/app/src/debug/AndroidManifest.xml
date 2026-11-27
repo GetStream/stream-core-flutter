@@ -4,4 +4,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- The integration tests serve videos from local http servers. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>

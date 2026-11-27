@@ -27,3 +27,10 @@ flutter:
     #     -c:v libx264 -profile:v baseline -level 3.0 -pix_fmt yuv420p \
     #     -crf 30 -movflags +faststart assets/sample_video.mp4
     - assets/sample_video.mp4
+    # One-frame clips wider than the output cap and the source limit:
+    #   ffmpeg -f lavfi -i color=c=red:s=6000x1000:d=1 -frames:v 1 -c:v libx264 \
+    #     -pix_fmt yuv420p assets/wide_6000x1000.mp4
+    #   ffmpeg -f lavfi -i color=c=blue:s=9000x500:d=1 -frames:v 1 -c:v libx264 \
+    #     -pix_fmt yuv420p assets/wide_9000x500.mp4
+    - assets/wide_6000x1000.mp4
+    - assets/wide_9000x500.mp4
