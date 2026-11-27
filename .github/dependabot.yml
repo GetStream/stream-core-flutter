@@ -4,7 +4,10 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/"
+    # "/" covers only .github/workflows; the composite actions need their own entry.
+    directories:
+      - "/"
+      - "/.github/actions/*"
     schedule:
       interval: "weekly"
     # A release must be a week old before it is proposed, so a compromised one has time to be caught.
