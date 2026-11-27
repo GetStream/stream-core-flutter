@@ -2,7 +2,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'privacy_settings_request.g.dart';
 
-/// The privacy settings to apply to the user on connect.
+/// The chat privacy settings to apply to the user on connect.
+///
+/// A setting left `null` keeps the value the user already has.
 @JsonSerializable(createFactory: false, includeIfNull: false)
 final class PrivacySettingsRequest {
   const PrivacySettingsRequest({
@@ -11,11 +13,16 @@ final class PrivacySettingsRequest {
     this.deliveryReceipts,
   });
 
+  /// The typing indicator setting, or `null` to keep the current one.
   final TypingIndicatorsRequest? typingIndicators;
+
+  /// The read receipt setting, or `null` to keep the current one.
   final ReadReceiptsRequest? readReceipts;
+
+  /// The delivery receipt setting, or `null` to keep the current one.
   final DeliveryReceiptsRequest? deliveryReceipts;
 
-  Map<String, dynamic> toJson() => _$PrivacySettingsRequestToJson(this);
+  Map<String, Object?> toJson() => _$PrivacySettingsRequestToJson(this);
 }
 
 /// The settings for typing indicator events.
@@ -26,7 +33,7 @@ final class TypingIndicatorsRequest {
   /// Whether the user sends typing indicator events.
   final bool enabled;
 
-  Map<String, dynamic> toJson() => _$TypingIndicatorsRequestToJson(this);
+  Map<String, Object?> toJson() => _$TypingIndicatorsRequestToJson(this);
 }
 
 /// The settings for read receipt events.
@@ -37,7 +44,7 @@ final class ReadReceiptsRequest {
   /// Whether the user sends read receipt events.
   final bool enabled;
 
-  Map<String, dynamic> toJson() => _$ReadReceiptsRequestToJson(this);
+  Map<String, Object?> toJson() => _$ReadReceiptsRequestToJson(this);
 }
 
 /// The settings for delivery receipt events.
@@ -48,5 +55,5 @@ final class DeliveryReceiptsRequest {
   /// Whether the user sends delivery receipt events.
   final bool enabled;
 
-  Map<String, dynamic> toJson() => _$DeliveryReceiptsRequestToJson(this);
+  Map<String, Object?> toJson() => _$DeliveryReceiptsRequestToJson(this);
 }

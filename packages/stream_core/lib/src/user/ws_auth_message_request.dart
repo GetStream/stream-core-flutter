@@ -15,17 +15,15 @@ class WsAuthMessageRequest extends WsRequest {
   final String token;
   final ConnectUserDetailsRequest? userDetails;
 
-  /// The channel member custom data keys to add to the member of each message this connection receives.
+  /// The channel member custom data keys to include with each chat message this connection receives, at most 8.
   final List<String>? memberCustomInclude;
 
-  /// The realtime event protocol version this connection asks for.
-  final int? eventProtocol;
+  /// The realtime event protocol this connection asks for, or `null` for the server's default.
+  final EventProtocol? eventProtocol;
 
   @override
   List<Object?> get props => [products, token, userDetails, memberCustomInclude, eventProtocol];
 
-  // Hand-written: a generated toJson would also send the getters Equatable adds (`props`, `hashCode`,
-  // `stringify`), and `props` repeats the token.
   @override
   Map<String, dynamic> toJson() {
     return {
@@ -42,4 +40,15 @@ class WsAuthMessageRequest extends WsRequest {
     return '${objectRuntimeType(this, 'WsAuthMessageRequest')}(products: $products, userId: ${userDetails?.id}, '
         'memberCustomInclude: $memberCustomInclude, eventProtocol: $eventProtocol)';
   }
+}
+
+/// The realtime event protocol version a connection asks for.
+///
+/// A version the server does not support yet falls back to the newest one it does.
+extension type const EventProtocol(int _) implements int {
+  /// The legacy event format.
+  static const legacy = EventProtocol(0);
+
+  /// The V3 event format, which leaves the members out of some chat events in large channels.
+  static const v3 = EventProtocol(3);
 }

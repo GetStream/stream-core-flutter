@@ -3,12 +3,12 @@
 ### ✨ Features
 
 - Added `ConnectUserDetailsRequest.privacySettings` and `PrivacySettingsRequest`, which set the user's typing indicator, read receipt and delivery receipt settings on connect
-- Added `WsAuthMessageRequest.memberCustomInclude` and `WsAuthMessageRequest.eventProtocol`
+- Added `WsAuthMessageRequest.memberCustomInclude`, which adds channel member custom data to received chat messages, and `WsAuthMessageRequest.eventProtocol`, which picks the realtime event protocol version from `EventProtocol`
 
 ### 🐞 Fixed
 
 - Fixed `flutter build --analyze-size` crashing in the AOT compiler (`Request to create artificial node for object with cid 58`) in apps that use two or more `SortField`s.
-- Fixed `WsAuthMessageRequest` sending its token twice, along with `props`, `hash_code` and `stringify`, and sending `null` for fields that were not set
+- Fixed `WsAuthMessageRequest` sending its token twice, unrelated extra keys, and `null` for unset fields; it now sends only the fields that were set
 - Fixed `WsAuthMessageRequest.toString` showing the token in debug builds
 
 ## 0.5.2

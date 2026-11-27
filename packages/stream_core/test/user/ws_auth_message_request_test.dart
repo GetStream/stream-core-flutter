@@ -18,6 +18,20 @@ void main() {
     });
   });
 
+  test('sends the member custom data keys and event protocol when set', () {
+    const request = WsAuthMessageRequest(
+      token: 'secret-token',
+      memberCustomInclude: ['nickname'],
+      eventProtocol: EventProtocol.v3,
+    );
+
+    expect(request.toJson(), {
+      'token': 'secret-token',
+      'member_custom_include': ['nickname'],
+      'event_protocol': 3,
+    });
+  });
+
   test('keeps the token out of its string form', () {
     const request = WsAuthMessageRequest(
       products: ['feeds'],
