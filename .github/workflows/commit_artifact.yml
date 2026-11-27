@@ -1,0 +1,102 @@
+name: commit_artifact
+
+# Commits files that an earlier job of the calling run uploaded as an artifact,
+# through bot-commit and the CI bot's app token. Lets the heavy work run on a
+# free runner: only this job calls the GitHub API, which the org IP allow list
+# permits from the static-IP runners alone.
+#
+# The artifact must keep each file's path from the repository root. An
+# upload-artifact `path` that starts with a wildcard, such as
+# `**/test/**/goldens/**/*.png`, does.
+#
+#   commit:
+#     needs: render
+#     uses: GetStream/stream-core-flutter/.github/workflows/commit_artifact.yml@<sha>
+#     with:
+#       artifact: goldens
+#       files: "**/test/**/goldens/**/*.png"
+#       message: "chore: update goldens"
+#       client-id: ${{ vars.FLUTTER_CI_BOT_CLIENT_ID }}
+#     secrets:
+#       private-key: ${{ secrets.FLUTTER_CI_BOT_PRIVATE_KEY }}
+
+on:
+  workflow_call:
+    inputs:
+      artifact:
+        description: The artifact of the calling run that holds the files.
+        type: string
+        required: true
+      files:
+        description: The files that may be committed, as bot-commit's `files`.
+        type: string
+        required: true
+      message:
+        description: The commit message; lines after the first become its body.
+        type: string
+        required: true
+      client-id:
+        description: The client ID of the GitHub App that commits.
+        type: string
+        required: true
+      branch:
+        description: The branch to commit to. Defaults to the pull request's head branch, or the run's branch.
+        type: string
+        required: false
+        default: ""
+      expected-head-sha:
+        description: The commit the files were made on; nothing is committed if the branch moved past it.
+        type: string
+        required: false
+        default: ""
+    secrets:
+      private-key:
+        description: The private key of the GitHub App that commits.
+        required: true
+    outputs:
+      changed:
+        description: "`true` when there was something to commit."
+        value: ${{ jobs.commit.outputs.changed }}
+      commit:
+        description: The new commit; empty when there was nothing to commit or the branch moved.
+        value: ${{ jobs.commit.outputs.commit }}
+      moved:
+        description: "`true` when the branch moved past `expected-head-sha`, so nothing was committed."
+        value: ${{ jobs.commit.outputs.moved }}
+
+permissions:
+  contents: read
+
+jobs:
+  commit:
+    runs-on:
+      group: github-public-amd64
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+      commit: ${{ steps.commit.outputs.commit }}
+      moved: ${{ steps.commit.outputs.moved }}
+    steps:
+      - name: 🔑 Mint CI Bot Token
+        id: ci-bot-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ inputs.client-id }}
+          private-key: ${{ secrets.private-key }}
+
+      - name: 📥 Download Files
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ inputs.artifact }}
+
+      # By repository path: `./` would resolve against the calling repository.
+      - name: 📤 Commit
+        id: commit
+        uses: GetStream/stream-core-flutter/.github/actions/bot-commit@e823bcc597a13dc9b243f53f84eaa06f08f66f97
+        with:
+          files: ${{ inputs.files }}
+          message: ${{ inputs.message }}
+          token: ${{ steps.ci-bot-token.outputs.token }}
+          branch: ${{ inputs.branch || github.head_ref || github.ref_name }}
+          expected-head-sha: ${{ inputs.expected-head-sha || github.event.pull_request.head.sha || github.sha }}
+          detect-changes: "false"
