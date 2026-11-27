@@ -35,6 +35,7 @@ jobs:
     name: Slack Report
     runs-on:
       group: github-public-amd64
+    timeout-minutes: 5
     needs: [analyze_beta_versions]
     if: failure() && github.event_name == 'schedule'
     steps:
