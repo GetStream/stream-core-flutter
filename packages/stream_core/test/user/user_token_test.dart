@@ -6,6 +6,22 @@ import 'package:test/test.dart';
 import '../helpers/user_token.dart';
 
 void main() {
+  test('a token without a user id is refused without quoting the token', () {
+    final rawValue = generateTestJwt('');
+
+    expect(
+      () => UserToken(rawValue),
+      throwsA(isA<ArgumentError>().having((it) => '$it', 'description', isNot(contains(rawValue)))),
+    );
+  });
+
+  test('describes itself without its raw value', () {
+    final token = generateTestUserToken('user-id');
+
+    expect('$token', contains('user-id'));
+    expect('$token', isNot(contains(token.rawValue)));
+  });
+
   group('UserToken.expiresAt', () {
     test('is read from the exp claim', () {
       // 'exp' has no room for milliseconds, so a finer-grained moment comes back truncated.
