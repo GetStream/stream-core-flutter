@@ -15,4 +15,5 @@ Map<String, dynamic> _$ConnectUserDetailsRequestToJson(
   'language': ?instance.language,
   'name': ?instance.name,
   'custom': ?instance.custom,
+  'privacy_settings': ?instance.privacySettings?.toJson(),
 };

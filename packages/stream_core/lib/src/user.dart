@@ -1,4 +1,5 @@
 export 'user/connect_user_details_request.dart';
+export 'user/privacy_settings_request.dart';
 export 'user/token_manager.dart';
 export 'user/token_provider.dart';
 export 'user/user.dart';

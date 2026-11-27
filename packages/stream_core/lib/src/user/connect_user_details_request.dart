@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../utils/standard.dart';
+import 'privacy_settings_request.dart';
 import 'user.dart';
 
 part 'connect_user_details_request.g.dart';
@@ -14,6 +15,7 @@ class ConnectUserDetailsRequest {
     this.language,
     this.name,
     this.custom,
+    this.privacySettings,
   });
 
   /// Creates the details to send when connecting as [user].
@@ -43,6 +45,9 @@ class ConnectUserDetailsRequest {
   final String? language;
   final String? name;
   final Map<String, Object?>? custom;
+
+  /// The privacy settings to apply to the user.
+  final PrivacySettingsRequest? privacySettings;
 
   Map<String, dynamic> toJson() => _$ConnectUserDetailsRequestToJson(this);
 }

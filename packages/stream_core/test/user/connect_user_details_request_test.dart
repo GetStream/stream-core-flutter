@@ -56,4 +56,21 @@ void main() {
       expect(details.name, isNull);
     });
   });
+
+  test('sends only the privacy settings that were set', () {
+    const details = ConnectUserDetailsRequest(
+      id: 'user-1',
+      privacySettings: PrivacySettingsRequest(
+        typingIndicators: TypingIndicatorsRequest(enabled: false),
+        readReceipts: ReadReceiptsRequest(enabled: true),
+      ),
+    );
+
+    final json = details.toJson();
+
+    expect(json['privacy_settings'], {
+      'typing_indicators': {'enabled': false},
+      'read_receipts': {'enabled': true},
+    });
+  });
 }
